@@ -62,6 +62,7 @@ import useTouchMove from './touchmove'
 import { getImage } from '../request';
 
 export default {
+  name: 'bili-player',
   setup() {
     const onfullscreen = (e: any) => {
       const iframe = e.target
@@ -109,19 +110,19 @@ export default {
     }
     const videoContainerRef = ref(null)
     const videoInfoRef = ref(null)
-    watch(() => video.value && video.value.comments, () => {
-      nextTick(() => {
-        const videoInfoContainer = videoInfoRef.value as unknown as HTMLElement
-        const emojis = [...videoInfoContainer.querySelectorAll('img[data-emoji]')] as HTMLImageElement[]
-        emojis.forEach(img => {
-          getImage((img.dataset as any).emoji, true).then(blobUrl => {
-            img.src = blobUrl
-          })
-        })
-      })
-    })
+    // watch(() => video.value && video.value.comments, () => {
+    //   nextTick(() => {
+    //     const videoInfoContainer = videoInfoRef.value as unknown as HTMLElement
+    //     const emojis = [...videoInfoContainer.querySelectorAll('img[data-emoji]')] as HTMLImageElement[]
+    //     emojis.forEach(img => {
+    //       getImage((img.dataset as any).emoji, true).then(blobUrl => {
+    //         img.src = blobUrl
+    //       })
+    //     })
+    //   })
+    // })
 
-    useTouchMove(videoContainerRef, videoInfoRef)
+    // useTouchMove(videoContainerRef, videoInfoRef)
     return {
       videoContainerRef, videoInfoRef,
       iframeSrc, onfullscreen, iframeStyle, video, avatar, onShare

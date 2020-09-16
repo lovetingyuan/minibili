@@ -30,6 +30,7 @@ export const showUp = (up: User) => {
 };
 
 export default {
+  name: 'up-list',
   components: {
     'up-item': UpItem
   },

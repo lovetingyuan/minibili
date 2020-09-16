@@ -1,4 +1,4 @@
 module.exports = {
-  // esbuildTarget: 'es2018'
+  esbuildTarget: 'es6',
   minify: false
 }

@@ -27,10 +27,8 @@
     </span>
     <img src="~../assets/logout.png" @click="logout" class="logout" width="16" />
   </p>
-  <template v-if="userInfo">
-    <up-list></up-list>
-  </template>
-  <div v-else class="loginBtn" @click="login">{{loading ? '加载中' : '登录'}}</div>
+  <up-list v-if="userInfo"></up-list>
+  <div v-else class="loginBtn" @click="login">{{loading ? '加载中...' : '登录'}}</div>
 </template>
 
 <script lang="ts">
@@ -61,6 +59,7 @@ const channels: Cate[] = [{
 }]
 
 export default {
+  name: 'main-view',
   components: {
     'up-list': UpList
   },
@@ -80,7 +79,6 @@ export default {
       store.currentUp = null
       store.currentVideo = null
       store.currentCate = cate
-      // store.showVideoList = true
       if (!store.ranks[cate.id]) {
         Plugins.Toast.show({ text: '正在加载视频列表...' })
       }

@@ -16,7 +16,7 @@
     "es6-promise-plugin": "^4.2.2",
     "lru-cache": "^6.0.0",
     "normalize.css": "^8.0.1",
-    "vue": "^3.0.0-rc.11"
+    "vue": "3.0.0-rc.11"
   },
   "scripts": {
     "serve": "vite serve ./",

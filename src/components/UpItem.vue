@@ -9,6 +9,7 @@
 import avatar from '../assets/akari.jpg'
 
 export default {
+  name: 'up-item',
   props: {
     face: {
       type: String, required: true

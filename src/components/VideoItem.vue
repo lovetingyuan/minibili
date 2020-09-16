@@ -1,16 +1,15 @@
 <template>
   <div class="video-item">
     <div class="video-item-img">
-      <cross-image :url="pic" @click="openIframe" :default="videoPic"></cross-image>
+      <cross-image :url="pic" @click="openPlayer" :default="videoPic"></cross-image>
     </div>
     <div class="video-text">
       <p class="title">{{index}}.
         <span style="font-weight: bold;" v-if="up">{{up}}: </span>
         <span>{{title}}</span>
-      </p>                                                                                                                          
+      </p>
       <span class="play">
-        <!-- <span class="play-icon">▶</span> -->
-        <img src="~../assets/play.png" class="play-icon" @click="openIframe" alt="播放" width="12">
+        <img src="~../assets/play.png" class="play-icon" @click="openPlayer" alt="播放" width="12">
         {{play}}
       </span>
       <span class="date"> {{days}}天前</span>
@@ -18,7 +17,7 @@
       <img src="~../assets/share.png" class="share" width="12" @click="onShare" alt="分享">
     </div>
     <span class="video-time">{{time}}</span>
-    <span class="play-shape" @click="openIframe"></span>
+    <span class="play-shape" @click="openPlayer"></span>
   </div>
 </template>
 
@@ -32,6 +31,7 @@ import { getComments } from '../request'
 import { Video } from 'src/types';
 
 export default {
+  name: 'video-item',
   props: {
     video: {
       type: Object as PropType<Video>,
@@ -49,7 +49,7 @@ export default {
     const days = Math.round((Date.now() - video.date) / (24 * 60 * 60 * 1000))
     const time = new Date(video.len + new Date().getTimezoneOffset() * 60 * 1000)
     const [hour, minute, second] = [time.getHours(), time.getMinutes(), time.getSeconds()]
-    const openIframe = () => {
+    const openPlayer = () => {
       store.currentVideo = video
       getComments(video.aid).then(comments => {
         video.comments = comments
@@ -63,12 +63,12 @@ export default {
         dialogTitle: '分享B站视频'
       });
     }
-    const showDesc = () => {
-      Plugins.Modals.alert({
-        title: video.title,
-        message: video.desc || ''
-      })
-    }
+    // const showDesc = () => {
+    //   Plugins.Modals.alert({
+    //     title: video.title,
+    //     message: video.desc || ''
+    //   })
+    // }
     return {
       video,
       pic: video.cover,
@@ -77,11 +77,11 @@ export default {
       play: video.view < 10000 ? video.view : Math.round(video.view / 10000) + '万',
       days: days,
       time: [hour, minute, second].join(':'),
-      openIframe,
+      openPlayer,
       index: props.index,
       videoPic: videoPic,
       up: store.currentUp ? '' : video.up.name,
-      onShare, showDesc
+      onShare
     }
   }
 }

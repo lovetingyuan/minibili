@@ -31,6 +31,7 @@ const observer = new IntersectionObserver((entries, observer) => {
 });
 
 export default {
+  name: 'cross-image',
   props: {
     url: {
       type: String,

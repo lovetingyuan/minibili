@@ -1,6 +1,6 @@
 {
   "appId": "me.tingyuan.minibili",
-  "appName": "minibili",
+  "appName": "MiniBili",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
   "webDir": "dist",

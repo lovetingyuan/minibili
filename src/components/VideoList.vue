@@ -22,6 +22,7 @@ import store from '../store'
 import avatar from '../assets/akari.jpg'
 
 export default {
+  name: 'video-list',
   components: { VideoItem },
   setup() {
     const videoList = computed(() => {
@@ -32,7 +33,7 @@ export default {
       }
       return []
     })
-    const defaultTitle = 'bilibili(゜-゜)つロ千杯~'
+    const defaultTitle = 'Minibili(゜-゜)つロ千杯~'
     const title = computed(() => {
       if (store.currentUp) {
         return store.currentUp.name + '投稿的视频'

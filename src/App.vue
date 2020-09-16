@@ -1,7 +1,7 @@
 <template>
   <main>
     <keep-alive>
-      <component v-bind:is="currentComponent"></component>
+      <component :is="currentComponent"></component>
     </keep-alive>
   </main>
 </template>
@@ -11,7 +11,7 @@ import VideoList from './components/VideoList.vue'
 import BiliPlayer from './components/BiliPlayer.vue'
 import MainView from './components/MainView.vue'
 import store from './store'
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, ref, watch, watchEffect } from 'vue'
 
 export default {
   name: 'App',
@@ -26,22 +26,17 @@ export default {
     }
     const currentComponent = ref<keyof typeof scrollTop>('main-view')
     watch(() => {
-      return [
-        store.currentVideo, store.currentUp, store.currentCate
-      ]
-    }, () => {
+      return [ store.currentVideo, store.currentUp, store.currentCate ]
+    }, ([ currentVideo, currentUp, currentCate ], old) => {
       scrollTop[currentComponent.value] = window.scrollY
-      if (store.currentVideo) {
+      if (currentVideo) {
         currentComponent.value = 'bili-player'
-      } else if (store.currentUp || store.currentCate) {
+      } else if (currentUp || currentCate) {
         currentComponent.value = 'video-list'
       } else {
         currentComponent.value = 'main-view'
       }
-      nextTick(() => {
-        window.scrollTo(0, scrollTop[currentComponent.value])
-      })
-    }, { immediate: true })
+    })
     return { currentComponent }
   }
 }
