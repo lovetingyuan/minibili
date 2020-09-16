@@ -1,2 +1,2 @@
 # minibili
-The minimalist bilibili version
+The minimalist bilibili app

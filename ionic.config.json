@@ -1,0 +1,7 @@
+{
+  "name": "me.tingyuan.minibili",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
