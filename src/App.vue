@@ -36,6 +36,9 @@ export default {
       } else {
         currentComponent.value = 'main-view'
       }
+      nextTick(() => {
+        window.scrollTo(0, scrollTop[currentComponent.value])
+      })
     })
     return { currentComponent }
   }

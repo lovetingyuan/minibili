@@ -42,6 +42,7 @@ export async function getImage(imgUrl: string, forcecache?: boolean): Promise<st
     imgUrl = 'https:' + imgUrl
   }
   const _url = new URL(imgUrl)
+  console.log('image request ', imgUrl)
   return HTTP.sendRequest(imgUrl, {
     method: 'get',
     responseType: 'blob',
@@ -223,12 +224,24 @@ export async function getUserInfo(userId: string | number) {
 }
 
 const handleMsg = (msg: string, emoji: VideoCommentRes.Reply['content']['emote']) => {
+  emoji && Object.keys(emoji).forEach(k => {
+    if (!imgCache.has(k)) {
+      getImage(emoji[k].url, true).then(blob => {
+        document.querySelectorAll(`img[data-emoji="${k}"]`).forEach(img => {
+          let _img = img as HTMLImageElement
+          if (!_img.src) {
+            _img.src = blob
+          }
+        })
+      })
+    }
+  })
   return msg
     .replace(/\n/g, '<br>')
     .replace(/ /g, '&nbsp;')
     .replace(/\[(.+?)\]/g, (s) => {
-      if (emoji[s]) {
-        return `<img width="16" data-emoji="${emoji[s].url}">`
+      if (emoji && emoji[s]) {
+        return `<img width="20" data-emoji="${s}">`
       }
       return s
     })

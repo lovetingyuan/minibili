@@ -14,7 +14,6 @@
       ></iframe>
     </div>
     <div class="video-info" v-if="video" ref="videoInfoRef">
-      <!-- <div class="video-info-top" ref="videoInfoTop"></div> -->
       <div class="up-info">
         <cross-image :url="video.up.face" :default="avatar" class="user-face"></cross-image>
         <span class="user-name">{{video.up.name}}</span>
@@ -110,19 +109,8 @@ export default {
     }
     const videoContainerRef = ref(null)
     const videoInfoRef = ref(null)
-    // watch(() => video.value && video.value.comments, () => {
-    //   nextTick(() => {
-    //     const videoInfoContainer = videoInfoRef.value as unknown as HTMLElement
-    //     const emojis = [...videoInfoContainer.querySelectorAll('img[data-emoji]')] as HTMLImageElement[]
-    //     emojis.forEach(img => {
-    //       getImage((img.dataset as any).emoji, true).then(blobUrl => {
-    //         img.src = blobUrl
-    //       })
-    //     })
-    //   })
-    // })
 
-    // useTouchMove(videoContainerRef, videoInfoRef)
+    useTouchMove(videoContainerRef, videoInfoRef)
     return {
       videoContainerRef, videoInfoRef,
       iframeSrc, onfullscreen, iframeStyle, video, avatar, onShare

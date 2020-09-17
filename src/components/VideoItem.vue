@@ -41,9 +41,7 @@ export default {
       type: Number, required: true
     }
   },
-  setup (props: {
-    video: Video, index: number
-  }) {
+  setup (props) {
     // *  aid, bvid, author, coins, duration, pic, play, title
     const video = props.video
     const days = Math.round((Date.now() - video.date) / (24 * 60 * 60 * 1000))
@@ -52,7 +50,7 @@ export default {
     const openPlayer = () => {
       store.currentVideo = video
       getComments(video.aid).then(comments => {
-        video.comments = comments
+        video.comments = comments || []
       })
     }
     const onShare = () => {

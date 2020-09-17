@@ -18,7 +18,7 @@ export default {
       type: String, required: true
     }
   },
-  setup (props: { face: string, name: string }) {
+  setup (props) {
     return {
       name: props.name,
       face: props.face,

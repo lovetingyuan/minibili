@@ -218,7 +218,7 @@ export namespace VideoCommentRes {
     text: string, url: string
   }
   interface Content {
-    emote: { [k: string]: Emote } // 消息中的表情
+    emote?: { [k: string]: Emote } // 消息中的表情
     message: string
   }
   interface Member {
