@@ -1,8 +1,6 @@
 <template>
   <div class="player">
-    <div class="iframe-container"
-      ref="videoContainerRef"
-      :style="iframeStyle">
+    <div class="iframe-container" ref="videoContainerRef" :style="iframeStyle">
       <iframe
         :src="iframeSrc"
         class="player-iframe"
@@ -10,6 +8,7 @@
         importance="high"
         v-if="iframeSrc"
         allow="fullscreen"
+        ref="iframeRef"
         @webkitfullscreenchange="onfullscreen"
       ></iframe>
     </div>
@@ -27,25 +26,20 @@
           <template v-for="(comment, i) of video.comments" :key="comment.user + i">
             <div class="line"></div>
             <li class="comment-item comment-item1">
-              <p class="comment-content"
-                v-html="`<b>${i + 1}. ${comment.user}: </b>${comment.content} ${comment.like ? `<small>${comment.like}👍</small>` : ''}`">
-              </p>
+              <p class="comment-content" v-html="getComment(comment, i)"></p>
               <ul v-if="comment.comments" class="comment-list reply-list">
                 <li v-for="reply of comment.comments" :key="reply.user + reply.like" class="comment-item">
-                  <p class="comment-content"
-                    v-html="`<b>${reply.user}: </b>${reply.content} ${reply.like ? `<small>${reply.like}👍</small>` : ''}`">
-                  </p>
+                  <p class="comment-content" v-html="getComment(reply)"></p>
                 </li>
               </ul>
             </li>
           </template>
+          <p style="text-align:center;margin-top: 20px;">≡ω≡</p>
         </ol>
-        <p v-else style="text-align: center;margin: 50px 0; font-size: 30px;">. . .</p>
+        <spin-loading v-else></spin-loading>
       </div>
     </div>
-    <p v-else style="text-align: center; font-size: 30px; margin: 60px 0;">
-      . . .
-    </p>
+    <spin-loading v-else></spin-loading>
   </div>
 </template>
 
@@ -59,13 +53,18 @@ import avatar from '../assets/akari.jpg'
 const playerHref = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
 import useTouchMove from './touchmove'
 import { getImage } from '../request';
+import { Reply } from '../types';
+// import { emitter } from '../main';
 
 export default {
   name: 'bili-player',
   setup() {
+    const iframeRef = ref<HTMLIFrameElement | null>(null)
     const onfullscreen = (e: any) => {
+      console.log(99, e)
       const iframe = e.target
       const fullscreen = (iframe._fullscreen = !iframe._fullscreen)
+      store.isFullScreen = fullscreen
       if (fullscreen) {
         ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.LANDSCAPE)
         iframeStyle.value = 'height: 100vh'
@@ -75,6 +74,16 @@ export default {
         iframeStyle.value = ''
       }
     }
+    // emitter.on('backButtonClicked', () => {
+    //   if (store.isFullScreen && iframeRef.value !== null) {
+    //     iframeRef.value.dispatchEvent(new Event('webkitfullscreenchange'))
+    //     // ;(iframeRef.value as any)._fullscreen = false
+    //     // store.isFullScreen = false
+    //     // ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.PORTRAIT)
+    //     // ScreenOrientation.unlock()
+    //     // iframeStyle.value = ''
+    //   }
+    // })
     const iframeSrc = computed(() => {
       if (!store.currentVideo) {
         ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.PORTRAIT)
@@ -112,8 +121,10 @@ export default {
 
     useTouchMove(videoContainerRef, videoInfoRef)
     return {
-      videoContainerRef, videoInfoRef,
-      iframeSrc, onfullscreen, iframeStyle, video, avatar, onShare
+      videoContainerRef, videoInfoRef, getComment (data: Reply, i?: number) {
+        return `<b>${i !== undefined ? (i + 1) + '.' : ''}${data.user}: </b>${data.content} ${data.like ? `<small>${data.like}👍</small>` : ''}`
+      },
+      iframeSrc, onfullscreen, iframeStyle, video, avatar, onShare, iframeRef
     }
   }
 }
@@ -148,14 +159,13 @@ export default {
   padding: 20px 20px;
   background-color: white;
 }
-/* .video-info-top {
-  position: absolute;
-  height: 1px;
-  width: 100%;
-  top: 0;
-} */
+
 .video-title {
   font-size: 16px;
+  line-height: 1.4;
+}
+.video-title::first-letter {
+  font-size: 1.4em;
 }
 .video-desc {
   line-height: 1.4;
@@ -171,8 +181,10 @@ export default {
   background: linear-gradient(#ddd, #fff 10%);
 } */
 .reply-list {
-  padding-left: 14px;
+  padding-left: 10px;
   font-size: .9em;
+  border-left: 1px solid #aaa;
+  margin-left: 8px;
 }
 
 .comments {
@@ -204,7 +216,6 @@ hr {
   display: inline-block;
   border-radius: 50%;
   margin-right: 10px;
-  border: 1px solid #ddd;
 }
 .user-name {
   font-size: 16px;

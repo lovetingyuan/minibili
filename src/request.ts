@@ -100,7 +100,7 @@ export async function getHomePage() {
 
 export async function getAllUps(userId: number | string) { // 326081112
   // https://space.bilibili.com/326081112?from=search&seid=8086157821159781294
-  if (store.ups.length) return
+  if (store.ups) return
   const jsonpUrl = (pn: number) => `https://api.bilibili.com/x/relation/followings?vmid=${userId}&pn=${pn}&ps=50&order=desc&jsonp=jsonp&callback=__jp8`
   const geval = eval
   const getUp = (u: AllUpsRes.Response['data']['list'][0]) => ({
@@ -112,7 +112,10 @@ export async function getAllUps(userId: number | string) { // 326081112
   return request(jsonpUrl(1)).then(res => {
     const data: AllUpsRes.Response = geval(res.replace('__jp8', ''))
     const total = data.data.total
-    store.ups.push(...data.data.list.map(getUp))
+    if (!store.ups) {
+      store.ups = []
+    }
+    store.ups && store.ups.push(...data.data.list.map(getUp))
     const rest = total - 50
     if (rest > 0) {
       const pages = Math.ceil(rest / 50)
@@ -124,7 +127,7 @@ export async function getAllUps(userId: number | string) { // 326081112
     if (!Array.isArray(res)) return
     res.forEach(res => {
       const data = geval(res.replace('__jp8', ''))
-      store.ups.push(...data.data.list.map(getUp))
+      store.ups && store.ups.push(...data.data.list.map(getUp))
     })
   })
 }
@@ -236,7 +239,7 @@ const handleMsg = (msg: string, emoji: VideoCommentRes.Reply['content']['emote']
       })
     }
   })
-  return msg
+  const _msg = msg
     .replace(/\n/g, '<br>')
     .replace(/ /g, '&nbsp;')
     .replace(/\[(.+?)\]/g, (s) => {
@@ -245,6 +248,10 @@ const handleMsg = (msg: string, emoji: VideoCommentRes.Reply['content']['emote']
       }
       return s
     })
+  if (_msg.includes('<br>')) {
+    return '<br>' + _msg
+  }
+  return _msg
 }
 
 export async function getComments(aid: string | number): Promise<Reply[] | undefined> {

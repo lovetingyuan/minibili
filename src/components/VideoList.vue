@@ -1,21 +1,29 @@
 <template>
-  <p class="title">
-    <img src="~../assets/back.png" alt="返回" class="back-icon" @click="onBack" width="16">
+  <p class="title" :style="`padding: ${pic ? '13px' : '16px'} 0`">
+    <img src="~../assets/back.png" alt="返回" class="back-icon" @click="onBack" width="16" />
     <span class="upface" v-if="pic">
       <cross-image :url="pic" ::default="avatar"></cross-image>
     </span>
     <span style="text">{{title}}</span>
   </p>
-  <ol v-if="videoList.length" class="video-list">
-    <li v-for="(video, i) of videoList" :key="video.bvid" class="video-item">
-      <video-item :video="video" :index="i + 1"></video-item>
-    </li>
-  </ol>
-  <p v-else style="text-align: center;margin: 80px 0;">视频列表为空(lll￢ω￢)</p>
+  <div v-if="videoList">
+    <ol v-if="videoList.length" class="video-list">
+      <li v-for="(video, i) of videoList" :key="video.bvid" class="video-item">
+        <video-item :video="video" :index="i + 1"></video-item>
+      </li>
+    </ol>
+    <div v-else style="text-align: center; margin: 80px 0;">
+      <img src="~../assets/bili.svg" alt="bili" width="100" />
+      <p>
+        <br />视频列表为空(lll￢ω￢)
+      </p>
+    </div>
+  </div>
+  <spin-loading v-else></spin-loading>
 </template>
 
 <script lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onActivated, onDeactivated } from 'vue';
 import request, { getUpVideos } from '../request'
 import VideoItem from './VideoItem.vue'
 import store from '../store'
@@ -31,7 +39,7 @@ export default {
       } else if (store.currentCate && store.ranks[store.currentCate.id]) {
         return store.ranks[store.currentCate.id]
       }
-      return []
+      return null
     })
     const defaultTitle = 'Minibili(゜-゜)つロ千杯~'
     const title = computed(() => {
@@ -53,7 +61,6 @@ export default {
     })
     return {
       videoList, title, pic, avatar, onBack() {
-        // store.showVideoList = false
         store.currentCate = null
         store.currentUp = null
       }
@@ -72,11 +79,10 @@ export default {
   text-indent: 10px;
   position: sticky;
   top: 0;
-  font-size: 14px;
+  font-size: 16px;
   background-color: white;
   z-index: 1;
   margin: 0;
-  padding: 14px 0;
   box-shadow: 0 0 12px 2px #aaaaaa;
   user-select: none;
 }
@@ -96,5 +102,4 @@ export default {
   vertical-align: middle;
   margin-right: 10px;
 }
-
 </style>

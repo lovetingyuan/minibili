@@ -1,13 +1,18 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import CrossImage from './components/CrossImage.vue'
+import Loading from './components/Loading.vue'
 import 'normalize.css'
 import './index.css'
 import store from './store'
 import { Plugins } from '@capacitor/core'
+// import mitt, { Emitter } from 'mitt'
+
+// export const emitter: Emitter = mitt()
 
 const app = createApp(App)
 app.component('cross-image', CrossImage)
+app.component('spin-loading', Loading)
 app.mount('#app')
 
 const playerHref = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
@@ -22,15 +27,23 @@ Plugins.Browser.addListener('browserPageLoaded', () => {
   })
 })
 
+let isWifi = false
 let handler = Plugins.Network.addListener('networkStatusChange', (status) => {
   if (!status.connected) {
     Plugins.Toast.show({ text: '网络连接似乎有问题' })
   } else if (status.connectionType !== 'wifi') {
+    isWifi = false
     Plugins.Toast.show({ text: '当前不是Wifi连接，注意流量消耗' })
+  } else {
+    if (!isWifi) {
+      isWifi = true
+      Plugins.Toast.show({ text: 'Wifi已连接' })
+    }
   }
 });
 
 const exitApp = () => {
+  Plugins.App.removeAllListeners()
   app.unmount('#app')
   handler.remove()
   return Plugins.App.exitApp();
@@ -50,6 +63,8 @@ Plugins.Network.getStatus().then(status => {
         return exitApp()
       }
     });
+  } else {
+    isWifi = true
   }
 })
 
@@ -57,6 +72,11 @@ let timer: number | null = null
 
 Plugins.App.addListener('backButton', () => {
   if (store.currentVideo) {
+    // if (store.isFullScreen) {
+    //   emitter.emit('backButtonClicked')
+    // } else {
+    //   store.currentVideo = null
+    // }
     store.currentVideo = null
     return
   }

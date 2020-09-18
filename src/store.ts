@@ -1,5 +1,4 @@
 import { reactive } from 'vue'
-import { Plugins } from '@capacitor/core'
 import { Store } from './types'
 
 const store = reactive<Store>({
@@ -7,9 +6,10 @@ const store = reactive<Store>({
   currentUp: null,
   currentCate: null,
   userInfo: null,
-  ups: [],
+  ups: null,
   ranks: {},
   upVideos: {},
+  isFullScreen: false
 })
 
 if (process.env.NODE_ENV === 'development') {
@@ -18,10 +18,5 @@ if (process.env.NODE_ENV === 'development') {
   window._store = store
 }
 
-Plugins.Storage.get({ key: 'userInfo' }).then(result => {
-  if (result.value) {
-    store.userInfo = JSON.parse(result.value)
-  }
-})
 
 export default store

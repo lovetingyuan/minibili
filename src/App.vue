@@ -3,6 +3,8 @@
     <keep-alive>
       <component :is="currentComponent"></component>
     </keep-alive>
+    <img src="~./assets/akari.jpg" hidden alt />
+    <img src="~./assets/video.png" hidden alt />
   </main>
 </template>
 
@@ -26,8 +28,8 @@ export default {
     }
     const currentComponent = ref<keyof typeof scrollTop>('main-view')
     watch(() => {
-      return [ store.currentVideo, store.currentUp, store.currentCate ]
-    }, ([ currentVideo, currentUp, currentCate ], old) => {
+      return [store.currentVideo, store.currentUp, store.currentCate]
+    }, ([currentVideo, currentUp, currentCate], old) => {
       scrollTop[currentComponent.value] = window.scrollY
       if (currentVideo) {
         currentComponent.value = 'bili-player'
@@ -37,7 +39,8 @@ export default {
         currentComponent.value = 'main-view'
       }
       nextTick(() => {
-        window.scrollTo(0, scrollTop[currentComponent.value])
+        const top = scrollTop[currentComponent.value]
+        window.scrollTo(0, top)
       })
     })
     return { currentComponent }
@@ -46,22 +49,22 @@ export default {
 </script>
 
 <style scoped>
-  .tabs {
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-    background-color: white;
-    display: flex;
-    box-shadow: 0 0 16px 4px #ddd;
-  }
-  .tab-item {
-    flex: 1;
-    font-size: 14px;
-    padding: 16px 0;
-    text-align: center;
-    border-right: 1px solid #ddd;
-  }
-  .tab-item:last-child {
-    border: none;
-  }
+.tabs {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  background-color: white;
+  display: flex;
+  box-shadow: 0 0 16px 4px #ddd;
+}
+.tab-item {
+  flex: 1;
+  font-size: 14px;
+  padding: 16px 0;
+  text-align: center;
+  border-right: 1px solid #ddd;
+}
+.tab-item:last-child {
+  border: none;
+}
 </style>

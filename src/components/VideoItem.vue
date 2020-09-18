@@ -61,12 +61,6 @@ export default {
         dialogTitle: '分享B站视频'
       });
     }
-    // const showDesc = () => {
-    //   Plugins.Modals.alert({
-    //     title: video.title,
-    //     message: video.desc || ''
-    //   })
-    // }
     return {
       video,
       pic: video.cover,

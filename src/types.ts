@@ -34,7 +34,7 @@ export interface Store {
   currentUp: User | null,
   currentCate: Cate | null,
   userInfo: User | null,
-  ups: User[],
+  ups: User[] | null,
   ranks: {
     [k: string]: Video[]
   },
@@ -43,6 +43,7 @@ export interface Store {
       list: Video[]
     }
   },
+  isFullScreen: boolean
 }
 
 export namespace HomePageRes {

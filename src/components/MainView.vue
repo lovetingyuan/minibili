@@ -7,6 +7,9 @@
       style="vertical-align:bottom; margin-right: 10px"
     />
     <span>频道排行</span>
+    <img src="~../assets/about.png" 
+    @click="showAbout"
+    width="20" style="vertical-align:bottom; margin-right:20px; float: right;" alt="about">
   </p>
   <div class="channels">
     <div class="channel-item" v-for="c of channels" :key="c.name" @click="showCate(c)">{{c.name}}</div>
@@ -15,20 +18,33 @@
     <i></i>
     <i></i>
     <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
   </div>
   <hr />
-  <p class="user-info" v-if="userInfo">
-    <span class="user" @click="showUser">
-      <span>
-        <cross-image :url="userInfo.face" ::default="avatar"></cross-image>
+  <div v-if="userInfo">
+    <p class="user-info">
+      <span class="user" @click="showUser">
+        <span>
+          <cross-image :url="userInfo.face" ::default="avatar"></cross-image>
+        </span>
+        <span>{{userInfo.name}}</span>
+        <span class="level">L{{userInfo.level}}</span>
       </span>
-      <span>{{userInfo.name}}</span>
-      <span class="level">L{{userInfo.level}}</span>
-    </span>
-    <img src="~../assets/logout.png" @click="logout" class="logout" width="16" />
-  </p>
-  <up-list v-if="userInfo"></up-list>
-  <div v-else class="loginBtn" @click="login">{{loading ? '加载中...' : '登录'}}</div>
+      <img src="~../assets/logout.png" @click="logout" class="logout" width="16" />
+    </p>
+    <up-list v-if="userUps"></up-list>
+    <spin-loading v-else></spin-loading>
+  </div>
+  <div v-else style="text-align: center;">
+    <br />
+    <img src="~../assets/bili.svg" alt="bili" width="80" />
+    <div class="loginBtn" @click="login">{{loading ? '加载中...' : '登 录'}}</div>
+  </div>
+  <!-- <div v-if="prerender">
+    <spin-loading></spin-loading>
+  </div>-->
 </template>
 
 <script lang="ts">
@@ -38,7 +54,7 @@ import { getAllUps, getRanks, getHomePage, getUserInfo } from '../request'
 import store from '../store'
 import avatar from '../assets/akari.jpg'
 import { Plugins } from '@capacitor/core'
-import { Cate } from 'src/types'
+import { Cate, User } from 'src/types'
 
 const channels: Cate[] = [{
   name: '首页', id: -1
@@ -58,23 +74,30 @@ const channels: Cate[] = [{
   name: '纪录', id: 177
 }]
 
+const fetchUserUps = (uid: string | number) => {
+  return getAllUps(uid).finally(() => {
+    if (!store.ups) {
+      Plugins.Toast.show({ text: `加载关注列表失败` })
+    }
+  })
+}
+Plugins.Storage.get({ key: 'userInfo' }).then(result => {
+  if (result.value) {
+    store.userInfo = JSON.parse(result.value)
+    if (store.userInfo) {
+      fetchUserUps(store.userInfo.id)
+    }
+  }
+})
 export default {
   name: 'main-view',
   components: {
     'up-list': UpList
   },
   setup() {
+    const userId = ref('')
+    const loading = ref(false)
 
-    watch(() => store.userInfo, () => {
-      if (store.userInfo && !store.ups.length) {
-        Plugins.Toast.show({ text: `正在加载关注列表` })
-        getAllUps(store.userInfo.id).finally(() => {
-          if (!store.ups.length) {
-            Plugins.Toast.show({ text: `加载关注列表失败或还没有关注的up` })
-          }
-        })
-      }
-    }, { immediate: true })
     const showCate = (cate: Cate) => {
       store.currentUp = null
       store.currentVideo = null
@@ -88,24 +111,24 @@ export default {
         }
       })
     }
-    const userId = ref('')
-    const loading = ref(false)
     const logout = async () => {
       const logoutRet = await Plugins.Modals.confirm({
         cancelButtonTitle: '取消',
         okButtonTitle: '确认',
-        message: '确认要退出？',
-        title: '退出确认'
+        message: '确认要注销？',
+        title: '注销确认'
       })
       if (logoutRet.value) {
         userId.value = ''
         store.userInfo = null
+        store.ups = null
         Plugins.Storage.remove({ key: 'userInfo' })
       }
     }
     const login = async () => {
+      if (loading.value) return
       const promptRet = await Plugins.Modals.prompt({
-        title: '你好',
+        title: '你好~^v^~',
         message: '登录space.bilibili.com，获取地址栏中的数字作为B站ID',
         okButtonTitle: '确定',
         cancelButtonTitle: '取消',
@@ -113,23 +136,29 @@ export default {
       });
       if (promptRet.cancelled) return
       const uid = promptRet.value.trim()
-      if (/^\d{5,}$/.test(uid)) {
+      if (!uid) {
+        Plugins.Browser.open({
+          url: 'https://space.bilibili.com'
+        })
+      }
+      if (/^\d{1,10}$/.test(uid)) {
         loading.value = true
         await Promise.all([
           getUserInfo(uid),
-          getAllUps(uid)
+          fetchUserUps(uid),
         ]).finally(() => {
           if (!store.userInfo) {
             Plugins.Toast.show({
-              text: '登录失败'
+              text: '登录失败，请检查您的ID是否正确'
             })
           }
           loading.value = false
         })
       } else {
-        Plugins.Browser.open({
-          url: 'https://space.bilibili.com'
+        Plugins.Toast.show({
+          text: '您的输入有误，正确的ID应该是一组数字'
         })
+        login()
       }
     }
     const showUser = () => {
@@ -137,9 +166,22 @@ export default {
         showUp(store.userInfo)
       }
     }
+    const [version, timestamp] = (document.querySelector('meta[name="version"]') as any).content.split(',')
+
+    const showAbout = () => {
+      Plugins.Modals.alert({
+        title: '关于',
+        message: [
+          '迷你版B站，不要看太久哦(*^_^*)。',
+          `版本：${version}，${new Date(+timestamp).toLocaleDateString()}`,
+          '',
+          'https://github.com/lovetingyuan/minibili'
+        ].join('\n')
+      })
+    }
     return {
-      avatar, logout, login, loading, showUser,
-      channels, showCate, userId, userInfo: computed(() => store.userInfo)
+      avatar, logout, login, loading, showUser, prerender: !!(window as any).__prerender, showAbout,
+      channels, showCate, userId, userInfo: computed(() => store.userInfo), userUps: computed(() => store.ups)
     }
   }
 }
@@ -156,9 +198,9 @@ export default {
   background-color: var(--theme-color);
   width: fit-content;
   color: white;
-  padding: 10px 32px;
+  padding: 12px 52px;
   border-radius: 4px;
-  margin: 60px auto;
+  margin: 30px auto;
   user-select: none;
 }
 .channels {
