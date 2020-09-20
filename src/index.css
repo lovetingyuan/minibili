@@ -10,3 +10,7 @@
   vertical-align: text-bottom;
   margin: 0 3px;
 }
+
+.g-noselect {
+  user-select: none;
+}

@@ -2,7 +2,7 @@ import { HTTP } from '@ionic-native/http';
 import store from './store'
 import LRU from "lru-cache"
 import { Plugins } from '@capacitor/core'
-import { HomePageRes, VideoRankRes, VideoCommentRes, Reply, UserInfoRes, AllUpsRes, UpVideosRes, User } from './types';
+import { HomePageRes, VideoRankRes, VideoCommentRes, Reply, UserInfoRes, AllUpsRes, UpVideosRes, User, GithubReleaseRes } from './types';
 const geval = eval
 
 export { HTTP }
@@ -17,13 +17,13 @@ export default function request(url: string): Promise<string> {
     'Referer': url,
     'Host': _url.host
   }).then(res => {
-    if (res.status === 200) {
+    if (res.status === 200 && res.data !== undefined) {
       return res.data
     }
     throw res
   }).catch(err => {
     console.error(err)
-    Plugins.Toast.show({
+    url.includes('bilibili.com') && Plugins.Toast.show({
       text: '请求失败/(ㄒoㄒ)/~~'
     })
   })
@@ -42,7 +42,6 @@ export async function getImage(imgUrl: string, forcecache?: boolean): Promise<st
     imgUrl = 'https:' + imgUrl
   }
   const _url = new URL(imgUrl)
-  console.log('image request ', imgUrl)
   return HTTP.sendRequest(imgUrl, {
     method: 'get',
     responseType: 'blob',
@@ -100,22 +99,20 @@ export async function getHomePage() {
 
 export async function getAllUps(userId: number | string) { // 326081112
   // https://space.bilibili.com/326081112?from=search&seid=8086157821159781294
-  if (store.ups) return
-  const jsonpUrl = (pn: number) => `https://api.bilibili.com/x/relation/followings?vmid=${userId}&pn=${pn}&ps=50&order=desc&jsonp=jsonp&callback=__jp8`
-  const geval = eval
+  // if (store.ups) return
+  const callbackname = '__jp' + Date.now()
+  const jsonpUrl = (pn: number) => `https://api.bilibili.com/x/relation/followings?vmid=${userId}&pn=${pn}&ps=50&order=desc&jsonp=jsonp&callback=${callbackname}`
   const getUp = (u: AllUpsRes.Response['data']['list'][0]) => ({
     name: u.uname,
     face: u.face,
     id: u.mid,
     sign: u.sign
   })
+  const upslist: User[] = []
   return request(jsonpUrl(1)).then(res => {
-    const data: AllUpsRes.Response = geval(res.replace('__jp8', ''))
+    const data: AllUpsRes.Response = geval(res.replace(callbackname, ''))
     const total = data.data.total
-    if (!store.ups) {
-      store.ups = []
-    }
-    store.ups && store.ups.push(...data.data.list.map(getUp))
+    upslist.push(...data.data.list.map(getUp))
     const rest = total - 50
     if (rest > 0) {
       const pages = Math.ceil(rest / 50)
@@ -126,9 +123,12 @@ export async function getAllUps(userId: number | string) { // 326081112
   }).then(res => {
     if (!Array.isArray(res)) return
     res.forEach(res => {
-      const data = geval(res.replace('__jp8', ''))
-      store.ups && store.ups.push(...data.data.list.map(getUp))
+      const data = geval(res.replace(callbackname, ''))
+      upslist.push(...data.data.list.map(getUp))
     })
+  }).then(() => {
+    Plugins.Storage.set({ key: 'userUps', value: JSON.stringify(upslist) })
+    store.ups = upslist
   })
 }
 
@@ -239,12 +239,12 @@ const handleMsg = (msg: string, emoji: VideoCommentRes.Reply['content']['emote']
       })
     }
   })
-  const _msg = msg
+  const _msg = msg.trimEnd()
     .replace(/\n/g, '<br>')
     .replace(/ /g, '&nbsp;')
     .replace(/\[(.+?)\]/g, (s) => {
       if (emoji && emoji[s]) {
-        return `<img width="20" data-emoji="${s}">`
+        return `<img width="24" data-emoji="${s}">`
       }
       return s
     })
@@ -273,6 +273,21 @@ export async function getComments(aid: string | number): Promise<Reply[] | undef
     if (data.code !== 0) return
     const replies = data.data.replies || []
     return replies.map(handleReply)
+  })
+}
+
+export function getLatestRelease () {
+  // const url = 'https://api.github.com/repos/vuejs/vue-next/releases/latest'
+  const url = 'https://api.github.com/repos/shadowsocks/shadowsocks-android/releases/latest'
+  return request(url).then(res => {
+    if (!res) return
+    const response = JSON.parse(res) as GithubReleaseRes.Response
+    let tagName = response.tag_name
+    if (tagName[0] === 'v') tagName = tagName.slice(1)
+    store.latestVersion = tagName
+    if (response.assets.length) {
+      store.downloadUrl = response.assets[0].browser_download_url
+    }
   })
 }
 

@@ -1,5 +1,8 @@
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { reactive } from 'vue'
 import { Store } from './types'
+
+const [version, timestamp] = (document.querySelector('meta[name="version"]') as any).content.split(',')
 
 const store = reactive<Store>({
   currentVideo: null,
@@ -9,7 +12,10 @@ const store = reactive<Store>({
   ups: null,
   ranks: {},
   upVideos: {},
-  isFullScreen: false
+  isFullScreen: false,
+  orientation: ScreenOrientation.type,
+  version,
+  publishDate: (new Date(timestamp)).toLocaleDateString()
 })
 
 if (process.env.NODE_ENV === 'development') {

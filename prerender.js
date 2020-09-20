@@ -60,7 +60,7 @@ module.exports = JSDOM.fromURL(`http://localhost:${port}`, {
         fs.writeFileSync(indexPath, prerenderhtml)
         resolve()
         console.log('Prerender done.')
-      }, 10000);
+      });
     }
   })
 });

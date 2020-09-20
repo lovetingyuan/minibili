@@ -1,4 +1,6 @@
 <template>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" v-if="showImg" hidden @load="onLoad">
+
   <p class="title" :style="`padding: ${pic ? '13px' : '16px'} 0`">
     <img src="~../assets/back.png" alt="返回" class="back-icon" @click="onBack" width="16" />
     <span class="upface" v-if="pic">
@@ -11,6 +13,7 @@
       <li v-for="(video, i) of videoList" :key="video.bvid" class="video-item">
         <video-item :video="video" :index="i + 1"></video-item>
       </li>
+      <p style="text-align:center;margin-top: 20px;">≡ω≡</p>
     </ol>
     <div v-else style="text-align: center; margin: 80px 0;">
       <img src="~../assets/bili.svg" alt="bili" width="100" />
@@ -33,6 +36,15 @@ export default {
   name: 'video-list',
   components: { VideoItem },
   setup() {
+    const showImg = ref(false)
+    onActivated(() => {
+      showImg.value = true
+      console.log('video list actived')
+    })
+    onDeactivated(() => {
+      showImg.value = false
+      console.log('video list deactived', scrollY)
+    })
     const videoList = computed(() => {
       if (store.currentUp && store.upVideos[store.currentUp.id]) {
         return store.upVideos[store.currentUp.id].list
@@ -63,7 +75,9 @@ export default {
       videoList, title, pic, avatar, onBack() {
         store.currentCate = null
         store.currentUp = null
-      }
+      }, onLoad() {
+        document.dispatchEvent(new Event('__keepvideolistscrolly'))
+      }, showImg
     }
   }
 }

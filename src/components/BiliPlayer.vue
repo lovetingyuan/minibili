@@ -13,23 +13,40 @@
       ></iframe>
     </div>
     <div class="video-info" v-if="video" ref="videoInfoRef">
-      <div class="up-info">
+      <div class="g-noselect">
         <cross-image :url="video.up.face" :default="avatar" class="user-face"></cross-image>
         <span class="user-name">{{video.up.name}}</span>
         <span>{{video.view < 10000 ? video.view : (Math.round(video.view / 10000) + '万')}}播放</span>
-        <img src="~../assets/share.png" class="share-btn" width="13" @click="onShare" alt="分享">
+        <img src="~../assets/share.png" class="share-btn" width="13" @click="onShare" alt="分享" />
       </div>
       <p class="video-title">{{video.title}}</p>
-      <p class="video-desc" v-if="video.description">简介：{{video.description}}</p>
+      <p class="video-desc" v-if="video.desc">
+        <b class="g-noselect">简介：</b>
+        {{video.desc}}
+      </p>
       <div class="comments">
         <ol class="comment-list" v-if="video.comments.length">
           <template v-for="(comment, i) of video.comments" :key="comment.user + i">
             <div class="line"></div>
             <li class="comment-item comment-item1">
-              <p class="comment-content" v-html="getComment(comment, i)"></p>
+              <p
+                class="comment-content"
+                :data-user="`${i+1}.${comment.user}: `"
+                :data-like="comment.like ? comment.like+'👍' : ''"
+                v-html="comment.content"
+              ></p>
               <ul v-if="comment.comments" class="comment-list reply-list">
-                <li v-for="reply of comment.comments" :key="reply.user + reply.like" class="comment-item">
-                  <p class="comment-content" v-html="getComment(reply)"></p>
+                <li
+                  v-for="reply of comment.comments"
+                  :key="reply.user + reply.like"
+                  class="comment-item"
+                >
+                  <p
+                    class="comment-content"
+                    :data-user="`${reply.user}: `"
+                    :data-like="reply.like ? reply.like+'👍' : ''"
+                    v-html="reply.content"
+                  ></p>
                 </li>
               </ul>
             </li>
@@ -54,39 +71,42 @@ const playerHref = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
 import useTouchMove from './touchmove'
 import { getImage } from '../request';
 import { Reply } from '../types';
-// import { emitter } from '../main';
+
+interface IFrameEle extends HTMLIFrameElement {
+  _fullscreen: boolean,
+  webkitRequestFullScreen: typeof Element.prototype.requestFullscreen
+}
 
 export default {
   name: 'bili-player',
   setup() {
     const iframeRef = ref<HTMLIFrameElement | null>(null)
     const onfullscreen = (e: any) => {
-      console.log(99, e)
-      const iframe = e.target
+      const iframe = e.target as IFrameEle
+      store.orientation = ScreenOrientation.type
       const fullscreen = (iframe._fullscreen = !iframe._fullscreen)
       store.isFullScreen = fullscreen
       if (fullscreen) {
         ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.LANDSCAPE)
+        try {
+          if (iframe.requestFullscreen) {
+            iframe.requestFullscreen()
+          } else if (iframe.webkitRequestFullScreen) {
+            iframe.webkitRequestFullScreen()
+          }
+        } catch (_) { }
         iframeStyle.value = 'height: 100vh'
       } else {
-        ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.PORTRAIT)
-        ScreenOrientation.unlock()
-        iframeStyle.value = ''
+        ScreenOrientation.lock(store.orientation).then(() => {
+          ScreenOrientation.unlock()
+          iframeStyle.value = 'height: 60vw'
+        })
       }
     }
-    // emitter.on('backButtonClicked', () => {
-    //   if (store.isFullScreen && iframeRef.value !== null) {
-    //     iframeRef.value.dispatchEvent(new Event('webkitfullscreenchange'))
-    //     // ;(iframeRef.value as any)._fullscreen = false
-    //     // store.isFullScreen = false
-    //     // ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.PORTRAIT)
-    //     // ScreenOrientation.unlock()
-    //     // iframeStyle.value = ''
-    //   }
-    // })
     const iframeSrc = computed(() => {
       if (!store.currentVideo) {
-        ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.PORTRAIT)
+        console.log('dsfsdfsdfds')
+        ScreenOrientation.lock(store.orientation)
         ScreenOrientation.unlock()
         return ''
       }
@@ -98,6 +118,7 @@ export default {
     })
     const iframeStyle = ref('')
     const handler = () => {
+      store.orientation = ScreenOrientation.type
       if (ScreenOrientation.type.startsWith('landscape')) {
         iframeStyle.value = 'height: 100vh'
         // Plugins.StatusBar.setOverlaysWebView({ overlay: true })
@@ -121,8 +142,8 @@ export default {
 
     useTouchMove(videoContainerRef, videoInfoRef)
     return {
-      videoContainerRef, videoInfoRef, getComment (data: Reply, i?: number) {
-        return `<b>${i !== undefined ? (i + 1) + '.' : ''}${data.user}: </b>${data.content} ${data.like ? `<small>${data.like}👍</small>` : ''}`
+      videoContainerRef, videoInfoRef, getComment(data: Reply, i?: number) {
+        return `<b class="g-noselect">${i !== undefined ? (i + 1) + '.' : ''}${data.user}: </b>${data.content}${data.like ? `<small class="g-noselect"> ${data.like}👍</small>` : ''}`
       },
       iframeSrc, onfullscreen, iframeStyle, video, avatar, onShare, iframeRef
     }
@@ -145,6 +166,7 @@ export default {
   resize: vertical;
   overflow: auto;
   flex-shrink: 0;
+  transition: height 0.1s;
 }
 .player-iframe {
   width: 100%;
@@ -182,7 +204,7 @@ export default {
 } */
 .reply-list {
   padding-left: 10px;
-  font-size: .9em;
+  font-size: 0.9em;
   border-left: 1px solid #aaa;
   margin-left: 8px;
 }
@@ -192,18 +214,27 @@ export default {
 }
 hr {
   margin: 20px 0;
-  transform: scale(.9, .6);
+  transform: scale(0.9, 0.6);
 }
 .comment-content {
   display: inline-block;
   margin: 4px 0;
   line-height: 1.5;
 }
+.comment-content:before {
+  content: attr(data-user);
+  font-weight: bold;
+}
+.comment-content::after {
+  content: attr(data-like);
+  font-size: 0.8em;
+  margin-left: 0.8em;
+}
 
 .line {
   border-top: 1px solid #ddd;
   margin: 16px 0;
-  transform: scaleY(.5);
+  transform: scaleY(0.5);
 }
 .line:first-child {
   border-color: #999;
@@ -223,6 +254,7 @@ hr {
   font-weight: bold;
 }
 .share-btn {
-  vertical-align: middle; margin-left: 16px;
+  vertical-align: middle;
+  margin-left: 16px;
 }
 </style>

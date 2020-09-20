@@ -6,9 +6,11 @@ import 'normalize.css'
 import './index.css'
 import store from './store'
 import { Plugins } from '@capacitor/core'
-// import mitt, { Emitter } from 'mitt'
+import { getLatestRelease } from './request'
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
-// export const emitter: Emitter = mitt()
+getLatestRelease()
+// Plugins.SplashScreen.hide();
 
 const app = createApp(App)
 app.component('cross-image', CrossImage)
@@ -72,11 +74,6 @@ let timer: number | null = null
 
 Plugins.App.addListener('backButton', () => {
   if (store.currentVideo) {
-    // if (store.isFullScreen) {
-    //   emitter.emit('backButtonClicked')
-    // } else {
-    //   store.currentVideo = null
-    // }
     store.currentVideo = null
     return
   }

@@ -6,12 +6,18 @@
   "webDir": "dist",
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 0
+      "launchShowDuration": 0,
+      "launchAutoHide": true,
+      "backgroundColor": "#ffffffff",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "androidSpinnerStyle": "large",
+      "iosSpinnerStyle": "small",
+      "spinnerColor": "#fb7299",
+      "showSpinner": true,
+      "splashFullScreen": true,
+      "splashImmersive": true
     }
   },
-  "cordova": {},
-  "server": {
-    "url": "http://192.168.1.108:8100",
-    "cleartext": true
-  }
+  "cordova": {}
 }

@@ -21,27 +21,35 @@ export default {
     VideoList, BiliPlayer, MainView
   },
   setup() {
-    const scrollTop = {
-      'bili-player': 0,
-      'video-list': 0,
-      'main-view': 0,
-    }
-    const currentComponent = ref<keyof typeof scrollTop>('main-view')
+    const currentComponent = ref<'bili-player' | 'video-list' | 'main-view'>('main-view')
+    // main-view -> video-list -> bili-player
+    let videolistscrolly = window.scrollY
+    let mainviewscrolly = window.scrollY
+    document.addEventListener('__keepvideolistscrolly', () => {
+      window.scrollTo(0, videolistscrolly)
+    })
     watch(() => {
       return [store.currentVideo, store.currentUp, store.currentCate]
     }, ([currentVideo, currentUp, currentCate], old) => {
-      scrollTop[currentComponent.value] = window.scrollY
       if (currentVideo) {
+        videolistscrolly = window.scrollY
         currentComponent.value = 'bili-player'
       } else if (currentUp || currentCate) {
+        if (currentComponent.value === 'main-view') {
+          mainviewscrolly = window.scrollY
+          videolistscrolly = 0
+        }
+        nextTick(() => {
+          window.scrollTo(0, videolistscrolly)
+        })
         currentComponent.value = 'video-list'
       } else {
+        videolistscrolly = 0
         currentComponent.value = 'main-view'
+        nextTick(() => {
+          window.scrollTo(0, mainviewscrolly)
+        })
       }
-      nextTick(() => {
-        const top = scrollTop[currentComponent.value]
-        window.scrollTo(0, top)
-      })
     })
     return { currentComponent }
   }

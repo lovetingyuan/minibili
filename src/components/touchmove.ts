@@ -13,17 +13,18 @@ export default function usePlayerSizeChange(playerContainer: Ref<HTMLElement | n
   })
   let startY: number, moveY: number, startHeight = initPlayerHeight
   function onTouch(e: TouchEvent) {
-    if (e.type === 'touchstart' && playerContainer.value && infoContainer.value) {
+    if (!playerContainer.value || !infoContainer.value) return
+    if (e.type === 'touchstart') {
       startHeight = getDomHeight(playerContainer.value)
       if (infoContainer.value.scrollTop === 0) {
         startY = e.touches[0].pageY
-        if (startHeight > initPlayerHeight + 50) {
+        if (startHeight > initPlayerHeight + 1) {
           infoContainer.value.style.overflowY = 'hidden'
         }
       } else {
         startY = -1
       }
-    } else if (e.type === 'touchmove' && infoContainer.value && playerContainer.value) {
+    } else {
       const isTop = infoContainer.value.scrollTop === 0
       if (isTop && startY === -1) {
         startY = e.touches[0].pageY
@@ -34,6 +35,7 @@ export default function usePlayerSizeChange(playerContainer: Ref<HTMLElement | n
         playerContainer.value.style.height = height + 'px'
         infoContainer.value.style.overflowY = 'hidden'
       } else {
+        playerContainer.value.style.height = initPlayerHeight + 'px'
         infoContainer.value.style.overflowY = 'auto'
       }
     }

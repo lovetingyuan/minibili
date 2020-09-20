@@ -1,5 +1,5 @@
 <template>
-  <p class="title">
+  <p class="title g-noselect">
     <img
       src="~../assets/favicon.png"
       alt="bili"
@@ -11,7 +11,7 @@
     @click="showAbout"
     width="20" style="vertical-align:bottom; margin-right:20px; float: right;" alt="about">
   </p>
-  <div class="channels">
+  <div class="channels g-noselect">
     <div class="channel-item" v-for="c of channels" :key="c.name" @click="showCate(c)">{{c.name}}</div>
     <i></i>
     <i></i>
@@ -23,7 +23,7 @@
     <i></i>
   </div>
   <hr />
-  <div v-if="userInfo">
+  <div v-if="userInfo" class="g-noselect">
     <p class="user-info">
       <span class="user" @click="showUser">
         <span>
@@ -42,9 +42,9 @@
     <img src="~../assets/bili.svg" alt="bili" width="80" />
     <div class="loginBtn" @click="login">{{loading ? '加载中...' : '登 录'}}</div>
   </div>
-  <!-- <div v-if="prerender">
+  <div v-if="prerender">
     <spin-loading></spin-loading>
-  </div>-->
+  </div>
 </template>
 
 <script lang="ts">
@@ -87,6 +87,11 @@ Plugins.Storage.get({ key: 'userInfo' }).then(result => {
     if (store.userInfo) {
       fetchUserUps(store.userInfo.id)
     }
+  }
+})
+Plugins.Storage.get({ key: 'userUps' }).then(result => {
+  if (result.value) {
+    store.ups = JSON.parse(result.value)
   }
 })
 export default {
@@ -166,18 +171,32 @@ export default {
         showUp(store.userInfo)
       }
     }
-    const [version, timestamp] = (document.querySelector('meta[name="version"]') as any).content.split(',')
 
     const showAbout = () => {
-      Plugins.Modals.alert({
-        title: '关于',
-        message: [
-          '迷你版B站，不要看太久哦(*^_^*)。',
-          `版本：${version}，${new Date(+timestamp).toLocaleDateString()}`,
-          '',
-          'https://github.com/lovetingyuan/minibili'
-        ].join('\n')
-      })
+      const [msg1, msg2, msg3] = ['迷你版B站，不要贪杯哦(*^_^*)。', `当前版本：${store.version}，${store.publishDate}`, 'Github: https://github.com/lovetingyuan/minibili']
+      if (store.latestVersion && store.latestVersion !== store.version) {
+        Plugins.Modals.confirm({
+          title: '关于',
+          message: [
+            msg1, msg2,
+            `有新版本：${store.latestVersion}，点击确定下载`,
+            '', msg3
+          ].join('\n'),
+          okButtonTitle: '确定',
+          cancelButtonTitle: '取消'
+        }).then(res => {
+          if (res.value && store.downloadUrl) {
+            Plugins.Browser.open({
+              url: store.downloadUrl
+            })
+          }
+        })
+      } else {
+        Plugins.Modals.alert({
+          title: '关于',
+          message: [msg1, msg2, '', msg3].join('\n')
+        })
+      }
     }
     return {
       avatar, logout, login, loading, showUser, prerender: !!(window as any).__prerender, showAbout,

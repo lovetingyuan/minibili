@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, toRaw } from 'vue'
+import { onMounted, PropType, toRaw } from 'vue'
 import videoPic from '../assets/video.png'
 import store from '../store'
 import { Plugins } from '@capacitor/core';
