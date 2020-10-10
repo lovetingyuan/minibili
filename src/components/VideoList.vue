@@ -1,12 +1,11 @@
 <template>
 <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=" v-if="showImg" hidden @load="onLoad">
-
   <p class="title" :style="`padding: ${pic ? '13px' : '16px'} 0`">
     <img src="~../assets/back.png" alt="返回" class="back-icon" @click="onBack" width="16" />
     <span class="upface" v-if="pic">
-      <cross-image :url="pic" ::default="avatar"></cross-image>
+      <cross-image :url="pic" :default="avatar"></cross-image>
     </span>
-    <span style="text">{{title}}</span>
+    <span class="text">{{title}}</span>
   </p>
   <div v-if="videoList">
     <ol v-if="videoList.length" class="video-list">
@@ -22,7 +21,12 @@
       </p>
     </div>
   </div>
-  <spin-loading v-else></spin-loading>
+  <ol v-else class="video-list">
+    <li v-for="(i) in 10" class="video-item">
+      <video-item :index="i"></video-item>
+    </li>
+  </ol>
+  <!-- <spin-loading v-else></spin-loading> -->
 </template>
 
 <script lang="ts">
@@ -39,11 +43,9 @@ export default {
     const showImg = ref(false)
     onActivated(() => {
       showImg.value = true
-      console.log('video list actived')
     })
     onDeactivated(() => {
       showImg.value = false
-      console.log('video list deactived', scrollY)
     })
     const videoList = computed(() => {
       if (store.currentUp && store.upVideos[store.currentUp.id]) {
@@ -53,17 +55,16 @@ export default {
       }
       return null
     })
-    const defaultTitle = 'Minibili(゜-゜)つロ千杯~'
     const title = computed(() => {
       if (store.currentUp) {
         return store.currentUp.name + '投稿的视频'
       } else if (store.currentCate) {
         if (store.currentCate.id === -1) {
-          return defaultTitle
+          return document.title
         }
         return store.currentCate.name + '频道的排行'
       }
-      return defaultTitle
+      return document.title
     })
     const pic = computed(() => {
       if (store.currentUp) {
@@ -99,6 +100,10 @@ export default {
   margin: 0;
   box-shadow: 0 0 12px 2px #aaaaaa;
   user-select: none;
+}
+.title .text {
+  position: relative;
+  top: 2px;
 }
 .back-icon {
   vertical-align: middle;

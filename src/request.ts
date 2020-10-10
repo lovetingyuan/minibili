@@ -75,7 +75,7 @@ export async function getHomePage() {
       if ('__INITIAL_STATE__' in window) {
         const data: HomePageRes.Response = (window as any).__INITIAL_STATE__
         delete (window as any).__INITIAL_STATE__
-        store.ranks['-1'] = data.flow[data.flow.fields[0]].extra.list.map(v => {
+        store.ranks['-1'] = data.list['getHot-page-count-10'].extra.list.map(v => {
           return {
             bvid: v.bvid,
             aid: v.aid,
@@ -239,7 +239,7 @@ const handleMsg = (msg: string, emoji: VideoCommentRes.Reply['content']['emote']
       })
     }
   })
-  const _msg = msg.trimEnd()
+  const _msg = msg.trim()
     .replace(/\n/g, '<br>')
     .replace(/ /g, '&nbsp;')
     .replace(/\[(.+?)\]/g, (s) => {
@@ -278,7 +278,7 @@ export async function getComments(aid: string | number): Promise<Reply[] | undef
 
 export function getLatestRelease () {
   // const url = 'https://api.github.com/repos/vuejs/vue-next/releases/latest'
-  const url = 'https://api.github.com/repos/shadowsocks/shadowsocks-android/releases/latest'
+  const url = 'https://api.github.com/repos/lovetingyuan/minibili/releases/latest'
   return request(url).then(res => {
     if (!res) return
     const response = JSON.parse(res) as GithubReleaseRes.Response

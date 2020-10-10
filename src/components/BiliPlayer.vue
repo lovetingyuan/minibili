@@ -16,7 +16,7 @@
       <div class="g-noselect">
         <cross-image :url="video.up.face" :default="avatar" class="user-face"></cross-image>
         <span class="user-name">{{video.up.name}}</span>
-        <span>{{video.view < 10000 ? video.view : (Math.round(video.view / 10000) + '万')}}播放</span>
+        <span>{{G_PlayTimes(video.view)}}播放</span>
         <img src="~../assets/share.png" class="share-btn" width="13" @click="onShare" alt="分享" />
       </div>
       <p class="video-title">{{video.title}}</p>
@@ -87,15 +87,17 @@ export default {
       const fullscreen = (iframe._fullscreen = !iframe._fullscreen)
       store.isFullScreen = fullscreen
       if (fullscreen) {
-        ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.LANDSCAPE)
-        try {
-          if (iframe.requestFullscreen) {
-            iframe.requestFullscreen()
-          } else if (iframe.webkitRequestFullScreen) {
-            iframe.webkitRequestFullScreen()
-          }
-        } catch (_) { }
         iframeStyle.value = 'height: 100vh'
+        nextTick(() => {
+          ScreenOrientation.lock(ScreenOrientation.ORIENTATIONS.LANDSCAPE)
+          try {
+            if (iframe.requestFullscreen) {
+              iframe.requestFullscreen()
+            } else if (iframe.webkitRequestFullScreen) {
+              iframe.webkitRequestFullScreen()
+            }
+          } catch (_) { }
+        })
       } else {
         ScreenOrientation.lock(store.orientation).then(() => {
           ScreenOrientation.unlock()
@@ -103,13 +105,15 @@ export default {
         })
       }
     }
-    const iframeSrc = computed(() => {
-      if (!store.currentVideo) {
-        console.log('dsfsdfsdfds')
-        ScreenOrientation.lock(store.orientation)
+    document.addEventListener('__backbuttonclicked', () => {
+      store.isFullScreen = false
+      ScreenOrientation.lock(store.orientation).then(() => {
         ScreenOrientation.unlock()
-        return ''
-      }
+        iframeStyle.value = 'height: 60vw'
+      })
+    })
+    const iframeSrc = computed(() => {
+      if (!store.currentVideo) return ''
       // pc: https://player.bilibili.com/player.html
       return `${playerHref}?bvid=${store.currentVideo.bvid}&autoplay=true&highQuality=true`
     })
@@ -167,6 +171,8 @@ export default {
   overflow: auto;
   flex-shrink: 0;
   transition: height 0.1s;
+  transform: translateZ(0);
+  will-change: transform;
 }
 .player-iframe {
   width: 100%;
@@ -180,6 +186,7 @@ export default {
   font-size: 14px;
   padding: 20px 20px;
   background-color: white;
+  will-change: scroll-position;
 }
 
 .video-title {

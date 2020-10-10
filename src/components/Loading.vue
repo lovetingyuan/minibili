@@ -11,6 +11,7 @@
   transform-origin: center;
   text-align: center;
   position: relative;
+  top: -40px;
 }
 @keyframes ldio-6yqx4gpvkkt {
   0% { transform: rotate(0) }

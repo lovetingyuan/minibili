@@ -3,6 +3,14 @@
     <li v-for="up of ups" :key="up.mid" class="up-item">
       <up-item :face="up.face" :name="up.name" @click="showUp(up)"></up-item>
     </li>
+     <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
+    <i></i>
   </ul>
   <p v-else style="text-align: center; margin: 50px 0;">关注列表为空</p>
 </template>
@@ -19,9 +27,9 @@ export const showUp = (up: User) => {
   store.currentUp = up;
   store.currentCate = null;
   store.currentVideo = null
-  if (!store.upVideos[up.id]) {
-    Plugins.Toast.show({ text: "正在加载视频列表..." });
-  }
+  // if (!store.upVideos[up.id]) {
+  //   Plugins.Toast.show({ text: "正在加载视频列表...", duration: 'short' });
+  // }
   getUpVideos(up.id).finally(() => {
     if (!store.upVideos[up.id]) {
       Plugins.Toast.show({ text: `加载${up.name}的视频失败` });

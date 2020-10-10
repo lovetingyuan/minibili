@@ -39,11 +39,11 @@ export default {
   props: {
     url: {
       type: String,
-      required: true,
+      required: false,
     },
     default: String,
   },
-  setup(props: { url: string; default?: string }) {
+  setup(props) {
     const imgRef = ref<HTMLImageElement | null>(null);
     onMounted(() => {
       observer && observer.observe((imgRef as Ref<HTMLImageElement>).value);
