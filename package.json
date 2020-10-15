@@ -8,11 +8,13 @@
     "ionic:serve": "vite serve ./",
     "ionic:build": "vite build ./ --assetsDir=assets && node prerender.js",
     "android:serve": "npx ionic cap run android -l --external",
+    "ios:serve": "npx ionic cap run ios -l --external",
     "android:build": "npx ionic cap sync android --prod"
   },
   "dependencies": {
     "@capacitor/android": "2.4.1",
     "@capacitor/core": "2.4.1",
+    "@capacitor/ios": "2.4.1",
     "@ionic-native/core": "^5.28.0",
     "@ionic-native/file": "^5.28.0",
     "@ionic-native/http": "^5.28.0",

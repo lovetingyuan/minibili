@@ -66,6 +66,11 @@
   dependencies:
     tslib "^1.9.0"
 
+"@capacitor/ios@2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-2.4.1.tgz#c65f3d3ae24b50806e60189087efc6703ac96e69"
+  integrity sha512-Q1PfO67zn2668Gu9OYY2v02TuB20E530HHfe28wrK9X1Jy5jRFl1ZUr3epCkaB4XJQeGqM42oACO+BwURNAW5Q==
+
 "@ionic-native/core@^5.28.0":
   version "5.28.0"
   resolved "https://registry.yarnpkg.com/@ionic-native/core/-/core-5.28.0.tgz#9fdbc3657d778c4c524c7091e6f0c8e4426bcd28"
