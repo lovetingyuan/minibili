@@ -4,17 +4,19 @@
       <cross-image :url="pic" @click="openPlayer" :default="videoPic"></cross-image>
     </div>
     <div class="video-text">
-      <p class="title">{{index}}.
-        <span style="font-weight: bold;" v-if="up">{{up}}: </span>
-        <span>{{title}}</span>
+      <p class="title" v-if="title">{{index}}.
+        <span class="up">{{up ? up + ': ' : ''}}</span>
+        <span class="title-content">{{title}}</span>
       </p>
-      <span class="play">
+      <div v-else style="background-color: #ddd; height: 2em; width: 55vw; margin-top: 5px; margin-bottom: 14px;"></div>
+      <template v-if="title">
         <img src="~../assets/play.png" class="play-icon" @click="openPlayer" alt="播放" width="12">
-        {{play}}
-      </span>
-      <span class="date"> {{days}}天前</span>
-      <span class="cate" v-if="cate">{{cate}}</span>
-      <img src="~../assets/share.png" class="share" width="12" @click="onShare" alt="分享">
+        <span class="play">{{G_PlayTimes(play)}}</span>
+        <span class="date">{{days}}天前</span>
+        <span class="cate">{{cate}}</span>
+        <img src="~../assets/share.png" class="share g-vamiddle" width="12" @click="onShare" alt="分享">
+      </template>
+      <div v-else style="background-color: #ddd; height: 1em; width: 50vw;"></div>
     </div>
     <span class="video-time">{{time}}</span>
     <span class="play-shape" @click="openPlayer"></span>
@@ -35,25 +37,23 @@ export default {
   props: {
     video: {
       type: Object as PropType<Video>,
-      required: true
+      required: false
     },
     index: {
       type: Number, required: true
     }
   },
   setup (props) {
-    // *  aid, bvid, author, coins, duration, pic, play, title
     const video = props.video
-    const days = Math.round((Date.now() - video.date) / (24 * 60 * 60 * 1000))
-    const time = new Date(video.len + new Date().getTimezoneOffset() * 60 * 1000)
-    const [hour, minute, second] = [time.getHours(), time.getMinutes(), time.getSeconds()]
     const openPlayer = () => {
+      if (!video) return
       store.currentVideo = video
       getComments(video.aid).then(comments => {
         video.comments = comments || []
       })
     }
     const onShare = () => {
+      if (!video) return
       Share.share({
         title: video.title,
         text: video.title + '\n',
@@ -61,26 +61,33 @@ export default {
         dialogTitle: '分享B站视频'
       });
     }
-    return {
-      video,
-      pic: video.cover,
-      title: video.title,
-      cate: video.cate,
-      play: video.view < 10000 ? video.view : Math.round(video.view / 10000) + '万',
+    const days = video && Math.round((Date.now() - video.date) / (24 * 60 * 60 * 1000))
+    let time: string = ''
+    if (video) {
+      const date = new Date(video.len + new Date().getTimezoneOffset() * 60 * 1000)
+      time = [date.getHours(), date.getMinutes(), date.getSeconds()].join(':')
+    }
+    const data = {
+      pic: video && video.cover,
+      title: video && video.title,
+      cate: video && video.cate,
+      play: video && video.view,
       days: days,
-      time: [hour, minute, second].join(':'),
+      time: time,
       openPlayer,
       index: props.index,
       videoPic: videoPic,
-      up: store.currentUp ? '' : video.up.name,
+      up: store.currentUp ? '' : (video && video.up.name),
       onShare
     }
+    return data
   }
 }
 </script>
 <style scoped>
   .play-icon {
-    vertical-align: text-top;
+    vertical-align: middle;
+    margin-right: 5px;
   }
   .video-item {
     text-align: left;
@@ -113,14 +120,21 @@ export default {
     -webkit-line-clamp:3;
     -webkit-box-orient:vertical;
   }
+  .up {
+    font-weight: bold;
+  }
+  /* .title-content:empty {
+    background-color: #ddd;
+    height: 2em;
+    display: inline-block;
+    width: 55vw;
+  } */
   .video-text .cate, .video-text .date, .video-text .play, .video-text .time, .video-text .share {
     font-size: 12px;
     color: #555;
     margin-right: 6px;
   }
-  .video-text .share {
-    vertical-align: middle;
-  }
+
   .video-time {
     position: absolute;
     top: 5px;

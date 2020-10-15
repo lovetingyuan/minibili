@@ -31,6 +31,7 @@ export default {
 <style scoped>
   .up-item img {
     width: 66%;
+    max-width: 60px;
     /* height: 66%; */
     min-height: 30px;
     display: block;

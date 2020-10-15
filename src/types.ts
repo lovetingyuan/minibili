@@ -91,8 +91,8 @@ export namespace HomePageRes {
   }
 
   export interface Response {
-    flow: {
-      fields: ['getHot-page-count-10'],
+    list: {
+      // fields: ['getHot-page-count-10'],
       'getHot-page-count-10': {
         error: any,
         total: number

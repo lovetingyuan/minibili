@@ -32,10 +32,18 @@ export default function usePlayerSizeChange(playerContainer: Ref<HTMLElement | n
       moveY = e.touches[0].pageY - startY
       const height = (moveY + startHeight)
       if ((height > initPlayerHeight && height < maxHeight) && isTop) {
-        playerContainer.value.style.height = height + 'px'
+        requestAnimationFrame(() => {
+          if (playerContainer.value) {
+            if (Math.abs(height - initPlayerHeight) < 10) {
+              playerContainer.value.style.height = initPlayerHeight + 'px'
+            } else {
+              playerContainer.value.style.height = height + 'px'
+            }
+          }
+        })
         infoContainer.value.style.overflowY = 'hidden'
       } else {
-        playerContainer.value.style.height = initPlayerHeight + 'px'
+        // playerContainer.value.style.height = initPlayerHeight + 'px'
         infoContainer.value.style.overflowY = 'auto'
       }
     }

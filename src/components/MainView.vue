@@ -27,7 +27,7 @@
     <p class="user-info">
       <span class="user" @click="showUser">
         <span>
-          <cross-image :url="userInfo.face" ::default="avatar"></cross-image>
+          <cross-image :url="userInfo.face" :default="avatar"></cross-image>
         </span>
         <span>{{userInfo.name}}</span>
         <span class="level">L{{userInfo.level}}</span>
@@ -37,12 +37,12 @@
     <up-list v-if="userUps"></up-list>
     <spin-loading v-else></spin-loading>
   </div>
-  <div v-else style="text-align: center;">
+  <div v-else-if="!prerender" style="text-align: center;">
     <br />
     <img src="~../assets/bili.svg" alt="bili" width="80" />
     <div class="loginBtn" @click="login">{{loading ? '加载中...' : '登 录'}}</div>
   </div>
-  <div v-if="prerender">
+  <div v-else>
     <spin-loading></spin-loading>
   </div>
 </template>
@@ -90,7 +90,7 @@ Plugins.Storage.get({ key: 'userInfo' }).then(result => {
   }
 })
 Plugins.Storage.get({ key: 'userUps' }).then(result => {
-  if (result.value) {
+  if (result.value && !store.ups) {
     store.ups = JSON.parse(result.value)
   }
 })
@@ -107,9 +107,9 @@ export default {
       store.currentUp = null
       store.currentVideo = null
       store.currentCate = cate
-      if (!store.ranks[cate.id]) {
-        Plugins.Toast.show({ text: '正在加载视频列表...' })
-      }
+      // if (!store.ranks[cate.id]) {
+      //   Plugins.Toast.show({ text: '正在加载视频列表...', duration: 'short' })
+      // }
       getRanks(cate.id).finally(() => {
         if (!store.ranks[cate.id]) {
           Plugins.Toast.show({ text: `加载${cate.name}的视频失败` })
@@ -120,7 +120,7 @@ export default {
       const logoutRet = await Plugins.Modals.confirm({
         cancelButtonTitle: '取消',
         okButtonTitle: '确认',
-        message: '确认要注销？',
+        message: '确认要注销？' + `(ID: ${store.userInfo && store.userInfo.id})`,
         title: '注销确认'
       })
       if (logoutRet.value) {
@@ -128,6 +128,7 @@ export default {
         store.userInfo = null
         store.ups = null
         Plugins.Storage.remove({ key: 'userInfo' })
+        Plugins.Storage.remove({ key: 'userUps' })
       }
     }
     const login = async () => {
