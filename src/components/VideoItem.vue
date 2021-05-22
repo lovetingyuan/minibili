@@ -12,7 +12,7 @@
       <template v-if="title">
         <img src="~../assets/play.png" class="play-icon" @click="openPlayer" alt="播放" width="12">
         <span class="play">{{G_PlayTimes(play)}}</span>
-        <span class="date">{{days}}天前</span>
+        <span class="date">{{G_PubDays(days)}}天前</span>
         <span class="cate">{{cate}}</span>
         <img src="~../assets/share.png" class="share g-vamiddle" width="12" @click="onShare" alt="分享">
       </template>
@@ -61,7 +61,6 @@ export default {
         dialogTitle: '分享B站视频'
       });
     }
-    const days = video && Math.round((Date.now() - video.date) / (24 * 60 * 60 * 1000))
     let time: string = ''
     if (video) {
       const date = new Date(video.len + new Date().getTimezoneOffset() * 60 * 1000)
@@ -72,7 +71,7 @@ export default {
       title: video && video.title,
       cate: video && video.cate,
       play: video && video.view,
-      days: days,
+      days: video && video.date,
       time: time,
       openPlayer,
       index: props.index,

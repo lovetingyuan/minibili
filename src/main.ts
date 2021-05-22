@@ -43,6 +43,15 @@ app.config.globalProperties = {
   G_PlayTimes(times: number) {
     if (typeof times !== 'number') return '0'
     return times < 10000 ? times : Math.round(times / 10000) + '万'
+  },
+  G_PubDays(date?:number) {
+    if (date) {
+      const days = Math.round((Date.now() - date) / (24 * 60 * 60 * 1000))
+      if (days) {
+        return days + '天前'
+      }
+      return '今天'
+    }
   }
 }
 app.mount('#app')

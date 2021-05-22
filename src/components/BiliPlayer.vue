@@ -16,13 +16,12 @@
       <div class="g-noselect">
         <cross-image :url="video.up.face" :default="avatar" class="user-face"></cross-image>
         <span class="user-name">{{video.up.name}}</span>
-        <span>{{G_PlayTimes(video.view)}}播放</span>
+        <span>{{G_PlayTimes(video.view)}}播放&nbsp;&nbsp;{{G_PubDays(video.date)}}</span>
         <img src="~../assets/share.png" class="share-btn" width="13" @click="onShare" alt="分享" />
       </div>
       <p class="video-title">{{video.title}}</p>
       <p class="video-desc" v-if="video.desc">
-        <b class="g-noselect">简介：</b>
-        {{video.desc}}
+        <b class="g-noselect">简介：</b>{{video.desc}}
       </p>
       <div class="comments">
         <ol class="comment-list" v-if="video.comments.length">
