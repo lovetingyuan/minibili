@@ -1,37 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2015",
-    "module": "esnext",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "node",
-    "allowJs": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": false,
-    "baseUrl": ".",
-    "types": [
-      "node"
-    ],
-    "paths": {
-      // "@/*": [
-      //   "src/*"
-      // ]
-    },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
+    "strict": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "extends": "expo/tsconfig.base"
 }
