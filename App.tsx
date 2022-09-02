@@ -75,6 +75,8 @@ const Main = () => {
                       '所有数据都来自B站',
                       '',
                       '版本：' + require('./app.json').expo.version,
+                      '',
+                      'https://github.com/lovetingyuan/minibili',
                     ].join('\n'),
                   );
                 }}>
