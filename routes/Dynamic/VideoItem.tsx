@@ -25,7 +25,8 @@ type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0];
 type VideoDynamicItem = Extract<DynamicItems, { type: DynamicType.Video }>;
 
 export default function VideoItem(props: VideoDynamicItem) {
-  const { mid, name, cover, title, aid, date, play, bvid, text } = props;
+  const { mid, name, cover, title, aid, date, play, bvid, text, duration } =
+    props;
   const isTracy = mid === TracyId;
   const onShare = useCallback(() => {
     handleShare(name, title, bvid);
@@ -55,6 +56,9 @@ export default function VideoItem(props: VideoDynamicItem) {
             style={styles.tvIcon}
             source={require('../../assets/tv.png')}
           />
+          <View style={styles.videoLength}>
+            <Text style={styles.videoLengthText}>{duration}</Text>
+          </View>
         </View>
         <View style={styles.videoInfo}>
           <Text style={styles.title} numberOfLines={3}>
@@ -127,5 +131,20 @@ const styles = StyleSheet.create({
   videoInfoText: {
     color: '#666',
     fontSize: 12,
+  },
+  videoLength: {
+    position: 'absolute',
+    // paddingVertical: 1,
+    paddingHorizontal: 2,
+    backgroundColor: '#ddd',
+    bottom: 0,
+    borderRadius: 2,
+    opacity: 0.8,
+    margin: 5,
+  },
+  videoLengthText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });

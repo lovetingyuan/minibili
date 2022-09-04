@@ -15,16 +15,17 @@ export default function TracyBtn() {
       visible={true}
       icon={
         <Avatar
-          size={55}
+          size={56}
           rounded
-          source={require('../assets/tracy-avatar.webp')}
+          source={{
+            uri: 'https://i1.hdslb.com/bfs/face/2c7c282460812e14a3266f338d563b3ef4b1b009.jpg@240w_240h_1c_1s.webp',
+          }}
         />
       }
-      size="large"
       color="#fb7299"
       placement="right"
       onPress={() => {
-        navigation.navigate('Dynamic', { upId: TracyId });
+        navigation.navigate('Dynamic', { mid: TracyId });
       }}
     />
   );

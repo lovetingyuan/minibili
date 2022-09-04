@@ -3,7 +3,7 @@ import { getDynamicItems } from './services/Bilibili';
 export type RootStackParamList = {
   Home: undefined;
   Main: {};
-  WebPage: { url: string; bvid?: string; title: string };
+  WebPage: { url: string; title: string };
   Play: {
     aid: number | string;
     bvid: string;
@@ -11,7 +11,10 @@ export type RootStackParamList = {
     mid: number;
   };
   Dynamic: {
-    upId: number;
+    mid: number;
+    name?: string;
+    face?: string;
+    sign?: string;
   };
   Hot: undefined;
   Follow: undefined;

@@ -34,9 +34,10 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
   });
   const [loading, setLoading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
-  const upId = route.params?.upId || TracyId;
+  const upId = route.params.mid || TracyId;
   const dynamicListRef = React.useRef<FlatList | null>(null);
-  const scrollOffset = React.useRef(0);
+  const [initLoad, setInitLoad] = React.useState(true);
+
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
@@ -44,24 +45,14 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
       if (!navigation.isFocused()) {
         return;
       }
-      if (dynamicListRef) {
-        dynamicListRef.current?.scrollToIndex({
-          index: 0,
-          animated: true,
-        });
-      }
+      dynamicListRef.current?.scrollToIndex({
+        index: 0,
+        animated: true,
+      });
     });
     return unsubscribe;
   }, [navigation]);
-  React.useEffect(() => {
-    if (upId) {
-      setLatest(upId);
-    }
-    resetDynamicItems();
-  }, [upId]);
-  React.useEffect(() => {
-    loadMoreDynamicItems();
-  }, [upId, pageInfoRef.current]);
+
   React.useEffect(() => {
     const handler = function () {
       if (navigation.isFocused()) {
@@ -96,7 +87,7 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
       </View>
     );
   };
-  const loadMoreDynamicItems = () => {
+  const loadMoreDynamicItems = React.useCallback(() => {
     const { offset, hasMore } = pageInfoRef.current;
     if (loading || !hasMore) {
       return;
@@ -121,7 +112,7 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
         setLoading(false);
         setRefreshing(false);
       });
-  };
+  }, [loading, upId, dynamicItems]);
   const resetDynamicItems = () => {
     pageInfoRef.current = {
       hasMore: true,
@@ -129,17 +120,27 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
     };
     setLoading(false);
     setDynamicItems([]);
+    setInitLoad(true);
   };
+  if (initLoad) {
+    setInitLoad(false);
+    loadMoreDynamicItems();
+  }
+  React.useEffect(() => {
+    if (upId) {
+      setLatest(upId);
+    }
+    resetDynamicItems();
+  }, [upId]);
 
   return (
     <View style={styles.container}>
-      <Header mid={upId} />
+      <Header {...route.params} />
       <FlatList
         data={dynamicItems}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         onEndReachedThreshold={1}
-        onScroll={e => (scrollOffset.current = e.nativeEvent.contentOffset.y)}
         refreshing={refreshing}
         style={styles.listStyle}
         ref={dynamicListRef}

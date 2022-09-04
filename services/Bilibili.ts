@@ -40,7 +40,7 @@ export function request<D extends Record<string, any>>(url: string) {
     .then((res: { code: number; message: string; data: D }) => {
       if (res.code) {
         ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
-        throw new Error('未能获取当前数据');
+        throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''));
       }
       return res.data;
     });

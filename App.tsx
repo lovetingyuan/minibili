@@ -1,5 +1,12 @@
 import React, { ReactNode } from 'react';
-import { Alert, Pressable, StatusBar, StyleSheet, Text } from 'react-native';
+import {
+  Alert,
+  Image,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+} from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -13,7 +20,7 @@ import WebPage from './routes/WebPage';
 import { checkWifi } from './hooks/useNetStatusToast';
 import { RootStackParamList } from './types';
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
-import { Icon } from '@rneui/base';
+import { getBlackUps } from './routes/Hot/blackUps';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -67,24 +74,28 @@ const Main = () => {
           headerRight() {
             return (
               <Pressable
-                onPress={() => {
+                onPress={async () => {
+                  const blacks = await getBlackUps;
+                  const blacksNum = Object.keys(blacks).length;
                   Alert.alert(
-                    'minibili',
+                    `关于 minibili (${require('./app.json').expo.version})`,
                     [
                       '',
-                      '所有数据都来自B站',
-                      '',
-                      '版本：' + require('./app.json').expo.version,
+                      '所有数据都来自B站官网，仅供学习交流',
                       '',
                       'https://github.com/lovetingyuan/minibili',
+                      '',
+                      blacksNum
+                        ? `黑名单(${blacksNum})：\n${Object.values(blacks).join(
+                            ', ',
+                          )}`
+                        : '',
                     ].join('\n'),
                   );
                 }}>
-                <Icon
-                  name="info-outline"
-                  style={{ marginRight: 18 }}
-                  size={18}
-                  color="#888"
+                <Image
+                  style={{ width: 16, height: 16, marginRight: 18, top: 3 }}
+                  source={require('./assets/info.png')}
                 />
               </Pressable>
             );

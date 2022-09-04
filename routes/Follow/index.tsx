@@ -28,22 +28,25 @@ export default function Follow({ navigation, route }: Props) {
   const inputRef = React.useRef<Input | null>(null);
   const followListRef = React.useRef<FlatList | null>(null);
 
+  const [initLoad, setInitLoad] = React.useState(true);
   React.useEffect(() => {
-    if (!userId) {
-      AsyncStorage.getItem('USER_ID').then(id => {
-        if (id) {
-          setUserId(id);
-        } else {
-          inputRef.current?.focus();
-        }
-      });
-    } else {
-      loadMoreUps();
-      getUserInfo(userId).then(user => {
-        setUserInfo(user);
-      });
-    }
-  }, [userId]);
+    AsyncStorage.getItem('USER_ID').then(id => {
+      if (id) {
+        setUserId(id);
+      } else {
+        inputRef.current?.focus();
+      }
+    });
+  }, []);
+
+  // React.useEffect(() => {
+  //   if (userId) {
+  //     loadMoreUps();
+  //     getUserInfo(userId).then(user => {
+  //       setUserInfo(user);
+  //     });
+  //   }
+  // }, [userId]);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -85,6 +88,13 @@ export default function Follow({ navigation, route }: Props) {
         setLoading(false);
       });
   };
+  if (userId && initLoad) {
+    loadMoreUps();
+    setInitLoad(false);
+    getUserInfo(userId).then(user => {
+      setUserInfo(user);
+    });
+  }
   const clearUser = async () => {
     await AsyncStorage.removeItem('USER_ID');
     setUserId('');
@@ -92,6 +102,7 @@ export default function Follow({ navigation, route }: Props) {
     setLoadDone(false);
     setLoading(false);
     setPage(1);
+    setInitLoad(true);
   };
   return (
     <View style={styles.container}>

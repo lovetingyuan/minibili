@@ -26,20 +26,8 @@ function __hack() {
       clearInterval(timer);
     }
   }, 200);
-  // const timer2 = setInterval(() => {
-  //   const jump = document.querySelector('.mplayer-toast-jump');
-  //   const video = document.querySelector('video');
-  //   if (jump && video) {
-  //     const playProgress = video.currentTime / video.duration;
-  //     if (playProgress < 0.5) {
-  //       (jump as HTMLSpanElement).click();
-  //       clearInterval(timer2);
-  //     }
-  //   }
-  // }, 200);
   setTimeout(() => {
     clearInterval(timer);
-    // clearInterval(timer2);
   }, 5000);
 }
 const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`;
@@ -197,7 +185,11 @@ export default ({ route }: Props) => {
         <View style={styles.videoHeader}>
           <View style={styles.upInfoContainer}>
             {videoInfo?.upFace ? (
-              <Avatar size={35} rounded source={{ uri: videoInfo.upFace }} />
+              <Avatar
+                size={35}
+                rounded
+                source={{ uri: videoInfo.upFace + '@80w_80h_1c.webp' }}
+              />
             ) : null}
             <Text style={[styles.upName, tracyStyle]}>
               {videoInfo?.upName || '-'}
@@ -347,7 +339,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#ddd',
 
-    message: { fontSize: 16, lineHeight: 22, marginLeft: 2 },
+    message: { fontSize: 16, lineHeight: 22 },
 
     replyUpName: {
       fontWeight: 'bold',
@@ -395,7 +387,7 @@ const styles = StyleSheet.create({
   repliesreplies: {
     marginTop: 5,
     borderLeftColor: '#ddd',
-    borderLeftWidth: 1,
+    borderLeftWidth: 0.5,
     marginLeft: 6,
     paddingLeft: 6,
   },

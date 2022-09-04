@@ -42,12 +42,12 @@ export default function Hot({ navigation }: Props) {
       videosIdMap[second.bvid] = true;
     }
   });
-  const [loadMore, setLoadMore] = React.useState(false);
   const hotListRef = React.useRef<FlatList | null>(null);
-  React.useEffect(() => {
+  const [initLoad, setInitLoad] = React.useState(true);
+
+  if (!initLoad) {
     SplashScreen.hideAsync();
-    loadMoreDynamicItems();
-  }, [loadMore]);
+  }
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
@@ -99,7 +99,7 @@ export default function Hot({ navigation }: Props) {
       ...state,
       list: newList,
     });
-    setLoadMore(!loadMore);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentVideoRef.current]);
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'N/A');
@@ -147,7 +147,7 @@ export default function Hot({ navigation }: Props) {
       </View>
     );
   };
-  const loadMoreDynamicItems = async () => {
+  const loadMoreHotItems = async () => {
     if (loadingRef.current || !moreRef.current) {
       return;
     }
@@ -194,8 +194,12 @@ export default function Hot({ navigation }: Props) {
       list: [],
       refreshing: false,
     });
-    setLoadMore(!loadMore);
+    setInitLoad(true);
   };
+  if (initLoad) {
+    setInitLoad(false);
+    loadMoreHotItems();
+  }
   const toggleOverlay = () => {
     setModalVisible(!modalVisible);
   };
@@ -265,9 +269,7 @@ export default function Hot({ navigation }: Props) {
         refreshing={state.refreshing}
         onEndReachedThreshold={0.4}
         onRefresh={resetDynamicItems}
-        onEndReached={() => {
-          setLoadMore(!loadMore);
-        }}
+        onEndReached={loadMoreHotItems}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             哔哩哔哩 (゜-゜)つロ 干杯~-bilibili

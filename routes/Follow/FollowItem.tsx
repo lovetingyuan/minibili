@@ -48,7 +48,7 @@ export default function FollowItem(props: UpItem) {
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
-        navigation.navigate('Dynamic', { upId: mid });
+        navigation.navigate('Dynamic', { mid, face, name, sign });
         setUpdatedId(0);
       }}>
       <View style={styles.container}>
@@ -56,7 +56,7 @@ export default function FollowItem(props: UpItem) {
           size={56}
           containerStyle={{ marginRight: 14 }}
           rounded
-          source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.png') }}
+          source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
         />
         <View style={{ flex: 1 }}>
           <View style={styles.nameContainer}>
@@ -78,6 +78,7 @@ export default function FollowItem(props: UpItem) {
           <Button
             title="直播中~"
             type="clear"
+            titleStyle={{ fontSize: 13 }}
             onPress={() => {
               if (livingInfo.liveUrl) {
                 navigation.navigate('WebPage', {

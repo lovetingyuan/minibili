@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   videoLength: {
     position: 'absolute',
-    paddingVertical: 1,
+    // paddingVertical: 1,
     paddingHorizontal: 4,
     backgroundColor: '#ddd',
     alignItems: 'center',
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   image: {
     flex: 1,
-    // width: null,
+    width: undefined,
     maxWidth: '100%',
     borderRadius: 4,
     aspectRatio: 1.7,

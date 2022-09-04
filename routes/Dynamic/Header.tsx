@@ -14,8 +14,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
-export default function Header(props: { mid: number }) {
-  const { mid } = props;
+export default function Header(props: {
+  mid: number;
+  name?: string;
+  face?: string;
+  sign?: string;
+}) {
+  const { mid, name, face, sign } = props;
   const [fans, setFans] = React.useState('');
 
   const navigation = useNavigation<NavigationProps['navigation']>();
@@ -23,7 +28,7 @@ export default function Header(props: { mid: number }) {
   type User = GetFuncPromiseType<typeof getUserInfo>;
   const [userInfo, setUserInfo] = React.useState<User | null>(null);
   const updateUserInfo = React.useCallback(() => {
-    getUserInfo(mid).then(setUserInfo);
+    getUserInfo(mid).then(setUserInfo, () => setUserInfo(null));
   }, [mid]);
   React.useEffect(() => {
     updateUserInfo();
@@ -42,36 +47,46 @@ export default function Header(props: { mid: number }) {
   if (isTracy) {
     nameStyle.color = '#f25d8e';
   }
-  if (!userInfo) {
-    return null;
-  }
+  const avatar = userInfo?.face || face;
   return (
     <View style={styles.header}>
       <TouchableWithoutFeedback
         onPress={() => {
-          navigation.navigate('WebPage', {
-            url: `https://space.bilibili.com/${mid}`,
-            title: userInfo.name,
-          });
+          const title = userInfo?.name || name;
+          if (title) {
+            navigation.navigate('WebPage', {
+              url: `https://space.bilibili.com/${mid}`,
+              title,
+            });
+          }
         }}>
-        <Avatar
-          size={58}
-          containerStyle={{ marginRight: 14 }}
-          rounded
-          source={{ uri: userInfo.face + (isTracy ? '' : '@120w_120h_1c.png') }}
-        />
+        {avatar ? (
+          <Avatar
+            size={58}
+            containerStyle={{ marginRight: 14 }}
+            rounded
+            source={{
+              uri: avatar + (isTracy ? '' : '@120w_120h_1c.webp'),
+            }}
+          />
+        ) : (
+          <View />
+        )}
       </TouchableWithoutFeedback>
       <View style={{ flex: 1 }}>
         <Text>
-          <Text style={{ ...styles.name, ...nameStyle }}>{userInfo.name}</Text>
+          <Text style={{ ...styles.name, ...nameStyle }}>
+            {userInfo?.name || name}
+          </Text>
           {'    '} {fans}关注
         </Text>
-        <Text style={styles.sign}>{userInfo.sign}</Text>
+        <Text style={styles.sign}>{userInfo?.sign || sign}</Text>
       </View>
-      {userInfo.living ? (
+      {userInfo?.living ? (
         <Button
           title="直播中"
           type="clear"
+          titleStyle={{ fontSize: 13 }}
           onPress={() => {
             if (userInfo.liveUrl) {
               navigation.navigate('WebPage', {

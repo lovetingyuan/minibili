@@ -34,11 +34,7 @@ export default function RichTextItem(props: {
         </ScrollView>
       ) : null}
       <View style={styles.info}>
-        <Icon
-          name="update"
-          color="#666"
-          iconProps={{ name: 'update', size: 14 }}
-        />
+        <Icon name="update" color="#666" size={14} />
         <Text style={styles.date}> {date}</Text>
       </View>
     </View>

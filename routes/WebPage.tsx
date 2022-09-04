@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import useNetStatusToast from '../hooks/useNetStatusToast';
+// import useNetStatusToast from '../hooks/useNetStatusToast';
 
 function __hack() {
   const style = document.createElement('style');
@@ -162,9 +162,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>;
 
 export default ({ route }: Props) => {
   __DEV__ && console.log(route.name);
-  const { url, bvid } = route.params;
+  const { url } = route.params;
   const webviewRef = React.useRef<WebView | null>(null);
-  useNetStatusToast(bvid);
+  // useNetStatusToast(bvid);
 
   return (
     <WebView
