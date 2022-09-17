@@ -8,7 +8,7 @@ import {
   BackHandler,
 } from 'react-native';
 import { getDynamicItems, TracyId } from '../../services/Bilibili';
-import { setLatest } from '../../services/Updates';
+// import { setLatest } from '../../services/Updates';
 import { DynamicItem, DynamicType } from '../../types';
 import ForwardItem from './ForwardItem';
 import Header from './Header';
@@ -34,10 +34,9 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
   });
   const [loading, setLoading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
-  const upId = route.params.mid || TracyId;
+  const upId = route.params?.mid || TracyId;
   const dynamicListRef = React.useRef<FlatList | null>(null);
   const [initLoad, setInitLoad] = React.useState(true);
-
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
@@ -54,8 +53,9 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
   }, [navigation]);
 
   React.useEffect(() => {
+    const follow = route.params?.follow;
     const handler = function () {
-      if (navigation.isFocused()) {
+      if (navigation.isFocused() && follow) {
         navigation.navigate('Follow');
         return true;
       }
@@ -65,7 +65,7 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
     return () => {
       BackHandler.removeEventListener('hardwareBackPress', handler);
     };
-  }, [upId, navigation]);
+  }, [upId, navigation, route.params]);
   const renderItem = ({ item }: any) => {
     let Item: any = null;
     if (item.type === DynamicType.Video) {
@@ -127,9 +127,6 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
     loadMoreDynamicItems();
   }
   React.useEffect(() => {
-    if (upId) {
-      setLatest(upId);
-    }
     resetDynamicItems();
   }, [upId]);
 
@@ -153,7 +150,11 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
-            {pageInfoRef.current.hasMore ? '加载中...' : '到底了~'}
+            {dynamicItems.length
+              ? pageInfoRef.current.hasMore
+                ? '加载中...'
+                : '到底了~'
+              : ''}
           </Text>
         }
       />

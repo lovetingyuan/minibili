@@ -1,16 +1,30 @@
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Icon } from '@rneui/base';
 import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  // Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { TracyId } from '../../services/Bilibili';
+import { RootStackParamList } from '../../types';
+type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function RichTextItem(props: {
   text: string;
   date: number;
   mid: number;
+  name: string;
   images: { src: string; ratio: number }[];
 }) {
-  const { text, date, mid, images } = props;
+  const { text, date, mid, images, name } = props;
   const isTracy = mid === TracyId;
+  const navigation = useNavigation<NavigationProps['navigation']>();
 
   return (
     <View style={[styles.textContainer]}>
@@ -22,13 +36,22 @@ export default function RichTextItem(props: {
           style={styles.imagesContainer}>
           {images.map(img => {
             return (
-              <Image
-                style={[styles.image, { aspectRatio: img.ratio }]}
-                key={img.src}
-                source={{
-                  uri: img.src + (isTracy ? '' : '@240w_240h_1c.webp'),
-                }}
-              />
+              <Pressable
+                onPress={() => {
+                  // Linking.openURL(img.src);
+                  navigation.navigate('WebPage', {
+                    url: img.src,
+                    title: name,
+                  });
+                }}>
+                <Image
+                  style={[styles.image, { aspectRatio: img.ratio }]}
+                  key={img.src}
+                  source={{
+                    uri: img.src + (isTracy ? '' : '@240w_240h_1c.webp'),
+                  }}
+                />
+              </Pressable>
             );
           })}
         </ScrollView>

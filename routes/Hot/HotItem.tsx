@@ -7,7 +7,6 @@ type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0];
 
 const parseDuration = (duration: number) => {
   const date = new Date(duration * 1000);
-  // date.getTimezoneOffset()
   const hour = date.getHours() - date.getTimezoneOffset() / -60;
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const seconds = date.getSeconds().toString().padStart(2, '0');
@@ -64,18 +63,16 @@ const styles = StyleSheet.create({
   },
   videoLength: {
     position: 'absolute',
-    // paddingVertical: 1,
     paddingHorizontal: 4,
-    backgroundColor: '#ddd',
+    backgroundColor: 'rgba(0,0,0,.5)',
     alignItems: 'center',
     borderRadius: 2,
-    opacity: 0.8,
     margin: 5,
   },
   videoLengthText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#eee',
   },
   image: {
     flex: 1,

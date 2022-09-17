@@ -90,7 +90,7 @@ const handleMessage = (msg: string) => {
   return result;
 };
 
-export default ({ route }: Props) => {
+export default ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name);
   const { aid, bvid, name, mid } = route.params;
   type Comments = GetFuncPromiseType<typeof getVideoComments>;
@@ -147,6 +147,17 @@ export default ({ route }: Props) => {
       handleShare(name, videoInfo.title, bvid);
     }
   }, [name, videoInfo, bvid]);
+  // useEffect(() => {
+  //   const handler = () => {
+  //     console.log(999);
+  //     navigation.goBack();
+  //     return true;
+  //   };
+  //   BackHandler.addEventListener('hardwareBackPress', handler);
+  //   return () => {
+  //     BackHandler.removeEventListener('hardwareBackPress', handler);
+  //   };
+  // }, []);
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -183,18 +194,30 @@ export default ({ route }: Props) => {
       </View>
       <ScrollView style={styles.videoInfoContainer}>
         <View style={styles.videoHeader}>
-          <View style={styles.upInfoContainer}>
-            {videoInfo?.upFace ? (
-              <Avatar
-                size={35}
-                rounded
-                source={{ uri: videoInfo.upFace + '@80w_80h_1c.webp' }}
-              />
-            ) : null}
-            <Text style={[styles.upName, tracyStyle]}>
-              {videoInfo?.upName || '-'}
-            </Text>
-          </View>
+          <Pressable
+            onPress={() => {
+              navigation.navigate('Dynamic', {
+                mid,
+                face: videoInfo?.upFace,
+                name,
+                sign: '',
+                follow: false,
+              });
+            }}>
+            <View style={styles.upInfoContainer}>
+              {videoInfo?.upFace ? (
+                <Avatar
+                  size={35}
+                  rounded
+                  source={{ uri: videoInfo.upFace + '@80w_80h_1c.webp' }}
+                />
+              ) : null}
+              <Text style={[styles.upName, tracyStyle]}>
+                {videoInfo?.upName || '-'}
+              </Text>
+            </View>
+          </Pressable>
+
           <View style={styles.videoInfo}>
             <Icon name="update" color="#999" size={14} />
             <Text style={styles.videoInfoText}>
@@ -218,7 +241,6 @@ export default ({ route }: Props) => {
             </Pressable>
           </View>
         </View>
-
         <View>
           <Text style={styles.videoTitle}>{videoInfo?.title || ''}</Text>
           {videoInfo?.desc && videoInfo.desc.trim() !== '-' ? (
@@ -240,10 +262,14 @@ export default ({ route }: Props) => {
                     style={[
                       styles.replyItem.message,
                       comment.top ? styles.topReply : null,
+                      comment.upLike ? styles.upLikeReply : null,
                     ]}
                     selectable
                     selectionColor={'#BFEDFA'}>
                     {handleMessage(comment.message)}
+                    <Text style={{ fontSize: 12 }}>
+                      {comment.like ? ` ${comment.like}👍` : ''}
+                    </Text>
                   </Text>
                 </View>
                 {comment.replies ? (
@@ -338,9 +364,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderBottomWidth: 0.5,
     borderBottomColor: '#ddd',
-
     message: { fontSize: 16, lineHeight: 22 },
-
     replyUpName: {
       fontWeight: 'bold',
       color: '#666',
@@ -349,6 +373,10 @@ const styles = StyleSheet.create({
   },
   topReply: {
     color: '#00699D',
+  },
+  upLikeReply: {
+    textDecorationColor: '#00699D',
+    textDecorationLine: 'underline',
   },
   replyItemContent: {
     flexDirection: 'row',
@@ -386,9 +414,7 @@ const styles = StyleSheet.create({
   },
   repliesreplies: {
     marginTop: 5,
-    borderLeftColor: '#ddd',
-    borderLeftWidth: 0.5,
-    marginLeft: 6,
-    paddingLeft: 6,
+    marginLeft: 4,
+    paddingLeft: 4,
   },
 });

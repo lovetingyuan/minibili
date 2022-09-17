@@ -25,7 +25,7 @@ export default function TracyBtn() {
       color="#fb7299"
       placement="right"
       onPress={() => {
-        navigation.navigate('Dynamic', { mid: TracyId });
+        navigation.navigate('Dynamic', { mid: TracyId, follow: true });
       }}
     />
   );

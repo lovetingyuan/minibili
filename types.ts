@@ -15,6 +15,7 @@ export type RootStackParamList = {
     name?: string;
     face?: string;
     sign?: string;
+    follow?: boolean;
   };
   Hot: undefined;
   Follow: undefined;

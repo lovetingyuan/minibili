@@ -4,6 +4,8 @@ import { DynamicType } from '../types';
 
 export const TracyId = 1458143131; // 1660828480, 1661938567
 
+let errorTime = Date.now();
+
 // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=326081112&timezone_offset=-480
 export function request<D extends Record<string, any>>(url: string) {
   const host = 'api.bilibili.com';
@@ -19,14 +21,15 @@ export function request<D extends Record<string, any>>(url: string) {
       'cache-control': 'max-age=0',
       'sec-ch-ua':
         '"Chromium";v="104", " Not A;Brand";v="99", "Microsoft Edge";v="104"',
-      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-mobile': '?1',
       'sec-ch-ua-platform': '"Windows"',
       'sec-fetch-dest': 'empty',
       'sec-fetch-mode': 'cors',
       'sec-fetch-site': 'same-site',
-      'upgrade-insecure-requests': '1',
-      'user-agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.0.1293.54',
+      // 'upgrade-insecure-requests': '1',
+      'user-agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.${Math.random()
+        .toString()
+        .slice(6)}.54`,
     },
     referrerPolicy: 'no-referrer-when-downgrade',
     // referrerPolicy: 'strict-origin-when-cross-origin',
@@ -39,7 +42,10 @@ export function request<D extends Record<string, any>>(url: string) {
     .then(r => r.json())
     .then((res: { code: number; message: string; data: D }) => {
       if (res.code) {
-        ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
+        if (Date.now() - errorTime > 20000) {
+          ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
+          errorTime = Date.now();
+        }
         throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''));
       }
       return res.data;
@@ -517,6 +523,7 @@ export function getVideoComments(aid: string | number) {
           mid: item.member.mid,
           upLike: item.up_action.like,
           top: false,
+          like: item.like,
           replies:
             item.replies?.map(v => {
               return {
@@ -537,6 +544,7 @@ export function getVideoComments(aid: string | number) {
         id: item.rpid_str,
         mid: item.member.mid,
         upLike: item.up_action.like,
+        like: item.like,
         top: true,
         replies:
           item.replies?.map(v => {
