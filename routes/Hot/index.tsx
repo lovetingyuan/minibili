@@ -10,15 +10,17 @@ import {
   Linking,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import { getHotList, TracyId } from '../../services/Bilibili';
+import { getHotList } from '../../services/Bilibili';
 import HotItem from './HotItem';
-import { Overlay, Button } from '@rneui/themed';
+// import { Overlay, Button } from '@rneui/themed';
 import TracyBtn from '../../components/TracyBtn';
 import handleShare from '../../services/Share';
 import { addBlackUser, getBlackUps } from './blackUps';
 import { GetFuncPromiseType } from '../../types';
 import { RootStackParamList } from '../../types';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import ButtonsOverlay from '../../components/ButtonsOverlay';
+import useMemoizedFn from '../../hooks/useMemoizedFn';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>;
 
@@ -200,9 +202,9 @@ export default function Hot({ navigation }: Props) {
     setInitLoad(false);
     loadMoreHotItems();
   }
-  const toggleOverlay = () => {
-    setModalVisible(!modalVisible);
-  };
+  // const toggleOverlay = () => {
+  //   setModalVisible(!modalVisible);
+  // };
   const onShare = async () => {
     if (currentVideoRef.current) {
       setModalVisible(false);
@@ -210,58 +212,55 @@ export default function Hot({ navigation }: Props) {
       handleShare(name, title, bvid);
     }
   };
+  const handleOverlayClick = useMemoizedFn((name: string) => {
+    if (name === 'black') {
+      setModalVisible(false);
+      Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
+        {
+          text: '取消',
+          style: 'cancel',
+        },
+        { text: '确定', onPress: addBlackUp },
+      ]);
+    } else if (name === 'share') {
+      onShare();
+    } else if (name === 'openApp') {
+      if (!currentVideoRef.current) {
+        return;
+      }
+      setModalVisible(false);
+      Linking.openURL(`bilibili://video/${currentVideoRef.current.bvid}`).catch(
+        err => {
+          if (err.message.includes('No Activity found to handle Intent')) {
+            ToastAndroid.show('未安装B站', ToastAndroid.SHORT);
+          }
+        },
+      );
+    }
+  });
+  const buttons = [
+    {
+      text: `不再看 ${currentVideoRef.current?.name} 的视频`,
+      name: 'black',
+    },
+    {
+      text: `分享(${currentVideoRef.current?.shareNum})`,
+      name: 'share',
+    },
+    {
+      text: '在B站APP打开',
+      name: 'openApp',
+    },
+  ];
   return (
     <View style={styles.container}>
-      <Overlay
-        isVisible={modalVisible}
-        overlayStyle={{ minWidth: 200 }}
-        onBackdropPress={toggleOverlay}>
-        {currentVideoRef.current?.mid === TracyId ? null : (
-          <Button
-            title={`不再看 ${currentVideoRef.current?.name} 的视频`}
-            type="clear"
-            onPress={() => {
-              setModalVisible(false);
-              Alert.alert(
-                `不再看 ${currentVideoRef.current?.name} 的视频？`,
-                '',
-                [
-                  {
-                    text: '取消',
-                    style: 'cancel',
-                  },
-                  { text: '确定', onPress: addBlackUp },
-                ],
-              );
-            }}
-            buttonStyle={styles.popupBtn}
-          />
-        )}
-        <Button
-          title={`分享(${currentVideoRef.current?.shareNum})`}
-          onPress={onShare}
-          buttonStyle={styles.popupBtn}
-          type="clear"
-        />
-        <Button
-          title="在B站APP打开"
-          onPress={() => {
-            if (!currentVideoRef.current) {
-              return;
-            }
-            setModalVisible(false);
-            Linking.openURL(
-              `bilibili://video/${currentVideoRef.current.bvid}`,
-            ).catch(err => {
-              if (err.message.includes('No Activity found to handle Intent')) {
-                ToastAndroid.show('未安装B站', ToastAndroid.SHORT);
-              }
-            });
-          }}
-          buttonStyle={styles.popupBtn}
-          type="clear"
-        />
-      </Overlay>
+      <ButtonsOverlay
+        visible={modalVisible}
+        overlayStyle={{ minWidth: 220 }}
+        buttons={buttons}
+        onPress={handleOverlayClick}
+        dismiss={() => setModalVisible(false)}
+      />
       <FlatList
         data={state.list}
         ref={hotListRef}

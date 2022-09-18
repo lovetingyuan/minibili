@@ -119,28 +119,28 @@ function __hack() {
     },
     true,
   );
-  const reloadButton = document.createElement('div');
-  reloadButton.innerHTML = '&#8635;';
-  reloadButton.addEventListener('click', () => {
-    window.location.reload();
-  });
-  reloadButton.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    width: 40px;
-    height: 40px;
-    border-radius: 23px;
-    background: #fff;
-    line-height: 40px;
-    font-weight: bold;
-    font-size: 32px;
-    text-align: center;
-    z-index: 99;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    color: #555;
-  `;
-  document.body.appendChild(reloadButton);
+  // const reloadButton = document.createElement('div');
+  // reloadButton.innerHTML = '&#8635;';
+  // reloadButton.addEventListener('click', () => {
+  //   window.location.reload();
+  // });
+  // reloadButton.style.cssText = `
+  //   position: fixed;
+  //   bottom: 20px;
+  //   left: 20px;
+  //   width: 40px;
+  //   height: 40px;
+  //   border-radius: 23px;
+  //   background: #fff;
+  //   line-height: 40px;
+  //   font-weight: bold;
+  //   font-size: 32px;
+  //   text-align: center;
+  //   z-index: 99;
+  //   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  //   color: #555;
+  // `;
+  // document.body.appendChild(reloadButton);
 }
 const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`;
 const Loading = () => {

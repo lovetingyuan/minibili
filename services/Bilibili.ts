@@ -2,7 +2,11 @@ import { ToastAndroid } from 'react-native';
 import { getBlackUps } from '../routes/Hot/blackUps';
 import { DynamicType } from '../types';
 
-export const TracyId = 1458143131; // 1660828480, 1661938567
+export let TracyId = 1458143131; // 1660828480, 1661938567
+
+export const changeSpecialUpId = (mid: number) => {
+  TracyId = mid;
+};
 
 let errorTime = Date.now();
 

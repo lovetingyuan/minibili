@@ -37,6 +37,7 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
   const upId = route.params?.mid || TracyId;
   const dynamicListRef = React.useRef<FlatList | null>(null);
   const [initLoad, setInitLoad] = React.useState(true);
+  const [refreshHead, setRefreshHead] = React.useState(0);
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
@@ -125,6 +126,7 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
   if (initLoad) {
     setInitLoad(false);
     loadMoreDynamicItems();
+    setRefreshHead(refreshHead + 1);
   }
   React.useEffect(() => {
     resetDynamicItems();
@@ -132,7 +134,7 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Header {...route.params} />
+      <Header {...route.params} refreshHead={refreshHead} />
       <FlatList
         data={dynamicItems}
         renderItem={renderItem}

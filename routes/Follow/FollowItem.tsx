@@ -6,8 +6,9 @@ import { checkDynamics, setLatest } from '../../services/Updates';
 import { useNavigation } from '@react-navigation/native';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Button, Overlay } from '@rneui/base';
+import { Button } from '@rneui/base';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
+import ButtonsOverlay from '../../components/ButtonsOverlay';
 
 if (!Promise.allSettled) {
   const rejectHandler = (reason: any) => ({ status: 'rejected', reason });
@@ -71,32 +72,48 @@ export default function FollowItem(props: {
   }, [startUpdate, mid]);
 
   const [modalVisible, setModalVisible] = React.useState(false);
-  const markNew = useMemoizedFn(() => {
-    const random = Math.random().toString().slice(2, 10);
-    setLatest(mid, random);
-    setUpdatedId(random);
-    // toggleOverlay();
-    setModalVisible(false);
-  });
-  const hideModal = useMemoizedFn(() => {
-    setModalVisible(false);
-  });
-  const showModal = useMemoizedFn(() => {
-    if (updatedId) {
-      return;
-    }
-    setModalVisible(true);
-  });
   const gotoDynamic = useMemoizedFn(() => {
     navigation.navigate('Dynamic', { mid, face, name, sign, follow: true });
     setLatest(mid, updatedId + '');
     setUpdatedId('');
   });
+  const gotoLivePage = useMemoizedFn(() => {
+    if (livingInfo?.liveUrl) {
+      navigation.navigate('WebPage', {
+        url: livingInfo.liveUrl,
+        title: name + '的直播间',
+      });
+    }
+  });
+  const buttons = [
+    updatedId
+      ? null
+      : {
+          text: '标记为未读',
+          name: 'unread',
+        },
+    {
+      text: `设置 ${props.item.name} 为特别关注`,
+      name: 'special',
+    },
+  ].filter(Boolean);
+  const handleOverlayClick = useMemoizedFn((n: string) => {
+    if (n === 'unread') {
+      const random = Math.random().toString().slice(2, 10);
+      setLatest(mid, random);
+      setUpdatedId(random);
+      setModalVisible(false);
+    } else if (n === 'special') {
+      // TODO:
+    }
+  });
   return (
     <View>
       <TouchableOpacity
         activeOpacity={0.8}
-        onLongPress={showModal}
+        onLongPress={() => {
+          setModalVisible(true);
+        }}
         onPress={gotoDynamic}>
         <View style={styles.container}>
           <Avatar
@@ -126,29 +143,20 @@ export default function FollowItem(props: {
               title="直播中~"
               type="clear"
               titleStyle={{ fontSize: 13 }}
-              onPress={() => {
-                if (livingInfo.liveUrl) {
-                  navigation.navigate('WebPage', {
-                    url: livingInfo.liveUrl,
-                    title: name + '的直播间',
-                  });
-                }
-              }}
+              onPress={gotoLivePage}
             />
           ) : null}
         </View>
       </TouchableOpacity>
-      <Overlay
-        isVisible={modalVisible}
-        overlayStyle={{
-          padding: 16,
-          backgroundColor: 'white',
+      <ButtonsOverlay
+        // @ts-ignore
+        buttons={buttons}
+        onPress={handleOverlayClick}
+        visible={modalVisible}
+        dismiss={() => {
+          setModalVisible(false);
         }}
-        onBackdropPress={hideModal}>
-        <Button type="clear" onPress={markNew}>
-          标记未读{'                   '}
-        </Button>
-      </Overlay>
+      />
     </View>
   );
 }
@@ -189,4 +197,13 @@ const styles = StyleSheet.create({
   newIcon: { width: 28, height: 11, marginLeft: 10, top: -1 },
   signText: { color: '#555', marginTop: 2, fontSize: 13 },
   liveText: { color: '#008AC5', fontSize: 14, marginLeft: 12, marginRight: 5 },
+  overlay: {
+    padding: 16,
+    backgroundColor: 'white',
+    minWidth: 200,
+  },
+  overlayButton: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
 });

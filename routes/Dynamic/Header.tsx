@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
+import useMemoizedFn from '../../hooks/useMemoizedFn';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function Header(props: {
@@ -19,35 +20,36 @@ export default function Header(props: {
   name?: string;
   face?: string;
   sign?: string;
+  refreshHead: number;
 }) {
-  const { mid, name, face, sign } = props;
+  const { mid, name, face, sign, refreshHead } = props;
   const [fans, setFans] = React.useState('');
 
   const navigation = useNavigation<NavigationProps['navigation']>();
   const isTracy = mid === TracyId;
   type User = GetFuncPromiseType<typeof getUserInfo>;
   const [userInfo, setUserInfo] = React.useState<User | null>(null);
-  const updateUserInfo = React.useCallback(() => {
+  const updateUserInfo = useMemoizedFn(() => {
     getUserInfo(mid).then(setUserInfo, () => setUserInfo(null));
-  }, [mid]);
+  });
   React.useEffect(() => {
     updateUserInfo();
     getFansData(mid).then(data => {
       setFans((data.follower / 10000).toFixed(1) + '万');
     });
-    let timer: any;
-    if (isTracy) {
-      timer = setInterval(updateUserInfo, 60 * 1000);
-    }
-    return () => {
-      timer && clearInterval(timer);
-    };
-  }, [mid, isTracy, updateUserInfo]);
+    // let timer: any;
+    // if (isTracy) {
+    //   timer = setInterval(updateUserInfo, 60 * 1000);
+    // }
+    // return () => {
+    //   timer && clearInterval(timer);
+    // };
+  }, [mid, refreshHead, updateUserInfo]);
   const nameStyle: Record<string, any> = {};
   if (isTracy) {
     nameStyle.color = '#f25d8e';
   }
-  const avatar = userInfo?.face || face;
+  const avatar = userInfo?.face || face || '';
   return (
     <View style={styles.header}>
       <TouchableWithoutFeedback
@@ -60,27 +62,27 @@ export default function Header(props: {
             });
           }
         }}>
-        {avatar ? (
-          <Avatar
-            size={58}
-            containerStyle={{ marginRight: 14 }}
-            rounded
-            source={{
-              uri: avatar + (isTracy ? '' : '@120w_120h_1c.webp'),
-            }}
-          />
-        ) : (
-          <View />
-        )}
+        <Avatar
+          size={58}
+          containerStyle={{ marginRight: 14 }}
+          rounded
+          source={
+            avatar
+              ? {
+                  uri: avatar + (isTracy ? '' : '@120w_120h_1c.webp'),
+                }
+              : require('../../assets/empty-avatar.png')
+          }
+        />
       </TouchableWithoutFeedback>
       <View style={{ flex: 1 }}>
         <Text>
           <Text style={{ ...styles.name, ...nameStyle }}>
-            {userInfo?.name || name}
+            {userInfo?.name || name || '未知'}
           </Text>
           {'    '} {fans}关注
         </Text>
-        <Text style={styles.sign}>{userInfo?.sign || sign}</Text>
+        <Text style={styles.sign}>{userInfo?.sign || sign || '加载失败'}</Text>
       </View>
       {userInfo?.living ? (
         <Button

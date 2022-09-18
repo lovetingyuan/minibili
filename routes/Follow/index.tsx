@@ -8,8 +8,9 @@ import {
   // Image,
   Pressable,
   ToastAndroid,
+  Image,
 } from 'react-native';
-import { Button, Avatar } from '@rneui/themed';
+import { Avatar } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FollowItem from './FollowItem';
 import { getFollowUps, getUserInfo } from '../../services/Bilibili';
@@ -20,6 +21,8 @@ import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { Icon, Input } from '@rneui/base';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
+import ButtonsOverlay from '../../components/ButtonsOverlay';
+import { getBlackUps } from '../Hot/blackUps';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 
@@ -33,7 +36,16 @@ export default function Follow({ navigation, route }: Props) {
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = React.useState<UserInfo>({
+    living: false,
+    face: '',
+    liveUrl: '',
+    name: '未知',
+    sign: '加载失败',
+    mid: 0,
+    level: 0,
+    sex: '',
+  });
   const [followedNum, setFollowedNum] = React.useState(0);
   const inputRef = React.useRef<Input | null>(null);
   const followListRef = React.useRef<FlatList | null>(null);
@@ -41,6 +53,11 @@ export default function Follow({ navigation, route }: Props) {
   const getUpdate = useMemoizedFn(() => {
     ToastAndroid.show('刷新中...', ToastAndroid.SHORT);
     setStartUpdate(startUpdate + 1);
+    if (!userInfo.face) {
+      getUserInfo(userId).then(user => {
+        setUserInfo(user);
+      });
+    }
   });
 
   const [initLoad, setInitLoad] = React.useState(true);
@@ -57,15 +74,6 @@ export default function Follow({ navigation, route }: Props) {
     });
   }, []);
 
-  // React.useEffect(() => {
-  //   if (userId) {
-  //     loadMoreUps();
-  //     getUserInfo(userId).then(user => {
-  //       setUserInfo(user);
-  //     });
-  //   }
-  // }, [userId]);
-
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
@@ -80,14 +88,8 @@ export default function Follow({ navigation, route }: Props) {
     });
     return unsubscribe;
   }, [navigation]);
-  // const handleUpdate = useMemoizedFn((mid: number) => {
-  //   if (!updatedUps.includes(mid)) {
-  //     setUpdatedUps(updatedUps.concat(mid));
-  //   }
-  // });
-  // const handleLive = useMemoizedFn(() => {
-  //   setHasLiving(true);
-  // });
+  const [modalVisible, setModalVisible] = React.useState(false);
+
   if (!userId) {
     return <Login setUserId={setUserId} />;
   }
@@ -132,46 +134,93 @@ export default function Follow({ navigation, route }: Props) {
     setPage(1);
     setInitLoad(true);
   };
+  const buttons = [
+    {
+      text: '退出',
+      name: 'logout',
+    },
+    {
+      text: '黑名单',
+      name: 'black',
+    },
+    {
+      text: '关于',
+      name: 'about',
+    },
+  ];
+  const handleOverlayClick = (name: string) => {
+    if (name === 'logout') {
+      clearUser();
+    } else if (name === 'black') {
+      getBlackUps.then(blacks => {
+        const blacksNum = Object.keys(blacks).length;
+        if (!blacksNum) {
+          ToastAndroid.show('暂无黑名单UP', ToastAndroid.SHORT);
+        } else {
+          Alert.alert(
+            `黑名单(${blacksNum})`,
+            Object.values(blacks)
+              .filter(v => typeof v === 'string')
+              .join(', '),
+          );
+        }
+      });
+    } else if (name === 'about') {
+      Alert.alert(
+        `关于 minibili (${require('../../app.json').expo.version})`,
+        [
+          '',
+          '所有数据都来自B站官网，仅供学习交流',
+          '',
+          'https://github.com/lovetingyuan/minibili',
+        ].join('\n'),
+      );
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.userContainer}>
-        {userInfo?.face ? (
-          <Avatar
-            size={60}
-            containerStyle={{ marginRight: 16 }}
-            onPress={() => {
-              if (userInfo) {
-                navigation.navigate('WebPage', {
-                  title: userInfo.name,
-                  url: `https://space.bilibili.com/${userId}`,
-                });
-              }
-            }}
-            rounded
-            source={{ uri: userInfo.face }}
-          />
-        ) : null}
-
+        <Avatar
+          size={60}
+          containerStyle={{ marginRight: 16 }}
+          onPress={() => {
+            if (userInfo) {
+              navigation.navigate('WebPage', {
+                title: userInfo.name,
+                url: `https://space.bilibili.com/${userId}`,
+              });
+            }
+          }}
+          rounded
+          source={
+            userInfo.face
+              ? { uri: userInfo.face }
+              : require('../../assets/empty-avatar.png')
+          }
+        />
         <View style={{ flex: 1 }}>
           <Text style={styles.myName}>{userInfo?.name || ''}</Text>
           <Text style={styles.mySign}>{userInfo?.sign || ''}</Text>
         </View>
-        <Button
-          title="退出"
-          type="clear"
+        <Pressable
           onPress={() => {
-            Alert.alert('确定要退出吗？', '', [
-              {
-                text: '取消',
-                style: 'cancel',
-              },
-              {
-                text: '确定',
-                onPress: clearUser,
-              },
-            ]);
+            setModalVisible(true);
+          }}>
+          <Image
+            source={require('../../assets/info-face.png')}
+            style={styles.infoFace}
+          />
+        </Pressable>
+        <ButtonsOverlay
+          buttons={buttons}
+          visible={modalVisible}
+          onPress={handleOverlayClick}
+          dismiss={() => {
+            setModalVisible(false);
           }}
-          titleStyle={styles.logoutText}
+          overlayStyle={{
+            minWidth: 240,
+          }}
         />
       </View>
       <View style={styles.listTitleContainer}>
@@ -255,5 +304,9 @@ const styles = StyleSheet.create({
   liveIcon: {
     width: 26,
     height: 24,
+  },
+  infoFace: {
+    width: 15,
+    height: 15,
   },
 });
