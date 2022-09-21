@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { getFollowUps, getUserInfo, TracyId } from '../../services/Bilibili';
+import { getFollowUps, getUserInfo } from '../../services/Bilibili';
 import { Avatar } from '@rneui/themed';
 import { checkDynamics, setLatest } from '../../services/Updates';
 import { useNavigation } from '@react-navigation/native';
@@ -9,6 +9,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppContext } from '../../context';
 
 if (!Promise.allSettled) {
   const rejectHandler = (reason: any) => ({ status: 'rejected', reason });
@@ -26,16 +28,13 @@ if (!Promise.allSettled) {
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
-export default function FollowItem(props: {
-  item: UpItem;
-  startUpdate: number;
-}) {
+export default function FollowItem(props: { item: UpItem }) {
   const {
     item: { face, name, sign, mid },
-    startUpdate,
   } = props;
+  const { setSpecialUser, specialUser } = React.useContext(AppContext);
   const tracyStyle: Record<string, any> = {};
-  const isTracy = mid === TracyId;
+  const isTracy = mid.toString() === specialUser?.mid;
   if (isTracy) {
     tracyStyle.color = '#fb7299';
     tracyStyle.fontSize = 18;
@@ -69,7 +68,7 @@ export default function FollowItem(props: {
         setLoading(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startUpdate, mid]);
+  }, [mid]);
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const gotoDynamic = useMemoizedFn(() => {
@@ -93,7 +92,7 @@ export default function FollowItem(props: {
           name: 'unread',
         },
     {
-      text: `设置 ${props.item.name} 为特别关注`,
+      text: `设置 ${props.item.name} 为特别关注 ❤`,
       name: 'special',
     },
   ].filter(Boolean);
@@ -104,11 +103,15 @@ export default function FollowItem(props: {
       setUpdatedId(random);
       setModalVisible(false);
     } else if (n === 'special') {
-      // TODO:
+      setSpecialUser({
+        name,
+        mid: mid + '',
+        face,
+      });
     }
   });
   return (
-    <View>
+    <View style={{ opacity: loading ? 0.4 : 1 }}>
       <TouchableOpacity
         activeOpacity={0.8}
         onLongPress={() => {
@@ -124,7 +127,9 @@ export default function FollowItem(props: {
           />
           <View style={{ flex: 1 }}>
             <View style={styles.nameContainer}>
-              <Text style={[styles.name, tracyStyle]}>{name}</Text>
+              <Text style={[styles.name, tracyStyle]}>
+                {name} {isTracy ? ' ❤' : ''}
+              </Text>
               {updatedId ? (
                 <Image
                   style={styles.newIcon}

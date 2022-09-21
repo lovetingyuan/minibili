@@ -202,9 +202,7 @@ export default function Hot({ navigation }: Props) {
     setInitLoad(false);
     loadMoreHotItems();
   }
-  // const toggleOverlay = () => {
-  //   setModalVisible(!modalVisible);
-  // };
+
   const onShare = async () => {
     if (currentVideoRef.current) {
       setModalVisible(false);

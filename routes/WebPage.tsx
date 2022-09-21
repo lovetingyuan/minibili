@@ -178,6 +178,7 @@ export default ({ route }: Props) => {
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
       renderLoading={Loading}
+      userAgent="xfhkjhksjfdsfsfdsf"
       ref={webviewRef}
       onMessage={evt => {
         const { action, payload } = JSON.parse(evt.nativeEvent.data);

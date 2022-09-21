@@ -1,5 +1,6 @@
 import { Button, Overlay } from '@rneui/base';
 import React from 'react';
+import { StyleSheet } from 'react-native';
 // import { useWindowDimensions } from 'react-native';
 
 export default function ButtonsOverlay(props: {
@@ -40,13 +41,18 @@ export default function ButtonsOverlay(props: {
   return (
     <Overlay
       isVisible={props.visible}
-      overlayStyle={{
-        padding: 16,
-        backgroundColor: 'white',
-        ...props.overlayStyle,
-      }}
+      overlayStyle={[styles.overlayStyle, props.overlayStyle]}
       onBackdropPress={props.dismiss}>
       {Buttons}
     </Overlay>
   );
 }
+
+const styles = StyleSheet.create({
+  overlayStyle: {
+    paddingVertical: 12,
+    paddingLeft: 12,
+    paddingRight: 24,
+    backgroundColor: 'white',
+  },
+});

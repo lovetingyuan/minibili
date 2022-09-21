@@ -1,12 +1,5 @@
 import React, { ReactNode } from 'react';
-import {
-  Alert,
-  Image,
-  Pressable,
-  StatusBar,
-  StyleSheet,
-  Text,
-} from 'react-native';
+import { StatusBar, StyleSheet, Text } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -20,7 +13,11 @@ import WebPage from './routes/WebPage';
 import { checkWifi } from './hooks/useNetStatusToast';
 import { RootStackParamList } from './types';
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
-import { getBlackUps } from './routes/Hot/blackUps';
+// import { getBlackUps } from './routes/Hot/blackUps';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppContext, SpecialUser } from './context';
+
+const TracyId = 1458143131;
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -71,35 +68,6 @@ const Main = () => {
           tabBarLabel: getLabel('热门'),
           headerTitle: '🔥 热门' + (__DEV__ ? ' dev' : ''),
           headerTitleStyle: { fontSize: 18, color: '#555' },
-          headerRight() {
-            return (
-              <Pressable
-                onPress={async () => {
-                  const blacks = await getBlackUps;
-                  const blacksNum = Object.keys(blacks).length;
-                  Alert.alert(
-                    `关于 minibili (${require('./app.json').expo.version})`,
-                    [
-                      '',
-                      '所有数据都来自B站官网，仅供学习交流',
-                      '',
-                      'https://github.com/lovetingyuan/minibili',
-                      '',
-                      blacksNum
-                        ? `黑名单(${blacksNum})：\n${Object.values(blacks).join(
-                            ', ',
-                          )}`
-                        : '',
-                    ].join('\n'),
-                  );
-                }}>
-                <Image
-                  style={{ width: 16, height: 16, marginRight: 18, top: 3 }}
-                  source={require('./assets/info.png')}
-                />
-              </Pressable>
-            );
-          },
           headerShown: true,
         }}
       />
@@ -122,41 +90,76 @@ const Main = () => {
 };
 
 export default () => {
+  const [userId, _setUserId] = React.useState('');
+  const [specialUser, _setSpecialUser] = React.useState<SpecialUser>({
+    mid: TracyId.toString(),
+    name: '侯翠翠',
+    face: 'https://i1.hdslb.com/bfs/face/2c7c282460812e14a3266f338d563b3ef4b1b009.jpg',
+  });
+  React.useEffect(() => {
+    AsyncStorage.getItem('USER_ID').then(res => {
+      setUserId(res || '');
+    });
+    AsyncStorage.getItem('SPECIAL_USER').then(res => {
+      if (res) {
+        setSpecialUser(JSON.parse(res));
+      }
+    });
+  }, []);
+  const setUserId = (mid: string) => {
+    AsyncStorage.setItem('USER_ID', mid).then(() => {
+      _setUserId(mid);
+    });
+  };
+  const setSpecialUser = (user: SpecialUser) => {
+    AsyncStorage.setItem('SPECIAL_USER', JSON.stringify(user)).then(() => {
+      _setSpecialUser(user);
+    });
+  };
   return (
-    <NavigationContainer>
-      <StatusBar backgroundColor="transparent" barStyle="dark-content" />
-      <Stack.Navigator
-        initialRouteName="Main"
-        screenOptions={{
-          headerTitleStyle: {
-            fontSize: 18,
-            color: '#555',
-          },
-        }}>
-        <Stack.Screen
-          name="Main"
-          component={Main}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Play"
-          component={Play}
-          options={props => {
-            return {
-              title: props.route.params.name,
-            };
-          }}
-        />
-        <Stack.Screen
-          name="WebPage"
-          component={WebPage}
-          options={props => {
-            return {
-              title: props.route.params.title,
-            };
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AppContext.Provider
+      value={{
+        userId,
+        specialUser,
+        setUserId,
+        setSpecialUser,
+        defaultMid: TracyId.toString(),
+      }}>
+      <NavigationContainer>
+        <StatusBar backgroundColor="transparent" barStyle="dark-content" />
+        <Stack.Navigator
+          initialRouteName="Main"
+          screenOptions={{
+            headerTitleStyle: {
+              fontSize: 18,
+              color: '#555',
+            },
+          }}>
+          <Stack.Screen
+            name="Main"
+            component={Main}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Play"
+            component={Play}
+            options={props => {
+              return {
+                title: props.route.params.name,
+              };
+            }}
+          />
+          <Stack.Screen
+            name="WebPage"
+            component={WebPage}
+            options={props => {
+              return {
+                title: props.route.params.title,
+              };
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AppContext.Provider>
   );
 };

@@ -4,14 +4,14 @@ import { Icon } from '@rneui/base';
 import React from 'react';
 import {
   Image,
-  // Linking,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { TracyId } from '../../services/Bilibili';
+import { AppContext } from '../../context';
 import { RootStackParamList } from '../../types';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
@@ -23,7 +23,8 @@ export default function RichTextItem(props: {
   images: { src: string; ratio: number }[];
 }) {
   const { text, date, mid, images, name } = props;
-  const isTracy = mid === TracyId;
+  const { specialUser } = React.useContext(AppContext);
+  const isTracy = mid.toString() === specialUser?.mid;
   const navigation = useNavigation<NavigationProps['navigation']>();
 
   return (
@@ -37,8 +38,9 @@ export default function RichTextItem(props: {
           {images.map(img => {
             return (
               <Pressable
+                key={img.src}
                 onPress={() => {
-                  // Linking.openURL(img.src);
+                  Linking.openURL(img.src);
                   navigation.navigate('WebPage', {
                     url: img.src,
                     title: name,

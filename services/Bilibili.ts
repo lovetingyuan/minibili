@@ -2,61 +2,83 @@ import { ToastAndroid } from 'react-native';
 import { getBlackUps } from '../routes/Hot/blackUps';
 import { DynamicType } from '../types';
 
-export let TracyId = 1458143131; // 1660828480, 1661938567
-
-export const changeSpecialUpId = (mid: number) => {
-  TracyId = mid;
-};
-
 let errorTime = Date.now();
 
 // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=326081112&timezone_offset=-480
 export function request<D extends Record<string, any>>(url: string) {
   const host = 'api.bilibili.com';
   const requestUrl = url.startsWith('http') ? url : 'https://' + host + url;
-  return fetch(requestUrl, {
-    headers: {
-      authority: host,
-      referrer: 'https://space.bilibili.com/',
-      host: host,
-      origin: 'https://api.bilibili.com',
-      accept: 'application/json, text/plain, */*',
-      'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-      'cache-control': 'max-age=0',
-      'sec-ch-ua':
-        '"Chromium";v="104", " Not A;Brand";v="99", "Microsoft Edge";v="104"',
-      'sec-ch-ua-mobile': '?1',
-      'sec-ch-ua-platform': '"Windows"',
-      'sec-fetch-dest': 'empty',
-      'sec-fetch-mode': 'cors',
-      'sec-fetch-site': 'same-site',
-      // 'upgrade-insecure-requests': '1',
-      'user-agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.${Math.random()
-        .toString()
-        .slice(6)}.54`,
-    },
-    referrerPolicy: 'no-referrer-when-downgrade',
-    // referrerPolicy: 'strict-origin-when-cross-origin',
-    body: null,
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'omit',
-    // credentials: 'include',
-  })
-    .then(r => r.json())
-    .then((res: { code: number; message: string; data: D }) => {
-      if (res.code) {
-        if (Date.now() - errorTime > 20000) {
-          ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
-          errorTime = Date.now();
+  return (
+    fetch(requestUrl, {
+      headers: {
+        host,
+        origin: 'https://api.bilibili.com',
+        referrer: requestUrl,
+        accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+        'cache-control': 'no-cache',
+        pragma: 'no-cache',
+        'sec-ch-ua':
+          '"Microsoft Edge";v="105", " Not;A Brand";v="99", "Chromium";v="105"',
+        'sec-ch-ua-mobile': '?1',
+        'sec-ch-ua-platform': '"Android"',
+        'sec-fetch-dest': 'document',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-site': 'none',
+        'sec-fetch-user': '?1',
+        'upgrade-insecure-requests': '1',
+      },
+      referrerPolicy: 'strict-origin-when-cross-origin',
+      body: null,
+      method: 'GET',
+      mode: 'cors',
+      // credentials: 'include',
+    })
+      // return fetch(requestUrl, {
+      //   headers: {
+      //     authority: host,
+      //     referrer: 'https://space.bilibili.com/',
+      //     host: host,
+      //     origin: 'https://api.bilibili.com',
+      //     accept: 'application/json, text/plain, */*',
+      //     'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+      //     'cache-control': 'max-age=0',
+      //     'sec-ch-ua':
+      //       '"Chromium";v="104", " Not A;Brand";v="99", "Microsoft Edge";v="104"',
+      //     'sec-ch-ua-mobile': '?1',
+      //     'sec-ch-ua-platform': '"Windows"',
+      //     'sec-fetch-dest': 'empty',
+      //     'sec-fetch-mode': 'cors',
+      //     'sec-fetch-site': 'same-site',
+      //     // 'upgrade-insecure-requests': '1',
+      //     'user-agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.${Math.random()
+      //       .toString()
+      //       .slice(6)}.54`,
+      //   },
+      //   referrerPolicy: 'no-referrer-when-downgrade',
+      //   // referrerPolicy: 'strict-origin-when-cross-origin',
+      //   body: null,
+      //   method: 'GET',
+      //   mode: 'cors',
+      //   credentials: 'omit',
+      //   // credentials: 'include',
+      // })
+      .then(r => r.json())
+      .then((res: { code: number; message: string; data: D }) => {
+        if (res.code) {
+          if (Date.now() - errorTime > 20000) {
+            ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
+            errorTime = Date.now();
+          }
+          throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''));
         }
-        throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''));
-      }
-      return res.data;
-    });
+        return res.data;
+      })
+  );
 }
 
-export async function getUserInfo(uid: string | number = TracyId) {
+export async function getUserInfo(uid: string | number) {
   // https://api.bilibili.com/x/space/acc/info?mid=1458143131
   interface Res {
     birthday: string;
@@ -93,7 +115,7 @@ export async function getUserInfo(uid: string | number = TracyId) {
   };
 }
 
-export async function getDynamicItems(offset = '', uid = TracyId) {
+export async function getDynamicItems(offset = '', uid: string | number) {
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480
   interface Author {
     face: string;
@@ -281,7 +303,7 @@ export async function getDynamicItems(offset = '', uid = TracyId) {
   };
 }
 
-export async function getFansData(uid = TracyId) {
+export async function getFansData(uid: string | number) {
   // https://api.bilibili.com/x/relation/stat?vmid=14427395
   const data = await request<{
     mid: number;

@@ -7,7 +7,7 @@ import {
   ToastAndroid,
   BackHandler,
 } from 'react-native';
-import { getDynamicItems, TracyId } from '../../services/Bilibili';
+import { getDynamicItems } from '../../services/Bilibili';
 // import { setLatest } from '../../services/Updates';
 import { DynamicItem, DynamicType } from '../../types';
 import ForwardItem from './ForwardItem';
@@ -16,6 +16,7 @@ import RichTextItem from './RichTextItem';
 import VideoItem from './VideoItem';
 import { RootStackParamList } from '../../types';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { AppContext } from '../../context';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>;
 
@@ -34,7 +35,8 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
   });
   const [loading, setLoading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
-  const upId = route.params?.mid || TracyId;
+  const { specialUser } = React.useContext(AppContext);
+  const upId = route.params?.mid || specialUser?.mid;
   const dynamicListRef = React.useRef<FlatList | null>(null);
   const [initLoad, setInitLoad] = React.useState(true);
   const [refreshHead, setRefreshHead] = React.useState(0);
@@ -93,6 +95,9 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
     if (loading || !hasMore) {
       return;
     }
+    if (!upId) {
+      return;
+    }
     setLoading(true);
     getDynamicItems(offset, upId)
       .then(
@@ -134,7 +139,7 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Header {...route.params} refreshHead={refreshHead} />
+      <Header {...route.params} />
       <FlatList
         data={dynamicItems}
         renderItem={renderItem}

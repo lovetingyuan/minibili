@@ -18,20 +18,38 @@ import TracyBtn from '../../components/TracyBtn';
 import Login from './Login';
 
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
-import { Icon, Input } from '@rneui/base';
+import { Input } from '@rneui/base';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import { getBlackUps } from '../Hot/blackUps';
+import { AppContext } from '../../context';
+// import useNextRender from '../../hooks/useNextRender';
+// import WebviewApi from '../../components/WebviewApi';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 
 type UserInfo = GetFuncPromiseType<typeof getUserInfo>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
 
+const buttons = [
+  {
+    text: '退出',
+    name: 'logout',
+  },
+  {
+    text: '黑名单',
+    name: 'black',
+  },
+  {
+    text: '关于',
+    name: 'about',
+  },
+];
+
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
-  const [userId, setUserId] = React.useState('');
+  const { userId, setUserId } = React.useContext(AppContext);
   const [ups, setUps] = React.useState<UpItem[]>([]);
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -40,8 +58,8 @@ export default function Follow({ navigation, route }: Props) {
     living: false,
     face: '',
     liveUrl: '',
-    name: '未知',
-    sign: '加载失败',
+    name: '...',
+    sign: '加载中...',
     mid: 0,
     level: 0,
     sex: '',
@@ -49,21 +67,34 @@ export default function Follow({ navigation, route }: Props) {
   const [followedNum, setFollowedNum] = React.useState(0);
   const inputRef = React.useRef<Input | null>(null);
   const followListRef = React.useRef<FlatList | null>(null);
-  const [startUpdate, setStartUpdate] = React.useState(0);
+  const [refresh] = React.useState(false);
+  const currentList = React.useRef<any>(null);
+
   const getUpdate = useMemoizedFn(() => {
     ToastAndroid.show('刷新中...', ToastAndroid.SHORT);
-    setStartUpdate(startUpdate + 1);
-    if (!userInfo.face) {
-      getUserInfo(userId).then(user => {
-        setUserInfo(user);
-      });
-    }
+    setUps((currentList.current = []));
+    setLoadDone(false);
+    setLoading(false);
+    setPage(1);
   });
-
-  const [initLoad, setInitLoad] = React.useState(true);
-  // const [updatedUps, setUpdatedUps] = React.useState<number[]>([]);
-  // const [hasLiving, setHasLiving] = React.useState(false);
-
+  React.useEffect(() => {
+    if (userId && (!currentList.current || currentList.current === ups)) {
+      loadMoreUps();
+      if (!userInfo.face) {
+        getUserInfo(userId)
+          .then(user => {
+            setUserInfo(user);
+          })
+          .catch(() => {
+            setUserInfo({
+              ...userInfo,
+              name: '未知',
+              sign: '加载失败',
+            });
+          });
+      }
+    }
+  }, [userId, currentList.current]);
   React.useEffect(() => {
     AsyncStorage.getItem('USER_ID').then(id => {
       if (id) {
@@ -90,13 +121,7 @@ export default function Follow({ navigation, route }: Props) {
   }, [navigation]);
   const [modalVisible, setModalVisible] = React.useState(false);
 
-  if (!userId) {
-    return <Login setUserId={setUserId} />;
-  }
-
-  const renderItem = ({ item }: { item: UpItem }) => (
-    <FollowItem item={item} startUpdate={startUpdate} />
-  );
+  const renderItem = ({ item }: { item: UpItem }) => <FollowItem item={item} />;
   const loadMoreUps = () => {
     if (loadDone || loading) {
       return;
@@ -118,36 +143,16 @@ export default function Follow({ navigation, route }: Props) {
         setLoading(false);
       });
   };
-  if (userId && initLoad) {
-    loadMoreUps();
-    setInitLoad(false);
-    getUserInfo(userId).then(user => {
-      setUserInfo(user);
-    });
-  }
+
   const clearUser = async () => {
-    await AsyncStorage.removeItem('USER_ID');
+    // await AsyncStorage.removeItem('USER_ID');
     setUserId('');
-    setUps([]);
+    setUps((currentList.current = []));
     setLoadDone(false);
     setLoading(false);
     setPage(1);
-    setInitLoad(true);
   };
-  const buttons = [
-    {
-      text: '退出',
-      name: 'logout',
-    },
-    {
-      text: '黑名单',
-      name: 'black',
-    },
-    {
-      text: '关于',
-      name: 'about',
-    },
-  ];
+
   const handleOverlayClick = (name: string) => {
     if (name === 'logout') {
       clearUser();
@@ -177,6 +182,11 @@ export default function Follow({ navigation, route }: Props) {
       );
     }
   };
+
+  if (!userId) {
+    return <Login />;
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.userContainer}>
@@ -202,12 +212,14 @@ export default function Follow({ navigation, route }: Props) {
           <Text style={styles.myName}>{userInfo?.name || ''}</Text>
           <Text style={styles.mySign}>{userInfo?.sign || ''}</Text>
         </View>
+        {/* {userId ? <WebviewApi mid={userId} onLoad={setUserInfo} /> : null} */}
+
         <Pressable
           onPress={() => {
             setModalVisible(true);
           }}>
           <Image
-            source={require('../../assets/info-face.png')}
+            source={require('../../assets/info-icon.png')}
             style={styles.infoFace}
           />
         </Pressable>
@@ -228,9 +240,6 @@ export default function Follow({ navigation, route }: Props) {
           关注列表
           <Text style={{ fontSize: 14 }}>({followedNum})</Text>：
         </Text>
-        <Pressable onPress={getUpdate}>
-          <Icon name="refresh" color="#00AEEC" />
-        </Pressable>
       </View>
       <FlatList
         data={ups}
@@ -238,6 +247,8 @@ export default function Follow({ navigation, route }: Props) {
         keyExtractor={item => item.mid + ''}
         onEndReachedThreshold={1}
         onEndReached={loadMoreUps}
+        refreshing={refresh}
+        onRefresh={getUpdate}
         ref={followListRef}
         ListEmptyComponent={
           <Text style={styles.listEmptyText}>

@@ -8,10 +8,10 @@ export type RootStackParamList = {
     aid: number | string;
     bvid: string;
     name: string;
-    mid: number;
+    mid: string | number;
   };
   Dynamic: {
-    mid: number;
+    mid?: string | number;
     name?: string;
     face?: string;
     sign?: string;

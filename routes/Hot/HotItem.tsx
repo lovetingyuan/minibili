@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { getHotList, TracyId } from '../../services/Bilibili';
+import { AppContext } from '../../context';
+import { getHotList } from '../../services/Bilibili';
 import { GetFuncPromiseType } from '../../types';
 
 type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0];
@@ -15,7 +16,8 @@ const parseDuration = (duration: number) => {
 
 export default function HotItem({ video }: { video: HotVideo }) {
   const playNum = (video.playNum / 10000).toFixed(1) + '万';
-  const isTracy = video.mid === TracyId;
+  const { specialUser } = React.useContext(AppContext);
+  const isTracy = video.mid.toString() === specialUser?.mid;
   return (
     <View style={styles.itemContainer}>
       <Image

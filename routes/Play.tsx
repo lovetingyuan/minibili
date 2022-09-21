@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { getVideoComments, getVideoInfo, TracyId } from '../services/Bilibili';
+import { getVideoComments, getVideoInfo } from '../services/Bilibili';
 import { Avatar, Icon } from '@rneui/base';
 // import { useFocusEffect } from '@react-navigation/native';
 import useNetStatusToast from '../hooks/useNetStatusToast';
@@ -52,6 +52,7 @@ const parseDate = (time?: number) => {
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GetFuncPromiseType, RootStackParamList } from '../types';
+import { AppContext } from '../context';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
 
@@ -103,8 +104,9 @@ export default ({ route, navigation }: Props) => {
   // const [showWebView, setShowWebView] = React.useState(true);
   useKeepAwake();
   const connectType = useNetStatusToast(bvid);
+  const { specialUser } = React.useContext(AppContext);
   const tracyStyle =
-    mid === TracyId
+    mid.toString() === specialUser?.mid
       ? {
           color: 'rgb(251, 114, 153)',
         }
@@ -304,10 +306,12 @@ export default ({ route, navigation }: Props) => {
             <Text style={styles.noCommentText}>暂无评论</Text>
           </View>
         )}
-        <View style={styles.footerContainer}>
-          <Text style={styles.footerText}>只加载前20条</Text>
-          <Text />
-        </View>
+        {comments.length ? (
+          <View style={styles.footerContainer}>
+            <Text style={styles.footerText}>只加载前20条</Text>
+            <Text />
+          </View>
+        ) : null}
       </ScrollView>
     </View>
   );
@@ -373,10 +377,11 @@ const styles = StyleSheet.create({
   },
   topReply: {
     color: '#00699D',
+    fontWeight: 'bold',
   },
   upLikeReply: {
     textDecorationColor: '#00699D',
-    textDecorationLine: 'underline',
+    color: '#4f7d00',
   },
   replyItemContent: {
     flexDirection: 'row',

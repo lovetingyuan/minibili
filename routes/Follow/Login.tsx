@@ -10,18 +10,19 @@ import {
   StyleSheet,
   ToastAndroid,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppContext } from '../../context';
 
-export default function Login(props: { setUserId: (id: string) => void }) {
+export default function Login() {
   const inputUserIdRef = React.useRef('');
   const inputRef = React.useRef(null);
-  const { setUserId } = props;
+  const { setUserId } = React.useContext(AppContext);
   const storeUserId = () => {
     if (!inputUserIdRef.current) {
       ToastAndroid.show('请输入ID', ToastAndroid.SHORT);
       return;
     }
-    AsyncStorage.setItem('USER_ID', inputUserIdRef.current);
+    // AsyncStorage.setItem('USER_ID', inputUserIdRef.current);
     setUserId(inputUserIdRef.current);
   };
 

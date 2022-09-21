@@ -7,51 +7,50 @@ import {
   StatusBar,
 } from 'react-native';
 import { Avatar } from '@rneui/themed';
-import { getFansData, getUserInfo, TracyId } from '../../services/Bilibili';
+import { getFansData, getUserInfo } from '../../services/Bilibili';
 import { useNavigation } from '@react-navigation/native';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
-import useMemoizedFn from '../../hooks/useMemoizedFn';
+// import useMemoizedFn from '../../hooks/useMemoizedFn';
+// import WebviewApi from '../../components/WebviewApi';
+// import useMemoizedFn from '../../hooks/useMemoizedFn';
+import { AppContext } from '../../context';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function Header(props: {
-  mid: number;
+  mid?: number | string;
   name?: string;
   face?: string;
   sign?: string;
-  refreshHead: number;
 }) {
-  const { mid, name, face, sign, refreshHead } = props;
+  const { mid, name, face, sign } = props;
   const [fans, setFans] = React.useState('');
 
   const navigation = useNavigation<NavigationProps['navigation']>();
-  const isTracy = mid === TracyId;
+  const { specialUser } = React.useContext(AppContext);
+  const isTracy = mid?.toString() === specialUser?.mid;
   type User = GetFuncPromiseType<typeof getUserInfo>;
   const [userInfo, setUserInfo] = React.useState<User | null>(null);
-  const updateUserInfo = useMemoizedFn(() => {
-    getUserInfo(mid).then(setUserInfo, () => setUserInfo(null));
-  });
   React.useEffect(() => {
-    updateUserInfo();
-    getFansData(mid).then(data => {
-      setFans((data.follower / 10000).toFixed(1) + '万');
-    });
-    // let timer: any;
-    // if (isTracy) {
-    //   timer = setInterval(updateUserInfo, 60 * 1000);
-    // }
-    // return () => {
-    //   timer && clearInterval(timer);
-    // };
-  }, [mid, refreshHead, updateUserInfo]);
+    if (mid) {
+      getUserInfo(mid).then(setUserInfo, () => setUserInfo(null));
+      getFansData(mid).then(data => {
+        setFans((data.follower / 10000).toFixed(1) + '万');
+      });
+    }
+  }, [mid]);
   const nameStyle: Record<string, any> = {};
   if (isTracy) {
     nameStyle.color = '#f25d8e';
   }
   const avatar = userInfo?.face || face || '';
+  if (!mid) {
+    return null;
+  }
   return (
     <View style={styles.header}>
+      {/* <WebviewApi mid={mid} onLoad={setUserInfo} /> */}
       <TouchableWithoutFeedback
         onPress={() => {
           const title = userInfo?.name || name;

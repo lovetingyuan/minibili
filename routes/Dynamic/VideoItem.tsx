@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { getDynamicItems, TracyId } from '../../services/Bilibili';
+import { AppContext } from '../../context';
+import { getDynamicItems } from '../../services/Bilibili';
 import handleShare from '../../services/Share';
 import {
   DynamicType,
@@ -27,7 +28,8 @@ type VideoDynamicItem = Extract<DynamicItems, { type: DynamicType.Video }>;
 export default function VideoItem(props: VideoDynamicItem) {
   const { mid, name, cover, title, aid, date, play, bvid, text, duration } =
     props;
-  const isTracy = mid === TracyId;
+  const { specialUser } = React.useContext(AppContext);
+  const isTracy = mid.toString() === specialUser?.mid;
   const onShare = useCallback(() => {
     handleShare(name, title, bvid);
   }, [name, title, bvid]);
