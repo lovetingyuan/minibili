@@ -136,10 +136,17 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
   React.useEffect(() => {
     resetDynamicItems();
   }, [upId]);
-
+  const headerProps = {
+    ...route.params,
+  };
+  if (!headerProps.mid) {
+    headerProps.mid = specialUser?.mid;
+    headerProps.name = specialUser?.name;
+    headerProps.face = specialUser?.face;
+  }
   return (
     <View style={styles.container}>
-      <Header {...route.params} />
+      <Header {...headerProps} />
       <FlatList
         data={dynamicItems}
         renderItem={renderItem}

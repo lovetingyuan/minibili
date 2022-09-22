@@ -7,75 +7,75 @@ let errorTime = Date.now();
 // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=326081112&timezone_offset=-480
 export function request<D extends Record<string, any>>(url: string) {
   const host = 'api.bilibili.com';
-  const requestUrl = url.startsWith('http') ? url : 'https://' + host + url;
-  return (
-    fetch(requestUrl, {
-      headers: {
-        host,
-        origin: 'https://api.bilibili.com',
-        referrer: requestUrl,
-        accept:
-          'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-        'cache-control': 'no-cache',
-        pragma: 'no-cache',
-        'sec-ch-ua':
-          '"Microsoft Edge";v="105", " Not;A Brand";v="99", "Chromium";v="105"',
-        'sec-ch-ua-mobile': '?1',
-        'sec-ch-ua-platform': '"Android"',
-        'sec-fetch-dest': 'document',
-        'sec-fetch-mode': 'navigate',
-        'sec-fetch-site': 'none',
-        'sec-fetch-user': '?1',
-        'upgrade-insecure-requests': '1',
-      },
-      referrerPolicy: 'strict-origin-when-cross-origin',
-      body: null,
-      method: 'GET',
-      mode: 'cors',
-      // credentials: 'include',
-    })
-      // return fetch(requestUrl, {
-      //   headers: {
-      //     authority: host,
-      //     referrer: 'https://space.bilibili.com/',
-      //     host: host,
-      //     origin: 'https://api.bilibili.com',
-      //     accept: 'application/json, text/plain, */*',
-      //     'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-      //     'cache-control': 'max-age=0',
-      //     'sec-ch-ua':
-      //       '"Chromium";v="104", " Not A;Brand";v="99", "Microsoft Edge";v="104"',
-      //     'sec-ch-ua-mobile': '?1',
-      //     'sec-ch-ua-platform': '"Windows"',
-      //     'sec-fetch-dest': 'empty',
-      //     'sec-fetch-mode': 'cors',
-      //     'sec-fetch-site': 'same-site',
-      //     // 'upgrade-insecure-requests': '1',
-      //     'user-agent': `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36 Edg/104.${Math.random()
-      //       .toString()
-      //       .slice(6)}.54`,
-      //   },
-      //   referrerPolicy: 'no-referrer-when-downgrade',
-      //   // referrerPolicy: 'strict-origin-when-cross-origin',
-      //   body: null,
-      //   method: 'GET',
-      //   mode: 'cors',
-      //   credentials: 'omit',
-      //   // credentials: 'include',
-      // })
-      .then(r => r.json())
-      .then((res: { code: number; message: string; data: D }) => {
-        if (res.code) {
-          if (Date.now() - errorTime > 20000) {
-            ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
-            errorTime = Date.now();
-          }
-          throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''));
+  const requestUrl = url.startsWith('http') ? url : 'http://' + host + url;
+  // return (
+  // fetch(requestUrl, {
+  //   headers: {
+  //     host,
+  //     origin: 'https://api.bilibili.com',
+  //     referer: requestUrl,
+  //     accept:
+  //       'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+  //     'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+  //     'cache-control': 'no-cache',
+  //     pragma: 'no-cache',
+  //     'sec-ch-ua':
+  //       '"Microsoft Edge";v="105", " Not;A Brand";v="99", "Chromium";v="105"',
+  //     'sec-ch-ua-mobile': '?1',
+  //     'sec-ch-ua-platform': '"Android"',
+  //     'sec-fetch-dest': 'document',
+  //     'sec-fetch-mode': 'navigate',
+  //     'sec-fetch-site': 'none',
+  //     'sec-fetch-user': '?1',
+  //     'upgrade-insecure-requests': '1',
+  //   },
+  //   referrerPolicy: 'strict-origin-when-cross-origin',
+  //   body: '',
+  //   method: 'GET',
+  //   mode: 'cors',
+  //   // credentials: 'include',
+  // })
+  return fetch(requestUrl + '&_t=' + Date.now(), {
+    headers: {
+      // authority: host,
+      // referer: 'https://api.bilibili.com/',
+      host: host,
+      origin: 'https://api.bilibili.com',
+      accept: 'application/json, text/plain, */*',
+      'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+      'cache-control': 'max-age=0',
+      'sec-ch-ua':
+        '"Chromium";v="104", " Not A;Brand";v="99", "Microsoft Edge";v="104"',
+      'sec-ch-ua-mobile': '?1',
+      'sec-ch-ua-platform': '"Android"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'same-site',
+      // 'upgrade-insecure-requests': '1',
+      'user-agent':
+        'Mozilla/5.0 (Linux; Android 10; Pixel 4 XL Build/QQ2A.200305.004.A1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99 XWEB/3140 MMWEBSDK/20211001 Mobile Safari/537.36 MMWEBID/8391 MicroMessenger/8.0.16.2040(0x2800103A) Process/toolsmp WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64',
+    },
+    referrer: 'https://space.bilibili.com',
+    referrerPolicy: 'no-referrer-when-downgrade',
+    // referrerPolicy: 'strict-origin-when-cross-origin',
+    body: null,
+    method: 'GET',
+    mode: 'cors',
+    // credentials: 'omit',
+    credentials: 'include',
+  })
+    .then(r => r.json())
+    .then((res: { code: number; message: string; data: D }) => {
+      if (res.code) {
+        if (Date.now() - errorTime > 20000) {
+          ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
+          errorTime = Date.now();
         }
-        return res.data;
-      })
-  );
+        throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''));
+      }
+      return res.data;
+    });
+  // );
 }
 
 export async function getUserInfo(uid: string | number) {
@@ -99,7 +99,9 @@ export async function getUserInfo(uid: string | number) {
     sign: string;
     top_photo: string;
   }
-  const data = await request<Res>('/x/space/acc/info?mid=' + uid);
+  const data = await request<Res>(
+    '/x/space/acc/info?mid=' + uid + '&token=&platform=web&jsonp=jsonp',
+  );
   // if (code) {
   //   throw new Error('获取用户信息失败');
   // }
