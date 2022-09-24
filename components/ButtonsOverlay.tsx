@@ -5,10 +5,10 @@ import { StyleSheet } from 'react-native';
 
 export default function ButtonsOverlay(props: {
   visible: boolean;
-  buttons: {
+  buttons: ({
     text: string;
     name: string;
-  }[];
+  } | null)[];
   onPress: (name: string) => void;
   overlayStyle?: any;
   buttonStyle?: any;
@@ -19,25 +19,25 @@ export default function ButtonsOverlay(props: {
   //   setModalVisible(props.visible);
   // }, [props.visible]);
   // const { width } = useWindowDimensions();
-  const Buttons = props.buttons.map(button => {
-    return (
-      <Button
-        type="clear"
-        buttonStyle={{
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
-          marginVertical: 5,
-          ...props.buttonStyle,
-        }}
-        title={button.text}
-        key={button.name}
-        onPress={() => {
-          props.onPress(button.name);
-          props.dismiss();
-        }}
-      />
-    );
-  });
+  const Buttons = props.buttons
+    .map(button => {
+      if (!button) {
+        return null;
+      }
+      return (
+        <Button
+          type="clear"
+          buttonStyle={[styles.buttonStyle, props.buttonStyle]}
+          title={button.text}
+          key={button.name}
+          onPress={() => {
+            props.onPress(button.name);
+            props.dismiss();
+          }}
+        />
+      );
+    })
+    .filter(Boolean);
   return (
     <Overlay
       isVisible={props.visible}
@@ -54,5 +54,10 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 24,
     backgroundColor: 'white',
+  },
+  buttonStyle: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginVertical: 5,
   },
 });

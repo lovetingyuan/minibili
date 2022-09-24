@@ -1,16 +1,17 @@
 import { createContext } from 'react';
 
-export interface SpecialUser {
+export interface UserInfo {
   name: string;
-  mid: string;
+  mid: number | string;
   face: string;
+  sign: string;
 }
 
 export interface AppContextValue {
-  userId: string;
-  setUserId: (m: string) => void;
-  specialUser: SpecialUser | null;
-  setSpecialUser: (u: SpecialUser) => void;
+  userInfo: UserInfo;
+  setUserInfo: (u: UserInfo) => void;
+  specialUser: UserInfo;
+  setSpecialUser: (u: UserInfo) => void;
   defaultMid: string;
 }
 

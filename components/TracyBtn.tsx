@@ -28,7 +28,7 @@ export default function TracyBtn() {
       color="#fb7299"
       placement="right"
       onPress={() => {
-        navigation.navigate('Dynamic', { mid: specialUser.mid, follow: true });
+        navigation.navigate('Dynamic', { ...specialUser, follow: true });
       }}
     />
   );

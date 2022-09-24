@@ -14,7 +14,8 @@ const parseDuration = (duration: number) => {
   return [hour, minutes, seconds].filter(Boolean).join(':');
 };
 
-export default function HotItem({ video }: { video: HotVideo }) {
+export default React.memo(function HotItem({ video }: { video: HotVideo }) {
+  __DEV__ && console.log('hot video', video.title);
   const playNum = (video.playNum / 10000).toFixed(1) + '万';
   const { specialUser } = React.useContext(AppContext);
   const isTracy = video.mid.toString() === specialUser?.mid;
@@ -33,7 +34,7 @@ export default function HotItem({ video }: { video: HotVideo }) {
         {video.title}
       </Text>
       <View style={styles.videoInfo}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={styles.namePlay}>
           <Image
             style={styles.icon}
             source={require('../../assets/up-mark.png')}
@@ -45,7 +46,7 @@ export default function HotItem({ video }: { video: HotVideo }) {
             {video.name}
           </Text>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={styles.namePlay}>
           <Image
             style={styles.icon}
             source={require('../../assets/play-mark.png')}
@@ -55,7 +56,7 @@ export default function HotItem({ video }: { video: HotVideo }) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   itemContainer: {
@@ -110,4 +111,5 @@ const styles = StyleSheet.create({
     width: 13,
     height: 11,
   },
+  namePlay: { flexDirection: 'row', alignItems: 'center' },
 });

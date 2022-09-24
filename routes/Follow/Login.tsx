@@ -10,20 +10,35 @@ import {
   StyleSheet,
   ToastAndroid,
 } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppContext } from '../../context';
+import { getUserInfo } from '../../services/Bilibili';
 
 export default function Login() {
   const inputUserIdRef = React.useRef('');
   const inputRef = React.useRef(null);
-  const { setUserId } = React.useContext(AppContext);
+  const { setUserInfo } = React.useContext(AppContext);
   const storeUserId = () => {
     if (!inputUserIdRef.current) {
       ToastAndroid.show('请输入ID', ToastAndroid.SHORT);
       return;
     }
-    // AsyncStorage.setItem('USER_ID', inputUserIdRef.current);
-    setUserId(inputUserIdRef.current);
+    getUserInfo(inputUserIdRef.current)
+      .then(user => {
+        setUserInfo({
+          name: user.name,
+          mid: user.mid + '',
+          face: user.face,
+          sign: user.sign,
+        });
+      })
+      .catch(() => {
+        setUserInfo({
+          name: '',
+          face: '',
+          mid: inputUserIdRef.current,
+          sign: '',
+        });
+      });
   };
 
   return (

@@ -11,11 +11,11 @@ export type RootStackParamList = {
     mid: string | number;
   };
   Dynamic: {
-    mid?: string | number;
-    name?: string;
-    face?: string;
-    sign?: string;
-    follow?: boolean;
+    mid: string | number;
+    name: string;
+    face: string;
+    sign: string;
+    follow: boolean;
   };
   Hot: undefined;
   Follow: undefined;

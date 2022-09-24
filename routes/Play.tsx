@@ -12,7 +12,6 @@ import {
 import { WebView } from 'react-native-webview';
 import { getVideoComments, getVideoInfo } from '../services/Bilibili';
 import { Avatar, Icon } from '@rneui/base';
-// import { useFocusEffect } from '@react-navigation/native';
 import useNetStatusToast from '../hooks/useNetStatusToast';
 import handleShare from '../services/Share';
 import { useKeepAwake } from 'expo-keep-awake';
@@ -101,7 +100,6 @@ export default ({ route, navigation }: Props) => {
   const webviewRef = React.useRef<null | WebView>(null);
   const { width, height } = useWindowDimensions();
   const [videoHeight, setVideoHeight] = React.useState(height * 0.4);
-  // const [showWebView, setShowWebView] = React.useState(true);
   useKeepAwake();
   const connectType = useNetStatusToast(bvid);
   const { specialUser } = React.useContext(AppContext);
@@ -149,17 +147,7 @@ export default ({ route, navigation }: Props) => {
       handleShare(name, videoInfo.title, bvid);
     }
   }, [name, videoInfo, bvid]);
-  // useEffect(() => {
-  //   const handler = () => {
-  //     console.log(999);
-  //     navigation.goBack();
-  //     return true;
-  //   };
-  //   BackHandler.addEventListener('hardwareBackPress', handler);
-  //   return () => {
-  //     BackHandler.removeEventListener('hardwareBackPress', handler);
-  //   };
-  // }, []);
+
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -200,7 +188,7 @@ export default ({ route, navigation }: Props) => {
             onPress={() => {
               navigation.navigate('Dynamic', {
                 mid,
-                face: videoInfo?.upFace,
+                face: videoInfo?.upFace || '',
                 name,
                 sign: '',
                 follow: false,
@@ -263,8 +251,8 @@ export default ({ route, navigation }: Props) => {
                   <Text
                     style={[
                       styles.replyItem.message,
-                      comment.top ? styles.topReply : null,
                       comment.upLike ? styles.upLikeReply : null,
+                      comment.top ? styles.topReply : null,
                     ]}
                     selectable
                     selectionColor={'#BFEDFA'}>
@@ -380,8 +368,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   upLikeReply: {
-    textDecorationColor: '#00699D',
     color: '#4f7d00',
+    fontWeight: 'bold',
   },
   replyItemContent: {
     flexDirection: 'row',

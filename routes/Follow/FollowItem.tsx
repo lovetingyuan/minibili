@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { getFollowUps, getUserInfo } from '../../services/Bilibili';
+import { getFollowUps, getLiveStatus } from '../../services/Bilibili';
 import { Avatar } from '@rneui/themed';
 import { checkDynamics, setLatest } from '../../services/Updates';
 import { useNavigation } from '@react-navigation/native';
@@ -9,14 +9,11 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppContext } from '../../context';
 
 if (!Promise.allSettled) {
   const rejectHandler = (reason: any) => ({ status: 'rejected', reason });
-
   const resolveHandler = (value: any) => ({ status: 'fulfilled', value });
-
   (Promise as any).allSettled = function (promises: any[]) {
     const convertedPromises = promises.map(p =>
       Promise.resolve(p).then(resolveHandler, rejectHandler),
@@ -28,7 +25,8 @@ if (!Promise.allSettled) {
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
-export default function FollowItem(props: { item: UpItem }) {
+export default React.memo(function FollowItem(props: { item: UpItem }) {
+  __DEV__ && console.log('follow item', props.item.name);
   const {
     item: { face, name, sign, mid },
   } = props;
@@ -50,23 +48,25 @@ export default function FollowItem(props: { item: UpItem }) {
     if (loading) {
       return;
     }
+    // return;
     setLoading(true);
-    Promise.allSettled([checkDynamics(mid), getUserInfo(mid)])
-      .then(([a, b]) => {
+    Promise.allSettled([checkDynamics(mid), getLiveStatus(mid)]).then(
+      ([a, b]) => {
         if (a.status === 'fulfilled' && a.value) {
           setUpdatedId(a.value);
         }
         if (b.status === 'fulfilled') {
-          const { living, liveUrl } = b.value;
+          const { living, roomId } = b.value;
           setLiving({
             living,
-            liveUrl,
+            liveUrl: 'https://live.bilibili.com/' + roomId,
           });
         }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+        if (a.status === 'fulfilled' && b.status === 'fulfilled') {
+          setLoading(false);
+        }
+      },
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mid]);
 
@@ -107,6 +107,7 @@ export default function FollowItem(props: { item: UpItem }) {
         name,
         mid: mid + '',
         face,
+        sign,
       });
     }
   });
@@ -164,7 +165,7 @@ export default function FollowItem(props: { item: UpItem }) {
       />
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

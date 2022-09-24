@@ -7,34 +7,61 @@ import {
   StatusBar,
 } from 'react-native';
 import { Avatar } from '@rneui/themed';
-import { getFansData, getUserInfo } from '../../services/Bilibili';
+import {
+  getFansData,
+  getLiveStatus,
+  getUserInfo,
+} from '../../services/Bilibili';
 import { useNavigation } from '@react-navigation/native';
-import { GetFuncPromiseType, RootStackParamList } from '../../types';
+import { RootStackParamList } from '../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
-// import useMemoizedFn from '../../hooks/useMemoizedFn';
-// import WebviewApi from '../../components/WebviewApi';
-// import useMemoizedFn from '../../hooks/useMemoizedFn';
-import { AppContext } from '../../context';
+import { AppContext, UserInfo } from '../../context';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function Header(props: {
-  mid?: number | string;
-  name?: string;
-  face?: string;
-  sign?: string;
+  mid: number | string;
+  name: string;
+  face: string;
+  sign: string;
 }) {
-  const { mid, name, face, sign } = props;
+  const { mid } = props;
   const [fans, setFans] = React.useState('');
 
   const navigation = useNavigation<NavigationProps['navigation']>();
   const { specialUser } = React.useContext(AppContext);
-  const isTracy = mid?.toString() === specialUser?.mid;
-  type User = GetFuncPromiseType<typeof getUserInfo>;
-  const [userInfo, setUserInfo] = React.useState<User | null>(null);
+  const isTracy = mid.toString() === specialUser?.mid;
+  const [userInfo, setUserInfo] = React.useState<UserInfo>({ ...props });
+  const [liveInfo, setLiveInfo] = React.useState({
+    living: false,
+    liveUrl: '',
+  });
   React.useEffect(() => {
     if (mid) {
-      getUserInfo(mid).then(setUserInfo, () => setUserInfo(null));
+      getUserInfo(mid)
+        .then(res => {
+          setUserInfo({
+            name: res.name,
+            face: res.face,
+            sign: res.sign,
+            mid: res.mid + '',
+          });
+          setLiveInfo({
+            living: res.living,
+            liveUrl: res.liveUrl || '',
+          });
+        })
+        .catch(() => {
+          if (isTracy) {
+            setUserInfo({ ...userInfo, ...specialUser });
+          }
+          getLiveStatus(mid).then(res => {
+            setLiveInfo({
+              living: res.living,
+              liveUrl: 'https://live.bilibili.com/' + res.roomId,
+            });
+          });
+        });
       getFansData(mid).then(data => {
         setFans((data.follower / 10000).toFixed(1) + '万');
       });
@@ -44,22 +71,18 @@ export default function Header(props: {
   if (isTracy) {
     nameStyle.color = '#f25d8e';
   }
-  const avatar = userInfo?.face || face || '';
+  const avatar = userInfo.face;
   if (!mid) {
-    return null;
+    return <Text>{userInfo.name}</Text>;
   }
   return (
     <View style={styles.header}>
-      {/* <WebviewApi mid={mid} onLoad={setUserInfo} /> */}
       <TouchableWithoutFeedback
         onPress={() => {
-          const title = userInfo?.name || name;
-          if (title) {
-            navigation.navigate('WebPage', {
-              url: `https://space.bilibili.com/${mid}`,
-              title,
-            });
-          }
+          navigation.navigate('WebPage', {
+            url: `https://space.bilibili.com/${mid}`,
+            title: userInfo.name,
+          });
         }}>
         <Avatar
           size={58}
@@ -76,23 +99,21 @@ export default function Header(props: {
       </TouchableWithoutFeedback>
       <View style={{ flex: 1 }}>
         <Text>
-          <Text style={{ ...styles.name, ...nameStyle }}>
-            {userInfo?.name || name || '未知'}
-          </Text>
-          {'    '} {fans}关注
+          <Text style={{ ...styles.name, ...nameStyle }}>{userInfo.name}</Text>
+          {'    '} {fans}关注 {isTracy ? '❤' : ''}
         </Text>
-        <Text style={styles.sign}>{userInfo?.sign || sign || '加载失败'}</Text>
+        <Text style={[styles.sign]}>{userInfo.sign}</Text>
       </View>
-      {userInfo?.living ? (
+      {liveInfo.living ? (
         <Button
           title="直播中"
           type="clear"
           titleStyle={{ fontSize: 13 }}
           onPress={() => {
-            if (userInfo.liveUrl) {
+            if (liveInfo.liveUrl) {
               navigation.navigate('WebPage', {
-                url: userInfo.liveUrl,
-                title: userInfo.name,
+                url: liveInfo.liveUrl,
+                title: userInfo.name + '的直播间',
               });
             }
           }}

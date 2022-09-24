@@ -5,32 +5,24 @@ import {
   FlatList,
   StyleSheet,
   Alert,
-  // Image,
   Pressable,
   ToastAndroid,
   Image,
 } from 'react-native';
 import { Avatar } from '@rneui/themed';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import FollowItem from './FollowItem';
 import { getFollowUps, getUserInfo } from '../../services/Bilibili';
 import TracyBtn from '../../components/TracyBtn';
 import Login from './Login';
 
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
-import { Input } from '@rneui/base';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import { getBlackUps } from '../Hot/blackUps';
 import { AppContext } from '../../context';
-// import WebviewApi from '../../components/WebviewApi';
-// import useNextRender from '../../hooks/useNextRender';
-// import WebviewApi from '../../components/WebviewApi';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
-
-type UserInfo = GetFuncPromiseType<typeof getUserInfo>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
 
 const buttons = [
@@ -50,23 +42,12 @@ const buttons = [
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
-  const { userId, setUserId } = React.useContext(AppContext);
+  const { userInfo, setUserInfo } = React.useContext(AppContext);
   const [ups, setUps] = React.useState<UpItem[]>([]);
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<UserInfo>({
-    living: false,
-    face: '',
-    liveUrl: '',
-    name: '...',
-    sign: '加载中...',
-    mid: 0,
-    level: 0,
-    sex: '',
-  });
   const [followedNum, setFollowedNum] = React.useState(0);
-  const inputRef = React.useRef<Input | null>(null);
   const followListRef = React.useRef<FlatList | null>(null);
   const [refresh] = React.useState(false);
   const currentList = React.useRef<any>(null);
@@ -79,32 +60,24 @@ export default function Follow({ navigation, route }: Props) {
     setPage(1);
   });
   React.useEffect(() => {
-    if (userId && (!currentList.current || currentList.current === ups)) {
-      loadMoreUps();
-      if (!userInfo.face) {
-        getUserInfo(userId)
-          .then(user => {
-            setUserInfo(user);
-          })
-          .catch(() => {
-            setUserInfo({
-              ...userInfo,
-              name: '未知',
-              sign: '加载失败',
-            });
+    if (userInfo.mid) {
+      getUserInfo(userInfo.mid)
+        .then(user => {
+          setUserInfo({
+            name: user.name,
+            face: user.face,
+            mid: user.mid + '',
+            sign: user.sign,
           });
-      }
+        })
+        .catch(() => {});
     }
-  }, [userId, currentList.current]);
+  }, [userInfo.mid]);
   React.useEffect(() => {
-    AsyncStorage.getItem('USER_ID').then(id => {
-      if (id) {
-        setUserId(id);
-      } else {
-        inputRef.current?.focus();
-      }
-    });
-  }, []);
+    if (userInfo.mid && (!currentList.current || currentList.current === ups)) {
+      loadMoreUps();
+    }
+  }, [userInfo, currentList.current]);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -122,13 +95,15 @@ export default function Follow({ navigation, route }: Props) {
   }, [navigation]);
   const [modalVisible, setModalVisible] = React.useState(false);
 
-  const renderItem = ({ item }: { item: UpItem }) => <FollowItem item={item} />;
+  const renderItem = ({ item }: { item: UpItem }) => {
+    return <FollowItem item={item} />;
+  };
   const loadMoreUps = () => {
     if (loadDone || loading) {
       return;
     }
     setLoading(true);
-    getFollowUps(userId, page)
+    getFollowUps(userInfo.mid, page)
       .then(({ list, total }) => {
         if (!followedNum) {
           setFollowedNum(total);
@@ -140,14 +115,21 @@ export default function Follow({ navigation, route }: Props) {
           setLoadDone(true);
         }
       })
+      .catch(() => {
+        setFollowedNum(0);
+      })
       .finally(() => {
         setLoading(false);
       });
   };
 
   const clearUser = async () => {
-    // await AsyncStorage.removeItem('USER_ID');
-    setUserId('');
+    setUserInfo({
+      name: '',
+      mid: '',
+      face: '',
+      sign: '',
+    });
     setUps((currentList.current = []));
     setLoadDone(false);
     setLoading(false);
@@ -184,7 +166,7 @@ export default function Follow({ navigation, route }: Props) {
     }
   };
 
-  if (!userId) {
+  if (!userInfo.mid) {
     return <Login />;
   }
 
@@ -198,7 +180,7 @@ export default function Follow({ navigation, route }: Props) {
             if (userInfo) {
               navigation.navigate('WebPage', {
                 title: userInfo.name,
-                url: `https://space.bilibili.com/${userId}`,
+                url: `https://space.bilibili.com/${userInfo.mid}`,
               });
             }
           }}
@@ -253,7 +235,11 @@ export default function Follow({ navigation, route }: Props) {
         ref={followListRef}
         ListEmptyComponent={
           <Text style={styles.listEmptyText}>
-            {ups.length ? '关注的UP列表' : '暂无关注'}
+            {loading
+              ? '加载中...'
+              : ups.length
+              ? ''
+              : '暂无关注（需要在隐私设置中公开你的关注）'}
           </Text>
         }
         ListFooterComponent={

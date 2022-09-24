@@ -1,13 +1,15 @@
 import { ToastAndroid } from 'react-native';
 import { getBlackUps } from '../routes/Hot/blackUps';
 import { DynamicType } from '../types';
+import { URL } from 'react-native-url-polyfill';
 
 let errorTime = Date.now();
 
 // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=326081112&timezone_offset=-480
 export function request<D extends Record<string, any>>(url: string) {
-  const host = 'api.bilibili.com';
-  const requestUrl = url.startsWith('http') ? url : 'http://' + host + url;
+  const requestUrl = url.startsWith('http')
+    ? url
+    : 'http://api.bilibili.com' + url;
   // return (
   // fetch(requestUrl, {
   //   headers: {
@@ -35,12 +37,13 @@ export function request<D extends Record<string, any>>(url: string) {
   //   mode: 'cors',
   //   // credentials: 'include',
   // })
+  const { origin, hostname } = new URL(requestUrl);
   return fetch(requestUrl + '&_t=' + Date.now(), {
     headers: {
       // authority: host,
       // referer: 'https://api.bilibili.com/',
-      host: host,
-      origin: 'https://api.bilibili.com',
+      host: hostname,
+      origin,
       accept: 'application/json, text/plain, */*',
       'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
       'cache-control': 'max-age=0',
@@ -52,8 +55,7 @@ export function request<D extends Record<string, any>>(url: string) {
       'sec-fetch-mode': 'cors',
       'sec-fetch-site': 'same-site',
       // 'upgrade-insecure-requests': '1',
-      'user-agent':
-        'Mozilla/5.0 (Linux; Android 10; Pixel 4 XL Build/QQ2A.200305.004.A1; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/86.0.4240.99 XWEB/3140 MMWEBSDK/20211001 Mobile Safari/537.36 MMWEBID/8391 MicroMessenger/8.0.16.2040(0x2800103A) Process/toolsmp WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64',
+      'user-agent': 'BiLiBiLi ANDROID Client/8.0.0 (orz@****.my)',
     },
     referrer: 'https://space.bilibili.com',
     referrerPolicy: 'no-referrer-when-downgrade',
@@ -323,13 +325,6 @@ export async function getFansData(uid: string | number) {
 export async function getFollowUps(uid: number | string, page = 1) {
   // https://api.bilibili.com/x/relation/followings?vmid=14427395&pn=1&ps=20&order=desc&jsonp=jsonp
   interface Followed {
-    // attribute: 2;
-    // contract_info: {
-    //   is_contractor: false;
-    //   ts: 0;
-    //   is_contract: false;
-    //   user_attr: 0;
-    // };
     face: string;
     mid: number;
     mtime: number;
@@ -675,3 +670,50 @@ export function getVideoInfo(aid: string | number) {
     };
   });
 }
+
+export const getLiveStatus = async (mid: number | string) => {
+  interface LiveUserInfo {
+    room_id: number;
+    info: {
+      face: string;
+      uid: number;
+      uname: string;
+    };
+  }
+  interface LiveInfo {
+    uid: number;
+    room_id: number;
+    attention: number;
+    online: number;
+    description: string;
+    live_status: number;
+    title: string;
+    user_cover: string;
+    is_strict_room: boolean;
+    live_time: string;
+  }
+  const {
+    room_id,
+    info: { uname, face },
+  } = await request<LiveUserInfo>(
+    'https://api.live.bilibili.com/live_user/v1/Master/info?uid=' + mid,
+  );
+  if (!room_id) {
+    return {
+      living: false,
+      roomId: '',
+      name: uname,
+      face,
+    };
+  }
+
+  const { live_status } = await request<LiveInfo>(
+    'https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' + room_id,
+  );
+  return {
+    living: live_status === 1,
+    roomId: room_id as number,
+    name: uname,
+    face,
+  };
+};

@@ -138,15 +138,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     // paddingVertical: 1,
     paddingHorizontal: 2,
-    backgroundColor: '#ddd',
+    backgroundColor: 'rgba(0,0,0,.5)',
     bottom: 0,
     borderRadius: 2,
-    opacity: 0.8,
     margin: 5,
   },
   videoLengthText: {
     fontSize: 11,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#e2e2e2',
   },
 });

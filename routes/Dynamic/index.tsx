@@ -8,7 +8,6 @@ import {
   BackHandler,
 } from 'react-native';
 import { getDynamicItems } from '../../services/Bilibili';
-// import { setLatest } from '../../services/Updates';
 import { DynamicItem, DynamicType } from '../../types';
 import ForwardItem from './ForwardItem';
 import Header from './Header';
@@ -20,7 +19,7 @@ import { AppContext } from '../../context';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>;
 
-export default function BackgroundFetchScreen({ navigation, route }: Props) {
+export default function Dynamic({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
 
   const [dynamicItems, setDynamicItems] = React.useState<DynamicItem[]>([]);
@@ -136,14 +135,8 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
   React.useEffect(() => {
     resetDynamicItems();
   }, [upId]);
-  const headerProps = {
-    ...route.params,
-  };
-  if (!headerProps.mid) {
-    headerProps.mid = specialUser?.mid;
-    headerProps.name = specialUser?.name;
-    headerProps.face = specialUser?.face;
-  }
+  const headerProps = route.params || specialUser;
+
   return (
     <View style={styles.container}>
       <Header {...headerProps} />
@@ -158,9 +151,14 @@ export default function BackgroundFetchScreen({ navigation, route }: Props) {
         onRefresh={resetDynamicItems}
         onEndReached={loadMoreDynamicItems}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
-          </Text>
+          <>
+            <Text style={styles.emptyText}>
+              哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
+            </Text>
+            {loading ? (
+              <Text style={{ textAlign: 'center' }}>加载中...</Text>
+            ) : null}
+          </>
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>

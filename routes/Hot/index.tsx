@@ -12,7 +12,6 @@ import {
 import * as SplashScreen from 'expo-splash-screen';
 import { getHotList } from '../../services/Bilibili';
 import HotItem from './HotItem';
-// import { Overlay, Button } from '@rneui/themed';
 import TracyBtn from '../../components/TracyBtn';
 import handleShare from '../../services/Share';
 import { addBlackUser, getBlackUps } from './blackUps';
@@ -21,6 +20,7 @@ import { RootStackParamList } from '../../types';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
+import { TracyId } from '../../constants';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>;
 
@@ -237,10 +237,12 @@ export default function Hot({ navigation }: Props) {
     }
   });
   const buttons = [
-    {
-      text: `不再看 ${currentVideoRef.current?.name} 的视频`,
-      name: 'black',
-    },
+    currentVideoRef.current?.mid == TracyId
+      ? null
+      : {
+          text: `不再看 ${currentVideoRef.current?.name} 的视频`,
+          name: 'black',
+        },
     {
       text: `分享(${currentVideoRef.current?.shareNum})`,
       name: 'share',
@@ -249,7 +251,7 @@ export default function Hot({ navigation }: Props) {
       text: '在B站APP打开',
       name: 'openApp',
     },
-  ];
+  ].filter(Boolean);
   return (
     <View style={styles.container}>
       <ButtonsOverlay

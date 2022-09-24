@@ -8,16 +8,15 @@ import Play from './routes/Play';
 import Follow from './routes/Follow';
 import Dynamic from './routes/Dynamic';
 import Hot from './routes/Hot';
-import './services/Living';
 import WebPage from './routes/WebPage';
 import { checkWifi } from './hooks/useNetStatusToast';
 import { RootStackParamList } from './types';
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
 // import { getBlackUps } from './routes/Hot/blackUps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppContext, SpecialUser } from './context';
-
-const TracyId = 1458143131;
+import { AppContext, UserInfo } from './context';
+import checkLiving from './services/Living';
+import { TracyId } from './constants';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -89,16 +88,35 @@ const Main = () => {
   );
 };
 
+checkLiving();
+
 export default () => {
-  const [userId, _setUserId] = React.useState('');
-  const [specialUser, _setSpecialUser] = React.useState<SpecialUser>({
+  const [userInfo, _setUserInfo] = React.useState<UserInfo>({
+    name: '',
+    sign: '',
+    mid: '',
+    face: '',
+  });
+  const [specialUser, _setSpecialUser] = React.useState<UserInfo>({
     mid: TracyId.toString(),
     name: '侯翠翠',
     face: 'https://i1.hdslb.com/bfs/face/2c7c282460812e14a3266f338d563b3ef4b1b009.jpg',
+    sign: '自由散漫',
   });
   React.useEffect(() => {
-    AsyncStorage.getItem('USER_ID').then(res => {
-      setUserId(res || '');
+    AsyncStorage.getItem('USER_INFO').then(res => {
+      if (res) {
+        try {
+          _setUserInfo(JSON.parse(res));
+        } catch (e) {
+          _setUserInfo({
+            name: '',
+            mid: '',
+            face: '',
+            sign: '',
+          });
+        }
+      }
     });
     AsyncStorage.getItem('SPECIAL_USER').then(res => {
       if (res) {
@@ -106,12 +124,13 @@ export default () => {
       }
     });
   }, []);
-  const setUserId = (mid: string) => {
-    AsyncStorage.setItem('USER_ID', mid).then(() => {
-      _setUserId(mid);
+
+  const setUserInfo = (user: UserInfo) => {
+    AsyncStorage.setItem('USER_INFO', JSON.stringify(user)).then(() => {
+      _setUserInfo(user);
     });
   };
-  const setSpecialUser = (user: SpecialUser) => {
+  const setSpecialUser = (user: UserInfo) => {
     AsyncStorage.setItem('SPECIAL_USER', JSON.stringify(user)).then(() => {
       _setSpecialUser(user);
     });
@@ -119,9 +138,9 @@ export default () => {
   return (
     <AppContext.Provider
       value={{
-        userId,
+        userInfo,
         specialUser,
-        setUserId,
+        setUserInfo,
         setSpecialUser,
         defaultMid: TracyId.toString(),
       }}>
