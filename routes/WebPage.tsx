@@ -155,7 +155,7 @@ export default ({ route }: Props) => {
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
       renderLoading={Loading}
-      userAgent="BILIBILI 8.0.0"
+      // userAgent="BILIBILI 8.0.0"
       ref={webviewRef}
       onMessage={evt => {
         const { action, payload } = JSON.parse(evt.nativeEvent.data);

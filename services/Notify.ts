@@ -17,7 +17,8 @@ export default function notify(title: string, body?: string) {
       autoDismiss: false,
       sticky: false,
       badge: 2,
+      vibrate: [5000],
     },
-    trigger: { seconds: 5 },
+    trigger: { seconds: 1 },
   });
 }

@@ -15,8 +15,8 @@ import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/
 // import { getBlackUps } from './routes/Hot/blackUps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppContext, UserInfo } from './context';
-import checkLiving from './services/Living';
-import { TracyId } from './constants';
+import { TracyId, TracyInfo } from './constants';
+import CheckLiving from './components/CheckLiving';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -88,8 +88,6 @@ const Main = () => {
   );
 };
 
-checkLiving();
-
 export default () => {
   const [userInfo, _setUserInfo] = React.useState<UserInfo>({
     name: '',
@@ -97,12 +95,7 @@ export default () => {
     mid: '',
     face: '',
   });
-  const [specialUser, _setSpecialUser] = React.useState<UserInfo>({
-    mid: TracyId.toString(),
-    name: '侯翠翠',
-    face: 'https://i1.hdslb.com/bfs/face/2c7c282460812e14a3266f338d563b3ef4b1b009.jpg',
-    sign: '自由散漫',
-  });
+  const [specialUser, _setSpecialUser] = React.useState<UserInfo>(TracyInfo);
   React.useEffect(() => {
     AsyncStorage.getItem('USER_INFO').then(res => {
       if (res) {
@@ -144,8 +137,9 @@ export default () => {
         setSpecialUser,
         defaultMid: TracyId.toString(),
       }}>
+      <StatusBar backgroundColor="transparent" barStyle="dark-content" />
       <NavigationContainer>
-        <StatusBar backgroundColor="transparent" barStyle="dark-content" />
+        <CheckLiving />
         <Stack.Navigator
           initialRouteName="Main"
           screenOptions={{
