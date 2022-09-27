@@ -168,6 +168,28 @@ export async function getDynamicItems(offset = '', uid: string | number) {
       };
     };
   }
+  interface Article {
+    desc: null;
+    major: {
+      type: 'MAJOR_TYPE_ARTICLE';
+      article: {
+        covers: string[];
+        desc: string;
+        label: string;
+        title: string;
+        items: {
+          src: string;
+          width: number;
+          height: number;
+          size: number;
+        }[];
+      };
+    };
+  }
+  interface Word {
+    major: null;
+    desc: Desc;
+  }
   interface Res {
     has_more: boolean;
     items: (
@@ -193,13 +215,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
             id_str: string;
             modules: {
               module_author: Author;
-              module_dynamic:
-                | AV
-                | Draw
-                | {
-                    major: null;
-                    desc: Desc;
-                  };
+              module_dynamic: AV | Draw | Article | Word;
             };
           };
         }
@@ -216,10 +232,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           id_str: string;
           modules: {
             module_author: Author;
-            module_dynamic: {
-              major: null;
-              desc: Desc;
-            };
+            module_dynamic: Word;
           };
         }
     )[];
@@ -246,6 +259,12 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           name: item.modules?.module_author?.name,
           text: item.modules?.module_dynamic?.desc?.text,
         };
+        if (item.type === 'DYNAMIC_TYPE_WORD') {
+          return {
+            ...common,
+            type: DynamicType.Word as const,
+          };
+        }
         if (item.type === 'DYNAMIC_TYPE_AV') {
           const video = item.modules.module_dynamic.major.archive;
           return {
@@ -291,6 +310,19 @@ export async function getDynamicItems(offset = '', uid: string | number) {
                 return {
                   ratio: v.width / v.height,
                   src: v.src,
+                };
+              }),
+            };
+          }
+          if (forward.major?.type === 'MAJOR_TYPE_ARTICLE') {
+            return {
+              ...common,
+              type: DynamicType.ForwardDraw as const,
+              forwardText: forward.major?.article?.title,
+              images: forward.major?.article?.covers?.map(v => {
+                return {
+                  ratio: 2,
+                  src: v,
                 };
               }),
             };

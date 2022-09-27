@@ -13,7 +13,41 @@ import {
 } from 'react-native';
 import { AppContext } from '../../context';
 import { RootStackParamList } from '../../types';
+import { parseUrl } from '../../utils';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
+// import urlRegex from 'url-regex';
+
+// const urlregex = urlRegex({
+//   strict: true,
+//   // exact: true,
+// });
+// // const urlregex =
+// //   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/gi;
+// // const urlregex = /^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/
+// const handleText = (text: string) => {
+//   const nodes = [];
+//   let prev = 0;
+//   text.replace(urlregex, (a, b) => {
+//     nodes.push(<Text key={nodes.length}>{text.substring(prev, b)}</Text>);
+//     nodes.push(
+//       <Text
+//         key={nodes.length}
+//         style={{
+//           color: '#008AC5',
+//           // textDecorationLine: 'underline',
+//         }}
+//         onPress={() => {
+//           Linking.openURL(a);
+//         }}>
+//         {a}
+//       </Text>,
+//     );
+//     prev = b + a.length;
+//     return '';
+//   });
+//   nodes.push(<Text key={nodes.length}>{text.substring(prev)}</Text>);
+//   return nodes;
+// };
 
 export default function RichTextItem(props: {
   text: string;
@@ -29,7 +63,7 @@ export default function RichTextItem(props: {
 
   return (
     <View style={[styles.textContainer]}>
-      <Text style={styles.textItem}>{text}</Text>
+      <Text style={styles.textItem}>{parseUrl(text)}</Text>
       {images.length ? (
         <ScrollView
           horizontal

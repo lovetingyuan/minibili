@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-  listContainerStyle: { paddingTop: 10, paddingHorizontal: 6 },
+  listContainerStyle: { paddingTop: 18, paddingHorizontal: 6 },
   bottomEnd: {
     textAlign: 'center',
     color: '#999',

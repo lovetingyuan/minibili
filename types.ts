@@ -31,6 +31,7 @@ export type DynamicItem = GetFuncPromiseType<
 export const enum DynamicType {
   Video = 'video',
   Draw = 'draw',
+  Word = 'word',
   ForwardVideo = 'ForwardVideo',
   ForwardDraw = 'ForwardDraw',
   ForwardOther = 'ForwardOther',

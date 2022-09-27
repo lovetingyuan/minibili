@@ -3,6 +3,7 @@ import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { getDynamicItems } from '../../services/Bilibili';
 import { DynamicType, GetFuncPromiseType } from '../../types';
+import { parseUrl } from '../../utils';
 
 type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0];
 
@@ -52,7 +53,9 @@ export default function ForwardItem(props: ForwardItems) {
   }
   return (
     <View style={[styles.textContainer]}>
-      <Text style={styles.textItem}>{props.text}</Text>
+      {props.text ? (
+        <Text style={styles.textItem}>{parseUrl(props.text)}</Text>
+      ) : null}
       <View style={styles.forwardContainer}>
         {props.forwardText ? (
           <Text style={{ marginBottom: 8 }} numberOfLines={2}>
@@ -84,9 +87,9 @@ const styles = StyleSheet.create({
   },
   forwardContainer: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 8,
     marginTop: 12,
-    paddingLeft: 10,
+    paddingLeft: 8,
     borderLeftWidth: 0.5,
     borderLeftColor: '#bbb',
   },

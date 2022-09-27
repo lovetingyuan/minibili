@@ -16,6 +16,7 @@ import VideoItem from './VideoItem';
 import { RootStackParamList } from '../../types';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { AppContext } from '../../context';
+import WordItem from './WordItem';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>;
 
@@ -70,6 +71,9 @@ export default function Dynamic({ navigation, route }: Props) {
   }, [upId, navigation, route.params]);
   const renderItem = ({ item }: any) => {
     let Item: any = null;
+    if (item.type === DynamicType.Word) {
+      Item = WordItem;
+    }
     if (item.type === DynamicType.Video) {
       Item = VideoItem;
     }
