@@ -24,9 +24,11 @@ function __hack() {
   #app .m-home-no-more,
   #app .launch-app-btn.m-nav-openapp,
   #app .follow .follow-btn,
-  #app .launch-app-btn.related-openapp {
+  #app .launch-app-btn.related-openapp,
+  #app .launch-app-btn.dynamic-float-openapp.dynamic-float-btn {
     display: none!important;
   }
+
   `;
   document.head.appendChild(style);
   if (window.location.pathname.startsWith('/video/')) {
@@ -135,6 +137,7 @@ const Loading = () => {
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
+import { AppContext } from '../context';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>;
 
@@ -142,20 +145,23 @@ export default ({ route }: Props) => {
   __DEV__ && console.log(route.name);
   const { url } = route.params;
   const webviewRef = React.useRef<WebView | null>(null);
-
+  const { webviewMode } = React.useContext(AppContext);
   return (
     <WebView
       style={styles.container}
       source={{ uri: url }}
-      originWhitelist={['https://*', 'bilibili://*']}
+      key={webviewMode}
+      // originWhitelist={['https://*', 'bilibili://*']}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback
       startInLoadingState
+      applicationNameForUserAgent={'BILIBILI/8.0.0'}
+      // allowsBackForwardNavigationGestures
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
       renderLoading={Loading}
-      // userAgent="BILIBILI 8.0.0"
+      userAgent={webviewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
       ref={webviewRef}
       onMessage={evt => {
         const { action, payload } = JSON.parse(evt.nativeEvent.data);

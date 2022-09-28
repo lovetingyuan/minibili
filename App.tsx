@@ -14,9 +14,10 @@ import { RootStackParamList } from './types';
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
 // import { getBlackUps } from './routes/Hot/blackUps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppContext, UserInfo } from './context';
+import { AppContext, AppContextValue, UserInfo } from './context';
 import { TracyId, TracyInfo } from './constants';
 import CheckLiving from './components/CheckLiving';
+import { Button } from '@rneui/themed';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -116,6 +117,10 @@ export default () => {
         setSpecialUser(JSON.parse(res));
       }
     });
+    AsyncStorage.getItem('WEBVIEW_MODE').then(res => {
+      const mode = (res || 'MOBILE') as AppContextValue['webviewMode'];
+      setWebviewMode(mode);
+    });
   }, []);
 
   const setUserInfo = (user: UserInfo) => {
@@ -128,6 +133,12 @@ export default () => {
       _setSpecialUser(user);
     });
   };
+  const [webviewMode, _setWebviewMode] =
+    React.useState<AppContextValue['webviewMode']>('MOBILE');
+  const setWebviewMode = (mode: AppContextValue['webviewMode']) => {
+    AsyncStorage.setItem('WEBVIEW_MODE', mode);
+    _setWebviewMode(mode);
+  };
   return (
     <AppContext.Provider
       value={{
@@ -135,6 +146,8 @@ export default () => {
         specialUser,
         setUserInfo,
         setSpecialUser,
+        webviewMode,
+        setWebviewMode,
         defaultMid: TracyId.toString(),
       }}>
       <StatusBar backgroundColor="transparent" barStyle="dark-content" />
@@ -168,6 +181,23 @@ export default () => {
             options={props => {
               return {
                 title: props.route.params.title,
+                headerRight() {
+                  return (
+                    <Button
+                      titleStyle={{ fontSize: 13 }}
+                      onPress={() => {
+                        if (webviewMode === 'MOBILE') {
+                          setWebviewMode('PC');
+                        } else {
+                          setWebviewMode('MOBILE');
+                        }
+                      }}
+                      size="sm"
+                      type="clear">
+                      {webviewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
+                    </Button>
+                  );
+                },
               };
             }}
           />

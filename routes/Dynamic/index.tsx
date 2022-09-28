@@ -6,6 +6,7 @@ import {
   FlatList,
   ToastAndroid,
   BackHandler,
+  TouchableOpacity,
 } from 'react-native';
 import { getDynamicItems } from '../../services/Bilibili';
 import { DynamicItem, DynamicType } from '../../types';
@@ -17,6 +18,7 @@ import { RootStackParamList } from '../../types';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { AppContext } from '../../context';
 import WordItem from './WordItem';
+import ButtonsOverlay from '../../components/ButtonsOverlay';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>;
 
@@ -40,6 +42,8 @@ export default function Dynamic({ navigation, route }: Props) {
   const dynamicListRef = React.useRef<FlatList | null>(null);
   const [initLoad, setInitLoad] = React.useState(true);
   const [refreshHead, setRefreshHead] = React.useState(0);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const currentDynamicIdRef = React.useRef('');
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
@@ -87,10 +91,18 @@ export default function Dynamic({ navigation, route }: Props) {
     ) {
       Item = ForwardItem;
     }
+    // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
     return (
-      <View style={styles.itemContainer}>
-        <Item {...item} />
-      </View>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onLongPress={() => {
+          currentDynamicIdRef.current = item.id;
+          setModalVisible(true);
+        }}>
+        <View style={styles.itemContainer}>
+          <Item {...item} />
+        </View>
+      </TouchableOpacity>
     );
   };
   const loadMoreDynamicItems = React.useCallback(() => {
@@ -140,9 +152,29 @@ export default function Dynamic({ navigation, route }: Props) {
     resetDynamicItems();
   }, [upId]);
   const headerProps = route.params || specialUser;
-
+  const buttons = [
+    {
+      name: 'openWebPage',
+      text: '在B站网站查看',
+    },
+  ];
+  const handleOverlayClick = (name: string) => {
+    if (name === 'openWebPage') {
+      navigation.navigate('WebPage', {
+        title: headerProps.name + '的动态',
+        url: 'https://m.bilibili.com/dynamic/' + currentDynamicIdRef.current,
+      });
+    }
+  };
   return (
     <View style={styles.container}>
+      <ButtonsOverlay
+        visible={modalVisible}
+        overlayStyle={{ minWidth: 220 }}
+        buttons={buttons}
+        onPress={handleOverlayClick}
+        dismiss={() => setModalVisible(false)}
+      />
       <Header {...headerProps} />
       <FlatList
         data={dynamicItems}
