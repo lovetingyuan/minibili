@@ -1,5 +1,6 @@
-import { Linking, StyleSheet, Text } from 'react-native';
+import { Image, Linking, StyleSheet, Text } from 'react-native';
 import React from 'react';
+import emojis from './emojis';
 
 export const parseEmoji = (msg: string) => {
   if (!/\[.+\]/g.test(msg)) {
@@ -18,11 +19,23 @@ export const parseEmoji = (msg: string) => {
       isEmoji = true;
     } else if (c === ']') {
       isEmoji = false;
-      result.push(
-        <Text key={emojiStr + i} style={styles.emojiText}>
-          {' ' + emojiStr + ' '}
-        </Text>,
-      );
+      console.log(emojiStr);
+      if (emojis[`[${emojiStr}]`]) {
+        const { id, url } = emojis[`[${emojiStr}]`];
+        result.push(
+          <Image
+            key={id}
+            source={{ uri: url }}
+            style={{ width: 20, height: 20 }}
+          />,
+        );
+      } else {
+        result.push(
+          <Text key={emojiStr + i} style={styles.emojiText}>
+            {' ' + emojiStr + ' '}
+          </Text>,
+        );
+      }
       emojiStr = '';
     } else {
       if (isEmoji) {
@@ -36,11 +49,22 @@ export const parseEmoji = (msg: string) => {
     result.push(normalStr);
   }
   if (emojiStr) {
-    result.push(
-      <Text key={emojiStr + i} style={styles.emojiText}>
-        {' ' + emojiStr + ' '}
-      </Text>,
-    );
+    if (emojis[`[${emojiStr}]`]) {
+      const { id, url } = emojis[`[${emojiStr}]`];
+      result.push(
+        <Image
+          key={id}
+          source={{ uri: url }}
+          style={{ width: 20, height: 20 }}
+        />,
+      );
+    } else {
+      result.push(
+        <Text key={emojiStr + i} style={styles.emojiText}>
+          {' ' + emojiStr + ' '}
+        </Text>,
+      );
+    }
   }
   return result;
 };

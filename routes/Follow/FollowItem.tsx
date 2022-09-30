@@ -25,147 +25,152 @@ if (!Promise.allSettled) {
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
-export default React.memo(function FollowItem(props: { item: UpItem }) {
-  __DEV__ && console.log('follow item', props.item.name);
-  const {
-    item: { face, name, sign, mid },
-  } = props;
-  const { setSpecialUser, specialUser } = React.useContext(AppContext);
-  const tracyStyle: Record<string, any> = {};
-  const isTracy = mid.toString() === specialUser?.mid;
-  if (isTracy) {
-    tracyStyle.color = '#fb7299';
-    tracyStyle.fontSize = 18;
-  }
-  const [updatedId, setUpdatedId] = React.useState('');
-  const [livingInfo, setLiving] = React.useState<{
-    living: boolean;
-    liveUrl?: string;
-  } | null>(null);
-  const navigation = useNavigation<NavigationProps['navigation']>();
-  const [loading, setLoading] = React.useState(false);
-  React.useEffect(() => {
-    if (loading) {
-      return;
+export default React.memo(
+  function FollowItem(props: { item: UpItem }) {
+    __DEV__ && console.log('follow item', props.item.name);
+    const {
+      item: { face, name, sign, mid },
+    } = props;
+    const { setSpecialUser, specialUser } = React.useContext(AppContext);
+    const tracyStyle: Record<string, any> = {};
+    const isTracy = mid.toString() === specialUser?.mid;
+    if (isTracy) {
+      tracyStyle.color = '#fb7299';
+      tracyStyle.fontSize = 18;
     }
-    // return;
-    setLoading(true);
-    Promise.allSettled([checkDynamics(mid), getLiveStatus(mid)]).then(
-      ([a, b]) => {
-        if (a.status === 'fulfilled' && a.value) {
-          setUpdatedId(a.value);
-        }
-        if (b.status === 'fulfilled') {
-          const { living, roomId } = b.value;
-          setLiving({
-            living,
-            liveUrl: 'https://live.bilibili.com/' + roomId,
-          });
-        }
-        if (a.status === 'fulfilled' && b.status === 'fulfilled') {
-          setLoading(false);
-        }
-      },
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mid]);
-
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const gotoDynamic = useMemoizedFn(() => {
-    navigation.navigate('Dynamic', { mid, face, name, sign, follow: true });
-    setLatest(mid, updatedId + '');
-    setUpdatedId('');
-  });
-  const gotoLivePage = useMemoizedFn(() => {
-    if (livingInfo?.liveUrl) {
-      navigation.navigate('WebPage', {
-        url: livingInfo.liveUrl,
-        title: name + '的直播间',
-      });
-    }
-  });
-  const buttons = [
-    updatedId
-      ? null
-      : {
-          text: '标记为未读',
-          name: 'unread',
+    const [updatedId, setUpdatedId] = React.useState('');
+    const [livingInfo, setLiving] = React.useState<{
+      living: boolean;
+      liveUrl?: string;
+    } | null>(null);
+    const navigation = useNavigation<NavigationProps['navigation']>();
+    const [loading, setLoading] = React.useState(false);
+    React.useEffect(() => {
+      if (loading) {
+        return;
+      }
+      // return;
+      setLoading(true);
+      Promise.allSettled([checkDynamics(mid), getLiveStatus(mid)]).then(
+        ([a, b]) => {
+          if (a.status === 'fulfilled' && a.value) {
+            setUpdatedId(a.value);
+          }
+          if (b.status === 'fulfilled') {
+            const { living, roomId } = b.value;
+            setLiving({
+              living,
+              liveUrl: 'https://live.bilibili.com/' + roomId,
+            });
+          }
+          if (a.status === 'fulfilled' && b.status === 'fulfilled') {
+            setLoading(false);
+          }
         },
-    {
-      text: `设置 ${props.item.name} 为特别关注 ❤`,
-      name: 'special',
-    },
-  ].filter(Boolean);
-  const handleOverlayClick = useMemoizedFn((n: string) => {
-    if (n === 'unread') {
-      const random = Math.random().toString().slice(2, 10);
-      setLatest(mid, random);
-      setUpdatedId(random);
-      setModalVisible(false);
-    } else if (n === 'special') {
-      setSpecialUser({
-        name,
-        mid: mid + '',
-        face,
-        sign,
-      });
-    }
-  });
-  return (
-    <View style={{ opacity: loading ? 0.4 : 1 }}>
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onLongPress={() => {
-          setModalVisible(true);
-        }}
-        onPress={gotoDynamic}>
-        <View style={styles.container}>
-          <Avatar
-            size={56}
-            containerStyle={{ marginRight: 14 }}
-            rounded
-            source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
-          />
-          <View style={{ flex: 1 }}>
-            <View style={styles.nameContainer}>
-              <Text style={[styles.name, tracyStyle]}>
-                {name} {isTracy ? ' ❤' : ''}
-              </Text>
-              {updatedId ? (
-                <Image
-                  style={styles.newIcon}
-                  source={require('../../assets/new.png')}
-                />
+      );
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [mid]);
+
+    const [modalVisible, setModalVisible] = React.useState(false);
+    const gotoDynamic = useMemoizedFn(() => {
+      navigation.navigate('Dynamic', { mid, face, name, sign, follow: true });
+      setLatest(mid, updatedId + '');
+      setUpdatedId('');
+    });
+    const gotoLivePage = useMemoizedFn(() => {
+      if (livingInfo?.liveUrl) {
+        navigation.navigate('WebPage', {
+          url: livingInfo.liveUrl,
+          title: name + '的直播间',
+        });
+      }
+    });
+    const buttons = [
+      updatedId
+        ? null
+        : {
+            text: '标记为未读',
+            name: 'unread',
+          },
+      {
+        text: `设置 ${props.item.name} 为特别关注 ❤`,
+        name: 'special',
+      },
+    ].filter(Boolean);
+    const handleOverlayClick = useMemoizedFn((n: string) => {
+      if (n === 'unread') {
+        const random = Math.random().toString().slice(2, 10);
+        setLatest(mid, random);
+        setUpdatedId(random);
+        setModalVisible(false);
+      } else if (n === 'special') {
+        setSpecialUser({
+          name,
+          mid: mid + '',
+          face,
+          sign,
+        });
+      }
+    });
+    return (
+      <View style={{ opacity: loading ? 0.4 : 1 }}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onLongPress={() => {
+            setModalVisible(true);
+          }}
+          onPress={gotoDynamic}>
+          <View style={styles.container}>
+            <Avatar
+              size={56}
+              containerStyle={{ marginRight: 14 }}
+              rounded
+              source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
+            />
+            <View style={{ flex: 1 }}>
+              <View style={styles.nameContainer}>
+                <Text style={[styles.name, tracyStyle]}>
+                  {name} {isTracy ? ' ❤' : ''}
+                </Text>
+                {updatedId ? (
+                  <Image
+                    style={styles.newIcon}
+                    source={require('../../assets/new.png')}
+                  />
+                ) : null}
+              </View>
+              {sign ? (
+                <Text style={styles.signText} numberOfLines={2}>
+                  {sign}
+                </Text>
               ) : null}
             </View>
-            {sign ? (
-              <Text style={styles.signText} numberOfLines={2}>
-                {sign}
-              </Text>
+            {livingInfo?.living ? (
+              <Button
+                title="直播中~"
+                type="clear"
+                titleStyle={{ fontSize: 13 }}
+                onPress={gotoLivePage}
+              />
             ) : null}
           </View>
-          {livingInfo?.living ? (
-            <Button
-              title="直播中~"
-              type="clear"
-              titleStyle={{ fontSize: 13 }}
-              onPress={gotoLivePage}
-            />
-          ) : null}
-        </View>
-      </TouchableOpacity>
-      <ButtonsOverlay
-        // @ts-ignore
-        buttons={buttons}
-        onPress={handleOverlayClick}
-        visible={modalVisible}
-        dismiss={() => {
-          setModalVisible(false);
-        }}
-      />
-    </View>
-  );
-});
+        </TouchableOpacity>
+        <ButtonsOverlay
+          // @ts-ignore
+          buttons={buttons}
+          onPress={handleOverlayClick}
+          visible={modalVisible}
+          dismiss={() => {
+            setModalVisible(false);
+          }}
+        />
+      </View>
+    );
+  },
+  (a, b) => {
+    return a.item?.mid === b.item?.mid;
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

@@ -6,7 +6,10 @@ import { URL } from 'react-native-url-polyfill';
 let errorTime = Date.now();
 
 // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=326081112&timezone_offset=-480
-export function request<D extends Record<string, any>>(url: string) {
+export function request<D extends Record<string, any>>(
+  url: string,
+  referer?: string,
+) {
   const requestUrl = url.startsWith('http')
     ? url
     : 'http://api.bilibili.com' + url;
@@ -57,7 +60,7 @@ export function request<D extends Record<string, any>>(url: string) {
       // 'upgrade-insecure-requests': '1',
       'user-agent': 'BiLiBiLi ANDROID Client/8.0.0 (orz@****.my)',
     },
-    referrer: 'https://space.bilibili.com',
+    referrer: referer || 'https://space.bilibili.com',
     referrerPolicy: 'no-referrer-when-downgrade',
     // referrerPolicy: 'strict-origin-when-cross-origin',
     body: null,
@@ -102,7 +105,9 @@ export async function getUserInfo(uid: string | number) {
     top_photo: string;
   }
   const data = await request<Res>(
+    //?mid=1717066021&token=&platform=web&jsonp=jsonp
     '/x/space/acc/info?mid=' + uid + '&token=&platform=web&jsonp=jsonp',
+    'https://space.bilibili.com/' + uid,
   );
   // if (code) {
   //   throw new Error('获取用户信息失败');

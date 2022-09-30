@@ -48,15 +48,38 @@ export default function Follow({ navigation, route }: Props) {
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [followedNum, setFollowedNum] = React.useState(0);
+  const [updateText, setUpdateText] = React.useState('刚刚更新');
+  const updateTimeRef = React.useRef(Date.now());
   const followListRef = React.useRef<FlatList | null>(null);
   const [refresh] = React.useState(false);
   const currentList = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    const a = setInterval(() => {
+      const now = Date.now();
+      if (now - updateTimeRef.current < 5 * 60 * 1000) {
+        setUpdateText('刚刚更新');
+      } else {
+        const date = new Date(updateTimeRef.current);
+        setUpdateText(
+          `${date.getHours().toString().padStart(2, '0')}:${date
+            .getMinutes()
+            .toString()
+            .padStart(2, '0')}更新`,
+        );
+      }
+    }, 1000 * 60);
+    return () => {
+      clearInterval(a);
+    };
+  }, []);
 
   const getUpdate = useMemoizedFn(() => {
     ToastAndroid.show('刷新中...', ToastAndroid.SHORT);
     setUps((currentList.current = []));
     setLoadDone(false);
     setLoading(false);
+    setFollowedNum(0);
     setPage(1);
   });
   React.useEffect(() => {
@@ -76,6 +99,8 @@ export default function Follow({ navigation, route }: Props) {
   React.useEffect(() => {
     if (userInfo.mid && (!currentList.current || currentList.current === ups)) {
       loadMoreUps();
+      updateTimeRef.current = Date.now();
+      setUpdateText('刚刚更新');
     }
   }, [userInfo, currentList.current]);
 
@@ -133,6 +158,7 @@ export default function Follow({ navigation, route }: Props) {
     setUps((currentList.current = []));
     setLoadDone(false);
     setLoading(false);
+    setFollowedNum(0);
     setPage(1);
   };
 
@@ -223,6 +249,7 @@ export default function Follow({ navigation, route }: Props) {
           关注列表
           <Text style={{ fontSize: 14 }}>({followedNum})</Text>：
         </Text>
+        <Text style={styles.updateTime}>{updateText}</Text>
       </View>
       <FlatList
         data={ups}
@@ -306,5 +333,9 @@ const styles = StyleSheet.create({
   infoFace: {
     width: 15,
     height: 15,
+  },
+  updateTime: {
+    fontSize: 12,
+    color: '#666',
   },
 });

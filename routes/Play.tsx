@@ -15,7 +15,8 @@ import { Avatar, Icon } from '@rneui/base';
 import useNetStatusToast from '../hooks/useNetStatusToast';
 import handleShare from '../services/Share';
 import { useKeepAwake } from 'expo-keep-awake';
-
+// https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1
+// https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
 function __hack() {
   const timer = setInterval(() => {
@@ -46,7 +47,13 @@ const parseDate = (time?: number) => {
     return '-';
   }
   const date = new Date(time * 1000);
-  return date.getMonth() + 1 + '-' + date.getDate();
+  const year = new Date().getFullYear();
+  return (
+    (year !== date.getFullYear() ? date.getFullYear() + '-' : '') +
+    (date.getMonth() + 1) +
+    '-' +
+    date.getDate()
+  );
 };
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';

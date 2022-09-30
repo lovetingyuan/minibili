@@ -54,6 +54,8 @@ export default function Header(props: {
         .catch(() => {
           if (isTracy) {
             setUserInfo({ ...userInfo, ...specialUser });
+          } else {
+            setUserInfo({ ...props });
           }
           getLiveStatus(mid).then(res => {
             setLiveInfo({
