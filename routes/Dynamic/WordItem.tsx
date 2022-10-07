@@ -1,9 +1,22 @@
-import { Text } from 'react-native';
 import React from 'react';
-import { parseUrl } from '../../utils';
+import { View } from 'react-native';
+import RichText from '../../components/RichText';
+import DateAndOpen from './DateAndOpen';
 
-export default function WordItem(props: { text: string }) {
+export default function WordItem(props: {
+  date: string;
+  id: string;
+  text: string;
+  name: string;
+}) {
   return (
-    <Text style={{ fontSize: 16, lineHeight: 26 }}>{parseUrl(props.text)}</Text>
+    <View>
+      <RichText
+        imageSize={16}
+        text={props.text}
+        textProps={{ style: { fontSize: 16, lineHeight: 24 } }}
+      />
+      <DateAndOpen name={props.name} id={props.id} date={props.date} />
+    </View>
   );
 }

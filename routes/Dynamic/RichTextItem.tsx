@@ -1,6 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Icon } from '@rneui/base';
 import React from 'react';
 import {
   Image,
@@ -8,62 +7,35 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
+import RichText from '../../components/RichText';
 import { AppContext } from '../../context';
 import { RootStackParamList } from '../../types';
-import { parseUrl } from '../../utils';
-type NavigationProps = NativeStackScreenProps<RootStackParamList>;
-// import urlRegex from 'url-regex';
+import DateAndOpen from './DateAndOpen';
 
-// const urlregex = urlRegex({
-//   strict: true,
-//   // exact: true,
-// });
-// // const urlregex =
-// //   /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/gi;
-// // const urlregex = /^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/
-// const handleText = (text: string) => {
-//   const nodes = [];
-//   let prev = 0;
-//   text.replace(urlregex, (a, b) => {
-//     nodes.push(<Text key={nodes.length}>{text.substring(prev, b)}</Text>);
-//     nodes.push(
-//       <Text
-//         key={nodes.length}
-//         style={{
-//           color: '#008AC5',
-//           // textDecorationLine: 'underline',
-//         }}
-//         onPress={() => {
-//           Linking.openURL(a);
-//         }}>
-//         {a}
-//       </Text>,
-//     );
-//     prev = b + a.length;
-//     return '';
-//   });
-//   nodes.push(<Text key={nodes.length}>{text.substring(prev)}</Text>);
-//   return nodes;
-// };
+type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function RichTextItem(props: {
   text: string;
-  date: number;
+  date: string;
   mid: number;
   name: string;
+  id: string | number;
   images: { src: string; ratio: number }[];
 }) {
-  const { text, date, mid, images, name } = props;
+  const { text, date, mid, images, name, id } = props;
   const { specialUser } = React.useContext(AppContext);
   const isTracy = mid.toString() === specialUser?.mid;
   const navigation = useNavigation<NavigationProps['navigation']>();
 
   return (
     <View style={[styles.textContainer]}>
-      <Text style={styles.textItem}>{parseUrl(text)}</Text>
+      <RichText
+        text={text}
+        imageSize={16}
+        textProps={{ style: { fontSize: 16, lineHeight: 25 } }}
+      />
       {images.length ? (
         <ScrollView
           horizontal
@@ -92,10 +64,7 @@ export default function RichTextItem(props: {
           })}
         </ScrollView>
       ) : null}
-      <View style={styles.info}>
-        <Icon name="update" color="#666" size={14} />
-        <Text style={styles.date}> {date}</Text>
-      </View>
+      <DateAndOpen name={name} id={id} date={date} />
     </View>
   );
 }

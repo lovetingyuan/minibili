@@ -22,7 +22,6 @@ export default function RichText(props: {
   imageSize?: number;
   textProps?: TextProps;
 }) {
-  // const nodes = []
   const parseEmoji = (text: string) => {
     if (!text) {
       return [];
@@ -56,7 +55,10 @@ export default function RichText(props: {
             <Image
               key={index++}
               source={{ uri: url }}
-              style={{ width: props.imageSize, height: props.imageSize }}
+              style={{
+                width: props.imageSize,
+                height: props.imageSize,
+              }}
             />,
           );
         } else {
@@ -89,7 +91,10 @@ export default function RichText(props: {
           <Image
             key={index++}
             source={{ uri: url }}
-            style={{ width: props.imageSize, height: props.imageSize }}
+            style={{
+              width: props.imageSize,
+              height: props.imageSize,
+            }}
           />,
         );
       } else {
@@ -104,7 +109,7 @@ export default function RichText(props: {
   };
 
   if (!/http(s)?:\/\/.+/.test(props.text)) {
-    return <>{parseEmoji(props.text)}</>;
+    return <Text style={styles.textContainer}>{parseEmoji(props.text)}</Text>;
   }
   const nodes = [];
   let prev = 0;
@@ -125,11 +130,15 @@ export default function RichText(props: {
   });
 
   nodes.push(...parseEmoji(props.text.substring(prev)));
-  return <>{nodes}</>;
+  return <Text style={styles.textContainer}>{nodes}</Text>;
 }
 
 const styles = StyleSheet.create({
   link: {
     color: '#008AC5',
+  },
+  textContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

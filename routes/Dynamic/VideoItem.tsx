@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import RichText from '../../components/RichText';
 import { AppContext } from '../../context';
 import { getDynamicItems } from '../../services/Bilibili';
 import handleShare from '../../services/Share';
@@ -18,7 +19,6 @@ import {
   GetFuncPromiseType,
   RootStackParamList,
 } from '../../types';
-import { parseUrl } from '../../utils';
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
@@ -47,7 +47,16 @@ export default function VideoItem(props: VideoDynamicItem) {
           name,
         });
       }}>
-      {text ? <Text style={styles.descText}>{parseUrl(text)}</Text> : null}
+      {text ? (
+        <View style={{ marginBottom: 12 }}>
+          <RichText
+            text={text}
+            imageSize={16}
+            textProps={{ style: { fontSize: 16, lineHeight: 26 } }}
+          />
+        </View>
+      ) : null}
+      {/* <Text style={styles.descText}>{parseUrl(text)}</Text> : null} */}
       <View style={styles.videoContainer}>
         <View style={styles.imageContainer}>
           <Image

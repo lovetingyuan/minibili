@@ -15,6 +15,7 @@ import { Avatar, Icon } from '@rneui/base';
 import useNetStatusToast from '../../hooks/useNetStatusToast';
 import handleShare from '../../services/Share';
 import { useKeepAwake } from 'expo-keep-awake';
+import Comment from '../../components/Comment';
 // https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
@@ -37,7 +38,7 @@ const Loading = () => {
       <Image
         style={styles.loadingImage}
         resizeMode="contain"
-        source={require('../assets/video-loading.png')}
+        source={require('../../assets/video-loading.png')}
       />
     </View>
   );
@@ -59,7 +60,6 @@ const parseDate = (time?: number) => {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { AppContext } from '../../context';
-import { processText } from '../../utils';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
 
@@ -96,25 +96,40 @@ export default ({ route, navigation }: Props) => {
     });
   }, [bvid, aid, width, height]);
 
-  const isUpStyle = (uname: string) => {
-    if (uname === name) {
-      return {
-        color: '#FF6699',
-      };
-    }
-  };
   const search = new URLSearchParams();
+  const playUrl = 'https://player.bilibili.com/player.html';
   Object.entries({
     aid,
     bvid,
     autoplay: 1,
     highQuality: connectType === 'wifi' ? 1 : 0,
-    quality: connectType === 'wifi' ? 20 : 16,
+    quality: connectType === 'wifi' ? 100 : 16,
     portraitFullScreen: true,
     hasMuteButton: true,
   }).forEach(([k, v]) => {
     search.append(k, v + '');
   });
+  // const playUrl = 'https://www.bilibili.com/blackboard/newplayer.html';
+  // Object.entries({
+  //   crossDomain: true,
+  //   as_wide: 1,
+  //   page: 1,
+  //   bvid,
+  //   poster: 1,
+  //   autoplay: 1,
+  //   highQuality: 1,
+  // }).forEach(([k, v]) => {
+  //   search.append(k, v + '');
+  // });
+
+  // const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html';
+  // Object.entries({
+  //   danmaku: 1,
+  //   highQuality: 1,
+  //   bvid,
+  // }).forEach(([k, v]) => {
+  //   search.append(k, v + '');
+  // });
   const onShare = useCallback(() => {
     if (videoInfo) {
       handleShare(name, videoInfo.title, bvid);
@@ -128,7 +143,7 @@ export default ({ route, navigation }: Props) => {
         style={[styles.playerContainer, { height: videoHeight }]}>
         <WebView
           source={{
-            uri: `https://player.bilibili.com/player.html?${search}`,
+            uri: `${playUrl}?${search}`,
           }}
           originWhitelist={['https://*', 'bilibili://*']}
           allowsFullscreenVideo
@@ -190,7 +205,7 @@ export default ({ route, navigation }: Props) => {
             <Text>{'   '}</Text>
             <Image
               style={styles.icon}
-              source={require('../assets/play-mark.png')}
+              source={require('../../assets/play-mark.png')}
             />
             <Text style={styles.videoInfoText}>
               {' '}
@@ -199,7 +214,7 @@ export default ({ route, navigation }: Props) => {
             <Pressable onPress={onShare}>
               <Image
                 style={styles.shareIcon}
-                source={require('../assets/share.png')}
+                source={require('../../assets/share.png')}
               />
             </Pressable>
           </View>
@@ -210,55 +225,17 @@ export default ({ route, navigation }: Props) => {
             <Text style={styles.videoDesc}>{videoInfo.desc}</Text>
           ) : null}
         </View>
-        <View style={styles.repliesContainer} />
+        <View style={styles.commentsContainer} />
         {comments?.length ? (
           comments.map((comment, i) => {
             return (
               <View
-                style={[styles.replyItem, i ? null : { paddingTop: 0 }]}
-                key={comment.id}>
-                <View style={styles.replyItemContent}>
-                  <Text style={[styles.replyName, isUpStyle(comment.name)]}>
-                    {comment.name}:{' '}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.replyItemMessage,
-                      comment.upLike ? styles.upLikeReply : null,
-                      comment.top ? styles.topReply : null,
-                    ]}
-                    selectable
-                    selectionColor={'#BFEDFA'}>
-                    {processText(comment.message)}
-                    <Text style={{ fontSize: 12 }}>
-                      {comment.like ? ` ${comment.like}👍` : ''}
-                    </Text>
-                  </Text>
-                </View>
-                {comment.replies ? (
-                  <View style={styles.repliesreplies}>
-                    {comment.replies.map(reply => {
-                      return (
-                        <View key={reply.id} style={styles.replyReplyContainer}>
-                          <Text
-                            style={[styles.replyUpName, isUpStyle(reply.name)]}>
-                            {reply.name}:{' '}
-                          </Text>
-                          <View style={styles.replyMessage}>
-                            {processText(reply.message, {
-                              textProps: {
-                                selectable: true,
-                                selectionColor: '#BFEDFA',
-                                textBreakStrategy: 'balanced',
-                              },
-                              imageSize: 14,
-                            })}
-                          </View>
-                        </View>
-                      );
-                    })}
-                  </View>
-                ) : null}
+                key={comment.id}
+                style={[
+                  styles.commentItemContainer,
+                  i ? null : { marginTop: 0 },
+                ]}>
+                <Comment upName={name} comment={comment} />
               </View>
             );
           })
@@ -319,10 +296,15 @@ const styles = StyleSheet.create({
   videoInfoText: { color: '#888' },
   videoTitle: { fontSize: 16, marginTop: 12 },
   videoDesc: { marginTop: 10 },
-  repliesContainer: {
+  commentsContainer: {
     borderBottomColor: '#ddd',
     borderBottomWidth: 1,
     marginVertical: 24,
+  },
+  commentItemContainer: {
+    marginTop: 20,
+    borderBottomColor: '#eee',
+    borderBottomWidth: 0.5,
   },
   replyItem: {
     paddingBottom: 16,

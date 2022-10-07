@@ -229,7 +229,7 @@ export default function Follow({ navigation, route }: Props) {
             setModalVisible(true);
           }}>
           <Image
-            source={require('../../assets/info-icon.png')}
+            source={require('../../assets/snow.png')}
             style={styles.infoFace}
           />
         </Pressable>
@@ -332,8 +332,8 @@ const styles = StyleSheet.create({
     height: 24,
   },
   infoFace: {
-    width: 15,
-    height: 15,
+    width: 18,
+    height: 18,
   },
   updateTime: {
     fontSize: 12,

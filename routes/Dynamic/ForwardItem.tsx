@@ -1,9 +1,9 @@
-import { Icon } from '@rneui/base';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import RichText from '../../components/RichText';
 import { getDynamicItems } from '../../services/Bilibili';
 import { DynamicType, GetFuncPromiseType } from '../../types';
-import { parseUrl } from '../../utils';
+import DateAndOpen from './DateAndOpen';
 
 type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0];
 
@@ -54,8 +54,9 @@ export default function ForwardItem(props: ForwardItems) {
   return (
     <View style={[styles.textContainer]}>
       {props.text ? (
-        <Text style={styles.textItem}>{parseUrl(props.text)}</Text>
-      ) : null}
+        <RichText imageSize={16} text={props.text} />
+      ) : // <Text style={styles.textItem}>{parseUrl(props.text)}</Text>
+      null}
       <View style={styles.forwardContainer}>
         {props.forwardText ? (
           <Text style={{ marginBottom: 8 }} numberOfLines={2}>
@@ -64,10 +65,7 @@ export default function ForwardItem(props: ForwardItems) {
         ) : null}
         <View style={styles.forwardContent}>{forwardContent}</View>
       </View>
-      <View style={styles.info}>
-        <Icon name="update" color="#666" size={14} />
-        <Text style={styles.date}> {props.date}</Text>
-      </View>
+      <DateAndOpen name={props.name} id={props.id} date={props.date} />
     </View>
   );
 }

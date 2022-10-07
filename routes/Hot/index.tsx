@@ -104,7 +104,7 @@ export default function Hot({ navigation }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentVideoRef.current]);
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
-    const key = item[0].bvid + (item[1] ? item[1].bvid : '');
+    const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a');
     return (
       <View key={key} style={styles.itemContainer}>
         {item.filter(Boolean).map(_item => {
@@ -113,6 +113,7 @@ export default function Hot({ navigation }: Props) {
             <TouchableOpacity
               activeOpacity={0.8}
               style={{ flex: 1 }}
+              key={val?.bvid || '-'}
               onPress={() => {
                 navigation.navigate('Play', {
                   mid: val.mid,
