@@ -104,48 +104,31 @@ export default function Hot({ navigation }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentVideoRef.current]);
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
-    const key = item[0].bvid + (item[1] ? item[1].bvid : 'N/A');
-    const [first, second] = item;
+    const key = item[0].bvid + (item[1] ? item[1].bvid : '');
     return (
       <View key={key} style={styles.itemContainer}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={{ flex: 1 }}
-          onPress={() => {
-            navigation.navigate('Play', {
-              mid: first.mid,
-              bvid: first.bvid,
-              name: first.name,
-              aid: first.aid,
-            });
-          }}
-          onLongPress={() => {
-            currentVideoRef.current = first;
-            setModalVisible(true);
-          }}>
-          <HotItem video={first} />
-        </TouchableOpacity>
-        {second ? (
-          <TouchableOpacity
-            style={{ flex: 1 }}
-            activeOpacity={0.8}
-            onPress={() => {
-              navigation.navigate('Play', {
-                mid: second.mid,
-                bvid: second.bvid,
-                name: second.name,
-                aid: second.aid,
-              });
-            }}
-            onLongPress={() => {
-              currentVideoRef.current = second;
-              setModalVisible(true);
-            }}>
-            <HotItem video={second} />
-          </TouchableOpacity>
-        ) : (
-          <View style={{ flex: 1 }} />
-        )}
+        {item.filter(Boolean).map(_item => {
+          const val = _item!;
+          return (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={{ flex: 1 }}
+              onPress={() => {
+                navigation.navigate('Play', {
+                  mid: val.mid,
+                  bvid: val.bvid,
+                  name: val.name,
+                  aid: val.aid,
+                });
+              }}
+              onLongPress={() => {
+                currentVideoRef.current = val;
+                setModalVisible(true);
+              }}>
+              <HotItem video={val} />
+            </TouchableOpacity>
+          );
+        })}
       </View>
     );
   };

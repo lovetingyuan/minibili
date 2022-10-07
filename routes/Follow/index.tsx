@@ -27,8 +27,9 @@ type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
 
 const buttons = [
   {
-    text: '退出',
+    text: '退出（长按）',
     name: 'logout',
+    longPress: true,
   },
   {
     text: '黑名单',

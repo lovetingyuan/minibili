@@ -8,6 +8,7 @@ export default function ButtonsOverlay(props: {
   buttons: ({
     text: string;
     name: string;
+    longPress?: boolean;
   } | null)[];
   onPress: (name: string) => void;
   overlayStyle?: any;
@@ -30,14 +31,26 @@ export default function ButtonsOverlay(props: {
           buttonStyle={[styles.buttonStyle, props.buttonStyle]}
           title={button.text}
           key={button.name}
-          onPress={() => {
-            props.onPress(button.name);
-            props.dismiss();
-          }}
+          {...(button.longPress
+            ? {
+                onLongPress: () => {
+                  props.onPress(button.name);
+                  props.dismiss();
+                },
+              }
+            : {
+                onPress: () => {
+                  props.onPress(button.name);
+                  props.dismiss();
+                },
+              })}
         />
       );
     })
     .filter(Boolean);
+  if (!Buttons.length) {
+    return null;
+  }
   return (
     <Overlay
       isVisible={props.visible}

@@ -92,10 +92,12 @@ export default React.memo(
             text: '标记为未读',
             name: 'unread',
           },
-      {
-        text: `设置 ${props.item.name} 为特别关注 ❤`,
-        name: 'special',
-      },
+      specialUser.name === props.item.name
+        ? null
+        : {
+            text: `设置 ${props.item.name} 为特别关注 ❤`,
+            name: 'special',
+          },
     ].filter(Boolean);
     const handleOverlayClick = useMemoizedFn((n: string) => {
       if (n === 'unread') {
