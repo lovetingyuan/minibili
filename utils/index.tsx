@@ -1,41 +1,69 @@
 import { Image, Linking, StyleSheet, Text } from 'react-native';
 import React from 'react';
+import urlRegex from 'url-regex';
 import emojis from './emojis';
 
-export const parseEmoji = (msg: string) => {
+let index = 0;
+interface ProcessTextOptions {
+  textProps?: any;
+  imageSize?: any;
+}
+
+const getTextNode = (text: string) =>
+  text ? (
+    <Text
+      selectable
+      selectionColor="#BFEDFA"
+      textBreakStrategy="balanced"
+      key={index++}>
+      {text}
+    </Text>
+  ) : null;
+// const getImgNode = (url: string) => (
+//   <Image key={index++} source={{ uri: url }} style={styles.emojiImage} />
+// );
+const getEmojiNode = (text: string, imageSize?: number) => {
+  if (emojis[`[${text}]`]) {
+    const { url } = emojis[`[${text}]`];
+    return (
+      <Image
+        key={index++}
+        source={{ uri: url }}
+        style={[
+          styles.emojiImage,
+          imageSize ? { width: imageSize, height: imageSize } : null,
+        ]}
+      />
+    );
+    // return getImgNode(url);
+  }
+  return (
+    <Text key={index++} style={styles.emojiText}>
+      {' ' + text + ' '}
+    </Text>
+  );
+};
+
+export const parseEmoji = (msg: string, options: ProcessTextOptions) => {
+  if (!msg) {
+    return [];
+  }
   if (!/\[.+\]/g.test(msg)) {
-    return msg;
+    return [getTextNode(msg)];
   }
   let normalStr = '';
   let emojiStr = '';
   const result = [];
   let isEmoji = false;
-  let i = 0;
+
   for (let c of msg) {
-    i++;
     if (c === '[') {
-      result.push(normalStr);
+      result.push(getTextNode(normalStr));
       normalStr = '';
       isEmoji = true;
     } else if (c === ']') {
       isEmoji = false;
-      console.log(emojiStr);
-      if (emojis[`[${emojiStr}]`]) {
-        const { id, url } = emojis[`[${emojiStr}]`];
-        result.push(
-          <Image
-            key={id}
-            source={{ uri: url }}
-            style={{ width: 20, height: 20 }}
-          />,
-        );
-      } else {
-        result.push(
-          <Text key={emojiStr + i} style={styles.emojiText}>
-            {' ' + emojiStr + ' '}
-          </Text>,
-        );
-      }
+      result.push(getEmojiNode(emojiStr, options.imageSize));
       emojiStr = '';
     } else {
       if (isEmoji) {
@@ -46,47 +74,30 @@ export const parseEmoji = (msg: string) => {
     }
   }
   if (normalStr) {
-    result.push(normalStr);
+    result.push(getTextNode(normalStr));
   }
   if (emojiStr) {
-    if (emojis[`[${emojiStr}]`]) {
-      const { id, url } = emojis[`[${emojiStr}]`];
-      result.push(
-        <Image
-          key={id}
-          source={{ uri: url }}
-          style={{ width: 20, height: 20 }}
-        />,
-      );
-    } else {
-      result.push(
-        <Text key={emojiStr + i} style={styles.emojiText}>
-          {' ' + emojiStr + ' '}
-        </Text>,
-      );
-    }
+    result.push(getEmojiNode(emojiStr, options.imageSize));
   }
   return result;
 };
-import urlRegex from 'url-regex';
 
 const urlregex = urlRegex({
   strict: true,
   // exact: true,
 });
 
-export const parseUrl = (text: string) => {
+export const parseUrl = (text: string, options: ProcessTextOptions) => {
   if (!/http(s)?:\/\/.+/.test(text)) {
-    return parseEmoji(text);
+    return parseEmoji(text, options);
   }
   const nodes = [];
   let prev = 0;
   text.replace(urlregex, (a, b) => {
-    nodes.push(...parseEmoji(text.substring(prev, b)));
-    // nodes.push(<Text key={nodes.length}>{text.substring(prev, b)}</Text>);
+    nodes.push(...parseEmoji(text.substring(prev, b), options));
     nodes.push(
       <Text
-        key={nodes.length}
+        key={index++}
         style={styles.link}
         onPress={() => {
           Linking.openURL(a);
@@ -97,8 +108,13 @@ export const parseUrl = (text: string) => {
     prev = b + a.length;
     return '';
   });
-  nodes.push(...parseEmoji(text.substring(prev)));
+
+  nodes.push(...parseEmoji(text.substring(prev), options));
   return nodes;
+};
+
+export const processText = (text: string, options?: ProcessTextOptions) => {
+  return parseUrl(text, options || {});
 };
 
 const styles = StyleSheet.create({
@@ -109,4 +125,5 @@ const styles = StyleSheet.create({
   link: {
     color: '#008AC5',
   },
+  emojiImage: { width: 18, height: 18 },
 });

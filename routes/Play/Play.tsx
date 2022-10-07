@@ -10,10 +10,10 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { getVideoComments, getVideoInfo } from '../services/Bilibili';
+import { getVideoComments, getVideoInfo } from '../../services/Bilibili';
 import { Avatar, Icon } from '@rneui/base';
-import useNetStatusToast from '../hooks/useNetStatusToast';
-import handleShare from '../services/Share';
+import useNetStatusToast from '../../hooks/useNetStatusToast';
+import handleShare from '../../services/Share';
 import { useKeepAwake } from 'expo-keep-awake';
 // https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
@@ -57,45 +57,11 @@ const parseDate = (time?: number) => {
 };
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { GetFuncPromiseType, RootStackParamList } from '../types';
-import { AppContext } from '../context';
+import { GetFuncPromiseType, RootStackParamList } from '../../types';
+import { AppContext } from '../../context';
+import { processText } from '../../utils';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
-
-const handleMessage = (msg: string) => {
-  let normalStr = '';
-  let emojiStr = '';
-  const result = [];
-  let isEmoji = false;
-  let i = 0;
-  for (let c of msg) {
-    i++;
-    if (c === '[') {
-      result.push(normalStr);
-      normalStr = '';
-      isEmoji = true;
-    } else if (c === ']') {
-      isEmoji = false;
-      result.push(
-        <Text key={emojiStr + i} style={styles.emojiText}>
-          {' '}
-          {emojiStr}
-        </Text>,
-      );
-      emojiStr = '';
-    } else {
-      if (isEmoji) {
-        emojiStr += c;
-      } else {
-        normalStr += c;
-      }
-    }
-  }
-  if (normalStr) {
-    result.push(normalStr);
-  }
-  return result;
-};
 
 export default ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name);
@@ -257,13 +223,13 @@ export default ({ route, navigation }: Props) => {
                   </Text>
                   <Text
                     style={[
-                      styles.replyItem.message,
+                      styles.replyItemMessage,
                       comment.upLike ? styles.upLikeReply : null,
                       comment.top ? styles.topReply : null,
                     ]}
                     selectable
                     selectionColor={'#BFEDFA'}>
-                    {handleMessage(comment.message)}
+                    {processText(comment.message)}
                     <Text style={{ fontSize: 12 }}>
                       {comment.like ? ` ${comment.like}👍` : ''}
                     </Text>
@@ -273,21 +239,21 @@ export default ({ route, navigation }: Props) => {
                   <View style={styles.repliesreplies}>
                     {comment.replies.map(reply => {
                       return (
-                        <View key={reply.id} style={styles.replyContainer}>
+                        <View key={reply.id} style={styles.replyReplyContainer}>
                           <Text
-                            style={[
-                              styles.replyItem.replyUpName,
-                              isUpStyle(reply.name),
-                            ]}>
+                            style={[styles.replyUpName, isUpStyle(reply.name)]}>
                             {reply.name}:{' '}
                           </Text>
-                          <Text
-                            selectable
-                            selectionColor={'#BFEDFA'}
-                            textBreakStrategy="balanced"
-                            style={styles.replyItem.replyMessage}>
-                            {handleMessage(reply.message)}
-                          </Text>
+                          <View style={styles.replyMessage}>
+                            {processText(reply.message, {
+                              textProps: {
+                                selectable: true,
+                                selectionColor: '#BFEDFA',
+                                textBreakStrategy: 'balanced',
+                              },
+                              imageSize: 14,
+                            })}
+                          </View>
                         </View>
                       );
                     })}
@@ -363,13 +329,15 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderBottomWidth: 0.5,
     borderBottomColor: '#ddd',
-    message: { fontSize: 16, lineHeight: 22 },
-    replyUpName: {
-      fontWeight: 'bold',
-      color: '#666',
-    },
-    replyMessage: { color: '#666' },
+    // alignItems: 'center',
   },
+  replyUpName: {
+    fontWeight: 'bold',
+    color: '#666',
+  },
+  replyMessage: { color: '#666', alignItems: 'center' },
+
+  replyItemMessage: { fontSize: 16, lineHeight: 22 },
   topReply: {
     color: '#00699D',
     fontWeight: 'bold',
@@ -387,11 +355,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 6,
   },
-  replyContainer: {
+  replyReplyContainer: {
     flex: 1,
     flexWrap: 'wrap',
     flexDirection: 'row',
     paddingTop: 5,
+    // alignItems: 'flex-start',
   },
   icon: {
     width: 13,

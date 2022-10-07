@@ -4,7 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Play from './routes/Play';
+import Play from './routes/Play/Play';
 import Follow from './routes/Follow';
 import Dynamic from './routes/Dynamic';
 import Hot from './routes/Hot';
