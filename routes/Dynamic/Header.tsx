@@ -65,7 +65,11 @@ export default function Header(props: {
           });
         });
       getFansData(mid).then(data => {
-        setFans((data.follower / 10000).toFixed(1) + '万');
+        if (data.follower < 10000) {
+          setFans(data.follower + '');
+        } else {
+          setFans((data.follower / 10000).toFixed(1) + '万');
+        }
       });
     }
   }, [mid]);

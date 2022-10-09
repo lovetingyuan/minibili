@@ -28,7 +28,6 @@ export default function RichTextItem(props: {
   const { specialUser } = React.useContext(AppContext);
   const isTracy = mid.toString() === specialUser?.mid;
   const navigation = useNavigation<NavigationProps['navigation']>();
-
   return (
     <View style={[styles.textContainer]}>
       <RichText
@@ -64,7 +63,7 @@ export default function RichTextItem(props: {
           })}
         </ScrollView>
       ) : null}
-      <DateAndOpen name={name} id={id} date={date} />
+      <DateAndOpen title={props.text} name={name} id={id} date={date} />
     </View>
   );
 }

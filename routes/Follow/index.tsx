@@ -11,7 +11,11 @@ import {
 } from 'react-native';
 import { Avatar } from '@rneui/themed';
 import FollowItem from './FollowItem';
-import { getFollowUps, getUserInfo } from '../../services/Bilibili';
+import {
+  getFansData,
+  getFollowUps,
+  getUserInfo,
+} from '../../services/Bilibili';
 import TracyBtn from '../../components/TracyBtn';
 import Login from './Login';
 
@@ -54,6 +58,7 @@ export default function Follow({ navigation, route }: Props) {
   const followListRef = React.useRef<FlatList | null>(null);
   const [refresh] = React.useState(false);
   const currentList = React.useRef<any>(null);
+  const [fans, setFans] = React.useState('');
 
   React.useEffect(() => {
     const a = setInterval(() => {
@@ -95,6 +100,13 @@ export default function Follow({ navigation, route }: Props) {
           });
         })
         .catch(() => {});
+      getFansData(userInfo.mid).then(data => {
+        if (data.follower < 10000) {
+          setFans(data.follower + '');
+        } else {
+          setFans((data.follower / 10000).toFixed(1) + '万');
+        }
+      });
     }
   }, [userInfo.mid]);
   React.useEffect(() => {
@@ -135,7 +147,7 @@ export default function Follow({ navigation, route }: Props) {
           setFollowedNum(total);
         }
         if (list.length) {
-          setUps(ups.concat(list));
+          setUps(page === 1 ? list : ups.concat(list));
           setPage(page + 1);
         } else {
           setLoadDone(true);
@@ -219,7 +231,13 @@ export default function Follow({ navigation, route }: Props) {
           }
         />
         <View style={{ flex: 1 }}>
-          <Text style={styles.myName}>{userInfo?.name || ''}</Text>
+          <Text style={styles.myName}>
+            {userInfo?.name || ''}
+            <Text style={styles.fansNumText}>
+              {'    '}
+              {fans}关注
+            </Text>
+          </Text>
           <Text style={styles.mySign}>{userInfo?.sign || ''}</Text>
         </View>
         {/* {userId ? <WebviewApi mid={userId} onLoad={setUserInfo} /> : null} */}
@@ -285,10 +303,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    marginTop: 10,
   },
-  myName: { fontSize: 18, marginBottom: 5, fontWeight: 'bold' },
-  mySign: { color: '#555' },
+  myName: { fontSize: 18, fontWeight: 'bold' },
+  mySign: { color: '#555', marginTop: 6 },
+  fansNumText: { fontSize: 14, fontWeight: 'normal' },
   logo: {
     width: 160,
     height: 160,
@@ -304,6 +322,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
+    paddingTop: 27,
+    backgroundColor: 'white',
   },
   listTitleContainer: {
     // flex: 1,
@@ -313,10 +333,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   listTitle: {
-    fontSize: 18,
+    fontSize: 16,
     // marginLeft: 20,
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 18,
+    marginBottom: 15,
   },
   userFace: {
     width: 60,

@@ -40,13 +40,13 @@ export default function Comment(props: Props) {
             {' '}
             <Image
               source={require('../assets/top.png')}
-              style={{ width: 24, height: 12 }}
+              style={styles.topImg}
             />
           </>
         ) : null}
-        <Text style={styles.likeNum}>
-          {comment.like ? `  ${comment.like}👍` : ''}
-        </Text>
+        {comment.like ? (
+          <Text style={styles.likeNum}> {comment.like}</Text>
+        ) : null}
       </Text>
       {comment.replies ? (
         <View style={styles.reply}>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   reply: {
     marginLeft: 10,
     marginTop: 8,
-    opacity: 0.7,
+    opacity: 0.75,
     flex: 1,
   },
   replyItem: {
@@ -108,5 +108,13 @@ const styles = StyleSheet.create({
   replyName: {
     fontWeight: 'bold',
   },
-  likeNum: { fontSize: 12, fontStyle: 'italic' },
+  likeNum: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: '#fa5a57',
+  },
+  topImg: {
+    width: 24,
+    height: 12,
+  },
 });

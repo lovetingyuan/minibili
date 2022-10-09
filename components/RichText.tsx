@@ -1,13 +1,5 @@
-import React from 'react';
-import {
-  Image,
-  Linking,
-  // StyleProp,
-  StyleSheet,
-  Text,
-  TextProps,
-  // TextStyle,
-} from 'react-native';
+import React, { ReactNode } from 'react';
+import { Image, Linking, StyleSheet, Text, TextProps } from 'react-native';
 import urlRegex from 'url-regex';
 import emojis from '../utils/emojis';
 
@@ -23,8 +15,10 @@ export default function RichText(props: {
   textProps?: TextProps;
 }) {
   const parseEmoji = (text: string) => {
+    const result: ReactNode[] = [];
+
     if (!text) {
-      return [];
+      return result;
     }
     if (!/\[.+\]/g.test(text)) {
       return [
@@ -35,7 +29,6 @@ export default function RichText(props: {
     }
     let normalStr = '';
     let emojiStr = '';
-    const result = [];
     let isEmoji = false;
 
     for (let c of text) {

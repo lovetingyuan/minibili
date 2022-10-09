@@ -19,6 +19,12 @@ type ForwardItems = Extract<
 
 export default function ForwardItem(props: ForwardItems) {
   let forwardContent = null;
+  // const top = props.top ? (
+  //   <Image
+  //     source={require('../../assets/top.png')}
+  //     style={{ width: 30, height: 15 }}
+  //   />
+  // ) : null;
   if (props.type === DynamicType.ForwardVideo) {
     forwardContent = (
       <>
@@ -53,8 +59,15 @@ export default function ForwardItem(props: ForwardItems) {
   }
   return (
     <View style={[styles.textContainer]}>
+      {/* {top} */}
       {props.text ? (
-        <RichText imageSize={16} text={props.text} />
+        <RichText
+          imageSize={16}
+          text={props.text}
+          textProps={{
+            style: { fontSize: 16, color: props.top ? '#00699D' : 'black' },
+          }}
+        />
       ) : // <Text style={styles.textItem}>{parseUrl(props.text)}</Text>
       null}
       <View style={styles.forwardContainer}>
@@ -65,7 +78,12 @@ export default function ForwardItem(props: ForwardItems) {
         ) : null}
         <View style={styles.forwardContent}>{forwardContent}</View>
       </View>
-      <DateAndOpen name={props.name} id={props.id} date={props.date} />
+      <DateAndOpen
+        name={props.name}
+        id={props.id}
+        title={props.text || '-'}
+        date={props.date}
+      />
     </View>
   );
 }

@@ -6,6 +6,7 @@ import {
   FlatList,
   ToastAndroid,
   BackHandler,
+  Image,
   // TouchableOpacity,
 } from 'react-native';
 import { getDynamicItems } from '../../services/Bilibili';
@@ -22,7 +23,7 @@ import WordItem from './WordItem';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>;
 
-export default function Dynamic({ navigation, route }: Props) {
+const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name);
 
   const [dynamicItems, setDynamicItems] = React.useState<DynamicItem[]>([]);
@@ -94,18 +95,15 @@ export default function Dynamic({ navigation, route }: Props) {
     // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
     return (
       <View style={styles.itemContainer}>
+        {item.top ? (
+          <Image
+            source={require('../../assets/top.png')}
+            style={{ width: 30, height: 15 }}
+          />
+        ) : null}
         <Item {...item} />
       </View>
     );
-    // return (
-    //   <TouchableOpacity
-    //     activeOpacity={0.8}
-    //     onLongPress={() => {
-    //       currentDynamicIdRef.current = item.id;
-    //       setModalVisible(true);
-    //     }}
-    //   />
-    // );
   };
   const loadMoreDynamicItems = React.useCallback(() => {
     const { offset, hasMore } = pageInfoRef.current;
@@ -154,29 +152,8 @@ export default function Dynamic({ navigation, route }: Props) {
     resetDynamicItems();
   }, [upId]);
   const headerProps = route.params || specialUser;
-  // const buttons = [
-  //   {
-  //     name: 'openWebPage',
-  //     text: '在B站网站查看',
-  //   },
-  // ];
-  // const handleOverlayClick = (name: string) => {
-  //   if (name === 'openWebPage') {
-  //     navigation.navigate('WebPage', {
-  //       title: headerProps.name + '的动态',
-  //       url: 'https://m.bilibili.com/dynamic/' + currentDynamicIdRef.current,
-  //     });
-  //   }
-  // };
   return (
     <View style={styles.container}>
-      {/* <ButtonsOverlay
-        visible={modalVisible}
-        overlayStyle={{ minWidth: 220 }}
-        buttons={buttons}
-        onPress={handleOverlayClick}
-        dismiss={() => setModalVisible(false)}
-      /> */}
       <Header {...headerProps} />
       <FlatList
         data={dynamicItems}
@@ -210,7 +187,7 @@ export default function Dynamic({ navigation, route }: Props) {
       />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -239,3 +216,5 @@ const styles = StyleSheet.create({
   },
   listStyle: { paddingTop: 15 },
 });
+
+export default Dynamic;

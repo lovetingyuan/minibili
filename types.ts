@@ -2,7 +2,7 @@ import { getDynamicItems } from './services/Bilibili';
 
 export type RootStackParamList = {
   Home: undefined;
-  Main: {};
+  Main: undefined;
   WebPage: { url: string; title: string; type?: 'pc' | 'mobile' };
   Play: {
     aid: number | string;

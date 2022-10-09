@@ -27,8 +27,26 @@ function __hack() {
       clearInterval(timer);
     }
   }, 200);
+
+  const timer2 = setInterval(() => {
+    const dom = document.querySelector<HTMLDivElement>('.mplayer-display');
+    if (dom) {
+      clearInterval(timer2);
+      dom.ondblclick = () => {
+        const video = document.querySelector('video');
+        if (video) {
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+        }
+      };
+    }
+  }, 200);
   setTimeout(() => {
     clearInterval(timer);
+    clearInterval(timer2);
   }, 5000);
 }
 const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`;
@@ -154,6 +172,9 @@ export default ({ route, navigation }: Props) => {
           injectedJavaScript={INJECTED_JAVASCRIPT}
           renderLoading={Loading}
           ref={webviewRef}
+          onMessage={evt => {
+            console.log(999, evt.nativeEvent.data);
+          }}
           onError={() => {
             ToastAndroid.show('加载失败', ToastAndroid.SHORT);
             webviewRef && webviewRef.current?.reload();
@@ -221,7 +242,9 @@ export default ({ route, navigation }: Props) => {
         </View>
         <View>
           <Text style={styles.videoTitle}>{videoInfo?.title || ''}</Text>
-          {videoInfo?.desc && videoInfo.desc.trim() !== '-' ? (
+          {videoInfo?.desc &&
+          videoInfo.desc.trim() !== '-' &&
+          videoInfo.title !== videoInfo.desc ? (
             <Text style={styles.videoDesc}>{videoInfo.desc}</Text>
           ) : null}
         </View>
@@ -246,7 +269,7 @@ export default ({ route, navigation }: Props) => {
         )}
         {comments.length ? (
           <View style={styles.footerContainer}>
-            <Text style={styles.footerText}>只加载前20条</Text>
+            <Text style={styles.footerText}>只加载前40条</Text>
             <Text />
           </View>
         ) : null}

@@ -1,5 +1,12 @@
 import React, { ReactNode } from 'react';
-import { StatusBar, StyleSheet, Text } from 'react-native';
+import {
+  Image,
+  Linking,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+} from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -12,7 +19,6 @@ import WebPage from './routes/WebPage';
 import { checkWifi } from './hooks/useNetStatusToast';
 import { RootStackParamList } from './types';
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
-// import { getBlackUps } from './routes/Hot/blackUps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppContext, AppContextValue, UserInfo } from './context';
 import { TracyId, TracyInfo } from './constants';
@@ -172,6 +178,34 @@ export default () => {
             options={props => {
               return {
                 title: props.route.params.name,
+                headerRight() {
+                  return (
+                    <Pressable
+                      onPress={() => {
+                        Linking.openURL(
+                          `bilibili://video/${props.route.params.bvid}`,
+                        ).catch(err => {
+                          if (
+                            err.message.includes(
+                              'No Activity found to handle Intent',
+                            )
+                          ) {
+                            props.navigation.navigate('WebPage', {
+                              title: props.route.params.name + '的动态',
+                              url:
+                                'https://m.bilibili.com/video/' +
+                                props.route.params.bvid,
+                            });
+                          }
+                        });
+                      }}>
+                      <Image
+                        style={{ width: 36, height: 14 }}
+                        source={require('./assets/bili-text.png')}
+                      />
+                    </Pressable>
+                  );
+                },
               };
             }}
           />

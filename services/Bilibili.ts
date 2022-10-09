@@ -72,6 +72,7 @@ export function request<D extends Record<string, any>>(
     .then(r => r.json())
     .then((res: { code: number; message: string; data: D }) => {
       if (res.code) {
+        console.log('error', res.code, res.message);
         if (Date.now() - errorTime > 20000) {
           ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
           errorTime = Date.now();
@@ -194,6 +195,14 @@ export async function getDynamicItems(offset = '', uid: string | number) {
   interface Word {
     major: null;
     desc: Desc;
+    additional?: any;
+  }
+  interface Topic {
+    major: null;
+    desc: Desc;
+    topic?: {
+      name: string;
+    };
   }
   interface Res {
     has_more: boolean;
@@ -203,6 +212,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           modules: {
             module_author: Author;
             module_dynamic: AV;
+            module_tag?: { text: string };
           };
           id_str: string;
         }
@@ -215,12 +225,14 @@ export async function getDynamicItems(offset = '', uid: string | number) {
               desc: Desc | null;
               major: null;
             };
+            module_tag?: { text: string };
           };
           orig: {
             id_str: string;
             modules: {
               module_author: Author;
-              module_dynamic: AV | Draw | Article | Word;
+              module_dynamic: AV | Draw | Article | Word | Topic;
+              module_tag?: { text: string };
             };
           };
         }
@@ -230,6 +242,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           modules: {
             module_author: Author;
             module_dynamic: Draw;
+            module_tag?: { text: string };
           };
         }
       | {
@@ -238,6 +251,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           modules: {
             module_author: Author;
             module_dynamic: Word;
+            module_tag?: { text: string };
           };
         }
     )[];
@@ -263,11 +277,14 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           mid: item.modules?.module_author?.mid,
           name: item.modules?.module_author?.name,
           text: item.modules?.module_dynamic?.desc?.text,
+          top: item.modules?.module_tag?.text === '置顶',
         };
         if (item.type === 'DYNAMIC_TYPE_WORD') {
           return {
             ...common,
             type: DynamicType.Word as const,
+            additionalText:
+              item.modules.module_dynamic.additional?.reserve?.desc1?.text,
           };
         }
         if (item.type === 'DYNAMIC_TYPE_AV') {
@@ -335,8 +352,11 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           return {
             ...common,
             type: DynamicType.ForwardOther as const,
-            forwardText: forward.desc?.text,
-            // image: forward.major?.cover,
+            forwardText:
+              forward.desc?.text +
+              ('topic' in forward && forward.topic?.name
+                ? '#' + forward.topic.name
+                : ''),
           };
         }
       })
@@ -363,7 +383,7 @@ export async function getFollowUps(uid: number | string, page = 1) {
   // https://api.bilibili.com/x/relation/followings?vmid=14427395&pn=1&ps=20&order=desc&jsonp=jsonp
   interface Followed {
     face: string;
-    mid: number;
+    mid: number | string;
     mtime: number;
     official_verify: { type: number; desc: string };
     sign: string;
@@ -569,11 +589,15 @@ export function getVideoComments(aid: string | number) {
     upper: { mid: number };
     vote: 0;
   }
-  return request<ReplyRes>('/x/v2/reply/main?type=1&oid=' + aid).then(res => {
+  return Promise.all([
+    request<ReplyRes>('/x/v2/reply/main?type=1&next=1&oid=' + aid),
+    request<ReplyRes>('/x/v2/reply/main?type=1&next=2&oid=' + aid),
+  ]).then(([res1, res2]) => {
     // if (res.code) {
     //   throw new Error('获取评论失败');
     // }
-    const replies = res.replies
+    const replies = res1.replies
+      .concat(res2.replies)
       .filter(v => !v.invisible)
       .map(item => {
         return {
@@ -596,8 +620,8 @@ export function getVideoComments(aid: string | number) {
             }) || [],
         };
       });
-    if (res.top.upper) {
-      const item = res.top.upper;
+    if (res1.top.upper) {
+      const item = res1.top.upper;
       replies.unshift({
         message: item.content.message,
         name: item.member.uname,

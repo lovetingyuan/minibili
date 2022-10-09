@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import handleShare from '../../services/Share';
 import { RootStackParamList } from '../../types';
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
@@ -18,6 +19,8 @@ export default function DateAndOpen(props: {
   id: number | string;
   name: string;
   date: string;
+  top?: boolean;
+  title: string;
 }) {
   const navigation = useNavigation<NavigationProps['navigation']>();
   return (
@@ -38,8 +41,17 @@ export default function DateAndOpen(props: {
           );
         }}>
         <Image
-          style={{ width: 30, height: 12, marginLeft: 20 }}
+          style={styles.biliImg}
           source={require('../../assets/bili-text.png')}
+        />
+      </Pressable>
+      <Pressable
+        onPress={() => {
+          handleShare(props.name, props.title, props.id);
+        }}>
+        <Image
+          style={styles.shareImg}
+          source={require('../../assets/share.png')}
         />
       </Pressable>
     </View>
@@ -53,4 +65,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   date: { color: '#555', fontSize: 12 },
+  biliImg: { width: 30, height: 12, marginLeft: 20 },
+  shareImg: { width: 16, height: 16, marginLeft: 20 },
 });

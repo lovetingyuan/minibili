@@ -3,7 +3,7 @@ import { getDynamicItems } from './Bilibili';
 
 // const latestMap: Record<string, number> = {};
 
-export async function checkDynamics(mid: number) {
+export async function checkDynamics(mid: number | string) {
   const key = `DYNAMIC_ITEM_${mid}`;
   const prev = +((await AsyncStorage.getItem(key)) || 0);
   const { items } = await getDynamicItems('', mid);
@@ -27,7 +27,7 @@ export async function checkDynamics(mid: number) {
   }
 }
 
-export async function setLatest(mid: number, latestTime: string) {
+export async function setLatest(mid: number | string, latestTime: string) {
   const key = `DYNAMIC_ITEM_${mid}`;
   await AsyncStorage.setItem(key, latestTime);
 }

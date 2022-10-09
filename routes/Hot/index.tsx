@@ -107,8 +107,11 @@ export default function Hot({ navigation }: Props) {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a');
     return (
       <View key={key} style={styles.itemContainer}>
-        {item.filter(Boolean).map(_item => {
-          const val = _item!;
+        {item.map(_item => {
+          const val = _item;
+          if (!val) {
+            return <View style={{ flex: 1 }} />;
+          }
           return (
             <TouchableOpacity
               activeOpacity={0.8}
@@ -165,7 +168,7 @@ export default function Hot({ navigation }: Props) {
         },
         err => {
           __DEV__ && console.log(err);
-          ToastAndroid.show('请求动态失败', ToastAndroid.SHORT);
+          ToastAndroid.show('请求热门失败', ToastAndroid.SHORT);
         },
       )
       .finally(() => {
@@ -216,6 +219,11 @@ export default function Hot({ navigation }: Props) {
           if (err.message.includes('No Activity found to handle Intent')) {
             ToastAndroid.show('未安装B站', ToastAndroid.SHORT);
           }
+          navigation.navigate('WebPage', {
+            title: currentVideoRef.current!.name + '的动态',
+            url:
+              'https://m.bilibili.com/video/' + currentVideoRef.current!.bvid,
+          });
         },
       );
     }
@@ -232,7 +240,7 @@ export default function Hot({ navigation }: Props) {
       name: 'share',
     },
     {
-      text: '在B站APP打开',
+      text: '在B站打开',
       name: 'openApp',
     },
   ].filter(Boolean);
@@ -290,7 +298,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#999',
     marginTop: 10,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   emptyText: {
     textAlign: 'center',
