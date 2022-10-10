@@ -19,12 +19,6 @@ type ForwardItems = Extract<
 
 export default function ForwardItem(props: ForwardItems) {
   let forwardContent = null;
-  // const top = props.top ? (
-  //   <Image
-  //     source={require('../../assets/top.png')}
-  //     style={{ width: 30, height: 15 }}
-  //   />
-  // ) : null;
   if (props.type === DynamicType.ForwardVideo) {
     forwardContent = (
       <>

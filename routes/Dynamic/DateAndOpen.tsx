@@ -62,9 +62,9 @@ const styles = StyleSheet.create({
   info: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
   date: { color: '#555', fontSize: 12 },
   biliImg: { width: 30, height: 12, marginLeft: 20 },
-  shareImg: { width: 16, height: 16, marginLeft: 20 },
+  shareImg: { width: 15, height: 15, marginLeft: 20 },
 });

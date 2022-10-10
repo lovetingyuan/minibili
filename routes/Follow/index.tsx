@@ -47,7 +47,7 @@ const buttons = [
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
-  const { userInfo, setUserInfo } = React.useContext(AppContext);
+  const { userInfo, setUserInfo, specialUser } = React.useContext(AppContext);
   const [ups, setUps] = React.useState<UpItem[]>([]);
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -209,6 +209,18 @@ export default function Follow({ navigation, route }: Props) {
     return <Login />;
   }
 
+  const displayUps = [...ups];
+  if (specialUser && displayUps.length) {
+    const spIndex = displayUps.findIndex(v => v.mid == specialUser.mid);
+    if (spIndex > 0) {
+      const sp = displayUps[spIndex];
+      displayUps.splice(spIndex, 1);
+      displayUps.unshift(sp);
+    } else if (spIndex === -1) {
+      displayUps.unshift({ ...specialUser });
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.userContainer}>
@@ -271,7 +283,7 @@ export default function Follow({ navigation, route }: Props) {
         <Text style={styles.updateTime}>{updateText}</Text>
       </View>
       <FlatList
-        data={ups}
+        data={displayUps}
         renderItem={renderItem}
         keyExtractor={item => item.mid + ''}
         onEndReachedThreshold={1}

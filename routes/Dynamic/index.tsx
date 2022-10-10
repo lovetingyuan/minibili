@@ -98,7 +98,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         {item.top ? (
           <Image
             source={require('../../assets/top.png')}
-            style={{ width: 30, height: 15 }}
+            style={{ width: 28.5, height: 14, marginBottom: 4 }}
           />
         ) : null}
         <Item {...item} />

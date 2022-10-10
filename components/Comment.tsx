@@ -56,7 +56,7 @@ export default function Comment(props: Props) {
                 <Text style={[styles.replyName, upStyle(reply.name)]}>
                   {reply.name}:{' '}
                 </Text>
-                <RichText text={reply.message} imageSize={14} />
+                <RichText text={reply.message} imageSize={15} />
               </Text>
             );
           })}
