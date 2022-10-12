@@ -25,6 +25,7 @@ import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import { getBlackUps } from '../Hot/blackUps';
 import { AppContext } from '../../context';
+import * as Application from 'expo-application';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
@@ -193,8 +194,9 @@ export default function Follow({ navigation, route }: Props) {
         }
       });
     } else if (name === 'about') {
+      const version = Application.nativeApplicationVersion;
       Alert.alert(
-        `关于 minibili (${require('../../app.json').expo.version})`,
+        `关于 minibili (${version})`,
         [
           '',
           '所有数据都来自B站官网，仅供学习交流',

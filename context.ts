@@ -16,6 +16,8 @@ export interface AppContextValue {
   setSpecialUser: (u: UserInfo) => void;
   webviewMode: WebViewMode;
   setWebviewMode: (mode: WebViewMode) => void;
+  playedVideos: Record<string, boolean>;
+  setPlayedVideos: (bvid: string) => void;
   defaultMid: string;
 }
 

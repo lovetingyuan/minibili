@@ -14,7 +14,7 @@ import { getVideoComments, getVideoInfo } from '../../services/Bilibili';
 import { Avatar, Icon } from '@rneui/base';
 import useNetStatusToast from '../../hooks/useNetStatusToast';
 import handleShare from '../../services/Share';
-import { useKeepAwake } from 'expo-keep-awake';
+import * as KeepAwake from 'expo-keep-awake';
 import Comment from '../../components/Comment';
 // https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
@@ -44,9 +44,33 @@ function __hack() {
       };
     }
   }, 200);
+  const postPlayState = (state: string) => {
+    ((window as any).ReactNativeWebView as WebView).postMessage(
+      JSON.stringify({
+        action: 'playState',
+        payload: state,
+      }),
+    );
+  };
+  const timer3 = setInterval(() => {
+    const video = document.querySelector('video');
+    if (video) {
+      clearInterval(timer3);
+      video.addEventListener('play', () => {
+        postPlayState('play');
+      });
+      Array('ended', 'pause', 'waiting').forEach(evt => {
+        video.addEventListener(evt, () => {
+          postPlayState('pause');
+        });
+      });
+      postPlayState(video.paused ? 'pause' : 'play');
+    }
+  }, 200);
   setTimeout(() => {
     clearInterval(timer);
     clearInterval(timer2);
+    clearInterval(timer3);
   }, 5000);
 }
 const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`;
@@ -78,6 +102,7 @@ const parseDate = (time?: number) => {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { AppContext } from '../../context';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
 
@@ -91,9 +116,9 @@ export default ({ route, navigation }: Props) => {
   const webviewRef = React.useRef<null | WebView>(null);
   const { width, height } = useWindowDimensions();
   const [videoHeight, setVideoHeight] = React.useState(height * 0.4);
-  useKeepAwake();
+  // useKeepAwake();
   const connectType = useNetStatusToast(bvid);
-  const { specialUser } = React.useContext(AppContext);
+  const { specialUser, setPlayedVideos } = React.useContext(AppContext);
   const tracyStyle =
     mid.toString() === specialUser?.mid
       ? {
@@ -113,6 +138,15 @@ export default ({ route, navigation }: Props) => {
       }
     });
   }, [bvid, aid, width, height]);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setPlayedVideos(bvid);
+    }, 8000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [bvid]);
 
   const search = new URLSearchParams();
   const playUrl = 'https://player.bilibili.com/player.html';
@@ -154,6 +188,13 @@ export default ({ route, navigation }: Props) => {
     }
   }, [name, videoInfo, bvid]);
 
+  useFocusEffect(() => {
+    const isFocused = useIsFocused();
+    if (!isFocused) {
+      KeepAwake.deactivateKeepAwake('PLAY');
+    }
+  });
+
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -173,7 +214,16 @@ export default ({ route, navigation }: Props) => {
           renderLoading={Loading}
           ref={webviewRef}
           onMessage={evt => {
-            console.log(999, evt.nativeEvent.data);
+            try {
+              const data = JSON.parse(evt.nativeEvent.data);
+              if (data.action === 'playState') {
+                if (data.payload === 'play') {
+                  KeepAwake.activateKeepAwake('PLAY');
+                } else {
+                  KeepAwake.deactivateKeepAwake('PLAY');
+                }
+              }
+            } catch (e) {}
           }}
           onError={() => {
             ToastAndroid.show('加载失败', ToastAndroid.SHORT);

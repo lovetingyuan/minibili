@@ -17,7 +17,7 @@ const parseDuration = (duration: number) => {
 export default React.memo(function HotItem({ video }: { video: HotVideo }) {
   __DEV__ && console.log('hot video', video.title);
   const playNum = (video.playNum / 10000).toFixed(1) + '万';
-  const { specialUser } = React.useContext(AppContext);
+  const { specialUser, playedVideos } = React.useContext(AppContext);
   const isTracy = video.mid.toString() === specialUser?.mid;
   return (
     <View style={styles.itemContainer}>
@@ -30,6 +30,12 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
           {parseDuration(video.duration)}
         </Text>
       </View>
+      {playedVideos[video.bvid] ? (
+        <View style={styles.watched}>
+          <Text style={styles.videoLengthText}>已看过</Text>
+        </View>
+      ) : null}
+
       <Text style={styles.title} numberOfLines={2}>
         {video.title}
       </Text>
@@ -44,6 +50,7 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
             adjustsFontSizeToFit
             style={[styles.upNameText, isTracy ? styles.upNameTracy : null]}>
             {video.name}
+            {isTracy ? ' ❤' : ''}
           </Text>
         </View>
         <View style={styles.namePlay}>
@@ -68,6 +75,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     paddingHorizontal: 4,
     backgroundColor: 'rgba(0,0,0,.5)',
+    alignItems: 'center',
+    borderRadius: 2,
+    margin: 5,
+  },
+  watched: {
+    position: 'absolute',
+    right: 0,
+    paddingHorizontal: 4,
+    backgroundColor: 'rgba(0,0,0,.7)',
     alignItems: 'center',
     borderRadius: 2,
     margin: 5,

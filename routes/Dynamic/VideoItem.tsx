@@ -56,7 +56,6 @@ export default function VideoItem(props: VideoDynamicItem) {
           />
         </View>
       ) : null}
-      {/* <Text style={styles.descText}>{parseUrl(text)}</Text> : null} */}
       <View style={styles.videoContainer}>
         <View style={styles.imageContainer}>
           <Image

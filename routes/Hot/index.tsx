@@ -68,6 +68,7 @@ export default function Hot({ navigation }: Props) {
   const moreRef = React.useRef(true);
   const currentVideoRef = React.useRef<VideoItem | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const layoutCallbackRef = React.useRef<any>(null);
   const addBlackUp = React.useCallback(async () => {
     if (!currentVideoRef.current) {
       return;
@@ -106,33 +107,63 @@ export default function Hot({ navigation }: Props) {
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a');
     return (
-      <View key={key} style={styles.itemContainer}>
-        {item.map(_item => {
-          const val = _item;
-          if (!val) {
-            return <View style={{ flex: 1 }} />;
+      <View
+        key={key}
+        style={styles.itemContainer}
+        onLayout={e => {
+          const height = e.nativeEvent.layout.height;
+          if (!layoutCallbackRef.current) {
+            layoutCallbackRef.current = (data: any, index: number) => {
+              return {
+                length: height,
+                offset: height * index,
+                index,
+              };
+            };
           }
-          return (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{ flex: 1 }}
-              key={val?.bvid || '-'}
-              onPress={() => {
-                navigation.navigate('Play', {
-                  mid: val.mid,
-                  bvid: val.bvid,
-                  name: val.name,
-                  aid: val.aid,
-                });
-              }}
-              onLongPress={() => {
-                currentVideoRef.current = val;
-                setModalVisible(true);
-              }}>
-              <HotItem video={val} />
-            </TouchableOpacity>
-          );
-        })}
+        }}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={{ flex: 1 }}
+          onPress={() => {
+            navigation.navigate('Play', {
+              mid: item[0].mid,
+              bvid: item[0].bvid,
+              name: item[0].name,
+              aid: item[0].aid,
+            });
+          }}
+          onLongPress={() => {
+            currentVideoRef.current = item[0];
+            setModalVisible(true);
+          }}>
+          <HotItem video={item[0]} />
+        </TouchableOpacity>
+        {item[1] ? (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={{ flex: 1 }}
+            onPress={() => {
+              navigation.navigate('Play', {
+                mid: item[1]!.mid,
+                bvid: item[1]!.bvid,
+                name: item[1]!.name,
+                aid: item[1]!.aid,
+              });
+            }}
+            onLongPress={() => {
+              currentVideoRef.current = item[1]!;
+              setModalVisible(true);
+            }}>
+            <HotItem video={item[1]} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity activeOpacity={0.8} style={{ flex: 1 }}>
+            <View
+              style={{ flex: 1, marginVertical: 12, marginHorizontal: 6 }}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     );
   };
@@ -261,6 +292,11 @@ export default function Hot({ navigation }: Props) {
         onEndReachedThreshold={0.4}
         onRefresh={resetDynamicItems}
         onEndReached={loadMoreHotItems}
+        {...(layoutCallbackRef.current
+          ? {
+              getItemLayout: layoutCallbackRef.current,
+            }
+          : null)}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             哔哩哔哩 (゜-゜)つロ 干杯~-bilibili

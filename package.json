@@ -19,6 +19,7 @@
     "@rneui/base": "^4.0.0-rc.5",
     "@rneui/themed": "^4.0.0-rc.5",
     "expo": "~46.0.13",
+    "expo-application": "~4.2.2",
     "expo-background-fetch": "^10.2.0",
     "expo-keep-awake": "~10.2.0",
     "expo-notifications": "~0.16.1",

@@ -13,10 +13,22 @@ import {
 import { AppContext } from '../../context';
 import { getUserInfo } from '../../services/Bilibili';
 
+const leftTv = require('../../assets/tv-left.png');
+const rightTv = require('../../assets/tv-right.png');
+
 export default function Login() {
   const inputUserIdRef = React.useRef('');
   const inputRef = React.useRef(null);
   const { setUserInfo } = React.useContext(AppContext);
+  const [tvImg, setTvImg] = React.useState(true);
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setTvImg(v => !v);
+    }, 666);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
   const storeUserId = () => {
     if (!inputUserIdRef.current) {
       ToastAndroid.show('请输入ID', ToastAndroid.SHORT);
@@ -40,13 +52,12 @@ export default function Login() {
         });
       });
   };
-
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image source={require('../../assets/icon.png')} style={styles.logo} />
+        <Image source={tvImg ? leftTv : rightTv} style={styles.logo} />
       </View>
-      <Text style={styles.text}>访问你的B站账号的主页并登录:</Text>
+      <Text style={styles.text}>访问你的B站账号的主页并登录：</Text>
       <Pressable
         onPress={() => {
           Linking.openURL('https://space.bilibili.com/');
@@ -108,7 +119,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 40,
+    marginTop: 30,
     width: '95%',
   },
   buttonStyle: {

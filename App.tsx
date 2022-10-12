@@ -103,6 +103,9 @@ export default () => {
     face: '',
   });
   const [specialUser, _setSpecialUser] = React.useState<UserInfo>(TracyInfo);
+  const [playedVideos, _setPlayedVideos] = React.useState<
+    Record<string, boolean>
+  >({});
   React.useEffect(() => {
     AsyncStorage.getItem('USER_INFO').then(res => {
       if (res) {
@@ -127,6 +130,11 @@ export default () => {
       const mode = (res || 'MOBILE') as AppContextValue['webviewMode'];
       setWebviewMode(mode);
     });
+    AsyncStorage.getItem('PLAYED_VIDEOS').then(res => {
+      if (res) {
+        setPlayedVideos(JSON.parse(res));
+      }
+    });
   }, []);
 
   const setUserInfo = (user: UserInfo) => {
@@ -145,6 +153,11 @@ export default () => {
     AsyncStorage.setItem('WEBVIEW_MODE', mode);
     _setWebviewMode(mode);
   };
+  const setPlayedVideos = (bvid: string) => {
+    const played = { ...playedVideos, [bvid]: true };
+    _setPlayedVideos(played);
+    AsyncStorage.setItem('PLAYED_VIDEOS', JSON.stringify(played));
+  };
   return (
     <AppContext.Provider
       value={{
@@ -154,6 +167,8 @@ export default () => {
         setSpecialUser,
         webviewMode,
         setWebviewMode,
+        playedVideos,
+        setPlayedVideos,
         defaultMid: TracyId.toString(),
       }}>
       <StatusBar backgroundColor="transparent" barStyle="dark-content" />

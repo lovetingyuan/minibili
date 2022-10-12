@@ -53,7 +53,6 @@ export default function ForwardItem(props: ForwardItems) {
   }
   return (
     <View style={[styles.textContainer]}>
-      {/* {top} */}
       {props.text ? (
         <RichText
           imageSize={16}
@@ -62,8 +61,7 @@ export default function ForwardItem(props: ForwardItems) {
             style: { fontSize: 16, color: props.top ? '#00699D' : 'black' },
           }}
         />
-      ) : // <Text style={styles.textItem}>{parseUrl(props.text)}</Text>
-      null}
+      ) : null}
       <View style={styles.forwardContainer}>
         {props.forwardText ? (
           <Text style={{ marginBottom: 8 }} numberOfLines={2}>
@@ -98,10 +96,12 @@ const styles = StyleSheet.create({
   forwardContainer: {
     flex: 1,
     marginLeft: 8,
-    marginTop: 12,
+    marginBottom: 8,
+    marginTop: 16,
     paddingLeft: 8,
     borderLeftWidth: 0.5,
     borderLeftColor: '#bbb',
+    opacity: 0.7,
   },
   forwardContent: {
     flex: 1,
