@@ -21,6 +21,7 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import { TracyId } from '../../constants';
+import { addBlackTag, getBlackTags } from './blackTags';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>;
 
@@ -104,6 +105,37 @@ export default function Hot({ navigation }: Props) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentVideoRef.current]);
+  const addBlackTagName = React.useCallback(async () => {
+    if (!currentVideoRef.current) {
+      return;
+    }
+    const blackTags = await addBlackTag(currentVideoRef.current.tag);
+    const newList: [VideoItem, VideoItem?][] = [];
+    let current: [VideoItem?, VideoItem?] = [];
+    for (let [item1, item2] of state.list) {
+      if (!(item1.tag in blackTags)) {
+        current.push(item1);
+        if (current.length === 2) {
+          newList.push(current as [VideoItem, VideoItem]);
+          current = [];
+        }
+      }
+      if (item2 && !(item2.tag in blackTags)) {
+        current.push(item2);
+        if (current.length === 2) {
+          newList.push(current as [VideoItem, VideoItem]);
+          current = [];
+        }
+      }
+    }
+    if (current.length) {
+      newList.push(current as [VideoItem, VideoItem?]);
+    }
+    setState({
+      ...state,
+      list: newList,
+    });
+  }, [currentVideoRef.current]);
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a');
     return (
@@ -172,14 +204,36 @@ export default function Hot({ navigation }: Props) {
       return;
     }
     loadingRef.current = true;
-    await getBlackUps;
+    const blackUps = await getBlackUps;
+    const blackTags = await getBlackTags;
 
     getHotList(state.page)
       .then(
         ({ more, list }) => {
           moreRef.current = more;
           const last = state.list[state.list.length - 1];
-          list = list.filter(v => !videosIdMap[v.bvid]);
+          console.log(99, list);
+          list = list.filter(v => {
+            if (videosIdMap[v.bvid]) {
+              return false;
+            }
+            if (v.tag in blackTags) {
+              return false;
+            }
+            if (v.mid in blackUps) {
+              return false;
+            }
+            return true;
+          });
+          if (!list.length) {
+            loadingRef.current = false;
+            setState({
+              ...state,
+              page: state.page + 1,
+            });
+            // loadMoreHotItems();
+            return;
+          }
           if (last && last.length === 1) {
             last.push(list.shift());
           }
@@ -238,6 +292,14 @@ export default function Hot({ navigation }: Props) {
         },
         { text: '确定', onPress: addBlackUp },
       ]);
+    } else if (name === 'blackByTag') {
+      Alert.alert(`不再看 ${currentVideoRef.current?.tag} 类型的视频？`, '', [
+        {
+          text: '取消',
+          style: 'cancel',
+        },
+        { text: '确定', onPress: addBlackTagName },
+      ]);
     } else if (name === 'share') {
       onShare();
     } else if (name === 'openApp') {
@@ -266,6 +328,10 @@ export default function Hot({ navigation }: Props) {
           text: `不再看 ${currentVideoRef.current?.name} 的视频`,
           name: 'black',
         },
+    {
+      text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
+      name: 'blackByTag',
+    },
     {
       text: `分享(${currentVideoRef.current?.shareNum})`,
       name: 'share',

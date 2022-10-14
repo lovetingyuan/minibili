@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { getVideoComments } from '../services/Bilibili';
 import { GetFuncPromiseType } from '../types';
 import RichText from './RichText';
@@ -35,7 +35,7 @@ export default function Comment(props: Props) {
           {comment.name}:{' '}
         </Text>
         <RichText text={comment.message} imageSize={18} />
-        {comment.top ? (
+        {/* {comment.top ? (
           <>
             {' '}
             <Image
@@ -43,7 +43,7 @@ export default function Comment(props: Props) {
               style={styles.topImg}
             />
           </>
-        ) : null}
+        ) : null} */}
         {comment.like ? (
           <Text style={styles.likeNum}> {comment.like}</Text>
         ) : null}

@@ -26,6 +26,7 @@ import ButtonsOverlay from '../../components/ButtonsOverlay';
 import { getBlackUps } from '../Hot/blackUps';
 import { AppContext } from '../../context';
 import * as Application from 'expo-application';
+import { getBlackTags } from '../Hot/blackTags';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
@@ -180,18 +181,20 @@ export default function Follow({ navigation, route }: Props) {
     if (name === 'logout') {
       clearUser();
     } else if (name === 'black') {
-      getBlackUps.then(blacks => {
-        const blacksNum = Object.keys(blacks).length;
-        if (!blacksNum) {
-          ToastAndroid.show('暂无黑名单UP', ToastAndroid.SHORT);
-        } else {
-          Alert.alert(
-            `黑名单(${blacksNum})`,
-            Object.values(blacks)
-              .filter(v => typeof v === 'string')
-              .join(', '),
-          );
-        }
+      Promise.all([getBlackUps, getBlackTags]).then(([blackUps, tags]) => {
+        console.log(99, tags);
+        Alert.alert(
+          '黑名单',
+          (Object.keys(blackUps).length
+            ? `UP(${Object.keys(blackUps).length})：${Object.values(blackUps)
+                .filter(v => typeof v === 'string')
+                .join(', ')}`
+            : 'UP：暂无') +
+            '\n\n' +
+            (Object.keys(tags).length
+              ? `类型：${Object.keys(tags).join(', ')}`
+              : '类型：暂无'),
+        );
       });
     } else if (name === 'about') {
       const version = Application.nativeApplicationVersion;

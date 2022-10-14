@@ -481,6 +481,8 @@ export async function getHotList(page = 1) {
           mid: item.owner.mid,
           playNum: item.stat.view,
           shareNum: item.stat.share,
+          tag: item.tname,
+          videosNum: item.videos,
         };
       }),
   };
@@ -728,6 +730,17 @@ export function getVideoInfo(aid: string | number) {
       likeNum: data.stat.like,
       replyNum: data.stat.reply,
       viewNum: data.stat.view,
+      // videosNum: data.pages.length,
+      videosNum: data.videos,
+      pages: data.pages?.map(v => {
+        return {
+          width: v.dimension.width,
+          height: v.dimension.height,
+          cid: v.cid,
+          title: v.part,
+          page: v.page,
+        };
+      }),
     };
   });
 }

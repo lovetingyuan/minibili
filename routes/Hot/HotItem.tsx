@@ -21,21 +21,27 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
   const isTracy = video.mid.toString() === specialUser?.mid;
   return (
     <View style={styles.itemContainer}>
-      <Image
-        style={styles.image}
-        source={{ uri: video.cover + '@480w_270h_1c.webp' }}
-      />
-      <View style={styles.videoLength}>
-        <Text style={styles.videoLengthText}>
-          {parseDuration(video.duration)}
-        </Text>
-      </View>
-      {playedVideos[video.bvid] ? (
-        <View style={styles.watched}>
-          <Text style={styles.videoLengthText}>已看过</Text>
+      <View style={{ flex: 1 }}>
+        <Image
+          style={styles.image}
+          source={{ uri: video.cover + '@480w_270h_1c.webp' }}
+        />
+        <View style={styles.videoLength}>
+          <Text style={styles.videoLengthText}>
+            {parseDuration(video.duration)}
+          </Text>
         </View>
-      ) : null}
-
+        {playedVideos[video.bvid] ? (
+          <View style={styles.watched}>
+            <Text style={styles.videoLengthText}>已看过</Text>
+          </View>
+        ) : null}
+        {video.tag ? (
+          <View style={styles.videoTag}>
+            <Text style={styles.videoTagText}>{video.tag}</Text>
+          </View>
+        ) : null}
+      </View>
       <Text style={styles.title} numberOfLines={2}>
         {video.title}
       </Text>
@@ -92,6 +98,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: '#eee',
+  },
+  videoTag: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 4,
+    backgroundColor: 'rgba(0,0,0,.5)',
+    alignItems: 'center',
+    borderRadius: 2,
+    margin: 5,
+  },
+  videoTagText: {
+    color: 'white',
+    fontSize: 12,
   },
   image: {
     flex: 1,

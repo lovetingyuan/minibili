@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { getVideoComments, getVideoInfo } from '../../services/Bilibili';
-import { Avatar, Icon } from '@rneui/base';
+import { Avatar, ButtonGroup, Divider, Icon } from '@rneui/base';
 import useNetStatusToast from '../../hooks/useNetStatusToast';
 import handleShare from '../../services/Share';
 import * as KeepAwake from 'expo-keep-awake';
@@ -24,6 +24,7 @@ function __hack() {
     const player = document.querySelector('.mplayer-load-layer');
     if (player) {
       (player as HTMLDivElement).click();
+      document.querySelector('video')?.play();
       clearInterval(timer);
     }
   }, 200);
@@ -103,6 +104,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { AppContext } from '../../context';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+// import { Button } from '@rneui/themed';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
 
@@ -115,7 +117,8 @@ export default ({ route, navigation }: Props) => {
   const [videoInfo, setVideoInfo] = React.useState<VideoInfo | null>(null);
   const webviewRef = React.useRef<null | WebView>(null);
   const { width, height } = useWindowDimensions();
-  const [videoHeight, setVideoHeight] = React.useState(height * 0.4);
+  const [videoViewHeight, setVideoViewHeight] = React.useState(height * 0.4);
+  const [currentPage, setCurrentPage] = React.useState(0);
   // useKeepAwake();
   const connectType = useNetStatusToast(bvid);
   const { specialUser, setPlayedVideos } = React.useContext(AppContext);
@@ -131,13 +134,26 @@ export default ({ route, navigation }: Props) => {
     });
     getVideoInfo(aid).then(vi => {
       setVideoInfo(vi);
-      if (vi.width >= vi.height) {
-        setVideoHeight((vi.height / vi.width) * width + 80);
-      } else {
-        setVideoHeight(height * 0.4);
-      }
     });
-  }, [bvid, aid, width, height]);
+  }, [bvid, aid]);
+
+  React.useEffect(() => {
+    const vi = videoInfo;
+    if (!vi) {
+      return;
+    }
+    const [videoWidth, videoHeight] =
+      currentPage > 0
+        ? [vi.pages[currentPage].width, vi.pages[currentPage].height]
+        : [vi.width, vi.height];
+    if (videoWidth >= videoHeight) {
+      setVideoViewHeight((videoHeight / videoWidth) * width + 80);
+    } else {
+      setVideoViewHeight(height * 0.4);
+    }
+  }, [videoInfo, width, height, currentPage]);
+
+  // const videoTitle = videoInfo?.pages[currentPage].title || '-';
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -158,6 +174,7 @@ export default ({ route, navigation }: Props) => {
     quality: connectType === 'wifi' ? 100 : 16,
     portraitFullScreen: true,
     hasMuteButton: true,
+    page: currentPage + 1,
   }).forEach(([k, v]) => {
     search.append(k, v + '');
   });
@@ -187,9 +204,8 @@ export default ({ route, navigation }: Props) => {
       handleShare(name, videoInfo.title, bvid);
     }
   }, [name, videoInfo, bvid]);
-
+  const isFocused = useIsFocused();
   useFocusEffect(() => {
-    const isFocused = useIsFocused();
     if (!isFocused) {
       KeepAwake.deactivateKeepAwake('PLAY');
     }
@@ -199,7 +215,7 @@ export default ({ route, navigation }: Props) => {
     <View style={{ flex: 1 }}>
       <View
         renderToHardwareTextureAndroid
-        style={[styles.playerContainer, { height: videoHeight }]}>
+        style={[styles.playerContainer, { height: videoViewHeight }]}>
         <WebView
           source={{
             uri: `${playUrl}?${search}`,
@@ -291,14 +307,95 @@ export default ({ route, navigation }: Props) => {
           </View>
         </View>
         <View>
-          <Text style={styles.videoTitle}>{videoInfo?.title || ''}</Text>
-          {videoInfo?.desc &&
-          videoInfo.desc.trim() !== '-' &&
-          videoInfo.title !== videoInfo.desc ? (
+          <Text style={styles.videoTitle}>
+            {videoInfo?.title || videoInfo?.pages[0].title || '-'}
+          </Text>
+          {videoInfo?.desc && videoInfo.desc.trim() !== '-' ? (
             <Text style={styles.videoDesc}>{videoInfo.desc}</Text>
           ) : null}
+
+          {
+            (videoInfo?.videosNum || 0) > 1 ? (
+              <ButtonGroup
+                buttonStyle={{}}
+                buttonContainerStyle={{
+                  margin: 0,
+                }}
+                innerBorderStyle={{
+                  width: 0.5,
+                }}
+                buttons={videoInfo?.pages.map((v, i) => `${i + 1}. ${v.title}`)}
+                containerStyle={{
+                  marginTop: 16,
+                  marginLeft: 0,
+                  marginRight: 0,
+                  borderWidth: 0,
+                }}
+                onPress={setCurrentPage}
+                selectedButtonStyle={{}}
+                selectedIndex={currentPage}
+                selectedTextStyle={{}}
+                textStyle={{
+                  fontSize: 14,
+                }}
+              />
+            ) : null // <ScrollView
+            //   horizontal
+            //   showsHorizontalScrollIndicator
+            //   style={styles.videoPages}>
+            //   <ButtonGroup
+            //     buttonStyle={{ width: 100 }}
+            //     buttonContainerStyle={
+            //       {
+            //         // marginTop: 15,
+            //       }
+            //     }
+            //     buttons={videoInfo?.pages.map(v => v.title)}
+            //     containerStyle={{
+            //       marginTop: 15,
+            //       marginLeft: 0,
+            //       marginRight: 0,
+            //     }}
+            //     innerBorderStyle={{}}
+            //     onPress={i => setCurrentPage(i)}
+            //     selectedButtonStyle={{
+            //       borderWidth: 1,
+            //       borderColor: 'blue',
+            //     }}
+            //     selectedIndex={currentPage}
+            //     // selectedIndexes={selectedIndexes}
+            //     selectedTextStyle={{}}
+            //     textStyle={{
+            //       fontSize: 14,
+            //     }}
+            //   />
+            //   {/* {videoInfo?.pages.map((item, i) => {
+            //     return (
+            //       <Button
+            //         key={item.cid}
+            //         type="clear"
+            //         onPress={() => {
+            //           setCurrentPage(i);
+            //         }}>
+            //         {item.title}
+            //       </Button>
+            //     );
+            //   })} */}
+            // </ScrollView>
+          }
         </View>
-        <View style={styles.commentsContainer} />
+        {/* <View style={styles.divider}> */}
+        {/* <View style={styles.dividerLine} /> */}
+        {/* <Divider inset={true} insetType="middle" /> */}
+        <Divider
+          style={{ width: '100%', marginVertical: 20 }}
+          color="#ddd"
+          insetType="left"
+          subHeaderStyle={{}}
+          width={1}
+          orientation="horizontal"
+        />
+        {/* </View> */}
         {comments?.length ? (
           comments.map((comment, i) => {
             return (
@@ -369,10 +466,19 @@ const styles = StyleSheet.create({
   videoInfoText: { color: '#888' },
   videoTitle: { fontSize: 16, marginTop: 12 },
   videoDesc: { marginTop: 10 },
-  commentsContainer: {
+  videoPages: {
+    // flex: 1,
+  },
+  divider: {
+    flexDirection: 'row',
+    marginVertical: 24,
+    alignItems: 'center',
+  },
+  dividerLine: {
     borderBottomColor: '#ddd',
     borderBottomWidth: 1,
-    marginVertical: 24,
+    flexGrow: 1,
+    marginLeft: 10,
   },
   commentItemContainer: {
     marginTop: 20,
