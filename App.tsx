@@ -6,6 +6,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  Alert,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
@@ -24,6 +25,8 @@ import { AppContext, AppContextValue, UserInfo } from './context';
 import { TracyId, TracyInfo } from './constants';
 import CheckLiving from './components/CheckLiving';
 import { Button } from '@rneui/themed';
+import { getBlackUps } from './routes/Hot/blackUps';
+import { getBlackTags } from './routes/Hot/blackTags';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -47,6 +50,23 @@ const getLabel = (text: string) => {
     return <Text style={css.text}>{text}</Text>;
   };
   return labelCmp;
+};
+
+const showFilter = () => {
+  Promise.all([getBlackUps, getBlackTags]).then(([blackUps, tags]) => {
+    Alert.alert(
+      '黑名单',
+      (Object.keys(blackUps).length
+        ? `UP(${Object.keys(blackUps).length})：${Object.values(blackUps)
+            .filter(v => typeof v === 'string')
+            .join(', ')}`
+        : 'UP：暂无') +
+        '\n\n' +
+        (Object.keys(tags).length
+          ? `类型：${Object.keys(tags).join(', ')}`
+          : '类型：暂无'),
+    );
+  });
 };
 
 const Main = () => {
@@ -75,6 +95,16 @@ const Main = () => {
           headerTitle: '🔥 热门' + (__DEV__ ? ' dev' : ''),
           headerTitleStyle: { fontSize: 18, color: '#555' },
           headerShown: true,
+          headerRight() {
+            return (
+              <Pressable onPress={showFilter}>
+                <Image
+                  source={require('./assets/filter.png')}
+                  style={{ width: 16, height: 16, marginRight: 16 }}
+                />
+              </Pressable>
+            );
+          },
         }}
       />
       <Tab.Screen
@@ -123,16 +153,16 @@ export default () => {
     });
     AsyncStorage.getItem('SPECIAL_USER').then(res => {
       if (res) {
-        setSpecialUser(JSON.parse(res));
+        _setSpecialUser(JSON.parse(res));
       }
     });
     AsyncStorage.getItem('WEBVIEW_MODE').then(res => {
       const mode = (res || 'MOBILE') as AppContextValue['webviewMode'];
-      setWebviewMode(mode);
+      _setWebviewMode(mode);
     });
     AsyncStorage.getItem('PLAYED_VIDEOS').then(res => {
       if (res) {
-        setPlayedVideos(JSON.parse(res));
+        _setPlayedVideos(JSON.parse(res));
       }
     });
   }, []);

@@ -45,13 +45,8 @@ export default React.memo(
     } | null>(null);
     const navigation = useNavigation<NavigationProps['navigation']>();
     const [loading, setLoading] = React.useState(false);
-    React.useEffect(() => {
-      if (loading) {
-        return;
-      }
-      // return;
-      setLoading(true);
-      Promise.allSettled([checkDynamics(mid), getLiveStatus(mid)]).then(
+    const updateData = React.useCallback(() => {
+      return Promise.allSettled([checkDynamics(mid), getLiveStatus(mid)]).then(
         ([a, b]) => {
           if (a.status === 'fulfilled' && a.value) {
             setUpdatedId(a.value);
@@ -68,8 +63,30 @@ export default React.memo(
           }
         },
       );
+    }, [mid]);
+    React.useEffect(() => {
+      if (loading) {
+        return;
+      }
+      setLoading(true);
+      updateData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mid]);
+    React.useEffect(() => {
+      let updateTime = Math.random() * 5;
+      if (updateTime < 5) {
+        updateTime += 5;
+      }
+      if (updateTime > 8) {
+        updateTime -= 2;
+      }
+      const timer = setInterval(() => {
+        updateData();
+      }, updateTime * 60 * 1000);
+      return () => {
+        clearInterval(timer);
+      };
+    }, [updateData]);
 
     const [modalVisible, setModalVisible] = React.useState(false);
     const gotoDynamic = useMemoizedFn(() => {

@@ -72,7 +72,7 @@ export function request<D extends Record<string, any>>(
     .then(r => r.json())
     .then((res: { code: number; message: string; data: D }) => {
       if (res.code) {
-        console.log('error', res.code, res.message);
+        __DEV__ && console.log('error', res.code, res.message);
         if (Date.now() - errorTime > 20000) {
           ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
           errorTime = Date.now();

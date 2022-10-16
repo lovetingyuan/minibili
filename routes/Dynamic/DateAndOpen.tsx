@@ -25,8 +25,19 @@ export default function DateAndOpen(props: {
   const navigation = useNavigation<NavigationProps['navigation']>();
   return (
     <View style={styles.info}>
-      <Icon name="update" color="#666" size={14} />
-      <Text style={styles.date}> {props.date}</Text>
+      <View style={styles.infoLeft}>
+        <Icon name="update" color="#666" size={14} />
+        <Text style={styles.date}> {props.date}</Text>
+        <Pressable
+          onPress={() => {
+            handleShare(props.name, props.title, props.id);
+          }}>
+          <Image
+            style={styles.shareImg}
+            source={require('../../assets/share.png')}
+          />
+        </Pressable>
+      </View>
       <Pressable
         onPress={() => {
           Linking.openURL(`bilibili://following/detail/${props.id}`).catch(
@@ -45,15 +56,6 @@ export default function DateAndOpen(props: {
           source={require('../../assets/bili-text.png')}
         />
       </Pressable>
-      <Pressable
-        onPress={() => {
-          handleShare(props.name, props.title, props.id);
-        }}>
-        <Image
-          style={styles.shareImg}
-          source={require('../../assets/share.png')}
-        />
-      </Pressable>
     </View>
   );
 }
@@ -63,8 +65,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
+    justifyContent: 'space-between',
+  },
+  infoLeft: {
+    flexDirection: 'row',
   },
   date: { color: '#555', fontSize: 12 },
-  biliImg: { width: 30, height: 12, marginLeft: 20 },
+  biliImg: { width: 30, height: 12, marginRight: 10 },
   shareImg: { width: 15, height: 15, marginLeft: 20 },
 });

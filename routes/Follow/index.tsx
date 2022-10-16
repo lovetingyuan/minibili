@@ -23,10 +23,8 @@ import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
-import { getBlackUps } from '../Hot/blackUps';
-import { AppContext } from '../../context';
 import * as Application from 'expo-application';
-import { getBlackTags } from '../Hot/blackTags';
+import { AppContext } from '../../context';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
@@ -36,10 +34,6 @@ const buttons = [
     text: '退出（长按）',
     name: 'logout',
     longPress: true,
-  },
-  {
-    text: '黑名单',
-    name: 'black',
   },
   {
     text: '关于',
@@ -180,22 +174,6 @@ export default function Follow({ navigation, route }: Props) {
   const handleOverlayClick = (name: string) => {
     if (name === 'logout') {
       clearUser();
-    } else if (name === 'black') {
-      Promise.all([getBlackUps, getBlackTags]).then(([blackUps, tags]) => {
-        console.log(99, tags);
-        Alert.alert(
-          '黑名单',
-          (Object.keys(blackUps).length
-            ? `UP(${Object.keys(blackUps).length})：${Object.values(blackUps)
-                .filter(v => typeof v === 'string')
-                .join(', ')}`
-            : 'UP：暂无') +
-            '\n\n' +
-            (Object.keys(tags).length
-              ? `类型：${Object.keys(tags).join(', ')}`
-              : '类型：暂无'),
-        );
-      });
     } else if (name === 'about') {
       const version = Application.nativeApplicationVersion;
       Alert.alert(
@@ -257,8 +235,6 @@ export default function Follow({ navigation, route }: Props) {
           </Text>
           <Text style={styles.mySign}>{userInfo?.sign || ''}</Text>
         </View>
-        {/* {userId ? <WebviewApi mid={userId} onLoad={setUserInfo} /> : null} */}
-
         <Pressable
           onPress={() => {
             setModalVisible(true);
@@ -343,7 +319,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   listTitleContainer: {
-    // flex: 1,
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
@@ -351,7 +326,6 @@ const styles = StyleSheet.create({
   },
   listTitle: {
     fontSize: 16,
-    // marginLeft: 20,
     marginTop: 18,
     marginBottom: 15,
   },

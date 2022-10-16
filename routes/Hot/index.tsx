@@ -190,11 +190,7 @@ export default function Hot({ navigation }: Props) {
             <HotItem video={item[1]} />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity activeOpacity={0.8} style={{ flex: 1 }}>
-            <View
-              style={{ flex: 1, marginVertical: 12, marginHorizontal: 6 }}
-            />
-          </TouchableOpacity>
+          <View style={{ flex: 1, marginVertical: 12, marginHorizontal: 6 }} />
         )}
       </View>
     );
@@ -212,7 +208,6 @@ export default function Hot({ navigation }: Props) {
         ({ more, list }) => {
           moreRef.current = more;
           const last = state.list[state.list.length - 1];
-          console.log(99, list);
           list = list.filter(v => {
             if (videosIdMap[v.bvid]) {
               return false;
@@ -231,7 +226,6 @@ export default function Hot({ navigation }: Props) {
               ...state,
               page: state.page + 1,
             });
-            // loadMoreHotItems();
             return;
           }
           if (last && last.length === 1) {
@@ -370,7 +364,7 @@ export default function Hot({ navigation }: Props) {
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
-            {moreRef.current ? '加载中...' : '到底了~'}
+            {moreRef.current ? '加载中...' : `到底了~(${state.list.length})`}
           </Text>
         }
         style={styles.listContainerStyle}

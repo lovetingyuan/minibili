@@ -7,6 +7,9 @@ import { GetFuncPromiseType } from '../../types';
 type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0];
 
 const parseDuration = (duration: number) => {
+  if (duration >= 24 * 60 * 60) {
+    return `约${Math.round(duration / 60 / 60)}小时`;
+  }
   const date = new Date(duration * 1000);
   const hour = date.getHours() - date.getTimezoneOffset() / -60;
   const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -19,11 +22,12 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
   const playNum = (video.playNum / 10000).toFixed(1) + '万';
   const { specialUser, playedVideos } = React.useContext(AppContext);
   const isTracy = video.mid.toString() === specialUser?.mid;
+  const watched = playedVideos[video.bvid];
   return (
-    <View style={styles.itemContainer}>
+    <View style={[styles.itemContainer]}>
       <View style={{ flex: 1 }}>
         <Image
-          style={styles.image}
+          style={[styles.image, watched ? { opacity: 0.6 } : null]}
           source={{ uri: video.cover + '@480w_270h_1c.webp' }}
         />
         <View style={styles.videoLength}>
@@ -31,7 +35,7 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
             {parseDuration(video.duration)}
           </Text>
         </View>
-        {playedVideos[video.bvid] ? (
+        {watched ? (
           <View style={styles.watched}>
             <Text style={styles.videoLengthText}>已看过</Text>
           </View>
@@ -42,10 +46,12 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
           </View>
         ) : null}
       </View>
-      <Text style={styles.title} numberOfLines={2}>
+      <Text
+        style={[styles.title, watched ? { opacity: 0.6 } : null]}
+        numberOfLines={2}>
         {video.title}
       </Text>
-      <View style={styles.videoInfo}>
+      <View style={[styles.videoInfo, watched ? { opacity: 0.6 } : null]}>
         <View style={styles.namePlay}>
           <Image
             style={styles.icon}

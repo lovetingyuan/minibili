@@ -210,7 +210,16 @@ export default ({ route, navigation }: Props) => {
       KeepAwake.deactivateKeepAwake('PLAY');
     }
   });
-
+  let videoDesc = videoInfo?.desc;
+  if (videoDesc === '-') {
+    videoDesc = '';
+  } else if (
+    videoDesc &&
+    videoInfo?.videosNum === 1 &&
+    videoDesc === videoInfo.title
+  ) {
+    videoDesc = '';
+  }
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -310,10 +319,7 @@ export default ({ route, navigation }: Props) => {
           <Text style={styles.videoTitle}>
             {videoInfo?.title || videoInfo?.pages[0].title || '-'}
           </Text>
-          {videoInfo?.desc && videoInfo.desc.trim() !== '-' ? (
-            <Text style={styles.videoDesc}>{videoInfo.desc}</Text>
-          ) : null}
-
+          {videoDesc ? <Text style={styles.videoDesc}>{videoDesc}</Text> : null}
           {
             (videoInfo?.videosNum || 0) > 1 ? (
               <ButtonGroup

@@ -54,8 +54,7 @@ export default function WebviewApi(props: {
         ref={webviewRef}
         onMessage={evt => {
           try {
-            const { code, data, message } = JSON.parse(evt.nativeEvent.data);
-            console.log('onmessage', code, data.name, message);
+            const { code, data } = JSON.parse(evt.nativeEvent.data);
             if (code === 0) {
               const payload = {
                 living: !!data.live_room?.liveStatus,
