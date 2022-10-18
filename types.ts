@@ -17,7 +17,9 @@ export type RootStackParamList = {
     sign: string;
     follow: boolean;
   };
-  Hot: undefined;
+  Hot: {
+    query: number;
+  };
   Follow: undefined;
 };
 

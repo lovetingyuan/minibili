@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { getVideoComments, getVideoInfo } from '../../services/Bilibili';
-import { Avatar, ButtonGroup, Divider, Icon } from '@rneui/base';
+import { Avatar, ButtonGroup, Icon } from '@rneui/base';
 import useNetStatusToast from '../../hooks/useNetStatusToast';
 import handleShare from '../../services/Share';
 import * as KeepAwake from 'expo-keep-awake';
@@ -75,13 +75,18 @@ function __hack() {
   }, 5000);
 }
 const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`;
-const Loading = () => {
+const Loading = (cover?: string) => {
   return (
     <View style={styles.loadingView}>
       <Image
-        style={styles.loadingImage}
-        resizeMode="contain"
-        source={require('../../assets/video-loading.png')}
+        style={{
+          flex: 1,
+          width: cover ? '100%' : '80%',
+        }}
+        resizeMode="cover"
+        source={
+          cover ? { uri: cover } : require('../../assets/video-loading.png')
+        }
       />
     </View>
   );
@@ -236,7 +241,7 @@ export default ({ route, navigation }: Props) => {
           startInLoadingState
           mediaPlaybackRequiresUserAction={false}
           injectedJavaScript={INJECTED_JAVASCRIPT}
-          renderLoading={Loading}
+          renderLoading={() => Loading(videoInfo?.cover)}
           ref={webviewRef}
           onMessage={evt => {
             try {
@@ -390,17 +395,28 @@ export default ({ route, navigation }: Props) => {
             // </ScrollView>
           }
         </View>
-        {/* <View style={styles.divider}> */}
-        {/* <View style={styles.dividerLine} /> */}
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={{ color: '#888', fontSize: 12 }}>
+            {'  '}
+            {videoInfo?.tname}
+          </Text>
+        </View>
         {/* <Divider inset={true} insetType="middle" /> */}
-        <Divider
-          style={{ width: '100%', marginVertical: 20 }}
+        {/* <Divider
+          style={{
+            width: '30%',
+            flex: 1,
+            flexDirection: 'row',
+            marginVertical: 20,
+          }}
           color="#ddd"
           insetType="left"
-          subHeaderStyle={{}}
+          subHeader={videoInfo?.tname}
+          subHeaderStyle={{ fontSize: 14 }}
           width={1}
           orientation="horizontal"
-        />
+        /> */}
         {/* </View> */}
         {comments?.length ? (
           comments.map((comment, i) => {
@@ -441,10 +457,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
-  loadingImage: {
-    flex: 1,
-    width: '80%',
-  },
+
   playerContainer: { width: '100%', height: '40%' },
   videoInfoContainer: { paddingVertical: 20, paddingHorizontal: 16 },
   videoHeader: {
@@ -477,14 +490,13 @@ const styles = StyleSheet.create({
   },
   divider: {
     flexDirection: 'row',
-    marginVertical: 24,
+    marginVertical: 18,
     alignItems: 'center',
   },
   dividerLine: {
     borderBottomColor: '#ddd',
     borderBottomWidth: 1,
     flexGrow: 1,
-    marginLeft: 10,
   },
   commentItemContainer: {
     marginTop: 20,

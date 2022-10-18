@@ -106,21 +106,26 @@ export default function RichText(props: {
   }
   const nodes = [];
   let prev = 0;
-  props.text.replace(urlregex, (a, b) => {
-    nodes.push(...parseEmoji(props.text.substring(prev, b)));
-    nodes.push(
-      <Text
-        key={index++}
-        style={styles.link}
-        onPress={() => {
-          Linking.openURL(a);
-        }}>
-        {a}
-      </Text>,
-    );
-    prev = b + a.length;
-    return '';
-  });
+  props.text
+    // .replace(
+    //   /([\u00A0-\u00FF]|[\u0100-\u017F]|[\u0180-\u024F])+/gm,
+    //   s => ` ${s} `,
+    // )
+    .replace(urlregex, (a, b) => {
+      nodes.push(...parseEmoji(props.text.substring(prev, b)));
+      nodes.push(
+        <Text
+          key={index++}
+          style={styles.link}
+          onPress={() => {
+            Linking.openURL(a);
+          }}>
+          {a}
+        </Text>,
+      );
+      prev = b + a.length;
+      return '';
+    });
 
   nodes.push(...parseEmoji(props.text.substring(prev)));
   return <Text style={styles.textContainer}>{nodes}</Text>;

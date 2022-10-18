@@ -8,6 +8,7 @@ import {
   ToastAndroid,
   Alert,
   Linking,
+  Switch,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { getHotList } from '../../services/Bilibili';
@@ -22,12 +23,15 @@ import ButtonsOverlay from '../../components/ButtonsOverlay';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import { TracyId } from '../../constants';
 import { addBlackTag, getBlackTags } from './blackTags';
+import useDialog from '../../hooks/useDialog';
+import { AppContext } from '../../context';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>;
 
 type VideoItem = GetFuncPromiseType<typeof getHotList>['list'][0];
 
-export default function Hot({ navigation }: Props) {
+export default function Hot({ navigation, route }: Props) {
+  // console.log(932424, route.params);
   const [state, setState] = React.useState<{
     page: number;
     list: [VideoItem, VideoItem?][];
@@ -37,6 +41,7 @@ export default function Hot({ navigation }: Props) {
     list: [],
     refreshing: false,
   });
+  const { playedVideos } = React.useContext(AppContext);
   const videosIdMap: Record<string, boolean> = {};
   state.list.forEach(item => {
     const [first, second] = item;
@@ -65,6 +70,51 @@ export default function Hot({ navigation }: Props) {
     });
     return unsubscribe;
   }, [navigation]);
+
+  // const dialogContent = ;
+
+  const { dialog, toggleDialog } = useDialog('不再看');
+
+  const [hideWatched, setHideWatched] = React.useState(false);
+
+  const filterWatched = useMemoizedFn(() => {
+    setHideWatched(v => !v);
+  });
+
+  React.useEffect(() => {
+    if (!route.params?.query) {
+      return;
+    }
+    Promise.all([getBlackUps, getBlackTags]).then(([blackUps, tags]) => {
+      toggleDialog(
+        <>
+          <Text>
+            {Object.keys(blackUps).length
+              ? `UP(${Object.keys(blackUps).length})：${Object.values(blackUps)
+                  .filter(v => typeof v === 'string')
+                  .join(', ')}`
+              : 'UP：暂无'}
+          </Text>
+          <Text> </Text>
+          <Text>
+            {Object.keys(tags).length
+              ? `类型：${Object.keys(tags).join(', ')}`
+              : '类型：暂无'}
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop: 5,
+              alignItems: 'center',
+              // flex: 1,
+            }}>
+            <Text>不看已看过的</Text>
+            <Switch value={hideWatched} onValueChange={filterWatched} />
+          </View>
+        </>,
+      );
+    });
+  }, [route.params?.query, hideWatched]);
   const loadingRef = React.useRef(false);
   const moreRef = React.useRef(true);
   const currentVideoRef = React.useRef<VideoItem | null>(null);
@@ -218,6 +268,9 @@ export default function Hot({ navigation }: Props) {
             if (v.mid in blackUps) {
               return false;
             }
+            if (hideWatched && v.mid in playedVideos) {
+              return false;
+            }
             return true;
           });
           if (!list.length) {
@@ -337,6 +390,7 @@ export default function Hot({ navigation }: Props) {
   ].filter(Boolean);
   return (
     <View style={styles.container}>
+      {dialog}
       <ButtonsOverlay
         visible={modalVisible}
         overlayStyle={{ minWidth: 220 }}

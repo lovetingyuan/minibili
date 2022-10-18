@@ -618,6 +618,7 @@ export function getVideoComments(aid: string | number) {
                 id: v.rpid_str,
                 mid: v.mid,
                 upLike: v.up_action.like,
+                like: v.like,
               };
             }) || [],
         };
@@ -640,6 +641,7 @@ export function getVideoComments(aid: string | number) {
               id: v.rpid_str,
               mid: v.mid,
               upLike: v.up_action.like,
+              like: v.like,
             };
           }) || [],
       });
@@ -730,8 +732,10 @@ export function getVideoInfo(aid: string | number) {
       likeNum: data.stat.like,
       replyNum: data.stat.reply,
       viewNum: data.stat.view,
+      cover: data.pic,
       // videosNum: data.pages.length,
       videosNum: data.videos,
+      tname: data.tname,
       pages: data.pages?.map(v => {
         return {
           width: v.dimension.width,

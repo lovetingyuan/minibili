@@ -27,6 +27,7 @@ import CheckLiving from './components/CheckLiving';
 import { Button } from '@rneui/themed';
 import { getBlackUps } from './routes/Hot/blackUps';
 import { getBlackTags } from './routes/Hot/blackTags';
+// import useDialog from './hooks/useDialog';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -69,7 +70,18 @@ const showFilter = () => {
   });
 };
 
+// const HotComp = (props, dialog) => {
+//   return (
+//     <>
+//       {dialog}
+//       <Hot {...props} />
+//     </>
+//   );
+// };
+
 const Main = () => {
+
+
   return (
     <Tab.Navigator
       initialRouteName="Hot"
@@ -90,21 +102,28 @@ const Main = () => {
       <Tab.Screen
         name="Hot"
         component={Hot}
-        options={{
-          tabBarLabel: getLabel('热门'),
-          headerTitle: '🔥 热门' + (__DEV__ ? ' dev' : ''),
-          headerTitleStyle: { fontSize: 18, color: '#555' },
-          headerShown: true,
-          headerRight() {
-            return (
-              <Pressable onPress={showFilter}>
-                <Image
-                  source={require('./assets/filter.png')}
-                  style={{ width: 16, height: 16, marginRight: 16 }}
-                />
-              </Pressable>
-            );
-          },
+        options={options => {
+          return {
+            tabBarLabel: getLabel('热门'),
+            headerTitle: '🔥 热门' + (__DEV__ ? ' dev' : ''),
+            headerTitleStyle: { fontSize: 18, color: '#555' },
+            headerShown: true,
+            headerRight() {
+              return (
+                <Pressable
+                  onPress={() => {
+                    options.navigation.setParams({
+                      query: Date.now(),
+                    });
+                  }}>
+                  <Image
+                    source={require('./assets/filter.png')}
+                    style={{ width: 16, height: 16, marginRight: 16 }}
+                  />
+                </Pressable>
+              );
+            },
+          };
         }}
       />
       <Tab.Screen

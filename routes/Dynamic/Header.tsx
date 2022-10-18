@@ -108,7 +108,9 @@ export default function Header(props: {
           <Text style={{ ...styles.name, ...nameStyle }}>{userInfo.name}</Text>
           {'    '} {fans}关注 {isTracy ? '❤' : ''}
         </Text>
-        <Text style={[styles.sign]}>{userInfo.sign}</Text>
+        <Text style={[styles.sign, isTracy ? { color: '#178bcf' } : null]}>
+          {userInfo.sign}
+        </Text>
       </View>
       {liveInfo.living ? (
         <Button

@@ -40,6 +40,18 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
             <Text style={styles.videoLengthText}>已看过</Text>
           </View>
         ) : null}
+        {watched ? (
+          <Image
+            source={require('../../assets/99W.png')}
+            style={{
+              width: '40%',
+              height: '70%',
+              position: 'absolute',
+              top: '20%',
+              alignSelf: 'center',
+            }}
+          />
+        ) : null}
         {video.tag ? (
           <View style={styles.videoTag}>
             <Text style={styles.videoTagText}>{video.tag}</Text>

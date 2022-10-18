@@ -4,10 +4,10 @@ import {
   View,
   FlatList,
   StyleSheet,
-  Alert,
   Pressable,
   ToastAndroid,
   Image,
+  Linking,
 } from 'react-native';
 import { Avatar } from '@rneui/themed';
 import FollowItem from './FollowItem';
@@ -25,6 +25,7 @@ import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import * as Application from 'expo-application';
 import { AppContext } from '../../context';
+import useDialog from '../../hooks/useDialog';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
@@ -40,6 +41,8 @@ const buttons = [
     name: 'about',
   },
 ];
+
+const githubLink = 'https://github.com/lovetingyuan/minibili';
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
@@ -170,21 +173,31 @@ export default function Follow({ navigation, route }: Props) {
     setFollowedNum(0);
     setPage(1);
   };
+  const version = Application.nativeApplicationVersion;
+
+  const dialogContent = (
+    <>
+      <Text style={{ fontSize: 16 }}>当前版本：{version}</Text>
+      <Text>
+        注：本应用所有数据均为B站官网公开，仅供学习交流
+        <Text
+          onPress={() => {
+            Linking.openURL(githubLink);
+          }}
+          style={{ color: 'rgb(32, 137, 220)' }}>
+          {' '}
+          (github)
+        </Text>
+      </Text>
+    </>
+  );
+  const { dialog, toggleDialog } = useDialog('关于minibili', dialogContent);
 
   const handleOverlayClick = (name: string) => {
     if (name === 'logout') {
       clearUser();
     } else if (name === 'about') {
-      const version = Application.nativeApplicationVersion;
-      Alert.alert(
-        `关于 minibili (${version})`,
-        [
-          '',
-          '所有数据都来自B站官网，仅供学习交流',
-          '',
-          'https://github.com/lovetingyuan/minibili',
-        ].join('\n'),
-      );
+      toggleDialog();
     }
   };
 
@@ -206,6 +219,7 @@ export default function Follow({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
+      {dialog}
       <View style={styles.userContainer}>
         <Avatar
           size={60}

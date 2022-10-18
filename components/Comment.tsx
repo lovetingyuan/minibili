@@ -35,15 +35,6 @@ export default function Comment(props: Props) {
           {comment.name}:{' '}
         </Text>
         <RichText text={comment.message} imageSize={18} />
-        {/* {comment.top ? (
-          <>
-            {' '}
-            <Image
-              source={require('../assets/top.png')}
-              style={styles.topImg}
-            />
-          </>
-        ) : null} */}
         {comment.like ? (
           <Text style={styles.likeNum}> {comment.like}</Text>
         ) : null}
@@ -57,6 +48,9 @@ export default function Comment(props: Props) {
                   {reply.name}:{' '}
                 </Text>
                 <RichText text={reply.message} imageSize={15} />
+                {reply.like ? (
+                  <Text style={styles.likeText}> {reply.like}</Text>
+                ) : null}
               </Text>
             );
           })}
@@ -116,5 +110,9 @@ const styles = StyleSheet.create({
   topImg: {
     width: 24,
     height: 12,
+  },
+  likeText: {
+    fontSize: 12,
+    color: '#fa5a57',
   },
 });

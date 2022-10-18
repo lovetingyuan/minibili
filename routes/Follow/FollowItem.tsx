@@ -159,7 +159,12 @@ export default React.memo(
                 ) : null}
               </View>
               {sign ? (
-                <Text style={styles.signText} numberOfLines={2}>
+                <Text
+                  style={[
+                    styles.signText,
+                    isTracy ? { color: '#178bcf' } : null,
+                  ]}
+                  numberOfLines={2}>
                   {sign}
                 </Text>
               ) : null}
