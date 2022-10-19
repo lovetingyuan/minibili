@@ -5,6 +5,7 @@ import {
   Text,
   TouchableWithoutFeedback,
   StatusBar,
+  Image,
 } from 'react-native';
 import { Avatar } from '@rneui/themed';
 import {
@@ -105,10 +106,26 @@ export default function Header(props: {
       </TouchableWithoutFeedback>
       <View style={{ flex: 1 }}>
         <Text>
-          <Text style={{ ...styles.name, ...nameStyle }}>{userInfo.name}</Text>
-          {'    '} {fans}关注 {isTracy ? '❤' : ''}
+          <Text style={{ ...styles.name, ...nameStyle }}>
+            {userInfo.name}
+            {'  '}
+          </Text>
+          {isTracy ? (
+            <Image
+              source={require('../../assets/heart.png')}
+              style={{ width: 24, height: 24, marginLeft: 10 }}
+            />
+          ) : null}
+          <Text>
+            {'    '} {fans}关注
+          </Text>
         </Text>
-        <Text style={[styles.sign, isTracy ? { color: '#178bcf' } : null]}>
+
+        <Text
+          style={[
+            styles.sign,
+            isTracy ? { color: '#178bcf', fontSize: 15 } : null,
+          ]}>
           {userInfo.sign}
         </Text>
       </View>

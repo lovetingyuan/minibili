@@ -80,8 +80,6 @@ const showFilter = () => {
 // };
 
 const Main = () => {
-
-
   return (
     <Tab.Navigator
       initialRouteName="Hot"

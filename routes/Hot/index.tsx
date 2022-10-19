@@ -8,7 +8,7 @@ import {
   ToastAndroid,
   Alert,
   Linking,
-  Switch,
+  // Switch,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { getHotList } from '../../services/Bilibili';
@@ -101,16 +101,15 @@ export default function Hot({ navigation, route }: Props) {
               ? `类型：${Object.keys(tags).join(', ')}`
               : '类型：暂无'}
           </Text>
-          <View
+          {/* <View
             style={{
               flexDirection: 'row',
               marginTop: 5,
               alignItems: 'center',
-              // flex: 1,
             }}>
             <Text>不看已看过的</Text>
             <Switch value={hideWatched} onValueChange={filterWatched} />
-          </View>
+          </View> */}
         </>,
       );
     });
@@ -375,10 +374,12 @@ export default function Hot({ navigation, route }: Props) {
           text: `不再看 ${currentVideoRef.current?.name} 的视频`,
           name: 'black',
         },
-    {
-      text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
-      name: 'blackByTag',
-    },
+    currentVideoRef.current?.mid == TracyId
+      ? null
+      : {
+          text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
+          name: 'blackByTag',
+        },
     {
       text: `分享(${currentVideoRef.current?.shareNum})`,
       name: 'share',
@@ -388,6 +389,23 @@ export default function Hot({ navigation, route }: Props) {
       name: 'openApp',
     },
   ].filter(Boolean);
+  // let data = [];
+  // if (hideWatched) {
+  //   let currentItem = [];
+  //   for (let item of state.list) {
+  //     if (item[0].mid in playedVideos) {
+  //     }
+  //   }
+  // } else {
+  //   data = state.list;
+  // }
+
+  // const data = state.list.filter(v => {
+  //   if (hideWatched && v.mid in playedVideos) {
+  //     return false;
+  //   }
+  //   return true;
+  // });
   return (
     <View style={styles.container}>
       {dialog}

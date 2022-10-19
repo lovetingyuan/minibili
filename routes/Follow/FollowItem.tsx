@@ -10,6 +10,7 @@ import { Button } from '@rneui/base';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import { AppContext } from '../../context';
+import notify from '../../services/Notify';
 
 if (!Promise.allSettled) {
   const rejectHandler = (reason: any) => ({ status: 'rejected', reason });
@@ -50,6 +51,7 @@ export default React.memo(
         ([a, b]) => {
           if (a.status === 'fulfilled' && a.value) {
             setUpdatedId(a.value);
+            notify(`${name} 更新了`);
           }
           if (b.status === 'fulfilled') {
             const { living, roomId } = b.value;
@@ -57,6 +59,7 @@ export default React.memo(
               living,
               liveUrl: 'https://live.bilibili.com/' + roomId,
             });
+            living && notify(`${name} 正在直播`);
           }
           if (a.status === 'fulfilled' && b.status === 'fulfilled') {
             setLoading(false);
@@ -148,9 +151,13 @@ export default React.memo(
             />
             <View style={{ flex: 1 }}>
               <View style={styles.nameContainer}>
-                <Text style={[styles.name, tracyStyle]}>
-                  {name} {isTracy ? ' ❤' : ''}
-                </Text>
+                <Text style={[styles.name, tracyStyle]}>{name}</Text>
+                {isTracy ? (
+                  <Image
+                    source={require('../../assets/heart.png')}
+                    style={{ width: 24, height: 24, marginLeft: 5 }}
+                  />
+                ) : null}
                 {updatedId ? (
                   <Image
                     style={styles.newIcon}
@@ -162,7 +169,7 @@ export default React.memo(
                 <Text
                   style={[
                     styles.signText,
-                    isTracy ? { color: '#178bcf' } : null,
+                    isTracy ? { color: '#178bcf', fontSize: 14 } : null,
                   ]}
                   numberOfLines={2}>
                   {sign}

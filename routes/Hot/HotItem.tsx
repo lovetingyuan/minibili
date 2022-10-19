@@ -42,7 +42,7 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
         ) : null}
         {watched ? (
           <Image
-            source={require('../../assets/99W.png')}
+            source={require('../../assets/viewed.png')}
             style={{
               width: '40%',
               height: '70%',
