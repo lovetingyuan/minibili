@@ -137,7 +137,8 @@ const Loading = () => {
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import { AppContext } from '../context';
+import store from '../valtio/store';
+import { useSnapshot } from 'valtio';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>;
 
@@ -145,12 +146,12 @@ export default ({ route }: Props) => {
   __DEV__ && console.log(route.name);
   const { url } = route.params;
   const webviewRef = React.useRef<WebView | null>(null);
-  const { webviewMode } = React.useContext(AppContext);
+  const { webViewMode } = useSnapshot(store);
   return (
     <WebView
       style={styles.container}
       source={{ uri: url }}
-      key={webviewMode}
+      key={webViewMode}
       // originWhitelist={['https://*', 'bilibili://*']}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
@@ -161,7 +162,7 @@ export default ({ route }: Props) => {
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
       renderLoading={Loading}
-      userAgent={webviewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
+      userAgent={webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
       ref={webviewRef}
       onMessage={evt => {
         const { action, payload } = JSON.parse(evt.nativeEvent.data);

@@ -14,24 +14,20 @@ import {
   getUserInfo,
 } from '../../services/Bilibili';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList, UserInfo } from '../../types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
-import { AppContext, UserInfo } from '../../context';
+import store from '../../valtio/store';
+import { useSnapshot } from 'valtio';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
-export default function Header(props: {
-  mid: number | string;
-  name: string;
-  face: string;
-  sign: string;
-}) {
+export default function Header(props: UserInfo) {
   const { mid } = props;
   const [fans, setFans] = React.useState('');
 
   const navigation = useNavigation<NavigationProps['navigation']>();
-  const { specialUser } = React.useContext(AppContext);
-  const isTracy = mid.toString() === specialUser?.mid;
+  const { specialUser } = useSnapshot(store);
+  const isTracy = mid && mid.toString() === specialUser.mid;
   const [userInfo, setUserInfo] = React.useState<UserInfo>({ ...props });
   const [liveInfo, setLiveInfo] = React.useState({
     living: false,

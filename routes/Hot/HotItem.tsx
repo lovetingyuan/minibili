@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { AppContext } from '../../context';
+// import { AppContext } from '../../context';
 import { getHotList } from '../../services/Bilibili';
 import { GetFuncPromiseType } from '../../types';
+import store from '../../valtio/store';
+import { useSnapshot } from 'valtio';
 
 type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0];
 
@@ -17,14 +19,21 @@ const parseDuration = (duration: number) => {
   return [hour, minutes, seconds].filter(Boolean).join(':');
 };
 
-export default React.memo(function HotItem({ video }: { video: HotVideo }) {
+export default React.memo(function HotItem({
+  video,
+  itemStyle,
+}: {
+  video: HotVideo;
+  itemStyle: any;
+}) {
   __DEV__ && console.log('hot video', video.title);
   const playNum = (video.playNum / 10000).toFixed(1) + '万';
-  const { specialUser, playedVideos } = React.useContext(AppContext);
-  const isTracy = video.mid.toString() === specialUser?.mid;
-  const watched = playedVideos[video.bvid];
+  const { specialUser } = useSnapshot(store);
+  const isTracy = video.mid.toString() === specialUser.mid;
+  const { watchedVideos } = useSnapshot(store);
+  const watched = watchedVideos[video.bvid];
   return (
-    <View style={[styles.itemContainer]}>
+    <View style={[styles.itemContainer, itemStyle]}>
       <View style={{ flex: 1 }}>
         <Image
           style={[styles.image, watched ? { opacity: 0.6 } : null]}
@@ -93,7 +102,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     flex: 1,
     marginVertical: 12,
-    marginHorizontal: 6,
+    // marginHorizontal: 10,
   },
   videoLength: {
     position: 'absolute',

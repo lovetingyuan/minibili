@@ -1,6 +1,5 @@
 import React from 'react';
 import { Input, Button, Icon } from '@rneui/themed';
-
 import {
   View,
   Text,
@@ -10,8 +9,8 @@ import {
   StyleSheet,
   ToastAndroid,
 } from 'react-native';
-import { AppContext } from '../../context';
 import { getUserInfo } from '../../services/Bilibili';
+import store from '../../valtio/store';
 
 const leftTv = require('../../assets/tv-left.png');
 const rightTv = require('../../assets/tv-right.png');
@@ -19,7 +18,6 @@ const rightTv = require('../../assets/tv-right.png');
 export default function Login() {
   const inputUserIdRef = React.useRef('');
   const inputRef = React.useRef(null);
-  const { setUserInfo } = React.useContext(AppContext);
   const [tvImg, setTvImg] = React.useState(true);
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -36,20 +34,25 @@ export default function Login() {
     }
     getUserInfo(inputUserIdRef.current)
       .then(user => {
-        setUserInfo({
+        if (!user?.mid) {
+          ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT);
+          return;
+        }
+        store.userInfo = {
           name: user.name,
           mid: user.mid + '',
           face: user.face,
           sign: user.sign,
-        });
+        };
       })
       .catch(() => {
-        setUserInfo({
+        ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT);
+        store.userInfo = {
           name: '',
           face: '',
-          mid: inputUserIdRef.current,
+          mid: '',
           sign: '',
-        });
+        };
       });
   };
   return (

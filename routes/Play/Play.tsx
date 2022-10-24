@@ -107,8 +107,10 @@ const parseDate = (time?: number) => {
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
-import { AppContext } from '../../context';
+// import { AppContext } from '../../context';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import store from '../../valtio/store';
+import { useSnapshot } from 'valtio';
 // import { Button } from '@rneui/themed';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
@@ -126,9 +128,9 @@ export default ({ route, navigation }: Props) => {
   const [currentPage, setCurrentPage] = React.useState(0);
   // useKeepAwake();
   const connectType = useNetStatusToast(bvid);
-  const { specialUser, setPlayedVideos } = React.useContext(AppContext);
+  const { specialUser } = useSnapshot(store);
   const tracyStyle =
-    mid.toString() === specialUser?.mid
+    mid && mid.toString() === specialUser?.mid
       ? {
           color: 'rgb(251, 114, 153)',
         }
@@ -158,11 +160,9 @@ export default ({ route, navigation }: Props) => {
     }
   }, [videoInfo, width, height, currentPage]);
 
-  // const videoTitle = videoInfo?.pages[currentPage].title || '-';
-
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      setPlayedVideos(bvid);
+      store.watchedVideos[bvid] = true;
     }, 8000);
     return () => {
       clearTimeout(timer);
@@ -275,13 +275,16 @@ export default ({ route, navigation }: Props) => {
         <View style={styles.videoHeader}>
           <Pressable
             onPress={() => {
-              navigation.navigate('Dynamic', {
+              store.dynamicUser = {
                 mid,
                 face: videoInfo?.upFace || '',
                 name,
                 sign: '',
                 follow: false,
-              });
+              };
+              setTimeout(() => {
+                navigation.navigate('Dynamic', store.dynamicUser);
+              }, 200);
             }}>
             <View style={styles.upInfoContainer}>
               {videoInfo?.upFace ? (

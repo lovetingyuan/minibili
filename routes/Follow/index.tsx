@@ -24,8 +24,9 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import * as Application from 'expo-application';
-import { AppContext } from '../../context';
 import useDialog from '../../hooks/useDialog';
+import store from '../../valtio/store';
+import { useSnapshot } from 'valtio';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
@@ -46,7 +47,7 @@ const githubLink = 'https://github.com/lovetingyuan/minibili';
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
-  const { userInfo, setUserInfo, specialUser } = React.useContext(AppContext);
+  const { specialUser, userInfo } = useSnapshot(store);
   const [ups, setUps] = React.useState<UpItem[]>([]);
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -91,12 +92,12 @@ export default function Follow({ navigation, route }: Props) {
     if (userInfo.mid) {
       getUserInfo(userInfo.mid)
         .then(user => {
-          setUserInfo({
+          store.userInfo = {
             name: user.name,
             face: user.face,
             mid: user.mid + '',
             sign: user.sign,
-          });
+          };
         })
         .catch(() => {});
       getFansData(userInfo.mid).then(data => {
@@ -123,10 +124,11 @@ export default function Follow({ navigation, route }: Props) {
       if (!navigation.isFocused()) {
         return;
       }
-      followListRef.current?.scrollToIndex({
-        index: 0,
-        animated: true,
-      });
+      ups.length &&
+        followListRef.current?.scrollToIndex({
+          index: 0,
+          animated: true,
+        });
     });
     return unsubscribe;
   }, [navigation]);
@@ -161,12 +163,7 @@ export default function Follow({ navigation, route }: Props) {
   };
 
   const clearUser = async () => {
-    setUserInfo({
-      name: '',
-      mid: '',
-      face: '',
-      sign: '',
-    });
+    store.userInfo = { name: '', mid: '', face: '', sign: '' };
     setUps((currentList.current = []));
     setLoadDone(false);
     setLoading(false);
@@ -206,7 +203,7 @@ export default function Follow({ navigation, route }: Props) {
   }
 
   const displayUps = [...ups];
-  if (specialUser && displayUps.length) {
+  if (specialUser.mid && displayUps.length) {
     const spIndex = displayUps.findIndex(v => v.mid == specialUser.mid);
     if (spIndex > 0) {
       const sp = displayUps[spIndex];
@@ -273,7 +270,13 @@ export default function Follow({ navigation, route }: Props) {
       <View style={styles.listTitleContainer}>
         <Text style={styles.listTitle}>
           关注列表
-          <Text style={{ fontSize: 14 }}>({followedNum})</Text>：
+          <Text style={{ fontSize: 14 }}>({followedNum})</Text>：{' '}
+          {Object.values(store.updatedUps).filter(Boolean).length > 0 ? (
+            <Image
+              source={require('../../assets/new.png')}
+              style={styles.newIcon}
+            />
+          ) : null}
         </Text>
         <Text style={styles.updateTime}>{updateText}</Text>
       </View>
@@ -351,7 +354,7 @@ const styles = StyleSheet.create({
   },
   logoutText: { color: '#5896de', fontSize: 14 },
   listEmptyText: { textAlign: 'center', marginVertical: 40 },
-  newIcon: { width: 28, height: 11, marginLeft: 8, top: 1 },
+  newIcon: { width: 28, height: 11, marginLeft: 8 },
   liveIcon: {
     width: 26,
     height: 24,

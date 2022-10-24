@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Image, Linking, StyleSheet, Text, TextProps } from 'react-native';
 import urlRegex from 'url-regex';
-import emojis from '../utils/emojis';
+import emojis from '../constants/emojis';
 
 let index = 0;
 const urlregex = urlRegex({

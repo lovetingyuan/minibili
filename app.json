@@ -39,12 +39,25 @@
           "color": "#ffffff",
           "sounds": []
         }
-      ]
+      ],
+      "sentry-expo"
     ],
     "extra": {
       "eas": {
         "projectId": "a3cf9972-f1fb-4874-92a5-7a579e471538"
       }
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "tingyuan123",
+            "project": "minibili",
+            "authToken": "c394d891bc1443f5b47636ac10fcba7f15addf1f8cf64c6ba63897f61414142b"
+          }
+        }
+      ]
     }
   }
 }

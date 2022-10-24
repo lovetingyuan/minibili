@@ -10,10 +10,11 @@ import {
   View,
 } from 'react-native';
 import RichText from '../../components/RichText';
-import { AppContext } from '../../context';
+// import { AppContext } from '../../context';
 import { RootStackParamList } from '../../types';
 import DateAndOpen from './DateAndOpen';
-
+import { useSnapshot } from 'valtio';
+import store from '../../valtio/store';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function RichTextItem(props: {
@@ -25,8 +26,8 @@ export default function RichTextItem(props: {
   images: { src: string; ratio: number }[];
 }) {
   const { text, date, mid, images, name, id } = props;
-  const { specialUser } = React.useContext(AppContext);
-  const isTracy = mid.toString() === specialUser?.mid;
+  const { specialUser } = useSnapshot(store);
+  const isTracy = mid && mid.toString() === specialUser.mid;
   const navigation = useNavigation<NavigationProps['navigation']>();
   return (
     <View style={[styles.textContainer]}>

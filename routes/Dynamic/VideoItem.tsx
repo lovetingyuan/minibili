@@ -11,7 +11,6 @@ import {
   View,
 } from 'react-native';
 import RichText from '../../components/RichText';
-import { AppContext } from '../../context';
 import { getDynamicItems } from '../../services/Bilibili';
 import handleShare from '../../services/Share';
 import {
@@ -19,6 +18,8 @@ import {
   GetFuncPromiseType,
   RootStackParamList,
 } from '../../types';
+import store from '../../valtio/store';
+import { useSnapshot } from 'valtio';
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
@@ -29,8 +30,8 @@ type VideoDynamicItem = Extract<DynamicItems, { type: DynamicType.Video }>;
 export default function VideoItem(props: VideoDynamicItem) {
   const { mid, name, cover, title, aid, date, play, bvid, text, duration } =
     props;
-  const { specialUser } = React.useContext(AppContext);
-  const isTracy = mid.toString() === specialUser?.mid;
+  const { specialUser } = useSnapshot(store);
+  const isTracy = mid && mid.toString() === specialUser.mid;
   const onShare = useCallback(() => {
     handleShare(name, title, bvid);
   }, [name, title, bvid]);

@@ -3,14 +3,15 @@ import { useNavigation } from '@react-navigation/native';
 import { FAB, Avatar } from '@rneui/themed';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-import { AppContext } from '../context';
+import { useSnapshot } from 'valtio';
+import store from '../valtio/store';
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function TracyBtn() {
   const navigation = useNavigation<NavigationProps['navigation']>();
-  const { specialUser } = React.useContext(AppContext);
-  if (!specialUser) {
+  const { specialUser } = useSnapshot(store);
+  if (!specialUser.mid) {
     return null;
   }
   return (
@@ -28,7 +29,10 @@ export default function TracyBtn() {
       color="#fb7299"
       placement="right"
       onPress={() => {
-        navigation.navigate('Dynamic', { ...specialUser, follow: true });
+        store.dynamicUser = { ...specialUser, follow: true };
+        setTimeout(() => {
+          navigation.navigate('Dynamic', { ...specialUser, follow: true });
+        }, 200);
       }}
     />
   );

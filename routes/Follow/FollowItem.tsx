@@ -9,18 +9,22 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
-import { AppContext } from '../../context';
-import notify from '../../services/Notify';
+import { useSnapshot } from 'valtio';
+import store from '../../valtio/store';
 
-if (!Promise.allSettled) {
-  const rejectHandler = (reason: any) => ({ status: 'rejected', reason });
-  const resolveHandler = (value: any) => ({ status: 'fulfilled', value });
-  (Promise as any).allSettled = function (promises: any[]) {
-    const convertedPromises = promises.map(p =>
-      Promise.resolve(p).then(resolveHandler, rejectHandler),
-    );
-    return Promise.all(convertedPromises);
-  };
+const rejectHandler = (reason: any) => ({
+  status: 'rejected' as const,
+  reason,
+});
+const resolveHandler = (value: any) => ({
+  status: 'fulfilled' as const,
+  value,
+});
+function allSettled(promises: Promise<any>[]) {
+  const convertedPromises = promises.map(p =>
+    Promise.resolve(p).then(resolveHandler, rejectHandler),
+  );
+  return Promise.all(convertedPromises);
 }
 
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
@@ -32,9 +36,9 @@ export default React.memo(
     const {
       item: { face, name, sign, mid },
     } = props;
-    const { setSpecialUser, specialUser } = React.useContext(AppContext);
+    const { specialUser } = useSnapshot(store);
     const tracyStyle: Record<string, any> = {};
-    const isTracy = mid.toString() === specialUser?.mid;
+    const isTracy = mid && mid.toString() === specialUser?.mid;
     if (isTracy) {
       tracyStyle.color = '#fb7299';
       tracyStyle.fontSize = 18;
@@ -47,11 +51,11 @@ export default React.memo(
     const navigation = useNavigation<NavigationProps['navigation']>();
     const [loading, setLoading] = React.useState(false);
     const updateData = React.useCallback(() => {
-      return Promise.allSettled([checkDynamics(mid), getLiveStatus(mid)]).then(
+      return allSettled([checkDynamics(mid), getLiveStatus(mid)]).then(
         ([a, b]) => {
           if (a.status === 'fulfilled' && a.value) {
             setUpdatedId(a.value);
-            notify(`${name} 更新了`);
+            store.updatedUps[mid] = true;
           }
           if (b.status === 'fulfilled') {
             const { living, roomId } = b.value;
@@ -59,7 +63,6 @@ export default React.memo(
               living,
               liveUrl: 'https://live.bilibili.com/' + roomId,
             });
-            living && notify(`${name} 正在直播`);
           }
           if (a.status === 'fulfilled' && b.status === 'fulfilled') {
             setLoading(false);
@@ -93,9 +96,19 @@ export default React.memo(
 
     const [modalVisible, setModalVisible] = React.useState(false);
     const gotoDynamic = useMemoizedFn(() => {
-      navigation.navigate('Dynamic', { mid, face, name, sign, follow: true });
+      store.dynamicUser = {
+        mid,
+        face,
+        name,
+        sign,
+        follow: true,
+      };
+      setTimeout(() => {
+        navigation.navigate('Dynamic', { mid, face, name, sign, follow: true });
+      }, 200);
       setLatest(mid, updatedId + '');
       setUpdatedId('');
+      store.updatedUps[mid] = false;
     });
     const gotoLivePage = useMemoizedFn(() => {
       if (livingInfo?.liveUrl) {
@@ -112,8 +125,11 @@ export default React.memo(
             text: '标记为未读',
             name: 'unread',
           },
-      specialUser.name === props.item.name
-        ? null
+      specialUser?.name === props.item.name
+        ? {
+            text: '取消特别关注',
+            name: 'cancelSpecial',
+          }
         : {
             text: `设置 ${props.item.name} 为特别关注 ❤`,
             name: 'special',
@@ -124,14 +140,22 @@ export default React.memo(
         const random = Math.random().toString().slice(2, 10);
         setLatest(mid, random);
         setUpdatedId(random);
+        store.updatedUps[mid] = true;
         setModalVisible(false);
       } else if (n === 'special') {
-        setSpecialUser({
+        store.specialUser = {
           name,
           mid: mid + '',
           face,
           sign,
-        });
+        };
+      } else if (n === 'cancelSpecial') {
+        store.specialUser = {
+          name: '',
+          mid: '',
+          face: '',
+          sign: '',
+        };
       }
     });
     return (

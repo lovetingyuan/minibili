@@ -2,13 +2,13 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import React from 'react';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import { Alert, Vibration } from 'react-native';
 import { getLiveStatus } from '../services/Bilibili';
 import notify from '../services/Notify';
-import { AppContext } from '../context';
+import store from '../valtio/store';
+import { useSnapshot } from 'valtio';
 
 const BACKGROUND_FETCH_TASK = 'background-fetch';
 
@@ -16,7 +16,7 @@ type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function CheckLiving() {
   const navigation = useNavigation<NavigationProps['navigation']>();
-  const { specialUser } = React.useContext(AppContext);
+  const { specialUser } = useSnapshot(store);
   const alertedRef = React.useRef(false);
   const checkTimerRef = React.useRef<any>(0);
   const checkTask = () => {

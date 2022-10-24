@@ -8,7 +8,6 @@ import {
   ToastAndroid,
   Alert,
   Linking,
-  // Switch,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { getHotList } from '../../services/Bilibili';
@@ -24,7 +23,7 @@ import useMemoizedFn from '../../hooks/useMemoizedFn';
 import { TracyId } from '../../constants';
 import { addBlackTag, getBlackTags } from './blackTags';
 import useDialog from '../../hooks/useDialog';
-import { AppContext } from '../../context';
+import { FlashList } from '@shopify/flash-list';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>;
 
@@ -41,7 +40,6 @@ export default function Hot({ navigation, route }: Props) {
     list: [],
     refreshing: false,
   });
-  const { playedVideos } = React.useContext(AppContext);
   const videosIdMap: Record<string, boolean> = {};
   state.list.forEach(item => {
     const [first, second] = item;
@@ -63,23 +61,16 @@ export default function Hot({ navigation, route }: Props) {
       if (!navigation.isFocused()) {
         return;
       }
-      hotListRef.current?.scrollToIndex({
-        index: 0,
-        animated: true,
-      });
+      state.list.length &&
+        hotListRef.current?.scrollToIndex({
+          index: 0,
+          animated: true,
+        });
     });
     return unsubscribe;
   }, [navigation]);
 
-  // const dialogContent = ;
-
   const { dialog, toggleDialog } = useDialog('不再看');
-
-  const [hideWatched, setHideWatched] = React.useState(false);
-
-  const filterWatched = useMemoizedFn(() => {
-    setHideWatched(v => !v);
-  });
 
   React.useEffect(() => {
     if (!route.params?.query) {
@@ -113,12 +104,11 @@ export default function Hot({ navigation, route }: Props) {
         </>,
       );
     });
-  }, [route.params?.query, hideWatched]);
+  }, [route.params?.query]);
   const loadingRef = React.useRef(false);
   const moreRef = React.useRef(true);
   const currentVideoRef = React.useRef<VideoItem | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const layoutCallbackRef = React.useRef<any>(null);
   const addBlackUp = React.useCallback(async () => {
     if (!currentVideoRef.current) {
       return;
@@ -188,21 +178,7 @@ export default function Hot({ navigation, route }: Props) {
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a');
     return (
-      <View
-        key={key}
-        style={styles.itemContainer}
-        onLayout={e => {
-          const height = e.nativeEvent.layout.height;
-          if (!layoutCallbackRef.current) {
-            layoutCallbackRef.current = (data: any, index: number) => {
-              return {
-                length: height,
-                offset: height * index,
-                index,
-              };
-            };
-          }
-        }}>
+      <View key={key} style={styles.itemContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
           style={{ flex: 1 }}
@@ -218,7 +194,11 @@ export default function Hot({ navigation, route }: Props) {
             currentVideoRef.current = item[0];
             setModalVisible(true);
           }}>
-          <HotItem video={item[0]} />
+          <HotItem
+            video={item[0]}
+            key={item[0].bvid}
+            itemStyle={{ marginLeft: 10, marginRight: 6 }}
+          />
         </TouchableOpacity>
         {item[1] ? (
           <TouchableOpacity
@@ -236,10 +216,21 @@ export default function Hot({ navigation, route }: Props) {
               currentVideoRef.current = item[1]!;
               setModalVisible(true);
             }}>
-            <HotItem video={item[1]} />
+            <HotItem
+              video={item[1]}
+              key={item[0].bvid}
+              itemStyle={{ marginRight: 10, marginLeft: 6 }}
+            />
           </TouchableOpacity>
         ) : (
-          <View style={{ flex: 1, marginVertical: 12, marginHorizontal: 6 }} />
+          <View
+            style={{
+              flex: 1,
+              marginVertical: 12,
+              marginRight: 10,
+              marginLeft: 6,
+            }}
+          />
         )}
       </View>
     );
@@ -267,9 +258,9 @@ export default function Hot({ navigation, route }: Props) {
             if (v.mid in blackUps) {
               return false;
             }
-            if (hideWatched && v.mid in playedVideos) {
-              return false;
-            }
+            // if (hideWatched && v.mid in playedVideos) {
+            //   return false;
+            // }
             return true;
           });
           if (!list.length) {
@@ -389,23 +380,6 @@ export default function Hot({ navigation, route }: Props) {
       name: 'openApp',
     },
   ].filter(Boolean);
-  // let data = [];
-  // if (hideWatched) {
-  //   let currentItem = [];
-  //   for (let item of state.list) {
-  //     if (item[0].mid in playedVideos) {
-  //     }
-  //   }
-  // } else {
-  //   data = state.list;
-  // }
-
-  // const data = state.list.filter(v => {
-  //   if (hideWatched && v.mid in playedVideos) {
-  //     return false;
-  //   }
-  //   return true;
-  // });
   return (
     <View style={styles.container}>
       {dialog}
@@ -416,19 +390,11 @@ export default function Hot({ navigation, route }: Props) {
         onPress={handleOverlayClick}
         dismiss={() => setModalVisible(false)}
       />
-      <FlatList
-        data={state.list}
+      <FlashList
         ref={hotListRef}
+        data={state.list}
         renderItem={renderItem}
-        refreshing={state.refreshing}
-        onEndReachedThreshold={0.4}
-        onRefresh={resetDynamicItems}
-        onEndReached={loadMoreHotItems}
-        {...(layoutCallbackRef.current
-          ? {
-              getItemLayout: layoutCallbackRef.current,
-            }
-          : null)}
+        estimatedItemSize={200}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
@@ -439,7 +405,11 @@ export default function Hot({ navigation, route }: Props) {
             {moreRef.current ? '加载中...' : `到底了~(${state.list.length})`}
           </Text>
         }
-        style={styles.listContainerStyle}
+        onEndReached={loadMoreHotItems}
+        onEndReachedThreshold={0.4}
+        refreshing={state.refreshing}
+        onRefresh={resetDynamicItems}
+        contentContainerStyle={styles.listContainerStyle}
       />
       <TracyBtn />
     </View>
@@ -461,12 +431,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-  listContainerStyle: { paddingTop: 18, paddingHorizontal: 6 },
+  listContainerStyle: { paddingTop: 14 },
   bottomEnd: {
     textAlign: 'center',
     color: '#999',
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 10,
   },
   emptyText: {
     textAlign: 'center',

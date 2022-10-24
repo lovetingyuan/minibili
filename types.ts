@@ -38,3 +38,10 @@ export const enum DynamicType {
   ForwardDraw = 'ForwardDraw',
   ForwardOther = 'ForwardOther',
 }
+
+export interface UserInfo {
+  mid: number | string;
+  name: string;
+  face: string;
+  sign: string;
+}

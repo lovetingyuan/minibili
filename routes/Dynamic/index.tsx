@@ -7,7 +7,6 @@ import {
   ToastAndroid,
   BackHandler,
   Image,
-  // TouchableOpacity,
 } from 'react-native';
 import { getDynamicItems } from '../../services/Bilibili';
 import { DynamicItem, DynamicType } from '../../types';
@@ -17,9 +16,9 @@ import RichTextItem from './RichTextItem';
 import VideoItem from './VideoItem';
 import { RootStackParamList } from '../../types';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { AppContext } from '../../context';
 import WordItem from './WordItem';
-// import ButtonsOverlay from '../../components/ButtonsOverlay';
+import store from '../../valtio/store';
+import { useSnapshot } from 'valtio';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>;
 
@@ -38,7 +37,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   });
   const [loading, setLoading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
-  const { specialUser } = React.useContext(AppContext);
+  const { specialUser } = useSnapshot(store);
   const upId = route.params?.mid || specialUser?.mid;
   const dynamicListRef = React.useRef<FlatList | null>(null);
   const [initLoad, setInitLoad] = React.useState(true);
@@ -52,10 +51,11 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       if (!navigation.isFocused()) {
         return;
       }
-      dynamicListRef.current?.scrollToIndex({
-        index: 0,
-        animated: true,
-      });
+      dynamicItems.length &&
+        dynamicListRef.current?.scrollToIndex({
+          index: 0,
+          animated: true,
+        });
     });
     return unsubscribe;
   }, [navigation]);
