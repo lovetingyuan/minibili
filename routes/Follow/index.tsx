@@ -27,6 +27,7 @@ import * as Application from 'expo-application';
 import useDialog from '../../hooks/useDialog';
 import store from '../../valtio/store';
 import { useSnapshot } from 'valtio';
+import { Badge } from '@rneui/base';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
@@ -47,7 +48,7 @@ const githubLink = 'https://github.com/lovetingyuan/minibili';
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
-  const { specialUser, userInfo } = useSnapshot(store);
+  const { specialUser, userInfo, updatedUps } = useSnapshot(store);
   const [ups, setUps] = React.useState<UpItem[]>([]);
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -131,7 +132,7 @@ export default function Follow({ navigation, route }: Props) {
         });
     });
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, ups]);
   const [modalVisible, setModalVisible] = React.useState(false);
 
   const renderItem = ({ item }: { item: UpItem }) => {
@@ -214,6 +215,8 @@ export default function Follow({ navigation, route }: Props) {
     }
   }
 
+  const updateCount = Object.values(updatedUps).filter(Boolean).length;
+
   return (
     <View style={styles.container}>
       {dialog}
@@ -271,14 +274,25 @@ export default function Follow({ navigation, route }: Props) {
         <Text style={styles.listTitle}>
           关注列表
           <Text style={{ fontSize: 14 }}>({followedNum})</Text>：{' '}
-          {Object.values(store.updatedUps).filter(Boolean).length > 0 ? (
-            <Image
-              source={require('../../assets/new.png')}
-              style={styles.newIcon}
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.updateTime}>{updateText}</Text>
+          {updateCount > 0 ? (
+            <Badge
+              status="success"
+              value={updateCount >= 100 ? '99+' : updateCount}
+              badgeStyle={{
+                height: 13,
+                width: updateCount >= 100 ? 26 : updateCount < 10 ? 10 : 20,
+                backgroundColor: '#fb7299',
+              }}
+              textStyle={{ fontSize: 10 }}
+              containerStyle={{
+                marginLeft: 5,
+              }}
             />
           ) : null}
-        </Text>
-        <Text style={styles.updateTime}>{updateText}</Text>
+        </View>
       </View>
       <FlatList
         data={displayUps}

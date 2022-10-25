@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
+  // FlatList,
   ToastAndroid,
   Alert,
   Linking,
@@ -14,23 +14,24 @@ import { getHotList } from '../../services/Bilibili';
 import HotItem from './HotItem';
 import TracyBtn from '../../components/TracyBtn';
 import handleShare from '../../services/Share';
-import { addBlackUser, getBlackUps } from './blackUps';
+// import { addBlackUser, getBlackUps } from './blackUps';
 import { GetFuncPromiseType } from '../../types';
 import { RootStackParamList } from '../../types';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import { TracyId } from '../../constants';
-import { addBlackTag, getBlackTags } from './blackTags';
+// import { addBlackTag, getBlackTags } from './blackTags';
 import useDialog from '../../hooks/useDialog';
 import { FlashList } from '@shopify/flash-list';
+import store from '../../valtio/store';
+import { useSnapshot } from 'valtio';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>;
 
 type VideoItem = GetFuncPromiseType<typeof getHotList>['list'][0];
 
 export default function Hot({ navigation, route }: Props) {
-  // console.log(932424, route.params);
   const [state, setState] = React.useState<{
     page: number;
     list: [VideoItem, VideoItem?][];
@@ -48,8 +49,11 @@ export default function Hot({ navigation, route }: Props) {
       videosIdMap[second.bvid] = true;
     }
   });
-  const hotListRef = React.useRef<FlatList | null>(null);
+  const hotListRef = React.useRef<any>(null);
   const [initLoad, setInitLoad] = React.useState(true);
+  const { blackUps, blackTags } = useSnapshot(store);
+  // const snapshot = useSnapshot(store);
+  // console.log(932424, route.name);
 
   if (!initLoad) {
     SplashScreen.hideAsync();
@@ -62,13 +66,12 @@ export default function Hot({ navigation, route }: Props) {
         return;
       }
       state.list.length &&
-        hotListRef.current?.scrollToIndex({
-          index: 0,
-          animated: true,
+        hotListRef.current?.scrollToOffset({
+          offset: 0,
         });
     });
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, state.list]);
 
   const { dialog, toggleDialog } = useDialog('不再看');
 
@@ -76,23 +79,22 @@ export default function Hot({ navigation, route }: Props) {
     if (!route.params?.query) {
       return;
     }
-    Promise.all([getBlackUps, getBlackTags]).then(([blackUps, tags]) => {
-      toggleDialog(
-        <>
-          <Text>
-            {Object.keys(blackUps).length
-              ? `UP(${Object.keys(blackUps).length})：${Object.values(blackUps)
-                  .filter(v => typeof v === 'string')
-                  .join(', ')}`
-              : 'UP：暂无'}
-          </Text>
-          <Text> </Text>
-          <Text>
-            {Object.keys(tags).length
-              ? `类型：${Object.keys(tags).join(', ')}`
-              : '类型：暂无'}
-          </Text>
-          {/* <View
+    toggleDialog(
+      <>
+        <Text>
+          {Object.keys(blackUps).length
+            ? `UP(${Object.keys(blackUps).length})：${Object.values(blackUps)
+                .filter(v => typeof v === 'string')
+                .join(', ')}`
+            : 'UP：暂无'}
+        </Text>
+        <Text> </Text>
+        <Text>
+          {Object.keys(blackTags).length
+            ? `类型：${Object.keys(blackTags).join(', ')}`
+            : '类型：暂无'}
+        </Text>
+        {/* <View
             style={{
               flexDirection: 'row',
               marginTop: 5,
@@ -101,9 +103,8 @@ export default function Hot({ navigation, route }: Props) {
             <Text>不看已看过的</Text>
             <Switch value={hideWatched} onValueChange={filterWatched} />
           </View> */}
-        </>,
-      );
-    });
+      </>,
+    );
   }, [route.params?.query]);
   const loadingRef = React.useRef(false);
   const moreRef = React.useRef(true);
@@ -113,68 +114,80 @@ export default function Hot({ navigation, route }: Props) {
     if (!currentVideoRef.current) {
       return;
     }
-    const blackUps = await addBlackUser(
-      currentVideoRef.current.mid,
-      currentVideoRef.current.name,
-    );
-    const newList: [VideoItem, VideoItem?][] = [];
-    let current: [VideoItem?, VideoItem?] = [];
-    for (let [item1, item2] of state.list) {
-      if (!(item1.mid in blackUps)) {
-        current.push(item1);
-        if (current.length === 2) {
-          newList.push(current as [VideoItem, VideoItem]);
-          current = [];
-        }
-      }
-      if (item2 && !(item2.mid in blackUps)) {
-        current.push(item2);
-        if (current.length === 2) {
-          newList.push(current as [VideoItem, VideoItem]);
-          current = [];
-        }
-      }
-    }
-    if (current.length) {
-      newList.push(current as [VideoItem, VideoItem?]);
-    }
-    setState({
-      ...state,
-      list: newList,
-    });
+    const { mid, name } = currentVideoRef.current;
+    store.blackUps['_' + mid] = name;
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentVideoRef.current]);
-  const addBlackTagName = React.useCallback(async () => {
+  const addBlackTagName = () => {
     if (!currentVideoRef.current) {
       return;
     }
-    const blackTags = await addBlackTag(currentVideoRef.current.tag);
-    const newList: [VideoItem, VideoItem?][] = [];
-    let current: [VideoItem?, VideoItem?] = [];
-    for (let [item1, item2] of state.list) {
-      if (!(item1.tag in blackTags)) {
-        current.push(item1);
-        if (current.length === 2) {
-          newList.push(current as [VideoItem, VideoItem]);
-          current = [];
-        }
-      }
-      if (item2 && !(item2.tag in blackTags)) {
-        current.push(item2);
-        if (current.length === 2) {
-          newList.push(current as [VideoItem, VideoItem]);
-          current = [];
-        }
-      }
-    }
-    if (current.length) {
-      newList.push(current as [VideoItem, VideoItem?]);
-    }
-    setState({
-      ...state,
-      list: newList,
-    });
-  }, [currentVideoRef.current]);
+    const { tag } = currentVideoRef.current;
+    store.blackTags[tag] = true;
+    // console.log(242342, store.blackTags);
+    // const blackTags = await addBlackTag(currentVideoRef.current.tag);
+  };
+
+  // React.useEffect(() => {
+  //   if (!Object.keys(blackTags).length) {
+  //     return;
+  //   }
+  //   console.log('tag changed', blackTags, state.list[0]?.[1]);
+  //   const newList: [VideoItem, VideoItem?][] = [];
+  //   let current: [VideoItem?, VideoItem?] = [];
+  //   for (let [item1, item2] of state.list) {
+  //     if (!(item1.tag in blackTags)) {
+  //       current.push(item1);
+  //       if (current.length === 2) {
+  //         newList.push(current as [VideoItem, VideoItem]);
+  //         current = [];
+  //       }
+  //     }
+  //     if (item2 && !(item2.tag in blackTags)) {
+  //       current.push(item2);
+  //       if (current.length === 2) {
+  //         newList.push(current as [VideoItem, VideoItem]);
+  //         current = [];
+  //       }
+  //     }
+  //   }
+  //   if (current.length) {
+  //     newList.push(current as [VideoItem, VideoItem?]);
+  //   }
+  //   setState({
+  //     ...state,
+  //     list: newList,
+  //   });
+  //   console.log('5555555555', newList[0]);
+  // }, [blackTags]);
+  // React.useEffect(() => {
+  //   const newList: [VideoItem, VideoItem?][] = [];
+  //   let current: [VideoItem?, VideoItem?] = [];
+  //   for (let [item1, item2] of state.list) {
+  //     if (!(item1.mid in blackUps)) {
+  //       current.push(item1);
+  //       if (current.length === 2) {
+  //         newList.push(current as [VideoItem, VideoItem]);
+  //         current = [];
+  //       }
+  //     }
+  //     if (item2 && !(item2.mid in blackUps)) {
+  //       current.push(item2);
+  //       if (current.length === 2) {
+  //         newList.push(current as [VideoItem, VideoItem]);
+  //         current = [];
+  //       }
+  //     }
+  //   }
+  //   if (current.length) {
+  //     newList.push(current as [VideoItem, VideoItem?]);
+  //   }
+  //   setState({
+  //     ...state,
+  //     list: newList,
+  //   });
+  // }, [blackUps]);
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a');
     return (
@@ -240,8 +253,6 @@ export default function Hot({ navigation, route }: Props) {
       return;
     }
     loadingRef.current = true;
-    const blackUps = await getBlackUps;
-    const blackTags = await getBlackTags;
 
     getHotList(state.page)
       .then(
@@ -250,12 +261,13 @@ export default function Hot({ navigation, route }: Props) {
           const last = state.list[state.list.length - 1];
           list = list.filter(v => {
             if (videosIdMap[v.bvid]) {
+              // 为了去重，有时候会有重复的视频
               return false;
             }
             if (v.tag in blackTags) {
               return false;
             }
-            if (v.mid in blackUps) {
+            if ('_' + v.mid in blackUps) {
               return false;
             }
             // if (hideWatched && v.mid in playedVideos) {
@@ -287,6 +299,10 @@ export default function Hot({ navigation, route }: Props) {
             page: state.page + 1,
             list: state.list.concat(viewList),
           });
+          // console.log(2222, blackTags, blackUps, store.blackTags);
+          // 为了触发过滤，因为black是异步数据，第一次快照的black列表还是空的
+          // store.blackTags = { ...store.blackTags };
+          // store.blackUps = { ...store.blackUps };
         },
         err => {
           __DEV__ && console.log(err);
@@ -380,6 +396,27 @@ export default function Hot({ navigation, route }: Props) {
       name: 'openApp',
     },
   ].filter(Boolean);
+  const hotVideoList: [VideoItem, VideoItem?][] = [];
+  let current: [VideoItem?, VideoItem?] = [];
+  for (let [item1, item2] of state.list) {
+    if (!('_' + item1.mid in blackUps) && !(item1.tag in blackTags)) {
+      current.push(item1);
+      if (current.length === 2) {
+        hotVideoList.push(current as [VideoItem, VideoItem]);
+        current = [];
+      }
+    }
+    if (item2 && !('_' + item2.mid in blackUps) && !(item2.tag in blackTags)) {
+      current.push(item2);
+      if (current.length === 2) {
+        hotVideoList.push(current as [VideoItem, VideoItem]);
+        current = [];
+      }
+    }
+  }
+  if (current.length) {
+    hotVideoList.push(current as [VideoItem, VideoItem?]);
+  }
   return (
     <View style={styles.container}>
       {dialog}
@@ -391,8 +428,10 @@ export default function Hot({ navigation, route }: Props) {
         dismiss={() => setModalVisible(false)}
       />
       <FlashList
-        ref={hotListRef}
-        data={state.list}
+        ref={v => {
+          hotListRef.current = v;
+        }}
+        data={hotVideoList}
         renderItem={renderItem}
         estimatedItemSize={200}
         ListEmptyComponent={

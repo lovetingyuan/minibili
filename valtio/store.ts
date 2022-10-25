@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { proxy } from 'valtio';
 import { watch } from 'valtio/utils';
-// import biliOfficialUser from '../constants/bili-official-user';
 import { UserInfo } from '../types';
 
 const syncStoreKeys = [
@@ -14,7 +13,7 @@ const syncStoreKeys = [
 ];
 
 const store = proxy<{
-  blackUps: Record<string, { mid: string; name: string }>;
+  blackUps: Record<string, string>;
   blackTags: Record<string, boolean>;
   userInfo: UserInfo;
   specialUser: UserInfo;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-// import { AppContext } from '../../context';
 import { getHotList } from '../../services/Bilibili';
 import { GetFuncPromiseType } from '../../types';
 import store from '../../valtio/store';
@@ -26,7 +25,7 @@ export default React.memo(function HotItem({
   video: HotVideo;
   itemStyle: any;
 }) {
-  __DEV__ && console.log('hot video', video.title);
+  // __DEV__ && console.log('hot video', video.title);
   const playNum = (video.playNum / 10000).toFixed(1) + '万';
   const { specialUser } = useSnapshot(store);
   const isTracy = video.mid.toString() === specialUser.mid;

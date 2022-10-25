@@ -1,5 +1,5 @@
 import { ToastAndroid } from 'react-native';
-import { getBlackUps } from '../routes/Hot/blackUps';
+// import { getBlackUps } from '../routes/Hot/blackUps';
 import { DynamicType } from '../types';
 import { URL } from 'react-native-url-polyfill';
 
@@ -453,7 +453,7 @@ export async function getHotList(page = 1) {
     tname: string;
     videos: number;
   }
-  const blackUps = await getBlackUps;
+  // const blackUps = await getBlackUps;
   const data = await request<{
     list: Hot[];
     no_more: boolean;
@@ -464,27 +464,23 @@ export async function getHotList(page = 1) {
   const { no_more, list } = data;
   return {
     more: !no_more,
-    list: list
-      .filter(item => {
-        return !(item.owner.mid in blackUps);
-      })
-      .map(item => {
-        return {
-          aid: item.aid,
-          bvid: item.bvid,
-          cid: item.cid,
-          title: item.title,
-          cover: item.pic,
-          duration: item.duration,
-          pubDate: item.pubdate,
-          name: item.owner.name,
-          mid: item.owner.mid,
-          playNum: item.stat.view,
-          shareNum: item.stat.share,
-          tag: item.tname,
-          videosNum: item.videos,
-        };
-      }),
+    list: list.map(item => {
+      return {
+        aid: item.aid,
+        bvid: item.bvid,
+        cid: item.cid,
+        title: item.title,
+        cover: item.pic,
+        duration: item.duration,
+        pubDate: item.pubdate,
+        name: item.owner.name,
+        mid: item.owner.mid,
+        playNum: item.stat.view,
+        shareNum: item.stat.share,
+        tag: item.tname,
+        videosNum: item.videos,
+      };
+    }),
   };
 }
 

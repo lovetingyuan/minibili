@@ -58,7 +58,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         });
     });
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, dynamicItems]);
 
   React.useEffect(() => {
     const follow = route.params?.follow;
