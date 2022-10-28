@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { FAB, Avatar } from '@rneui/themed';
+import { FAB, Avatar } from '@rneui/base';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { useSnapshot } from 'valtio';

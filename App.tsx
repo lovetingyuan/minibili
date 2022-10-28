@@ -7,7 +7,19 @@
 //   debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 // });
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 import Main from './Main';
+
+AsyncStorage.getItem('FIRST_RUN').then(res => {
+  if (!res) {
+    Alert.alert(
+      '使用说明',
+      '本App为超简易版B站，所有数据均为官方公开，请勿频繁刷新',
+    );
+  }
+  AsyncStorage.setItem('FIRST_RUN', 'false');
+});
 
 export default Main;
 

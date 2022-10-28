@@ -14,14 +14,12 @@ import { getHotList } from '../../services/Bilibili';
 import HotItem from './HotItem';
 import TracyBtn from '../../components/TracyBtn';
 import handleShare from '../../services/Share';
-// import { addBlackUser, getBlackUps } from './blackUps';
 import { GetFuncPromiseType } from '../../types';
 import { RootStackParamList } from '../../types';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import { TracyId } from '../../constants';
-// import { addBlackTag, getBlackTags } from './blackTags';
 import useDialog from '../../hooks/useDialog';
 import { FlashList } from '@shopify/flash-list';
 import store from '../../valtio/store';
@@ -110,84 +108,20 @@ export default function Hot({ navigation, route }: Props) {
   const moreRef = React.useRef(true);
   const currentVideoRef = React.useRef<VideoItem | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const addBlackUp = React.useCallback(async () => {
+  const addBlackUp = () => {
     if (!currentVideoRef.current) {
       return;
     }
     const { mid, name } = currentVideoRef.current;
     store.blackUps['_' + mid] = name;
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentVideoRef.current]);
+  };
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
       return;
     }
     const { tag } = currentVideoRef.current;
     store.blackTags[tag] = true;
-    // console.log(242342, store.blackTags);
-    // const blackTags = await addBlackTag(currentVideoRef.current.tag);
   };
-
-  // React.useEffect(() => {
-  //   if (!Object.keys(blackTags).length) {
-  //     return;
-  //   }
-  //   console.log('tag changed', blackTags, state.list[0]?.[1]);
-  //   const newList: [VideoItem, VideoItem?][] = [];
-  //   let current: [VideoItem?, VideoItem?] = [];
-  //   for (let [item1, item2] of state.list) {
-  //     if (!(item1.tag in blackTags)) {
-  //       current.push(item1);
-  //       if (current.length === 2) {
-  //         newList.push(current as [VideoItem, VideoItem]);
-  //         current = [];
-  //       }
-  //     }
-  //     if (item2 && !(item2.tag in blackTags)) {
-  //       current.push(item2);
-  //       if (current.length === 2) {
-  //         newList.push(current as [VideoItem, VideoItem]);
-  //         current = [];
-  //       }
-  //     }
-  //   }
-  //   if (current.length) {
-  //     newList.push(current as [VideoItem, VideoItem?]);
-  //   }
-  //   setState({
-  //     ...state,
-  //     list: newList,
-  //   });
-  //   console.log('5555555555', newList[0]);
-  // }, [blackTags]);
-  // React.useEffect(() => {
-  //   const newList: [VideoItem, VideoItem?][] = [];
-  //   let current: [VideoItem?, VideoItem?] = [];
-  //   for (let [item1, item2] of state.list) {
-  //     if (!(item1.mid in blackUps)) {
-  //       current.push(item1);
-  //       if (current.length === 2) {
-  //         newList.push(current as [VideoItem, VideoItem]);
-  //         current = [];
-  //       }
-  //     }
-  //     if (item2 && !(item2.mid in blackUps)) {
-  //       current.push(item2);
-  //       if (current.length === 2) {
-  //         newList.push(current as [VideoItem, VideoItem]);
-  //         current = [];
-  //       }
-  //     }
-  //   }
-  //   if (current.length) {
-  //     newList.push(current as [VideoItem, VideoItem?]);
-  //   }
-  //   setState({
-  //     ...state,
-  //     list: newList,
-  //   });
-  // }, [blackUps]);
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a');
     return (
@@ -248,7 +182,7 @@ export default function Hot({ navigation, route }: Props) {
       </View>
     );
   };
-  const loadMoreHotItems = async () => {
+  const loadMoreHotItems = () => {
     if (loadingRef.current || !moreRef.current) {
       return;
     }
@@ -299,10 +233,6 @@ export default function Hot({ navigation, route }: Props) {
             page: state.page + 1,
             list: state.list.concat(viewList),
           });
-          // console.log(2222, blackTags, blackUps, store.blackTags);
-          // 为了触发过滤，因为black是异步数据，第一次快照的black列表还是空的
-          // store.blackTags = { ...store.blackTags };
-          // store.blackUps = { ...store.blackUps };
         },
         err => {
           __DEV__ && console.log(err);
@@ -328,7 +258,7 @@ export default function Hot({ navigation, route }: Props) {
     loadMoreHotItems();
   }
 
-  const onShare = async () => {
+  const onShare = () => {
     if (currentVideoRef.current) {
       setModalVisible(false);
       const { name, title, bvid } = currentVideoRef.current;

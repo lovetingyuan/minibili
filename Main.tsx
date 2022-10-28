@@ -6,6 +6,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  View,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
@@ -20,9 +21,10 @@ import { checkWifi } from './hooks/useNetStatusToast';
 import { RootStackParamList } from './types';
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
 import CheckLiving from './components/CheckLiving';
-import { Button } from '@rneui/themed';
+import { Button } from '@rneui/base';
 import store from './valtio/store';
 import { useSnapshot } from 'valtio';
+import { Badge } from '@rneui/base';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -30,7 +32,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 SplashScreen.preventAutoHideAsync();
 checkWifi();
 
-const getLabel = (text: string) => {
+const getLabel = (text: string, updatedCount?: number) => {
   const labelCmp: (props: {
     focused: boolean;
     color: string;
@@ -43,13 +45,37 @@ const getLabel = (text: string) => {
         fontWeight: props.focused ? 'bold' : 'normal',
       },
     });
+    if (text === '我的' && updatedCount) {
+      return (
+        <View>
+          <Badge
+            status="success"
+            value={updatedCount >= 100 ? '99+' : updatedCount}
+            badgeStyle={{
+              height: 13,
+              width: updatedCount >= 100 ? 26 : updatedCount < 10 ? 10 : 20,
+              backgroundColor: '#fb7299',
+              position: 'absolute',
+              left: 24,
+            }}
+            textStyle={{ fontSize: 10 }}
+            containerStyle={{
+              marginLeft: 5,
+            }}
+          />
+          <Text style={css.text}>{text}</Text>
+        </View>
+      );
+    }
     return <Text style={css.text}>{text}</Text>;
   };
   return labelCmp;
 };
 
 const Main = () => {
-  const { dynamicUser } = useSnapshot(store);
+  const { dynamicUser, updatedUps } = useSnapshot(store);
+  const updateCount = Object.values(updatedUps).filter(Boolean).length;
+
   return (
     <Tab.Navigator
       initialRouteName="Hot"
@@ -107,7 +133,7 @@ const Main = () => {
         name="Follow"
         component={Follow}
         options={{
-          tabBarLabel: getLabel('我的'),
+          tabBarLabel: getLabel('我的', updateCount),
         }}
       />
     </Tab.Navigator>

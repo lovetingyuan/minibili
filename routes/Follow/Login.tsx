@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Button, Icon } from '@rneui/themed';
+import { Input, Button, Icon } from '@rneui/base';
 import {
   View,
   Text,

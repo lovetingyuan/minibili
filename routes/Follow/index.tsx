@@ -9,7 +9,7 @@ import {
   Image,
   Linking,
 } from 'react-native';
-import { Avatar } from '@rneui/themed';
+import { Avatar, Badge } from '@rneui/base';
 import FollowItem from './FollowItem';
 import {
   getFansData,
@@ -27,7 +27,7 @@ import * as Application from 'expo-application';
 import useDialog from '../../hooks/useDialog';
 import store from '../../valtio/store';
 import { useSnapshot } from 'valtio';
-import { Badge } from '@rneui/base';
+// import { Badge } from '@rneui/base';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
@@ -48,7 +48,7 @@ const githubLink = 'https://github.com/lovetingyuan/minibili';
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
-  const { specialUser, userInfo, updatedUps } = useSnapshot(store);
+  const { specialUser, userInfo, livingUps } = useSnapshot(store);
   const [ups, setUps] = React.useState<UpItem[]>([]);
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -170,6 +170,7 @@ export default function Follow({ navigation, route }: Props) {
     setLoading(false);
     setFollowedNum(0);
     setPage(1);
+    store.updatedUps = {};
   };
   const version = Application.nativeApplicationVersion;
 
@@ -215,7 +216,7 @@ export default function Follow({ navigation, route }: Props) {
     }
   }
 
-  const updateCount = Object.values(updatedUps).filter(Boolean).length;
+  // const updateCount = Object.values(updatedUps).filter(Boolean).length;
 
   return (
     <View style={styles.container}>
@@ -277,16 +278,16 @@ export default function Follow({ navigation, route }: Props) {
         </Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={styles.updateTime}>{updateText}</Text>
-          {updateCount > 0 ? (
+          {Object.values(livingUps).filter(Boolean).length ? (
             <Badge
               status="success"
-              value={updateCount >= 100 ? '99+' : updateCount}
+              value={'有直播'}
               badgeStyle={{
-                height: 13,
-                width: updateCount >= 100 ? 26 : updateCount < 10 ? 10 : 20,
-                backgroundColor: '#fb7299',
+                height: 15,
+                width: 42,
+                backgroundColor: '#00a1d6',
               }}
-              textStyle={{ fontSize: 10 }}
+              textStyle={{ fontSize: 11 }}
               containerStyle={{
                 marginLeft: 5,
               }}

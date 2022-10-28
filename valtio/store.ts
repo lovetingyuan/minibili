@@ -21,6 +21,7 @@ const store = proxy<{
   watchedVideos: Record<string, any>;
   dynamicUser: any;
   updatedUps: Record<string, boolean>;
+  livingUps: Record<string, boolean>;
 }>({
   blackUps: {},
   blackTags: {},
@@ -36,6 +37,7 @@ const store = proxy<{
   // ----
   dynamicUser: {},
   updatedUps: {},
+  livingUps: {},
 });
 
 Promise.all(

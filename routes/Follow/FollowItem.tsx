@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { getFollowUps, getLiveStatus } from '../../services/Bilibili';
-import { Avatar } from '@rneui/themed';
+import { Avatar } from '@rneui/base';
 import { checkDynamics, setLatest } from '../../services/Updates';
 import { useNavigation } from '@react-navigation/native';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
@@ -51,24 +51,26 @@ export default React.memo(
     const navigation = useNavigation<NavigationProps['navigation']>();
     const [loading, setLoading] = React.useState(false);
     const updateData = React.useCallback(() => {
-      return allSettled([checkDynamics(mid), getLiveStatus(mid)]).then(
-        ([a, b]) => {
-          if (a.status === 'fulfilled' && a.value) {
-            setUpdatedId(a.value);
-            store.updatedUps[mid] = true;
-          }
-          if (b.status === 'fulfilled') {
-            const { living, roomId } = b.value;
-            setLiving({
-              living,
-              liveUrl: 'https://live.bilibili.com/' + roomId,
-            });
-          }
-          if (a.status === 'fulfilled' && b.status === 'fulfilled') {
-            setLoading(false);
-          }
-        },
-      );
+      return allSettled([
+        updatedId ? Promise.resolve('') : checkDynamics(mid),
+        getLiveStatus(mid),
+      ]).then(([a, b]) => {
+        if (a.status === 'fulfilled' && a.value) {
+          setUpdatedId(a.value);
+          store.updatedUps[mid] = true;
+        }
+        if (b.status === 'fulfilled') {
+          const { living, roomId } = b.value;
+          setLiving({
+            living,
+            liveUrl: 'https://live.bilibili.com/' + roomId,
+          });
+          store.livingUps[mid] = living;
+        }
+        if (a.status === 'fulfilled' && b.status === 'fulfilled') {
+          setLoading(false);
+        }
+      });
     }, [mid]);
     React.useEffect(() => {
       if (loading) {

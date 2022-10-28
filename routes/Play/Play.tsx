@@ -20,9 +20,21 @@ import Comment from '../../components/Comment';
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
 function __hack() {
+  function debounce(func: (...a: any) => any, delay: number) {
+    let timer: any;
+    func();
+    return function (this: any, ...args: any) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        func.call(this, ...args);
+      }, delay);
+    };
+  }
   const timer = setInterval(() => {
-    const player = document.querySelector('.mplayer-load-layer');
-    if (player) {
+    const player = document.querySelector<HTMLDivElement>(
+      '.mplayer-load-layer',
+    );
+    if (player && player.style.display !== 'none') {
       (player as HTMLDivElement).click();
       document.querySelector('video')?.play();
       clearInterval(timer);
@@ -66,12 +78,76 @@ function __hack() {
         });
       });
       postPlayState(video.paused ? 'pause' : 'play');
+      video.addEventListener('canplay', () => {
+        const { videoWidth, videoHeight } = video;
+        const right = document.querySelector('.mplayer-right');
+        if (
+          videoWidth < videoHeight &&
+          right &&
+          !document.getElementById('arrow-btn')
+        ) {
+          const arrowBtn = document.createElement('div');
+          arrowBtn.innerHTML = '&dArr;';
+          arrowBtn.id = 'arrow-btn';
+          arrowBtn.dataset.direction = 'down';
+          arrowBtn.style.cssText = `
+          width: 36px;
+          height: 36px;
+          color: white;
+          text-align: center;
+          font-size: 30px;
+          transform: scale(1.2, 1);
+          `;
+          arrowBtn.addEventListener(
+            'click',
+            debounce(() => {
+              const direction = arrowBtn.dataset.direction;
+              if (direction === 'up') {
+                arrowBtn.dataset.direction = 'down';
+                arrowBtn.innerHTML = '&dArr;';
+              } else {
+                arrowBtn.dataset.direction = 'up';
+                arrowBtn.innerHTML = '&uArr;';
+              }
+              ((window as any).ReactNativeWebView as WebView).postMessage(
+                JSON.stringify({
+                  action: 'change-video-height',
+                  payload: direction,
+                }),
+              );
+            }, 500),
+          );
+          right.appendChild(arrowBtn);
+        }
+      });
     }
   }, 200);
+  const timer4 = setInterval(() => {
+    const right = document.querySelector('.mplayer-right');
+    if (!right) {
+      return;
+    }
+    clearInterval(timer4);
+    const reloadBtn = document.createElement('div');
+    reloadBtn.innerHTML = '&orarr;';
+    reloadBtn.style.cssText = `
+    width: 36px;
+    height: 36px;
+    color: white;
+    font-size: 28px;
+    text-align: center;
+    transform: rotate(90deg);
+    `;
+    reloadBtn.addEventListener('click', () => {
+      location.reload();
+    });
+    right.appendChild(reloadBtn);
+  }, 100);
   setTimeout(() => {
     clearInterval(timer);
     clearInterval(timer2);
     clearInterval(timer3);
+    clearInterval(timer4);
   }, 5000);
 }
 const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`;
@@ -107,11 +183,9 @@ const parseDate = (time?: number) => {
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
-// import { AppContext } from '../../context';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import store from '../../valtio/store';
 import { useSnapshot } from 'valtio';
-// import { Button } from '@rneui/themed';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
 
@@ -144,6 +218,8 @@ export default ({ route, navigation }: Props) => {
     });
   }, [bvid, aid]);
 
+  const [verticalScale, setVerticalScale] = React.useState(0.4);
+
   React.useEffect(() => {
     const vi = videoInfo;
     if (!vi) {
@@ -156,9 +232,9 @@ export default ({ route, navigation }: Props) => {
     if (videoWidth >= videoHeight) {
       setVideoViewHeight((videoHeight / videoWidth) * width + 80);
     } else {
-      setVideoViewHeight(height * 0.4);
+      setVideoViewHeight(height * verticalScale);
     }
-  }, [videoInfo, width, height, currentPage]);
+  }, [videoInfo, width, height, currentPage, verticalScale]);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -253,6 +329,9 @@ export default ({ route, navigation }: Props) => {
                   KeepAwake.deactivateKeepAwake('PLAY');
                 }
               }
+              if (data.action === 'change-video-height') {
+                setVerticalScale(data.payload === 'up' ? 0.4 : 0.7);
+              }
             } catch (e) {}
           }}
           onError={() => {
@@ -271,7 +350,24 @@ export default ({ route, navigation }: Props) => {
           }}
         />
       </View>
+      {/* <View>
+        <Image
+          source={require('../../assets/up.png')}
+          style={{ width: 30, height: 15 }}
+        />
+      </View> */}
       <ScrollView style={styles.videoInfoContainer}>
+        {/* <View style={{ alignItems: 'center', position: 'absolute', top: -20 }}>
+          <Pressable
+            onPress={() => {
+              setVerticalScale(verticalScale === 0.4 ? 0.7 : 0.4);
+            }}>
+            <Image
+              source={require('../../assets/down.png')}
+              style={{ width: 30, height: 15 }}
+            />
+          </Pressable>
+        </View> */}
         <View style={styles.videoHeader}>
           <Pressable
             onPress={() => {
@@ -405,22 +501,6 @@ export default ({ route, navigation }: Props) => {
             {videoInfo?.tname}
           </Text>
         </View>
-        {/* <Divider inset={true} insetType="middle" /> */}
-        {/* <Divider
-          style={{
-            width: '30%',
-            flex: 1,
-            flexDirection: 'row',
-            marginVertical: 20,
-          }}
-          color="#ddd"
-          insetType="left"
-          subHeader={videoInfo?.tname}
-          subHeaderStyle={{ fontSize: 14 }}
-          width={1}
-          orientation="horizontal"
-        /> */}
-        {/* </View> */}
         {comments?.length ? (
           comments.map((comment, i) => {
             return (

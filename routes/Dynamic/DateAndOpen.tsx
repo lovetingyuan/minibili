@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/core';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Icon } from '@rneui/themed';
+import { Icon } from '@rneui/base';
 import React from 'react';
 import {
   Image,

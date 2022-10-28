@@ -7,7 +7,7 @@ import {
   StatusBar,
   Image,
 } from 'react-native';
-import { Avatar } from '@rneui/themed';
+import { Avatar } from '@rneui/base';
 import {
   getFansData,
   getLiveStatus,
