@@ -20,10 +20,10 @@ const parseDuration = (duration: number) => {
 
 export default React.memo(function HotItem({
   video,
-  itemStyle,
-}: {
+}: // itemStyle,
+{
   video: HotVideo;
-  itemStyle: any;
+  // itemStyle: any;
 }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = (video.playNum / 10000).toFixed(1) + '万';
@@ -32,7 +32,7 @@ export default React.memo(function HotItem({
   const { watchedVideos } = useSnapshot(store);
   const watched = watchedVideos[video.bvid];
   return (
-    <View style={[styles.itemContainer, itemStyle]}>
+    <View style={[styles.itemContainer]}>
       <View style={{ flex: 1 }}>
         <Image
           style={[styles.image, watched ? { opacity: 0.6 } : null]}

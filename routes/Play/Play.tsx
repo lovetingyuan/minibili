@@ -12,24 +12,15 @@ import {
 import { WebView } from 'react-native-webview';
 import { getVideoComments, getVideoInfo } from '../../services/Bilibili';
 import { Avatar, ButtonGroup, Icon } from '@rneui/base';
-import useNetStatusToast from '../../hooks/useNetStatusToast';
-import handleShare from '../../services/Share';
+// import useNetStatusToast from '../../hooks/useNetStatusToast';
+import { handleShareVideo } from '../../services/Share';
 import * as KeepAwake from 'expo-keep-awake';
 import Comment from '../../components/Comment';
 // https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
+// https://www.bilibili.com/blackboard/html5mobileplayer.html?bvid=BV1BN4y1G7tx&page=1&posterFirst=1
 function __hack() {
-  function debounce(func: (...a: any) => any, delay: number) {
-    let timer: any;
-    func();
-    return function (this: any, ...args: any) {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        func.call(this, ...args);
-      }, delay);
-    };
-  }
   const timer = setInterval(() => {
     const player = document.querySelector<HTMLDivElement>(
       '.mplayer-load-layer',
@@ -69,16 +60,7 @@ function __hack() {
     const video = document.querySelector('video');
     if (video) {
       clearInterval(timer3);
-      video.addEventListener('play', () => {
-        postPlayState('play');
-      });
-      Array('ended', 'pause', 'waiting').forEach(evt => {
-        video.addEventListener(evt, () => {
-          postPlayState('pause');
-        });
-      });
-      postPlayState(video.paused ? 'pause' : 'play');
-      video.addEventListener('canplay', () => {
+      const handleVideoSize = () => {
         const { videoWidth, videoHeight } = video;
         const right = document.querySelector('.mplayer-right');
         if (
@@ -98,27 +80,50 @@ function __hack() {
           font-size: 30px;
           transform: scale(1.2, 1);
           `;
-          arrowBtn.addEventListener(
-            'click',
-            debounce(() => {
-              const direction = arrowBtn.dataset.direction;
-              if (direction === 'up') {
-                arrowBtn.dataset.direction = 'down';
-                arrowBtn.innerHTML = '&dArr;';
-              } else {
-                arrowBtn.dataset.direction = 'up';
-                arrowBtn.innerHTML = '&uArr;';
-              }
-              ((window as any).ReactNativeWebView as WebView).postMessage(
-                JSON.stringify({
-                  action: 'change-video-height',
-                  payload: direction,
-                }),
-              );
-            }, 500),
-          );
+          arrowBtn.addEventListener('click', () => {
+            const direction = arrowBtn.dataset.direction;
+            if (direction === 'up') {
+              arrowBtn.dataset.direction = 'down';
+              arrowBtn.innerHTML = '&dArr;';
+            } else {
+              arrowBtn.dataset.direction = 'up';
+              arrowBtn.innerHTML = '&uArr;';
+            }
+            ((window as any).ReactNativeWebView as WebView).postMessage(
+              JSON.stringify({
+                action: 'change-video-height',
+                payload: direction,
+              }),
+            );
+          });
           right.appendChild(arrowBtn);
         }
+      };
+      video.addEventListener('play', () => {
+        postPlayState('play');
+      });
+      Array('ended', 'pause', 'waiting').forEach(evt => {
+        video.addEventListener(evt, () => {
+          postPlayState('pause');
+        });
+      });
+      postPlayState(video.paused ? 'pause' : 'play');
+      if (video.videoWidth) {
+        handleVideoSize();
+      }
+      video.addEventListener('canplay', handleVideoSize);
+      video.addEventListener('ended', () => {
+        const arrowBtn = document.getElementById('arrow-btn');
+        if (arrowBtn) {
+          arrowBtn.dataset.direction = 'down';
+          arrowBtn.innerHTML = '&dArr;';
+        }
+        ((window as any).ReactNativeWebView as WebView).postMessage(
+          JSON.stringify({
+            action: 'change-video-height',
+            payload: 'up',
+          }),
+        );
       });
     }
   }, 200);
@@ -143,12 +148,27 @@ function __hack() {
     });
     right.appendChild(reloadBtn);
   }, 100);
+  const timer5 = setInterval(() => {
+    const poster =
+      document.querySelector<HTMLImageElement>('img.mplayer-poster');
+    if (poster && !poster.dataset.patched) {
+      poster.dataset.patched = 'true';
+      const image = poster.src;
+      // @ts-ignore
+      poster.style.backdropFilter = 'blur(15px)';
+      poster.style.objectFit = 'contain';
+      if (poster.parentElement) {
+        poster.parentElement.style.backgroundImage = `url("${image}")`;
+      }
+    }
+  }, 100);
   setTimeout(() => {
     clearInterval(timer);
     clearInterval(timer2);
     clearInterval(timer3);
     clearInterval(timer4);
-  }, 5000);
+    clearInterval(timer5);
+  }, 4000);
 }
 const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`;
 const Loading = (cover?: string) => {
@@ -180,12 +200,29 @@ const parseDate = (time?: number) => {
     date.getDate()
   );
 };
+import { useNetInfo } from '@react-native-community/netinfo';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import store from '../../valtio/store';
 import { useSnapshot } from 'valtio';
+
+import { debounce } from 'throttle-debounce';
+
+const netTip = debounce(
+  1000,
+  () => {
+    ToastAndroid.showWithGravity(
+      ' 请注意当前网络不是 wifi ',
+      ToastAndroid.LONG,
+      ToastAndroid.CENTER,
+    );
+  },
+  {
+    atBegin: true,
+  },
+);
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
 
@@ -200,8 +237,12 @@ export default ({ route, navigation }: Props) => {
   const { width, height } = useWindowDimensions();
   const [videoViewHeight, setVideoViewHeight] = React.useState(height * 0.4);
   const [currentPage, setCurrentPage] = React.useState(0);
-  // useKeepAwake();
-  const connectType = useNetStatusToast(bvid);
+
+  const { type: connectType } = useNetInfo();
+  if (connectType !== 'wifi' && connectType !== 'unknown') {
+    netTip();
+  }
+
   const { specialUser } = useSnapshot(store);
   const tracyStyle =
     mid && mid.toString() === specialUser?.mid
@@ -246,15 +287,15 @@ export default ({ route, navigation }: Props) => {
   }, [bvid]);
 
   const search = new URLSearchParams();
-  const playUrl = 'https://player.bilibili.com/player.html';
+  const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html';
   Object.entries({
-    aid,
+    // aid,
     bvid,
     autoplay: 1,
     highQuality: connectType === 'wifi' ? 1 : 0,
     quality: connectType === 'wifi' ? 100 : 16,
     portraitFullScreen: true,
-    hasMuteButton: true,
+    // hasMuteButton: true,
     page: currentPage + 1,
   }).forEach(([k, v]) => {
     search.append(k, v + '');
@@ -282,7 +323,7 @@ export default ({ route, navigation }: Props) => {
   // });
   const onShare = useCallback(() => {
     if (videoInfo) {
-      handleShare(name, videoInfo.title, bvid);
+      handleShareVideo(name, videoInfo.title, bvid);
     }
   }, [name, videoInfo, bvid]);
   const isFocused = useIsFocused();
@@ -301,6 +342,13 @@ export default ({ route, navigation }: Props) => {
   ) {
     videoDesc = '';
   }
+  // console.log(99999, videoInfo);
+  // const slices = [];
+  // if (videoInfo) {
+  //   if (videoInfo.pages.length !== videoInfo.videos) {
+
+  //   }
+  // }
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -332,6 +380,9 @@ export default ({ route, navigation }: Props) => {
               if (data.action === 'change-video-height') {
                 setVerticalScale(data.payload === 'up' ? 0.4 : 0.7);
               }
+              if (data.action === 'test') {
+                console.log('sfhskdfs', data.payload);
+              }
             } catch (e) {}
           }}
           onError={() => {
@@ -340,6 +391,9 @@ export default ({ route, navigation }: Props) => {
           }}
           onShouldStartLoadWithRequest={request => {
             // Only allow navigating within this website
+            if (request.url.endsWith('/log-reporter.js')) {
+              return false;
+            }
             if (
               request.url.startsWith('http') &&
               !request.url.includes('.apk')
@@ -350,24 +404,7 @@ export default ({ route, navigation }: Props) => {
           }}
         />
       </View>
-      {/* <View>
-        <Image
-          source={require('../../assets/up.png')}
-          style={{ width: 30, height: 15 }}
-        />
-      </View> */}
       <ScrollView style={styles.videoInfoContainer}>
-        {/* <View style={{ alignItems: 'center', position: 'absolute', top: -20 }}>
-          <Pressable
-            onPress={() => {
-              setVerticalScale(verticalScale === 0.4 ? 0.7 : 0.4);
-            }}>
-            <Image
-              source={require('../../assets/down.png')}
-              style={{ width: 30, height: 15 }}
-            />
-          </Pressable>
-        </View> */}
         <View style={styles.videoHeader}>
           <Pressable
             onPress={() => {
@@ -449,6 +486,8 @@ export default ({ route, navigation }: Props) => {
                   fontSize: 14,
                 }}
               />
+            ) : videoInfo?.videos !== videoInfo?.videosNum ? (
+              <Text>该视频为交互视频，暂不支持</Text>
             ) : null // <ScrollView
             //   horizontal
             //   showsHorizontalScrollIndicator

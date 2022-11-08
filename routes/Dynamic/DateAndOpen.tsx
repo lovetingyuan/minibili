@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import handleShare from '../../services/Share';
+import {handleShareVideo} from '../../services/Share';
 import { RootStackParamList } from '../../types';
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
@@ -30,7 +30,7 @@ export default function DateAndOpen(props: {
         <Text style={styles.date}> {props.date}</Text>
         <Pressable
           onPress={() => {
-            handleShare(props.name, props.title, props.id);
+            handleShareVideo(props.name, props.title, props.id);
           }}>
           <Image
             style={styles.shareImg}

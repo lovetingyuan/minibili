@@ -9,7 +9,6 @@ import {
   Alert,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-// import useNetStatusToast from '../hooks/useNetStatusToast';
 
 function __hack() {
   const style = document.createElement('style');

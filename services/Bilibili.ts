@@ -204,6 +204,17 @@ export async function getDynamicItems(offset = '', uid: string | number) {
       name: string;
     };
   }
+  interface Live {
+    major: {
+      type: 'MAJOR_TYPE_LIVE';
+      live: {
+        cover: string;
+        title: string;
+      };
+    };
+    desc: null;
+    topic: null;
+  }
   interface Res {
     has_more: boolean;
     items: (
@@ -231,7 +242,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
             id_str: string;
             modules: {
               module_author: Author;
-              module_dynamic: AV | Draw | Article | Word | Topic;
+              module_dynamic: AV | Draw | Article | Word | Topic | Live;
               module_tag?: { text: string };
             };
           };
@@ -347,6 +358,21 @@ export async function getDynamicItems(offset = '', uid: string | number) {
                   src: v,
                 };
               }),
+            };
+          }
+          if (forward.major?.type === 'MAJOR_TYPE_LIVE') {
+            return {
+              ...common,
+              type: DynamicType.ForwardVideo as const,
+              forwardText: '直播',
+              title: forward.major?.live.title,
+              cover: forward.major?.live.cover,
+              // images: forward.major?.article?.covers?.map(v => {
+              //   return {
+              //     ratio: 2,
+              //     src: v,
+              //   };
+              // }),
             };
           }
           return {
@@ -730,7 +756,8 @@ export function getVideoInfo(aid: string | number) {
       viewNum: data.stat.view,
       cover: data.pic,
       // videosNum: data.pages.length,
-      videosNum: data.videos,
+      videosNum: data.pages?.length || 0,
+      videos: data.videos,
       tname: data.tname,
       pages: data.pages?.map(v => {
         return {

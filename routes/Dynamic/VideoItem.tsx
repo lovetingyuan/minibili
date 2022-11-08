@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import RichText from '../../components/RichText';
 import { getDynamicItems } from '../../services/Bilibili';
-import handleShare from '../../services/Share';
+import { handleShareVideo } from '../../services/Share';
 import {
   DynamicType,
   GetFuncPromiseType,
@@ -33,7 +33,7 @@ export default function VideoItem(props: VideoDynamicItem) {
   const { specialUser } = useSnapshot(store);
   const isTracy = mid && mid.toString() === specialUser.mid;
   const onShare = useCallback(() => {
-    handleShare(name, title, bvid);
+    handleShareVideo(name, title, bvid);
   }, [name, title, bvid]);
   const navigation = useNavigation<NavigationProps['navigation']>();
 

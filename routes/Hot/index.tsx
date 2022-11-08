@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  // FlatList,
   ToastAndroid,
   Alert,
   Linking,
@@ -13,7 +12,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { getHotList } from '../../services/Bilibili';
 import HotItem from './HotItem';
 import TracyBtn from '../../components/TracyBtn';
-import handleShare from '../../services/Share';
+import { handleShareVideo } from '../../services/Share';
 import { GetFuncPromiseType } from '../../types';
 import { RootStackParamList } from '../../types';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -24,12 +23,13 @@ import useDialog from '../../hooks/useDialog';
 import { FlashList } from '@shopify/flash-list';
 import store from '../../valtio/store';
 import { useSnapshot } from 'valtio';
+import { Switch } from '@rneui/base';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>;
 
 type VideoItem = GetFuncPromiseType<typeof getHotList>['list'][0];
 
-export default function Hot({ navigation, route }: Props) {
+export default function Hot({ navigation }: Props) {
   const [state, setState] = React.useState<{
     page: number;
     list: [VideoItem, VideoItem?][];
@@ -49,9 +49,8 @@ export default function Hot({ navigation, route }: Props) {
   });
   const hotListRef = React.useRef<any>(null);
   const [initLoad, setInitLoad] = React.useState(true);
-  const { blackUps, blackTags } = useSnapshot(store);
-  // const snapshot = useSnapshot(store);
-  // console.log(932424, route.name);
+  const { blackUps, blackTags, showBlackDialog, hideWatched, watchedVideos } =
+    useSnapshot(store);
 
   if (!initLoad) {
     SplashScreen.hideAsync();
@@ -72,14 +71,13 @@ export default function Hot({ navigation, route }: Props) {
   }, [navigation, state.list]);
 
   const { dialog, toggleDialog } = useDialog('不再看');
-
   React.useEffect(() => {
-    if (!route.params?.query) {
+    if (!showBlackDialog) {
       return;
     }
     toggleDialog(
       <>
-        <Text>
+        <Text style={{ textDecorationLine: 'line-through', marginTop: 10 }}>
           {Object.keys(blackUps).length
             ? `UP(${Object.keys(blackUps).length})：${Object.values(blackUps)
                 .filter(v => typeof v === 'string')
@@ -92,18 +90,25 @@ export default function Hot({ navigation, route }: Props) {
             ? `类型：${Object.keys(blackTags).join(', ')}`
             : '类型：暂无'}
         </Text>
-        {/* <View
-            style={{
-              flexDirection: 'row',
-              marginTop: 5,
-              alignItems: 'center',
-            }}>
-            <Text>不看已看过的</Text>
-            <Switch value={hideWatched} onValueChange={filterWatched} />
-          </View> */}
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 5,
+            alignItems: 'center',
+          }}>
+          <Text>不看已看过的</Text>
+          <Switch
+            value={hideWatched}
+            onValueChange={v => {
+              store.hideWatched = v;
+              v && loadMoreHotItems();
+            }}
+          />
+        </View>
       </>,
     );
-  }, [route.params?.query]);
+  }, [showBlackDialog, hideWatched]);
+
   const loadingRef = React.useRef(false);
   const moreRef = React.useRef(true);
   const currentVideoRef = React.useRef<VideoItem | null>(null);
@@ -128,7 +133,7 @@ export default function Hot({ navigation, route }: Props) {
       <View key={key} style={styles.itemContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
-          style={{ flex: 1 }}
+          style={{ flex: 1, marginRight: 8 }}
           onPress={() => {
             navigation.navigate('Play', {
               mid: item[0].mid,
@@ -144,7 +149,7 @@ export default function Hot({ navigation, route }: Props) {
           <HotItem
             video={item[0]}
             key={item[0].bvid}
-            itemStyle={{ marginLeft: 10, marginRight: 6 }}
+            // itemStyle={{ marginLeft: 10, marginRight: 6 }}
           />
         </TouchableOpacity>
         {item[1] ? (
@@ -166,7 +171,7 @@ export default function Hot({ navigation, route }: Props) {
             <HotItem
               video={item[1]}
               key={item[0].bvid}
-              itemStyle={{ marginRight: 10, marginLeft: 6 }}
+              // itemStyle={{ marginRight: 10, marginLeft: 6 }}
             />
           </TouchableOpacity>
         ) : (
@@ -183,6 +188,7 @@ export default function Hot({ navigation, route }: Props) {
     );
   };
   const loadMoreHotItems = () => {
+    // console.log('loadr morer3-----------33');
     if (loadingRef.current || !moreRef.current) {
       return;
     }
@@ -204,9 +210,9 @@ export default function Hot({ navigation, route }: Props) {
             if ('_' + v.mid in blackUps) {
               return false;
             }
-            // if (hideWatched && v.mid in playedVideos) {
-            //   return false;
-            // }
+            if (hideWatched && v.bvid in watchedVideos) {
+              return false;
+            }
             return true;
           });
           if (!list.length) {
@@ -228,11 +234,17 @@ export default function Hot({ navigation, route }: Props) {
               viewList.push([list[i]]);
             }
           }
+          const newList = state.list.concat(viewList);
           setState({
             ...state,
             page: state.page + 1,
-            list: state.list.concat(viewList),
+            list: newList,
           });
+          // loadingRef.current = false;
+          // console.log('sdfhsdfsjs', newList.length);
+          // if (newList.length < 20) {
+          //   // loadMoreHotItems();
+          // }
         },
         err => {
           __DEV__ && console.log(err);
@@ -262,7 +274,7 @@ export default function Hot({ navigation, route }: Props) {
     if (currentVideoRef.current) {
       setModalVisible(false);
       const { name, title, bvid } = currentVideoRef.current;
-      handleShare(name, title, bvid);
+      handleShareVideo(name, title, bvid);
     }
   };
   const handleOverlayClick = useMemoizedFn((name: string) => {
@@ -329,14 +341,23 @@ export default function Hot({ navigation, route }: Props) {
   const hotVideoList: [VideoItem, VideoItem?][] = [];
   let current: [VideoItem?, VideoItem?] = [];
   for (let [item1, item2] of state.list) {
-    if (!('_' + item1.mid in blackUps) && !(item1.tag in blackTags)) {
+    if (
+      !('_' + item1.mid in blackUps) &&
+      !(item1.tag in blackTags) &&
+      (hideWatched ? !(item1.bvid in watchedVideos) : true)
+    ) {
       current.push(item1);
       if (current.length === 2) {
         hotVideoList.push(current as [VideoItem, VideoItem]);
         current = [];
       }
     }
-    if (item2 && !('_' + item2.mid in blackUps) && !(item2.tag in blackTags)) {
+    if (
+      item2 &&
+      !('_' + item2.mid in blackUps) &&
+      !(item2.tag in blackTags) &&
+      (hideWatched ? !(item2.bvid in watchedVideos) : true)
+    ) {
       current.push(item2);
       if (current.length === 2) {
         hotVideoList.push(current as [VideoItem, VideoItem]);
@@ -346,6 +367,9 @@ export default function Hot({ navigation, route }: Props) {
   }
   if (current.length) {
     hotVideoList.push(current as [VideoItem, VideoItem?]);
+  }
+  if (hotVideoList.length < 10) {
+    setTimeout(loadMoreHotItems);
   }
   return (
     <View style={styles.container}>
@@ -375,7 +399,7 @@ export default function Hot({ navigation, route }: Props) {
           </Text>
         }
         onEndReached={loadMoreHotItems}
-        onEndReachedThreshold={0.4}
+        onEndReachedThreshold={0.5}
         refreshing={state.refreshing}
         onRefresh={resetDynamicItems}
         contentContainerStyle={styles.listContainerStyle}
@@ -399,6 +423,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
+    paddingHorizontal: 8,
   },
   listContainerStyle: { paddingTop: 14 },
   bottomEnd: {

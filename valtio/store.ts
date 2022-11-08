@@ -10,7 +10,8 @@ const syncStoreKeys = [
   'specialUser',
   'webViewMode',
   'watchedVideos',
-];
+  'hideWatched',
+] as const;
 
 const store = proxy<{
   blackUps: Record<string, string>;
@@ -22,6 +23,8 @@ const store = proxy<{
   dynamicUser: any;
   updatedUps: Record<string, boolean>;
   livingUps: Record<string, boolean>;
+  showBlackDialog: number;
+  hideWatched: boolean;
 }>({
   blackUps: {},
   blackTags: {},
@@ -38,6 +41,8 @@ const store = proxy<{
   dynamicUser: {},
   updatedUps: {},
   livingUps: {},
+  showBlackDialog: 0,
+  hideWatched: false,
 });
 
 Promise.all(

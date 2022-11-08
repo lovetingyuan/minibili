@@ -1,8 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDynamicItems } from './Bilibili';
 
-// const latestMap: Record<string, number> = {};
-
 export async function checkDynamics(mid: number | string) {
   const key = `DYNAMIC_ITEM_${mid}`;
   const prev = +((await AsyncStorage.getItem(key)) || 0);
@@ -19,10 +17,8 @@ export async function checkDynamics(mid: number | string) {
     return;
   }
   if (!prev) {
-    // latestMap[mid] = latestTime;
     await AsyncStorage.setItem(key, latestTime + '');
   } else if (latestTime !== prev) {
-    // latestMap[mid] = latestTime;
     return latestTime.toString();
   }
 }

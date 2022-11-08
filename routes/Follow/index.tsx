@@ -8,6 +8,7 @@ import {
   ToastAndroid,
   Image,
   Linking,
+  Alert,
 } from 'react-native';
 import { Avatar, Badge } from '@rneui/base';
 import FollowItem from './FollowItem';
@@ -28,15 +29,15 @@ import useDialog from '../../hooks/useDialog';
 import store from '../../valtio/store';
 import { useSnapshot } from 'valtio';
 // import { Badge } from '@rneui/base';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
 
 const buttons = [
   {
-    text: '退出（长按）',
+    text: '退出',
     name: 'logout',
-    longPress: true,
   },
   {
     text: '关于',
@@ -194,7 +195,15 @@ export default function Follow({ navigation, route }: Props) {
 
   const handleOverlayClick = (name: string) => {
     if (name === 'logout') {
-      clearUser();
+      Alert.alert('确定退出吗？', '', [
+        {
+          text: '取消',
+        },
+        {
+          text: '确定',
+          onPress: clearUser,
+        },
+      ]);
     } else if (name === 'about') {
       toggleDialog();
     }
@@ -271,7 +280,10 @@ export default function Follow({ navigation, route }: Props) {
           }}
         />
       </View>
-      <View style={styles.listTitleContainer}>
+      <LinearGradient
+        // Background Linear Gradient
+        colors={['white', '#f2f2f2']}
+        style={styles.listTitleContainer}>
         <Text style={styles.listTitle}>
           关注列表
           <Text style={{ fontSize: 14 }}>({followedNum})</Text>：{' '}
@@ -294,7 +306,7 @@ export default function Follow({ navigation, route }: Props) {
             />
           ) : null}
         </View>
-      </View>
+      </LinearGradient>
       <FlatList
         data={displayUps}
         renderItem={renderItem}

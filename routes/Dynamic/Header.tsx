@@ -6,6 +6,7 @@ import {
   TouchableWithoutFeedback,
   StatusBar,
   Image,
+  Pressable,
 } from 'react-native';
 import { Avatar } from '@rneui/base';
 import {
@@ -19,6 +20,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button } from '@rneui/base';
 import store from '../../valtio/store';
 import { useSnapshot } from 'valtio';
+import { handleShareUp } from '../../services/Share';
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 
 export default function Header(props: UserInfo) {
@@ -101,7 +103,7 @@ export default function Header(props: UserInfo) {
         />
       </TouchableWithoutFeedback>
       <View style={{ flex: 1 }}>
-        <Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ ...styles.name, ...nameStyle }}>
             {userInfo.name}
             {'  '}
@@ -115,7 +117,18 @@ export default function Header(props: UserInfo) {
           <Text>
             {'    '} {fans}关注
           </Text>
-        </Text>
+          <Pressable
+            onPress={() => {
+              if (userInfo) {
+                handleShareUp(userInfo.name, userInfo.mid, userInfo.sign);
+              }
+            }}>
+            <Image
+              style={styles.shareImg}
+              source={require('../../assets/share.png')}
+            />
+          </Pressable>
+        </View>
 
         <Text
           style={[
@@ -174,4 +187,5 @@ const styles = StyleSheet.create({
     color: '#86b300',
     marginLeft: 20,
   },
+  shareImg: { width: 15, height: 15, marginLeft: 20 },
 });

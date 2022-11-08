@@ -6,6 +6,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  ToastAndroid,
   View,
 } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
@@ -17,22 +18,36 @@ import Follow from './routes/Follow';
 import Dynamic from './routes/Dynamic';
 import Hot from './routes/Hot';
 import WebPage from './routes/WebPage';
-import { checkWifi } from './hooks/useNetStatusToast';
 import { RootStackParamList } from './types';
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
-import CheckLiving from './components/CheckLiving';
 import { Button } from '@rneui/base';
 import store from './valtio/store';
 import { useSnapshot } from 'valtio';
 import { Badge } from '@rneui/base';
+import NetInfo from '@react-native-community/netinfo';
+import checkLiving from './services/checkLiving';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 SplashScreen.preventAutoHideAsync();
-checkWifi();
+checkLiving();
 
-const getLabel = (text: string, updatedCount?: number) => {
+NetInfo.fetch().then(state => {
+  if (state.isConnected) {
+    if (state.type !== 'wifi') {
+      ToastAndroid.showWithGravity(
+        ' 请注意当前网络不是 wifi ',
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER,
+      );
+    }
+    return state.type;
+  } else {
+    ToastAndroid.show('当前网络有问题', ToastAndroid.SHORT);
+  }
+});
+const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
   const labelCmp: (props: {
     focused: boolean;
     color: string;
@@ -52,13 +67,16 @@ const getLabel = (text: string, updatedCount?: number) => {
             status="success"
             value={updatedCount >= 100 ? '99+' : updatedCount}
             badgeStyle={{
-              height: 13,
+              height: 14,
               width: updatedCount >= 100 ? 26 : updatedCount < 10 ? 10 : 20,
-              backgroundColor: '#fb7299',
+              backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
               position: 'absolute',
               left: 24,
             }}
-            textStyle={{ fontSize: 10 }}
+            textStyle={{
+              fontSize: 11,
+              fontWeight: props.focused ? 'bold' : 'normal',
+            }}
             containerStyle={{
               marginLeft: 5,
             }}
@@ -73,9 +91,9 @@ const getLabel = (text: string, updatedCount?: number) => {
 };
 
 const Main = () => {
-  const { dynamicUser, updatedUps } = useSnapshot(store);
+  const { dynamicUser, updatedUps, livingUps } = useSnapshot(store);
   const updateCount = Object.values(updatedUps).filter(Boolean).length;
-
+  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0;
   return (
     <Tab.Navigator
       initialRouteName="Hot"
@@ -106,9 +124,7 @@ const Main = () => {
               return (
                 <Pressable
                   onPress={() => {
-                    options.navigation.setParams({
-                      query: Date.now(),
-                    });
+                    store.showBlackDialog++;
                   }}>
                   <Image
                     source={require('./assets/filter.png')}
@@ -133,7 +149,7 @@ const Main = () => {
         name="Follow"
         component={Follow}
         options={{
-          tabBarLabel: getLabel('我的', updateCount),
+          tabBarLabel: getLabel('我的', updateCount, hasLiving),
         }}
       />
     </Tab.Navigator>
@@ -147,7 +163,7 @@ export default () => {
     <>
       <StatusBar backgroundColor="transparent" barStyle="dark-content" />
       <NavigationContainer>
-        <CheckLiving />
+        {/* <CheckLiving /> */}
         <Stack.Navigator
           initialRouteName="Main"
           screenOptions={{
