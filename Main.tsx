@@ -74,7 +74,7 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
               left: 24,
             }}
             textStyle={{
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: props.focused ? 'bold' : 'normal',
             }}
             containerStyle={{

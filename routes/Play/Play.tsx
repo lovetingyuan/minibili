@@ -162,6 +162,28 @@ function __hack() {
       }
     }
   }, 100);
+  setInterval(() => {
+    const sss = Array.from(
+      document.querySelectorAll<any>('.mplayer-toast.mplayer-show'),
+    );
+    if (sss.length) {
+      const failed = sss.findIndex(
+        s =>
+          s.querySelector('.mplayer-toast-text')?.innerText.trim() ===
+          '播放失败',
+      );
+      if (failed !== -1) {
+        const jump = sss[failed].querySelector('.mplayer-toast-jump');
+        if (jump.innerText.trim() === '') {
+          jump.innerHTML = '✕';
+          jump.addEventListener('click', (e: any) => {
+            e.preventDefault();
+            jump.parentElement!.classList.remove('mplayer-show');
+          });
+        }
+      }
+    }
+  }, 1000);
   setTimeout(() => {
     clearInterval(timer);
     clearInterval(timer2);
@@ -380,8 +402,8 @@ export default ({ route, navigation }: Props) => {
               if (data.action === 'change-video-height') {
                 setVerticalScale(data.payload === 'up' ? 0.4 : 0.7);
               }
-              if (data.action === 'test') {
-                console.log('sfhskdfs', data.payload);
+              if (data.action === 'console.log') {
+                console.log('message', data.payload);
               }
             } catch (e) {}
           }}

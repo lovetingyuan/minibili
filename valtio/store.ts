@@ -5,6 +5,7 @@ import { UserInfo } from '../types';
 
 const syncStoreKeys = [
   'blackUps',
+  'followedUps',
   'blackTags',
   'userInfo',
   'specialUser',
@@ -15,6 +16,7 @@ const syncStoreKeys = [
 
 const store = proxy<{
   blackUps: Record<string, string>;
+  followedUps: UserInfo[];
   blackTags: Record<string, boolean>;
   userInfo: UserInfo;
   specialUser: UserInfo;
@@ -27,6 +29,7 @@ const store = proxy<{
   hideWatched: boolean;
 }>({
   blackUps: {},
+  followedUps: [],
   blackTags: {},
   userInfo: {
     name: '',
@@ -57,6 +60,9 @@ Promise.all(
         store[k] = JSON.parse(data);
       }
     }
+    store.dynamicUser = store.specialUser.mid
+      ? { ...store.specialUser }
+      : { ...store.userInfo };
   })
   .then(() => {
     watch(get => {

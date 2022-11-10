@@ -49,7 +49,7 @@ const githubLink = 'https://github.com/lovetingyuan/minibili';
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
-  const { specialUser, userInfo, livingUps } = useSnapshot(store);
+  const { specialUser, userInfo, livingUps, followedUps } = useSnapshot(store);
   const [ups, setUps] = React.useState<UpItem[]>([]);
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -61,6 +61,10 @@ export default function Follow({ navigation, route }: Props) {
   const [refresh] = React.useState(false);
   const currentList = React.useRef<any>(null);
   const [fans, setFans] = React.useState('');
+
+  React.useEffect(() => {
+    setUps([...followedUps]);
+  }, [followedUps]);
 
   React.useEffect(() => {
     const a = setInterval(() => {
@@ -94,12 +98,16 @@ export default function Follow({ navigation, route }: Props) {
     if (userInfo.mid) {
       getUserInfo(userInfo.mid)
         .then(user => {
-          store.userInfo = {
+          const info = {
             name: user.name,
             face: user.face,
             mid: user.mid + '',
             sign: user.sign,
           };
+          store.userInfo = info;
+          if (!store.dynamicUser.mid) {
+            store.dynamicUser = { ...info };
+          }
         })
         .catch(() => {});
       getFansData(userInfo.mid).then(data => {
@@ -153,6 +161,7 @@ export default function Follow({ navigation, route }: Props) {
           setUps(page === 1 ? list : ups.concat(list));
           setPage(page + 1);
         } else {
+          store.followedUps = [...ups];
           setLoadDone(true);
         }
       })
@@ -172,6 +181,8 @@ export default function Follow({ navigation, route }: Props) {
     setFollowedNum(0);
     setPage(1);
     store.updatedUps = {};
+    store.specialUser = {};
+    store.dynamicUser = {};
   };
   const version = Application.nativeApplicationVersion;
 
@@ -225,8 +236,6 @@ export default function Follow({ navigation, route }: Props) {
     }
   }
 
-  // const updateCount = Object.values(updatedUps).filter(Boolean).length;
-
   return (
     <View style={styles.container}>
       {dialog}
@@ -236,10 +245,11 @@ export default function Follow({ navigation, route }: Props) {
           containerStyle={{ marginRight: 16 }}
           onPress={() => {
             if (userInfo) {
-              navigation.navigate('WebPage', {
-                title: userInfo.name,
-                url: `https://space.bilibili.com/${userInfo.mid}`,
-              });
+              store.dynamicUser = {
+                ...userInfo,
+                follow: false,
+              };
+              navigation.navigate('Dynamic');
             }
           }}
           rounded
@@ -358,7 +368,7 @@ const styles = StyleSheet.create({
   userContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    padding: 12,
     paddingTop: 27,
     backgroundColor: 'white',
   },
@@ -389,6 +399,7 @@ const styles = StyleSheet.create({
   infoFace: {
     width: 18,
     height: 18,
+    marginRight: 5,
   },
   updateTime: {
     fontSize: 12,

@@ -104,18 +104,15 @@ export default function Header(props: UserInfo) {
       </TouchableWithoutFeedback>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ ...styles.name, ...nameStyle }}>
-            {userInfo.name}
-            {'  '}
-          </Text>
+          <Text style={{ ...styles.name, ...nameStyle }}>{userInfo.name}</Text>
           {isTracy ? (
             <Image
               source={require('../../assets/heart.png')}
-              style={{ width: 24, height: 24, marginLeft: 10 }}
+              style={{ width: 24, height: 24, marginLeft: 5 }}
             />
           ) : null}
           <Text>
-            {'    '} {fans}关注
+            {'   '} {fans}关注
           </Text>
           <Pressable
             onPress={() => {
@@ -162,8 +159,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
     paddingTop: StatusBar.currentHeight,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: 12,
+    paddingRight: 12,
     paddingBottom: 20,
   },
   image: {

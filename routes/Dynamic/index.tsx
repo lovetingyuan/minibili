@@ -37,8 +37,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   });
   const [loading, setLoading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
-  const { specialUser } = useSnapshot(store);
-  const upId = route.params?.mid || specialUser?.mid;
+  const { specialUser, dynamicUser } = useSnapshot(store);
+  const upId = dynamicUser?.mid || specialUser?.mid;
   const dynamicListRef = React.useRef<FlatList | null>(null);
   const [initLoad, setInitLoad] = React.useState(true);
   const [refreshHead, setRefreshHead] = React.useState(0);
@@ -151,7 +151,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   React.useEffect(() => {
     resetDynamicItems();
   }, [upId]);
-  const headerProps = route.params || specialUser;
+  const headerProps = dynamicUser.mid ? dynamicUser : specialUser;
   return (
     <View style={styles.container}>
       <Header {...headerProps} />
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     paddingVertical: 18,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderBottomColor: '#eaeaea',
     borderBottomWidth: 1,
   },

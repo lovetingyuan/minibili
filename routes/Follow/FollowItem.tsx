@@ -170,7 +170,7 @@ export default React.memo(
           onPress={gotoDynamic}>
           <View style={styles.container}>
             <Avatar
-              size={56}
+              size={52}
               containerStyle={{ marginRight: 14 }}
               rounded
               source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
@@ -236,8 +236,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 14,
     paddingBottom: 14,
-    paddingLeft: 20,
-    paddingRight: 20,
+    paddingLeft: 14,
+    paddingRight: 14,
   },
   face: {
     width: 60,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   nameContainer: { flexDirection: 'row', alignItems: 'center' },
   name: {
     fontSize: 16,
-    marginBottom: 3,
+    // marginBottom: ,
     fontWeight: 'bold',
   },
   textContainer: {

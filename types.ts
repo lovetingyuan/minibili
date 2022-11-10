@@ -10,7 +10,7 @@ export type RootStackParamList = {
     name: string;
     mid: string | number;
   };
-  Dynamic: {
+  Dynamic?: {
     mid: string | number;
     name: string;
     face: string;
