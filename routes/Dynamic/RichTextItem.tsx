@@ -27,7 +27,7 @@ export default function RichTextItem(props: {
 }) {
   const { text, date, mid, images, name, id } = props;
   const { specialUser } = useSnapshot(store);
-  const isTracy = mid && mid.toString() === specialUser.mid;
+  const isTracy = mid == specialUser?.mid;
   const navigation = useNavigation<NavigationProps['navigation']>();
   return (
     <View style={[styles.textContainer]}>

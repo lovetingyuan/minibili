@@ -28,7 +28,7 @@ export default React.memo(function HotItem({
   // __DEV__ && console.log('hot video', video.title);
   const playNum = (video.playNum / 10000).toFixed(1) + '万';
   const { specialUser } = useSnapshot(store);
-  const isTracy = video.mid.toString() === specialUser.mid;
+  const isTracy = video.mid == specialUser?.mid;
   const { watchedVideos } = useSnapshot(store);
   const watched = watchedVideos[video.bvid];
   return (

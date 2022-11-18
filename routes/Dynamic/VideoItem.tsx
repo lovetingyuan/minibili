@@ -31,7 +31,7 @@ export default function VideoItem(props: VideoDynamicItem) {
   const { mid, name, cover, title, aid, date, play, bvid, text, duration } =
     props;
   const { specialUser } = useSnapshot(store);
-  const isTracy = mid && mid.toString() === specialUser.mid;
+  const isTracy = mid == specialUser?.mid;
   const onShare = useCallback(() => {
     handleShareVideo(name, title, bvid);
   }, [name, title, bvid]);

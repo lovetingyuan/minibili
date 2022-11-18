@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import {handleShareVideo} from '../../services/Share';
+import { handleShareVideo } from '../../services/Share';
 import { RootStackParamList } from '../../types';
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>;

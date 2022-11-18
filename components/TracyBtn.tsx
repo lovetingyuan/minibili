@@ -11,7 +11,7 @@ type NavigationProps = NativeStackScreenProps<RootStackParamList>;
 export default function TracyBtn() {
   const navigation = useNavigation<NavigationProps['navigation']>();
   const { specialUser } = useSnapshot(store);
-  if (!specialUser.mid) {
+  if (!specialUser) {
     return null;
   }
   return (
@@ -29,9 +29,9 @@ export default function TracyBtn() {
       color="#fb7299"
       placement="right"
       onPress={() => {
-        store.dynamicUser = { ...specialUser, follow: true };
+        store.dynamicUser = { ...specialUser };
         setTimeout(() => {
-          navigation.navigate('Dynamic', { ...specialUser, follow: true });
+          navigation.navigate('Dynamic', { ...specialUser });
         }, 200);
       }}
     />

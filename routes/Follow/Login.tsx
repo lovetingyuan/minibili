@@ -47,12 +47,7 @@ export default function Login() {
       })
       .catch(() => {
         ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT);
-        store.userInfo = {
-          name: '',
-          face: '',
-          mid: '',
-          sign: '',
-        };
+        store.userInfo = null;
       });
   };
   return (

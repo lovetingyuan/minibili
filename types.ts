@@ -15,7 +15,6 @@ export type RootStackParamList = {
     name: string;
     face: string;
     sign: string;
-    follow: boolean;
   };
   Hot: {
     query: number;

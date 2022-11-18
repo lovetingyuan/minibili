@@ -29,7 +29,7 @@ export default function Header(props: UserInfo) {
 
   const navigation = useNavigation<NavigationProps['navigation']>();
   const { specialUser } = useSnapshot(store);
-  const isTracy = mid && mid.toString() === specialUser.mid;
+  const isTracy = mid == specialUser?.mid;
   const [userInfo, setUserInfo] = React.useState<UserInfo>({ ...props });
   const [liveInfo, setLiveInfo] = React.useState({
     living: false,
@@ -107,8 +107,8 @@ export default function Header(props: UserInfo) {
           <Text style={{ ...styles.name, ...nameStyle }}>{userInfo.name}</Text>
           {isTracy ? (
             <Image
-              source={require('../../assets/heart.png')}
-              style={{ width: 24, height: 24, marginLeft: 5 }}
+              source={require('../../assets/GC1.png')}
+              style={{ width: 18, height: 18, marginLeft: 5 }}
             />
           ) : null}
           <Text>

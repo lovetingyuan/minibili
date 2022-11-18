@@ -20,7 +20,7 @@ import {
 import TracyBtn from '../../components/TracyBtn';
 import Login from './Login';
 
-import { GetFuncPromiseType, RootStackParamList } from '../../types';
+import { GetFuncPromiseType, RootStackParamList, UserInfo } from '../../types';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import useMemoizedFn from '../../hooks/useMemoizedFn';
 import ButtonsOverlay from '../../components/ButtonsOverlay';
@@ -49,7 +49,7 @@ const githubLink = 'https://github.com/lovetingyuan/minibili';
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name);
-  const { specialUser, userInfo, livingUps, followedUps } = useSnapshot(store);
+  const { specialUser, userInfo, livingUps, updatedUps } = useSnapshot(store);
   const [ups, setUps] = React.useState<UpItem[]>([]);
   const [loadDone, setLoadDone] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -62,9 +62,13 @@ export default function Follow({ navigation, route }: Props) {
   const currentList = React.useRef<any>(null);
   const [fans, setFans] = React.useState('');
 
+  // React.useEffect(() => {
+  //   setUps([...followedUps]);
+  // }, [followedUps]);
+
   React.useEffect(() => {
-    setUps([...followedUps]);
-  }, [followedUps]);
+    store.followedUps = [...ups];
+  }, [ups]);
 
   React.useEffect(() => {
     const a = setInterval(() => {
@@ -95,7 +99,7 @@ export default function Follow({ navigation, route }: Props) {
     setPage(1);
   });
   React.useEffect(() => {
-    if (userInfo.mid) {
+    if (userInfo) {
       getUserInfo(userInfo.mid)
         .then(user => {
           const info = {
@@ -105,7 +109,7 @@ export default function Follow({ navigation, route }: Props) {
             sign: user.sign,
           };
           store.userInfo = info;
-          if (!store.dynamicUser.mid) {
+          if (!store.dynamicUser) {
             store.dynamicUser = { ...info };
           }
         })
@@ -118,9 +122,9 @@ export default function Follow({ navigation, route }: Props) {
         }
       });
     }
-  }, [userInfo.mid]);
+  }, [userInfo?.mid]);
   React.useEffect(() => {
-    if (userInfo.mid && (!currentList.current || currentList.current === ups)) {
+    if (userInfo && (!currentList.current || currentList.current === ups)) {
       loadMoreUps();
       updateTimeRef.current = Date.now();
       setUpdateText('刚刚更新');
@@ -148,7 +152,7 @@ export default function Follow({ navigation, route }: Props) {
     return <FollowItem item={item} />;
   };
   const loadMoreUps = () => {
-    if (loadDone || loading) {
+    if (loadDone || loading || !userInfo) {
       return;
     }
     setLoading(true);
@@ -161,7 +165,6 @@ export default function Follow({ navigation, route }: Props) {
           setUps(page === 1 ? list : ups.concat(list));
           setPage(page + 1);
         } else {
-          store.followedUps = [...ups];
           setLoadDone(true);
         }
       })
@@ -174,15 +177,15 @@ export default function Follow({ navigation, route }: Props) {
   };
 
   const clearUser = async () => {
-    store.userInfo = { name: '', mid: '', face: '', sign: '' };
     setUps((currentList.current = []));
     setLoadDone(false);
     setLoading(false);
     setFollowedNum(0);
     setPage(1);
+    store.userInfo = null;
     store.updatedUps = {};
-    store.specialUser = {};
-    store.dynamicUser = {};
+    store.specialUser = null;
+    store.dynamicUser = null;
   };
   const version = Application.nativeApplicationVersion;
 
@@ -220,21 +223,26 @@ export default function Follow({ navigation, route }: Props) {
     }
   };
 
-  if (!userInfo.mid) {
+  if (!userInfo) {
     return <Login />;
   }
 
-  const displayUps = [...ups];
-  if (specialUser.mid && displayUps.length) {
-    const spIndex = displayUps.findIndex(v => v.mid == specialUser.mid);
-    if (spIndex > 0) {
-      const sp = displayUps[spIndex];
-      displayUps.splice(spIndex, 1);
-      displayUps.unshift(sp);
-    } else if (spIndex === -1) {
-      displayUps.unshift({ ...specialUser });
+  const displayUps: UserInfo[] = [];
+  if (specialUser) {
+    displayUps.push({ ...specialUser });
+  }
+  const notUpdateUsers = [];
+  for (let up of ups) {
+    if (up.mid == specialUser?.mid) {
+      continue;
+    }
+    if (updatedUps[up.mid]) {
+      displayUps.push(up);
+    } else {
+      notUpdateUsers.push(up);
     }
   }
+  displayUps.push(...notUpdateUsers);
 
   return (
     <View style={styles.container}>
@@ -247,7 +255,6 @@ export default function Follow({ navigation, route }: Props) {
             if (userInfo) {
               store.dynamicUser = {
                 ...userInfo,
-                follow: false,
               };
               navigation.navigate('Dynamic');
             }
@@ -261,13 +268,13 @@ export default function Follow({ navigation, route }: Props) {
         />
         <View style={{ flex: 1 }}>
           <Text style={styles.myName}>
-            {userInfo?.name || ''}
+            {userInfo.name}
             <Text style={styles.fansNumText}>
               {'    '}
               {fans}关注
             </Text>
           </Text>
-          <Text style={styles.mySign}>{userInfo?.sign || ''}</Text>
+          <Text style={styles.mySign}>{userInfo.sign}</Text>
         </View>
         <Pressable
           onPress={() => {

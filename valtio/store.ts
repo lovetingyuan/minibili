@@ -18,11 +18,11 @@ const store = proxy<{
   blackUps: Record<string, string>;
   followedUps: UserInfo[];
   blackTags: Record<string, boolean>;
-  userInfo: UserInfo;
-  specialUser: UserInfo;
+  userInfo: UserInfo | null;
+  specialUser: UserInfo | null;
   webViewMode: 'PC' | 'MOBILE';
   watchedVideos: Record<string, any>;
-  dynamicUser: any;
+  dynamicUser: UserInfo | null;
   updatedUps: Record<string, boolean>;
   livingUps: Record<string, boolean>;
   showBlackDialog: number;
@@ -31,17 +31,12 @@ const store = proxy<{
   blackUps: {},
   followedUps: [],
   blackTags: {},
-  userInfo: {
-    name: '',
-    mid: '',
-    face: '',
-    sign: '',
-  },
-  specialUser: { name: '', mid: '', face: '', sign: '' },
+  userInfo: null,
+  specialUser: null,
   webViewMode: 'PC',
   watchedVideos: {},
   // ----
-  dynamicUser: {},
+  dynamicUser: null,
   updatedUps: {},
   livingUps: {},
   showBlackDialog: 0,
@@ -57,12 +52,15 @@ Promise.all(
     for (let i = 0; i < res.length; i++) {
       const [k, data] = res[i];
       if (data) {
+        // @ts-ignore
         store[k] = JSON.parse(data);
       }
     }
-    store.dynamicUser = store.specialUser.mid
+    store.dynamicUser = store.specialUser
       ? { ...store.specialUser }
-      : { ...store.userInfo };
+      : store.userInfo
+      ? { ...store.userInfo }
+      : null;
   })
   .then(() => {
     watch(get => {

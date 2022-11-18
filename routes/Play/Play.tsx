@@ -16,6 +16,8 @@ import { Avatar, ButtonGroup, Icon } from '@rneui/base';
 import { handleShareVideo } from '../../services/Share';
 import * as KeepAwake from 'expo-keep-awake';
 import Comment from '../../components/Comment';
+import * as Clipboard from 'expo-clipboard';
+
 // https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
@@ -267,7 +269,7 @@ export default ({ route, navigation }: Props) => {
 
   const { specialUser } = useSnapshot(store);
   const tracyStyle =
-    mid && mid.toString() === specialUser?.mid
+    mid == specialUser?.mid
       ? {
           color: 'rgb(251, 114, 153)',
         }
@@ -434,12 +436,11 @@ export default ({ route, navigation }: Props) => {
                 mid,
                 face: videoInfo?.upFace || '',
                 name,
-                sign: '',
-                follow: false,
+                sign: '-',
               };
-              setTimeout(() => {
-                navigation.navigate('Dynamic', store.dynamicUser);
-              }, 200);
+              // setTimeout(() => {
+              navigation.navigate('Dynamic');
+              // }, 200);
             }}>
             <View style={styles.upInfoContainer}>
               {videoInfo?.upFace ? (
@@ -557,8 +558,19 @@ export default ({ route, navigation }: Props) => {
         </View>
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
-          <Text style={{ color: '#888', fontSize: 12 }}>
-            {'  '}
+          <Pressable
+            onPress={() => {
+              Clipboard.setStringAsync(videoInfo?.bvid || '').then(() => {
+                ToastAndroid.show('已复制', ToastAndroid.SHORT);
+              });
+            }}>
+            <Text style={{ color: '#666', fontSize: 12 }}>
+              {'  '}
+              {videoInfo?.bvid}
+              {' - '}
+            </Text>
+          </Pressable>
+          <Text style={{ color: '#666', fontSize: 12 }}>
             {videoInfo?.tname}
           </Text>
         </View>
@@ -603,7 +615,7 @@ const styles = StyleSheet.create({
   },
 
   playerContainer: { width: '100%', height: '40%' },
-  videoInfoContainer: { paddingVertical: 20, paddingHorizontal: 16 },
+  videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
   videoHeader: {
     flexDirection: 'row',
     alignItems: 'center',

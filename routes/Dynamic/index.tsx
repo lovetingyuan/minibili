@@ -37,7 +37,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   });
   const [loading, setLoading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
-  const { specialUser, dynamicUser } = useSnapshot(store);
+  const { specialUser, dynamicUser, followedUps } = useSnapshot(store);
   const upId = dynamicUser?.mid || specialUser?.mid;
   const dynamicListRef = React.useRef<FlatList | null>(null);
   const [initLoad, setInitLoad] = React.useState(true);
@@ -61,9 +61,15 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   }, [navigation, dynamicItems]);
 
   React.useEffect(() => {
-    const follow = route.params?.follow;
     const handler = function () {
-      if (navigation.isFocused() && follow) {
+      console.log(
+        followedUps.map(v => v.mid),
+        dynamicUser,
+      );
+      if (
+        navigation.isFocused() &&
+        followedUps.find(v => v.mid == dynamicUser?.mid)
+      ) {
         navigation.navigate('Follow');
         return true;
       }
@@ -151,7 +157,10 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   React.useEffect(() => {
     resetDynamicItems();
   }, [upId]);
-  const headerProps = dynamicUser.mid ? dynamicUser : specialUser;
+  const headerProps = dynamicUser || specialUser;
+  if (!headerProps) {
+    return null;
+  }
   return (
     <View style={styles.container}>
       <Header {...headerProps} />

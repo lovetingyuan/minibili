@@ -75,6 +75,7 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
             }}
             textStyle={{
               fontSize: 10,
+              lineHeight: 12,
               fontWeight: props.focused ? 'bold' : 'normal',
             }}
             containerStyle={{
@@ -136,7 +137,7 @@ const Main = () => {
           };
         }}
       />
-      {dynamicUser.mid ? (
+      {dynamicUser ? (
         <Tab.Screen
           name="Dynamic"
           component={Dynamic}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { getFollowUps, getLiveStatus } from '../../services/Bilibili';
-import { Avatar } from '@rneui/base';
+import { Avatar, Badge } from '@rneui/base';
 import { checkDynamics, setLatest } from '../../services/Updates';
 import { useNavigation } from '@react-navigation/native';
 import { GetFuncPromiseType, RootStackParamList } from '../../types';
@@ -38,7 +38,7 @@ export default React.memo(
     } = props;
     const { specialUser } = useSnapshot(store);
     const tracyStyle: Record<string, any> = {};
-    const isTracy = mid && mid.toString() === specialUser?.mid;
+    const isTracy = mid == specialUser?.mid;
     if (isTracy) {
       tracyStyle.color = '#fb7299';
       tracyStyle.fontSize = 18;
@@ -103,11 +103,10 @@ export default React.memo(
         face,
         name,
         sign,
-        follow: true,
       };
-      setTimeout(() => {
-        navigation.navigate('Dynamic', { mid, face, name, sign, follow: true });
-      }, 200);
+      // setTimeout(() => {
+      navigation.navigate('Dynamic');
+      // }, 200);
       setLatest(mid, updatedId + '');
       setUpdatedId('');
       store.updatedUps[mid] = false;
@@ -152,12 +151,7 @@ export default React.memo(
           sign,
         };
       } else if (n === 'cancelSpecial') {
-        store.specialUser = {
-          name: '',
-          mid: '',
-          face: '',
-          sign: '',
-        };
+        store.specialUser = null;
       }
     });
     return (
@@ -180,14 +174,34 @@ export default React.memo(
                 <Text style={[styles.name, tracyStyle]}>{name}</Text>
                 {isTracy ? (
                   <Image
-                    source={require('../../assets/heart.png')}
-                    style={{ width: 24, height: 24, marginLeft: 5 }}
+                    source={require('../../assets/GC1.png')}
+                    style={{ width: 18, height: 18, marginLeft: 8 }}
                   />
                 ) : null}
                 {updatedId ? (
-                  <Image
-                    style={styles.newIcon}
-                    source={require('../../assets/new.png')}
+                  // <Image
+                  //   style={styles.newIcon}
+                  //   source={require('../../assets/new.png')}
+                  // />
+                  <Badge
+                    status="success"
+                    value="新"
+                    badgeStyle={{
+                      height: 14,
+                      width: 22,
+                      backgroundColor: '#fb7299',
+                      position: 'absolute',
+                      top: -7,
+                      left: 0,
+                    }}
+                    textStyle={{
+                      fontSize: 11,
+                      lineHeight: 14,
+                      fontWeight: 'bold',
+                    }}
+                    containerStyle={{
+                      marginLeft: 5,
+                    }}
                   />
                 ) : null}
               </View>
