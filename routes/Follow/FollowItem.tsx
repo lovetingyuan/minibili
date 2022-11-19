@@ -97,7 +97,7 @@ export default React.memo(
     }, [updateData]);
 
     const [modalVisible, setModalVisible] = React.useState(false);
-    const gotoDynamic = useMemoizedFn(() => {
+    const gotoDynamic = useMemoizedFn((clearUpdate: any) => {
       store.dynamicUser = {
         mid,
         face,
@@ -107,9 +107,11 @@ export default React.memo(
       // setTimeout(() => {
       navigation.navigate('Dynamic');
       // }, 200);
-      setLatest(mid, updatedId + '');
-      setUpdatedId('');
-      store.updatedUps[mid] = false;
+      if (clearUpdate !== false) {
+        setLatest(mid, updatedId + '');
+        setUpdatedId('');
+        store.updatedUps[mid] = false;
+      }
     });
     const gotoLivePage = useMemoizedFn(() => {
       if (livingInfo?.liveUrl) {
@@ -135,6 +137,12 @@ export default React.memo(
             text: `设置 ${props.item.name} 为特别关注 ❤`,
             name: 'special',
           },
+      updatedId
+        ? {
+            text: '查看动态',
+            name: 'view',
+          }
+        : null,
     ].filter(Boolean);
     const handleOverlayClick = useMemoizedFn((n: string) => {
       if (n === 'unread') {
@@ -152,6 +160,8 @@ export default React.memo(
         };
       } else if (n === 'cancelSpecial') {
         store.specialUser = null;
+      } else if (n === 'view') {
+        gotoDynamic(false);
       }
     });
     return (
@@ -163,12 +173,22 @@ export default React.memo(
           }}
           onPress={gotoDynamic}>
           <View style={styles.container}>
-            <Avatar
-              size={52}
-              containerStyle={{ marginRight: 14 }}
-              rounded
-              source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
-            />
+            <View>
+              <Avatar
+                size={52}
+                containerStyle={{ marginRight: 16 }}
+                rounded
+                source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
+              />
+              {updatedId ? (
+                <Badge
+                  status="success"
+                  value=""
+                  key={updatedId}
+                  badgeStyle={styles.updateMark}
+                />
+              ) : null}
+            </View>
             <View style={{ flex: 1 }}>
               <View style={styles.nameContainer}>
                 <Text style={[styles.name, tracyStyle]}>{name}</Text>
@@ -178,30 +198,14 @@ export default React.memo(
                     style={{ width: 18, height: 18, marginLeft: 8 }}
                   />
                 ) : null}
-                {updatedId ? (
-                  // <Image
-                  //   style={styles.newIcon}
-                  //   source={require('../../assets/new.png')}
-                  // />
-                  <Badge
-                    status="success"
-                    value="新"
-                    badgeStyle={{
-                      height: 14,
-                      width: 22,
-                      backgroundColor: '#fb7299',
-                      position: 'absolute',
-                      top: -7,
-                      left: 0,
-                    }}
-                    textStyle={{
-                      fontSize: 11,
-                      lineHeight: 14,
-                      fontWeight: 'bold',
-                    }}
-                    containerStyle={{
-                      marginLeft: 5,
-                    }}
+                {livingInfo?.living ? (
+                  <Button
+                    title="直播中~"
+                    type="clear"
+                    size="sm"
+                    containerStyle={{ marginLeft: 10 }}
+                    titleStyle={{ fontSize: 13 }}
+                    onPress={gotoLivePage}
                   />
                 ) : null}
               </View>
@@ -216,14 +220,6 @@ export default React.memo(
                 </Text>
               ) : null}
             </View>
-            {livingInfo?.living ? (
-              <Button
-                title="直播中~"
-                type="clear"
-                titleStyle={{ fontSize: 13 }}
-                onPress={gotoLivePage}
-              />
-            ) : null}
           </View>
         </TouchableOpacity>
         <ButtonsOverlay
@@ -248,8 +244,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 14,
-    paddingBottom: 14,
+    paddingTop: 10,
+    paddingBottom: 10,
     paddingLeft: 14,
     paddingRight: 14,
   },
@@ -276,7 +272,15 @@ const styles = StyleSheet.create({
     flex: 1,
     flexWrap: 'wrap',
   },
-  newIcon: { width: 28, height: 11, marginLeft: 10, top: -1 },
+  updateMark: {
+    height: 12,
+    width: 12,
+    backgroundColor: '#fb7299',
+    borderRadius: 14,
+    position: 'absolute',
+    top: -48,
+    left: 43,
+  },
   signText: { color: '#555', marginTop: 2, fontSize: 13 },
   liveText: { color: '#008AC5', fontSize: 14, marginLeft: 12, marginRight: 5 },
   overlay: {

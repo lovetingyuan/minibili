@@ -10,7 +10,7 @@ import {
   Linking,
   Alert,
 } from 'react-native';
-import { Avatar, Badge } from '@rneui/base';
+import { Avatar } from '@rneui/base';
 import FollowItem from './FollowItem';
 import {
   getFansData,
@@ -55,7 +55,7 @@ export default function Follow({ navigation, route }: Props) {
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [followedNum, setFollowedNum] = React.useState(0);
-  const [updateText, setUpdateText] = React.useState('刚刚更新');
+  // const [updateText, setUpdateText] = React.useState('刚刚更新');
   const updateTimeRef = React.useRef(Date.now());
   const followListRef = React.useRef<FlatList | null>(null);
   const [refresh] = React.useState(false);
@@ -70,25 +70,25 @@ export default function Follow({ navigation, route }: Props) {
     store.followedUps = [...ups];
   }, [ups]);
 
-  React.useEffect(() => {
-    const a = setInterval(() => {
-      const now = Date.now();
-      if (now - updateTimeRef.current < 5 * 60 * 1000) {
-        setUpdateText('刚刚更新');
-      } else {
-        const date = new Date(updateTimeRef.current);
-        setUpdateText(
-          `${date.getHours().toString().padStart(2, '0')}:${date
-            .getMinutes()
-            .toString()
-            .padStart(2, '0')}更新`,
-        );
-      }
-    }, 1000 * 60);
-    return () => {
-      clearInterval(a);
-    };
-  }, []);
+  // React.useEffect(() => {
+  //   const a = setInterval(() => {
+  //     const now = Date.now();
+  //     if (now - updateTimeRef.current < 5 * 60 * 1000) {
+  //       setUpdateText('刚刚更新');
+  //     } else {
+  //       const date = new Date(updateTimeRef.current);
+  //       setUpdateText(
+  //         `${date.getHours().toString().padStart(2, '0')}:${date
+  //           .getMinutes()
+  //           .toString()
+  //           .padStart(2, '0')}更新`,
+  //       );
+  //     }
+  //   }, 1000 * 60);
+  //   return () => {
+  //     clearInterval(a);
+  //   };
+  // }, []);
 
   const getUpdate = useMemoizedFn(() => {
     ToastAndroid.show('刷新中...', ToastAndroid.SHORT);
@@ -127,7 +127,7 @@ export default function Follow({ navigation, route }: Props) {
     if (userInfo && (!currentList.current || currentList.current === ups)) {
       loadMoreUps();
       updateTimeRef.current = Date.now();
-      setUpdateText('刚刚更新');
+      // setUpdateText('刚刚更新');
     }
   }, [userInfo, currentList.current]);
 
@@ -227,22 +227,25 @@ export default function Follow({ navigation, route }: Props) {
     return <Login />;
   }
 
-  const displayUps: UserInfo[] = [];
+  const topUps: UserInfo[] = [];
+  const updateUps: UserInfo[] = [];
   if (specialUser) {
-    displayUps.push({ ...specialUser });
+    topUps.push({ ...specialUser });
   }
-  const notUpdateUsers = [];
+  const notUpdateUsers: UserInfo[] = [];
   for (let up of ups) {
     if (up.mid == specialUser?.mid) {
       continue;
     }
-    if (updatedUps[up.mid]) {
-      displayUps.push(up);
+    if (livingUps[up.mid]) {
+      topUps.push(up);
+    } else if (updatedUps[up.mid]) {
+      updateUps.push(up);
     } else {
       notUpdateUsers.push(up);
     }
   }
-  displayUps.push(...notUpdateUsers);
+  const displayUps = [...topUps, ...updateUps, ...notUpdateUsers];
 
   return (
     <View style={styles.container}>
@@ -305,9 +308,9 @@ export default function Follow({ navigation, route }: Props) {
           关注列表
           <Text style={{ fontSize: 14 }}>({followedNum})</Text>：{' '}
         </Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.updateTime}>{updateText}</Text>
-          {Object.values(livingUps).filter(Boolean).length ? (
+        {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}> */}
+        {/* <Text style={styles.updateTime}>{updateText}</Text> */}
+        {/* {Object.values(livingUps).filter(Boolean).length ? (
             <Badge
               status="success"
               value={'有直播'}
@@ -321,8 +324,8 @@ export default function Follow({ navigation, route }: Props) {
                 marginLeft: 5,
               }}
             />
-          ) : null}
-        </View>
+          ) : null} */}
+        {/* </View> */}
       </LinearGradient>
       <FlatList
         data={displayUps}

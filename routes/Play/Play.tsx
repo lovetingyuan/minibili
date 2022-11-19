@@ -106,7 +106,7 @@ function __hack() {
       });
       Array('ended', 'pause', 'waiting').forEach(evt => {
         video.addEventListener(evt, () => {
-          postPlayState('pause');
+          postPlayState(evt);
         });
       });
       postPlayState(video.paused ? 'pause' : 'play');
@@ -157,7 +157,7 @@ function __hack() {
       poster.dataset.patched = 'true';
       const image = poster.src;
       // @ts-ignore
-      poster.style.backdropFilter = 'blur(15px)';
+      poster.style.backdropFilter = 'blur(12px)';
       poster.style.objectFit = 'contain';
       if (poster.parentElement) {
         poster.parentElement.style.backgroundImage = `url("${image}")`;
@@ -284,6 +284,7 @@ export default ({ route, navigation }: Props) => {
   }, [bvid, aid]);
 
   const [verticalScale, setVerticalScale] = React.useState(0.4);
+  const [extraHeight, setExtraHeight] = React.useState(0);
 
   React.useEffect(() => {
     const vi = videoInfo;
@@ -295,11 +296,11 @@ export default ({ route, navigation }: Props) => {
         ? [vi.pages[currentPage].width, vi.pages[currentPage].height]
         : [vi.width, vi.height];
     if (videoWidth >= videoHeight) {
-      setVideoViewHeight((videoHeight / videoWidth) * width + 80);
+      setVideoViewHeight((videoHeight / videoWidth) * width + extraHeight);
     } else {
       setVideoViewHeight(height * verticalScale);
     }
-  }, [videoInfo, width, height, currentPage, verticalScale]);
+  }, [videoInfo, width, height, currentPage, verticalScale, extraHeight]);
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -397,15 +398,19 @@ export default ({ route, navigation }: Props) => {
               if (data.action === 'playState') {
                 if (data.payload === 'play') {
                   KeepAwake.activateKeepAwake('PLAY');
+                  setExtraHeight(80);
                 } else {
                   KeepAwake.deactivateKeepAwake('PLAY');
+                  if (data.payload === 'ended') {
+                    setExtraHeight(0);
+                  }
                 }
               }
               if (data.action === 'change-video-height') {
                 setVerticalScale(data.payload === 'up' ? 0.4 : 0.7);
               }
               if (data.action === 'console.log') {
-                console.log('message', data.payload);
+                __DEV__ && console.log('message', data.payload);
               }
             } catch (e) {}
           }}

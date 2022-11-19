@@ -62,10 +62,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
 
   React.useEffect(() => {
     const handler = function () {
-      console.log(
-        followedUps.map(v => v.mid),
-        dynamicUser,
-      );
       if (
         navigation.isFocused() &&
         followedUps.find(v => v.mid == dynamicUser?.mid)
