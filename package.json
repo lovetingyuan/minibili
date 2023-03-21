@@ -7,7 +7,7 @@
     "android": "adb devices -l && npx expo start -c --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:android": " eas build -p android --profile preview",
+    "build:android": " eas build -p android --profile production",
     "fixdeps": "npx expo install --fix"
   },
   "dependencies": {
@@ -33,7 +33,7 @@
     "expo-updates": "~0.16.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "0.71.3",
+    "react-native": "0.71.4",
     "react-native-exception-handler": "^2.10.10",
     "react-native-safe-area-context": "4.5.0",
     "react-native-screens": "~3.20.0",
