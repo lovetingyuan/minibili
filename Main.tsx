@@ -1,37 +1,37 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from 'react'
 import {
   Image,
   Linking,
   Pressable,
-  StatusBar,
   StyleSheet,
   Text,
   ToastAndroid,
   View,
-} from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Play from './routes/Play/Play';
-import Follow from './routes/Follow';
-import Dynamic from './routes/Dynamic';
-import Hot from './routes/Hot';
-import WebPage from './routes/WebPage';
-import { RootStackParamList } from './types';
-import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types';
-import { Button } from '@rneui/base';
-import store from './valtio/store';
-import { useSnapshot } from 'valtio';
-import { Badge } from '@rneui/base';
-import NetInfo from '@react-native-community/netinfo';
-import checkLiving from './services/checkLiving';
+} from 'react-native'
+import { StatusBar } from 'expo-status-bar'
+import * as SplashScreen from 'expo-splash-screen'
+import { NavigationContainer } from '@react-navigation/native'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import Play from './routes/Play/Play'
+import Follow from './routes/Follow'
+import Dynamic from './routes/Dynamic'
+import Hot from './routes/Hot'
+import WebPage from './routes/WebPage'
+import { RootStackParamList } from './types'
+import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
+import { Button } from '@rneui/base'
+import store from './valtio/store'
+import { useSnapshot } from 'valtio'
+import { Badge } from '@rneui/base'
+import NetInfo from '@react-native-community/netinfo'
+// import checkLiving from './services/checkLiving'
 
-const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator()
+const Stack = createNativeStackNavigator<RootStackParamList>()
 
-SplashScreen.preventAutoHideAsync();
-checkLiving();
+SplashScreen.preventAutoHideAsync()
+// checkLiving()
 
 NetInfo.fetch().then(state => {
   if (state.isConnected) {
@@ -40,18 +40,18 @@ NetInfo.fetch().then(state => {
         ' 请注意当前网络不是 wifi ',
         ToastAndroid.LONG,
         ToastAndroid.CENTER,
-      );
+      )
     }
-    return state.type;
+    return state.type
   } else {
-    ToastAndroid.show('当前网络有问题', ToastAndroid.SHORT);
+    ToastAndroid.show('当前网络有问题', ToastAndroid.SHORT)
   }
-});
+})
 const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
   const labelCmp: (props: {
-    focused: boolean;
-    color: string;
-    position: LabelPosition;
+    focused: boolean
+    color: string
+    position: LabelPosition
   }) => ReactNode = props => {
     const css = StyleSheet.create({
       text: {
@@ -59,7 +59,7 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
         fontSize: props.focused ? 17 : 16,
         fontWeight: props.focused ? 'bold' : 'normal',
       },
-    });
+    })
     if (text === '我的' && updatedCount) {
       return (
         <View>
@@ -84,17 +84,17 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
           />
           <Text style={css.text}>{text}</Text>
         </View>
-      );
+      )
     }
-    return <Text style={css.text}>{text}</Text>;
-  };
-  return labelCmp;
-};
+    return <Text style={css.text}>{text}</Text>
+  }
+  return labelCmp
+}
 
 const Main = () => {
-  const { dynamicUser, updatedUps, livingUps } = useSnapshot(store);
-  const updateCount = Object.values(updatedUps).filter(Boolean).length;
-  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0;
+  const { dynamicUser, updatedUps, livingUps } = useSnapshot(store)
+  const updateCount = Object.values(updatedUps).filter(Boolean).length
+  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
     <Tab.Navigator
       initialRouteName="Hot"
@@ -115,7 +115,7 @@ const Main = () => {
       <Tab.Screen
         name="Hot"
         component={Hot}
-        options={options => {
+        options={() => {
           return {
             tabBarLabel: getLabel('热门'),
             headerTitle: '🔥 热门' + (__DEV__ ? ' dev' : ''),
@@ -125,16 +125,16 @@ const Main = () => {
               return (
                 <Pressable
                   onPress={() => {
-                    store.showBlackDialog++;
+                    store.showBlackDialog++
                   }}>
                   <Image
                     source={require('./assets/filter.png')}
                     style={{ width: 16, height: 16, marginRight: 16 }}
                   />
                 </Pressable>
-              );
+              )
             },
-          };
+          }
         }}
       />
       {dynamicUser ? (
@@ -154,15 +154,15 @@ const Main = () => {
         }}
       />
     </Tab.Navigator>
-  );
-};
+  )
+}
 
 export default () => {
-  const { webViewMode } = useSnapshot(store);
+  const { webViewMode } = useSnapshot(store)
 
   return (
     <>
-      <StatusBar backgroundColor="transparent" barStyle="dark-content" />
+      <StatusBar style="auto" />
       <NavigationContainer>
         {/* <CheckLiving /> */}
         <Stack.Navigator
@@ -201,18 +201,18 @@ export default () => {
                               url:
                                 'https://m.bilibili.com/video/' +
                                 props.route.params.bvid,
-                            });
+                            })
                           }
-                        });
+                        })
                       }}>
                       <Image
                         style={{ width: 36, height: 14 }}
                         source={require('./assets/bili-text.png')}
                       />
                     </Pressable>
-                  );
+                  )
                 },
-              };
+              }
             }}
           />
           <Stack.Screen
@@ -227,19 +227,19 @@ export default () => {
                       titleStyle={{ fontSize: 13 }}
                       onPress={() => {
                         store.webViewMode =
-                          webViewMode === 'MOBILE' ? 'PC' : 'MOBILE';
+                          webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
                       }}
                       size="sm"
                       type="clear">
                       {webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
                     </Button>
-                  );
+                  )
                 },
-              };
+              }
             }}
           />
         </Stack.Navigator>
       </NavigationContainer>
     </>
-  );
-};
+  )
+}

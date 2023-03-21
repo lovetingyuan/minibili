@@ -1,6 +1,6 @@
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React from 'react';
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import React from 'react'
 import {
   Image,
   Linking,
@@ -8,27 +8,27 @@ import {
   ScrollView,
   StyleSheet,
   View,
-} from 'react-native';
-import RichText from '../../components/RichText';
+} from 'react-native'
+import RichText from '../../components/RichText'
 // import { AppContext } from '../../context';
-import { RootStackParamList } from '../../types';
-import DateAndOpen from './DateAndOpen';
-import { useSnapshot } from 'valtio';
-import store from '../../valtio/store';
-type NavigationProps = NativeStackScreenProps<RootStackParamList>;
+import { RootStackParamList } from '../../types'
+import DateAndOpen from './DateAndOpen'
+import { useSnapshot } from 'valtio'
+import store from '../../valtio/store'
+type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function RichTextItem(props: {
-  text: string;
-  date: string;
-  mid: number;
-  name: string;
-  id: string | number;
-  images: { src: string; ratio: number }[];
+  text: string
+  date: string
+  mid: number
+  name: string
+  id: string | number
+  images: { src: string; ratio: number }[]
 }) {
-  const { text, date, mid, images, name, id } = props;
-  const { specialUser } = useSnapshot(store);
-  const isTracy = mid == specialUser?.mid;
-  const navigation = useNavigation<NavigationProps['navigation']>();
+  const { text, date, mid, images, name, id } = props
+  const { specialUser } = useSnapshot(store)
+  const isTracy = mid == specialUser?.mid
+  const navigation = useNavigation<NavigationProps['navigation']>()
   return (
     <View style={[styles.textContainer]}>
       <RichText
@@ -46,11 +46,11 @@ export default function RichTextItem(props: {
               <Pressable
                 key={img.src}
                 onPress={() => {
-                  Linking.openURL(img.src);
+                  Linking.openURL(img.src)
                   navigation.navigate('WebPage', {
                     url: img.src,
                     title: name,
-                  });
+                  })
                 }}>
                 <Image
                   style={[styles.image, { aspectRatio: img.ratio }]}
@@ -60,13 +60,13 @@ export default function RichTextItem(props: {
                   }}
                 />
               </Pressable>
-            );
+            )
           })}
         </ScrollView>
       ) : null}
       <DateAndOpen title={props.text} name={name} id={id} date={date} />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -91,4 +91,4 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   date: { color: '#555', fontSize: 12 },
-});
+})

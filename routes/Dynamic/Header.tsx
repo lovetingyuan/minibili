@@ -1,40 +1,39 @@
-import React from 'react';
+import React from 'react'
 import {
   View,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
-  StatusBar,
   Image,
   Pressable,
-} from 'react-native';
-import { Avatar } from '@rneui/base';
+} from 'react-native'
+import { Avatar } from '@rneui/base'
 import {
   getFansData,
   getLiveStatus,
   getUserInfo,
-} from '../../services/Bilibili';
-import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList, UserInfo } from '../../types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Button } from '@rneui/base';
-import store from '../../valtio/store';
-import { useSnapshot } from 'valtio';
-import { handleShareUp } from '../../services/Share';
-type NavigationProps = NativeStackScreenProps<RootStackParamList>;
+} from '../../services/Bilibili'
+import { useNavigation } from '@react-navigation/native'
+import { RootStackParamList, UserInfo } from '../../types'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Button } from '@rneui/base'
+import store from '../../valtio/store'
+import { useSnapshot } from 'valtio'
+import { handleShareUp } from '../../services/Share'
+type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function Header(props: UserInfo) {
-  const { mid } = props;
-  const [fans, setFans] = React.useState('');
+  const { mid } = props
+  const [fans, setFans] = React.useState('')
 
-  const navigation = useNavigation<NavigationProps['navigation']>();
-  const { specialUser } = useSnapshot(store);
-  const isTracy = mid == specialUser?.mid;
-  const [userInfo, setUserInfo] = React.useState<UserInfo>({ ...props });
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const { specialUser } = useSnapshot(store)
+  const isTracy = mid == specialUser?.mid
+  const [userInfo, setUserInfo] = React.useState<UserInfo>({ ...props })
   const [liveInfo, setLiveInfo] = React.useState({
     living: false,
     liveUrl: '',
-  });
+  })
   React.useEffect(() => {
     if (mid) {
       getUserInfo(mid)
@@ -44,41 +43,41 @@ export default function Header(props: UserInfo) {
             face: res.face,
             sign: res.sign,
             mid: res.mid + '',
-          });
+          })
           setLiveInfo({
             living: res.living,
             liveUrl: res.liveUrl || '',
-          });
+          })
         })
         .catch(() => {
           if (isTracy) {
-            setUserInfo({ ...userInfo, ...specialUser });
+            setUserInfo({ ...userInfo, ...specialUser })
           } else {
-            setUserInfo({ ...props });
+            setUserInfo({ ...props })
           }
           getLiveStatus(mid).then(res => {
             setLiveInfo({
               living: res.living,
               liveUrl: 'https://live.bilibili.com/' + res.roomId,
-            });
-          });
-        });
+            })
+          })
+        })
       getFansData(mid).then(data => {
         if (data.follower < 10000) {
-          setFans(data.follower + '');
+          setFans(data.follower + '')
         } else {
-          setFans((data.follower / 10000).toFixed(1) + '万');
+          setFans((data.follower / 10000).toFixed(1) + '万')
         }
-      });
+      })
     }
-  }, [mid]);
-  const nameStyle: Record<string, any> = {};
+  }, [mid])
+  const nameStyle: Record<string, any> = {}
   if (isTracy) {
-    nameStyle.color = '#f25d8e';
+    nameStyle.color = '#f25d8e'
   }
-  const avatar = userInfo.face;
+  const avatar = userInfo.face
   if (!mid) {
-    return <Text>{userInfo.name}</Text>;
+    return <Text>{userInfo.name}</Text>
   }
   return (
     <View style={styles.header}>
@@ -87,7 +86,7 @@ export default function Header(props: UserInfo) {
           navigation.navigate('WebPage', {
             url: `https://space.bilibili.com/${mid}`,
             title: userInfo.name,
-          });
+          })
         }}>
         <Avatar
           size={58}
@@ -117,7 +116,7 @@ export default function Header(props: UserInfo) {
           <Pressable
             onPress={() => {
               if (userInfo) {
-                handleShareUp(userInfo.name, userInfo.mid, userInfo.sign);
+                handleShareUp(userInfo.name, userInfo.mid, userInfo.sign)
               }
             }}>
             <Image
@@ -145,20 +144,20 @@ export default function Header(props: UserInfo) {
               navigation.navigate('WebPage', {
                 url: liveInfo.liveUrl,
                 title: userInfo.name + '的直播间',
-              });
+              })
             }
           }}
         />
       ) : null}
     </View>
-  );
+  )
 }
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingTop: StatusBar.currentHeight,
+    paddingTop: 50,
     paddingLeft: 12,
     paddingRight: 12,
     paddingBottom: 20,
@@ -185,4 +184,4 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   shareImg: { width: 15, height: 15, marginLeft: 20 },
-});
+})

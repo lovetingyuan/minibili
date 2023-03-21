@@ -1,5 +1,5 @@
-import React from 'react';
-import { Input, Button, Icon } from '@rneui/base';
+import React from 'react'
+import { Input, Button, Icon } from '@rneui/base'
 import {
   View,
   Text,
@@ -8,48 +8,48 @@ import {
   Linking,
   StyleSheet,
   ToastAndroid,
-} from 'react-native';
-import { getUserInfo } from '../../services/Bilibili';
-import store from '../../valtio/store';
+} from 'react-native'
+import { getUserInfo } from '../../services/Bilibili'
+import store from '../../valtio/store'
 
-const leftTv = require('../../assets/tv-left.png');
-const rightTv = require('../../assets/tv-right.png');
+const leftTv = require('../../assets/tv-left.png')
+const rightTv = require('../../assets/tv-right.png')
 
 export default function Login() {
-  const inputUserIdRef = React.useRef('');
-  const inputRef = React.useRef(null);
-  const [tvImg, setTvImg] = React.useState(true);
+  const inputUserIdRef = React.useRef('')
+  const inputRef = React.useRef(null)
+  const [tvImg, setTvImg] = React.useState(true)
   React.useEffect(() => {
     const timer = setInterval(() => {
-      setTvImg(v => !v);
-    }, 666);
+      setTvImg(v => !v)
+    }, 666)
     return () => {
-      clearInterval(timer);
-    };
-  }, []);
+      clearInterval(timer)
+    }
+  }, [])
   const storeUserId = () => {
     if (!inputUserIdRef.current) {
-      ToastAndroid.show('请输入ID', ToastAndroid.SHORT);
-      return;
+      ToastAndroid.show('请输入ID', ToastAndroid.SHORT)
+      return
     }
     getUserInfo(inputUserIdRef.current)
       .then(user => {
         if (!user?.mid) {
-          ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT);
-          return;
+          ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
+          return
         }
         store.userInfo = {
           name: user.name,
           mid: user.mid + '',
           face: user.face,
           sign: user.sign,
-        };
+        }
       })
       .catch(() => {
-        ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT);
-        store.userInfo = null;
-      });
-  };
+        ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
+        store.userInfo = null
+      })
+  }
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -58,7 +58,7 @@ export default function Login() {
       <Text style={styles.text}>访问你的B站账号的主页并登录：</Text>
       <Pressable
         onPress={() => {
-          Linking.openURL('https://space.bilibili.com/');
+          Linking.openURL('https://space.bilibili.com/')
         }}>
         <Text style={styles.linkText} selectable>
           https://space.bilibili.com/
@@ -89,7 +89,7 @@ export default function Login() {
         />
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -132,4 +132,4 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   buttonTextStyle: { fontWeight: '600', fontSize: 18 },
-});
+})

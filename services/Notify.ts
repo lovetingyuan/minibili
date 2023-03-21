@@ -1,4 +1,4 @@
-import * as Notifications from 'expo-notifications';
+import * as Notifications from 'expo-notifications'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -6,7 +6,7 @@ Notifications.setNotificationHandler({
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
-});
+})
 
 export default function notify(title: string, body?: string) {
   return Notifications.scheduleNotificationAsync({
@@ -20,5 +20,5 @@ export default function notify(title: string, body?: string) {
       vibrate: [5000],
     },
     trigger: { seconds: 1 },
-  });
+  })
 }

@@ -1,9 +1,9 @@
-import { ToastAndroid } from 'react-native';
+import { ToastAndroid } from 'react-native'
 // import { getBlackUps } from '../routes/Hot/blackUps';
-import { DynamicType } from '../types';
-import { URL } from 'react-native-url-polyfill';
+import { DynamicType } from '../types'
+import { URL } from 'react-native-url-polyfill'
 
-let errorTime = Date.now();
+let errorTime = Date.now()
 
 // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=326081112&timezone_offset=-480
 export function request<D extends Record<string, any>>(
@@ -12,7 +12,7 @@ export function request<D extends Record<string, any>>(
 ) {
   const requestUrl = url.startsWith('http')
     ? url
-    : 'http://api.bilibili.com' + url;
+    : 'http://api.bilibili.com' + url
   // return (
   // fetch(requestUrl, {
   //   headers: {
@@ -40,7 +40,7 @@ export function request<D extends Record<string, any>>(
   //   mode: 'cors',
   //   // credentials: 'include',
   // })
-  const { origin, hostname } = new URL(requestUrl);
+  const { origin, hostname } = new URL(requestUrl)
   return fetch(requestUrl + '&_t=' + Date.now(), {
     headers: {
       // authority: host,
@@ -72,44 +72,44 @@ export function request<D extends Record<string, any>>(
     .then(r => r.json())
     .then((res: { code: number; message: string; data: D }) => {
       if (res.code) {
-        __DEV__ && console.log('error', res.code, res.message);
+        __DEV__ && console.log('error', res.code, res.message)
         if (Date.now() - errorTime > 20000) {
-          ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT);
-          errorTime = Date.now();
+          ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT)
+          errorTime = Date.now()
         }
-        throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''));
+        throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''))
       }
-      return res.data;
-    });
+      return res.data
+    })
   // );
 }
 
 export async function getUserInfo(uid: string | number) {
   // https://api.bilibili.com/x/space/acc/info?mid=1458143131
   interface Res {
-    birthday: string;
-    coins: number;
-    face: string;
-    level: number;
+    birthday: string
+    coins: number
+    face: string
+    level: number
     live_room: {
-      cover: string;
-      liveStatus: 0 | 1;
-      roomStatus: 1 | 0;
-      roomid: number;
-      title: string;
-      url: string;
-    } | null;
-    mid: number;
-    name: string;
-    sex: string;
-    sign: string;
-    top_photo: string;
+      cover: string
+      liveStatus: 0 | 1
+      roomStatus: 1 | 0
+      roomid: number
+      title: string
+      url: string
+    } | null
+    mid: number
+    name: string
+    sex: string
+    sign: string
+    top_photo: string
   }
   const data = await request<Res>(
     //?mid=1717066021&token=&platform=web&jsonp=jsonp
     '/x/space/acc/info?mid=' + uid + '&token=&platform=web&jsonp=jsonp',
     'https://space.bilibili.com/' + uid,
-  );
+  )
   // if (code) {
   //   throw new Error('获取用户信息失败');
   // }
@@ -122,157 +122,157 @@ export async function getUserInfo(uid: string | number) {
     mid: data.mid,
     level: data.level,
     sex: data.sex,
-  };
+  }
 }
 
 export async function getDynamicItems(offset = '', uid: string | number) {
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480
   interface Author {
-    face: string;
-    following: boolean;
-    jump_url: string;
-    label: string;
-    mid: number;
-    name: string;
-    pub_location_text: string;
-    pub_time: string;
-    pub_ts: number;
-    type: 'AUTHOR_TYPE_NORMAL';
+    face: string
+    following: boolean
+    jump_url: string
+    label: string
+    mid: number
+    name: string
+    pub_location_text: string
+    pub_time: string
+    pub_ts: number
+    type: 'AUTHOR_TYPE_NORMAL'
   }
   interface Desc {
-    text: string;
+    text: string
   }
   interface AV {
-    desc: Desc | null;
+    desc: Desc | null
     major: {
-      type: 'MAJOR_TYPE_ARCHIVE';
+      type: 'MAJOR_TYPE_ARCHIVE'
       archive: {
-        aid: string;
-        bvid: string;
-        cover: string;
-        desc: string;
-        duration_text: string;
-        jump_url: string;
-        stat: { danmaku: string; play: string };
-        title: string;
-        type: number;
-      };
-    };
+        aid: string
+        bvid: string
+        cover: string
+        desc: string
+        duration_text: string
+        jump_url: string
+        stat: { danmaku: string; play: string }
+        title: string
+        type: number
+      }
+    }
   }
   interface Draw {
-    desc: Desc | null;
+    desc: Desc | null
     major: {
-      type: 'MAJOR_TYPE_DRAW';
+      type: 'MAJOR_TYPE_DRAW'
       draw: {
-        id: number;
+        id: number
         items: {
-          src: string;
-          width: number;
-          height: number;
-          size: number;
-        }[];
-      };
-    };
+          src: string
+          width: number
+          height: number
+          size: number
+        }[]
+      }
+    }
   }
   interface Article {
-    desc: null;
+    desc: null
     major: {
-      type: 'MAJOR_TYPE_ARTICLE';
+      type: 'MAJOR_TYPE_ARTICLE'
       article: {
-        covers: string[];
-        desc: string;
-        label: string;
-        title: string;
+        covers: string[]
+        desc: string
+        label: string
+        title: string
         items: {
-          src: string;
-          width: number;
-          height: number;
-          size: number;
-        }[];
-      };
-    };
+          src: string
+          width: number
+          height: number
+          size: number
+        }[]
+      }
+    }
   }
   interface Word {
-    major: null;
-    desc: Desc;
-    additional?: any;
+    major: null
+    desc: Desc
+    additional?: any
   }
   interface Topic {
-    major: null;
-    desc: Desc;
+    major: null
+    desc: Desc
     topic?: {
-      name: string;
-    };
+      name: string
+    }
   }
   interface Live {
     major: {
-      type: 'MAJOR_TYPE_LIVE';
+      type: 'MAJOR_TYPE_LIVE'
       live: {
-        cover: string;
-        title: string;
-      };
-    };
-    desc: null;
-    topic: null;
+        cover: string
+        title: string
+      }
+    }
+    desc: null
+    topic: null
   }
   interface Res {
-    has_more: boolean;
+    has_more: boolean
     items: (
       | {
-          type: 'DYNAMIC_TYPE_AV';
+          type: 'DYNAMIC_TYPE_AV'
           modules: {
-            module_author: Author;
-            module_dynamic: AV;
-            module_tag?: { text: string };
-          };
-          id_str: string;
+            module_author: Author
+            module_dynamic: AV
+            module_tag?: { text: string }
+          }
+          id_str: string
         }
       | {
-          type: 'DYNAMIC_TYPE_FORWARD';
-          id_str: string;
+          type: 'DYNAMIC_TYPE_FORWARD'
+          id_str: string
           modules: {
-            module_author: Author;
+            module_author: Author
             module_dynamic: {
-              desc: Desc | null;
-              major: null;
-            };
-            module_tag?: { text: string };
-          };
+              desc: Desc | null
+              major: null
+            }
+            module_tag?: { text: string }
+          }
           orig: {
-            id_str: string;
+            id_str: string
             modules: {
-              module_author: Author;
-              module_dynamic: AV | Draw | Article | Word | Topic | Live;
-              module_tag?: { text: string };
-            };
-          };
+              module_author: Author
+              module_dynamic: AV | Draw | Article | Word | Topic | Live
+              module_tag?: { text: string }
+            }
+          }
         }
       | {
-          type: 'DYNAMIC_TYPE_DRAW';
-          id_str: string;
+          type: 'DYNAMIC_TYPE_DRAW'
+          id_str: string
           modules: {
-            module_author: Author;
-            module_dynamic: Draw;
-            module_tag?: { text: string };
-          };
+            module_author: Author
+            module_dynamic: Draw
+            module_tag?: { text: string }
+          }
         }
       | {
-          type: 'DYNAMIC_TYPE_WORD';
-          id_str: string;
+          type: 'DYNAMIC_TYPE_WORD'
+          id_str: string
           modules: {
-            module_author: Author;
-            module_dynamic: Word;
-            module_tag?: { text: string };
-          };
+            module_author: Author
+            module_dynamic: Word
+            module_tag?: { text: string }
+          }
         }
-    )[];
-    offset: string;
-    update_baseline: string;
-    update_num: number;
+    )[]
+    offset: string
+    update_baseline: string
+    update_num: number
   }
   const data = await request<Res>(
     `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${uid}&timezone_offset=-480`,
-  );
+  )
   // if (code) {
   //   return Promise.reject(new Error(message));
   // }
@@ -289,17 +289,17 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           name: item.modules?.module_author?.name,
           text: item.modules?.module_dynamic?.desc?.text,
           top: item.modules?.module_tag?.text === '置顶',
-        };
+        }
         if (item.type === 'DYNAMIC_TYPE_WORD') {
           return {
             ...common,
             type: DynamicType.Word as const,
             additionalText:
               item.modules.module_dynamic.additional?.reserve?.desc1?.text,
-          };
+          }
         }
         if (item.type === 'DYNAMIC_TYPE_AV') {
-          const video = item.modules.module_dynamic.major.archive;
+          const video = item.modules.module_dynamic.major.archive
           return {
             ...common,
             type: DynamicType.Video as const,
@@ -309,7 +309,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
             bvid: video.bvid,
             aid: video.aid,
             duration: video.duration_text,
-          };
+          }
         }
         if (item.type === 'DYNAMIC_TYPE_DRAW') {
           return {
@@ -319,12 +319,12 @@ export async function getDynamicItems(offset = '', uid: string | number) {
               return {
                 src: v.src,
                 ratio: v.width / v.height,
-              };
+              }
             }),
-          };
+          }
         }
         if (item.type === 'DYNAMIC_TYPE_FORWARD') {
-          const forward = item.orig.modules?.module_dynamic || {};
+          const forward = item.orig.modules?.module_dynamic || {}
           if (forward.major?.type === 'MAJOR_TYPE_ARCHIVE') {
             return {
               ...common,
@@ -332,7 +332,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
               forwardText: forward.desc?.text,
               cover: forward.major?.archive.cover,
               title: forward.major?.archive.title,
-            };
+            }
           }
           if (forward.major?.type === 'MAJOR_TYPE_DRAW') {
             return {
@@ -343,9 +343,9 @@ export async function getDynamicItems(offset = '', uid: string | number) {
                 return {
                   ratio: v.width / v.height,
                   src: v.src,
-                };
+                }
               }),
-            };
+            }
           }
           if (forward.major?.type === 'MAJOR_TYPE_ARTICLE') {
             return {
@@ -356,9 +356,9 @@ export async function getDynamicItems(offset = '', uid: string | number) {
                 return {
                   ratio: 2,
                   src: v,
-                };
+                }
               }),
-            };
+            }
           }
           if (forward.major?.type === 'MAJOR_TYPE_LIVE') {
             return {
@@ -373,7 +373,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
               //     src: v,
               //   };
               // }),
-            };
+            }
           }
           return {
             ...common,
@@ -383,111 +383,138 @@ export async function getDynamicItems(offset = '', uid: string | number) {
               ('topic' in forward && forward.topic?.name
                 ? '#' + forward.topic.name
                 : ''),
-          };
+          }
         }
       })
       .filter(Boolean),
-  };
+  }
 }
 
 export async function getFansData(uid: string | number) {
   // https://api.bilibili.com/x/relation/stat?vmid=14427395
   const data = await request<{
-    mid: number;
-    following: number;
-    whisper: number;
-    black: number;
-    follower: number;
-  }>(`/x/relation/stat?vmid=${uid}`);
+    mid: number
+    following: number
+    whisper: number
+    black: number
+    follower: number
+  }>(`/x/relation/stat?vmid=${uid}`)
   // if (code) {
   //   throw new Error('获取关注数失败');
   // }
-  return data;
+  return data
 }
 
-export async function getFollowUps(uid: number | string, page = 1) {
-  // https://api.bilibili.com/x/relation/followings?vmid=14427395&pn=1&ps=20&order=desc&jsonp=jsonp
+export async function getFollowUps(uid: number | string) {
+  // https://api.bilibili.com/x/relation/followings?vmid=14427395&pn=1&ps=50&order=desc&jsonp=jsonp
   interface Followed {
-    face: string;
-    mid: number | string;
-    mtime: number;
-    official_verify: { type: number; desc: string };
-    sign: string;
+    face: string
+    mid: number | string
+    mtime: number
+    official_verify: { type: number; desc: string }
+    sign: string
     // special: 0;
-    tag: null;
-    uname: string;
+    tag: null
+    uname: string
   }
   const data = await request<{
-    list: Followed[];
-    total: number;
-  }>(
-    `/x/relation/followings?vmid=${uid}&pn=${page}&ps=20&order=desc&jsonp=jsonp`,
-  );
+    list: Followed[]
+    total: number
+  }>(`/x/relation/followings?vmid=${uid}&pn=1&ps=50&order=desc&jsonp=jsonp`)
+  const total = data.total
+  const list = [data.list]
+  const pages = Math.ceil(total / 50) - 1
+  await Promise.all(
+    Array.from({ length: pages }).map((v, i) => {
+      return request<{
+        list: Followed[]
+        total: number
+      }>(
+        `/x/relation/followings?vmid=${uid}&pn=${
+          i + 2
+        }&ps=50&order=desc&jsonp=jsonp`,
+      ).then(res => {
+        list[i + 1] = res.list
+      })
+    }),
+  )
   // if (code) {
   //   throw new Error('获取关注列表失败');
   // }
   return {
-    total: data.total,
-    list: data.list.map(up => {
-      return {
-        face: up.face,
-        mid: up.mid,
-        name: up.uname,
-        sign: up.sign,
-      };
-    }),
-  };
+    total,
+    list: list.reduce(
+      (a, b) => {
+        return a.concat(
+          b.map(up => {
+            return {
+              face: up.face,
+              mid: up.mid,
+              name: up.uname,
+              sign: up.sign,
+            }
+          }),
+        )
+      },
+      [] as {
+        face: string
+        mid: string | number
+        name: string
+        sign: string
+      }[],
+    ),
+  }
 }
 
 export async function getHotList(page = 1) {
   // https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1
   interface Hot {
-    aid: number;
-    bvid: string;
-    cid: number;
-    copyright: 1 | 0;
-    ctime: number;
-    desc: string;
-    dimension: { width: number; height: number; rotate: number };
-    duration: number;
-    dynamic: string;
-    first_frame: string;
-    is_ogv: boolean;
-    ogv_info: null;
-    owner: { mid: number; name: string; face: string };
-    pic: string;
-    pubdate: number;
+    aid: number
+    bvid: string
+    cid: number
+    copyright: 1 | 0
+    ctime: number
+    desc: string
+    dimension: { width: number; height: number; rotate: number }
+    duration: number
+    dynamic: string
+    first_frame: string
+    is_ogv: boolean
+    ogv_info: null
+    owner: { mid: number; name: string; face: string }
+    pic: string
+    pubdate: number
     // rcmd_reason: {content: '百万播放', corner_mark: 0}
     // rights: {bp: 0, elec: 0, download: 0, movie: 0, pay: 0, …}
     // season_type: 0
-    short_link: string;
-    short_link_v2: string;
+    short_link: string
+    short_link_v2: string
     stat: {
-      aid: number;
-      view: number;
-      danmaku: number;
-      favorite: number;
-      his_rank: number;
-      like: number;
-      now_rank: number;
-      reply: number;
-      share: number;
-    };
-    state: number;
-    tid: number;
-    title: string;
-    tname: string;
-    videos: number;
+      aid: number
+      view: number
+      danmaku: number
+      favorite: number
+      his_rank: number
+      like: number
+      now_rank: number
+      reply: number
+      share: number
+    }
+    state: number
+    tid: number
+    title: string
+    tname: string
+    videos: number
   }
   // const blackUps = await getBlackUps;
   const data = await request<{
-    list: Hot[];
-    no_more: boolean;
-  }>(`/x/web-interface/popular?ps=20&pn=${page}`);
+    list: Hot[]
+    no_more: boolean
+  }>(`/x/web-interface/popular?ps=20&pn=${page}`)
   // if (code !== 0) {
   //   throw new Error(message);
   // }
-  const { no_more, list } = data;
+  const { no_more, list } = data
   return {
     more: !no_more,
     list: list.map(item => {
@@ -505,53 +532,53 @@ export async function getHotList(page = 1) {
         shareNum: item.stat.share,
         tag: item.tname,
         videosNum: item.videos,
-      };
+      }
     }),
-  };
+  }
 }
 
 export function getVideoComments(aid: string | number) {
   // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
   interface Member {
-    DisplayRank: string;
-    avatar: string;
-    contract_desc: string;
-    face_nft_new: 0;
-    fans_detail: null;
-    following: 0;
-    is_contractor: false;
-    is_followed: 0;
-    is_senior_member: 0;
+    DisplayRank: string
+    avatar: string
+    contract_desc: string
+    face_nft_new: 0
+    fans_detail: null
+    following: 0
+    is_contractor: false
+    is_followed: 0
+    is_senior_member: 0
     level_info: {
-      current_level: 3;
-      current_min: 0;
-      current_exp: 0;
-      next_exp: 0;
-    };
-    mid: string;
+      current_level: 3
+      current_min: 0
+      current_exp: 0
+      next_exp: 0
+    }
+    mid: string
     nameplate: {
-      condition: '';
-      image: '';
-      image_small: '';
-      level: '';
-      name: '';
-      nid: 0;
-    };
-    nft_interaction: null;
-    official_verify: { type: -1; desc: '' };
+      condition: ''
+      image: ''
+      image_small: ''
+      level: ''
+      name: ''
+      nid: 0
+    }
+    nft_interaction: null
+    official_verify: { type: -1; desc: '' }
     pendant: {
-      expire: 0;
-      image: '';
-      image_enhance: '';
-      image_enhance_frame: '';
-      name: '';
-      pid: 0;
-    };
-    rank: string;
-    sex: string;
-    sign: string;
-    uname: string;
-    user_sailing: { pendant: null; cardbg: null; cardbg_with_focus: null };
+      expire: 0
+      image: ''
+      image_enhance: ''
+      image_enhance_frame: ''
+      name: ''
+      pid: 0
+    }
+    rank: string
+    sex: string
+    sign: string
+    uname: string
+    user_sailing: { pendant: null; cardbg: null; cardbg_with_focus: null }
     // vip: {vipType: 0, vipDueDate: 0, dueRemark: '', accessStatus: 0, vipStatus: 0, …}
   }
   interface Reply {
@@ -559,59 +586,59 @@ export function getVideoComments(aid: string | number) {
     // assist: 0
     // attr: 0
     content: {
-      message: string;
-      plat: number;
-      device: string;
-      jump_url: {};
-      max_line: number;
-      members: [];
-    };
-    count: number;
-    ctime: number;
+      message: string
+      plat: number
+      device: string
+      jump_url: {}
+      max_line: number
+      members: []
+    }
+    count: number
+    ctime: number
     // dialog: 0
     // fansgrade: 0
     // folder: {has_folded: false, is_folded: false, rule: ''}
-    invisible: boolean;
-    like: number;
-    member: Member;
-    mid: number;
-    oid: number;
-    parent: number;
-    parent_str: string;
-    rcount: number;
-    replies: Reply[] | null;
-    reply_control: { time_desc: string; location: string };
-    root: number;
-    root_str: string;
-    rpid: number;
-    rpid_str: string;
-    show_follow: boolean;
-    state: number;
-    type: number;
-    up_action: { like: boolean; reply: boolean };
+    invisible: boolean
+    like: number
+    member: Member
+    mid: number
+    oid: number
+    parent: number
+    parent_str: string
+    rcount: number
+    replies: Reply[] | null
+    reply_control: { time_desc: string; location: string }
+    root: number
+    root_str: string
+    rpid: number
+    rpid_str: string
+    show_follow: boolean
+    state: number
+    type: number
+    up_action: { like: boolean; reply: boolean }
   }
   interface ReplyRes {
-    assist: number;
-    blacklist: number;
-    callbacks: {};
-    cm: {};
-    config: { showtopic: 1; show_up_flag: true; read_only: false };
+    assist: number
+    blacklist: number
+    callbacks: {}
+    cm: {}
+    config: { showtopic: 1; show_up_flag: true; read_only: false }
     // control: {input_disable: false, root_input_text: '发一条友善的评论', child_input_text: '', giveup_input_text: '不发没关系，请继续友善哦~', answer_guide_text: '需要升级成为lv2会员后才可以评论，先去答题转正吧！', …}
     // cursor: {is_begin: false, prev: 4, next: 5, is_end: false, all_count: 539, …}
     // effects: {preloading: ''}
     // folder: {has_folded: false, is_folded: false, rule: 'https://www.bilibili.com/blackboard/foldingreply.html'}
-    note: 1;
-    notice: null;
-    replies: Reply[];
+    note: 1
+    notice: null
+    replies: Reply[]
     top: {
-      admin: null;
-      upper: Reply | null;
-      vote: null;
-    };
+      admin: null
+      upper: Reply | null
+      vote: null
+    }
     // top_replies: null
     // up_selection: {pending_count: 0, ignore_count: 0}
-    upper: { mid: number };
-    vote: 0;
+    upper: { mid: number }
+    vote: 0
   }
   return Promise.all([
     request<ReplyRes>('/x/v2/reply/main?type=1&next=1&oid=' + aid),
@@ -641,12 +668,12 @@ export function getVideoComments(aid: string | number) {
                 mid: v.mid,
                 upLike: v.up_action.like,
                 like: v.like,
-              };
+              }
             }) || [],
-        };
-      });
+        }
+      })
     if (res1.top.upper) {
-      const item = res1.top.upper;
+      const item = res1.top.upper
       replies.unshift({
         message: item.content.message,
         name: item.member.uname,
@@ -664,74 +691,74 @@ export function getVideoComments(aid: string | number) {
               mid: v.mid,
               upLike: v.up_action.like,
               like: v.like,
-            };
+            }
           }) || [],
-      });
+      })
     }
-    return replies;
-  });
+    return replies
+  })
 }
 
 export function getVideoInfo(aid: string | number) {
   // https://api.bilibili.com/x/web-interface/view?aid=336141511
   interface Video {
-    aid: number;
-    bvid: string;
-    cid: number;
-    copyright: number;
-    ctime: number;
-    desc: string;
+    aid: number
+    bvid: string
+    cid: number
+    copyright: number
+    ctime: number
+    desc: string
     // desc_v2: [{…}]
-    dimension: { width: number; height: number; rotate: number };
-    duration: number;
-    dynamic: string;
+    dimension: { width: number; height: number; rotate: number }
+    duration: number
+    dynamic: string
     // honor_reply: {honor: Array(1)}
-    is_chargeable_season: boolean;
-    is_season_display: boolean;
-    is_story: boolean;
-    like_icon: string;
-    mission_id: number;
-    no_cache: boolean;
-    owner: { mid: number; name: string; face: string };
+    is_chargeable_season: boolean
+    is_season_display: boolean
+    is_story: boolean
+    like_icon: string
+    mission_id: number
+    no_cache: boolean
+    owner: { mid: number; name: string; face: string }
     pages: {
-      cid: number;
-      dimension: { width: number; height: number; rotate: number };
-      duration: number;
-      first_frame: string;
-      from: string;
-      page: number;
-      part: string;
-      vid: string;
-      weblink: string;
-    }[];
-    pic: string;
+      cid: number
+      dimension: { width: number; height: number; rotate: number }
+      duration: number
+      first_frame: string
+      from: string
+      page: number
+      part: string
+      vid: string
+      weblink: string
+    }[]
+    pic: string
     // premiere: null
-    pubdate: number;
+    pubdate: number
     // rights: {bp: 0, elec: 0, download: 1, movie: 0, pay: 0, …}
-    season_id: number;
+    season_id: number
     stat: {
-      aid: number;
-      view: number;
-      danmaku: number;
-      favorite: number;
-      his_rank: number;
-      like: number;
-      now_rank: number;
-      reply: number;
-      share: number;
-    };
-    state: number;
+      aid: number
+      view: number
+      danmaku: number
+      favorite: number
+      his_rank: number
+      like: number
+      now_rank: number
+      reply: number
+      share: number
+    }
+    state: number
     // subtitle: {allow_submit: true, list: Array(0)}
-    teenage_mode: number;
-    tid: number;
-    title: string;
-    tname: string;
+    teenage_mode: number
+    tid: number
+    title: string
+    tname: string
     // ugc_season: {id: number, title: string, cover: string, mid: number, intro: string, …}
     // user_garb: {url_image_ani_cut: ''}
-    videos: number;
+    videos: number
   }
   return request<Video>('/x/web-interface/view?aid=' + aid).then(res => {
-    const data = res;
+    const data = res
     // if (code) {
     //   throw new Error('获取视频信息失败');
     // }
@@ -766,55 +793,55 @@ export function getVideoInfo(aid: string | number) {
           cid: v.cid,
           title: v.part,
           page: v.page,
-        };
+        }
       }),
-    };
-  });
+    }
+  })
 }
 
 export const getLiveStatus = async (mid: number | string) => {
   interface LiveUserInfo {
-    room_id: number;
+    room_id: number
     info: {
-      face: string;
-      uid: number;
-      uname: string;
-    };
+      face: string
+      uid: number
+      uname: string
+    }
   }
   interface LiveInfo {
-    uid: number;
-    room_id: number;
-    attention: number;
-    online: number;
-    description: string;
-    live_status: number;
-    title: string;
-    user_cover: string;
-    is_strict_room: boolean;
-    live_time: string;
+    uid: number
+    room_id: number
+    attention: number
+    online: number
+    description: string
+    live_status: number
+    title: string
+    user_cover: string
+    is_strict_room: boolean
+    live_time: string
   }
   const {
     room_id,
     info: { uname, face },
   } = await request<LiveUserInfo>(
     'https://api.live.bilibili.com/live_user/v1/Master/info?uid=' + mid,
-  );
+  )
   if (!room_id) {
     return {
       living: false,
       roomId: '',
       name: uname,
       face,
-    };
+    }
   }
 
   const { live_status } = await request<LiveInfo>(
     'https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' + room_id,
-  );
+  )
   return {
     living: live_status === 1,
     roomId: room_id as number,
     name: uname,
     face,
-  };
-};
+  }
+}

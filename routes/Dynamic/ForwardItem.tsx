@@ -1,11 +1,11 @@
-import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import RichText from '../../components/RichText';
-import { getDynamicItems } from '../../services/Bilibili';
-import { DynamicType, GetFuncPromiseType } from '../../types';
-import DateAndOpen from './DateAndOpen';
+import React from 'react'
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import RichText from '../../components/RichText'
+import { getDynamicItems } from '../../services/Bilibili'
+import { DynamicType, GetFuncPromiseType } from '../../types'
+import DateAndOpen from './DateAndOpen'
 
-type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0];
+type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0]
 
 type ForwardItems = Extract<
   DynamicItems,
@@ -13,12 +13,12 @@ type ForwardItems = Extract<
     type:
       | DynamicType.ForwardVideo
       | DynamicType.ForwardDraw
-      | DynamicType.ForwardOther;
+      | DynamicType.ForwardOther
   }
->;
+>
 
 export default function ForwardItem(props: ForwardItems) {
-  let forwardContent = null;
+  let forwardContent = null
   if (props.type === DynamicType.ForwardVideo) {
     forwardContent = (
       <>
@@ -30,7 +30,7 @@ export default function ForwardItem(props: ForwardItems) {
           {props.title}
         </Text>
       </>
-    );
+    )
   } else if (props.type === DynamicType.ForwardDraw) {
     forwardContent = (
       <ScrollView
@@ -44,12 +44,12 @@ export default function ForwardItem(props: ForwardItems) {
               key={img.src}
               source={{ uri: img.src + '@240w_240h_1c.webp' }}
             />
-          );
+          )
         })}
       </ScrollView>
-    );
+    )
   } else if (props.type === DynamicType.ForwardOther) {
-    forwardContent = <Text>{props.forwardText}</Text>;
+    forwardContent = <Text>{props.forwardText}</Text>
   }
   return (
     <View style={[styles.textContainer]}>
@@ -77,7 +77,7 @@ export default function ForwardItem(props: ForwardItems) {
         date={props.date}
       />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -120,4 +120,4 @@ const styles = StyleSheet.create({
   },
   date: { color: '#555', fontSize: 12 },
   imagesContainer: {},
-});
+})

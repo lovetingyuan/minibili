@@ -1,126 +1,126 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { getFollowUps, getLiveStatus } from '../../services/Bilibili';
-import { Avatar, Badge } from '@rneui/base';
-import { checkDynamics, setLatest } from '../../services/Updates';
-import { useNavigation } from '@react-navigation/native';
-import { GetFuncPromiseType, RootStackParamList } from '../../types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Button } from '@rneui/base';
-import useMemoizedFn from '../../hooks/useMemoizedFn';
-import ButtonsOverlay from '../../components/ButtonsOverlay';
-import { useSnapshot } from 'valtio';
-import store from '../../valtio/store';
+import React from 'react'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { getFollowUps, getLiveStatus } from '../../services/Bilibili'
+import { Avatar, Badge } from '@rneui/base'
+import { checkDynamics, setLatest } from '../../services/Updates'
+import { useNavigation } from '@react-navigation/native'
+import { GetFuncPromiseType, RootStackParamList } from '../../types'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Button } from '@rneui/base'
+import useMemoizedFn from '../../hooks/useMemoizedFn'
+import ButtonsOverlay from '../../components/ButtonsOverlay'
+import { useSnapshot } from 'valtio'
+import store from '../../valtio/store'
 
 const rejectHandler = (reason: any) => ({
   status: 'rejected' as const,
   reason,
-});
+})
 const resolveHandler = (value: any) => ({
   status: 'fulfilled' as const,
   value,
-});
+})
 function allSettled(promises: Promise<any>[]) {
   const convertedPromises = promises.map(p =>
     Promise.resolve(p).then(resolveHandler, rejectHandler),
-  );
-  return Promise.all(convertedPromises);
+  )
+  return Promise.all(convertedPromises)
 }
 
-type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
-type NavigationProps = NativeStackScreenProps<RootStackParamList>;
+type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
+type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default React.memo(
   function FollowItem(props: { item: UpItem }) {
-    __DEV__ && console.log('follow item', props.item.name);
+    __DEV__ && console.log('follow item', props.item.name)
     const {
       item: { face, name, sign, mid },
-    } = props;
-    const { specialUser } = useSnapshot(store);
-    const tracyStyle: Record<string, any> = {};
-    const isTracy = mid == specialUser?.mid;
+    } = props
+    const { specialUser } = useSnapshot(store)
+    const tracyStyle: Record<string, any> = {}
+    const isTracy = mid == specialUser?.mid
     if (isTracy) {
-      tracyStyle.color = '#fb7299';
-      tracyStyle.fontSize = 18;
+      tracyStyle.color = '#fb7299'
+      tracyStyle.fontSize = 18
     }
-    const [updatedId, setUpdatedId] = React.useState('');
+    const [updatedId, setUpdatedId] = React.useState('')
     const [livingInfo, setLiving] = React.useState<{
-      living: boolean;
-      liveUrl?: string;
-    } | null>(null);
-    const navigation = useNavigation<NavigationProps['navigation']>();
-    const [loading, setLoading] = React.useState(false);
+      living: boolean
+      liveUrl?: string
+    } | null>(null)
+    const navigation = useNavigation<NavigationProps['navigation']>()
+    const [loading, setLoading] = React.useState(false)
     const updateData = React.useCallback(() => {
       return allSettled([
         updatedId ? Promise.resolve('') : checkDynamics(mid),
         getLiveStatus(mid),
       ]).then(([a, b]) => {
         if (a.status === 'fulfilled' && a.value) {
-          setUpdatedId(a.value);
-          store.updatedUps[mid] = true;
+          setUpdatedId(a.value)
+          store.updatedUps[mid] = true
         }
         if (b.status === 'fulfilled') {
-          const { living, roomId } = b.value;
+          const { living, roomId } = b.value
           setLiving({
             living,
             liveUrl: 'https://live.bilibili.com/' + roomId,
-          });
-          store.livingUps[mid] = living;
+          })
+          store.livingUps[mid] = living
         }
         if (a.status === 'fulfilled' && b.status === 'fulfilled') {
-          setLoading(false);
+          setLoading(false)
         }
-      });
-    }, [mid]);
+      })
+    }, [mid])
     React.useEffect(() => {
       if (loading) {
-        return;
+        return
       }
-      setLoading(true);
-      updateData();
+      setLoading(true)
+      updateData()
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mid]);
+    }, [mid])
     React.useEffect(() => {
-      let updateTime = Math.random() * 5;
+      let updateTime = Math.random() * 5
       if (updateTime < 5) {
-        updateTime += 5;
+        updateTime += 5
       }
       if (updateTime > 8) {
-        updateTime -= 2;
+        updateTime -= 2
       }
       const timer = setInterval(() => {
-        updateData();
-      }, updateTime * 60 * 1000);
+        updateData()
+      }, updateTime * 60 * 1000)
       return () => {
-        clearInterval(timer);
-      };
-    }, [updateData]);
+        clearInterval(timer)
+      }
+    }, [updateData])
 
-    const [modalVisible, setModalVisible] = React.useState(false);
+    const [modalVisible, setModalVisible] = React.useState(false)
     const gotoDynamic = useMemoizedFn((clearUpdate: any) => {
       store.dynamicUser = {
         mid,
         face,
         name,
         sign,
-      };
+      }
       // setTimeout(() => {
-      navigation.navigate('Dynamic');
+      navigation.navigate('Dynamic')
       // }, 200);
       if (clearUpdate !== false) {
-        setLatest(mid, updatedId + '');
-        setUpdatedId('');
-        store.updatedUps[mid] = false;
+        setLatest(mid, updatedId + '')
+        setUpdatedId('')
+        store.updatedUps[mid] = false
       }
-    });
+    })
     const gotoLivePage = useMemoizedFn(() => {
       if (livingInfo?.liveUrl) {
         navigation.navigate('WebPage', {
           url: livingInfo.liveUrl,
           title: name + '的直播间',
-        });
+        })
       }
-    });
+    })
     const buttons = [
       updatedId
         ? null
@@ -143,33 +143,33 @@ export default React.memo(
             name: 'view',
           }
         : null,
-    ].filter(Boolean);
+    ].filter(Boolean)
     const handleOverlayClick = useMemoizedFn((n: string) => {
       if (n === 'unread') {
-        const random = Math.random().toString().slice(2, 10);
-        setLatest(mid, random);
-        setUpdatedId(random);
-        store.updatedUps[mid] = true;
-        setModalVisible(false);
+        const random = Math.random().toString().slice(2, 10)
+        setLatest(mid, random)
+        setUpdatedId(random)
+        store.updatedUps[mid] = true
+        setModalVisible(false)
       } else if (n === 'special') {
         store.specialUser = {
           name,
           mid: mid + '',
           face,
           sign,
-        };
+        }
       } else if (n === 'cancelSpecial') {
-        store.specialUser = null;
+        store.specialUser = null
       } else if (n === 'view') {
-        gotoDynamic(false);
+        gotoDynamic(false)
       }
-    });
+    })
     return (
       <View style={{ opacity: loading ? 0.4 : 1 }}>
         <TouchableOpacity
           activeOpacity={0.8}
           onLongPress={() => {
-            setModalVisible(true);
+            setModalVisible(true)
           }}
           onPress={gotoDynamic}>
           <View style={styles.container}>
@@ -228,16 +228,16 @@ export default React.memo(
           onPress={handleOverlayClick}
           visible={modalVisible}
           dismiss={() => {
-            setModalVisible(false);
+            setModalVisible(false)
           }}
         />
       </View>
-    );
+    )
   },
   (a, b) => {
-    return a.item?.mid === b.item?.mid;
+    return a.item?.mid === b.item?.mid
   },
-);
+)
 
 const styles = StyleSheet.create({
   container: {
@@ -292,4 +292,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },
-});
+})

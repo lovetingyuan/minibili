@@ -1,36 +1,36 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { getHotList } from '../../services/Bilibili';
-import { GetFuncPromiseType } from '../../types';
-import store from '../../valtio/store';
-import { useSnapshot } from 'valtio';
+import React from 'react'
+import { View, Text, Image, StyleSheet } from 'react-native'
+import { getHotList } from '../../services/Bilibili'
+import { GetFuncPromiseType } from '../../types'
+import store from '../../valtio/store'
+import { useSnapshot } from 'valtio'
 
-type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0];
+type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0]
 
 const parseDuration = (duration: number) => {
   if (duration >= 24 * 60 * 60) {
-    return `约${Math.round(duration / 60 / 60)}小时`;
+    return `约${Math.round(duration / 60 / 60)}小时`
   }
-  const date = new Date(duration * 1000);
-  const hour = date.getHours() - date.getTimezoneOffset() / -60;
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const seconds = date.getSeconds().toString().padStart(2, '0');
-  return [hour, minutes, seconds].filter(Boolean).join(':');
-};
+  const date = new Date(duration * 1000)
+  const hour = date.getHours() - date.getTimezoneOffset() / -60
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  const seconds = date.getSeconds().toString().padStart(2, '0')
+  return [hour, minutes, seconds].filter(Boolean).join(':')
+}
 
 export default React.memo(function HotItem({
   video,
 }: // itemStyle,
 {
-  video: HotVideo;
+  video: HotVideo
   // itemStyle: any;
 }) {
   // __DEV__ && console.log('hot video', video.title);
-  const playNum = (video.playNum / 10000).toFixed(1) + '万';
-  const { specialUser } = useSnapshot(store);
-  const isTracy = video.mid == specialUser?.mid;
-  const { watchedVideos } = useSnapshot(store);
-  const watched = watchedVideos[video.bvid];
+  const playNum = (video.playNum / 10000).toFixed(1) + '万'
+  const { specialUser } = useSnapshot(store)
+  const isTracy = video.mid == specialUser?.mid
+  const { watchedVideos } = useSnapshot(store)
+  const watched = watchedVideos[video.bvid]
   return (
     <View style={[styles.itemContainer]}>
       <View style={{ flex: 1 }}>
@@ -94,8 +94,8 @@ export default React.memo(function HotItem({
         </View>
       </View>
     </View>
-  );
-});
+  )
+})
 
 const styles = StyleSheet.create({
   itemContainer: {
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
     height: 11,
   },
   namePlay: { flexDirection: 'row', alignItems: 'center' },
-});
+})

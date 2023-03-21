@@ -1,35 +1,35 @@
-import React, { ReactNode } from 'react';
-import { Image, Linking, StyleSheet, Text, TextProps } from 'react-native';
-import urlRegex from 'url-regex';
-import emojis from '../constants/emojis';
+import React, { ReactNode } from 'react'
+import { Image, Linking, StyleSheet, Text, TextProps } from 'react-native'
+import urlRegex from 'url-regex'
+import emojis from '../constants/emojis'
 
-let index = 0;
+let index = 0
 const urlregex = urlRegex({
   strict: true,
   // exact: true,
-});
+})
 
 export default function RichText(props: {
-  text: string;
-  imageSize?: number;
-  textProps?: TextProps;
+  text: string
+  imageSize?: number
+  textProps?: TextProps
 }) {
   const parseEmoji = (text: string) => {
-    const result: ReactNode[] = [];
+    const result: ReactNode[] = []
 
     if (!text) {
-      return result;
+      return result
     }
     if (!/\[.+\]/g.test(text)) {
       return [
         <Text {...props.textProps} key={index++}>
           {text}
         </Text>,
-      ];
+      ]
     }
-    let normalStr = '';
-    let emojiStr = '';
-    let isEmoji = false;
+    let normalStr = ''
+    let emojiStr = ''
+    let isEmoji = false
 
     for (let c of text) {
       if (c === '[') {
@@ -37,13 +37,13 @@ export default function RichText(props: {
           <Text {...props.textProps} key={index++}>
             {normalStr}
           </Text>,
-        );
-        normalStr = '';
-        isEmoji = true;
+        )
+        normalStr = ''
+        isEmoji = true
       } else if (c === ']') {
-        isEmoji = false;
+        isEmoji = false
         if (emojis[`[${emojiStr}]`]) {
-          const { url } = emojis[`[${emojiStr}]`];
+          const { url } = emojis[`[${emojiStr}]`]
           result.push(
             <Image
               key={index++}
@@ -53,20 +53,20 @@ export default function RichText(props: {
                 height: props.imageSize,
               }}
             />,
-          );
+          )
         } else {
           result.push(
             <Text {...props.textProps} key={index++}>
               {' ' + emojiStr + ' '}
             </Text>,
-          );
+          )
         }
-        emojiStr = '';
+        emojiStr = ''
       } else {
         if (isEmoji) {
-          emojiStr += c;
+          emojiStr += c
         } else {
-          normalStr += c;
+          normalStr += c
         }
       }
     }
@@ -75,11 +75,11 @@ export default function RichText(props: {
         <Text {...props.textProps} key={index++}>
           {normalStr}
         </Text>,
-      );
+      )
     }
     if (emojiStr) {
       if (emojis[`[${emojiStr}]`]) {
-        const { url } = emojis[`[${emojiStr}]`];
+        const { url } = emojis[`[${emojiStr}]`]
         result.push(
           <Image
             key={index++}
@@ -89,46 +89,46 @@ export default function RichText(props: {
               height: props.imageSize,
             }}
           />,
-        );
+        )
       } else {
         result.push(
           <Text {...props.textProps} key={index++}>
             {' ' + emojiStr + ' '}
           </Text>,
-        );
+        )
       }
     }
-    return result;
-  };
+    return result
+  }
 
   if (!/http(s)?:\/\/.+/.test(props.text)) {
-    return <Text style={styles.textContainer}>{parseEmoji(props.text)}</Text>;
+    return <Text style={styles.textContainer}>{parseEmoji(props.text)}</Text>
   }
-  const nodes = [];
-  let prev = 0;
+  const nodes = []
+  let prev = 0
   props.text
     // .replace(
     //   /([\u00A0-\u00FF]|[\u0100-\u017F]|[\u0180-\u024F])+/gm,
     //   s => ` ${s} `,
     // )
     .replace(urlregex, (a, b) => {
-      nodes.push(...parseEmoji(props.text.substring(prev, b)));
+      nodes.push(...parseEmoji(props.text.substring(prev, b)))
       nodes.push(
         <Text
           key={index++}
           style={styles.link}
           onPress={() => {
-            Linking.openURL(a);
+            Linking.openURL(a)
           }}>
           {a}
         </Text>,
-      );
-      prev = b + a.length;
-      return '';
-    });
+      )
+      prev = b + a.length
+      return ''
+    })
 
-  nodes.push(...parseEmoji(props.text.substring(prev)));
-  return <Text style={styles.textContainer}>{nodes}</Text>;
+  nodes.push(...parseEmoji(props.text.substring(prev)))
+  return <Text style={styles.textContainer}>{nodes}</Text>
 }
 
 const styles = StyleSheet.create({
@@ -139,4 +139,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-});
+})

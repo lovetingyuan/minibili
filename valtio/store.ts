@@ -1,7 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { proxy } from 'valtio';
-import { watch } from 'valtio/utils';
-import { UserInfo } from '../types';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { proxy } from 'valtio'
+import { watch } from 'valtio/utils'
+import { UserInfo } from '../types'
 
 const syncStoreKeys = [
   'blackUps',
@@ -12,21 +12,21 @@ const syncStoreKeys = [
   'webViewMode',
   'watchedVideos',
   'hideWatched',
-] as const;
+] as const
 
 const store = proxy<{
-  blackUps: Record<string, string>;
-  followedUps: UserInfo[];
-  blackTags: Record<string, boolean>;
-  userInfo: UserInfo | null;
-  specialUser: UserInfo | null;
-  webViewMode: 'PC' | 'MOBILE';
-  watchedVideos: Record<string, any>;
-  dynamicUser: UserInfo | null;
-  updatedUps: Record<string, boolean>;
-  livingUps: Record<string, boolean>;
-  showBlackDialog: number;
-  hideWatched: boolean;
+  blackUps: Record<string, string>
+  followedUps: UserInfo[]
+  blackTags: Record<string, boolean>
+  userInfo: UserInfo | null
+  specialUser: UserInfo | null
+  webViewMode: 'PC' | 'MOBILE'
+  watchedVideos: Record<string, any>
+  dynamicUser: UserInfo | null
+  updatedUps: Record<string, boolean>
+  livingUps: Record<string, boolean>
+  showBlackDialog: number
+  hideWatched: boolean
 }>({
   blackUps: {},
   followedUps: [],
@@ -41,34 +41,34 @@ const store = proxy<{
   livingUps: {},
   showBlackDialog: 0,
   hideWatched: false,
-});
+})
 
 Promise.all(
   syncStoreKeys.map(k => {
-    return AsyncStorage.getItem(k).then(data => [k, data]);
+    return AsyncStorage.getItem(k).then(data => [k, data])
   }),
 )
   .then(res => {
     for (let i = 0; i < res.length; i++) {
-      const [k, data] = res[i];
+      const [k, data] = res[i]
       if (data) {
         // @ts-ignore
-        store[k] = JSON.parse(data);
+        store[k] = JSON.parse(data)
       }
     }
     store.dynamicUser = store.specialUser
       ? { ...store.specialUser }
       : store.userInfo
       ? { ...store.userInfo }
-      : null;
+      : null
   })
   .then(() => {
     watch(get => {
       for (let k of syncStoreKeys) {
-        const data = get(store)[k as keyof typeof store];
-        AsyncStorage.setItem(k, JSON.stringify(data));
+        const data = get(store)[k as keyof typeof store]
+        AsyncStorage.setItem(k, JSON.stringify(data))
       }
-    });
-  });
+    })
+  })
 
-export default store;
+export default store

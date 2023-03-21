@@ -943,4 +943,4 @@ export default {
     id: 82,
     url: 'http://i0.hdslb.com/bfs/emote/0b8cb81a68de5d5365212c99375e7ace3e7891b7.png',
   },
-} as Record<string, { id: number; url: string }>;
+} as Record<string, { id: number; url: string }>

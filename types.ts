@@ -1,33 +1,31 @@
-import { getDynamicItems } from './services/Bilibili';
+import { getDynamicItems } from './services/Bilibili'
 
 export type RootStackParamList = {
-  Home: undefined;
-  Main: undefined;
-  WebPage: { url: string; title: string; type?: 'pc' | 'mobile' };
+  Home: undefined
+  Main: undefined
+  WebPage: { url: string; title: string; type?: 'pc' | 'mobile' }
   Play: {
-    aid: number | string;
-    bvid: string;
-    name: string;
-    mid: string | number;
-  };
+    aid: number | string
+    bvid: string
+    name: string
+    mid: string | number
+  }
   Dynamic?: {
-    mid: string | number;
-    name: string;
-    face: string;
-    sign: string;
-  };
+    mid: string | number
+    name: string
+    face: string
+    sign: string
+  }
   Hot: {
-    query: number;
-  };
-  Follow: undefined;
-};
+    query: number
+  }
+  Follow: undefined
+}
 
 export type GetFuncPromiseType<F extends (...a: any) => any> =
-  ReturnType<F> extends Promise<infer R> ? R : never;
+  ReturnType<F> extends Promise<infer R> ? R : never
 
-export type DynamicItem = GetFuncPromiseType<
-  typeof getDynamicItems
->['items'][0];
+export type DynamicItem = GetFuncPromiseType<typeof getDynamicItems>['items'][0]
 
 export const enum DynamicType {
   Video = 'video',
@@ -39,8 +37,8 @@ export const enum DynamicType {
 }
 
 export interface UserInfo {
-  mid: number | string;
-  name: string;
-  face: string;
-  sign: string;
+  mid: number | string
+  name: string
+  face: string
+  sign: string
 }

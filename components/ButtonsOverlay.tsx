@@ -1,19 +1,19 @@
-import { Button, Overlay } from '@rneui/base';
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import { Button, Overlay } from '@rneui/base'
+import React from 'react'
+import { StyleSheet } from 'react-native'
 // import { useWindowDimensions } from 'react-native';
 
 export default function ButtonsOverlay(props: {
-  visible: boolean;
+  visible: boolean
   buttons: ({
-    text: string;
-    name: string;
-    longPress?: boolean;
-  } | null)[];
-  onPress: (name: string) => void;
-  overlayStyle?: any;
-  buttonStyle?: any;
-  dismiss: () => void;
+    text: string
+    name: string
+    longPress?: boolean
+  } | null)[]
+  onPress: (name: string) => void
+  overlayStyle?: any
+  buttonStyle?: any
+  dismiss: () => void
 }) {
   // const [modalVisible, setModalVisible] = React.useState(false);
   // React.useEffect(() => {
@@ -23,7 +23,7 @@ export default function ButtonsOverlay(props: {
   const Buttons = props.buttons
     .map(button => {
       if (!button) {
-        return null;
+        return null
       }
       return (
         <Button
@@ -34,22 +34,22 @@ export default function ButtonsOverlay(props: {
           {...(button.longPress
             ? {
                 onLongPress: () => {
-                  props.onPress(button.name);
-                  props.dismiss();
+                  props.onPress(button.name)
+                  props.dismiss()
                 },
               }
             : {
                 onPress: () => {
-                  props.onPress(button.name);
-                  props.dismiss();
+                  props.onPress(button.name)
+                  props.dismiss()
                 },
               })}
         />
-      );
+      )
     })
-    .filter(Boolean);
+    .filter(Boolean)
   if (!Buttons.length) {
-    return null;
+    return null
   }
   return (
     <Overlay
@@ -58,7 +58,7 @@ export default function ButtonsOverlay(props: {
       onBackdropPress={props.dismiss}>
       {Buttons}
     </Overlay>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -73,4 +73,4 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     marginVertical: 5,
   },
-});
+})

@@ -1,16 +1,16 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import WebView from 'react-native-webview';
+import React from 'react'
+import { StyleSheet, View } from 'react-native'
+import WebView from 'react-native-webview'
 
 const INJECTED_JAVASCRIPT = `
 window.ReactNativeWebView.postMessage(document.body.textContent);
-`;
+`
 export default function WebviewApi(props: {
-  mid: number | string;
-  onLoad: (data: any) => void;
+  mid: number | string
+  onLoad: (data: any) => void
 }) {
-  const webviewRef = React.useRef<WebView>(null);
-  const { mid, onLoad } = props;
+  const webviewRef = React.useRef<WebView>(null)
+  const { mid, onLoad } = props
   // const source = {
   //   uri: 'https://api.bilibili.com/x/space/acc/info?mid=' + props.mid,
   // };
@@ -54,7 +54,7 @@ export default function WebviewApi(props: {
         ref={webviewRef}
         onMessage={evt => {
           try {
-            const { code, data } = JSON.parse(evt.nativeEvent.data);
+            const { code, data } = JSON.parse(evt.nativeEvent.data)
             if (code === 0) {
               const payload = {
                 living: !!data.live_room?.liveStatus,
@@ -65,17 +65,17 @@ export default function WebviewApi(props: {
                 mid: data.mid,
                 level: data.level,
                 sex: data.sex,
-              };
-              onLoad(payload);
+              }
+              onLoad(payload)
             }
           } catch (e) {
-            onLoad(evt.nativeEvent.data);
+            onLoad(evt.nativeEvent.data)
           }
         }}
       />
-    );
-  }, [mid, onLoad]);
-  return <View style={styles.container}>{webview}</View>;
+    )
+  }, [mid, onLoad])
+  return <View style={styles.container}>{webview}</View>
 }
 
 const styles = StyleSheet.create({
@@ -84,4 +84,4 @@ const styles = StyleSheet.create({
     height: 100,
     // opacity: 0,
   },
-});
+})

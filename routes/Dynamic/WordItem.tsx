@@ -1,14 +1,14 @@
-import React from 'react';
-import { Text, View } from 'react-native';
-import RichText from '../../components/RichText';
-import DateAndOpen from './DateAndOpen';
+import React from 'react'
+import { Text, View } from 'react-native'
+import RichText from '../../components/RichText'
+import DateAndOpen from './DateAndOpen'
 
 export default function WordItem(props: {
-  date: string;
-  id: string;
-  text: string;
-  name: string;
-  additionalText?: string;
+  date: string
+  id: string
+  text: string
+  name: string
+  additionalText?: string
 }) {
   return (
     <View>
@@ -27,5 +27,5 @@ export default function WordItem(props: {
         date={props.date}
       />
     </View>
-  );
+  )
 }

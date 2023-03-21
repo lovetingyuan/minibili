@@ -1,18 +1,18 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { getVideoComments } from '../services/Bilibili';
-import { GetFuncPromiseType } from '../types';
-import RichText from './RichText';
+import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import { getVideoComments } from '../services/Bilibili'
+import { GetFuncPromiseType } from '../types'
+import RichText from './RichText'
 
-type Comments = GetFuncPromiseType<typeof getVideoComments>;
+type Comments = GetFuncPromiseType<typeof getVideoComments>
 
 interface Props {
-  upName: string;
-  comment: Comments[0];
+  upName: string
+  comment: Comments[0]
 }
 
 export default function Comment(props: Props) {
-  const { comment, upName } = props;
+  const { comment, upName } = props
   const upStyle = (name: string) => {
     return upName === name
       ? {
@@ -20,8 +20,8 @@ export default function Comment(props: Props) {
         }
       : {
           color: 'black',
-        };
-  };
+        }
+  }
 
   return (
     <>
@@ -52,12 +52,12 @@ export default function Comment(props: Props) {
                   <Text style={styles.likeText}> {reply.like}</Text>
                 ) : null}
               </Text>
-            );
+            )
           })}
         </View>
       ) : null}
     </>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -115,4 +115,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#fa5a57',
   },
-});
+})

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback } from 'react'
 import {
   StyleSheet,
   View,
@@ -8,15 +8,15 @@ import {
   ScrollView,
   Pressable,
   useWindowDimensions,
-} from 'react-native';
-import { WebView } from 'react-native-webview';
-import { getVideoComments, getVideoInfo } from '../../services/Bilibili';
-import { Avatar, ButtonGroup, Icon } from '@rneui/base';
+} from 'react-native'
+import { WebView } from 'react-native-webview'
+import { getVideoComments, getVideoInfo } from '../../services/Bilibili'
+import { Avatar, ButtonGroup, Icon } from '@rneui/base'
 // import useNetStatusToast from '../../hooks/useNetStatusToast';
-import { handleShareVideo } from '../../services/Share';
-import * as KeepAwake from 'expo-keep-awake';
-import Comment from '../../components/Comment';
-import * as Clipboard from 'expo-clipboard';
+import { handleShareVideo } from '../../services/Share'
+import * as KeepAwake from 'expo-keep-awake'
+import Comment from '../../components/Comment'
+import * as Clipboard from 'expo-clipboard'
 
 // https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
@@ -24,56 +24,54 @@ import * as Clipboard from 'expo-clipboard';
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?bvid=BV1BN4y1G7tx&page=1&posterFirst=1
 function __hack() {
   const timer = setInterval(() => {
-    const player = document.querySelector<HTMLDivElement>(
-      '.mplayer-load-layer',
-    );
+    const player = document.querySelector<HTMLDivElement>('.mplayer-load-layer')
     if (player && player.style.display !== 'none') {
-      (player as HTMLDivElement).click();
-      document.querySelector('video')?.play();
-      clearInterval(timer);
+      ;(player as HTMLDivElement).click()
+      document.querySelector('video')?.play()
+      clearInterval(timer)
     }
-  }, 200);
+  }, 200)
 
   const timer2 = setInterval(() => {
-    const dom = document.querySelector<HTMLDivElement>('.mplayer-display');
+    const dom = document.querySelector<HTMLDivElement>('.mplayer-display')
     if (dom) {
-      clearInterval(timer2);
+      clearInterval(timer2)
       dom.ondblclick = () => {
-        const video = document.querySelector('video');
+        const video = document.querySelector('video')
         if (video) {
           if (video.paused) {
-            video.play();
+            video.play()
           } else {
-            video.pause();
+            video.pause()
           }
         }
-      };
+      }
     }
-  }, 200);
+  }, 200)
   const postPlayState = (state: string) => {
-    ((window as any).ReactNativeWebView as WebView).postMessage(
+    ;((window as any).ReactNativeWebView as WebView).postMessage(
       JSON.stringify({
         action: 'playState',
         payload: state,
       }),
-    );
-  };
+    )
+  }
   const timer3 = setInterval(() => {
-    const video = document.querySelector('video');
+    const video = document.querySelector('video')
     if (video) {
-      clearInterval(timer3);
+      clearInterval(timer3)
       const handleVideoSize = () => {
-        const { videoWidth, videoHeight } = video;
-        const right = document.querySelector('.mplayer-right');
+        const { videoWidth, videoHeight } = video
+        const right = document.querySelector('.mplayer-right')
         if (
           videoWidth < videoHeight &&
           right &&
           !document.getElementById('arrow-btn')
         ) {
-          const arrowBtn = document.createElement('div');
-          arrowBtn.innerHTML = '&dArr;';
-          arrowBtn.id = 'arrow-btn';
-          arrowBtn.dataset.direction = 'down';
+          const arrowBtn = document.createElement('div')
+          arrowBtn.innerHTML = '&dArr;'
+          arrowBtn.id = 'arrow-btn'
+          arrowBtn.dataset.direction = 'down'
           arrowBtn.style.cssText = `
           width: 36px;
           height: 36px;
@@ -81,62 +79,62 @@ function __hack() {
           text-align: center;
           font-size: 30px;
           transform: scale(1.2, 1);
-          `;
+          `
           arrowBtn.addEventListener('click', () => {
-            const direction = arrowBtn.dataset.direction;
+            const direction = arrowBtn.dataset.direction
             if (direction === 'up') {
-              arrowBtn.dataset.direction = 'down';
-              arrowBtn.innerHTML = '&dArr;';
+              arrowBtn.dataset.direction = 'down'
+              arrowBtn.innerHTML = '&dArr;'
             } else {
-              arrowBtn.dataset.direction = 'up';
-              arrowBtn.innerHTML = '&uArr;';
+              arrowBtn.dataset.direction = 'up'
+              arrowBtn.innerHTML = '&uArr;'
             }
-            ((window as any).ReactNativeWebView as WebView).postMessage(
+            ;((window as any).ReactNativeWebView as WebView).postMessage(
               JSON.stringify({
                 action: 'change-video-height',
                 payload: direction,
               }),
-            );
-          });
-          right.appendChild(arrowBtn);
+            )
+          })
+          right.appendChild(arrowBtn)
         }
-      };
+      }
       video.addEventListener('play', () => {
-        postPlayState('play');
-      });
+        postPlayState('play')
+      })
       Array('ended', 'pause', 'waiting').forEach(evt => {
         video.addEventListener(evt, () => {
-          postPlayState(evt);
-        });
-      });
-      postPlayState(video.paused ? 'pause' : 'play');
+          postPlayState(evt)
+        })
+      })
+      postPlayState(video.paused ? 'pause' : 'play')
       if (video.videoWidth) {
-        handleVideoSize();
+        handleVideoSize()
       }
-      video.addEventListener('canplay', handleVideoSize);
+      video.addEventListener('canplay', handleVideoSize)
       video.addEventListener('ended', () => {
-        const arrowBtn = document.getElementById('arrow-btn');
+        const arrowBtn = document.getElementById('arrow-btn')
         if (arrowBtn) {
-          arrowBtn.dataset.direction = 'down';
-          arrowBtn.innerHTML = '&dArr;';
+          arrowBtn.dataset.direction = 'down'
+          arrowBtn.innerHTML = '&dArr;'
         }
-        ((window as any).ReactNativeWebView as WebView).postMessage(
+        ;((window as any).ReactNativeWebView as WebView).postMessage(
           JSON.stringify({
             action: 'change-video-height',
             payload: 'up',
           }),
-        );
-      });
+        )
+      })
     }
-  }, 200);
+  }, 200)
   const timer4 = setInterval(() => {
-    const right = document.querySelector('.mplayer-right');
+    const right = document.querySelector('.mplayer-right')
     if (!right) {
-      return;
+      return
     }
-    clearInterval(timer4);
-    const reloadBtn = document.createElement('div');
-    reloadBtn.innerHTML = '&orarr;';
+    clearInterval(timer4)
+    const reloadBtn = document.createElement('div')
+    reloadBtn.innerHTML = '&orarr;'
     reloadBtn.style.cssText = `
     width: 36px;
     height: 36px;
@@ -144,57 +142,57 @@ function __hack() {
     font-size: 28px;
     text-align: center;
     transform: rotate(90deg);
-    `;
+    `
     reloadBtn.addEventListener('click', () => {
-      location.reload();
-    });
-    right.appendChild(reloadBtn);
-  }, 100);
+      location.reload()
+    })
+    right.appendChild(reloadBtn)
+  }, 100)
   const timer5 = setInterval(() => {
     const poster =
-      document.querySelector<HTMLImageElement>('img.mplayer-poster');
+      document.querySelector<HTMLImageElement>('img.mplayer-poster')
     if (poster && !poster.dataset.patched) {
-      poster.dataset.patched = 'true';
-      const image = poster.src;
+      poster.dataset.patched = 'true'
+      const image = poster.src
       // @ts-ignore
-      poster.style.backdropFilter = 'blur(12px)';
-      poster.style.objectFit = 'contain';
+      poster.style.backdropFilter = 'blur(12px)'
+      poster.style.objectFit = 'contain'
       if (poster.parentElement) {
-        poster.parentElement.style.backgroundImage = `url("${image}")`;
+        poster.parentElement.style.backgroundImage = `url("${image}")`
       }
     }
-  }, 100);
+  }, 100)
   setInterval(() => {
     const sss = Array.from(
       document.querySelectorAll<any>('.mplayer-toast.mplayer-show'),
-    );
+    )
     if (sss.length) {
       const failed = sss.findIndex(
         s =>
           s.querySelector('.mplayer-toast-text')?.innerText.trim() ===
           '播放失败',
-      );
+      )
       if (failed !== -1) {
-        const jump = sss[failed].querySelector('.mplayer-toast-jump');
+        const jump = sss[failed].querySelector('.mplayer-toast-jump')
         if (jump.innerText.trim() === '') {
-          jump.innerHTML = '✕';
+          jump.innerHTML = '✕'
           jump.addEventListener('click', (e: any) => {
-            e.preventDefault();
-            jump.parentElement!.classList.remove('mplayer-show');
-          });
+            e.preventDefault()
+            jump.parentElement!.classList.remove('mplayer-show')
+          })
         }
       }
     }
-  }, 1000);
+  }, 1000)
   setTimeout(() => {
-    clearInterval(timer);
-    clearInterval(timer2);
-    clearInterval(timer3);
-    clearInterval(timer4);
-    clearInterval(timer5);
-  }, 4000);
+    clearInterval(timer)
+    clearInterval(timer2)
+    clearInterval(timer3)
+    clearInterval(timer4)
+    clearInterval(timer5)
+  }, 4000)
 }
-const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`;
+const INJECTED_JAVASCRIPT = `(${__hack.toString()})();`
 const Loading = (cover?: string) => {
   return (
     <View style={styles.loadingView}>
@@ -209,30 +207,30 @@ const Loading = (cover?: string) => {
         }
       />
     </View>
-  );
-};
+  )
+}
 const parseDate = (time?: number) => {
   if (!time) {
-    return '-';
+    return '-'
   }
-  const date = new Date(time * 1000);
-  const year = new Date().getFullYear();
+  const date = new Date(time * 1000)
+  const year = new Date().getFullYear()
   return (
     (year !== date.getFullYear() ? date.getFullYear() + '-' : '') +
     (date.getMonth() + 1) +
     '-' +
     date.getDate()
-  );
-};
-import { useNetInfo } from '@react-native-community/netinfo';
+  )
+}
+import { useNetInfo } from '@react-native-community/netinfo'
 
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { GetFuncPromiseType, RootStackParamList } from '../../types';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
-import store from '../../valtio/store';
-import { useSnapshot } from 'valtio';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { GetFuncPromiseType, RootStackParamList } from '../../types'
+import { useFocusEffect, useIsFocused } from '@react-navigation/native'
+import store from '../../valtio/store'
+import { useSnapshot } from 'valtio'
 
-import { debounce } from 'throttle-debounce';
+import { debounce } from 'throttle-debounce'
 
 const netTip = debounce(
   1000,
@@ -241,78 +239,78 @@ const netTip = debounce(
       ' 请注意当前网络不是 wifi ',
       ToastAndroid.LONG,
       ToastAndroid.CENTER,
-    );
+    )
   },
   {
     atBegin: true,
   },
-);
+)
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Play'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 export default ({ route, navigation }: Props) => {
-  __DEV__ && console.log(route.name);
-  const { aid, bvid, name, mid } = route.params;
-  type Comments = GetFuncPromiseType<typeof getVideoComments>;
-  type VideoInfo = GetFuncPromiseType<typeof getVideoInfo>;
-  const [comments, setComments] = React.useState<Comments>([]);
-  const [videoInfo, setVideoInfo] = React.useState<VideoInfo | null>(null);
-  const webviewRef = React.useRef<null | WebView>(null);
-  const { width, height } = useWindowDimensions();
-  const [videoViewHeight, setVideoViewHeight] = React.useState(height * 0.4);
-  const [currentPage, setCurrentPage] = React.useState(0);
+  __DEV__ && console.log(route.name)
+  const { aid, bvid, name, mid } = route.params
+  type Comments = GetFuncPromiseType<typeof getVideoComments>
+  type VideoInfo = GetFuncPromiseType<typeof getVideoInfo>
+  const [comments, setComments] = React.useState<Comments>([])
+  const [videoInfo, setVideoInfo] = React.useState<VideoInfo | null>(null)
+  const webviewRef = React.useRef<null | WebView>(null)
+  const { width, height } = useWindowDimensions()
+  const [videoViewHeight, setVideoViewHeight] = React.useState(height * 0.4)
+  const [currentPage, setCurrentPage] = React.useState(0)
 
-  const { type: connectType } = useNetInfo();
+  const { type: connectType } = useNetInfo()
   if (connectType !== 'wifi' && connectType !== 'unknown') {
-    netTip();
+    netTip()
   }
 
-  const { specialUser } = useSnapshot(store);
+  const { specialUser } = useSnapshot(store)
   const tracyStyle =
     mid == specialUser?.mid
       ? {
           color: 'rgb(251, 114, 153)',
         }
-      : null;
+      : null
   React.useEffect(() => {
     getVideoComments(aid).then(replies => {
-      setComments(replies);
-    });
+      setComments(replies)
+    })
     getVideoInfo(aid).then(vi => {
-      setVideoInfo(vi);
-    });
-  }, [bvid, aid]);
+      setVideoInfo(vi)
+    })
+  }, [bvid, aid])
 
-  const [verticalScale, setVerticalScale] = React.useState(0.4);
-  const [extraHeight, setExtraHeight] = React.useState(0);
+  const [verticalScale, setVerticalScale] = React.useState(0.4)
+  const [extraHeight, setExtraHeight] = React.useState(0)
 
   React.useEffect(() => {
-    const vi = videoInfo;
+    const vi = videoInfo
     if (!vi) {
-      return;
+      return
     }
     const [videoWidth, videoHeight] =
       currentPage > 0
         ? [vi.pages[currentPage].width, vi.pages[currentPage].height]
-        : [vi.width, vi.height];
+        : [vi.width, vi.height]
     if (videoWidth >= videoHeight) {
-      setVideoViewHeight((videoHeight / videoWidth) * width + extraHeight);
+      setVideoViewHeight((videoHeight / videoWidth) * width + extraHeight)
     } else {
-      setVideoViewHeight(height * verticalScale);
+      setVideoViewHeight(height * verticalScale)
     }
-  }, [videoInfo, width, height, currentPage, verticalScale, extraHeight]);
+  }, [videoInfo, width, height, currentPage, verticalScale, extraHeight])
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      store.watchedVideos[bvid] = true;
-    }, 8000);
+      store.watchedVideos[bvid] = true
+    }, 8000)
     return () => {
-      clearTimeout(timer);
-    };
-  }, [bvid]);
+      clearTimeout(timer)
+    }
+  }, [bvid])
 
-  const search = new URLSearchParams();
-  const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html';
+  const search = new URLSearchParams()
+  const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
   Object.entries({
     // aid,
     bvid,
@@ -323,8 +321,8 @@ export default ({ route, navigation }: Props) => {
     // hasMuteButton: true,
     page: currentPage + 1,
   }).forEach(([k, v]) => {
-    search.append(k, v + '');
-  });
+    search.append(k, v + '')
+  })
   // const playUrl = 'https://www.bilibili.com/blackboard/newplayer.html';
   // Object.entries({
   //   crossDomain: true,
@@ -348,24 +346,24 @@ export default ({ route, navigation }: Props) => {
   // });
   const onShare = useCallback(() => {
     if (videoInfo) {
-      handleShareVideo(name, videoInfo.title, bvid);
+      handleShareVideo(name, videoInfo.title, bvid)
     }
-  }, [name, videoInfo, bvid]);
-  const isFocused = useIsFocused();
+  }, [name, videoInfo, bvid])
+  const isFocused = useIsFocused()
   useFocusEffect(() => {
     if (!isFocused) {
-      KeepAwake.deactivateKeepAwake('PLAY');
+      KeepAwake.deactivateKeepAwake('PLAY')
     }
-  });
-  let videoDesc = videoInfo?.desc;
+  })
+  let videoDesc = videoInfo?.desc
   if (videoDesc === '-') {
-    videoDesc = '';
+    videoDesc = ''
   } else if (
     videoDesc &&
     videoInfo?.videosNum === 1 &&
     videoDesc === videoInfo.title
   ) {
-    videoDesc = '';
+    videoDesc = ''
   }
   // console.log(99999, videoInfo);
   // const slices = [];
@@ -394,42 +392,42 @@ export default ({ route, navigation }: Props) => {
           ref={webviewRef}
           onMessage={evt => {
             try {
-              const data = JSON.parse(evt.nativeEvent.data);
+              const data = JSON.parse(evt.nativeEvent.data)
               if (data.action === 'playState') {
                 if (data.payload === 'play') {
-                  KeepAwake.activateKeepAwake('PLAY');
-                  setExtraHeight(80);
+                  KeepAwake.activateKeepAwake('PLAY')
+                  setExtraHeight(80)
                 } else {
-                  KeepAwake.deactivateKeepAwake('PLAY');
+                  KeepAwake.deactivateKeepAwake('PLAY')
                   if (data.payload === 'ended') {
-                    setExtraHeight(0);
+                    setExtraHeight(0)
                   }
                 }
               }
               if (data.action === 'change-video-height') {
-                setVerticalScale(data.payload === 'up' ? 0.4 : 0.7);
+                setVerticalScale(data.payload === 'up' ? 0.4 : 0.7)
               }
               if (data.action === 'console.log') {
-                __DEV__ && console.log('message', data.payload);
+                __DEV__ && console.log('message', data.payload)
               }
             } catch (e) {}
           }}
           onError={() => {
-            ToastAndroid.show('加载失败', ToastAndroid.SHORT);
-            webviewRef && webviewRef.current?.reload();
+            ToastAndroid.show('加载失败', ToastAndroid.SHORT)
+            webviewRef && webviewRef.current?.reload()
           }}
           onShouldStartLoadWithRequest={request => {
             // Only allow navigating within this website
             if (request.url.endsWith('/log-reporter.js')) {
-              return false;
+              return false
             }
             if (
               request.url.startsWith('http') &&
               !request.url.includes('.apk')
             ) {
-              return true;
+              return true
             }
-            return false;
+            return false
           }}
         />
       </View>
@@ -442,9 +440,9 @@ export default ({ route, navigation }: Props) => {
                 face: videoInfo?.upFace || '',
                 name,
                 sign: '-',
-              };
+              }
               // setTimeout(() => {
-              navigation.navigate('Dynamic');
+              navigation.navigate('Dynamic')
               // }, 200);
             }}>
             <View style={styles.upInfoContainer}>
@@ -566,8 +564,8 @@ export default ({ route, navigation }: Props) => {
           <Pressable
             onPress={() => {
               Clipboard.setStringAsync(videoInfo?.bvid || '').then(() => {
-                ToastAndroid.show('已复制', ToastAndroid.SHORT);
-              });
+                ToastAndroid.show('已复制', ToastAndroid.SHORT)
+              })
             }}>
             <Text style={{ color: '#666', fontSize: 12 }}>
               {'  '}
@@ -590,7 +588,7 @@ export default ({ route, navigation }: Props) => {
                 ]}>
                 <Comment upName={name} comment={comment} />
               </View>
-            );
+            )
           })
         ) : (
           <View>
@@ -605,8 +603,8 @@ export default ({ route, navigation }: Props) => {
         ) : null}
       </ScrollView>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -726,4 +724,4 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     paddingLeft: 4,
   },
-});
+})

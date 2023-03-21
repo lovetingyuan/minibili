@@ -1,7 +1,7 @@
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Icon } from '@rneui/base';
-import React, { useCallback } from 'react';
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Icon } from '@rneui/base'
+import React, { useCallback } from 'react'
 import {
   Image,
   Pressable,
@@ -9,33 +9,33 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import RichText from '../../components/RichText';
-import { getDynamicItems } from '../../services/Bilibili';
-import { handleShareVideo } from '../../services/Share';
+} from 'react-native'
+import RichText from '../../components/RichText'
+import { getDynamicItems } from '../../services/Bilibili'
+import { handleShareVideo } from '../../services/Share'
 import {
   DynamicType,
   GetFuncPromiseType,
   RootStackParamList,
-} from '../../types';
-import store from '../../valtio/store';
-import { useSnapshot } from 'valtio';
+} from '../../types'
+import store from '../../valtio/store'
+import { useSnapshot } from 'valtio'
 
-type NavigationProps = NativeStackScreenProps<RootStackParamList>;
+type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
-type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0];
+type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0]
 
-type VideoDynamicItem = Extract<DynamicItems, { type: DynamicType.Video }>;
+type VideoDynamicItem = Extract<DynamicItems, { type: DynamicType.Video }>
 
 export default function VideoItem(props: VideoDynamicItem) {
   const { mid, name, cover, title, aid, date, play, bvid, text, duration } =
-    props;
-  const { specialUser } = useSnapshot(store);
-  const isTracy = mid == specialUser?.mid;
+    props
+  const { specialUser } = useSnapshot(store)
+  const isTracy = mid == specialUser?.mid
   const onShare = useCallback(() => {
-    handleShareVideo(name, title, bvid);
-  }, [name, title, bvid]);
-  const navigation = useNavigation<NavigationProps['navigation']>();
+    handleShareVideo(name, title, bvid)
+  }, [name, title, bvid])
+  const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (
     <TouchableOpacity
@@ -46,7 +46,7 @@ export default function VideoItem(props: VideoDynamicItem) {
           aid,
           mid,
           name,
-        });
+        })
       }}>
       {text ? (
         <View style={{ marginBottom: 12 }}>
@@ -94,7 +94,7 @@ export default function VideoItem(props: VideoDynamicItem) {
         </View>
       </View>
     </TouchableOpacity>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -158,4 +158,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#e2e2e2',
   },
-});
+})

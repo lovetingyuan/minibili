@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   StyleSheet,
   View,
@@ -7,41 +7,41 @@ import {
   ToastAndroid,
   BackHandler,
   Image,
-} from 'react-native';
-import { getDynamicItems } from '../../services/Bilibili';
-import { DynamicItem, DynamicType } from '../../types';
-import ForwardItem from './ForwardItem';
-import Header from './Header';
-import RichTextItem from './RichTextItem';
-import VideoItem from './VideoItem';
-import { RootStackParamList } from '../../types';
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import WordItem from './WordItem';
-import store from '../../valtio/store';
-import { useSnapshot } from 'valtio';
+} from 'react-native'
+import { getDynamicItems } from '../../services/Bilibili'
+import { DynamicItem, DynamicType } from '../../types'
+import ForwardItem from './ForwardItem'
+import Header from './Header'
+import RichTextItem from './RichTextItem'
+import VideoItem from './VideoItem'
+import { RootStackParamList } from '../../types'
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
+import WordItem from './WordItem'
+import store from '../../valtio/store'
+import { useSnapshot } from 'valtio'
 
-type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>;
+type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
-  __DEV__ && console.log(route.name);
+  __DEV__ && console.log(route.name)
 
-  const [dynamicItems, setDynamicItems] = React.useState<DynamicItem[]>([]);
+  const [dynamicItems, setDynamicItems] = React.useState<DynamicItem[]>([])
   const pageInfoRef = React.useRef<{
-    hasMore: boolean;
-    offset: string;
-    init?: boolean;
+    hasMore: boolean
+    offset: string
+    init?: boolean
   }>({
     hasMore: true,
     offset: '',
     init: true,
-  });
-  const [loading, setLoading] = React.useState(false);
-  const [refreshing, setRefreshing] = React.useState(false);
-  const { specialUser, dynamicUser, followedUps } = useSnapshot(store);
-  const upId = dynamicUser?.mid || specialUser?.mid;
-  const dynamicListRef = React.useRef<FlatList | null>(null);
-  const [initLoad, setInitLoad] = React.useState(true);
-  const [refreshHead, setRefreshHead] = React.useState(0);
+  })
+  const [loading, setLoading] = React.useState(false)
+  const [refreshing, setRefreshing] = React.useState(false)
+  const { specialUser, dynamicUser, followedUps } = useSnapshot(store)
+  const upId = dynamicUser?.mid || specialUser?.mid
+  const dynamicListRef = React.useRef<FlatList | null>(null)
+  const [initLoad, setInitLoad] = React.useState(true)
+  const [refreshHead, setRefreshHead] = React.useState(0)
   // const [modalVisible, setModalVisible] = React.useState(false);
   // const currentDynamicIdRef = React.useRef('');
   React.useEffect(() => {
@@ -49,16 +49,16 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       // Prevent default behavior
       // e.preventDefault();
       if (!navigation.isFocused()) {
-        return;
+        return
       }
       dynamicItems.length &&
         dynamicListRef.current?.scrollToIndex({
           index: 0,
           animated: true,
-        });
-    });
-    return unsubscribe;
-  }, [navigation, dynamicItems]);
+        })
+    })
+    return unsubscribe
+  }, [navigation, dynamicItems])
 
   React.useEffect(() => {
     const handler = function () {
@@ -66,33 +66,33 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         navigation.isFocused() &&
         followedUps.find(v => v.mid == dynamicUser?.mid)
       ) {
-        navigation.navigate('Follow');
-        return true;
+        navigation.navigate('Follow')
+        return true
       }
-      return false;
-    };
-    BackHandler.addEventListener('hardwareBackPress', handler);
+      return false
+    }
+    BackHandler.addEventListener('hardwareBackPress', handler)
     return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handler);
-    };
-  }, [upId, navigation, route.params]);
+      BackHandler.removeEventListener('hardwareBackPress', handler)
+    }
+  }, [upId, navigation, route.params])
   const renderItem = ({ item }: any) => {
-    let Item: any = null;
+    let Item: any = null
     if (item.type === DynamicType.Word) {
-      Item = WordItem;
+      Item = WordItem
     }
     if (item.type === DynamicType.Video) {
-      Item = VideoItem;
+      Item = VideoItem
     }
     if (item.type === DynamicType.Draw) {
-      Item = RichTextItem;
+      Item = RichTextItem
     }
     if (
       item.type === DynamicType.ForwardDraw ||
       item.type === DynamicType.ForwardVideo ||
       item.type === DynamicType.ForwardOther
     ) {
-      Item = ForwardItem;
+      Item = ForwardItem
     }
     // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
     return (
@@ -105,57 +105,57 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         ) : null}
         <Item {...item} />
       </View>
-    );
-  };
+    )
+  }
   const loadMoreDynamicItems = React.useCallback(() => {
-    const { offset, hasMore } = pageInfoRef.current;
+    const { offset, hasMore } = pageInfoRef.current
     if (loading || !hasMore) {
-      return;
+      return
     }
     if (!upId) {
-      return;
+      return
     }
-    setLoading(true);
+    setLoading(true)
     getDynamicItems(offset, upId)
       .then(
         ({ more, items, offset: os }) => {
           if (!pageInfoRef.current.offset) {
-            setDynamicItems(items);
+            setDynamicItems(items)
           } else {
-            setDynamicItems(dynamicItems.concat(items));
+            setDynamicItems(dynamicItems.concat(items))
           }
-          pageInfoRef.current.hasMore = more;
-          pageInfoRef.current.offset = os;
+          pageInfoRef.current.hasMore = more
+          pageInfoRef.current.offset = os
         },
         () => {
-          ToastAndroid.show('请求动态失败', ToastAndroid.SHORT);
+          ToastAndroid.show('请求动态失败', ToastAndroid.SHORT)
         },
       )
       .finally(() => {
-        setLoading(false);
-        setRefreshing(false);
-      });
-  }, [loading, upId, dynamicItems]);
+        setLoading(false)
+        setRefreshing(false)
+      })
+  }, [loading, upId, dynamicItems])
   const resetDynamicItems = () => {
     pageInfoRef.current = {
       hasMore: true,
       offset: '',
-    };
-    setLoading(false);
-    setDynamicItems([]);
-    setInitLoad(true);
-  };
+    }
+    setLoading(false)
+    setDynamicItems([])
+    setInitLoad(true)
+  }
   if (initLoad) {
-    setInitLoad(false);
-    loadMoreDynamicItems();
-    setRefreshHead(refreshHead + 1);
+    setInitLoad(false)
+    loadMoreDynamicItems()
+    setRefreshHead(refreshHead + 1)
   }
   React.useEffect(() => {
-    resetDynamicItems();
-  }, [upId]);
-  const headerProps = dynamicUser || specialUser;
+    resetDynamicItems()
+  }, [upId])
+  const headerProps = dynamicUser || specialUser
   if (!headerProps) {
-    return null;
+    return null
   }
   return (
     <View style={styles.container}>
@@ -191,8 +191,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         }
       />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -220,6 +220,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   listStyle: { paddingTop: 15 },
-});
+})
 
-export default Dynamic;
+export default Dynamic

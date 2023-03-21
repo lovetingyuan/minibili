@@ -1,38 +1,34 @@
-import React from 'react';
+import React from 'react'
 import {
   Text,
   View,
   FlatList,
   StyleSheet,
   Pressable,
-  ToastAndroid,
+  // ToastAndroid,
   Image,
   Linking,
   Alert,
-} from 'react-native';
-import { Avatar } from '@rneui/base';
-import FollowItem from './FollowItem';
-import {
-  getFansData,
-  getFollowUps,
-  getUserInfo,
-} from '../../services/Bilibili';
-import TracyBtn from '../../components/TracyBtn';
-import Login from './Login';
+} from 'react-native'
+import { Avatar } from '@rneui/base'
+import FollowItem from './FollowItem'
+import { getFansData, getFollowUps, getUserInfo } from '../../services/Bilibili'
+import TracyBtn from '../../components/TracyBtn'
+import Login from './Login'
 
-import { GetFuncPromiseType, RootStackParamList, UserInfo } from '../../types';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import useMemoizedFn from '../../hooks/useMemoizedFn';
-import ButtonsOverlay from '../../components/ButtonsOverlay';
-import * as Application from 'expo-application';
-import useDialog from '../../hooks/useDialog';
-import store from '../../valtio/store';
-import { useSnapshot } from 'valtio';
+import { GetFuncPromiseType, RootStackParamList, UserInfo } from '../../types'
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
+// import useMemoizedFn from '../../hooks/useMemoizedFn'
+import ButtonsOverlay from '../../components/ButtonsOverlay'
+import * as Application from 'expo-application'
+import useDialog from '../../hooks/useDialog'
+import store from '../../valtio/store'
+import { useSnapshot } from 'valtio'
 // import { Badge } from '@rneui/base';
-import { LinearGradient } from 'expo-linear-gradient';
+// import { LinearGradient } from 'expo-linear-gradient'
 
-type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>;
-type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0];
+type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
+type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
 
 const buttons = [
   {
@@ -43,151 +39,142 @@ const buttons = [
     text: '关于',
     name: 'about',
   },
-];
+]
 
-const githubLink = 'https://github.com/lovetingyuan/minibili';
+const githubLink = 'https://github.com/lovetingyuan/minibili'
 
 export default function Follow({ navigation, route }: Props) {
-  __DEV__ && console.log(route.name);
-  const { specialUser, userInfo, livingUps, updatedUps } = useSnapshot(store);
-  const [ups, setUps] = React.useState<UpItem[]>([]);
-  const [loadDone, setLoadDone] = React.useState(false);
-  const [page, setPage] = React.useState(1);
-  const [loading, setLoading] = React.useState(false);
-  const [followedNum, setFollowedNum] = React.useState(0);
+  __DEV__ && console.log(route.name)
+  const { specialUser, userInfo, livingUps, updatedUps } = useSnapshot(store)
+  const [ups, setUps] = React.useState<UpItem[]>([])
+  // const [loadDone, setLoadDone] = React.useState(false)
+  // const [page, setPage] = React.useState(1)
+  const [loading, setLoading] = React.useState(false)
+  const [followedNum, setFollowedNum] = React.useState(0)
   // const [updateText, setUpdateText] = React.useState('刚刚更新');
-  const updateTimeRef = React.useRef(Date.now());
-  const followListRef = React.useRef<FlatList | null>(null);
-  const [refresh] = React.useState(false);
-  const currentList = React.useRef<any>(null);
-  const [fans, setFans] = React.useState('');
+  // const updateTimeRef = React.useRef(Date.now())
+  const followListRef = React.useRef<FlatList | null>(null)
+  // const [refresh] = React.useState(false)
+  const currentList = React.useRef<any>(null)
+  const [fans, setFans] = React.useState('')
 
   // React.useEffect(() => {
   //   setUps([...followedUps]);
   // }, [followedUps]);
 
   React.useEffect(() => {
-    store.followedUps = [...ups];
-  }, [ups]);
+    store.followedUps = [...ups]
+  }, [ups])
 
+  // const getUpdate = useMemoizedFn(() => {
+  //   ToastAndroid.show('刷新中...', ToastAndroid.SHORT)
+  //   setUps((currentList.current = []))
+  //   setLoadDone(false)
+  //   setLoading(false)
+  //   setFollowedNum(0)
+  //   setPage(1)
+  // })
+  React.useEffect(() => {
+    if (!userInfo?.mid) {
+      return
+    }
+    getUserInfo(userInfo.mid).then(user => {
+      const info = {
+        name: user.name,
+        face: user.face,
+        mid: user.mid + '',
+        sign: user.sign,
+      }
+      store.userInfo = info
+      if (!store.dynamicUser) {
+        store.dynamicUser = { ...info }
+      }
+    })
+    getFansData(userInfo.mid).then(data => {
+      if (data.follower < 10000) {
+        setFans(data.follower + '')
+      } else {
+        setFans((data.follower / 10000).toFixed(1) + '万')
+      }
+    })
+    setLoading(true)
+    getFollowUps(userInfo.mid)
+      .then(({ list, total }) => {
+        setFollowedNum(total)
+        setUps(list)
+      })
+      .catch(() => {
+        setFollowedNum(0)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [userInfo?.mid])
   // React.useEffect(() => {
-  //   const a = setInterval(() => {
-  //     const now = Date.now();
-  //     if (now - updateTimeRef.current < 5 * 60 * 1000) {
-  //       setUpdateText('刚刚更新');
-  //     } else {
-  //       const date = new Date(updateTimeRef.current);
-  //       setUpdateText(
-  //         `${date.getHours().toString().padStart(2, '0')}:${date
-  //           .getMinutes()
-  //           .toString()
-  //           .padStart(2, '0')}更新`,
-  //       );
-  //     }
-  //   }, 1000 * 60);
-  //   return () => {
-  //     clearInterval(a);
-  //   };
-  // }, []);
-
-  const getUpdate = useMemoizedFn(() => {
-    ToastAndroid.show('刷新中...', ToastAndroid.SHORT);
-    setUps((currentList.current = []));
-    setLoadDone(false);
-    setLoading(false);
-    setFollowedNum(0);
-    setPage(1);
-  });
-  React.useEffect(() => {
-    if (userInfo) {
-      getUserInfo(userInfo.mid)
-        .then(user => {
-          const info = {
-            name: user.name,
-            face: user.face,
-            mid: user.mid + '',
-            sign: user.sign,
-          };
-          store.userInfo = info;
-          if (!store.dynamicUser) {
-            store.dynamicUser = { ...info };
-          }
-        })
-        .catch(() => {});
-      getFansData(userInfo.mid).then(data => {
-        if (data.follower < 10000) {
-          setFans(data.follower + '');
-        } else {
-          setFans((data.follower / 10000).toFixed(1) + '万');
-        }
-      });
-    }
-  }, [userInfo?.mid]);
-  React.useEffect(() => {
-    if (userInfo && (!currentList.current || currentList.current === ups)) {
-      loadMoreUps();
-      updateTimeRef.current = Date.now();
-      // setUpdateText('刚刚更新');
-    }
-  }, [userInfo, currentList.current]);
+  //   if (userInfo && (!currentList.current || currentList.current === ups)) {
+  //     // fetc()
+  //     updateTimeRef.current = Date.now()
+  //     // setUpdateText('刚刚更新');
+  //   }
+  // }, [userInfo, currentList.current])
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
       // e.preventDefault();
       if (!navigation.isFocused()) {
-        return;
+        return
       }
       ups.length &&
         followListRef.current?.scrollToIndex({
           index: 0,
           animated: true,
-        });
-    });
-    return unsubscribe;
-  }, [navigation, ups]);
-  const [modalVisible, setModalVisible] = React.useState(false);
+        })
+    })
+    return unsubscribe
+  }, [navigation, ups])
+  const [modalVisible, setModalVisible] = React.useState(false)
 
   const renderItem = ({ item }: { item: UpItem }) => {
-    return <FollowItem item={item} />;
-  };
-  const loadMoreUps = () => {
-    if (loadDone || loading || !userInfo) {
-      return;
-    }
-    setLoading(true);
-    getFollowUps(userInfo.mid, page)
-      .then(({ list, total }) => {
-        if (!followedNum) {
-          setFollowedNum(total);
-        }
-        if (list.length) {
-          setUps(page === 1 ? list : ups.concat(list));
-          setPage(page + 1);
-        } else {
-          setLoadDone(true);
-        }
-      })
-      .catch(() => {
-        setFollowedNum(0);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+    return <FollowItem item={item} />
+  }
+  // const loadMoreUps = () => {
+  //   if (loadDone || loading || !userInfo) {
+  //     return
+  //   }
+  //   setLoading(true)
+  //   getFollowUps(userInfo.mid, page)
+  //     .then(({ list, total }) => {
+  //       if (!followedNum) {
+  //         setFollowedNum(total)
+  //       }
+  //       if (list.length) {
+  //         setUps(page === 1 ? list : ups.concat(list))
+  //         setPage(page + 1)
+  //       } else {
+  //         setLoadDone(true)
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setFollowedNum(0)
+  //     })
+  //     .finally(() => {
+  //       setLoading(false)
+  //     })
+  // }
 
   const clearUser = async () => {
-    setUps((currentList.current = []));
-    setLoadDone(false);
-    setLoading(false);
-    setFollowedNum(0);
-    setPage(1);
-    store.userInfo = null;
-    store.updatedUps = {};
-    store.specialUser = null;
-    store.dynamicUser = null;
-  };
-  const version = Application.nativeApplicationVersion;
+    setUps((currentList.current = []))
+    // setLoadDone(false)
+    setLoading(false)
+    setFollowedNum(0)
+    // setPage(1)
+    store.userInfo = null
+    store.updatedUps = {}
+    store.specialUser = null
+    store.dynamicUser = null
+  }
+  const version = Application.nativeApplicationVersion
 
   const dialogContent = (
     <>
@@ -196,7 +183,7 @@ export default function Follow({ navigation, route }: Props) {
         注：本应用所有数据均为B站官网公开，仅供学习交流
         <Text
           onPress={() => {
-            Linking.openURL(githubLink);
+            Linking.openURL(githubLink)
           }}
           style={{ color: 'rgb(32, 137, 220)' }}>
           {' '}
@@ -204,8 +191,8 @@ export default function Follow({ navigation, route }: Props) {
         </Text>
       </Text>
     </>
-  );
-  const { dialog, toggleDialog } = useDialog('关于minibili', dialogContent);
+  )
+  const { dialog, toggleDialog } = useDialog('关于minibili', dialogContent)
 
   const handleOverlayClick = (name: string) => {
     if (name === 'logout') {
@@ -217,35 +204,35 @@ export default function Follow({ navigation, route }: Props) {
           text: '确定',
           onPress: clearUser,
         },
-      ]);
+      ])
     } else if (name === 'about') {
-      toggleDialog();
+      toggleDialog()
     }
-  };
+  }
 
   if (!userInfo) {
-    return <Login />;
+    return <Login />
   }
 
-  const topUps: UserInfo[] = [];
-  const updateUps: UserInfo[] = [];
+  const topUps: UserInfo[] = []
+  const updateUps: UserInfo[] = []
   if (specialUser) {
-    topUps.push({ ...specialUser });
+    topUps.push({ ...specialUser })
   }
-  const notUpdateUsers: UserInfo[] = [];
+  const notUpdateUsers: UserInfo[] = []
   for (let up of ups) {
     if (up.mid == specialUser?.mid) {
-      continue;
+      continue
     }
     if (livingUps[up.mid]) {
-      topUps.push(up);
+      topUps.push(up)
     } else if (updatedUps[up.mid]) {
-      updateUps.push(up);
+      updateUps.push(up)
     } else {
-      notUpdateUsers.push(up);
+      notUpdateUsers.push(up)
     }
   }
-  const displayUps = [...topUps, ...updateUps, ...notUpdateUsers];
+  const displayUps = [...topUps, ...updateUps, ...notUpdateUsers]
 
   return (
     <View style={styles.container}>
@@ -258,8 +245,8 @@ export default function Follow({ navigation, route }: Props) {
             if (userInfo) {
               store.dynamicUser = {
                 ...userInfo,
-              };
-              navigation.navigate('Dynamic');
+              }
+              navigation.navigate('Dynamic')
             }
           }}
           rounded
@@ -281,7 +268,7 @@ export default function Follow({ navigation, route }: Props) {
         </View>
         <Pressable
           onPress={() => {
-            setModalVisible(true);
+            setModalVisible(true)
           }}>
           <Image
             source={require('../../assets/snow.png')}
@@ -293,48 +280,27 @@ export default function Follow({ navigation, route }: Props) {
           visible={modalVisible}
           onPress={handleOverlayClick}
           dismiss={() => {
-            setModalVisible(false);
+            setModalVisible(false)
           }}
           overlayStyle={{
             minWidth: 240,
           }}
         />
       </View>
-      <LinearGradient
-        // Background Linear Gradient
-        colors={['white', '#f2f2f2']}
-        style={styles.listTitleContainer}>
+      <View style={styles.listTitleContainer}>
         <Text style={styles.listTitle}>
           关注列表
           <Text style={{ fontSize: 14 }}>({followedNum})</Text>：{' '}
         </Text>
-        {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}> */}
-        {/* <Text style={styles.updateTime}>{updateText}</Text> */}
-        {/* {Object.values(livingUps).filter(Boolean).length ? (
-            <Badge
-              status="success"
-              value={'有直播'}
-              badgeStyle={{
-                height: 15,
-                width: 42,
-                backgroundColor: '#00a1d6',
-              }}
-              textStyle={{ fontSize: 11 }}
-              containerStyle={{
-                marginLeft: 5,
-              }}
-            />
-          ) : null} */}
-        {/* </View> */}
-      </LinearGradient>
+      </View>
       <FlatList
         data={displayUps}
         renderItem={renderItem}
         keyExtractor={item => item.mid + ''}
         onEndReachedThreshold={1}
-        onEndReached={loadMoreUps}
-        refreshing={refresh}
-        onRefresh={getUpdate}
+        // onEndReached={loadMoreUps}
+        // refreshing={refresh}
+        // onRefresh={getUpdate}
         ref={followListRef}
         ListEmptyComponent={
           <Text style={styles.listEmptyText}>
@@ -347,13 +313,13 @@ export default function Follow({ navigation, route }: Props) {
         }
         ListFooterComponent={
           <Text style={styles.bottomText}>
-            {ups.length ? (loadDone ? '到底了~' : '加载中...') : ''}
+            {loading ? '加载中...' : '到底了~'}
           </Text>
         }
       />
       <TracyBtn />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -379,7 +345,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    paddingTop: 27,
+    paddingTop: 50,
     backgroundColor: 'white',
   },
   listTitleContainer: {
@@ -415,4 +381,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
-});
+})

@@ -1,28 +1,21 @@
-import { useNavigation } from '@react-navigation/core';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Icon } from '@rneui/base';
-import React from 'react';
-import {
-  Image,
-  Linking,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { handleShareVideo } from '../../services/Share';
-import { RootStackParamList } from '../../types';
+import { useNavigation } from '@react-navigation/core'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Icon } from '@rneui/base'
+import React from 'react'
+import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native'
+import { handleShareVideo } from '../../services/Share'
+import { RootStackParamList } from '../../types'
 
-type NavigationProps = NativeStackScreenProps<RootStackParamList>;
+type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function DateAndOpen(props: {
-  id: number | string;
-  name: string;
-  date: string;
-  top?: boolean;
-  title: string;
+  id: number | string
+  name: string
+  date: string
+  top?: boolean
+  title: string
 }) {
-  const navigation = useNavigation<NavigationProps['navigation']>();
+  const navigation = useNavigation<NavigationProps['navigation']>()
   return (
     <View style={styles.info}>
       <View style={styles.infoLeft}>
@@ -30,7 +23,7 @@ export default function DateAndOpen(props: {
         <Text style={styles.date}> {props.date}</Text>
         <Pressable
           onPress={() => {
-            handleShareVideo(props.name, props.title, props.id);
+            handleShareVideo(props.name, props.title, props.id)
           }}>
           <Image
             style={styles.shareImg}
@@ -46,10 +39,10 @@ export default function DateAndOpen(props: {
                 navigation.navigate('WebPage', {
                   title: props.name + '的动态',
                   url: 'https://m.bilibili.com/dynamic/' + props.id,
-                });
+                })
               }
             },
-          );
+          )
         }}>
         <Image
           style={styles.biliImg}
@@ -57,7 +50,7 @@ export default function DateAndOpen(props: {
         />
       </Pressable>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -73,4 +66,4 @@ const styles = StyleSheet.create({
   date: { color: '#555', fontSize: 12 },
   biliImg: { width: 30, height: 12, marginRight: 10 },
   shareImg: { width: 15, height: 15, marginLeft: 20 },
-});
+})
