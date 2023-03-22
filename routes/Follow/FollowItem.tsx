@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { getFollowUps, getLiveStatus } from '../../services/Bilibili'
 import { Avatar, Badge } from '@rneui/base'
 import { checkDynamics, setLatest } from '../../services/Updates'
@@ -97,7 +97,7 @@ export default React.memo(
     }, [updateData])
 
     const [modalVisible, setModalVisible] = React.useState(false)
-    const gotoDynamic = useMemoizedFn((clearUpdate: any) => {
+    const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
       store.dynamicUser = {
         mid,
         face,
@@ -107,7 +107,7 @@ export default React.memo(
       // setTimeout(() => {
       navigation.navigate('Dynamic')
       // }, 200);
-      if (clearUpdate !== false) {
+      if (clearUpdate) {
         setLatest(mid, updatedId + '')
         setUpdatedId('')
         store.updatedUps[mid] = false
@@ -137,12 +137,6 @@ export default React.memo(
             text: `设置 ${props.item.name} 为特别关注 ❤`,
             name: 'special',
           },
-      updatedId
-        ? {
-            text: '查看动态',
-            name: 'view',
-          }
-        : null,
     ].filter(Boolean)
     const handleOverlayClick = useMemoizedFn((n: string) => {
       if (n === 'unread') {
@@ -160,68 +154,60 @@ export default React.memo(
         }
       } else if (n === 'cancelSpecial') {
         store.specialUser = null
-      } else if (n === 'view') {
-        gotoDynamic(false)
       }
     })
     return (
-      <View style={{ opacity: loading ? 0.4 : 1 }}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onLongPress={() => {
-            setModalVisible(true)
-          }}
-          onPress={gotoDynamic}>
-          <View style={styles.container}>
-            <View>
-              <Avatar
-                size={52}
-                containerStyle={{ marginRight: 16 }}
-                rounded
-                source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
-              />
-              {updatedId ? (
-                <Badge
-                  status="success"
-                  value=""
-                  key={updatedId}
-                  badgeStyle={styles.updateMark}
+      <>
+        <View style={{ opacity: loading ? 0.4 : 1, ...styles.container }}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => gotoDynamic(true)}>
+            <Avatar
+              size={55}
+              containerStyle={{ marginRight: 15 }}
+              rounded
+              source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
+            />
+            {updatedId ? (
+              <Badge key={updatedId} badgeStyle={styles.updateMark} />
+            ) : null}
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onLongPress={() => setModalVisible(true)}
+            style={styles.nameSignContainer}
+            onPress={() => gotoDynamic(false)}>
+            <View style={styles.nameContainer}>
+              <Text style={[styles.name, tracyStyle]}>{name}</Text>
+              {/* {isTracy ? (
+                <Image
+                  source={require('../../assets/GC1.png')}
+                  style={{ width: 18, height: 18, marginLeft: 8 }}
+                />
+              ) : null} */}
+              {livingInfo?.living ? (
+                <Button
+                  title="直播中~"
+                  type="clear"
+                  size="sm"
+                  containerStyle={{ marginLeft: 10 }}
+                  titleStyle={{ fontSize: 13 }}
+                  onPress={gotoLivePage}
                 />
               ) : null}
             </View>
-            <View style={{ flex: 1 }}>
-              <View style={styles.nameContainer}>
-                <Text style={[styles.name, tracyStyle]}>{name}</Text>
-                {isTracy ? (
-                  <Image
-                    source={require('../../assets/GC1.png')}
-                    style={{ width: 18, height: 18, marginLeft: 8 }}
-                  />
-                ) : null}
-                {livingInfo?.living ? (
-                  <Button
-                    title="直播中~"
-                    type="clear"
-                    size="sm"
-                    containerStyle={{ marginLeft: 10 }}
-                    titleStyle={{ fontSize: 13 }}
-                    onPress={gotoLivePage}
-                  />
-                ) : null}
-              </View>
-              {sign ? (
-                <Text
-                  style={[
-                    styles.signText,
-                    isTracy ? { color: '#178bcf', fontSize: 14 } : null,
-                  ]}
-                  numberOfLines={2}>
-                  {sign}
-                </Text>
-              ) : null}
-            </View>
-          </View>
-        </TouchableOpacity>
+            {sign ? (
+              <Text
+                style={[
+                  styles.signText,
+                  isTracy ? { color: '#178bcf', fontSize: 14 } : null,
+                ]}
+                numberOfLines={2}>
+                {sign}
+              </Text>
+            ) : null}
+          </TouchableOpacity>
+        </View>
         <ButtonsOverlay
           // @ts-ignore
           buttons={buttons}
@@ -231,7 +217,7 @@ export default React.memo(
             setModalVisible(false)
           }}
         />
-      </View>
+      </>
     )
   },
   (a, b) => {
@@ -241,55 +227,32 @@ export default React.memo(
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 14,
-    paddingRight: 14,
+    marginVertical: 10,
+    marginHorizontal: 15,
   },
-  face: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.34,
-    shadowRadius: 6.27,
+  nameSignContainer: {
+    flexGrow: 1,
+    flexShrink: 1,
   },
-  nameContainer: { flexDirection: 'row', alignItems: 'center' },
+  nameContainer: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
   name: {
     fontSize: 16,
-    // marginBottom: ,
     fontWeight: 'bold',
   },
-  textContainer: {
-    flex: 1,
-    flexWrap: 'wrap',
-  },
   updateMark: {
-    height: 12,
-    width: 12,
+    height: 14,
+    width: 14,
     backgroundColor: '#fb7299',
     borderRadius: 14,
     position: 'absolute',
-    top: -48,
-    left: 43,
+    top: -50,
+    left: 45,
   },
-  signText: { color: '#555', marginTop: 2, fontSize: 13 },
+  signText: { color: '#555', fontSize: 13 },
   liveText: { color: '#008AC5', fontSize: 14, marginLeft: 12, marginRight: 5 },
-  overlay: {
-    padding: 16,
-    backgroundColor: 'white',
-    minWidth: 200,
-  },
-  overlayButton: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-  },
 })

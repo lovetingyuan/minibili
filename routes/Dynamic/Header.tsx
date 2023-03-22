@@ -20,6 +20,7 @@ import { Button } from '@rneui/base'
 import store from '../../valtio/store'
 import { useSnapshot } from 'valtio'
 import { handleShareUp } from '../../services/Share'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function Header(props: UserInfo) {
@@ -111,18 +112,16 @@ export default function Header(props: UserInfo) {
             />
           ) : null}
           <Text>
-            {'   '} {fans}关注
+            {'   '} {fans}粉丝
           </Text>
           <Pressable
+            style={{ marginLeft: 10 }}
             onPress={() => {
               if (userInfo) {
                 handleShareUp(userInfo.name, userInfo.mid, userInfo.sign)
               }
             }}>
-            <Image
-              style={styles.shareImg}
-              source={require('../../assets/share.png')}
-            />
+            <MaterialCommunityIcons name="share" size={22} color="#666" />
           </Pressable>
         </View>
 

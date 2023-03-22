@@ -11,6 +11,7 @@
     "fixdeps": "npx expo install --fix"
   },
   "dependencies": {
+    "@expo/vector-icons": "^13.0.0",
     "@react-native-async-storage/async-storage": "1.17.11",
     "@react-native-community/netinfo": "9.3.7",
     "@react-navigation/bottom-tabs": "^6.4.0",

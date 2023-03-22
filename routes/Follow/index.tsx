@@ -261,7 +261,9 @@ export default function Follow({ navigation, route }: Props) {
             {userInfo.name}
             <Text style={styles.fansNumText}>
               {'    '}
-              {fans}关注
+              {fans}粉丝
+              {'    '}
+              {followedNum}关注
             </Text>
           </Text>
           <Text style={styles.mySign}>{userInfo.sign}</Text>
@@ -287,17 +289,20 @@ export default function Follow({ navigation, route }: Props) {
           }}
         />
       </View>
-      <View style={styles.listTitleContainer}>
+      {/* <View style={styles.listTitleContainer}>
         <Text style={styles.listTitle}>
           关注列表
           <Text style={{ fontSize: 14 }}>({followedNum})</Text>：{' '}
         </Text>
-      </View>
+      </View> */}
       <FlatList
         data={displayUps}
         renderItem={renderItem}
         keyExtractor={item => item.mid + ''}
         onEndReachedThreshold={1}
+        style={{
+          paddingTop: 18,
+        }}
         // onEndReached={loadMoreUps}
         // refreshing={refresh}
         // onRefresh={getUpdate}
@@ -336,7 +341,7 @@ const styles = StyleSheet.create({
   },
   bottomText: {
     textAlign: 'center',
-    marginBottom: 10,
+    paddingBottom: 30,
     marginTop: 10,
     color: '#555',
     fontSize: 12,

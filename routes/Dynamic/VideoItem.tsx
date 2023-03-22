@@ -1,18 +1,9 @@
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Icon } from '@rneui/base'
-import React, { useCallback } from 'react'
-import {
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import React from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import RichText from '../../components/RichText'
 import { getDynamicItems } from '../../services/Bilibili'
-import { handleShareVideo } from '../../services/Share'
 import {
   DynamicType,
   GetFuncPromiseType,
@@ -20,6 +11,7 @@ import {
 } from '../../types'
 import store from '../../valtio/store'
 import { useSnapshot } from 'valtio'
+import { SimpleVideoInfo } from '../../components/PlayInfo'
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
@@ -32,9 +24,7 @@ export default function VideoItem(props: VideoDynamicItem) {
     props
   const { specialUser } = useSnapshot(store)
   const isTracy = mid == specialUser?.mid
-  const onShare = useCallback(() => {
-    handleShareVideo(name, title, bvid)
-  }, [name, title, bvid])
+
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (
@@ -76,21 +66,7 @@ export default function VideoItem(props: VideoDynamicItem) {
           <Text style={styles.title} numberOfLines={3}>
             {title}
           </Text>
-          <View>
-            <View style={styles.videoInfoItem}>
-              <Icon name="update" color="#666" size={14} />
-              <Text style={styles.videoInfoText}> {date}</Text>
-              <Text>{'  '}</Text>
-              <Icon name="play-arrow" color="#666" size={18} />
-              <Text style={styles.videoInfoText}>{play}</Text>
-              <Pressable onPress={onShare}>
-                <Image
-                  style={styles.shareIcon}
-                  source={require('../../assets/share.png')}
-                />
-              </Pressable>
-            </View>
-          </View>
+          <SimpleVideoInfo {...{ name, title, bvid, play, date }} />
         </View>
       </View>
     </TouchableOpacity>

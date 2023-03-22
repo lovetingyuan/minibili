@@ -1,15 +1,14 @@
 import { useNavigation } from '@react-navigation/core'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Icon } from '@rneui/base'
 import React from 'react'
-import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native'
-import { handleShareVideo } from '../../services/Share'
+import { Image, Linking, Pressable, StyleSheet, View } from 'react-native'
+import { SimpleVideoInfo } from '../../components/PlayInfo'
 import { RootStackParamList } from '../../types'
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function DateAndOpen(props: {
-  id: number | string
+  id: string | number
   name: string
   date: string
   top?: boolean
@@ -18,19 +17,14 @@ export default function DateAndOpen(props: {
   const navigation = useNavigation<NavigationProps['navigation']>()
   return (
     <View style={styles.info}>
-      <View style={styles.infoLeft}>
-        <Icon name="update" color="#666" size={14} />
-        <Text style={styles.date}> {props.date}</Text>
-        <Pressable
-          onPress={() => {
-            handleShareVideo(props.name, props.title, props.id)
-          }}>
-          <Image
-            style={styles.shareImg}
-            source={require('../../assets/share.png')}
-          />
-        </Pressable>
-      </View>
+      <SimpleVideoInfo
+        {...{
+          title: props.title,
+          name: props.name,
+          bvid: props.id,
+          date: props.date,
+        }}
+      />
       <Pressable
         onPress={() => {
           Linking.openURL(`bilibili://following/detail/${props.id}`).catch(
