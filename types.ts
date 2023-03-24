@@ -20,6 +20,7 @@ export type RootStackParamList = {
     query: number
   }
   Follow: undefined
+  About: undefined
 }
 
 export type GetFuncPromiseType<F extends (...a: any) => any> =
@@ -42,3 +43,6 @@ export interface UserInfo {
   face: string
   sign: string
 }
+
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+export type NavigationProps = NativeStackScreenProps<RootStackParamList>

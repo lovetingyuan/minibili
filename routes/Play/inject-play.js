@@ -53,14 +53,14 @@ const hack = `function __hack() {
       })
     })
     postPlayState(video.paused ? 'pause' : 'play')
-    video.addEventListener('ended', () => {
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          action: 'change-video-height',
-          payload: 'up',
-        }),
-      )
-    })
+    // video.addEventListener('ended', () => {
+    //   window.ReactNativeWebView.postMessage(
+    //     JSON.stringify({
+    //       action: 'change-video-height',
+    //       payload: 'up',
+    //     }),
+    //   )
+    // })
   }, 200)
   const timer4 = setInterval(() => {
     const right = document.querySelector('.mplayer-right')

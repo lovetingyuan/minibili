@@ -10,7 +10,7 @@ import {
   ToastAndroid,
 } from 'react-native'
 import { getUserInfo } from '../../services/Bilibili'
-import store from '../../valtio/store'
+import store from '../../store'
 
 const leftTv = require('../../assets/tv-left.png')
 const rightTv = require('../../assets/tv-right.png')

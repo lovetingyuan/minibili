@@ -17,7 +17,7 @@ import VideoItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import WordItem from './WordItem'
-import store from '../../valtio/store'
+import store from '../../store'
 import { useSnapshot } from 'valtio'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>
@@ -42,12 +42,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   const dynamicListRef = React.useRef<FlatList | null>(null)
   const [initLoad, setInitLoad] = React.useState(true)
   const [refreshHead, setRefreshHead] = React.useState(0)
-  // const [modalVisible, setModalVisible] = React.useState(false);
-  // const currentDynamicIdRef = React.useRef('');
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
-      // Prevent default behavior
-      // e.preventDefault();
       if (!navigation.isFocused()) {
         return
       }

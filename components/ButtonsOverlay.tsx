@@ -15,11 +15,6 @@ export default function ButtonsOverlay(props: {
   buttonStyle?: any
   dismiss: () => void
 }) {
-  // const [modalVisible, setModalVisible] = React.useState(false);
-  // React.useEffect(() => {
-  //   setModalVisible(props.visible);
-  // }, [props.visible]);
-  // const { width } = useWindowDimensions();
   const Buttons = props.buttons
     .map(button => {
       if (!button) {
@@ -67,6 +62,7 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
     paddingRight: 24,
     backgroundColor: 'white',
+    minWidth: 200,
   },
   buttonStyle: {
     flexDirection: 'row',

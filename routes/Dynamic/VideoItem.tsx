@@ -9,7 +9,7 @@ import {
   GetFuncPromiseType,
   RootStackParamList,
 } from '../../types'
-import store from '../../valtio/store'
+import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
 

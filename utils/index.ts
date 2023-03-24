@@ -32,3 +32,14 @@ export const parseDate = (time?: number | string) => {
   const day = date.getDate().toString().padStart(2, '0')
   return `${year ? year + '-' : ''}${month}-${day}`
 }
+
+export const parseDuration = (duration: number) => {
+  if (duration >= 24 * 60 * 60) {
+    return `约${Math.round(duration / 60 / 60)}小时`
+  }
+  const date = new Date(duration * 1000)
+  const hour = date.getHours() - date.getTimezoneOffset() / -60
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  const seconds = date.getSeconds().toString().padStart(2, '0')
+  return [hour, minutes, seconds].filter(Boolean).join(':')
+}

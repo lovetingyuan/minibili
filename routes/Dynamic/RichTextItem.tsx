@@ -14,7 +14,7 @@ import RichText from '../../components/RichText'
 import { RootStackParamList } from '../../types'
 import DateAndOpen from './DateAndOpen'
 import { useSnapshot } from 'valtio'
-import store from '../../valtio/store'
+import store from '../../store'
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function RichTextItem(props: {

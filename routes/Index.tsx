@@ -13,25 +13,24 @@ import * as SplashScreen from 'expo-splash-screen'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import Play from './routes/Play/Play'
-import Follow from './routes/Follow'
-import Dynamic from './routes/Dynamic'
-import Hot from './routes/Hot'
-import WebPage from './routes/WebPage'
-import { RootStackParamList } from './types'
+import Play from './Play/Play'
+import Follow from './Follow'
+import Dynamic from './Dynamic'
+import About from './About'
+import Hot from './Hot'
+import WebPage from './WebPage'
+import { RootStackParamList } from '../types'
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
 import { Button } from '@rneui/base'
-import store from './valtio/store'
+import store from '../store'
 import { useSnapshot } from 'valtio'
 import { Badge } from '@rneui/base'
 import NetInfo from '@react-native-community/netinfo'
-// import checkLiving from './services/checkLiving'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 SplashScreen.preventAutoHideAsync()
-// checkLiving()
 
 NetInfo.fetch().then(state => {
   if (state.isConnected) {
@@ -122,17 +121,7 @@ const Main = () => {
             headerTitleStyle: { fontSize: 18, color: '#555' },
             headerShown: true,
             headerRight() {
-              return (
-                <Pressable
-                  onPress={() => {
-                    store.showBlackDialog++
-                  }}>
-                  <Image
-                    source={require('./assets/filter.png')}
-                    style={{ width: 16, height: 16, marginRight: 16 }}
-                  />
-                </Pressable>
-              )
+              return null
             },
           }
         }}
@@ -207,7 +196,7 @@ export default () => {
                       }}>
                       <Image
                         style={{ width: 36, height: 14 }}
-                        source={require('./assets/bili-text.png')}
+                        source={require('../assets/bili-text.png')}
                       />
                     </Pressable>
                   )
@@ -236,6 +225,13 @@ export default () => {
                   )
                 },
               }
+            }}
+          />
+          <Stack.Screen
+            name="About"
+            component={About}
+            options={{
+              title: '关于',
             }}
           />
         </Stack.Navigator>

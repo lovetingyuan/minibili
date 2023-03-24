@@ -4,7 +4,7 @@ import { FAB, Avatar } from '@rneui/base'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
 import { useSnapshot } from 'valtio'
-import store from '../valtio/store'
+import store from '../store'
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 

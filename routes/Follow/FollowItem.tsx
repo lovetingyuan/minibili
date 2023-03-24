@@ -10,7 +10,7 @@ import { Button } from '@rneui/base'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
 import { useSnapshot } from 'valtio'
-import store from '../../valtio/store'
+import store from '../../store'
 
 const rejectHandler = (reason: any) => ({
   status: 'rejected' as const,
@@ -238,7 +238,8 @@ const styles = StyleSheet.create({
   },
   nameContainer: {
     flexDirection: 'row',
-    marginBottom: 4,
+    marginBottom: 3,
+    alignItems: 'center',
   },
   name: {
     fontSize: 16,

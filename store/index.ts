@@ -10,7 +10,6 @@ const syncStoreKeys = [
   'userInfo',
   'specialUser',
   'webViewMode',
-  'watchedVideos',
   'hideWatched',
 ] as const
 
@@ -21,7 +20,6 @@ const store = proxy<{
   userInfo: UserInfo | null
   specialUser: UserInfo | null
   webViewMode: 'PC' | 'MOBILE'
-  watchedVideos: Record<string, any>
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
   livingUps: Record<string, boolean>
@@ -34,7 +32,6 @@ const store = proxy<{
   userInfo: null,
   specialUser: null,
   webViewMode: 'PC',
-  watchedVideos: {},
   // ----
   dynamicUser: null,
   updatedUps: {},

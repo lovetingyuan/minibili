@@ -6,9 +6,7 @@ import {
   Text,
   ScrollView,
   Pressable,
-  useWindowDimensions,
 } from 'react-native'
-import { WebView } from 'react-native-webview'
 import { getVideoComments, getVideoInfo } from '../../services/Bilibili'
 import { Avatar, ButtonGroup } from '@rneui/base'
 // import useNetStatusToast from '../../hooks/useNetStatusToast';
@@ -20,33 +18,18 @@ import * as Clipboard from 'expo-clipboard'
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?bvid=BV1BN4y1G7tx&page=1&posterFirst=1
 
-import { useNetInfo } from '@react-native-community/netinfo'
+// import NetInfo from '@react-native-community/netinfo'
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { GetFuncPromiseType, RootStackParamList } from '../../types'
-import { useFocusEffect, useIsFocused } from '@react-navigation/native'
-import store from '../../valtio/store'
+// import { useFocusEffect, useIsFocused } from '@react-navigation/native'
+import store from '../../store'
 import { useSnapshot } from 'valtio'
 
-import { debounce } from 'throttle-debounce'
+// import { debounce } from 'throttle-debounce'
 import { PlayInfo } from '../../components/PlayInfo'
-import { INJECTED_JAVASCRIPT } from './inject-play'
-import { Loading } from './page-loading'
-
-const netTip = debounce(
-  1000,
-  () => {
-    ToastAndroid.showWithGravity(
-      ' 请注意当前网络不是 wifi ',
-      ToastAndroid.LONG,
-      ToastAndroid.CENTER,
-    )
-  },
-  {
-    atBegin: true,
-  },
-)
-
+import { useIsWifi } from '../../hooks/useIsWifi'
+import Player from './Player'
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 export default ({ route, navigation }: Props) => {
@@ -56,16 +39,7 @@ export default ({ route, navigation }: Props) => {
   type VideoInfo = GetFuncPromiseType<typeof getVideoInfo>
   const [comments, setComments] = React.useState<Comments>([])
   const [videoInfo, setVideoInfo] = React.useState<VideoInfo | null>(null)
-  const webviewRef = React.useRef<null | WebView>(null)
-  const { width, height } = useWindowDimensions()
-  // const [videoViewHeight, setVideoViewHeight] = React.useState(height * 0.4)
-  let videoViewHeight = height * 0.4
   const [currentPage, setCurrentPage] = React.useState(0)
-
-  const { type: connectType } = useNetInfo()
-  if (connectType !== 'wifi' && connectType !== 'unknown') {
-    netTip()
-  }
 
   const { specialUser } = useSnapshot(store)
   const tracyStyle =
@@ -82,70 +56,22 @@ export default ({ route, navigation }: Props) => {
       setVideoInfo(vi)
     })
   }, [bvid, aid])
-
-  const [verticalScale, setVerticalScale] = React.useState(0.4)
-  const [extraHeight, setExtraHeight] = React.useState(0)
-
-  if (videoInfo) {
-    const [videoWidth, videoHeight] =
-      currentPage > 0
-        ? [
-            videoInfo.pages[currentPage].width,
-            videoInfo.pages[currentPage].height,
-          ]
-        : [videoInfo.width, videoInfo.height]
-    if (videoWidth >= videoHeight) {
-      videoViewHeight = (videoHeight / videoWidth) * width + extraHeight
-    } else {
-      videoViewHeight = height * verticalScale
-    }
-  }
-
-  // React.useEffect(() => {
-  //   const vi = videoInfo
-  //   if (!vi) {
-  //     return
-  //   }
-  //   const [videoWidth, videoHeight] =
-  //     currentPage > 0
-  //       ? [vi.pages[currentPage].width, vi.pages[currentPage].height]
-  //       : [vi.width, vi.height]
-  //   if (videoWidth >= videoHeight) {
-  //     setVideoViewHeight((videoHeight / videoWidth) * width + extraHeight)
-  //   } else {
-  //     setVideoViewHeight(height * verticalScale)
-  //   }
-  // }, [videoInfo, width, height, currentPage, verticalScale, extraHeight])
-
+  const isWifi = useIsWifi()
   React.useEffect(() => {
-    const timer = setTimeout(() => {
-      store.watchedVideos[bvid] = true
-    }, 8000)
-    return () => {
-      clearTimeout(timer)
+    if (isWifi === false) {
+      ToastAndroid.showWithGravity(
+        ' 请注意当前网络不是 Wifi ',
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER,
+      )
     }
-  }, [bvid])
-
-  const search = new URLSearchParams()
-  const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
-  Object.entries({
-    // aid,
-    bvid,
-    autoplay: 1,
-    highQuality: connectType === 'wifi' ? 1 : 0,
-    quality: connectType === 'wifi' ? 100 : 16,
-    portraitFullScreen: true,
-    // hasMuteButton: true,
-    page: currentPage + 1,
-  }).forEach(([k, v]) => {
-    search.append(k, v + '')
-  })
-  const isFocused = useIsFocused()
-  useFocusEffect(() => {
-    if (!isFocused) {
+  }, [isWifi])
+  React.useEffect(() => {
+    return () => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
-  })
+  }, [])
+
   let videoDesc = videoInfo?.desc
   if (videoDesc === '-') {
     videoDesc = ''
@@ -158,63 +84,7 @@ export default ({ route, navigation }: Props) => {
   }
   return (
     <View style={{ flex: 1 }}>
-      <View
-        renderToHardwareTextureAndroid
-        style={[styles.playerContainer, { height: videoViewHeight }]}>
-        <WebView
-          source={{
-            uri: `${playUrl}?${search}`,
-          }}
-          originWhitelist={['https://*', 'bilibili://*']}
-          allowsFullscreenVideo
-          injectedJavaScriptForMainFrameOnly
-          allowsInlineMediaPlayback
-          startInLoadingState
-          mediaPlaybackRequiresUserAction={false}
-          injectedJavaScript={INJECTED_JAVASCRIPT}
-          renderLoading={() => Loading(videoInfo?.cover)}
-          ref={webviewRef}
-          onMessage={evt => {
-            try {
-              const data = JSON.parse(evt.nativeEvent.data)
-              if (data.action === 'playState') {
-                if (data.payload === 'play' || data.payload === 'waiting') {
-                  KeepAwake.activateKeepAwake('PLAY')
-                  setExtraHeight(80)
-                } else {
-                  KeepAwake.deactivateKeepAwake('PLAY')
-                  if (data.payload === 'ended') {
-                    setExtraHeight(0)
-                  }
-                }
-              }
-              if (data.action === 'change-video-height') {
-                setVerticalScale(data.payload === 'up' ? 0.4 : 0.7)
-              }
-              if (data.action === 'console.log') {
-                __DEV__ && console.log('message', data.payload)
-              }
-            } catch (e) {}
-          }}
-          onError={() => {
-            ToastAndroid.show('加载失败', ToastAndroid.SHORT)
-            webviewRef && webviewRef.current?.reload()
-          }}
-          onShouldStartLoadWithRequest={request => {
-            // Only allow navigating within this website
-            if (request.url.endsWith('/log-reporter.js')) {
-              return false
-            }
-            if (
-              request.url.startsWith('http') &&
-              !request.url.includes('.apk')
-            ) {
-              return true
-            }
-            return false
-          }}
-        />
-      </View>
+      <Player video={videoInfo} page={currentPage} />
       <ScrollView style={styles.videoInfoContainer}>
         <View style={styles.videoHeader}>
           <Pressable
@@ -370,7 +240,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  playerContainer: { width: '100%', height: '40%' },
   videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
   videoHeader: {
     flexDirection: 'row',

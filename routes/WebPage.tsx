@@ -136,7 +136,7 @@ const Loading = () => {
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
-import store from '../valtio/store'
+import store from '../store'
 import { useSnapshot } from 'valtio'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>

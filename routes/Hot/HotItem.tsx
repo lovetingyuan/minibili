@@ -2,40 +2,22 @@ import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { getHotList } from '../../services/Bilibili'
 import { GetFuncPromiseType } from '../../types'
-import store from '../../valtio/store'
+import store from '../../store'
 import { useSnapshot } from 'valtio'
+import { parseDuration, parseNumber } from '../../utils'
 
 type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0]
 
-const parseDuration = (duration: number) => {
-  if (duration >= 24 * 60 * 60) {
-    return `约${Math.round(duration / 60 / 60)}小时`
-  }
-  const date = new Date(duration * 1000)
-  const hour = date.getHours() - date.getTimezoneOffset() / -60
-  const minutes = date.getMinutes().toString().padStart(2, '0')
-  const seconds = date.getSeconds().toString().padStart(2, '0')
-  return [hour, minutes, seconds].filter(Boolean).join(':')
-}
-
-export default React.memo(function HotItem({
-  video,
-}: // itemStyle,
-{
-  video: HotVideo
-  // itemStyle: any;
-}) {
+export default React.memo(function HotItem({ video }: { video: HotVideo }) {
   // __DEV__ && console.log('hot video', video.title);
-  const playNum = (video.playNum / 10000).toFixed(1) + '万'
+  const playNum = parseNumber(video.playNum)
   const { specialUser } = useSnapshot(store)
   const isTracy = video.mid == specialUser?.mid
-  const { watchedVideos } = useSnapshot(store)
-  const watched = watchedVideos[video.bvid]
   return (
     <View style={[styles.itemContainer]}>
       <View style={{ flex: 1 }}>
         <Image
-          style={[styles.image, watched ? { opacity: 0.6 } : null]}
+          style={styles.image}
           source={{ uri: video.cover + '@480w_270h_1c.webp' }}
         />
         <View style={styles.videoLength}>
@@ -43,35 +25,16 @@ export default React.memo(function HotItem({
             {parseDuration(video.duration)}
           </Text>
         </View>
-        {watched ? (
-          <View style={styles.watched}>
-            <Text style={styles.videoLengthText}>已看过</Text>
-          </View>
-        ) : null}
-        {watched ? (
-          <Image
-            source={require('../../assets/viewed.png')}
-            style={{
-              width: '40%',
-              height: '70%',
-              position: 'absolute',
-              top: '20%',
-              alignSelf: 'center',
-            }}
-          />
-        ) : null}
         {video.tag ? (
           <View style={styles.videoTag}>
             <Text style={styles.videoTagText}>{video.tag}</Text>
           </View>
         ) : null}
       </View>
-      <Text
-        style={[styles.title, watched ? { opacity: 0.6 } : null]}
-        numberOfLines={2}>
+      <Text style={styles.title} numberOfLines={2}>
         {video.title}
       </Text>
-      <View style={[styles.videoInfo, watched ? { opacity: 0.6 } : null]}>
+      <View style={styles.videoInfo}>
         <View style={styles.namePlay}>
           <Image
             style={styles.icon}
