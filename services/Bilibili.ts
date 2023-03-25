@@ -329,7 +329,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
             return {
               ...common,
               type: DynamicType.ForwardVideo as const,
-              forwardText: forward.desc?.text,
+              forwardText: forward.desc?.text || '无',
               cover: forward.major?.archive.cover,
               title: forward.major?.archive.title,
             }
@@ -338,7 +338,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
             return {
               ...common,
               type: DynamicType.ForwardDraw as const,
-              forwardText: forward.desc?.text,
+              forwardText: forward.desc?.text || '无',
               images: forward.major.draw.items.map(v => {
                 return {
                   ratio: v.width / v.height,
@@ -351,7 +351,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
             return {
               ...common,
               type: DynamicType.ForwardDraw as const,
-              forwardText: forward.major?.article?.title,
+              forwardText: forward.major?.article?.title || '无',
               images: forward.major?.article?.covers?.map(v => {
                 return {
                   ratio: 2,
@@ -367,19 +367,13 @@ export async function getDynamicItems(offset = '', uid: string | number) {
               forwardText: '直播',
               title: forward.major?.live.title,
               cover: forward.major?.live.cover,
-              // images: forward.major?.article?.covers?.map(v => {
-              //   return {
-              //     ratio: 2,
-              //     src: v,
-              //   };
-              // }),
             }
           }
           return {
             ...common,
             type: DynamicType.ForwardOther as const,
             forwardText:
-              forward.desc?.text +
+              (forward.desc?.text || '无') +
               ('topic' in forward && forward.topic?.name
                 ? '#' + forward.topic.name
                 : ''),

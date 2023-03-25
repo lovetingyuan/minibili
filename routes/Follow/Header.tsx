@@ -70,7 +70,9 @@ export default function Header(props: {
             store.dynamicUser = {
               ...userInfo,
             }
-            navigation.navigate('Dynamic')
+            navigation.navigate('Dynamic', {
+              from: 'followed',
+            })
           }
         }}
         rounded

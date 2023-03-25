@@ -47,8 +47,8 @@ function Player(props: { video: VideoInfo | null; page: number }) {
   }
   if (props.video.width && props.video.height) {
     const [videoWidth, videoHeight] = [
-      props.video.pages[props.page].width,
-      props.video.pages[props.page].height,
+      props.video.pages[props.page - 1].width,
+      props.video.pages[props.page - 1].height,
     ]
     if (videoWidth >= videoHeight) {
       videoViewHeight = (videoHeight / videoWidth) * width + extraHeight
@@ -66,7 +66,7 @@ function Player(props: { video: VideoInfo | null; page: number }) {
     highQuality: isWifi === true ? 1 : 0,
     quality: isWifi === true ? 100 : 16,
     portraitFullScreen: true,
-    page: (props.page || 0) + 1,
+    page: props.page,
   }).forEach(([k, v]) => {
     search.append(k, v + '')
   })

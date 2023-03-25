@@ -10,7 +10,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
 import store from '../store'
 import { useSnapshot } from 'valtio'
-import { Button } from '@rneui/base'
+import { Button, Icon } from '@rneui/base'
+import { Pressable } from 'react-native'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
@@ -23,15 +24,23 @@ export default ({ route, navigation }: Props) => {
     navigation.setOptions({
       headerRight: () => {
         return (
-          <Button
-            titleStyle={{ fontSize: 13 }}
-            onPress={() => {
-              store.webViewMode = webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
-            }}
-            size="sm"
-            type="clear">
-            {webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
-          </Button>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Button
+              titleStyle={{ fontSize: 13 }}
+              onPress={() => {
+                store.webViewMode = webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
+              }}
+              size="sm"
+              type="clear">
+              {webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
+            </Button>
+            <Pressable
+              onPress={() => {
+                webviewRef.current?.reload()
+              }}>
+              <Icon name="refresh" size={20} color="#666" />
+            </Pressable>
+          </View>
         )
       },
     })

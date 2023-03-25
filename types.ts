@@ -11,10 +11,7 @@ export type RootStackParamList = {
     mid: string | number
   }
   Dynamic?: {
-    mid: string | number
-    name: string
-    face: string
-    sign: string
+    from?: string
   }
   Hot: {
     query: number

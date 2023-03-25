@@ -6,14 +6,13 @@ import {
   TouchableWithoutFeedback,
   Pressable,
 } from 'react-native'
-import { Avatar } from '@rneui/base'
+import { Avatar, Icon } from '@rneui/base'
 import { getFansData, getUserInfo } from '../../services/Bilibili'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList, UserInfo } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button } from '@rneui/base'
 import { handleShareUp } from '../../services/Share'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function Header(props: UserInfo) {
@@ -87,7 +86,7 @@ export default function Header(props: UserInfo) {
                 handleShareUp(userInfo.name, userInfo.mid, userInfo.sign)
               }
             }}>
-            <MaterialCommunityIcons name="share" size={22} color="#666" />
+            <Icon type="fontisto" name="share-a" size={13} color="#666" />
           </Pressable>
         </View>
 

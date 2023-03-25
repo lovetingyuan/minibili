@@ -1,10 +1,10 @@
 import React from 'react'
 import { StyleSheet, View, Text, Pressable } from 'react-native'
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { parseDate, parseNumber } from '../utils'
 import { handleShareVideo } from '../services/Share'
 import { GetFuncPromiseType } from '../types'
 import { getVideoInfo } from '../services/Bilibili'
+import { Icon } from '@rneui/base'
 type VideoInfo = GetFuncPromiseType<typeof getVideoInfo>
 
 export function PlayInfo(props: { name: string; video: VideoInfo }) {
@@ -14,19 +14,19 @@ export function PlayInfo(props: { name: string; video: VideoInfo }) {
   return (
     <View style={styles.videoInfo}>
       <View style={styles.iconText}>
-        <MaterialIcons name="date-range" size={14} color="#666" />
+        <Icon name="date-range" size={15} color="#666" />
         <Text style={styles.videoInfoText}>
           {parseDate(props.video.pubTime)}
         </Text>
       </View>
       <View style={styles.iconText}>
-        <MaterialIcons name="play-circle-outline" size={14} color="#666" />
+        <Icon name="play-circle-outline" size={15} color="#666" />
         <Text style={styles.videoInfoText}>
           {parseNumber(props.video.viewNum)}
         </Text>
       </View>
       <View style={styles.iconText}>
-        <MaterialIcons name="thumb-up-off-alt" size={14} color="#666" />
+        <Icon name="thumb-up-off-alt" size={15} color="#666" />
         <Text style={styles.videoInfoText}>
           {parseNumber(props.video.likeNum)}
         </Text>
@@ -36,7 +36,7 @@ export function PlayInfo(props: { name: string; video: VideoInfo }) {
           onPress={() => {
             handleShareVideo(props.name, props.video.title, props.video.bvid)
           }}>
-          <MaterialCommunityIcons name="share" size={18} color="#666" />
+          <Icon type="fontisto" name="share-a" size={13} color="#666" />
         </Pressable>
       )}
     </View>
@@ -52,12 +52,12 @@ export function SimpleVideoInfo(props: {
   return (
     <View style={styles.videoInfo}>
       <View style={styles.iconText}>
-        <MaterialIcons name="date-range" size={14} color="#666" />
+        <Icon name="date-range" size={15} color="#666" />
         <Text style={styles.videoInfoText}>{props.date}</Text>
       </View>
       {props.play === undefined ? null : (
         <View style={styles.iconText}>
-          <MaterialIcons name="play-circle-outline" size={14} color="#666" />
+          <Icon name="play-circle-outline" size={15} color="#666" />
           <Text style={styles.videoInfoText}>{props.play}</Text>
         </View>
       )}
@@ -65,7 +65,7 @@ export function SimpleVideoInfo(props: {
         onPress={() => {
           handleShareVideo(props.name, props.title, props.bvid)
         }}>
-        <MaterialCommunityIcons name="share" size={18} color="#666" />
+        <Icon type="fontisto" name="share-a" size={13} color="#666" />
       </Pressable>
     </View>
   )

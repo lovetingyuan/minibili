@@ -1,4 +1,5 @@
 const hack = `function __hack() {
+  let videoDom;
   const timer = setInterval(() => {
     const player = document.querySelector('.mplayer-load-layer')
     if (player && player.style.display !== 'none') {
@@ -35,6 +36,7 @@ const hack = `function __hack() {
   const timer3 = setInterval(() => {
     const video = document.querySelector('video')
     if (!video) return;
+    videoDom = video
     clearInterval(timer3)
     const postPlayState = (state) => {
       window.ReactNativeWebView.postMessage(
@@ -53,14 +55,6 @@ const hack = `function __hack() {
       })
     })
     postPlayState(video.paused ? 'pause' : 'play')
-    // video.addEventListener('ended', () => {
-    //   window.ReactNativeWebView.postMessage(
-    //     JSON.stringify({
-    //       action: 'change-video-height',
-    //       payload: 'up',
-    //     }),
-    //   )
-    // })
   }, 200)
   const timer4 = setInterval(() => {
     const right = document.querySelector('.mplayer-right')
@@ -130,8 +124,10 @@ const hack = `function __hack() {
   document.addEventListener('touchstart', function (e) {
     startY = e.touches[0].clientY
   })
+  let video;
   document.addEventListener('touchmove', function (e) {
     endY = e.touches[0].clientY
+    if (videoDom && videoDom.ended) return;
     if (endY - startY > 100) {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({

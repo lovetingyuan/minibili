@@ -9,8 +9,7 @@ import {
   Image,
 } from 'react-native'
 import { getVideoComments, getVideoInfo } from '../../services/Bilibili'
-import { Avatar, ButtonGroup } from '@rneui/base'
-// import useNetStatusToast from '../../hooks/useNetStatusToast';
+import { Avatar, Icon, ListItem } from '@rneui/base'
 import * as KeepAwake from 'expo-keep-awake'
 import Comment from '../../components/Comment'
 import * as Clipboard from 'expo-clipboard'
@@ -19,19 +18,14 @@ import * as Clipboard from 'expo-clipboard'
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?bvid=BV1BN4y1G7tx&page=1&posterFirst=1
 
-// import NetInfo from '@react-native-community/netinfo'
-
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { GetFuncPromiseType, RootStackParamList } from '../../types'
-// import { useFocusEffect, useIsFocused } from '@react-navigation/native'
 import store from '../../store'
-// import { useSnapshot } from 'valtio'
-
-// import { debounce } from 'throttle-debounce'
 import { PlayInfo } from '../../components/PlayInfo'
 import { useIsWifi } from '../../hooks/useIsWifi'
 import Player from './Player'
 import { openBiliVideo } from '../../utils'
+
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 export default ({ route, navigation }: Props) => {
@@ -41,7 +35,7 @@ export default ({ route, navigation }: Props) => {
   type VideoInfo = GetFuncPromiseType<typeof getVideoInfo>
   const [comments, setComments] = React.useState<Comments>([])
   const [videoInfo, setVideoInfo] = React.useState<VideoInfo | null>(null)
-  const [currentPage, setCurrentPage] = React.useState(0)
+  const [currentPage, setCurrentPage] = React.useState(1)
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -59,13 +53,6 @@ export default ({ route, navigation }: Props) => {
     })
   }, [navigation, bvid])
 
-  // const { specialUser } = useSnapshot(store)
-  // const tracyStyle =
-  //   mid == specialUser?.mid
-  //     ? {
-  //         color: 'rgb(251, 114, 153)',
-  //       }
-  //     : null
   React.useEffect(() => {
     getVideoComments(aid).then(replies => {
       setComments(replies)
@@ -89,6 +76,8 @@ export default ({ route, navigation }: Props) => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   }, [])
+
+  const [expanded, setExpanded] = React.useState(false)
 
   let videoDesc = videoInfo?.desc
   if (videoDesc === '-') {
@@ -133,77 +122,56 @@ export default ({ route, navigation }: Props) => {
             {videoInfo?.title || videoInfo?.pages[0].title || '-'}
           </Text>
           {videoDesc ? <Text style={styles.videoDesc}>{videoDesc}</Text> : null}
-          {
-            (videoInfo?.videosNum || 0) > 1 ? (
-              <ButtonGroup
-                buttonStyle={{}}
-                buttonContainerStyle={{
-                  margin: 0,
-                }}
-                innerBorderStyle={{
-                  width: 0.5,
-                }}
-                buttons={videoInfo?.pages.map((v, i) => `${i + 1}. ${v.title}`)}
-                containerStyle={{
-                  marginTop: 16,
-                  marginLeft: 0,
-                  marginRight: 0,
-                  borderWidth: 0,
-                }}
-                onPress={setCurrentPage}
-                selectedButtonStyle={{}}
-                selectedIndex={currentPage}
-                selectedTextStyle={{}}
-                textStyle={{
-                  fontSize: 14,
-                }}
-              />
-            ) : videoInfo?.videos !== videoInfo?.videosNum ? (
-              <Text>该视频为交互视频，暂不支持</Text>
-            ) : null // <ScrollView
-            //   horizontal
-            //   showsHorizontalScrollIndicator
-            //   style={styles.videoPages}>
-            //   <ButtonGroup
-            //     buttonStyle={{ width: 100 }}
-            //     buttonContainerStyle={
-            //       {
-            //         // marginTop: 15,
-            //       }
-            //     }
-            //     buttons={videoInfo?.pages.map(v => v.title)}
-            //     containerStyle={{
-            //       marginTop: 15,
-            //       marginLeft: 0,
-            //       marginRight: 0,
-            //     }}
-            //     innerBorderStyle={{}}
-            //     onPress={i => setCurrentPage(i)}
-            //     selectedButtonStyle={{
-            //       borderWidth: 1,
-            //       borderColor: 'blue',
-            //     }}
-            //     selectedIndex={currentPage}
-            //     // selectedIndexes={selectedIndexes}
-            //     selectedTextStyle={{}}
-            //     textStyle={{
-            //       fontSize: 14,
-            //     }}
-            //   />
-            //   {/* {videoInfo?.pages.map((item, i) => {
-            //     return (
-            //       <Button
-            //         key={item.cid}
-            //         type="clear"
-            //         onPress={() => {
-            //           setCurrentPage(i);
-            //         }}>
-            //         {item.title}
-            //       </Button>
-            //     );
-            //   })} */}
-            // </ScrollView>
-          }
+          {(videoInfo?.videosNum || 0) > 1 ? (
+            <ListItem.Accordion
+              containerStyle={{
+                paddingVertical: 5,
+                paddingHorizontal: 10,
+                marginTop: 20,
+              }}
+              content={
+                <ListItem.Content>
+                  <ListItem.Title>
+                    视频分集（{videoInfo?.videosNum}） {currentPage}:{' '}
+                    {videoInfo?.pages[currentPage].title}
+                  </ListItem.Title>
+                </ListItem.Content>
+              }
+              isExpanded={expanded}
+              onPress={() => {
+                setExpanded(!expanded)
+              }}>
+              {videoInfo?.pages.map(v => {
+                const selected = v.page === currentPage
+                return (
+                  <ListItem
+                    key={v.cid}
+                    onPress={() => {
+                      setCurrentPage(v.page)
+                    }}
+                    containerStyle={{
+                      paddingVertical: 10,
+                      paddingHorizontal: 20,
+                      backgroundColor: selected ? '#00AEEC' : 'white',
+                    }}
+                    bottomDivider>
+                    <ListItem.Content>
+                      <ListItem.Title
+                        style={{
+                          color: selected ? 'white' : '#555',
+                        }}>
+                        {v.page}. {v.title}
+                      </ListItem.Title>
+                    </ListItem.Content>
+                  </ListItem>
+                )
+              })}
+            </ListItem.Accordion>
+          ) : videoInfo?.videos !== videoInfo?.videosNum ? (
+            <Text style={{ marginTop: 10, color: 'orange' }}>
+              该视频为交互视频，暂不支持
+            </Text>
+          ) : null}
         </View>
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
@@ -216,9 +184,9 @@ export default ({ route, navigation }: Props) => {
             <Text style={{ color: '#666', fontSize: 12 }}>
               {'  '}
               {videoInfo?.bvid}
-              {' - '}
             </Text>
           </Pressable>
+          <Icon type="entypo" name="dot-single" size={12} color="#666" />
           <Text style={{ color: '#666', fontSize: 12 }}>
             {videoInfo?.tname}
           </Text>

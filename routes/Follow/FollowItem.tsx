@@ -98,9 +98,9 @@ export default React.memo(
         name,
         sign,
       }
-      // setTimeout(() => {
-      navigation.navigate('Dynamic')
-      // }, 200);
+      navigation.navigate('Dynamic', {
+        from: 'followed',
+      })
       if (clearUpdate) {
         setLatest(mid, updatedId + '')
         setUpdatedId('')

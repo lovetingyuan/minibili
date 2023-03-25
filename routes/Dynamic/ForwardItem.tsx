@@ -18,7 +18,7 @@ type ForwardItems = Extract<
 >
 
 export default function ForwardItem(props: ForwardItems) {
-  let forwardContent = null
+  let forwardContent = <Text>无</Text>
   if (props.type === DynamicType.ForwardVideo) {
     forwardContent = (
       <>

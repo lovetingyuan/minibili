@@ -37,7 +37,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   })
   const [loading, setLoading] = React.useState(false)
   const [refreshing, setRefreshing] = React.useState(false)
-  const { dynamicUser, followedUps } = useSnapshot(store)
+  const { dynamicUser } = useSnapshot(store)
   const upId = dynamicUser?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<FlatList | null>(null)
   const [initLoad, setInitLoad] = React.useState(true)
@@ -58,10 +58,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
 
   React.useEffect(() => {
     const handler = function () {
-      if (
-        navigation.isFocused() &&
-        followedUps.find(v => v.mid == dynamicUser?.mid)
-      ) {
+      if (route.params?.from === 'followed' && navigation.isFocused()) {
         navigation.navigate('Follow')
         return true
       }
