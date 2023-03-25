@@ -1,14 +1,11 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { getVideoComments } from '../services/Bilibili'
-import { GetFuncPromiseType } from '../types'
+import { ReplyItem } from '../services/api/video-comments'
 import RichText from './RichText'
-
-type Comments = GetFuncPromiseType<typeof getVideoComments>
 
 interface Props {
   upName: string
-  comment: Comments[0]
+  comment: ReplyItem
 }
 
 export default function Comment(props: Props) {

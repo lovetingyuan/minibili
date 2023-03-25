@@ -8,7 +8,6 @@ import {
   Pressable,
   Image,
 } from 'react-native'
-import { getVideoComments, getVideoInfo } from '../../services/Bilibili'
 import { Avatar, Icon, ListItem } from '@rneui/base'
 import * as KeepAwake from 'expo-keep-awake'
 import Comment from '../../components/Comment'
@@ -19,21 +18,21 @@ import * as Clipboard from 'expo-clipboard'
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?bvid=BV1BN4y1G7tx&page=1&posterFirst=1
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { GetFuncPromiseType, RootStackParamList } from '../../types'
+import { RootStackParamList } from '../../types'
 import store from '../../store'
 import { PlayInfo } from '../../components/PlayInfo'
 import { useIsWifi } from '../../hooks/useIsWifi'
 import Player from './Player'
 import { openBiliVideo } from '../../utils'
+import { useVideoInfo, VideoInfo } from '../../services/api/video-info'
+import { ReplyItem, useVideoComments } from '../../services/api/video-comments'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 export default ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { aid, bvid, name, mid } = route.params
-  type Comments = GetFuncPromiseType<typeof getVideoComments>
-  type VideoInfo = GetFuncPromiseType<typeof getVideoInfo>
-  const [comments, setComments] = React.useState<Comments>([])
+  const [comments, setComments] = React.useState<ReplyItem[]>([])
   const [videoInfo, setVideoInfo] = React.useState<VideoInfo | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
 
@@ -53,14 +52,18 @@ export default ({ route, navigation }: Props) => {
     })
   }, [navigation, bvid])
 
-  React.useEffect(() => {
-    getVideoComments(aid).then(replies => {
-      setComments(replies)
-    })
-    getVideoInfo(aid).then(vi => {
-      setVideoInfo(vi)
-    })
-  }, [bvid, aid])
+  const { data: vi, error } = useVideoInfo(aid)
+  if (!error && vi?.bvid && !videoInfo?.bvid) {
+    setVideoInfo(vi)
+  }
+  const {
+    data: replies,
+    isLoading: replyLoading,
+    error: replyError,
+  } = useVideoComments(aid)
+  if (!replyLoading && !replyError && !comments.length) {
+    setComments(replies)
+  }
   const isWifi = useIsWifi()
   React.useEffect(() => {
     if (isWifi === false) {

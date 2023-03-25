@@ -3,12 +3,9 @@ import React from 'react'
 import { ToastAndroid, useWindowDimensions, View } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useIsWifi } from '../../hooks/useIsWifi'
-import { getVideoInfo } from '../../services/Bilibili'
-import { GetFuncPromiseType } from '../../types'
+import { VideoInfo } from '../../services/api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import { Loading } from './page-loading'
-
-type VideoInfo = GetFuncPromiseType<typeof getVideoInfo>
 
 function Player(props: { video: VideoInfo | null; page: number }) {
   const isWifi = useIsWifi()

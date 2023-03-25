@@ -2,32 +2,30 @@ import React from 'react'
 import { StyleSheet, View, Text, Pressable } from 'react-native'
 import { parseDate, parseNumber } from '../utils'
 import { handleShareVideo } from '../services/Share'
-import { GetFuncPromiseType } from '../types'
-import { getVideoInfo } from '../services/Bilibili'
 import { Icon } from '@rneui/base'
-type VideoInfo = GetFuncPromiseType<typeof getVideoInfo>
+import { VideoInfo } from '../services/api/video-info'
 
 export function PlayInfo(props: { name: string; video: VideoInfo }) {
   if (!props.video.bvid) {
     return null
   }
   return (
-    <View style={styles.videoInfo}>
+    <View style={styles.VideoItem}>
       <View style={styles.iconText}>
         <Icon name="date-range" size={15} color="#666" />
-        <Text style={styles.videoInfoText}>
+        <Text style={styles.VideoItemText}>
           {parseDate(props.video.pubTime)}
         </Text>
       </View>
       <View style={styles.iconText}>
         <Icon name="play-circle-outline" size={15} color="#666" />
-        <Text style={styles.videoInfoText}>
+        <Text style={styles.VideoItemText}>
           {parseNumber(props.video.viewNum)}
         </Text>
       </View>
       <View style={styles.iconText}>
         <Icon name="thumb-up-off-alt" size={15} color="#666" />
-        <Text style={styles.videoInfoText}>
+        <Text style={styles.VideoItemText}>
           {parseNumber(props.video.likeNum)}
         </Text>
       </View>
@@ -50,15 +48,15 @@ export function SimpleVideoInfo(props: {
   play?: string
 }) {
   return (
-    <View style={styles.videoInfo}>
+    <View style={styles.VideoItem}>
       <View style={styles.iconText}>
         <Icon name="date-range" size={15} color="#666" />
-        <Text style={styles.videoInfoText}>{props.date}</Text>
+        <Text style={styles.VideoItemText}>{props.date}</Text>
       </View>
       {props.play === undefined ? null : (
         <View style={styles.iconText}>
           <Icon name="play-circle-outline" size={15} color="#666" />
-          <Text style={styles.videoInfoText}>{props.play}</Text>
+          <Text style={styles.VideoItemText}>{props.play}</Text>
         </View>
       )}
       <Pressable
@@ -72,7 +70,7 @@ export function SimpleVideoInfo(props: {
 }
 
 const styles = StyleSheet.create({
-  videoInfo: {
+  VideoItem: {
     flexDirection: 'row',
     flexShrink: 0,
     minWidth: 80,
@@ -85,7 +83,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  videoInfoText: {
+  VideoItemText: {
     color: '#666',
     fontSize: 12,
   },
