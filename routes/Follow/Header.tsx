@@ -8,8 +8,8 @@ import { useSnapshot } from 'valtio'
 import { StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
-import { getFansData, getUserInfo } from '../../services/Bilibili'
 import { Alert } from 'react-native'
+import { useUserInfo } from '../../services/api/user-info'
 
 const buttons = [
   {
@@ -28,34 +28,23 @@ export default function Header(props: {
 }) {
   const { userInfo } = useSnapshot(store)
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const [fans, setFans] = React.useState('')
   const [modalVisible, setModalVisible] = React.useState(false)
 
-  React.useEffect(() => {
-    if (!userInfo?.mid) {
-      return
+  const { data } = useUserInfo(userInfo?.mid)
+  if (data?.mid) {
+    if (!store.userInfo) {
+      store.userInfo = {
+        name: data.name,
+        face: data.face,
+        sign: data.sign,
+        mid: data.mid + '',
+      }
     }
-    getUserInfo(userInfo.mid).then(user => {
-      const info = {
-        name: user.name,
-        face: user.face,
-        mid: user.mid + '',
-        sign: user.sign,
-      }
-      store.userInfo = info
-      if (!store.dynamicUser) {
-        store.dynamicUser = { ...info }
-      }
-    })
-    getFansData(userInfo.mid).then(data => {
-      if (data.follower < 10000) {
-        setFans(data.follower + '')
-      } else {
-        setFans((data.follower / 10000).toFixed(1) + '万')
-      }
-    })
-  }, [userInfo?.mid])
-
+    if (!store.dynamicUser) {
+      store.dynamicUser = { ...store.userInfo }
+    }
+  }
+  const fansCount = data?.fans
   if (!userInfo) {
     return <View style={styles.userContainer} />
   }
@@ -87,7 +76,7 @@ export default function Header(props: {
           {userInfo.name}
           <Text style={styles.fansNumText}>
             {'    '}
-            {fans}粉丝
+            {fansCount}粉丝
             {'    '}
             {props.followedCount}关注
           </Text>

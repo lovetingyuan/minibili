@@ -9,78 +9,49 @@ import {
   Linking,
 } from 'react-native'
 import * as SplashScreen from 'expo-splash-screen'
-import { getHotList } from '../../services/Bilibili'
 import HotItem from './HotItem'
-// import TracyBtn from '../../components/TracyBtn'
 import { handleShareVideo } from '../../services/Share'
-import { GetFuncPromiseType } from '../../types'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { TracyId } from '../../constants'
-// import useDialog from '../../hooks/useDialog'
 import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
-// import { Switch } from '@rneui/base'
+import { useHotVideos, VideoItem } from '../../services/api/hot-videos'
+// import { VideoItem } from '../../services/api/types'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
 
-type VideoItem = GetFuncPromiseType<typeof getHotList>['list'][0]
-
 export default function Hot({ navigation }: Props) {
-  const [state, setState] = React.useState<{
-    page: number
-    list: [VideoItem, VideoItem?][]
-    refreshing: boolean
-  }>({
-    page: 1,
-    list: [],
-    refreshing: false,
-  })
-  const videosIdMap: Record<string, boolean> = {}
-  state.list.forEach(item => {
-    const [first, second] = item
-    videosIdMap[first.bvid] = true
-    if (second) {
-      videosIdMap[second.bvid] = true
-    }
-  })
   const hotListRef = React.useRef<any>(null)
   const { blackUps, blackTags } = useSnapshot(store)
+
+  const { list, page, setSize, isRefreshing, loading, refresh, isReachingEnd } =
+    useHotVideos()
 
   React.useEffect(() => {
     navigation.setOptions({
       headerRight() {
-        if (!state.list.length) {
+        if (!list.length) {
           return null
         }
-        return (
-          <Text
-            style={{
-              fontSize: 16,
-              marginRight: 20,
-            }}>
-            {state.list.length * 2}
-          </Text>
-        )
+        return <Text style={styles.videoCount}>{list.length}</Text>
       },
     })
     const unsubscribe = navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return
       }
-      state.list.length &&
+      list.length &&
         hotListRef.current?.scrollToOffset({
           offset: 0,
         })
     })
     return unsubscribe
-  }, [navigation, state.list])
+  }, [navigation, list])
 
-  const loadingRef = React.useRef(false)
-  const moreRef = React.useRef(true)
   const currentVideoRef = React.useRef<VideoItem | null>(null)
   const [modalVisible, setModalVisible] = React.useState(false)
   const addBlackUp = () => {
@@ -141,69 +112,6 @@ export default function Hot({ navigation }: Props) {
         )}
       </View>
     )
-  }
-  const loadMoreHotItems = async () => {
-    // console.log('loadr morer3-----------33');
-    if (loadingRef.current || !moreRef.current) {
-      return
-    }
-    loadingRef.current = true
-
-    const { more, list: _list } = await getHotList(state.page).catch(() => {
-      ToastAndroid.show('请求热门失败', ToastAndroid.SHORT)
-      return { more: false, list: [] }
-    })
-    moreRef.current = more
-    const last = state.list[state.list.length - 1]
-    const list = _list.filter(v => {
-      if (
-        videosIdMap[v.bvid] || // videosIdMap 为了去重，有时候会有重复的视频
-        v.tag in blackTags ||
-        '_' + v.mid in blackUps
-      ) {
-        return false
-      }
-      return true
-    })
-    if (!list.length) {
-      loadingRef.current = false
-      setState({
-        ...state,
-        page: state.page + 1,
-      })
-      return
-    }
-    if (last && last.length === 1) {
-      last.push(list.shift())
-    }
-    const viewList: [VideoItem, VideoItem?][] = []
-    for (let i = 0; i < list.length; i = i + 2) {
-      if (list[i + 1]) {
-        viewList.push([list[i], list[i + 1]])
-      } else {
-        viewList.push([list[i]])
-      }
-    }
-    const newList = state.list.concat(viewList)
-    setState({
-      ...state,
-      page: state.page + 1,
-      list: newList,
-    })
-    loadingRef.current = false
-    SplashScreen.hideAsync()
-  }
-  const resetDynamicItems = () => {
-    loadingRef.current = false
-    moreRef.current = true
-    setState({
-      page: 1,
-      list: [],
-      refreshing: false,
-    })
-  }
-  if (state.page === 1) {
-    loadMoreHotItems()
   }
 
   const handleOverlayClick = useMemoizedFn((action: string) => {
@@ -273,27 +181,21 @@ export default function Hot({ navigation }: Props) {
   ].filter(Boolean)
   const hotVideoList: [VideoItem, VideoItem?][] = []
   let current: [VideoItem?, VideoItem?] = []
-  for (let [item1, item2] of state.list) {
-    if (!('_' + item1.mid in blackUps) && !(item1.tag in blackTags)) {
-      current.push(item1)
-      if (current.length === 2) {
-        hotVideoList.push(current as [VideoItem, VideoItem])
-        current = []
-      }
-    }
-    if (item2 && !('_' + item2.mid in blackUps) && !(item2.tag in blackTags)) {
-      current.push(item2)
+  for (const item of list) {
+    if (!('_' + item.mid in blackUps) && !(item.tag in blackTags)) {
+      current.push(item)
       if (current.length === 2) {
         hotVideoList.push(current as [VideoItem, VideoItem])
         current = []
       }
     }
   }
+
   if (current.length) {
     hotVideoList.push(current as [VideoItem, VideoItem?])
   }
-  if (hotVideoList.length < 10) {
-    setTimeout(loadMoreHotItems)
+  if (hotVideoList.length) {
+    SplashScreen.hideAsync()
   }
   return (
     <View style={styles.container}>
@@ -317,16 +219,17 @@ export default function Hot({ navigation }: Props) {
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
-            {moreRef.current ? '加载中...' : '到底了~'}
+            {loading ? '加载中...' : isReachingEnd ? '到底了~' : ''}
           </Text>
         }
-        onEndReached={loadMoreHotItems}
+        onEndReached={() => {
+          setSize(page + 1)
+        }}
         onEndReachedThreshold={0.5}
-        refreshing={state.refreshing}
-        onRefresh={resetDynamicItems}
+        refreshing={isRefreshing}
+        onRefresh={refresh}
         contentContainerStyle={styles.listContainerStyle}
       />
-      {/* <TracyBtn /> */}
     </View>
   )
 }
@@ -353,5 +256,9 @@ const styles = StyleSheet.create({
     marginVertical: 100,
     fontSize: 18,
     color: '#fb7299',
+  },
+  videoCount: {
+    fontSize: 16,
+    marginRight: 20,
   },
 })

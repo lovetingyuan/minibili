@@ -54,3 +54,18 @@ export const openBiliVideo = async (bvid: string) => {
     }
   })
 }
+
+const rejectHandler = (reason: any) => ({
+  status: 'rejected' as const,
+  reason,
+})
+const resolveHandler = (value: any) => ({
+  status: 'fulfilled' as const,
+  value,
+})
+export function allSettled(promises: Promise<any>[]) {
+  const convertedPromises = promises.map(p =>
+    Promise.resolve(p).then(resolveHandler, rejectHandler),
+  )
+  return Promise.all(convertedPromises)
+}

@@ -13,33 +13,6 @@ export function request<D extends Record<string, any>>(
   const requestUrl = url.startsWith('http')
     ? url
     : 'http://api.bilibili.com' + url
-  // return (
-  // fetch(requestUrl, {
-  //   headers: {
-  //     host,
-  //     origin: 'https://api.bilibili.com',
-  //     referer: requestUrl,
-  //     accept:
-  //       'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-  //     'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-  //     'cache-control': 'no-cache',
-  //     pragma: 'no-cache',
-  //     'sec-ch-ua':
-  //       '"Microsoft Edge";v="105", " Not;A Brand";v="99", "Chromium";v="105"',
-  //     'sec-ch-ua-mobile': '?1',
-  //     'sec-ch-ua-platform': '"Android"',
-  //     'sec-fetch-dest': 'document',
-  //     'sec-fetch-mode': 'navigate',
-  //     'sec-fetch-site': 'none',
-  //     'sec-fetch-user': '?1',
-  //     'upgrade-insecure-requests': '1',
-  //   },
-  //   referrerPolicy: 'strict-origin-when-cross-origin',
-  //   body: '',
-  //   method: 'GET',
-  //   mode: 'cors',
-  //   // credentials: 'include',
-  // })
   const { origin, hostname } = new URL(requestUrl)
   return fetch(requestUrl + '&_t=' + Date.now(), {
     headers: {
@@ -384,21 +357,6 @@ export async function getDynamicItems(offset = '', uid: string | number) {
   }
 }
 
-export async function getFansData(uid: string | number) {
-  // https://api.bilibili.com/x/relation/stat?vmid=14427395
-  const data = await request<{
-    mid: number
-    following: number
-    whisper: number
-    black: number
-    follower: number
-  }>(`/x/relation/stat?vmid=${uid}`)
-  // if (code) {
-  //   throw new Error('获取关注数失败');
-  // }
-  return data
-}
-
 export async function getFollowUps(uid: number | string) {
   // https://api.bilibili.com/x/relation/followings?vmid=14427395&pn=1&ps=50&order=desc&jsonp=jsonp
   interface Followed {
@@ -457,77 +415,6 @@ export async function getFollowUps(uid: number | string) {
         sign: string
       }[],
     ),
-  }
-}
-
-export async function getHotList(page = 1) {
-  // https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1
-  interface Hot {
-    aid: number
-    bvid: string
-    cid: number
-    copyright: 1 | 0
-    ctime: number
-    desc: string
-    dimension: { width: number; height: number; rotate: number }
-    duration: number
-    dynamic: string
-    first_frame: string
-    is_ogv: boolean
-    ogv_info: null
-    owner: { mid: number; name: string; face: string }
-    pic: string
-    pubdate: number
-    // rcmd_reason: {content: '百万播放', corner_mark: 0}
-    // rights: {bp: 0, elec: 0, download: 0, movie: 0, pay: 0, …}
-    // season_type: 0
-    short_link: string
-    short_link_v2: string
-    stat: {
-      aid: number
-      view: number
-      danmaku: number
-      favorite: number
-      his_rank: number
-      like: number
-      now_rank: number
-      reply: number
-      share: number
-    }
-    state: number
-    tid: number
-    title: string
-    tname: string
-    videos: number
-  }
-  // const blackUps = await getBlackUps;
-  const data = await request<{
-    list: Hot[]
-    no_more: boolean
-  }>(`/x/web-interface/popular?ps=20&pn=${page}`)
-  // if (code !== 0) {
-  //   throw new Error(message);
-  // }
-  const { no_more, list } = data
-  return {
-    more: !no_more,
-    list: list.map(item => {
-      return {
-        aid: item.aid,
-        bvid: item.bvid,
-        cid: item.cid,
-        title: item.title,
-        cover: item.pic,
-        duration: item.duration,
-        pubDate: item.pubdate,
-        name: item.owner.name,
-        mid: item.owner.mid,
-        playNum: item.stat.view,
-        shareNum: item.stat.share,
-        tag: item.tname,
-        videosNum: item.videos,
-      }
-    }),
   }
 }
 

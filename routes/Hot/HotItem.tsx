@@ -1,12 +1,9 @@
 import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
-import { getHotList } from '../../services/Bilibili'
-import { GetFuncPromiseType } from '../../types'
+import { VideoItem } from '../../services/api/hot-videos'
 import { parseDuration, parseNumber } from '../../utils'
 
-type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0]
-
-export default React.memo(function HotItem({ video }: { video: HotVideo }) {
+export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
   return (
@@ -59,7 +56,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     flex: 1,
     marginVertical: 12,
-    // marginHorizontal: 10,
   },
   videoLength: {
     position: 'absolute',

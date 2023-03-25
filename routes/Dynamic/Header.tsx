@@ -7,52 +7,40 @@ import {
   Pressable,
 } from 'react-native'
 import { Avatar, Icon } from '@rneui/base'
-import { getFansData, getUserInfo } from '../../services/Bilibili'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList, UserInfo } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button } from '@rneui/base'
 import { handleShareUp } from '../../services/Share'
+import { useUserInfo } from '../../services/api/user-info'
+
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function Header(props: UserInfo) {
   const { mid } = props
-  const [fans, setFans] = React.useState('')
-
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const [userInfo, setUserInfo] = React.useState<UserInfo>({ ...props })
-  const [liveInfo, setLiveInfo] = React.useState({
+  const userInfo = { ...props }
+  const livingInfo = {
     living: false,
     liveUrl: '',
-  })
-  React.useEffect(() => {
-    if (!mid) {
-      return
-    }
-    getUserInfo(mid).then(res => {
-      setUserInfo({
-        name: res.name,
-        face: res.face,
-        sign: res.sign,
-        mid: res.mid + '',
-      })
-      setLiveInfo({
-        living: res.living,
-        liveUrl: res.liveUrl || '',
-      })
-    })
-    getFansData(mid).then(data => {
-      if (data.follower < 10000) {
-        setFans(data.follower + '')
-      } else {
-        setFans((data.follower / 10000).toFixed(1) + '万')
-      }
-    })
-  }, [mid])
-  const avatar = userInfo.face
-  if (!mid) {
-    return <Text>{userInfo.name}</Text>
   }
+  const { data } = useUserInfo(props.mid)
+  if (data?.mid) {
+    Object.assign(userInfo, {
+      name: data.name,
+      face: data.face,
+      sign: data.sign,
+      mid: data.mid + '',
+    })
+    Object.assign(livingInfo, {
+      living: data.living,
+      liveUrl: data.liveUrl || '',
+    })
+  }
+  const fansCount = data?.fans
+
+  const avatar = userInfo.face
+
   return (
     <View style={styles.header}>
       <TouchableWithoutFeedback
@@ -77,7 +65,7 @@ export default function Header(props: UserInfo) {
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ ...styles.name }}>{userInfo.name}</Text>
           <Text>
-            {'   '} {fans}粉丝
+            {'   '} {fansCount}粉丝
           </Text>
           <Pressable
             style={{ marginLeft: 10 }}
@@ -94,15 +82,15 @@ export default function Header(props: UserInfo) {
           {userInfo.sign}
         </Text>
       </View>
-      {liveInfo.living ? (
+      {livingInfo.living ? (
         <Button
           title="直播中"
           type="clear"
           titleStyle={{ fontSize: 13 }}
           onPress={() => {
-            if (liveInfo.liveUrl) {
+            if (livingInfo.liveUrl) {
               navigation.navigate('WebPage', {
-                url: liveInfo.liveUrl,
+                url: livingInfo.liveUrl,
                 title: userInfo.name + '的直播间',
               })
             }

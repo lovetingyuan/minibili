@@ -11,21 +11,7 @@ import useMemoizedFn from '../../hooks/useMemoizedFn'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
 // import { useSnapshot } from 'valtio'
 import store from '../../store'
-
-const rejectHandler = (reason: any) => ({
-  status: 'rejected' as const,
-  reason,
-})
-const resolveHandler = (value: any) => ({
-  status: 'fulfilled' as const,
-  value,
-})
-function allSettled(promises: Promise<any>[]) {
-  const convertedPromises = promises.map(p =>
-    Promise.resolve(p).then(resolveHandler, rejectHandler),
-  )
-  return Promise.all(convertedPromises)
-}
+import { allSettled } from '../../utils'
 
 type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
