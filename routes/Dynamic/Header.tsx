@@ -91,7 +91,9 @@ export default function Header(props: UserInfo) {
           </Pressable>
         </View>
 
-        <Text style={styles.sign}>{userInfo.sign}</Text>
+        <Text style={styles.sign} numberOfLines={2}>
+          {userInfo.sign}
+        </Text>
       </View>
       {liveInfo.living ? (
         <Button
