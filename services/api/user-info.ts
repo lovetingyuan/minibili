@@ -4,6 +4,7 @@ import fetcher from './fetcher'
 
 const fetcher2 = <T>(url: string) => {
   __DEV__ && console.log('fetch user info: ' + url)
+  // return Promise.reject('sdfs')
   return fetcher<T>(url, 'https://space.bilibili.com/')
 }
 
@@ -47,6 +48,7 @@ export function useUserInfo(mid?: number | string) {
     data: !error && data ? getUserInfo(data, data2) : null,
     isValidating,
     isLoading,
+    error,
   }
 }
 

@@ -9,8 +9,9 @@ import {
   StyleSheet,
   ToastAndroid,
 } from 'react-native'
-import { getUserInfo } from '../../services/Bilibili'
+
 import store from '../../store'
+import { useUserInfo } from '../../services/api/user-info'
 
 const leftTv = require('../../assets/tv-left.png')
 const rightTv = require('../../assets/tv-right.png')
@@ -19,6 +20,7 @@ export default function Login() {
   const inputUserIdRef = React.useRef('')
   const inputRef = React.useRef(null)
   const [tvImg, setTvImg] = React.useState(true)
+  const [userId, setUserId] = React.useState('')
   React.useEffect(() => {
     const timer = setInterval(() => {
       setTvImg(v => !v)
@@ -27,28 +29,27 @@ export default function Login() {
       clearInterval(timer)
     }
   }, [])
+  const { data, error } = useUserInfo(userId)
+  if (userId && data?.mid && !store.userInfo) {
+    store.userInfo = {
+      name: data.name,
+      mid: data.mid + '',
+      face: data.face,
+      sign: data.sign,
+    }
+  }
+  React.useEffect(() => {
+    if (userId && !data?.mid && error) {
+      ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
+    }
+  }, [userId, data, error])
+
   const storeUserId = () => {
     if (!inputUserIdRef.current) {
       ToastAndroid.show('请输入ID', ToastAndroid.SHORT)
       return
     }
-    getUserInfo(inputUserIdRef.current)
-      .then(user => {
-        if (!user?.mid) {
-          ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
-          return
-        }
-        store.userInfo = {
-          name: user.name,
-          mid: user.mid + '',
-          face: user.face,
-          sign: user.sign,
-        }
-      })
-      .catch(() => {
-        ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
-        store.userInfo = null
-      })
+    setUserId(inputUserIdRef.current)
   }
   return (
     <View style={styles.container}>

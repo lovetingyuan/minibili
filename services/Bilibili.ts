@@ -57,47 +57,6 @@ export function request<D extends Record<string, any>>(
   // );
 }
 
-export async function getUserInfo(uid: string | number) {
-  // https://api.bilibili.com/x/space/acc/info?mid=1458143131
-  interface Res {
-    birthday: string
-    coins: number
-    face: string
-    level: number
-    live_room: {
-      cover: string
-      liveStatus: 0 | 1
-      roomStatus: 1 | 0
-      roomid: number
-      title: string
-      url: string
-    } | null
-    mid: number
-    name: string
-    sex: string
-    sign: string
-    top_photo: string
-  }
-  const data = await request<Res>(
-    //?mid=1717066021&token=&platform=web&jsonp=jsonp
-    '/x/space/acc/info?mid=' + uid + '&token=&platform=web&jsonp=jsonp',
-    'https://space.bilibili.com/' + uid,
-  )
-  // if (code) {
-  //   throw new Error('获取用户信息失败');
-  // }
-  return {
-    living: !!data.live_room?.liveStatus,
-    liveUrl: data.live_room?.url,
-    face: data.face,
-    name: data.name,
-    sign: data.sign,
-    mid: data.mid,
-    level: data.level,
-    sex: data.sex,
-  }
-}
-
 export async function getDynamicItems(offset = '', uid: string | number) {
   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480
   interface Author {
