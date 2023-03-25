@@ -1,3 +1,5 @@
+import { Linking } from 'react-native'
+
 export const parseNumber = (num?: number) => {
   if (num == null) {
     return ''
@@ -42,4 +44,13 @@ export const parseDuration = (duration: number) => {
   const minutes = date.getMinutes().toString().padStart(2, '0')
   const seconds = date.getSeconds().toString().padStart(2, '0')
   return [hour, minutes, seconds].filter(Boolean).join(':')
+}
+
+export const openBiliVideo = async (bvid: string) => {
+  const url = `bilibili://video/${bvid}`
+  Linking.canOpenURL(url).then(openable => {
+    if (!openable) {
+      Linking.openURL('https://m.bilibili.com/video/' + bvid)
+    }
+  })
 }

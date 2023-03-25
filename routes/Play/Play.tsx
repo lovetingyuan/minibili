@@ -6,6 +6,7 @@ import {
   Text,
   ScrollView,
   Pressable,
+  Image,
 } from 'react-native'
 import { getVideoComments, getVideoInfo } from '../../services/Bilibili'
 import { Avatar, ButtonGroup } from '@rneui/base'
@@ -24,12 +25,13 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { GetFuncPromiseType, RootStackParamList } from '../../types'
 // import { useFocusEffect, useIsFocused } from '@react-navigation/native'
 import store from '../../store'
-import { useSnapshot } from 'valtio'
+// import { useSnapshot } from 'valtio'
 
 // import { debounce } from 'throttle-debounce'
 import { PlayInfo } from '../../components/PlayInfo'
 import { useIsWifi } from '../../hooks/useIsWifi'
 import Player from './Player'
+import { openBiliVideo } from '../../utils'
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 export default ({ route, navigation }: Props) => {
@@ -41,13 +43,29 @@ export default ({ route, navigation }: Props) => {
   const [videoInfo, setVideoInfo] = React.useState<VideoInfo | null>(null)
   const [currentPage, setCurrentPage] = React.useState(0)
 
-  const { specialUser } = useSnapshot(store)
-  const tracyStyle =
-    mid == specialUser?.mid
-      ? {
-          color: 'rgb(251, 114, 153)',
-        }
-      : null
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() => {
+            openBiliVideo(bvid)
+          }}>
+          <Image
+            style={{ width: 36, height: 14 }}
+            source={require('../../assets/bili-text.png')}
+          />
+        </Pressable>
+      ),
+    })
+  }, [navigation, bvid])
+
+  // const { specialUser } = useSnapshot(store)
+  // const tracyStyle =
+  //   mid == specialUser?.mid
+  //     ? {
+  //         color: 'rgb(251, 114, 153)',
+  //       }
+  //     : null
   React.useEffect(() => {
     getVideoComments(aid).then(replies => {
       setComments(replies)
@@ -105,9 +123,7 @@ export default ({ route, navigation }: Props) => {
                   source={{ uri: videoInfo.upFace + '@80w_80h_1c.webp' }}
                 />
               ) : null}
-              <Text style={[styles.upName, tracyStyle]}>
-                {videoInfo?.upName || '-'}
-              </Text>
+              <Text style={[styles.upName]}>{videoInfo?.upName || '-'}</Text>
             </View>
           </Pressable>
           {!!videoInfo && <PlayInfo video={videoInfo} name={name} />}

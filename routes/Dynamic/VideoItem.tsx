@@ -9,8 +9,6 @@ import {
   GetFuncPromiseType,
   RootStackParamList,
 } from '../../types'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
@@ -22,8 +20,6 @@ type VideoDynamicItem = Extract<DynamicItems, { type: DynamicType.Video }>
 export default function VideoItem(props: VideoDynamicItem) {
   const { mid, name, cover, title, aid, date, play, bvid, text, duration } =
     props
-  const { specialUser } = useSnapshot(store)
-  const isTracy = mid == specialUser?.mid
 
   const navigation = useNavigation<NavigationProps['navigation']>()
 
@@ -51,7 +47,7 @@ export default function VideoItem(props: VideoDynamicItem) {
         <View style={styles.imageContainer}>
           <Image
             style={styles.image}
-            source={{ uri: cover + (isTracy ? '' : '@702w_394h.webp') }}
+            source={{ uri: cover + '@702w_394h.webp' }}
             loadingIndicatorSource={require('../../assets/video-loading.png')}
           />
           <Image

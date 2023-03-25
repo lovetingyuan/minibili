@@ -8,7 +8,7 @@ const syncStoreKeys = [
   'followedUps',
   'blackTags',
   'userInfo',
-  'specialUser',
+  // 'specialUser',
   'webViewMode',
   'hideWatched',
 ] as const
@@ -18,8 +18,9 @@ const store = proxy<{
   followedUps: UserInfo[]
   blackTags: Record<string, boolean>
   userInfo: UserInfo | null
-  specialUser: UserInfo | null
+  // specialUser: UserInfo | null
   webViewMode: 'PC' | 'MOBILE'
+  topUps: (string | number)[]
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
   livingUps: Record<string, boolean>
@@ -30,8 +31,9 @@ const store = proxy<{
   followedUps: [],
   blackTags: {},
   userInfo: null,
-  specialUser: null,
+  // specialUser: null,
   webViewMode: 'PC',
+  topUps: [],
   // ----
   dynamicUser: null,
   updatedUps: {},
@@ -53,11 +55,7 @@ Promise.all(
         store[k] = JSON.parse(data)
       }
     }
-    store.dynamicUser = store.specialUser
-      ? { ...store.specialUser }
-      : store.userInfo
-      ? { ...store.userInfo }
-      : null
+    store.dynamicUser = store.userInfo ? { ...store.userInfo } : null
   })
   .then(() => {
     watch(get => {

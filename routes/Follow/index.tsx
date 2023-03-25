@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, View, FlatList, StyleSheet } from 'react-native'
 import FollowItem from './FollowItem'
 import { getFollowUps } from '../../services/Bilibili'
-import TracyBtn from '../../components/TracyBtn'
+// import TracyBtn from '../../components/TracyBtn'
 import Login from './Login'
 
 import { GetFuncPromiseType, RootStackParamList, UserInfo } from '../../types'
@@ -16,7 +16,7 @@ type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name)
-  const { specialUser, userInfo, livingUps, updatedUps } = useSnapshot(store)
+  const { userInfo, livingUps, updatedUps } = useSnapshot(store)
   const [ups, setUps] = React.useState<UpItem[]>([])
   const [loading, setLoading] = React.useState(false)
   const [followedNum, setFollowedNum] = React.useState(0)
@@ -66,7 +66,7 @@ export default function Follow({ navigation, route }: Props) {
     setFollowedNum(0)
     store.userInfo = null
     store.updatedUps = {}
-    store.specialUser = null
+    // store.specialUser = null
     store.dynamicUser = null
   }
 
@@ -76,14 +76,14 @@ export default function Follow({ navigation, route }: Props) {
 
   const topUps: UserInfo[] = []
   const updateUps: UserInfo[] = []
-  if (specialUser) {
-    topUps.push({ ...specialUser })
-  }
+  // if (specialUser) {
+  //   topUps.push({ ...specialUser })
+  // }
   const notUpdateUsers: UserInfo[] = []
   for (let up of ups) {
-    if (up.mid == specialUser?.mid) {
-      continue
-    }
+    // if (up.mid == specialUser?.mid) {
+    //   continue
+    // }
     if (livingUps[up.mid]) {
       topUps.push(up)
     } else if (updatedUps[up.mid]) {
@@ -121,7 +121,7 @@ export default function Follow({ navigation, route }: Props) {
           </Text>
         }
       />
-      <TracyBtn />
+      {/* <TracyBtn /> */}
     </View>
   )
 }

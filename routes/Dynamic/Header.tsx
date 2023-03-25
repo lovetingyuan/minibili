@@ -4,21 +4,14 @@ import {
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
-  Image,
   Pressable,
 } from 'react-native'
 import { Avatar } from '@rneui/base'
-import {
-  getFansData,
-  getLiveStatus,
-  getUserInfo,
-} from '../../services/Bilibili'
+import { getFansData, getUserInfo } from '../../services/Bilibili'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList, UserInfo } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button } from '@rneui/base'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
 import { handleShareUp } from '../../services/Share'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
@@ -28,54 +21,35 @@ export default function Header(props: UserInfo) {
   const [fans, setFans] = React.useState('')
 
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { specialUser } = useSnapshot(store)
-  const isTracy = mid == specialUser?.mid
   const [userInfo, setUserInfo] = React.useState<UserInfo>({ ...props })
   const [liveInfo, setLiveInfo] = React.useState({
     living: false,
     liveUrl: '',
   })
   React.useEffect(() => {
-    if (mid) {
-      getUserInfo(mid)
-        .then(res => {
-          setUserInfo({
-            name: res.name,
-            face: res.face,
-            sign: res.sign,
-            mid: res.mid + '',
-          })
-          setLiveInfo({
-            living: res.living,
-            liveUrl: res.liveUrl || '',
-          })
-        })
-        .catch(() => {
-          if (isTracy) {
-            setUserInfo({ ...userInfo, ...specialUser })
-          } else {
-            setUserInfo({ ...props })
-          }
-          getLiveStatus(mid).then(res => {
-            setLiveInfo({
-              living: res.living,
-              liveUrl: 'https://live.bilibili.com/' + res.roomId,
-            })
-          })
-        })
-      getFansData(mid).then(data => {
-        if (data.follower < 10000) {
-          setFans(data.follower + '')
-        } else {
-          setFans((data.follower / 10000).toFixed(1) + '万')
-        }
-      })
+    if (!mid) {
+      return
     }
+    getUserInfo(mid).then(res => {
+      setUserInfo({
+        name: res.name,
+        face: res.face,
+        sign: res.sign,
+        mid: res.mid + '',
+      })
+      setLiveInfo({
+        living: res.living,
+        liveUrl: res.liveUrl || '',
+      })
+    })
+    getFansData(mid).then(data => {
+      if (data.follower < 10000) {
+        setFans(data.follower + '')
+      } else {
+        setFans((data.follower / 10000).toFixed(1) + '万')
+      }
+    })
   }, [mid])
-  const nameStyle: Record<string, any> = {}
-  if (isTracy) {
-    nameStyle.color = '#f25d8e'
-  }
   const avatar = userInfo.face
   if (!mid) {
     return <Text>{userInfo.name}</Text>
@@ -86,7 +60,7 @@ export default function Header(props: UserInfo) {
         onPress={() => {
           navigation.navigate('WebPage', {
             url: `https://space.bilibili.com/${mid}`,
-            title: userInfo.name,
+            title: userInfo.name + '的主页',
           })
         }}>
         <Avatar
@@ -95,22 +69,14 @@ export default function Header(props: UserInfo) {
           rounded
           source={
             avatar
-              ? {
-                  uri: avatar + (isTracy ? '' : '@120w_120h_1c.webp'),
-                }
+              ? { uri: avatar + '@240w_240h_1c.webp' }
               : require('../../assets/empty-avatar.png')
           }
         />
       </TouchableWithoutFeedback>
       <View style={{ flex: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ ...styles.name, ...nameStyle }}>{userInfo.name}</Text>
-          {isTracy ? (
-            <Image
-              source={require('../../assets/GC1.png')}
-              style={{ width: 18, height: 18, marginLeft: 5 }}
-            />
-          ) : null}
+          <Text style={{ ...styles.name }}>{userInfo.name}</Text>
           <Text>
             {'   '} {fans}粉丝
           </Text>
@@ -125,13 +91,7 @@ export default function Header(props: UserInfo) {
           </Pressable>
         </View>
 
-        <Text
-          style={[
-            styles.sign,
-            isTracy ? { color: '#178bcf', fontSize: 15 } : null,
-          ]}>
-          {userInfo.sign}
-        </Text>
+        <Text style={styles.sign}>{userInfo.sign}</Text>
       </View>
       {liveInfo.living ? (
         <Button

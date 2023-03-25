@@ -37,8 +37,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   })
   const [loading, setLoading] = React.useState(false)
   const [refreshing, setRefreshing] = React.useState(false)
-  const { specialUser, dynamicUser, followedUps } = useSnapshot(store)
-  const upId = dynamicUser?.mid || specialUser?.mid
+  const { dynamicUser, followedUps } = useSnapshot(store)
+  const upId = dynamicUser?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<FlatList | null>(null)
   const [initLoad, setInitLoad] = React.useState(true)
   const [refreshHead, setRefreshHead] = React.useState(0)
@@ -149,7 +149,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   React.useEffect(() => {
     resetDynamicItems()
   }, [upId])
-  const headerProps = dynamicUser || specialUser
+  const headerProps = dynamicUser // || specialUser
   if (!headerProps) {
     return null
   }

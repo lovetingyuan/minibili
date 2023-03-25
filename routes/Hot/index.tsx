@@ -11,7 +11,7 @@ import {
 import * as SplashScreen from 'expo-splash-screen'
 import { getHotList } from '../../services/Bilibili'
 import HotItem from './HotItem'
-import TracyBtn from '../../components/TracyBtn'
+// import TracyBtn from '../../components/TracyBtn'
 import { handleShareVideo } from '../../services/Share'
 import { GetFuncPromiseType } from '../../types'
 import { RootStackParamList } from '../../types'
@@ -51,6 +51,22 @@ export default function Hot({ navigation }: Props) {
   const { blackUps, blackTags } = useSnapshot(store)
 
   React.useEffect(() => {
+    navigation.setOptions({
+      headerRight() {
+        if (!state.list.length) {
+          return null
+        }
+        return (
+          <Text
+            style={{
+              fontSize: 16,
+              marginRight: 20,
+            }}>
+            {state.list.length * 2}
+          </Text>
+        )
+      },
+    })
     const unsubscribe = navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return
@@ -301,7 +317,7 @@ export default function Hot({ navigation }: Props) {
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
-            {moreRef.current ? '加载中...' : `到底了~(${state.list.length})`}
+            {moreRef.current ? '加载中...' : '到底了~'}
           </Text>
         }
         onEndReached={loadMoreHotItems}
@@ -310,7 +326,7 @@ export default function Hot({ navigation }: Props) {
         onRefresh={resetDynamicItems}
         contentContainerStyle={styles.listContainerStyle}
       />
-      <TracyBtn />
+      {/* <TracyBtn /> */}
     </View>
   )
 }

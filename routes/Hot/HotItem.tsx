@@ -2,8 +2,6 @@ import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { getHotList } from '../../services/Bilibili'
 import { GetFuncPromiseType } from '../../types'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
 import { parseDuration, parseNumber } from '../../utils'
 
 type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0]
@@ -11,8 +9,6 @@ type HotVideo = GetFuncPromiseType<typeof getHotList>['list'][0]
 export default React.memo(function HotItem({ video }: { video: HotVideo }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
-  const { specialUser } = useSnapshot(store)
-  const isTracy = video.mid == specialUser?.mid
   return (
     <View style={[styles.itemContainer]}>
       <View style={{ flex: 1 }}>
@@ -43,9 +39,8 @@ export default React.memo(function HotItem({ video }: { video: HotVideo }) {
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
-            style={[styles.upNameText, isTracy ? styles.upNameTracy : null]}>
+            style={[styles.upNameText]}>
             {video.name}
-            {isTracy ? ' ❤' : ''}
           </Text>
         </View>
         <View style={styles.namePlay}>

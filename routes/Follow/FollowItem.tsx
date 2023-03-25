@@ -9,7 +9,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button } from '@rneui/base'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
-import { useSnapshot } from 'valtio'
+// import { useSnapshot } from 'valtio'
 import store from '../../store'
 
 const rejectHandler = (reason: any) => ({
@@ -36,13 +36,7 @@ export default React.memo(
     const {
       item: { face, name, sign, mid },
     } = props
-    const { specialUser } = useSnapshot(store)
-    const tracyStyle: Record<string, any> = {}
-    const isTracy = mid == specialUser?.mid
-    if (isTracy) {
-      tracyStyle.color = '#fb7299'
-      tracyStyle.fontSize = 18
-    }
+    // const { topUps } = useSnapshot(store)
     const [updatedId, setUpdatedId] = React.useState('')
     const [livingInfo, setLiving] = React.useState<{
       living: boolean
@@ -128,15 +122,24 @@ export default React.memo(
             text: '标记为未读',
             name: 'unread',
           },
-      specialUser?.name === props.item.name
-        ? {
-            text: '取消特别关注',
-            name: 'cancelSpecial',
-          }
-        : {
-            text: `设置 ${props.item.name} 为特别关注 ❤`,
-            name: 'special',
-          },
+      // specialUser?.name === props.item.name
+      //   ? {
+      //       text: '取消特别关注',
+      //       name: 'cancelSpecial',
+      //     }
+      //   : {
+      //       text: `设置 ${props.item.name} 为特别关注 ❤`,
+      //       name: 'special',
+      //     },
+      // topUps.includes(props.item.mid)
+      //   ? {
+      //       text: '取消置顶',
+      //       name: 'cancelTop',
+      //     }
+      //   : {
+      //       text: '置顶',
+      //       name: 'setTop',
+      //     },
     ].filter(Boolean)
     const handleOverlayClick = useMemoizedFn((n: string) => {
       if (n === 'unread') {
@@ -145,16 +148,24 @@ export default React.memo(
         setUpdatedId(random)
         store.updatedUps[mid] = true
         setModalVisible(false)
-      } else if (n === 'special') {
-        store.specialUser = {
-          name,
-          mid: mid + '',
-          face,
-          sign,
-        }
-      } else if (n === 'cancelSpecial') {
-        store.specialUser = null
       }
+      //  else if (n === 'special') {
+      //   store.specialUser = {
+      //     name,
+      //     mid: mid + '',
+      //     face,
+      //     sign,
+      //   }
+      // } else if (n === 'cancelSpecial') {
+      //   store.specialUser = null
+      // }
+      //  else if (n === 'setTop') {
+      //   const _topUps = store.topUps.filter(v => v !== mid)
+      //   _topUps.unshift(mid)
+      //   store.topUps = _topUps
+      // } else if (n === 'cancelTop') {
+      //   store.topUps = store.topUps.filter(v => v !== mid)
+      // }
     })
     return (
       <>
@@ -166,7 +177,7 @@ export default React.memo(
               size={55}
               containerStyle={{ marginRight: 15 }}
               rounded
-              source={{ uri: face + (isTracy ? '' : '@120w_120h_1c.webp') }}
+              source={{ uri: face + '@120w_120h_1c.webp' }}
             />
             {updatedId ? (
               <Badge key={updatedId} badgeStyle={styles.updateMark} />
@@ -178,13 +189,7 @@ export default React.memo(
             style={styles.nameSignContainer}
             onPress={() => gotoDynamic(false)}>
             <View style={styles.nameContainer}>
-              <Text style={[styles.name, tracyStyle]}>{name}</Text>
-              {/* {isTracy ? (
-                <Image
-                  source={require('../../assets/GC1.png')}
-                  style={{ width: 18, height: 18, marginLeft: 8 }}
-                />
-              ) : null} */}
+              <Text style={[styles.name]}>{name}</Text>
               {livingInfo?.living ? (
                 <Button
                   title="直播中~"
@@ -197,12 +202,7 @@ export default React.memo(
               ) : null}
             </View>
             {sign ? (
-              <Text
-                style={[
-                  styles.signText,
-                  isTracy ? { color: '#178bcf', fontSize: 14 } : null,
-                ]}
-                numberOfLines={2}>
+              <Text style={[styles.signText]} numberOfLines={2}>
                 {sign}
               </Text>
             ) : null}

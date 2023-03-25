@@ -13,8 +13,6 @@ import RichText from '../../components/RichText'
 // import { AppContext } from '../../context';
 import { RootStackParamList } from '../../types'
 import DateAndOpen from './DateAndOpen'
-import { useSnapshot } from 'valtio'
-import store from '../../store'
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function RichTextItem(props: {
@@ -25,9 +23,7 @@ export default function RichTextItem(props: {
   id: string | number
   images: { src: string; ratio: number }[]
 }) {
-  const { text, date, mid, images, name, id } = props
-  const { specialUser } = useSnapshot(store)
-  const isTracy = mid == specialUser?.mid
+  const { text, date, images, name, id } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
   return (
     <View style={[styles.textContainer]}>
@@ -56,7 +52,7 @@ export default function RichTextItem(props: {
                   style={[styles.image, { aspectRatio: img.ratio }]}
                   key={img.src}
                   source={{
-                    uri: img.src + (isTracy ? '' : '@240w_240h_1c.webp'),
+                    uri: img.src + '@240w_240h_1c.webp',
                   }}
                 />
               </Pressable>
