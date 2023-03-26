@@ -1,10 +1,10 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { getFollowUps, getLiveStatus } from '../../services/Bilibili'
+import { getLivingInfo } from '../../services/api/living-info'
 import { Avatar, Badge } from '@rneui/base'
 import { checkDynamics, setLatest } from '../../services/Updates'
 import { useNavigation } from '@react-navigation/native'
-import { GetFuncPromiseType, RootStackParamList } from '../../types'
+import { RootStackParamList } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button } from '@rneui/base'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
@@ -12,12 +12,13 @@ import ButtonsOverlay from '../../components/ButtonsOverlay'
 // import { useSnapshot } from 'valtio'
 import store from '../../store'
 import { allSettled } from '../../utils'
+import { FollowedUpItem } from '../../services/api/followed-ups'
 
-type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
+// type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default React.memo(
-  function FollowItem(props: { item: UpItem }) {
+  function FollowItem(props: { item: FollowedUpItem }) {
     __DEV__ && console.log('follow item', props.item.name)
     const {
       item: { face, name, sign, mid },
@@ -33,7 +34,8 @@ export default React.memo(
     const updateData = React.useCallback(() => {
       return allSettled([
         updatedId ? Promise.resolve('') : checkDynamics(mid),
-        getLiveStatus(mid),
+        // getLiveStatus(mid),
+        getLivingInfo(mid),
       ]).then(([a, b]) => {
         if (a.status === 'fulfilled' && a.value) {
           setUpdatedId(a.value)

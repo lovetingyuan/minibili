@@ -1,14 +1,11 @@
 import React from 'react'
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import RichText from '../../components/RichText'
-import { getDynamicItems } from '../../services/Bilibili'
-import { DynamicType, GetFuncPromiseType } from '../../types'
+import { DynamicItem, DynamicType } from '../../services/api/dynamic-items'
 import DateAndOpen from './DateAndOpen'
 
-type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0]
-
 type ForwardItems = Extract<
-  DynamicItems,
+  DynamicItem,
   {
     type:
       | DynamicType.ForwardVideo

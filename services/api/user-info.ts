@@ -2,12 +2,6 @@ import useSWR from 'swr'
 import { parseNumber } from '../../utils'
 import fetcher from './fetcher'
 
-const fetcher2 = <T>(url: string) => {
-  __DEV__ && console.log('fetch user info: ' + url)
-  // return Promise.reject('sdfs')
-  return fetcher<T>(url, 'https://space.bilibili.com/')
-}
-
 const getUserInfo = (
   userInfo: UserInfoResponse,
   userFans?: UserFansResponse,
@@ -33,16 +27,26 @@ export function useUserInfo(mid?: number | string) {
   // const blackUps = await getBlackUps;
   const { data, error, isValidating, isLoading } = useSWR<UserInfoResponse>(
     () => {
-      if (!mid) {
-        return ''
-      }
       return '/x/space/acc/info?mid=' + mid + '&token=&platform=web&jsonp=jsonp'
     },
-    fetcher2,
+    (url: string) => {
+      if (!mid) {
+        return Promise.reject(new Error('IGNORE'))
+      }
+      return fetcher<UserInfoResponse>(url, 'https://space.bilibili.com/')
+    },
   )
-  const { data: data2 } = useSWR<UserFansResponse>(() => {
-    return `/x/relation/stat?vmid=${mid}`
-  }, fetcher2)
+  const { data: data2 } = useSWR<UserFansResponse>(
+    () => {
+      return `/x/relation/stat?vmid=${mid}`
+    },
+    (url: string) => {
+      if (!mid) {
+        return Promise.reject(new Error('IGNORE'))
+      }
+      return fetcher<UserFansResponse>(url)
+    },
+  )
 
   return {
     data: !error && data ? getUserInfo(data, data2) : null,

@@ -1,0 +1,60 @@
+import fetcher from './fetcher'
+import useSWR from 'swr'
+
+export interface FollowedUpResponse {
+  face: string
+  mid: number | string
+  mtime: number
+  // official_verify: { type: number; desc: string }
+  sign: string
+  // special: 0;
+  tag: null
+  uname: string
+}
+
+const getFollowedUp = (up: FollowedUpResponse) => {
+  return {
+    face: up.face,
+    mid: up.mid,
+    name: up.uname,
+    sign: up.sign,
+  }
+}
+export type FollowedUpItem = ReturnType<typeof getFollowedUp>
+type Res = { total: number; list: FollowedUpResponse[] }
+
+const fetcher2 = async (url: string) => {
+  const mid = url.match(/vmid=(\d+)&/)?.[1]
+  if (!mid) {
+    return Promise.reject(new Error('IGNORE'))
+  }
+  const data = await fetcher<Res>(url)
+  const total = data.total
+  const list = [data.list]
+  const pages = Math.ceil(total / 50) - 1
+  await Promise.all(
+    Array.from({ length: pages }).map((v, i) => {
+      return fetcher<Res>(url.replace('pn=1', 'pn=' + (i + 2))).then(res => {
+        list[i + 1] = res.list
+      })
+    }),
+  )
+  return {
+    total,
+    list: list.flat().map(getFollowedUp),
+  }
+}
+
+// https://api.bilibili.com/x/relation/followings?vmid=14427395&pn=1&ps=50&order=desc&jsonp=jsonp
+export function useFollowedUps(mid?: string | number) {
+  const { data, error, isValidating, isLoading } = useSWR(
+    `/x/relation/followings?vmid=${mid}&pn=1&ps=50&order=desc&jsonp=jsonp`,
+    fetcher2,
+  )
+  return {
+    data,
+    error,
+    isValidating,
+    isLoading,
+  }
+}

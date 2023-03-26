@@ -1,45 +1,52 @@
 import React from 'react'
-import { Text, View, FlatList, StyleSheet } from 'react-native'
+import { Text, View, FlatList, StyleSheet, ToastAndroid } from 'react-native'
 import FollowItem from './FollowItem'
-import { getFollowUps } from '../../services/Bilibili'
 import Login from './Login'
 
-import { GetFuncPromiseType, RootStackParamList, UserInfo } from '../../types'
+import { RootStackParamList, UserInfo } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import Header from './Header'
+import { FollowedUpItem, useFollowedUps } from '../../services/api/followed-ups'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
-type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
+// type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name)
   const { userInfo, livingUps, updatedUps } = useSnapshot(store)
-  const [ups, setUps] = React.useState<UpItem[]>([])
+  const [ups, setUps] = React.useState<FollowedUpItem[]>([])
   const [loading, setLoading] = React.useState(false)
   const [followedNum, setFollowedNum] = React.useState(0)
   const followListRef = React.useRef<FlatList | null>(null)
 
+  const { data, error } = useFollowedUps(userInfo?.mid)
+  // if (userInfo?.mid) {
+  //   if (error) {
+  //     ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
+  //     setFollowedNum(0)
+  //     setUps([...store.followedUps])
+  //   } else if (data?.list) {
+  //     setUps(data.list)
+  //     setFollowedNum(data.total)
+  //     store.followedUps = [...data.list]
+  //   }
+  // }
+
   React.useEffect(() => {
-    if (!userInfo?.mid) {
-      return
-    }
-    setLoading(true)
-    getFollowUps(userInfo.mid)
-      .then(({ list, total }) => {
-        setFollowedNum(total)
-        setUps(list)
-        store.followedUps = list
-      })
-      .catch(() => {
+    if (userInfo?.mid) {
+      if (error) {
+        ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
         setFollowedNum(0)
         setUps([...store.followedUps])
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [userInfo?.mid])
+      } else if (data?.list) {
+        setUps(data.list)
+        setFollowedNum(data.total)
+        store.followedUps = [...data.list]
+      }
+    }
+  }, [userInfo?.mid, error, data])
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -57,7 +64,7 @@ export default function Follow({ navigation, route }: Props) {
     return unsubscribe
   }, [navigation, ups])
 
-  const renderItem = ({ item }: { item: UpItem }) => {
+  const renderItem = ({ item }: { item: FollowedUpItem }) => {
     return <FollowItem item={item} />
   }
 

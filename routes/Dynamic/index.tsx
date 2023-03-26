@@ -8,8 +8,6 @@ import {
   BackHandler,
   Image,
 } from 'react-native'
-import { getDynamicItems } from '../../services/Bilibili'
-import { DynamicItem, DynamicType } from '../../types'
 import ForwardItem from './ForwardItem'
 import Header from './Header'
 import RichTextItem from './RichTextItem'
@@ -19,6 +17,11 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import WordItem from './WordItem'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
+import {
+  DynamicItem,
+  DynamicType,
+  getDynamicItems,
+} from '../../services/api/dynamic-items'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>
 

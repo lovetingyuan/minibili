@@ -3,19 +3,13 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import RichText from '../../components/RichText'
-import { getDynamicItems } from '../../services/Bilibili'
-import {
-  DynamicType,
-  GetFuncPromiseType,
-  RootStackParamList,
-} from '../../types'
+import { RootStackParamList } from '../../types'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
+import { DynamicItem, DynamicType } from '../../services/api/dynamic-items'
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
-type DynamicItems = GetFuncPromiseType<typeof getDynamicItems>['items'][0]
-
-type VideoDynamicItem = Extract<DynamicItems, { type: DynamicType.Video }>
+type VideoDynamicItem = Extract<DynamicItem, { type: DynamicType.Video }>
 
 export default function VideoItem(props: VideoDynamicItem) {
   const { mid, name, cover, title, aid, date, play, bvid, text, duration } =
@@ -118,7 +112,6 @@ const styles = StyleSheet.create({
   },
   videoLength: {
     position: 'absolute',
-    // paddingVertical: 1,
     paddingHorizontal: 2,
     backgroundColor: 'rgba(0,0,0,.5)',
     bottom: 0,
