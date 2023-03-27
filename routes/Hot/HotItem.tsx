@@ -117,7 +117,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontSize: 13,
   },
-  upNameTracy: { color: '#FF6699', fontWeight: 'bold', fontSize: 14 },
   playNumText: {
     color: '#555',
     marginLeft: 4,

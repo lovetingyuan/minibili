@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Tracy",
-    "slug": "Tracy",
-    "version": "0.0.8",
+    "name": "minibili",
+    "slug": "minibili",
+    "version": "0.0.9",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,10 +14,12 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tingyuan.tracy",
+      "bundleIdentifier": "com.tingyuan.minibili",
       "buildNumber": "0.0.8"
     },
     "android": {
@@ -25,7 +27,7 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.tingyuan.tracy",
+      "package": "com.tingyuan.minibili",
       "versionCode": 8
     },
     "web": {
@@ -39,15 +41,24 @@
           "color": "#ffffff",
           "sounds": []
         }
-      ]
+      ],
+      "sentry-expo"
     ],
     "extra": {
       "eas": {
-        "projectId": "a3cf9972-f1fb-4874-92a5-7a579e471538"
+        "projectId": "17ac07b9-df37-4b3a-9a31-50da2bb5d44c"
       }
     },
     "hooks": {
-      "postPublish": []
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "tingyuan123",
+            "project": "minibili"
+          }
+        }
+      ]
     }
   }
 }
