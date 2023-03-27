@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { ReplyItem } from '../services/api/video-comments'
+import { ReplyItem } from '../api/video-comments'
 import RichText from './RichText'
 
 interface Props {

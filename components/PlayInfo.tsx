@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Pressable } from 'react-native'
 import { parseDate, parseNumber } from '../utils'
 import { handleShareVideo } from '../services/Share'
 import { Icon } from '@rneui/base'
-import { VideoInfo } from '../services/api/video-info'
+import { VideoInfo } from '../api/video-info'
 
 export function PlayInfo(props: { name: string; video: VideoInfo }) {
   if (!props.video.bvid) {

@@ -1,0 +1,10 @@
+import fetcher from './fetcher-test'
+import { test } from 'vitest'
+import { UserInfoResponseSchema } from './user-info.schema'
+
+test('user-info', async () => {
+  const res = await fetcher<any>(
+    'https://api.bilibili.com/x/space/acc/info?mid=14427395&token=&platform=web&jsonp=jsonp',
+  )
+  UserInfoResponseSchema.parse(res)
+})

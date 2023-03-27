@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 
 import store from '../../store'
-import { useUserInfo } from '../../services/api/user-info'
+import { useUserInfo } from '../../api/user-info'
 
 const leftTv = require('../../assets/tv-left.png')
 const rightTv = require('../../assets/tv-right.png')

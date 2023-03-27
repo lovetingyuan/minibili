@@ -7,9 +7,10 @@ import {
   ToastAndroid,
   BackHandler,
   Image,
+  useWindowDimensions,
+  // Pressable,
 } from 'react-native'
 import ForwardItem from './ForwardItem'
-import Header from './Header'
 import RichTextItem from './RichTextItem'
 import VideoItem from './VideoItem'
 import { RootStackParamList } from '../../types'
@@ -21,7 +22,10 @@ import {
   DynamicItem,
   DynamicType,
   getDynamicItems,
-} from '../../services/api/dynamic-items'
+} from '../../api/dynamic-items'
+import { HeaderLeft, HeaderRight } from './Header'
+import { useUserFans } from '../../api/user-fans'
+// import { Avatar } from '@rneui/base'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -45,6 +49,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   const dynamicListRef = React.useRef<FlatList | null>(null)
   const [initLoad, setInitLoad] = React.useState(true)
   const [refreshHead, setRefreshHead] = React.useState(0)
+  const { data: fans } = useUserFans(upId)
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
@@ -58,6 +63,41 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     })
     return unsubscribe
   }, [navigation, dynamicItems])
+  const { width } = useWindowDimensions()
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => {
+        if (!dynamicUser) {
+          return '动态'
+        }
+        return (
+          <View style={{ position: 'relative', left: -20 }}>
+            <HeaderLeft
+              user={dynamicUser}
+              fans={fans}
+              width={width}
+              gotoWebPage={() => {
+                navigation.navigate('WebPage', {
+                  url: `https://space.bilibili.com/${dynamicUser.mid}`,
+                  title: dynamicUser.name + '的主页',
+                })
+              }}
+            />
+          </View>
+        )
+      },
+      headerTitleAlign: 'left',
+      headerStyle: {
+        flexWrap: 'wrap',
+      },
+      headerRight: () => {
+        if (!dynamicUser) {
+          return null
+        }
+        return <HeaderRight user={dynamicUser} fans={fans} />
+      },
+    })
+  }, [navigation, dynamicUser, fans, width])
 
   React.useEffect(() => {
     const handler = function () {
@@ -155,7 +195,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   }
   return (
     <View style={styles.container}>
-      <Header {...headerProps} />
+      {/* <Header {...headerProps} /> */}
       <FlatList
         data={dynamicItems}
         renderItem={renderItem}
@@ -194,6 +234,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
   itemContainer: {
     paddingVertical: 18,
     paddingHorizontal: 12,

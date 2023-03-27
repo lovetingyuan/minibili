@@ -5,7 +5,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import RichText from '../../components/RichText'
 import { RootStackParamList } from '../../types'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
-import { DynamicItem, DynamicType } from '../../services/api/dynamic-items'
+import { DynamicItem, DynamicType } from '../../api/dynamic-items'
 
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 

@@ -52,6 +52,17 @@ const hack = `function __hack() {
     Array('ended', 'pause', 'waiting').forEach(evt => {
       video.addEventListener(evt, () => {
         postPlayState(evt)
+        if (evt === 'ended') {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen(); // Firefox
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen(); // Chrome, Safari & Opera
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen(); // IE/Edge
+          }
+        }
       })
     })
     postPlayState(video.paused ? 'pause' : 'play')

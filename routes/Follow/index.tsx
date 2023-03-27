@@ -8,7 +8,7 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import Header from './Header'
-import { FollowedUpItem, useFollowedUps } from '../../services/api/followed-ups'
+import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 // type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]

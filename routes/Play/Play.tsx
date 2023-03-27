@@ -24,12 +24,12 @@ import { PlayInfo } from '../../components/PlayInfo'
 import { useIsWifi } from '../../hooks/useIsWifi'
 import Player from './Player'
 import { openBiliVideo } from '../../utils'
-import { useVideoInfo, VideoInfo } from '../../services/api/video-info'
-import { ReplyItem, useVideoComments } from '../../services/api/video-comments'
+import { useVideoInfo, VideoInfo } from '../../api/video-info'
+import { ReplyItem, useVideoComments } from '../../api/video-comments'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
-export default ({ route, navigation }: Props) => {
+const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { aid, bvid, name, mid } = route.params
   const [comments, setComments] = React.useState<ReplyItem[]>([])
@@ -221,6 +221,10 @@ export default ({ route, navigation }: Props) => {
       </ScrollView>
     </View>
   )
+}
+
+export default (props: Props) => {
+  return <PlayPage {...props} key={props.route.params.bvid} />
 }
 
 const styles = StyleSheet.create({

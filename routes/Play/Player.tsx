@@ -3,17 +3,28 @@ import React from 'react'
 import { ToastAndroid, useWindowDimensions, View } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useIsWifi } from '../../hooks/useIsWifi'
-import { VideoInfo } from '../../services/api/video-info'
+import { VideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import { Loading } from './page-loading'
 
 function Player(props: { video: VideoInfo | null; page: number }) {
   const isWifi = useIsWifi()
   const { width, height } = useWindowDimensions()
-  let videoViewHeight = height * 0.4
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
+
+  if (!props.video) {
+    return null
+  }
+  let isVerticalVideo = false
+  if (props.video.width && props.video.height) {
+    const [videoWidth, videoHeight] = [
+      props.video.pages[props.page - 1].width,
+      props.video.pages[props.page - 1].height,
+    ]
+    isVerticalVideo = videoWidth < videoHeight
+  }
   const handleMessage = (evt: WebViewMessageEvent) => {
     try {
       const data = JSON.parse(evt.nativeEvent.data)
@@ -22,6 +33,9 @@ function Player(props: { video: VideoInfo | null; page: number }) {
         if (data.payload === 'play' || data.payload === 'waiting') {
           KeepAwake.activateKeepAwakeAsync('PLAY')
           setExtraHeight(40)
+          if (isVerticalVideo && !verticalScale) {
+            setVerticalScale(0.4)
+          }
         } else {
           KeepAwake.deactivateKeepAwake('PLAY')
           if (data.payload === 'ended') {
@@ -39,18 +53,18 @@ function Player(props: { video: VideoInfo | null; page: number }) {
     } catch (e) {}
   }
 
-  if (!props.video) {
-    return null
-  }
+  let videoViewHeight = height * 0.4
   if (props.video.width && props.video.height) {
     const [videoWidth, videoHeight] = [
       props.video.pages[props.page - 1].width,
       props.video.pages[props.page - 1].height,
     ]
-    if (videoWidth >= videoHeight) {
-      videoViewHeight = (videoHeight / videoWidth) * width + extraHeight
-    } else {
-      videoViewHeight = height * (verticalScale || 0.3)
+    videoViewHeight =
+      (isVerticalVideo ? videoWidth / videoHeight : videoHeight / videoWidth) *
+        width +
+      extraHeight
+    if (isVerticalVideo && verticalScale) {
+      videoViewHeight = verticalScale * height
     }
   }
   const renderLoading = () => Loading(props.video?.cover)

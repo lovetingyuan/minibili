@@ -1,6 +1,7 @@
 {
   "name": "minibili",
   "version": "1.0.0",
+  "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -11,7 +12,10 @@
     "fixdeps": "npx expo install --fix",
     "doctor": "npx expo-cli doctor",
     "site": "cd site && npm run dev",
-    "build:site": "cd site && npm run build"
+    "build:site": "cd site && npm run build",
+    "format": "npx prettier ./ --write",
+    "test": "npx vitest",
+    "proxy": "cross-env http_proxy=http://127.0.0.1:7890 && cross-env https_proxy=http://127.0.0.1:7890"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.17.11",
@@ -46,7 +50,8 @@
     "swr": "^2.1.1",
     "throttle-debounce": "^5.0.0",
     "url-regex": "^5.0.0",
-    "valtio": "^1.7.4"
+    "valtio": "^1.7.4",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -57,9 +62,10 @@
     "@types/throttle-debounce": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "eslint": "^7.32.0",
-    "typescript": "^4.9.4"
-  },
-  "private": true
+    "typescript": "^4.9.4",
+    "vitest": "^0.29.7"
+  }
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { getLivingInfo } from '../../services/api/living-info'
+import { getLivingInfo } from '../../api/living-info'
 import { Avatar, Badge } from '@rneui/base'
 import { checkDynamics, setLatest } from '../../services/Updates'
 import { useNavigation } from '@react-navigation/native'
@@ -12,7 +12,7 @@ import ButtonsOverlay from '../../components/ButtonsOverlay'
 // import { useSnapshot } from 'valtio'
 import store from '../../store'
 import { allSettled } from '../../utils'
-import { FollowedUpItem } from '../../services/api/followed-ups'
+import { FollowedUpItem } from '../../api/followed-ups'
 
 // type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
 type NavigationProps = NativeStackScreenProps<RootStackParamList>

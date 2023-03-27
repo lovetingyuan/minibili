@@ -8,6 +8,7 @@ import About from './About'
 import WebPage from './WebPage'
 import { RootStackParamList } from '../types'
 import MainTab from './MainTab'
+import Dynamic from './Dynamic'
 import { NetToast } from '../components/NetToast'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -32,6 +33,13 @@ export default () => {
             name="Main"
             component={MainTab}
             options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Dynamic"
+            component={Dynamic}
+            options={{
+              headerTitle: '动态',
+            }}
           />
           <Stack.Screen
             name="Play"

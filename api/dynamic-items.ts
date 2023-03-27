@@ -1,4 +1,4 @@
-import { GetFuncPromiseType } from '../../types'
+import { GetFuncPromiseType } from '../types'
 import request from './fetcher'
 
 export type DynamicItem = GetFuncPromiseType<typeof getDynamicItems>['items'][0]

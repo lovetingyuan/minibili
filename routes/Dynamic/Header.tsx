@@ -1,135 +1,75 @@
-import React from 'react'
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  Pressable,
-} from 'react-native'
 import { Avatar, Icon } from '@rneui/base'
-import { useNavigation } from '@react-navigation/native'
-import { RootStackParamList, UserInfo } from '../../types'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Button } from '@rneui/base'
+import React from 'react'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { UserInfo } from '../../types'
 import { handleShareUp } from '../../services/Share'
-import { useUserInfo } from '../../services/api/user-info'
 
-type NavigationProps = NativeStackScreenProps<RootStackParamList>
-
-export default function Header(props: UserInfo) {
-  const { mid } = props
-  const navigation = useNavigation<NavigationProps['navigation']>()
-  const userInfo = { ...props }
-  const livingInfo = {
-    living: false,
-    liveUrl: '',
-  }
-  const { data } = useUserInfo(props.mid)
-  if (data?.mid) {
-    Object.assign(userInfo, {
-      name: data.name,
-      face: data.face,
-      sign: data.sign,
-      mid: data.mid + '',
-    })
-    Object.assign(livingInfo, {
-      living: data.living,
-      liveUrl: data.liveUrl || '',
-    })
-  }
-  const fansCount = data?.fans
-
-  const avatar = userInfo.face
-
+export function HeaderLeft(props: {
+  user: UserInfo
+  fans?: string
+  width: number
+  gotoWebPage: () => void
+}) {
+  const userName = props.user.name
   return (
-    <View style={styles.header}>
-      <TouchableWithoutFeedback
-        onPress={() => {
-          navigation.navigate('WebPage', {
-            url: `https://space.bilibili.com/${mid}`,
-            title: userInfo.name + '的主页',
-          })
-        }}>
+    <View style={styles.left}>
+      <Pressable onPress={props.gotoWebPage}>
         <Avatar
-          size={58}
-          containerStyle={{ marginRight: 14 }}
+          size={32}
+          containerStyle={{ marginRight: 12 }}
           rounded
-          source={
-            avatar
-              ? { uri: avatar + '@240w_240h_1c.webp' }
-              : require('../../assets/empty-avatar.png')
-          }
-        />
-      </TouchableWithoutFeedback>
-      <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ ...styles.name }}>{userInfo.name}</Text>
-          <Text>
-            {'   '} {fansCount}粉丝
-          </Text>
-          <Pressable
-            style={{ marginLeft: 10 }}
-            onPress={() => {
-              if (userInfo) {
-                handleShareUp(userInfo.name, userInfo.mid, userInfo.sign)
-              }
-            }}>
-            <Icon type="fontisto" name="share-a" size={13} color="#666" />
-          </Pressable>
-        </View>
-
-        <Text style={styles.sign} numberOfLines={2}>
-          {userInfo.sign}
-        </Text>
-      </View>
-      {livingInfo.living ? (
-        <Button
-          title="直播中"
-          type="clear"
-          titleStyle={{ fontSize: 13 }}
-          onPress={() => {
-            if (livingInfo.liveUrl) {
-              navigation.navigate('WebPage', {
-                url: livingInfo.liveUrl,
-                title: userInfo.name + '的直播间',
-              })
-            }
+          source={{
+            uri: props.user.face + '@240w_240h_1c.webp',
           }}
         />
-      ) : null}
+      </Pressable>
+      <Text
+        adjustsFontSizeToFit
+        numberOfLines={2}
+        ellipsizeMode="head"
+        style={[
+          {
+            fontSize: userName
+              ? Math.min((props.width * 0.45) / userName.length, 18)
+              : 18,
+          },
+        ]}>
+        {userName}的动态
+      </Text>
+      <Text style={{ fontSize: 14, marginLeft: 12 }}>{props.fans}粉丝</Text>
+    </View>
+  )
+}
+
+export function HeaderRight(props: { user: UserInfo; fans: string }) {
+  return (
+    <View style={styles.right}>
+      <Pressable
+        style={{ marginLeft: 10 }}
+        onPress={() => {
+          if (props.user) {
+            handleShareUp(props.user.name, props.user.mid, props.user.sign)
+          }
+        }}>
+        <Icon type="fontisto" name="share-a" size={13} color="#666" />
+      </Pressable>
     </View>
   )
 }
 const styles = StyleSheet.create({
-  header: {
+  left: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
-    paddingTop: 50,
-    paddingLeft: 12,
-    paddingRight: 12,
-    paddingBottom: 20,
+    flex: 1,
   },
-  image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 18,
+  // userName: {
+  //   // fontSize: 18,
+  //   // flexShrink: 1,
+  //   flexWrap: 'wrap',
+  // },
+  right: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // width: 200,
   },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  sign: {
-    marginTop: 3,
-    fontStyle: 'italic',
-    fontSize: 13,
-    letterSpacing: 1,
-    color: '#666',
-  },
-  livingText: {
-    color: '#86b300',
-    marginLeft: 20,
-  },
-  shareImg: { width: 15, height: 15, marginLeft: 20 },
 })

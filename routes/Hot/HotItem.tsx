@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
-import { VideoItem } from '../../services/api/hot-videos'
+import { VideoItem } from '../../api/hot-videos'
 import { parseDuration, parseNumber } from '../../utils'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {

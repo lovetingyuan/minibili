@@ -19,7 +19,7 @@ import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
-import { useHotVideos, VideoItem } from '../../services/api/hot-videos'
+import { useHotVideos, VideoItem } from '../../api/hot-videos'
 // import { VideoItem } from '../../services/api/types'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
@@ -32,14 +32,14 @@ export default function Hot({ navigation }: Props) {
     useHotVideos()
 
   React.useEffect(() => {
-    navigation.setOptions({
-      headerRight() {
-        if (!list.length) {
-          return null
-        }
-        return <Text style={styles.videoCount}>{list.length}</Text>
-      },
-    })
+    // navigation.setOptions({
+    //   headerRight() {
+    //     if (!list.length) {
+    //       return null
+    //     }
+    //     return <Text style={styles.videoCount}>{list.length}</Text>
+    //   },
+    // })
     const unsubscribe = navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return

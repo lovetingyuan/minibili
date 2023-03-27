@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react'
 import Follow from './Follow'
-import Dynamic from './Dynamic'
 import Hot from './Hot'
 import store from '../store'
 import { useSnapshot } from 'valtio'
@@ -56,7 +55,7 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
 }
 
 const MainTab = () => {
-  const { dynamicUser, updatedUps, livingUps } = useSnapshot(store)
+  const { updatedUps, livingUps } = useSnapshot(store)
   const updateCount = Object.values(updatedUps).filter(Boolean).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
@@ -91,7 +90,7 @@ const MainTab = () => {
           }
         }}
       />
-      {dynamicUser ? (
+      {/* {dynamicUser ? (
         <Tab.Screen
           name="Dynamic"
           component={Dynamic}
@@ -99,7 +98,7 @@ const MainTab = () => {
             tabBarLabel: getLabel('动态'),
           }}
         />
-      ) : null}
+      ) : null} */}
       <Tab.Screen
         name="Follow"
         component={Follow}

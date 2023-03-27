@@ -1,7 +1,7 @@
 import React from 'react'
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import RichText from '../../components/RichText'
-import { DynamicItem, DynamicType } from '../../services/api/dynamic-items'
+import { DynamicItem, DynamicType } from '../../api/dynamic-items'
 import DateAndOpen from './DateAndOpen'
 
 type ForwardItems = Extract<

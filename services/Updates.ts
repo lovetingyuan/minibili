@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getDynamicItems } from './api/dynamic-items'
+import { getDynamicItems } from '../api/dynamic-items'
 
 export async function checkDynamics(mid: number | string) {
   const key = `DYNAMIC_ITEM_${mid}`

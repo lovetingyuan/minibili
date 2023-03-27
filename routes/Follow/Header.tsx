@@ -9,7 +9,8 @@ import { StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import { Alert } from 'react-native'
-import { useUserInfo } from '../../services/api/user-info'
+import { useUserInfo } from '../../api/user-info'
+import { useUserFans } from '../../api/user-fans'
 
 const buttons = [
   {
@@ -44,7 +45,7 @@ export default function Header(props: {
       store.dynamicUser = { ...store.userInfo }
     }
   }
-  const fansCount = data?.fans
+  const { data: fansCount } = useUserFans(userInfo?.mid)
   if (!userInfo) {
     return <View style={styles.userContainer} />
   }
