@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build --outDir ../docs --emptyOutDir",
+    "dev": "vite --base /minibili/",
+    "build": "tsc && vite build --outDir ../docs --emptyOutDir --base /minibili/",
     "preview": "vite preview"
   },
   "devDependencies": {
