@@ -1,4 +1,3 @@
-// https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=326081112&timezone_offset=-480
 export default function request<D extends any>(url: string, referer?: string) {
   const requestUrl = url.startsWith('http')
     ? url

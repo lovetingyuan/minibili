@@ -1,16 +1,12 @@
 import fetcher from './fetcher'
 import useSWR from 'swr'
+import { z } from 'zod'
+import {
+  FollowedUpDataResponseSchema,
+  FollowedUpResponseSchema,
+} from './followed-ups.schema'
 
-export interface FollowedUpResponse {
-  face: string
-  mid: number | string
-  mtime: number
-  // official_verify: { type: number; desc: string }
-  sign: string
-  // special: 0;
-  tag: null
-  uname: string
-}
+export type FollowedUpResponse = z.infer<typeof FollowedUpResponseSchema>
 
 const getFollowedUp = (up: FollowedUpResponse) => {
   return {
@@ -21,7 +17,8 @@ const getFollowedUp = (up: FollowedUpResponse) => {
   }
 }
 export type FollowedUpItem = ReturnType<typeof getFollowedUp>
-type Res = { total: number; list: FollowedUpResponse[] }
+
+type Res = z.infer<typeof FollowedUpDataResponseSchema>
 
 const fetcher2 = async (url: string) => {
   const mid = url.match(/vmid=(\d+)&/)?.[1]

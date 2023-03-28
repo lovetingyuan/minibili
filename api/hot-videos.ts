@@ -1,5 +1,7 @@
 import useSWRInfinite from 'swr/infinite'
+import { z } from 'zod'
 import fetcher from './fetcher'
+import { HotVideoResponseSchema } from './hot-videos.schema'
 
 const fetcher2 = (url: string) => {
   __DEV__ && console.log('fetch hot videos: ' + url)
@@ -8,45 +10,8 @@ const fetcher2 = (url: string) => {
   )
 }
 
-export interface HotVideoResponse {
-  // https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1
-  aid: number
-  bvid: string
-  cid: number
-  copyright: 1 | 0
-  ctime: number
-  desc: string
-  dimension: { width: number; height: number; rotate: number }
-  duration: number
-  dynamic: string
-  first_frame: string
-  is_ogv: boolean
-  ogv_info: null
-  owner: { mid: number; name: string; face: string }
-  pic: string
-  pubdate: number
-  // rcmd_reason: {content: '百万播放', corner_mark: 0}
-  // rights: {bp: 0, elec: 0, download: 0, movie: 0, pay: 0, …}
-  // season_type: 0
-  short_link: string
-  short_link_v2: string
-  stat: {
-    aid: number
-    view: number
-    danmaku: number
-    favorite: number
-    his_rank: number
-    like: number
-    now_rank: number
-    reply: number
-    share: number
-  }
-  state: number
-  tid: number
-  title: string
-  tname: string
-  videos: number
-}
+export type HotVideoResponse = z.infer<typeof HotVideoResponseSchema>
+
 const getVideo = (item: HotVideoResponse) => {
   return {
     aid: item.aid,

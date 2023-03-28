@@ -1,64 +1,11 @@
 import fetcher from './fetcher'
 import useSWR from 'swr'
+import { z } from 'zod'
+import { VideoInfoResponseSchema } from './video-info.schema'
 
-export interface VideoItemResponse {
-  aid: number
-  bvid: string
-  cid: number
-  copyright: number
-  ctime: number
-  desc: string
-  // desc_v2: [{…}]
-  dimension: { width: number; height: number; rotate: number }
-  duration: number
-  dynamic: string
-  // honor_reply: {honor: Array(1)}
-  is_chargeable_season: boolean
-  is_season_display: boolean
-  is_story: boolean
-  like_icon: string
-  mission_id: number
-  no_cache: boolean
-  owner: { mid: number; name: string; face: string }
-  pages: {
-    cid: number
-    dimension: { width: number; height: number; rotate: number }
-    duration: number
-    first_frame: string
-    from: string
-    page: number
-    part: string
-    vid: string
-    weblink: string
-  }[]
-  pic: string
-  // premiere: null
-  pubdate: number
-  // rights: {bp: 0, elec: 0, download: 1, movie: 0, pay: 0, …}
-  season_id: number
-  stat: {
-    aid: number
-    view: number
-    danmaku: number
-    favorite: number
-    his_rank: number
-    like: number
-    now_rank: number
-    reply: number
-    share: number
-  }
-  state: number
-  // subtitle: {allow_submit: true, list: Array(0)}
-  teenage_mode: number
-  tid: number
-  title: string
-  tname: string
-  // ugc_season: {id: number, title: string, cover: string, mid: number, intro: string, …}
-  // user_garb: {url_image_ani_cut: ''}
-  videos: number
-}
+export type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>
 
-const getVideoItem = (data: VideoItemResponse) => {
+const getVideoItem = (data: VideoInfoResponse) => {
   return {
     aid: data.aid,
     bvid: data.bvid,
@@ -98,7 +45,7 @@ export type VideoInfo = ReturnType<typeof getVideoItem>
 
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
 export function useVideoInfo(aid: string | number) {
-  const { data, error, isValidating, isLoading } = useSWR<VideoItemResponse>(
+  const { data, error, isValidating, isLoading } = useSWR<VideoInfoResponse>(
     () => {
       return '/x/web-interface/view?aid=' + aid
     },

@@ -1,25 +1,12 @@
+import { z } from 'zod'
 import request from './fetcher'
+import {
+  LiveInfoResponseSchema,
+  LiveUserInfoResponseSchema,
+} from './living-info.schema'
 
-export interface LiveUserInfo {
-  room_id: number
-  info: {
-    face: string
-    uid: number
-    uname: string
-  }
-}
-export interface LiveInfo {
-  uid: number
-  room_id: number
-  attention: number
-  online: number
-  description: string
-  live_status: number
-  title: string
-  user_cover: string
-  is_strict_room: boolean
-  live_time: string
-}
+export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
+export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
 
 export const getLivingInfo = async (mid: number | string) => {
   const {
