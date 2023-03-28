@@ -15,38 +15,38 @@ type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name)
-  const { userInfo, livingUps, updatedUps } = useSnapshot(store)
+  const { $userInfo, livingUps, updatedUps } = useSnapshot(store)
   const [ups, setUps] = React.useState<FollowedUpItem[]>([])
   const [loading, setLoading] = React.useState(false)
   const [followedNum, setFollowedNum] = React.useState(0)
   const followListRef = React.useRef<FlatList | null>(null)
 
-  const { data, error } = useFollowedUps(userInfo?.mid)
+  const { data, error } = useFollowedUps($userInfo?.mid)
   // if (userInfo?.mid) {
   //   if (error) {
   //     ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
   //     setFollowedNum(0)
-  //     setUps([...store.followedUps])
+  //     setUps([...store.$followedUps])
   //   } else if (data?.list) {
   //     setUps(data.list)
   //     setFollowedNum(data.total)
-  //     store.followedUps = [...data.list]
+  //     store.$followedUps = [...data.list]
   //   }
   // }
 
   React.useEffect(() => {
-    if (userInfo?.mid) {
+    if ($userInfo?.mid) {
       if (error) {
         ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
         setFollowedNum(0)
-        setUps([...store.followedUps])
+        setUps([...store.$followedUps])
       } else if (data?.list) {
         setUps(data.list)
         setFollowedNum(data.total)
-        store.followedUps = [...data.list]
+        store.$followedUps = [...data.list]
       }
     }
-  }, [userInfo?.mid, error, data])
+  }, [$userInfo?.mid, error, data])
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -72,12 +72,12 @@ export default function Follow({ navigation, route }: Props) {
     setUps([])
     setLoading(false)
     setFollowedNum(0)
-    store.userInfo = null
+    store.$userInfo = null
     store.updatedUps = {}
     store.dynamicUser = null
   }
 
-  if (!userInfo) {
+  if (!$userInfo) {
     return <Login />
   }
 

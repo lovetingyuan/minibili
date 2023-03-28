@@ -30,8 +30,8 @@ export default function Login() {
     }
   }, [])
   const { data, error } = useUserInfo(userId)
-  if (userId && data?.mid && !store.userInfo) {
-    store.userInfo = {
+  if (userId && data?.mid && !store.$userInfo) {
+    store.$userInfo = {
       name: data.name,
       mid: data.mid + '',
       face: data.face,

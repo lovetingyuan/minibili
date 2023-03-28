@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import { Image, Linking, StyleSheet, Text, TextProps } from 'react-native'
 import urlRegex from 'url-regex'
-import emojis from '../constants/emojis'
+import { useEmojiList } from '../api/emojis'
 
 let index = 0
 const urlregex = urlRegex({
@@ -14,6 +14,7 @@ export default function RichText(props: {
   imageSize?: number
   textProps?: TextProps
 }) {
+  const { data: emojis } = useEmojiList()
   const parseEmoji = (text: string) => {
     const result: ReactNode[] = []
 

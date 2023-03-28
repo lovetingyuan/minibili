@@ -1,5 +1,4 @@
 import { ToastAndroid } from 'react-native'
-// import { getBlackUps } from '../routes/Hot/blackUps';
 import { URL } from 'react-native-url-polyfill'
 
 let errorTime = Date.now()

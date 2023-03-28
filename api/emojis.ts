@@ -1,7 +1,6 @@
-import useSWR from 'swr'
 import { z } from 'zod'
-
 import { emojiPackage, emojiResponseSchema } from './emojis.schema'
+import useSWRImmutable from 'swr/immutable'
 
 export type EmojiPackage = z.infer<typeof emojiPackage>
 const getEmojis = (pkgs?: EmojiPackage[]) => {
@@ -26,9 +25,8 @@ const getEmojis = (pkgs?: EmojiPackage[]) => {
 export type EmojiResponse = z.infer<typeof emojiResponseSchema>
 
 export function useEmojiList() {
-  const { data, error, isValidating, isLoading } = useSWR<EmojiResponse>(
-    '/x/emote/user/panel/web?business=reply',
-  )
+  const { data, error, isValidating, isLoading } =
+    useSWRImmutable<EmojiResponse>('/x/emote/user/panel/web?business=reply')
   return {
     data: getEmojis(data?.packages),
     error,

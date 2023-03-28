@@ -27,14 +27,14 @@ export default function Header(props: {
   followedCount: number
   logOut: () => void
 }) {
-  const { userInfo } = useSnapshot(store)
+  const { $userInfo } = useSnapshot(store)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const [modalVisible, setModalVisible] = React.useState(false)
 
-  const { data } = useUserInfo(userInfo?.mid)
+  const { data } = useUserInfo($userInfo?.mid)
   if (data?.mid) {
-    if (!store.userInfo) {
-      store.userInfo = {
+    if (!store.$userInfo) {
+      store.$userInfo = {
         name: data.name,
         face: data.face,
         sign: data.sign,
@@ -42,11 +42,11 @@ export default function Header(props: {
       }
     }
     if (!store.dynamicUser) {
-      store.dynamicUser = { ...store.userInfo }
+      store.dynamicUser = { ...store.$userInfo }
     }
   }
-  const { data: fansCount } = useUserFans(userInfo?.mid)
-  if (!userInfo) {
+  const { data: fansCount } = useUserFans($userInfo?.mid)
+  if (!$userInfo) {
     return <View style={styles.userContainer} />
   }
 
@@ -56,9 +56,9 @@ export default function Header(props: {
         size={60}
         containerStyle={{ marginRight: 16 }}
         onPress={() => {
-          if (userInfo) {
+          if ($userInfo) {
             store.dynamicUser = {
-              ...userInfo,
+              ...$userInfo,
             }
             navigation.navigate('Dynamic', {
               from: 'followed',
@@ -67,14 +67,14 @@ export default function Header(props: {
         }}
         rounded
         source={
-          userInfo.face
-            ? { uri: userInfo.face }
+          $userInfo.face
+            ? { uri: $userInfo.face }
             : require('../../assets/empty-avatar.png')
         }
       />
       <View style={{ flex: 1 }}>
         <Text style={styles.myName}>
-          {userInfo.name}
+          {$userInfo.name}
           <Text style={styles.fansNumText}>
             {'    '}
             {fansCount}粉丝
@@ -82,7 +82,7 @@ export default function Header(props: {
             {props.followedCount}关注
           </Text>
         </Text>
-        <Text style={styles.mySign}>{userInfo.sign}</Text>
+        <Text style={styles.mySign}>{$userInfo.sign}</Text>
       </View>
       <Pressable
         onPress={() => {
@@ -133,8 +133,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   infoFace: {
-    width: 18,
-    height: 18,
-    marginRight: 5,
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    position: 'relative',
+    top: -10,
   },
 })

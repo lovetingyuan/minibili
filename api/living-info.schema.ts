@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const LiveUserInfoResponseSchema = z.object({
+export const LiveRoomInfoResponseSchema = z.object({
   room_id: z.number(),
   info: z.object({
     face: z.string(),

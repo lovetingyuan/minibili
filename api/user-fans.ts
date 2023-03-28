@@ -4,7 +4,6 @@ import { parseNumber } from '../utils'
 import { UserFansResponseSchema } from './user-fans.schema'
 
 export function useUserFans(mid?: number | string) {
-  // const blackUps = await getBlackUps;
   const { data, mutate, error, isValidating, isLoading } =
     useSWR<UserFansResponse>(mid ? `/x/relation/stat?vmid=${mid}` : null)
 

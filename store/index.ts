@@ -3,67 +3,49 @@ import { proxy } from 'valtio'
 import { watch } from 'valtio/utils'
 import { UserInfo } from '../types'
 
-const syncStoreKeys = [
-  'blackUps',
-  'followedUps',
-  'blackTags',
-  'userInfo',
-  // 'specialUser',
-  'webViewMode',
-  'hideWatched',
-] as const
-
 const store = proxy<{
-  blackUps: Record<string, string>
-  followedUps: UserInfo[]
-  blackTags: Record<string, boolean>
-  userInfo: UserInfo | null
-  // specialUser: UserInfo | null
-  webViewMode: 'PC' | 'MOBILE'
-  topUps: (string | number)[]
+  $blackUps: Record<string, string>
+  $followedUps: UserInfo[]
+  $blackTags: Record<string, string>
+  $userInfo: UserInfo | null
+  $webViewMode: 'PC' | 'MOBILE'
+  $latestUpdateIds: Record<string, string>
+  // ----------------------------
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
   livingUps: Record<string, boolean>
-  showBlackDialog: number
-  hideWatched: boolean
 }>({
-  blackUps: {},
-  followedUps: [],
-  blackTags: {},
-  userInfo: null,
-  // specialUser: null,
-  webViewMode: 'PC',
-  topUps: [],
-  // ----
+  $blackUps: {},
+  $followedUps: [],
+  $blackTags: {},
+  $userInfo: null,
+  $webViewMode: 'PC',
+  $latestUpdateIds: {},
+  // -------------------------
   dynamicUser: null,
   updatedUps: {},
   livingUps: {},
-  showBlackDialog: 0,
-  hideWatched: false,
 })
 
-Promise.all(
-  syncStoreKeys.map(k => {
-    return AsyncStorage.getItem(k).then(data => [k, data])
-  }),
-)
-  .then(res => {
-    for (let i = 0; i < res.length; i++) {
-      const [k, data] = res[i]
-      if (data) {
-        // @ts-ignore
-        store[k] = JSON.parse(data)
-      }
-    }
-    store.dynamicUser = store.userInfo ? { ...store.userInfo } : null
-  })
-  .then(() => {
-    watch(get => {
-      for (let k of syncStoreKeys) {
-        const data = get(store)[k as keyof typeof store]
-        AsyncStorage.setItem(k, JSON.stringify(data))
-      }
-    })
+const StoragePrefix = 'Store:'
+
+Object.keys(store)
+  // 以$开头的数据表示需要持久化存储
+  .filter(k => k.startsWith('$'))
+  .forEach((k: string) => {
+    const key = k as keyof typeof store
+    AsyncStorage.getItem(StoragePrefix + key)
+      .then(data => {
+        if (data) {
+          store[key] = JSON.parse(data)
+        }
+      })
+      .then(() => {
+        watch(get => {
+          const data = get(store)[key]
+          AsyncStorage.setItem(StoragePrefix + key, JSON.stringify(data))
+        })
+      })
   })
 
 export default store

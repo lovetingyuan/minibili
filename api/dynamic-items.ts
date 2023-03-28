@@ -1,5 +1,8 @@
 import { GetFuncPromiseType } from '../types'
 import request from './fetcher'
+import useSWR from 'swr'
+import { useSnapshot } from 'valtio'
+import store from '../store'
 
 export type DynamicItem = GetFuncPromiseType<typeof getDynamicItems>['items'][0]
 
@@ -269,4 +272,38 @@ export async function getDynamicItems(offset = '', uid: string | number) {
       })
       .filter(Boolean),
   }
+}
+
+export function useHasUpdate(mid: number | string) {
+  const time = mid.toString().slice(0, 8).padEnd(8, '0')
+  const delay = mid.toString().slice(0, 4)
+  const { data } = useSWR<any>(
+    `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
+    (url: string) => {
+      return new Promise(r => {
+        setTimeout(() => {
+          r(request(url))
+        }, Number(delay))
+      })
+    },
+    {
+      refreshInterval: 5 * 60 * 1000 + Number(time),
+    },
+  )
+  const { $latestUpdateIds } = useSnapshot(store)
+  let latestTime = 0
+  let latestId = ''
+  if (data?.items && $latestUpdateIds[mid]) {
+    data.items.forEach((item: any) => {
+      const pubTime = item.modules?.module_author?.pub_ts
+      if (pubTime > latestTime) {
+        latestTime = pubTime
+        latestId = item.id_str
+      }
+    })
+    if ($latestUpdateIds[mid] !== latestId) {
+      return latestId
+    }
+  }
+  return ''
 }

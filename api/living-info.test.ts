@@ -1,7 +1,7 @@
 import fetcher from './fetcher-test'
 import { test, describe } from 'vitest'
 import {
-  LiveUserInfoResponseSchema,
+  LiveRoomInfoResponseSchema,
   LiveInfoResponseSchema,
 } from './living-info.schema'
 
@@ -10,7 +10,7 @@ describe('living-info', () => {
     const res = await fetcher(
       'https://api.live.bilibili.com/live_user/v1/Master/info?uid=14427395',
     )
-    LiveUserInfoResponseSchema.parse(res)
+    LiveRoomInfoResponseSchema.parse(res)
   })
   test('live-info', async () => {
     const res = await fetcher(

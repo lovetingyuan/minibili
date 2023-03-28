@@ -35,7 +35,6 @@ export type VideoItem = ReturnType<typeof getVideo>
 // https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1
 
 export function useHotVideos() {
-  // const blackUps = await getBlackUps;
   const { data, mutate, size, setSize, isValidating, isLoading } =
     useSWRInfinite<HotVideoResponse[]>(
       index => {

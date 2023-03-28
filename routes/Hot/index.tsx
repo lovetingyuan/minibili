@@ -20,13 +20,12 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-// import { VideoItem } from '../../services/api/types'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
 
 export default function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
-  const { blackUps, blackTags } = useSnapshot(store)
+  const { $blackUps, $blackTags } = useSnapshot(store)
 
   const { list, page, setSize, isRefreshing, loading, refresh, isReachingEnd } =
     useHotVideos()
@@ -59,14 +58,14 @@ export default function Hot({ navigation }: Props) {
       return
     }
     const { mid, name } = currentVideoRef.current
-    store.blackUps['_' + mid] = name
+    store.$blackUps['_' + mid] = name
   }
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
       return
     }
     const { tag } = currentVideoRef.current
-    store.blackTags[tag] = true
+    store.$blackTags[tag] = tag
   }
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a')
@@ -182,7 +181,7 @@ export default function Hot({ navigation }: Props) {
   const hotVideoList: [VideoItem, VideoItem?][] = []
   let current: [VideoItem?, VideoItem?] = []
   for (const item of list) {
-    if (!('_' + item.mid in blackUps) && !(item.tag in blackTags)) {
+    if (!('_' + item.mid in $blackUps) && !(item.tag in $blackTags)) {
       current.push(item)
       if (current.length === 2) {
         hotVideoList.push(current as [VideoItem, VideoItem])

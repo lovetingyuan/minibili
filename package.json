@@ -14,8 +14,7 @@
     "site": "cd site && npm run dev",
     "build:site": "cd site && npm run build",
     "format": "npx prettier ./ --write",
-    "test": "npx vitest",
-    "proxy": "cross-env http_proxy=http://127.0.0.1:7890 && cross-env https_proxy=http://127.0.0.1:7890"
+    "test": "npx vitest"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.17.11",

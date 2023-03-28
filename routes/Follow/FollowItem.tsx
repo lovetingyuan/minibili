@@ -1,20 +1,17 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { getLivingInfo } from '../../api/living-info'
+import { useLivingInfo } from '../../api/living-info'
 import { Avatar, Badge } from '@rneui/base'
-import { checkDynamics, setLatest } from '../../services/Updates'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button } from '@rneui/base'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
-// import { useSnapshot } from 'valtio'
 import store from '../../store'
-import { allSettled } from '../../utils'
 import { FollowedUpItem } from '../../api/followed-ups'
+import { useHasUpdate } from '../../api/dynamic-items'
 
-// type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
 type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default React.memo(
@@ -23,60 +20,10 @@ export default React.memo(
     const {
       item: { face, name, sign, mid },
     } = props
-    // const { topUps } = useSnapshot(store)
-    const [updatedId, setUpdatedId] = React.useState('')
-    const [livingInfo, setLiving] = React.useState<{
-      living: boolean
-      liveUrl?: string
-    } | null>(null)
+    const updateId = useHasUpdate(mid)
+    store.updatedUps[mid] = !!updateId
     const navigation = useNavigation<NavigationProps['navigation']>()
-    const [loading, setLoading] = React.useState(false)
-    const updateData = React.useCallback(() => {
-      return allSettled([
-        updatedId ? Promise.resolve('') : checkDynamics(mid),
-        // getLiveStatus(mid),
-        getLivingInfo(mid),
-      ]).then(([a, b]) => {
-        if (a.status === 'fulfilled' && a.value) {
-          setUpdatedId(a.value)
-          store.updatedUps[mid] = true
-        }
-        if (b.status === 'fulfilled') {
-          const { living, roomId } = b.value
-          setLiving({
-            living,
-            liveUrl: 'https://live.bilibili.com/' + roomId,
-          })
-          store.livingUps[mid] = living
-        }
-        if (a.status === 'fulfilled' && b.status === 'fulfilled') {
-          setLoading(false)
-        }
-      })
-    }, [mid])
-    React.useEffect(() => {
-      if (loading) {
-        return
-      }
-      setLoading(true)
-      updateData()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mid])
-    React.useEffect(() => {
-      let updateTime = Math.random() * 5
-      if (updateTime < 5) {
-        updateTime += 5
-      }
-      if (updateTime > 8) {
-        updateTime -= 2
-      }
-      const timer = setInterval(() => {
-        updateData()
-      }, updateTime * 60 * 1000)
-      return () => {
-        clearInterval(timer)
-      }
-    }, [updateData])
+    const liveInfo = useLivingInfo(mid)
 
     const [modalVisible, setModalVisible] = React.useState(false)
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
@@ -90,74 +37,36 @@ export default React.memo(
         from: 'followed',
       })
       if (clearUpdate) {
-        setLatest(mid, updatedId + '')
-        setUpdatedId('')
+        store.$latestUpdateIds[mid] = updateId
         store.updatedUps[mid] = false
       }
     })
     const gotoLivePage = useMemoizedFn(() => {
-      if (livingInfo?.liveUrl) {
+      if (liveInfo?.liveUrl) {
         navigation.navigate('WebPage', {
-          url: livingInfo.liveUrl,
+          url: liveInfo.liveUrl,
           title: name + '的直播间',
         })
       }
     })
     const buttons = [
-      updatedId
+      updateId
         ? null
         : {
             text: '标记为未读',
             name: 'unread',
           },
-      // specialUser?.name === props.item.name
-      //   ? {
-      //       text: '取消特别关注',
-      //       name: 'cancelSpecial',
-      //     }
-      //   : {
-      //       text: `设置 ${props.item.name} 为特别关注 ❤`,
-      //       name: 'special',
-      //     },
-      // topUps.includes(props.item.mid)
-      //   ? {
-      //       text: '取消置顶',
-      //       name: 'cancelTop',
-      //     }
-      //   : {
-      //       text: '置顶',
-      //       name: 'setTop',
-      //     },
     ].filter(Boolean)
     const handleOverlayClick = useMemoizedFn((n: string) => {
       if (n === 'unread') {
-        const random = Math.random().toString().slice(2, 10)
-        setLatest(mid, random)
-        setUpdatedId(random)
+        store.$latestUpdateIds[mid] = Math.random() + ''
         store.updatedUps[mid] = true
         setModalVisible(false)
       }
-      //  else if (n === 'special') {
-      //   store.specialUser = {
-      //     name,
-      //     mid: mid + '',
-      //     face,
-      //     sign,
-      //   }
-      // } else if (n === 'cancelSpecial') {
-      //   store.specialUser = null
-      // }
-      //  else if (n === 'setTop') {
-      //   const _topUps = store.topUps.filter(v => v !== mid)
-      //   _topUps.unshift(mid)
-      //   store.topUps = _topUps
-      // } else if (n === 'cancelTop') {
-      //   store.topUps = store.topUps.filter(v => v !== mid)
-      // }
     })
     return (
       <>
-        <View style={{ opacity: loading ? 0.4 : 1, ...styles.container }}>
+        <View style={{ ...styles.container }}>
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => gotoDynamic(true)}>
@@ -167,8 +76,8 @@ export default React.memo(
               rounded
               source={{ uri: face + '@120w_120h_1c.webp' }}
             />
-            {updatedId ? (
-              <Badge key={updatedId} badgeStyle={styles.updateMark} />
+            {updateId ? (
+              <Badge key={updateId} badgeStyle={styles.updateMark} />
             ) : null}
           </TouchableOpacity>
           <TouchableOpacity
@@ -178,7 +87,7 @@ export default React.memo(
             onPress={() => gotoDynamic(false)}>
             <View style={styles.nameContainer}>
               <Text style={[styles.name]}>{name}</Text>
-              {livingInfo?.living ? (
+              {liveInfo?.living ? (
                 <Button
                   title="直播中~"
                   type="clear"
@@ -197,7 +106,6 @@ export default React.memo(
           </TouchableOpacity>
         </View>
         <ButtonsOverlay
-          // @ts-ignore
           buttons={buttons}
           onPress={handleOverlayClick}
           visible={modalVisible}

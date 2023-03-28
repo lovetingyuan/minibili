@@ -19,7 +19,7 @@ export default ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { url } = route.params
   const webviewRef = React.useRef<WebView | null>(null)
-  const { webViewMode } = useSnapshot(store)
+  const { $webViewMode } = useSnapshot(store)
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => {
@@ -28,11 +28,11 @@ export default ({ route, navigation }: Props) => {
             <Button
               titleStyle={{ fontSize: 13 }}
               onPress={() => {
-                store.webViewMode = webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
+                store.$webViewMode = $webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
               }}
               size="sm"
               type="clear">
-              {webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
+              {$webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
             </Button>
             <Pressable
               onPress={() => {
@@ -44,12 +44,12 @@ export default ({ route, navigation }: Props) => {
         )
       },
     })
-  }, [navigation, webViewMode])
+  }, [navigation, $webViewMode])
   return (
     <WebView
       style={styles.container}
       source={{ uri: url }}
-      key={webViewMode}
+      key={$webViewMode}
       // originWhitelist={['https://*', 'bilibili://*']}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
@@ -60,7 +60,7 @@ export default ({ route, navigation }: Props) => {
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={''}
       renderLoading={Loading}
-      userAgent={webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
+      userAgent={$webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
       ref={webviewRef}
       onMessage={() => {
         // const { action, payload } = JSON.parse(evt.nativeEvent.data)
