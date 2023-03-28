@@ -17,12 +17,12 @@ const getUserInfo = (userInfo: UserInfoResponse) => {
 export function useUserInfo(mid?: number | string) {
   const { data, error, isValidating, isLoading } = useSWR<UserInfoResponse>(
     () => {
+      if (!mid) {
+        return null
+      }
       return '/x/space/acc/info?mid=' + mid + '&token=&platform=web&jsonp=jsonp'
     },
     (url: string) => {
-      if (!mid) {
-        return Promise.reject(new Error('IGNORE'))
-      }
       return fetcher<UserInfoResponse>(url, 'https://space.bilibili.com/')
     },
   )

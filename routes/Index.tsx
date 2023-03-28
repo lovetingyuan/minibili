@@ -10,6 +10,8 @@ import { RootStackParamList } from '../types'
 import MainTab from './MainTab'
 import Dynamic from './Dynamic'
 import { NetToast } from '../components/NetToast'
+import { SWRConfig } from 'swr'
+import fetcher from '../api/fetcher'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -17,7 +19,11 @@ SplashScreen.preventAutoHideAsync()
 
 export default () => {
   return (
-    <>
+    <SWRConfig
+      value={{
+        /* ... */
+        fetcher,
+      }}>
       <StatusBar style="auto" />
       <NetToast />
       <NavigationContainer>
@@ -68,6 +74,6 @@ export default () => {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </SWRConfig>
   )
 }

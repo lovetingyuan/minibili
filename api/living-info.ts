@@ -29,7 +29,7 @@ export const getLivingInfo = async (mid: number | string) => {
   )
   return {
     living: live_status === 1,
-    roomId: room_id as number,
+    roomId: room_id,
     name: uname,
     face,
   }

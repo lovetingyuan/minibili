@@ -1,4 +1,3 @@
-import fetcher from './fetcher'
 import useSWR from 'swr'
 import { z } from 'zod'
 import { ReplyResponseSchema } from './video-comments.schema'
@@ -68,14 +67,14 @@ export function useVideoComments(aid: string | number) {
     isLoading,
   } = useSWR<ReplyResponse>(() => {
     return '/x/v2/reply/main?type=1&next=1&oid=' + aid
-  }, fetcher)
+  })
   const {
     data: res2,
     error: error2,
     isLoading: isLoading2,
   } = useSWR<ReplyResponse>(() => {
     return '/x/v2/reply/main?type=1&next=2&oid=' + aid
-  }, fetcher)
+  })
   let replies: ReplyItem[] = []
   if (
     !error1 &&

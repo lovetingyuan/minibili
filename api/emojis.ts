@@ -1,4 +1,3 @@
-import fetcher from './fetcher'
 import useSWR from 'swr'
 import { z } from 'zod'
 
@@ -29,7 +28,6 @@ export type EmojiResponse = z.infer<typeof emojiResponseSchema>
 export function useEmojiList() {
   const { data, error, isValidating, isLoading } = useSWR<EmojiResponse>(
     '/x/emote/user/panel/web?business=reply',
-    fetcher,
   )
   return {
     data: getEmojis(data?.packages),

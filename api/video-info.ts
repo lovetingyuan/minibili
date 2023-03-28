@@ -1,4 +1,3 @@
-import fetcher from './fetcher'
 import useSWR from 'swr'
 import { z } from 'zod'
 import { VideoInfoResponseSchema } from './video-info.schema'
@@ -49,7 +48,6 @@ export function useVideoInfo(aid: string | number) {
     () => {
       return '/x/web-interface/view?aid=' + aid
     },
-    fetcher,
   )
   return {
     data: data ? getVideoItem(data) : null,

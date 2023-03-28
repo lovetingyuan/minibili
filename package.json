@@ -8,7 +8,7 @@
     "android": "adb devices -l && npx expo start -c --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:android": " eas build --platform android --profile production",
+    "build:android": "npm run test && eas build --platform android --profile production",
     "fixdeps": "npx expo install --fix",
     "doctor": "npx expo-cli doctor",
     "site": "cd site && npm run dev",
