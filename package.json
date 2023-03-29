@@ -14,7 +14,7 @@
     "site": "cd site && npm run dev",
     "build:site": "cd site && npm run build",
     "format": "npx prettier src --write",
-    "test": "npx vitest",
+    "test": "npx vitest run",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src"
   },
   "dependencies": {

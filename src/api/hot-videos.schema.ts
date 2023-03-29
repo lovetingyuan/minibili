@@ -14,7 +14,7 @@ export const HotVideoResponseSchema = z.object({
   }),
   duration: z.number(),
   dynamic: z.string(),
-  first_frame: z.string(),
+  // first_frame: z.string(),
   is_ogv: z.boolean(),
   // ogv_info: z.null(),
   owner: z.object({ mid: z.number(), name: z.string(), face: z.string() }),

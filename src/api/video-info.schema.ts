@@ -32,7 +32,7 @@ export const VideoInfoResponseSchema = z.object({
         rotate: z.number(),
       }),
       duration: z.number(),
-      first_frame: z.string(),
+      // first_frame: z.string(),
       from: z.string(),
       page: z.number(),
       part: z.string(),
