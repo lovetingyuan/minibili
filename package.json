@@ -2,7 +2,7 @@
   "name": "minibili",
   "version": "1.0.0",
   "private": true,
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "src/App.tsx",
   "scripts": {
     "start": "expo start",
     "android": "adb devices -l && npx expo start -c --android",
@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@react-native/eslint-config": "^0.72.1",
+    "@react-native-community/eslint-config": "^3.2.0",
     "@tsconfig/react-native": "^2.0.0",
     "@types/react": "^18.0.31",
     "@types/react-native": "~0.71.4",
