@@ -32,7 +32,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { aid, bvid, name, mid } = route.params
-  const [comments, setComments] = React.useState<ReplyItem[]>([])
+  const [comments, setComments] = React.useState<ReplyItem[] | null>(null)
   const [videoInfo, setVideoInfo] = React.useState<VideoInfo | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
 
@@ -61,7 +61,7 @@ const PlayPage = ({ route, navigation }: Props) => {
     isLoading: replyLoading,
     error: replyError,
   } = useVideoComments(aid)
-  if (!replyLoading && !replyError && !comments.length) {
+  if (!replyLoading && !replyError && comments === null) {
     setComments(replies)
   }
   const isWifi = useIsWifi()
@@ -212,7 +212,7 @@ const PlayPage = ({ route, navigation }: Props) => {
             <Text style={styles.noCommentText}>暂无评论</Text>
           </View>
         )}
-        {comments.length ? (
+        {comments?.length ? (
           <View style={styles.footerContainer}>
             <Text style={styles.footerText}>只加载前40条</Text>
             <Text />
