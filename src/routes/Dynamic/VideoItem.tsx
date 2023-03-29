@@ -1,13 +1,13 @@
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+// import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import RichText from '../../components/RichText'
-import { RootStackParamList } from '../../types'
+import { NavigationProps } from '../../types'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
 import { DynamicItem, DynamicType } from '../../api/dynamic-items'
 
-type NavigationProps = NativeStackScreenProps<RootStackParamList>
+// type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 type VideoDynamicItem = Extract<DynamicItem, { type: DynamicType.Video }>
 
@@ -42,11 +42,11 @@ export default function VideoItem(props: VideoDynamicItem) {
           <Image
             style={styles.image}
             source={{ uri: cover + '@702w_394h.webp' }}
-            loadingIndicatorSource={require('../../assets/video-loading.png')}
+            loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image
             style={styles.tvIcon}
-            source={require('../../assets/tv.png')}
+            source={require('../../../assets/tv.png')}
           />
           <View style={styles.videoLength}>
             <Text style={styles.videoLengthText}>{duration}</Text>

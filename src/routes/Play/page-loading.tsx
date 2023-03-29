@@ -11,7 +11,7 @@ export const Loading = (cover?: string) => {
         }}
         resizeMode="cover"
         source={
-          cover ? { uri: cover } : require('../../assets/video-loading.png')
+          cover ? { uri: cover } : require('../../../assets/video-loading.png')
         }
       />
     </View>

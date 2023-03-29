@@ -31,7 +31,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
         <View style={styles.namePlay}>
           <Image
             style={styles.icon}
-            source={require('../../assets/up-mark.png')}
+            source={require('../../../assets/up-mark.png')}
           />
           <Text
             numberOfLines={1}
@@ -43,7 +43,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
         <View style={styles.namePlay}>
           <Image
             style={styles.icon}
-            source={require('../../assets/play-mark.png')}
+            source={require('../../../assets/play-mark.png')}
           />
           <Text style={styles.playNumText}>{playNum}</Text>
         </View>

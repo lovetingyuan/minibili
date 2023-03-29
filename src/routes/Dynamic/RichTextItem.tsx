@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+// import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import {
   Image,
@@ -10,10 +10,11 @@ import {
   View,
 } from 'react-native'
 import RichText from '../../components/RichText'
+import { NavigationProps } from '../../types'
 // import { AppContext } from '../../context';
-import { RootStackParamList } from '../../types'
+// import { RootStackParamList } from '../../types'
 import DateAndOpen from './DateAndOpen'
-type NavigationProps = NativeStackScreenProps<RootStackParamList>
+// type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function RichTextItem(props: {
   text: string

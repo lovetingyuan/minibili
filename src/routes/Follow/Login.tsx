@@ -16,8 +16,8 @@ import {
 import store from '../../store'
 import { useUserInfo } from '../../api/user-info'
 
-const leftTv = require('../../assets/tv-left.png')
-const rightTv = require('../../assets/tv-right.png')
+const leftTv = require('../../../assets/tv-left.png')
+const rightTv = require('../../../assets/tv-right.png')
 
 export default function Login() {
   const inputUserIdRef = React.useRef('')

@@ -4,7 +4,7 @@ import { handleShareVideo, parseDate, parseNumber } from '../utils'
 import { Icon } from '@rneui/base'
 import { VideoInfo } from '../api/video-info'
 
-export function PlayInfo(props: { name: string; video: VideoInfo }) {
+export function PlayInfo(props: { video: VideoInfo }) {
   if (!props.video.bvid) {
     return null
   }
@@ -31,7 +31,11 @@ export function PlayInfo(props: { name: string; video: VideoInfo }) {
       {!!props.video.bvid && (
         <Pressable
           onPress={() => {
-            handleShareVideo(props.name, props.video.title, props.video.bvid)
+            handleShareVideo(
+              props.video.upName,
+              props.video.title,
+              props.video.bvid,
+            )
           }}>
           <Icon type="fontisto" name="share-a" size={13} color="#666" />
         </Pressable>

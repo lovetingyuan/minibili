@@ -1,11 +1,18 @@
 import React from 'react'
-import { Text, View, FlatList, StyleSheet, ToastAndroid } from 'react-native'
+import {
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+  ToastAndroid,
+  ActivityIndicator,
+} from 'react-native'
 import FollowItem from './FollowItem'
 import Login from './Login'
 
-import { RootStackParamList, UserInfo } from '../../types'
+import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import store from '../../store'
+import store, { UserInfo } from '../../store'
 import { useSnapshot } from 'valtio'
 import Header from './Header'
 import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
@@ -23,9 +30,11 @@ export default function Follow({ navigation, route }: Props) {
     ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
     showLoadingError.current = true
   }
-  if (data?.list) {
-    store.$followedUps = data.list
-  }
+  React.useEffect(() => {
+    if (data?.list) {
+      store.$followedUps = data.list
+    }
+  }, [data?.list])
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -68,22 +77,27 @@ export default function Follow({ navigation, route }: Props) {
   return (
     <View style={styles.container}>
       <Header />
-      <FlatList
-        data={displayUps}
-        renderItem={renderItem}
-        keyExtractor={item => item.mid + ''}
-        onEndReachedThreshold={1}
-        style={styles.list}
-        ref={followListRef}
-        ListEmptyComponent={
-          <Text style={styles.listEmptyText}>
-            {isLoading
-              ? '加载中...'
-              : '暂无关注（需要在隐私设置中公开你的关注）'}
-          </Text>
-        }
-        ListFooterComponent={<Text style={styles.bottomText}>{'到底了~'}</Text>}
-      />
+      <View style={{ flex: 1 }}>
+        <ActivityIndicator color="blue" style={styles.loading} animating />
+        <FlatList
+          data={displayUps}
+          renderItem={renderItem}
+          keyExtractor={item => item.mid + ''}
+          onEndReachedThreshold={1}
+          style={styles.list}
+          ref={followListRef}
+          ListEmptyComponent={
+            <Text style={styles.listEmptyText}>
+              {isLoading
+                ? '加载中...'
+                : '暂无关注（需要在隐私设置中公开你的关注）'}
+            </Text>
+          }
+          ListFooterComponent={
+            <Text style={styles.bottomText}>{'到底了~'}</Text>
+          }
+        />
+      </View>
     </View>
   )
 }
@@ -115,4 +129,9 @@ const styles = StyleSheet.create({
   },
 
   listEmptyText: { textAlign: 'center', marginVertical: 40 },
+  loading: {
+    position: 'absolute',
+    right: 15,
+    top: 15,
+  },
 })

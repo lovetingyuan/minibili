@@ -1,5 +1,5 @@
-const hack = `function __hack() {
-  let videoDom;
+function __$hack() {
+  let videoDom
   const timer = setInterval(() => {
     const player = document.querySelector('.mplayer-load-layer')
     if (player && player.style.display !== 'none') {
@@ -25,24 +25,18 @@ const hack = `function __hack() {
       }
     }
   }, 200)
-  const postPlayState = state => {
-    window.ReactNativeWebView.postMessage(
-      JSON.stringify({
-        action: 'playState',
-        payload: state,
-      }),
-    )
-  }
   const timer3 = setInterval(() => {
     const video = document.querySelector('video')
-    if (!video) return;
+    if (!video) {
+      return
+    }
     videoDom = video
     clearInterval(timer3)
-    const postPlayState = (state) => {
+    const postPlayState = state => {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
           action: 'playState',
-          payload: state
+          payload: state,
         }),
       )
     }
@@ -54,13 +48,13 @@ const hack = `function __hack() {
         postPlayState(evt)
         if (evt === 'ended') {
           if (document.exitFullscreen) {
-            document.exitFullscreen();
+            document.exitFullscreen()
           } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen(); // Firefox
+            document.mozCancelFullScreen() // Firefox
           } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen(); // Chrome, Safari & Opera
+            document.webkitExitFullscreen() // Chrome, Safari & Opera
           } else if (document.msExitFullscreen) {
-            document.msExitFullscreen(); // IE/Edge
+            document.msExitFullscreen() // IE/Edge
           }
         }
       })
@@ -75,14 +69,14 @@ const hack = `function __hack() {
     clearInterval(timer4)
     const reloadBtn = document.createElement('div')
     reloadBtn.innerHTML = '&orarr;'
-    reloadBtn.style.cssText = \`
+    reloadBtn.style.cssText = `
     width: 36px;
     height: 36px;
     color: white;
     font-size: 28px;
     text-align: center;
     transform: rotate(90deg);
-    \`
+    `
     reloadBtn.addEventListener('click', () => {
       window.location.reload()
     })
@@ -135,10 +129,12 @@ const hack = `function __hack() {
   document.addEventListener('touchstart', function (e) {
     startY = e.touches[0].clientY
   })
-  let video;
+  // let video
   document.addEventListener('touchmove', function (e) {
     endY = e.touches[0].clientY
-    if (videoDom && videoDom.ended) return;
+    if (videoDom && videoDom.ended) {
+      return
+    }
     if (endY - startY > 100) {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
@@ -155,6 +151,6 @@ const hack = `function __hack() {
       )
     }
   })
-}`
+}
 
-export const INJECTED_JAVASCRIPT = `(${hack})();`
+export const INJECTED_JAVASCRIPT = `(${__$hack})();`

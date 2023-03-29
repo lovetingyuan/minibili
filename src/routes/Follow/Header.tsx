@@ -74,7 +74,7 @@ export default function Header() {
         source={
           $userInfo.face
             ? { uri: $userInfo.face }
-            : require('../../assets/empty-avatar.png')
+            : require('../../../assets/empty-avatar.png')
         }
       />
       <View style={styles.right}>
@@ -94,7 +94,7 @@ export default function Header() {
           setModalVisible(true)
         }}>
         <Image
-          source={require('../../assets/snow.png')}
+          source={require('../../../assets/snow.png')}
           style={styles.infoFace}
         />
       </Pressable>

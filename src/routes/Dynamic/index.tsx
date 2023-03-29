@@ -133,7 +133,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       <View style={styles.itemContainer}>
         {item.top ? (
           <Image
-            source={require('../../assets/top.png')}
+            source={require('../../../assets/top.png')}
             style={{ width: 28.5, height: 14, marginBottom: 4 }}
           />
         ) : null}

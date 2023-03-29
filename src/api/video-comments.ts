@@ -1,3 +1,4 @@
+import React from 'react'
 import useSWR from 'swr'
 import { z } from 'zod'
 import { ReplyResponseSchema } from './video-comments.schema'
@@ -60,6 +61,7 @@ export type ReplyItem = ReturnType<typeof getReplies>[0]
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useVideoComments(aid: string | number) {
+  // console.log(object);
   const {
     data: res1,
     error: error1,
@@ -75,17 +77,17 @@ export function useVideoComments(aid: string | number) {
   } = useSWR<ReplyResponse>(() => {
     return '/x/v2/reply/main?type=1&next=2&oid=' + aid
   })
-  let replies: ReplyItem[] = []
-  if (
-    !error1 &&
-    !error2 &&
-    res1 &&
-    res2 &&
-    Array.isArray(res1?.replies) &&
-    Array.isArray(res2?.replies)
-  ) {
-    replies = getReplies(res1, res2)
-  }
+  const replies: ReplyItem[] = React.useMemo(() => {
+    if (
+      res1 &&
+      res2 &&
+      Array.isArray(res1?.replies) &&
+      Array.isArray(res2?.replies)
+    ) {
+      return getReplies(res1, res2)
+    }
+    return []
+  }, [res1, res2])
   return {
     data: replies,
     isLoading: isLoading || isLoading2,

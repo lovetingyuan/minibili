@@ -1,11 +1,12 @@
 import { useNavigation } from '@react-navigation/core'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+// import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import { Image, Linking, Pressable, StyleSheet, View } from 'react-native'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
-import { RootStackParamList } from '../../types'
+import { NavigationProps } from '../../types'
+// import { RootStackParamList } from '../../types'
 
-type NavigationProps = NativeStackScreenProps<RootStackParamList>
+// type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function DateAndOpen(props: {
   id: string | number
@@ -40,7 +41,7 @@ export default function DateAndOpen(props: {
         }}>
         <Image
           style={styles.biliImg}
-          source={require('../../assets/bili-text.png')}
+          source={require('../../../assets/bili-text.png')}
         />
       </Pressable>
     </View>

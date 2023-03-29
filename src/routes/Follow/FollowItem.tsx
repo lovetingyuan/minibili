@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { useLivingInfo } from '../../api/living-info'
 import { Avatar, Badge } from '@rneui/base'
 import { useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from '../../types'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { NavigationProps } from '../../types'
+// import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button } from '@rneui/base'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
@@ -12,7 +12,7 @@ import store from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
 import { useHasUpdate } from '../../api/dynamic-items'
 
-type NavigationProps = NativeStackScreenProps<RootStackParamList>
+// type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default React.memo(
   function FollowItem(props: { item: FollowedUpItem }) {
