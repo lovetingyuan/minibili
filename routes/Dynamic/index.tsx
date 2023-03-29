@@ -24,7 +24,7 @@ import {
   getDynamicItems,
 } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
-import { useUserFans } from '../../api/user-fans'
+import { useUserFans } from '../../api/user-relation'
 // import { Avatar } from '@rneui/base'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>

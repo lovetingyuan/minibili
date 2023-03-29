@@ -10,3 +10,11 @@ export const UserInfoResponseSchema = z.object({
   sex: z.string(),
   sign: z.string(),
 })
+
+// export const UserRelationResponseSchema = z.object({
+//   mid: z.number(),
+//   following: z.number(),
+//   whisper: z.number(),
+//   black: z.number(),
+//   follower: z.number(),
+// })

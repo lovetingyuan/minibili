@@ -11,42 +11,21 @@ import Header from './Header'
 import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
-// type UpItem = GetFuncPromiseType<typeof getFollowUps>['list'][0]
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name)
-  const { $userInfo, livingUps, updatedUps } = useSnapshot(store)
-  const [ups, setUps] = React.useState<FollowedUpItem[]>([])
-  const [loading, setLoading] = React.useState(false)
-  const [followedNum, setFollowedNum] = React.useState(0)
+  const { $userInfo, $followedUps, livingUps, updatedUps } = useSnapshot(store)
   const followListRef = React.useRef<FlatList | null>(null)
 
-  const { data, error } = useFollowedUps($userInfo?.mid)
-  // if (userInfo?.mid) {
-  //   if (error) {
-  //     ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
-  //     setFollowedNum(0)
-  //     setUps([...store.$followedUps])
-  //   } else if (data?.list) {
-  //     setUps(data.list)
-  //     setFollowedNum(data.total)
-  //     store.$followedUps = [...data.list]
-  //   }
-  // }
-
-  React.useEffect(() => {
-    if ($userInfo?.mid) {
-      if (error) {
-        ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
-        setFollowedNum(0)
-        setUps([...store.$followedUps])
-      } else if (data?.list) {
-        setUps(data.list)
-        setFollowedNum(data.total)
-        store.$followedUps = [...data.list]
-      }
-    }
-  }, [$userInfo?.mid, error, data])
+  const { data, error, isLoading } = useFollowedUps($userInfo?.mid)
+  const showLoadingError = React.useRef(false)
+  if (!showLoadingError.current && error) {
+    ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
+    showLoadingError.current = true
+  }
+  if (data?.list) {
+    store.$followedUps = data.list
+  }
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -55,26 +34,17 @@ export default function Follow({ navigation, route }: Props) {
       if (!navigation.isFocused()) {
         return
       }
-      ups.length &&
+      $followedUps.length &&
         followListRef.current?.scrollToIndex({
           index: 0,
           animated: true,
         })
     })
     return unsubscribe
-  }, [navigation, ups])
+  }, [navigation, $followedUps.length])
 
   const renderItem = ({ item }: { item: FollowedUpItem }) => {
     return <FollowItem item={item} />
-  }
-
-  const clearUser = async () => {
-    setUps([])
-    setLoading(false)
-    setFollowedNum(0)
-    store.$userInfo = null
-    store.updatedUps = {}
-    store.dynamicUser = null
   }
 
   if (!$userInfo) {
@@ -83,44 +53,36 @@ export default function Follow({ navigation, route }: Props) {
 
   const topUps: UserInfo[] = []
   const updateUps: UserInfo[] = []
-  const notUpdateUsers: UserInfo[] = []
-  for (let up of ups) {
+  const noUpdateUps: UserInfo[] = []
+  for (const up of $followedUps) {
     if (livingUps[up.mid]) {
-      topUps.push(up)
+      topUps.push({ ...up })
     } else if (updatedUps[up.mid]) {
-      updateUps.push(up)
+      updateUps.push({ ...up })
     } else {
-      notUpdateUsers.push(up)
+      noUpdateUps.push({ ...up })
     }
   }
-  const displayUps = [...topUps, ...updateUps, ...notUpdateUsers]
+  const displayUps = [...topUps, ...updateUps, ...noUpdateUps]
 
   return (
     <View style={styles.container}>
-      <Header followedCount={followedNum} logOut={clearUser} />
+      <Header />
       <FlatList
         data={displayUps}
         renderItem={renderItem}
         keyExtractor={item => item.mid + ''}
         onEndReachedThreshold={1}
-        style={{
-          paddingTop: 18,
-        }}
+        style={styles.list}
         ref={followListRef}
         ListEmptyComponent={
           <Text style={styles.listEmptyText}>
-            {loading
+            {isLoading
               ? '加载中...'
-              : ups.length
-              ? ''
               : '暂无关注（需要在隐私设置中公开你的关注）'}
           </Text>
         }
-        ListFooterComponent={
-          <Text style={styles.bottomText}>
-            {loading ? '加载中...' : '到底了~'}
-          </Text>
-        }
+        ListFooterComponent={<Text style={styles.bottomText}>{'到底了~'}</Text>}
       />
     </View>
   )
@@ -130,6 +92,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+  },
+  list: {
+    paddingTop: 18,
   },
   logo: {
     width: 160,

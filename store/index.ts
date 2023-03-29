@@ -1,7 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy } from 'valtio'
 import { watch } from 'valtio/utils'
-import { UserInfo } from '../types'
+export interface UserInfo {
+  mid: number | string
+  name: string
+  face: string
+  sign: string
+  // fans: number
+  // subs: number
+}
 
 const store = proxy<{
   $blackUps: Record<string, string>

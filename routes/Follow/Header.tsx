@@ -10,7 +10,8 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import { Alert } from 'react-native'
 import { useUserInfo } from '../../api/user-info'
-import { useUserFans } from '../../api/user-fans'
+import { useUserRelation } from '../../api/user-relation'
+import { parseNumber } from '../../utils'
 
 const buttons = [
   {
@@ -23,38 +24,42 @@ const buttons = [
   },
 ]
 
-export default function Header(props: {
-  followedCount: number
-  logOut: () => void
-}) {
+const logOut = () => {
+  store.$userInfo = null
+  store.updatedUps = {}
+  store.dynamicUser = null
+  store.$followedUps = []
+}
+export default function Header() {
   const { $userInfo } = useSnapshot(store)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const [modalVisible, setModalVisible] = React.useState(false)
 
-  const { data } = useUserInfo($userInfo?.mid)
-  if (data?.mid) {
+  const { data: user } = useUserInfo($userInfo?.mid)
+  const { data: relation } = useUserRelation($userInfo?.mid)
+
+  if (!$userInfo) {
+    return <View style={styles.userContainer} />
+  }
+  if (user?.mid) {
     if (!store.$userInfo) {
       store.$userInfo = {
-        name: data.name,
-        face: data.face,
-        sign: data.sign,
-        mid: data.mid + '',
+        name: user.name,
+        face: user.face,
+        sign: user.sign,
+        mid: user.mid + '',
       }
     }
     if (!store.dynamicUser) {
       store.dynamicUser = { ...store.$userInfo }
     }
   }
-  const { data: fansCount } = useUserFans($userInfo?.mid)
-  if (!$userInfo) {
-    return <View style={styles.userContainer} />
-  }
-
+  const fansCount = parseNumber(relation?.follower)
+  const followedCount = parseNumber(relation?.following)
   return (
     <View style={styles.userContainer}>
       <Avatar
         size={60}
-        containerStyle={{ marginRight: 16 }}
         onPress={() => {
           if ($userInfo) {
             store.dynamicUser = {
@@ -72,14 +77,14 @@ export default function Header(props: {
             : require('../../assets/empty-avatar.png')
         }
       />
-      <View style={{ flex: 1 }}>
+      <View style={styles.right}>
         <Text style={styles.myName}>
           {$userInfo.name}
           <Text style={styles.fansNumText}>
             {'    '}
             {fansCount}粉丝
             {'    '}
-            {props.followedCount}关注
+            {followedCount}关注
           </Text>
         </Text>
         <Text style={styles.mySign}>{$userInfo.sign}</Text>
@@ -104,9 +109,7 @@ export default function Header(props: {
               },
               {
                 text: '确定',
-                onPress: () => {
-                  props.logOut()
-                },
+                onPress: logOut,
               },
             ])
           } else if (name === 'about') {
@@ -122,6 +125,7 @@ export default function Header(props: {
 }
 
 const styles = StyleSheet.create({
+  right: { flex: 1, marginLeft: 16 },
   myName: { fontSize: 18, fontWeight: 'bold' },
   mySign: { color: '#555', marginTop: 6 },
   fansNumText: { fontSize: 14, fontWeight: 'normal' },

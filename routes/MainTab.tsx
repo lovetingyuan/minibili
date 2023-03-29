@@ -5,7 +5,7 @@ import store from '../store'
 import { useSnapshot } from 'valtio'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
-import { Text, View } from 'react-native'
+import { Text, Vibration, View, StyleSheet } from 'react-native'
 import { Badge } from '@rneui/base'
 import { RootStackParamList } from '../types'
 
@@ -17,33 +17,33 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
     color: string
     position: LabelPosition
   }) => ReactNode = props => {
-    const label = (
-      <Text
-        style={{
-          color: props.color,
-          fontSize: props.focused ? 19 : 18,
-          fontWeight: props.focused ? 'bold' : 'normal',
-        }}>
-        {text}
-      </Text>
-    )
+    const style = StyleSheet.create({
+      label: {
+        color: props.color,
+        fontSize: props.focused ? 19 : 18,
+        fontWeight: props.focused ? 'bold' : 'normal',
+      },
+      updateBadge: {
+        height: 18,
+        backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
+        position: 'absolute',
+        left: 30,
+        top: -5,
+      },
+      updateBadgeText: {
+        fontSize: 11,
+        fontWeight: props.focused ? 'bold' : 'normal',
+      },
+    })
+    const label = <Text style={style.label}>{text}</Text>
     if (text === '我的' && updatedCount) {
       return (
         <View>
           <Badge
             status="success"
             value={updatedCount}
-            badgeStyle={{
-              height: 18,
-              backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
-              position: 'absolute',
-              left: 30,
-              top: -5,
-            }}
-            textStyle={{
-              fontSize: 11,
-              fontWeight: props.focused ? 'bold' : 'normal',
-            }}
+            badgeStyle={style.updateBadge}
+            textStyle={style.updateBadgeText}
           />
           {label}
         </View>
@@ -58,6 +58,11 @@ const MainTab = () => {
   const { updatedUps, livingUps } = useSnapshot(store)
   const updateCount = Object.values(updatedUps).filter(Boolean).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
+  React.useEffect(() => {
+    if (hasLiving) {
+      Vibration.vibrate(2 * 1000)
+    }
+  }, [hasLiving])
   return (
     <Tab.Navigator
       initialRouteName="Hot"
@@ -90,15 +95,6 @@ const MainTab = () => {
           }
         }}
       />
-      {/* {dynamicUser ? (
-        <Tab.Screen
-          name="Dynamic"
-          component={Dynamic}
-          options={{
-            tabBarLabel: getLabel('动态'),
-          }}
-        />
-      ) : null} */}
       <Tab.Screen
         name="Follow"
         component={Follow}
@@ -109,4 +105,5 @@ const MainTab = () => {
     </Tab.Navigator>
   )
 }
+
 export default MainTab

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const UserFansResponseSchema = z.object({
+export const UserRelationResponseSchema = z.object({
   mid: z.number(),
   following: z.number(),
   whisper: z.number(),

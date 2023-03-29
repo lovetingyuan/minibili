@@ -26,6 +26,8 @@ export interface UserInfo {
   name: string
   face: string
   sign: string
+  // fans: number
+  // subs: number
 }
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
