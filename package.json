@@ -13,8 +13,9 @@
     "doctor": "npx expo-cli doctor",
     "site": "cd site && npm run dev",
     "build:site": "cd site && npm run build",
-    "format": "npx prettier ./ --write",
-    "test": "npx vitest"
+    "format": "npx prettier ./ --write --ignore-path docs/",
+    "test": "npx vitest",
+    "lint": "eslint --ext ts,tsx,js,jsx --fix src"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.17.11",
@@ -47,23 +48,23 @@
     "react-native-webview": "11.26.0",
     "sentry-expo": "~6.1.0",
     "swr": "^2.1.1",
-    "throttle-debounce": "^5.0.0",
     "url-regex": "^5.0.0",
     "valtio": "^1.7.4",
     "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@react-native-community/eslint-config": "^2.0.0",
+    "@react-native/eslint-config": "^0.72.1",
     "@tsconfig/react-native": "^2.0.0",
-    "@types/react": "~18.0.14",
-    "@types/react-native": "~0.69.6",
+    "@types/react": "^18.0.31",
+    "@types/react-native": "~0.71.4",
     "@types/throttle-debounce": "^5.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.29.0",
-    "@typescript-eslint/parser": "^5.29.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
-    "eslint": "^7.32.0",
+    "eslint": "^8.37.0",
+    "prettier": "^2.8.7",
     "typescript": "^4.9.4",
     "vitest": "^0.29.7"
   }

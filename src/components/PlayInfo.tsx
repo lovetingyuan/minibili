@@ -1,7 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, Text, Pressable } from 'react-native'
-import { parseDate, parseNumber } from '../utils'
-import { handleShareVideo } from '../services/Share'
+import { handleShareVideo, parseDate, parseNumber } from '../utils'
 import { Icon } from '@rneui/base'
 import { VideoInfo } from '../api/video-info'
 

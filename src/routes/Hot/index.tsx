@@ -10,7 +10,6 @@ import {
 } from 'react-native'
 import * as SplashScreen from 'expo-splash-screen'
 import HotItem from './HotItem'
-import { handleShareVideo } from '../../services/Share'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
@@ -20,6 +19,7 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
+import { handleShareVideo } from '../../utils'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
 

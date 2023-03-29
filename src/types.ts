@@ -21,14 +21,5 @@ export type RootStackParamList = {
 export type GetFuncPromiseType<F extends (...a: any) => any> =
   ReturnType<F> extends Promise<infer R> ? R : never
 
-export interface UserInfo {
-  mid: number | string
-  name: string
-  face: string
-  sign: string
-  // fans: number
-  // subs: number
-}
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>

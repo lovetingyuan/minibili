@@ -1,12 +1,12 @@
 import { Avatar, Icon } from '@rneui/base'
 import React from 'react'
 import { View, Text, StyleSheet, Pressable } from 'react-native'
-import { UserInfo } from '../../types'
-import { handleShareUp } from '../../services/Share'
+import { UserInfo } from '../../store'
+import { handleShareUp, parseNumber } from '../../utils'
 
 export function HeaderLeft(props: {
   user: UserInfo
-  fans?: string
+  fans?: number
   width: number
   gotoWebPage: () => void
 }) {
@@ -36,12 +36,14 @@ export function HeaderLeft(props: {
         ]}>
         {userName}的动态
       </Text>
-      <Text style={{ fontSize: 14, marginLeft: 12 }}>{props.fans}粉丝</Text>
+      <Text style={{ fontSize: 14, marginLeft: 12 }}>
+        {parseNumber(props.fans)}粉丝
+      </Text>
     </View>
   )
 }
 
-export function HeaderRight(props: { user: UserInfo; fans: string }) {
+export function HeaderRight(props: { user: UserInfo }) {
   return (
     <View style={styles.right}>
       <Pressable

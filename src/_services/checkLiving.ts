@@ -1,7 +1,7 @@
 import * as BackgroundFetch from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
 import { Vibration } from 'react-native'
-import notify from '../services/Notify'
+import notify from './Notify'
 import store from '../store'
 
 const BACKGROUND_FETCH_TASK = 'background-fetch'

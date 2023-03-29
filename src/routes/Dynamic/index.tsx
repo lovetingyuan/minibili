@@ -8,7 +8,6 @@ import {
   BackHandler,
   Image,
   useWindowDimensions,
-  // Pressable,
 } from 'react-native'
 import ForwardItem from './ForwardItem'
 import RichTextItem from './RichTextItem'
@@ -24,8 +23,7 @@ import {
   getDynamicItems,
 } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
-import { useUserFans } from '../../api/user-relation'
-// import { Avatar } from '@rneui/base'
+import { useUserRelation } from '../../api/user-relation'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -49,7 +47,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   const dynamicListRef = React.useRef<FlatList | null>(null)
   const [initLoad, setInitLoad] = React.useState(true)
   const [refreshHead, setRefreshHead] = React.useState(0)
-  const { data: fans } = useUserFans(upId)
+  const { data: fans } = useUserRelation(upId)
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
@@ -74,7 +72,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
           <View style={{ position: 'relative', left: -20 }}>
             <HeaderLeft
               user={dynamicUser}
-              fans={fans}
+              fans={fans?.follower}
               width={width}
               gotoWebPage={() => {
                 navigation.navigate('WebPage', {
@@ -94,7 +92,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         if (!dynamicUser) {
           return null
         }
-        return <HeaderRight user={dynamicUser} fans={fans} />
+        return <HeaderRight user={dynamicUser} />
       },
     })
   }, [navigation, dynamicUser, fans, width])
