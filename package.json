@@ -2,7 +2,7 @@
   "name": "minibili",
   "version": "1.0.0",
   "private": true,
-  "main": "src/App.tsx",
+  "main": "src/index.ts",
   "scripts": {
     "start": "expo start",
     "android": "adb devices -l && npx expo start -c --android",
