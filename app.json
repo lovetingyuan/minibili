@@ -3,7 +3,6 @@
     "name": "MiniBili",
     "slug": "minibili",
     "version": "0.0.9",
-    "entryPoint": "./src/App.tsx",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",

@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "build:android": "npm run test && eas build --platform android --profile production",
     "fixdeps": "npx expo install --fix",
-    "doctor": "npx expo-cli doctor",
+    "doctor": "expo-cli doctor",
     "site": "cd site && npm run dev",
     "build:site": "cd site && npm run build",
     "format": "npx prettier src --write",

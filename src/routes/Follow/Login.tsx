@@ -1,5 +1,5 @@
 import React from 'react'
-import { Input, Button, Icon } from '@rneui/base'
+import { Button } from '@rneui/base'
 import {
   View,
   Text,
@@ -8,6 +8,9 @@ import {
   Linking,
   StyleSheet,
   ToastAndroid,
+  KeyboardAvoidingView,
+  Platform,
+  TextInput,
 } from 'react-native'
 
 import store from '../../store'
@@ -18,7 +21,7 @@ const rightTv = require('../../assets/tv-right.png')
 
 export default function Login() {
   const inputUserIdRef = React.useRef('')
-  const inputRef = React.useRef(null)
+  // const inputRef = React.useRef(null)
   const [tvImg, setTvImg] = React.useState(true)
   const [userId, setUserId] = React.useState('')
   React.useEffect(() => {
@@ -52,7 +55,8 @@ export default function Login() {
     setUserId(inputUserIdRef.current)
   }
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={styles.logoContainer}>
         <Image source={tvImg ? leftTv : rightTv} style={styles.logo} />
       </View>
@@ -72,7 +76,12 @@ export default function Login() {
         说明：B站ID为个人页面地址栏中的一串数字（ID为公开信息，请放心输入）
       </Text>
       <View style={styles.inputContainer}>
-        <Input
+        <TextInput
+          onChangeText={text => (inputUserIdRef.current = text)}
+          placeholder="请输入你的B站ID"
+          keyboardType="numeric"
+        />
+        {/* <Input
           placeholder="请输入你的B站ID"
           onChangeText={text => (inputUserIdRef.current = text)}
           leftIcon={<Icon name="account-box" size={20} />}
@@ -80,7 +89,7 @@ export default function Login() {
           ref={inputRef}
           onSubmitEditing={storeUserId}
           style={{ flex: 1 }}
-        />
+        /> */}
         <Button
           title="登 录"
           onPress={storeUserId}
@@ -89,14 +98,11 @@ export default function Login() {
           containerStyle={styles.buttonContainerStyle}
         />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: '12%',
-  },
   logoContainer: {
     flexDirection: 'column',
     alignItems: 'center',
