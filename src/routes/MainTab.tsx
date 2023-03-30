@@ -24,7 +24,7 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
         fontWeight: props.focused ? 'bold' : 'normal',
       },
       updateBadge: {
-        height: 18,
+        height: 17,
         backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
         position: 'absolute',
         left: 30,

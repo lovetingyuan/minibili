@@ -3,7 +3,7 @@ export type RootStackParamList = {
   Main: undefined
   WebPage: { url: string; title: string; type?: 'pc' | 'mobile' }
   Play: {
-    aid: number | string
+    commentId: number | string
     bvid: string
     name: string
     mid: string | number
@@ -11,6 +11,7 @@ export type RootStackParamList = {
   Dynamic?: {
     from?: string
   }
+  DynamicDetail: {}
   Hot: {
     query: number
   }

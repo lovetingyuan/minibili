@@ -1,8 +1,11 @@
+// import React from 'react'
 import { GetFuncPromiseType } from '../types'
 import request from './fetcher'
 import useSWR from 'swr'
 import { useSnapshot } from 'valtio'
 import store from '../store'
+import PQueue from 'p-queue'
+import React from 'react'
 
 export type DynamicItem = GetFuncPromiseType<typeof getDynamicItems>['items'][0]
 
@@ -105,11 +108,16 @@ export async function getDynamicItems(offset = '', uid: string | number) {
     desc: null
     topic: null
   }
+  interface Basic {
+    comment_id_str: string
+    comment_type: number
+  }
   interface Res {
     has_more: boolean
     items: (
       | {
           type: 'DYNAMIC_TYPE_AV'
+          basic: Basic
           modules: {
             module_author: Author
             module_dynamic: AV
@@ -120,6 +128,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
       | {
           type: 'DYNAMIC_TYPE_FORWARD'
           id_str: string
+          basic: Basic
           modules: {
             module_author: Author
             module_dynamic: {
@@ -130,6 +139,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           }
           orig: {
             id_str: string
+            basic: Basic
             modules: {
               module_author: Author
               module_dynamic: AV | Draw | Article | Word | Topic | Live
@@ -140,6 +150,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
       | {
           type: 'DYNAMIC_TYPE_DRAW'
           id_str: string
+          basic: Basic
           modules: {
             module_author: Author
             module_dynamic: Draw
@@ -149,6 +160,7 @@ export async function getDynamicItems(offset = '', uid: string | number) {
       | {
           type: 'DYNAMIC_TYPE_WORD'
           id_str: string
+          basic: Basic
           modules: {
             module_author: Author
             module_dynamic: Word
@@ -179,6 +191,8 @@ export async function getDynamicItems(offset = '', uid: string | number) {
           name: item.modules?.module_author?.name,
           text: item.modules?.module_dynamic?.desc?.text,
           top: item.modules?.module_tag?.text === '置顶',
+          commentId: item.basic.comment_id_str,
+          commentType: item.basic.comment_type,
         }
         if (item.type === 'DYNAMIC_TYPE_WORD') {
           return {
@@ -274,22 +288,21 @@ export async function getDynamicItems(offset = '', uid: string | number) {
   }
 }
 
+const queue = new PQueue({ concurrency: 3 })
 export function useHasUpdate(mid: number | string) {
-  const time = mid.toString().slice(0, 8).padEnd(8, '0')
-  const delay = mid.toString().slice(0, 4)
-  const { data } = useSWR<any>(
+  const delay = mid.toString().slice(0, 5)
+  const { data, isLoading } = useSWR<any>(
     `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
     (url: string) => {
-      return new Promise(r => {
-        setTimeout(() => {
-          r(request(url))
-        }, Number(delay))
-      })
+      return queue.add(() => request(url))
     },
     {
-      refreshInterval: 5 * 60 * 1000 + Number(time),
+      refreshInterval: 5 * 60 * 1000 + Number(delay),
     },
   )
+  React.useEffect(() => {
+    store.checkUpdateMap[mid] = isLoading
+  }, [isLoading, mid])
   const { $latestUpdateIds } = useSnapshot(store)
   let latestTime = 0
   let latestId = ''

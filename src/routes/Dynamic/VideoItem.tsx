@@ -23,7 +23,7 @@ export default function VideoItem(props: VideoDynamicItem) {
       onPress={() => {
         navigation.navigate('Play', {
           bvid,
-          aid,
+          commentId: aid,
           mid,
           name,
         })

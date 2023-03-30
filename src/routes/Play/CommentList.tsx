@@ -1,15 +1,18 @@
 import React from 'react'
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
-import { ReplyItem, useVideoComments } from '../../api/video-comments'
+import { ReplyItem, useDynamicComments } from '../../api/dynamic-comments'
 import Comment from '../../components/Comment'
 
-export default function CommentList(props: { aid: string; upName: string }) {
+export default function CommentList(props: {
+  commentId: string | number
+  upName: string
+}) {
   const [comments, setComments] = React.useState<ReplyItem[] | null>(null)
   const {
     data: replies,
     isLoading: commentLoading,
     error: commentError,
-  } = useVideoComments(props.aid)
+  } = useDynamicComments(props.commentId, 1)
   if (comments !== replies) {
     setComments(replies)
   }

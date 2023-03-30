@@ -60,19 +60,20 @@ export default function About() {
               return (
                 <Chip
                   title={tag}
+                  key={tag}
                   type="outline"
                   icon={{
                     name: 'close',
                     type: 'Ionicons',
-                    size: 16,
+                    size: 18,
                     color: '#666',
                     onPress: () => {
                       delete store.$blackTags[tag]
                     },
                   }}
                   iconRight
-                  containerStyle={{ marginVertical: 15 }}
-                  buttonStyle={{ padding: 3 }}
+                  containerStyle={{ marginBottom: 7 }}
+                  buttonStyle={{ padding: 2, paddingStart: 0 }}
                 />
               )
             })}

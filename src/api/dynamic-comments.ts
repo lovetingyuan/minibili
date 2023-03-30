@@ -1,7 +1,7 @@
 import React from 'react'
 import useSWR from 'swr'
 import { z } from 'zod'
-import { ReplyResponseSchema } from './video-comments.schema'
+import { ReplyResponseSchema } from './dynamic-comments.schema'
 
 export type ReplyResponse = z.infer<typeof ReplyResponseSchema>
 
@@ -60,7 +60,7 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
 export type ReplyItem = ReturnType<typeof getReplies>[0]
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
-export function useVideoComments(aid: string | number) {
+export function useDynamicComments(oid: string | number, type: number) {
   // console.log(object);
   const {
     data: res1,
@@ -68,14 +68,14 @@ export function useVideoComments(aid: string | number) {
     // isValidating,
     isLoading,
   } = useSWR<ReplyResponse>(() => {
-    return '/x/v2/reply/main?type=1&next=1&oid=' + aid
+    return `/x/v2/reply/main?type=${type}&next=1&oid=${oid}`
   })
   const {
     data: res2,
     error: error2,
     isLoading: isLoading2,
   } = useSWR<ReplyResponse>(() => {
-    return '/x/v2/reply/main?type=1&next=2&oid=' + aid
+    return `/x/v2/reply/main?type=${type}&next=2&oid=${oid}`
   })
   const replies: ReplyItem[] = React.useMemo(() => {
     if (
