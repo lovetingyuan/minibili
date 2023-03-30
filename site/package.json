@@ -11,5 +11,9 @@
   "devDependencies": {
     "typescript": "^4.6.4",
     "vite": "^3.2.3"
+  },
+  "dependencies": {
+    "he": "^1.2.0",
+    "nanoid": "^4.0.2"
   }
 }

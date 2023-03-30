@@ -3,6 +3,7 @@
     "name": "MiniBili",
     "slug": "minibili",
     "version": "0.0.9",
+    "githubUrl": "https://github.com/lovetingyuan/minibili",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,7 +12,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tingyuan.minibili",
@@ -54,9 +57,6 @@
           }
         }
       ]
-    },
-    "runtimeVersion": {
-      "policy": "sdkVersion"
     }
   }
 }

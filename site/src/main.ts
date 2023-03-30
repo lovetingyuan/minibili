@@ -1,4 +1,21 @@
 import './style.css'
+import he from 'he'
+import { nanoid } from 'nanoid'
+
+const eventsMap: Record<string, boolean> = {}
+
+window._events = {
+  on(name: string, callback: () => void) {
+    if (name in eventsMap) {
+      return
+    }
+    eventsMap[name] = true
+    window.addEventListener(name, callback)
+  },
+  emit(name: string) {
+    window.dispatchEvent(new CustomEvent(name))
+  },
+}
 
 const elements = import.meta.glob('./elements/*.html', {
   eager: true,
@@ -13,35 +30,59 @@ Object.keys(elements).forEach(path => {
   customElements.define(
     tag,
     class extends HTMLElement {
-      render: () => Promise<string>
-      script: string
+      render: () => string
+      scriptCode: string
       template: string
       shadowRoot: ShadowRoot
       constructor() {
         super()
-        const template = document.createElement('template')
+        // const template = document.createElement('template')
         const doc = domparser.parseFromString(elements[path], 'text/html')
         const script = doc.querySelector('script')
-        this.script = script?.textContent || ''
-        this.template = elements[path]
+        this.scriptCode = script?.textContent || ''
+        script?.remove()
+        const eventsCode: string[] = []
+        Array.from(doc.querySelectorAll('[onclick]')).forEach(el => {
+          console.log(el)
+          const handler = el.getAttribute('onclick')
+          const id = 'event_' + nanoid(6)
+          eventsCode.push(`
+          const ${id} = () => { ${handler} }
+          _events.on("${id}", ${id})
+          `)
+          el.setAttribute('onclick', `_events.emit('${id}')`)
+        })
+        this.scriptCode += eventsCode.join('')
+        this.template = he.unescape(doc.body.innerHTML)
         // script?.remove()
-        template.innerHTML = this.template
-        this.render = () => Promise.resolve('')
+        // console.log(11, doc.body.innerHTML.includes('<script>'))
+        // template.innerHTML = doc.body.innerHTML
+        this.render = () => ''
         this.shadowRoot = this.attachShadow({ mode: 'open' })
-        this.shadowRoot.appendChild(template.content.cloneNode(true))
+        // const node = template.content.cloneNode(true)
+        // console.log(22, doc.body)
+        // doc.body.chil
+        // this.shadowRoot.appendChild(doc.body)
       }
       connectedCallback() {
         // @ts-ignore
-        this.render =
+        const render =
           // eslint-disable-next-line no-new-func
           new Function(`
           return (async () => {
-            ${this.script};
-            return \`${elements[path].trim()}\`
+            ${this.scriptCode};
+            return () => \`${this.template}\`
           })()
           `)
-        this.render.call({}).then(html => {
-          this.shadowRoot.innerHTML = html
+        const context = {
+          update: () => {
+            this.shadowRoot.innerHTML = this.render()
+          },
+        }
+        render.call(context).then((getHtml: () => string) => {
+          this.render = getHtml
+          console.log(11, getHtml)
+          this.shadowRoot.innerHTML = this.render()
         })
       }
     },

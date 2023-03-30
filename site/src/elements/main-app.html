@@ -2,4 +2,15 @@
   <download-page></download-page>
   <change-log></change-log>
   <my-counter></my-counter>
+  <my-counter></my-counter>
+  <p>${name}</p>
+  <button onclick="upper()">upper</button>
 </div>
+
+<script>
+  let name = 'tingyuan'
+  const upper = () => {
+    name = name.toUpperCase()
+    this.update()
+  }
+</script>

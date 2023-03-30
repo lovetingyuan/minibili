@@ -1,10 +1,12 @@
 <div>
-  <button onclick="${addCount}">count: ${count}</button>
+  <button onclick="addCount()">count: ${count}</button>
 </div>
 
 <script>
-  let count = 0;
+  let count = 0
   const addCount = () => {
     count++
+    console.log(this, count)
+    this.update()
   }
 </script>
