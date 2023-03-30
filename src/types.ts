@@ -11,7 +11,14 @@ export type RootStackParamList = {
   Dynamic?: {
     from?: string
   }
-  DynamicDetail: {}
+  DynamicDetail: {
+    commentId: number | string
+    commentType: number
+    images: { src: string; ratio: number }[]
+    name: string
+    mid: string | number
+    text: string
+  }
   Hot: {
     query: number
   }

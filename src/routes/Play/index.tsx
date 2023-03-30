@@ -80,7 +80,7 @@ const PlayPage = ({ route, navigation }: Props) => {
           currentPage={currentPage}
           changeCurrentPage={setCurrentPage}
         />
-        <CommentList upName={name} commentId={commentId} />
+        <CommentList upName={name} commentId={commentId} commentType={1} />
       </ScrollView>
     </View>
   )

@@ -5,6 +5,7 @@ import Comment from '../../components/Comment'
 
 export default function CommentList(props: {
   commentId: string | number
+  commentType: number
   upName: string
 }) {
   const [comments, setComments] = React.useState<ReplyItem[] | null>(null)
@@ -12,7 +13,7 @@ export default function CommentList(props: {
     data: replies,
     isLoading: commentLoading,
     error: commentError,
-  } = useDynamicComments(props.commentId, 1)
+  } = useDynamicComments(props.commentId, props.commentType)
   if (comments !== replies) {
     setComments(replies)
   }

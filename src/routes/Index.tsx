@@ -62,7 +62,7 @@ export default () => {
             component={DynamicDetail}
             options={props => {
               return {
-                headerTitle: 'dynamicd etail', // props.route.params.name,
+                headerTitle: props.route.params.name + '的动态', // props.route.params.name,
               }
             }}
           />

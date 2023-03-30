@@ -13,7 +13,6 @@ import ForwardItem from './ForwardItem'
 import RichTextItem from './RichTextItem'
 import VideoItem from './VideoItem'
 import { RootStackParamList } from '../../types'
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import WordItem from './WordItem'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
@@ -24,8 +23,9 @@ import {
 } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { useUserRelation } from '../../api/user-relation'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-type Props = BottomTabScreenProps<RootStackParamList, 'Dynamic'>
+type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name)
@@ -48,19 +48,19 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   const [initLoad, setInitLoad] = React.useState(true)
   const [refreshHead, setRefreshHead] = React.useState(0)
   const { data: fans } = useUserRelation(upId)
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('tabPress', () => {
-      if (!navigation.isFocused()) {
-        return
-      }
-      dynamicItems.length &&
-        dynamicListRef.current?.scrollToIndex({
-          index: 0,
-          animated: true,
-        })
-    })
-    return unsubscribe
-  }, [navigation, dynamicItems])
+  // React.useEffect(() => {
+  //   const unsubscribe = navigation.addListener('tabPress', () => {
+  //     if (!navigation.isFocused()) {
+  //       return
+  //     }
+  //     dynamicItems.length &&
+  //       dynamicListRef.current?.scrollToIndex({
+  //         index: 0,
+  //         animated: true,
+  //       })
+  //   })
+  //   return unsubscribe
+  // }, [navigation, dynamicItems])
   const { width } = useWindowDimensions()
   React.useEffect(() => {
     navigation.setOptions({
@@ -85,9 +85,9 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         )
       },
       headerTitleAlign: 'left',
-      headerStyle: {
-        flexWrap: 'wrap',
-      },
+      // headerStyle: {
+      //   flexWrap: 'wrap',
+      // },
       headerRight: () => {
         if (!dynamicUser) {
           return null
