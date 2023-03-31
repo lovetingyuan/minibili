@@ -30,7 +30,7 @@ Object.keys(elements).forEach(path => {
   customElements.define(
     tag,
     class extends HTMLElement {
-      render: () => string
+      render: () => void
       scriptCode: string
       template: string
       shadowRoot: ShadowRoot
@@ -75,15 +75,16 @@ Object.keys(elements).forEach(path => {
           })()
           `)
         const context = {
-          update: () => {
-            this.shadowRoot.innerHTML = this.render()
-          },
+          update: this.render,
         }
         render.call(context).then((getHtml: () => string) => {
-          this.render = getHtml
-          console.log(11, getHtml)
-          this.shadowRoot.innerHTML = this.render()
+          this.render = () => {
+            this.shadowRoot.innerHTML = getHtml()
+          }
         })
+      }
+      attributeChangedCallback() {
+        this.render()
       }
     },
   )
