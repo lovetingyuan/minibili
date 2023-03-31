@@ -84,7 +84,11 @@ function Player(props: { video: VideoInfo | null; page: number }) {
   return (
     <View
       renderToHardwareTextureAndroid
-      style={{ width: '100%', height: videoViewHeight + extraHeight }}>
+      style={{
+        width: '100%',
+        height: videoViewHeight + extraHeight,
+        flexShrink: 0,
+      }}>
       <WebView
         source={{
           uri: `${playUrl}?${search}`,

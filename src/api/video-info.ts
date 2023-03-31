@@ -43,10 +43,10 @@ const getVideoItem = (data: VideoInfoResponse) => {
 export type VideoInfo = ReturnType<typeof getVideoItem>
 
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
-export function useVideoInfo(aid: string | number) {
+export function useVideoInfo(bvid: string) {
   const { data, error, isValidating, isLoading } = useSWR<VideoInfoResponse>(
     () => {
-      return '/x/web-interface/view?aid=' + aid
+      return '/x/web-interface/view?bvid=' + bvid
     },
   )
   return {

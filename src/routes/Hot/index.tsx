@@ -79,7 +79,7 @@ export default function Hot({ navigation }: Props) {
               mid: item[0].mid,
               bvid: item[0].bvid,
               name: item[0].name,
-              aid: item[0].aid,
+              commentId: item[0].aid,
             })
           }}
           onLongPress={() => {
@@ -97,7 +97,7 @@ export default function Hot({ navigation }: Props) {
                 mid: item[1]!.mid,
                 bvid: item[1]!.bvid,
                 name: item[1]!.name,
-                aid: item[1]!.aid,
+                commentId: item[1]!.aid,
               })
             }}
             onLongPress={() => {

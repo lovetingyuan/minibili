@@ -21,6 +21,7 @@ const store = proxy<{
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
   livingUps: Record<string, boolean>
+  checkUpdateMap: Record<string, boolean>
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -32,6 +33,7 @@ const store = proxy<{
   dynamicUser: null,
   updatedUps: {},
   livingUps: {},
+  checkUpdateMap: {},
 })
 
 const StoragePrefix = 'Store:'

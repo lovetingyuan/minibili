@@ -3,13 +3,21 @@ export type RootStackParamList = {
   Main: undefined
   WebPage: { url: string; title: string; type?: 'pc' | 'mobile' }
   Play: {
-    aid: number | string
+    commentId: number | string
     bvid: string
     name: string
     mid: string | number
   }
   Dynamic?: {
     from?: string
+  }
+  DynamicDetail: {
+    commentId: number | string
+    commentType: number
+    images: { src: string; ratio: number }[]
+    name: string
+    mid: string | number
+    text: string
   }
   Hot: {
     query: number

@@ -21,7 +21,8 @@ type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name)
-  const { $userInfo, $followedUps, livingUps, updatedUps } = useSnapshot(store)
+  const { $userInfo, $followedUps, livingUps, updatedUps, checkUpdateMap } =
+    useSnapshot(store)
   const followListRef = React.useRef<FlatList | null>(null)
 
   const { data, error, isLoading } = useFollowedUps($userInfo?.mid)
@@ -73,12 +74,15 @@ export default function Follow({ navigation, route }: Props) {
     }
   }
   const displayUps = [...topUps, ...updateUps, ...noUpdateUps]
-
+  const isCheckingUpdate =
+    Object.values(checkUpdateMap).filter(Boolean).length > 0
   return (
     <View style={styles.container}>
       <Header />
       <View style={{ flex: 1 }}>
-        <ActivityIndicator color="blue" style={styles.loading} animating />
+        {isCheckingUpdate ? (
+          <ActivityIndicator color="blue" style={styles.loading} animating />
+        ) : null}
         <FlatList
           data={displayUps}
           renderItem={renderItem}

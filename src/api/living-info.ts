@@ -6,9 +6,12 @@ import {
 } from './living-info.schema'
 import useSWR from 'swr'
 import useSWRImmutable from 'swr/immutable'
+import PQueue from 'p-queue'
 
 export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
 export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
+
+const queue = new PQueue({ concurrency: 3 })
 
 export const useLiveRoomInfo = (mid: number | string) => {
   const { data } = useSWRImmutable<LiveRoomInfo>(
@@ -20,22 +23,17 @@ export const useLiveRoomInfo = (mid: number | string) => {
 
 export const useLivingInfo = (mid: number | string) => {
   const roomData = useLiveRoomInfo(mid)
-  const time = mid.toString().slice(0, 8).padEnd(8, '0')
-  const delay = mid.toString().slice(0, 4)
+  const delay = mid.toString().slice(0, 5)
   const { data, error } = useSWR<LiveInfo>(
     roomData?.room_id
       ? 'https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' +
           roomData.room_id
       : null,
     (url: string) => {
-      return new Promise(r => {
-        setTimeout(() => {
-          r(request(url))
-        }, Number(delay))
-      })
+      return queue.add(() => request(url))
     },
     {
-      refreshInterval: 8 * 60 * 1000 + Number(time),
+      refreshInterval: 10 * 60 * 1000 + Number(delay),
     },
   )
   if (!error && roomData?.room_id && data?.room_id) {

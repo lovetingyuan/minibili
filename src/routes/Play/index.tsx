@@ -31,7 +31,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
-  const { aid, bvid, name } = route.params
+  const { commentId, bvid, name } = route.params
   const [videoInfo, setVideoInfo] = React.useState<VideoInfoType | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
 
@@ -51,7 +51,7 @@ const PlayPage = ({ route, navigation }: Props) => {
     })
   }, [navigation, bvid])
 
-  const { data: vi, error } = useVideoInfo(aid)
+  const { data: vi, error } = useVideoInfo(bvid)
   if (!error && vi?.bvid && !videoInfo?.bvid) {
     setVideoInfo(vi)
   }
@@ -80,7 +80,7 @@ const PlayPage = ({ route, navigation }: Props) => {
           currentPage={currentPage}
           changeCurrentPage={setCurrentPage}
         />
-        <CommentList upName={name} aid={aid + ''} />
+        <CommentList upName={name} commentId={commentId} commentType={1} />
       </ScrollView>
     </View>
   )

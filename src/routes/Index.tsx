@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar'
 import * as SplashScreen from 'expo-splash-screen'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import Play from './Play/Play'
+import Play from './Play'
 import About from './About'
 import WebPage from './WebPage'
 import { RootStackParamList } from '../types'
@@ -12,6 +12,7 @@ import Dynamic from './Dynamic'
 import { NetToast } from '../components/NetToast'
 import { SWRConfig } from 'swr'
 import fetcher from '../api/fetcher'
+import DynamicDetail from './DynamicDetail'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -53,6 +54,15 @@ export default () => {
             options={props => {
               return {
                 headerTitle: props.route.params.name,
+              }
+            }}
+          />
+          <Stack.Screen
+            name="DynamicDetail"
+            component={DynamicDetail}
+            options={props => {
+              return {
+                headerTitle: props.route.params.name + '的动态', // props.route.params.name,
               }
             }}
           />
