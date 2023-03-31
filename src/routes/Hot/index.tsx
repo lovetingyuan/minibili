@@ -19,7 +19,7 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo } from '../../utils'
+import { handleShareVideo, isWifi } from '../../utils'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
 
@@ -31,25 +31,18 @@ export default function Hot({ navigation }: Props) {
     useHotVideos()
 
   React.useEffect(() => {
-    // navigation.setOptions({
-    //   headerRight() {
-    //     if (!list.length) {
-    //       return null
-    //     }
-    //     return <Text style={styles.videoCount}>{list.length}</Text>
-    //   },
-    // })
     const unsubscribe = navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return
       }
-      list.length &&
+      try {
         hotListRef.current?.scrollToOffset({
           offset: 0,
         })
+      } catch (err) {}
     })
     return unsubscribe
-  }, [navigation, list])
+  }, [navigation])
 
   const currentVideoRef = React.useRef<VideoItem | null>(null)
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -75,11 +68,14 @@ export default function Hot({ navigation }: Props) {
           activeOpacity={0.8}
           style={{ flex: 1 }}
           onPress={() => {
-            navigation.navigate('Play', {
-              mid: item[0].mid,
-              bvid: item[0].bvid,
-              name: item[0].name,
-              commentId: item[0].aid,
+            isWifi().then(wifi => {
+              navigation.navigate('Play', {
+                mid: item[0].mid,
+                bvid: item[0].bvid,
+                name: item[0].name,
+                commentId: item[0].aid,
+                wifi,
+              })
             })
           }}
           onLongPress={() => {
@@ -93,11 +89,14 @@ export default function Hot({ navigation }: Props) {
             activeOpacity={0.8}
             style={{ flex: 1, marginLeft: 8 }}
             onPress={() => {
-              navigation.navigate('Play', {
-                mid: item[1]!.mid,
-                bvid: item[1]!.bvid,
-                name: item[1]!.name,
-                commentId: item[1]!.aid,
+              isWifi().then(wifi => {
+                navigation.navigate('Play', {
+                  mid: item[1]!.mid,
+                  bvid: item[1]!.bvid,
+                  name: item[1]!.name,
+                  commentId: item[1]!.aid,
+                  wifi,
+                })
               })
             }}
             onLongPress={() => {

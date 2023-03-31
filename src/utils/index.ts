@@ -1,3 +1,4 @@
+import NetInfo from '@react-native-community/netinfo'
 import { Linking, Share, ToastAndroid } from 'react-native'
 
 export const parseNumber = (num?: number) => {
@@ -95,4 +96,10 @@ export async function handleShareUp(
   } catch (error) {
     ToastAndroid.show('分享失败', ToastAndroid.SHORT)
   }
+}
+
+export function isWifi() {
+  return NetInfo.fetch().then(state => {
+    return state.type === 'wifi'
+  })
 }

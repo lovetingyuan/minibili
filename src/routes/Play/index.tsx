@@ -5,8 +5,8 @@ import {
   ToastAndroid,
   // Text,
   ScrollView,
-  Pressable,
-  Image,
+  // Pressable,
+  // Image,
 } from 'react-native'
 // import { Avatar, Icon, ListItem } from '@rneui/base'
 import * as KeepAwake from 'expo-keep-awake'
@@ -20,55 +20,37 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 // import store from '../../store'
 // import { PlayInfo } from '../../components/PlayInfo'
-import { useIsWifi } from '../../hooks/useIsWifi'
+// import { useIsWifi } from '../../hooks/useIsWifi'
 import Player from './VideoPlayer'
-import { openBiliVideo } from '../../utils'
+// import { openBiliVideo } from '../../utils'
 import { useVideoInfo, VideoInfo as VideoInfoType } from '../../api/video-info'
 import CommentList from './CommentList'
 import VideoInfo from './VideoInfo'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
-const PlayPage = ({ route, navigation }: Props) => {
+const PlayPage = ({ route }: Props) => {
   __DEV__ && console.log(route.name)
-  const { commentId, bvid, name } = route.params
+  const { commentId, bvid, name, wifi } = route.params
   const [videoInfo, setVideoInfo] = React.useState<VideoInfoType | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
-
-  React.useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Pressable
-          onPress={() => {
-            openBiliVideo(bvid)
-          }}>
-          <Image
-            style={{ width: 36, height: 14 }}
-            source={require('../../../assets/bili-text.png')}
-          />
-        </Pressable>
-      ),
-    })
-  }, [navigation, bvid])
 
   const { data: vi, error } = useVideoInfo(bvid)
   if (!error && vi?.bvid && !videoInfo?.bvid) {
     setVideoInfo(vi)
   }
-  const isWifi = useIsWifi()
   React.useEffect(() => {
-    if (isWifi === false) {
+    if (!wifi) {
       ToastAndroid.showWithGravity(
         ' 请注意当前网络不是 Wifi ',
         ToastAndroid.LONG,
         ToastAndroid.CENTER,
       )
     }
-  }, [isWifi])
-  React.useEffect(() => {
     return () => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

@@ -44,14 +44,15 @@ export default function Follow({ navigation, route }: Props) {
       if (!navigation.isFocused()) {
         return
       }
-      $followedUps.length &&
+      try {
         followListRef.current?.scrollToIndex({
           index: 0,
           animated: true,
         })
+      } catch (err) {}
     })
     return unsubscribe
-  }, [navigation, $followedUps.length])
+  }, [navigation])
 
   const renderItem = ({ item }: { item: FollowedUpItem }) => {
     return <FollowItem item={item} />

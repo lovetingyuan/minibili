@@ -6,6 +6,7 @@ import RichText from '../../components/RichText'
 import { NavigationProps } from '../../types'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
 import { DynamicItem, DynamicType } from '../../api/dynamic-items'
+import { isWifi } from '../../utils'
 
 // type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
@@ -21,11 +22,14 @@ export default function VideoItem(props: VideoDynamicItem) {
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
-        navigation.navigate('Play', {
-          bvid,
-          commentId: aid,
-          mid,
-          name,
+        isWifi().then(wifi => {
+          navigation.navigate('Play', {
+            bvid,
+            commentId: aid,
+            mid,
+            name,
+            wifi,
+          })
         })
       }}>
       {text ? (

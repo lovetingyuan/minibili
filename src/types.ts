@@ -7,6 +7,7 @@ export type RootStackParamList = {
     bvid: string
     name: string
     mid: string | number
+    wifi: boolean
   }
   Dynamic?: {
     from?: string

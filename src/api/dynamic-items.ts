@@ -306,7 +306,7 @@ export function useHasUpdate(mid: number | string) {
   const { $latestUpdateIds } = useSnapshot(store)
   let latestTime = 0
   let latestId = ''
-  if (data?.items && $latestUpdateIds[mid]) {
+  if (data?.items) {
     data.items.forEach((item: any) => {
       const pubTime = item.modules?.module_author?.pub_ts
       if (pubTime > latestTime) {
@@ -314,7 +314,9 @@ export function useHasUpdate(mid: number | string) {
         latestId = item.id_str
       }
     })
-    if ($latestUpdateIds[mid] !== latestId) {
+    if (!$latestUpdateIds[mid]) {
+      store.$latestUpdateIds[mid] = latestId
+    } else if ($latestUpdateIds[mid] !== latestId) {
       return latestId
     }
   }

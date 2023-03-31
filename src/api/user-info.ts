@@ -1,4 +1,4 @@
-import useSWR from 'swr'
+import useSWRImmutable from 'swr/immutable'
 import fetcher from './fetcher'
 import { z } from 'zod'
 import {
@@ -39,17 +39,15 @@ const getUserInfo = (
 // }
 
 export function useUserInfo(mid?: number | string) {
-  const { data, error, isValidating, isLoading } = useSWR<UserInfoResponse>(
-    () => {
-      if (!mid) {
-        return null
-      }
-      return '/x/space/acc/info?mid=' + mid + '&token=&platform=web&jsonp=jsonp'
-    },
-    (url: string) => {
-      return fetcher<UserInfoResponse>(url, 'https://space.bilibili.com/')
-    },
-  )
+  const { data, error, isValidating, isLoading } =
+    useSWRImmutable<UserInfoResponse>(
+      mid
+        ? `/x/space/acc/info?mid=${mid}&token=&platform=web&jsonp=jsonp`
+        : null,
+      (url: string) => {
+        return fetcher<UserInfoResponse>(url, 'https://space.bilibili.com/')
+      },
+    )
   // const { data: relation } = useUserRelation(mid)
   return {
     data: data?.mid ? getUserInfo(data) : null,

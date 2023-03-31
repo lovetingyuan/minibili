@@ -41,11 +41,14 @@ export default function Login() {
       sign: data.sign,
     }
   }
-  React.useEffect(() => {
-    if (userId && !data?.mid && error) {
-      ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
-    }
-  }, [userId, data, error])
+  if (error) {
+    ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
+  }
+  // React.useEffect(() => {
+  //   if (userId && !data?.mid && error) {
+  //     ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
+  //   }
+  // }, [userId, data, error])
 
   const storeUserId = () => {
     if (!inputUserIdRef.current) {

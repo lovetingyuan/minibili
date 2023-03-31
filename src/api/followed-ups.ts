@@ -1,5 +1,5 @@
 import fetcher from './fetcher'
-import useSWR from 'swr'
+import useSWRImmutable from 'swr/immutable'
 import { z } from 'zod'
 import {
   FollowedUpDataResponseSchema,
@@ -40,7 +40,7 @@ const fetcher2 = async (url: string) => {
 
 // https://api.bilibili.com/x/relation/followings?vmid=14427395&pn=1&ps=50&order=desc&jsonp=jsonp
 export function useFollowedUps(mid?: string | number) {
-  const { data, error, isValidating, isLoading } = useSWR(
+  const { data, error, isLoading } = useSWRImmutable(
     mid
       ? `/x/relation/followings?vmid=${mid}&pn=1&ps=50&order=desc&jsonp=jsonp`
       : null,
@@ -49,7 +49,7 @@ export function useFollowedUps(mid?: string | number) {
   return {
     data,
     error,
-    isValidating,
+    // isValidating,
     isLoading,
   }
 }

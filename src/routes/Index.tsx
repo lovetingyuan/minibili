@@ -13,6 +13,8 @@ import { NetToast } from '../components/NetToast'
 import { SWRConfig } from 'swr'
 import fetcher from '../api/fetcher'
 import DynamicDetail from './DynamicDetail'
+import { Image, Pressable } from 'react-native'
+import { openBiliVideo } from '../utils'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -54,6 +56,19 @@ export default () => {
             options={props => {
               return {
                 headerTitle: props.route.params.name,
+                headerRight: () => {
+                  return (
+                    <Pressable
+                      onPress={() => {
+                        openBiliVideo(props.route.params.bvid)
+                      }}>
+                      <Image
+                        style={{ width: 36, height: 14 }}
+                        source={require('../../assets/bili-text.png')}
+                      />
+                    </Pressable>
+                  )
+                },
               }
             }}
           />
