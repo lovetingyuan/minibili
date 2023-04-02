@@ -106,7 +106,7 @@ export default function Hot({ navigation }: Props) {
             <HotItem video={item[1]} key={item[0].bvid} />
           </TouchableOpacity>
         ) : (
-          <View />
+          <View style={{ flex: 1 }} />
         )}
       </View>
     )
@@ -179,8 +179,13 @@ export default function Hot({ navigation }: Props) {
   ].filter(Boolean)
   const hotVideoList: [VideoItem, VideoItem?][] = []
   let current: [VideoItem?, VideoItem?] = []
+  const uniqVideosMap: Record<string, boolean> = {}
   for (const item of list) {
     if (!('_' + item.mid in $blackUps) && !(item.tag in $blackTags)) {
+      if (item.bvid in uniqVideosMap) {
+        continue
+      }
+      uniqVideosMap[item.bvid] = true
       current.push(item)
       if (current.length === 2) {
         hotVideoList.push(current as [VideoItem, VideoItem])

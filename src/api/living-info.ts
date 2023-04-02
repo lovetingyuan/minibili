@@ -7,6 +7,7 @@ import {
 import useSWR from 'swr'
 import useSWRImmutable from 'swr/immutable'
 import PQueue from 'p-queue'
+import store from '../store'
 
 export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
 export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
@@ -37,8 +38,10 @@ export const useLivingInfo = (mid: number | string) => {
     },
   )
   if (!error && roomData?.room_id && data?.room_id) {
+    const living = data.live_status === 1
+    store.livingUps[mid] = living
     return {
-      living: data.live_status === 1,
+      living,
       roomId: data.room_id,
       name: roomData.info.uname,
       face: roomData.info.face,
