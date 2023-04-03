@@ -89,7 +89,10 @@ export function useDynamicComments(oid: string | number, type: number) {
     return []
   }, [res1, res2])
   return {
-    data: replies,
+    data: {
+      allCount: res1?.cursor.all_count,
+      replies: replies,
+    },
     isLoading: isLoading || isLoading2,
     error: error1 || error2,
   }

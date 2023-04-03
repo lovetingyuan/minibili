@@ -60,7 +60,7 @@ const MainTab = () => {
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   React.useEffect(() => {
     if (hasLiving) {
-      Vibration.vibrate(2 * 1000)
+      Vibration.vibrate(1000)
     }
   }, [hasLiving])
   return (

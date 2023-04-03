@@ -9,6 +9,7 @@ export function HeaderLeft(props: {
   fans?: number
   width: number
   gotoWebPage: () => void
+  scrollTop: () => void
 }) {
   const userName = props.user.name
   return (
@@ -23,19 +24,24 @@ export function HeaderLeft(props: {
           }}
         />
       </Pressable>
-      <Text
-        adjustsFontSizeToFit
-        numberOfLines={2}
-        ellipsizeMode="head"
-        style={[
-          {
-            fontSize: userName
-              ? Math.min((props.width * 0.45) / userName.length, 18)
-              : 18,
-          },
-        ]}>
-        {userName}的动态
-      </Text>
+      <Pressable
+        onPress={() => {
+          props.scrollTop()
+        }}>
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={2}
+          ellipsizeMode="head"
+          style={[
+            {
+              fontSize: userName
+                ? Math.min((props.width * 0.45) / userName.length, 18)
+                : 18,
+            },
+          ]}>
+          {userName}的动态
+        </Text>
+      </Pressable>
       <Text style={{ fontSize: 14, marginLeft: 12 }}>
         {parseNumber(props.fans)}粉丝
       </Text>

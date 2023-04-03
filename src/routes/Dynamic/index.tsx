@@ -48,19 +48,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   const [initLoad, setInitLoad] = React.useState(true)
   const [refreshHead, setRefreshHead] = React.useState(0)
   const { data: fans } = useUserRelation(upId)
-  // React.useEffect(() => {
-  //   const unsubscribe = navigation.addListener('tabPress', () => {
-  //     if (!navigation.isFocused()) {
-  //       return
-  //     }
-  //     dynamicItems.length &&
-  //       dynamicListRef.current?.scrollToIndex({
-  //         index: 0,
-  //         animated: true,
-  //       })
-  //   })
-  //   return unsubscribe
-  // }, [navigation, dynamicItems])
   const { width } = useWindowDimensions()
   React.useEffect(() => {
     navigation.setOptions({
@@ -78,6 +65,11 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
                 navigation.navigate('WebPage', {
                   url: `https://space.bilibili.com/${dynamicUser.mid}`,
                   title: dynamicUser.name + '的主页',
+                })
+              }}
+              scrollTop={() => {
+                dynamicListRef.current?.scrollToIndex({
+                  index: 0,
                 })
               }}
             />

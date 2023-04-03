@@ -10,7 +10,7 @@ export default function CommentList(props: {
 }) {
   const [comments, setComments] = React.useState<ReplyItem[] | null>(null)
   const {
-    data: replies,
+    data: { replies, allCount },
     isLoading: commentLoading,
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)

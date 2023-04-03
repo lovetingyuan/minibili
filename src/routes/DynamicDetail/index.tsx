@@ -83,7 +83,7 @@ const DynamicDetail: React.FC<Props> = ({ navigation, route }) => {
         overlayStyle={{
           padding: 0,
           margin: 0,
-          backgroundColor: 'rgba(0,0,0,0.01)',
+          backgroundColor: 'rgba(0,0,0,0.8)',
         }}
         onBackdropPress={() => {
           setVisible(false)
