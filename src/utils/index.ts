@@ -1,5 +1,6 @@
 import NetInfo from '@react-native-community/netinfo'
 import { Linking, Share, ToastAndroid } from 'react-native'
+// import * as FileSystem from 'expo-file-system'
 
 export const parseNumber = (num?: number) => {
   if (num == null) {
@@ -103,3 +104,21 @@ export function isWifi() {
     return state.type === 'wifi'
   })
 }
+
+// export async function downloadImage(url: string) {
+//   const filename = url.split('/').pop() as string
+//   const downloadResumable = FileSystem.createDownloadResumable(
+//     url,
+//     FileSystem.documentDirectory + filename,
+//     {},
+//   )
+
+//   try {
+//     const { uri } = await downloadResumable.downloadAsync()
+//     console.log('Finished downloading to dfd', uri)
+//     ToastAndroid.show('下载完成', ToastAndroid.SHORT)
+//   } catch (e) {
+//     ToastAndroid.show('下载失败', ToastAndroid.SHORT)
+//     console.error(e)
+//   }
+// }

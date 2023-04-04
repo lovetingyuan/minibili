@@ -23,8 +23,8 @@ export const HotVideoResponseSchema = z.object({
   // rcmd_reason: z.object({content: '百万播放', corner_mark: 0}),
   // rights: z.object({bp: 0, elec: 0, download: 0, movie: 0, pay: 0, …}),
   // season_type: 0
-  short_link: z.string(),
-  short_link_v2: z.string(),
+  // short_link: z.string().nullable(),
+  // short_link_v2: z.string(),
   stat: z.object({
     aid: z.number(),
     view: z.number(),

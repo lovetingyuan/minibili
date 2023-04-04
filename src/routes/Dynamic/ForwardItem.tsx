@@ -1,56 +1,88 @@
 import React from 'react'
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Linking,
+} from 'react-native'
 import RichText from '../../components/RichText'
-import { DynamicItem, DynamicType } from '../../api/dynamic-items'
+import {
+  DynamicItemType,
+  DynamicMajorTypeEnum,
+  DynamicTypeEnum,
+} from '../../api/dynamic-items'
 import DateAndOpen from './DateAndOpen'
 
-type ForwardItems = Extract<
-  DynamicItem,
-  {
-    type:
-      | DynamicType.ForwardVideo
-      | DynamicType.ForwardDraw
-      | DynamicType.ForwardOther
-  }
->
-
-export default function ForwardItem(props: ForwardItems) {
-  let forwardContent = <Text>无</Text>
-  if (props.type === DynamicType.ForwardVideo) {
+export default function ForwardItem(
+  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
+) {
+  let forwardContent = <Text>暂不支持显示</Text>
+  if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_ARCHIVE) {
     forwardContent = (
-      <>
-        <Image
-          style={styles.forwardContentImage}
-          source={{ uri: props.cover + '@240w_240h_1c.webp' }}
-        />
-        <Text numberOfLines={3} style={{ flex: 6 }}>
-          {props.title}
+      <View style={{ flexDirection: 'column', flex: 1 }}>
+        {props.payload.text ? (
+          <Text style={{ marginBottom: 10, fontSize: 16 }}>
+            {props.payload.text}
+          </Text>
+        ) : null}
+        <View style={{ flexDirection: 'row' }}>
+          <Image
+            style={styles.forwardContentImage}
+            source={{ uri: props.payload.cover + '@240w_240h_1c.webp' }}
+          />
+          <Text numberOfLines={3} style={{ flex: 6 }}>
+            {props.payload.title}
+          </Text>
+        </View>
+      </View>
+    )
+  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_DRAW) {
+    forwardContent = (
+      <View style={{ flexDirection: 'column' }}>
+        <RichText text={props.payload.text} />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator
+          style={styles.imagesContainer}>
+          {props.payload.images?.map(img => {
+            return (
+              <Image
+                style={[styles.image, { aspectRatio: img.ratio }]}
+                key={img.src}
+                source={{ uri: img.src + '@240w_240h_1c.webp' }}
+              />
+            )
+          })}
+        </ScrollView>
+        {props.payload.text2 ? <Text>{props.payload.text2}</Text> : null}
+      </View>
+    )
+  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_ARTICLE) {
+    forwardContent = (
+      <View>
+        <Text style={{ fontSize: 15, marginBottom: 10 }}>
+          {props.payload.title}
         </Text>
-      </>
+        <Text
+          numberOfLines={3}
+          style={{ backgroundColor: '#dedede', padding: 6 }}>
+          {props.payload.text}
+        </Text>
+      </View>
     )
-  } else if (props.type === DynamicType.ForwardDraw) {
-    forwardContent = (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator
-        style={styles.imagesContainer}>
-        {props.images.map(img => {
-          return (
-            <Image
-              style={[styles.image, { aspectRatio: img.ratio }]}
-              key={img.src}
-              source={{ uri: img.src + '@240w_240h_1c.webp' }}
-            />
-          )
-        })}
-      </ScrollView>
-    )
-  } else if (props.type === DynamicType.ForwardOther) {
-    forwardContent = <Text>{props.forwardText}</Text>
+  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_NONE) {
+    forwardContent = <Text>{props.payload.text}</Text>
   }
   return (
-    <View style={[styles.textContainer]}>
-      {props.text ? (
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() => {
+        Linking.openURL(`https://m.bilibili.com/dynamic/${props.commentId}`)
+      }}>
+      <View style={[styles.textContainer]}>
         <RichText
           imageSize={16}
           text={props.text}
@@ -58,22 +90,17 @@ export default function ForwardItem(props: ForwardItems) {
             style: { fontSize: 16, color: props.top ? '#00699D' : 'black' },
           }}
         />
-      ) : null}
-      <View style={styles.forwardContainer}>
-        {props.forwardText ? (
-          <Text style={{ marginBottom: 8 }} numberOfLines={2}>
-            {props.forwardText}
-          </Text>
-        ) : null}
-        <View style={styles.forwardContent}>{forwardContent}</View>
+        <View style={styles.forwardContainer}>
+          <View style={styles.forwardContent}>{forwardContent}</View>
+        </View>
+        <DateAndOpen
+          name={props.name}
+          id={props.id}
+          title={props.text || '-'}
+          date={props.date}
+        />
       </View>
-      <DateAndOpen
-        name={props.name}
-        id={props.id}
-        title={props.text || '-'}
-        date={props.date}
-      />
-    </View>
+    </TouchableOpacity>
   )
 }
 

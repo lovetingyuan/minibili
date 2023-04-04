@@ -1,9 +1,9 @@
-import { useNavigation } from '@react-navigation/core'
+// import { useNavigation } from '@react-navigation/core'
 // import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
-import { Image, Linking, Pressable, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
-import { NavigationProps } from '../../types'
+// import { NavigationProps } from '../../types'
 // import { RootStackParamList } from '../../types'
 
 // type NavigationProps = NativeStackScreenProps<RootStackParamList>
@@ -15,7 +15,7 @@ export default function DateAndOpen(props: {
   top?: boolean
   title: string
 }) {
-  const navigation = useNavigation<NavigationProps['navigation']>()
+  // const navigation = useNavigation<NavigationProps['navigation']>()
   return (
     <View style={styles.info}>
       <SimpleVideoInfo
@@ -26,7 +26,7 @@ export default function DateAndOpen(props: {
           date: props.date,
         }}
       />
-      <Pressable
+      {/* <Pressable
         onPress={() => {
           Linking.openURL(`bilibili://following/detail/${props.id}`).catch(
             err => {
@@ -43,7 +43,7 @@ export default function DateAndOpen(props: {
           style={styles.biliImg}
           source={require('../../../assets/bili-text.png')}
         />
-      </Pressable>
+      </Pressable> */}
     </View>
   )
 }

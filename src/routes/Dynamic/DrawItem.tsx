@@ -1,49 +1,35 @@
 import { useNavigation } from '@react-navigation/native'
-// import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import {
   Image,
-  Linking,
-  Pressable,
   ScrollView,
   StyleSheet,
   View,
+  Text,
   TouchableOpacity,
 } from 'react-native'
+import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
 import RichText from '../../components/RichText'
 import { NavigationProps } from '../../types'
-// import { AppContext } from '../../context';
-// import { RootStackParamList } from '../../types'
 import DateAndOpen from './DateAndOpen'
-// type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
-export default function RichTextItem(props: {
-  text: string
-  date: string
-  mid: number
-  name: string
-  commentId: string | number
-  commentType: number
-  images: { src: string; ratio: number }[]
-}) {
-  const { text, date, images, name, mid, commentId, commentType } = props
+export default function RichTextItem(
+  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_DRAW>,
+) {
+  const {
+    text,
+    date,
+    name,
+    commentId,
+    payload: { images },
+  } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
   return (
-    // <Pressable
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
         navigation.navigate('DynamicDetail', {
-          text,
-          images,
-          commentId,
-          commentType,
-          name,
-          mid,
-          // bvid,
-          // aid,
-          // mid,
-          // name,
+          item: props,
         })
       }}>
       <View style={[styles.textContainer]}>
@@ -59,26 +45,21 @@ export default function RichTextItem(props: {
             style={styles.imagesContainer}>
             {images.map(img => {
               return (
-                // <Pressable
-                //   key={img.src}
-                //   // onPress={() => {
-                //   //   Linking.openURL(img.src)
-                //   // }}
-                // >
-                <Image
-                  style={[styles.image, { aspectRatio: img.ratio }]}
-                  key={img.src}
-                  source={{
-                    uri: img.src + '@240w_240h_1c.webp',
-                  }}
-                />
-                // </Pressable>
+                <View key={img.src}>
+                  <Image
+                    style={[styles.image, { aspectRatio: img.ratio }]}
+                    source={{
+                      uri: img.src + '@240w_240h_1c.webp',
+                    }}
+                  />
+                </View>
               )
             })}
           </ScrollView>
         ) : null}
+        {props.payload.text ? <Text>{props.payload.text}</Text> : null}
         <DateAndOpen
-          title={props.text}
+          title={props.text || ''}
           name={name}
           id={commentId}
           date={date}
@@ -94,9 +75,10 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
   image: {
-    height: 80,
+    height: 90,
     marginRight: 20,
     marginVertical: 10,
+    borderRadius: 4,
   },
   textContainer: {
     flex: 1,

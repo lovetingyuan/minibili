@@ -3,11 +3,12 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import { ReplyItem, useDynamicComments } from '../../api/dynamic-comments'
 import Comment from '../../components/Comment'
 
-export default function CommentList(props: {
+const CommentList: React.FC<{
   commentId: string | number
   commentType: number
   upName: string
-}) {
+  setCommentsCount?: (count: number) => void
+}> = props => {
   const [comments, setComments] = React.useState<ReplyItem[] | null>(null)
   const {
     data: { replies, allCount },
@@ -17,6 +18,11 @@ export default function CommentList(props: {
   if (comments !== replies) {
     setComments(replies)
   }
+  React.useEffect(() => {
+    if (allCount) {
+      props.setCommentsCount?.(allCount)
+    }
+  }, [allCount, props])
   return (
     <View>
       {commentError ? (
@@ -71,3 +77,5 @@ const styles = StyleSheet.create({
     marginVertical: 50,
   },
 })
+
+export default CommentList

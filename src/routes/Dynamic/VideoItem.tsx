@@ -1,20 +1,22 @@
 import { useNavigation } from '@react-navigation/native'
-// import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import RichText from '../../components/RichText'
 import { NavigationProps } from '../../types'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
-import { DynamicItem, DynamicType } from '../../api/dynamic-items'
+import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
 import { isWifi } from '../../utils'
 
-// type NavigationProps = NativeStackScreenProps<RootStackParamList>
-
-type VideoDynamicItem = Extract<DynamicItem, { type: DynamicType.Video }>
-
-export default function VideoItem(props: VideoDynamicItem) {
-  const { mid, name, cover, title, aid, date, play, bvid, text, duration } =
-    props
+export default function VideoItem(
+  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_AV>,
+) {
+  const {
+    mid,
+    name,
+    payload: { cover, title, aid, bvid, play, duration },
+    date,
+    text,
+  } = props
 
   const navigation = useNavigation<NavigationProps['navigation']>()
 

@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from 'react-native'
 import ForwardItem from './ForwardItem'
-import RichTextItem from './RichTextItem'
+import RichTextItem from './DrawItem'
 import VideoItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import WordItem from './WordItem'
@@ -18,12 +18,14 @@ import store from '../../store'
 import { useSnapshot } from 'valtio'
 import {
   DynamicItem,
-  DynamicType,
+  DynamicTypeEnum,
   getDynamicItems,
 } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { useUserRelation } from '../../api/user-relation'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import DefaultItem from './DefaultItem'
+import ArticleItem from './ArticleItem'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -103,21 +105,20 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     }
   }, [upId, navigation, route.params])
   const renderItem = ({ item }: any) => {
-    let Item: any = null
-    if (item.type === DynamicType.Word) {
+    let Item: any = DefaultItem
+    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
       Item = WordItem
     }
-    if (item.type === DynamicType.Video) {
+    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_AV) {
       Item = VideoItem
     }
-    if (item.type === DynamicType.Draw) {
+    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
       Item = RichTextItem
     }
-    if (
-      item.type === DynamicType.ForwardDraw ||
-      item.type === DynamicType.ForwardVideo ||
-      item.type === DynamicType.ForwardOther
-    ) {
+    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
+      Item = ArticleItem
+    }
+    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
       Item = ForwardItem
     }
     // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
@@ -153,7 +154,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
           pageInfoRef.current.hasMore = more
           pageInfoRef.current.offset = os
         },
-        () => {
+        err => {
+          __DEV__ && console.error(err)
           ToastAndroid.show('请求动态失败', ToastAndroid.SHORT)
         },
       )
@@ -189,7 +191,9 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       <FlatList
         data={dynamicItems}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => {
+          return item.id
+        }}
         onEndReachedThreshold={1}
         refreshing={refreshing}
         style={styles.listStyle}

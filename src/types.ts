@@ -13,12 +13,7 @@ export type RootStackParamList = {
     from?: string
   }
   DynamicDetail: {
-    commentId: number | string
-    commentType: number
-    images: { src: string; ratio: number }[]
-    name: string
-    mid: string | number
-    text: string
+    item: Extract<DynamicItem, { type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW }>
   }
   Hot: {
     query: number
@@ -31,4 +26,5 @@ export type GetFuncPromiseType<F extends (...a: any) => any> =
   ReturnType<F> extends Promise<infer R> ? R : never
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { DynamicItem, DynamicTypeEnum } from './api/dynamic-items'
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>

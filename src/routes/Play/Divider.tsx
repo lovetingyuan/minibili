@@ -3,9 +3,16 @@ import { Pressable, View, Text, ToastAndroid, StyleSheet } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
 import { Icon } from '@rneui/base'
 
-export default function Divider(props: { bvid: string; tag: string }) {
+export default function Divider(props: {
+  bvid: string
+  tag: string
+  commentsCount: number
+}) {
   return (
     <View style={styles.divider}>
+      <Text style={{ color: '#666', fontSize: 12, marginRight: 12 }}>
+        {props.commentsCount}条评论
+      </Text>
       <View style={styles.dividerLine} />
       <Pressable
         onPress={() => {

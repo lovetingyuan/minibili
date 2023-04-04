@@ -13,7 +13,7 @@ import { NetToast } from '../components/NetToast'
 import { SWRConfig } from 'swr'
 import fetcher from '../api/fetcher'
 import DynamicDetail from './DynamicDetail'
-import { Image, Pressable } from 'react-native'
+import { Image, Pressable, Linking } from 'react-native'
 import { openBiliVideo } from '../utils'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -77,7 +77,22 @@ export default () => {
             component={DynamicDetail}
             options={props => {
               return {
-                headerTitle: props.route.params.name + '的动态', // props.route.params.name,
+                headerTitle: props.route.params.item.name + '的动态', // props.route.params.name,
+                headerRight: () => {
+                  return (
+                    <Pressable
+                      onPress={() => {
+                        Linking.openURL(
+                          `https://m.bilibili.com/dynamic/${props.route.params.item.id}`,
+                        )
+                      }}>
+                      <Image
+                        style={{ width: 36, height: 14 }}
+                        source={require('../../assets/bili-text.png')}
+                      />
+                    </Pressable>
+                  )
+                },
               }
             }}
           />

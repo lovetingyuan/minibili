@@ -10,11 +10,14 @@ const urlregex = urlRegex({
 })
 
 export default function RichText(props: {
-  text: string
+  text?: string
   imageSize?: number
   textProps?: TextProps
 }) {
   const { data: emojis } = useEmojiList()
+  if (!props.text) {
+    return null
+  }
   const parseEmoji = (text: string) => {
     const result: ReactNode[] = []
 
@@ -102,8 +105,9 @@ export default function RichText(props: {
     return result
   }
 
-  if (!/http(s)?:\/\/.+/.test(props.text)) {
-    return <Text style={styles.textContainer}>{parseEmoji(props.text)}</Text>
+  const text = props.text
+  if (!/http(s)?:\/\/.+/.test(text)) {
+    return <Text style={styles.textContainer}>{parseEmoji(text)}</Text>
   }
   const nodes = []
   let prev = 0
@@ -113,7 +117,7 @@ export default function RichText(props: {
     //   s => ` ${s} `,
     // )
     .replace(urlregex, (a, b) => {
-      nodes.push(...parseEmoji(props.text.substring(prev, b)))
+      nodes.push(...parseEmoji(text.substring(prev, b)))
       nodes.push(
         <Text
           key={index++}

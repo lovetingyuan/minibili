@@ -1,5 +1,4 @@
 import React from 'react'
-import Divider from './Divider'
 import VideoHeader from './VideoHeader'
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
 import type { VideoInfo as VideoInfoType } from '../../api/video-info'
@@ -88,7 +87,6 @@ export default function VideoInfo(props: {
           </Text>
         ) : null}
       </View>
-      <Divider bvid={videoInfo.bvid} tag={videoInfo.tname} />
     </>
   )
 }

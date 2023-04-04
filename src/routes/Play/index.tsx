@@ -26,6 +26,7 @@ import Player from './VideoPlayer'
 import { useVideoInfo, VideoInfo as VideoInfoType } from '../../api/video-info'
 import CommentList from './CommentList'
 import VideoInfo from './VideoInfo'
+import Divider from './Divider'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
@@ -34,7 +35,7 @@ const PlayPage = ({ route }: Props) => {
   const { commentId, bvid, name, wifi } = route.params
   const [videoInfo, setVideoInfo] = React.useState<VideoInfoType | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
-
+  const [commentsCount, setCommentsCount] = React.useState(0)
   const { data: vi, error } = useVideoInfo(bvid)
   if (!error && vi?.bvid && !videoInfo?.bvid) {
     setVideoInfo(vi)
@@ -62,7 +63,19 @@ const PlayPage = ({ route }: Props) => {
           currentPage={currentPage}
           changeCurrentPage={setCurrentPage}
         />
-        <CommentList upName={name} commentId={commentId} commentType={1} />
+        {videoInfo && (
+          <Divider
+            commentsCount={commentsCount}
+            bvid={videoInfo.bvid}
+            tag={videoInfo.tname}
+          />
+        )}
+        <CommentList
+          upName={name}
+          commentId={commentId}
+          commentType={1}
+          setCommentsCount={setCommentsCount}
+        />
       </ScrollView>
     </View>
   )
