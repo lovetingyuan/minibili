@@ -1,4 +1,4 @@
-import { Divider } from '@rneui/base'
+import { Divider } from '@rneui/themed'
 import React from 'react'
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import { ReplyItem, useDynamicComments } from '../api/dynamic-comments'

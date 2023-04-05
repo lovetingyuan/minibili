@@ -1,4 +1,4 @@
-import { Button, Overlay } from '@rneui/base'
+import { Button, Overlay } from '@rneui/themed'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 // import { useWindowDimensions } from 'react-native';

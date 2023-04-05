@@ -1,4 +1,4 @@
-import { Dialog } from '@rneui/base'
+import { Dialog } from '@rneui/themed'
 import React from 'react'
 import type { ReactNode } from 'react'
 

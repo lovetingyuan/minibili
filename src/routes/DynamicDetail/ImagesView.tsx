@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Pressable, Image, Text, Linking, StyleSheet } from 'react-native'
-import { Overlay } from '@rneui/base'
+import { Overlay } from '@rneui/themed'
 import { useNetInfo } from '@react-native-community/netinfo'
 import PagerView from 'react-native-pager-view'
 

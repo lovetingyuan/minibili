@@ -1,39 +1,18 @@
 import React from 'react'
 import { Text, View, Pressable, Image } from 'react-native'
-import { Avatar } from '@rneui/base'
-
-import ButtonsOverlay from '../../components/ButtonsOverlay'
+import { Avatar } from '@rneui/themed'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
-import { Alert } from 'react-native'
 import { useUserInfo } from '../../api/user-info'
 import { useUserRelation } from '../../api/user-relation'
 import { parseNumber } from '../../utils'
 
-const buttons = [
-  {
-    text: '退出',
-    name: 'logout',
-  },
-  {
-    text: '关于',
-    name: 'about',
-  },
-]
-
-const logOut = () => {
-  store.$userInfo = null
-  store.updatedUps = {}
-  store.dynamicUser = null
-  store.$followedUps = []
-}
 export default function Header() {
   const { $userInfo } = useSnapshot(store)
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const [modalVisible, setModalVisible] = React.useState(false)
 
   const { data: user } = useUserInfo($userInfo?.mid)
   const { data: relation } = useUserRelation($userInfo?.mid)
@@ -91,35 +70,13 @@ export default function Header() {
       </View>
       <Pressable
         onPress={() => {
-          setModalVisible(true)
+          navigation.navigate('About')
         }}>
         <Image
           source={require('../../../assets/snow.png')}
           style={styles.infoFace}
         />
       </Pressable>
-      <ButtonsOverlay
-        buttons={buttons}
-        visible={modalVisible}
-        onPress={(name: string) => {
-          if (name === 'logout') {
-            Alert.alert('确定退出吗？', '', [
-              {
-                text: '取消',
-              },
-              {
-                text: '确定',
-                onPress: logOut,
-              },
-            ])
-          } else if (name === 'about') {
-            navigation.navigate('About')
-          }
-        }}
-        dismiss={() => {
-          setModalVisible(false)
-        }}
-      />
     </View>
   )
 }

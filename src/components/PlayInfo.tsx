@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, Text, Pressable } from 'react-native'
 import { handleShareVideo, parseDate, parseNumber } from '../utils'
-import { Icon } from '@rneui/base'
+import { Icon } from '@rneui/themed'
 import { VideoInfo } from '../api/video-info'
 
 export function PlayInfo(props: { video: VideoInfo }) {

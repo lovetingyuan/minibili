@@ -10,7 +10,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../types'
 import store from '../store'
 import { useSnapshot } from 'valtio'
-import { Button, Icon } from '@rneui/base'
+import { Button, Icon } from '@rneui/themed'
 import { Pressable } from 'react-native'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>

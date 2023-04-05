@@ -6,7 +6,7 @@ import { useSnapshot } from 'valtio'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
 import { Text, Vibration, View, StyleSheet } from 'react-native'
-import { Badge } from '@rneui/base'
+import { Badge } from '@rneui/themed'
 import { RootStackParamList } from '../types'
 
 const Tab = createBottomTabNavigator<RootStackParamList>()

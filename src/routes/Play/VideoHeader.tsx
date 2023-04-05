@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Avatar, Icon } from '@rneui/base'
+import { Avatar, Icon } from '@rneui/themed'
 import React from 'react'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'

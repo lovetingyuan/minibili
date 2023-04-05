@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button } from '@rneui/base'
+import { Button, Input } from '@rneui/themed'
 import {
   View,
   Text,
@@ -10,7 +10,6 @@ import {
   ToastAndroid,
   KeyboardAvoidingView,
   Platform,
-  TextInput,
 } from 'react-native'
 
 import store from '../../store'
@@ -21,7 +20,6 @@ const rightTv = require('../../../assets/tv-right.png')
 
 export default function Login() {
   const inputUserIdRef = React.useRef('')
-  // const inputRef = React.useRef(null)
   const [tvImg, setTvImg] = React.useState(true)
   const [userId, setUserId] = React.useState('')
   React.useEffect(() => {
@@ -44,12 +42,6 @@ export default function Login() {
   if (error) {
     ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
   }
-  // React.useEffect(() => {
-  //   if (userId && !data?.mid && error) {
-  //     ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
-  //   }
-  // }, [userId, data, error])
-
   const storeUserId = () => {
     if (!inputUserIdRef.current) {
       ToastAndroid.show('请输入ID', ToastAndroid.SHORT)
@@ -59,7 +51,8 @@ export default function Login() {
   }
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ padding: 30 }}>
       <View style={styles.logoContainer}>
         <Image source={tvImg ? leftTv : rightTv} style={styles.logo} />
       </View>
@@ -72,27 +65,22 @@ export default function Login() {
           https://space.bilibili.com/
         </Text>
       </Pressable>
-      <Text style={styles.text}>
-        然后输入你的B站ID（注意：你需要在隐私设置中设置你的关注列表为公开）
+      <Text style={styles.text}>然后输入你的B站ID</Text>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20 }}>
+        说明：
       </Text>
-      <Text style={styles.text}>
-        说明：B站ID为个人页面地址栏中的一串数字（ID为公开信息，请放心输入）
+      <Text style={{ paddingLeft: 20, marginTop: 5 }}>
+        B站ID为个人页面地址栏中的一串数字（ID为公开信息，请放心输入）
+      </Text>
+      <Text style={{ paddingLeft: 20, marginTop: 5 }}>
+        你需要在隐私设置中设置你的关注列表为公开
       </Text>
       <View style={styles.inputContainer}>
-        <TextInput
+        <Input
           onChangeText={text => (inputUserIdRef.current = text)}
           placeholder="请输入你的B站ID"
           keyboardType="numeric"
         />
-        {/* <Input
-          placeholder="请输入你的B站ID"
-          onChangeText={text => (inputUserIdRef.current = text)}
-          leftIcon={<Icon name="account-box" size={20} />}
-          keyboardType="numeric"
-          ref={inputRef}
-          onSubmitEditing={storeUserId}
-          style={{ flex: 1 }}
-        /> */}
         <Button
           title="登 录"
           onPress={storeUserId}

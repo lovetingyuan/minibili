@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Button } from '@rneui/base'
+import { Button } from '@rneui/themed'
 import React from 'react'
 import { View } from 'react-native'
 import { useSnapshot } from 'valtio'

@@ -2,7 +2,7 @@ import React from 'react'
 import VideoHeader from './VideoHeader'
 import { View, Text, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import { ListItem } from '@rneui/base'
+import { ListItem } from '@rneui/themed'
 
 export default function VideoInfo(props: {
   bvid: string

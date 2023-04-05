@@ -1,4 +1,4 @@
-import { Avatar, Icon } from '@rneui/base'
+import { Avatar, Icon } from '@rneui/themed'
 import React from 'react'
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { UserInfo } from '../../store'

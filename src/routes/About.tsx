@@ -1,13 +1,15 @@
 import React from 'react'
-import { Linking, Pressable, View } from 'react-native'
+import { Linking, Pressable, View, Alert } from 'react-native'
 import { Text } from 'react-native'
 import * as Application from 'expo-application'
 import { StyleSheet } from 'react-native'
 import { useSnapshot } from 'valtio'
 import store from '../store'
-import { Card, Chip, ListItem, Button } from '@rneui/base'
+import { Card, Chip, ListItem, Button } from '@rneui/themed'
 import { useCheckVersion } from '../hooks/useCheckVersion'
 import { githubLink, site } from '../constants'
+import { NavigationProps } from '../types'
+import { useNavigation } from '@react-navigation/native'
 
 const version = Application.nativeApplicationVersion
 
@@ -15,12 +17,31 @@ export default function About() {
   const { $userInfo, $blackTags, $blackUps } = useSnapshot(store)
   const [expanded, setExpanded] = React.useState(false)
   const [expandedUp, setExpandedUp] = React.useState(false)
+  const navigation = useNavigation<NavigationProps['navigation']>()
+
   const {
     data: { hasUpdate, downloadLink, latestVersion },
     error,
     isLoading,
     mutate,
   } = useCheckVersion()
+  const handleLogOut = () => {
+    Alert.alert('确定退出吗？', '', [
+      {
+        text: '取消',
+      },
+      {
+        text: '确定',
+        onPress: () => {
+          store.$userInfo = null
+          store.updatedUps = {}
+          store.dynamicUser = null
+          store.$followedUps = []
+          navigation.goBack()
+        },
+      },
+    ])
+  }
   return (
     <View style={styles.container}>
       <Card>
@@ -29,7 +50,16 @@ export default function About() {
             onPress={() => {
               Linking.openURL(site)
             }}>
-            <Text style={styles.appName}>MiniBili</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text style={styles.appName}>MiniBili</Text>
+              <Text
+                style={{
+                  alignSelf: 'flex-end',
+                  marginLeft: 20,
+                }}>
+                当前版本：{version}{' '}
+              </Text>
+            </View>
           </Pressable>
         </Card.Title>
         <Card.Divider />
@@ -45,9 +75,19 @@ export default function About() {
           </Button>
         </View>
         <Text />
-        <Text style={{ fontSize: 16, color: '#555' }}>
-          当前版本：{version} {'    '}当前用户ID：{$userInfo?.mid}
-        </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text style={{ fontSize: 16, color: '#555', marginRight: 20 }}>
+            当前用户ID：{$userInfo?.mid}
+          </Text>
+          <Button type="clear" size="sm" onPress={handleLogOut}>
+            退出
+          </Button>
+        </View>
         <Text style={{ marginTop: 20 }}>
           注：本应用所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!
         </Text>
@@ -142,9 +182,11 @@ const styles = StyleSheet.create({
   },
   appName: {
     fontSize: 40,
-    textAlign: 'left',
+    // textAlign: 'left',
     color: '#fb7299',
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
+    // width: 300,
+    // borderWidth: 1,
   },
   desc: {
     justifyContent: 'space-between',

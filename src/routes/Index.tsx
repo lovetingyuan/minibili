@@ -15,7 +15,7 @@ import fetcher from '../api/fetcher'
 import DynamicDetail from './DynamicDetail'
 import { Image, Pressable, Linking, Alert } from 'react-native'
 import { openBiliVideo } from '../utils'
-import { Button } from '@rneui/base'
+import { Button } from '@rneui/themed'
 import { site } from '../constants'
 import { useCheckVersion } from '../hooks/useCheckVersion'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -28,42 +28,44 @@ SplashScreen.preventAutoHideAsync()
 export default () => {
   const { data } = useCheckVersion()
 
-  AsyncStorage.getItem('FIRST_RUN').then(res => {
-    AsyncStorage.setItem('FIRST_RUN', 'false')
-    if (!res) {
-      Alert.alert(
-        '使用说明',
-        '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
-      )
-    } else {
-      if (
-        data?.hasUpdate &&
-        !store.$ignoredVersions.includes(data.latestVersion!)
-      ) {
+  React.useEffect(() => {
+    AsyncStorage.getItem('FIRST_RUN').then(res => {
+      AsyncStorage.setItem('FIRST_RUN', 'false')
+      if (!res) {
         Alert.alert(
-          '有新版本',
-          `${data.currentVersion} --> ${data.latestVersion}`,
-          [
-            {
-              text: '取消',
-            },
-            {
-              text: '忽略',
-              onPress: () => {
-                store.$ignoredVersions.push(data.latestVersion!)
-              },
-            },
-            {
-              text: '下载更新',
-              onPress: () => {
-                Linking.openURL(data.downloadLink!)
-              },
-            },
-          ],
+          '使用说明',
+          '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
         )
+      } else {
+        if (
+          data?.hasUpdate &&
+          !store.$ignoredVersions.includes(data.latestVersion!)
+        ) {
+          Alert.alert(
+            '有新版本',
+            `${data.currentVersion} --> ${data.latestVersion}`,
+            [
+              {
+                text: '取消',
+              },
+              {
+                text: '忽略',
+                onPress: () => {
+                  store.$ignoredVersions.push(data.latestVersion!)
+                },
+              },
+              {
+                text: '下载更新',
+                onPress: () => {
+                  Linking.openURL(data.downloadLink!)
+                },
+              },
+            ],
+          )
+        }
       }
-    }
-  })
+    })
+  }, [data])
 
   return (
     <SWRConfig

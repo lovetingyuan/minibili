@@ -14,12 +14,13 @@ import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
-import { TracyId } from '../../constants'
+import { TracyId, ranks } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, isWifi, parseDate } from '../../utils'
+import { Button, Dialog } from '@rneui/themed'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
 
@@ -30,7 +31,24 @@ export default function Hot({ navigation }: Props) {
   const { list, page, setSize, isRefreshing, loading, refresh, isReachingEnd } =
     useHotVideos()
 
+  const [showRank, setShowRank] = React.useState(false)
+
   React.useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => {
+        return (
+          <Button
+            type="clear"
+            size="sm"
+            containerStyle={{ marginRight: 10 }}
+            onPress={() => {
+              setShowRank(true)
+            }}>
+            排行
+          </Button>
+        )
+      },
+    })
     const unsubscribe = navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return
@@ -205,6 +223,22 @@ export default function Hot({ navigation }: Props) {
         onPress={handleOverlayClick}
         dismiss={() => setModalVisible(false)}
       />
+      <Dialog
+        isVisible={showRank}
+        onBackdropPress={() => {
+          setShowRank(false)
+        }}>
+        <Dialog.Title title="分区排行" />
+        <View style={styles.rankContainer}>
+          {ranks.map(rank => {
+            return (
+              <View key={rank.rid} style={styles.rankItem}>
+                <Text>{rank.label}</Text>
+              </View>
+            )
+          })}
+        </View>
+      </Dialog>
       <FlashList
         ref={v => {
           hotListRef.current = v
@@ -260,5 +294,22 @@ const styles = StyleSheet.create({
   videoCount: {
     fontSize: 16,
     marginRight: 20,
+  },
+  rankContainer: {
+    margin: 10,
+    flexDirection: 'row',
+    gap: 15,
+    flexWrap: 'wrap',
+  },
+  rankItem: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    backgroundColor: 'pink',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rankItemText: {
+    fontSize: 18,
   },
 })
