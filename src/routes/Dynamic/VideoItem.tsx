@@ -27,7 +27,7 @@ export default function VideoItem(
       activeOpacity={0.8}
       onPress={() => {
         isWifi().then(wifi => {
-          navigation.navigate('Play', {
+          navigation.push('Play', {
             bvid,
             commentId,
             mid,

@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid'
 
 const eventsMap: Record<string, boolean> = {}
 
+// @ts-ignore
 window._events = {
   on(name: string, callback: () => void) {
     if (name in eventsMap) {
@@ -81,6 +82,7 @@ Object.keys(elements).forEach(path => {
           this.render = () => {
             this.shadowRoot.innerHTML = getHtml()
           }
+          this.render()
         })
       }
       attributeChangedCallback() {
