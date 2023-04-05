@@ -2,17 +2,16 @@
   "downloadLink": "https://expo.dev/artifacts/eas/kUWk3qsk8qZE9sr7RHYg1V.apk",
   "changelog": [
     {
+      "version": "0.0.3",
+      "changes": ["修复了一些问题", "优化了体验"]
+    },
+    {
       "version": "0.0.2",
-      "changes": [
-        "修复了一些问题",
-        "优化了体验"
-      ]
+      "changes": ["修复了一些问题", "优化了体验"]
     },
     {
       "version": "0.0.1",
-      "changes": [
-        "修复了一些问题"
-      ]
+      "changes": ["修复了一些问题"]
     }
   ]
 }

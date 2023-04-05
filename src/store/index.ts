@@ -17,6 +17,7 @@ const store = proxy<{
   $userInfo: UserInfo | null
   $webViewMode: 'PC' | 'MOBILE'
   $latestUpdateIds: Record<string, string>
+  $ignoredVersions: string[]
   // ----------------------------
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
@@ -29,6 +30,7 @@ const store = proxy<{
   $userInfo: null,
   $webViewMode: 'PC',
   $latestUpdateIds: {},
+  $ignoredVersions: [],
   // -------------------------
   dynamicUser: null,
   updatedUps: {},
