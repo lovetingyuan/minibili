@@ -1,7 +1,6 @@
 import React from 'react'
-import { View, Text, Pressable, Linking } from 'react-native'
+import { View, Text, Pressable, Linking, StyleSheet } from 'react-native'
 import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
-// import RichText from '../../components/RichText'
 import DateAndOpen from './DateAndOpen'
 
 export default function ArticleItem(
@@ -9,16 +8,12 @@ export default function ArticleItem(
 ) {
   return (
     <View>
-      <Text style={{ marginBottom: 10, fontSize: 16 }}>
-        {props.payload.title}
-      </Text>
+      <Text style={styles.title}>{props.payload.title}</Text>
       <Pressable
         onPress={() => {
           Linking.openURL(props.payload.url)
         }}>
-        <Text
-          style={{ backgroundColor: '#e6e6e6', padding: 8 }}
-          numberOfLines={5}>
+        <Text style={styles.article} numberOfLines={5}>
           {props.payload.text}
         </Text>
       </Pressable>
@@ -31,3 +26,8 @@ export default function ArticleItem(
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  title: { marginBottom: 10, fontSize: 16 },
+  article: { backgroundColor: '#e6e6e6', padding: 8 },
+})

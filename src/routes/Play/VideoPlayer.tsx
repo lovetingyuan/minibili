@@ -1,30 +1,34 @@
 import * as KeepAwake from 'expo-keep-awake'
 import React from 'react'
-import { ToastAndroid, useWindowDimensions, View } from 'react-native'
+import {
+  ToastAndroid,
+  useWindowDimensions,
+  View,
+  Image,
+  StyleSheet,
+} from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
+import { useVideoInfo } from '../../api/video-info'
 import { useIsWifi } from '../../hooks/useIsWifi'
-import { VideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
-import { Loading } from './page-loading'
 
-function Player(props: { video: VideoInfo | null; page: number }) {
+function Player(props: { cover: string; page: number; bvid: string }) {
+  const { cover, page, bvid } = props
   const isWifi = useIsWifi()
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
+  const { data: videoInfo, error } = useVideoInfo(bvid)
 
-  if (!props.video) {
-    return null
+  let videoWidth = 0
+  let videoHeight = 0
+  if (!error && videoInfo?.bvid) {
+    videoWidth = videoInfo.width
+    videoHeight = videoInfo.height
   }
-  let isVerticalVideo = false
-  if (props.video.width && props.video.height) {
-    const [videoWidth, videoHeight] = [
-      props.video.pages[props.page - 1].width,
-      props.video.pages[props.page - 1].height,
-    ]
-    isVerticalVideo = videoWidth < videoHeight
-  }
+  const isVerticalVideo = videoWidth < videoHeight
+
   const handleMessage = (evt: WebViewMessageEvent) => {
     try {
       const data = JSON.parse(evt.nativeEvent.data)
@@ -54,11 +58,7 @@ function Player(props: { video: VideoInfo | null; page: number }) {
   }
 
   let videoViewHeight = height * 0.4
-  if (props.video.width && props.video.height) {
-    const [videoWidth, videoHeight] = [
-      props.video.pages[props.page - 1].width,
-      props.video.pages[props.page - 1].height,
-    ]
+  if (videoWidth && videoHeight) {
     videoViewHeight =
       (isVerticalVideo ? videoWidth / videoHeight : videoHeight / videoWidth) *
         width +
@@ -67,17 +67,30 @@ function Player(props: { video: VideoInfo | null; page: number }) {
       videoViewHeight = verticalScale * height
     }
   }
-  const renderLoading = () => Loading(props.video?.cover)
+  const renderLoading = () => (
+    <View style={styles.loadingView}>
+      <Image
+        style={{
+          flex: 1,
+          width: cover ? '100%' : '80%',
+        }}
+        resizeMode="cover"
+        source={
+          cover ? { uri: cover } : require('../../../assets/video-loading.png')
+        }
+      />
+    </View>
+  )
 
   const search = new URLSearchParams()
   const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
   Object.entries({
-    bvid: props.video.bvid,
+    bvid,
     autoplay: 1,
     highQuality: isWifi === true ? 1 : 0,
     quality: isWifi === true ? 100 : 16,
     portraitFullScreen: true,
-    page: props.page,
+    page,
   }).forEach(([k, v]) => {
     search.append(k, v + '')
   })
@@ -121,3 +134,11 @@ function Player(props: { video: VideoInfo | null; page: number }) {
 }
 
 export default Player
+const styles = StyleSheet.create({
+  loadingView: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    alignItems: 'center',
+  },
+})

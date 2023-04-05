@@ -10,7 +10,7 @@ const getVideoItem = (data: VideoInfoResponse) => {
     bvid: data.bvid,
     cid: data.cid,
     // copyright: number;
-    pubTime: data.ctime,
+    pubTime: data.pubdate,
     desc: data.desc,
     // desc_v2: [{…}]
     width: data.dimension.width,

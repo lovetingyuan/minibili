@@ -76,15 +76,14 @@ export default () => {
             name="DynamicDetail"
             component={DynamicDetail}
             options={props => {
+              const { name, id } = props.route.params.detail
               return {
-                headerTitle: props.route.params.item.name + '的动态', // props.route.params.name,
+                headerTitle: name + '的动态', // props.route.params.name,
                 headerRight: () => {
                   return (
                     <Pressable
                       onPress={() => {
-                        Linking.openURL(
-                          `https://m.bilibili.com/dynamic/${props.route.params.item.id}`,
-                        )
+                        Linking.openURL(`https://m.bilibili.com/dynamic/${id}`)
                       }}>
                       <Image
                         style={{ width: 36, height: 14 }}

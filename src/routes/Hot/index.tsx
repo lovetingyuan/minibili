@@ -19,7 +19,7 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, isWifi } from '../../utils'
+import { handleShareVideo, isWifi, parseDate } from '../../utils'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
 
@@ -60,6 +60,23 @@ export default function Hot({ navigation }: Props) {
     const { tag } = currentVideoRef.current
     store.$blackTags[tag] = tag
   }
+  const gotoPlay = (data: VideoItem) => {
+    const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
+    isWifi().then(wifi => {
+      navigation.navigate('Play', {
+        mid,
+        bvid,
+        name,
+        commentId: aid,
+        wifi,
+        face,
+        cover,
+        desc,
+        title,
+        date: parseDate(pubDate),
+      })
+    })
+  }
   const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
     const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a')
     return (
@@ -67,17 +84,7 @@ export default function Hot({ navigation }: Props) {
         <TouchableOpacity
           activeOpacity={0.8}
           style={{ flex: 1 }}
-          onPress={() => {
-            isWifi().then(wifi => {
-              navigation.navigate('Play', {
-                mid: item[0].mid,
-                bvid: item[0].bvid,
-                name: item[0].name,
-                commentId: item[0].aid,
-                wifi,
-              })
-            })
-          }}
+          onPress={() => gotoPlay(item[0])}
           onLongPress={() => {
             currentVideoRef.current = item[0]
             setModalVisible(true)
@@ -88,17 +95,7 @@ export default function Hot({ navigation }: Props) {
           <TouchableOpacity
             activeOpacity={0.8}
             style={{ flex: 1, marginLeft: 8 }}
-            onPress={() => {
-              isWifi().then(wifi => {
-                navigation.navigate('Play', {
-                  mid: item[1]!.mid,
-                  bvid: item[1]!.bvid,
-                  name: item[1]!.name,
-                  commentId: item[1]!.aid,
-                  wifi,
-                })
-              })
-            }}
+            onPress={() => gotoPlay(item[1]!)}
             onLongPress={() => {
               currentVideoRef.current = item[1]!
               setModalVisible(true)

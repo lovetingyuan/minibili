@@ -8,12 +8,21 @@ export type RootStackParamList = {
     name: string
     mid: string | number
     wifi: boolean
+    face: string
+    date: string
+    cover: string
+    // playNum: number
+    // likeNum: number
+    // commentNum: number
+    title: string
+    desc: string
+    from?: 'dynamic'
   }
   Dynamic?: {
     from?: string
   }
   DynamicDetail: {
-    item: Extract<DynamicItem, { type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW }>
+    detail: Extract<DynamicItem, { type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW }>
   }
   Hot: {
     query: number

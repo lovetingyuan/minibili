@@ -13,9 +13,11 @@ export default function VideoItem(
   const {
     mid,
     name,
-    payload: { cover, title, aid, bvid, play, duration },
+    payload: { cover, title, bvid, play, duration, desc },
     date,
     text,
+    face,
+    commentId,
   } = props
 
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -27,10 +29,16 @@ export default function VideoItem(
         isWifi().then(wifi => {
           navigation.navigate('Play', {
             bvid,
-            commentId: aid,
+            commentId,
             mid,
             name,
             wifi,
+            face,
+            cover,
+            desc,
+            title,
+            date,
+            from: 'dynamic',
           })
         })
       }}>

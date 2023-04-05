@@ -1,35 +1,30 @@
 import React from 'react'
-import {
-  View,
-  Pressable,
-  ScrollView,
-  Image,
-  StyleSheet,
-  Text,
-  Linking,
-} from 'react-native'
+import { View, Pressable, ScrollView, Image, StyleSheet } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 import RichText from '../../components/RichText'
-import CommentList from '../Play/CommentList'
-import PagerView from 'react-native-pager-view'
-import { Divider, Overlay } from '@rneui/base'
-import { useNetInfo } from '@react-native-community/netinfo'
-// import { downloadImage } from '../../utils'
+import CommentList from '../../components/CommentList'
+import Header from './Header'
+import ImagesView from './ImagesView'
 
-type Props = NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>
-
-const DynamicDetail: React.FC<Props> = ({ route }) => {
-  const [visible, setVisible] = React.useState(false)
+const DynamicDetail: React.FC<
+  NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>
+> = ({ route }) => {
   const {
     text,
     name,
+    date,
     commentId,
     commentType,
     payload: { images },
-  } = route.params.item
-  const [currentImageIndex, setCurrentImageIndex] = React.useState(0)
-  const netinfo = useNetInfo()
+    id,
+    face,
+    forwardCount,
+    likeCount,
+  } = route.params.detail
+  const [imageIndex, setImageIndex] = React.useState(0)
+  const [visible, setVisible] = React.useState(false)
+
   return (
     <>
       <View
@@ -54,7 +49,7 @@ const DynamicDetail: React.FC<Props> = ({ route }) => {
                   <Pressable
                     key={img.src}
                     onPress={() => {
-                      setCurrentImageIndex(i)
+                      setImageIndex(i)
                       setVisible(true)
                     }}>
                     <Image
@@ -70,7 +65,15 @@ const DynamicDetail: React.FC<Props> = ({ route }) => {
             </ScrollView>
           ) : null}
         </View>
-        <Divider />
+        <Header
+          face={face}
+          id={id}
+          forwardCount={forwardCount}
+          likeCount={likeCount}
+          name={name}
+          text={text || ''}
+          date={date}
+        />
         <ScrollView style={styles.scrollView}>
           <CommentList
             upName={name}
@@ -79,57 +82,12 @@ const DynamicDetail: React.FC<Props> = ({ route }) => {
           />
         </ScrollView>
       </View>
-      <Overlay
-        isVisible={visible}
-        fullScreen
-        overlayStyle={styles.overlay}
-        onBackdropPress={() => {
-          setVisible(false)
-        }}>
-        <PagerView
-          style={styles.viewPager}
-          initialPage={currentImageIndex}
-          onPageSelected={e => {
-            setCurrentImageIndex(e.nativeEvent.position)
-          }}>
-          {images.map(img => {
-            return (
-              <View key={img.src} style={styles.page}>
-                <Pressable
-                  onPress={() => {
-                    Linking.openURL(img.src)
-                  }}>
-                  <Image
-                    style={[styles.pagerImage, { aspectRatio: img.ratio }]}
-                    key={img.src}
-                    loadingIndicatorSource={require('../../../assets/loading.png')}
-                    source={{
-                      uri:
-                        netinfo.type === 'wifi'
-                          ? img.src
-                          : img.src + '@640w_640h_2c.webp',
-                    }}
-                  />
-                </Pressable>
-              </View>
-            )
-          })}
-        </PagerView>
-        <View style={styles.pagerNum}>
-          <Text style={styles.pagerNumText}>
-            {currentImageIndex + 1}/{images.length}
-          </Text>
-          {/* <Button
-            size="sm"
-            type="clear"
-            titleStyle={{ color: 'white' }}
-            onPress={() => {
-              downloadImage(images[currentImageIndex].src)
-            }}>
-            下载
-          </Button> */}
-        </View>
-      </Overlay>
+      <ImagesView
+        images={images}
+        visible={visible}
+        imageIndex={imageIndex}
+        setImageIndex={setImageIndex}
+      />
     </>
   )
 }
@@ -147,25 +105,18 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   imagesContainer: {
-    marginVertical: 20,
     marginHorizontal: 15,
     flexShrink: 1,
   },
   pagerImage: {
-    // flex: 1,
     width: '100%',
-
-    // borderColor: 'red',
-    backgroundColor: 'red',
-    // height: '100%',
-    // resizeMode: 'stretch',
   },
   scrollView: {
     flex: 1,
     height: 100,
     flexGrow: 1,
     paddingHorizontal: 15,
-    marginTop: 20,
+    marginTop: 10,
   },
   overlay: {
     padding: 0,

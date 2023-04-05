@@ -230,6 +230,7 @@ const getCommon = (item: DynamicListResponse['items'][0]) => {
   return {
     id: item.id_str,
     // type: item.type,
+    face: item.modules.module_author.face,
     date: item.modules?.module_author?.pub_time,
     time: item.modules?.module_author?.pub_ts,
     mid: item.modules?.module_author?.mid,
@@ -238,6 +239,9 @@ const getCommon = (item: DynamicListResponse['items'][0]) => {
     top: item.modules?.module_tag?.text === '置顶',
     commentId: item.basic.comment_id_str,
     commentType: item.basic.comment_type,
+    commentCount: item.modules.module_stat.comment.count,
+    likeCount: item.modules.module_stat.like.count,
+    forwardCount: item.modules.module_stat.forward.count,
   }
 }
 
@@ -272,6 +276,8 @@ const getVideoItem = (
       bvid: video.bvid,
       aid: video.aid,
       duration: video.duration_text,
+      desc: video.desc,
+      // date:
     },
   }
 }
@@ -403,6 +409,7 @@ const getUnknownItem = (
     type: DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN as const,
     payload: {
       text: '暂不支持显示',
+      type: item.type as DynamicTypeEnum,
     },
   }
 }

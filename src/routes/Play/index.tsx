@@ -3,14 +3,13 @@ import {
   StyleSheet,
   View,
   ToastAndroid,
-  // Text,
   ScrollView,
-  // Pressable,
-  // Image,
+  Pressable,
+  Text,
 } from 'react-native'
-// import { Avatar, Icon, ListItem } from '@rneui/base'
 import * as KeepAwake from 'expo-keep-awake'
-// import * as Clipboard from 'expo-clipboard'
+import * as Clipboard from 'expo-clipboard'
+
 // https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?danmaku=1&highQuality=0&bvid=BV1cB4y1n7v8
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
@@ -18,28 +17,35 @@ import * as KeepAwake from 'expo-keep-awake'
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
-// import store from '../../store'
-// import { PlayInfo } from '../../components/PlayInfo'
-// import { useIsWifi } from '../../hooks/useIsWifi'
 import Player from './VideoPlayer'
-// import { openBiliVideo } from '../../utils'
 import { useVideoInfo, VideoInfo as VideoInfoType } from '../../api/video-info'
-import CommentList from './CommentList'
+import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
-import Divider from './Divider'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 const PlayPage = ({ route }: Props) => {
   __DEV__ && console.log(route.name)
-  const { commentId, bvid, name, wifi } = route.params
+  const {
+    commentId,
+    bvid,
+    name,
+    wifi,
+    title,
+    desc,
+    face,
+    cover,
+    mid,
+    date,
+    from,
+  } = route.params
   const [videoInfo, setVideoInfo] = React.useState<VideoInfoType | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
-  const [commentsCount, setCommentsCount] = React.useState(0)
   const { data: vi, error } = useVideoInfo(bvid)
   if (!error && vi?.bvid && !videoInfo?.bvid) {
     setVideoInfo(vi)
   }
+  const isFromDynamic = from === 'dynamic'
   React.useEffect(() => {
     if (!wifi) {
       ToastAndroid.showWithGravity(
@@ -51,31 +57,44 @@ const PlayPage = ({ route }: Props) => {
     return () => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
+  }, [wifi])
   return (
-    <View style={{ flex: 1 }}>
-      <Player video={videoInfo} page={currentPage} />
+    <View style={styles.container}>
+      <Player cover={cover} page={currentPage} bvid={bvid} />
       <ScrollView style={styles.videoInfoContainer}>
         <VideoInfo
-          videoInfo={videoInfo}
-          currentPage={currentPage}
-          changeCurrentPage={setCurrentPage}
+          bvid={bvid}
+          title={title}
+          desc={desc}
+          face={face}
+          name={name}
+          mid={mid}
+          date={date}
+          page={currentPage}
+          changePage={setCurrentPage}
+          isFromDynamic={isFromDynamic}
         />
-        {videoInfo && (
-          <Divider
-            commentsCount={commentsCount}
-            bvid={videoInfo.bvid}
-            tag={videoInfo.tname}
+        <View style={{ marginTop: 10 }}>
+          <CommentList
+            upName={name}
+            commentId={commentId}
+            commentType={1}
+            dividerRight={
+              <View style={styles.right}>
+                <Pressable
+                  onPress={() => {
+                    Clipboard.setStringAsync(bvid).then(() => {
+                      ToastAndroid.show('已复制', ToastAndroid.SHORT)
+                    })
+                  }}>
+                  <Text style={styles.text}>{bvid}</Text>
+                </Pressable>
+                <Text> - </Text>
+                <Text style={styles.text}>{videoInfo?.tname}</Text>
+              </View>
+            }
           />
-        )}
-        <CommentList
-          upName={name}
-          commentId={commentId}
-          commentType={1}
-          setCommentsCount={setCommentsCount}
-        />
+        </View>
       </ScrollView>
     </View>
   )
@@ -90,4 +109,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
+  text: { color: '#666', fontSize: 12 },
+  right: { flexDirection: 'row', alignItems: 'center' },
 })

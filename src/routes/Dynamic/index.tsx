@@ -79,9 +79,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         )
       },
       headerTitleAlign: 'left',
-      // headerStyle: {
-      //   flexWrap: 'wrap',
-      // },
       headerRight: () => {
         if (!dynamicUser) {
           return null
@@ -187,13 +184,10 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   }
   return (
     <View style={styles.container}>
-      {/* <Header {...headerProps} /> */}
       <FlatList
         data={dynamicItems}
         renderItem={renderItem}
-        keyExtractor={item => {
-          return item.id
-        }}
+        keyExtractor={item => item.id}
         onEndReachedThreshold={1}
         refreshing={refreshing}
         style={styles.listStyle}

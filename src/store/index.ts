@@ -20,7 +20,7 @@ const store = proxy<{
   // ----------------------------
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
-  livingUps: Record<string, boolean>
+  livingUps: Record<string, string>
   checkUpdateMap: Record<string, boolean>
 }>({
   $blackUps: {},

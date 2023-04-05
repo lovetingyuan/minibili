@@ -39,13 +39,14 @@ export const useLivingInfo = (mid: number | string) => {
   )
   if (!error && roomData?.room_id && data?.room_id) {
     const living = data.live_status === 1
-    store.livingUps[mid] = living
+    const liveUrl = 'https://live.bilibili.com/' + data.room_id
+    store.livingUps[mid] = living ? liveUrl : ''
     return {
       living,
       roomId: data.room_id,
       name: roomData.info.uname,
       face: roomData.info.face,
-      liveUrl: 'https://live.bilibili.com/' + data.room_id,
+      liveUrl,
     }
   }
   return null

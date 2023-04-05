@@ -29,7 +29,7 @@ export default function RichTextItem(
       activeOpacity={0.8}
       onPress={() => {
         navigation.navigate('DynamicDetail', {
-          item: props,
+          detail: props,
         })
       }}>
       <View style={[styles.textContainer]}>
