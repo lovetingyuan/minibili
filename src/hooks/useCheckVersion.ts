@@ -22,7 +22,7 @@ export function useCheckVersion() {
   return {
     data: {
       latestVersion,
-      hasUpdate: __DEV__ ? false : hasUpdate,
+      hasUpdate, //: __DEV__ ? false : hasUpdate,
       currentVersion: version,
       downloadLink,
     },

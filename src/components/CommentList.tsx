@@ -22,12 +22,11 @@ const CommentList: React.FC<{
   return (
     <View>
       <View style={styles.divider}>
-        {/* <Divider /> */}
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={styles.commentCountContainer}>
           <Icon
             name="comment-text-outline"
             type="material-community"
-            size={16}
+            size={15}
             color="#555"
           />
           <Text style={styles.commentCount}>{allCount || 0}条评论</Text>
@@ -81,33 +80,22 @@ const styles = StyleSheet.create({
     marginVertical: 50,
   },
   divider: {
-    // position: 'relative',
-    // marginVertical: 30,
     marginVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    paddingBottom: 8,
+    paddingBottom: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  commentCountContainer: { flexDirection: 'row', alignItems: 'center' },
   commentCount: {
     color: '#555',
-    fontSize: 14,
+    fontSize: 13,
     marginRight: 12,
-    // position: 'absolute',
-    // left: 10,
-    // top: -7,
-    // zIndex: 1,
-    // backgroundColor: '#f0f0f0',
     paddingHorizontal: 8,
   },
   right: {
-    // position: 'absolute',
-    // right: 10,
-    // top: -8,
-    // zIndex: 1,
     paddingHorizontal: 8,
-    // backgroundColor: '#f2f2f2',
   },
 })
 

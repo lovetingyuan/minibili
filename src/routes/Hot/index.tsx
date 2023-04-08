@@ -36,17 +36,18 @@ export default function Hot({ navigation }: Props) {
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => {
-        return (
-          <Button
-            type="clear"
-            size="sm"
-            containerStyle={{ marginRight: 10 }}
-            onPress={() => {
-              setShowRank(true)
-            }}>
-            排行
-          </Button>
-        )
+        return null
+        // return (
+        //   <Button
+        //     type="clear"
+        //     size="sm"
+        //     containerStyle={{ marginRight: 10 }}
+        //     onPress={() => {
+        //       setShowRank(true)
+        //     }}>
+        //     排行
+        //   </Button>
+        // )
       },
     })
     const unsubscribe = navigation.addListener('tabPress', () => {

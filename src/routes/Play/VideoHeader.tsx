@@ -24,6 +24,7 @@ export default function VideoHeader(props: {
       <Pressable
         onPress={() => {
           if (isFromDynamic) {
+            navigation.goBack()
             return
           }
           store.dynamicUser = {
@@ -62,10 +63,14 @@ export default function VideoHeader(props: {
         </View>
 
         <Pressable
+          style={{ flexDirection: 'row', alignItems: 'center' }}
           onPress={() => {
             handleShareVideo(name, title, bvid)
           }}>
-          <Icon type="fontisto" name="share-a" size={13} color="#666" />
+          <Icon type="material-community" name="share" size={20} color="#666" />
+          <Text style={styles.VideoItemText}>
+            {parseNumber(videoInfo?.shareNum)}
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -103,7 +108,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   VideoItemText: {
-    color: '#666',
-    fontSize: 12,
+    color: '#555',
+    fontSize: 13,
   },
 })

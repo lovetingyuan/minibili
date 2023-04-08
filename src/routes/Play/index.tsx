@@ -89,7 +89,7 @@ const PlayPage = ({ route }: Props) => {
                   }}>
                   <Text style={styles.text}>{bvid}</Text>
                 </Pressable>
-                <Text> - </Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}> · </Text>
                 <Text style={styles.text}>{videoInfo?.tname}</Text>
               </View>
             }

@@ -23,6 +23,7 @@ const getVideoItem = (data: VideoInfoResponse) => {
     title: data.title,
     likeNum: data.stat.like,
     replyNum: data.stat.reply,
+    shareNum: data.stat.share,
     viewNum: data.stat.view,
     cover: data.pic,
     // videosNum: data.pages.length,

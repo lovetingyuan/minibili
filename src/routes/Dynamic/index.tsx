@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     paddingVertical: 18,
     paddingHorizontal: 12,
-    borderBottomColor: '#eaeaea',
+    borderBottomColor: '#ddd',
     borderBottomWidth: 1,
   },
   bottomEnd: {

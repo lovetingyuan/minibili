@@ -94,10 +94,7 @@ const DynamicDetail: React.FC<
                   size={22}
                   color="#666"
                 />
-                <Text style={styles.text}>
-                  {parseNumber(forwardCount)}
-                  {'  '}
-                </Text>
+                <Text style={styles.text}>{parseNumber(forwardCount)}</Text>
               </Pressable>
             </View>
           }
@@ -194,6 +191,6 @@ const styles = StyleSheet.create({
     color: '#555',
     fontSize: 13,
   },
-  share: { flexDirection: 'row', alignItems: 'center' },
+  share: { flexDirection: 'row', alignItems: 'center', gap: 3 },
 })
 export default DynamicDetail
