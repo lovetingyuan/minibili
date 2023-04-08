@@ -54,9 +54,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   React.useEffect(() => {
     navigation.setOptions({
       headerTitle: () => {
-        if (!dynamicUser) {
-          return '动态'
-        }
         return (
           <View style={{ position: 'relative', left: -20 }}>
             <HeaderLeft
@@ -64,10 +61,12 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
               fans={fans?.follower}
               width={width}
               gotoWebPage={() => {
-                navigation.navigate('WebPage', {
-                  url: `https://space.bilibili.com/${dynamicUser.mid}`,
-                  title: dynamicUser.name + '的主页',
-                })
+                if (dynamicUser) {
+                  navigation.navigate('WebPage', {
+                    url: `https://space.bilibili.com/${dynamicUser.mid}`,
+                    title: dynamicUser.name + '的主页',
+                  })
+                }
               }}
               scrollTop={() => {
                 dynamicListRef.current?.scrollToIndex({

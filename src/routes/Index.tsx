@@ -13,9 +13,9 @@ import { NetToast } from '../components/NetToast'
 import { SWRConfig } from 'swr'
 import fetcher from '../api/fetcher'
 import DynamicDetail from './DynamicDetail'
-import { Image, Pressable, Linking, Alert } from 'react-native'
+import { Image, Pressable, Linking, Alert, View, Text } from 'react-native'
 import { openBiliVideo } from '../utils'
-import { Button } from '@rneui/themed'
+import { Avatar, Button } from '@rneui/themed'
 import { site } from '../constants'
 import { useCheckVersion } from '../hooks/useCheckVersion'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -121,9 +121,28 @@ export default () => {
             name="DynamicDetail"
             component={DynamicDetail}
             options={props => {
-              const { name, id } = props.route.params.detail
+              const { name, id, face } = props.route.params.detail
               return {
-                headerTitle: name + '的动态', // props.route.params.name,
+                // headerTitle: name + '的动态', // props.route.params.name,
+                headerTitle: () => {
+                  return (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 10,
+                        position: 'relative',
+                        left: -20,
+                      }}>
+                      <Avatar
+                        size={30}
+                        rounded
+                        source={{ uri: face + '@80w_80h_1c.webp' }}
+                      />
+                      <Text style={{ fontSize: 18 }}>{name}的动态</Text>
+                    </View>
+                  )
+                },
                 headerRight: () => {
                   return (
                     <Pressable

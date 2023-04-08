@@ -1,4 +1,4 @@
-import { Divider } from '@rneui/themed'
+import { Icon } from '@rneui/themed'
 import React from 'react'
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import { ReplyItem, useDynamicComments } from '../api/dynamic-comments'
@@ -22,8 +22,16 @@ const CommentList: React.FC<{
   return (
     <View>
       <View style={styles.divider}>
-        <Divider />
-        <Text style={styles.commentCount}>{allCount || 0}条评论</Text>
+        {/* <Divider /> */}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Icon
+            name="comment-text-outline"
+            type="material-community"
+            size={16}
+            color="#555"
+          />
+          <Text style={styles.commentCount}>{allCount || 0}条评论</Text>
+        </View>
         <View style={styles.right}>{props.dividerRight}</View>
       </View>
       {commentError ? (
@@ -73,29 +81,33 @@ const styles = StyleSheet.create({
     marginVertical: 50,
   },
   divider: {
-    position: 'relative',
+    // position: 'relative',
     // marginVertical: 30,
-    marginTop: 15,
-    marginBottom: 20,
+    marginVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingBottom: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   commentCount: {
-    color: '#666',
-    fontSize: 12,
+    color: '#555',
+    fontSize: 14,
     marginRight: 12,
-    position: 'absolute',
-    left: 10,
-    top: -7,
-    zIndex: 1,
-    backgroundColor: '#f0f0f0',
+    // position: 'absolute',
+    // left: 10,
+    // top: -7,
+    // zIndex: 1,
+    // backgroundColor: '#f0f0f0',
     paddingHorizontal: 8,
   },
   right: {
-    position: 'absolute',
-    right: 10,
-    top: -8,
-    zIndex: 1,
+    // position: 'absolute',
+    // right: 10,
+    // top: -8,
+    // zIndex: 1,
     paddingHorizontal: 8,
-    backgroundColor: '#f2f2f2',
+    // backgroundColor: '#f2f2f2',
   },
 })
 

@@ -73,6 +73,8 @@ export default function ForwardItem(
         </Text>
       </View>
     )
+  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_WORD) {
+    forwardContent = <Text>{props.payload.text}</Text>
   } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_NONE) {
     forwardContent = <Text>{props.payload.text}</Text>
   }

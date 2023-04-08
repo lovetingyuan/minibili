@@ -5,12 +5,15 @@ import { UserInfo } from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 
 export function HeaderLeft(props: {
-  user: UserInfo
+  user: UserInfo | null
   fans?: number
   width: number
   gotoWebPage: () => void
   scrollTop: () => void
 }) {
+  if (!props.user) {
+    return <Text>动态</Text>
+  }
   const userName = props.user.name
   return (
     <View style={styles.left}>

@@ -7,7 +7,6 @@ import DateAndOpen from './DateAndOpen'
 export default function WordItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_WORD>,
 ) {
-  // console.log(111, props)
   return (
     <TouchableOpacity
       activeOpacity={0.8}

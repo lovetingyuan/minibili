@@ -44,7 +44,6 @@ Object.keys(elements).forEach(path => {
         script?.remove()
         const eventsCode: string[] = []
         Array.from(doc.querySelectorAll('[onclick]')).forEach(el => {
-          console.log(el)
           const handler = el.getAttribute('onclick')
           const id = 'event_' + nanoid(6)
           eventsCode.push(`

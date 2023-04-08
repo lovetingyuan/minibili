@@ -9,8 +9,9 @@ export default function ImagesView(props: {
   imageIndex: number
   setImageIndex: (p: number) => void
   visible: boolean
+  setVisible: (v: boolean) => void
 }) {
-  const { images, imageIndex, visible } = props
+  const { images, imageIndex, visible, setVisible } = props
   const netinfo = useNetInfo()
 
   return (
@@ -19,7 +20,7 @@ export default function ImagesView(props: {
       fullScreen
       overlayStyle={styles.overlay}
       onBackdropPress={() => {
-        // setVisible(false)
+        setVisible(false)
       }}>
       <PagerView
         style={styles.viewPager}

@@ -1,11 +1,19 @@
 import React from 'react'
-import { View, Pressable, ScrollView, Image, StyleSheet } from 'react-native'
+import {
+  View,
+  Pressable,
+  Text,
+  ScrollView,
+  Image,
+  StyleSheet,
+} from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 import RichText from '../../components/RichText'
 import CommentList from '../../components/CommentList'
-import Header from './Header'
 import ImagesView from './ImagesView'
+import { Icon } from '@rneui/themed'
+import { handleShareVideo, parseNumber } from '../../utils'
 
 const DynamicDetail: React.FC<
   NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>
@@ -18,7 +26,6 @@ const DynamicDetail: React.FC<
     commentType,
     payload: { images },
     id,
-    face,
     forwardCount,
     likeCount,
   } = route.params.detail
@@ -27,10 +34,7 @@ const DynamicDetail: React.FC<
 
   return (
     <>
-      <View
-        style={{
-          flex: 1,
-        }}>
+      <ScrollView style={styles.scrollView}>
         <View style={styles.textContainer}>
           <RichText
             text={text}
@@ -65,28 +69,46 @@ const DynamicDetail: React.FC<
             </ScrollView>
           ) : null}
         </View>
-        <Header
-          face={face}
-          id={id}
-          forwardCount={forwardCount}
-          likeCount={likeCount}
-          name={name}
-          text={text || ''}
-          date={date}
+        <CommentList
+          upName={name}
+          commentId={commentId}
+          commentType={commentType}
+          dividerRight={
+            <View style={styles.info}>
+              <View style={styles.iconText}>
+                <Icon name="date-range" size={16} color="#666" />
+                <Text style={styles.text}>{date}</Text>
+              </View>
+              <View style={styles.iconText}>
+                <Icon name="thumb-up-off-alt" size={16} color="#666" />
+                <Text style={styles.text}>{parseNumber(likeCount)}</Text>
+              </View>
+              <Pressable
+                style={styles.share}
+                onPress={() => {
+                  handleShareVideo(name, text ? text.substring(0, 30) : '-', id)
+                }}>
+                <Icon
+                  type="material-community"
+                  name="share"
+                  size={22}
+                  color="#666"
+                />
+                <Text style={styles.text}>
+                  {parseNumber(forwardCount)}
+                  {'  '}
+                </Text>
+              </Pressable>
+            </View>
+          }
         />
-        <ScrollView style={styles.scrollView}>
-          <CommentList
-            upName={name}
-            commentId={commentId}
-            commentType={commentType}
-          />
-        </ScrollView>
-      </View>
+      </ScrollView>
       <ImagesView
         images={images}
         visible={visible}
         imageIndex={imageIndex}
         setImageIndex={setImageIndex}
+        setVisible={setVisible}
       />
     </>
   )
@@ -94,7 +116,7 @@ const DynamicDetail: React.FC<
 
 const styles = StyleSheet.create({
   textContainer: {
-    marginHorizontal: 15,
+    // marginHorizontal: 15,
     marginTop: 20,
     minHeight: 50,
     flexShrink: 1,
@@ -105,7 +127,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   imagesContainer: {
-    marginHorizontal: 15,
+    // marginHorizontal: 15,
     flexShrink: 1,
   },
   pagerImage: {
@@ -113,10 +135,11 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    height: 100,
+    // height: 100,
     flexGrow: 1,
     paddingHorizontal: 15,
-    marginTop: 10,
+    // marginTop: 10,
+    backgroundColor: 'white',
   },
   overlay: {
     padding: 0,
@@ -144,5 +167,33 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
+  upInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  upName: {
+    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  info: {
+    flexDirection: 'row',
+    flexShrink: 0,
+    minWidth: 80,
+    color: '#666',
+    alignItems: 'center',
+    gap: 10,
+  },
+  iconText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  text: {
+    color: '#555',
+    fontSize: 13,
+  },
+  share: { flexDirection: 'row', alignItems: 'center' },
 })
 export default DynamicDetail

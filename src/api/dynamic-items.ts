@@ -125,6 +125,13 @@ interface MajorLive {
   }
 }
 
+interface MajorWord {
+  type: DynamicMajorTypeEnum.MAJOR_TYPE_WORD
+  desc: {
+    text: string
+  }
+}
+
 interface MajorNone {
   type: DynamicMajorTypeEnum.MAJOR_TYPE_NONE
   none: {
@@ -194,11 +201,18 @@ export interface DynamicItemResponse<T extends DynamicType> {
           comment_id_str: string
           comment_type: number
         }
+        type?: DynamicTypeEnum
         modules: {
           module_author: Author
           module_dynamic: {
             desc: { text: string } | null
-            major: MajorAV | MajorArticle | MajorDraw | MajorLive | MajorNone
+            major:
+              | MajorAV
+              | MajorArticle
+              | MajorDraw
+              | MajorLive
+              | MajorNone
+              | MajorWord
             additional?: {
               reserve?: {
                 title?: string
@@ -347,6 +361,16 @@ const getForwardItem = (
       },
     }
   }
+  if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
+    return {
+      ...common,
+      type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+      payload: {
+        type: DynamicMajorTypeEnum.MAJOR_TYPE_WORD as const,
+        text: forward.desc?.text,
+      },
+    }
+  }
   if (forward.major?.type === DynamicMajorTypeEnum.MAJOR_TYPE_NONE) {
     return {
       ...common,
@@ -357,8 +381,7 @@ const getForwardItem = (
       },
     }
   }
-  return common
-  // return getUnknownItem(item)
+  return getUnknownForwardItem(item)
 }
 
 const getDrawItem = (
@@ -407,6 +430,18 @@ const getUnknownItem = (
   return {
     ...getCommon(item),
     type: DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN as const,
+    payload: {
+      text: '暂不支持显示',
+      type: item.type as DynamicTypeEnum,
+    },
+  }
+}
+const getUnknownForwardItem = (
+  item: DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
+) => {
+  return {
+    ...getCommon(item),
+    type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
     payload: {
       text: '暂不支持显示',
       type: item.type as DynamicTypeEnum,
