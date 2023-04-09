@@ -38,7 +38,7 @@ export default function Header() {
   return (
     <View style={styles.userContainer}>
       <Avatar
-        size={60}
+        size={55}
         onPress={() => {
           if ($userInfo) {
             store.dynamicUser = {
@@ -89,8 +89,9 @@ const styles = StyleSheet.create({
   userContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    paddingHorizontal: 18,
     paddingTop: 50,
+    paddingBottom: 15,
     backgroundColor: 'white',
   },
   infoFace: {

@@ -7,7 +7,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
   return (
-    <View style={[styles.itemContainer]}>
+    <View style={styles.itemContainer}>
       <View style={{ flex: 1 }}>
         <Image
           style={styles.image}
@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     flex: 1,
     marginVertical: 12,
+    // borderWidth: 1,
   },
   videoLength: {
     position: 'absolute',

@@ -21,7 +21,6 @@ export default React.memo(
     store.updatedUps[mid] = !!updateId
     const navigation = useNavigation<NavigationProps['navigation']>()
     const liveInfo = useLivingInfo(mid)
-
     const [modalVisible, setModalVisible] = React.useState(false)
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
       store.dynamicUser = {
@@ -66,18 +65,36 @@ export default React.memo(
         <View style={{ ...styles.container }}>
           <TouchableOpacity
             activeOpacity={0.8}
+            onLongPress={() => setModalVisible(true)}
             onPress={() => gotoDynamic(true)}>
             <Avatar
-              size={55}
-              containerStyle={{ marginRight: 15 }}
+              size={50}
               rounded
               source={{ uri: face + '@120w_120h_1c.webp' }}
             />
-            {updateId ? (
-              <Badge key={updateId} badgeStyle={styles.updateMark} />
-            ) : null}
           </TouchableOpacity>
+          {updateId ? (
+            <Badge key={updateId} badgeStyle={styles.updateMark} />
+          ) : null}
           <TouchableOpacity
+            activeOpacity={0.8}
+            onLongPress={() => setModalVisible(true)}
+            onPress={() => gotoDynamic(false)}>
+            <Text style={[styles.name]}>{name}</Text>
+          </TouchableOpacity>
+          {liveInfo?.living ? (
+            <Button
+              title="直播中~"
+              type="clear"
+              size="sm"
+              containerStyle={{ marginLeft: 10 }}
+              titleStyle={{ fontSize: 13 }}
+              onPress={gotoLivePage}
+            />
+          ) : null}
+          {/* </TouchableOpacity> */}
+        </View>
+        {/* <TouchableOpacity
             activeOpacity={0.8}
             onLongPress={() => setModalVisible(true)}
             style={styles.nameSignContainer}
@@ -94,14 +111,14 @@ export default React.memo(
                   onPress={gotoLivePage}
                 />
               ) : null}
-            </View>
-            {sign ? (
+            </View> */}
+        {/* {sign ? (
               <Text style={[styles.signText]} numberOfLines={2}>
                 {sign}
               </Text>
-            ) : null}
-          </TouchableOpacity>
-        </View>
+            ) : null} */}
+        {/* </TouchableOpacity> */}
+        {/* </View> */}
         <ButtonsOverlay
           buttons={buttons}
           onPress={handleOverlayClick}
@@ -120,23 +137,24 @@ export default React.memo(
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 10,
-    marginHorizontal: 15,
+    marginVertical: 15,
+    marginHorizontal: 10,
+    flex: 1,
   },
-  nameSignContainer: {
-    flexGrow: 1,
-    flexShrink: 1,
-  },
-  nameContainer: {
-    flexDirection: 'row',
-    marginBottom: 3,
-    alignItems: 'center',
-  },
+  // nameSignContainer: {
+  // flexGrow: 1,
+  // flexShrink: 1,
+  // },
+  // nameContainer: {
+  //   flexDirection: 'row',
+  //   marginBottom: 3,
+  //   alignItems: 'center',
+  // },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15,
+    // fontWeight: 'bold',
+    marginTop: 8,
   },
   updateMark: {
     height: 14,
@@ -144,8 +162,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fb7299',
     borderRadius: 14,
     position: 'absolute',
-    top: -50,
-    left: 45,
+    top: -45,
+    right: -30,
   },
   signText: { color: '#555', fontSize: 13 },
   liveText: { color: '#008AC5', fontSize: 14, marginLeft: 12, marginRight: 5 },

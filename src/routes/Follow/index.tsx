@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ToastAndroid,
   ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native'
 import FollowItem from './FollowItem'
 import Login from './Login'
@@ -36,6 +37,7 @@ export default function Follow({ navigation, route }: Props) {
       store.$followedUps = data.list
     }
   }, [data?.list])
+  const { width } = useWindowDimensions()
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -77,6 +79,8 @@ export default function Follow({ navigation, route }: Props) {
   const displayUps = [...topUps, ...updateUps, ...noUpdateUps]
   const isCheckingUpdate =
     Object.values(checkUpdateMap).filter(Boolean).length > 0
+  const columns = Math.floor(width / 90)
+
   return (
     <View style={styles.container}>
       <Header />
@@ -89,8 +93,11 @@ export default function Follow({ navigation, route }: Props) {
           renderItem={renderItem}
           keyExtractor={item => item.mid + ''}
           onEndReachedThreshold={1}
-          style={styles.list}
+          numColumns={columns}
           ref={followListRef}
+          contentContainerStyle={{
+            paddingTop: 20,
+          }}
           ListEmptyComponent={
             <Text style={styles.listEmptyText}>
               {isLoading
@@ -111,9 +118,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-  },
-  list: {
-    paddingTop: 18,
   },
   logo: {
     width: 160,

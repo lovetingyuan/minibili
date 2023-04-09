@@ -7,6 +7,7 @@ import {
   ToastAndroid,
   Alert,
   Linking,
+  useWindowDimensions,
 } from 'react-native'
 import * as SplashScreen from 'expo-splash-screen'
 import HotItem from './HotItem'
@@ -20,7 +21,7 @@ import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, isWifi, parseDate } from '../../utils'
-import { Button, Dialog } from '@rneui/themed'
+import { Dialog } from '@rneui/themed'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
 
@@ -96,35 +97,26 @@ export default function Hot({ navigation }: Props) {
       })
     })
   }
-  const renderItem = ({ item }: { item: [VideoItem, VideoItem?] }) => {
-    const key = item[0].bvid + (item[1] ? item[1].bvid : 'n/a')
+  const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
+    const key = item.bvid
     return (
-      <View key={key} style={styles.itemContainer}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={{ flex: 1 }}
-          onPress={() => gotoPlay(item[0])}
-          onLongPress={() => {
-            currentVideoRef.current = item[0]
-            setModalVisible(true)
-          }}>
-          <HotItem video={item[0]} key={item[0].bvid} />
-        </TouchableOpacity>
-        {item[1] ? (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={{ flex: 1, marginLeft: 8 }}
-            onPress={() => gotoPlay(item[1]!)}
-            onLongPress={() => {
-              currentVideoRef.current = item[1]!
-              setModalVisible(true)
-            }}>
-            <HotItem video={item[1]} key={item[0].bvid} />
-          </TouchableOpacity>
-        ) : (
-          <View style={{ flex: 1 }} />
-        )}
-      </View>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={[
+          styles.itemContainer,
+          {
+            paddingLeft: index % 2 ? 5 : 8,
+            paddingRight: index % 2 ? 8 : 5,
+          },
+        ]}
+        key={key}
+        onPress={() => gotoPlay(item)}
+        onLongPress={() => {
+          currentVideoRef.current = item
+          setModalVisible(true)
+        }}>
+        <HotItem video={item} />
+      </TouchableOpacity>
     )
   }
 
@@ -193,8 +185,7 @@ export default function Hot({ navigation }: Props) {
       name: 'openApp',
     },
   ].filter(Boolean)
-  const hotVideoList: [VideoItem, VideoItem?][] = []
-  let current: [VideoItem?, VideoItem?] = []
+  const hotVideoList: VideoItem[] = []
   const uniqVideosMap: Record<string, boolean> = {}
   for (const item of list) {
     if (!('_' + item.mid in $blackUps) && !(item.tag in $blackTags)) {
@@ -202,20 +193,19 @@ export default function Hot({ navigation }: Props) {
         continue
       }
       uniqVideosMap[item.bvid] = true
-      current.push(item)
-      if (current.length === 2) {
-        hotVideoList.push(current as [VideoItem, VideoItem])
-        current = []
-      }
+      hotVideoList.push(item)
     }
   }
 
-  if (current.length) {
-    hotVideoList.push(current as [VideoItem, VideoItem?])
-  }
-  if (hotVideoList.length) {
-    SplashScreen.hideAsync()
-  }
+  React.useEffect(() => {
+    if (hotVideoList.length) {
+      SplashScreen.hideAsync()
+    }
+  }, [hotVideoList.length])
+  const { width } = useWindowDimensions()
+
+  const estimatedItemSize = width / 2 - 10
+
   return (
     <View style={styles.container}>
       <ButtonsOverlay
@@ -244,9 +234,10 @@ export default function Hot({ navigation }: Props) {
         ref={v => {
           hotListRef.current = v
         }}
+        numColumns={2}
         data={hotVideoList}
         renderItem={renderItem}
-        estimatedItemSize={200}
+        estimatedItemSize={estimatedItemSize}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
@@ -277,7 +268,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 8,
+    // paddingHorizontal: 8,
   },
   listContainerStyle: { paddingTop: 14 },
   bottomEnd: {
