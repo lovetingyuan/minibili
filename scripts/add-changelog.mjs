@@ -6,7 +6,6 @@ const require = createRequire(import.meta.url);
 
 const { version } = require('../package.json')
 const appJsonFile = require.resolve('../app.json')
-const changelogFile = require.resolve('../site/public/changelog.json')
 
 inquirer
   .prompt([
@@ -22,8 +21,12 @@ inquirer
     },
   ])
   .then(answers => {
-
-    console.log(
-      `Your name is ${answers.version}, you are from ${answers.changelog} and  old.`,
-    )
+    const appJson = require(appJsonFile)
+    appJson.version = answers.version
+    appJson.ios.buildNumber = appJson.version
+    appJson.android.versionCode++
+    fs.writeFileSync(appJsonFile, JSON.stringify(appJsonFile, null, 2))
+    // console.log(
+    //   `Your name is ${answers.version}, you are from ${answers.changelog} and  old.`,
+    // )
   })
