@@ -38,6 +38,8 @@ export default function Follow({ navigation, route }: Props) {
     }
   }, [data?.list])
   const { width } = useWindowDimensions()
+  const columns = Math.floor(width / 90)
+  const rest = data?.list.length ? data.list.length % columns : 0
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -47,17 +49,24 @@ export default function Follow({ navigation, route }: Props) {
         return
       }
       try {
-        followListRef.current?.scrollToIndex({
-          index: 0,
-          animated: true,
+        followListRef.current?.scrollToOffset({
+          offset: 0,
         })
       } catch (err) {}
     })
     return unsubscribe
   }, [navigation])
 
-  const renderItem = ({ item }: { item: FollowedUpItem }) => {
-    return <FollowItem item={item} />
+  const renderItem = ({
+    item,
+  }: {
+    item: FollowedUpItem | null
+    index: number
+  }) => {
+    if (item) {
+      return <FollowItem item={item} />
+    }
+    return <View style={{ flex: 1, marginHorizontal: 10 }} />
   }
 
   if (!$userInfo) {
@@ -76,10 +85,16 @@ export default function Follow({ navigation, route }: Props) {
       noUpdateUps.push({ ...up })
     }
   }
-  const displayUps = [...topUps, ...updateUps, ...noUpdateUps]
+  const displayUps: (UserInfo | null)[] = [
+    ...topUps,
+    ...updateUps,
+    ...noUpdateUps,
+  ]
+  if (rest) {
+    displayUps.push(...Array.from({ length: rest }).map(() => null))
+  }
   const isCheckingUpdate =
     Object.values(checkUpdateMap).filter(Boolean).length > 0
-  const columns = Math.floor(width / 90)
 
   return (
     <View style={styles.container}>
@@ -91,10 +106,15 @@ export default function Follow({ navigation, route }: Props) {
         <FlatList
           data={displayUps}
           renderItem={renderItem}
-          keyExtractor={item => item.mid + ''}
+          keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
           onEndReachedThreshold={1}
           numColumns={columns}
           ref={followListRef}
+          columnWrapperStyle={{
+            // borderWidth: 1,
+            paddingHorizontal: 10,
+            // alignItems: 'flex-start',
+          }}
           contentContainerStyle={{
             paddingTop: 20,
           }}

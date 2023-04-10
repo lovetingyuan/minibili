@@ -2,16 +2,12 @@
   "downloadLink": "https://expo.dev/artifacts/eas/gxA5aRsAJKHhShVD2djRwP.apk",
   "changelog": [
     {
+      "version": "0.0.11",
+      "changes": ["优化了UI"]
+    },
+    {
       "version": "0.0.10",
       "changes": ["添加更新功能", "优化了体验"]
-    },
-    {
-      "version": "0.0.2",
-      "changes": ["修复了一些问题", "优化了体验"]
-    },
-    {
-      "version": "0.0.1",
-      "changes": ["修复了一些问题"]
     }
   ]
 }

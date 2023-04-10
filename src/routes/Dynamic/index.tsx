@@ -26,6 +26,7 @@ import { useUserRelation } from '../../api/user-relation'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import DefaultItem from './DefaultItem'
 import ArticleItem from './ArticleItem'
+import { Icon } from '@rneui/themed'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -69,8 +70,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
                 }
               }}
               scrollTop={() => {
-                dynamicListRef.current?.scrollToIndex({
-                  index: 0,
+                dynamicListRef.current?.scrollToOffset({
+                  offset: 0,
                 })
               }}
             />
@@ -189,8 +190,15 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         keyExtractor={item => item.id}
         onEndReachedThreshold={1}
         refreshing={refreshing}
-        style={styles.listStyle}
         ref={dynamicListRef}
+        ListHeaderComponent={
+          dynamicUser.sign ? (
+            <View style={styles.signTextContainer}>
+              <Icon name="billboard" type="material-community" size={20} />
+              <Text style={styles.signText}>{dynamicUser.sign.trim()}</Text>
+            </View>
+          ) : null
+        }
         onRefresh={resetDynamicItems}
         onEndReached={loadMoreDynamicItems}
         ListEmptyComponent={
@@ -225,8 +233,8 @@ const styles = StyleSheet.create({
   itemContainer: {
     paddingVertical: 18,
     paddingHorizontal: 12,
-    borderBottomColor: '#ddd',
-    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 0.5,
   },
   bottomEnd: {
     fontSize: 12,
@@ -244,6 +252,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   listStyle: { paddingTop: 15 },
+  signTextContainer: {
+    paddingHorizontal: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#aaa',
+    paddingVertical: 10,
+    flex: 1,
+    flexDirection: 'row',
+  },
+  signText: {
+    fontSize: 15,
+    lineHeight: 25,
+    marginLeft: 10,
+    flexShrink: 1,
+  },
 })
 
 export default Dynamic

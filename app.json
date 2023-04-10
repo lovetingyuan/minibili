@@ -2,7 +2,7 @@
   "expo": {
     "name": "MiniBili",
     "slug": "minibili",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "githubUrl": "https://github.com/lovetingyuan/minibili",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tingyuan.minibili",
-      "buildNumber": "0.0.10"
+      "buildNumber": "0.0.11"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +24,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.tingyuan.minibili",
-      "versionCode": 10
+      "versionCode": 11
     },
     "web": {
       "favicon": "./assets/favicon.png"

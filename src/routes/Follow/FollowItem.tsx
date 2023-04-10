@@ -12,7 +12,7 @@ import { FollowedUpItem } from '../../api/followed-ups'
 import { useHasUpdate } from '../../api/dynamic-items'
 
 export default React.memo(
-  function FollowItem(props: { item: FollowedUpItem }) {
+  function FollowItem(props: { item: FollowedUpItem; width?: number }) {
     __DEV__ && console.log('follow item', props.item.name)
     const {
       item: { face, name, sign, mid },
@@ -62,7 +62,7 @@ export default React.memo(
     })
     return (
       <>
-        <View style={{ ...styles.container }}>
+        <View style={[{ ...styles.container }]}>
           <TouchableOpacity
             activeOpacity={0.8}
             onLongPress={() => setModalVisible(true)}
@@ -92,33 +92,7 @@ export default React.memo(
               onPress={gotoLivePage}
             />
           ) : null}
-          {/* </TouchableOpacity> */}
         </View>
-        {/* <TouchableOpacity
-            activeOpacity={0.8}
-            onLongPress={() => setModalVisible(true)}
-            style={styles.nameSignContainer}
-            onPress={() => gotoDynamic(false)}>
-            <View style={styles.nameContainer}>
-              <Text style={[styles.name]}>{name}</Text>
-              {liveInfo?.living ? (
-                <Button
-                  title="直播中~"
-                  type="clear"
-                  size="sm"
-                  containerStyle={{ marginLeft: 10 }}
-                  titleStyle={{ fontSize: 13 }}
-                  onPress={gotoLivePage}
-                />
-              ) : null}
-            </View> */}
-        {/* {sign ? (
-              <Text style={[styles.signText]} numberOfLines={2}>
-                {sign}
-              </Text>
-            ) : null} */}
-        {/* </TouchableOpacity> */}
-        {/* </View> */}
         <ButtonsOverlay
           buttons={buttons}
           onPress={handleOverlayClick}
@@ -138,22 +112,12 @@ export default React.memo(
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginVertical: 15,
+    marginVertical: 12,
     marginHorizontal: 10,
     flex: 1,
   },
-  // nameSignContainer: {
-  // flexGrow: 1,
-  // flexShrink: 1,
-  // },
-  // nameContainer: {
-  //   flexDirection: 'row',
-  //   marginBottom: 3,
-  //   alignItems: 'center',
-  // },
   name: {
-    fontSize: 15,
-    // fontWeight: 'bold',
+    fontSize: 14,
     marginTop: 8,
   },
   updateMark: {
