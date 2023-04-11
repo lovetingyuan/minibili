@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "prebuild:android": "node scripts/update-version --pre",
     "postbuild:android": "node scripts/update-version --post",
-    "build:android": "npm run test && eas build --platform android --profile production",
+    "build:android": "npm run test && eas build --platform android --profile production --json --non-interactive",
     "fixdeps": "npx expo install --fix",
     "doctor": "expo-cli doctor",
     "docs": "npx vite docs --base /minibili/",
