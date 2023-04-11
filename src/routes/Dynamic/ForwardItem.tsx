@@ -75,6 +75,16 @@ export default function ForwardItem(
     )
   } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_WORD) {
     forwardContent = <Text>{props.payload.text}</Text>
+  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_LIVE) {
+    forwardContent = (
+      <View>
+        <Text>{props.payload.title}</Text>
+        <Image
+          source={{ uri: props.payload.cover }}
+          style={{ width: 100, height: 50, marginTop: 5, borderRadius: 4 }}
+        />
+      </View>
+    )
   } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_NONE) {
     forwardContent = <Text>{props.payload.text}</Text>
   }

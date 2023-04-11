@@ -39,12 +39,19 @@ export default function Login() {
       sign: data.sign,
     }
   }
-  if (error) {
-    ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
-  }
-  const storeUserId = () => {
+  React.useEffect(() => {
+    if (error) {
+      ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
+    }
+  }, [error])
+
+  const login = () => {
     if (!inputUserIdRef.current) {
       ToastAndroid.show('请输入ID', ToastAndroid.SHORT)
+      return
+    }
+    if (!/^\d{3,}$/.test(inputUserIdRef.current)) {
+      ToastAndroid.show('请输入正确的UID', ToastAndroid.SHORT)
       return
     }
     setUserId(inputUserIdRef.current)
@@ -65,7 +72,7 @@ export default function Login() {
           https://space.bilibili.com/
         </Text>
       </Pressable>
-      <Text style={styles.text}>然后输入你的B站ID</Text>
+      <Text style={styles.text}>然后输入你的B站ID(uid)</Text>
       <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20 }}>
         说明：
       </Text>
@@ -83,7 +90,7 @@ export default function Login() {
         />
         <Button
           title="登 录"
-          onPress={storeUserId}
+          onPress={login}
           titleStyle={styles.buttonTextStyle}
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainerStyle}

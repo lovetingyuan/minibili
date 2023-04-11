@@ -36,7 +36,7 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
       },
     })
     const label = <Text style={style.label}>{text}</Text>
-    if (text === '我的' && updatedCount) {
+    if (text === '关注' && updatedCount) {
       return (
         <View>
           <Badge
@@ -99,7 +99,7 @@ const MainTab = () => {
         name="Follow"
         component={Follow}
         options={{
-          tabBarLabel: getLabel('我的', updateCount, hasLiving),
+          tabBarLabel: getLabel('关注', updateCount, hasLiving),
         }}
       />
     </Tab.Navigator>

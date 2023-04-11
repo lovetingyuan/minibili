@@ -192,7 +192,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         refreshing={refreshing}
         ref={dynamicListRef}
         ListHeaderComponent={
-          dynamicUser.sign ? (
+          dynamicUser.sign && dynamicUser.sign !== '-' ? (
             <View style={styles.signTextContainer}>
               <Icon name="billboard" type="material-community" size={20} />
               <Text style={styles.signText}>{dynamicUser.sign.trim()}</Text>

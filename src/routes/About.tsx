@@ -1,11 +1,21 @@
 import React from 'react'
-import { Linking, Pressable, View, Alert, ToastAndroid } from 'react-native'
+import {
+  Linking,
+  Pressable,
+  View,
+  Alert,
+  ToastAndroid,
+  Share,
+} from 'react-native'
 import { Text } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { useSnapshot } from 'valtio'
 import store from '../store'
-import { Card, Chip, ListItem, Button } from '@rneui/themed'
-import { useCheckVersion } from '../hooks/useCheckVersion'
+import { Card, Chip, ListItem, Button, Icon } from '@rneui/themed'
+import {
+  checkUpdate as checkUpdateApi,
+  currentVersion,
+} from '../api/checkAppUpdate'
 import { githubLink, site } from '../constants'
 import { NavigationProps } from '../types'
 import { useNavigation } from '@react-navigation/native'
@@ -16,15 +26,6 @@ export default function About() {
   const [expandedUp, setExpandedUp] = React.useState(false)
   const navigation = useNavigation<NavigationProps['navigation']>()
 
-  const {
-    data: { hasUpdate, downloadLink, latestVersion, currentVersion },
-    error,
-    isLoading,
-    mutate,
-  } = useCheckVersion()
-  if (error) {
-    ToastAndroid.show('检查更新失败', ToastAndroid.SHORT)
-  }
   const handleLogOut = () => {
     Alert.alert('确定退出吗？', '', [
       {
@@ -37,84 +38,115 @@ export default function About() {
           store.updatedUps = {}
           store.dynamicUser = null
           store.$followedUps = []
+          store.livingUps = {}
+          store.$ignoredVersions = []
           navigation.goBack()
         },
       },
     ])
   }
+  const checkUpdate = () => {
+    ToastAndroid.show('请稍后...', ToastAndroid.SHORT)
+    checkUpdateApi().then(data => {
+      if (data.hasUpdate) {
+        Alert.alert(
+          '有新版本',
+          `${data.currentVersion} --> ${data.latestVersion}\n\n${data.changes
+            .map((v, i) => i + 1 + '. ' + v)
+            .join('\n')}`,
+          [
+            {
+              text: '取消',
+            },
+            {
+              text: '下载更新',
+              onPress: () => {
+                Linking.openURL(data.downloadLink!)
+              },
+            },
+          ],
+        )
+      } else {
+        ToastAndroid.show('暂无更新', ToastAndroid.SHORT)
+      }
+    })
+  }
+  const handleShare = () => {
+    Share.share({
+      message: 'MiniBili - 简单的B站浏览\n点击下载：' + site,
+    })
+  }
   return (
     <View style={styles.container}>
       <Card>
-        <Card.Title
-          style={{
-            alignSelf: 'flex-start',
-          }}>
+        <Card.FeaturedTitle>
           <Pressable
-            style={{ flexDirection: 'row', alignItems: 'center' }}
             onPress={() => {
               Linking.openURL(site)
             }}>
-            <Text style={styles.appName}>MiniBili </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: '#555',
-                width: 200,
-                alignSelf: 'flex-end',
-                position: 'relative',
-                top: -5,
-              }}>
-              当前版本：{currentVersion}
-            </Text>
+            <Text style={styles.appName}>MiniBili</Text>
           </Pressable>
-        </Card.Title>
-        <Card.Divider />
-        <View style={styles.desc}>
-          <Text style={{ fontSize: 20 }}>一款简单的B站浏览app</Text>
-          <Button
-            size="sm"
-            type="clear"
-            onPress={() => {
-              Linking.openURL(githubLink)
+        </Card.FeaturedTitle>
+        <Card.FeaturedSubtitle style={{ borderWidth: 0 }}>
+          <ListItem
+            containerStyle={{
+              padding: 0,
+              paddingBottom: 10,
             }}>
-            Github
+            <ListItem.Content>
+              <ListItem.Title style={{ fontSize: 18 }}>
+                一款简单的B站浏览app
+              </ListItem.Title>
+            </ListItem.Content>
+            <Icon
+              name="github"
+              type="material-community"
+              size={20}
+              color="#555"
+              onPress={() => {
+                Linking.openURL(githubLink)
+              }}></Icon>
+          </ListItem>
+        </Card.FeaturedSubtitle>
+        <Card.Divider />
+
+        <ListItem containerStyle={{ padding: 0 }}>
+          <ListItem.Content>
+            <ListItem.Title right>当前版本：{currentVersion}</ListItem.Title>
+          </ListItem.Content>
+          <Button
+            type="clear"
+            size="sm"
+            onPress={() => {
+              checkUpdate()
+            }}>
+            检查更新
           </Button>
-        </View>
-        <Text />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <Text style={{ fontSize: 16, color: '#555', marginRight: 20 }}>
-            当前用户ID：{$userInfo?.mid}
-          </Text>
+        </ListItem>
+        <ListItem containerStyle={{ padding: 0 }}>
+          <ListItem.Content>
+            <ListItem.Title right>当前用户ID：{$userInfo?.mid}</ListItem.Title>
+          </ListItem.Content>
           <Button type="clear" size="sm" onPress={handleLogOut}>
             退出
           </Button>
-        </View>
-        <Text style={{ marginTop: 20 }}>
-          注：本应用所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!
-        </Text>
-        <View style={{ marginTop: 15 }}>
-          <Button
-            type="outline"
-            loading={isLoading}
-            onPress={() => {
-              if (!error && !isLoading && hasUpdate && downloadLink) {
-                Linking.openURL(downloadLink)
-              } else {
-                mutate()
-              }
-            }}>
-            {isLoading
-              ? '正在检查更新...'
-              : hasUpdate
-              ? `有新版本${latestVersion}，点击下载`
-              : '检查更新'}
+        </ListItem>
+        <ListItem containerStyle={{ padding: 0 }}>
+          <ListItem.Content>
+            <ListItem.Title right>欢迎分享本应用 ❤</ListItem.Title>
+          </ListItem.Content>
+          <Button type="clear" size="sm" onPress={handleShare}>
+            分享
           </Button>
-        </View>
+        </ListItem>
+        <ListItem containerStyle={{ padding: 0, marginTop: 20 }}>
+          <ListItem.Content>
+            <ListItem.Title>声明：</ListItem.Title>
+            <ListItem.Subtitle right style={{ paddingLeft: 10, paddingTop: 5 }}>
+              本应用所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!
+            </ListItem.Subtitle>
+          </ListItem.Content>
+        </ListItem>
         <ListItem.Accordion
           containerStyle={styles.blackTitle}
           content={
@@ -184,14 +216,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  itemText: {
+    fontSize: 16,
+  },
   appName: {
     fontSize: 40,
-    // textAlign: 'left',
     color: '#fb7299',
     alignSelf: 'flex-end',
     fontWeight: 'bold',
-    // width: 300,
-    // borderWidth: 1,
+    flexShrink: 0,
+    paddingRight: 30,
   },
   desc: {
     justifyContent: 'space-between',

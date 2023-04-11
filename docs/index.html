@@ -1,20 +1,115 @@
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <!-- <link rel="icon" type="image/svg+xml" href="/vite.svg"> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MiniBili</title>
-  <script type="module" crossorigin src="/minibili/assets/index.2bd04091.js"></script>
-  <link rel="stylesheet" href="/minibili/assets/index.e245af9d.css">
+  <style>
+    #app {
+      text-align: center;
+      /* width: 600px; */
+      margin: 0 auto;
+    }
+
+    .logo {
+      max-width: 100%;
+      width: 400px;
+      margin: 50px 20px;
+    }
+
+    #download-btn {
+      display: block;
+      padding: 12px 24px;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
+      margin: 0 auto;
+      width: 200px;
+      font-size: 18px;
+      text-decoration: none;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease-in-out;
+    }
+
+    #download-btn:hover {
+      background-color: #0062cc;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    #download-btn img {
+      vertical-align: middle;
+    }
+
+    details {
+      text-align: left;
+      /* max-width: 500px; */
+      padding: 0 30px;
+      margin: 40px auto;
+    }
+
+    summary {
+      font-weight: bold;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    li {
+      word-break: break-all;
+    }
+
+  </style>
 </head>
 
 <body>
   <div id="app">
-    <main-app></main-app>
+    <img src="./minibili.webp" class="logo" alt="minibili logo">
+    <br>
+    <a href="undefined" download="MiniBili.apk" id="download-btn">
+      下载APK</a>
+    <details>
+      <summary>
+        更新日志：
+      </summary>
+      <div id="changelog">
+
+        <h5><a href="https://expo.dev/artifacts/eas/vvcwjjPgjxkx6ZQZKtEfNy.apk" target="_blank">0.0.11</a>(2023-04-10)
+        </h5>
+        <ul>
+          <li>chore</li>
+        </ul>
+
+        <h5><a href="https://expo.dev/artifacts/eas/gxA5aRsAJKHhShVD2djRwP.apk" target="_blank">0.0.10</a>(2023-04-09)
+        </h5>
+        <ul>
+          <li>chore</li>
+        </ul>
+
+        <h5><a href="https://expo.dev/artifacts/eas/iWs8pG7XeYL654P1g3VqSF.apk" target="_blank">0.0.10</a>(2023-04-08)
+        </h5>
+        <ul>
+          <li>chore</li>
+        </ul>
+
+        <h5><a href="https://expo.dev/artifacts/eas/41MKq3EjSDPDbWgcGopv43.apk" target="_blank">0.0.10</a>(2023-04-08)
+        </h5>
+        <ul>
+          <li>Merge</li>
+          <li>branch</li>
+          <li>'main'</li>
+          <li>of</li>
+          <li>https://github.com/lovetingyuan/minibili</li>
+        </ul>
+
+        <h5><a href="https://expo.dev/artifacts/eas/bSMzWLyFq9Jw5AwDNcQYdp.apk" target="_blank">0.0.10</a>(2023-04-05)
+        </h5>
+        <ul>
+          <li>0.0.10</li>
+        </ul>
+      </div>
+    </details>
   </div>
-  
 </body>
 
 </html>
