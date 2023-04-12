@@ -11,7 +11,7 @@ if (argv.pre) {
   if (!changes.trim()) {
     throw new Error('更新日志不能为空')
   }
-  await $`npm version ${newVersion} -m ${changes}`
+  await $`npm version ${newVersion} -m ${changes} --no-git-tag-version`
   const { expo } = await fs.readJson(path.resolve(__dirname, '../app.json'))
   expo.version = newVersion
   expo.ios.buildNumber = newVersion
