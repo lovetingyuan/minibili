@@ -21,94 +21,24 @@ await fs.writeJson(
   { spaces: 2 },
 )
 
-/**
- * [
-  {
-    "id": "3b3a18ae-e3fa-4b5a-b8e9-c22a848f8cbf",
-    "status": "FINISHED",
-    "platform": "ANDROID",
-    "artifacts": {
-      "buildUrl": "https://expo.dev/artifacts/eas/8jbW8US56Y9Mp1Tkx3fRKM.apk",
-      "applicationArchiveUrl": "https://expo.dev/artifacts/eas/8jbW8US56Y9Mp1Tkx3fRKM.apk"
-    },
-    "initiatingActor": {
-      "id": "7fe27145-df05-4123-8102-627699be725a",
-      "displayName": "tingyuan"
-    },
-    "project": {
-      "id": "17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
-      "name": "MiniBili",
-      "slug": "minibili",
-      "ownerAccount": {
-        "id": "5ff38c4f-cd29-466d-94d1-bb863a85a56e",
-        "name": "tingyuan"
-      }
-    },
-    "releaseChannel": "production",
-    "distribution": "STORE",
-    "buildProfile": "production",
-    "sdkVersion": "48.0.0",
-    "appVersion": "0.0.13",
-    "appBuildVersion": "15",
-    "gitCommitHash": "972b3700a6a46d9b63355fd4d969599d9be504db",
-    "gitCommitMessage": "chore",
-    "priority": "NORMAL",
-    "createdAt": "2023-04-12T05:03:24.876Z",
-    "updatedAt": "2023-04-12T05:12:30.128Z",
-    "completedAt": "2023-04-12T05:12:20.925Z",
-    "resourceClass": "ANDROID_MEDIUM"
-  }
-]
- */
-echo(chalk.cyan(latestBuild.artifacts.applicationArchiveUrl))
+echo(chalk.cyan('https://expo.dev/accounts/tingyuan/projects/minibili/builds'))
+
 const buildOutput = await spinner('eas building...', () => {
   return $`eas build --platform android --profile production --json --non-interactive`
 })
 
-const output = await spinner(
+const buildList = await spinner(
   'get eas build list...',
   () => $`eas build:list --platform android --limit 5 --json --non-interactive`,
 )
-const buildList = JSON.parse(output.toString('utf8').trim())
-const latestBuild = buildList[0]
-const { Window } = require('happy-dom')
 
-const { document } = new Window({
-  url: 'http://localhost',
-  settings: {
-    disableJavaScriptEvaluation: true,
-    disableJavaScriptFileLoading: true,
-    disableCSSFileLoading: true,
-    disableIframePageLoading: true,
-    enableFileSystemHttpRequests: false,
-  },
-})
-const htmlFile = path.resolve(__dirname, '../docs/index.html')
-document.write(fs.readFileSync(htmlFile, 'utf8'))
-document.getElementById('changelog').innerHTML = `
-  ${buildList
-    .map(change => {
-      const apkUrl =
-        change.artifacts.applicationArchiveUrl || change.artifacts.buildUrl
-      const updateMessage = change.gitCommitMessage.split('  ')
-      const buildDate = change.completedAt.split('T')[0]
-      const version = change.appVersion
-      return `
-    <h4><a href="${apkUrl}" target="_blank">${version}</a> (${buildDate})</h4>
-    <ul>
-      ${updateMessage
-        .map(msg => {
-          return `<li>${msg}</li>`
-        })
-        .join('\n')}
-      </ul>`
-    })
-    .join('\n')}
-  `
-document.getElementById('download-btn').href =
-  latestBuild.artifacts.applicationArchiveUrl || latestBuild.artifacts.buildUrl
-await fs.outputFile(htmlFile, document.documentElement.outerHTML)
+await fs.outputFile(
+  path.resolve(__dirname, '../docs/version.json'),
+  buildList.toString('utf8').trim(),
+)
+
 await $`git commit -a --amend -C HEAD`
 
 await spinner('git push...', () => retry(3, () => $`git push`))
+
 echo(chalk.green('build done!'))

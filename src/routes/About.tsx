@@ -51,9 +51,9 @@ export default function About() {
       if (data.hasUpdate) {
         Alert.alert(
           '有新版本',
-          `${data.currentVersion} --> ${data.latestVersion}\n\n${data.changes
-            .map((v, i) => i + 1 + '. ' + v)
-            .join('\n')}`,
+          `${data.currentVersion} --> ${
+            data.latestVersion
+          }\n\n${data.changes.join('\n')}`,
           [
             {
               text: '取消',
