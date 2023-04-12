@@ -13,8 +13,8 @@ if (argv.pre) {
   }
   await $`npm version ${newVersion} -m ${changes}`
   const { expo } = await fs.readJson(path.resolve(__dirname, '../app.json'))
-  expo.version = answers.version
-  expo.ios.buildNumber = answers.version
+  expo.version = newVersion
+  expo.ios.buildNumber = newVersion
   expo.android.versionCode++
   await fs.writeJson(path.resolve(__dirname, '../app.json'), { expo })
 } else if (argv.post) {
