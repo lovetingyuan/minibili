@@ -10,7 +10,7 @@ const changes = await question('更新日志（使用双空格分开）')
 if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
-await $`npm version ${newVersion} -m ${changes} --no-git-tag-version`
+await $`npm version ${newVersion} -m ${changes}`
 const { expo } = await fs.readJson(path.resolve(__dirname, '../app.json'))
 expo.version = newVersion
 expo.ios.buildNumber = newVersion
@@ -106,8 +106,10 @@ document.getElementById('changelog').innerHTML = `
   `
 document.getElementById('download-btn').href = latestBuild.apkUrl
 await fs.outputFile(htmlFile, document.documentElement.outerHTML)
+await $`git commit -a --amend -C HEAD`
+
 await spinner(
-  'git commit...',
-  () => $`git add . && git commit --amend -C HEAD && git push`,
+  'git push...',
+  retry(3, () => $`git push`),
 )
 echo(chalk.green('build done!'))
