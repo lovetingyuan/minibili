@@ -1,5 +1,5 @@
 #!/usr/bin/env zx
-// $`git status`
+
 const { version } = require('../package.json')
 const newVersion = await question(`更新版本（${version} -> ?）`)
 const semver = require('semver')
@@ -20,11 +20,51 @@ await fs.writeJson(
   { expo },
   { spaces: 2 },
 )
-await spinner(
-  'eas building...',
-  () =>
-    $`eas build --platform android --profile production --json --non-interactive`,
-)
+
+echo('https://expo.dev/accounts/tingyuan/projects/minibili/')
+/**
+ * [
+  {
+    "id": "3b3a18ae-e3fa-4b5a-b8e9-c22a848f8cbf",
+    "status": "FINISHED",
+    "platform": "ANDROID",
+    "artifacts": {
+      "buildUrl": "https://expo.dev/artifacts/eas/8jbW8US56Y9Mp1Tkx3fRKM.apk",
+      "applicationArchiveUrl": "https://expo.dev/artifacts/eas/8jbW8US56Y9Mp1Tkx3fRKM.apk"
+    },
+    "initiatingActor": {
+      "id": "7fe27145-df05-4123-8102-627699be725a",
+      "displayName": "tingyuan"
+    },
+    "project": {
+      "id": "17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
+      "name": "MiniBili",
+      "slug": "minibili",
+      "ownerAccount": {
+        "id": "5ff38c4f-cd29-466d-94d1-bb863a85a56e",
+        "name": "tingyuan"
+      }
+    },
+    "releaseChannel": "production",
+    "distribution": "STORE",
+    "buildProfile": "production",
+    "sdkVersion": "48.0.0",
+    "appVersion": "0.0.13",
+    "appBuildVersion": "15",
+    "gitCommitHash": "972b3700a6a46d9b63355fd4d969599d9be504db",
+    "gitCommitMessage": "chore",
+    "priority": "NORMAL",
+    "createdAt": "2023-04-12T05:03:24.876Z",
+    "updatedAt": "2023-04-12T05:12:30.128Z",
+    "completedAt": "2023-04-12T05:12:20.925Z",
+    "resourceClass": "ANDROID_MEDIUM"
+  }
+]
+ */
+const buildOutput = await spinner('eas building...', () => {
+  return $`eas build --platform android --profile production --json --non-interactive`
+})
+
 const output = await spinner(
   'get eas build list...',
   () => $`eas build:list --platform android --limit 5 --json --non-interactive`,
