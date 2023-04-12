@@ -21,7 +21,6 @@ await fs.writeJson(
   { spaces: 2 },
 )
 
-echo('https://expo.dev/accounts/tingyuan/projects/minibili/')
 /**
  * [
   {
@@ -61,6 +60,7 @@ echo('https://expo.dev/accounts/tingyuan/projects/minibili/')
   }
 ]
  */
+echo(chalk.cyan(latestBuild.artifacts.applicationArchiveUrl))
 const buildOutput = await spinner('eas building...', () => {
   return $`eas build --platform android --profile production --json --non-interactive`
 })
@@ -88,7 +88,8 @@ document.write(fs.readFileSync(htmlFile, 'utf8'))
 document.getElementById('changelog').innerHTML = `
   ${buildList
     .map(change => {
-      const apkUrl = change.artifacts.applicationArchiveUrl
+      const apkUrl =
+        change.artifacts.applicationArchiveUrl || change.artifacts.buildUrl
       const updateMessage = change.gitCommitMessage.split('  ')
       const buildDate = change.completedAt.split('T')[0]
       const version = change.appVersion
@@ -104,12 +105,10 @@ document.getElementById('changelog').innerHTML = `
     })
     .join('\n')}
   `
-document.getElementById('download-btn').href = latestBuild.apkUrl
+document.getElementById('download-btn').href =
+  latestBuild.artifacts.applicationArchiveUrl || latestBuild.artifacts.buildUrl
 await fs.outputFile(htmlFile, document.documentElement.outerHTML)
 await $`git commit -a --amend -C HEAD`
 
-await spinner(
-  'git push...',
-  retry(3, () => $`git push`),
-)
+await spinner('git push...', () => retry(3, () => $`git push`))
 echo(chalk.green('build done!'))
