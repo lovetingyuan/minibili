@@ -77,7 +77,7 @@
         </details>
       </div>
       <script>
-        fetch('./version.json')
+        fetch('./version.json?_t=' + Date.now())
           .then(r => r.json())
           .then(list => {
             const latestBuild = list[0]
