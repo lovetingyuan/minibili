@@ -21,6 +21,7 @@ import Player from './VideoPlayer'
 import { useVideoInfo, VideoInfo as VideoInfoType } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
+import { isWifi } from '../../utils'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
@@ -47,17 +48,19 @@ const PlayPage = ({ route }: Props) => {
   }
   const isFromDynamic = from === 'dynamic'
   React.useEffect(() => {
-    if (!wifi) {
-      ToastAndroid.showWithGravity(
-        ' 请注意当前网络不是 Wifi ',
-        ToastAndroid.LONG,
-        ToastAndroid.CENTER,
-      )
-    }
+    isWifi().then(wifi => {
+      if (!wifi) {
+        ToastAndroid.showWithGravity(
+          ' 请注意当前网络不是 Wifi ',
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        )
+      }
+    })
     return () => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
-  }, [wifi])
+  }, [])
   return (
     <View style={styles.container}>
       <Player cover={cover} page={currentPage} bvid={bvid} />

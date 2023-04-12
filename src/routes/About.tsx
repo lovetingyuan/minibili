@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     fontWeight: 'bold',
     flexShrink: 0,
-    paddingRight: 30,
+    paddingRight: 50,
   },
   desc: {
     justifyContent: 'space-between',
