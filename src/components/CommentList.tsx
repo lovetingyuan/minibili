@@ -1,7 +1,7 @@
 import { Icon } from '@rneui/themed'
 import React from 'react'
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
-import { ReplyItem, useDynamicComments } from '../api/dynamic-comments'
+import { useDynamicComments } from '../api/dynamic-comments'
 import Comment from './Comment'
 
 const CommentList: React.FC<{
@@ -10,15 +10,12 @@ const CommentList: React.FC<{
   upName: string
   dividerRight?: React.ReactNode
 }> = props => {
-  const [comments, setComments] = React.useState<ReplyItem[] | null>(null)
   const {
-    data: { replies, allCount },
+    data: { replies: comments, allCount },
     isLoading: commentLoading,
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)
-  if (comments !== replies) {
-    setComments(replies)
-  }
+
   return (
     <View>
       <View style={styles.divider}>

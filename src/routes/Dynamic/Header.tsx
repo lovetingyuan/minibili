@@ -3,17 +3,14 @@ import React from 'react'
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import { UserInfo } from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
+import { useUserRelation } from '../../api/user-relation'
 
 export function HeaderLeft(props: {
-  user: UserInfo | null
-  fans?: number
-  width: number
+  user: UserInfo
   gotoWebPage: () => void
   scrollTop: () => void
 }) {
-  if (!props.user) {
-    return <Text>动态</Text>
-  }
+  const { data: fans } = useUserRelation(props.user.mid)
   const userName = props.user.name
   return (
     <View style={styles.left}>
@@ -37,16 +34,14 @@ export function HeaderLeft(props: {
           ellipsizeMode="head"
           style={[
             {
-              fontSize: userName
-                ? Math.min((props.width * 0.45) / userName.length, 18)
-                : 18,
+              fontSize: 16,
             },
           ]}>
           {userName}的动态
         </Text>
       </Pressable>
       <Text style={{ fontSize: 14, marginLeft: 12 }}>
-        {parseNumber(props.fans)}粉丝
+        {parseNumber(fans?.follower)}粉丝
       </Text>
     </View>
   )

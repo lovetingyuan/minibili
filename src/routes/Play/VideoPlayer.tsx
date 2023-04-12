@@ -9,12 +9,14 @@ import {
 } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
-import { useIsWifi } from '../../hooks/useIsWifi'
+// import { useIsWifi } from '../../hooks/useIsWifi'
 import { INJECTED_JAVASCRIPT } from './inject-play'
-
-function Player(props: { cover: string; page: number; bvid: string }) {
-  const { cover, page, bvid } = props
-  const isWifi = useIsWifi()
+import useMounted from '../../hooks/useMounted'
+import { isWifi } from '../../utils'
+type Props = { cover: string; page: number; bvid: string }
+function Player(props: Props & { wifi: boolean }) {
+  const { cover, page, bvid, wifi } = props
+  // const isWifi = useIsWifi()
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
@@ -86,9 +88,9 @@ function Player(props: { cover: string; page: number; bvid: string }) {
   const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
   Object.entries({
     bvid,
-    autoplay: 1,
-    highQuality: isWifi === true ? 1 : 0,
-    quality: isWifi === true ? 100 : 16,
+    autoplay: wifi ? 1 : 0,
+    highQuality: wifi ? 1 : 0,
+    quality: wifi ? 100 : 16,
     portraitFullScreen: true,
     page,
   }).forEach(([k, v]) => {
@@ -133,7 +135,18 @@ function Player(props: { cover: string; page: number; bvid: string }) {
   )
 }
 
-export default Player
+export default (props: Props) => {
+  const [wifi, setWifi] = React.useState<boolean | null>(null)
+  useMounted(() => {
+    isWifi().then(wifi => {
+      setWifi(wifi)
+    })
+  })
+  if (wifi === null) {
+    return <View style={{ width: '100%', height: '40%' }} />
+  }
+  return <Player {...props} wifi={wifi} />
+}
 const styles = StyleSheet.create({
   loadingView: {
     position: 'absolute',

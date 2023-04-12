@@ -18,6 +18,7 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
         upLike: item.up_action.like,
         top: false,
         like: item.like,
+        sex: item.member.sex,
         replies:
           item.replies?.map(v => {
             return {
@@ -41,6 +42,7 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
       upLike: item.up_action.like,
       like: item.like,
       top: true,
+      sex: item.member.sex,
       replies:
         item.replies?.map(v => {
           return {
@@ -61,7 +63,6 @@ export type ReplyItem = ReturnType<typeof getReplies>[0]
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
-  // console.log(object);
   const {
     data: res1,
     error: error1,

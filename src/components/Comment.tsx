@@ -2,6 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { ReplyItem } from '../api/dynamic-comments'
 import RichText from './RichText'
+import { Icon } from '@rneui/themed'
 
 interface Props {
   upName: string
@@ -29,7 +30,8 @@ export default function Comment(props: Props) {
           comment.top ? styles.top : null,
         ]}>
         <Text style={[styles.commentName, upStyle(comment.name)]}>
-          {comment.name}:{' '}
+          【{comment.name}】
+          {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}:{' '}
         </Text>
         <RichText text={comment.message} imageSize={18} />
         {comment.like ? (
@@ -74,6 +76,7 @@ const styles = StyleSheet.create({
   commentName: {
     fontWeight: 'bold',
     fontSize: 16,
+    verticalAlign: 'middle',
   },
   top: {
     color: '#00699D',

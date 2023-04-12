@@ -14,6 +14,7 @@ import {
 
 import store from '../../store'
 import { useUserInfo } from '../../api/user-info'
+import useMounted from '../../hooks/useMounted'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
@@ -22,14 +23,14 @@ export default function Login() {
   const inputUserIdRef = React.useRef('')
   const [tvImg, setTvImg] = React.useState(true)
   const [userId, setUserId] = React.useState('')
-  React.useEffect(() => {
+  useMounted(() => {
     const timer = setInterval(() => {
       setTvImg(v => !v)
     }, 666)
     return () => {
       clearInterval(timer)
     }
-  }, [])
+  })
   const { data, error } = useUserInfo(userId)
   if (userId && data?.mid && !store.$userInfo) {
     store.$userInfo = {

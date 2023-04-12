@@ -7,7 +7,6 @@ import {
   ToastAndroid,
   BackHandler,
   Image,
-  useWindowDimensions,
 } from 'react-native'
 import ForwardItem from './ForwardItem'
 import RichTextItem from './DrawItem'
@@ -22,11 +21,12 @@ import {
   getDynamicItems,
 } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
-import { useUserRelation } from '../../api/user-relation'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import DefaultItem from './DefaultItem'
 import ArticleItem from './ArticleItem'
 import { Icon } from '@rneui/themed'
+import useMemoizedFn from '../../hooks/useMemoizedFn'
+import useMounted from '../../hooks/useMounted'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -45,13 +45,11 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   })
   const [loading, setLoading] = React.useState(false)
   const [refreshing, setRefreshing] = React.useState(false)
-  const { dynamicUser } = useSnapshot(store)
-  const upId = dynamicUser?.mid // || specialUser?.mid
+  const dynamicUser = useSnapshot(store).dynamicUser!
+  const upId = dynamicUser.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<FlatList | null>(null)
   const [initLoad, setInitLoad] = React.useState(true)
   const [refreshHead, setRefreshHead] = React.useState(0)
-  const { data: fans } = useUserRelation(upId)
-  const { width } = useWindowDimensions()
   React.useEffect(() => {
     navigation.setOptions({
       headerTitle: () => {
@@ -59,15 +57,11 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
           <View style={{ position: 'relative', left: -20 }}>
             <HeaderLeft
               user={dynamicUser}
-              fans={fans?.follower}
-              width={width}
               gotoWebPage={() => {
-                if (dynamicUser) {
-                  navigation.navigate('WebPage', {
-                    url: `https://space.bilibili.com/${dynamicUser.mid}`,
-                    title: dynamicUser.name + '的主页',
-                  })
-                }
+                navigation.navigate('WebPage', {
+                  url: `https://space.bilibili.com/${dynamicUser.mid}`,
+                  title: dynamicUser.name + '的主页',
+                })
               }}
               scrollTop={() => {
                 dynamicListRef.current?.scrollToOffset({
@@ -80,27 +74,23 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       },
       headerTitleAlign: 'left',
       headerRight: () => {
-        if (!dynamicUser) {
-          return null
-        }
         return <HeaderRight user={dynamicUser} />
       },
     })
-  }, [navigation, dynamicUser, fans, width])
-
-  React.useEffect(() => {
-    const handler = function () {
-      if (route.params?.from === 'followed' && navigation.isFocused()) {
-        navigation.navigate('Follow')
-        return true
-      }
-      return false
+  }, [navigation, dynamicUser])
+  const handleBack = useMemoizedFn(() => {
+    if (route.params?.from === 'followed' && navigation.isFocused()) {
+      navigation.navigate('Follow')
+      return true
     }
-    BackHandler.addEventListener('hardwareBackPress', handler)
+    return false
+  })
+  useMounted(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBack)
     return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handler)
+      BackHandler.removeEventListener('hardwareBackPress', handleBack)
     }
-  }, [upId, navigation, route.params])
+  })
   const renderItem = ({ item }: any) => {
     let Item: any = DefaultItem
     if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
@@ -178,10 +168,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   React.useEffect(() => {
     resetDynamicItems()
   }, [upId])
-  const headerProps = dynamicUser // || specialUser
-  if (!headerProps) {
-    return null
-  }
   return (
     <View style={styles.container}>
       <FlatList

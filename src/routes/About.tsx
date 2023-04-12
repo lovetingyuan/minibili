@@ -84,7 +84,7 @@ export default function About() {
             onPress={() => {
               Linking.openURL(site)
             }}>
-            <Text style={styles.appName}>MiniBili</Text>
+            <Text style={styles.appName}>MiniBili </Text>
           </Pressable>
         </Card.FeaturedTitle>
         <Card.FeaturedSubtitle style={{ borderWidth: 0 }}>
@@ -95,7 +95,7 @@ export default function About() {
             }}>
             <ListItem.Content>
               <ListItem.Title style={{ fontSize: 18 }}>
-                一款简单的B站浏览app
+                一款简单的B站浏览App
               </ListItem.Title>
             </ListItem.Content>
             <Icon
@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     fontWeight: 'bold',
     flexShrink: 0,
-    paddingRight: 50,
   },
   desc: {
     justifyContent: 'space-between',

@@ -104,6 +104,16 @@ export function isWifi() {
     return state.type === 'wifi'
   })
 }
+export async function checkWifi() {
+  const wifi = await isWifi()
+  if (!wifi) {
+    ToastAndroid.showWithGravity(
+      ' 请注意当前网络不是 Wifi ',
+      ToastAndroid.LONG,
+      ToastAndroid.CENTER,
+    )
+  }
+}
 
 // export async function downloadImage(url: string) {
 //   const filename = url.split('/').pop() as string

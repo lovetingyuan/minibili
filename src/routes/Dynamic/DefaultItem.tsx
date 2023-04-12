@@ -15,9 +15,9 @@ export default function DefaultItem(
   const { livingUps } = useSnapshot(store)
   const liveUrl = livingUps[props.mid]
   const navigation = useNavigation<NavigationProps['navigation']>()
-  if (!props.payload) {
-    return <Text>hjskfhdsj{JSON.stringify(props, null, 2)}</Text>
-  }
+  // if (!props.payload) {
+  //   return <Text>{JSON.stringify(props, null, 2)}</Text>
+  // }
   if (props.payload.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
     return (
       <Button

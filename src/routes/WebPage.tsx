@@ -12,6 +12,7 @@ import store from '../store'
 import { useSnapshot } from 'valtio'
 import { Button, Icon } from '@rneui/themed'
 import { Pressable } from 'react-native'
+import useMemoizedFn from '../hooks/useMemoizedFn'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
@@ -20,31 +21,32 @@ export default ({ route, navigation }: Props) => {
   const { url } = route.params
   const webviewRef = React.useRef<WebView | null>(null)
   const { $webViewMode } = useSnapshot(store)
+  const headerRight = useMemoizedFn(() => {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Button
+          titleStyle={{ fontSize: 13 }}
+          onPress={() => {
+            store.$webViewMode = $webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
+          }}
+          size="sm"
+          type="clear">
+          {$webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
+        </Button>
+        <Pressable
+          onPress={() => {
+            webviewRef.current?.reload()
+          }}>
+          <Icon name="refresh" size={20} color="#666" />
+        </Pressable>
+      </View>
+    )
+  })
   React.useEffect(() => {
     navigation.setOptions({
-      headerRight: () => {
-        return (
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Button
-              titleStyle={{ fontSize: 13 }}
-              onPress={() => {
-                store.$webViewMode = $webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
-              }}
-              size="sm"
-              type="clear">
-              {$webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
-            </Button>
-            <Pressable
-              onPress={() => {
-                webviewRef.current?.reload()
-              }}>
-              <Icon name="refresh" size={20} color="#666" />
-            </Pressable>
-          </View>
-        )
-      },
+      headerRight,
     })
-  }, [navigation, $webViewMode])
+  }, [navigation])
   return (
     <WebView
       style={styles.container}

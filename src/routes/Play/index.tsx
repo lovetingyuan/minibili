@@ -21,25 +21,15 @@ import Player from './VideoPlayer'
 import { useVideoInfo, VideoInfo as VideoInfoType } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
-import { isWifi } from '../../utils'
+import { checkWifi, isWifi } from '../../utils'
+import useMounted from '../../hooks/useMounted'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 const PlayPage = ({ route }: Props) => {
   __DEV__ && console.log(route.name)
-  const {
-    commentId,
-    bvid,
-    name,
-    wifi,
-    title,
-    desc,
-    face,
-    cover,
-    mid,
-    date,
-    from,
-  } = route.params
+  const { commentId, bvid, name, title, desc, face, cover, mid, date, from } =
+    route.params
   const [videoInfo, setVideoInfo] = React.useState<VideoInfoType | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: vi, error } = useVideoInfo(bvid)
@@ -47,20 +37,12 @@ const PlayPage = ({ route }: Props) => {
     setVideoInfo(vi)
   }
   const isFromDynamic = from === 'dynamic'
-  React.useEffect(() => {
-    isWifi().then(wifi => {
-      if (!wifi) {
-        ToastAndroid.showWithGravity(
-          ' 请注意当前网络不是 Wifi ',
-          ToastAndroid.LONG,
-          ToastAndroid.CENTER,
-        )
-      }
-    })
+  useMounted(() => {
+    checkWifi()
     return () => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
-  }, [])
+  })
   return (
     <View style={styles.container}>
       <Player cover={cover} page={currentPage} bvid={bvid} />

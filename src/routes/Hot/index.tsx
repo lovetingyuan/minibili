@@ -35,22 +35,6 @@ export default function Hot({ navigation }: Props) {
   const [showRank, setShowRank] = React.useState(false)
 
   React.useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => {
-        return null
-        // return (
-        //   <Button
-        //     type="clear"
-        //     size="sm"
-        //     containerStyle={{ marginRight: 10 }}
-        //     onPress={() => {
-        //       setShowRank(true)
-        //     }}>
-        //     排行
-        //   </Button>
-        // )
-      },
-    })
     const unsubscribe = navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return
@@ -196,12 +180,10 @@ export default function Hot({ navigation }: Props) {
       hotVideoList.push(item)
     }
   }
+  if (hotVideoList.length) {
+    SplashScreen.hideAsync()
+  }
 
-  React.useEffect(() => {
-    if (hotVideoList.length) {
-      SplashScreen.hideAsync()
-    }
-  }, [hotVideoList.length])
   const { width } = useWindowDimensions()
 
   const estimatedItemSize = width / 2 - 10

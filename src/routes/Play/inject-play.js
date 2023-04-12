@@ -1,14 +1,5 @@
 function __$hack() {
   let videoDom
-  const timer = setInterval(() => {
-    const player = document.querySelector('.mplayer-load-layer')
-    if (player && player.style.display !== 'none') {
-      player.click()
-      document.querySelector('video')?.play()
-      clearInterval(timer)
-    }
-  }, 200)
-
   const timer2 = setInterval(() => {
     const dom = document.querySelector('.mplayer-display')
     if (dom) {
@@ -118,7 +109,6 @@ function __$hack() {
     }
   }, 1000)
   setTimeout(() => {
-    clearInterval(timer)
     clearInterval(timer2)
     clearInterval(timer3)
     clearInterval(timer4)

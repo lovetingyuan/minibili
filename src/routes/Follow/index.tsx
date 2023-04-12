@@ -32,11 +32,9 @@ export default function Follow({ navigation, route }: Props) {
     ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
     showLoadingError.current = true
   }
-  React.useEffect(() => {
-    if (data?.list) {
-      store.$followedUps = data.list
-    }
-  }, [data?.list])
+  if (!store.$followedUps.length && data?.list.length) {
+    store.$followedUps = data.list
+  }
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
   const rest = data?.list.length ? data.list.length % columns : 0
