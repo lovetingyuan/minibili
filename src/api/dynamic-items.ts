@@ -493,9 +493,11 @@ export function useHasUpdate(mid: number | string) {
       refreshInterval: 5 * 60 * 1000 + Number(delay),
     },
   )
-  React.useEffect(() => {
-    store.checkUpdateMap[mid] = isLoading
-  }, [isLoading, mid])
+  if (isLoading) {
+    store.checkingUpdateMap[mid] = true
+  } else if (store.checkingUpdateMap[mid]) {
+    store.checkingUpdateMap[mid] = false
+  }
   const { $latestUpdateIds } = useSnapshot(store)
   let latestTime = 0
   let latestId = ''

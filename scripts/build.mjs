@@ -21,7 +21,11 @@ await fs.writeJson(
   { spaces: 2 },
 )
 
-echo(chalk.cyan('https://expo.dev/accounts/tingyuan/projects/minibili/builds'))
+echo(
+  chalk.cyan(
+    'eas: https://expo.dev/accounts/tingyuan/projects/minibili/builds',
+  ),
+)
 
 const buildOutput = await spinner('eas building...', () => {
   return $`eas build --platform android --profile production --json --non-interactive`

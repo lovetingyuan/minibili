@@ -11,8 +11,7 @@
     "build:android": "npm run test && zx scripts/build.mjs",
     "fixdeps": "npx expo install --fix",
     "doctor": "expo-cli doctor",
-    "docs": "npx vite docs --base /minibili/",
-    "build:site": "cd site && npm run build",
+    "docs": "npx vite docs",
     "format": "npx prettier src --write",
     "test": "npx vitest run",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src"
@@ -67,7 +66,6 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "eslint": "^8.37.0",
-    "happy-dom": "^9.1.9",
     "prettier": "^2.8.7",
     "typescript": "^4.9.4",
     "vitest": "^0.29.7",

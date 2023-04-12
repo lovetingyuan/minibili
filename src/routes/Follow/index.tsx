@@ -22,7 +22,7 @@ type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(route.name)
-  const { $userInfo, $followedUps, livingUps, updatedUps, checkUpdateMap } =
+  const { $userInfo, $followedUps, livingUps, updatedUps, checkingUpdateMap } =
     useSnapshot(store)
   const followListRef = React.useRef<FlatList | null>(null)
 
@@ -94,7 +94,7 @@ export default function Follow({ navigation, route }: Props) {
     displayUps.push(...Array.from({ length: rest }).map(() => null))
   }
   const isCheckingUpdate =
-    Object.values(checkUpdateMap).filter(Boolean).length > 0
+    Object.values(checkingUpdateMap).filter(Boolean).length > 0
 
   return (
     <View style={styles.container}>
