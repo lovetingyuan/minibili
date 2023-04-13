@@ -21,7 +21,7 @@ import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, isWifi, parseDate } from '../../utils'
-import { Dialog } from '@rneui/themed'
+// import { Dialog } from '@rneui/themed'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
 
@@ -196,7 +196,7 @@ export default function Hot({ navigation }: Props) {
         onPress={handleOverlayClick}
         dismiss={() => setModalVisible(false)}
       />
-      <Dialog
+      {/* <Dialog
         isVisible={showRank}
         onBackdropPress={() => {
           setShowRank(false)
@@ -211,7 +211,7 @@ export default function Hot({ navigation }: Props) {
             )
           })}
         </View>
-      </Dialog>
+      </Dialog> */}
       <FlashList
         ref={v => {
           hotListRef.current = v
