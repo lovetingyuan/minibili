@@ -19,7 +19,7 @@
       .logo {
         max-width: 100%;
         width: 400px;
-        margin: 50px 20px;
+        margin: 50px auto;
       }
 
       #download-btn {
@@ -49,7 +49,7 @@
       details {
         text-align: left;
         padding: 0 30px;
-        max-width: 500px;
+        max-width: 400px;
         margin: 40px auto;
       }
 
@@ -78,8 +78,8 @@
       }
       .github {
         position: fixed;
-        top: 30px;
-        right: 30px;
+        top: 20px;
+        right: 20px;
         cursor: pointer;
       }
     </style>
@@ -144,6 +144,9 @@
           .catch(() => {
             alert('出错了，请刷新重试')
           })
+        if (location.search.includes('showchangelog=true')) {
+          document.querySelector('details').setAttribute('open', '')
+        }
       </script>
     </body>
   </head>
