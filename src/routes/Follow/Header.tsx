@@ -6,55 +6,31 @@ import { useSnapshot } from 'valtio'
 import { StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
-import { useUserInfo } from '../../api/user-info'
+// import { useUserInfo } from '../../api/user-info'
 import { useUserRelation } from '../../api/user-relation'
 import { parseNumber } from '../../utils'
 
 export default function Header() {
-  const { $userInfo } = useSnapshot(store)
+  const $userInfo = useSnapshot(store).$userInfo!
   const navigation = useNavigation<NavigationProps['navigation']>()
-
-  const { data: user } = useUserInfo($userInfo?.mid)
-  const { data: relation } = useUserRelation($userInfo?.mid)
-
-  if (!$userInfo) {
-    return <View style={styles.userContainer} />
-  }
-  if (user?.mid) {
-    if (!store.$userInfo) {
-      store.$userInfo = {
-        name: user.name,
-        face: user.face,
-        sign: user.sign,
-        mid: user.mid + '',
-      }
-    }
-    if (!store.dynamicUser) {
-      store.dynamicUser = { ...store.$userInfo }
-    }
-  }
+  const { data: relation } = useUserRelation($userInfo.mid)
   const fansCount = parseNumber(relation?.follower)
   const followedCount = parseNumber(relation?.following)
+
   return (
     <View style={styles.userContainer}>
       <Avatar
         size={55}
         onPress={() => {
-          if ($userInfo) {
-            store.dynamicUser = {
-              ...$userInfo,
-            }
-            navigation.navigate('Dynamic', {
-              from: 'followed',
-            })
+          store.dynamicUser = {
+            ...$userInfo,
           }
+          navigation.navigate('Dynamic', {
+            from: 'followed',
+          })
         }}
         rounded
-        source={
-          $userInfo.face
-            ? { uri: $userInfo.face }
-            : require('../../../assets/empty-avatar.png')
-        }
+        source={{ uri: $userInfo.face }}
       />
       <View style={styles.right}>
         <Text style={styles.myName}>

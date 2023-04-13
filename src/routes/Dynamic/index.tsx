@@ -50,34 +50,27 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   const dynamicListRef = React.useRef<FlatList | null>(null)
   const [initLoad, setInitLoad] = React.useState(true)
   const [refreshHead, setRefreshHead] = React.useState(0)
+
   React.useEffect(() => {
     navigation.setOptions({
       headerTitle: () => {
         return (
-          <View style={{ position: 'relative', left: -20 }}>
-            <HeaderLeft
-              user={dynamicUser}
-              gotoWebPage={() => {
-                navigation.navigate('WebPage', {
-                  url: `https://space.bilibili.com/${dynamicUser.mid}`,
-                  title: dynamicUser.name + '的主页',
-                })
-              }}
-              scrollTop={() => {
-                dynamicListRef.current?.scrollToOffset({
-                  offset: 0,
-                })
-              }}
-            />
-          </View>
+          <HeaderLeft
+            style={{ position: 'relative', left: -20 }}
+            scrollTop={() => {
+              dynamicListRef.current?.scrollToOffset({
+                offset: 0,
+              })
+            }}
+          />
         )
       },
       headerTitleAlign: 'left',
       headerRight: () => {
-        return <HeaderRight user={dynamicUser} />
+        return <HeaderRight />
       },
     })
-  }, [navigation, dynamicUser])
+  }, [navigation])
   const handleBack = useMemoizedFn(() => {
     if (route.params?.from === 'followed' && navigation.isFocused()) {
       navigation.navigate('Follow')

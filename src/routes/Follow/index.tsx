@@ -13,7 +13,7 @@ import Login from './Login'
 
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import store, { UserInfo } from '../../store'
+import store from '../../store'
 import { useSnapshot } from 'valtio'
 import Header from './Header'
 import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
@@ -71,9 +71,9 @@ export default function Follow({ navigation, route }: Props) {
     return <Login />
   }
 
-  const topUps: UserInfo[] = []
-  const updateUps: UserInfo[] = []
-  const noUpdateUps: UserInfo[] = []
+  const topUps: FollowedUpItem[] = []
+  const updateUps: FollowedUpItem[] = []
+  const noUpdateUps: FollowedUpItem[] = []
   for (const up of $followedUps) {
     if (livingUps[up.mid]) {
       topUps.push({ ...up })
@@ -83,7 +83,7 @@ export default function Follow({ navigation, route }: Props) {
       noUpdateUps.push({ ...up })
     }
   }
-  const displayUps: (UserInfo | null)[] = [
+  const displayUps: (FollowedUpItem | null)[] = [
     ...topUps,
     ...updateUps,
     ...noUpdateUps,

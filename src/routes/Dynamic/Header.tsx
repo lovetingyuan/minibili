@@ -1,26 +1,43 @@
 import { Avatar, Icon } from '@rneui/themed'
 import React from 'react'
-import { View, Text, StyleSheet, Pressable } from 'react-native'
-import { UserInfo } from '../../store'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+} from 'react-native'
+import store from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
+import { useSnapshot } from 'valtio'
+import { useNavigation } from '@react-navigation/native'
+import { NavigationProps } from '../../types'
 
 export function HeaderLeft(props: {
-  user: UserInfo
-  gotoWebPage: () => void
   scrollTop: () => void
+  style?: StyleProp<ViewStyle>
 }) {
-  const { data: fans } = useUserRelation(props.user.mid)
-  const userName = props.user.name
+  const { dynamicUser: user } = useSnapshot(store)
+  const { data: fans } = useUserRelation(user?.mid)
+  const userName = user?.name
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const gotoWebPage = () => {
+    navigation.navigate('WebPage', {
+      url: `https://space.bilibili.com/${user?.mid}`,
+      title: user?.name + '的主页',
+    })
+  }
   return (
-    <View style={styles.left}>
-      <Pressable onPress={props.gotoWebPage}>
+    <View style={[styles.left, props.style]}>
+      <Pressable onPress={gotoWebPage}>
         <Avatar
           size={32}
           containerStyle={{ marginRight: 12 }}
           rounded
           source={{
-            uri: props.user.face + '@240w_240h_1c.webp',
+            uri: user?.face + '@240w_240h_1c.webp',
           }}
         />
       </Pressable>
@@ -47,14 +64,15 @@ export function HeaderLeft(props: {
   )
 }
 
-export function HeaderRight(props: { user: UserInfo }) {
+export function HeaderRight() {
+  const { dynamicUser: user } = useSnapshot(store)
   return (
     <View style={styles.right}>
       <Pressable
         style={{ marginLeft: 10 }}
         onPress={() => {
-          if (props.user) {
-            handleShareUp(props.user.name, props.user.mid, props.user.sign)
+          if (user) {
+            handleShareUp(user.name, user.mid, user.sign)
           }
         }}>
         <Icon type="fontisto" name="share-a" size={13} color="#666" />

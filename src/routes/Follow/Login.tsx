@@ -56,6 +56,7 @@ export default function Login() {
       return
     }
     setUserId(inputUserIdRef.current)
+    ToastAndroid.show('请稍候...', ToastAndroid.SHORT)
   }
   return (
     <KeyboardAvoidingView
