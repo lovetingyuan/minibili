@@ -64,7 +64,7 @@ export default function Follow({ navigation, route }: Props) {
     if (item) {
       return <FollowItem item={item} />
     }
-    return <View style={{ flex: 1, marginHorizontal: 10 }} />
+    return <View style={{ flex: 1, marginHorizontal: 10, height: 20 }} />
   }
 
   if (!$userInfo) {
@@ -109,9 +109,7 @@ export default function Follow({ navigation, route }: Props) {
           numColumns={columns}
           ref={followListRef}
           columnWrapperStyle={{
-            // borderWidth: 1,
             paddingHorizontal: 10,
-            // alignItems: 'flex-start',
           }}
           contentContainerStyle={{
             paddingTop: 20,
@@ -143,8 +141,7 @@ const styles = StyleSheet.create({
   },
   bottomText: {
     textAlign: 'center',
-    paddingBottom: 30,
-    marginTop: 10,
+    paddingBottom: 10,
     color: '#555',
     fontSize: 12,
   },

@@ -22,7 +22,13 @@ export type RootStackParamList = {
     from?: string
   }
   DynamicDetail: {
-    detail: Extract<DynamicItem, { type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW }>
+    detail: Extract<
+      DynamicItem,
+      | { type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW }
+      | {
+          type: DynamicTypeEnum.DYNAMIC_TYPE_WORD
+        }
+    >
   }
   VideoList: {
     query: number

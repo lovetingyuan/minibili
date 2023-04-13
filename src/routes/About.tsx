@@ -40,7 +40,9 @@ export default function About() {
           store.$followedUps = []
           store.livingUps = {}
           store.$ignoredVersions = []
-          navigation.goBack()
+          setTimeout(() => {
+            navigation.goBack()
+          }, 100)
         },
       },
     ])

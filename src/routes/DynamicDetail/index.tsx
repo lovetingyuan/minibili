@@ -14,6 +14,7 @@ import CommentList from '../../components/CommentList'
 import ImagesView from './ImagesView'
 import { Icon } from '@rneui/themed'
 import { handleShareVideo, parseNumber } from '../../utils'
+import { DynamicTypeEnum } from '../../api/dynamic-items'
 
 const DynamicDetail: React.FC<
   NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>
@@ -24,7 +25,8 @@ const DynamicDetail: React.FC<
     date,
     commentId,
     commentType,
-    payload: { images },
+    type,
+    payload,
     id,
     forwardCount,
     likeCount,
@@ -42,33 +44,46 @@ const DynamicDetail: React.FC<
             textProps={{ style: { fontSize: 16, lineHeight: 25 } }}
           />
         </View>
-        <View style={styles.imagesContainer}>
-          {images.length ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator
-              style={{ marginVertical: 0 }}>
-              {images.map((img, i) => {
-                return (
-                  <Pressable
-                    key={img.src}
-                    onPress={() => {
-                      setImageIndex(i)
-                      setVisible(true)
-                    }}>
-                    <Image
-                      style={[styles.image, { aspectRatio: img.ratio }]}
+        {type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW ? (
+          <View style={styles.imagesContainer}>
+            {payload.images.length ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator
+                style={{ marginVertical: 0 }}>
+                {payload.images.map((img, i) => {
+                  return (
+                    <Pressable
                       key={img.src}
-                      source={{
-                        uri: img.src + '@240w_240h_1c.webp',
-                      }}
-                    />
-                  </Pressable>
-                )
-              })}
-            </ScrollView>
-          ) : null}
-        </View>
+                      onPress={() => {
+                        setImageIndex(i)
+                        setVisible(true)
+                      }}>
+                      <Image
+                        style={[styles.image, { aspectRatio: img.ratio }]}
+                        key={img.src}
+                        source={{
+                          uri: img.src + '@240w_240h_1c.webp',
+                        }}
+                      />
+                    </Pressable>
+                  )
+                })}
+              </ScrollView>
+            ) : null}
+          </View>
+        ) : type === DynamicTypeEnum.DYNAMIC_TYPE_WORD ? (
+          <View>
+            <Text>{payload.text}</Text>
+            {payload.image ? (
+              <Image
+                source={{ uri: payload.image }}
+                style={{ width: 200, height: 100, marginTop: 10 }}
+              />
+            ) : null}
+          </View>
+        ) : null}
+
         <CommentList
           upName={name}
           commentId={commentId}
@@ -100,13 +115,16 @@ const DynamicDetail: React.FC<
           }
         />
       </ScrollView>
-      <ImagesView
-        images={images}
-        visible={visible}
-        imageIndex={imageIndex}
-        setImageIndex={setImageIndex}
-        setVisible={setVisible}
-      />
+      {type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW &&
+      payload.images.length > 0 ? (
+        <ImagesView
+          images={payload.images}
+          visible={visible}
+          imageIndex={imageIndex}
+          setImageIndex={setImageIndex}
+          setVisible={setVisible}
+        />
+      ) : null}
     </>
   )
 }

@@ -1,6 +1,6 @@
 import { Button, Overlay } from '@rneui/themed'
 import React from 'react'
-import { useWindowDimensions } from 'react-native'
+import { StyleSheet, useWindowDimensions } from 'react-native'
 
 export default function ButtonsOverlay(props: {
   visible: boolean
@@ -14,6 +14,7 @@ export default function ButtonsOverlay(props: {
   buttonStyle?: any
   dismiss: () => void
 }) {
+  const { width } = useWindowDimensions()
   const Buttons = props.buttons
     .map(button => {
       if (!button) {
@@ -22,7 +23,7 @@ export default function ButtonsOverlay(props: {
       return (
         <Button
           type="clear"
-          containerStyle={{ alignItems: 'flex-start', paddingHorizontal: 12 }}
+          buttonStyle={styles.button}
           title={button.text}
           key={button.name}
           {...(button.longPress
@@ -43,7 +44,6 @@ export default function ButtonsOverlay(props: {
     })
     .filter(Boolean)
 
-  const { width } = useWindowDimensions()
   if (!Buttons.length) {
     return null
   }
@@ -53,10 +53,19 @@ export default function ButtonsOverlay(props: {
       overlayStyle={{
         paddingHorizontal: 0,
         paddingVertical: 12,
-        minWidth: width * 0.8,
+        minWidth: width * 0.6,
       }}
       onBackdropPress={props.dismiss}>
       {Buttons}
     </Overlay>
   )
 }
+
+const styles = StyleSheet.create({
+  button: {
+    width: '100%',
+    justifyContent: 'flex-start',
+    padding: 10,
+    paddingHorizontal: 20,
+  },
+})

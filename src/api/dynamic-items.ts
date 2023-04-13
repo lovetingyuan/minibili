@@ -163,12 +163,20 @@ export interface DynamicItemResponse<T extends DynamicType> {
       additional?: T extends
         | DynamicTypeEnum.DYNAMIC_TYPE_WORD
         | DynamicTypeEnum.DYNAMIC_TYPE_DRAW
-        ? {
-            reserve?: {
-              title?: string
-              desc1?: { text: string }
-            }
-          }
+        ?
+            | {
+                reserve?: {
+                  title?: string
+                  desc1?: { text: string }
+                }
+              }
+            | {
+                type: 'ADDITIONAL_TYPE_UGC'
+                ugc: {
+                  cover: string
+                  title: string
+                }
+              }
         : never
       topic?: {
         name: string
@@ -259,16 +267,25 @@ const getCommon = (item: DynamicListResponse['items'][0]) => {
 const getWordItem = (
   item: DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_WORD>,
 ) => {
+  const additional = item.modules.module_dynamic.additional
+  let text: string = ''
+  let image: string = ''
+  if (additional) {
+    if ('reserve' in additional) {
+      text = [additional?.reserve?.title, additional?.reserve?.desc1?.text]
+        .filter(Boolean)
+        .join('\n')
+    } else if ('ugc' in additional) {
+      text = additional.ugc.title
+      image = additional.ugc.cover
+    }
+  }
   return {
     ...getCommon(item),
     type: DynamicTypeEnum.DYNAMIC_TYPE_WORD as const,
     payload: {
-      text: [
-        item.modules.module_dynamic.additional?.reserve?.title,
-        item.modules.module_dynamic.additional?.reserve?.desc1?.text,
-      ]
-        .filter(Boolean)
-        .join('\n'),
+      text,
+      image,
     },
   }
 }
@@ -384,16 +401,18 @@ const getForwardItem = (
 const getDrawItem = (
   item: DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_DRAW>,
 ) => {
+  let text = ''
+  const additional = item.modules.module_dynamic.additional
+  if (additional && 'reserve' in additional) {
+    text = [additional?.reserve?.title, additional?.reserve?.desc1?.text]
+      .filter(Boolean)
+      .join('\n')
+  }
   return {
     ...getCommon(item),
     type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW as const,
     payload: {
-      text: [
-        item.modules.module_dynamic.additional?.reserve?.title,
-        item.modules.module_dynamic.additional?.reserve?.desc1?.text,
-      ]
-        .filter(Boolean)
-        .join('\n'),
+      text,
       images: item.modules?.module_dynamic?.major?.draw?.items?.map(v => {
         return {
           src: v.src,

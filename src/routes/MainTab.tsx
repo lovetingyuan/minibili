@@ -5,9 +5,10 @@ import store from '../store'
 import { useSnapshot } from 'valtio'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
-import { Text, Vibration, View, StyleSheet } from 'react-native'
-import { Badge } from '@rneui/themed'
+import { Text, Vibration, View, StyleSheet, Pressable } from 'react-native'
+import { Badge, Button, Icon, Overlay } from '@rneui/themed'
 import { RootStackParamList } from '../types'
+import { RanksConfig } from '../constants'
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
 
@@ -54,6 +55,66 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
   return labelCmp
 }
 
+const HeaderTitle = () => {
+  const [visible, setVisible] = React.useState(false)
+  const { videosType } = useSnapshot(store)
+  return (
+    <View>
+      <Pressable
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          height: '100%',
+        }}
+        onPress={() => {
+          setVisible(true)
+        }}>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 'bold',
+          }}>
+          {videosType.label +
+            (videosType.rid === -1 ? '' : '排行') +
+            (__DEV__ ? ' dev ' : ' ')}
+        </Text>
+        <Icon name="triangle-down" type="octicon" size={30} />
+      </Pressable>
+      <Overlay
+        isVisible={visible}
+        backdropStyle={{
+          backgroundColor: 'rgba(0,0,0,0.0001)',
+        }}
+        overlayStyle={{
+          paddingHorizontal: 0,
+          paddingVertical: 10,
+          position: 'absolute',
+          top: 50,
+          left: 15,
+        }}
+        onBackdropPress={() => {
+          setVisible(false)
+        }}>
+        <View style={{ width: 80 }}>
+          {RanksConfig.map(item => {
+            return (
+              <Button
+                type="clear"
+                key={item.rid}
+                onPress={() => {
+                  store.videosType = item
+                  setVisible(false)
+                }}>
+                {item.label}
+              </Button>
+            )
+          })}
+        </View>
+      </Overlay>
+    </View>
+  )
+}
+
 const MainTab = () => {
   const { updatedUps, livingUps } = useSnapshot(store)
   const updateCount = Object.values(updatedUps).filter(Boolean).length
@@ -85,8 +146,8 @@ const MainTab = () => {
         component={VideoList}
         options={() => {
           return {
-            tabBarLabel: getLabel('热门'),
-            headerTitle: '🔥 热门' + (__DEV__ ? ' dev' : ''),
+            tabBarLabel: getLabel('视频'),
+            headerTitle: HeaderTitle,
             headerTitleStyle: { fontSize: 18, color: '#555' },
             headerShown: true,
             headerRight() {

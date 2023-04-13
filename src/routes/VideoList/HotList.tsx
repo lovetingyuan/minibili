@@ -19,16 +19,17 @@ import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
-import { VideoItem } from '../../api/hot-videos'
+import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, parseDate } from '../../utils'
-import { useRankList } from '../../api/rank-list'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
-export default function Ranks({ navigation }: Props) {
-  const videoListRef = React.useRef<any>(null)
-  const { videosType, $blackUps } = useSnapshot(store)
-  const { data: list = [], isLoading } = useRankList(videosType?.rid)
+export default function Hot({ navigation }: Props) {
+  const hotListRef = React.useRef<any>(null)
+  const { $blackUps, $blackTags } = useSnapshot(store)
+
+  const { list, page, setSize, isRefreshing, loading, refresh, isReachingEnd } =
+    useHotVideos()
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -36,7 +37,7 @@ export default function Ranks({ navigation }: Props) {
         return
       }
       try {
-        videoListRef.current?.scrollToOffset({
+        hotListRef.current?.scrollToOffset({
           offset: 0,
         })
       } catch (err) {}
@@ -52,6 +53,13 @@ export default function Ranks({ navigation }: Props) {
     }
     const { mid, name } = currentVideoRef.current
     store.$blackUps['_' + mid] = name
+  }
+  const addBlackTagName = () => {
+    if (!currentVideoRef.current) {
+      return
+    }
+    const { tag } = currentVideoRef.current
+    store.$blackTags[tag] = tag
   }
   const gotoPlay = (data: VideoItem) => {
     const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
@@ -100,6 +108,14 @@ export default function Ranks({ navigation }: Props) {
         },
         { text: '确定', onPress: addBlackUp },
       ])
+    } else if (action === 'blackByTag') {
+      Alert.alert(`不再看 ${currentVideoRef.current?.tag} 类型的视频？`, '', [
+        {
+          text: '取消',
+          style: 'cancel',
+        },
+        { text: '确定', onPress: addBlackTagName },
+      ])
     } else if (action === 'share') {
       if (currentVideoRef.current) {
         setModalVisible(false)
@@ -132,6 +148,12 @@ export default function Ranks({ navigation }: Props) {
           text: `不再看 ${currentVideoRef.current?.name} 的视频`,
           name: 'black',
         },
+    currentVideoRef.current?.mid == TracyId
+      ? null
+      : {
+          text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
+          name: 'blackByTag',
+        },
     {
       text: `分享(${currentVideoRef.current?.shareNum})`,
       name: 'share',
@@ -141,18 +163,18 @@ export default function Ranks({ navigation }: Props) {
       name: 'openApp',
     },
   ].filter(Boolean)
-  const videoList: VideoItem[] = []
+  const hotVideoList: VideoItem[] = []
   const uniqVideosMap: Record<string, boolean> = {}
   for (const item of list) {
-    if (!('_' + item.mid in $blackUps)) {
+    if (!('_' + item.mid in $blackUps) && !(item.tag in $blackTags)) {
       if (item.bvid in uniqVideosMap) {
         continue
       }
       uniqVideosMap[item.bvid] = true
-      videoList.push(item)
+      hotVideoList.push(item)
     }
   }
-  if (videoList.length) {
+  if (hotVideoList.length) {
     try {
       SplashScreen.hideAsync()
     } catch (err) {}
@@ -170,12 +192,28 @@ export default function Ranks({ navigation }: Props) {
         onPress={handleOverlayClick}
         dismiss={() => setModalVisible(false)}
       />
+      {/* <Dialog
+        isVisible={showRank}
+        onBackdropPress={() => {
+          setShowRank(false)
+        }}>
+        <Dialog.Title title="分区排行" />
+        <View style={styles.rankContainer}>
+          {ranks.map(rank => {
+            return (
+              <View key={rank.rid} style={styles.rankItem}>
+                <Text>{rank.label}</Text>
+              </View>
+            )
+          })}
+        </View>
+      </Dialog> */}
       <FlashList
         ref={v => {
-          videoListRef.current = v
+          hotListRef.current = v
         }}
         numColumns={2}
-        data={videoList}
+        data={hotVideoList}
         renderItem={renderItem}
         estimatedItemSize={estimatedItemSize}
         ListEmptyComponent={
@@ -185,9 +223,15 @@ export default function Ranks({ navigation }: Props) {
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
-            {isLoading ? '加载中...' : '到底了~'}
+            {loading ? '加载中...' : isReachingEnd ? '到底了~' : ''}
           </Text>
         }
+        onEndReached={() => {
+          setSize(page + 1)
+        }}
+        onEndReachedThreshold={0.5}
+        refreshing={isRefreshing}
+        onRefresh={refresh}
         contentContainerStyle={styles.listContainerStyle}
       />
     </View>
@@ -202,6 +246,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
+    // paddingHorizontal: 8,
   },
   listContainerStyle: { paddingTop: 14 },
   bottomEnd: {

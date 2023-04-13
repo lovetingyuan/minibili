@@ -1,7 +1,7 @@
 import useSWRInfinite from 'swr/infinite'
 import { z } from 'zod'
 import fetcher from './fetcher'
-import { HotVideoResponseSchema } from './hot-videos.schema'
+import { VideoItemResponseSchema } from './hot-videos.schema'
 
 const fetcher2 = (url: string) => {
   __DEV__ && console.log('fetch hot videos: ' + url)
@@ -10,9 +10,9 @@ const fetcher2 = (url: string) => {
   )
 }
 
-export type HotVideoResponse = z.infer<typeof HotVideoResponseSchema>
+export type HotVideoResponse = z.infer<typeof VideoItemResponseSchema>
 
-const getVideo = (item: HotVideoResponse) => {
+export const getVideo = (item: HotVideoResponse) => {
   return {
     aid: item.aid,
     bvid: item.bvid,

@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy } from 'valtio'
 import { watch } from 'valtio/utils'
+import { RanksConfig } from '../constants'
 
 interface UserInfo {
   mid: number | string
@@ -24,6 +25,7 @@ const store = proxy<{
   updatedUps: Record<string, boolean>
   livingUps: Record<string, string>
   checkingUpdateMap: Record<string, boolean>
+  videosType: (typeof RanksConfig)[number]
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -37,6 +39,7 @@ const store = proxy<{
   updatedUps: {},
   livingUps: {},
   checkingUpdateMap: {},
+  videosType: RanksConfig[0],
 })
 
 const StoragePrefix = 'Store:'
@@ -45,7 +48,9 @@ Object.keys(store)
   // 以$开头的数据表示需要持久化存储
   .filter(k => k.startsWith('$'))
   .forEach((k: string) => {
-    const key = k as keyof typeof store
+    type Keys = keyof typeof store
+    type StoredKeys<K extends Keys> = K extends `$${string}` ? K : never
+    const key = k as StoredKeys<Keys>
     AsyncStorage.getItem(StoragePrefix + key)
       .then(data => {
         if (data) {

@@ -3,7 +3,15 @@ export const githubLink = 'https://github.com/lovetingyuan/minibili'
 export const site = 'https://lovetingyuan.github.io/minibili/'
 export const changelogUrl = site + 'version.json'
 
-export const ranks = [
+export const RanksConfig = [
+  {
+    rid: -1,
+    label: '热门',
+  },
+  {
+    rid: 0,
+    label: '全站',
+  },
   {
     rid: 1,
     label: '动画',
