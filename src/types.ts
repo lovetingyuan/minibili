@@ -7,7 +7,7 @@ export type RootStackParamList = {
     bvid: string
     name: string
     mid: string | number
-    wifi: boolean
+    // wifi: boolean
     face: string
     date: string
     cover: string
@@ -24,7 +24,7 @@ export type RootStackParamList = {
   DynamicDetail: {
     detail: Extract<DynamicItem, { type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW }>
   }
-  Hot: {
+  VideoList: {
     query: number
   }
   Follow: undefined

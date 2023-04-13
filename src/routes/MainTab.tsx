@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import Follow from './Follow'
-import Hot from './Hot'
+import VideoList from './VideoList'
 import store from '../store'
 import { useSnapshot } from 'valtio'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
@@ -65,7 +65,7 @@ const MainTab = () => {
   }, [hasLiving])
   return (
     <Tab.Navigator
-      initialRouteName="Hot"
+      initialRouteName="VideoList"
       screenOptions={{
         headerShown: false,
         tabBarIconStyle: {
@@ -81,8 +81,8 @@ const MainTab = () => {
         tabBarActiveTintColor: '#FB7299',
       }}>
       <Tab.Screen
-        name="Hot"
-        component={Hot}
+        name="VideoList"
+        component={VideoList}
         options={() => {
           return {
             tabBarLabel: getLabel('热门'),

@@ -17,11 +17,11 @@ import * as Clipboard from 'expo-clipboard'
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
-import Player from './VideoPlayer'
+import Player from './Player'
 import { useVideoInfo, VideoInfo as VideoInfoType } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
-import { checkWifi, isWifi } from '../../utils'
+import { checkWifi } from '../../utils'
 import useMounted from '../../hooks/useMounted'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>

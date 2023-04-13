@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from 'react-native'
 import * as SplashScreen from 'expo-splash-screen'
-import HotItem from './HotItem'
+import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
@@ -20,10 +20,9 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, isWifi, parseDate } from '../../utils'
-// import { Dialog } from '@rneui/themed'
+import { handleShareVideo, parseDate } from '../../utils'
 
-type Props = BottomTabScreenProps<RootStackParamList, 'Hot'>
+type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
 export default function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
@@ -66,19 +65,16 @@ export default function Hot({ navigation }: Props) {
   }
   const gotoPlay = (data: VideoItem) => {
     const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
-    isWifi().then(wifi => {
-      navigation.navigate('Play', {
-        mid,
-        bvid,
-        name,
-        commentId: aid,
-        wifi,
-        face,
-        cover,
-        desc,
-        title,
-        date: parseDate(pubDate),
-      })
+    navigation.navigate('Play', {
+      mid,
+      bvid,
+      name,
+      commentId: aid,
+      face,
+      cover,
+      desc,
+      title,
+      date: parseDate(pubDate),
     })
   }
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {

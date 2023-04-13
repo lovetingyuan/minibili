@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy } from 'valtio'
 import { watch } from 'valtio/utils'
+
 interface UserInfo {
   mid: number | string
   name: string

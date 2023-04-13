@@ -26,20 +26,17 @@ export default function VideoItem(
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
-        isWifi().then(wifi => {
-          navigation.push('Play', {
-            bvid,
-            commentId,
-            mid,
-            name,
-            wifi,
-            face,
-            cover,
-            desc,
-            title,
-            date,
-            from: 'dynamic',
-          })
+        navigation.push('Play', {
+          bvid,
+          commentId,
+          mid,
+          name,
+          face,
+          cover,
+          desc,
+          title,
+          date,
+          from: 'dynamic',
         })
       }}>
       {text ? (
