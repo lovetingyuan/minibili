@@ -7,4 +7,5 @@ module.exports = {
   rules: {
     semi: 'off',
   },
+  ignorePatterns: ['scripts/build.mjs'],
 }

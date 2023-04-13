@@ -1,11 +1,8 @@
-// import React from 'react'
-// import { GetFuncPromiseType } from '../types'
 import request from './fetcher'
 import useSWR from 'swr'
 import { useSnapshot } from 'valtio'
 import store from '../store'
 import PQueue from 'p-queue'
-import React from 'react'
 
 export type DynamicItem =
   | ReturnType<typeof getWordItem>

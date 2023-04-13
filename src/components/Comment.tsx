@@ -2,7 +2,6 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { ReplyItem } from '../api/dynamic-comments'
 import RichText from './RichText'
-import { Icon } from '@rneui/themed'
 
 interface Props {
   upName: string

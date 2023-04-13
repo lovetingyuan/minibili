@@ -1,12 +1,6 @@
-// import { useNavigation } from '@react-navigation/core'
-// import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
-// import { NavigationProps } from '../../types'
-// import { RootStackParamList } from '../../types'
-
-// type NavigationProps = NativeStackScreenProps<RootStackParamList>
 
 export default function DateAndOpen(props: {
   id: string | number
@@ -15,7 +9,6 @@ export default function DateAndOpen(props: {
   top?: boolean
   title: string
 }) {
-  // const navigation = useNavigation<NavigationProps['navigation']>()
   return (
     <View style={styles.info}>
       <SimpleVideoInfo

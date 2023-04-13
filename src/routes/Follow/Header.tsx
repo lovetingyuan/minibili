@@ -6,7 +6,6 @@ import { useSnapshot } from 'valtio'
 import { StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
-// import { useUserInfo } from '../../api/user-info'
 import { useUserRelation } from '../../api/user-relation'
 import { parseNumber } from '../../utils'
 

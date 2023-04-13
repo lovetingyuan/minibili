@@ -1,4 +1,3 @@
-import useSWR from 'swr'
 import * as Application from 'expo-application'
 import { changelogUrl } from '../constants'
 
@@ -59,21 +58,3 @@ export const checkUpdate = (url = changelogUrl) => {
       }
     })
 }
-
-// export function useCheckVersion() {
-//   const { data, mutate, isLoading, isValidating, error } = useSWR<{
-//     hasUpdate: boolean
-//     latestVersion: string
-//     downloadLink: string
-//     currentVersion: string | null
-//     changes: string[]
-//   }>(changelogUrl, checkUpdate)
-
-//   return {
-//     data,
-//     mutate,
-//     isLoading,
-//     isValidating,
-//     error,
-//   }
-// }
