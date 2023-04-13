@@ -5,7 +5,6 @@ import RichText from '../../components/RichText'
 import { NavigationProps } from '../../types'
 import { SimpleVideoInfo } from '../../components/PlayInfo'
 import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
-import { isWifi } from '../../utils'
 
 export default function VideoItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_AV>,

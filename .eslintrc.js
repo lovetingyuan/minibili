@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   extends: '@react-native-community',
-  parseOptions: {
+  parserOptions: {
     ecmaVersion: 2022,
   },
   rules: {

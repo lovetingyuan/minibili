@@ -105,7 +105,8 @@ export default function About() {
               color="#555"
               onPress={() => {
                 Linking.openURL(githubLink)
-              }}></Icon>
+              }}
+            />
           </ListItem>
         </Card.FeaturedSubtitle>
         <Card.Divider />

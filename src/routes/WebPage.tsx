@@ -46,7 +46,7 @@ export default ({ route, navigation }: Props) => {
     navigation.setOptions({
       headerRight,
     })
-  }, [navigation])
+  }, [navigation, headerRight])
   return (
     <WebView
       style={styles.container}

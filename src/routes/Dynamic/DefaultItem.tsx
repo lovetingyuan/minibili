@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Button } from '@rneui/themed'
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import { useSnapshot } from 'valtio'
 import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
 import RichText from '../../components/RichText'

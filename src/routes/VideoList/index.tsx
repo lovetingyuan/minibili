@@ -15,7 +15,7 @@ import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import ButtonsOverlay from '../../components/ButtonsOverlay'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
-import { TracyId, ranks } from '../../constants'
+import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
@@ -30,8 +30,6 @@ export default function Hot({ navigation }: Props) {
 
   const { list, page, setSize, isRefreshing, loading, refresh, isReachingEnd } =
     useHotVideos()
-
-  const [showRank, setShowRank] = React.useState(false)
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {

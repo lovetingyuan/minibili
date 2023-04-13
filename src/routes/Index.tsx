@@ -39,8 +39,12 @@ setTimeout(() => {
 
 setTimeout(() => {
   checkUpdate().then(data => {
-    if (!data.hasUpdate) return
-    if (store.$ignoredVersions.includes(data.latestVersion)) return
+    if (!data.hasUpdate) {
+      return
+    }
+    if (store.$ignoredVersions.includes(data.latestVersion)) {
+      return
+    }
     Alert.alert(
       '有新版本',
       `${data.currentVersion} --> ${data.latestVersion}\n\n${data.changes.join(
