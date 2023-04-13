@@ -13,13 +13,15 @@ import { NetToast } from '../components/NetToast'
 import { SWRConfig } from 'swr'
 import fetcher from '../api/fetcher'
 import DynamicDetail from './DynamicDetail'
-import { Image, Pressable, Linking, Alert, View, Text } from 'react-native'
-import { openBiliVideo } from '../utils'
-import { Avatar, Button } from '@rneui/themed'
+import { Linking, Alert } from 'react-native'
+import { Button } from '@rneui/themed'
 import { site } from '../constants'
 import { checkUpdate } from '../api/checkAppUpdate'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import store from '../store'
+import HeaderTitle from './DynamicDetail/HeaderTitle'
+import HeaderRight from './DynamicDetail/HeaderRight'
+import PlayHeaderRight from './Play/HeaderRight'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -73,6 +75,19 @@ setTimeout(() => {
   })
 }, 1000)
 
+const AboutHeaderRight = () => {
+  return (
+    <Button
+      type="clear"
+      size="sm"
+      onPress={() => {
+        Linking.openURL(site + '?showchangelog=true')
+      }}>
+      更新日志
+    </Button>
+  )
+}
+
 export default () => {
   return (
     <SWRConfig
@@ -108,19 +123,7 @@ export default () => {
             options={props => {
               return {
                 headerTitle: props.route.params.name,
-                headerRight: () => {
-                  return (
-                    <Pressable
-                      onPress={() => {
-                        openBiliVideo(props.route.params.bvid)
-                      }}>
-                      <Image
-                        style={{ width: 36, height: 14 }}
-                        source={require('../../assets/bili-text.png')}
-                      />
-                    </Pressable>
-                  )
-                },
+                headerRight: () => PlayHeaderRight(props),
               }
             }}
           />
@@ -128,41 +131,9 @@ export default () => {
             name="DynamicDetail"
             component={DynamicDetail}
             options={props => {
-              const { name, id, face } = props.route.params.detail
               return {
-                // headerTitle: name + '的动态', // props.route.params.name,
-                headerTitle: () => {
-                  return (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 10,
-                        position: 'relative',
-                        left: -20,
-                      }}>
-                      <Avatar
-                        size={30}
-                        rounded
-                        source={{ uri: face + '@80w_80h_1c.webp' }}
-                      />
-                      <Text style={{ fontSize: 18 }}>{name}的动态</Text>
-                    </View>
-                  )
-                },
-                headerRight: () => {
-                  return (
-                    <Pressable
-                      onPress={() => {
-                        Linking.openURL(`https://m.bilibili.com/dynamic/${id}`)
-                      }}>
-                      <Image
-                        style={{ width: 36, height: 14 }}
-                        source={require('../../assets/bili-text.png')}
-                      />
-                    </Pressable>
-                  )
-                },
+                headerTitle: () => HeaderTitle(props),
+                headerRight: () => HeaderRight(props),
               }
             }}
           />
@@ -180,18 +151,7 @@ export default () => {
             component={About}
             options={{
               headerTitle: '关于',
-              headerRight: () => {
-                return (
-                  <Button
-                    type="clear"
-                    size="sm"
-                    onPress={() => {
-                      Linking.openURL(site)
-                    }}>
-                    更新日志
-                  </Button>
-                )
-              },
+              headerRight: AboutHeaderRight,
             }}
           />
         </Stack.Navigator>

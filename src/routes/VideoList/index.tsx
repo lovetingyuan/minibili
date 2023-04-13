@@ -175,7 +175,9 @@ export default function Hot({ navigation }: Props) {
     }
   }
   if (hotVideoList.length) {
-    SplashScreen.hideAsync()
+    try {
+      SplashScreen.hideAsync()
+    } catch (err) {}
   }
 
   const { width } = useWindowDimensions()
