@@ -50,6 +50,7 @@ try {
 
   echo(chalk.green('build done!'))
 } catch (err) {
+  await $`git checkout -- .`
   await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
   const { expo } = await fs.readJson(path.resolve(__dirname, '../app.json'))
   expo.version = version
