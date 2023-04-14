@@ -6,12 +6,8 @@ function __$hack() {
       clearInterval(timer2)
       dom.ondblclick = () => {
         const video = document.querySelector('video')
-        if (video) {
-          if (video.paused) {
-            video.play()
-          } else {
-            video.pause()
-          }
+        if (video && !video.paused) {
+          video.pause()
         }
       }
     }
@@ -119,7 +115,7 @@ function __$hack() {
   document.addEventListener('touchstart', function (e) {
     startY = e.touches[0].clientY
   })
-  // let video
+
   document.addEventListener('touchmove', function (e) {
     endY = e.touches[0].clientY
     if (videoDom && videoDom.ended) {
@@ -143,4 +139,4 @@ function __$hack() {
   })
 }
 
-export const INJECTED_JAVASCRIPT = `(${__$hack})();`
+export const INJECTED_JAVASCRIPT = `(${__$hack})();true;`

@@ -71,14 +71,14 @@ const HeaderTitle = () => {
         }}>
         <Text
           style={{
-            fontSize: 20,
+            fontSize: 19,
             fontWeight: 'bold',
           }}>
           {videosType.label +
             (videosType.rid === -1 ? '' : '排行') +
             (__DEV__ ? ' dev ' : ' ')}
         </Text>
-        <Icon name="triangle-down" type="octicon" size={30} />
+        <Icon name="triangle-down" type="octicon" size={28} />
       </Pressable>
       <Overlay
         isVisible={visible}
