@@ -3,6 +3,9 @@
   "version": "0.0.20",
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
+  "engines": {
+    "node": ">=18.15.0"
+  },
   "scripts": {
     "start": "expo start",
     "android": "adb devices -l && npx expo start -c --android",
