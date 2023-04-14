@@ -36,7 +36,7 @@ try {
   const buildList = await spinner(
     'get eas build list...',
     () =>
-      $`eas build:list --platform android --limit 5 --json --non-interactive`,
+      $`eas build:list --platform android --limit 5 --json --non-interactive --status finished`,
   )
 
   await fs.outputFile(
