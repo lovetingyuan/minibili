@@ -8,6 +8,7 @@ import {
   Alert,
   Linking,
   useWindowDimensions,
+  ActivityIndicator,
 } from 'react-native'
 import * as SplashScreen from 'expo-splash-screen'
 import HotItem from './VideoItem'
@@ -184,9 +185,18 @@ export default function Ranks({ navigation }: Props) {
           </Text>
         }
         ListFooterComponent={
-          <Text style={styles.bottomEnd}>
-            {isLoading ? '加载中...' : '到底了~'}
-          </Text>
+          <View>
+            <Text style={styles.bottomEnd}>
+              {isLoading ? '加载中...' : '到底了~'}
+            </Text>
+            {isLoading ? (
+              <ActivityIndicator
+                color="blue"
+                animating
+                style={{ marginTop: 30 }}
+              />
+            ) : null}
+          </View>
         }
         contentContainerStyle={styles.listContainerStyle}
       />
