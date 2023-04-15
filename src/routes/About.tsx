@@ -2,10 +2,10 @@ import React from 'react'
 import {
   Linking,
   Pressable,
-  View,
   Alert,
   ToastAndroid,
   Share,
+  ScrollView,
 } from 'react-native'
 import { Text } from 'react-native'
 import { StyleSheet } from 'react-native'
@@ -24,6 +24,7 @@ export default function About() {
   const { $userInfo, $blackTags, $blackUps } = useSnapshot(store)
   const [expanded, setExpanded] = React.useState(false)
   const [expandedUp, setExpandedUp] = React.useState(false)
+  const [expandedStatement, setExpandedStatement] = React.useState(true)
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   const handleLogOut = () => {
@@ -79,7 +80,7 @@ export default function About() {
     })
   }
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Card>
         <Card.FeaturedTitle>
           <Pressable
@@ -142,14 +143,24 @@ export default function About() {
             分享
           </Button>
         </ListItem>
-        <ListItem containerStyle={{ padding: 0, marginTop: 20 }}>
-          <ListItem.Content>
-            <ListItem.Title>声明：</ListItem.Title>
-            <ListItem.Subtitle right style={{ paddingLeft: 10, paddingTop: 5 }}>
-              本应用所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!
+        <ListItem.Accordion
+          containerStyle={styles.blackTitle}
+          content={
+            <ListItem.Content>
+              <ListItem.Title>声明</ListItem.Title>
+            </ListItem.Content>
+          }
+          isExpanded={expandedStatement}
+          onPress={() => {
+            setExpandedStatement(!expandedStatement)
+          }}>
+          <ListItem containerStyle={styles.statementContent}>
+            <ListItem.Subtitle right>
+              本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题可在Github中提出）
             </ListItem.Subtitle>
-          </ListItem.Content>
-        </ListItem>
+          </ListItem>
+        </ListItem.Accordion>
+        <Card.Divider />
         <ListItem.Accordion
           containerStyle={styles.blackTitle}
           content={
@@ -161,10 +172,7 @@ export default function About() {
           onPress={() => {
             setExpanded(!expanded)
           }}>
-          <ListItem
-            containerStyle={{
-              flexWrap: 'wrap',
-            }}>
+          <ListItem containerStyle={styles.blackContent}>
             {Object.values($blackTags).map(tag => {
               return (
                 <Chip
@@ -193,17 +201,14 @@ export default function About() {
           containerStyle={styles.blackTitle}
           content={
             <ListItem.Content>
-              <ListItem.Title>不再看的up</ListItem.Title>
+              <ListItem.Title>不再看的UP</ListItem.Title>
             </ListItem.Content>
           }
           isExpanded={expandedUp}
           onPress={() => {
             setExpandedUp(!expandedUp)
           }}>
-          <ListItem
-            containerStyle={{
-              flexWrap: 'wrap',
-            }}>
+          <ListItem containerStyle={styles.blackContent}>
             {Object.values($blackUps).map(name => {
               return <Text key={name}>{name}</Text>
             })}
@@ -211,13 +216,14 @@ export default function About() {
           </ListItem>
         </ListItem.Accordion>
       </Card>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginBottom: 15,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -243,7 +249,18 @@ const styles = StyleSheet.create({
   blackTitle: {
     paddingVertical: 0,
     paddingHorizontal: 0,
-    marginTop: 15,
-    marginBottom: 0,
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  blackContent: {
+    flexWrap: 'wrap',
+    paddingTop: 0,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+  },
+  statementContent: {
+    paddingVertical: 0,
+    paddingHorizontal: 10,
+    marginBottom: 20,
   },
 })

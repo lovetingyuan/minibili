@@ -6,11 +6,11 @@ export const changelogUrl = site + 'version.json'
 export const RanksConfig = [
   {
     rid: -1,
-    label: '热门',
+    label: '🔥 热门',
   },
   {
     rid: 0,
-    label: '全站',
+    label: '📺 全站',
   },
   {
     rid: 1,

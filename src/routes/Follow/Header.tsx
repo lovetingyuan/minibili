@@ -1,6 +1,6 @@
 import React from 'react'
-import { Text, View, Pressable, Image } from 'react-native'
-import { Avatar } from '@rneui/themed'
+import { Text, View, Pressable } from 'react-native'
+import { Avatar, Icon } from '@rneui/themed'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { StyleSheet } from 'react-native'
@@ -34,40 +34,45 @@ export default function Header() {
         source={{ uri: $userInfo?.face }}
       />
       <View style={styles.right}>
-        <Text style={styles.myName}>
-          {$userInfo.name}
-          <Text style={styles.fansNumText}>
-            {'    '}
-            {fansCount}粉丝
-            {'    '}
-            {followedCount}关注
+        <View style={styles.nameContainer}>
+          <Text>
+            <Text style={styles.myName}>{$userInfo.name}</Text>
+            <Text style={styles.fansNumText}>
+              {'    '}
+              {fansCount}粉丝
+              {'    '}
+              {followedCount}关注
+            </Text>
           </Text>
-        </Text>
+          <Pressable
+            style={{ padding: 5 }}
+            onPress={() => {
+              navigation.navigate('About')
+            }}>
+            <Icon name="snow" type="ionicon" size={18} color="#00AEEC" />
+          </Pressable>
+        </View>
         <Text style={styles.mySign}>{$userInfo.sign}</Text>
       </View>
-      <Pressable
-        onPress={() => {
-          navigation.navigate('About')
-        }}>
-        <Image
-          source={require('../../../assets/snow.png')}
-          style={styles.infoFace}
-        />
-      </Pressable>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   right: { flex: 1, marginLeft: 16 },
-  myName: { fontSize: 18, fontWeight: 'bold' },
-  mySign: { color: '#555', marginTop: 6 },
-  fansNumText: { fontSize: 14, fontWeight: 'normal' },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  myName: { fontSize: 20, fontWeight: 'bold' },
+  mySign: { color: '#555', marginTop: 5, fontSize: 15 },
+  fansNumText: { fontSize: 14 },
   userContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 18,
-    paddingTop: 50,
+    paddingTop: 45,
     paddingBottom: 15,
     backgroundColor: 'white',
   },

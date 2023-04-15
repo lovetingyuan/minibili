@@ -45,8 +45,12 @@ export const parseDuration = (seconds: number) => {
   let hourString = hour < 10 ? '0' + hour : hour
   let minuteString = minute < 10 ? '0' + minute : minute
   let secondString = second < 10 ? '0' + second : second
-
-  return hourString + ':' + minuteString + ':' + secondString
+  return (
+    (hourString === '00' ? '' : hourString + ':') +
+    minuteString +
+    ':' +
+    secondString
+  )
 }
 
 export const openBiliVideo = async (bvid: string) => {

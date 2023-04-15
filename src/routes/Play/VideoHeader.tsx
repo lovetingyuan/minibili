@@ -21,7 +21,7 @@ export default function VideoHeader(props: {
   const { data: videoInfo } = useVideoInfo(bvid)
   return (
     <View style={styles.videoHeader}>
-      <Pressable
+      {/* <Pressable
         onPress={() => {
           if (isFromDynamic) {
             navigation.goBack()
@@ -37,12 +37,38 @@ export default function VideoHeader(props: {
         }}>
         <View style={styles.upInfoContainer}>
           <Avatar
-            size={35}
+            size={32}
             rounded
             source={{ uri: face + '@80w_80h_1c.webp' }}
           />
-          <Text style={[styles.upName]}>{name}</Text>
+          <Text
+            style={[styles.upName]}
+            adjustsFontSizeToFit
+            numberOfLines={1}
+            ellipsizeMode="tail">
+            {name}zfsdfsdfsdfea
+          </Text>
         </View>
+      </Pressable> */}
+      <Pressable
+        onPress={() => {
+          if (isFromDynamic) {
+            navigation.goBack()
+            return
+          }
+          store.dynamicUser = {
+            mid,
+            face,
+            name,
+            sign: '-',
+          }
+          navigation.navigate('Dynamic')
+        }}
+        style={styles.upInfoContainer}>
+        <Avatar size={32} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
+        <Text adjustsFontSizeToFit numberOfLines={1} style={styles.upName}>
+          {name}
+        </Text>
       </Pressable>
       <View style={styles.VideoItem}>
         <View style={styles.iconText}>
@@ -88,16 +114,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 12,
+    flex: 1,
   },
   upName: {
     marginLeft: 10,
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 'bold',
+    // flex: 1,
+    flexGrow: 1,
+    flexShrink: 1,
+    // borderWidth: 1,
   },
   VideoItem: {
     flexDirection: 'row',
     flexShrink: 0,
-    minWidth: 80,
+    // minWidth: 80,
+    // borderWidth: 1,
     color: '#666',
     alignItems: 'center',
     gap: 10,

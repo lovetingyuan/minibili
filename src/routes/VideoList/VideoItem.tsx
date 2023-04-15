@@ -27,8 +27,8 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
       <Text style={styles.title} numberOfLines={2}>
         {video.title}
       </Text>
-      <View style={styles.videoInfo}>
-        <View style={styles.namePlay}>
+      <View style={[styles.videoInfo]}>
+        <View style={[styles.namePlay, { flexShrink: 1 }]}>
           <Image
             style={styles.icon}
             source={require('../../../assets/up-mark.png')}
@@ -36,11 +36,18 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           <Text
             numberOfLines={1}
             adjustsFontSizeToFit
+            ellipsizeMode="tail"
             style={[styles.upNameText]}>
-            {video.name}
+            {video.name}dsdasdas
           </Text>
         </View>
-        <View style={styles.namePlay}>
+        <View
+          style={[
+            styles.namePlay,
+            {
+              marginLeft: 5,
+            },
+          ]}>
           <Image
             style={styles.icon}
             source={require('../../../assets/play-mark.png')}
@@ -56,7 +63,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     flex: 1,
     marginVertical: 12,
-    // borderWidth: 1,
   },
   videoLength: {
     position: 'absolute',
@@ -116,6 +122,7 @@ const styles = StyleSheet.create({
   upNameText: {
     color: '#00699D',
     marginLeft: 4,
+    marginRight: 5,
     fontSize: 13,
   },
   playNumText: {

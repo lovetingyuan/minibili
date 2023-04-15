@@ -20,6 +20,7 @@ const store = proxy<{
   $webViewMode: 'PC' | 'MOBILE'
   $latestUpdateIds: Record<string, string>
   $ignoredVersions: string[]
+  $ranksList: { rid: number; label: string }[]
   // ----------------------------
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
@@ -34,6 +35,7 @@ const store = proxy<{
   $webViewMode: 'PC',
   $latestUpdateIds: {},
   $ignoredVersions: [],
+  $ranksList: RanksConfig,
   // -------------------------
   dynamicUser: null,
   updatedUps: {},

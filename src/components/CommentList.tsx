@@ -78,13 +78,17 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginVertical: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    paddingBottom: 5,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#aaa',
+    paddingBottom: 3,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  commentCountContainer: { flexDirection: 'row', alignItems: 'center' },
+  commentCountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 4,
+  },
   commentCount: {
     color: '#555',
     fontSize: 13,
@@ -92,7 +96,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   right: {
-    paddingHorizontal: 8,
+    marginLeft: 8,
+    marginRight: 4,
   },
 })
 

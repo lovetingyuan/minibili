@@ -104,7 +104,9 @@ export default function Follow({ navigation, route }: Props) {
         <FlatList
           data={displayUps}
           renderItem={renderItem}
-          keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
+          keyExtractor={(item, index) =>
+            /**item ? item.mid + '' : **/ index + ''
+          }
           onEndReachedThreshold={1}
           numColumns={columns}
           ref={followListRef}

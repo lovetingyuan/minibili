@@ -80,7 +80,9 @@ export default React.memo(
             activeOpacity={0.8}
             onLongPress={() => setModalVisible(true)}
             onPress={() => gotoDynamic(false)}>
-            <Text style={[styles.name]}>{name}</Text>
+            <Text style={[styles.name]} numberOfLines={2} ellipsizeMode="tail">
+              {name}
+            </Text>
           </TouchableOpacity>
           {liveInfo?.living ? (
             <Button

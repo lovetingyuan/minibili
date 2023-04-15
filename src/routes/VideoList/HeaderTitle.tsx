@@ -1,6 +1,5 @@
 import { Button, Icon, Overlay } from '@rneui/themed'
 import { Pressable, ScrollView, Text, View } from 'react-native'
-import { RanksConfig } from '../../constants'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import React from 'react'
@@ -8,7 +7,7 @@ import { StyleSheet } from 'react-native'
 
 const HeaderTitle = () => {
   const [visible, setVisible] = React.useState(false)
-  const { videosType } = useSnapshot(store)
+  const { videosType, $ranksList } = useSnapshot(store)
   return (
     <View>
       <Pressable
@@ -31,7 +30,7 @@ const HeaderTitle = () => {
           setVisible(false)
         }}>
         <ScrollView style={styles.typeList}>
-          {RanksConfig.map(item => {
+          {$ranksList.map(item => {
             return (
               <Button
                 type="clear"
