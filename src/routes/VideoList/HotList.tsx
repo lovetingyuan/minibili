@@ -192,22 +192,6 @@ export default function Hot({ navigation }: Props) {
         onPress={handleOverlayClick}
         dismiss={() => setModalVisible(false)}
       />
-      {/* <Dialog
-        isVisible={showRank}
-        onBackdropPress={() => {
-          setShowRank(false)
-        }}>
-        <Dialog.Title title="分区排行" />
-        <View style={styles.rankContainer}>
-          {ranks.map(rank => {
-            return (
-              <View key={rank.rid} style={styles.rankItem}>
-                <Text>{rank.label}</Text>
-              </View>
-            )
-          })}
-        </View>
-      </Dialog> */}
       <FlashList
         ref={v => {
           hotListRef.current = v

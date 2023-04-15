@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Pressable, Image, Text, Linking, StyleSheet } from 'react-native'
-import { Overlay } from '@rneui/themed'
+import { Icon, Overlay } from '@rneui/themed'
 import { useNetInfo } from '@react-native-community/netinfo'
 import PagerView from 'react-native-pager-view'
 
@@ -54,7 +54,16 @@ export default function ImagesView(props: {
       <View style={styles.pagerNum}>
         <Text style={styles.pagerNumText}>
           {imageIndex + 1}/{images.length}
+          {'    '}
         </Text>
+        <Icon
+          name="open-in-browser"
+          size={22}
+          color={'white'}
+          onPress={() => {
+            Linking.openURL(images[imageIndex].src)
+          }}
+        />
       </View>
     </Overlay>
   )

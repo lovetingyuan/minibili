@@ -34,7 +34,6 @@ export function HeaderLeft(props: {
       <Pressable onPress={gotoWebPage}>
         <Avatar
           size={32}
-          containerStyle={{ marginRight: 12 }}
           rounded
           source={{
             uri: user?.face + '@240w_240h_1c.webp',
@@ -42,24 +41,16 @@ export function HeaderLeft(props: {
         />
       </Pressable>
       <Pressable
+        style={styles.titleContainer}
+        key={fans?.follower || '-'}
         onPress={() => {
           props.scrollTop()
         }}>
-        <Text
-          adjustsFontSizeToFit
-          numberOfLines={2}
-          ellipsizeMode="head"
-          style={[
-            {
-              fontSize: 16,
-            },
-          ]}>
+        <Text adjustsFontSizeToFit numberOfLines={1} style={styles.titleText}>
           {userName}的动态
         </Text>
       </Pressable>
-      <Text style={{ fontSize: 14, marginLeft: 12 }}>
-        {parseNumber(fans?.follower)}粉丝
-      </Text>
+      <Text style={styles.fansText}>{parseNumber(fans?.follower)}粉丝</Text>
     </View>
   )
 }
@@ -67,33 +58,32 @@ export function HeaderLeft(props: {
 export function HeaderRight() {
   const { dynamicUser: user } = useSnapshot(store)
   return (
-    <View style={styles.right}>
-      <Pressable
-        style={{ marginLeft: 10 }}
-        onPress={() => {
-          if (user) {
-            handleShareUp(user.name, user.mid, user.sign)
-          }
-        }}>
-        <Icon type="fontisto" name="share-a" size={13} color="#666" />
-      </Pressable>
-    </View>
+    <Pressable
+      style={styles.right}
+      onPress={() => {
+        if (user) {
+          handleShareUp(user.name, user.mid, user.sign)
+        }
+      }}>
+      <Icon type="fontisto" name="share-a" size={13} color="#666" />
+    </Pressable>
   )
 }
+
 const styles = StyleSheet.create({
   left: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    marginRight: 110,
   },
-  // userName: {
-  //   // fontSize: 18,
-  //   // flexShrink: 1,
-  //   flexWrap: 'wrap',
-  // },
+  titleContainer: { flexShrink: 1, marginLeft: 10 },
+  titleText: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  fansText: { fontSize: 14 },
   right: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    // width: 200,
+    marginLeft: 10,
+    padding: 5,
   },
 })

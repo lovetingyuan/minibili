@@ -6,6 +6,7 @@ import { useVideoInfo } from '../../api/video-info'
 import store from '../../store'
 import { NavigationProps } from '../../types'
 import { handleShareVideo, parseNumber } from '../../utils'
+import useMounted from '../../hooks/useMounted'
 
 export default function VideoHeader(props: {
   bvid: string
@@ -19,37 +20,16 @@ export default function VideoHeader(props: {
   const { bvid, name, face, mid, date, title, isFromDynamic } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: videoInfo } = useVideoInfo(bvid)
+  const [nameTextKey, setNameTextKey] = React.useState('-')
+  useMounted(() => {
+    for (let i = 0; i < 2; i++) {
+      setTimeout(() => {
+        setNameTextKey('--' + Math.random())
+      }, (i + 1) * 100)
+    }
+  })
   return (
     <View style={styles.videoHeader}>
-      {/* <Pressable
-        onPress={() => {
-          if (isFromDynamic) {
-            navigation.goBack()
-            return
-          }
-          store.dynamicUser = {
-            mid,
-            face,
-            name,
-            sign: '-',
-          }
-          navigation.navigate('Dynamic')
-        }}>
-        <View style={styles.upInfoContainer}>
-          <Avatar
-            size={32}
-            rounded
-            source={{ uri: face + '@80w_80h_1c.webp' }}
-          />
-          <Text
-            style={[styles.upName]}
-            adjustsFontSizeToFit
-            numberOfLines={1}
-            ellipsizeMode="tail">
-            {name}zfsdfsdfsdfea
-          </Text>
-        </View>
-      </Pressable> */}
       <Pressable
         onPress={() => {
           if (isFromDynamic) {
@@ -66,7 +46,12 @@ export default function VideoHeader(props: {
         }}
         style={styles.upInfoContainer}>
         <Avatar size={32} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
-        <Text adjustsFontSizeToFit numberOfLines={1} style={styles.upName}>
+        <Text
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={styles.upName}
+          key={nameTextKey}>
           {name}
         </Text>
       </Pressable>
@@ -113,7 +98,7 @@ const styles = StyleSheet.create({
   upInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
     flex: 1,
   },
   upName: {

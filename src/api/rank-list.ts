@@ -5,7 +5,7 @@ import useSWR from 'swr'
 import { HotVideoResponse, getVideo } from './hot-videos'
 
 export const useRankList = (rid?: number) => {
-  const { data, error, isLoading } = useSWR<{
+  const { data, error, isLoading, mutate } = useSWR<{
     list: HotVideoResponse[]
     note: string
   }>(
@@ -21,6 +21,7 @@ export const useRankList = (rid?: number) => {
   )
   return {
     data: data?.list.map(getVideo),
+    mutate,
     error,
     isLoading,
   }

@@ -29,7 +29,8 @@ type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 export default function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)
   const { videosType, $blackUps } = useSnapshot(store)
-  const { data: list = [], isLoading } = useRankList(videosType?.rid)
+  const { data: list = [], isLoading, mutate } = useRankList(videosType?.rid)
+  const [isRefreshing] = React.useState(false)
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -179,6 +180,8 @@ export default function Ranks({ navigation }: Props) {
         data={videoList}
         renderItem={renderItem}
         estimatedItemSize={estimatedItemSize}
+        refreshing={isRefreshing}
+        onRefresh={() => mutate()}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             哔哩哔哩 (゜-゜)つロ 干杯~-bilibili

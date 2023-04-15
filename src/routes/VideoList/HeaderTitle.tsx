@@ -71,5 +71,5 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: 'bold',
   },
-  typeList: { width: 80, maxHeight: 400 },
+  typeList: { width: 100, maxHeight: 400 },
 })

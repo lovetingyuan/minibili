@@ -91,11 +91,11 @@ const DynamicDetail: React.FC<
           dividerRight={
             <View style={styles.info}>
               <View style={styles.iconText}>
-                <Icon name="date-range" size={16} color="#666" />
+                <Icon name="date-range" size={15} color="#666" />
                 <Text style={styles.text}>{date}</Text>
               </View>
               <View style={styles.iconText}>
-                <Icon name="thumb-up-off-alt" size={16} color="#666" />
+                <Icon name="thumb-up-off-alt" size={15} color="#666" />
                 <Text style={styles.text}>{parseNumber(likeCount)}</Text>
               </View>
               <Pressable
@@ -106,7 +106,7 @@ const DynamicDetail: React.FC<
                 <Icon
                   type="material-community"
                   name="share"
-                  size={22}
+                  size={20}
                   color="#666"
                 />
                 <Text style={styles.text}>{parseNumber(forwardCount)}</Text>
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // height: 100,
     flexGrow: 1,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     // marginTop: 10,
     backgroundColor: 'white',
   },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#555',
-    fontSize: 13,
+    fontSize: 12,
   },
   share: { flexDirection: 'row', alignItems: 'center', gap: 3 },
 })

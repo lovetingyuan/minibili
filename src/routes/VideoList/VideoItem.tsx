@@ -38,16 +38,10 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
             adjustsFontSizeToFit
             ellipsizeMode="tail"
             style={[styles.upNameText]}>
-            {video.name}dsdasdas
+            {video.name}
           </Text>
         </View>
-        <View
-          style={[
-            styles.namePlay,
-            {
-              marginLeft: 5,
-            },
-          ]}>
+        <View style={[styles.namePlay]}>
           <Image
             style={styles.icon}
             source={require('../../../assets/play-mark.png')}
