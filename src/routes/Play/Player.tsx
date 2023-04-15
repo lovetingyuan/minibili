@@ -138,9 +138,7 @@ function Player(props: Props & { wifi: boolean }) {
 export default (props: Props) => {
   const [wifi, setWifi] = React.useState<boolean | null>(null)
   useMounted(() => {
-    isWifi().then(wifi => {
-      setWifi(wifi)
-    })
+    isWifi().then(setWifi)
   })
   if (wifi === null) {
     return <View style={{ width: '100%', height: '40%' }} />

@@ -10,39 +10,56 @@ const changes = await question('更新日志（使用双空格分开）')
 if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
-await $`npm version ${newVersion} -m ${changes} --allow-same-version`
-const { expo } = await fs.readJson(path.resolve(__dirname, '../app.json'))
-expo.version = newVersion
-expo.ios.buildNumber = newVersion
-expo.android.versionCode++
-await fs.writeJson(
-  path.resolve(__dirname, '../app.json'),
-  { expo },
-  { spaces: 2 },
-)
 
-echo(
-  chalk.cyan(
-    'eas: https://expo.dev/accounts/tingyuan/projects/minibili/builds',
-  ),
-)
+try {
+  await $`npm version ${newVersion} -m ${changes} --allow-same-version`
+  const { expo } = await fs.readJson(path.resolve(__dirname, '../app.json'))
+  expo.version = newVersion
+  expo.ios.buildNumber = newVersion
+  expo.android.versionCode++
+  await fs.writeJson(
+    path.resolve(__dirname, '../app.json'),
+    { expo },
+    { spaces: 2 },
+  )
 
-const buildOutput = await spinner('eas building...', () => {
-  return $`eas build --platform android --profile production --json --non-interactive`
-})
+  echo(
+    chalk.cyan(
+      'eas: https://expo.dev/accounts/tingyuan/projects/minibili/builds',
+    ),
+  )
 
-const buildList = await spinner(
-  'get eas build list...',
-  () => $`eas build:list --platform android --limit 5 --json --non-interactive`,
-)
+  const buildOutput = await spinner('eas building...', () => {
+    return $`eas build --platform android --profile production --json --non-interactive`
+  })
 
-await fs.outputFile(
-  path.resolve(__dirname, '../docs/version.json'),
-  buildList.toString('utf8').trim(),
-)
+  const buildList = await spinner(
+    'get eas build list...',
+    () =>
+      $`eas build:list --platform android --limit 5 --json --non-interactive --status finished`,
+  )
 
-await $`git commit -a --amend -C HEAD`
+  await fs.outputFile(
+    path.resolve(__dirname, '../docs/version.json'),
+    buildList.toString('utf8').trim(),
+  )
 
-await spinner('git push...', () => retry(3, () => $`git push`))
+  await $`git commit -a --amend -C HEAD`
 
-echo(chalk.green('build done!'))
+  await spinner('git push...', () => retry(3, () => $`git push`))
+
+  echo(chalk.green('build done!'))
+} catch (err) {
+  await $`git checkout -- .`
+  await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
+  const { expo } = await fs.readJson(path.resolve(__dirname, '../app.json'))
+  expo.version = version
+  expo.ios.buildNumber = version
+  expo.android.versionCode--
+  await fs.writeJson(
+    path.resolve(__dirname, '../app.json'),
+    { expo },
+    { spaces: 2 },
+  )
+  throw err
+}

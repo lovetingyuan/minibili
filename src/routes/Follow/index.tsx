@@ -32,7 +32,7 @@ export default function Follow({ navigation, route }: Props) {
     ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
     showLoadingError.current = true
   }
-  if (!store.$followedUps.length && data?.list.length) {
+  if (!$followedUps.length && data?.list.length) {
     store.$followedUps = data.list
   }
   const { width } = useWindowDimensions()

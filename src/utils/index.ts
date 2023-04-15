@@ -37,15 +37,16 @@ export const parseDate = (time?: number | string) => {
   return `${year ? year + '-' : ''}${month}-${day}`
 }
 
-export const parseDuration = (duration: number) => {
-  if (duration >= 24 * 60 * 60) {
-    return `约${Math.round(duration / 60 / 60)}小时`
-  }
-  const date = new Date(duration * 1000)
-  const hour = date.getHours() - date.getTimezoneOffset() / -60
-  const minutes = date.getMinutes().toString().padStart(2, '0')
-  const seconds = date.getSeconds().toString().padStart(2, '0')
-  return [hour, minutes, seconds].filter(Boolean).join(':')
+export const parseDuration = (seconds: number) => {
+  let hour = Math.floor(seconds / 3600)
+  let minute = Math.floor((seconds - hour * 3600) / 60)
+  let second = seconds - hour * 3600 - minute * 60
+
+  let hourString = hour < 10 ? '0' + hour : hour
+  let minuteString = minute < 10 ? '0' + minute : minute
+  let secondString = second < 10 ? '0' + second : second
+
+  return hourString + ':' + minuteString + ':' + secondString
 }
 
 export const openBiliVideo = async (bvid: string) => {

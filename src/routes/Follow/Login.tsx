@@ -15,6 +15,7 @@ import {
 import store from '../../store'
 import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
+import { useSnapshot } from 'valtio'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
@@ -23,6 +24,7 @@ export default function Login() {
   const inputUserIdRef = React.useRef('')
   const [tvImg, setTvImg] = React.useState(true)
   const [userId, setUserId] = React.useState('')
+  const { $userInfo } = useSnapshot(store)
   useMounted(() => {
     const timer = setInterval(() => {
       setTvImg(v => !v)
@@ -32,7 +34,7 @@ export default function Login() {
     }
   })
   const { data, error } = useUserInfo(userId)
-  if (userId && data?.mid && !store.$userInfo) {
+  if (userId && data?.mid && !$userInfo) {
     store.$userInfo = {
       name: data.name,
       mid: data.mid + '',

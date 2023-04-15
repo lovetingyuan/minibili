@@ -509,12 +509,13 @@ export function useHasUpdate(mid: number | string) {
       refreshInterval: 5 * 60 * 1000 + Number(delay),
     },
   )
+  const { $latestUpdateIds, checkingUpdateMap } = useSnapshot(store)
+
   if (isLoading) {
     store.checkingUpdateMap[mid] = true
-  } else if (store.checkingUpdateMap[mid]) {
+  } else if (checkingUpdateMap[mid]) {
     store.checkingUpdateMap[mid] = false
   }
-  const { $latestUpdateIds } = useSnapshot(store)
   let latestTime = 0
   let latestId = ''
   if (data?.items) {

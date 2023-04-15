@@ -40,4 +40,40 @@ export const RanksConfig = [
     rid: 119,
     label: '鬼畜',
   },
+  {
+    rid: 129,
+    label: '舞蹈',
+  },
+  {
+    rid: 4,
+    label: '游戏',
+  },
+  {
+    rid: 223,
+    label: '汽车',
+  },
+  {
+    rid: 211,
+    label: '美食',
+  },
+  {
+    rid: 217,
+    label: '动物',
+  },
+  {
+    rid: 5,
+    label: '娱乐',
+  },
+  {
+    rid: 181,
+    label: '影视',
+  },
+  {
+    rid: 155,
+    label: '时尚',
+  },
+  {
+    rid: 168,
+    label: '国创',
+  },
 ]
