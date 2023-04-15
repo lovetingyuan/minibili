@@ -10,12 +10,14 @@ import { useUserRelation } from '../../api/user-relation'
 import { parseNumber } from '../../utils'
 
 export default function Header() {
-  const $userInfo = useSnapshot(store).$userInfo!
+  const { $userInfo } = useSnapshot(store)
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { data: relation } = useUserRelation($userInfo.mid)
+  const { data: relation } = useUserRelation($userInfo?.mid)
   const fansCount = parseNumber(relation?.follower)
   const followedCount = parseNumber(relation?.following)
-
+  if (!$userInfo) {
+    return null
+  }
   return (
     <View style={styles.userContainer}>
       <Avatar
@@ -29,7 +31,7 @@ export default function Header() {
           })
         }}
         rounded
-        source={{ uri: $userInfo.face }}
+        source={{ uri: $userInfo?.face }}
       />
       <View style={styles.right}>
         <Text style={styles.myName}>
