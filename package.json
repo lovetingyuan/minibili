@@ -1,6 +1,6 @@
 {
   "name": "minibili",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
