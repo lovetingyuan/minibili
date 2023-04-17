@@ -23,20 +23,27 @@ import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
 import { checkWifi } from '../../utils'
 import useMounted from '../../hooks/useMounted'
+import { useSnapshot } from 'valtio'
+import store from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
-const PlayPage = ({ route }: Props) => {
+const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
-  const { commentId, bvid, name, title, desc, face, cover, mid, date, from } =
-    route.params
+  const { currentVideo } = useSnapshot(store)
+  const { aid, bvid, name, cover } = currentVideo!
+  const isFromDynamic = route.params?.from === 'dynamic'
   const [videoInfo, setVideoInfo] = React.useState<VideoInfoType | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: vi, error } = useVideoInfo(bvid)
   if (!error && vi?.bvid && !videoInfo?.bvid) {
     setVideoInfo(vi)
   }
-  const isFromDynamic = from === 'dynamic'
+  React.useEffect(() => {
+    navigation.setOptions({
+      headerTitle: name,
+    })
+  }, [navigation, name])
   useMounted(() => {
     checkWifi()
     return () => {
@@ -48,13 +55,6 @@ const PlayPage = ({ route }: Props) => {
       <Player cover={cover} page={currentPage} bvid={bvid} />
       <ScrollView style={styles.videoInfoContainer}>
         <VideoInfo
-          bvid={bvid}
-          title={title}
-          desc={desc}
-          face={face}
-          name={name}
-          mid={mid}
-          date={date}
           page={currentPage}
           changePage={setCurrentPage}
           isFromDynamic={isFromDynamic}
@@ -62,7 +62,7 @@ const PlayPage = ({ route }: Props) => {
         <View style={{ marginTop: 10 }}>
           <CommentList
             upName={name}
-            commentId={commentId}
+            commentId={aid}
             commentType={1}
             dividerRight={
               <View style={styles.right}>
@@ -74,7 +74,7 @@ const PlayPage = ({ route }: Props) => {
                   }}>
                   <Text style={styles.text}>{bvid}</Text>
                 </Pressable>
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}> · </Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}> · </Text>
                 <Text style={styles.text}>{videoInfo?.tname}</Text>
               </View>
             }
@@ -85,9 +85,7 @@ const PlayPage = ({ route }: Props) => {
   )
 }
 
-export default (props: Props) => {
-  return <PlayPage {...props} key={props.route.params.bvid} />
-}
+export default PlayPage
 
 const styles = StyleSheet.create({
   container: {

@@ -7,7 +7,7 @@ import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
 import RichText from '../../components/RichText'
 import store from '../../store'
 import { NavigationProps } from '../../types'
-import DateAndOpen from './DateAndOpen'
+import DynamicStat from './DynamicStat'
 
 export default function DefaultItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN>,
@@ -41,11 +41,13 @@ export default function DefaultItem(
         text={props.text}
         textProps={{ style: { fontSize: 16, lineHeight: 24 } }}
       />
-      <DateAndOpen
+      <DynamicStat
         title={props.text || ''}
         name={props.name}
         id={props.id}
         date={props.date}
+        like={props.likeCount}
+        share={props.forwardCount}
       />
     </View>
   )

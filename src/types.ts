@@ -2,20 +2,20 @@ export type RootStackParamList = {
   Home: undefined
   Main: undefined
   WebPage: { url: string; title: string; type?: 'pc' | 'mobile' }
-  Play: {
-    commentId: number | string
-    bvid: string
-    name: string
-    mid: string | number
-    // wifi: boolean
-    face: string
-    date: string
-    cover: string
-    // playNum: number
-    // likeNum: number
-    // commentNum: number
-    title: string
-    desc: string
+  Play?: {
+    // commentId: number | string
+    // bvid: string
+    // name: string
+    // mid: string | number
+    // // wifi: boolean
+    // face: string
+    // date: string
+    // cover: string
+    // // playNum: number
+    // // likeNum: number
+    // // commentNum: number
+    // title: string
+    // desc: string
     from?: 'dynamic'
   }
   Dynamic?: {

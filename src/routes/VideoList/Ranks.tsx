@@ -21,7 +21,7 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, parseDate } from '../../utils'
+import { handleShareVideo } from '../../utils'
 import { useRankList } from '../../api/rank-list'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
@@ -56,18 +56,9 @@ export default function Ranks({ navigation }: Props) {
     store.$blackUps['_' + mid] = name
   }
   const gotoPlay = (data: VideoItem) => {
-    const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
-    navigation.navigate('Play', {
-      mid,
-      bvid,
-      name,
-      commentId: aid,
-      face,
-      cover,
-      desc,
-      title,
-      date: parseDate(pubDate),
-    })
+    // const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
+    store.currentVideo = data
+    navigation.navigate('Play')
   }
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
     const key = item.bvid
@@ -196,6 +187,7 @@ export default function Ranks({ navigation }: Props) {
               <ActivityIndicator
                 color="blue"
                 animating
+                size={'large'}
                 style={{ marginTop: 30 }}
               />
             ) : null}
@@ -219,7 +211,7 @@ const styles = StyleSheet.create({
   listContainerStyle: { paddingTop: 14 },
   bottomEnd: {
     textAlign: 'center',
-    color: '#999',
+    color: '#555',
     marginTop: 10,
     marginBottom: 10,
   },

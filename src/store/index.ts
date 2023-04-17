@@ -20,13 +20,24 @@ const store = proxy<{
   $webViewMode: 'PC' | 'MOBILE'
   $latestUpdateIds: Record<string, string>
   $ignoredVersions: string[]
-  $ranksList: { rid: number; label: string }[]
   // ----------------------------
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
   livingUps: Record<string, string>
   checkingUpdateMap: Record<string, boolean>
   videosType: (typeof RanksConfig)[number]
+  currentVideo: {
+    bvid: string
+    name: string
+    face: string
+    mid: number | string
+    pubDate: number | string
+    title: string
+    aid: number
+    cover: string
+    desc: string
+  } | null
+  ranksList: { rid: number; label: string }[]
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -35,13 +46,14 @@ const store = proxy<{
   $webViewMode: 'PC',
   $latestUpdateIds: {},
   $ignoredVersions: [],
-  $ranksList: RanksConfig,
   // -------------------------
   dynamicUser: null,
   updatedUps: {},
   livingUps: {},
   checkingUpdateMap: {},
   videosType: RanksConfig[0],
+  currentVideo: null,
+  ranksList: RanksConfig,
 })
 
 const StoragePrefix = 'Store:'

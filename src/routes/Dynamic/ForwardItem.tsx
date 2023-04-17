@@ -14,7 +14,7 @@ import {
   DynamicMajorTypeEnum,
   DynamicTypeEnum,
 } from '../../api/dynamic-items'
-import DateAndOpen from './DateAndOpen'
+import DynamicStat from './DynamicStat'
 
 export default function ForwardItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
@@ -105,11 +105,13 @@ export default function ForwardItem(
         <View style={styles.forwardContainer}>
           <View style={styles.forwardContent}>{forwardContent}</View>
         </View>
-        <DateAndOpen
+        <DynamicStat
           name={props.name}
           id={props.id}
           title={props.text || '-'}
           date={props.date}
+          like={props.likeCount}
+          share={props.forwardCount}
         />
       </View>
     </TouchableOpacity>

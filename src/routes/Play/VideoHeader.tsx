@@ -5,19 +5,14 @@ import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import store from '../../store'
 import { NavigationProps } from '../../types'
-import { handleShareVideo, parseNumber } from '../../utils'
+import { handleShareVideo, parseDate, parseNumber } from '../../utils'
 import useMounted from '../../hooks/useMounted'
+import { useSnapshot } from 'valtio'
 
-export default function VideoHeader(props: {
-  bvid: string
-  name: string
-  face: string
-  mid: number | string
-  date: string
-  title: string
-  isFromDynamic: boolean
-}) {
-  const { bvid, name, face, mid, date, title, isFromDynamic } = props
+export default function VideoHeader(props: { isFromDynamic: boolean }) {
+  const { isFromDynamic } = props
+  const { currentVideo } = useSnapshot(store)
+  const { bvid, name, face, mid, pubDate, title } = currentVideo!
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: videoInfo } = useVideoInfo(bvid)
   const [nameTextKey, setNameTextKey] = React.useState('-')
@@ -52,13 +47,13 @@ export default function VideoHeader(props: {
           ellipsizeMode="tail"
           style={styles.upName}
           key={nameTextKey}>
-          {name}
+          {name + ' '}
         </Text>
       </Pressable>
       <View style={styles.VideoItem}>
         <View style={styles.iconText}>
           <Icon name="date-range" size={15} color="#666" />
-          <Text style={styles.VideoItemText}>{date}</Text>
+          <Text style={styles.VideoItemText}>{parseDate(pubDate)}</Text>
         </View>
         <View style={styles.iconText}>
           <Icon name="play-circle-outline" size={15} color="#666" />
@@ -98,7 +93,7 @@ const styles = StyleSheet.create({
   upInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: 5,
     flex: 1,
   },
   upName: {

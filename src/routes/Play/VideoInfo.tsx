@@ -3,21 +3,24 @@ import VideoHeader from './VideoHeader'
 import { View, Text, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { ListItem } from '@rneui/themed'
+import { useSnapshot } from 'valtio'
+import store from '../../store'
 
 export default function VideoInfo(props: {
-  bvid: string
+  // bvid: string
   page: number
-  title: string
-  desc: string
-  face: string
-  name: string
-  mid: number | string
-  date: string
+  // title: string
+  // desc: string
+  // face: string
+  // name: string
+  // mid: number | string
+  // date: string
   isFromDynamic: boolean
-  changePage: (v: number) => void
+  changePage: (p: number) => void
 }) {
-  const { bvid, page, title, desc, face, name, mid, date, isFromDynamic } =
-    props
+  const { page, isFromDynamic, changePage } = props
+  const { currentVideo } = useSnapshot(store)
+  const { bvid, title, desc } = currentVideo!
   let videoDesc = desc
   if (videoDesc === '-') {
     videoDesc = ''
@@ -29,15 +32,7 @@ export default function VideoInfo(props: {
 
   return (
     <>
-      <VideoHeader
-        bvid={bvid}
-        face={face}
-        name={name}
-        mid={mid}
-        date={date}
-        title={title}
-        isFromDynamic={isFromDynamic}
-      />
+      <VideoHeader isFromDynamic={isFromDynamic} />
       <View>
         <Text style={styles.videoTitle}>{title}</Text>
         {videoDesc ? <Text style={styles.videoDesc}>{videoDesc}</Text> : null}
@@ -60,9 +55,9 @@ export default function VideoInfo(props: {
               const selected = v.page === page
               return (
                 <ListItem
-                  key={v.cid}
+                  key={v.page}
                   onPress={() => {
-                    props.changePage(v.page)
+                    changePage(v.page)
                   }}
                   containerStyle={{
                     paddingVertical: 10,

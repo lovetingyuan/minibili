@@ -47,7 +47,7 @@ export function HeaderLeft(props: {
           props.scrollTop()
         }}>
         <Text adjustsFontSizeToFit numberOfLines={1} style={styles.titleText}>
-          {userName}的动态
+          {userName + '  '}
         </Text>
       </Pressable>
       <Text style={styles.fansText}>{parseNumber(fans?.follower)}粉丝</Text>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   titleContainer: { flexShrink: 1, marginLeft: 10 },
   titleText: {
     fontSize: 18,
-    marginRight: 10,
+    // marginRight: 10,
   },
   fansText: { fontSize: 14 },
   right: {

@@ -26,6 +26,7 @@ export default function About() {
   const [expandedUp, setExpandedUp] = React.useState(false)
   const [expandedStatement, setExpandedStatement] = React.useState(true)
   const navigation = useNavigation<NavigationProps['navigation']>()
+  const [checkingUpdate, setCheckingUpdate] = React.useState(false)
 
   const handleLogOut = () => {
     Alert.alert('确定退出吗？', '', [
@@ -49,30 +50,41 @@ export default function About() {
     ])
   }
   const checkUpdate = () => {
+    if (checkingUpdate) {
+      return
+    }
+    setCheckingUpdate(true)
     ToastAndroid.show('请稍后...', ToastAndroid.SHORT)
-    checkUpdateApi().then(data => {
-      if (data.hasUpdate) {
-        Alert.alert(
-          '有新版本',
-          `${data.currentVersion} --> ${
-            data.latestVersion
-          }\n\n${data.changes.join('\n')}`,
-          [
-            {
-              text: '取消',
-            },
-            {
-              text: '下载更新',
-              onPress: () => {
-                Linking.openURL(data.downloadLink!)
+    checkUpdateApi().then(
+      data => {
+        if (data.hasUpdate) {
+          Alert.alert(
+            '有新版本',
+            `${data.currentVersion} --> ${
+              data.latestVersion
+            }\n\n${data.changes.join('\n')}`,
+            [
+              {
+                text: '取消',
               },
-            },
-          ],
-        )
-      } else {
-        ToastAndroid.show('暂无更新', ToastAndroid.SHORT)
-      }
-    })
+              {
+                text: '下载更新',
+                onPress: () => {
+                  Linking.openURL(data.downloadLink!)
+                },
+              },
+            ],
+          )
+        } else {
+          ToastAndroid.show('暂无更新', ToastAndroid.SHORT)
+        }
+        setCheckingUpdate(false)
+      },
+      () => {
+        ToastAndroid.show('检查更新失败', ToastAndroid.SHORT)
+        setCheckingUpdate(false)
+      },
+    )
   }
   const handleShare = () => {
     Share.share({
@@ -121,6 +133,7 @@ export default function About() {
           <Button
             type="clear"
             size="sm"
+            loading={checkingUpdate}
             onPress={() => {
               checkUpdate()
             }}>
@@ -189,8 +202,12 @@ export default function About() {
                     },
                   }}
                   iconRight
-                  containerStyle={{ marginBottom: 7 }}
-                  buttonStyle={{ padding: 2, paddingStart: 0 }}
+                  titleStyle={{ textAlign: 'left' }}
+                  containerStyle={{ marginBottom: 7, alignSelf: 'flex-start' }}
+                  buttonStyle={{
+                    padding: 0,
+                    paddingVertical: 2,
+                  }}
                 />
               )
             })}
@@ -254,9 +271,10 @@ const styles = StyleSheet.create({
   },
   blackContent: {
     flexWrap: 'wrap',
-    paddingTop: 0,
-    paddingBottom: 10,
-    paddingHorizontal: 10,
+    padding: 0,
+    paddingHorizontal: 5,
+    // paddingBottom: 10,
+    // paddingHorizontal: 10,
   },
   statementContent: {
     paddingVertical: 0,

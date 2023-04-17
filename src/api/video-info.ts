@@ -8,7 +8,7 @@ const getVideoItem = (data: VideoInfoResponse) => {
   return {
     aid: data.aid,
     bvid: data.bvid,
-    cid: data.cid,
+    // cid: data.cid,
     // copyright: number;
     pubTime: data.pubdate,
     desc: data.desc,
@@ -34,7 +34,7 @@ const getVideoItem = (data: VideoInfoResponse) => {
       return {
         width: v.dimension.width,
         height: v.dimension.height,
-        cid: v.cid,
+        // cid: v.cid,
         title: v.part,
         page: v.page,
       }

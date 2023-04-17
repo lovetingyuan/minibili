@@ -37,7 +37,10 @@ export const parseDate = (time?: number | string) => {
   return `${year ? year + '-' : ''}${month}-${day}`
 }
 
-export const parseDuration = (seconds: number) => {
+export const parseDuration = (seconds: number | string) => {
+  if (typeof seconds === 'string') {
+    return seconds
+  }
   let hour = Math.floor(seconds / 3600)
   let minute = Math.floor((seconds - hour * 3600) / 60)
   let second = seconds - hour * 3600 - minute * 60

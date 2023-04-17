@@ -16,7 +16,7 @@ export const getVideo = (item: HotVideoResponse) => {
   return {
     aid: item.aid,
     bvid: item.bvid,
-    cid: item.cid,
+    // cid: item.cid,
     title: item.title,
     desc: item.desc,
     cover: item.pic,

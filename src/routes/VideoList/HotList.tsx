@@ -20,7 +20,7 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, parseDate } from '../../utils'
+import { handleShareVideo } from '../../utils'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
@@ -62,18 +62,9 @@ export default function Hot({ navigation }: Props) {
     store.$blackTags[tag] = tag
   }
   const gotoPlay = (data: VideoItem) => {
-    const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
-    navigation.navigate('Play', {
-      mid,
-      bvid,
-      name,
-      commentId: aid,
-      face,
-      cover,
-      desc,
-      title,
-      date: parseDate(pubDate),
-    })
+    store.currentVideo = data
+    // const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
+    navigation.navigate('Play')
   }
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
     const key = item.bvid

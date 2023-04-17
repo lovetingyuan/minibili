@@ -109,7 +109,9 @@ const DynamicDetail: React.FC<
                   size={20}
                   color="#666"
                 />
-                <Text style={styles.text}>{parseNumber(forwardCount)}</Text>
+                {forwardCount ? (
+                  <Text style={styles.text}>{parseNumber(forwardCount)}</Text>
+                ) : null}
               </Pressable>
             </View>
           }

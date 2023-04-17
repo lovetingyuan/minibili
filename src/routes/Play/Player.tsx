@@ -9,14 +9,12 @@ import {
 } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
-// import { useIsWifi } from '../../hooks/useIsWifi'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
 import { isWifi } from '../../utils'
 type Props = { cover: string; page: number; bvid: string }
 function Player(props: Props & { wifi: boolean }) {
   const { cover, page, bvid, wifi } = props
-  // const isWifi = useIsWifi()
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
@@ -72,14 +70,9 @@ function Player(props: Props & { wifi: boolean }) {
   const renderLoading = () => (
     <View style={styles.loadingView}>
       <Image
-        style={{
-          flex: 1,
-          width: cover ? '100%' : '80%',
-        }}
+        style={styles.loadingImage}
         resizeMode="cover"
-        source={
-          cover ? { uri: cover } : require('../../../assets/video-loading.png')
-        }
+        source={{ uri: cover }}
       />
     </View>
   )
@@ -151,5 +144,9 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
     alignItems: 'center',
+  },
+  loadingImage: {
+    flex: 1,
+    width: '100%',
   },
 })

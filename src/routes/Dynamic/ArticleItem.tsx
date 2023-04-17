@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text, Pressable, Linking, StyleSheet } from 'react-native'
 import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
-import DateAndOpen from './DateAndOpen'
+import DynamicStat from './DynamicStat'
 
 export default function ArticleItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE>,
@@ -17,11 +17,13 @@ export default function ArticleItem(
           {props.payload.text}
         </Text>
       </Pressable>
-      <DateAndOpen
+      <DynamicStat
         title={props.payload.text}
         name={props.name}
         id={props.id}
         date={props.date}
+        like={props.likeCount}
+        share={props.forwardCount}
       />
     </View>
   )

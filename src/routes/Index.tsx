@@ -75,19 +75,6 @@ setTimeout(() => {
   })
 }, 1000)
 
-const AboutHeaderRight = () => {
-  return (
-    <Button
-      type="clear"
-      size="sm"
-      onPress={() => {
-        Linking.openURL(site + '?showchangelog=true')
-      }}>
-      更新日志
-    </Button>
-  )
-}
-
 export default () => {
   return (
     <SWRConfig
@@ -122,7 +109,7 @@ export default () => {
             component={Play}
             options={props => {
               return {
-                headerTitle: props.route.params.name,
+                headerTitle: '',
                 headerRight: () => PlayHeaderRight(props),
               }
             }}
@@ -151,7 +138,16 @@ export default () => {
             component={About}
             options={{
               headerTitle: '关于',
-              headerRight: AboutHeaderRight,
+              headerRight: () => (
+                <Button
+                  type="clear"
+                  size="sm"
+                  onPress={() => {
+                    Linking.openURL(site + '?showchangelog=true')
+                  }}>
+                  更新日志
+                </Button>
+              ),
             }}
           />
         </Stack.Navigator>

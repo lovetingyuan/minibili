@@ -7,7 +7,7 @@ import { StyleSheet } from 'react-native'
 
 const HeaderTitle = () => {
   const [visible, setVisible] = React.useState(false)
-  const { videosType, $ranksList } = useSnapshot(store)
+  const { videosType, ranksList } = useSnapshot(store)
   return (
     <View>
       <Pressable
@@ -30,11 +30,21 @@ const HeaderTitle = () => {
           setVisible(false)
         }}>
         <ScrollView style={styles.typeList}>
-          {$ranksList.map(item => {
+          {ranksList.map((item, i) => {
             return (
               <Button
-                type="clear"
+                type={item.rid === videosType.rid ? 'solid' : 'clear'}
                 key={item.rid}
+                containerStyle={
+                  {
+                    // paddingVertical: 3,
+                  }
+                }
+                titleStyle={
+                  i
+                    ? { marginVertical: 3 }
+                    : { fontWeight: 'bold', marginVertical: 3 }
+                }
                 onPress={() => {
                   store.videosType = item
                   setVisible(false)
@@ -54,7 +64,7 @@ export default HeaderTitle
 const styles = StyleSheet.create({
   overlay: {
     paddingHorizontal: 0,
-    paddingVertical: 10,
+    // paddingVertical: 10,
     position: 'absolute',
     top: 50,
     left: 15,

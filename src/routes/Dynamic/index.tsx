@@ -7,6 +7,7 @@ import {
   ToastAndroid,
   BackHandler,
   Image,
+  ActivityIndicator,
 } from 'react-native'
 import ForwardItem from './ForwardItem'
 import RichTextItem from './DrawItem'
@@ -34,6 +35,10 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name)
 
   const [dynamicItems, setDynamicItems] = React.useState<DynamicItem[]>([])
+  if (__DEV__) {
+    // @ts-ignore
+    globalThis._dynamicList = dynamicItems
+  }
   const pageInfoRef = React.useRef<{
     hasMore: boolean
     offset: string
@@ -66,9 +71,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         )
       },
       headerTitleAlign: 'left',
-      headerRight: () => {
-        return <HeaderRight />
-      },
+      headerRight: () => <HeaderRight />,
     })
   }, [navigation])
   const handleBack = useMemoizedFn(() => {
@@ -107,7 +110,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         {item.top ? (
           <Image
             source={require('../../../assets/top.png')}
-            style={{ width: 28.5, height: 14, marginBottom: 4 }}
+            style={styles.topMark}
           />
         ) : null}
         <Item {...item} />
@@ -173,7 +176,12 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         ListHeaderComponent={
           dynamicUser.sign && dynamicUser.sign !== '-' ? (
             <View style={styles.signTextContainer}>
-              <Icon name="billboard" type="material-community" size={20} />
+              <Icon
+                name="billboard"
+                type="material-community"
+                size={16}
+                style={styles.signMark}
+              />
               <Text style={styles.signText}>{dynamicUser.sign.trim()}</Text>
             </View>
           ) : null
@@ -186,7 +194,15 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
               哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
             </Text>
             {loading ? (
-              <Text style={{ textAlign: 'center' }}>加载中...</Text>
+              <View>
+                <Text style={{ textAlign: 'center' }}>加载中...</Text>
+                <ActivityIndicator
+                  color="blue"
+                  animating
+                  size={'large'}
+                  style={{ marginTop: 30 }}
+                />
+              </View>
             ) : null}
           </>
         }
@@ -240,10 +256,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   signText: {
-    fontSize: 15,
-    lineHeight: 25,
+    fontSize: 14,
+    lineHeight: 22,
     marginLeft: 10,
     flexShrink: 1,
+    color: '#666',
+  },
+  topMark: { width: 28.5, height: 14, marginBottom: 5 },
+  signMark: {
+    position: 'relative',
+    top: 3,
   },
 })
 

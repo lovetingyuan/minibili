@@ -87,7 +87,7 @@ const MainTab = () => {
         options={() => {
           return {
             tabBarLabel: getLabel('视频'),
-            headerTitle: HeaderTitle,
+            headerTitle: () => <HeaderTitle />,
             headerShown: true,
           }
         }}

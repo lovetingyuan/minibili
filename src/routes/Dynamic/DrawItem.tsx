@@ -11,7 +11,7 @@ import {
 import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
 import RichText from '../../components/RichText'
 import { NavigationProps } from '../../types'
-import DateAndOpen from './DateAndOpen'
+import DynamicStat from './DynamicStat'
 
 export default function RichTextItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_DRAW>,
@@ -22,6 +22,8 @@ export default function RichTextItem(
     name,
     commentId,
     payload: { images },
+    likeCount,
+    forwardCount,
   } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
   return (
@@ -72,15 +74,18 @@ export default function RichTextItem(
           })}
         </ScrollView>
       ) : null}
-      {props.payload.text ? <Text>{props.payload.text}</Text> : null}
-      <DateAndOpen
+      {props.payload.text ? (
+        <Text style={{ marginTop: 5 }}>{props.payload.text}</Text>
+      ) : null}
+      <DynamicStat
         title={props.text || ''}
         name={name}
         id={commentId}
         date={date}
+        like={likeCount}
+        share={forwardCount}
       />
     </View>
-    // </TouchableOpacity>
   )
 }
 

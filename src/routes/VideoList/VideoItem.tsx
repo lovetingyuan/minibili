@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { VideoItem } from '../../api/hot-videos'
-import { parseDuration, parseNumber } from '../../utils'
+import { parseDate, parseDuration, parseNumber } from '../../utils'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
@@ -13,14 +13,28 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           style={styles.image}
           source={{ uri: video.cover + '@480w_270h_1c.webp' }}
         />
-        <View style={styles.videoLength}>
-          <Text style={styles.videoLengthText}>
-            {parseDuration(video.duration)}
-          </Text>
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>{parseDuration(video.duration)}</Text>
+        </View>
+        <View
+          style={[
+            styles.textContainer,
+            {
+              bottom: 0,
+            },
+          ]}>
+          <Text style={styles.text}>{parseDate(video.pubDate)}</Text>
         </View>
         {video.tag ? (
-          <View style={styles.videoTag}>
-            <Text style={styles.videoTagText}>{video.tag}</Text>
+          <View
+            style={[
+              styles.textContainer,
+              {
+                right: 0,
+                bottom: 0,
+              },
+            ]}>
+            <Text style={styles.text}>{video.tag}</Text>
           </View>
         ) : null}
       </View>
@@ -28,7 +42,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
         {video.title}
       </Text>
       <View style={[styles.videoInfo]}>
-        <View style={[styles.namePlay, { flexShrink: 1 }]}>
+        <View style={[styles.namePlay]}>
           <Image
             style={styles.icon}
             source={require('../../../assets/up-mark.png')}
@@ -38,7 +52,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
             adjustsFontSizeToFit
             ellipsizeMode="tail"
             style={[styles.upNameText]}>
-            {video.name}
+            {video.name + ' '}
           </Text>
         </View>
         <View style={[styles.namePlay]}>
@@ -58,7 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 12,
   },
-  videoLength: {
+  textContainer: {
     position: 'absolute',
     paddingHorizontal: 4,
     backgroundColor: 'rgba(0,0,0,.5)',
@@ -66,31 +80,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     margin: 5,
   },
-  watched: {
-    position: 'absolute',
-    right: 0,
-    paddingHorizontal: 4,
-    backgroundColor: 'rgba(0,0,0,.7)',
-    alignItems: 'center',
-    borderRadius: 2,
-    margin: 5,
-  },
-  videoLengthText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#eee',
-  },
-  videoTag: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 4,
-    backgroundColor: 'rgba(0,0,0,.5)',
-    alignItems: 'center',
-    borderRadius: 2,
-    margin: 5,
-  },
-  videoTagText: {
+  text: {
     color: 'white',
     fontSize: 12,
   },
@@ -116,7 +106,6 @@ const styles = StyleSheet.create({
   upNameText: {
     color: '#00699D',
     marginLeft: 4,
-    marginRight: 5,
     fontSize: 13,
   },
   playNumText: {
@@ -128,5 +117,5 @@ const styles = StyleSheet.create({
     width: 13,
     height: 11,
   },
-  namePlay: { flexDirection: 'row', alignItems: 'center' },
+  namePlay: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
 })
