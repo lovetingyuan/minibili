@@ -1,16 +1,22 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Image, Linking, Pressable, StyleSheet } from 'react-native'
-import { RootStackParamList } from '../../types'
+import { Image, Pressable, StyleSheet } from 'react-native'
+import { NavigationProps, RootStackParamList } from '../../types'
 import React from 'react'
+import { useNavigation } from '@react-navigation/native'
 
 export default function HeaderRight(
   props: NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>,
 ) {
   const { id } = props.route.params.detail
+  const navigation = useNavigation<NavigationProps['navigation']>()
+
   return (
     <Pressable
       onPress={() => {
-        Linking.openURL(`https://m.bilibili.com/dynamic/${id}`)
+        console.log(`https://m.bilibili.com/dynamic/${id}`)
+        navigation.navigate('WebPage', {
+          url: `https://m.bilibili.com/dynamic/${id}`,
+        })
       }}>
       <Image
         style={styles.image}
