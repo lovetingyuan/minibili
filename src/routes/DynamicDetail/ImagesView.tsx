@@ -33,7 +33,6 @@ export default function ImagesView(props: {
             <View key={img.src} style={styles.page}>
               <Image
                 style={[styles.pagerImage, { aspectRatio: img.ratio }]}
-                key={img.src}
                 loadingIndicatorSource={require('../../../assets/loading.png')}
                 source={{
                   uri:

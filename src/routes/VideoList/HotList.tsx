@@ -4,9 +4,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ToastAndroid,
   Alert,
-  Linking,
   useWindowDimensions,
 } from 'react-native'
 import * as SplashScreen from 'expo-splash-screen'
@@ -20,7 +18,7 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo } from '../../utils'
+import { handleShareVideo, openBiliVideo } from '../../utils'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
@@ -118,18 +116,7 @@ export default function Hot({ navigation }: Props) {
         return
       }
       setModalVisible(false)
-      Linking.openURL(`bilibili://video/${currentVideoRef.current.bvid}`).catch(
-        err => {
-          if (err.message.includes('No Activity found to handle Intent')) {
-            ToastAndroid.show('未安装B站', ToastAndroid.SHORT)
-          }
-          navigation.navigate('WebPage', {
-            title: currentVideoRef.current!.name + '的动态',
-            url:
-              'https://m.bilibili.com/video/' + currentVideoRef.current!.bvid,
-          })
-        },
-      )
+      openBiliVideo(currentVideoRef.current.bvid)
     }
   })
   const buttons = [

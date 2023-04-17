@@ -6,7 +6,7 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Linking,
+  // Linking,
 } from 'react-native'
 import RichText from '../../components/RichText'
 import {
@@ -15,10 +15,13 @@ import {
   DynamicTypeEnum,
 } from '../../api/dynamic-items'
 import DynamicStat from './DynamicStat'
+import { useNavigation } from '@react-navigation/native'
+import { NavigationProps } from '../../types'
 
 export default function ForwardItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
+  const navigation = useNavigation<NavigationProps['navigation']>()
   let forwardContent = <Text>暂不支持显示</Text>
   if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_ARCHIVE) {
     forwardContent = (
@@ -92,7 +95,10 @@ export default function ForwardItem(
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => {
-        Linking.openURL(`https://m.bilibili.com/dynamic/${props.commentId}`)
+        navigation.navigate('WebPage', {
+          url: `https://m.bilibili.com/dynamic/${props.commentId}`,
+        })
+        // Linking.openURL(`https://m.bilibili.com/dynamic/${props.commentId}`)
       }}>
       <View style={[styles.textContainer]}>
         <RichText

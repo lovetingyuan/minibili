@@ -1,16 +1,18 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Image, Pressable, StyleSheet } from 'react-native'
-import { RootStackParamList } from '../../types'
 import React from 'react'
 import { openBiliVideo } from '../../utils'
+import { useSnapshot } from 'valtio'
+import store from '../../store'
 
-export default function HeaderRight(
-  props: NativeStackScreenProps<RootStackParamList, 'Play'>,
-) {
+export default function HeaderRight() {
+  const { currentVideo } = useSnapshot(store)
   return (
     <Pressable
       onPress={() => {
-        openBiliVideo(props.route.params.bvid)
+        const bvid = currentVideo?.bvid
+        if (bvid) {
+          openBiliVideo(bvid)
+        }
       }}>
       <Image
         style={styles.image}

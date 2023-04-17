@@ -17,7 +17,6 @@ export default function WordItem(
         navigation.navigate('DynamicDetail', {
           detail: props,
         })
-        // Linking.openURL(`https://m.bilibili.com/dynamic/${props.commentId}`)
       }}>
       <RichText
         imageSize={16}

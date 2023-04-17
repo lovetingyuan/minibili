@@ -4,9 +4,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ToastAndroid,
   Alert,
-  Linking,
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native'
@@ -21,7 +19,7 @@ import { FlashList } from '@shopify/flash-list'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { VideoItem } from '../../api/hot-videos'
-import { handleShareVideo } from '../../utils'
+import { handleShareVideo, openBiliVideo } from '../../utils'
 import { useRankList } from '../../api/rank-list'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
@@ -56,7 +54,6 @@ export default function Ranks({ navigation }: Props) {
     store.$blackUps['_' + mid] = name
   }
   const gotoPlay = (data: VideoItem) => {
-    // const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
     store.currentVideo = data
     navigation.navigate('Play')
   }
@@ -104,18 +101,7 @@ export default function Ranks({ navigation }: Props) {
         return
       }
       setModalVisible(false)
-      Linking.openURL(`bilibili://video/${currentVideoRef.current.bvid}`).catch(
-        err => {
-          if (err.message.includes('No Activity found to handle Intent')) {
-            ToastAndroid.show('未安装B站', ToastAndroid.SHORT)
-          }
-          navigation.navigate('WebPage', {
-            title: currentVideoRef.current!.name + '的动态',
-            url:
-              'https://m.bilibili.com/video/' + currentVideoRef.current!.bvid,
-          })
-        },
-      )
+      openBiliVideo(currentVideoRef.current.bvid)
     }
   })
   const buttons = [

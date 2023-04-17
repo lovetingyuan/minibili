@@ -107,10 +107,10 @@ export default () => {
           <Stack.Screen
             name="Play"
             component={Play}
-            options={props => {
+            options={() => {
               return {
                 headerTitle: '',
-                headerRight: () => PlayHeaderRight(props),
+                headerRight: () => PlayHeaderRight(),
               }
             }}
           />
@@ -129,7 +129,7 @@ export default () => {
             component={WebPage}
             options={props => {
               return {
-                headerTitle: props.route.params.title,
+                headerTitle: props.route.params.title || '-',
               }
             }}
           />
