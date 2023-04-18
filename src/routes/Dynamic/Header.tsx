@@ -19,15 +19,17 @@ export function HeaderLeft(props: {
   scrollTop: () => void
   style?: StyleProp<ViewStyle>
 }) {
-  const { dynamicUser: user } = useSnapshot(store)
-  const { data: fans } = useUserRelation(user?.mid)
-  const userName = user?.name
+  const { dynamicUser } = useSnapshot(store)
+  const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const gotoWebPage = () => {
-    navigation.navigate('WebPage', {
-      url: `https://space.bilibili.com/${user?.mid}`,
-      title: user?.name + '的主页',
-    })
+    const user = store.dynamicUser
+    if (user) {
+      navigation.navigate('WebPage', {
+        url: `https://space.bilibili.com/${user?.mid}`,
+        title: user?.name + '的主页',
+      })
+    }
   }
   return (
     <View style={[styles.left, props.style]}>
@@ -36,7 +38,7 @@ export function HeaderLeft(props: {
           size={32}
           rounded
           source={{
-            uri: user?.face + '@240w_240h_1c.webp',
+            uri: dynamicUser?.face + '@240w_240h_1c.webp',
           }}
         />
       </Pressable>
@@ -47,7 +49,7 @@ export function HeaderLeft(props: {
           props.scrollTop()
         }}>
         <Text adjustsFontSizeToFit numberOfLines={1} style={styles.titleText}>
-          {userName + '  '}
+          {(dynamicUser?.name || '') + '  '}
         </Text>
       </Pressable>
       <Text style={styles.fansText}>{parseNumber(fans?.follower)}粉丝</Text>
@@ -56,13 +58,13 @@ export function HeaderLeft(props: {
 }
 
 export function HeaderRight() {
-  const { dynamicUser: user } = useSnapshot(store)
   return (
     <Pressable
       style={styles.right}
       onPress={() => {
-        if (user) {
-          handleShareUp(user.name, user.mid, user.sign)
+        if (store.dynamicUser) {
+          const { name, mid, sign } = store.dynamicUser
+          handleShareUp(name, mid, sign)
         }
       }}>
       <Icon type="fontisto" name="share-a" size={13} color="#666" />

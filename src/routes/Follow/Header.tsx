@@ -15,20 +15,19 @@ export default function Header() {
   const { data: relation } = useUserRelation($userInfo?.mid)
   const fansCount = parseNumber(relation?.follower)
   const followedCount = parseNumber(relation?.following)
-  if (!$userInfo) {
-    return null
-  }
   return (
     <View style={styles.userContainer}>
       <Avatar
         size={55}
         onPress={() => {
-          store.dynamicUser = {
-            ...$userInfo,
+          if (store.$userInfo) {
+            store.dynamicUser = {
+              ...store.$userInfo,
+            }
+            navigation.navigate('Dynamic', {
+              from: 'followed',
+            })
           }
-          navigation.navigate('Dynamic', {
-            from: 'followed',
-          })
         }}
         rounded
         source={{ uri: $userInfo?.face }}
@@ -36,7 +35,7 @@ export default function Header() {
       <View style={styles.right}>
         <View style={styles.nameContainer}>
           <Text>
-            <Text style={styles.myName}>{$userInfo.name}</Text>
+            <Text style={styles.myName}>{$userInfo?.name}</Text>
             <Text style={styles.fansNumText}>
               {'    '}
               {fansCount}粉丝
@@ -52,7 +51,7 @@ export default function Header() {
             <Icon name="snow" type="ionicon" size={18} color="#00AEEC" />
           </Pressable>
         </View>
-        <Text style={styles.mySign}>{$userInfo.sign}</Text>
+        <Text style={styles.mySign}>{$userInfo?.sign}</Text>
       </View>
     </View>
   )
