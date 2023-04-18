@@ -30,7 +30,7 @@ function __$hack() {
     video.addEventListener('play', () => {
       postPlayState('play')
     })
-    Array('ended', 'pause', 'waiting').forEach(evt => {
+    ;['ended', 'pause', 'waiting'].forEach(evt => {
       video.addEventListener(evt, () => {
         postPlayState(evt)
         if (evt === 'ended') {
