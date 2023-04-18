@@ -12,18 +12,25 @@ import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
 import { isWifi } from '../../utils'
-type Props = { cover: string; page: number; bvid: string }
+import { useSnapshot } from 'valtio'
+import store from '../../store'
+type Props = { page: number }
+
 function Player(props: Props & { wifi: boolean }) {
-  const { cover, page, bvid, wifi } = props
+  const { page, wifi } = props
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
-  const { data: videoInfo, error } = useVideoInfo(bvid)
-
+  const { currentVideo } = useSnapshot(store)
+  const { data: vi, error } = useVideoInfo(currentVideo?.bvid)
+  const videoInfo = {
+    ...currentVideo,
+    ...vi,
+  }
   let videoWidth = 0
   let videoHeight = 0
-  if (!error && videoInfo?.bvid) {
+  if (!error && videoInfo?.bvid && videoInfo.width && videoInfo.height) {
     videoWidth = videoInfo.width
     videoHeight = videoInfo.height
   }
@@ -72,7 +79,7 @@ function Player(props: Props & { wifi: boolean }) {
       <Image
         style={styles.loadingImage}
         resizeMode="cover"
-        source={{ uri: cover }}
+        source={{ uri: videoInfo.cover }}
       />
     </View>
   )
@@ -80,7 +87,7 @@ function Player(props: Props & { wifi: boolean }) {
   const search = new URLSearchParams()
   const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
   Object.entries({
-    bvid,
+    bvid: videoInfo.bvid,
     autoplay: wifi ? 1 : 0,
     highQuality: wifi ? 1 : 0,
     quality: wifi ? 100 : 16,

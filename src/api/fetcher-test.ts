@@ -6,7 +6,6 @@ export default function request<D extends any>(url: string, referer?: string) {
   return fetch(requestUrl + '&_t=' + Date.now(), {
     headers: {
       // authority: host,
-      // referer: 'https://api.bilibili.com/',
       host: hostname,
       origin,
       accept: 'application/json, text/plain, */*',
@@ -34,9 +33,8 @@ export default function request<D extends any>(url: string, referer?: string) {
     .then(r => r.json())
     .then((res: { code: number; message: string; data: D }) => {
       if (res.code) {
-        throw new Error('未能获取当前数据')
+        throw new Error('未能获取当前数据' + res.code + url)
       }
       return res.data
     })
-  // );
 }

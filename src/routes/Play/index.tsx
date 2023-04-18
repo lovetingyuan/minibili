@@ -18,7 +18,7 @@ import * as Clipboard from 'expo-clipboard'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 import Player from './Player'
-import { useVideoInfo, VideoInfo as VideoInfoType } from '../../api/video-info'
+import { useVideoInfo } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
 import { checkWifi } from '../../utils'
@@ -31,28 +31,32 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { currentVideo } = useSnapshot(store)
-  const { aid, bvid, name, cover } = currentVideo!
   const isFromDynamic = route.params?.from === 'dynamic'
-  const [videoInfo, setVideoInfo] = React.useState<VideoInfoType | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
-  const { data: vi, error } = useVideoInfo(bvid)
-  if (!error && vi?.bvid && !videoInfo?.bvid) {
-    setVideoInfo(vi)
+  const { data: vi } = useVideoInfo(currentVideo?.bvid)
+
+  const videoInfo = {
+    ...currentVideo,
+    ...vi,
   }
   React.useEffect(() => {
-    navigation.setOptions({
-      headerTitle: name,
-    })
-  }, [navigation, name])
+    videoInfo.name &&
+      navigation.setOptions({
+        headerTitle: videoInfo.name,
+      })
+  }, [navigation, videoInfo.name])
   useMounted(() => {
     checkWifi()
     return () => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
+  if (!videoInfo.aid || !videoInfo.name) {
+    return null
+  }
   return (
     <View style={styles.container}>
-      <Player cover={cover} page={currentPage} bvid={bvid} />
+      <Player page={currentPage} />
       <ScrollView style={styles.videoInfoContainer}>
         <VideoInfo
           page={currentPage}
@@ -61,18 +65,19 @@ const PlayPage = ({ route, navigation }: Props) => {
         />
         <View style={{ marginTop: 10 }}>
           <CommentList
-            upName={name}
-            commentId={aid}
+            upName={videoInfo.name}
+            commentId={videoInfo.aid}
             commentType={1}
             dividerRight={
               <View style={styles.right}>
                 <Pressable
                   onPress={() => {
-                    Clipboard.setStringAsync(bvid).then(() => {
-                      ToastAndroid.show('已复制', ToastAndroid.SHORT)
-                    })
+                    videoInfo.bvid &&
+                      Clipboard.setStringAsync(videoInfo.bvid).then(() => {
+                        ToastAndroid.show('已复制', ToastAndroid.SHORT)
+                      })
                   }}>
-                  <Text style={styles.text}>{bvid}</Text>
+                  <Text style={styles.text}>{videoInfo.bvid}</Text>
                 </Pressable>
                 <Text style={{ fontSize: 18, fontWeight: 'bold' }}> · </Text>
                 <Text style={styles.text}>{videoInfo?.tname}</Text>

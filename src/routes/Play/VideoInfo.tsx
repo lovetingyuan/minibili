@@ -20,16 +20,15 @@ export default function VideoInfo(props: {
 }) {
   const { page, isFromDynamic, changePage } = props
   const { currentVideo } = useSnapshot(store)
-  const { bvid, title, desc } = currentVideo!
+  const { data: videoInfo } = useVideoInfo(currentVideo?.bvid)
+  const [expanded, setExpanded] = React.useState(false)
+  const { title, desc } = currentVideo || videoInfo || {}
   let videoDesc = desc
   if (videoDesc === '-') {
     videoDesc = ''
   } else if (videoDesc && videoDesc === title) {
     videoDesc = ''
   }
-  const { data: videoInfo } = useVideoInfo(bvid)
-  const [expanded, setExpanded] = React.useState(false)
-
   return (
     <>
       <VideoHeader isFromDynamic={isFromDynamic} />

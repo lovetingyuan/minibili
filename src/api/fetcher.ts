@@ -41,8 +41,13 @@ export default function request<D extends any>(url: string, referer?: string) {
     .then(r => r.json())
     .then((res: { code: number; message: string; data: D }) => {
       if (res.code) {
-        __DEV__ && console.log('error', res.code, res.message)
-        if (Date.now() - errorTime > 20000) {
+        if (__DEV__) {
+          ToastAndroid.show(
+            ` 数据获取失败:${url}, ${res.code} ${res.message}`,
+            ToastAndroid.SHORT,
+          )
+          console.log('error', url, res.code, res.message)
+        } else if (Date.now() - errorTime > 10000) {
           ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT)
           errorTime = Date.now()
         }
@@ -50,5 +55,4 @@ export default function request<D extends any>(url: string, referer?: string) {
       }
       return res.data
     })
-  // );
 }

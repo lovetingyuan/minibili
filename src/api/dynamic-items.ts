@@ -75,6 +75,18 @@ export const enum DynamicMajorTypeEnum {
   MAJOR_TYPE_NONE = 'MAJOR_TYPE_NONE',
 }
 
+export const enum DynamicAdditionalTypeEnum {
+  ADDITIONAL_TYPE_NONE = 'ADDITIONAL_TYPE_NONE',
+  ADDITIONAL_TYPE_PGC = 'ADDITIONAL_TYPE_PGC',
+  ADDITIONAL_TYPE_GOODS = 'ADDITIONAL_TYPE_GOODS',
+  ADDITIONAL_TYPE_VOTE = 'ADDITIONAL_TYPE_VOTE',
+  ADDITIONAL_TYPE_COMMON = 'ADDITIONAL_TYPE_COMMON',
+  ADDITIONAL_TYPE_MATCH = 'ADDITIONAL_TYPE_MATCH',
+  ADDITIONAL_TYPE_UP_RCMD = 'ADDITIONAL_TYPE_UP_RCMD',
+  ADDITIONAL_TYPE_UGC = 'ADDITIONAL_TYPE_UGC',
+  ADDITIONAL_TYPE_RESERVE = 'ADDITIONAL_TYPE_RESERVE',
+}
+
 interface MajorAV {
   type: DynamicMajorTypeEnum.MAJOR_TYPE_ARCHIVE
   archive: {
@@ -139,6 +151,7 @@ interface MajorNone {
 export interface DynamicItemResponse<T extends DynamicType> {
   type: T
   id_str: string
+  visible: boolean
   basic: {
     comment_id_str: string
     comment_type: number
@@ -146,17 +159,16 @@ export interface DynamicItemResponse<T extends DynamicType> {
   modules: {
     module_author: Author
     module_dynamic: {
-      desc: T extends DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
-        ? null
-        : { text?: string } | null
-      major: T extends DynamicTypeEnum.DYNAMIC_TYPE_FORWARD
+      desc: { text: string } | null
+      topic: { name: string; jump_url: string } | null
+      major: T extends
+        | DynamicTypeEnum.DYNAMIC_TYPE_FORWARD
+        | DynamicTypeEnum.DYNAMIC_TYPE_WORD
         ? null
         : T extends DynamicTypeEnum.DYNAMIC_TYPE_AV
         ? MajorAV
         : T extends DynamicTypeEnum.DYNAMIC_TYPE_DRAW
         ? MajorDraw
-        : T extends DynamicTypeEnum.DYNAMIC_TYPE_WORD
-        ? null
         : T extends DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
         ? MajorArticle
         : unknown
@@ -165,22 +177,21 @@ export interface DynamicItemResponse<T extends DynamicType> {
         | DynamicTypeEnum.DYNAMIC_TYPE_DRAW
         ?
             | {
-                reserve?: {
-                  title?: string
+                type: DynamicAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE
+                reserve: {
+                  title: string
                   desc1?: { text: string }
+                  desc2?: { text: string }
                 }
               }
             | {
-                type: 'ADDITIONAL_TYPE_UGC'
+                type: DynamicAdditionalTypeEnum.ADDITIONAL_TYPE_UGC
                 ugc: {
                   cover: string
                   title: string
                 }
               }
         : never
-      topic?: {
-        name: string
-      }
     }
     module_tag?: { text: string }
     module_stat: {
@@ -206,7 +217,7 @@ export interface DynamicItemResponse<T extends DynamicType> {
           comment_id_str: string
           comment_type: number
         }
-        type?: DynamicTypeEnum
+        type: DynamicTypeEnum
         modules: {
           module_author: Author
           module_dynamic: {
@@ -227,7 +238,7 @@ export interface DynamicItemResponse<T extends DynamicType> {
           }
         }
       }
-    : null
+    : never
 }
 
 export interface DynamicListResponse {
@@ -470,9 +481,6 @@ export async function getDynamicItems(offset = '', uid: string | number) {
   const data = await request<DynamicListResponse>(
     `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${uid}&timezone_offset=-480`,
   )
-  // if (code) {
-  //   return Promise.reject(new Error(message));
-  // }
   return {
     more: data.has_more,
     offset: data.offset,
