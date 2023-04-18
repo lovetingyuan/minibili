@@ -3,5 +3,10 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: ['./scripts/babel-plugin-function-source.js'],
+    env: {
+      production: {
+        plugins: ['transform-remove-console'],
+      },
+    },
   }
 }

@@ -12,20 +12,18 @@ export default function HeaderRight(
 
   return (
     <Pressable
+      style={{ padding: 8 }}
       onPress={() => {
-        console.log(`https://m.bilibili.com/dynamic/${id}`)
         navigation.navigate('WebPage', {
+          title: props.route.name + '的动态',
           url: `https://m.bilibili.com/dynamic/${id}`,
         })
       }}>
-      <Image
-        style={styles.image}
-        source={require('../../../assets/bili-text.png')}
-      />
+      <Image style={styles.image} source={require('../../../assets/to.png')} />
     </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
-  image: { width: 36, height: 14 },
+  image: { width: 32, height: 20 },
 })

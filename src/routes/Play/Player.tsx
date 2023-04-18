@@ -6,6 +6,8 @@ import {
   View,
   Image,
   StyleSheet,
+  ImageBackground,
+  Pressable,
 } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
@@ -14,6 +16,7 @@ import useMounted from '../../hooks/useMounted'
 import { isWifi } from '../../utils'
 import { useSnapshot } from 'valtio'
 import store from '../../store'
+import { Icon } from '@rneui/themed'
 type Props = { page: number }
 
 function Player(props: Props & { wifi: boolean }) {
@@ -24,6 +27,7 @@ function Player(props: Props & { wifi: boolean }) {
   const playStateRef = React.useRef('')
   const { currentVideo } = useSnapshot(store)
   const { data: vi, error } = useVideoInfo(currentVideo?.bvid)
+  const [loadPlayer, setLoadPlayer] = React.useState(wifi)
   const videoInfo = {
     ...currentVideo,
     ...vi,
@@ -96,6 +100,35 @@ function Player(props: Props & { wifi: boolean }) {
   }).forEach(([k, v]) => {
     search.append(k, v + '')
   })
+  const webview = (
+    <WebView
+      source={{
+        uri: `${playUrl}?${search}`,
+      }}
+      originWhitelist={['https://*', 'bilibili://*']}
+      allowsFullscreenVideo
+      injectedJavaScriptForMainFrameOnly
+      allowsInlineMediaPlayback
+      startInLoadingState
+      mediaPlaybackRequiresUserAction={false}
+      injectedJavaScript={INJECTED_JAVASCRIPT}
+      renderLoading={renderLoading}
+      onMessage={handleMessage}
+      onError={() => {
+        ToastAndroid.show('加载失败', ToastAndroid.SHORT)
+      }}
+      onShouldStartLoadWithRequest={request => {
+        // Only allow navigating within this website
+        if (request.url.endsWith('/log-reporter.js')) {
+          return false
+        }
+        if (request.url.startsWith('http') && !request.url.includes('.apk')) {
+          return true
+        }
+        return false
+      }}
+    />
+  )
   return (
     <View
       renderToHardwareTextureAndroid
@@ -104,33 +137,33 @@ function Player(props: Props & { wifi: boolean }) {
         height: videoViewHeight + extraHeight,
         flexShrink: 0,
       }}>
-      <WebView
-        source={{
-          uri: `${playUrl}?${search}`,
-        }}
-        originWhitelist={['https://*', 'bilibili://*']}
-        allowsFullscreenVideo
-        injectedJavaScriptForMainFrameOnly
-        allowsInlineMediaPlayback
-        startInLoadingState
-        mediaPlaybackRequiresUserAction={false}
-        injectedJavaScript={INJECTED_JAVASCRIPT}
-        renderLoading={renderLoading}
-        onMessage={handleMessage}
-        onError={() => {
-          ToastAndroid.show('加载失败', ToastAndroid.SHORT)
-        }}
-        onShouldStartLoadWithRequest={request => {
-          // Only allow navigating within this website
-          if (request.url.endsWith('/log-reporter.js')) {
-            return false
-          }
-          if (request.url.startsWith('http') && !request.url.includes('.apk')) {
-            return true
-          }
-          return false
-        }}
-      />
+      {!loadPlayer ? (
+        webview
+      ) : (
+        <Pressable
+          onPress={() => {
+            setLoadPlayer(true)
+          }}
+          style={{
+            flex: 1,
+          }}>
+          <ImageBackground
+            source={{ uri: videoInfo.cover + '@672w_378h_1c.webp' }}
+            resizeMode="cover"
+            style={styles.videoCover}>
+            <Icon
+              name="television-play"
+              type="material-community"
+              size={60}
+              color={'white'}
+            />
+            {/* <Image
+              source={require('../../../assets/ic_play.png')}
+              style={{ width: 60, height: 60 }}
+            /> */}
+          </ImageBackground>
+        </Pressable>
+      )}
     </View>
   )
 }
@@ -155,5 +188,10 @@ const styles = StyleSheet.create({
   loadingImage: {
     flex: 1,
     width: '100%',
+  },
+  videoCover: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })

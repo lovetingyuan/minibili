@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { useLivingInfo } from '../../api/living-info'
+import { useLivingInfo2 } from '../../api/living-info'
 import { Avatar, Badge } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
@@ -20,7 +20,7 @@ export default React.memo(
     const updateId = useHasUpdate(mid)
     store.updatedUps[mid] = !!updateId
     const navigation = useNavigation<NavigationProps['navigation']>()
-    const liveInfo = useLivingInfo(mid)
+    const liveInfo = useLivingInfo2(mid)
     const [modalVisible, setModalVisible] = React.useState(false)
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
       store.dynamicUser = {
@@ -38,9 +38,9 @@ export default React.memo(
       }
     })
     const gotoLivePage = useMemoizedFn(() => {
-      if (liveInfo?.liveUrl) {
+      if (liveInfo.data?.liveUrl) {
         navigation.navigate('WebPage', {
-          url: liveInfo.liveUrl,
+          url: liveInfo.data.liveUrl,
           title: name + '的直播间',
         })
       }
@@ -68,7 +68,7 @@ export default React.memo(
             onLongPress={() => setModalVisible(true)}
             onPress={() => gotoDynamic(true)}>
             <Avatar
-              size={50}
+              size={45}
               rounded
               source={{ uri: face + '@120w_120h_1c.webp' }}
             />
@@ -84,7 +84,7 @@ export default React.memo(
               {name}
             </Text>
           </TouchableOpacity>
-          {liveInfo?.living ? (
+          {liveInfo.data?.living ? (
             <Button
               title="直播中~"
               type="clear"

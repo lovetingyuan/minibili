@@ -96,9 +96,9 @@ export default function ForwardItem(
       activeOpacity={0.8}
       onPress={() => {
         navigation.navigate('WebPage', {
+          title: props.name + '的动态',
           url: `https://m.bilibili.com/dynamic/${props.commentId}`,
         })
-        // Linking.openURL(`https://m.bilibili.com/dynamic/${props.commentId}`)
       }}>
       <View style={[styles.textContainer]}>
         <RichText

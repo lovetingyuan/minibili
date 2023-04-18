@@ -1,3 +1,2 @@
-import './sentry'
-import App from './routes/Index'
-export default App
+import './init'
+export { default } from './routes/Index'

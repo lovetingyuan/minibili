@@ -34,7 +34,7 @@ const fetcher2 = async (url: string) => {
   )
   return {
     total,
-    list: list.flat().map(getFollowedUp),
+    list: list.flat().map(getFollowedUp).slice(0, 4),
   }
 }
 

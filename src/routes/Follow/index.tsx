@@ -21,7 +21,7 @@ import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 export default function Follow({ navigation, route }: Props) {
-  __DEV__ && console.log(route.name)
+  __DEV__ && console.log(111, route.name)
   const { $userInfo, $followedUps, livingUps, updatedUps, checkingUpdateMap } =
     useSnapshot(store)
   const followListRef = React.useRef<FlatList | null>(null)
@@ -66,7 +66,6 @@ export default function Follow({ navigation, route }: Props) {
     }
     return <View style={{ flex: 1, marginHorizontal: 10, height: 20 }} />
   }
-
   if (!$userInfo) {
     return <Login />
   }
@@ -104,9 +103,7 @@ export default function Follow({ navigation, route }: Props) {
         <FlatList
           data={displayUps}
           renderItem={renderItem}
-          keyExtractor={(item, index) =>
-            /**item ? item.mid + '' : **/ index + ''
-          }
+          keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
           onEndReachedThreshold={1}
           numColumns={columns}
           ref={followListRef}

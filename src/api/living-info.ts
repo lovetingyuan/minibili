@@ -53,21 +53,45 @@ export const useLivingInfo = (mid: number | string) => {
 }
 
 // https://api.bilibili.com/x/space/wbi/acc/info?mid=3493257772272614&token=&platform=web
-// export function getLivingInfo(mid: string | number) {
-//   return request<{
-//     live_room: {
-//       roomStatus: number
-//       liveStatus: number
-//       url: string
-//       title: string
-//       cover: string
-//       roomid: number
-//     }
-//   }>(`/x/space/wbi/acc/info?mid=${mid}&token=&platform=web`).then(data => {
-//     return {
-//       living: data.live_room.liveStatus === 1,
-//       roomId: data.live_room.roomid,
-//       roomEnable: data.live_room.roomStatus === 1,
-//     }
-//   })
-// }
+export const useLivingInfo2 = (mid: number | string) => {
+  const delay = mid.toString().slice(0, 5)
+  const { data, error } = useSWR<{
+    mid: number
+    name: string
+    sex: string
+    face: string
+    sign: string
+    birthday: string
+    live_room: {
+      roomStatus: number
+      liveStatus: number
+      url: string
+      title: string
+      cover: string
+      roomid: number
+    }
+  }>(
+    `/x/space/wbi/acc/info?mid=${mid}&token=&platform=web`,
+    (url: string) => {
+      return queue.add(() => request(url))
+    },
+    {
+      refreshInterval: 10 * 60 * 1000 + Number(delay),
+    },
+  )
+  if (__DEV__ && error) {
+    console.error('liveing', error)
+  }
+  return {
+    data: data
+      ? {
+          living: data.live_room.liveStatus === 1,
+          liveUrl: data.live_room.url,
+          roomId: data.live_room.roomid,
+          name: data.name,
+          face: data.face,
+        }
+      : null,
+    error,
+  }
+}

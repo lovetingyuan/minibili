@@ -11,44 +11,54 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
-import { Button, Icon } from '@rneui/themed'
-import { Pressable } from 'react-native'
-import useMemoizedFn from '../../hooks/useMemoizedFn'
+import { Icon } from '@rneui/themed'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
 export default ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { url, title } = route.params
-  console.log(3333, title, url)
   const webviewRef = React.useRef<WebView | null>(null)
   const { $webViewMode } = useSnapshot(store)
-  const headerRight = useMemoizedFn(() => {
-    return (
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Button
-          titleStyle={{ fontSize: 13 }}
-          onPress={() => {
-            store.$webViewMode = $webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
-          }}
-          size="sm"
-          type="clear">
-          {$webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
-        </Button>
-        <Pressable
-          onPress={() => {
-            webviewRef.current?.reload()
-          }}>
-          <Icon name="refresh" size={20} color="#666" />
-        </Pressable>
-      </View>
-    )
-  })
   React.useEffect(() => {
     navigation.setOptions({
-      headerRight,
+      headerRight: () => {
+        return (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Icon
+              onPress={() => {
+                store.$webViewMode =
+                  store.$webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
+              }}
+              name={
+                store.$webViewMode === 'MOBILE' ? 'mobile-friendly' : 'computer'
+              }
+              color="#666"
+              size={18}
+            />
+            <Icon
+              name="refresh"
+              size={20}
+              color="#666"
+              style={{ marginLeft: 8 }}
+              onPress={() => {
+                webviewRef.current?.reload()
+              }}
+            />
+            <Icon
+              name="open-in-browser"
+              size={20}
+              color="#666"
+              style={{ marginLeft: 8 }}
+              onPress={() => {
+                Linking.openURL(url)
+              }}
+            />
+          </View>
+        )
+      },
     })
-  }, [navigation, headerRight])
+  }, [navigation, $webViewMode, url])
   return (
     <WebView
       style={styles.container}
@@ -73,11 +83,6 @@ export default ({ route, navigation }: Props) => {
             headerTitle: data.payload,
           })
         }
-      }}
-      onNavigationStateChange={() => {
-        // Keep track of going back navigation within component
-        console.log(2222)
-        return true
       }}
       onError={() => {
         ToastAndroid.show('加载失败', ToastAndroid.SHORT)
