@@ -8,8 +8,6 @@ interface UserInfo {
   name: string
   face: string
   sign: string
-  // fans: number
-  // subs: number
 }
 
 const store = proxy<{

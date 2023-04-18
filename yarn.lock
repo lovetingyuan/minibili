@@ -4337,6 +4337,11 @@ eslint-plugin-react@^7.30.1:
     semver "^6.3.0"
     string.prototype.matchall "^4.0.8"
 
+eslint-plugin-valtio@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.npmmirror.com/eslint-plugin-valtio/-/eslint-plugin-valtio-0.6.2.tgz#b66791b3b6c5964a1736c6a75106355e8cfb63be"
+  integrity sha512-7U870y+gjL6xsiwPyMcUFHFbrMPk2t02X6V4VF5rSDi0f3A/uQDqAVvsY7m035plKW0Ke2i1aRch4tNWtnRqLA==
+
 eslint-scope@5.1.1, eslint-scope@^5.1.1:
   version "5.1.1"
   resolved "https://registry.npmmirror.com/eslint-scope/-/eslint-scope-5.1.1.tgz#e786e59a66cb92b3f6c1fb0d508aab174848f48c"

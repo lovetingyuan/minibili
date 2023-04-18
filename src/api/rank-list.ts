@@ -1,4 +1,3 @@
-// /x/web-interface/ranking/v2?rid=36&type=all
 import request from './fetcher'
 
 import useSWR from 'swr'

@@ -15,4 +15,10 @@ describe('ranks-videos', () => {
     )
     RankVideosDataResponseSchema.parse(res)
   })
+  test('all-videos', async () => {
+    const res = await fetcher(
+      'https://api.bilibili.com/x/web-interface/ranking/v2?rid=0&type=all',
+    )
+    RankVideosDataResponseSchema.parse(res)
+  })
 })

@@ -15,7 +15,6 @@ export const VideoInfoResponseSchema = z.object({
   }),
   duration: z.number(),
   dynamic: z.string(),
-  // honor_reply: {honor: Array(1)}
   is_chargeable_season: z.boolean(),
   is_season_display: z.boolean(),
   is_story: z.boolean(),
@@ -32,7 +31,6 @@ export const VideoInfoResponseSchema = z.object({
         rotate: z.number(),
       }),
       duration: z.number(),
-      // first_frame: z.string(),
       from: z.string(),
       page: z.number(),
       part: z.string(),
@@ -41,9 +39,7 @@ export const VideoInfoResponseSchema = z.object({
     })
     .array(),
   pic: z.string(),
-  // premiere: null
   pubdate: z.number(),
-  // rights: {bp: 0, elec: 0, download: 1, movie: 0, pay: 0, …}
   season_id: z.number(),
   stat: z.object({
     aid: z.number(),
@@ -57,12 +53,9 @@ export const VideoInfoResponseSchema = z.object({
     share: z.number(),
   }),
   state: z.number(),
-  // subtitle: {allow_submit: true, list: Array(0)}
   teenage_mode: z.number(),
   tid: z.number(),
   title: z.string(),
   tname: z.string(),
-  // ugc_season: {id: z.number(),, title: z.string(),, cover: z.string(),, mid: z.number(),, intro: z.string(),, …}
-  // user_garb: {url_image_ani_cut: ''}
   videos: z.number(),
 })

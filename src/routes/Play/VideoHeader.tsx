@@ -12,9 +12,13 @@ import { useSnapshot } from 'valtio'
 export default function VideoHeader(props: { isFromDynamic: boolean }) {
   const { isFromDynamic } = props
   const { currentVideo } = useSnapshot(store)
-  const { bvid, name, face, mid, pubDate, title } = currentVideo!
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { data: videoInfo } = useVideoInfo(bvid)
+  const { data: vi } = useVideoInfo(currentVideo?.bvid)
+  const videoInfo = {
+    ...currentVideo,
+    ...vi,
+  }
+  const { bvid, name, face, mid, pubDate, title } = videoInfo
   const [nameTextKey, setNameTextKey] = React.useState('-')
   useMounted(() => {
     for (let i = 0; i < 2; i++) {
@@ -29,6 +33,9 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
         onPress={() => {
           if (isFromDynamic) {
             navigation.goBack()
+            return
+          }
+          if (!mid || !face || !name) {
             return
           }
           store.dynamicUser = {
@@ -69,9 +76,11 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
         </View>
 
         <Pressable
-          style={{ flexDirection: 'row', alignItems: 'center' }}
+          style={styles.shareBtn}
           onPress={() => {
-            handleShareVideo(name, title, bvid)
+            if (name && title && bvid) {
+              handleShareVideo(name, title, bvid)
+            }
           }}>
           <Icon type="material-community" name="share" size={20} color="#666" />
           <Text style={styles.VideoItemText}>
@@ -100,16 +109,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 17,
     fontWeight: 'bold',
-    // flex: 1,
     flexGrow: 1,
     flexShrink: 1,
-    // borderWidth: 1,
   },
   VideoItem: {
     flexDirection: 'row',
     flexShrink: 0,
-    // minWidth: 80,
-    // borderWidth: 1,
     color: '#666',
     alignItems: 'center',
     gap: 10,
@@ -123,4 +128,5 @@ const styles = StyleSheet.create({
     color: '#555',
     fontSize: 13,
   },
+  shareBtn: { flexDirection: 'row', alignItems: 'center' },
 })

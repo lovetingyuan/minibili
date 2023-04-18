@@ -26,7 +26,6 @@ const getVideoItem = (data: VideoInfoResponse) => {
     shareNum: data.stat.share,
     viewNum: data.stat.view,
     cover: data.pic,
-    // videosNum: data.pages.length,
     videosNum: data.pages?.length || 0,
     videos: data.videos,
     tname: data.tname,
@@ -44,11 +43,9 @@ const getVideoItem = (data: VideoInfoResponse) => {
 export type VideoInfo = ReturnType<typeof getVideoItem>
 
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
-export function useVideoInfo(bvid: string) {
+export function useVideoInfo(bvid?: string) {
   const { data, error, isValidating, isLoading } = useSWR<VideoInfoResponse>(
-    () => {
-      return '/x/web-interface/view?bvid=' + bvid
-    },
+    bvid ? '/x/web-interface/view?bvid=' + bvid : null,
   )
   return {
     data: data ? getVideoItem(data) : null,
