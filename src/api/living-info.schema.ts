@@ -21,3 +21,20 @@ export const LiveInfoResponseSchema = z.object({
   is_strict_room: z.boolean(),
   live_time: z.string(),
 })
+
+export const LiveUserInfoResponseSchema = z.object({
+  mid: z.number(),
+  name: z.string(),
+  sex: z.string(),
+  face: z.string(),
+  sign: z.string(),
+  birthday: z.string(),
+  live_room: z.object({
+    roomStatus: z.number(),
+    liveStatus: z.number(),
+    url: z.string(),
+    title: z.string(),
+    cover: z.string(),
+    roomid: z.number(),
+  }),
+})

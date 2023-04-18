@@ -3,6 +3,7 @@ import request from './fetcher'
 import {
   LiveInfoResponseSchema,
   LiveRoomInfoResponseSchema,
+  LiveUserInfoResponseSchema,
 } from './living-info.schema'
 import useSWR from 'swr'
 import useSWRImmutable from 'swr/immutable'
@@ -11,6 +12,7 @@ import store from '../store'
 
 export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
 export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
+export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
 
 const queue = new PQueue({ concurrency: 3 })
 
@@ -55,22 +57,7 @@ export const useLivingInfo = (mid: number | string) => {
 // https://api.bilibili.com/x/space/wbi/acc/info?mid=3493257772272614&token=&platform=web
 export const useLivingInfo2 = (mid: number | string) => {
   const delay = mid.toString().slice(0, 5)
-  const { data, error } = useSWR<{
-    mid: number
-    name: string
-    sex: string
-    face: string
-    sign: string
-    birthday: string
-    live_room: {
-      roomStatus: number
-      liveStatus: number
-      url: string
-      title: string
-      cover: string
-      roomid: number
-    }
-  }>(
+  const { data, error } = useSWR<LiveUserInfo>(
     `/x/space/wbi/acc/info?mid=${mid}&token=&platform=web`,
     (url: string) => {
       return queue.add(() => request(url))
