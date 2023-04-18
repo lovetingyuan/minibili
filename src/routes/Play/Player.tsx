@@ -137,7 +137,7 @@ function Player(props: Props & { wifi: boolean }) {
         height: videoViewHeight + extraHeight,
         flexShrink: 0,
       }}>
-      {!loadPlayer ? (
+      {loadPlayer ? (
         webview
       ) : (
         <Pressable
