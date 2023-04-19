@@ -72,9 +72,10 @@ export const useLivingInfo2 = (mid: number | string) => {
   return {
     data: data
       ? {
-          living: data.live_room.liveStatus === 1,
-          liveUrl: data.live_room.url,
-          roomId: data.live_room.roomid,
+          hasLiveRoom: !!data.live_room,
+          living: data.live_room?.liveStatus === 1,
+          liveUrl: data.live_room?.url,
+          roomId: data.live_room?.roomid,
           name: data.name,
           face: data.face,
         }

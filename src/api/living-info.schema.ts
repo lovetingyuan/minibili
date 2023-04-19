@@ -29,12 +29,14 @@ export const LiveUserInfoResponseSchema = z.object({
   face: z.string(),
   sign: z.string(),
   birthday: z.string(),
-  live_room: z.object({
-    roomStatus: z.number(),
-    liveStatus: z.number(),
-    url: z.string(),
-    title: z.string(),
-    cover: z.string(),
-    roomid: z.number(),
-  }),
+  live_room: z
+    .object({
+      roomStatus: z.number(),
+      liveStatus: z.number(),
+      url: z.string(),
+      title: z.string(),
+      cover: z.string(),
+      roomid: z.number(),
+    })
+    .optional(),
 })
