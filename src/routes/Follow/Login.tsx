@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native'
+import * as SentryExpo from 'sentry-expo'
 
 import store from '../../store'
 import { useUserInfo } from '../../api/user-info'
@@ -41,10 +42,22 @@ export default function Login() {
       face: data.face,
       sign: data.sign,
     }
+    SentryExpo.Native.configureScope(function (scope) {
+      scope.setUser({ id: data.mid + '', username: data.name })
+    })
+    SentryExpo.Native.captureMessage('user:login', {
+      tags: {
+        category: 'user-login',
+      },
+      extra: {
+        mid: data.mid,
+        name: data.name,
+      },
+    })
   }
   React.useEffect(() => {
     if (error) {
-      ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
+      ToastAndroid.show('获取用户信息失', ToastAndroid.SHORT)
     }
   }, [error])
 

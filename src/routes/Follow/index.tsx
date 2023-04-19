@@ -27,14 +27,20 @@ export default function Follow({ navigation, route }: Props) {
   const followListRef = React.useRef<FlatList | null>(null)
 
   const { data, error, isLoading } = useFollowedUps($userInfo?.mid)
-  const showLoadingError = React.useRef(false)
-  if (!showLoadingError.current && error) {
-    ToastAndroid.show('获取关注列表失败', ToastAndroid.SHORT)
-    showLoadingError.current = true
-  }
-  if (!$followedUps.length && data?.list.length) {
-    store.$followedUps = data.list
-  }
+  React.useEffect(() => {
+    if (error) {
+      ToastAndroid.show(
+        '获取关注列表失败（用户需要设置关注列表公开）',
+        ToastAndroid.SHORT,
+      )
+    }
+  }, [error])
+  React.useEffect(() => {
+    if (data?.list) {
+      store.$followedUps = data?.list
+    }
+  }, [data?.list])
+
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
   const rest = data?.list.length ? data.list.length % columns : 0
@@ -86,10 +92,8 @@ export default function Follow({ navigation, route }: Props) {
     ...topUps,
     ...updateUps,
     ...noUpdateUps,
+    ...(rest ? Array.from({ length: rest }).map(() => null) : []),
   ]
-  if (rest) {
-    displayUps.push(...Array.from({ length: rest }).map(() => null))
-  }
   const isCheckingUpdate =
     Object.values(checkingUpdateMap).filter(Boolean).length > 0
 

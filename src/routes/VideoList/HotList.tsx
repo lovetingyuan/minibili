@@ -19,6 +19,7 @@ import store from '../../store'
 import { useSnapshot } from 'valtio'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, openBiliVideo } from '../../utils'
+import * as SentryExpo from 'sentry-expo'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
@@ -51,6 +52,11 @@ export default function Hot({ navigation }: Props) {
     }
     const { mid, name } = currentVideoRef.current
     store.$blackUps['_' + mid] = name
+    SentryExpo.Native.captureMessage('user:action:add-black', {
+      tags: {
+        category: 'user-action',
+      },
+    })
   }
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {

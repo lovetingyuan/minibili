@@ -52,14 +52,21 @@ export default function request<D extends any>(url: string, referer?: string) {
           ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT)
           errorTime = Date.now()
         }
-        const errMsg =
-          'Request API failed: ' +
-          JSON.stringify({
+        const errMsg = JSON.stringify({
+          url,
+          code: res.code,
+          message: res.message,
+        })
+        SentryExpo.Native.captureMessage(errMsg, {
+          tags: {
+            category: 'api-error',
+          },
+          extra: {
             url,
             code: res.code,
             message: res.message,
-          })
-        SentryExpo.Native.captureMessage(errMsg)
+          },
+        })
         throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + errMsg : ''))
       }
       return res.data
