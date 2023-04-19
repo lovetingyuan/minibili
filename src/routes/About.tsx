@@ -60,9 +60,9 @@ export default function About() {
         if (data.hasUpdate) {
           Alert.alert(
             '有新版本',
-            `${data.currentVersion} --> ${
-              data.latestVersion
-            }\n\n${data.changes.join('\n')}`,
+            `${data.currentVersion} --> ${data.latestVersion}\n\n${data.changes
+              .join('\n')
+              .replace('[force]', '')}`,
             [
               {
                 text: '取消',

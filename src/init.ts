@@ -54,9 +54,9 @@ firstTip().then(() => {
           const forceUpdate = data.changes.some(v => v.includes('[force]'))
           Alert.alert(
             '有新版本',
-            `${data.currentVersion} --> ${
-              data.latestVersion
-            }\n\n${data.changes.join('\n')}`,
+            `${data.currentVersion} --> ${data.latestVersion}\n\n${data.changes
+              .join('\n')
+              .replace('[force]', '')}`,
             forceUpdate
               ? [
                   {

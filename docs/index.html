@@ -125,7 +125,9 @@
                 const apkUrl =
                   change.artifacts.applicationArchiveUrl ||
                   change.artifacts.buildUrl
-                const updateMessage = change.gitCommitMessage.split('  ')
+                const updateMessage = change.gitCommitMessage
+                  .replace('[force]', '')
+                  .split('  ')
                 const buildDate = change.completedAt.split('T')[0]
                 const version = change.appVersion
                 return `
