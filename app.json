@@ -26,7 +26,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.tingyuan.minibili",
-      "versionCode": 30
+      "versionCode": 32
     },
     "web": {
       "favicon": "./assets/favicon.png"

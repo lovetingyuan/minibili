@@ -67,7 +67,7 @@ export default function request<D extends any>(url: string, referer?: string) {
             message: res.message,
           },
         })
-        SentryExpo.Native.captureEvent()
+        // SentryExpo.Native.captureEvent()
         throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + errMsg : ''))
       }
       return res.data
