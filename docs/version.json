@@ -1,4 +1,43 @@
+★ eas-cli@3.9.3 is now available.
+To upgrade, run npm install -g eas-cli.
+Proceeding with outdated version.
+
 [
+  {
+    "id": "e8f388c0-471d-490b-a941-cb64201f8162",
+    "status": "FINISHED",
+    "platform": "ANDROID",
+    "artifacts": {
+      "buildUrl": "https://expo.dev/artifacts/eas/uLqdJxDn9949U1iqENzyv9.apk",
+      "applicationArchiveUrl": "https://expo.dev/artifacts/eas/uLqdJxDn9949U1iqENzyv9.apk"
+    },
+    "initiatingActor": {
+      "id": "7fe27145-df05-4123-8102-627699be725a",
+      "displayName": "tingyuan"
+    },
+    "project": {
+      "id": "17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
+      "name": "MiniBili",
+      "slug": "minibili",
+      "ownerAccount": {
+        "id": "5ff38c4f-cd29-466d-94d1-bb863a85a56e",
+        "name": "tingyuan"
+      }
+    },
+    "releaseChannel": "production",
+    "distribution": "STORE",
+    "buildProfile": "production",
+    "sdkVersion": "48.0.0",
+    "appVersion": "0.0.26",
+    "appBuildVersion": "31",
+    "gitCommitHash": "c19ee9dd9961ac2f8e5be90fb7dda0d794360aa7",
+    "gitCommitMessage": "调整UI细节",
+    "priority": "NORMAL",
+    "createdAt": "2023-04-19T02:11:53.786Z",
+    "updatedAt": "2023-04-19T02:24:00.878Z",
+    "completedAt": "2023-04-19T02:23:59.277Z",
+    "resourceClass": "ANDROID_MEDIUM"
+  },
   {
     "id": "1054d8e3-e721-4783-8426-97167d4bc53a",
     "status": "FINISHED",
@@ -137,41 +176,6 @@
     "createdAt": "2023-04-14T04:53:51.353Z",
     "updatedAt": "2023-04-14T05:05:53.454Z",
     "completedAt": "2023-04-14T05:05:48.638Z",
-    "resourceClass": "ANDROID_MEDIUM"
-  },
-  {
-    "id": "11388a8d-6295-41c2-8af4-31915ba88140",
-    "status": "FINISHED",
-    "platform": "ANDROID",
-    "artifacts": {
-      "buildUrl": "https://expo.dev/artifacts/eas/38kyMtQVNvaiPN8XUJUGGh.apk",
-      "applicationArchiveUrl": "https://expo.dev/artifacts/eas/38kyMtQVNvaiPN8XUJUGGh.apk"
-    },
-    "initiatingActor": {
-      "id": "7fe27145-df05-4123-8102-627699be725a",
-      "displayName": "tingyuan"
-    },
-    "project": {
-      "id": "17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
-      "name": "MiniBili",
-      "slug": "minibili",
-      "ownerAccount": {
-        "id": "5ff38c4f-cd29-466d-94d1-bb863a85a56e",
-        "name": "tingyuan"
-      }
-    },
-    "releaseChannel": "production",
-    "distribution": "STORE",
-    "buildProfile": "production",
-    "sdkVersion": "48.0.0",
-    "appVersion": "0.0.21",
-    "appBuildVersion": "25",
-    "gitCommitHash": "b0c55d2dcceaff27c35800c2dcebca6668c44df6",
-    "gitCommitMessage": "优化细节  修复一些已知问题",
-    "priority": "NORMAL",
-    "createdAt": "2023-04-14T03:37:58.906Z",
-    "updatedAt": "2023-04-14T03:49:59.153Z",
-    "completedAt": "2023-04-14T03:49:55.585Z",
     "resourceClass": "ANDROID_MEDIUM"
   }
 ]
