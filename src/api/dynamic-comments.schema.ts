@@ -16,7 +16,7 @@ export const MemberSchema = z.object({
   uname: z.string(),
 })
 
-export const baseReplySchema = z.object({
+const BaseReplySchema = z.object({
   content: z.object({
     message: z.string(),
   }),
@@ -41,11 +41,11 @@ export const baseReplySchema = z.object({
   up_action: z.object({ like: z.boolean(), reply: z.boolean() }),
 })
 
-type ReplaySchema = z.infer<typeof baseReplySchema> & {
+type ReplaySchema = z.infer<typeof BaseReplySchema> & {
   replies: ReplaySchema[] | null
 }
 
-const RepliesSchema: z.ZodType<ReplaySchema> = baseReplySchema.extend({
+const RepliesSchema: z.ZodType<ReplaySchema> = BaseReplySchema.extend({
   replies: z.lazy(() => RepliesSchema.array()).nullable(),
 })
 

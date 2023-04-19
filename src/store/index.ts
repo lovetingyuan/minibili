@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy } from 'valtio'
 import { watch } from 'valtio/utils'
 import { RanksConfig } from '../constants'
-import * as SentryExpo from 'sentry-expo'
 
 interface UserInfo {
   mid: number | string
@@ -68,15 +67,6 @@ Object.keys(store)
       .then(data => {
         if (data) {
           store[key] = JSON.parse(data)
-          if (key === '$userInfo' && store.$userInfo) {
-            const user = {
-              id: store.$userInfo.mid + '',
-              username: store.$userInfo.name,
-            }
-            SentryExpo.Native.configureScope(function (scope) {
-              scope.setUser(user)
-            })
-          }
         }
       })
       .then(() => {

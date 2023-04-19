@@ -52,12 +52,7 @@ export default function request<D extends any>(url: string, referer?: string) {
           ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT)
           errorTime = Date.now()
         }
-        const errMsg = JSON.stringify({
-          url,
-          code: res.code,
-          message: res.message,
-        })
-        SentryExpo.Native.captureMessage(errMsg, {
+        SentryExpo.Native.captureException('api:error', {
           tags: {
             category: 'api-error',
           },
@@ -67,8 +62,9 @@ export default function request<D extends any>(url: string, referer?: string) {
             message: res.message,
           },
         })
-        // SentryExpo.Native.captureEvent()
-        throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + errMsg : ''))
+        return Promise.reject(
+          new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : '')),
+        )
       }
       return res.data
     })

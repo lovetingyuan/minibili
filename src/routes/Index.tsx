@@ -12,20 +12,62 @@ import { NetToast } from '../components/NetToast'
 import { SWRConfig } from 'swr'
 import fetcher from '../api/fetcher'
 import DynamicDetail from './DynamicDetail'
-import { Linking } from 'react-native'
+import { Linking, AppState } from 'react-native'
 import { Button } from '@rneui/themed'
 import { site } from '../constants'
 import HeaderTitle from './DynamicDetail/HeaderTitle'
 import HeaderRight from './DynamicDetail/HeaderRight'
 import PlayHeaderRight from './Play/HeaderRight'
+import NetInfo from '@react-native-community/netinfo'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
+
+let online = true
+let focus = true
 
 export default () => {
   return (
     <SWRConfig
       value={{
         fetcher,
+        isVisible() {
+          return focus
+        },
+        isOnline() {
+          return online
+        },
+        initFocus(callback) {
+          /* 向状态 provider 注册侦听器 */
+          let appState = AppState.currentState
+
+          // 订阅 app 状态更改事件
+          const subscription = AppState.addEventListener(
+            'change',
+            nextAppState => {
+              online = nextAppState === 'active'
+              /* 如果正在从后台或非 active 模式恢复到 active 模式 */
+              if (appState.match(/inactive|background/) && online) {
+                callback()
+              }
+              appState = nextAppState
+            },
+          )
+
+          return () => {
+            subscription.remove()
+          }
+        },
+        initReconnect(callback) {
+          /* 向状态 provider 注册侦听器 */
+          return NetInfo.addEventListener(state => {
+            if (state.isConnected) {
+              online = true
+              callback()
+            } else {
+              online = false
+            }
+          })
+        },
       }}>
       <StatusBar style="auto" />
       <NetToast />

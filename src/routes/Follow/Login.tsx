@@ -47,10 +47,11 @@ export default function Login() {
     })
     SentryExpo.Native.captureMessage('user:login', {
       tags: {
-        category: 'user-login',
+        category: 'action',
+        action: 'login',
       },
       extra: {
-        mid: data.mid,
+        id: data.mid,
         name: data.name,
       },
     })

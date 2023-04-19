@@ -53,9 +53,13 @@ export default function Ranks({ navigation }: Props) {
     }
     const { mid, name } = currentVideoRef.current
     store.$blackUps['_' + mid] = name
-    SentryExpo.Native.captureMessage('user:action:add-black', {
+    SentryExpo.Native.captureMessage('user:action', {
       tags: {
-        category: 'user-action',
+        category: 'action',
+        action: 'add-black-up',
+      },
+      extra: {
+        blackMid: mid,
       },
     })
   }

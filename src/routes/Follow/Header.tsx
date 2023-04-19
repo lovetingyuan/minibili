@@ -48,9 +48,10 @@ export default function Header() {
             style={{ padding: 5 }}
             onPress={() => {
               navigation.navigate('About')
-              SentryExpo.Native.captureMessage('user:view:about', {
+              SentryExpo.Native.captureMessage('user:navigation', {
                 tags: {
-                  category: 'user-view',
+                  category: 'navigation',
+                  route: 'about',
                 },
               })
             }}>

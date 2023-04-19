@@ -1,4 +1,5 @@
 import React from 'react'
+import * as SentryExpo from 'sentry-expo'
 import {
   Linking,
   Pressable,
@@ -42,6 +43,9 @@ export default function About() {
           store.$followedUps = []
           store.livingUps = {}
           store.$ignoredVersions = []
+          SentryExpo.Native.configureScope(function (scope) {
+            scope.setUser(null)
+          })
           setTimeout(() => {
             navigation.goBack()
           }, 100)
