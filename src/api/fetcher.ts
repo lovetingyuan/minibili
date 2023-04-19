@@ -1,5 +1,6 @@
 import { ToastAndroid } from 'react-native'
 import { URL } from 'react-native-url-polyfill'
+import * as SentryExpo from 'sentry-expo'
 
 let errorTime = Date.now()
 
@@ -51,7 +52,15 @@ export default function request<D extends any>(url: string, referer?: string) {
           ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT)
           errorTime = Date.now()
         }
-        throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : ''))
+        const errMsg =
+          'Request API failed: ' +
+          JSON.stringify({
+            url,
+            code: res.code,
+            message: res.message,
+          })
+        SentryExpo.Native.captureMessage(errMsg)
+        throw new Error('未能获取当前数据' + (__DEV__ ? ' ' + errMsg : ''))
       }
       return res.data
     })
