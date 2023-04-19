@@ -38,10 +38,12 @@ try {
     () =>
       $`eas build:list --platform android --limit 5 --json --non-interactive --status finished`,
   )
-
+  let buildListStr = buildList.toString('utf8')
+  const index = buildListStr.indexOf('[')
+  buildListStr = buildListStr.substring(index)
   await fs.outputFile(
     path.resolve(__dirname, '../docs/version.json'),
-    buildList.toString('utf8').trim(),
+    buildListStr,
   )
 
   await $`git commit -a --amend -C HEAD`
