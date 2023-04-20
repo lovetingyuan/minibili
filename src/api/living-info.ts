@@ -67,7 +67,7 @@ export const useLivingInfo2 = (mid: number | string) => {
     },
   )
   if (__DEV__ && error) {
-    console.error('liveing', error)
+    console.error('living', error)
   }
   return {
     data: data

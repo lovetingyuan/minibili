@@ -3,7 +3,7 @@ import { changelogUrl } from '../constants'
 
 export const currentVersion = Application.nativeApplicationVersion
 
-interface buildInfo {
+export interface BuildInfo {
   id: string
   status: 'PENDING' | 'FINISHED'
   platform: 'ANDROID' | 'IOS' | 'ALL'
@@ -42,7 +42,7 @@ interface buildInfo {
 export const checkUpdate = (url = changelogUrl) => {
   return fetch(url + '?_t=' + Date.now())
     .then(r => r.json())
-    .then((res: buildInfo[]) => {
+    .then((res: BuildInfo[]) => {
       const latestVersion = res[0].appVersion
       const hasUpdate = res[0].appVersion
         ? res[0].appVersion !== currentVersion

@@ -9,13 +9,14 @@ import store from '../../store'
 import { NavigationProps } from '../../types'
 import DynamicStat from './DynamicStat'
 
-export default function DefaultItem(
-  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN>,
-) {
+export default function DefaultItem(props: DynamicItemType<DynamicTypeEnum>) {
   const { livingUps } = useSnapshot(store)
   const liveUrl = livingUps[props.mid]
   const navigation = useNavigation<NavigationProps['navigation']>()
-  if (props.payload.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+  if (
+    'type' in props.payload &&
+    props.payload.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD
+  ) {
     return (
       <Button
         type="clear"

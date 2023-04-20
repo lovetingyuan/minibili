@@ -3,21 +3,9 @@ import useSWR from 'swr'
 import { useSnapshot } from 'valtio'
 import store from '../store'
 import PQueue from 'p-queue'
+import { Author } from './dynamic-items.schema'
 
 export type DynamicItem = ReturnType<typeof getDynamicItem>
-
-interface Author {
-  face: string
-  following: boolean
-  jump_url: string
-  label: string
-  mid: number
-  name: string
-  pub_location_text: string
-  pub_time: string
-  pub_ts: number
-  // type: 'AUTHOR_TYPE_NORMAL'
-}
 
 export const enum DynamicTypeEnum {
   DYNAMIC_TYPE_AV = 'DYNAMIC_TYPE_AV',
@@ -185,7 +173,7 @@ export interface DynamicItemResponse<T extends DynamicTypeEnum> {
                   title: string
                 }
               }
-        : never
+        : unknown
     }
     module_tag?: { text: string }
     module_stat: {
@@ -249,18 +237,8 @@ export interface DynamicListResponse {
   update_baseline: string
   update_num: number
   items: (
-    | DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_AV>
-    | DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_DRAW>
-    | DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_WORD>
-    | DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE>
-    | DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN>
-    | DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_AV>
-    | DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_WORD>
-    | DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_DRAW>
-    | DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE>
-    | DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_LIVE>
-    | DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_NONE>
-    | DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN>
+    | DynamicItemResponse<DynamicTypeEnum>
+    | DynamicForwardItemResponse<DynamicTypeEnum>
   )[]
 }
 
@@ -469,30 +447,27 @@ const getArticleItem = (
   }
 }
 
-const getUnknownItem = (
-  item: DynamicItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN>,
-) => {
+const getUnknownItem = (item: DynamicItemResponse<DynamicTypeEnum>) => {
   return {
     ...getCommon(item),
-    type: DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN as const,
+    type: item.type,
     payload: {
       text: '暂不支持显示',
-      type: item.type as DynamicTypeEnum,
+      type: item.type,
     },
   }
 }
-const getUnknownForwardItem = (
-  item: DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_UNKNOWN>,
-) => {
-  return {
-    ...getCommon(item),
-    type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
-    payload: {
-      text: '暂不支持显示',
-      type: item.type as DynamicTypeEnum,
-    },
-  }
-}
+
+// const getUnknownForwardItem = (item: DynamicItemResponse<DynamicTypeEnum>) => {
+//   return {
+//     ...getCommon(item),
+//     type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+//     payload: {
+//       text: '暂不支持显示',
+//       type: item.type as DynamicTypeEnum,
+//     },
+//   }
+// }
 
 function isForwardType<T extends DynamicTypeEnum>(
   item: any,
@@ -504,20 +479,27 @@ function isForwardType<T extends DynamicTypeEnum>(
   )
 }
 
+function isType<T extends DynamicTypeEnum>(
+  item: any,
+  type: T,
+): item is DynamicItemResponse<T> {
+  return item.type === type
+}
+
 const getDynamicItem = (item: DynamicListResponse['items'][0]) => {
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
+  if (isType(item, DynamicTypeEnum.DYNAMIC_TYPE_WORD)) {
     return getWordItem(item)
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_AV) {
+  if (isType(item, DynamicTypeEnum.DYNAMIC_TYPE_AV)) {
     return getVideoItem(item)
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
+  if (isType(item, DynamicTypeEnum.DYNAMIC_TYPE_DRAW)) {
     return getDrawItem(item)
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
+  if (isType(item, DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE)) {
     return getArticleItem(item)
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
+  if (isType(item, DynamicTypeEnum.DYNAMIC_TYPE_FORWARD)) {
     if (isForwardType(item, DynamicTypeEnum.DYNAMIC_TYPE_AV)) {
       return getVideoForwardItem(item)
     }
@@ -536,7 +518,7 @@ const getDynamicItem = (item: DynamicListResponse['items'][0]) => {
     if (isForwardType(item, DynamicTypeEnum.DYNAMIC_TYPE_NONE)) {
       return getNoneForwardItem(item)
     }
-    return getUnknownForwardItem(item)
+    return getUnknownItem(item)
   }
   return getUnknownItem(item)
 }
