@@ -13,7 +13,7 @@ import { useHasUpdate } from '../../api/dynamic-items'
 
 export default React.memo(
   function FollowItem(props: { item: FollowedUpItem; width?: number }) {
-    __DEV__ && console.log('follow item', props.item.name)
+    // __DEV__ && console.log('follow item', props.item.name)
     const {
       item: { face, name, sign, mid },
     } = props

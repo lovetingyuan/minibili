@@ -12,9 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "assets/*"
-    ],
+    "assetBundlePatterns": ["assets/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tingyuan.minibili",
@@ -53,8 +51,7 @@
           "file": "sentry-expo/upload-sourcemaps",
           "config": {
             "organization": "tingyuan123",
-            "project": "minibili",
-            "authToken": "${SENTRY_AUTH_TOKEN}"
+            "project": "minibili"
           }
         }
       ]

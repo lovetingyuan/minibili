@@ -136,22 +136,8 @@ const getVideoItem = (
   }
 }
 
-// const getLiveForwardItem = (
-//   item: DynamicForwardItemResponse<DynamicTypeEnum.DYNAMIC_TYPE_LIVE>,
-// ) => {
-//   const forward = item.orig.modules.module_dynamic
-//   return {
-//     ...getCommon(item),
-//     type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
-//     payload: {
-//       type: MajorTypeEnum.MAJOR_TYPE_LIVE as const,
-//       title: '直播：' + forward.major?.live.title,
-//       cover: forward.major?.live.cover,
-//     },
-//   }
-// }
-
 const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
+  __DEV__ && console.log('unknown', JSON.stringify(item, null, 2))
   return {
     ...getCommon(item),
     type: item.type,
@@ -161,17 +147,6 @@ const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
     },
   }
 }
-
-// const getUnknownForwardItem = (item: DynamicItemResponse<DynamicTypeEnum>) => {
-//   return {
-//     ...getCommon(item),
-//     type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
-//     payload: {
-//       text: '暂不支持显示',
-//       type: item.type as DynamicTypeEnum,
-//     },
-//   }
-// }
 
 const getDynamicItem = (item: DynamicItemResponse) => {
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
@@ -249,9 +224,20 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
-    // if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE) {
-    //   return getLiveForwardItem(item)
-    // }
+    if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE) {
+      const forward = item.orig.modules.module_dynamic
+      return {
+        ...getCommon(item),
+        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        payload: {
+          type: MajorTypeEnum.MAJOR_TYPE_LIVE as const,
+          text: forward.desc?.text,
+          title:
+            forward.major.live.title + '\n' + forward.major.live.badge.text,
+          cover: forward.major.live.cover,
+        },
+      }
+    }
     if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_NONE) {
       return {
         ...getCommon(item),

@@ -72,6 +72,16 @@ export enum AdditionalTypeEnum {
   ADDITIONAL_TYPE_PGC = 'ADDITIONAL_TYPE_PGC',
 }
 
+export enum AdditionalOtherTypeEnum {
+  ADDITIONAL_TYPE_NONE = 'ADDITIONAL_TYPE_NONE',
+  ADDITIONAL_TYPE_GOODS = 'ADDITIONAL_TYPE_GOODS',
+  ADDITIONAL_TYPE_VOTE = 'ADDITIONAL_TYPE_VOTE',
+  ADDITIONAL_TYPE_COMMON = 'ADDITIONAL_TYPE_COMMON',
+  ADDITIONAL_TYPE_MATCH = 'ADDITIONAL_TYPE_MATCH',
+  ADDITIONAL_TYPE_UP_RCMD = 'ADDITIONAL_TYPE_UP_RCMD',
+  ADDITIONAL_TYPE_PGC = 'ADDITIONAL_TYPE_PGC',
+}
+
 const MajorAVSchema = z.object({
   type: z.enum([MajorTypeEnum.MAJOR_TYPE_ARCHIVE]),
   archive: z.object({
@@ -122,6 +132,7 @@ export type MajorArticle = z.infer<typeof MajorArticleSchema>
 const MajorLiveSchema = z.object({
   type: z.enum([MajorTypeEnum.MAJOR_TYPE_LIVE]),
   live: z.object({
+    badge: z.object({ text: z.string() }),
     cover: z.string(),
     title: z.string(),
   }),
@@ -165,7 +176,7 @@ const AdditionalReserveSchema = z.object({
 })
 
 const AdditionalOtherSchema = z.object({
-  type: z.nativeEnum(AdditionalTypeEnum),
+  type: z.nativeEnum(AdditionalOtherTypeEnum),
 })
 
 const DynamicModulesBaseSchema = z.object({
@@ -211,23 +222,6 @@ const DynamicItemBaseSchema = z.object({
     }),
   ),
 })
-
-// const BaseTeacher = z.object({ id: z.number(), students: z.array(z.string()) })
-// const HasID = z.object({ id: z.string(), ff: z.boolean() })
-
-// const Teacher = BaseTeacher.merge(HasID)
-// type Teacher = z.infer<typeof Teacher> // => { students: string[], id: string }
-
-// const DynamicVideoItemSchema = DynamicItemBaseSchema.merge(
-//   z.object({
-//     type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_AV]),
-//     modules: z.object({
-//       module_dynamic: z.object({
-//         major: MajorAVSchema,
-//       }),
-//     }),
-//   }),
-// )
 
 export type DynamicItemBaseType = z.infer<typeof DynamicItemBaseSchema>
 
@@ -290,24 +284,6 @@ const DynamicDrawItemSchema = DynamicItemBaseSchema.merge(
   }),
 )
 
-// const DynamicDrawItemSchema = DynamicItemBaseSchema.merge(
-//   z.object({
-//     type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_DRAW]),
-//     modules: z.object({
-//       module_dynamic: z.object({
-//         major: MajorDrawSchema,
-//         additional: z
-//           .discriminatedUnion('type', [
-//             AdditionalReserveSchema,
-//             AdditionalUGCSchema,
-//             AdditionalOtherSchema,
-//           ])
-//           .nullish(),
-//       }),
-//     }),
-//   }),
-// )
-
 const DynamicArticleItemSchema = DynamicItemBaseSchema.merge(
   z.object({
     type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE]),
@@ -322,17 +298,6 @@ const DynamicArticleItemSchema = DynamicItemBaseSchema.merge(
     ),
   }),
 )
-
-// const DynamicArticleItemSchema = DynamicItemBaseSchema.merge(
-//   z.object({
-//     type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE]),
-//     modules: z.object({
-//       module_dynamic: z.object({
-//         major: MajorArticleSchema,
-//       }),
-//     }),
-//   }),
-// )
 
 const BaseOrigSchema = z.object({
   id_str: z.string().nullable(), // MajorNoneSchema
@@ -355,7 +320,7 @@ export enum ForwardOtherTypeEnum {
   DYNAMIC_TYPE_MUSIC = 'DYNAMIC_TYPE_MUSIC',
   DYNAMIC_TYPE_COMMON_SQUARE = 'DYNAMIC_TYPE_COMMON_SQUARE',
   DYNAMIC_TYPE_COMMON_VERTICAL = 'DYNAMIC_TYPE_COMMON_VERTICAL',
-  DYNAMIC_TYPE_LIVE = 'DYNAMIC_TYPE_LIVE',
+  // DYNAMIC_TYPE_LIVE = 'DYNAMIC_TYPE_LIVE',
   DYNAMIC_TYPE_MEDIALIST = 'DYNAMIC_TYPE_MEDIALIST',
   DYNAMIC_TYPE_COURSES_SEASON = 'DYNAMIC_TYPE_COURSES_SEASON',
   DYNAMIC_TYPE_COURSES_BATCH = 'DYNAMIC_TYPE_COURSES_BATCH',
@@ -424,6 +389,18 @@ const DynamicForwardItemSchema = DynamicItemBaseSchema.merge(
             module_dynamic: z.object({
               desc: z.object({ text: z.string() }).nullable(),
               major: MajorArticleSchema,
+            }),
+          }),
+        }),
+      ),
+      BaseOrigSchema.merge(
+        z.object({
+          type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_LIVE]),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              desc: z.object({ text: z.string() }).nullable(),
+              major: MajorLiveSchema,
             }),
           }),
         }),

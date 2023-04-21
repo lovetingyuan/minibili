@@ -6,7 +6,6 @@ import {
   Text,
   View,
   TouchableOpacity,
-  // Linking,
 } from 'react-native'
 import RichText from '../../components/RichText'
 import { DynamicItemType } from '../../api/dynamic-items'
