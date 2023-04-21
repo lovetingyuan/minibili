@@ -16,11 +16,7 @@ import { RootStackParamList } from '../../types'
 import WordItem from './WordItem'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
-import {
-  DynamicItem,
-  DynamicTypeEnum,
-  getDynamicItems,
-} from '../../api/dynamic-items'
+import { DynamicItem, getDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import DefaultItem from './DefaultItem'
@@ -28,6 +24,7 @@ import ArticleItem from './ArticleItem'
 import { Icon } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useMounted from '../../hooks/useMounted'
+import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 

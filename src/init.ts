@@ -8,34 +8,30 @@ import store from './store'
 
 SplashScreen.preventAutoHideAsync()
 
-const firstTip = () => {
-  return new Promise(r => {
-    AsyncStorage.getItem('FIRST_RUN').then(res => {
-      if (!res) {
-        Alert.alert(
-          '使用说明',
-          '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
-          [
-            {
-              text: '确定',
-              onPress: () => {
-                AsyncStorage.setItem('FIRST_RUN', 'false')
-                r(null)
-              },
-            },
-          ],
+new Promise(r => {
+  AsyncStorage.getItem('FIRST_RUN').then(res => {
+    if (!res) {
+      Alert.alert(
+        '使用说明',
+        '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
+        [
           {
-            cancelable: false,
+            text: '确定',
+            onPress: () => {
+              AsyncStorage.setItem('FIRST_RUN', 'false')
+              r(null)
+            },
           },
-        )
-      } else {
-        r(null)
-      }
-    })
+        ],
+        {
+          cancelable: false,
+        },
+      )
+    } else {
+      r(null)
+    }
   })
-}
-
-firstTip().then(() => {
+}).then(() => {
   let checkedUpdate = false
   let checking = false
   NetInfo.addEventListener(state => {

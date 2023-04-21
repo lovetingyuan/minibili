@@ -1,7 +1,8 @@
 import React from 'react'
 import { View, Text, Pressable, Linking, StyleSheet } from 'react-native'
-import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
+import { DynamicItemType } from '../../api/dynamic-items'
 import DynamicStat from './DynamicStat'
+import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
 
 export default function ArticleItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE>,
