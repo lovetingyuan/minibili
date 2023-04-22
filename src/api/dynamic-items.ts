@@ -4,6 +4,7 @@ import { useSnapshot } from 'valtio'
 import store from '../store'
 import PQueue from 'p-queue'
 import {
+  AdditionalTypeEnum,
   DynamicForwardItem,
   DynamicItemBaseType,
   DynamicItemResponse,
@@ -12,6 +13,8 @@ import {
   DynamicUnknownItem,
   MajorTypeEnum,
 } from './dynamic-items.schema'
+import useSWRInfinite from 'swr/infinite'
+
 export type DynamicItem = ReturnType<typeof getDynamicItem>
 
 export type DynamicType = keyof typeof DynamicTypeEnum
@@ -24,7 +27,7 @@ const getCommon = (item: DynamicItemBaseType) => {
   return {
     id: item.id_str,
     // type: item.type,
-    face: item.modules.module_author.face,
+    face: item.modules?.module_author.face,
     date: item.modules?.module_author?.pub_time,
     time: item.modules?.module_author?.pub_ts,
     mid: item.modules?.module_author?.mid,
@@ -137,7 +140,7 @@ const getVideoItem = (
 }
 
 const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
-  __DEV__ && console.log('unknown', JSON.stringify(item, null, 2))
+  __DEV__ && console.log('unknown', item)
   return {
     ...getCommon(item),
     type: item.type,
@@ -176,12 +179,29 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       }
     }
     if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
+      if (!item.orig.modules.module_dynamic.major) {
+        console.log(333, item)
+      }
+      const additional = item.orig.modules.module_dynamic.additional
+      const text = [item.orig.modules.module_dynamic.desc?.text]
+      // let additionalText = ''/
+      if (additional) {
+        if (additional.type === AdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE) {
+          text.push(
+            ...[
+              additional.reserve.title || '',
+              additional.reserve.desc1?.text || '',
+              additional.reserve.desc2?.text || '',
+            ],
+          )
+        }
+      }
       return {
         ...getCommon(item),
         type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
         payload: {
           type: MajorTypeEnum.MAJOR_TYPE_WORD as const,
-          text: item.orig.modules.module_dynamic.major.desc?.text,
+          text: text.filter(Boolean).join('\n'),
         },
       }
     }
@@ -247,7 +267,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
           text: item.orig.modules.module_dynamic.major.none.tips,
         },
       }
-      // return getNoneForwardItem(item)
     }
     return getUnknownItem(item)
   }
@@ -263,6 +282,55 @@ export async function getDynamicItems(offset = '', uid: string | number) {
     more: data.has_more,
     offset: data.offset,
     items: data.items.map(getDynamicItem),
+  }
+}
+
+const fetcher2 = (url: string) => {
+  __DEV__ && console.log('fetch dynamic items: ' + url)
+  return request<DynamicListResponse>(url) // .then(res => res.items)
+}
+
+export function useDynamicItems(mid: string | number) {
+  const { data, mutate, size, setSize, isValidating, isLoading, error } =
+    useSWRInfinite<DynamicListResponse>(
+      (offset, response) => {
+        if (response && (!response.has_more || !response.items.length)) {
+          return null
+        }
+        if (!offset) {
+          return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
+        }
+        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480`
+      },
+      fetcher2,
+      {
+        revalidateFirstPage: false,
+        revalidateAll: false,
+      },
+    )
+
+  let dynamicItems: DynamicListResponse['items'] = []
+  if (data) {
+    dynamicItems = data.reduce((a, b) => {
+      return a.concat(b.items)
+    }, [] as DynamicListResponse['items'])
+  }
+
+  const isLoadingMore =
+    isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')
+  const isEmpty = data?.[0]?.items.length === 0
+  const isReachingEnd = isEmpty || (data && !data[data.length - 1]?.has_more)
+  const isRefreshing = isValidating && !!data && data.length === size
+
+  return {
+    list: dynamicItems.map(getDynamicItem),
+    page: size,
+    setSize,
+    error,
+    isRefreshing,
+    isReachingEnd,
+    loading: isLoadingMore,
+    refresh: mutate,
   }
 }
 

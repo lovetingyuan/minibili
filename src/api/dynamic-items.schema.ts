@@ -352,7 +352,9 @@ const DynamicForwardItemSchema = DynamicItemBaseSchema.merge(
           modules: z.object({
             module_author: AuthorSchema,
             module_dynamic: z.object({
-              major: MajorWordSchema,
+              additional: AdditionalReserveSchema.nullable(),
+              desc: z.object({ text: z.string() }).nullable(),
+              major: z.null(),
             }),
           }),
         }),
