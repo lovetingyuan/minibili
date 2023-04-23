@@ -1,10 +1,20 @@
 import React from 'react'
-import { StyleSheet, View, ToastAndroid, Linking } from 'react-native'
+import { StyleSheet, View, ToastAndroid, Linking, Image } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { INJECTED_JAVASCRIPT } from './inject-code'
 
 const Loading = () => {
-  return <View style={styles.loadingView} />
+  return (
+    <View style={styles.loadingView}>
+      <Image
+        source={require('../../../assets/video-loading.png')}
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
+      />
+    </View>
+  )
 }
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'

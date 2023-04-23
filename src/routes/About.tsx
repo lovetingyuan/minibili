@@ -16,7 +16,7 @@ import { Card, Chip, ListItem, Button, Icon } from '@rneui/themed'
 import {
   checkUpdate as checkUpdateApi,
   currentVersion,
-} from '../api/checkAppUpdate'
+} from '../api/check-update'
 import { githubLink, site } from '../constants'
 import { NavigationProps } from '../types'
 import { useNavigation } from '@react-navigation/native'

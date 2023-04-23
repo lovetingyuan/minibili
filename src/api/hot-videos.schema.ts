@@ -47,8 +47,3 @@ export const HotVideosDataResponseSchema = z.object({
   list: VideoItemResponseSchema.array(),
   no_more: z.boolean(),
 })
-
-export const RankVideosDataResponseSchema = z.object({
-  list: VideoItemResponseSchema.array(),
-  note: z.string(),
-})

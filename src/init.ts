@@ -1,7 +1,7 @@
 import './sentry'
 import * as SplashScreen from 'expo-splash-screen'
 import { Linking, Alert } from 'react-native'
-import { checkUpdate } from './api/checkAppUpdate'
+import { checkUpdate } from './api/check-update'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import NetInfo from '@react-native-community/netinfo'
 import store from './store'
