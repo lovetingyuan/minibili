@@ -1,20 +1,20 @@
-import { z } from 'zod'
-import request from './fetcher'
-import {
-  LiveInfoResponseSchema,
-  LiveRoomInfoResponseSchema,
-  LiveUserInfoResponseSchema,
-} from './living-info.schema'
-import useSWR from 'swr'
-// import useSWRImmutable from 'swr/immutable'
-import PQueue from 'p-queue'
-import store from '../store'
+// import { z } from 'zod'
+// import request from './fetcher'
+// import {
+//   LiveInfoResponseSchema,
+//   LiveRoomInfoResponseSchema,
+//   LiveUserInfoResponseSchema,
+// } from './living-info.schema'
+// import useSWR from 'swr'
+// // import useSWRImmutable from 'swr/immutable'
+// import PQueue from 'p-queue'
+// import store from '../store'
 
-export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
-export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
-export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
+// export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
+// export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
+// export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
 
-const queue = new PQueue({ concurrency: 3 })
+// const queue = new PQueue({ concurrency: 3 })
 
 // const useLiveRoomInfo = (mid: number | string) => {
 //   const { data } = useSWRImmutable<LiveRoomInfo>(
@@ -55,34 +55,34 @@ const queue = new PQueue({ concurrency: 3 })
 // }
 
 // https://api.bilibili.com/x/space/wbi/acc/info?mid=3493257772272614&token=&platform=web
-export const useLivingInfo2 = (mid: number | string) => {
-  const delay = mid.toString().slice(0, 5)
-  const { data, error } = useSWR<LiveUserInfo>(
-    `/x/space/wbi/acc/info?mid=${mid}&token=&platform=web`,
-    (url: string) => {
-      return queue.add(() => request(url))
-    },
-    {
-      refreshInterval: 10 * 60 * 1000 + Number(delay),
-    },
-  )
-  if (__DEV__ && error) {
-    console.error('living', error)
-  }
-  const living = data?.live_room?.liveStatus === 1
-  const liveUrl = data?.live_room?.url || ''
-  store.livingUps[mid] = living ? liveUrl : ''
-  return {
-    data: data
-      ? {
-          hasLiveRoom: !!data.live_room,
-          living,
-          liveUrl,
-          roomId: data.live_room?.roomid,
-          name: data.name,
-          face: data.face,
-        }
-      : null,
-    error,
-  }
-}
+// export const useLivingInfo2 = (mid: number | string) => {
+//   const delay = mid.toString().slice(0, 5)
+//   const { data, error } = useSWR<LiveUserInfo>(
+//     `/x/space/wbi/acc/info?mid=${mid}&token=&platform=web`,
+//     (url: string) => {
+//       return queue.add(() => request(url))
+//     },
+//     {
+//       refreshInterval: 10 * 60 * 1000 + Number(delay),
+//     },
+//   )
+//   if (__DEV__ && error) {
+//     console.error('living', error)
+//   }
+//   const living = data?.live_room?.liveStatus === 1
+//   const liveUrl = data?.live_room?.url || ''
+//   store.livingUps[mid] = living ? liveUrl : ''
+//   return {
+//     data: data
+//       ? {
+//           hasLiveRoom: !!data.live_room,
+//           living,
+//           liveUrl,
+//           roomId: data.live_room?.roomid,
+//           name: data.name,
+//           face: data.face,
+//         }
+//       : null,
+//     error,
+//   }
+// }

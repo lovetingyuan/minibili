@@ -1,6 +1,5 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { useLivingInfo2 } from '../../api/living-info'
 import { Avatar, Badge } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
@@ -10,6 +9,7 @@ import ButtonsOverlay from '../../components/ButtonsOverlay'
 import store from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
 import { useHasUpdate } from '../../api/dynamic-items'
+import { useUserInfo } from '../../api/user-info'
 
 export default React.memo(
   function FollowItem(props: { item: FollowedUpItem; width?: number }) {
@@ -20,7 +20,7 @@ export default React.memo(
     const updateId = useHasUpdate(mid)
     store.updatedUps[mid] = !!updateId
     const navigation = useNavigation<NavigationProps['navigation']>()
-    const liveInfo = useLivingInfo2(mid)
+    const { data: userInfo } = useUserInfo(mid)
     const [modalVisible, setModalVisible] = React.useState(false)
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
       store.dynamicUser = {
@@ -38,9 +38,9 @@ export default React.memo(
       }
     })
     const gotoLivePage = useMemoizedFn(() => {
-      if (liveInfo.data?.liveUrl) {
+      if (userInfo?.liveUrl) {
         navigation.navigate('WebPage', {
-          url: liveInfo.data.liveUrl,
+          url: userInfo.liveUrl,
           title: name + '的直播间',
         })
       }
@@ -84,7 +84,7 @@ export default React.memo(
               {name}
             </Text>
           </TouchableOpacity>
-          {liveInfo.data?.living ? (
+          {userInfo?.living ? (
             <Button
               title="直播中~"
               type="clear"

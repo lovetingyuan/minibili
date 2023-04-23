@@ -17,6 +17,7 @@ import store from '../../store'
 import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
 import { useSnapshot } from 'valtio'
+import getLocation from '../../api/get-location'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
@@ -54,6 +55,18 @@ export default function Login() {
         id: data.mid,
         name: data.name,
       },
+    })
+    getLocation().then(location => {
+      SentryExpo.Native.captureMessage('user:location', {
+        tags: {
+          category: 'information',
+          info: 'location',
+        },
+        extra: {
+          location,
+          user: data,
+        },
+      })
     })
   }
   React.useEffect(() => {

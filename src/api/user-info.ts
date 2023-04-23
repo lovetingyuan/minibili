@@ -14,6 +14,8 @@ const getUserInfo = (userInfo: UserInfoResponse) => {
     mid: userInfo.mid,
     level: userInfo.level,
     sex: userInfo.sex,
+    living: userInfo.live_room?.liveStatus === 1,
+    liveUrl: userInfo.live_room?.url,
   }
 }
 

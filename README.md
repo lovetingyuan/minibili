@@ -7,3 +7,5 @@ The minimalist Bilibili version
 https://lovetingyuan.github.io/minibili/
 
 Developed with React-Native
+
+Thanks https://socialsisteryi.github.io/bilibili-API-collect/
