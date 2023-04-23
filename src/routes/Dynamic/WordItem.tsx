@@ -1,10 +1,11 @@
 import React from 'react'
 import { TouchableOpacity, Text, View, Image } from 'react-native'
-import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
+import { DynamicItemType } from '../../api/dynamic-items'
 import RichText from '../../components/RichText'
 import DynamicStat from './DynamicStat'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
+import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
 
 export default function WordItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_WORD>,

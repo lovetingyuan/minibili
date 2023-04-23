@@ -3,7 +3,6 @@ import {
   StyleSheet,
   View,
   Text,
-  FlatList,
   ToastAndroid,
   BackHandler,
   Image,
@@ -16,11 +15,7 @@ import { RootStackParamList } from '../../types'
 import WordItem from './WordItem'
 import store from '../../store'
 import { useSnapshot } from 'valtio'
-import {
-  DynamicItem,
-  DynamicTypeEnum,
-  getDynamicItems,
-} from '../../api/dynamic-items'
+import { useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import DefaultItem from './DefaultItem'
@@ -28,33 +23,32 @@ import ArticleItem from './ArticleItem'
 import { Icon } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useMounted from '../../hooks/useMounted'
+import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
+import { FlashList } from '@shopify/flash-list'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name)
-
-  const [dynamicItems, setDynamicItems] = React.useState<DynamicItem[]>([])
-  if (__DEV__) {
-    // @ts-ignore
-    globalThis._dynamicList = dynamicItems
-  }
-  const pageInfoRef = React.useRef<{
-    hasMore: boolean
-    offset: string
-    init?: boolean
-  }>({
-    hasMore: true,
-    offset: '',
-    init: true,
-  })
-  const [loading, setLoading] = React.useState(false)
-  const [refreshing, setRefreshing] = React.useState(false)
   const dynamicUser = useSnapshot(store).dynamicUser!
   const upId = dynamicUser.mid // || specialUser?.mid
-  const dynamicListRef = React.useRef<FlatList | null>(null)
-  const [initLoad, setInitLoad] = React.useState(true)
-  const [refreshHead, setRefreshHead] = React.useState(0)
+  const dynamicListRef = React.useRef<any>(null)
+
+  const {
+    list,
+    page,
+    setSize,
+    isRefreshing,
+    loading,
+    refresh,
+    isReachingEnd,
+    error,
+  } = useDynamicItems(upId)
+  React.useEffect(() => {
+    if (error) {
+      ToastAndroid.show('请求动态失败', ToastAndroid.SHORT)
+    }
+  }, [upId, error])
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -117,62 +111,16 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       </View>
     )
   }
-  const loadMoreDynamicItems = React.useCallback(() => {
-    const { offset, hasMore } = pageInfoRef.current
-    if (loading || !hasMore) {
-      return
-    }
-    if (!upId) {
-      return
-    }
-    setLoading(true)
-    getDynamicItems(offset, upId)
-      .then(
-        ({ more, items, offset: os }) => {
-          if (!pageInfoRef.current.offset) {
-            setDynamicItems(items)
-          } else {
-            setDynamicItems(dynamicItems.concat(items))
-          }
-          pageInfoRef.current.hasMore = more
-          pageInfoRef.current.offset = os
-        },
-        err => {
-          __DEV__ && console.error(err)
-          ToastAndroid.show('请求动态失败', ToastAndroid.SHORT)
-        },
-      )
-      .finally(() => {
-        setLoading(false)
-        setRefreshing(false)
-      })
-  }, [loading, upId, dynamicItems])
-  const resetDynamicItems = () => {
-    pageInfoRef.current = {
-      hasMore: true,
-      offset: '',
-    }
-    setLoading(false)
-    setDynamicItems([])
-    setInitLoad(true)
-  }
-  if (initLoad) {
-    setInitLoad(false)
-    loadMoreDynamicItems()
-    setRefreshHead(refreshHead + 1)
-  }
-  React.useEffect(() => {
-    resetDynamicItems()
-  }, [upId])
+
   return (
     <View style={styles.container}>
-      <FlatList
-        data={dynamicItems}
+      <FlashList
+        data={list}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         onEndReachedThreshold={1}
-        refreshing={refreshing}
         ref={dynamicListRef}
+        estimatedItemSize={100}
         ListHeaderComponent={
           dynamicUser.sign && dynamicUser.sign !== '-' ? (
             <View style={styles.signTextContainer}>
@@ -186,8 +134,11 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
             </View>
           ) : null
         }
-        onRefresh={resetDynamicItems}
-        onEndReached={loadMoreDynamicItems}
+        onEndReached={() => {
+          setSize(page + 1)
+        }}
+        refreshing={isRefreshing}
+        onRefresh={refresh}
         ListEmptyComponent={
           <>
             <Text style={styles.emptyText}>
@@ -208,11 +159,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
-            {dynamicItems.length
-              ? pageInfoRef.current.hasMore
-                ? '加载中...'
-                : '到底了~'
-              : ''}
+            {isReachingEnd ? '到底了~' : loading ? '加载中...' : ''}
           </Text>
         }
       />
@@ -262,7 +209,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     color: '#666',
   },
-  topMark: { width: 28.5, height: 14, marginBottom: 5 },
+  topMark: { width: 29, height: 14, marginBottom: 5 },
   signMark: {
     position: 'relative',
     top: 3,

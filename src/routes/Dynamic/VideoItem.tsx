@@ -11,10 +11,11 @@ import {
 import RichText from '../../components/RichText'
 import { NavigationProps } from '../../types'
 // import { SimpleVideoInfo } from '../../components/PlayInfo'
-import { DynamicItemType, DynamicTypeEnum } from '../../api/dynamic-items'
+import { DynamicItemType } from '../../api/dynamic-items'
 import store from '../../store'
 import { Icon } from '@rneui/themed'
 import { parseNumber } from '../../utils'
+import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
 
 export default function VideoItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_AV>,

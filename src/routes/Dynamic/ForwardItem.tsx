@@ -6,24 +6,20 @@ import {
   Text,
   View,
   TouchableOpacity,
-  // Linking,
 } from 'react-native'
 import RichText from '../../components/RichText'
-import {
-  DynamicItemType,
-  DynamicMajorTypeEnum,
-  DynamicTypeEnum,
-} from '../../api/dynamic-items'
+import { DynamicItemType } from '../../api/dynamic-items'
 import DynamicStat from './DynamicStat'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
+import { DynamicTypeEnum, MajorTypeEnum } from '../../api/dynamic-items.schema'
 
 export default function ForwardItem(
   props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   let forwardContent = <Text>暂不支持显示</Text>
-  if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_ARCHIVE) {
+  if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_ARCHIVE) {
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
         {props.payload.text ? (
@@ -42,7 +38,7 @@ export default function ForwardItem(
         </View>
       </View>
     )
-  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_DRAW) {
+  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_DRAW) {
     forwardContent = (
       <View style={{ flexDirection: 'column' }}>
         <RichText text={props.payload.text} />
@@ -60,10 +56,10 @@ export default function ForwardItem(
             )
           })}
         </ScrollView>
-        {props.payload.text2 ? <Text>{props.payload.text2}</Text> : null}
+        {/* {props.payload.text2 ? <Text>{props.payload.text2}</Text> : null} */}
       </View>
     )
-  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_ARTICLE) {
+  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_ARTICLE) {
     forwardContent = (
       <View>
         <Text style={{ fontSize: 15, marginBottom: 10 }}>
@@ -76,9 +72,9 @@ export default function ForwardItem(
         </Text>
       </View>
     )
-  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_WORD) {
+  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_WORD) {
     forwardContent = <Text>{props.payload.text}</Text>
-  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_LIVE) {
+  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_LIVE) {
     forwardContent = (
       <View>
         <Text>{props.payload.title}</Text>
@@ -88,7 +84,7 @@ export default function ForwardItem(
         />
       </View>
     )
-  } else if (props.payload.type === DynamicMajorTypeEnum.MAJOR_TYPE_NONE) {
+  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_NONE) {
     forwardContent = <Text>{props.payload.text}</Text>
   }
   return (

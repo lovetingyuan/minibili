@@ -37,4 +37,5 @@ function __$hack() {
     }),
   )
 }
+
 export const INJECTED_JAVASCRIPT = `(${__$hack})();true;`

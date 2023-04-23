@@ -14,7 +14,7 @@ import CommentList from '../../components/CommentList'
 import ImagesView from './ImagesView'
 import { Icon } from '@rneui/themed'
 import { handleShareVideo, parseNumber } from '../../utils'
-import { DynamicTypeEnum } from '../../api/dynamic-items'
+import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
 
 const DynamicDetail: React.FC<
   NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>

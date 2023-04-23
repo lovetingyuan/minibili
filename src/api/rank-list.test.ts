@@ -1,6 +1,6 @@
 import fetcher from './fetcher-test'
 import { describe, test } from 'vitest'
-import { RankVideosDataResponseSchema } from './hot-videos.schema'
+import { RankVideosDataResponseSchema } from './rank-list.schema'
 
 describe('ranks-videos', () => {
   test('animation-videos', async () => {

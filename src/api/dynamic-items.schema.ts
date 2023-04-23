@@ -14,16 +14,13 @@ export const AuthorSchema = z.object({
 
 export type Author = z.infer<typeof AuthorSchema>
 
-export enum DynamicHandledTypeEnum {
+export enum DynamicTypeEnum {
   DYNAMIC_TYPE_AV = 'DYNAMIC_TYPE_AV',
   DYNAMIC_TYPE_DRAW = 'DYNAMIC_TYPE_DRAW',
   DYNAMIC_TYPE_WORD = 'DYNAMIC_TYPE_WORD',
   DYNAMIC_TYPE_ARTICLE = 'DYNAMIC_TYPE_ARTICLE',
-}
-
-export const DynamicNoneType = 'DYNAMIC_TYPE_NONE' as const
-
-export enum DynamicOtherTypeEnum {
+  DYNAMIC_TYPE_FORWARD = 'DYNAMIC_TYPE_FORWARD',
+  // ------------------------------------------
   DYNAMIC_TYPE_OTHER = 'DYNAMIC_TYPE_OTHER',
   DYNAMIC_TYPE_NONE = 'DYNAMIC_TYPE_NONE',
   DYNAMIC_TYPE_PGC = 'DYNAMIC_TYPE_PGC',
@@ -44,18 +41,14 @@ export enum DynamicOtherTypeEnum {
   DYNAMIC_TYPE_SUBSCRIPTION_NEW = 'DYNAMIC_TYPE_SUBSCRIPTION_NEW',
 }
 
-export const DynamicForwardItemType = 'DYNAMIC_TYPE_FORWARD' as const
-
-export enum MajorHandledTypeEnum {
+export enum MajorTypeEnum {
   MAJOR_TYPE_ARCHIVE = 'MAJOR_TYPE_ARCHIVE',
   MAJOR_TYPE_DRAW = 'MAJOR_TYPE_DRAW',
   MAJOR_TYPE_ARTICLE = 'MAJOR_TYPE_ARTICLE',
   MAJOR_TYPE_LIVE = 'MAJOR_TYPE_LIVE',
   MAJOR_TYPE_WORD = 'MAJOR_TYPE_WORD',
   MAJOR_TYPE_NONE = 'MAJOR_TYPE_NONE',
-}
-
-export enum MajorOtherTypeEnum {
+  // -----------------------------------------
   MAJOR_TYPE_PGC = 'MAJOR_TYPE_PGC',
   MAJOR_TYPE_COURSES = 'MAJOR_TYPE_COURSES',
   MAJOR_TYPE_COMMON = 'MAJOR_TYPE_COMMON',
@@ -66,9 +59,17 @@ export enum MajorOtherTypeEnum {
   MAJOR_TYPE_SUBSCRIPTION_NEW = 'MAJOR_TYPE_SUBSCRIPTION_NEW',
 }
 
-export enum AdditionalHandledTypeEnum {
+export enum AdditionalTypeEnum {
   ADDITIONAL_TYPE_RESERVE = 'ADDITIONAL_TYPE_RESERVE',
   ADDITIONAL_TYPE_UGC = 'ADDITIONAL_TYPE_UGC',
+  // -------------------------------------------------
+  ADDITIONAL_TYPE_NONE = 'ADDITIONAL_TYPE_NONE',
+  ADDITIONAL_TYPE_GOODS = 'ADDITIONAL_TYPE_GOODS',
+  ADDITIONAL_TYPE_VOTE = 'ADDITIONAL_TYPE_VOTE',
+  ADDITIONAL_TYPE_COMMON = 'ADDITIONAL_TYPE_COMMON',
+  ADDITIONAL_TYPE_MATCH = 'ADDITIONAL_TYPE_MATCH',
+  ADDITIONAL_TYPE_UP_RCMD = 'ADDITIONAL_TYPE_UP_RCMD',
+  ADDITIONAL_TYPE_PGC = 'ADDITIONAL_TYPE_PGC',
 }
 
 export enum AdditionalOtherTypeEnum {
@@ -82,7 +83,7 @@ export enum AdditionalOtherTypeEnum {
 }
 
 const MajorAVSchema = z.object({
-  type: z.enum([MajorHandledTypeEnum.MAJOR_TYPE_ARCHIVE]),
+  type: z.enum([MajorTypeEnum.MAJOR_TYPE_ARCHIVE]),
   archive: z.object({
     aid: z.string(),
     bvid: z.string(),
@@ -96,8 +97,10 @@ const MajorAVSchema = z.object({
   }),
 })
 
+export type MajorAV = z.infer<typeof MajorAVSchema>
+
 const MajorDrawSchema = z.object({
-  type: z.enum([MajorHandledTypeEnum.MAJOR_TYPE_DRAW]),
+  type: z.enum([MajorTypeEnum.MAJOR_TYPE_DRAW]),
   draw: z.object({
     id: z.number(),
     items: z.array(
@@ -111,8 +114,10 @@ const MajorDrawSchema = z.object({
   }),
 })
 
+export type MajorDraw = z.infer<typeof MajorDrawSchema>
+
 const MajorArticleSchema = z.object({
-  type: z.enum([MajorHandledTypeEnum.MAJOR_TYPE_ARTICLE]),
+  type: z.enum([MajorTypeEnum.MAJOR_TYPE_ARTICLE]),
   article: z.object({
     covers: z.array(z.string()),
     desc: z.string(),
@@ -122,34 +127,39 @@ const MajorArticleSchema = z.object({
   }),
 })
 
+export type MajorArticle = z.infer<typeof MajorArticleSchema>
+
 const MajorLiveSchema = z.object({
-  type: z.enum([MajorHandledTypeEnum.MAJOR_TYPE_LIVE]),
+  type: z.enum([MajorTypeEnum.MAJOR_TYPE_LIVE]),
   live: z.object({
+    badge: z.object({ text: z.string() }),
     cover: z.string(),
     title: z.string(),
   }),
 })
 
+export type MajorLive = z.infer<typeof MajorLiveSchema>
+
 const MajorWordSchema = z.object({
-  type: z.enum([MajorHandledTypeEnum.MAJOR_TYPE_WORD]),
+  type: z.enum([MajorTypeEnum.MAJOR_TYPE_WORD]),
   desc: z.object({
     text: z.string(),
   }),
 })
 
+export type MajorWord = z.infer<typeof MajorWordSchema>
+
 const MajorNoneSchema = z.object({
-  type: z.enum([MajorHandledTypeEnum.MAJOR_TYPE_NONE]),
+  type: z.enum([MajorTypeEnum.MAJOR_TYPE_NONE]),
   none: z.object({
     tips: z.string(),
   }),
 })
 
-const MajorOtherSchema = z.object({
-  type: z.nativeEnum(MajorOtherTypeEnum),
-})
+export type MajorNone = z.infer<typeof MajorNoneSchema>
 
-const AdditionalUgcSchema = z.object({
-  type: z.enum([AdditionalHandledTypeEnum.ADDITIONAL_TYPE_UGC]),
+const AdditionalUGCSchema = z.object({
+  type: z.enum([AdditionalTypeEnum.ADDITIONAL_TYPE_UGC]),
   ugc: z.object({
     cover: z.string(),
     title: z.string(),
@@ -157,7 +167,7 @@ const AdditionalUgcSchema = z.object({
 })
 
 const AdditionalReserveSchema = z.object({
-  type: z.enum([AdditionalHandledTypeEnum.ADDITIONAL_TYPE_RESERVE]),
+  type: z.enum([AdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE]),
   reserve: z.object({
     title: z.string(),
     desc1: z.object({ text: z.string() }).optional(),
@@ -169,100 +179,128 @@ const AdditionalOtherSchema = z.object({
   type: z.nativeEnum(AdditionalOtherTypeEnum),
 })
 
-const DynamicItemResponseSchema = z.object({
-  type: z.nativeEnum(DynamicHandledTypeEnum),
+const DynamicModulesBaseSchema = z.object({
+  module_author: AuthorSchema,
+  module_tag: z.object({ text: z.string() }).optional(),
+  module_stat: z.object({
+    comment: z.object({
+      count: z.number(),
+      forbidden: z.boolean(),
+    }),
+    forward: z.object({
+      count: z.number(),
+      forbidden: z.boolean(),
+    }),
+    like: z.object({
+      count: z.number(),
+      forbidden: z.boolean(),
+      status: z.boolean(),
+    }),
+  }),
+})
+
+const ModuleDynamicBaseSchema = z.object({
+  desc: z.object({ text: z.string() }).nullable(),
+  topic: z.object({ name: z.string(), jump_url: z.string() }).nullish(),
+})
+
+const DynamicItemBaseSchema = z.object({
   id_str: z.string(),
   visible: z.boolean(),
   basic: z.object({
     comment_id_str: z.string(),
     comment_type: z.number(),
   }),
-  modules: z.object({
-    module_author: AuthorSchema,
-    module_tag: z.object({ text: z.string() }).optional(),
-    module_stat: z.object({
-      comment: z.object({
-        count: z.number(),
-        forbidden: z.boolean(),
-      }),
-      forward: z.object({
-        count: z.number(),
-        forbidden: z.boolean(),
-      }),
-      like: z.object({
-        count: z.number(),
-        forbidden: z.boolean(),
-        status: z.boolean(),
-      }),
-    }),
-    module_dynamic: z.object({
-      desc: z.object({ text: z.string() }).nullable(),
-      topic: z.object({ name: z.string(), jump_url: z.string() }).nullish(),
-      major: z
-        .discriminatedUnion('type', [
-          MajorAVSchema,
-          MajorDrawSchema,
-          MajorArticleSchema,
-          MajorLiveSchema,
-          MajorNoneSchema,
-          // MajorWordSchema,
-          MajorOtherSchema,
-        ])
-        .nullable(),
-      additional: z
-        .discriminatedUnion('type', [
-          AdditionalReserveSchema,
-          AdditionalUgcSchema,
-          AdditionalOtherSchema,
-        ])
-        .nullish(),
-    }),
-  }),
-})
-
-const DynamicForwardItemResponseSchema = DynamicItemResponseSchema.extend({
-  type: z.enum([DynamicForwardItemType]),
-  orig: z.object({
-    id_str: z.string().nullable(), // MajorNoneSchema
-    basic: z.object({
-      comment_id_str: z.string(),
-      comment_type: z.number(),
-    }),
-    type: z.union([
-      z.nativeEnum(DynamicHandledTypeEnum),
-      z.enum([DynamicNoneType]),
-    ]),
-    modules: z.object({
-      module_author: AuthorSchema,
+  modules: DynamicModulesBaseSchema.merge(
+    z.object({
       module_dynamic: z.object({
         desc: z.object({ text: z.string() }).nullable(),
-        major: z
-          .discriminatedUnion('type', [
-            MajorAVSchema,
-            MajorDrawSchema,
-            MajorArticleSchema,
-            MajorLiveSchema,
-            MajorNoneSchema,
-            MajorWordSchema,
-            MajorOtherSchema,
-          ])
-          .nullable(),
-        additional: z
-          .discriminatedUnion('type', [
-            AdditionalReserveSchema,
-            AdditionalUgcSchema,
-            AdditionalOtherSchema,
-          ])
-          .nullish(),
+        topic: z.object({ name: z.string(), jump_url: z.string() }).nullish(),
+        // major: z.any(),
+        // additional: z.any(),
       }),
     }),
-  }),
+  ),
 })
 
-const DynamicOtherItemResponseSchema = z.object({
-  type: z.nativeEnum(DynamicOtherTypeEnum),
-  id_str: z.string(),
-  visible: z.boolean(),
+export type DynamicItemBaseType = z.infer<typeof DynamicItemBaseSchema>
+
+const DynamicVideoItemSchema = DynamicItemBaseSchema.merge(
+  z.object({
+    type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_AV]),
+    modules: DynamicModulesBaseSchema.merge(
+      z.object({
+        module_dynamic: ModuleDynamicBaseSchema.merge(
+          z.object({
+            major: MajorAVSchema,
+          }),
+        ),
+      }),
+    ),
+  }),
+)
+
+const DynamicWordItemSchema = DynamicItemBaseSchema.merge(
+  z.object({
+    type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_WORD]),
+    modules: DynamicModulesBaseSchema.merge(
+      z.object({
+        module_dynamic: ModuleDynamicBaseSchema.merge(
+          z.object({
+            major: MajorWordSchema,
+            additional: z
+              .discriminatedUnion('type', [
+                AdditionalReserveSchema,
+                AdditionalUGCSchema,
+                AdditionalOtherSchema,
+              ])
+              .nullish(),
+          }),
+        ),
+      }),
+    ),
+  }),
+)
+
+const DynamicDrawItemSchema = DynamicItemBaseSchema.merge(
+  z.object({
+    type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_DRAW]),
+    modules: DynamicModulesBaseSchema.merge(
+      z.object({
+        module_dynamic: ModuleDynamicBaseSchema.merge(
+          z.object({
+            major: MajorDrawSchema,
+            additional: z
+              .discriminatedUnion('type', [
+                AdditionalReserveSchema,
+                AdditionalUGCSchema,
+                AdditionalOtherSchema,
+              ])
+              .nullish(),
+          }),
+        ),
+      }),
+    ),
+  }),
+)
+
+const DynamicArticleItemSchema = DynamicItemBaseSchema.merge(
+  z.object({
+    type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE]),
+    modules: DynamicModulesBaseSchema.merge(
+      z.object({
+        module_dynamic: ModuleDynamicBaseSchema.merge(
+          z.object({
+            major: MajorArticleSchema,
+          }),
+        ),
+      }),
+    ),
+  }),
+)
+
+const BaseOrigSchema = z.object({
+  id_str: z.string().nullable(), // MajorNoneSchema
   basic: z.object({
     comment_id_str: z.string(),
     comment_type: z.number(),
@@ -274,22 +312,177 @@ const DynamicOtherItemResponseSchema = z.object({
     }),
   }),
 })
+
+export enum ForwardOtherTypeEnum {
+  DYNAMIC_TYPE_OTHER = 'DYNAMIC_TYPE_OTHER',
+  DYNAMIC_TYPE_PGC = 'DYNAMIC_TYPE_PGC',
+  DYNAMIC_TYPE_COURSES = 'DYNAMIC_TYPE_COURSES',
+  DYNAMIC_TYPE_MUSIC = 'DYNAMIC_TYPE_MUSIC',
+  DYNAMIC_TYPE_COMMON_SQUARE = 'DYNAMIC_TYPE_COMMON_SQUARE',
+  DYNAMIC_TYPE_COMMON_VERTICAL = 'DYNAMIC_TYPE_COMMON_VERTICAL',
+  // DYNAMIC_TYPE_LIVE = 'DYNAMIC_TYPE_LIVE',
+  DYNAMIC_TYPE_MEDIALIST = 'DYNAMIC_TYPE_MEDIALIST',
+  DYNAMIC_TYPE_COURSES_SEASON = 'DYNAMIC_TYPE_COURSES_SEASON',
+  DYNAMIC_TYPE_COURSES_BATCH = 'DYNAMIC_TYPE_COURSES_BATCH',
+  DYNAMIC_TYPE_AD = 'DYNAMIC_TYPE_AD',
+  DYNAMIC_TYPE_APPLET = 'DYNAMIC_TYPE_APPLET',
+  DYNAMIC_TYPE_SUBSCRIPTION = 'DYNAMIC_TYPE_SUBSCRIPTION',
+  DYNAMIC_TYPE_LIVE_RCMD = 'DYNAMIC_TYPE_LIVE_RCMD',
+  DYNAMIC_TYPE_BANNER = 'DYNAMIC_TYPE_BANNER',
+  DYNAMIC_TYPE_UGC_SEASON = 'DYNAMIC_TYPE_UGC_SEASON',
+  DYNAMIC_TYPE_SUBSCRIPTION_NEW = 'DYNAMIC_TYPE_SUBSCRIPTION_NEW',
+}
+
+const DynamicForwardItemSchema = DynamicItemBaseSchema.merge(
+  z.object({
+    type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_FORWARD]),
+    modules: DynamicModulesBaseSchema.merge(
+      z.object({
+        module_dynamic: ModuleDynamicBaseSchema.merge(
+          z.object({
+            major: z.null(),
+          }),
+        ),
+      }),
+    ),
+    orig: z.discriminatedUnion('type', [
+      BaseOrigSchema.merge(
+        z.object({
+          type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_WORD]),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              additional: AdditionalReserveSchema.nullable(),
+              desc: z.object({ text: z.string() }).nullable(),
+              major: z.null(),
+            }),
+          }),
+        }),
+      ),
+      BaseOrigSchema.merge(
+        z.object({
+          type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_AV]),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              desc: z.object({ text: z.string() }).nullable(),
+              major: MajorAVSchema,
+            }),
+          }),
+        }),
+      ),
+      BaseOrigSchema.merge(
+        z.object({
+          type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_DRAW]),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              desc: z.object({ text: z.string() }).nullable(),
+              major: MajorDrawSchema,
+            }),
+          }),
+        }),
+      ),
+      BaseOrigSchema.merge(
+        z.object({
+          type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE]),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              desc: z.object({ text: z.string() }).nullable(),
+              major: MajorArticleSchema,
+            }),
+          }),
+        }),
+      ),
+      BaseOrigSchema.merge(
+        z.object({
+          type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_LIVE]),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              desc: z.object({ text: z.string() }).nullable(),
+              major: MajorLiveSchema,
+            }),
+          }),
+        }),
+      ),
+      BaseOrigSchema.merge(
+        z.object({
+          type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_NONE]),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              desc: z.object({ text: z.string() }).nullable(),
+              major: MajorNoneSchema,
+            }),
+          }),
+        }),
+      ),
+      BaseOrigSchema.merge(
+        z.object({
+          type: z.nativeEnum(ForwardOtherTypeEnum),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              desc: z.object({ text: z.string() }).nullable(),
+              major: z.unknown().nullable(),
+            }),
+          }),
+        }),
+      ),
+    ]),
+  }),
+)
+
+export type DynamicForwardItem = z.infer<typeof DynamicForwardItemSchema>
+
+export enum OtherTypeEnum {
+  DYNAMIC_TYPE_OTHER = 'DYNAMIC_TYPE_OTHER',
+  DYNAMIC_TYPE_NONE = 'DYNAMIC_TYPE_NONE',
+  DYNAMIC_TYPE_PGC = 'DYNAMIC_TYPE_PGC',
+  DYNAMIC_TYPE_COURSES = 'DYNAMIC_TYPE_COURSES',
+  DYNAMIC_TYPE_MUSIC = 'DYNAMIC_TYPE_MUSIC',
+  DYNAMIC_TYPE_COMMON_SQUARE = 'DYNAMIC_TYPE_COMMON_SQUARE',
+  DYNAMIC_TYPE_COMMON_VERTICAL = 'DYNAMIC_TYPE_COMMON_VERTICAL',
+  DYNAMIC_TYPE_LIVE = 'DYNAMIC_TYPE_LIVE',
+  DYNAMIC_TYPE_MEDIALIST = 'DYNAMIC_TYPE_MEDIALIST',
+  DYNAMIC_TYPE_COURSES_SEASON = 'DYNAMIC_TYPE_COURSES_SEASON',
+  DYNAMIC_TYPE_COURSES_BATCH = 'DYNAMIC_TYPE_COURSES_BATCH',
+  DYNAMIC_TYPE_AD = 'DYNAMIC_TYPE_AD',
+  DYNAMIC_TYPE_APPLET = 'DYNAMIC_TYPE_APPLET',
+  DYNAMIC_TYPE_SUBSCRIPTION = 'DYNAMIC_TYPE_SUBSCRIPTION',
+  DYNAMIC_TYPE_LIVE_RCMD = 'DYNAMIC_TYPE_LIVE_RCMD',
+  DYNAMIC_TYPE_BANNER = 'DYNAMIC_TYPE_BANNER',
+  DYNAMIC_TYPE_UGC_SEASON = 'DYNAMIC_TYPE_UGC_SEASON',
+  DYNAMIC_TYPE_SUBSCRIPTION_NEW = 'DYNAMIC_TYPE_SUBSCRIPTION_NEW',
+}
+
+const DynamicUnknownItemSchema = DynamicItemBaseSchema.merge(
+  z.object({
+    type: z.nativeEnum(OtherTypeEnum),
+  }),
+)
+
+export type DynamicUnknownItem = z.infer<typeof DynamicUnknownItemSchema>
+
+const DynamicItemResponseSchema = z.discriminatedUnion('type', [
+  DynamicVideoItemSchema,
+  DynamicWordItemSchema,
+  DynamicDrawItemSchema,
+  DynamicArticleItemSchema,
+  DynamicForwardItemSchema,
+  DynamicUnknownItemSchema,
+])
+
+export type DynamicItemResponse = z.infer<typeof DynamicItemResponseSchema>
 
 export const DynamicListResponseSchema = z.object({
   has_more: z.boolean(),
   offset: z.string(),
   update_baseline: z.string(),
   update_num: z.number(),
-  items: z.array(
-    z.discriminatedUnion('type', [
-      DynamicItemResponseSchema,
-      DynamicOtherItemResponseSchema,
-      DynamicForwardItemResponseSchema,
-    ]),
-  ),
+  items: z.array(DynamicItemResponseSchema),
 })
 
-export type bar = z.infer<typeof DynamicItemResponseSchema>
-// type a = bar['modules']['module_dynamic']['major']
-export type foo = z.infer<typeof DynamicListResponseSchema>
-export type biz = z.infer<typeof DynamicForwardItemResponseSchema>
+export type DynamicListResponse = z.infer<typeof DynamicListResponseSchema>

@@ -42,7 +42,7 @@ export default function VideoInfo(props: {
               <ListItem.Content>
                 <ListItem.Title>
                   视频分集（{videoInfo?.videosNum}） {page}:{' '}
-                  {videoInfo?.pages[page].title}
+                  {videoInfo?.pages[page - 1].title}
                 </ListItem.Title>
               </ListItem.Content>
             }

@@ -1,5 +1,7 @@
 #!/usr/bin/env zx
 
+import { BuildListSchema } from '../src/api/check-update.schema'
+
 const { version } = require('../package.json')
 const newVersion = await question(`更新版本（${version} -> ?）`)
 const semver = require('semver')
@@ -41,6 +43,7 @@ try {
   let buildListStr = buildList.toString('utf8')
   const index = buildListStr.indexOf('[')
   buildListStr = buildListStr.substring(index)
+  BuildListSchema.parse(JSON.parse(buildListStr))
   await fs.outputFile(
     path.resolve(__dirname, '../docs/version.json'),
     buildListStr,
@@ -54,14 +57,5 @@ try {
 } catch (err) {
   await $`git checkout -- .`
   await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
-  const { expo } = await fs.readJson(path.resolve(__dirname, '../app.json'))
-  expo.version = version
-  expo.ios.buildNumber = version
-  expo.android.versionCode--
-  await fs.writeJson(
-    path.resolve(__dirname, '../app.json'),
-    { expo },
-    { spaces: 2 },
-  )
   throw err
 }
