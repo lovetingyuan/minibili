@@ -1,5 +1,4 @@
 import React from 'react'
-import * as SentryExpo from 'sentry-expo'
 import {
   Linking,
   Pressable,
@@ -20,6 +19,7 @@ import {
 import { githubLink, site } from '../constants'
 import { NavigationProps } from '../types'
 import { useNavigation } from '@react-navigation/native'
+import { Action, clearUser, reportUserAction } from '../utils/report'
 
 export default function About() {
   const { $userInfo, $blackTags, $blackUps } = useSnapshot(store)
@@ -37,15 +37,17 @@ export default function About() {
       {
         text: '确定',
         onPress: () => {
+          reportUserAction(Action.LOGOUT, {
+            mid: store.$userInfo?.mid,
+            name: store.$userInfo?.name,
+          })
           store.$userInfo = null
           store.updatedUps = {}
           store.dynamicUser = null
           store.$followedUps = []
           store.livingUps = {}
           store.$ignoredVersions = []
-          SentryExpo.Native.configureScope(function (scope) {
-            scope.setUser(null)
-          })
+          clearUser()
           setTimeout(() => {
             navigation.goBack()
           }, 100)

@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import { useUserRelation } from '../../api/user-relation'
 import { parseNumber } from '../../utils'
-import * as SentryExpo from 'sentry-expo'
+import { reportNavigation } from '../../utils/report'
 
 export default function Header() {
   const { $userInfo } = useSnapshot(store)
@@ -48,12 +48,7 @@ export default function Header() {
             style={{ padding: 5 }}
             onPress={() => {
               navigation.navigate('About')
-              SentryExpo.Native.captureMessage('user:navigation', {
-                tags: {
-                  category: 'navigation',
-                  route: 'about',
-                },
-              })
+              reportNavigation('About')
             }}>
             <Icon name="snow" type="ionicon" size={18} color="#00AEEC" />
           </Pressable>

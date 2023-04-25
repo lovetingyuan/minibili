@@ -11,13 +11,17 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native'
-import * as SentryExpo from 'sentry-expo'
 
 import store from '../../store'
 import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
 import { useSnapshot } from 'valtio'
-import getLocation from '../../api/get-location'
+import {
+  Action,
+  reportUserAction,
+  reportUserLocation,
+  setUser,
+} from '../../utils/report'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
@@ -43,31 +47,9 @@ export default function Login() {
       face: data.face,
       sign: data.sign,
     }
-    SentryExpo.Native.configureScope(function (scope) {
-      scope.setUser({ id: data.mid + '', username: data.name })
-    })
-    SentryExpo.Native.captureMessage('user:login', {
-      tags: {
-        category: 'action',
-        action: 'login',
-      },
-      extra: {
-        id: data.mid,
-        name: data.name,
-      },
-    })
-    getLocation().then(location => {
-      SentryExpo.Native.captureMessage('user:location', {
-        tags: {
-          category: 'information',
-          info: 'location',
-        },
-        extra: {
-          location,
-          user: data,
-        },
-      })
-    })
+    setUser(data.mid, data.name)
+    reportUserAction(Action.LOGIN, data)
+    reportUserLocation()
   }
   React.useEffect(() => {
     if (error) {

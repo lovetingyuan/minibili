@@ -1,6 +1,6 @@
 import { ToastAndroid } from 'react-native'
 import { URL } from 'react-native-url-polyfill'
-import * as SentryExpo from 'sentry-expo'
+import { reportApiError } from '../utils/report'
 
 let errorTime = Date.now()
 
@@ -52,15 +52,10 @@ export default function request<D extends any>(url: string, referer?: string) {
           ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT)
           errorTime = Date.now()
         }
-        SentryExpo.Native.captureException('api:error', {
-          tags: {
-            category: 'api-error',
-          },
-          extra: {
-            url,
-            code: res.code,
-            message: res.message,
-          },
+        reportApiError({
+          url,
+          code: res.code,
+          message: res.message,
         })
         return Promise.reject(
           new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : '')),

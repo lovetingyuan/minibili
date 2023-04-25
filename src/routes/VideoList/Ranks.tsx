@@ -21,7 +21,7 @@ import { useSnapshot } from 'valtio'
 import { VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, openBiliVideo } from '../../utils'
 import { useRankList } from '../../api/rank-list'
-import * as SentryExpo from 'sentry-expo'
+import { Action, reportUserAction } from '../../utils/report'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
@@ -53,15 +53,7 @@ export default function Ranks({ navigation }: Props) {
     }
     const { mid, name } = currentVideoRef.current
     store.$blackUps['_' + mid] = name
-    SentryExpo.Native.captureMessage('user:action', {
-      tags: {
-        category: 'action',
-        action: 'add-black-up',
-      },
-      extra: {
-        blackMid: mid,
-      },
-    })
+    reportUserAction(Action.ADD_BLACK_UP, { mid, name })
   }
   const gotoPlay = (data: VideoItem) => {
     store.currentVideo = data
