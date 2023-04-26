@@ -24,7 +24,8 @@ const fetcher2 = async (url: string) => {
   const data = await fetcher<Res>(url)
   const total = data.total
   const list = [data.list]
-  const pages = Math.ceil(total / 50) - 1
+  // 系统限制最多访问前五页
+  const pages = Math.min(Math.ceil(total / 50) - 1, 4)
   await Promise.all(
     Array.from({ length: pages }).map((v, i) => {
       return fetcher<Res>(url.replace('pn=1', 'pn=' + (i + 2))).then(res => {
