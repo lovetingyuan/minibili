@@ -25,7 +25,8 @@ const fetcher2 = async (url: string) => {
   const total = data.total
   const list = [data.list]
   // 系统限制最多访问前五页
-  const pages = Math.min(Math.ceil(total / 50) - 1, 4)
+  const pageCount = Math.ceil(total / 50) - 1
+  const pages = Math.min(pageCount, 4)
   await Promise.all(
     Array.from({ length: pages }).map((v, i) => {
       return fetcher<Res>(url.replace('pn=1', 'pn=' + (i + 2))).then(res => {

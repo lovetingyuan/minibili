@@ -16,6 +16,7 @@ export enum Category {
 }
 
 export enum Action {
+  OPEN_APP = 'open-app',
   LOGIN = 'login',
   LOGOUT = 'logout',
   ADD_BLACK_UP = 'add-black-up',
@@ -29,7 +30,7 @@ export function reportApiError(api: {
   SentryExpo.Native.captureException('api:error', {
     tags: {
       type: ReportType.API,
-      category: Category.API_ERR,
+      'type.category': Category.API_ERR,
     },
     contexts: {
       api,
@@ -41,7 +42,7 @@ export function reportNavigation(route: string) {
   SentryExpo.Native.captureMessage('user:action', {
     tags: {
       type: ReportType.USER_ACTION,
-      category: Category.NAVIGATION,
+      'type.category': Category.NAVIGATION,
     },
     contexts: {
       route: {
@@ -55,7 +56,7 @@ export function reportUserAction(action: Action, extraData: any = null) {
   SentryExpo.Native.captureMessage('user:action', {
     tags: {
       type: ReportType.USER_ACTION,
-      category: Category.COMMON_ACTION,
+      'type.category': Category.COMMON_ACTION,
     },
     contexts: {
       action: {
@@ -64,34 +65,43 @@ export function reportUserAction(action: Action, extraData: any = null) {
       },
     },
   })
+  if (action === Action.LOGIN || action === Action.OPEN_APP) {
+    getLocation().then(loc => {
+      SentryExpo.Native.captureMessage('user:data', {
+        tags: {
+          type: ReportType.USER_DATA,
+          'type.category': Category.LOCATION,
+        },
+        contexts: {
+          data: {
+            location: loc,
+          },
+        },
+      })
+    })
+  }
 }
 
-export function reportUserLocation() {
-  getLocation().then(loc => {
-    SentryExpo.Native.captureMessage('user:data', {
-      tags: {
-        type: ReportType.USER_DATA,
-        category: Category.LOCATION,
-      },
-      contexts: {
-        data: {
-          location: loc,
-        },
-      },
-    })
-  })
-}
+// export function reportUserLocation() {
+//   getLocation().then(loc => {
+//     SentryExpo.Native.captureMessage('user:data', {
+//       tags: {
+//         type: ReportType.USER_DATA,
+//         'type.category': Category.LOCATION,
+//       },
+//       contexts: {
+//         data: {
+//           location: loc,
+//         },
+//       },
+//     })
+//   })
+// }
 
 export function setUser(mid: string | number, name: string) {
   SentryExpo.Native.setUser({ id: mid + '', username: name })
-  // SentryExpo.Native.configureScope(function (scope) {
-  //   scope.setUser({ id: mid + '', username: name })
-  // })
 }
 
 export function clearUser() {
   SentryExpo.Native.setUser(null)
-  // SentryExpo.Native.configureScope(function (scope) {
-  //   scope.setUser(null)
-  // })
 }

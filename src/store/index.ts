@@ -2,7 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy } from 'valtio'
 import { watch } from 'valtio/utils'
 import { RanksConfig } from '../constants'
-import { setUser } from '../utils/report'
+import { Action, reportUserAction, setUser } from '../utils/report'
+import { RemoteConfig, getRemoteConfig } from '../api/get-config'
+import { checkUpdate } from '../api/check-update'
 
 interface UserInfo {
   mid: number | string
@@ -37,6 +39,8 @@ const store = proxy<{
     desc: string
   } | null
   ranksList: { rid: number; label: string }[]
+  remoteConfig: Promise<RemoteConfig>
+  updateInfo: ReturnType<typeof checkUpdate>
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -53,6 +57,8 @@ const store = proxy<{
   videosType: RanksConfig[0],
   currentVideo: null,
   ranksList: RanksConfig,
+  remoteConfig: getRemoteConfig(),
+  updateInfo: checkUpdate(),
 })
 
 const StoragePrefix = 'Store:'
@@ -70,6 +76,7 @@ Object.keys(store)
           store[key] = JSON.parse(data)
           if (key === '$userInfo') {
             setUser(store.$userInfo?.mid + '', store.$userInfo?.name + '')
+            reportUserAction(Action.OPEN_APP)
           }
         }
       })

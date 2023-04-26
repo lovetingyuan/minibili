@@ -12,5 +12,5 @@ export default function getLocation() {
     longitude: number
     zone_id: number
     country_code: number
-  }>('/x/web-interface/zone') //.then(data => {})
+  }>('/x/web-interface/zone?_t=' + Date.now()) //.then(data => {})
 }
