@@ -7,6 +7,7 @@ import {
   ToastAndroid,
   ActivityIndicator,
   useWindowDimensions,
+  Alert,
 } from 'react-native'
 import FollowItem from './FollowItem'
 import Login from './Login'
@@ -27,6 +28,12 @@ export default function Follow({ navigation, route }: Props) {
   const followListRef = React.useRef<FlatList | null>(null)
 
   const { data, error, isLoading } = useFollowedUps($userInfo?.mid)
+  React.useEffect(() => {
+    if (data?.total && data?.total / 50 > 5) {
+      Alert.alert('系统限制最多只能加载前250个关注的UP')
+    }
+  }, [data?.total])
+
   React.useEffect(() => {
     if (error) {
       ToastAndroid.show(

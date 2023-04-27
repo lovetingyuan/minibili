@@ -1,125 +1,119 @@
 import './sentry'
 import * as SplashScreen from 'expo-splash-screen'
-import { Linking, Alert, BackHandler } from 'react-native'
-import { checkUpdate } from './api/check-update'
+import { Linking, Alert } from 'react-native'
+import { currentVersion } from './api/check-update'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import NetInfo from '@react-native-community/netinfo'
 import store from './store'
-import { getRemoteConfig } from './api/get-config'
 
 SplashScreen.preventAutoHideAsync()
 
-new Promise(r => {
-  AsyncStorage.getItem('FIRST_RUN').then(res => {
-    if (!res) {
-      Alert.alert(
-        '使用说明',
-        '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
-        [
-          {
-            text: '确定',
-            onPress: () => {
-              r(AsyncStorage.setItem('FIRST_RUN', 'false'))
-            },
-          },
-        ],
-        {
-          cancelable: false,
-        },
-      )
-    } else {
-      r(null)
-    }
-  })
-})
-  .then(() => {
-    return new Promise(resolve => {
-      getRemoteConfig().then(config => {
-        if (!config.statement.show) {
-          resolve(null)
-          return
-        }
+async function init() {
+  await new Promise(r => {
+    AsyncStorage.getItem('FIRST_RUN').then(res => {
+      if (!res) {
         Alert.alert(
-          config.statement.title,
-          config.statement.content,
+          '使用说明',
+          '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
           [
             {
               text: '确定',
               onPress: () => {
-                if (config.statement.exit) {
-                  BackHandler.exitApp()
-                }
-                resolve(null)
+                r(AsyncStorage.setItem('FIRST_RUN', 'false'))
               },
             },
           ],
           {
-            cancelable: config.statement.cancel,
+            cancelable: false,
           },
         )
-      })
-    })
-  })
-  .then(() => {
-    let checkedUpdate = false
-    let checking = false
-    NetInfo.addEventListener(state => {
-      if (state.isConnected && !checkedUpdate && !checking) {
-        checking = true
-        checkUpdate()
-          .then(data => {
-            checkedUpdate = true
-            checking = false
-            if (!data.hasUpdate) {
-              return
-            }
-            if (store.$ignoredVersions.includes(data.latestVersion)) {
-              return
-            }
-            const forceUpdate = data.changes.some(v => v.includes('[force]'))
-            Alert.alert(
-              '有新版本',
-              `${data.currentVersion} --> ${
-                data.latestVersion
-              }\n\n${data.changes.join('\n').replace('[force]', '')}`,
-              forceUpdate
-                ? [
-                    {
-                      text: '下载更新',
-                      onPress: () => {
-                        Linking.openURL(data.downloadLink!)
-                      },
-                    },
-                  ]
-                : [
-                    {
-                      text: '取消',
-                    },
-                    {
-                      text: '忽略',
-                      onPress: () => {
-                        if (
-                          !store.$ignoredVersions.includes(data.latestVersion)
-                        ) {
-                          store.$ignoredVersions.push(data.latestVersion!)
-                        }
-                      },
-                    },
-                    {
-                      text: '下载更新',
-                      onPress: () => {
-                        Linking.openURL(data.downloadLink!)
-                      },
-                    },
-                  ],
-              {
-                cancelable: forceUpdate ? false : true,
-              },
-            )
-          })
-          .catch(() => {
-            checking = false
-          })
+      } else {
+        r(null)
       }
     })
   })
+  const remoteConfig = await store.remoteConfig
+  let isBroken = false
+  if (currentVersion && remoteConfig.brokenVersions.includes(currentVersion)) {
+    isBroken = true
+    await new Promise(r => {
+      Alert.alert(
+        '注意',
+        '当前版本存在问题，请更新APP后使用',
+        [
+          {
+            text: '确定',
+            onPress: () => {
+              r(null)
+            },
+          },
+        ],
+        {
+          onDismiss: () => r(null),
+        },
+      )
+    })
+  }
+  if (remoteConfig.statement.show) {
+    await new Promise(r => {
+      Alert.alert(
+        remoteConfig.statement.title,
+        remoteConfig.statement.content,
+        [
+          {
+            text: '确定',
+            onPress: () => {
+              r(null)
+            },
+          },
+        ],
+        {
+          cancelable: remoteConfig.statement.dismiss,
+          onDismiss: () => r(null),
+        },
+      )
+    })
+  }
+  const updateInfo = await store.updateInfo
+  const isIgnoredVersion = store.$ignoredVersions.includes(
+    updateInfo.latestVersion,
+  )
+  if (updateInfo.hasUpdate) {
+    if (isBroken || !isIgnoredVersion) {
+      await new Promise(r => {
+        Alert.alert(
+          '有新版本',
+          `${updateInfo.currentVersion} --> ${
+            updateInfo.latestVersion
+          }\n\n${updateInfo.changes.join('\n').replace('[force]', '')}`,
+          [
+            {
+              text: '取消',
+            },
+            {
+              text: '忽略',
+              onPress: () => {
+                r(null)
+                store.$ignoredVersions.push(updateInfo.latestVersion!)
+              },
+            },
+            {
+              text: '下载更新',
+              onPress: () => {
+                r(null)
+                Linking.openURL(updateInfo.downloadLink!)
+              },
+            },
+          ],
+          {
+            onDismiss: () => r(null),
+          },
+          // {
+          //   cancelable: isBroken ? false : true,
+          // },
+        )
+      })
+    }
+  }
+}
+
+init()

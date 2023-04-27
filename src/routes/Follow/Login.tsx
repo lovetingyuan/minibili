@@ -16,12 +16,7 @@ import store from '../../store'
 import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
 import { useSnapshot } from 'valtio'
-import {
-  Action,
-  reportUserAction,
-  reportUserLocation,
-  setUser,
-} from '../../utils/report'
+import { Action, reportUserAction, setUser } from '../../utils/report'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
@@ -49,7 +44,6 @@ export default function Login() {
     }
     setUser(data.mid, data.name)
     reportUserAction(Action.LOGIN, data)
-    reportUserLocation()
   }
   React.useEffect(() => {
     if (error) {
