@@ -32,8 +32,9 @@ if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
 
-await $`npm version ${newVersion}-${Number(appBuildVersion) + 1
-  } -m ${changes} --allow-same-version`
+await $`npm version ${newVersion}-${
+  Number(appBuildVersion) + 1
+} -m ${changes} --allow-same-version`
 
 echo(
   chalk.cyan(
