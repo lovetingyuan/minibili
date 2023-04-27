@@ -1,3 +1,4 @@
+require('dotenv').config()
 const pkg = require('./package.json')
 const [version, versionCode] = pkg.version.split('-')
 
@@ -51,6 +52,7 @@ module.exports = {
         config: {
           organization: 'tingyuan123',
           project: 'minibili',
+          authToken: process.env.SENTRY_AUTH_TOKEN,
         },
       },
     ],

@@ -89,15 +89,22 @@ try {
 }
 
 try {
-  await `wget ${buildList[0].artifacts.buildUrl} -q -O ./dist/minibili-${buildList[0].appVersion}.apk`
+  await $`wget ${buildList[0].artifacts.buildUrl} -q -O ./dist/minibili-${buildList[0].appVersion}.apk`
 } catch (err) {
   echo(chalk.red('Failed to download apk.'))
   throw err
 }
 
 try {
-  await 'npm publish'
+  await $`npm publish`
 } catch (err) {
   echo(chalk.red('Failed to publish to npm.'))
+  throw err
+}
+
+try {
+  await $`expo publish`
+} catch (err) {
+  echo(chalk.red('Failed to publish sourcemap.'))
   throw err
 }
