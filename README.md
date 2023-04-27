@@ -2,7 +2,7 @@
 
 The minimalist Bilibili version
 
-![minibili](./docs/minibili.webp)
+![minibili](./docs/minibili.png)
 
 https://lovetingyuan.github.io/minibili/
 

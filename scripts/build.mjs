@@ -50,7 +50,7 @@ try {
 } catch (err) {
   await $`git checkout -- .`
   await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
-  echo(chalk.red('Failed to build new apk,' + err?.message))
+  echo(chalk.red('Failed to build new apk on EAS.'))
   throw err
 }
 let buildList = []
@@ -68,7 +68,7 @@ try {
     ),
   )
 } catch (err) {
-  echo(chalk.red('Failed to get build list,' + err?.message))
+  echo(chalk.red('Failed to get build list.'))
   throw err
 }
 
@@ -85,5 +85,19 @@ try {
   echo(chalk.green('Build done!'))
 } catch (err) {
   echo(chalk.red('Failed to push build list to git.'))
+  throw err
+}
+
+try {
+  await `wget ${buildList[0].artifacts.buildUrl} -q -O ./dist/minibili-${buildList[0].appVersion}.apk`
+} catch (err) {
+  echo(chalk.red('Failed to download apk.'))
+  throw err
+}
+
+try {
+  await 'npm publish'
+} catch (err) {
+  echo(chalk.red('Failed to publish to npm.'))
   throw err
 }
