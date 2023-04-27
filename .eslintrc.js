@@ -9,5 +9,4 @@ module.exports = {
     'valtio/state-snapshot-rule': 'error',
     'valtio/avoid-this-in-proxy': 'error',
   },
-  ignorePatterns: ['scripts/build.mjs'],
 }
