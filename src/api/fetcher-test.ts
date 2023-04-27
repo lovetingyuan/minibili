@@ -33,7 +33,7 @@ export default function request<D extends any>(url: string, referer?: string) {
     .then(r => r.json())
     .then((res: { code: number; message: string; data: D }) => {
       if (res.code) {
-        throw new Error('未能获取当前数据' + res.code + url)
+        throw new Error(`fetch error: ${JSON.stringify(res)}, ${url}`)
       }
       return res.data
     })

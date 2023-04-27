@@ -247,7 +247,7 @@ const DynamicWordItemSchema = DynamicItemBaseSchema.merge(
       z.object({
         module_dynamic: ModuleDynamicBaseSchema.merge(
           z.object({
-            major: MajorWordSchema,
+            major: MajorWordSchema.nullable(),
             additional: z
               .discriminatedUnion('type', [
                 AdditionalReserveSchema,

@@ -1,8 +1,7 @@
 #!/usr/bin/env zx
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
 
-import { BuildListSchema } from '../src/api/check-update.schema'
-
+// import { BuildListSchema } from '../src/api/check-update.schema'
 const { version } = require('../package.json')
 const semver = require('semver')
 
@@ -10,7 +9,7 @@ const getBuildList = buildStr => {
   let buildListStr = buildStr.toString('utf8')
   buildListStr = buildListStr.substring(buildListStr.indexOf('['))
   const list = JSON.parse(buildListStr)
-  BuildListSchema.parse(list)
+  // BuildListSchema.parse(list)
   list.toString = () => buildListStr.trim()
   return list
 }
@@ -33,9 +32,8 @@ if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
 
-await $`npm version ${newVersion}-${
-  Number(appBuildVersion) + 1
-} -m ${changes} --allow-same-version`
+await $`npm version ${newVersion}-${Number(appBuildVersion) + 1
+  } -m ${changes} --allow-same-version`
 
 echo(
   chalk.cyan(
