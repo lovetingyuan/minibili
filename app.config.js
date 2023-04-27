@@ -27,7 +27,7 @@ module.exports = {
       backgroundColor: '#FFFFFF',
     },
     package: 'com.tingyuan.minibili',
-    versionCode,
+    versionCode: Number(versionCode),
   },
   plugins: [
     [

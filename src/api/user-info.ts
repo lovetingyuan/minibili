@@ -22,7 +22,7 @@ const getUserInfo = (userInfo: UserInfoResponse) => {
 
 export function useUserInfo(mid?: number | string) {
   const { data, error, isValidating, isLoading } = useSWR<UserInfoResponse>(
-    mid ? `/x/space/acc/info?mid=${mid}&token=&platform=web&jsonp=jsonp` : null,
+    mid ? `/x/space/acc/info?mid=${mid}` : null,
     (url: string) => {
       return fetcher<UserInfoResponse>(url, 'https://space.bilibili.com/')
     },

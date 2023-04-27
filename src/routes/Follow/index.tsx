@@ -83,26 +83,30 @@ export default function Follow({ navigation, route }: Props) {
     return <Login />
   }
 
-  const topUps: FollowedUpItem[] = []
-  const updateUps: FollowedUpItem[] = []
-  const noUpdateUps: FollowedUpItem[] = []
-  for (const up of $followedUps) {
-    if (livingUps[up.mid]) {
-      topUps.push({ ...up })
-    } else if (updatedUps[up.mid]) {
-      updateUps.push({ ...up })
-    } else {
-      noUpdateUps.push({ ...up })
-    }
-  }
-  const displayUps: (FollowedUpItem | null)[] = [
-    ...topUps,
-    ...updateUps,
-    ...noUpdateUps,
-    ...(rest ? Array.from({ length: rest }).map(() => null) : []),
-  ]
   const isCheckingUpdate =
     Object.values(checkingUpdateMap).filter(Boolean).length > 0
+
+  let displayUps: (FollowedUpItem | null)[] = $followedUps.slice()
+  if (!isCheckingUpdate) {
+    const topUps: FollowedUpItem[] = []
+    const updateUps: FollowedUpItem[] = []
+    const noUpdateUps: FollowedUpItem[] = []
+    for (const up of $followedUps) {
+      if (livingUps[up.mid]) {
+        topUps.push({ ...up })
+      } else if (updatedUps[up.mid]) {
+        updateUps.push({ ...up })
+      } else {
+        noUpdateUps.push({ ...up })
+      }
+    }
+    displayUps = [
+      ...topUps,
+      ...updateUps,
+      ...noUpdateUps,
+      ...(rest ? Array.from({ length: rest }).map(() => null) : []),
+    ]
+  }
 
   return (
     <View style={styles.container}>
