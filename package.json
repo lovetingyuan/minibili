@@ -35,7 +35,6 @@
     "expo": "~48.0.10",
     "expo-application": "~5.1.1",
     "expo-background-fetch": "~11.1.1",
-    "expo-cli": "^6.3.2",
     "expo-clipboard": "~4.1.2",
     "expo-constants": "~14.2.1",
     "expo-device": "~5.2.1",
@@ -63,6 +62,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@expo/cli": "^0.7.1",
     "@react-native-community/eslint-config": "^3.2.0",
     "@tsconfig/react-native": "^2.0.0",
     "@types/react": "^18.0.31",
