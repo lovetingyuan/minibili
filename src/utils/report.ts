@@ -1,5 +1,6 @@
 import * as SentryExpo from 'sentry-expo'
 import getLocation from '../api/get-location'
+import { DynamicTypeEnum } from '../api/dynamic-items.schema'
 
 export enum ReportType {
   USER_ACTION = 'user_action',
@@ -13,6 +14,7 @@ export enum Category {
   LOGIN = 'action.login',
   LOCATION = 'data.location',
   COMMON_ACTION = 'action.common',
+  UNKNOWN_ITEM = 'data.unknownitem',
 }
 
 export enum Action {
@@ -71,6 +73,7 @@ export function reportUserAction(action: Action, extraData: any = null) {
         tags: {
           type: ReportType.USER_DATA,
           'type.category': Category.LOCATION,
+          location: [loc.country, loc.province, loc.city].join('/'),
         },
         contexts: {
           data: {
@@ -106,4 +109,22 @@ export function setUser(mid: string | number, name: string) {
 export function clearUser() {
   SentryExpo.Native.setUser(null)
   SentryExpo.Native.setTag('biliUrl', null)
+}
+
+export function reportUnknownDynamicItem(item: any) {
+  let type = item.type
+  if (type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
+    type = 'FORWARD:' + item.orig?.type
+  }
+  SentryExpo.Native.captureMessage('unknown dynamic item:' + type, {
+    tags: {
+      type: ReportType.USER_DATA,
+      'type.category': Category.UNKNOWN_ITEM,
+    },
+    contexts: {
+      dynamicItem: {
+        data: JSON.stringify(item, null, 2),
+      },
+    },
+  })
 }

@@ -11,6 +11,7 @@ import {
 import ForwardItem from './ForwardItem'
 import RichTextItem from './DrawItem'
 import VideoItem from './VideoItem'
+import LivingItem from './LivingItem'
 import { RootStackParamList } from '../../types'
 import WordItem from './WordItem'
 import store from '../../store'
@@ -81,6 +82,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       BackHandler.removeEventListener('hardwareBackPress', handleBack)
     }
   })
+
   const renderItem = ({ item }: any) => {
     let Item: any = DefaultItem
     if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
@@ -97,6 +99,9 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     }
     if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
       Item = ForwardItem
+    }
+    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+      Item = LivingItem
     }
     // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
     return (

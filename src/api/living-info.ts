@@ -1,6 +1,8 @@
 import { z } from 'zod'
+import React from 'react'
 import request from './fetcher'
 import {
+  LiveInfoBatchItemSchema,
   LiveInfoResponseSchema,
   LiveRoomInfoResponseSchema,
   LiveUserInfoResponseSchema,
@@ -9,10 +11,13 @@ import useSWR from 'swr'
 import useSWRImmutable from 'swr/immutable'
 import PQueue from 'p-queue'
 import store from '../store'
+import { useSnapshot } from 'valtio'
+import { ToastAndroid } from 'react-native'
 
 export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
 export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
 export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
+export type LiveInfoBatchItem = z.infer<typeof LiveInfoBatchItemSchema>
 
 const queue = new PQueue({ concurrency: 3 })
 
@@ -24,7 +29,8 @@ const useLiveRoomInfo = (mid: number | string) => {
   return data
 }
 
-export const useLivingInfo = (mid: number | string) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const useLivingInfo = (mid: number | string) => {
   const roomData = useLiveRoomInfo(mid)
   const delay = mid.toString().slice(0, 5)
   const { data, error } = useSWR<LiveInfo>(
@@ -83,6 +89,32 @@ export const useLivingInfo2 = (mid: number | string) => {
           face: data.face,
         }
       : null,
+    error,
+  }
+}
+
+export const useLivingInfo3 = () => {
+  // api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?uids[]=672328094&uids[]=322892
+  const { $followedUps } = useSnapshot(store)
+  const uids = $followedUps
+    .map(user => {
+      return `uids[]=${user.mid}`
+    })
+    .join('&')
+  const { data, error } = useSWR<Record<number, LiveInfoBatchItem>>(
+    `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}`,
+    request,
+    {
+      refreshInterval: 10 * 60 * 1000,
+    },
+  )
+  React.useEffect(() => {
+    if (error) {
+      ToastAndroid.show('获取直播状态失败', ToastAndroid.SHORT)
+    }
+  }, [error])
+  return {
+    data,
     error,
   }
 }

@@ -11,9 +11,12 @@ import {
   DynamicListResponse,
   DynamicTypeEnum,
   DynamicUnknownItem,
+  ForwardOtherTypeEnum,
   MajorTypeEnum,
+  OtherTypeEnum,
 } from './dynamic-items.schema'
 import useSWRInfinite from 'swr/infinite'
+import { reportUnknownDynamicItem } from '../utils/report'
 
 export type DynamicItem = ReturnType<typeof getDynamicItem>
 
@@ -90,6 +93,25 @@ const getArticleItem = (
   }
 }
 
+const getLivingItem = (
+  item: Extract<
+    DynamicItemResponse,
+    { type: DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD }
+  >,
+) => {
+  return {
+    ...getCommon(item),
+    type: item.type,
+    payload: {
+      name: item.modules.module_author.name, // + '正在直播',
+      mid: item.modules.module_author.mid,
+      // text: item.modules.module_dynamic.major.article.desc,
+      // cover: item.modules.module_dynamic.major.article.covers[0],
+      // url: 'https:' + item.modules.module_dynamic.major.article.jump_url,
+    },
+  }
+}
+
 const getWordItem = (
   item: Extract<
     DynamicItemResponse,
@@ -141,6 +163,13 @@ const getVideoItem = (
 
 const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
   __DEV__ && console.log('unknown', item)
+  if (
+    item.type in OtherTypeEnum ||
+    (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD &&
+      item.orig.type in ForwardOtherTypeEnum)
+  ) {
+    reportUnknownDynamicItem(item)
+  }
   return {
     ...getCommon(item),
     type: item.type,
@@ -164,6 +193,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
     return getArticleItem(item)
   }
+  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+    return getLivingItem(item)
+  }
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_AV) {
       const forward = item.orig.modules.module_dynamic
@@ -179,9 +211,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       }
     }
     if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
-      if (!item.orig.modules.module_dynamic.major) {
-        console.log(333, item)
-      }
       const additional = item.orig.modules.module_dynamic.additional
       const text = [item.orig.modules.module_dynamic.desc?.text]
       // let additionalText = ''/

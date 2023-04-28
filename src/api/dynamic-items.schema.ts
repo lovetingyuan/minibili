@@ -299,6 +299,28 @@ const DynamicArticleItemSchema = DynamicItemBaseSchema.merge(
   }),
 )
 
+const MajorLivingSchema = z.object({
+  type: z.enum([MajorTypeEnum.MAJOR_TYPE_LIVE_RCMD]),
+  live_rcmd: z.object({
+    content: z.string(),
+    reserve_type: z.number(),
+  }),
+})
+const DynamicLivingItemSchema = DynamicItemBaseSchema.merge(
+  z.object({
+    type: z.enum([DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD]),
+    modules: DynamicModulesBaseSchema.merge(
+      z.object({
+        module_dynamic: ModuleDynamicBaseSchema.merge(
+          z.object({
+            major: MajorLivingSchema,
+          }),
+        ),
+      }),
+    ),
+  }),
+)
+
 const BaseOrigSchema = z.object({
   id_str: z.string().nullable(), // MajorNoneSchema
   basic: z.object({
@@ -452,7 +474,7 @@ export enum OtherTypeEnum {
   DYNAMIC_TYPE_AD = 'DYNAMIC_TYPE_AD',
   DYNAMIC_TYPE_APPLET = 'DYNAMIC_TYPE_APPLET',
   DYNAMIC_TYPE_SUBSCRIPTION = 'DYNAMIC_TYPE_SUBSCRIPTION',
-  DYNAMIC_TYPE_LIVE_RCMD = 'DYNAMIC_TYPE_LIVE_RCMD',
+  // DYNAMIC_TYPE_LIVE_RCMD = 'DYNAMIC_TYPE_LIVE_RCMD',
   DYNAMIC_TYPE_BANNER = 'DYNAMIC_TYPE_BANNER',
   DYNAMIC_TYPE_UGC_SEASON = 'DYNAMIC_TYPE_UGC_SEASON',
   DYNAMIC_TYPE_SUBSCRIPTION_NEW = 'DYNAMIC_TYPE_SUBSCRIPTION_NEW',
@@ -472,6 +494,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
   DynamicDrawItemSchema,
   DynamicArticleItemSchema,
   DynamicForwardItemSchema,
+  DynamicLivingItemSchema,
   DynamicUnknownItemSchema,
 ])
 

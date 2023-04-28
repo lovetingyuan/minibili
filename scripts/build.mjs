@@ -100,11 +100,11 @@ try {
 } catch (err) {
   echo(chalk.red('Failed to publish to npm.'))
   throw err
-}
-
-try {
-  await $`expo publish`
-} catch (err) {
-  echo(chalk.red('Failed to publish sourcemap.'))
-  throw err
+} finally {
+  try {
+    await $`expo publish`
+  } catch (err) {
+    echo(chalk.red('Failed to publish sourcemap.'))
+    throw err
+  }
 }
