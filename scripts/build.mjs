@@ -52,14 +52,14 @@ try {
   echo(chalk.red('Failed to build new apk on EAS.'))
   throw err
 }
-let buildList = []
+let buildListStr = ''
 
 await new Promise(r => {
   setTimeout(r, 5000)
 })
 
 try {
-  buildList = await spinner('get eas build list...', () =>
+  buildListStr = await spinner('get eas build list...', () =>
     retry(
       5,
       () =>
@@ -71,10 +71,11 @@ try {
   throw err
 }
 
+const buildList = getBuildList(buildListStr)
 try {
   await fs.outputFile(
     path.resolve(__dirname, '../docs/version.json'),
-    getBuildList(buildList),
+    buildList,
   )
 
   await $`git commit -a --amend -C HEAD`
