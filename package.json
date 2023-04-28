@@ -15,8 +15,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:android": "npm run test && zx scripts/build.mjs",
-    "doctor": "expo-cli doctor",
-    "aa": "npx expo doctor --fix-dependencies",
+    "doctor": "expo-cli doctor --fix-dependencies",
     "docs": "npx vite docs",
     "format": "npx prettier src --write",
     "test": "npx vitest run",
@@ -62,7 +61,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@expo/cli": "^0.7.1",
     "@react-native-community/eslint-config": "^3.2.0",
     "@tsconfig/react-native": "^2.0.0",
     "@types/react": "^18.0.31",
