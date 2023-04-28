@@ -39,8 +39,14 @@ export default function request<D extends any>(url: string, referer?: string) {
     // credentials: 'omit',
     credentials: 'include',
   })
-    .then(r => r.json())
-    .then((res: { code: number; message: string; data: D }) => {
+    .then(r => r.text())
+    .then(resText => {
+      const index = resText.indexOf('}{"code":')
+      if (index > -1) {
+        resText = resText.substring(index + 1)
+      }
+      const res: { code: number; message: string; data: D } =
+        JSON.parse(resText)
       if (res.code) {
         if (__DEV__) {
           ToastAndroid.show(
