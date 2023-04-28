@@ -273,17 +273,17 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   return getUnknownItem(item)
 }
 
-export async function getDynamicItems(offset = '', uid: string | number) {
-  // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480
-  const data = await request<DynamicListResponse>(
-    `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${uid}&timezone_offset=-480`,
-  )
-  return {
-    more: data.has_more,
-    offset: data.offset,
-    items: data.items.map(getDynamicItem),
-  }
-}
+// export async function getDynamicItems(offset = '', uid: string | number) {
+//   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480
+//   const data = await request<DynamicListResponse>(
+//     `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${uid}&timezone_offset=-480`,
+//   )
+//   return {
+//     more: data.has_more,
+//     offset: data.offset,
+//     items: data.items.map(getDynamicItem),
+//   }
+// }
 
 const fetcher2 = (url: string) => {
   __DEV__ && console.log('fetch dynamic items: ' + url)

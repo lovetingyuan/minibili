@@ -1,3 +1,7 @@
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { DynamicItem } from './api/dynamic-items'
+import { DynamicTypeEnum } from './api/dynamic-items.schema'
+
 export type RootStackParamList = {
   Home: undefined
   Main: undefined
@@ -27,6 +31,4 @@ export type RootStackParamList = {
 export type GetFuncPromiseType<F extends (...a: any) => any> =
   ReturnType<F> extends Promise<infer R> ? R : never
 
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { DynamicItem, DynamicTypeEnum } from './api/dynamic-items'
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>

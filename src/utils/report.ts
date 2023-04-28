@@ -100,8 +100,10 @@ export function reportUserAction(action: Action, extraData: any = null) {
 
 export function setUser(mid: string | number, name: string) {
   SentryExpo.Native.setUser({ id: mid + '', username: name })
+  SentryExpo.Native.setTag('biliUrl', `https://space.bilibili.com/${mid}`)
 }
 
 export function clearUser() {
   SentryExpo.Native.setUser(null)
+  SentryExpo.Native.setTag('biliUrl', null)
 }
