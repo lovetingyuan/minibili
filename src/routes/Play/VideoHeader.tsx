@@ -48,7 +48,7 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
         style={styles.upInfoContainer}>
         <Avatar size={32} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
         <Text
-          adjustsFontSizeToFit
+          // adjustsFontSizeToFit
           numberOfLines={1}
           ellipsizeMode="tail"
           style={styles.upName}
@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
   },
   upName: {
     marginLeft: 10,
+    marginRight: 5,
     fontSize: 17,
     fontWeight: 'bold',
     flexGrow: 1,

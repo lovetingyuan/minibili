@@ -36,7 +36,10 @@ export const parseDate = (time?: number | string) => {
   return `${year ? year + '-' : ''}${month}-${day}`
 }
 
-export const parseDuration = (seconds: number | string) => {
+export const parseDuration = (seconds?: number | string) => {
+  if (!seconds) {
+    return ''
+  }
   if (typeof seconds === 'string') {
     return seconds
   }

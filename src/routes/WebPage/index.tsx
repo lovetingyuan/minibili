@@ -8,9 +8,10 @@ const Loading = () => {
     <View style={styles.loadingView}>
       <Image
         source={require('../../../assets/video-loading.png')}
+        resizeMode="center"
         style={{
           width: '100%',
-          height: '100%',
+          // height: '100%',
         }}
       />
     </View>
@@ -122,6 +123,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: '100%',
     width: '100%',
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingImage: {
     flex: 1,

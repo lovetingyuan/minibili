@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import React from 'react'
+// import React from 'react'
 import request from './fetcher'
 import {
   LiveInfoBatchItemSchema,
@@ -9,18 +9,19 @@ import {
 } from './living-info.schema'
 import useSWR from 'swr'
 // import useSWRImmutable from 'swr/immutable'
-import PQueue from 'p-queue'
-import store, { useStore } from '../store'
+// import PQueue from 'p-queue'
+import { useStore } from '../store'
+// import store, { useStore } from '../store'
 
-import { ToastAndroid, Vibration } from 'react-native'
-import { throttle } from 'throttle-debounce'
+// import { Vibration } from 'react-native'
+// import { throttle } from 'throttle-debounce'
 
 export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
 export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
 export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
 export type LiveInfoBatchItem = z.infer<typeof LiveInfoBatchItemSchema>
 
-const queue = new PQueue({ concurrency: 5 })
+// const queue = new PQueue({ concurrency: 5 })
 
 // const useLiveRoomInfo = (mid: number | string) => {
 //   const { data } = useSWRImmutable<LiveRoomInfo>(
@@ -30,7 +31,6 @@ const queue = new PQueue({ concurrency: 5 })
 //   return data
 // }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 // const useLivingInfo = (mid: number | string) => {
 //   const roomData = useLiveRoomInfo(mid)
 //   const delay = mid.toString().slice(0, 5)
@@ -61,57 +61,46 @@ const queue = new PQueue({ concurrency: 5 })
 //   return null
 // }
 
-const vibrate = throttle(
-  5000,
-  () => {
-    Vibration.vibrate(1000)
-  },
-  {
-    noLeading: false,
-    noTrailing: false,
-  },
-)
-
 //api.bilibili.com/x/space/wbi/acc/info?mid=3493257772272614&token=&platform=web
-export const useLivingInfo2 = (mid: number | string) => {
-  const delay = mid.toString().slice(0, 5)
-  const { data, error } = useSWR<LiveUserInfo>(
-    `/x/space/wbi/acc/info?mid=${mid}&token=&platform=web`,
-    (url: string) => {
-      return queue.add(() => request(url))
-    },
-    {
-      refreshInterval: 10 * 60 * 1000 + Number(delay),
-    },
-  )
-  if (__DEV__ && error) {
-    console.error('living', error)
-  }
-  const living = data?.live_room?.liveStatus === 1
-  const liveUrl = data?.live_room?.url || ''
-  store.livingUps[mid] = living ? liveUrl : ''
-  React.useEffect(() => {
-    if (!!store.livingUps[mid] !== living) {
-      store.livingUps[mid] = living ? liveUrl : ''
-      if (living) {
-        vibrate()
-      }
-    }
-  }, [living, liveUrl, mid])
-  return {
-    data: data
-      ? {
-          hasLiveRoom: !!data.live_room,
-          living,
-          liveUrl,
-          roomId: data.live_room?.roomid,
-          name: data.name,
-          face: data.face,
-        }
-      : null,
-    error,
-  }
-}
+// const useLivingInfo2 = (mid: number | string) => {
+//   const delay = mid.toString().slice(0, 5)
+//   const { data, error } = useSWR<LiveUserInfo>(
+//     `/x/space/wbi/acc/info?mid=${mid}&token=&platform=web`,
+//     (url: string) => {
+//       return queue.add(() => request(url))
+//     },
+//     {
+//       refreshInterval: 10 * 60 * 1000 + Number(delay),
+//     },
+//   )
+//   if (__DEV__ && error) {
+//     console.error('living', error)
+//   }
+//   const living = data?.live_room?.liveStatus === 1
+//   const liveUrl = data?.live_room?.url || ''
+//   store.livingUps[mid] = living ? liveUrl : ''
+//   React.useEffect(() => {
+//     if (!!store.livingUps[mid] !== living) {
+//       store.livingUps[mid] = living ? liveUrl : ''
+//       if (living) {
+//         vibrate()
+//       }
+//     }
+//   }, [living, liveUrl, mid])
+//   return {
+//     data: data
+//       ? {
+//           hasLiveRoom: !!data.live_room,
+//           living,
+//           liveUrl,
+//           roomId: data.live_room?.roomid,
+//           name: data.name,
+//           face: data.face,
+//         }
+//       : null,
+//     error,
+//   }
+// }
 
 export const useLivingInfo3 = () => {
   // api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?uids[]=672328094&uids[]=322892
@@ -121,18 +110,15 @@ export const useLivingInfo3 = () => {
       return `uids[]=${user.mid}`
     })
     .join('&')
-  const { data, error } = useSWR<Record<number, LiveInfoBatchItem>>(
-    `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}`,
+  const { data, error } = useSWR<Record<string, LiveInfoBatchItem>>(
+    uids
+      ? `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}`
+      : null,
     request,
     {
       refreshInterval: 5 * 60 * 1000,
     },
   )
-  React.useEffect(() => {
-    if (error) {
-      ToastAndroid.show('获取直播状态失败', ToastAndroid.SHORT)
-    }
-  }, [error])
   return {
     data,
     error,

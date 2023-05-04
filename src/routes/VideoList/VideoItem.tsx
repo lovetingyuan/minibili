@@ -26,14 +26,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           <Text style={styles.text}>{parseDate(video.pubDate)}</Text>
         </View>
         {video.tag ? (
-          <View
-            style={[
-              styles.textContainer,
-              {
-                right: 0,
-                bottom: 0,
-              },
-            ]}>
+          <View style={[styles.textContainer]}>
             <Text style={styles.text}>{video.tag}</Text>
           </View>
         ) : null}
@@ -42,25 +35,25 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
         {video.title}
       </Text>
       <View style={[styles.videoInfo]}>
-        <View style={[styles.namePlay]}>
+        <View style={[styles.upName]}>
           <Image
             style={styles.icon}
             source={require('../../../assets/up-mark.png')}
           />
           <Text
             numberOfLines={1}
-            adjustsFontSizeToFit
+            // adjustsFontSizeToFit
             ellipsizeMode="tail"
             style={[styles.upNameText]}>
-            {video.name + ' '}
+            {video.name}
           </Text>
         </View>
-        <View style={[styles.namePlay]}>
+        <View style={[styles.playNum]}>
           <Image
             style={styles.icon}
             source={require('../../../assets/play-mark.png')}
           />
-          <Text style={styles.playNumText}>{playNum}</Text>
+          <Text style={[styles.playNumText]}>{playNum}</Text>
         </View>
       </View>
     </View>
@@ -79,6 +72,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 2,
     margin: 5,
+  },
+  videoTag: {
+    right: 0,
+    bottom: 0,
   },
   text: {
     color: 'white',
@@ -107,6 +104,8 @@ const styles = StyleSheet.create({
     color: '#00699D',
     marginLeft: 4,
     fontSize: 13,
+    flexGrow: 1,
+    flexShrink: 1,
   },
   playNumText: {
     color: '#555',
@@ -117,5 +116,6 @@ const styles = StyleSheet.create({
     width: 13,
     height: 11,
   },
-  namePlay: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
+  upName: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
+  playNum: { flexDirection: 'row', alignItems: 'center', flexShrink: 0 },
 })

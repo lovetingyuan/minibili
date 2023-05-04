@@ -8,12 +8,13 @@ import {
   StyleSheet,
   ImageBackground,
   Pressable,
+  Text,
 } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
-import { isWifi } from '../../utils'
+import { isWifi, parseDuration } from '../../utils'
 
 import { useStore } from '../../store'
 import { Icon } from '@rneui/themed'
@@ -157,10 +158,9 @@ function Player(props: Props & { wifi: boolean }) {
               size={60}
               color={'white'}
             />
-            {/* <Image
-              source={require('../../../assets/ic_play.png')}
-              style={{ width: 60, height: 60 }}
-            /> */}
+            <Text style={styles.duration}>
+              {parseDuration(videoInfo?.duration)}
+            </Text>
           </ImageBackground>
         </Pressable>
       )}
@@ -193,5 +193,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  duration: {
+    position: 'absolute',
+    bottom: 0,
+    margin: 10,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    color: 'white',
+    fontWeight: 'bold',
+    left: 0,
+    borderRadius: 4,
   },
 })

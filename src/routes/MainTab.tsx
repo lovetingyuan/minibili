@@ -5,14 +5,19 @@ import { useStore } from '../store'
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
-import { Text, View, StyleSheet } from 'react-native'
+import { Text, View, StyleSheet, ActivityIndicator } from 'react-native'
 import { Badge } from '@rneui/themed'
 import { RootStackParamList } from '../types'
 import HeaderTitle from './VideoList/HeaderTitle'
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
 
-const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
+const getLabel = (
+  text: string,
+  updatedCount?: number,
+  hasLiving?: boolean,
+  isCheckingUpdate?: boolean,
+) => {
   const labelCmp: (props: {
     focused: boolean
     color: string
@@ -35,17 +40,38 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
         fontSize: 11,
         fontWeight: props.focused ? 'bold' : 'normal',
       },
+      checkingUpdate: {
+        position: 'absolute',
+        left: 30,
+        top: -5,
+        scale: 0.9,
+        // transform: {
+        //   scale: 0.9,
+        // },
+      },
     })
     const label = <Text style={style.label}>{text}</Text>
+    // const isCheckingUpdate =
+    //   Object.values(checkingUpdateMap).filter(Boolean).length > 0
+
     if (text === '关注' && updatedCount) {
       return (
         <View>
-          <Badge
-            status="success"
-            value={updatedCount}
-            badgeStyle={style.updateBadge}
-            textStyle={style.updateBadgeText}
-          />
+          {isCheckingUpdate ? (
+            <ActivityIndicator
+              color="#00AEEC"
+              animating
+              size={'small'}
+              style={style.checkingUpdate}
+            />
+          ) : (
+            <Badge
+              status="success"
+              value={updatedCount}
+              badgeStyle={style.updateBadge}
+              textStyle={style.updateBadgeText}
+            />
+          )}
           {label}
         </View>
       )
@@ -56,9 +82,11 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
 }
 
 const MainTab = () => {
-  const { updatedUps, livingUps } = useStore()
+  const { updatedUps, livingUps, checkingUpdateMap } = useStore()
   const updateCount = Object.values(updatedUps).filter(Boolean).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
+  const isCheckingUpdate =
+    Object.values(checkingUpdateMap).filter(Boolean).length > 0
   return (
     <Tab.Navigator
       initialRouteName="VideoList"
@@ -91,7 +119,12 @@ const MainTab = () => {
         name="Follow"
         component={Follow}
         options={{
-          tabBarLabel: getLabel('关注', updateCount, hasLiving),
+          tabBarLabel: getLabel(
+            '关注',
+            updateCount,
+            hasLiving,
+            isCheckingUpdate,
+          ),
         }}
       />
     </Tab.Navigator>

@@ -56,7 +56,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       headerTitle: () => {
         return (
           <HeaderLeft
-            style={{ position: 'relative', left: -20 }}
+            style={{ position: 'relative', left: -10 }}
             scrollTop={() => {
               dynamicListRef.current?.scrollToOffset({
                 offset: 0,

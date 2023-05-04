@@ -5,9 +5,10 @@ import {
   FlatList,
   StyleSheet,
   ToastAndroid,
-  ActivityIndicator,
+  // ActivityIndicator,
   useWindowDimensions,
   Alert,
+  Vibration,
 } from 'react-native'
 import FollowItem from './FollowItem'
 import Login from './Login'
@@ -18,8 +19,21 @@ import store, { useStore } from '../../store'
 
 import Header from './Header'
 import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
+import { useLivingInfo3 } from '../../api/living-info'
+import { throttle } from 'throttle-debounce'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
+
+const vibrate = throttle(
+  5000,
+  () => {
+    Vibration.vibrate(1000)
+  },
+  {
+    noLeading: false,
+    noTrailing: false,
+  },
+)
 
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(111, route.name)
@@ -49,6 +63,28 @@ export default function Follow({ navigation, route }: Props) {
   }, [data?.list])
 
   const { width } = useWindowDimensions()
+  const { data: livingMap, error: livingError } = useLivingInfo3()
+  React.useEffect(() => {
+    if (livingError) {
+      ToastAndroid.show('检查直播失败', ToastAndroid.SHORT)
+    }
+  }, [livingError])
+  React.useEffect(() => {
+    livingMap &&
+      Object.keys(livingMap).forEach(mid => {
+        // https://live.bilibili.com/h5/24446464
+        const { live_status, room_id } = livingMap[mid]
+        const living = live_status === 1
+        const url = 'https://live.bilibili.com/h5/' + room_id
+
+        if (!!store.livingUps[mid] !== living) {
+          store.livingUps[mid] = living ? url : ''
+          if (living) {
+            vibrate()
+          }
+        }
+      })
+  }, [livingMap])
   const columns = Math.floor(width / 90)
   const rest = data?.list.length ? data.list.length % columns : 0
 
@@ -112,9 +148,9 @@ export default function Follow({ navigation, route }: Props) {
     <View style={styles.container}>
       <Header />
       <View style={{ flex: 1 }}>
-        {isCheckingUpdate ? (
+        {/* {isCheckingUpdate ? (
           <ActivityIndicator color="blue" style={styles.loading} animating />
-        ) : null}
+        ) : null} */}
         <FlatList
           data={displayUps}
           renderItem={renderItem}

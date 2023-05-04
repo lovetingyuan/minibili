@@ -29,6 +29,7 @@ export default function VideoItem(
     face,
     commentId,
     likeCount,
+    forwardCount,
   } = props
 
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -75,16 +76,15 @@ export default function VideoItem(
           <View style={styles.videoLength}>
             <Text style={styles.videoLengthText}>{duration}</Text>
           </View>
+          <View style={styles.videoDate}>
+            <Text style={styles.videoLengthText}>{props.date}</Text>
+          </View>
         </View>
         <View style={styles.videoInfo}>
           <Text style={styles.title} numberOfLines={3}>
             {title}
           </Text>
           <View style={styles.VideoItem}>
-            <View style={styles.iconText}>
-              <Icon name="date-range" size={15} color="#666" />
-              <Text style={styles.VideoItemText}>{props.date}</Text>
-            </View>
             {play === undefined ? null : (
               <View style={styles.iconText}>
                 <Icon name="play-circle-outline" size={15} color="#666" />
@@ -94,6 +94,17 @@ export default function VideoItem(
             <View style={styles.iconText}>
               <Icon name="thumb-up-off-alt" size={15} color="#666" />
               <Text style={styles.VideoItemText}>{parseNumber(likeCount)}</Text>
+            </View>
+            <View style={styles.iconText}>
+              <Icon
+                type="material-community"
+                name="share"
+                size={20}
+                color="#666"
+              />
+              <Text style={styles.VideoItemText}>
+                {parseNumber(forwardCount)}
+              </Text>
             </View>
           </View>
         </View>
@@ -153,7 +164,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     paddingHorizontal: 2,
     backgroundColor: 'rgba(0,0,0,.5)',
-    bottom: 0,
+    top: 0,
+    right: 0,
+    borderRadius: 2,
+    margin: 5,
+  },
+  videoDate: {
+    position: 'absolute',
+    paddingHorizontal: 2,
+    backgroundColor: 'rgba(0,0,0,.5)',
+    top: 0,
     borderRadius: 2,
     margin: 5,
   },

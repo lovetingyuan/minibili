@@ -54,7 +54,11 @@ function __$hack() {
       return
     }
     clearInterval(timer4)
+    if (right.getElementById('reload-button')) {
+      return
+    }
     const reloadBtn = document.createElement('div')
+    reloadBtn.id = 'reload-button'
     reloadBtn.innerHTML = '&orarr;'
     reloadBtn.style.cssText = `
     width: 36px;

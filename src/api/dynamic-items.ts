@@ -363,7 +363,7 @@ export function useDynamicItems(mid: string | number) {
   }
 }
 
-const queue = new PQueue({ concurrency: 3 })
+const queue = new PQueue({ concurrency: 5 })
 
 export function useHasUpdate(mid: number | string) {
   const delay = mid.toString().slice(0, 5)
@@ -401,3 +401,7 @@ export function useHasUpdate(mid: number | string) {
   }
   return ''
 }
+
+// export function useUpdatingInfo() {
+
+// }
