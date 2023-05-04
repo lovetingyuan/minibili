@@ -15,8 +15,8 @@ import ButtonsOverlay from '../../components/ButtonsOverlay'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
+import store, { useStore } from '../../store'
+
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, openBiliVideo } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
@@ -25,7 +25,7 @@ type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
 export default function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
-  const { $blackUps, $blackTags } = useSnapshot(store)
+  const { $blackUps, $blackTags } = useStore()
 
   const { list, page, setSize, isRefreshing, loading, refresh, isReachingEnd } =
     useHotVideos()

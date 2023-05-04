@@ -1,13 +1,13 @@
 import { Button, Icon, Overlay } from '@rneui/themed'
 import { Pressable, ScrollView, Text, View } from 'react-native'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
+import store, { useStore } from '../../store'
+
 import React from 'react'
 import { StyleSheet } from 'react-native'
 
 const HeaderTitle = () => {
   const [visible, setVisible] = React.useState(false)
-  const { videosType, ranksList } = useSnapshot(store)
+  const { videosType, ranksList } = useStore()
   return (
     <View>
       <Pressable

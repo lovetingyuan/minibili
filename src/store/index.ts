@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { proxy } from 'valtio'
+import { proxy, useSnapshot } from 'valtio'
 import { watch } from 'valtio/utils'
 import { RanksConfig } from '../constants'
 import { Action, reportUserAction, setUser } from '../utils/report'
@@ -87,5 +87,9 @@ Object.keys(store)
         })
       })
   })
+
+export function useStore() {
+  return useSnapshot(store)
+}
 
 export default store

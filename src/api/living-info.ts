@@ -8,57 +8,69 @@ import {
   LiveUserInfoResponseSchema,
 } from './living-info.schema'
 import useSWR from 'swr'
-import useSWRImmutable from 'swr/immutable'
+// import useSWRImmutable from 'swr/immutable'
 import PQueue from 'p-queue'
-import store from '../store'
-import { useSnapshot } from 'valtio'
-import { ToastAndroid } from 'react-native'
+import store, { useStore } from '../store'
+
+import { ToastAndroid, Vibration } from 'react-native'
+import { throttle } from 'throttle-debounce'
 
 export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
 export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
 export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
 export type LiveInfoBatchItem = z.infer<typeof LiveInfoBatchItemSchema>
 
-const queue = new PQueue({ concurrency: 3 })
+const queue = new PQueue({ concurrency: 5 })
 
-const useLiveRoomInfo = (mid: number | string) => {
-  const { data } = useSWRImmutable<LiveRoomInfo>(
-    'https://api.live.bilibili.com/live_user/v1/Master/info?uid=' + mid,
-    request,
-  )
-  return data
-}
+// const useLiveRoomInfo = (mid: number | string) => {
+//   const { data } = useSWRImmutable<LiveRoomInfo>(
+//     'https://api.live.bilibili.com/live_user/v1/Master/info?uid=' + mid,
+//     request,
+//   )
+//   return data
+// }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const useLivingInfo = (mid: number | string) => {
-  const roomData = useLiveRoomInfo(mid)
-  const delay = mid.toString().slice(0, 5)
-  const { data, error } = useSWR<LiveInfo>(
-    roomData?.room_id
-      ? 'https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' +
-          roomData.room_id
-      : null,
-    (url: string) => {
-      return queue.add(() => request(url))
-    },
-    {
-      refreshInterval: 10 * 60 * 1000 + Number(delay),
-    },
-  )
-  if (!error && roomData?.room_id && data?.room_id) {
-    const living = data.live_status === 1
-    const liveUrl = 'https://live.bilibili.com/' + data.room_id
-    store.livingUps[mid] = living ? liveUrl : ''
-    return {
-      living,
-      roomId: data.room_id,
-      name: roomData.info.uname,
-      face: roomData.info.face,
-      liveUrl,
-    }
-  }
-  return null
-}
+// const useLivingInfo = (mid: number | string) => {
+//   const roomData = useLiveRoomInfo(mid)
+//   const delay = mid.toString().slice(0, 5)
+//   const { data, error } = useSWR<LiveInfo>(
+//     roomData?.room_id
+//       ? 'https://api.live.bilibili.com/room/v1/Room/get_info?room_id=' +
+//           roomData.room_id
+//       : null,
+//     (url: string) => {
+//       return queue.add(() => request(url))
+//     },
+//     {
+//       refreshInterval: 10 * 60 * 1000 + Number(delay),
+//     },
+//   )
+//   if (!error && roomData?.room_id && data?.room_id) {
+//     const living = data.live_status === 1
+//     const liveUrl = 'https://live.bilibili.com/' + data.room_id
+//     store.livingUps[mid] = living ? liveUrl : ''
+//     return {
+//       living,
+//       roomId: data.room_id,
+//       name: roomData.info.uname,
+//       face: roomData.info.face,
+//       liveUrl,
+//     }
+//   }
+//   return null
+// }
+
+const vibrate = throttle(
+  5000,
+  () => {
+    Vibration.vibrate(1000)
+  },
+  {
+    noLeading: false,
+    noTrailing: false,
+  },
+)
 
 //api.bilibili.com/x/space/wbi/acc/info?mid=3493257772272614&token=&platform=web
 export const useLivingInfo2 = (mid: number | string) => {
@@ -78,6 +90,14 @@ export const useLivingInfo2 = (mid: number | string) => {
   const living = data?.live_room?.liveStatus === 1
   const liveUrl = data?.live_room?.url || ''
   store.livingUps[mid] = living ? liveUrl : ''
+  React.useEffect(() => {
+    if (!!store.livingUps[mid] !== living) {
+      store.livingUps[mid] = living ? liveUrl : ''
+      if (living) {
+        vibrate()
+      }
+    }
+  }, [living, liveUrl, mid])
   return {
     data: data
       ? {
@@ -95,7 +115,7 @@ export const useLivingInfo2 = (mid: number | string) => {
 
 export const useLivingInfo3 = () => {
   // api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?uids[]=672328094&uids[]=322892
-  const { $followedUps } = useSnapshot(store)
+  const { $followedUps } = useStore()
   const uids = $followedUps
     .map(user => {
       return `uids[]=${user.mid}`
@@ -105,7 +125,7 @@ export const useLivingInfo3 = () => {
     `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}`,
     request,
     {
-      refreshInterval: 10 * 60 * 1000,
+      refreshInterval: 5 * 60 * 1000,
     },
   )
   React.useEffect(() => {

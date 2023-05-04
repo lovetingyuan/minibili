@@ -1,7 +1,7 @@
 import request from './fetcher'
 import useSWR from 'swr'
-import { useSnapshot } from 'valtio'
-import store from '../store'
+
+import store, { useStore } from '../store'
 import PQueue from 'p-queue'
 import {
   AdditionalTypeEnum,
@@ -376,7 +376,7 @@ export function useHasUpdate(mid: number | string) {
       refreshInterval: 5 * 60 * 1000 + Number(delay),
     },
   )
-  const { $latestUpdateIds, checkingUpdateMap } = useSnapshot(store)
+  const { $latestUpdateIds, checkingUpdateMap } = useStore()
 
   if (isLoading) {
     store.checkingUpdateMap[mid] = true

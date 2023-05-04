@@ -14,8 +14,7 @@ import VideoItem from './VideoItem'
 import LivingItem from './LivingItem'
 import { RootStackParamList } from '../../types'
 import WordItem from './WordItem'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
+
 import { useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -26,12 +25,13 @@ import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useMounted from '../../hooks/useMounted'
 import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
 import { FlashList } from '@shopify/flash-list'
+import { useStore } from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name)
-  const dynamicUser = useSnapshot(store).dynamicUser!
+  const dynamicUser = useStore().dynamicUser!
   const upId = dynamicUser.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<any>(null)
 

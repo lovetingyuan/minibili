@@ -19,8 +19,8 @@ const Loading = () => {
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
+import store, { useStore } from '../../store'
+
 import { Icon } from '@rneui/themed'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
@@ -29,7 +29,7 @@ export default ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { url, title } = route.params
   const webviewRef = React.useRef<WebView | null>(null)
-  const { $webViewMode } = useSnapshot(store)
+  const { $webViewMode } = useStore()
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => {

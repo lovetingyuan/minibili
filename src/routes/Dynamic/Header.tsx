@@ -8,10 +8,10 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import store from '../../store'
+import store, { useStore } from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
-import { useSnapshot } from 'valtio'
+
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 
@@ -19,7 +19,7 @@ export function HeaderLeft(props: {
   scrollTop: () => void
   style?: StyleProp<ViewStyle>
 }) {
-  const { dynamicUser } = useSnapshot(store)
+  const { dynamicUser } = useStore()
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const gotoWebPage = () => {

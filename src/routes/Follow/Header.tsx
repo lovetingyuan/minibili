@@ -1,8 +1,8 @@
 import React from 'react'
 import { Text, View, Pressable } from 'react-native'
 import { Avatar, Icon } from '@rneui/themed'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
+import store, { useStore } from '../../store'
+
 import { StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
@@ -11,7 +11,7 @@ import { parseNumber } from '../../utils'
 import { reportNavigation } from '../../utils/report'
 
 export default function Header() {
-  const { $userInfo } = useSnapshot(store)
+  const { $userInfo } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: relation } = useUserRelation($userInfo?.mid)
   const fansCount = parseNumber(relation?.follower)

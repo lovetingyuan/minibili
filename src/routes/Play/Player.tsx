@@ -14,8 +14,8 @@ import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
 import { isWifi } from '../../utils'
-import { useSnapshot } from 'valtio'
-import store from '../../store'
+
+import { useStore } from '../../store'
 import { Icon } from '@rneui/themed'
 type Props = { page: number }
 
@@ -25,7 +25,7 @@ function Player(props: Props & { wifi: boolean }) {
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
-  const { currentVideo } = useSnapshot(store)
+  const { currentVideo } = useStore()
   const { data: vi, error } = useVideoInfo(currentVideo?.bvid)
   const [loadPlayer, setLoadPlayer] = React.useState(wifi)
   const videoInfo = {

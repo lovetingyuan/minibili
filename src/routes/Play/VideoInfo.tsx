@@ -3,8 +3,7 @@ import VideoHeader from './VideoHeader'
 import { View, Text, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { ListItem } from '@rneui/themed'
-import { useSnapshot } from 'valtio'
-import store from '../../store'
+import { useStore } from '../../store'
 
 export default function VideoInfo(props: {
   // bvid: string
@@ -19,7 +18,7 @@ export default function VideoInfo(props: {
   changePage: (p: number) => void
 }) {
   const { page, isFromDynamic, changePage } = props
-  const { currentVideo } = useSnapshot(store)
+  const { currentVideo } = useStore()
   const { data: videoInfo } = useVideoInfo(currentVideo?.bvid)
   const [expanded, setExpanded] = React.useState(false)
   const { title, desc } = currentVideo || videoInfo || {}

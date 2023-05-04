@@ -9,8 +9,8 @@ import {
 } from 'react-native'
 import { Text } from 'react-native'
 import { StyleSheet } from 'react-native'
-import { useSnapshot } from 'valtio'
-import store from '../store'
+
+import store, { useStore } from '../store'
 import { Card, Chip, ListItem, Button, Icon } from '@rneui/themed'
 import {
   checkUpdate as checkUpdateApi,
@@ -22,12 +22,13 @@ import { useNavigation } from '@react-navigation/native'
 import { Action, clearUser, reportUserAction } from '../utils/report'
 
 export default function About() {
-  const { $userInfo, $blackTags, $blackUps } = useSnapshot(store)
+  const { $userInfo, $blackTags, $blackUps } = useStore()
   const [expanded, setExpanded] = React.useState(false)
   const [expandedUp, setExpandedUp] = React.useState(false)
   const [expandedStatement, setExpandedStatement] = React.useState(true)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const [checkingUpdate, setCheckingUpdate] = React.useState(false)
+  const [hasUpdate, setHasUpdate] = React.useState<boolean | null>(null)
 
   const handleLogOut = () => {
     Alert.alert('确定退出吗？', '', [
@@ -63,6 +64,7 @@ export default function About() {
     ToastAndroid.show('请稍后...', ToastAndroid.SHORT)
     checkUpdateApi().then(
       data => {
+        setHasUpdate(data.hasUpdate)
         if (data.hasUpdate) {
           Alert.alert(
             '有新版本',
@@ -143,7 +145,7 @@ export default function About() {
             onPress={() => {
               checkUpdate()
             }}>
-            检查更新
+            {hasUpdate === true ? '检查更新' : '暂无更新'}
           </Button>
         </ListItem>
         <ListItem containerStyle={{ padding: 0 }}>

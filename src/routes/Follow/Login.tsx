@@ -12,10 +12,10 @@ import {
   Platform,
 } from 'react-native'
 
-import store from '../../store'
+import store, { useStore } from '../../store'
 import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
-import { useSnapshot } from 'valtio'
+
 import { Action, reportUserAction, setUser } from '../../utils/report'
 
 const leftTv = require('../../../assets/tv-left.png')
@@ -25,7 +25,7 @@ export default function Login() {
   const inputUserIdRef = React.useRef('')
   const [tvImg, setTvImg] = React.useState(true)
   const [userId, setUserId] = React.useState('')
-  const { $userInfo } = useSnapshot(store)
+  const { $userInfo } = useStore()
   useMounted(() => {
     const timer = setInterval(() => {
       setTvImg(v => !v)

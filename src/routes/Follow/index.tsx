@@ -14,8 +14,8 @@ import Login from './Login'
 
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
+import store, { useStore } from '../../store'
+
 import Header from './Header'
 import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
 
@@ -24,7 +24,7 @@ type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 export default function Follow({ navigation, route }: Props) {
   __DEV__ && console.log(111, route.name)
   const { $userInfo, $followedUps, livingUps, updatedUps, checkingUpdateMap } =
-    useSnapshot(store)
+    useStore()
   const followListRef = React.useRef<FlatList | null>(null)
 
   const { data, error, isLoading } = useFollowedUps($userInfo?.mid)

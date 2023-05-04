@@ -24,14 +24,13 @@ import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
 import { checkWifi } from '../../utils'
 import useMounted from '../../hooks/useMounted'
-import { useSnapshot } from 'valtio'
-import store from '../../store'
+import { useStore } from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
-  const { currentVideo } = useSnapshot(store)
+  const { currentVideo } = useStore()
   const isFromDynamic = route.params?.from === 'dynamic'
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: vi } = useVideoInfo(currentVideo?.bvid)

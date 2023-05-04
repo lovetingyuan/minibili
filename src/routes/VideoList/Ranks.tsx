@@ -16,8 +16,8 @@ import ButtonsOverlay from '../../components/ButtonsOverlay'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
-import store from '../../store'
-import { useSnapshot } from 'valtio'
+import store, { useStore } from '../../store'
+
 import { VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, openBiliVideo } from '../../utils'
 import { useRankList } from '../../api/rank-list'
@@ -27,7 +27,7 @@ type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
 export default function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)
-  const { videosType, $blackUps } = useSnapshot(store)
+  const { videosType, $blackUps } = useStore()
   const { data: list = [], isLoading, mutate } = useRankList(videosType?.rid)
   const [isRefreshing] = React.useState(false)
 

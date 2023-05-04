@@ -3,15 +3,14 @@ import { Avatar, Icon } from '@rneui/themed'
 import React from 'react'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import store from '../../store'
+import store, { useStore } from '../../store'
 import { NavigationProps } from '../../types'
 import { handleShareVideo, parseDate, parseNumber } from '../../utils'
 import useMounted from '../../hooks/useMounted'
-import { useSnapshot } from 'valtio'
 
 export default function VideoHeader(props: { isFromDynamic: boolean }) {
   const { isFromDynamic } = props
-  const { currentVideo } = useSnapshot(store)
+  const { currentVideo } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: vi } = useVideoInfo(currentVideo?.bvid)
   const videoInfo = {

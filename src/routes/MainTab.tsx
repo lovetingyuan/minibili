@@ -1,11 +1,11 @@
 import React, { ReactNode } from 'react'
 import Follow from './Follow'
 import VideoList from './VideoList'
-import store from '../store'
-import { useSnapshot } from 'valtio'
+import { useStore } from '../store'
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
-import { Text, Vibration, View, StyleSheet } from 'react-native'
+import { Text, View, StyleSheet } from 'react-native'
 import { Badge } from '@rneui/themed'
 import { RootStackParamList } from '../types'
 import HeaderTitle from './VideoList/HeaderTitle'
@@ -56,14 +56,9 @@ const getLabel = (text: string, updatedCount?: number, hasLiving?: boolean) => {
 }
 
 const MainTab = () => {
-  const { updatedUps, livingUps } = useSnapshot(store)
+  const { updatedUps, livingUps } = useStore()
   const updateCount = Object.values(updatedUps).filter(Boolean).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
-  React.useEffect(() => {
-    if (hasLiving) {
-      Vibration.vibrate(1000)
-    }
-  }, [hasLiving])
   return (
     <Tab.Navigator
       initialRouteName="VideoList"
