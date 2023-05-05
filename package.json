@@ -1,6 +1,6 @@
 {
   "name": "minibili",
-  "version": "0.0.30-34",
+  "version": "0.0.31-35",
   "main": "node_modules/expo/AppEntry.js",
   "description": "minimum bilibili apk",
   "unpkg": "docs/version.json",
