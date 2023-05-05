@@ -142,6 +142,10 @@ export default function Follow({ navigation, route }: Props) {
       ...noUpdateUps,
       ...(rest ? Array.from({ length: rest }).map(() => null) : []),
     ]
+  } else {
+    displayUps.push(
+      ...(rest ? Array.from({ length: rest }).map(() => null) : []),
+    )
   }
 
   return (

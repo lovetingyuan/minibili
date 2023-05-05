@@ -9,14 +9,13 @@ import {
   DynamicItemBaseType,
   DynamicItemResponse,
   DynamicListResponse,
-  DynamicTypeEnum,
   DynamicUnknownItem,
-  ForwardOtherTypeEnum,
+  ForwardOtherDynamicTypeEnum,
   MajorTypeEnum,
-  OtherTypeEnum,
 } from './dynamic-items.schema'
 import useSWRInfinite from 'swr/infinite'
 import { reportUnknownDynamicItem } from '../utils/report'
+import { DynamicTypeEnum, OtherDynamicTypeEnum } from './dynamic-items.type'
 
 export type DynamicItem = ReturnType<typeof getDynamicItem>
 
@@ -45,128 +44,12 @@ const getCommon = (item: DynamicItemBaseType) => {
   }
 }
 
-const getDrawItem = (
-  item: Extract<
-    DynamicItemResponse,
-    { type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW }
-  >,
-) => {
-  let text = ''
-  const additional = item.modules.module_dynamic.additional
-  if (additional && 'reserve' in additional) {
-    text = [additional?.reserve?.title, additional?.reserve?.desc1?.text]
-      .filter(Boolean)
-      .join('\n')
-  }
-  return {
-    ...getCommon(item),
-    type: item.type,
-    payload: {
-      text,
-      images: item.modules?.module_dynamic?.major?.draw?.items?.map(v => {
-        return {
-          src: v.src,
-          width: v.width,
-          height: v.height,
-          ratio: v.width / v.height,
-        }
-      }),
-    },
-  }
-}
-
-const getArticleItem = (
-  item: Extract<
-    DynamicItemResponse,
-    { type: DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE }
-  >,
-) => {
-  return {
-    ...getCommon(item),
-    type: item.type,
-    payload: {
-      title: item.modules.module_dynamic.major.article.title,
-      text: item.modules.module_dynamic.major.article.desc,
-      cover: item.modules.module_dynamic.major.article.covers[0],
-      url: 'https:' + item.modules.module_dynamic.major.article.jump_url,
-    },
-  }
-}
-
-const getLivingItem = (
-  item: Extract<
-    DynamicItemResponse,
-    { type: DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD }
-  >,
-) => {
-  return {
-    ...getCommon(item),
-    type: item.type,
-    payload: {
-      name: item.modules.module_author.name, // + '正在直播',
-      mid: item.modules.module_author.mid,
-      // text: item.modules.module_dynamic.major.article.desc,
-      // cover: item.modules.module_dynamic.major.article.covers[0],
-      // url: 'https:' + item.modules.module_dynamic.major.article.jump_url,
-    },
-  }
-}
-
-const getWordItem = (
-  item: Extract<
-    DynamicItemResponse,
-    { type: DynamicTypeEnum.DYNAMIC_TYPE_WORD }
-  >,
-) => {
-  const additional = item.modules.module_dynamic.additional
-  let text: string = ''
-  let image: string = ''
-  if (additional) {
-    if ('reserve' in additional) {
-      text = [additional?.reserve?.title, additional?.reserve?.desc1?.text]
-        .filter(Boolean)
-        .join('\n')
-    } else if ('ugc' in additional) {
-      text = additional.ugc.title
-      image = additional.ugc.cover
-    }
-  }
-  return {
-    ...getCommon(item),
-    type: item.type,
-    payload: {
-      text,
-      image,
-    },
-  }
-}
-
-const getVideoItem = (
-  item: Extract<DynamicItemResponse, { type: DynamicTypeEnum.DYNAMIC_TYPE_AV }>,
-) => {
-  const video = item.modules.module_dynamic.major.archive
-  return {
-    ...getCommon(item),
-    type: DynamicTypeEnum.DYNAMIC_TYPE_AV as const,
-    payload: {
-      cover: video.cover,
-      title: video.title,
-      play: video.stat.play,
-      bvid: video.bvid,
-      aid: video.aid,
-      duration: video.duration_text,
-      desc: video.desc,
-      // date:
-    },
-  }
-}
-
 const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
   __DEV__ && console.log('unknown', item)
   if (
-    item.type in OtherTypeEnum ||
+    item.type in OtherDynamicTypeEnum ||
     (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD &&
-      item.orig.type in ForwardOtherTypeEnum)
+      item.orig.type in ForwardOtherDynamicTypeEnum)
   ) {
     reportUnknownDynamicItem(item)
   }
@@ -182,28 +65,100 @@ const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
 
 const getDynamicItem = (item: DynamicItemResponse) => {
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
-    return getWordItem(item)
+    const additional = item.modules.module_dynamic.additional
+    let text: string = ''
+    let image: string = ''
+    if (additional) {
+      if (additional.type === AdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE) {
+        text = [additional?.reserve?.title, additional?.reserve?.desc1?.text]
+          .filter(Boolean)
+          .join('\n')
+      } else if (additional.type === AdditionalTypeEnum.ADDITIONAL_TYPE_UGC) {
+        text = additional.ugc.title
+        image = additional.ugc.cover
+      }
+    }
+    return {
+      ...getCommon(item),
+      type: item.type,
+      payload: {
+        text,
+        image,
+      },
+    }
   }
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_AV) {
-    return getVideoItem(item)
+    const video = item.modules.module_dynamic.major.archive
+    return {
+      ...getCommon(item),
+      type: DynamicTypeEnum.DYNAMIC_TYPE_AV,
+      payload: {
+        cover: video.cover,
+        title: video.title,
+        play: video.stat.play,
+        bvid: video.bvid,
+        aid: video.aid,
+        duration: video.duration_text,
+        desc: video.desc,
+        // date:
+      },
+    }
   }
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
-    return getDrawItem(item)
+    let text = ''
+    const additional = item.modules.module_dynamic.additional
+    if (additional && 'reserve' in additional) {
+      text = [additional?.reserve?.title, additional?.reserve?.desc1?.text]
+        .filter(Boolean)
+        .join('\n')
+    }
+    return {
+      ...getCommon(item),
+      type: item.type,
+      payload: {
+        text,
+        images: item.modules?.module_dynamic?.major?.draw?.items?.map(v => {
+          return {
+            src: v.src,
+            width: v.width,
+            height: v.height,
+            ratio: v.width / v.height,
+          }
+        }),
+      },
+    }
   }
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
-    return getArticleItem(item)
+    const { article } = item.modules.module_dynamic.major
+    return {
+      ...getCommon(item),
+      type: item.type,
+      payload: {
+        title: article.title,
+        text: article.desc,
+        cover: article.covers[0],
+        url: 'https:' + article.jump_url,
+      },
+    }
   }
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-    return getLivingItem(item)
+    return {
+      ...getCommon(item),
+      type: item.type,
+      payload: {
+        name: item.modules.module_author.name, // + '正在直播',
+        mid: item.modules.module_author.mid,
+      },
+    }
   }
   if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_AV) {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_ARCHIVE as const,
+          type: MajorTypeEnum.MAJOR_TYPE_ARCHIVE,
           text: forward.desc?.text,
           cover: forward.major?.archive.cover,
           title: forward.major?.archive.title,
@@ -227,9 +182,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       }
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_WORD as const,
+          type: MajorTypeEnum.MAJOR_TYPE_WORD,
           text: text.filter(Boolean).join('\n'),
         },
       }
@@ -238,9 +193,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_DRAW as const,
+          type: MajorTypeEnum.MAJOR_TYPE_DRAW,
           text: forward.desc?.text,
           images: forward.major.draw.items.map(v => {
             return {
@@ -263,9 +218,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_ARTICLE as const,
+          type: MajorTypeEnum.MAJOR_TYPE_ARTICLE,
           text: forward.major.article.desc,
           title: forward.major.article.title,
           cover: forward.major.article.covers[0],
@@ -277,9 +232,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_LIVE as const,
+          type: MajorTypeEnum.MAJOR_TYPE_LIVE,
           text: forward.desc?.text,
           title:
             forward.major.live.title + '\n' + forward.major.live.badge.text,
@@ -290,9 +245,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_NONE) {
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_NONE as const,
+          type: MajorTypeEnum.MAJOR_TYPE_NONE,
           text: item.orig.modules.module_dynamic.major.none.tips,
         },
       }
@@ -301,18 +256,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   }
   return getUnknownItem(item)
 }
-
-// export async function getDynamicItems(offset = '', uid: string | number) {
-//   // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480
-//   const data = await request<DynamicListResponse>(
-//     `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${uid}&timezone_offset=-480`,
-//   )
-//   return {
-//     more: data.has_more,
-//     offset: data.offset,
-//     items: data.items.map(getDynamicItem),
-//   }
-// }
 
 const fetcher2 = (url: string) => {
   __DEV__ && console.log('fetch dynamic items: ' + url)
@@ -338,12 +281,10 @@ export function useDynamicItems(mid: string | number) {
       },
     )
 
-  let dynamicItems: DynamicListResponse['items'] = []
-  if (data) {
-    dynamicItems = data.reduce((a, b) => {
+  const dynamicItems: DynamicListResponse['items'] =
+    data?.reduce((a, b) => {
       return a.concat(b.items)
-    }, [] as DynamicListResponse['items'])
-  }
+    }, [] as DynamicListResponse['items']) || []
 
   const isLoadingMore =
     isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')
@@ -401,7 +342,3 @@ export function useHasUpdate(mid: number | string) {
   }
   return ''
 }
-
-// export function useUpdatingInfo() {
-
-// }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { DynamicTypeEnum, OtherDynamicTypeEnum } from './dynamic-items.type'
 
 export const AuthorSchema = z.object({
   face: z.string(),
@@ -13,33 +14,6 @@ export const AuthorSchema = z.object({
 })
 
 export type Author = z.infer<typeof AuthorSchema>
-
-export enum DynamicTypeEnum {
-  DYNAMIC_TYPE_AV = 'DYNAMIC_TYPE_AV',
-  DYNAMIC_TYPE_DRAW = 'DYNAMIC_TYPE_DRAW',
-  DYNAMIC_TYPE_WORD = 'DYNAMIC_TYPE_WORD',
-  DYNAMIC_TYPE_ARTICLE = 'DYNAMIC_TYPE_ARTICLE',
-  DYNAMIC_TYPE_FORWARD = 'DYNAMIC_TYPE_FORWARD',
-  // ------------------------------------------
-  DYNAMIC_TYPE_OTHER = 'DYNAMIC_TYPE_OTHER',
-  DYNAMIC_TYPE_NONE = 'DYNAMIC_TYPE_NONE',
-  DYNAMIC_TYPE_PGC = 'DYNAMIC_TYPE_PGC',
-  DYNAMIC_TYPE_COURSES = 'DYNAMIC_TYPE_COURSES',
-  DYNAMIC_TYPE_MUSIC = 'DYNAMIC_TYPE_MUSIC',
-  DYNAMIC_TYPE_COMMON_SQUARE = 'DYNAMIC_TYPE_COMMON_SQUARE',
-  DYNAMIC_TYPE_COMMON_VERTICAL = 'DYNAMIC_TYPE_COMMON_VERTICAL',
-  DYNAMIC_TYPE_LIVE = 'DYNAMIC_TYPE_LIVE',
-  DYNAMIC_TYPE_MEDIALIST = 'DYNAMIC_TYPE_MEDIALIST',
-  DYNAMIC_TYPE_COURSES_SEASON = 'DYNAMIC_TYPE_COURSES_SEASON',
-  DYNAMIC_TYPE_COURSES_BATCH = 'DYNAMIC_TYPE_COURSES_BATCH',
-  DYNAMIC_TYPE_AD = 'DYNAMIC_TYPE_AD',
-  DYNAMIC_TYPE_APPLET = 'DYNAMIC_TYPE_APPLET',
-  DYNAMIC_TYPE_SUBSCRIPTION = 'DYNAMIC_TYPE_SUBSCRIPTION',
-  DYNAMIC_TYPE_LIVE_RCMD = 'DYNAMIC_TYPE_LIVE_RCMD',
-  DYNAMIC_TYPE_BANNER = 'DYNAMIC_TYPE_BANNER',
-  DYNAMIC_TYPE_UGC_SEASON = 'DYNAMIC_TYPE_UGC_SEASON',
-  DYNAMIC_TYPE_SUBSCRIPTION_NEW = 'DYNAMIC_TYPE_SUBSCRIPTION_NEW',
-}
 
 export enum MajorTypeEnum {
   MAJOR_TYPE_ARCHIVE = 'MAJOR_TYPE_ARCHIVE',
@@ -72,7 +46,7 @@ export enum AdditionalTypeEnum {
   ADDITIONAL_TYPE_PGC = 'ADDITIONAL_TYPE_PGC',
 }
 
-export enum AdditionalOtherTypeEnum {
+export enum AdditionalOtherDynamicTypeEnum {
   ADDITIONAL_TYPE_NONE = 'ADDITIONAL_TYPE_NONE',
   ADDITIONAL_TYPE_GOODS = 'ADDITIONAL_TYPE_GOODS',
   ADDITIONAL_TYPE_VOTE = 'ADDITIONAL_TYPE_VOTE',
@@ -176,7 +150,7 @@ const AdditionalReserveSchema = z.object({
 })
 
 const AdditionalOtherSchema = z.object({
-  type: z.nativeEnum(AdditionalOtherTypeEnum),
+  type: z.nativeEnum(AdditionalOtherDynamicTypeEnum),
 })
 
 const DynamicModulesBaseSchema = z.object({
@@ -335,7 +309,7 @@ const BaseOrigSchema = z.object({
   }),
 })
 
-export enum ForwardOtherTypeEnum {
+export enum ForwardOtherDynamicTypeEnum {
   DYNAMIC_TYPE_OTHER = 'DYNAMIC_TYPE_OTHER',
   DYNAMIC_TYPE_PGC = 'DYNAMIC_TYPE_PGC',
   DYNAMIC_TYPE_COURSES = 'DYNAMIC_TYPE_COURSES',
@@ -443,7 +417,7 @@ const DynamicForwardItemSchema = DynamicItemBaseSchema.merge(
       ),
       BaseOrigSchema.merge(
         z.object({
-          type: z.nativeEnum(ForwardOtherTypeEnum),
+          type: z.nativeEnum(ForwardOtherDynamicTypeEnum),
           modules: z.object({
             module_author: AuthorSchema,
             module_dynamic: z.object({
@@ -459,30 +433,9 @@ const DynamicForwardItemSchema = DynamicItemBaseSchema.merge(
 
 export type DynamicForwardItem = z.infer<typeof DynamicForwardItemSchema>
 
-export enum OtherTypeEnum {
-  DYNAMIC_TYPE_OTHER = 'DYNAMIC_TYPE_OTHER',
-  DYNAMIC_TYPE_NONE = 'DYNAMIC_TYPE_NONE',
-  DYNAMIC_TYPE_PGC = 'DYNAMIC_TYPE_PGC',
-  DYNAMIC_TYPE_COURSES = 'DYNAMIC_TYPE_COURSES',
-  DYNAMIC_TYPE_MUSIC = 'DYNAMIC_TYPE_MUSIC',
-  DYNAMIC_TYPE_COMMON_SQUARE = 'DYNAMIC_TYPE_COMMON_SQUARE',
-  DYNAMIC_TYPE_COMMON_VERTICAL = 'DYNAMIC_TYPE_COMMON_VERTICAL',
-  DYNAMIC_TYPE_LIVE = 'DYNAMIC_TYPE_LIVE',
-  DYNAMIC_TYPE_MEDIALIST = 'DYNAMIC_TYPE_MEDIALIST',
-  DYNAMIC_TYPE_COURSES_SEASON = 'DYNAMIC_TYPE_COURSES_SEASON',
-  DYNAMIC_TYPE_COURSES_BATCH = 'DYNAMIC_TYPE_COURSES_BATCH',
-  DYNAMIC_TYPE_AD = 'DYNAMIC_TYPE_AD',
-  DYNAMIC_TYPE_APPLET = 'DYNAMIC_TYPE_APPLET',
-  DYNAMIC_TYPE_SUBSCRIPTION = 'DYNAMIC_TYPE_SUBSCRIPTION',
-  // DYNAMIC_TYPE_LIVE_RCMD = 'DYNAMIC_TYPE_LIVE_RCMD',
-  DYNAMIC_TYPE_BANNER = 'DYNAMIC_TYPE_BANNER',
-  DYNAMIC_TYPE_UGC_SEASON = 'DYNAMIC_TYPE_UGC_SEASON',
-  DYNAMIC_TYPE_SUBSCRIPTION_NEW = 'DYNAMIC_TYPE_SUBSCRIPTION_NEW',
-}
-
 const DynamicUnknownItemSchema = DynamicItemBaseSchema.merge(
   z.object({
-    type: z.nativeEnum(OtherTypeEnum),
+    type: z.nativeEnum(OtherDynamicTypeEnum),
   }),
 )
 
