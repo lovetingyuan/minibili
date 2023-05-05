@@ -60,11 +60,8 @@ export function reportUserAction(action: Action, extraData: any = null) {
       type: ReportType.USER_ACTION,
       'type.category': Category.COMMON_ACTION,
     },
-    contexts: {
-      action: {
-        name: action,
-        payload: extraData,
-      },
+    extra: {
+      extraData,
     },
   })
   if (action === Action.LOGIN || action === Action.OPEN_APP) {
@@ -117,14 +114,13 @@ export function reportUnknownDynamicItem(item: any) {
     type = 'FORWARD:' + item.orig?.type
   }
   SentryExpo.Native.captureMessage('unknown dynamic item:' + type, {
+    level: 'warning',
     tags: {
       type: ReportType.USER_DATA,
       'type.category': Category.UNKNOWN_ITEM,
     },
-    contexts: {
-      dynamicItem: {
-        data: JSON.stringify(item, null, 2),
-      },
+    extra: {
+      dynamicItem: JSON.stringify(item, null, 2),
     },
   })
 }

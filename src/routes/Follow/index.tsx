@@ -25,7 +25,7 @@ import { throttle } from 'throttle-debounce'
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 const vibrate = throttle(
-  5000,
+  10000,
   () => {
     Vibration.vibrate(1000)
   },
