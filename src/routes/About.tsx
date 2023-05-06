@@ -145,7 +145,7 @@ export default function About() {
             onPress={() => {
               checkUpdate()
             }}>
-            {hasUpdate === true ? '检查更新' : '暂无更新'}
+            {hasUpdate === false ? '暂无更新' : '检查更新'}
           </Button>
         </ListItem>
         <ListItem containerStyle={{ padding: 0 }}>
@@ -186,7 +186,9 @@ export default function About() {
           containerStyle={styles.blackTitle}
           content={
             <ListItem.Content>
-              <ListItem.Title>不感兴趣的分类</ListItem.Title>
+              <ListItem.Title>
+                不感兴趣的分类（{Object.keys($blackTags).length}）
+              </ListItem.Title>
             </ListItem.Content>
           }
           isExpanded={expanded}
@@ -226,7 +228,9 @@ export default function About() {
           containerStyle={styles.blackTitle}
           content={
             <ListItem.Content>
-              <ListItem.Title>不再看的UP</ListItem.Title>
+              <ListItem.Title>
+                不喜欢的UP（{Object.keys($blackUps).length}）
+              </ListItem.Title>
             </ListItem.Content>
           }
           isExpanded={expandedUp}

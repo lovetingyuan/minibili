@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 export default function HeaderRight(
   props: NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>,
 ) {
-  const { id } = props.route.params.detail
+  const { id, name } = props.route.params.detail
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (
@@ -15,7 +15,7 @@ export default function HeaderRight(
       style={{ padding: 8 }}
       onPress={() => {
         navigation.navigate('WebPage', {
-          title: props.route.name + '的动态',
+          title: name + '的动态',
           url: `https://m.bilibili.com/dynamic/${id}`,
         })
       }}>

@@ -26,7 +26,14 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           <Text style={styles.text}>{parseDate(video.pubDate)}</Text>
         </View>
         {video.tag ? (
-          <View style={[styles.textContainer]}>
+          <View
+            style={[
+              styles.textContainer,
+              {
+                right: 0,
+                bottom: 0,
+              },
+            ]}>
             <Text style={styles.text}>{video.tag}</Text>
           </View>
         ) : null}
@@ -42,7 +49,6 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           />
           <Text
             numberOfLines={1}
-            // adjustsFontSizeToFit
             ellipsizeMode="tail"
             style={[styles.upNameText]}>
             {video.name}
