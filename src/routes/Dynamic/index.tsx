@@ -23,9 +23,9 @@ import ArticleItem from './ArticleItem'
 import { Icon } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useMounted from '../../hooks/useMounted'
-import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
 import { FlashList } from '@shopify/flash-list'
 import { useStore } from '../../store'
+import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -85,22 +85,22 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
 
   const renderItem = ({ item }: any) => {
     let Item: any = DefaultItem
-    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
+    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD) {
       Item = WordItem
     }
-    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_AV) {
+    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
       Item = VideoItem
     }
-    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
+    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
       Item = RichTextItem
     }
-    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
+    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
       Item = ArticleItem
     }
-    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
+    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
       Item = ForwardItem
     }
-    if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
       Item = LivingItem
     }
     // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0

@@ -1,5 +1,7 @@
 {
-  "brokenVersions": [],
+  "brokenVersions": [
+    "0.0.32"
+  ],
   "statement": {
     "title": "",
     "content": "",
