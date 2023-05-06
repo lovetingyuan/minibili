@@ -14,7 +14,7 @@ import CommentList from '../../components/CommentList'
 import ImagesView from './ImagesView'
 import { Icon } from '@rneui/themed'
 import { handleShareVideo, parseNumber } from '../../utils'
-import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
+import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 
 const DynamicDetail: React.FC<
   NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>
@@ -44,9 +44,9 @@ const DynamicDetail: React.FC<
             textProps={{ style: { fontSize: 16, lineHeight: 25 } }}
           />
         </View>
-        {type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW ? (
+        {type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW ? (
           <View style={styles.imagesContainer}>
-            {payload.images.length ? (
+            {payload.images?.length ? (
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator
@@ -72,7 +72,7 @@ const DynamicDetail: React.FC<
               </ScrollView>
             ) : null}
           </View>
-        ) : type === DynamicTypeEnum.DYNAMIC_TYPE_WORD ? (
+        ) : type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD ? (
           <View>
             <Text>{payload.text}</Text>
             {payload.image ? (
@@ -117,7 +117,8 @@ const DynamicDetail: React.FC<
           }
         />
       </ScrollView>
-      {type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW &&
+      {type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW &&
+      payload.images &&
       payload.images.length > 0 ? (
         <ImagesView
           images={payload.images}

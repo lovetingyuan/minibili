@@ -4,43 +4,54 @@ import useSWR from 'swr'
 import store, { useStore } from '../store'
 import PQueue from 'p-queue'
 import {
-  AdditionalTypeEnum,
   DynamicForwardItem,
   DynamicItemBaseType,
   DynamicItemResponse,
   DynamicListResponse,
   DynamicUnknownItem,
-  ForwardOtherDynamicTypeEnum,
-  MajorTypeEnum,
 } from './dynamic-items.schema'
 import useSWRInfinite from 'swr/infinite'
 import { reportUnknownDynamicItem } from '../utils/report'
-import { DynamicTypeEnum, OtherDynamicTypeEnum } from './dynamic-items.type'
+import {
+  DynamicTypes,
+  // DynamicTypes,
+  HandledAdditionalTypeEnum,
+  HandledDynamicTypeEnum,
+  HandledForwardTypeEnum,
+  MajorTypeEnum,
+  OtherDynamicTypeEnum,
+  OtherForwardTypeEnum,
+} from './dynamic-items.type'
 
 export type DynamicItem = ReturnType<typeof getDynamicItem>
 
-export type DynamicType = keyof typeof DynamicTypeEnum
-export type DynamicItemType<T extends DynamicType> = Extract<
-  DynamicItem,
-  { type: T }
->
+// export type DynamicType = keyof typeof DynamicTypes
+export type DynamicItemType<
+  T extends keyof typeof DynamicTypes = keyof typeof DynamicTypes,
+> = Extract<DynamicItem, { type: T }>
 
 const getCommon = (item: DynamicItemBaseType) => {
+  const {
+    module_author: author,
+    module_stat: stat,
+    module_dynamic: dynamic,
+    module_tag: tag,
+  } = item.modules
   return {
     id: item.id_str,
     // type: item.type,
-    face: item.modules?.module_author.face,
-    date: item.modules?.module_author?.pub_time,
-    time: item.modules?.module_author?.pub_ts,
-    mid: item.modules?.module_author?.mid,
-    name: item.modules?.module_author?.name,
-    text: item.modules?.module_dynamic?.desc?.text,
-    top: item.modules?.module_tag?.text === '置顶',
+    face: author.face,
+    date: author.pub_time,
+    time: author.pub_ts,
+    mid: author.mid,
+    name: author.name,
+    text: dynamic?.desc?.text,
+    top: tag?.text === '置顶',
     commentId: item.basic.comment_id_str,
     commentType: item.basic.comment_type,
-    commentCount: item.modules.module_stat.comment.count,
-    likeCount: item.modules.module_stat.like.count,
-    forwardCount: item.modules.module_stat.forward.count,
+    commentCount: stat.comment.count,
+    likeCount: stat.like.count,
+    forwardCount: stat.forward.count,
   }
 }
 
@@ -48,8 +59,8 @@ const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
   __DEV__ && console.log('unknown', item)
   if (
     item.type in OtherDynamicTypeEnum ||
-    (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD &&
-      item.orig.type in ForwardOtherDynamicTypeEnum)
+    (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD &&
+      item.orig.type in OtherForwardTypeEnum)
   ) {
     reportUnknownDynamicItem(item)
   }
@@ -64,16 +75,20 @@ const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
 }
 
 const getDynamicItem = (item: DynamicItemResponse) => {
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD) {
     const additional = item.modules.module_dynamic.additional
     let text: string = ''
     let image: string = ''
     if (additional) {
-      if (additional.type === AdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE) {
+      if (
+        additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE
+      ) {
         text = [additional?.reserve?.title, additional?.reserve?.desc1?.text]
           .filter(Boolean)
           .join('\n')
-      } else if (additional.type === AdditionalTypeEnum.ADDITIONAL_TYPE_UGC) {
+      } else if (
+        additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UGC
+      ) {
         text = additional.ugc.title
         image = additional.ugc.cover
       }
@@ -87,11 +102,11 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       },
     }
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_AV) {
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
     const video = item.modules.module_dynamic.major.archive
     return {
       ...getCommon(item),
-      type: DynamicTypeEnum.DYNAMIC_TYPE_AV,
+      type: item.type,
       payload: {
         cover: video.cover,
         title: video.title,
@@ -104,7 +119,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       },
     }
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
     let text = ''
     const additional = item.modules.module_dynamic.additional
     if (additional && 'reserve' in additional) {
@@ -128,7 +143,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       },
     }
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
     const { article } = item.modules.module_dynamic.major
     return {
       ...getCommon(item),
@@ -141,7 +156,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       },
     }
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
     return {
       ...getCommon(item),
       type: item.type,
@@ -151,12 +166,13 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       },
     }
   }
-  if (item.type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
-    if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_AV) {
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
+    // const type = HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
+        type: item.type,
         payload: {
           type: MajorTypeEnum.MAJOR_TYPE_ARCHIVE,
           text: forward.desc?.text,
@@ -165,12 +181,14 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
-    if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_WORD) {
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
       const additional = item.orig.modules.module_dynamic.additional
       const text = [item.orig.modules.module_dynamic.desc?.text]
       // let additionalText = ''/
       if (additional) {
-        if (additional.type === AdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE) {
+        if (
+          additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE
+        ) {
           text.push(
             ...[
               additional.reserve.title || '',
@@ -182,18 +200,18 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       }
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
+        type: item.type,
         payload: {
           type: MajorTypeEnum.MAJOR_TYPE_WORD,
           text: text.filter(Boolean).join('\n'),
         },
       }
     }
-    if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW) {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
+        type: item.type,
         payload: {
           type: MajorTypeEnum.MAJOR_TYPE_DRAW,
           text: forward.desc?.text,
@@ -214,11 +232,11 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
-    if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE) {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
+        type: item.type,
         payload: {
           type: MajorTypeEnum.MAJOR_TYPE_ARTICLE,
           text: forward.major.article.desc,
@@ -228,11 +246,11 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
-    if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_LIVE) {
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE) {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
+        type: item.type,
         payload: {
           type: MajorTypeEnum.MAJOR_TYPE_LIVE,
           text: forward.desc?.text,
@@ -242,10 +260,10 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
-    if (item.orig.type === DynamicTypeEnum.DYNAMIC_TYPE_NONE) {
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {
       return {
         ...getCommon(item),
-        type: DynamicTypeEnum.DYNAMIC_TYPE_FORWARD,
+        type: item.type,
         payload: {
           type: MajorTypeEnum.MAJOR_TYPE_NONE,
           text: item.orig.modules.module_dynamic.major.none.tips,

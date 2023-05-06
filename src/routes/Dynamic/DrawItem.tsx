@@ -12,10 +12,10 @@ import { DynamicItemType } from '../../api/dynamic-items'
 import RichText from '../../components/RichText'
 import { NavigationProps } from '../../types'
 import DynamicStat from './DynamicStat'
-import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
+import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 
 export default function RichTextItem(
-  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_DRAW>,
+  props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW>,
 ) {
   const {
     text,

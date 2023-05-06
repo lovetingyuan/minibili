@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { DynamicItem } from './api/dynamic-items'
-import { DynamicTypeEnum } from './api/dynamic-items.schema'
+import { HandledDynamicTypeEnum } from './api/dynamic-items.type'
 
 export type RootStackParamList = {
   Home: undefined
@@ -15,9 +15,9 @@ export type RootStackParamList = {
   DynamicDetail: {
     detail: Extract<
       DynamicItem,
-      | { type: DynamicTypeEnum.DYNAMIC_TYPE_DRAW }
+      | { type: HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW }
       | {
-          type: DynamicTypeEnum.DYNAMIC_TYPE_WORD
+          type: HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD
         }
     >
   }

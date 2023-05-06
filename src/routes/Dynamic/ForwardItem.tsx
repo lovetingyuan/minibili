@@ -12,10 +12,13 @@ import { DynamicItemType } from '../../api/dynamic-items'
 import DynamicStat from './DynamicStat'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
-import { DynamicTypeEnum, MajorTypeEnum } from '../../api/dynamic-items.schema'
+import {
+  HandledDynamicTypeEnum,
+  MajorTypeEnum,
+} from '../../api/dynamic-items.type'
 
 export default function ForwardItem(
-  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
+  props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   let forwardContent = <Text>暂不支持显示</Text>

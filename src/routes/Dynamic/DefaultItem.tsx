@@ -8,9 +8,8 @@ import RichText from '../../components/RichText'
 // import store from '../../store'
 // import { NavigationProps } from '../../types'
 import DynamicStat from './DynamicStat'
-import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
 
-export default function DefaultItem(props: DynamicItemType<DynamicTypeEnum>) {
+export default function DefaultItem(props: DynamicItemType) {
   // const { livingUps } = useStore()
   // const liveUrl = livingUps[props.mid]
   // const navigation = useNavigation<NavigationProps['navigation']>()

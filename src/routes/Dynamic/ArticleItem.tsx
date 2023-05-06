@@ -2,10 +2,10 @@ import React from 'react'
 import { View, Text, Pressable, Linking, StyleSheet } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import DynamicStat from './DynamicStat'
-import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
+import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 
 export default function ArticleItem(
-  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_ARTICLE>,
+  props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE>,
 ) {
   return (
     <View>

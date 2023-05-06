@@ -15,10 +15,10 @@ import { DynamicItemType } from '../../api/dynamic-items'
 import store from '../../store'
 import { Icon } from '@rneui/themed'
 import { parseNumber } from '../../utils'
-import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
+import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 
 export default function VideoItem(
-  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_AV>,
+  props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>,
 ) {
   const {
     mid,

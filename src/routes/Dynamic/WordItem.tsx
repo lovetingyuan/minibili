@@ -5,10 +5,10 @@ import RichText from '../../components/RichText'
 import DynamicStat from './DynamicStat'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
-import { DynamicTypeEnum } from '../../api/dynamic-items.schema'
+import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 
 export default function WordItem(
-  props: DynamicItemType<DynamicTypeEnum.DYNAMIC_TYPE_WORD>,
+  props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD>,
 ) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   return (

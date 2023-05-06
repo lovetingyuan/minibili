@@ -1,6 +1,6 @@
 import * as SentryExpo from 'sentry-expo'
 import getLocation from '../api/get-location'
-import { DynamicTypeEnum } from '../api/dynamic-items.schema'
+import { HandledDynamicTypeEnum } from '../api/dynamic-items.type'
 
 export enum ReportType {
   USER_ACTION = 'user_action',
@@ -110,7 +110,7 @@ export function clearUser() {
 
 export function reportUnknownDynamicItem(item: any) {
   let type = item.type
-  if (type === DynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
+  if (type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     type = 'FORWARD:' + item.orig?.type
   }
   SentryExpo.Native.captureMessage('unknown dynamic item:' + type, {
