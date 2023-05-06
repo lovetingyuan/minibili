@@ -89,6 +89,7 @@ try {
 }
 
 try {
+  await $`rm -rf dist`
   await $`mkdir -p dist`
   await $`wget ${buildList[0].artifacts.buildUrl} -q -O ./dist/minibili-${buildList[0].appVersion}.apk`
 } catch (err) {
