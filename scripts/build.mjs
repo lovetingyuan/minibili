@@ -103,7 +103,7 @@ try {
   throw err
 } finally {
   try {
-    await $`expo publish`
+    await $`expo-cli publish`
   } catch (err) {
     echo(chalk.red('Failed to publish sourcemap.'))
     throw err
