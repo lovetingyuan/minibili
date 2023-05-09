@@ -18,7 +18,7 @@ import {
   HandledAdditionalTypeEnum,
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
-  MajorTypeEnum,
+  // MajorTypeEnum,
   OtherDynamicTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
@@ -55,25 +55,38 @@ const getCommon = (item: DynamicItemBaseType) => {
   }
 }
 
-const getUnknownItem = (item: DynamicUnknownItem | DynamicForwardItem) => {
+const getUnknownDynamicItem = (item: DynamicUnknownItem) => {
+  __DEV__ && console.log('unknown', item)
+  if (item.type in OtherDynamicTypeEnum) {
+    reportUnknownDynamicItem(item)
+  }
+  return {
+    ...getCommon(item),
+    type: item.type as OtherDynamicTypeEnum,
+    payload: {
+      text: '暂不支持显示',
+      type: item.type as OtherDynamicTypeEnum,
+    },
+  }
+}
+
+const getUnknownForwardItem = (item: DynamicForwardItem) => {
   __DEV__ && console.log('unknown', item)
   if (
-    item.type in OtherDynamicTypeEnum ||
-    (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD &&
-      item.orig.type in OtherForwardTypeEnum)
+    item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD &&
+    item.orig.type in OtherForwardTypeEnum
   ) {
     reportUnknownDynamicItem(item)
   }
   return {
     ...getCommon(item),
-    type: item.type,
+    type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
     payload: {
       text: '暂不支持显示',
-      type: item.type,
+      type: item.type as unknown as OtherForwardTypeEnum,
     },
   }
 }
-
 const getDynamicItem = (item: DynamicItemResponse) => {
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD) {
     const additional = item.modules.module_dynamic.additional
@@ -95,7 +108,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     }
     return {
       ...getCommon(item),
-      type: item.type,
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD as const,
       payload: {
         text,
         image,
@@ -106,7 +119,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     const video = item.modules.module_dynamic.major.archive
     return {
       ...getCommon(item),
-      type: item.type,
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_AV as const,
       payload: {
         cover: video.cover,
         title: video.title,
@@ -129,7 +142,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     }
     return {
       ...getCommon(item),
-      type: item.type,
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW as const,
       payload: {
         text,
         images: item.modules?.module_dynamic?.major?.draw?.items?.map(v => {
@@ -147,7 +160,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     const { article } = item.modules.module_dynamic.major
     return {
       ...getCommon(item),
-      type: item.type,
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
       payload: {
         title: article.title,
         text: article.desc,
@@ -159,7 +172,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
     return {
       ...getCommon(item),
-      type: item.type,
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD as const,
       payload: {
         name: item.modules.module_author.name, // + '正在直播',
         mid: item.modules.module_author.mid,
@@ -169,7 +182,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC) {
     return {
       ...getCommon(item),
-      type: item.type,
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC as const,
       payload: {
         title: item.modules.module_dynamic.major.music.title,
         label: item.modules.module_dynamic.major.music.label,
@@ -184,9 +197,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: item.type,
+        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_ARCHIVE,
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_AV as const,
           text: forward.desc?.text,
           cover: forward.major?.archive.cover,
           title: forward.major?.archive.title,
@@ -212,9 +225,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       }
       return {
         ...getCommon(item),
-        type: item.type,
+        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_WORD,
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_WORD as const,
           text: text.filter(Boolean).join('\n'),
         },
       }
@@ -223,9 +236,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: item.type,
+        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_DRAW,
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW as const,
           text: forward.desc?.text,
           images: forward.major.draw.items.map(v => {
             return {
@@ -248,9 +261,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: item.type,
+        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_ARTICLE,
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
           text: forward.major.article.desc,
           title: forward.major.article.title,
           cover: forward.major.article.covers[0],
@@ -262,9 +275,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: item.type,
+        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_LIVE,
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE as const,
           text: forward.desc?.text,
           title:
             forward.major.live.title + '\n' + forward.major.live.badge.text,
@@ -275,9 +288,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {
       return {
         ...getCommon(item),
-        type: item.type,
+        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
         payload: {
-          type: MajorTypeEnum.MAJOR_TYPE_NONE,
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_NONE as const,
           text: item.orig.modules.module_dynamic.major.none.tips,
         },
       }
@@ -287,7 +300,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         item.orig.modules.module_dynamic.major.music
       return {
         ...getCommon(item),
-        type: item.type,
+        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
         payload: {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC as const,
           title,
@@ -297,9 +310,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
-    return getUnknownItem(item)
+    return getUnknownForwardItem(item)
   }
-  return getUnknownItem(item)
+  return getUnknownDynamicItem(item)
 }
 
 const fetcher2 = (url: string) => {

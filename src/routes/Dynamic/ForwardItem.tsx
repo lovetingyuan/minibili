@@ -14,7 +14,7 @@ import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
-  MajorTypeEnum,
+  // MajorTypeEnum,
 } from '../../api/dynamic-items.type'
 // import MusicItem from './MusicItem'
 
@@ -23,7 +23,7 @@ export default function ForwardItem(
 ) {
   // const navigation = useNavigation<NavigationProps['navigation']>()
   let forwardContent = <Text>暂不支持显示</Text>
-  if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_ARCHIVE) {
+  if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
         {props.payload.text ? (
@@ -42,7 +42,7 @@ export default function ForwardItem(
         </View>
       </View>
     )
-  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_DRAW) {
+  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW) {
     forwardContent = (
       <View style={{ flexDirection: 'column' }}>
         <RichText text={props.payload.text} />
@@ -63,7 +63,9 @@ export default function ForwardItem(
         {/* {props.payload.text2 ? <Text>{props.payload.text2}</Text> : null} */}
       </View>
     )
-  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_ARTICLE) {
+  } else if (
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE
+  ) {
     forwardContent = (
       <View>
         <Text style={{ fontSize: 15, marginBottom: 10, fontWeight: 'bold' }}>
@@ -81,9 +83,9 @@ export default function ForwardItem(
         </Text>
       </View>
     )
-  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_WORD) {
+  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
     forwardContent = <Text>{props.payload.text}</Text>
-  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_LIVE) {
+  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE) {
     forwardContent = (
       <View>
         <Text>{props.payload.title}</Text>
@@ -114,7 +116,7 @@ export default function ForwardItem(
         />
       </View>
     )
-  } else if (props.payload.type === MajorTypeEnum.MAJOR_TYPE_NONE) {
+  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {
     forwardContent = (
       <Text style={{ fontStyle: 'italic' }}>{props.payload.text}</Text>
     )
