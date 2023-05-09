@@ -48,6 +48,7 @@ try {
       await $`eas build --platform android --profile production --json --non-interactive`
     echo(223333333 + res.toString('utf8'))
     const buildList = getBuildList(res)
+    console.log(22222, buildList)
     if (buildList[0].appVersion !== newVersion) {
       throw new Error('构建未成功')
     }
