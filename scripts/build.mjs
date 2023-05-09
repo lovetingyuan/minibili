@@ -46,9 +46,7 @@ try {
   await spinner('eas building...', async () => {
     const res =
       await $`eas build --platform android --profile production --json --non-interactive`
-    echo(223333333 + res.toString('utf8'))
     const buildList = getBuildList(res)
-    echo(2222244, JSON.stringify(buildList, null, 2))
     if (buildList[0].appVersion !== newVersion) {
       throw new Error('构建未成功')
     }
