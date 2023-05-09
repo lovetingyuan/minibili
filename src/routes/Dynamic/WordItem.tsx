@@ -1,24 +1,14 @@
 import React from 'react'
-import { TouchableOpacity, Text, View, Image } from 'react-native'
+import { Text, View, Image } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import RichText from '../../components/RichText'
-import DynamicStat from './DynamicStat'
-import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../../types'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 
 export default function WordItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD>,
 ) {
-  const navigation = useNavigation<NavigationProps['navigation']>()
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={() => {
-        navigation.navigate('DynamicDetail', {
-          detail: props,
-        })
-      }}>
+    <>
       <RichText
         imageSize={16}
         text={props.text}
@@ -37,14 +27,6 @@ export default function WordItem(
           ) : null}
         </View>
       ) : null}
-      <DynamicStat
-        title={props.text || ''}
-        name={props.name}
-        id={props.id}
-        date={props.date}
-        like={props.likeCount}
-        share={props.forwardCount}
-      />
-    </TouchableOpacity>
+    </>
   )
 }

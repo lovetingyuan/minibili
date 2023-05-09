@@ -19,7 +19,7 @@ import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 
 import { VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, openBiliVideo } from '../../utils'
+import { handleShareVideo, openBiliVideo, parseNumber } from '../../utils'
 import { useRankList } from '../../api/rank-list'
 import { Action, reportUserAction } from '../../utils/report'
 
@@ -114,7 +114,7 @@ export default function Ranks({ navigation }: Props) {
           name: 'black',
         },
     {
-      text: `分享(${currentVideoRef.current?.shareNum})`,
+      text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
       name: 'share',
     },
     {

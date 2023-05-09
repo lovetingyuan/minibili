@@ -41,6 +41,13 @@ const store = proxy<{
   ranksList: { rid: number; label: string }[]
   remoteConfig: Promise<RemoteConfig>
   updateInfo: ReturnType<typeof checkUpdate>
+  imagesList: {
+    src: string
+    width: number
+    height: number
+    ratio: number
+  }[]
+  currentImageIndex: number
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -59,6 +66,8 @@ const store = proxy<{
   ranksList: RanksConfig,
   remoteConfig: getRemoteConfig(),
   updateInfo: checkUpdate(),
+  imagesList: [],
+  currentImageIndex: 0,
 })
 
 const StoragePrefix = 'Store:'

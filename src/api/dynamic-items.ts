@@ -166,6 +166,18 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       },
     }
   }
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC) {
+    return {
+      ...getCommon(item),
+      type: item.type,
+      payload: {
+        title: item.modules.module_dynamic.major.music.title,
+        label: item.modules.module_dynamic.major.music.label,
+        cover: item.modules.module_dynamic.major.music.cover,
+        url: item.modules.module_dynamic.major.music.jump_url,
+      },
+    }
+  }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     // const type = HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
@@ -267,6 +279,21 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         payload: {
           type: MajorTypeEnum.MAJOR_TYPE_NONE,
           text: item.orig.modules.module_dynamic.major.none.tips,
+        },
+      }
+    }
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC) {
+      const { title, label, jump_url, cover } =
+        item.orig.modules.module_dynamic.major.music
+      return {
+        ...getCommon(item),
+        type: item.type,
+        payload: {
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC as const,
+          title,
+          label,
+          cover,
+          url: jump_url,
         },
       }
     }

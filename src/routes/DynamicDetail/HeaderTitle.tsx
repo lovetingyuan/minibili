@@ -10,7 +10,7 @@ export default function HeaderTitle(
   const { face, name } = props.route.params.detail
   return (
     <View style={styles.container}>
-      <Avatar size={30} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
+      <Avatar size={36} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
       <Text style={styles.text}>{name}的动态</Text>
     </View>
   )
@@ -24,5 +24,5 @@ const styles = StyleSheet.create({
     position: 'relative',
     left: -20,
   },
-  text: { fontSize: 18 },
+  text: { fontSize: 18, marginLeft: 5 },
 })

@@ -35,7 +35,7 @@ export function HeaderLeft(props: {
     <View style={[styles.left, props.style]}>
       <Pressable onPress={gotoWebPage}>
         <Avatar
-          size={32}
+          size={36}
           rounded
           source={{
             uri: dynamicUser?.face + '@240w_240h_1c.webp',
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 110,
   },
-  titleContainer: { flexShrink: 1, marginLeft: 10 },
+  titleContainer: { flexShrink: 1, marginLeft: 12 },
   titleText: {
     fontSize: 18,
     // marginRight: 10,

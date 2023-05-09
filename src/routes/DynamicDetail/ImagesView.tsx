@@ -3,32 +3,34 @@ import { View, Image, Text, Linking, StyleSheet } from 'react-native'
 import { Icon, Overlay } from '@rneui/themed'
 import { useNetInfo } from '@react-native-community/netinfo'
 import PagerView from 'react-native-pager-view'
+import store, { useStore } from '../../store'
 
-export default function ImagesView(props: {
-  images: { src: string; ratio: number }[]
-  imageIndex: number
-  setImageIndex: (p: number) => void
-  visible: boolean
-  setVisible: (v: boolean) => void
-}) {
-  const { images, imageIndex, visible, setVisible } = props
+export default function ImagesView() {
+  // const { images, imageIndex } = props
+  const { imagesList, currentImageIndex } = useStore()
   const netinfo = useNetInfo()
-
+  // const [visible, setVisible] = React.useState(false)
+  if (!imagesList.length) {
+    return null
+  }
   return (
     <Overlay
-      isVisible={visible}
+      isVisible={true}
       fullScreen
       overlayStyle={styles.overlay}
       onBackdropPress={() => {
-        setVisible(false)
+        // setVisible(false)
+        store.imagesList = []
+        store.currentImageIndex = 0
       }}>
       <PagerView
         style={styles.viewPager}
-        initialPage={imageIndex}
+        initialPage={currentImageIndex}
         onPageSelected={e => {
-          props.setImageIndex(e.nativeEvent.position)
+          // props.setImageIndex(e.nativeEvent.position)
+          store.currentImageIndex = e.nativeEvent.position
         }}>
-        {images.map(img => {
+        {imagesList.map(img => {
           return (
             <View key={img.src} style={styles.page}>
               <Image
@@ -47,7 +49,7 @@ export default function ImagesView(props: {
       </PagerView>
       <View style={styles.pagerNum}>
         <Text style={styles.pagerNumText}>
-          {imageIndex + 1}/{images.length}
+          {currentImageIndex + 1}/{imagesList.length}
           {'    '}
         </Text>
         <Icon
@@ -55,7 +57,7 @@ export default function ImagesView(props: {
           size={22}
           color={'white'}
           onPress={() => {
-            Linking.openURL(images[imageIndex].src)
+            Linking.openURL(imagesList[currentImageIndex].src)
           }}
         />
       </View>

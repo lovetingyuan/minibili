@@ -109,6 +109,19 @@ const MajorLivingSchema = z.object({
 
 export type MajorLiving = z.infer<typeof MajorLivingSchema>
 
+const MajorMusicSchema = z.object({
+  type: z.enum([MajorTypeEnum.MAJOR_TYPE_MUSIC]),
+  music: z.object({
+    cover: z.string(),
+    id: z.number(),
+    jump_url: z.string(),
+    label: z.string(),
+    title: z.string(),
+  }),
+})
+
+export type MajorMusic = z.infer<typeof MajorMusicSchema>
+
 const AdditionalUGCSchema = z.object({
   type: z.enum([AdditionalTypeEnum.ADDITIONAL_TYPE_UGC]),
   ugc: z.object({
@@ -246,6 +259,21 @@ const DynamicArticleItemSchema = DynamicItemBaseSchema.merge(
   }),
 )
 
+const DynamicMusicItemSchema = DynamicItemBaseSchema.merge(
+  z.object({
+    type: z.enum([HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC]),
+    modules: DynamicModulesBaseSchema.merge(
+      z.object({
+        module_dynamic: ModuleDynamicBaseSchema.merge(
+          z.object({
+            major: MajorMusicSchema,
+          }),
+        ),
+      }),
+    ),
+  }),
+)
+
 const DynamicLivingItemSchema = DynamicItemBaseSchema.merge(
   z.object({
     type: z.enum([HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD]),
@@ -363,6 +391,18 @@ const DynamicForwardItemSchema = DynamicItemBaseSchema.merge(
       ),
       BaseOrigSchema.merge(
         z.object({
+          type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC]),
+          modules: z.object({
+            module_author: AuthorSchema,
+            module_dynamic: z.object({
+              desc: z.object({ text: z.string() }).nullable(),
+              major: MajorMusicSchema,
+            }),
+          }),
+        }),
+      ),
+      BaseOrigSchema.merge(
+        z.object({
           type: z.nativeEnum(OtherForwardTypeEnum),
           modules: z.object({
             module_author: AuthorSchema,
@@ -394,6 +434,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
   DynamicArticleItemSchema,
   DynamicForwardItemSchema,
   DynamicLivingItemSchema,
+  DynamicMusicItemSchema,
   DynamicUnknownItemSchema,
 ])
 

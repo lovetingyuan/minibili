@@ -1,20 +1,12 @@
 import React from 'react'
-import {
-  View,
-  Pressable,
-  Text,
-  ScrollView,
-  Image,
-  StyleSheet,
-} from 'react-native'
+import { View, Pressable, Text, ScrollView, StyleSheet } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
-import RichText from '../../components/RichText'
 import CommentList from '../../components/CommentList'
 import ImagesView from './ImagesView'
 import { Icon } from '@rneui/themed'
 import { handleShareVideo, parseNumber } from '../../utils'
-import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+import DynamicItem from '../Dynamic/DynamicItem'
 
 const DynamicDetail: React.FC<
   NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>
@@ -25,65 +17,14 @@ const DynamicDetail: React.FC<
     date,
     commentId,
     commentType,
-    type,
-    payload,
     id,
     forwardCount,
     likeCount,
   } = route.params.detail
-  const [imageIndex, setImageIndex] = React.useState(0)
-  const [visible, setVisible] = React.useState(false)
-
   return (
     <>
       <ScrollView style={styles.scrollView}>
-        <View style={styles.textContainer}>
-          <RichText
-            text={text}
-            imageSize={16}
-            textProps={{ style: { fontSize: 16, lineHeight: 25 } }}
-          />
-        </View>
-        {type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW ? (
-          <View style={styles.imagesContainer}>
-            {payload.images?.length ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator
-                style={{ marginVertical: 0 }}>
-                {payload.images.map((img, i) => {
-                  return (
-                    <Pressable
-                      key={img.src}
-                      onPress={() => {
-                        setImageIndex(i)
-                        setVisible(true)
-                      }}>
-                      <Image
-                        style={[styles.image, { aspectRatio: img.ratio }]}
-                        key={img.src}
-                        source={{
-                          uri: img.src + '@240w_240h_1c.webp',
-                        }}
-                      />
-                    </Pressable>
-                  )
-                })}
-              </ScrollView>
-            ) : null}
-          </View>
-        ) : type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD ? (
-          <View>
-            <Text>{payload.text}</Text>
-            {payload.image ? (
-              <Image
-                source={{ uri: payload.image }}
-                style={{ width: 200, height: 100, marginTop: 10 }}
-              />
-            ) : null}
-          </View>
-        ) : null}
-
+        <DynamicItem item={route.params.detail} />
         <CommentList
           upName={name}
           commentId={commentId}
@@ -117,24 +58,13 @@ const DynamicDetail: React.FC<
           }
         />
       </ScrollView>
-      {type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW &&
-      payload.images &&
-      payload.images.length > 0 ? (
-        <ImagesView
-          images={payload.images}
-          visible={visible}
-          imageIndex={imageIndex}
-          setImageIndex={setImageIndex}
-          setVisible={setVisible}
-        />
-      ) : null}
+      <ImagesView />
     </>
   )
 }
 
 const styles = StyleSheet.create({
   textContainer: {
-    // marginHorizontal: 15,
     marginTop: 20,
     minHeight: 50,
     flexShrink: 1,
@@ -145,7 +75,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   imagesContainer: {
-    // marginHorizontal: 15,
     flexShrink: 1,
   },
   pagerImage: {
@@ -153,10 +82,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    // height: 100,
     flexGrow: 1,
     paddingHorizontal: 10,
-    // marginTop: 10,
+    paddingTop: 20,
     backgroundColor: 'white',
   },
   overlay: {
@@ -168,8 +96,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   page: {
-    // borderWidth: 1,
-    // borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -214,4 +140,5 @@ const styles = StyleSheet.create({
   },
   share: { flexDirection: 'row', alignItems: 'center', gap: 3 },
 })
+
 export default DynamicDetail

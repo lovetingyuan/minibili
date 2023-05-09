@@ -5,27 +5,22 @@ import {
   Text,
   ToastAndroid,
   BackHandler,
-  Image,
   ActivityIndicator,
+  // TouchableOpacity,
 } from 'react-native'
-import ForwardItem from './ForwardItem'
-import RichTextItem from './DrawItem'
-import VideoItem from './VideoItem'
-import LivingItem from './LivingItem'
 import { RootStackParamList } from '../../types'
-import WordItem from './WordItem'
 
 import { useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import DefaultItem from './DefaultItem'
-import ArticleItem from './ArticleItem'
 import { Icon } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useMounted from '../../hooks/useMounted'
 import { FlashList } from '@shopify/flash-list'
 import { useStore } from '../../store'
-import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+import DynamicItem from './DynamicItem'
+// import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+// import DynamicStat from './DynamicStat'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -45,6 +40,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     isReachingEnd,
     error,
   } = useDynamicItems(upId)
+  type ItemType = (typeof list)[number]
   React.useEffect(() => {
     if (error) {
       ToastAndroid.show('请求动态失败', ToastAndroid.SHORT)
@@ -83,38 +79,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     }
   })
 
-  const renderItem = ({ item }: any) => {
-    let Item: any = DefaultItem
-    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD) {
-      Item = WordItem
-    }
-    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
-      Item = VideoItem
-    }
-    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
-      Item = RichTextItem
-    }
-    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
-      Item = ArticleItem
-    }
-    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
-      Item = ForwardItem
-    }
-    if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-      Item = LivingItem
-    }
-    // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
-    return (
-      <View style={styles.itemContainer}>
-        {item.top ? (
-          <Image
-            source={require('../../../assets/top.png')}
-            style={styles.topMark}
-          />
-        ) : null}
-        <Item {...item} />
-      </View>
-    )
+  const renderItem = ({ item }: { item: ItemType }) => {
+    return <DynamicItem item={item} />
   }
 
   return (
@@ -151,7 +117,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
             </Text>
             {loading ? (
               <View>
-                <Text style={{ textAlign: 'center' }}>加载中...</Text>
                 <ActivityIndicator
                   color="blue"
                   animating
@@ -175,13 +140,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-
-  itemContainer: {
-    paddingVertical: 18,
-    paddingHorizontal: 12,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 0.5,
   },
   bottomEnd: {
     fontSize: 12,
@@ -214,10 +172,16 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     color: '#666',
   },
-  topMark: { width: 29, height: 14, marginBottom: 5 },
+
   signMark: {
     position: 'relative',
     top: 3,
+  },
+  itemContainer: {
+    paddingVertical: 18,
+    paddingHorizontal: 12,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 0.5,
   },
 })
 

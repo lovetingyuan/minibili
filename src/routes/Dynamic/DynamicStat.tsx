@@ -32,7 +32,7 @@ export default function DynamicStat(props: {
           <Text style={styles.VideoItemText}>{parseNumber(props.share)}</Text>
         ) : null}
       </Pressable>
-      {__DEV__ ? (
+      {/* {__DEV__ ? (
         <Pressable
           onPress={() => {
             // @ts-ignore
@@ -41,7 +41,7 @@ export default function DynamicStat(props: {
           }}>
           <Text>dev</Text>
         </Pressable>
-      ) : null}
+      ) : null} */}
     </View>
   )
 }

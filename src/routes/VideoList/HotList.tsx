@@ -18,7 +18,7 @@ import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, openBiliVideo } from '../../utils'
+import { handleShareVideo, openBiliVideo, parseNumber } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
@@ -135,7 +135,7 @@ export default function Hot({ navigation }: Props) {
           name: 'blackByTag',
         },
     {
-      text: `分享(${currentVideoRef.current?.shareNum})`,
+      text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
       name: 'share',
     },
     {

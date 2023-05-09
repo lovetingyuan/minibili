@@ -1,36 +1,53 @@
 import React from 'react'
-import { View, Text, Pressable, Linking, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
-import DynamicStat from './DynamicStat'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+import { useRoute } from '@react-navigation/native'
 
 export default function ArticleItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE>,
 ) {
+  const route = useRoute()
+  const isDetail = route.name === 'DynamicDetail'
+  const lines = isDetail ? undefined : 5
   return (
     <View>
-      <Text style={styles.title}>{props.payload.title}</Text>
-      <Pressable
+      <Text
+        style={[
+          styles.title,
+          isDetail && {
+            fontSize: 18,
+          },
+        ]}>
+        {isDetail ? '' : '文章：'}
+        {props.payload.title}
+      </Text>
+      {/* <Pressable
         onPress={() => {
           Linking.openURL(props.payload.url)
-        }}>
-        <Text style={styles.article} numberOfLines={5}>
-          {props.payload.text}
-        </Text>
-      </Pressable>
-      <DynamicStat
-        title={props.payload.text}
-        name={props.name}
-        id={props.id}
-        date={props.date}
-        like={props.likeCount}
-        share={props.forwardCount}
-      />
+        }}> */}
+      <Text
+        style={[
+          styles.article,
+          isDetail && {
+            lineHeight: 26,
+            fontSize: 16,
+          },
+        ]}
+        numberOfLines={lines}>
+        {props.payload.text}
+      </Text>
+      {/* </Pressable> */}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  title: { marginBottom: 10, fontSize: 16 },
-  article: { backgroundColor: '#e6e6e6', padding: 8 },
+  title: { fontSize: 16, fontWeight: 'bold', padding: 8 },
+  article: {
+    // borderWidth: 0.5,
+    padding: 8,
+    borderRadius: 4,
+    // borderColor: '#aaa',
+  },
 })

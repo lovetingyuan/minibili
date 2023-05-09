@@ -19,7 +19,7 @@ export default function Header() {
   return (
     <View style={styles.userContainer}>
       <Avatar
-        size={55}
+        size={50}
         onPress={() => {
           if (store.$userInfo) {
             store.dynamicUser = {
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   myName: { fontSize: 20, fontWeight: 'bold' },
-  mySign: { color: '#555', marginTop: 5, fontSize: 15 },
+  mySign: { color: '#555', fontSize: 15 },
   fansNumText: { fontSize: 14 },
   userContainer: {
     flexDirection: 'row',

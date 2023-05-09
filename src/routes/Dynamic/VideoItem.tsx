@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
+    // minHeight: 100,
     height: undefined,
     aspectRatio: 1.8,
     borderRadius: 5,
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
   },
   videoLength: {
     position: 'absolute',
-    paddingHorizontal: 2,
+    paddingHorizontal: 4,
     backgroundColor: 'rgba(0,0,0,.5)',
     top: 0,
     right: 0,
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   },
   videoDate: {
     position: 'absolute',
-    paddingHorizontal: 2,
+    paddingHorizontal: 4,
     backgroundColor: 'rgba(0,0,0,.5)',
     top: 0,
     borderRadius: 2,

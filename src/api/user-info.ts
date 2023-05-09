@@ -1,5 +1,5 @@
-// import useSWRImmutable from 'swr/immutable'
-import useSWR from 'swr'
+import useSWRImmutable from 'swr/immutable'
+// import useSWR from 'swr'
 import fetcher from './fetcher'
 import { z } from 'zod'
 import { UserInfoResponseSchema } from './user-info.schema'
@@ -21,15 +21,13 @@ const getUserInfo = (userInfo: UserInfoResponse) => {
 }
 
 export function useUserInfo(mid?: number | string) {
-  const { data, error, isValidating, isLoading } = useSWR<UserInfoResponse>(
-    mid ? `/x/space/acc/info?mid=${mid}` : null,
-    (url: string) => {
-      return fetcher<UserInfoResponse>(url, 'https://space.bilibili.com/')
-    },
-    {
-      refreshInterval: 10 * 60 * 1000,
-    },
-  )
+  const { data, error, isValidating, isLoading } =
+    useSWRImmutable<UserInfoResponse>(
+      mid ? `/x/space/acc/info?mid=${mid}` : null,
+      (url: string) => {
+        return fetcher<UserInfoResponse>(url, 'https://space.bilibili.com/')
+      },
+    )
   return {
     data: data?.mid ? getUserInfo(data) : null,
     isValidating,

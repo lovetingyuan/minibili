@@ -12,7 +12,7 @@ export default function HeaderRight(
 
   return (
     <Pressable
-      style={{ padding: 8 }}
+      style={styles.container}
       onPress={() => {
         navigation.navigate('WebPage', {
           title: name + '的动态',
@@ -25,5 +25,6 @@ export default function HeaderRight(
 }
 
 const styles = StyleSheet.create({
+  container: { padding: 8 },
   image: { width: 32, height: 20 },
 })
