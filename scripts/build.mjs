@@ -43,14 +43,15 @@ echo(
 )
 
 try {
-  const res = await spinner('eas building...', () => {
-    return $`eas build --platform android --profile production --json --non-interactive`
+  await spinner('eas building...', async () => {
+    const res =
+      await $`eas build --platform android --profile production --json --non-interactive`
+    echo(223333333 + res.toString('utf8'))
+    const buildList = getBuildList(res)
+    if (buildList[0].appVersion !== newVersion) {
+      throw new Error('构建未成功')
+    }
   })
-  echo(22 + res.toString('utf8'))
-  const buildList = getBuildList(res)
-  if (buildList[0].appVersion !== newVersion) {
-    throw new Error('构建未成功')
-  }
 } catch (err) {
   await $`git checkout -- .`
   await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
