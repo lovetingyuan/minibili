@@ -62,10 +62,10 @@ const getUnknownDynamicItem = (item: DynamicUnknownItem) => {
   }
   return {
     ...getCommon(item),
-    type: item.type as OtherDynamicTypeEnum,
+    type: item.type,
     payload: {
       text: '暂不支持显示',
-      type: item.type as OtherDynamicTypeEnum,
+      type: item.type,
     },
   }
 }
@@ -128,7 +128,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         aid: video.aid,
         duration: video.duration_text,
         desc: video.desc,
-        // date:
       },
     }
   }
