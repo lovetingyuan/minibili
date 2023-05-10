@@ -1,5 +1,40 @@
 [
   {
+    "id": "d73c3721-8090-411c-a99f-6aaf5645267c",
+    "status": "FINISHED",
+    "platform": "ANDROID",
+    "artifacts": {
+      "buildUrl": "https://expo.dev/artifacts/eas/szwWn4r15cpbLNjpusyPiE.apk",
+      "applicationArchiveUrl": "https://expo.dev/artifacts/eas/szwWn4r15cpbLNjpusyPiE.apk"
+    },
+    "initiatingActor": {
+      "id": "7fe27145-df05-4123-8102-627699be725a",
+      "displayName": "tingyuan"
+    },
+    "project": {
+      "id": "17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
+      "name": "MiniBili",
+      "slug": "minibili",
+      "ownerAccount": {
+        "id": "5ff38c4f-cd29-466d-94d1-bb863a85a56e",
+        "name": "tingyuan"
+      }
+    },
+    "releaseChannel": "production",
+    "distribution": "STORE",
+    "buildProfile": "production",
+    "sdkVersion": "48.0.0",
+    "appVersion": "0.0.34",
+    "appBuildVersion": "38",
+    "gitCommitHash": "0c655f4cc0e24ae28e58ece49129d3a1a2c85767",
+    "gitCommitMessage": "更新一些样式",
+    "priority": "NORMAL",
+    "createdAt": "2023-05-10T07:21:39.642Z",
+    "updatedAt": "2023-05-10T07:32:55.957Z",
+    "completedAt": "2023-05-10T07:32:49.427Z",
+    "resourceClass": "ANDROID_MEDIUM"
+  },
+  {
     "id": "5ee119e3-c728-475c-8408-bb5a6bed15cb",
     "status": "FINISHED",
     "platform": "ANDROID",
@@ -137,41 +172,6 @@
     "createdAt": "2023-04-28T02:33:49.768Z",
     "updatedAt": "2023-04-28T02:46:07.154Z",
     "completedAt": "2023-04-28T02:46:04.677Z",
-    "resourceClass": "ANDROID_MEDIUM"
-  },
-  {
-    "id": "bbc02bcd-06d6-44f2-854f-0751c98d1286",
-    "status": "FINISHED",
-    "platform": "ANDROID",
-    "artifacts": {
-      "buildUrl": "https://expo.dev/artifacts/eas/pbFPXMTTQd9mEr6r6QEaq3.apk",
-      "applicationArchiveUrl": "https://expo.dev/artifacts/eas/pbFPXMTTQd9mEr6r6QEaq3.apk"
-    },
-    "initiatingActor": {
-      "id": "7fe27145-df05-4123-8102-627699be725a",
-      "displayName": "tingyuan"
-    },
-    "project": {
-      "id": "17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
-      "name": "MiniBili",
-      "slug": "minibili",
-      "ownerAccount": {
-        "id": "5ff38c4f-cd29-466d-94d1-bb863a85a56e",
-        "name": "tingyuan"
-      }
-    },
-    "releaseChannel": "production",
-    "distribution": "STORE",
-    "buildProfile": "production",
-    "sdkVersion": "48.0.0",
-    "appVersion": "0.0.29",
-    "appBuildVersion": "33",
-    "gitCommitHash": "97abe342dcd78fdf744f2ba9f2c9f561fd3abb5c",
-    "gitCommitMessage": "修复构建问题",
-    "priority": "NORMAL",
-    "createdAt": "2023-04-19T08:37:56.285Z",
-    "updatedAt": "2023-04-19T08:54:19.938Z",
-    "completedAt": "2023-04-19T08:54:15.754Z",
     "resourceClass": "ANDROID_MEDIUM"
   }
 ]
