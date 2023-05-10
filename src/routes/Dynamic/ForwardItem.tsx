@@ -22,6 +22,7 @@ export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
   // const navigation = useNavigation<NavigationProps['navigation']>()
+  // const a = props.payload
   let forwardContent = <Text>暂不支持显示</Text>
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
     forwardContent = (

@@ -1,6 +1,7 @@
 import { ToastAndroid } from 'react-native'
 import { URL } from 'react-native-url-polyfill'
 import { reportApiError } from '../utils/report'
+import getUserAgent from '../utils/user-agent'
 
 let errorTime = Date.now()
 
@@ -28,7 +29,7 @@ export default function request<D extends any>(url: string, referer?: string) {
       'sec-fetch-mode': 'cors',
       'sec-fetch-site': 'same-site',
       // 'upgrade-insecure-requests': '1',
-      'user-agent': 'BiLiBiLi ANDROID Client/8.0.0 (orz@****.my)',
+      'user-agent': getUserAgent(),
     },
     referrer: referer || 'https://space.bilibili.com',
     referrerPolicy: 'no-referrer-when-downgrade',

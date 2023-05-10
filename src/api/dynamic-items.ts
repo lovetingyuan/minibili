@@ -23,8 +23,15 @@ import {
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
 
-export type DynamicItem = ReturnType<typeof getDynamicItem>
-
+type OmitUndef<T> = {
+  [K in keyof T as T[K] extends undefined ? never : K]: T[K]
+}
+type RemoveUndef<T> = T extends { type: string }
+  ? {
+      [K in keyof T]: K extends 'payload' ? OmitUndef<T[K]> : T[K]
+    }
+  : never
+export type DynamicItem = RemoveUndef<ReturnType<typeof getDynamicItem>>
 // export type DynamicType = keyof typeof DynamicTypes
 export type DynamicItemType<
   T extends keyof typeof DynamicTypes = keyof typeof DynamicTypes,
@@ -191,12 +198,12 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     }
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
-    // const type = HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD
+    const type = HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: type,
         payload: {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_AV as const,
           text: forward.desc?.text,
@@ -224,7 +231,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       }
       return {
         ...getCommon(item),
-        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: type,
         payload: {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_WORD as const,
           text: text.filter(Boolean).join('\n'),
@@ -235,7 +242,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: type,
         payload: {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW as const,
           text: forward.desc?.text,
@@ -260,7 +267,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: type,
         payload: {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
           text: forward.major.article.desc,
@@ -274,7 +281,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
-        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: type,
         payload: {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE as const,
           text: forward.desc?.text,
@@ -287,7 +294,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {
       return {
         ...getCommon(item),
-        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: type,
         payload: {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_NONE as const,
           text: item.orig.modules.module_dynamic.major.none.tips,
@@ -299,7 +306,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         item.orig.modules.module_dynamic.major.music
       return {
         ...getCommon(item),
-        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+        type: type,
         payload: {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC as const,
           title,
