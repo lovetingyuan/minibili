@@ -15,7 +15,7 @@ export default function WordItem(
         textProps={{ style: { fontSize: 16, lineHeight: 24 } }}
       />
       {props.payload.text || props.payload.image ? (
-        <View style={{ marginTop: 10, backgroundColor: '#e6e6e6', padding: 8 }}>
+        <View style={{ marginTop: 10 }}>
           {props.payload.text ? (
             <Text style={{}}>{props.payload.text}</Text>
           ) : null}

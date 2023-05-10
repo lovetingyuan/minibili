@@ -1,28 +1,15 @@
 import React from 'react'
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  // TouchableOpacity,
-} from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import RichText from '../../components/RichText'
 import { DynamicItemType } from '../../api/dynamic-items'
-// import { useNavigation } from '@react-navigation/native'
-// import { NavigationProps } from '../../types'
 import {
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
-  // MajorTypeEnum,
 } from '../../api/dynamic-items.type'
-// import MusicItem from './MusicItem'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
-  // const navigation = useNavigation<NavigationProps['navigation']>()
-  // const a = props.payload
   let forwardContent = <Text>暂不支持显示</Text>
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
     forwardContent = (
@@ -51,7 +38,7 @@ export default function ForwardItem(
           horizontal
           showsHorizontalScrollIndicator
           style={styles.imagesContainer}>
-          {props.payload.images?.map(img => {
+          {props.payload.images.map(img => {
             return (
               <Image
                 style={[styles.image, { aspectRatio: img.ratio }]}
@@ -72,16 +59,7 @@ export default function ForwardItem(
         <Text style={{ fontSize: 15, marginBottom: 10, fontWeight: 'bold' }}>
           {props.payload.title}
         </Text>
-        <Text
-          numberOfLines={3}
-          style={{
-            borderWidth: 0.5,
-            padding: 6,
-            borderRadius: 4,
-            borderColor: '#aaa',
-          }}>
-          {props.payload.text}
-        </Text>
+        <Text numberOfLines={3}>{props.payload.text}</Text>
       </View>
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
@@ -112,6 +90,23 @@ export default function ForwardItem(
             width: 120,
             height: 70,
             marginTop: 10,
+            borderRadius: 4,
+          }}
+        />
+      </View>
+    )
+  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC) {
+    forwardContent = (
+      <View style={{ gap: 10 }}>
+        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+          {props.payload.title}
+        </Text>
+        <Text>{props.payload.text}</Text>
+        <Image
+          source={{ uri: props.payload.cover }}
+          style={{
+            width: 160,
+            height: 80,
             borderRadius: 4,
           }}
         />

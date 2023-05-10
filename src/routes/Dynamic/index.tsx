@@ -6,7 +6,6 @@ import {
   ToastAndroid,
   BackHandler,
   ActivityIndicator,
-  // TouchableOpacity,
 } from 'react-native'
 import { RootStackParamList } from '../../types'
 
@@ -19,8 +18,6 @@ import useMounted from '../../hooks/useMounted'
 import { FlashList } from '@shopify/flash-list'
 import { useStore } from '../../store'
 import DynamicItem from './DynamicItem'
-// import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-// import DynamicStat from './DynamicStat'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
