@@ -91,7 +91,7 @@ const MajorSchema = {
         play: z.string(),
       }),
       sub_type: z.number(),
-      title: z.number(),
+      title: z.string(),
       type: z.number(),
     }),
   }),
