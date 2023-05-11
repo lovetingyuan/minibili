@@ -6,6 +6,6 @@ The minimum bilibili app.
 
 https://lovetingyuan.github.io/minibili/
 
-Developed with React-Native and Expo.
+Developed with Expo and React-Native.
 
 Thanks https://socialsisteryi.github.io/bilibili-API-collect/
