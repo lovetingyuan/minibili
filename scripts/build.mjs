@@ -77,28 +77,17 @@ try {
 }
 
 const buildList = getBuildList(buildListStr)
-try {
-  await fs.outputFile(
-    path.resolve(__dirname, '../docs/version.json'),
-    buildList,
-  )
-
-  await $`git commit -a --amend -C HEAD`
-
-  await spinner('git push...', () => retry(5, () => $`git push`))
-
-  echo(chalk.green('Build done!'))
-} catch (err) {
-  echo(chalk.red('Failed to push build list to git.'))
-  throw err
+if (buildList[0].appVersion !== newVersion) {
+  throw new Error('EAS latest version is not same as updated version.')
 }
 
+await fs.outputFile(path.resolve(__dirname, '../docs/version.json'), buildList)
+
 try {
-  await $`rm -rf dist`
-  await $`mkdir -p dist`
+  await $`rm -rf dist && mkdir -p dist`
   await $`wget ${buildList[0].artifacts.buildUrl} -q -O ./dist/minibili-${buildList[0].appVersion}.apk`
 } catch (err) {
-  echo(chalk.red('Failed to download apk.'))
+  echo(chalk.red('Failed to download latest apk.'))
   throw err
 }
 
@@ -107,11 +96,21 @@ try {
 } catch (err) {
   echo(chalk.red('Failed to publish to npm.'))
   throw err
-} finally {
-  try {
-    await $`expo-cli publish`
-  } catch (err) {
-    echo(chalk.red('Failed to publish sourcemap.'))
-    throw err
-  }
+}
+
+try {
+  echo('commit to github...')
+  await $`git commit -a --amend -C HEAD`
+  await spinner('git push...', () => retry(5, () => $`git push`))
+  echo(chalk.green('Build done!'))
+} catch (err) {
+  echo(chalk.red('Failed to push build list to git.'))
+  throw err
+}
+
+try {
+  await $`expo-cli publish`
+} catch (err) {
+  echo(chalk.red('Failed to publish sourcemap.'))
+  throw err
 }
