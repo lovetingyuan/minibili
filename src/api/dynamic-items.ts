@@ -31,11 +31,12 @@ type RemoveUndef<T> = T extends { type: string }
       [K in keyof T]: K extends 'payload' ? OmitUndef<T[K]> : T[K]
     }
   : never
-export type DynamicItem = RemoveUndef<ReturnType<typeof getDynamicItem>>
+export type DynamicItemAllType = RemoveUndef<ReturnType<typeof getDynamicItem>>
 // export type DynamicType = keyof typeof DynamicTypes
-export type DynamicItemType<
-  T extends keyof typeof DynamicTypes = keyof typeof DynamicTypes,
-> = Extract<DynamicItem, { type: T }>
+export type DynamicItemType<T extends keyof typeof DynamicTypes> = Extract<
+  DynamicItemAllType,
+  { type: T }
+>
 
 const getCommon = (item: DynamicItemBaseType) => {
   const {

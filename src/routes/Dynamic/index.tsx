@@ -6,11 +6,10 @@ import {
   ToastAndroid,
   BackHandler,
   ActivityIndicator,
-  // TouchableOpacity,
 } from 'react-native'
 import { RootStackParamList } from '../../types'
 
-import { useDynamicItems } from '../../api/dynamic-items'
+import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Icon } from '@rneui/themed'
@@ -19,8 +18,6 @@ import useMounted from '../../hooks/useMounted'
 import { FlashList } from '@shopify/flash-list'
 import { useStore } from '../../store'
 import DynamicItem from './DynamicItem'
-// import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-// import DynamicStat from './DynamicStat'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -40,7 +37,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     isReachingEnd,
     error,
   } = useDynamicItems(upId)
-  type ItemType = (typeof list)[number]
   React.useEffect(() => {
     if (error) {
       ToastAndroid.show('请求动态失败', ToastAndroid.SHORT)
@@ -79,7 +75,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     }
   })
 
-  const renderItem = ({ item }: { item: ItemType }) => {
+  const renderItem = ({ item }: { item: DynamicItemAllType }) => {
     return <DynamicItem item={item} />
   }
 

@@ -14,9 +14,10 @@ import DynamicStat from './DynamicStat'
 import { useRoute } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
+import { DynamicItemAllType } from '../../api/dynamic-items'
 
-export default function DynamicItem({ item }: any) {
-  let Item: any = DefaultItem
+export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
+  let Item: React.FC<any> = DefaultItem
   const route = useRoute()
   const navigation = useNavigation<NavigationProps['navigation']>()
 

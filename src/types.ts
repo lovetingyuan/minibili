@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { DynamicItem } from './api/dynamic-items'
-import { HandledDynamicTypeEnum } from './api/dynamic-items.type'
+import { DynamicItemAllType } from './api/dynamic-items'
+// import { HandledDynamicTypeEnum } from './api/dynamic-items.type'
 
 export type RootStackParamList = {
   Home: undefined
@@ -13,13 +13,7 @@ export type RootStackParamList = {
     from?: string
   }
   DynamicDetail: {
-    detail: Extract<
-      DynamicItem,
-      | { type: HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW }
-      | {
-          type: HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD
-        }
-    >
+    detail: DynamicItemAllType
   }
   VideoList: {
     query: number
