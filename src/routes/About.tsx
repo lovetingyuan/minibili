@@ -118,7 +118,7 @@ export default function About() {
             }}>
             <ListItem.Content>
               <ListItem.Title style={{ fontSize: 18 }}>
-                一款简单的B站浏览APP
+                一款简单的B站浏览App
               </ListItem.Title>
             </ListItem.Content>
             <Icon
