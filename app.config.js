@@ -57,4 +57,10 @@ module.exports = {
       },
     ],
   },
+  updates: {
+    url: 'https://u.expo.dev/17ac07b9-df37-4b3a-9a31-50da2bb5d44c',
+  },
+  runtimeVersion: {
+    policy: 'sdkVersion',
+  },
 }
