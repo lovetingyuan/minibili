@@ -101,4 +101,8 @@ export function useStore() {
   return useSnapshot(store)
 }
 
+export function setStore(callback: (s: typeof store) => void) {
+  callback(store)
+}
+
 export default store

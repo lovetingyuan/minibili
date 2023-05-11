@@ -10,6 +10,7 @@ import MusicItem from './MusicItem'
 
 import DefaultItem from './DefaultItem'
 import ArticleItem from './ArticleItem'
+import PGCItem from './PGCItem'
 import DynamicStat from './DynamicStat'
 import { useRoute } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native'
@@ -42,6 +43,9 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC) {
     Item = MusicItem
   }
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC) {
+    Item = PGCItem
+  }
   if (route.name === 'DynamicDetail') {
     return <Item {...item} />
   }
@@ -51,7 +55,10 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
       activeOpacity={0.8}
       style={[styles.itemContainer]}
       onPress={() => {
-        if (item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
+        if (
+          item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_AV &&
+          item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD
+        ) {
           navigation?.navigate('DynamicDetail', {
             detail: item,
           })

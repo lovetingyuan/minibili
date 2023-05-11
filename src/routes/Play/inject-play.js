@@ -48,37 +48,36 @@ function __$hack() {
     })
     postPlayState(video.paused ? 'pause' : 'play')
   }, 200)
-  const timer4 = setInterval(() => {
-    const right = document.querySelector('.mplayer-right')
-    if (!right) {
-      return
-    }
-    clearInterval(timer4)
-    if (right.getElementById('reload-button')) {
-      return
-    }
-    const reloadBtn = document.createElement('div')
-    reloadBtn.id = 'reload-button'
-    reloadBtn.innerHTML = '&orarr;'
-    reloadBtn.style.cssText = `
-    width: 36px;
-    height: 36px;
-    color: white;
-    font-size: 28px;
-    text-align: center;
-    transform: rotate(90deg);
-    `
-    reloadBtn.addEventListener('click', () => {
-      window.location.reload()
-    })
-    right.appendChild(reloadBtn)
-  }, 100)
+  // const timer4 = setInterval(() => {
+  //   const right = document.querySelector('.mplayer-right')
+  //   if (!right) {
+  //     return
+  //   }
+  //   clearInterval(timer4)
+  //   if (right.getElementById('reload-button')) {
+  //     return
+  //   }
+  //   const reloadBtn = document.createElement('div')
+  //   reloadBtn.id = 'reload-button'
+  //   reloadBtn.innerHTML = '&orarr;'
+  //   reloadBtn.style.cssText = `
+  //   width: 36px;
+  //   height: 36px;
+  //   color: white;
+  //   font-size: 28px;
+  //   text-align: center;
+  //   transform: rotate(90deg);
+  //   `
+  //   reloadBtn.addEventListener('click', () => {
+  //     window.location.reload()
+  //   })
+  //   right.appendChild(reloadBtn)
+  // }, 100)
   const timer5 = setInterval(() => {
     const poster = document.querySelector('img.mplayer-poster')
     if (poster && !poster.dataset.patched) {
       poster.dataset.patched = 'true'
       const image = poster.src
-      // @ts-ignore
       poster.style.backdropFilter = 'blur(12px)'
       poster.style.objectFit = 'contain'
       if (poster.parentElement) {
@@ -111,7 +110,7 @@ function __$hack() {
   setTimeout(() => {
     clearInterval(timer2)
     clearInterval(timer3)
-    clearInterval(timer4)
+    // clearInterval(timer4)
     clearInterval(timer5)
   }, 4000)
   let startY

@@ -1,25 +1,20 @@
 import request from './fetcher'
 import useSWR from 'swr'
 
-import store, { useStore } from '../store'
+import { setStore, useStore } from '../store'
 import PQueue from 'p-queue'
 import {
-  DynamicForwardItem,
   DynamicItemBaseType,
   DynamicItemResponse,
   DynamicListResponse,
-  DynamicUnknownItem,
 } from './dynamic-items.schema'
 import useSWRInfinite from 'swr/infinite'
 import { reportUnknownDynamicItem } from '../utils/report'
 import {
   DynamicTypes,
-  // DynamicTypes,
   HandledAdditionalTypeEnum,
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
-  // MajorTypeEnum,
-  OtherDynamicTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
 
@@ -63,38 +58,6 @@ const getCommon = (item: DynamicItemBaseType) => {
   }
 }
 
-const getUnknownDynamicItem = (item: DynamicUnknownItem) => {
-  __DEV__ && console.log('unknown', item)
-  if (item.type in OtherDynamicTypeEnum) {
-    reportUnknownDynamicItem(item)
-  }
-  return {
-    ...getCommon(item),
-    type: item.type as OtherDynamicTypeEnum,
-    payload: {
-      text: '暂不支持显示',
-      type: item.type as OtherDynamicTypeEnum,
-    },
-  }
-}
-
-const getUnknownForwardItem = (item: DynamicForwardItem) => {
-  __DEV__ && console.log('unknown', item)
-  if (
-    item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD &&
-    item.orig.type in OtherForwardTypeEnum
-  ) {
-    reportUnknownDynamicItem(item)
-  }
-  return {
-    ...getCommon(item),
-    type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
-    payload: {
-      text: '暂不支持显示',
-      type: item.type as unknown as OtherForwardTypeEnum,
-    },
-  }
-}
 const getDynamicItem = (item: DynamicItemResponse) => {
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD) {
     const additional = item.modules.module_dynamic.additional
@@ -136,7 +99,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         aid: video.aid,
         duration: video.duration_text,
         desc: video.desc,
-        // date:
       },
     }
   }
@@ -196,6 +158,18 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         label: item.modules.module_dynamic.major.music.label,
         cover: item.modules.module_dynamic.major.music.cover,
         url: item.modules.module_dynamic.major.music.jump_url,
+      },
+    }
+  }
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC) {
+    const { pgc } = item.modules.module_dynamic.major
+    return {
+      ...getCommon(item),
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC as const,
+      payload: {
+        title: item.modules.module_author.name,
+        cover: pgc.cover,
+        text: `${pgc.badge.text}: ${pgc.title} (${pgc.stat.play}播放)`,
       },
     }
   }
@@ -318,14 +292,39 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
-    return getUnknownForwardItem(item)
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC) {
+      const { pgc } = item.orig.modules.module_dynamic.major
+      const { name } = item.orig.modules.module_author
+      return {
+        ...getCommon(item),
+        type: type,
+        payload: {
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_PGC as const,
+          title: name,
+          cover: pgc.cover,
+          text: `${pgc.badge.text}: ${pgc.title} (${pgc.stat.play}播放)`,
+        },
+      }
+    }
+    reportUnknownDynamicItem(item)
+    return {
+      ...getCommon(item),
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
+      payload: {
+        text: '暂不支持显示',
+        type: item.type as unknown as OtherForwardTypeEnum,
+      },
+    }
   }
-  return getUnknownDynamicItem(item)
-}
-
-const fetcher2 = (url: string) => {
-  __DEV__ && console.log('fetch dynamic items: ' + url)
-  return request<DynamicListResponse>(url) // .then(res => res.items)
+  reportUnknownDynamicItem(item)
+  return {
+    ...getCommon(item),
+    type: item.type,
+    payload: {
+      text: '暂不支持显示',
+      type: item.type,
+    },
+  }
 }
 
 export function useDynamicItems(mid: string | number) {
@@ -340,7 +339,7 @@ export function useDynamicItems(mid: string | number) {
         }
         return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480`
       },
-      fetcher2,
+      request,
       {
         revalidateFirstPage: false,
         revalidateAll: false,
@@ -370,7 +369,7 @@ export function useDynamicItems(mid: string | number) {
   }
 }
 
-const queue = new PQueue({ concurrency: 5 })
+const queue = new PQueue({ concurrency: 10 })
 
 export function useHasUpdate(mid: number | string) {
   const delay = mid.toString().slice(0, 5)
@@ -380,16 +379,18 @@ export function useHasUpdate(mid: number | string) {
       return queue.add(() => request(url))
     },
     {
-      refreshInterval: 5 * 60 * 1000 + Number(delay),
+      refreshInterval: 6 * 60 * 1000 + Number(delay),
     },
   )
   const { $latestUpdateIds, checkingUpdateMap } = useStore()
+  setStore(store => {
+    if (isLoading) {
+      store.checkingUpdateMap[mid] = true
+    } else if (checkingUpdateMap[mid]) {
+      store.checkingUpdateMap[mid] = false
+    }
+  })
 
-  if (isLoading) {
-    store.checkingUpdateMap[mid] = true
-  } else if (checkingUpdateMap[mid]) {
-    store.checkingUpdateMap[mid] = false
-  }
   let latestTime = 0
   let latestId = ''
   if (data?.items) {
@@ -401,7 +402,9 @@ export function useHasUpdate(mid: number | string) {
       }
     })
     if (!$latestUpdateIds[mid]) {
-      store.$latestUpdateIds[mid] = latestId
+      setStore(store => {
+        store.$latestUpdateIds[mid] = latestId
+      })
     } else if ($latestUpdateIds[mid] !== latestId) {
       return latestId
     }

@@ -43,11 +43,12 @@ export default function ArticleItem(
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 16, fontWeight: 'bold', padding: 8 },
+  title: { fontSize: 16, fontWeight: 'bold' },
   article: {
+    paddingVertical: 10,
     // borderWidth: 0.5,
-    padding: 8,
-    borderRadius: 4,
+    // padding: 8,
+    // borderRadius: 4,
     // borderColor: '#aaa',
   },
 })

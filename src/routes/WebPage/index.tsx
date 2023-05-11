@@ -35,7 +35,7 @@ export default ({ route, navigation }: Props) => {
     navigation.setOptions({
       headerRight: () => {
         return (
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Icon
               onPress={() => {
                 store.$webViewMode =
