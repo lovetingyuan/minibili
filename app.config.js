@@ -63,4 +63,5 @@ module.exports = {
   runtimeVersion: {
     policy: 'sdkVersion',
   },
+  owner: 'tingyuan',
 }
