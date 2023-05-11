@@ -173,6 +173,18 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       },
     }
   }
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE) {
+    const { common } = item.modules.module_dynamic.major
+    return {
+      ...getCommon(item),
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE as const,
+      payload: {
+        title: common.title,
+        cover: common.cover,
+        text: `${common.badge.text}: ${common.desc}`,
+      },
+    }
+  }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     const type = HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
@@ -317,6 +329,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     }
   }
   reportUnknownDynamicItem(item)
+  console.log(1111, JSON.stringify(item, null, 2))
   return {
     ...getCommon(item),
     type: item.type,

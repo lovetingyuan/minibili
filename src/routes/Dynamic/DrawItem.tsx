@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontStyle: 'italic',
     borderLeftWidth: 0.5,
-    paddingLeft: 10,
+    paddingLeft: 8,
     borderLeftColor: '#aaa',
     lineHeight: 25,
   },

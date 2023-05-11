@@ -151,6 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     marginBottom: 12,
+    lineHeight: 22,
   },
   videoInfoItem: {
     flex: 1,

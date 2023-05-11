@@ -11,6 +11,7 @@ import MusicItem from './MusicItem'
 import DefaultItem from './DefaultItem'
 import ArticleItem from './ArticleItem'
 import PGCItem from './PGCItem'
+import CommonItem from './CommonItem'
 import DynamicStat from './DynamicStat'
 import { useRoute } from '@react-navigation/native'
 import { useNavigation } from '@react-navigation/native'
@@ -45,6 +46,9 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC) {
     Item = PGCItem
+  }
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE) {
+    Item = CommonItem
   }
   if (route.name === 'DynamicDetail') {
     return <Item {...item} />

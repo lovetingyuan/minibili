@@ -1,5 +1,12 @@
 import React from 'react'
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native'
 import RichText from '../../components/RichText'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
@@ -10,6 +17,7 @@ import {
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
+  const { width } = useWindowDimensions()
   let forwardContent = <Text>暂不支持显示</Text>
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
     forwardContent = (
@@ -33,7 +41,12 @@ export default function ForwardItem(
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW) {
     forwardContent = (
       <View style={{ flexDirection: 'column' }}>
-        <RichText text={props.payload.text} />
+        <View style={{ maxHeight: 50 }}>
+          <RichText
+            text={props.payload.text}
+            textProps={{ numberOfLines: 3 }}
+          />
+        </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator
@@ -63,7 +76,7 @@ export default function ForwardItem(
       </View>
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
-    forwardContent = <Text>{props.payload.text}</Text>
+    forwardContent = <Text numberOfLines={3}>{props.payload.text}</Text>
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE) {
     forwardContent = (
       <View>
@@ -97,19 +110,23 @@ export default function ForwardItem(
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC) {
     forwardContent = (
-      <View style={{ gap: 10 }}>
-        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-          {props.payload.title}
-        </Text>
-        <Text>{props.payload.text}</Text>
+      <View style={{ gap: 10, flexDirection: 'row', flexShrink: 1 }}>
         <Image
           source={{ uri: props.payload.cover }}
           style={{
-            width: 160,
+            width: width * 0.4,
             height: 80,
             borderRadius: 4,
           }}
         />
+        <View style={{ flexShrink: 1 }}>
+          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
+            {props.payload.title}
+          </Text>
+          <Text style={{ marginTop: 12, lineHeight: 23 }}>
+            {props.payload.text}
+          </Text>
+        </View>
       </View>
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {

@@ -4,6 +4,8 @@ import urlRegex from 'url-regex'
 import { useEmojiList } from '../api/emojis'
 
 let index = 0
+// const urlregex =
+//   /https?:\/\/[\w-]+(\.[\w-]+)+[/#?]?.*?(%[0-9A-F]{2}|[\w\-.,:@~!$&'()*+;=/?%#[\]]+)/i
 const urlregex = urlRegex({
   strict: true,
   // exact: true,

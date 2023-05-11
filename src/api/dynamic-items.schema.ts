@@ -118,6 +118,25 @@ const MajorSchema = {
       tips: z.string(),
     }),
   }),
+  Common: z.object({
+    type: z.enum([MajorTypeEnum.MAJOR_TYPE_COMMON]),
+    common: z.object({
+      badge: z.object({
+        // bg_color: '#FB7299',
+        // color: '#ffffff',
+        text: z.string(),
+      }),
+      biz_type: z.number(),
+      cover: z.string(),
+      desc: z.string(),
+      id: z.string(),
+      jump_url: z.string(),
+      label: z.string(),
+      // sketch_id: z.string(),
+      // style: 1,
+      title: z.string(),
+    }),
+  }),
 }
 
 const AdditionalUGCSchema = z.object({
@@ -304,6 +323,20 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
               major: MajorSchema.PGC,
+            }),
+          ),
+        }),
+      ),
+    }),
+  ),
+  DynamicItemBaseSchema.merge(
+    z.object({
+      type: z.enum([HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE]),
+      modules: DynamicModulesBaseSchema.merge(
+        z.object({
+          module_dynamic: ModuleDynamicBaseSchema.merge(
+            z.object({
+              major: MajorSchema.Common,
             }),
           ),
         }),
