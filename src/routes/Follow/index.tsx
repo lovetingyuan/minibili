@@ -86,8 +86,7 @@ export default function Follow({ navigation, route }: Props) {
       })
   }, [livingMap])
   const columns = Math.floor(width / 90)
-  const rest = data?.list.length ? data.list.length % columns : 0
-
+  const rest = columns - (data?.list.length ? data.list.length % columns : 0)
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
@@ -113,7 +112,7 @@ export default function Follow({ navigation, route }: Props) {
     if (item) {
       return <FollowItem item={item} />
     }
-    return <View style={{ flex: 1, marginHorizontal: 10, height: 20 }} />
+    return <View style={{ flex: 1 }} />
   }
   if (!$userInfo) {
     return <Login />

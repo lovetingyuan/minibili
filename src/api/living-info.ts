@@ -9,7 +9,6 @@ import {
 } from './living-info.schema'
 import useSWR from 'swr'
 // import useSWRImmutable from 'swr/immutable'
-// import PQueue from 'p-queue'
 import { useStore } from '../store'
 // import store, { useStore } from '../store'
 
@@ -20,8 +19,6 @@ export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
 export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
 export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
 export type LiveInfoBatchItem = z.infer<typeof LiveInfoBatchItemSchema>
-
-// const queue = new PQueue({ concurrency: 5 })
 
 // const useLiveRoomInfo = (mid: number | string) => {
 //   const { data } = useSWRImmutable<LiveRoomInfo>(

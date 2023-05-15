@@ -81,6 +81,7 @@ export default React.memo(
           ) : null}
           <TouchableOpacity
             activeOpacity={0.8}
+            style={{ width: '100%' }}
             onLongPress={() => setModalVisible(true)}
             onPress={() => gotoDynamic(false)}>
             <Text style={[styles.name]} numberOfLines={2} ellipsizeMode="tail">
@@ -92,8 +93,11 @@ export default React.memo(
               title="直播中~"
               type="clear"
               size="sm"
-              containerStyle={{ marginLeft: 10 }}
-              titleStyle={{ fontSize: 13 }}
+              containerStyle={{
+                position: 'relative',
+                top: -5,
+              }}
+              titleStyle={{ fontSize: 14 }}
               onPress={gotoLivePage}
             />
           ) : null}
@@ -117,13 +121,19 @@ export default React.memo(
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginVertical: 12,
-    marginHorizontal: 10,
+    // marginVertical: 12,
+    // marginHorizontal: 10,
+    marginBottom: 10,
     flex: 1,
   },
   name: {
     fontSize: 14,
-    marginTop: 8,
+    padding: 10,
+    textAlign: 'center',
+    // flex: 1,
+    // flexGrow: 1,
+    // width: '100%',
+    // marginTop: 8,
   },
   updateMark: {
     height: 14,
@@ -134,6 +144,5 @@ const styles = StyleSheet.create({
     top: -40,
     right: -30,
   },
-  signText: { color: '#555', fontSize: 13 },
   liveText: { color: '#008AC5', fontSize: 14, marginLeft: 12, marginRight: 5 },
 })

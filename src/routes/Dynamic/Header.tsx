@@ -1,4 +1,4 @@
-import { Avatar, Icon } from '@rneui/themed'
+import { Avatar, Button, Icon } from '@rneui/themed'
 import React from 'react'
 import {
   View,
@@ -19,7 +19,7 @@ export function HeaderLeft(props: {
   scrollTop: () => void
   style?: StyleProp<ViewStyle>
 }) {
-  const { dynamicUser } = useStore()
+  const { dynamicUser, livingUps } = useStore()
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const gotoWebPage = () => {
@@ -53,6 +53,22 @@ export function HeaderLeft(props: {
         </Text>
       </Pressable>
       <Text style={styles.fansText}>{parseNumber(fans?.follower)}粉丝</Text>
+      {dynamicUser && livingUps[dynamicUser.mid] ? (
+        <Button
+          size="sm"
+          type="clear"
+          buttonStyle={{ marginLeft: 10 }}
+          onPress={() => {
+            if (dynamicUser) {
+              navigation.navigate('WebPage', {
+                title: dynamicUser.name + '的直播间',
+                url: livingUps[dynamicUser.mid],
+              })
+            }
+          }}>
+          直播中
+        </Button>
+      ) : null}
     </View>
   )
 }

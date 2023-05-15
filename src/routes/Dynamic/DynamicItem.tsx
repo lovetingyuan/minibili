@@ -4,7 +4,7 @@ import { TouchableOpacity, Image, StyleSheet, Text } from 'react-native'
 import ForwardItem from './ForwardItem'
 import RichTextItem from './DrawItem'
 import VideoItem from './VideoItem'
-import LivingItem from './LivingItem'
+// import LivingItem from './LivingItem'
 import WordItem from './WordItem'
 import MusicItem from './MusicItem'
 
@@ -22,7 +22,9 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   let Item: React.FC<any> = DefaultItem
   const route = useRoute()
   const navigation = useNavigation<NavigationProps['navigation']>()
-
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+    return null
+  }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
     Item = VideoItem
   }
@@ -38,9 +40,9 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     Item = ForwardItem
   }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-    Item = LivingItem
-  }
+  // if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+  //   Item = LivingItem
+  // }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC) {
     Item = MusicItem
   }
@@ -61,10 +63,16 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
       onPress={() => {
         if (
           item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_AV &&
-          item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD
+          item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
         ) {
           navigation?.navigate('DynamicDetail', {
             detail: item,
+          })
+        }
+        if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
+          navigation?.navigate('WebPage', {
+            url: 'https://www.bilibili.com/read/mobile?id=' + item.commentId,
+            title: item.name + '的文章',
           })
         }
       }}>
