@@ -5,6 +5,7 @@ import { VideoItemResponseSchema } from './hot-videos.schema'
 
 const fetcher2 = (url: string) => {
   __DEV__ && console.log('fetch hot videos: ' + url)
+
   return fetcher<{ list: HotVideoResponse[]; no_more: boolean }>(url).then(
     res => res.list,
   )
@@ -39,7 +40,7 @@ export type VideoItem = ReturnType<typeof getVideo>
 // https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1
 
 export function useHotVideos() {
-  const { data, mutate, size, setSize, isValidating, isLoading } =
+  const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<HotVideoResponse[]>(
       index => {
         return `/x/web-interface/popular?ps=20&pn=${index + 1}`
@@ -66,5 +67,6 @@ export function useHotVideos() {
     isReachingEnd,
     loading: isLoadingMore,
     refresh: mutate,
+    error,
   }
 }

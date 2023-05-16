@@ -16,7 +16,7 @@ const getLabel = (
   text: string,
   updatedCount?: number,
   hasLiving?: boolean,
-  isCheckingUpdate?: boolean,
+  checkingUpUpdate?: boolean,
 ) => {
   const labelCmp: (props: {
     focused: boolean
@@ -51,13 +51,11 @@ const getLabel = (
       },
     })
     const label = <Text style={style.label}>{text}</Text>
-    // const isCheckingUpdate =
-    //   Object.values(checkingUpdateMap).filter(Boolean).length > 0
 
     if (text === '关注' && updatedCount) {
       return (
         <View>
-          {isCheckingUpdate ? (
+          {checkingUpUpdate ? (
             <ActivityIndicator
               color="#00AEEC"
               animating
@@ -82,11 +80,9 @@ const getLabel = (
 }
 
 const MainTab = () => {
-  const { updatedUps, livingUps, checkingUpdateMap } = useStore()
+  const { updatedUps, livingUps, checkingUpUpdate } = useStore()
   const updateCount = Object.values(updatedUps).filter(Boolean).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
-  const isCheckingUpdate =
-    Object.values(checkingUpdateMap).filter(Boolean).length > 0
   return (
     <Tab.Navigator
       initialRouteName="VideoList"
@@ -107,12 +103,10 @@ const MainTab = () => {
       <Tab.Screen
         name="VideoList"
         component={VideoList}
-        options={() => {
-          return {
-            tabBarLabel: getLabel('视频'),
-            headerTitle: () => <HeaderTitle />,
-            headerShown: true,
-          }
+        options={{
+          tabBarLabel: getLabel('视频'),
+          headerTitle: () => <HeaderTitle />,
+          headerShown: true,
         }}
       />
       <Tab.Screen
@@ -123,7 +117,7 @@ const MainTab = () => {
             '关注',
             updateCount,
             hasLiving,
-            isCheckingUpdate,
+            checkingUpUpdate,
           ),
         }}
       />

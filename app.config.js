@@ -44,6 +44,15 @@ module.exports = {
     eas: {
       projectId: '17ac07b9-df37-4b3a-9a31-50da2bb5d44c',
     },
+    buildTime: new Intl.DateTimeFormat('zh', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Shanghai',
+    }).format(new Date()),
   },
   hooks: {
     postPublish: [

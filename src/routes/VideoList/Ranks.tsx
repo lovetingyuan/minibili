@@ -8,7 +8,6 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native'
-import * as SplashScreen from 'expo-splash-screen'
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
@@ -132,11 +131,6 @@ export default function Ranks({ navigation }: Props) {
       uniqVideosMap[item.bvid] = true
       videoList.push(item)
     }
-  }
-  if (videoList.length) {
-    try {
-      SplashScreen.hideAsync()
-    } catch (err) {}
   }
 
   const { width } = useWindowDimensions()

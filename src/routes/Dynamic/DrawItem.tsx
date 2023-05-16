@@ -6,6 +6,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import RichText from '../../components/RichText'
@@ -22,6 +23,7 @@ export default function RichTextItem(
   } = props
   const route = useRoute()
   const isDetail = route.name === 'DynamicDetail'
+  const { width } = useWindowDimensions()
   const scrollImages = (
     <ScrollView
       horizontal
@@ -55,6 +57,37 @@ export default function RichTextItem(
       })}
     </ScrollView>
   )
+  const imageListWidth = images.length > 2 ? width / 3 - 20 : width / 2 - 20
+  const imageList = (
+    <View style={styles.imageListContainer}>
+      {images.map((img, i) => {
+        const ImageCmp = (
+          <Image
+            key={img.src}
+            style={[{ aspectRatio: 1, width: imageListWidth, borderRadius: 4 }]}
+            resizeMode="cover"
+            source={{
+              uri: img.src + '@240w_240h_1c.webp',
+            }}
+          />
+        )
+        if (!isDetail) {
+          return ImageCmp
+        }
+        return (
+          <TouchableOpacity
+            key={img.src}
+            activeOpacity={0.8}
+            onPress={() => {
+              store.imagesList = images.slice()
+              store.currentImageIndex = i
+            }}>
+            {ImageCmp}
+          </TouchableOpacity>
+        )
+      })}
+    </View>
+  )
   return (
     <View style={[styles.textContainer]}>
       <RichText
@@ -62,7 +95,7 @@ export default function RichTextItem(
         imageSize={16}
         textProps={{ style: { fontSize: 16, lineHeight: 25 } }}
       />
-      {images.length ? scrollImages : null}
+      {images.length ? (isDetail ? imageList : scrollImages) : null}
       {props.payload.text ? (
         <Text style={styles.postText}>{props.payload.text}</Text>
       ) : null}
@@ -100,5 +133,12 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     borderLeftColor: '#aaa',
     lineHeight: 25,
+  },
+  imageListContainer: {
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    gap: 10,
+    // justifyContent: 'center',
+    marginVertical: 20,
   },
 })

@@ -27,8 +27,16 @@ export default function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
   const { $blackUps, $blackTags } = useStore()
 
-  const { list, page, setSize, isRefreshing, loading, refresh, isReachingEnd } =
-    useHotVideos()
+  const {
+    list,
+    page,
+    setSize,
+    isRefreshing,
+    loading,
+    refresh,
+    isReachingEnd,
+    error,
+  } = useHotVideos()
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -154,7 +162,7 @@ export default function Hot({ navigation }: Props) {
       hotVideoList.push(item)
     }
   }
-  if (hotVideoList.length) {
+  if (hotVideoList.length || error) {
     try {
       SplashScreen.hideAsync()
     } catch (err) {}

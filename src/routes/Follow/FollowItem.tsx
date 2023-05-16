@@ -18,7 +18,17 @@ export default React.memo(
       item: { face, name, sign, mid },
     } = props
     const updateId = useHasUpdate(mid)
-    store.updatedUps[mid] = !!updateId
+
+    React.useEffect(() => {
+      if (updateId) {
+        if (!store.updatedUps[mid]) {
+          store.updatedUps[mid] = true
+        }
+      } else if (store.updatedUps[mid]) {
+        store.updatedUps[mid] = false
+      }
+    }, [updateId, mid])
+    // store.updatedUps[mid] = !!updateId
     const navigation = useNavigation<NavigationProps['navigation']>()
     const { livingUps } = useStore()
     // const { data: livingInfo } = useLivingInfo2(mid)

@@ -13,6 +13,7 @@ import {
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
 } from '../../api/dynamic-items.type'
+import { Avatar } from '@rneui/themed'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
@@ -89,23 +90,23 @@ export default function ForwardItem(
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC) {
     forwardContent = (
-      <View>
-        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
-          {props.payload.title}
-          <Text style={{ fontSize: 14, fontWeight: 'normal' }}>
-            {'    '}
-            {props.payload.label}
-          </Text>
-        </Text>
+      <View style={{ flexDirection: 'row', gap: 12 }}>
         <Image
           source={{ uri: props.payload.cover }}
           style={{
-            width: 120,
-            height: 70,
-            marginTop: 10,
+            width: 100,
+            height: 80,
             borderRadius: 4,
           }}
         />
+        <View style={{ gap: 8 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+            {props.payload.title}
+          </Text>
+          <Text style={{ fontSize: 14, fontWeight: 'normal' }}>
+            {props.payload.label}
+          </Text>
+        </View>
       </View>
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC) {
@@ -135,14 +136,6 @@ export default function ForwardItem(
     )
   }
   return (
-    // <TouchableOpacity
-    //   activeOpacity={0.8}
-    //   onPress={() => {
-    //     navigation.navigate('WebPage', {
-    //       title: props.name + '的动态',
-    //       url: `https://m.bilibili.com/dynamic/${props.commentId}`,
-    //     })
-    //   }}>
     <View style={[styles.textContainer]}>
       <RichText
         imageSize={16}
@@ -156,10 +149,24 @@ export default function ForwardItem(
         }}
       />
       <View style={styles.forwardContainer}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 10,
+          }}>
+          {props.payload.face && (
+            <Avatar source={{ uri: props.payload.face }} size={24} rounded />
+          )}
+          {props.payload.name && (
+            <Text style={{ fontWeight: 'bold', fontSize: 16, marginLeft: 8 }}>
+              {props.payload.name}
+            </Text>
+          )}
+        </View>
         <View style={styles.forwardContent}>{forwardContent}</View>
       </View>
     </View>
-    // </TouchableOpacity>
   )
 }
 
@@ -182,7 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 16,
     backgroundColor: 'rgba(0,0,0,0.05)',
-    padding: 12,
+    padding: 10,
     borderRadius: 4,
   },
   forwardContent: {

@@ -32,7 +32,7 @@ const CommentList: React.FC<{
       </View>
       {commentError ? (
         <View>
-          <Text style={styles.commentTipText}>评论加载失败</Text>
+          <Text style={styles.commentTipText}>评论已关闭或加载失败</Text>
         </View>
       ) : null}
       {commentLoading ? (

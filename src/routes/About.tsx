@@ -20,6 +20,7 @@ import { githubLink, site } from '../constants'
 import { NavigationProps } from '../types'
 import { useNavigation } from '@react-navigation/native'
 import { Action, clearUser, reportUserAction } from '../utils/report'
+import Constants from 'expo-constants'
 
 export default function About() {
   const { $userInfo, $blackTags, $blackUps } = useStore()
@@ -244,6 +245,9 @@ export default function About() {
             {Object.values($blackUps).length === 0 ? <Text>无</Text> : null}
           </ListItem>
         </ListItem.Accordion>
+        <Text style={styles.buildTime}>
+          {Constants.expoConfig?.extra?.buildTime}
+        </Text>
       </Card>
     </ScrollView>
   )
@@ -292,5 +296,11 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: 10,
     marginBottom: 20,
+  },
+  buildTime: {
+    textAlign: 'right',
+    fontSize: 12,
+    color: '#888',
+    marginTop: 20,
   },
 })

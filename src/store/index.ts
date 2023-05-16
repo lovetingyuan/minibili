@@ -25,7 +25,7 @@ const store = proxy<{
   dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
   livingUps: Record<string, string>
-  checkingUpdateMap: Record<string, boolean>
+  checkingUpUpdateMap: Record<string, boolean>
   videosType: (typeof RanksConfig)[number]
   currentVideo: {
     bvid: string
@@ -48,6 +48,7 @@ const store = proxy<{
     ratio: number
   }[]
   currentImageIndex: number
+  checkingUpUpdate: boolean
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -60,7 +61,10 @@ const store = proxy<{
   dynamicUser: null,
   updatedUps: {},
   livingUps: {},
-  checkingUpdateMap: {},
+  checkingUpUpdateMap: {},
+  get checkingUpUpdate() {
+    return Object.values(this.checkingUpUpdateMap).filter(Boolean).length > 0
+  },
   videosType: RanksConfig[0],
   currentVideo: null,
   ranksList: RanksConfig,

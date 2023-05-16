@@ -32,16 +32,6 @@ export default function DynamicStat(props: {
           <Text style={styles.VideoItemText}>{parseNumber(props.share)}</Text>
         ) : null}
       </Pressable>
-      {/* {__DEV__ ? (
-        <Pressable
-          onPress={() => {
-            // @ts-ignore
-            const item = globalThis._dynamicList.find(v => v.id == props.id)
-            console.log('item', JSON.stringify(item, null, 2))
-          }}>
-          <Text>dev</Text>
-        </Pressable>
-      ) : null} */}
     </View>
   )
 }

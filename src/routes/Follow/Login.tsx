@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Input } from '@rneui/themed'
+import { Button, Card, Input } from '@rneui/themed'
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   ToastAndroid,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native'
 
 import store, { useStore } from '../../store'
@@ -29,7 +30,7 @@ export default function Login() {
   useMounted(() => {
     const timer = setInterval(() => {
       setTvImg(v => !v)
-    }, 666)
+    }, 600)
     return () => {
       clearInterval(timer)
     }
@@ -66,43 +67,67 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ padding: 30 }}>
-      <View style={styles.logoContainer}>
-        <Image source={tvImg ? leftTv : rightTv} style={styles.logo} />
-      </View>
-      <Text style={styles.text}>访问你的B站账号的主页并登录：</Text>
-      <Pressable
-        onPress={() => {
-          Linking.openURL('https://space.bilibili.com/')
-        }}>
-        <Text style={styles.linkText} selectable>
-          https://space.bilibili.com/
-        </Text>
-      </Pressable>
-      <Text style={styles.text}>然后输入你的B站ID(uid)</Text>
-      <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20 }}>
-        说明：
-      </Text>
-      <Text style={{ paddingLeft: 20, marginTop: 5 }}>
-        B站ID为个人页面地址栏中的一串数字（ID为公开信息，请放心输入）
-      </Text>
-      <Text style={{ paddingLeft: 20, marginTop: 5 }}>
-        你需要在隐私设置中设置你的关注列表为公开
-      </Text>
-      <View style={styles.inputContainer}>
-        <Input
-          onChangeText={text => (inputUserIdRef.current = text)}
-          placeholder="请输入你的B站ID"
-          keyboardType="numeric"
-        />
-        <Button
-          title="登 录"
-          onPress={login}
-          titleStyle={styles.buttonTextStyle}
-          buttonStyle={styles.buttonStyle}
-          containerStyle={styles.buttonContainerStyle}
-        />
-      </View>
+      style={{ flex: 1 }}>
+      <ScrollView style={{ backgroundColor: '#ededed' }}>
+        <Card
+          containerStyle={{
+            marginHorizontal: 10,
+            marginTop: 50,
+          }}>
+          <View style={styles.logoContainer}>
+            <Card.Image source={tvImg ? leftTv : rightTv} style={styles.logo} />
+          </View>
+          <Card.Title style={{ fontSize: 30 }}>MiniBili</Card.Title>
+          <Card.Divider />
+          <Text style={styles.text}>访问你的B站账号的主页并登录：</Text>
+          <Pressable
+            onPress={() => {
+              Linking.openURL('https://space.bilibili.com/')
+            }}>
+            <Text style={styles.linkText} selectable>
+              https://space.bilibili.com/
+            </Text>
+          </Pressable>
+          <Text style={styles.text}>然后输入你的B站ID(uid)</Text>
+          <Text
+            style={{
+              marginTop: 10,
+              fontSize: 16,
+              lineHeight: 25,
+            }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>说明：</Text>
+            B站ID为个人页面地址栏中的一串数字，如下图所示（ID为公开信息，请放心输入；另外
+            <Text style={{ fontWeight: 'bold' }}>
+              你需要在隐私设置中设置你的关注列表为公开
+            </Text>
+            ）
+          </Text>
+          <Image
+            source={require('../../../assets/login-example.png')}
+            resizeMode="contain"
+            style={{
+              width: '100%',
+              // height: '28%',
+            }}
+          />
+          <View style={styles.inputContainer}>
+            <Input
+              onChangeText={text => (inputUserIdRef.current = text)}
+              placeholder="请输入你的B站ID"
+              keyboardType="numeric"
+              inputMode="numeric"
+              // enterKeyHint="enter"
+            />
+            <Button
+              title="登 录"
+              onPress={login}
+              titleStyle={styles.buttonTextStyle}
+              buttonStyle={styles.buttonStyle}
+              containerStyle={styles.buttonContainerStyle}
+            />
+          </View>
+        </Card>
+      </ScrollView>
     </KeyboardAvoidingView>
   )
 }
@@ -111,26 +136,24 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'column',
     alignItems: 'center',
-    marginBottom: 30,
   },
   logo: {
-    width: 160,
-    height: 160,
+    width: 130,
+    height: 130,
   },
   text: {
-    fontSize: 16,
+    fontSize: 18,
   },
   linkText: {
     margin: 10,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: 'rgba(90, 154, 230, 1)',
   },
   inputContainer: {
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 30,
-    width: '95%',
+    marginTop: 20,
   },
   buttonStyle: {
     backgroundColor: 'rgba(90, 154, 230, 1)',
@@ -138,6 +161,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderRadius: 30,
     height: 45,
+    marginBottom: 40,
   },
   buttonContainerStyle: {
     width: '96%',

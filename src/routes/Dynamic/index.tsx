@@ -111,7 +111,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
             <Text style={styles.emptyText}>
               哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
             </Text>
-            {loading ? (
+            {loading && !isReachingEnd ? (
               <View>
                 <ActivityIndicator
                   color="blue"
@@ -125,7 +125,13 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
-            {isReachingEnd ? '到底了~' : loading ? '加载中...' : ''}
+            {isReachingEnd
+              ? list.length
+                ? '到底了~'
+                : '暂无动态'
+              : loading
+              ? '加载中...'
+              : ''}
           </Text>
         }
       />
@@ -138,7 +144,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bottomEnd: {
-    fontSize: 12,
+    fontSize: 16,
     marginTop: 10,
     marginBottom: 20,
     color: '#999',

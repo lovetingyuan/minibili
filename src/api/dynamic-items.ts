@@ -1,7 +1,7 @@
 import request from './fetcher'
 import useSWR from 'swr'
-
-import { setStore, useStore } from '../store'
+import React from 'react'
+import store, { setStore, useStore } from '../store'
 import PQueue from 'p-queue'
 import {
   DynamicItemBaseType,
@@ -175,24 +175,33 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE) {
     const { common } = item.modules.module_dynamic.major
+    const label = common.badge.text || common.label
     return {
       ...getCommon(item),
       type: HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE as const,
       payload: {
         title: common.title,
         cover: common.cover,
-        text: `${common.badge.text}: ${common.desc}`,
+        text: `${label ? label + ': ' : ''}${common.desc}`,
       },
     }
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     const type = HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const
+    const getForwardUp = () => {
+      const author = item.orig.modules.module_author
+      return {
+        name: author.name,
+        face: author.face,
+      }
+    }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
       const forward = item.orig.modules.module_dynamic
       return {
         ...getCommon(item),
         type: type,
         payload: {
+          ...getForwardUp(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_AV as const,
           text: forward.desc?.text,
           cover: forward.major?.archive.cover,
@@ -221,6 +230,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
+          ...getForwardUp(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_WORD as const,
           text: text.filter(Boolean).join('\n'),
         },
@@ -232,6 +242,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
+          ...getForwardUp(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW as const,
           text: forward.desc?.text,
           images: forward.major.draw.items.map(v => {
@@ -257,6 +268,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
+          ...getForwardUp(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
           text: forward.major.article.desc,
           title: forward.major.article.title,
@@ -271,6 +283,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
+          ...getForwardUp(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE as const,
           text: forward.desc?.text,
           title:
@@ -284,6 +297,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
+          ...getForwardUp(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_NONE as const,
           text: item.orig.modules.module_dynamic.major.none.tips,
         },
@@ -296,6 +310,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
+          ...getForwardUp(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC as const,
           title,
           label,
@@ -311,6 +326,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
+          ...getForwardUp(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_PGC as const,
           title: name,
           cover: pgc.cover,
@@ -323,13 +339,13 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       ...getCommon(item),
       type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
       payload: {
+        ...getForwardUp(),
         text: '暂不支持显示',
         type: item.type as unknown as OtherForwardTypeEnum,
       },
     }
   }
   reportUnknownDynamicItem(item)
-  console.log(1111, JSON.stringify(item, null, 2))
   return {
     ...getCommon(item),
     type: item.type,
@@ -369,7 +385,6 @@ export function useDynamicItems(mid: string | number) {
   const isEmpty = data?.[0]?.items.length === 0
   const isReachingEnd = isEmpty || (data && !data[data.length - 1]?.has_more)
   const isRefreshing = isValidating && !!data && data.length === size
-
   return {
     list: dynamicItems.map(getDynamicItem),
     page: size,
@@ -382,7 +397,7 @@ export function useDynamicItems(mid: string | number) {
   }
 }
 
-const queue = new PQueue({ concurrency: 20 })
+const queue = new PQueue({ concurrency: 50 })
 
 export function useHasUpdate(mid: number | string) {
   const delay = mid.toString().slice(0, 5)
@@ -395,14 +410,10 @@ export function useHasUpdate(mid: number | string) {
       refreshInterval: 6 * 60 * 1000 + Number(delay),
     },
   )
-  const { $latestUpdateIds, checkingUpdateMap } = useStore()
-  setStore(store => {
-    if (isLoading) {
-      store.checkingUpdateMap[mid] = true
-    } else if (checkingUpdateMap[mid]) {
-      store.checkingUpdateMap[mid] = false
-    }
-  })
+  const { $latestUpdateIds } = useStore()
+  React.useEffect(() => {
+    store.checkingUpUpdateMap[mid] = isLoading
+  }, [mid, isLoading])
 
   let latestTime = 0
   let latestId = ''
