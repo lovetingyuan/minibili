@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
 
-// import { BuildListSchema } from '../src/api/check-update.schema'
+// import { BuildListSchema } from '../src/api/check-update.schema.ts'
 const { version } = require('../package.json')
 const semver = require('semver')
 
@@ -15,7 +15,7 @@ const getBuildList = buildStr => {
 }
 
 const latestBuild =
-  await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished`
+  await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
 const [{ appVersion, appBuildVersion }] = getBuildList(latestBuild)
 if (`${appVersion}-${appBuildVersion}` !== version) {
   throw new Error('Package version is not same as the latest build version')
@@ -68,7 +68,7 @@ try {
     retry(
       5,
       () =>
-        $`eas build:list --platform android --limit 5 --json --non-interactive --status finished`,
+        $`eas build:list --platform android --limit 5 --json --non-interactive --status finished --channel production`,
     ),
   )
 } catch (err) {
@@ -85,14 +85,18 @@ await fs.outputFile(path.resolve(__dirname, '../docs/version.json'), buildList)
 
 try {
   await $`rm -rf dist && mkdir -p dist`
-  await $`wget ${buildList[0].artifacts.buildUrl} -q -O ./dist/minibili-${buildList[0].appVersion}.apk`
+  await retry(
+    3,
+    () =>
+      $`wget ${buildList[0].artifacts.buildUrl} -q -O ./dist/minibili-${buildList[0].appVersion}.apk`,
+  )
 } catch (err) {
   echo(chalk.red('Failed to download latest apk.'))
   throw err
 }
 
 try {
-  await $`npm publish`
+  await retry(3, () => $`npm publish`)
 } catch (err) {
   echo(chalk.red('Failed to publish to npm.'))
   throw err
@@ -108,9 +112,9 @@ try {
   throw err
 }
 
-try {
-  await $`expo-cli publish`
-} catch (err) {
-  echo(chalk.red('Failed to publish sourcemap.'))
-  throw err
-}
+// try {
+//   await $`expo-cli publish`
+// } catch (err) {
+//   echo(chalk.red('Failed to publish sourcemap.'))
+//   throw err
+// }

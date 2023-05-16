@@ -22,7 +22,8 @@ export const BuildListSchema = z
         name: z.string(),
       }),
     }),
-    releaseChannel: z.string(),
+    channel: z.string().nullish(),
+    releaseChannel: z.string().nullish(),
     distribution: z.enum(['STORE']),
     buildProfile: z.string(),
     sdkVersion: z.string(),
@@ -36,4 +37,7 @@ export const BuildListSchema = z
     completedAt: z.string(),
     // resourceClass: 'ANDROID_MEDIUM'
   })
+  .refine(data => {
+    return !!data.channel || !!data.releaseChannel
+  }, 'channel error')
   .array()
