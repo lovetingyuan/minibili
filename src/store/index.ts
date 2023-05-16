@@ -3,7 +3,7 @@ import { proxy, useSnapshot } from 'valtio'
 import { watch } from 'valtio/utils'
 import { RanksConfig } from '../constants'
 import { Action, reportUserAction, setUser } from '../utils/report'
-import { RemoteConfig, getRemoteConfig } from '../api/get-config'
+// import { RemoteConfig, getRemoteConfig } from '../api/get-config'
 import { checkUpdate } from '../api/check-update'
 
 interface UserInfo {
@@ -39,7 +39,7 @@ const store = proxy<{
     desc: string
   } | null
   ranksList: { rid: number; label: string }[]
-  remoteConfig: Promise<RemoteConfig>
+  // remoteConfig: Promise<RemoteConfig>
   updateInfo: ReturnType<typeof checkUpdate>
   imagesList: {
     src: string
@@ -64,7 +64,7 @@ const store = proxy<{
   videosType: RanksConfig[0],
   currentVideo: null,
   ranksList: RanksConfig,
-  remoteConfig: getRemoteConfig(),
+  // remoteConfig: getRemoteConfig(),
   updateInfo: checkUpdate(),
   imagesList: [],
   currentImageIndex: 0,
