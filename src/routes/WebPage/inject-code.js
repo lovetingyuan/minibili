@@ -115,6 +115,22 @@ function __$hack(dev) {
       display: none!important;
     }
     `
+    const liveInfo = document.querySelector('.room-info')
+    const liveTimeSpan = document.createElement('span')
+    try {
+      const liveTime = new Date(
+        window.__NEPTUNE_IS_MY_WAIFU__.roomInfoRes.data.room_info
+          .live_start_time * 1000,
+      )
+      liveTimeSpan.textContent = `${liveTime.getHours()}:${liveTime.getMinutes()}开始`
+      liveTimeSpan.style.cssText = `
+      font-size: 12px;
+      color: white;
+      margin-left: 10px;
+      margin-right: 5px;
+      `
+      liveInfo.appendChild(liveTimeSpan)
+    } catch (err) {}
   } else {
     style.textContent = `
     #app .m-navbar {
