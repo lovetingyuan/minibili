@@ -54,7 +54,7 @@ export default ({ route, navigation }: Props) => {
               color="#666"
               size={18}
             />
-            <Icon
+            {/* <Icon
               name="refresh"
               size={20}
               color="#666"
@@ -62,7 +62,7 @@ export default ({ route, navigation }: Props) => {
               onPress={() => {
                 webviewRef.current?.reload()
               }}
-            />
+            /> */}
             <Icon
               name="open-in-browser"
               size={20}

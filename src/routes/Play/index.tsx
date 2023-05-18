@@ -51,6 +51,7 @@ const PlayPage = ({ route, navigation }: Props) => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
+
   if (!videoInfo.aid || !videoInfo.name) {
     return null
   }
