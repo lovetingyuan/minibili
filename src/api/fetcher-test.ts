@@ -1,7 +1,7 @@
 export default function request<D extends any>(url: string, referer?: string) {
   const requestUrl = url.startsWith('http')
     ? url
-    : 'http://api.bilibili.com' + url
+    : 'https://api.bilibili.com' + url
   const { origin, hostname } = new URL(requestUrl)
   return fetch(requestUrl + '&_t=' + Date.now(), {
     headers: {
