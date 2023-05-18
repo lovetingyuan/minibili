@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react'
 import Follow from './Follow'
 import VideoList from './VideoList'
+import Login from './Login'
 import { useStore } from '../store'
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
@@ -80,7 +81,7 @@ const getLabel = (
 }
 
 const MainTab = () => {
-  const { updatedUps, livingUps, checkingUpUpdate } = useStore()
+  const { updatedUps, livingUps, checkingUpUpdate, $userInfo } = useStore()
   const updateCount = Object.values(updatedUps).filter(Boolean).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
@@ -109,18 +110,28 @@ const MainTab = () => {
           headerShown: true,
         }}
       />
-      <Tab.Screen
-        name="Follow"
-        component={Follow}
-        options={{
-          tabBarLabel: getLabel(
-            '关注',
-            updateCount,
-            hasLiving,
-            checkingUpUpdate,
-          ),
-        }}
-      />
+      {$userInfo ? (
+        <Tab.Screen
+          name="Follow"
+          component={Follow}
+          options={{
+            tabBarLabel: getLabel(
+              '关注',
+              updateCount,
+              hasLiving,
+              checkingUpUpdate,
+            ),
+          }}
+        />
+      ) : (
+        <Tab.Screen
+          name="Login"
+          component={Login}
+          options={{
+            tabBarLabel: getLabel('登录'),
+          }}
+        />
+      )}
     </Tab.Navigator>
   )
 }

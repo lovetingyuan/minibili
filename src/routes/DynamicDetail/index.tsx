@@ -1,5 +1,12 @@
 import React from 'react'
-import { View, Pressable, Text, ScrollView, StyleSheet } from 'react-native'
+import {
+  View,
+  Pressable,
+  Text,
+  ScrollView,
+  StyleSheet,
+  ToastAndroid,
+} from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 import CommentList from '../../components/CommentList'
@@ -35,10 +42,14 @@ const DynamicDetail: React.FC<
                 <Icon name="date-range" size={15} color="#666" />
                 <Text style={styles.text}>{date}</Text>
               </View>
-              <View style={styles.iconText}>
+              <Pressable
+                style={styles.iconText}
+                onPress={() => {
+                  ToastAndroid.show('不支持点赞', ToastAndroid.SHORT)
+                }}>
                 <Icon name="thumb-up-off-alt" size={15} color="#666" />
                 <Text style={styles.text}>{parseNumber(likeCount)}</Text>
-              </View>
+              </Pressable>
               <Pressable
                 style={styles.share}
                 onPress={() => {
