@@ -62,17 +62,22 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
       style={[styles.itemContainer]}
       onPress={() => {
         if (
-          item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_AV &&
-          item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
+          item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV ||
+          item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
+        ) {
+          return
+        }
+        if (
+          item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW ||
+          item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD
         ) {
           navigation?.navigate('DynamicDetail', {
             detail: item,
           })
-        }
-        if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
-          navigation?.navigate('WebPage', {
-            url: 'https://www.bilibili.com/read/mobile?id=' + item.commentId,
-            title: item.name + '的文章',
+        } else {
+          navigation.navigate('WebPage', {
+            title: item.name + '的动态',
+            url: `https://m.bilibili.com/dynamic/${item.id}`,
           })
         }
       }}>

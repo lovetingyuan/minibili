@@ -10,16 +10,16 @@ import {
 import { Text } from 'react-native'
 import { StyleSheet } from 'react-native'
 
-import store, { useStore } from '../store'
+import store, { useStore } from '../../store'
 import { Card, Chip, ListItem, Button, Icon } from '@rneui/themed'
 import {
   checkUpdate as checkUpdateApi,
   currentVersion,
-} from '../api/check-update'
-import { githubLink, site } from '../constants'
-import { NavigationProps } from '../types'
+} from '../../api/check-update'
+import { githubLink, site } from '../../constants'
+import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
-import { Action, clearUser, reportUserAction } from '../utils/report'
+import { Action, clearUser, reportUserAction } from '../../utils/report'
 import Constants from 'expo-constants'
 
 export default function About() {

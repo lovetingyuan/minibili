@@ -122,7 +122,10 @@ function __$hack(dev) {
         window.__NEPTUNE_IS_MY_WAIFU__.roomInfoRes.data.room_info
           .live_start_time * 1000,
       )
-      liveTimeSpan.textContent = `${liveTime.getHours()}:${liveTime.getMinutes()}开始`
+      const minute = liveTime.getMinutes()
+      liveTimeSpan.textContent = `${liveTime.getHours()}:${
+        minute < 10 ? '0' + minute : minute
+      }开始`
       liveTimeSpan.style.cssText = `
       font-size: 12px;
       color: white;
