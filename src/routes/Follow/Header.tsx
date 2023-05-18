@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, View, Pressable } from 'react-native'
+import { Text, View } from 'react-native'
 import { Avatar, Icon } from '@rneui/themed'
 import store, { useStore } from '../../store'
 
@@ -44,14 +44,17 @@ export default function Header() {
               {followedCount}关注
             </Text>
           </Text>
-          <Pressable
-            style={{ padding: 5 }}
+          <Icon
             onPress={() => {
               navigation.navigate('About')
               reportNavigation('About')
-            }}>
-            <Icon name="snow" type="ionicon" size={18} color="#00AEEC" />
-          </Pressable>
+            }}
+            style={{ padding: 5 }}
+            name="snow"
+            type="ionicon"
+            size={18}
+            color="#00AEEC"
+          />
         </View>
         <Text style={styles.mySign}>{$userInfo?.sign}</Text>
       </View>

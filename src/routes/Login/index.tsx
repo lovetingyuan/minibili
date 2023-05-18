@@ -3,7 +3,6 @@ import { Button, Card, Input } from '@rneui/themed'
 import {
   View,
   Text,
-  Pressable,
   Image,
   Linking,
   StyleSheet,
@@ -18,6 +17,8 @@ import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
 
 import { Action, reportUserAction, setUser } from '../../utils/report'
+import { useNavigation } from '@react-navigation/native'
+import { NavigationProps } from '../../types'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
@@ -26,6 +27,7 @@ export default function Login() {
   const inputUserIdRef = React.useRef('')
   const [tvImg, setTvImg] = React.useState(true)
   const [userId, setUserId] = React.useState('')
+  const navigation = useNavigation<NavigationProps['navigation']>()
   const { $userInfo } = useStore()
   useMounted(() => {
     const timer = setInterval(() => {
@@ -35,7 +37,7 @@ export default function Login() {
       clearInterval(timer)
     }
   })
-  const { data, error } = useUserInfo(userId)
+  const { data, error, isLoading } = useUserInfo(userId)
   if (userId && data?.mid && !$userInfo) {
     store.$userInfo = {
       name: data.name,
@@ -45,10 +47,11 @@ export default function Login() {
     }
     setUser(data.mid, data.name)
     reportUserAction(Action.LOGIN, data)
+    navigation.navigate('Follow')
   }
   React.useEffect(() => {
     if (error) {
-      ToastAndroid.show('获取用户信息失', ToastAndroid.SHORT)
+      ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
     }
   }, [error])
 
@@ -80,14 +83,14 @@ export default function Login() {
           <Card.Title style={{ fontSize: 30 }}>MiniBili</Card.Title>
           <Card.Divider />
           <Text style={styles.text}>访问你的B站账号的主页并登录：</Text>
-          <Pressable
+          <Text
             onPress={() => {
               Linking.openURL('https://space.bilibili.com/')
-            }}>
-            <Text style={styles.linkText} selectable>
-              https://space.bilibili.com/
-            </Text>
-          </Pressable>
+            }}
+            style={styles.linkText}
+            selectable>
+            https://space.bilibili.com/
+          </Text>
           <Text style={styles.text}>然后输入你的B站ID(uid)</Text>
           <Text
             style={{
@@ -124,6 +127,7 @@ export default function Login() {
               titleStyle={styles.buttonTextStyle}
               buttonStyle={styles.buttonStyle}
               containerStyle={styles.buttonContainerStyle}
+              loading={isLoading}
             />
           </View>
         </Card>

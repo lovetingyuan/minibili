@@ -15,6 +15,7 @@ export enum Category {
   LOCATION = 'data.location',
   COMMON_ACTION = 'action.common',
   UNKNOWN_ITEM = 'data.unknownitem',
+  UNKNOWN_RICH_TEXT = 'data.unknown_rich_text',
 }
 
 export enum Action {
@@ -118,6 +119,20 @@ export function reportUnknownDynamicItem(item: any) {
     tags: {
       type: ReportType.USER_DATA,
       'type.category': Category.UNKNOWN_ITEM,
+    },
+    extra: {
+      dynamicItem: JSON.stringify(item, null, 2),
+    },
+  })
+}
+
+export function reportUnknownRichTextItem(item: any) {
+  const type = item.type
+  SentryExpo.Native.captureMessage('unknown rich text item:' + type, {
+    level: 'warning',
+    tags: {
+      type: ReportType.USER_DATA,
+      'type.category': Category.UNKNOWN_RICH_TEXT,
     },
     extra: {
       dynamicItem: JSON.stringify(item, null, 2),

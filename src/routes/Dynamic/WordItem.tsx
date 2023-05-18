@@ -1,24 +1,24 @@
 import React from 'react'
 import { Text, View, Image } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
-import RichText from '../../components/RichText'
+// import RichText from '../../components/RichText'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+import RichTexts from '../../components/RichTexts'
 
 export default function WordItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD>,
 ) {
   return (
     <>
-      <RichText
+      <RichTexts nodes={props.richTexts} topic={props.topic} />
+      {/* <RichText
         imageSize={16}
         text={props.text}
         textProps={{ style: { fontSize: 16, lineHeight: 24 } }}
-      />
+      /> */}
       {props.payload.text || props.payload.image ? (
         <View style={{ marginTop: 10 }}>
-          {props.payload.text ? (
-            <Text style={{}}>{props.payload.text}</Text>
-          ) : null}
+          {props.payload.text ? <Text>{props.payload.text}</Text> : null}
           {props.payload.image ? (
             <Image
               source={{ uri: props.payload.image }}

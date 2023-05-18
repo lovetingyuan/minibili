@@ -2,6 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { ReplyItem } from '../api/dynamic-comments'
 import RichText from './RichText'
+// import RichTexts from './RichTexts'
 
 interface Props {
   upName: string
@@ -32,6 +33,7 @@ export default function Comment(props: Props) {
           【{comment.name}】
           {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}:{' '}
         </Text>
+        {/* <RichTexts nodes={commr}></RichTexts> */}
         <RichText text={comment.message} imageSize={18} />
         {comment.like ? (
           <Text style={styles.likeNum}> {comment.like}</Text>

@@ -33,15 +33,14 @@ export function HeaderLeft(props: {
   }
   return (
     <View style={[styles.left, props.style]}>
-      <Pressable onPress={gotoWebPage}>
-        <Avatar
-          size={36}
-          rounded
-          source={{
-            uri: dynamicUser?.face + '@240w_240h_1c.webp',
-          }}
-        />
-      </Pressable>
+      <Avatar
+        size={36}
+        rounded
+        onPress={gotoWebPage}
+        source={{
+          uri: dynamicUser?.face + '@240w_240h_1c.webp',
+        }}
+      />
       <Pressable
         style={styles.titleContainer}
         key={fans?.follower || '-'}

@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  Linking,
-  Pressable,
-  Alert,
-  ToastAndroid,
-  Share,
-  ScrollView,
-} from 'react-native'
+import { Linking, Alert, ToastAndroid, Share, ScrollView } from 'react-native'
 import { Text } from 'react-native'
 import { StyleSheet } from 'react-native'
 
@@ -51,7 +44,7 @@ export default function About() {
           store.$ignoredVersions = []
           clearUser()
           setTimeout(() => {
-            navigation.goBack()
+            navigation.navigate('Login')
           }, 100)
         },
       },
@@ -62,7 +55,7 @@ export default function About() {
       return
     }
     setCheckingUpdate(true)
-    ToastAndroid.show('请稍后...', ToastAndroid.SHORT)
+    ToastAndroid.show('请稍候...', ToastAndroid.SHORT)
     checkUpdateApi().then(
       data => {
         setHasUpdate(data.hasUpdate)
@@ -104,12 +97,13 @@ export default function About() {
     <ScrollView style={styles.container}>
       <Card>
         <Card.FeaturedTitle>
-          <Pressable
+          <Text
             onPress={() => {
               Linking.openURL(site)
-            }}>
-            <Text style={styles.appName}>MiniBili </Text>
-          </Pressable>
+            }}
+            style={styles.appName}>
+            MiniBili{' '}
+          </Text>
         </Card.FeaturedTitle>
         <Card.FeaturedSubtitle style={{ borderWidth: 0 }}>
           <ListItem

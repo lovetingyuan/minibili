@@ -1,7 +1,20 @@
 import React from 'react'
-import { StyleSheet, View, ToastAndroid, Linking, Image } from 'react-native'
+import {
+  StyleSheet,
+  View,
+  ToastAndroid,
+  Linking,
+  Image,
+  // ScrollView,
+} from 'react-native'
 import { WebView } from 'react-native-webview'
 import { INJECTED_JAVASCRIPT } from './inject-code'
+
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { RootStackParamList } from '../../types'
+import store, { useStore } from '../../store'
+
+import { Icon } from '@rneui/themed'
 
 const Loading = () => {
   return (
@@ -17,12 +30,6 @@ const Loading = () => {
     </View>
   )
 }
-
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../types'
-import store, { useStore } from '../../store'
-
-import { Icon } from '@rneui/themed'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
@@ -80,6 +87,7 @@ export default ({ route, navigation }: Props) => {
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback
       startInLoadingState
+      pullToRefreshEnabled
       applicationNameForUserAgent={'BILIBILI/8.0.0'}
       // allowsBackForwardNavigationGestures
       mediaPlaybackRequiresUserAction={false}

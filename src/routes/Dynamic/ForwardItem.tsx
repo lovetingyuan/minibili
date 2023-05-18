@@ -14,6 +14,7 @@ import {
   HandledForwardTypeEnum,
 } from '../../api/dynamic-items.type'
 import { Avatar } from '@rneui/themed'
+import RichTexts from '../../components/RichTexts'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
@@ -137,7 +138,8 @@ export default function ForwardItem(
   }
   return (
     <View style={[styles.textContainer]}>
-      <RichText
+      <RichTexts nodes={props.richTexts} />
+      {/* <RichText
         imageSize={16}
         text={props.text}
         textProps={{
@@ -147,7 +149,7 @@ export default function ForwardItem(
             lineHeight: 24,
           },
         }}
-      />
+      /> */}
       <View style={styles.forwardContainer}>
         <View
           style={{

@@ -9,16 +9,17 @@ import {
   useWindowDimensions,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
-import RichText from '../../components/RichText'
+// import RichText from '../../components/RichText'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import store from '../../store'
 import { useRoute } from '@react-navigation/native'
+import RichTexts from '../../components/RichTexts'
 
 export default function RichTextItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW>,
 ) {
   const {
-    text,
+    // text,
     payload: { images },
   } = props
   const route = useRoute()
@@ -57,7 +58,7 @@ export default function RichTextItem(
       })}
     </ScrollView>
   )
-  const imageListWidth = images.length > 2 ? width / 3 - 20 : width / 2 - 20
+  const imageListWidth = images.length > 2 ? width / 3 - 10 : width / 2 - 15
   const imageList = (
     <View style={styles.imageListContainer}>
       {images.map((img, i) => {
@@ -90,11 +91,12 @@ export default function RichTextItem(
   )
   return (
     <View style={[styles.textContainer]}>
-      <RichText
+      <RichTexts nodes={props.richTexts} />
+      {/* <RichText
         text={text}
         imageSize={16}
         textProps={{ style: { fontSize: 16, lineHeight: 25 } }}
-      />
+      /> */}
       {images.length ? (isDetail ? imageList : scrollImages) : null}
       {props.payload.text ? (
         <Text style={styles.postText}>{props.payload.text}</Text>
@@ -137,7 +139,7 @@ const styles = StyleSheet.create({
   imageListContainer: {
     flexWrap: 'wrap',
     flexDirection: 'row',
-    gap: 10,
+    gap: 5,
     // justifyContent: 'center',
     marginVertical: 20,
   },

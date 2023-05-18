@@ -3,10 +3,12 @@ import {
   AdditionalTypeEnum,
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
+  HandledRichTextType,
   MajorTypeEnum,
   OtherAdditionalTypeEnum,
   OtherDynamicTypeEnum,
   OtherForwardTypeEnum,
+  OtherRichTextType,
 } from './dynamic-items.type'
 
 const AuthorSchema = z.object({
@@ -180,10 +182,46 @@ const DynamicModulesBaseSchema = z.object({
   }),
 })
 
+const RichTextSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT]),
+    // orig_text: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_WEB]),
+    jump_url: z.string(),
+    // orig_text: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_EMOJI]),
+    // orig_text: z.string(),
+    text: z.string(),
+    emoji: z.object({
+      icon_url: z.string(),
+      text: z.string(),
+    }),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_AT]),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.nativeEnum(OtherRichTextType),
+    text: z.string(),
+  }),
+])
+
 const ModuleDynamicBaseSchema = z.object({
-  desc: z.object({ text: z.string() }).nullable(),
-  topic: z.object({ name: z.string(), jump_url: z.string() }).nullish(),
+  desc: z
+    .object({ text: z.string(), rich_text_nodes: RichTextSchema.array() })
+    .nullable(),
+  topic: z.object({ name: z.string(), jump_url: z.string() }).nullable(),
 })
+
+export type RichTextNode = z.infer<typeof RichTextSchema>
 
 const DynamicItemBaseSchema = z.object({
   id_str: z.string(),
