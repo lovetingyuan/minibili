@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import RichText from '../../components/RichText'
+// import RichText from '../../components/RichText'
 import { NavigationProps } from '../../types'
 // import { SimpleVideoInfo } from '../../components/PlayInfo'
 import { DynamicItemType } from '../../api/dynamic-items'
@@ -16,6 +16,7 @@ import store from '../../store'
 import { Icon } from '@rneui/themed'
 import { parseNumber } from '../../utils'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+import RichTexts from '../../components/RichTexts'
 
 export default function VideoItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>,
@@ -25,7 +26,7 @@ export default function VideoItem(
     name,
     payload: { cover, title, bvid, play, duration, desc },
     date,
-    text,
+    // text,
     face,
     commentId,
     likeCount,
@@ -53,14 +54,8 @@ export default function VideoItem(
           from: 'dynamic',
         })
       }}>
-      {text ? (
-        <View style={{ marginBottom: 12 }}>
-          <RichText
-            text={text}
-            imageSize={16}
-            textProps={{ style: { fontSize: 16, lineHeight: 26 } }}
-          />
-        </View>
+      {props.richTexts ? (
+        <RichTexts nodes={props.richTexts} style={{ marginBottom: 12 }} />
       ) : null}
       <View style={styles.videoContainer}>
         <View style={styles.imageContainer}>

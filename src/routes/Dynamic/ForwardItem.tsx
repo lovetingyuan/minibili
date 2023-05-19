@@ -25,7 +25,7 @@ export default function ForwardItem(
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
         {props.payload.text ? (
-          <Text style={{ marginBottom: 10, fontSize: 16 }}>
+          <Text style={{ marginBottom: 10, fontSize: 14 }}>
             {props.payload.text}
           </Text>
         ) : null}
@@ -101,7 +101,7 @@ export default function ForwardItem(
           }}
         />
         <View style={{ gap: 8 }}>
-          <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+          <Text style={{ fontSize: 15, fontWeight: 'bold' }}>
             {props.payload.title}
           </Text>
           <Text style={{ fontSize: 14, fontWeight: 'normal' }}>
@@ -161,7 +161,7 @@ export default function ForwardItem(
             <Avatar source={{ uri: props.payload.face }} size={24} rounded />
           )}
           {props.payload.name && (
-            <Text style={{ fontWeight: 'bold', fontSize: 16, marginLeft: 8 }}>
+            <Text style={{ fontWeight: 'bold', fontSize: 15, marginLeft: 8 }}>
               {props.payload.name}
             </Text>
           )}

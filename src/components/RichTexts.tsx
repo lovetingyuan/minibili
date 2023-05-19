@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, Image, Linking, StyleSheet } from 'react-native'
+import { View, Text, Image, Linking, StyleSheet, ViewStyle } from 'react-native'
 import { RichTextNode } from '../api/dynamic-items.schema'
 import { HandledRichTextType } from '../api/dynamic-items.type'
 import { reportUnknownRichTextItem } from '../utils/report'
@@ -13,6 +13,7 @@ export default function RichTexts(props: {
     name: string
     jump_url: string
   } | null
+  style?: ViewStyle
 }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const reactNodes: React.ReactNode[] = []
@@ -72,7 +73,7 @@ export default function RichTexts(props: {
     }
   }
   return (
-    <View>
+    <View style={props.style}>
       {props.topic ? (
         <View style={styles.topicContainer}>
           <Icon name="tag" color="#178bcf" size={18} />
