@@ -192,9 +192,11 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     const type = HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const
     const getForwardUp = () => {
       const author = item.orig.modules.module_author
+      const richTexts = item.orig.modules.module_dynamic.desc?.rich_text_nodes
       return {
         name: author.name,
         face: author.face,
+        richTexts,
       }
     }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
@@ -208,6 +210,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
           text: forward.desc?.text,
           cover: forward.major?.archive.cover,
           title: forward.major?.archive.title,
+          play: forward.major.archive.stat.play,
         },
       }
     }

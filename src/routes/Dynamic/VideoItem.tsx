@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   tvIcon: {
-    width: 40,
-    height: 30,
+    width: 50,
+    height: 40,
     position: 'absolute',
     alignSelf: 'center',
   },
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   videoLength: {
     position: 'absolute',
     paddingHorizontal: 4,
-    backgroundColor: 'rgba(0,0,0,.5)',
+    backgroundColor: 'rgba(0,0,0,.7)',
     top: 0,
     right: 0,
     borderRadius: 2,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   videoDate: {
     position: 'absolute',
     paddingHorizontal: 4,
-    backgroundColor: 'rgba(0,0,0,.5)',
+    backgroundColor: 'rgba(0,0,0,.7)',
     top: 0,
     borderRadius: 2,
     margin: 5,

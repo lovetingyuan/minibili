@@ -91,12 +91,10 @@ export default function RichTextItem(
   )
   return (
     <View style={[styles.textContainer]}>
-      <RichTexts nodes={props.richTexts} />
-      {/* <RichText
-        text={text}
-        imageSize={16}
-        textProps={{ style: { fontSize: 16, lineHeight: 25 } }}
-      /> */}
+      <RichTexts
+        nodes={props.richTexts}
+        textProps={isDetail ? {} : { numberOfLines: 4 }}
+      />
       {images.length ? (isDetail ? imageList : scrollImages) : null}
       {props.payload.text ? (
         <Text style={styles.postText}>{props.payload.text}</Text>
@@ -112,7 +110,7 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 110,
-    marginRight: 20,
+    marginRight: 10,
     marginVertical: 10,
     borderRadius: 4,
   },
@@ -134,7 +132,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0.5,
     paddingLeft: 8,
     borderLeftColor: '#aaa',
-    lineHeight: 25,
+    lineHeight: 20,
   },
   imageListContainer: {
     flexWrap: 'wrap',

@@ -404,11 +404,13 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_WORD]),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                additional: AdditionalReserveSchema.nullable(),
-                desc: z.object({ text: z.string() }).nullable(),
-                major: z.null(),
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  additional: AdditionalReserveSchema.nullable(),
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: z.null(),
+                }),
+              ),
             }),
           }),
         ),
@@ -417,10 +419,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_AV]),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                desc: z.object({ text: z.string() }).nullable(),
-                major: MajorSchema.AV,
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.AV,
+                }),
+              ),
             }),
           }),
         ),
@@ -429,10 +433,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW]),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                desc: z.object({ text: z.string() }).nullable(),
-                major: MajorSchema.Draw,
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.Draw,
+                }),
+              ),
             }),
           }),
         ),
@@ -441,10 +447,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE]),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                desc: z.object({ text: z.string() }).nullable(),
-                major: MajorSchema.Article,
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.Article,
+                }),
+              ),
             }),
           }),
         ),
@@ -453,10 +461,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE]),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                desc: z.object({ text: z.string() }).nullable(),
-                major: MajorSchema.Live,
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.Live,
+                }),
+              ),
             }),
           }),
         ),
@@ -465,10 +475,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_NONE]),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                desc: z.object({ text: z.string() }).nullable(),
-                major: MajorSchema.None,
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.None,
+                }),
+              ),
             }),
           }),
         ),
@@ -477,10 +489,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC]),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                desc: z.object({ text: z.string() }).nullable(),
-                major: MajorSchema.Music,
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.Music,
+                }),
+              ),
             }),
           }),
         ),
@@ -489,10 +503,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_PGC]),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                desc: z.object({ text: z.string() }).nullable(),
-                major: MajorSchema.PGC,
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.PGC,
+                }),
+              ),
             }),
           }),
         ),
@@ -501,10 +517,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
             type: z.nativeEnum(OtherForwardTypeEnum),
             modules: z.object({
               module_author: AuthorSchema,
-              module_dynamic: z.object({
-                desc: z.object({ text: z.string() }).nullable(),
-                major: z.unknown().nullable(),
-              }),
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: z.unknown().nullable(),
+                }),
+              ),
             }),
           }),
         ),

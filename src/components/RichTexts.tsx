@@ -1,5 +1,13 @@
 import React from 'react'
-import { View, Text, Image, Linking, StyleSheet, ViewStyle } from 'react-native'
+import {
+  View,
+  Text,
+  Image,
+  Linking,
+  StyleSheet,
+  ViewStyle,
+  TextProps,
+} from 'react-native'
 import { RichTextNode } from '../api/dynamic-items.schema'
 import { HandledRichTextType } from '../api/dynamic-items.type'
 import { reportUnknownRichTextItem } from '../utils/report'
@@ -14,6 +22,8 @@ export default function RichTexts(props: {
     jump_url: string
   } | null
   style?: ViewStyle
+  textProps?: TextProps
+  fontSize?: number
 }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const reactNodes: React.ReactNode[] = []
@@ -21,10 +31,11 @@ export default function RichTexts(props: {
     return null
   }
   let key = 0
+  const fontSize = props.fontSize || 16
   for (const node of props.nodes) {
     if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT) {
       reactNodes.push(
-        <Text style={styles.text} key={key++}>
+        <Text style={[styles.text, { fontSize }]} key={key++}>
           {node.text}
         </Text>,
       )
@@ -35,8 +46,8 @@ export default function RichTexts(props: {
             Linking.openURL(node.jump_url)
           }}
           key={key++}
-          style={styles.link}>
-          {' '}
+          style={[styles.link, { fontSize }]}>
+          {' 🔗'}
           {node.text}{' '}
         </Text>,
       )
@@ -50,7 +61,7 @@ export default function RichTexts(props: {
               url: `https://m.bilibili.com/space/${node.rid}`,
             })
           }}
-          style={styles.link}>
+          style={[styles.link, { fontSize }]}>
           {' '}
           {node.text}
         </Text>,
@@ -60,7 +71,7 @@ export default function RichTexts(props: {
         <Image
           key={key++}
           source={{ uri: node.emoji.icon_url }}
-          style={styles.emoji}
+          style={[styles.emoji]}
         />,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC) {
@@ -70,14 +81,14 @@ export default function RichTexts(props: {
             Linking.openURL(node.jump_url)
           }}
           key={key++}
-          style={styles.link}>
+          style={[styles.link, { fontSize }]}>
           {node.text}
         </Text>,
       )
     } else {
       reportUnknownRichTextItem(node)
       reactNodes.push(
-        <Text style={styles.text} key={key++}>
+        <Text style={[styles.text, { fontSize }]} key={key++}>
           {node.text}
         </Text>,
       )
@@ -92,12 +103,14 @@ export default function RichTexts(props: {
             onPress={() => {
               props.topic?.jump_url && Linking.openURL(props.topic?.jump_url)
             }}
-            style={[styles.link]}>
+            style={[styles.link, { fontSize }]}>
             {props.topic.name}
           </Text>
         </View>
       ) : null}
-      <Text style={styles.textContainer}>{reactNodes}</Text>
+      <Text style={styles.textContainer} {...props.textProps}>
+        {reactNodes}
+      </Text>
     </View>
   )
 }

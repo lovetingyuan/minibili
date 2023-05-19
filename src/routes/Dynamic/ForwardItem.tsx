@@ -7,7 +7,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native'
-import RichText from '../../components/RichText'
+// import RichText from '../../components/RichText'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -25,30 +25,33 @@ export default function ForwardItem(
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
         {props.payload.text ? (
-          <Text style={{ marginBottom: 10, fontSize: 14 }}>
-            {props.payload.text}
-          </Text>
+          <RichTexts
+            nodes={props.payload.richTexts}
+            style={{ marginBottom: 10 }}
+          />
         ) : null}
         <View style={{ flexDirection: 'row' }}>
           <Image
             style={styles.forwardContentImage}
             source={{ uri: props.payload.cover + '@240w_240h_1c.webp' }}
           />
-          <Text numberOfLines={3} style={{ flex: 6 }}>
-            {props.payload.title}
-          </Text>
+          <View style={{ flex: 6 }}>
+            <Text numberOfLines={2} style={{ lineHeight: 20 }}>
+              <Text style={{ fontWeight: 'bold' }}>视频：</Text>
+              {props.payload.title}
+            </Text>
+            <Text style={{ marginTop: 10 }}>{props.payload.play}播放</Text>
+          </View>
         </View>
       </View>
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW) {
     forwardContent = (
       <View style={{ flexDirection: 'column' }}>
-        <View style={{ maxHeight: 50 }}>
-          <RichText
-            text={props.payload.text}
-            textProps={{ numberOfLines: 3 }}
-          />
-        </View>
+        <RichTexts
+          nodes={props.payload.richTexts}
+          textProps={{ numberOfLines: 3 }}
+        />
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator
@@ -78,7 +81,7 @@ export default function ForwardItem(
       </View>
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
-    forwardContent = <Text numberOfLines={3}>{props.payload.text}</Text>
+    forwardContent = <RichTexts nodes={props.payload.richTexts} />
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE) {
     forwardContent = (
       <View>
@@ -139,26 +142,15 @@ export default function ForwardItem(
   return (
     <View style={[styles.textContainer]}>
       <RichTexts nodes={props.richTexts} />
-      {/* <RichText
-        imageSize={16}
-        text={props.text}
-        textProps={{
-          style: {
-            fontSize: 16,
-            color: props.top ? '#00699D' : 'black',
-            lineHeight: 24,
-          },
-        }}
-      /> */}
       <View style={styles.forwardContainer}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginBottom: 10,
+            marginBottom: 6,
           }}>
           {props.payload.face && (
-            <Avatar source={{ uri: props.payload.face }} size={24} rounded />
+            <Avatar source={{ uri: props.payload.face }} size={22} rounded />
           )}
           {props.payload.name && (
             <Text style={{ fontWeight: 'bold', fontSize: 15, marginLeft: 8 }}>

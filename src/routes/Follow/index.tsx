@@ -154,7 +154,7 @@ export default function Follow({ navigation, route }: Props) {
             paddingHorizontal: 10,
           }}
           contentContainerStyle={{
-            paddingTop: 20,
+            paddingTop: 30,
           }}
           ListEmptyComponent={
             <Text style={styles.listEmptyText}>

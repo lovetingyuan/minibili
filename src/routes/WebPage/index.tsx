@@ -5,7 +5,9 @@ import {
   ToastAndroid,
   Linking,
   Image,
-  // ScrollView,
+  ScrollView,
+  Dimensions,
+  RefreshControl,
 } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { INJECTED_JAVASCRIPT } from './inject-code'
@@ -38,6 +40,18 @@ export default ({ route, navigation }: Props) => {
   const { url, title } = route.params
   const webviewRef = React.useRef<WebView | null>(null)
   const { $webViewMode } = useStore()
+  const [height, setHeight] = React.useState(Dimensions.get('screen').height)
+  const [isEnabled, setEnabled] = React.useState(true)
+  const [isRefreshing, setRefreshing] = React.useState(false)
+  const onRefresh = () => {
+    if (webviewRef.current) {
+      setRefreshing(true)
+      webviewRef.current.reload()
+      setTimeout(() => {
+        setRefreshing(false)
+      }, 1000)
+    }
+  }
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => {
@@ -78,54 +92,72 @@ export default ({ route, navigation }: Props) => {
     })
   }, [navigation, $webViewMode, url])
   return (
-    <WebView
-      style={styles.container}
-      source={{ uri: url }}
-      key={$webViewMode}
-      originWhitelist={['http://*', 'https://*', 'bilibili://*']}
-      allowsFullscreenVideo
-      injectedJavaScriptForMainFrameOnly
-      allowsInlineMediaPlayback
-      startInLoadingState
-      pullToRefreshEnabled
-      applicationNameForUserAgent={'BILIBILI/8.0.0'}
-      // allowsBackForwardNavigationGestures
-      mediaPlaybackRequiresUserAction={false}
-      injectedJavaScript={INJECTED_JAVASCRIPT}
-      renderLoading={Loading}
-      userAgent={$webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
-      ref={webviewRef}
-      onMessage={evt => {
-        const data = JSON.parse(evt.nativeEvent.data)
-        if (data.action === 'set-title' && !title) {
-          navigation.setOptions({
-            headerTitle: data.payload,
-          })
+    <ScrollView
+      onLayout={e => setHeight(e.nativeEvent.layout.height)}
+      refreshControl={
+        <RefreshControl
+          onRefresh={onRefresh}
+          refreshing={isRefreshing}
+          enabled={isEnabled}
+        />
+      }
+      style={styles.container}>
+      <WebView
+        style={[styles.container, { height }]}
+        source={{ uri: url }}
+        key={$webViewMode}
+        onScroll={e =>
+          setEnabled(
+            typeof onRefresh === 'function' &&
+              e.nativeEvent.contentOffset.y === 0,
+          )
         }
-      }}
-      onError={() => {
-        ToastAndroid.show('加载失败', ToastAndroid.SHORT)
-        // webviewRef && webviewRef.current?.reload()
-      }}
-      onShouldStartLoadWithRequest={request => {
-        if (request.url.startsWith('bilibili://')) {
-          Linking.openURL(request.url).catch(err => {
-            __DEV__ && console.error(err)
-          })
-          return false
-        }
-        if (request.url.includes('.apk')) {
-          return false
-        }
-        return true
-      }}
-    />
+        originWhitelist={['http://*', 'https://*', 'bilibili://*']}
+        allowsFullscreenVideo
+        injectedJavaScriptForMainFrameOnly
+        allowsInlineMediaPlayback
+        startInLoadingState
+        pullToRefreshEnabled
+        applicationNameForUserAgent={'BILIBILI/8.0.0'}
+        // allowsBackForwardNavigationGestures
+        mediaPlaybackRequiresUserAction={false}
+        injectedJavaScript={INJECTED_JAVASCRIPT}
+        renderLoading={Loading}
+        userAgent={$webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
+        ref={webviewRef}
+        onMessage={evt => {
+          const data = JSON.parse(evt.nativeEvent.data)
+          if (data.action === 'set-title' && !title) {
+            navigation.setOptions({
+              headerTitle: data.payload,
+            })
+          }
+        }}
+        onError={() => {
+          ToastAndroid.show('加载失败', ToastAndroid.SHORT)
+          // webviewRef && webviewRef.current?.reload()
+        }}
+        onShouldStartLoadWithRequest={request => {
+          if (request.url.startsWith('bilibili://')) {
+            Linking.openURL(request.url).catch(err => {
+              __DEV__ && console.error(err)
+            })
+            return false
+          }
+          if (request.url.includes('.apk')) {
+            return false
+          }
+          return true
+        }}
+      />
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
   },
   loadingView: {
     position: 'absolute',

@@ -2,6 +2,8 @@ require('dotenv').config()
 const pkg = require('./package.json')
 const [version, versionCode] = pkg.version.split('-')
 
+const dev = process.argv.includes('start')
+
 module.exports = {
   name: 'MiniBili',
   slug: 'minibili',
@@ -70,7 +72,12 @@ module.exports = {
     url: 'https://u.expo.dev/17ac07b9-df37-4b3a-9a31-50da2bb5d44c',
   },
   runtimeVersion: {
-    policy: 'sdkVersion',
+    policy: 'appVersion',
   },
   owner: 'tingyuan',
+}
+
+if (dev) {
+  delete module.exports.updates
+  delete module.exports.runtimeVersion
 }
