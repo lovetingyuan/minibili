@@ -1,8 +1,14 @@
 require('dotenv').config()
 const pkg = require('./package.json')
 const [version, versionCode] = pkg.version.split('-')
+const cp = require('child_process')
 
 const dev = process.argv.includes('start')
+const gitHash = cp
+  .execSync('git rev-parse HEAD')
+  .toString('utf-8')
+  .trim()
+  .slice(0, 8)
 
 module.exports = {
   name: 'MiniBili',
@@ -55,6 +61,7 @@ module.exports = {
       hour12: false,
       timeZone: 'Asia/Shanghai',
     }).format(new Date()),
+    gitHash,
   },
   hooks: {
     postPublish: [

@@ -197,6 +197,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         name: author.name,
         face: author.face,
         richTexts,
+        id: item.orig.id_str,
       }
     }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {

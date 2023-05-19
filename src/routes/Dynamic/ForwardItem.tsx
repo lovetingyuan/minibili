@@ -6,6 +6,7 @@ import {
   Text,
   View,
   useWindowDimensions,
+  Pressable,
 } from 'react-native'
 // import RichText from '../../components/RichText'
 import { DynamicItemType } from '../../api/dynamic-items'
@@ -15,11 +16,15 @@ import {
 } from '../../api/dynamic-items.type'
 import { Avatar } from '@rneui/themed'
 import RichTexts from '../../components/RichTexts'
+import { NavigationProps } from '../../types'
+import { useNavigation } from '@react-navigation/native'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
   const { width } = useWindowDimensions()
+  const navigation = useNavigation<NavigationProps['navigation']>()
+
   let forwardContent = <Text>暂不支持显示</Text>
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
     forwardContent = (
@@ -147,7 +152,7 @@ export default function ForwardItem(
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginBottom: 6,
+            marginBottom: 8,
           }}>
           {props.payload.face && (
             <Avatar source={{ uri: props.payload.face }} size={22} rounded />
@@ -158,7 +163,16 @@ export default function ForwardItem(
             </Text>
           )}
         </View>
-        <View style={styles.forwardContent}>{forwardContent}</View>
+        <Pressable
+          style={styles.forwardContent}
+          onPress={() => {
+            navigation.navigate('WebPage', {
+              title: props.payload.name + '的动态',
+              url: `https://m.bilibili.com/dynamic/${props.payload.id}`,
+            })
+          }}>
+          {forwardContent}
+        </Pressable>
       </View>
     </View>
   )

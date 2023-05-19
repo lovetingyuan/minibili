@@ -2,6 +2,7 @@ import React from 'react'
 import { Linking, Alert, ToastAndroid, Share, ScrollView } from 'react-native'
 import { Text } from 'react-native'
 import { StyleSheet } from 'react-native'
+import * as Clipboard from 'expo-clipboard'
 
 import store, { useStore } from '../../store'
 import { Card, Chip, ListItem, Button, Icon } from '@rneui/themed'
@@ -14,6 +15,7 @@ import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import { Action, clearUser, reportUserAction } from '../../utils/report'
 import Constants from 'expo-constants'
+import * as Updates from 'expo-updates'
 
 export default function About() {
   const { $userInfo, $blackTags, $blackUps } = useStore()
@@ -129,9 +131,27 @@ export default function About() {
         </Card.FeaturedSubtitle>
         <Card.Divider />
 
-        <ListItem containerStyle={{ padding: 0 }}>
+        <ListItem containerStyle={{ padding: 0, marginBottom: 5 }}>
           <ListItem.Content>
-            <ListItem.Title right>当前版本：{currentVersion}</ListItem.Title>
+            <ListItem.Title
+              right
+              onPress={() => {
+                Alert.alert(
+                  '版本信息',
+                  [
+                    `当前版本：${currentVersion} (${
+                      Constants.expoConfig?.extra?.gitHash || '-'
+                    })`,
+                    `更新时间：${Updates.createdAt?.toLocaleDateString()} ${Updates.createdAt?.toLocaleTimeString()}`,
+                    `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
+                    Updates.updateId && `更新ID: ${Updates.updateId}`,
+                  ]
+                    .filter(Boolean)
+                    .join('\n'),
+                )
+              }}>
+              当前版本：{currentVersion}
+            </ListItem.Title>
           </ListItem.Content>
           <Button
             type="clear"
@@ -143,15 +163,24 @@ export default function About() {
             {hasUpdate === false ? '暂无更新' : '检查更新'}
           </Button>
         </ListItem>
-        <ListItem containerStyle={{ padding: 0 }}>
+        <ListItem containerStyle={{ padding: 0, marginBottom: 5 }}>
           <ListItem.Content>
-            <ListItem.Title right>当前用户ID：{$userInfo?.mid}</ListItem.Title>
+            <ListItem.Title
+              right
+              onPress={() => {
+                $userInfo?.mid &&
+                  Clipboard.setStringAsync($userInfo.mid + '').then(() => {
+                    ToastAndroid.show('已复制uid', ToastAndroid.SHORT)
+                  })
+              }}>
+              当前用户ID：{$userInfo?.mid}
+            </ListItem.Title>
           </ListItem.Content>
           <Button type="clear" size="sm" onPress={handleLogOut}>
             退出
           </Button>
         </ListItem>
-        <ListItem containerStyle={{ padding: 0 }}>
+        <ListItem containerStyle={{ padding: 0, marginBottom: 5 }}>
           <ListItem.Content>
             <ListItem.Title right>欢迎分享本应用 ❤</ListItem.Title>
           </ListItem.Content>
@@ -239,9 +268,6 @@ export default function About() {
             {Object.values($blackUps).length === 0 ? <Text>无</Text> : null}
           </ListItem>
         </ListItem.Accordion>
-        <Text style={styles.buildTime}>
-          {Constants.expoConfig?.extra?.buildTime}
-        </Text>
       </Card>
     </ScrollView>
   )
