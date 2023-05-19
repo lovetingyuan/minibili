@@ -63,6 +63,17 @@ export default function RichTexts(props: {
           style={styles.emoji}
         />,
       )
+    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC) {
+      reactNodes.push(
+        <Text
+          onPress={() => {
+            Linking.openURL(node.jump_url)
+          }}
+          key={key++}
+          style={styles.link}>
+          {node.text}
+        </Text>,
+      )
     } else {
       reportUnknownRichTextItem(node)
       reactNodes.push(

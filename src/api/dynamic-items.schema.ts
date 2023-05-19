@@ -209,6 +209,11 @@ const RichTextSchema = z.discriminatedUnion('type', [
     text: z.string(),
   }),
   z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC]),
+    jump_url: z.string(),
+    text: z.string(),
+  }),
+  z.object({
     type: z.nativeEnum(OtherRichTextType),
     text: z.string(),
   }),
