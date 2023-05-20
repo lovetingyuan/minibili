@@ -1,6 +1,6 @@
 import fetcher from './fetcher-test'
 import { describe, test } from 'vitest'
-import { ReplyResponseSchema } from './dynamic-comments.schema'
+import { ReplyResponseSchema } from './comments.schema'
 
 describe('reply-list', () => {
   test('video-comment', async () => {

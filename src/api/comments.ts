@@ -1,9 +1,82 @@
 import React from 'react'
 import useSWR from 'swr'
 import { z } from 'zod'
-import { ReplyResponseSchema } from './dynamic-comments.schema'
+import { ReplayItem, ReplyResponseSchema } from './comments.schema'
 
 export type ReplyResponse = z.infer<typeof ReplyResponseSchema>
+const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/
+
+const parseMessage = (content: ReplayItem['content']) => {
+  const keys: string[] = []
+  if (content.at_name_to_mid) {
+    Object.keys(content.at_name_to_mid).forEach(name => {
+      keys.push('@' + name)
+    })
+  }
+  if (content.emote) {
+    Object.keys(content.emote).forEach(emoji => {
+      keys.push(emoji.replace('[', '\\[').replace(']', '\\]'))
+    })
+  }
+  if (content.jump_url) {
+    Object.keys(content.jump_url).forEach(bvid => {
+      if (bvid.startsWith('BV')) {
+        keys.push(bvid)
+      }
+    })
+  }
+  if (keys.length) {
+    const reg = new RegExp(`(${keys.join('|')})`)
+    return content.message
+      .split(reg)
+      .map((part, i) => {
+        if (i % 2) {
+          if (part[0] === '@') {
+            return {
+              type: 'at' as const,
+              text: part,
+              mid: content.at_name_to_mid![part.substring(1)],
+            }
+          }
+          if (part.startsWith('[') && part.endsWith(']')) {
+            return {
+              type: 'emoji' as const,
+              url: content.emote![part].url,
+            }
+          }
+          return {
+            type: 'av' as const,
+            text: content.jump_url![part].title,
+            url: 'https://b23.tv/' + part,
+          }
+        }
+        return part.split(urlReg).map((part2, j) => {
+          return j % 2
+            ? {
+                type: 'url' as const,
+                url: part2,
+              }
+            : {
+                type: 'text' as const,
+                text: part2,
+              }
+        })
+      })
+      .flat()
+  }
+  return content.message.split(urlReg).map((part2, j) => {
+    return j % 2
+      ? {
+          type: 'url' as const,
+          url: part2,
+        }
+      : {
+          type: 'text' as const,
+          text: part2,
+        }
+  })
+}
+export type MessageContent = ReturnType<typeof parseMessage>
 
 const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
   const replies = res1.replies
@@ -11,7 +84,7 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
     .filter(v => !v.invisible)
     .map(item => {
       return {
-        message: item.content.message,
+        message: parseMessage(item.content),
         name: item.member.uname,
         id: item.rpid_str,
         mid: item.member.mid,
@@ -22,7 +95,7 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
         replies:
           item.replies?.map(v => {
             return {
-              message: v.content.message,
+              message: parseMessage(v.content),
               name: v.member.uname,
               id: v.rpid_str,
               mid: v.mid,
@@ -35,7 +108,7 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
   if (res1.top.upper) {
     const item = res1.top.upper
     replies.unshift({
-      message: item.content.message,
+      message: parseMessage(item.content),
       name: item.member.uname,
       id: item.rpid_str,
       mid: item.member.mid,
@@ -46,7 +119,7 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
       replies:
         item.replies?.map(v => {
           return {
-            message: v.content.message,
+            message: parseMessage(v.content),
             name: v.member.uname,
             id: v.rpid_str,
             mid: v.mid,

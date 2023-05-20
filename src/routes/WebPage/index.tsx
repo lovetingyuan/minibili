@@ -14,9 +14,10 @@ import { INJECTED_JAVASCRIPT } from './inject-code'
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 
-import { Icon } from '@rneui/themed'
+import HeaderRight from './HeaderRight'
+import useMemoizedFn from '../../hooks/useMemoizedFn'
 
 const Loading = () => {
   return (
@@ -43,7 +44,7 @@ export default ({ route, navigation }: Props) => {
   const [height, setHeight] = React.useState(Dimensions.get('screen').height)
   const [isEnabled, setEnabled] = React.useState(true)
   const [isRefreshing, setRefreshing] = React.useState(false)
-  const onRefresh = () => {
+  const onRefresh = useMemoizedFn(() => {
     if (webviewRef.current) {
       setRefreshing(true)
       webviewRef.current.reload()
@@ -51,46 +52,14 @@ export default ({ route, navigation }: Props) => {
         setRefreshing(false)
       }, 1000)
     }
-  }
+  })
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => {
-        return (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <Icon
-              onPress={() => {
-                store.$webViewMode =
-                  store.$webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
-              }}
-              name={
-                store.$webViewMode === 'MOBILE' ? 'mobile-friendly' : 'computer'
-              }
-              color="#666"
-              size={18}
-            />
-            {/* <Icon
-              name="refresh"
-              size={20}
-              color="#666"
-              style={{ marginLeft: 8 }}
-              onPress={() => {
-                webviewRef.current?.reload()
-              }}
-            /> */}
-            <Icon
-              name="open-in-browser"
-              size={20}
-              color="#666"
-              style={{ marginLeft: 8 }}
-              onPress={() => {
-                Linking.openURL(url)
-              }}
-            />
-          </View>
-        )
+        return <HeaderRight title={title} url={url} reload={onRefresh} />
       },
     })
-  }, [navigation, $webViewMode, url])
+  }, [navigation, $webViewMode, url, onRefresh, title])
   return (
     <ScrollView
       onLayout={e => setHeight(e.nativeEvent.layout.height)}

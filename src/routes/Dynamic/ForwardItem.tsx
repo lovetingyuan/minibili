@@ -33,6 +33,7 @@ export default function ForwardItem(
           <RichTexts
             nodes={props.payload.richTexts}
             style={{ marginBottom: 10 }}
+            textProps={{ numberOfLines: 3 }}
           />
         ) : null}
         <View style={{ flexDirection: 'row' }}>
@@ -146,7 +147,7 @@ export default function ForwardItem(
   }
   return (
     <View style={[styles.textContainer]}>
-      <RichTexts nodes={props.richTexts} />
+      <RichTexts nodes={props.richTexts} textProps={{ numberOfLines: 3 }} />
       <View style={styles.forwardContainer}>
         <View
           style={{

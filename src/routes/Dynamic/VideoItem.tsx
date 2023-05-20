@@ -55,7 +55,11 @@ export default function VideoItem(
         })
       }}>
       {props.richTexts ? (
-        <RichTexts nodes={props.richTexts} style={{ marginBottom: 12 }} />
+        <RichTexts
+          nodes={props.richTexts}
+          style={{ marginBottom: 12 }}
+          textProps={{ numberOfLines: 3 }}
+        />
       ) : null}
       <View style={styles.videoContainer}>
         <View style={styles.imageContainer}>

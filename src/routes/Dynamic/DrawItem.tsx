@@ -93,6 +93,7 @@ export default function RichTextItem(
     <View style={[styles.textContainer]}>
       <RichTexts
         nodes={props.richTexts}
+        topic={props.topic}
         textProps={isDetail ? {} : { numberOfLines: 4 }}
       />
       {images.length ? (isDetail ? imageList : scrollImages) : null}

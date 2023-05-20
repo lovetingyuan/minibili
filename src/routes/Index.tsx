@@ -80,25 +80,7 @@ export default () => {
               fontSize: 18,
               color: '#555',
             },
-          }}
-          // screenListeners={() => ({
-          //   state: e => {
-          //     // Do something with the state
-          //     // console.log('state changed', e.data)
-          //     // SentryExpo.Native.configureScope(function (scope) {
-          //     //   // scope.setExtra('route', e.target)
-          //     //   scope.setTag('route', e.target)
-          //     //   scope.setContext('route', {
-          //     //     name: e.target,
-          //     //   })
-          //     // })
-          //     // Do something with the `navigation` object
-          //     // if (!navigation.canGoBack()) {
-          //     //   console.log("we're on the initial screen")
-          //     // }
-          //   },
-          // })}
-        >
+          }}>
           <Stack.Screen
             name="Main"
             component={MainTab}

@@ -1,28 +1,76 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { ReplyItem } from '../api/dynamic-comments'
-import RichText from './RichText'
-// import RichTexts from './RichTexts'
+import { Linking, StyleSheet, Text, View, Image } from 'react-native'
+import { MessageContent, ReplyItem } from '../api/comments'
 
 interface Props {
   upName: string
   comment: ReplyItem
 }
 
+function CommentText(props: { nodes: MessageContent }) {
+  const { nodes } = props
+  return (
+    <Text style={{ fontSize: 15 }}>
+      {nodes.map((node, i) => {
+        if (node.type === 'at') {
+          return (
+            <Text
+              key={i}
+              style={styles.link}
+              onPress={() => {
+                Linking.openURL('https://m.bilibili.com/space/' + node.mid)
+              }}>
+              {node.text}
+            </Text>
+          )
+        }
+        if (node.type === 'url') {
+          return (
+            <Text
+              key={i}
+              style={styles.link}
+              onPress={() => {
+                Linking.openURL(node.url)
+              }}>
+              {node.url}
+            </Text>
+          )
+        }
+        if (node.type === 'emoji') {
+          return (
+            <Image key={i} source={{ uri: node.url }} style={styles.emoji} />
+          )
+        }
+        if (node.type === 'av') {
+          return (
+            <Text
+              key={i}
+              style={styles.link}
+              onPress={() => {
+                Linking.openURL(node.url)
+              }}>
+              ▶{node.text}
+            </Text>
+          )
+        }
+        return <Text key={i}>{node.text}</Text>
+      })}
+    </Text>
+  )
+}
+
 export default function Comment(props: Props) {
   const { comment, upName } = props
   const upStyle = (name: string) => {
     return upName === name
-      ? {
-          color: '#FF6699',
-        }
+      ? styles.pinkName
       : {
           color: 'black',
         }
   }
 
   return (
-    <>
+    <View>
       <Text
         style={[
           styles.commentContent,
@@ -31,10 +79,16 @@ export default function Comment(props: Props) {
         ]}>
         <Text style={[styles.commentName, upStyle(comment.name)]}>
           【{comment.name}】
-          {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}:{' '}
+          {comment.sex === '男' ? (
+            '♂'
+          ) : comment.sex === '女' ? (
+            <Text style={styles.pinkName}>♀</Text>
+          ) : (
+            ''
+          )}
+          :{' '}
         </Text>
-        {/* <RichTexts nodes={commr}></RichTexts> */}
-        <RichText text={comment.message} imageSize={18} />
+        <CommentText nodes={comment.message} />
         {comment.like ? (
           <Text style={styles.likeNum}> {comment.like}</Text>
         ) : null}
@@ -47,16 +101,16 @@ export default function Comment(props: Props) {
                 <Text style={[styles.replyName, upStyle(reply.name)]}>
                   {reply.name}:{' '}
                 </Text>
-                <RichText text={reply.message} imageSize={15} />
+                <CommentText nodes={reply.message} />
                 {reply.like ? (
-                  <Text style={styles.likeText}> {reply.like}</Text>
+                  <Text style={styles.likeNum}> {reply.like}</Text>
                 ) : null}
               </Text>
             )
           })}
         </View>
       ) : null}
-    </>
+    </View>
   )
 }
 
@@ -112,8 +166,14 @@ const styles = StyleSheet.create({
     width: 24,
     height: 12,
   },
-  likeText: {
-    fontSize: 12,
-    color: '#fa5a57',
+  link: {
+    color: '#008AC5',
+  },
+  emoji: {
+    width: 18,
+    height: 18,
+  },
+  pinkName: {
+    color: '#FF6699',
   },
 })

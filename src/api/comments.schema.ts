@@ -16,10 +16,36 @@ export const MemberSchema = z.object({
   uname: z.string(),
 })
 
+const ContentSchema = z.object({
+  message: z.string(),
+  emote: z
+    .record(
+      z.object({
+        text: z.string(),
+        url: z.string(),
+        id: z.number(),
+      }),
+    )
+    .nullish(),
+  members: z
+    .object({
+      uname: z.string(),
+      mid: z.string(),
+    })
+    .array()
+    .nullish(),
+  at_name_to_mid: z.record(z.number()).nullish(),
+  jump_url: z
+    .record(
+      z.object({
+        title: z.string(),
+      }),
+    )
+    .nullish(),
+})
+
 const BaseReplySchema = z.object({
-  content: z.object({
-    message: z.string(),
-  }),
+  content: ContentSchema,
   count: z.number(),
   ctime: z.number(),
   invisible: z.boolean(),
@@ -41,11 +67,11 @@ const BaseReplySchema = z.object({
   up_action: z.object({ like: z.boolean(), reply: z.boolean() }),
 })
 
-type ReplaySchema = z.infer<typeof BaseReplySchema> & {
-  replies: ReplaySchema[] | null
+export type ReplayItem = z.infer<typeof BaseReplySchema> & {
+  replies: ReplayItem[] | null
 }
 
-const RepliesSchema: z.ZodType<ReplaySchema> = BaseReplySchema.extend({
+const RepliesSchema: z.ZodType<ReplayItem> = BaseReplySchema.extend({
   replies: z.lazy(() => RepliesSchema.array()).nullable(),
 })
 

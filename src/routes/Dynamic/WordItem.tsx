@@ -4,13 +4,20 @@ import { DynamicItemType } from '../../api/dynamic-items'
 // import RichText from '../../components/RichText'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
+import { useRoute } from '@react-navigation/native'
 
 export default function WordItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD>,
 ) {
+  const route = useRoute()
+  const isDetail = route.name === 'DynamicDetail'
   return (
     <>
-      <RichTexts nodes={props.richTexts} topic={props.topic} />
+      <RichTexts
+        nodes={props.richTexts}
+        topic={props.topic}
+        textProps={isDetail ? {} : { numberOfLines: 5 }}
+      />
       {/* <RichText
         imageSize={16}
         text={props.text}

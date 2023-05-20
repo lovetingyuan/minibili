@@ -1,7 +1,7 @@
 import { Icon } from '@rneui/themed'
 import React from 'react'
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
-import { useDynamicComments } from '../api/dynamic-comments'
+import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 
 const CommentList: React.FC<{
