@@ -1,4 +1,11 @@
-import { Button, Icon, Overlay, Text, useTheme } from '@rneui/themed'
+import {
+  Button,
+  Icon,
+  Overlay,
+  Text,
+  useTheme,
+  useThemeMode,
+} from '@rneui/themed'
 import { Pressable, ScrollView, View } from 'react-native'
 import store, { useStore } from '../../store'
 import React from 'react'
@@ -8,6 +15,7 @@ const HeaderTitle = () => {
   const [visible, setVisible] = React.useState(false)
   const { videosType, ranksList } = useStore()
   const { theme } = useTheme()
+  const { mode, setMode } = useThemeMode()
   return (
     <View>
       <Pressable
@@ -16,9 +24,7 @@ const HeaderTitle = () => {
           setVisible(true)
         }}>
         <Text style={[styles.title, { color: theme.colors.grey1 }]}>
-          {videosType.label +
-            (videosType.rid === -1 ? '' : '排行') +
-            (__DEV__ ? ' dev ' : '')}
+          {videosType.label + (videosType.rid === -1 ? '' : '排行')}{' '}
         </Text>
         <Icon
           name="triangle-down"
@@ -26,6 +32,16 @@ const HeaderTitle = () => {
           size={28}
           color={theme.colors.grey1}
         />
+        {__DEV__ ? (
+          <Text
+            onPress={() => {
+              console.log(3333, mode)
+              setMode(mode === 'dark' ? 'light' : 'dark')
+            }}>
+            {' '}
+            dev
+          </Text>
+        ) : null}
       </Pressable>
       <Overlay
         isVisible={visible}
