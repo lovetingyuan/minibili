@@ -128,7 +128,7 @@ export default function About() {
               name="github"
               type="material-community"
               size={20}
-              color="#555"
+              color={theme.colors.grey1}
               onPress={() => {
                 Linking.openURL(githubLink)
               }}

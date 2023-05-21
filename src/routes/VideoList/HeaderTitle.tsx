@@ -18,7 +18,7 @@ const HeaderTitle = () => {
         <Text style={[styles.title, { color: theme.colors.grey1 }]}>
           {videosType.label +
             (videosType.rid === -1 ? '' : '排行') +
-            (__DEV__ && ' dev ')}
+            (__DEV__ ? ' dev ' : '')}
         </Text>
         <Icon
           name="triangle-down"
