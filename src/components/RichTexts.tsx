@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   View,
-  Text,
   Image,
   Linking,
   StyleSheet,
@@ -11,7 +10,7 @@ import {
 import { RichTextNode } from '../api/dynamic-items.schema'
 import { HandledRichTextType } from '../api/dynamic-items.type'
 import { reportUnknownRichTextItem } from '../utils/report'
-import { Icon } from '@rneui/themed'
+import { Icon, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 
@@ -32,6 +31,7 @@ export default function RichTexts(props: {
   }
   let key = 0
   const fontSize = props.fontSize || 16
+
   for (const node of props.nodes) {
     if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT) {
       reactNodes.push(
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
+    color: 'red',
   },
   topicContainer: { flexDirection: 'row', alignItems: 'center' },
   emoji: {

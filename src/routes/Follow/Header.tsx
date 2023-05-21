@@ -1,6 +1,6 @@
 import React from 'react'
-import { Text, View } from 'react-native'
-import { Avatar, Icon } from '@rneui/themed'
+import { View } from 'react-native'
+import { Avatar, Icon, Text, useTheme } from '@rneui/themed'
 import store, { useStore } from '../../store'
 
 import { StyleSheet } from 'react-native'
@@ -16,8 +16,13 @@ export default function Header() {
   const { data: relation } = useUserRelation($userInfo?.mid)
   const fansCount = parseNumber(relation?.follower)
   const followedCount = parseNumber(relation?.following)
+  const { theme } = useTheme()
   return (
-    <View style={styles.userContainer}>
+    <View
+      style={[
+        styles.userContainer,
+        { backgroundColor: theme.colors.background },
+      ]}>
       <Avatar
         size={50}
         onPress={() => {
@@ -36,8 +41,8 @@ export default function Header() {
       <View style={styles.right}>
         <View style={styles.nameContainer}>
           <Text>
-            <Text style={styles.myName}>{$userInfo?.name}</Text>
-            <Text style={styles.fansNumText}>
+            <Text style={[styles.myName]}>{$userInfo?.name}</Text>
+            <Text style={[styles.fansNumText]}>
               {'    '}
               {fansCount}粉丝
               {'    '}
@@ -49,14 +54,16 @@ export default function Header() {
               navigation.navigate('About')
               reportNavigation('About')
             }}
-            style={{ padding: 5 }}
+            style={styles.snow}
             name="snow"
             type="ionicon"
             size={18}
             color="#00AEEC"
           />
         </View>
-        <Text style={styles.mySign}>{$userInfo?.sign}</Text>
+        <Text style={[styles.mySign, { color: theme.colors.grey1 }]}>
+          {$userInfo?.sign}
+        </Text>
       </View>
     </View>
   )
@@ -87,4 +94,5 @@ const styles = StyleSheet.create({
     position: 'relative',
     top: -10,
   },
+  snow: { padding: 6 },
 })

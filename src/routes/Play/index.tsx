@@ -5,8 +5,8 @@ import {
   ToastAndroid,
   ScrollView,
   Pressable,
-  Text,
 } from 'react-native'
+import { Text, useTheme } from '@rneui/themed'
 import * as KeepAwake from 'expo-keep-awake'
 import * as Clipboard from 'expo-clipboard'
 
@@ -34,7 +34,7 @@ const PlayPage = ({ route, navigation }: Props) => {
   const isFromDynamic = route.params?.from === 'dynamic'
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: vi } = useVideoInfo(currentVideo?.bvid)
-
+  const { theme } = useTheme()
   const videoInfo = {
     ...currentVideo,
     ...vi,
@@ -78,10 +78,20 @@ const PlayPage = ({ route, navigation }: Props) => {
                         ToastAndroid.show('已复制', ToastAndroid.SHORT)
                       })
                   }}>
-                  <Text style={styles.text}>{videoInfo.bvid}</Text>
+                  <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                    {videoInfo.bvid}
+                  </Text>
                 </Pressable>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}> · </Text>
-                <Text style={styles.text}>{videoInfo?.tname}</Text>
+                <Text
+                  style={[
+                    styles.text,
+                    { color: theme.colors.grey1, fontWeight: 'bold' },
+                  ]}>
+                  {' · '}
+                </Text>
+                <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                  {videoInfo?.tname}
+                </Text>
               </View>
             }
           />
@@ -98,6 +108,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
-  text: { color: '#666', fontSize: 12 },
+  text: { fontSize: 12 },
   right: { flexDirection: 'row', alignItems: 'center' },
 })

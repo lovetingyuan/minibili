@@ -1,6 +1,6 @@
-import { Icon } from '@rneui/themed'
+import { Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 
@@ -15,6 +15,7 @@ const CommentList: React.FC<{
     isLoading: commentLoading,
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)
+  const { theme } = useTheme()
 
   return (
     <View>
@@ -24,9 +25,11 @@ const CommentList: React.FC<{
             name="comment-text-outline"
             type="material-community"
             size={15}
-            color="#555"
+            color={theme.colors.grey1}
           />
-          <Text style={styles.commentCount}>{allCount || 0}条评论</Text>
+          <Text style={[styles.commentCount, { color: theme.colors.grey1 }]}>
+            {allCount || 0}条评论
+          </Text>
         </View>
         <View style={styles.right}>{props.dividerRight}</View>
       </View>
@@ -90,7 +93,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   commentCount: {
-    color: '#555',
     fontSize: 13,
     marginRight: 12,
     paddingHorizontal: 8,

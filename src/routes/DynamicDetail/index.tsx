@@ -2,7 +2,6 @@ import React from 'react'
 import {
   View,
   Pressable,
-  Text,
   ScrollView,
   StyleSheet,
   ToastAndroid,
@@ -11,7 +10,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 import CommentList from '../../components/CommentList'
 import ImagesView from './ImagesView'
-import { Icon } from '@rneui/themed'
+import { Icon, Text, useTheme } from '@rneui/themed'
 import { handleShareVideo, parseNumber } from '../../utils'
 import DynamicItem from '../Dynamic/DynamicItem'
 
@@ -28,6 +27,7 @@ const DynamicDetail: React.FC<
     forwardCount,
     likeCount,
   } = route.params.detail
+  const { theme } = useTheme()
   return (
     <>
       <ScrollView style={styles.scrollView}>
@@ -39,16 +39,24 @@ const DynamicDetail: React.FC<
           dividerRight={
             <View style={styles.info}>
               <View style={styles.iconText}>
-                <Icon name="date-range" size={15} color="#666" />
-                <Text style={styles.text}>{date}</Text>
+                <Icon name="date-range" size={15} color={theme.colors.grey1} />
+                <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                  {date}
+                </Text>
               </View>
               <Pressable
                 style={styles.iconText}
                 onPress={() => {
                   ToastAndroid.show('不支持点赞', ToastAndroid.SHORT)
                 }}>
-                <Icon name="thumb-up-off-alt" size={15} color="#666" />
-                <Text style={styles.text}>{parseNumber(likeCount)}</Text>
+                <Icon
+                  name="thumb-up-off-alt"
+                  size={15}
+                  color={theme.colors.grey1}
+                />
+                <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                  {parseNumber(likeCount)}
+                </Text>
               </Pressable>
               <Pressable
                 style={styles.share}
@@ -59,10 +67,12 @@ const DynamicDetail: React.FC<
                   type="material-community"
                   name="share"
                   size={20}
-                  color="#666"
+                  color={theme.colors.grey1}
                 />
                 {forwardCount ? (
-                  <Text style={styles.text}>{parseNumber(forwardCount)}</Text>
+                  <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                    {parseNumber(forwardCount)}
+                  </Text>
                 ) : null}
               </Pressable>
             </View>
@@ -96,7 +106,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 10,
     paddingTop: 20,
-    backgroundColor: 'white',
   },
   overlay: {
     padding: 0,

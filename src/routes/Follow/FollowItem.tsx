@@ -1,6 +1,6 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import { Avatar, Badge } from '@rneui/themed'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { Avatar, Badge, Text as Text2 } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import { Button } from '@rneui/themed'
@@ -9,7 +9,6 @@ import ButtonsOverlay from '../../components/ButtonsOverlay'
 import store, { useStore } from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
 import { useHasUpdate } from '../../api/dynamic-items'
-// import { useLivingInfo2 } from '../../api/living-info'
 
 export default React.memo(
   function FollowItem(props: { item: FollowedUpItem; width?: number }) {
@@ -18,7 +17,6 @@ export default React.memo(
       item: { face, name, sign, mid },
     } = props
     const updateId = useHasUpdate(mid)
-
     React.useEffect(() => {
       if (updateId) {
         if (!store.updatedUps[mid]) {
@@ -94,9 +92,9 @@ export default React.memo(
             style={{ width: '100%' }}
             onLongPress={() => setModalVisible(true)}
             onPress={() => gotoDynamic(false)}>
-            <Text style={[styles.name]} numberOfLines={2} ellipsizeMode="tail">
+            <Text2 style={[styles.name]} numberOfLines={2} ellipsizeMode="tail">
               {name}
-            </Text>
+            </Text2>
           </TouchableOpacity>
           {livingUps[mid] ? (
             <Button

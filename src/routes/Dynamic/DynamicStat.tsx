@@ -1,6 +1,6 @@
-import { Icon } from '@rneui/themed'
+import { Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import { StyleSheet, View, Pressable, Text } from 'react-native'
+import { StyleSheet, View, Pressable } from 'react-native'
 import { handleShareVideo, parseNumber } from '../../utils'
 
 export default function DynamicStat(props: {
@@ -12,24 +12,30 @@ export default function DynamicStat(props: {
   share: number
   title: string
 }) {
+  const { theme } = useTheme()
+  const gray = theme.colors.grey1
+  const textStyle = {
+    color: gray,
+    fontSize: 13,
+  }
   return (
     <View style={styles.VideoItem}>
       <View style={styles.iconText}>
-        <Icon name="date-range" size={15} color="#666" />
-        <Text style={styles.VideoItemText}>{props.date}</Text>
+        <Icon name="date-range" size={15} color={gray} />
+        <Text style={textStyle}>{props.date}</Text>
       </View>
       <View style={styles.iconText}>
-        <Icon name="thumb-up-off-alt" size={15} color="#666" />
-        <Text style={styles.VideoItemText}>{parseNumber(props.like)}</Text>
+        <Icon name="thumb-up-off-alt" size={15} color={gray} />
+        <Text style={textStyle}>{parseNumber(props.like)}</Text>
       </View>
       <Pressable
         style={styles.shareBtn}
         onPress={() => {
           handleShareVideo(props.name, props.title, props.id)
         }}>
-        <Icon type="material-community" name="share" size={22} color="#666" />
+        <Icon type="material-community" name="share" size={20} color={gray} />
         {props.share ? (
-          <Text style={styles.VideoItemText}>{parseNumber(props.share)}</Text>
+          <Text style={textStyle}>{parseNumber(props.share)}</Text>
         ) : null}
       </Pressable>
     </View>
@@ -52,7 +58,6 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   VideoItemText: {
-    color: '#666',
     fontSize: 12,
   },
   shareBtn: { flexDirection: 'row', alignItems: 'center' },

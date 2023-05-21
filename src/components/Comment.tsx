@@ -1,16 +1,20 @@
 import React from 'react'
-import { Linking, StyleSheet, Text, View, Image } from 'react-native'
+import { Linking, StyleSheet, View, Image, TextStyle } from 'react-native'
 import { MessageContent, ReplyItem } from '../api/comments'
+import { Text, useTheme } from '@rneui/themed'
 
 interface Props {
   upName: string
   comment: ReplyItem
 }
 
-function CommentText(props: { nodes: MessageContent }) {
-  const { nodes } = props
+function CommentText(props: {
+  nodes: MessageContent
+  style?: TextStyle | TextStyle[]
+}) {
+  const { nodes, style } = props
   return (
-    <Text style={{ fontSize: 15 }}>
+    <Text style={style} selectable>
       {nodes.map((node, i) => {
         if (node.type === 'at') {
           return (
@@ -53,7 +57,11 @@ function CommentText(props: { nodes: MessageContent }) {
             </Text>
           )
         }
-        return <Text key={i}>{node.text}</Text>
+        return (
+          <Text selectable key={i}>
+            {node.text}
+          </Text>
+        )
       })}
     </Text>
   )
@@ -61,45 +69,54 @@ function CommentText(props: { nodes: MessageContent }) {
 
 export default function Comment(props: Props) {
   const { comment, upName } = props
+  const { theme } = useTheme()
   const upStyle = (name: string) => {
     return upName === name
       ? styles.pinkName
       : {
-          color: 'black',
+          color: theme.colors.primary,
         }
   }
 
   return (
     <View>
-      <Text
-        style={[
-          styles.commentContent,
-          comment.upLike ? styles.upLike : null,
-          comment.top ? styles.top : null,
-        ]}>
-        <Text style={[styles.commentName, upStyle(comment.name)]}>
-          【{comment.name}】
-          {comment.sex === '男' ? (
-            '♂'
-          ) : comment.sex === '女' ? (
-            <Text style={styles.pinkName}>♀</Text>
-          ) : (
-            ''
-          )}
-          :{' '}
+      <Text style={[styles.commentContent]}>
+        <Text style={[styles.commentName]}>
+          <Text
+            style={upStyle(comment.name)}
+            onPress={() => {
+              Linking.openURL('https://m.bilibili.com/space/' + comment.mid)
+            }}>
+            {comment.name}
+          </Text>
+          <Text style={comment.sex === '女' ? styles.pinkName : null}>
+            {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}
+          </Text>
+          ：
         </Text>
-        <CommentText nodes={comment.message} />
+        <CommentText
+          nodes={comment.message}
+          style={[
+            styles.commentText,
+            comment.upLike ? styles.upLike : {},
+            comment.top ? styles.top : {},
+          ]}
+        />
         {comment.like ? (
           <Text style={styles.likeNum}> {comment.like}</Text>
         ) : null}
       </Text>
       {comment.replies ? (
-        <View style={styles.reply}>
+        <View style={[styles.reply]}>
           {comment.replies.map(reply => {
             return (
               <Text key={reply.id} style={styles.replyItem}>
-                <Text style={[styles.replyName, upStyle(reply.name)]}>
-                  {reply.name}:{' '}
+                <Text
+                  style={[styles.replyName, upStyle(reply.name)]}
+                  onPress={() => {
+                    Linking.openURL('https://m.bilibili.com/space/' + reply.mid)
+                  }}>
+                  {reply.name}：
                 </Text>
                 <CommentText nodes={reply.message} />
                 {reply.like ? (
@@ -121,12 +138,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  commentText: { fontSize: 15, lineHeight: 23 },
   commentContent: {
-    fontSize: 16,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 3,
-    lineHeight: 24,
   },
   commentName: {
     fontWeight: 'bold',
@@ -142,9 +158,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   reply: {
-    marginLeft: 10,
-    marginTop: 8,
-    opacity: 0.75,
+    marginLeft: 8,
+    marginTop: 5,
+    marginBottom: 10,
+    opacity: 0.7,
     flex: 1,
   },
   replyItem: {
@@ -155,7 +172,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   replyName: {
-    fontWeight: 'bold',
+    // fontWeight: 'bold',
   },
   likeNum: {
     fontSize: 12,

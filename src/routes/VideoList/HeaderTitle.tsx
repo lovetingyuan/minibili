@@ -1,13 +1,13 @@
-import { Button, Icon, Overlay } from '@rneui/themed'
-import { Pressable, ScrollView, Text, View } from 'react-native'
+import { Button, Icon, Overlay, Text, useTheme } from '@rneui/themed'
+import { Pressable, ScrollView, View } from 'react-native'
 import store, { useStore } from '../../store'
-
 import React from 'react'
 import { StyleSheet } from 'react-native'
 
 const HeaderTitle = () => {
   const [visible, setVisible] = React.useState(false)
   const { videosType, ranksList } = useStore()
+  const { theme } = useTheme()
   return (
     <View>
       <Pressable
@@ -15,17 +15,22 @@ const HeaderTitle = () => {
         onPress={() => {
           setVisible(true)
         }}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, { color: theme.colors.grey1 }]}>
           {videosType.label +
             (videosType.rid === -1 ? '' : '排行') +
-            (__DEV__ ? ' dev ' : ' ')}
+            (__DEV__ && ' dev ')}
         </Text>
-        <Icon name="triangle-down" type="octicon" size={28} color="#333" />
+        <Icon
+          name="triangle-down"
+          type="octicon"
+          size={28}
+          color={theme.colors.grey1}
+        />
       </Pressable>
       <Overlay
         isVisible={visible}
         backdropStyle={styles.backdrop}
-        overlayStyle={styles.overlay}
+        overlayStyle={[styles.overlay]}
         onBackdropPress={() => {
           setVisible(false)
         }}>
@@ -35,11 +40,6 @@ const HeaderTitle = () => {
               <Button
                 type={item.rid === videosType.rid ? 'solid' : 'clear'}
                 key={item.rid}
-                containerStyle={
-                  {
-                    // paddingVertical: 3,
-                  }
-                }
                 titleStyle={
                   i
                     ? { marginVertical: 3 }

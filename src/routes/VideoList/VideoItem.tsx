@@ -2,10 +2,14 @@ import React from 'react'
 import { View, Text, Image, StyleSheet } from 'react-native'
 import { VideoItem } from '../../api/hot-videos'
 import { parseDate, parseDuration, parseNumber } from '../../utils'
+// import useIsDark from '../../hooks/useIsDark'
+import { useTheme } from '@rneui/themed'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
+  const { theme } = useTheme()
+  // console.log(333, theme)
   return (
     <View style={styles.itemContainer}>
       <View style={{ flex: 1 }}>
@@ -38,7 +42,9 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           </View>
         ) : null}
       </View>
-      <Text style={styles.title} numberOfLines={2}>
+      <Text
+        style={[styles.title, { color: theme.colors.black }]}
+        numberOfLines={2}>
         {video.title}
       </Text>
       <View style={[styles.videoInfo]}>
@@ -50,7 +56,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"
-            style={[styles.upNameText]}>
+            style={[styles.upNameText, { color: theme.colors.primary }]}>
             {video.name}
           </Text>
         </View>
@@ -59,7 +65,9 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
             style={styles.icon}
             source={require('../../../assets/play-mark.png')}
           />
-          <Text style={[styles.playNumText]}>{playNum}</Text>
+          <Text style={[styles.playNumText, { color: theme.colors.grey1 }]}>
+            {playNum}
+          </Text>
         </View>
       </View>
     </View>
@@ -74,7 +82,7 @@ const styles = StyleSheet.create({
   textContainer: {
     position: 'absolute',
     paddingHorizontal: 4,
-    backgroundColor: 'rgba(0,0,0,.5)',
+    backgroundColor: 'rgba(0,0,0,.7)',
     alignItems: 'center',
     borderRadius: 2,
     margin: 5,

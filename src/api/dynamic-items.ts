@@ -190,7 +190,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     const type = HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const
-    const getForwardUp = () => {
+    const getForwardCommon = () => {
       const author = item.orig.modules.module_author
       const richTexts = item.orig.modules.module_dynamic.desc?.rich_text_nodes
       return {
@@ -198,6 +198,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         face: author.face,
         richTexts,
         id: item.orig.id_str,
+        mid: author.mid,
       }
     }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
@@ -206,7 +207,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
-          ...getForwardUp(),
+          ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_AV as const,
           text: forward.desc?.text,
           cover: forward.major?.archive.cover,
@@ -236,7 +237,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
-          ...getForwardUp(),
+          ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_WORD as const,
           text: text.filter(Boolean).join('\n'),
         },
@@ -248,7 +249,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
-          ...getForwardUp(),
+          ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW as const,
           text: forward.desc?.text,
           images: forward.major.draw.items.map(v => {
@@ -274,7 +275,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
-          ...getForwardUp(),
+          ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
           text: forward.major.article.desc,
           title: forward.major.article.title,
@@ -289,7 +290,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
-          ...getForwardUp(),
+          ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE as const,
           text: forward.desc?.text,
           title:
@@ -303,7 +304,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
-          ...getForwardUp(),
+          ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_NONE as const,
           text: item.orig.modules.module_dynamic.major.none.tips,
         },
@@ -316,7 +317,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
-          ...getForwardUp(),
+          ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC as const,
           title,
           label,
@@ -332,7 +333,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         ...getCommon(item),
         type: type,
         payload: {
-          ...getForwardUp(),
+          ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_PGC as const,
           title: name,
           cover: pgc.cover,
@@ -345,7 +346,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       ...getCommon(item),
       type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
       payload: {
-        ...getForwardUp(),
+        ...getForwardCommon(),
         text: '暂不支持显示',
         type: item.type as unknown as OtherForwardTypeEnum,
       },

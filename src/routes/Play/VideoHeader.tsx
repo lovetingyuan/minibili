@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
-import { Avatar, Icon } from '@rneui/themed'
+import { Avatar, Icon, Text } from '@rneui/themed'
 import React from 'react'
-import { View, Text, Pressable, StyleSheet, ToastAndroid } from 'react-native'
+import { View, Pressable, StyleSheet, ToastAndroid } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import store, { useStore } from '../../store'
 import { NavigationProps } from '../../types'
@@ -19,6 +19,7 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
   }
   const { bvid, name, face, mid, pubDate, title } = videoInfo
   const [nameTextKey, setNameTextKey] = React.useState('-')
+  // const { theme } = useTheme()
   useMounted(() => {
     for (let i = 0; i < 2; i++) {
       setTimeout(() => {
@@ -58,11 +59,11 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
       </Pressable>
       <View style={styles.VideoItem}>
         <View style={styles.iconText}>
-          <Icon name="date-range" size={15} color="#666" />
+          <Icon name="date-range" size={15} />
           <Text style={styles.VideoItemText}>{parseDate(pubDate)}</Text>
         </View>
         <View style={styles.iconText}>
-          <Icon name="play-circle-outline" size={15} color="#666" />
+          <Icon name="play-circle-outline" size={15} />
           <Text style={styles.VideoItemText}>
             {parseNumber(videoInfo?.viewNum)}
           </Text>
@@ -72,7 +73,7 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
           onPress={() => {
             ToastAndroid.show('不支持点赞', ToastAndroid.SHORT)
           }}>
-          <Icon name="thumb-up-off-alt" size={15} color="#666" />
+          <Icon name="thumb-up-off-alt" size={15} />
           <Text style={styles.VideoItemText}>
             {parseNumber(videoInfo?.likeNum)}
           </Text>
@@ -85,8 +86,8 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
               handleShareVideo(name, title, bvid)
             }
           }}>
-          <Icon type="material-community" name="share" size={20} color="#666" />
-          <Text style={styles.VideoItemText}>
+          <Icon type="material-community" name="share" size={20} />
+          <Text style={[styles.VideoItemText]}>
             {parseNumber(videoInfo?.shareNum)}
           </Text>
         </Pressable>
@@ -129,7 +130,6 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   VideoItemText: {
-    color: '#555',
     fontSize: 13,
   },
   shareBtn: { flexDirection: 'row', alignItems: 'center' },

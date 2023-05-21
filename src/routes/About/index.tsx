@@ -1,11 +1,19 @@
 import React from 'react'
 import { Linking, Alert, ToastAndroid, Share, ScrollView } from 'react-native'
-import { Text } from 'react-native'
+// import {  } from 'react-native'
 import { StyleSheet } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
 
 import store, { useStore } from '../../store'
-import { Card, Chip, ListItem, Button, Icon } from '@rneui/themed'
+import {
+  Card,
+  Chip,
+  ListItem,
+  Button,
+  Icon,
+  Text,
+  useTheme,
+} from '@rneui/themed'
 import {
   checkUpdate as checkUpdateApi,
   currentVersion,
@@ -25,6 +33,7 @@ export default function About() {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const [checkingUpdate, setCheckingUpdate] = React.useState(false)
   const [hasUpdate, setHasUpdate] = React.useState<boolean | null>(null)
+  const { theme } = useTheme()
 
   const handleLogOut = () => {
     Alert.alert('确定退出吗？', '', [
@@ -57,7 +66,6 @@ export default function About() {
       return
     }
     setCheckingUpdate(true)
-    ToastAndroid.show('请稍候...', ToastAndroid.SHORT)
     checkUpdateApi().then(
       data => {
         setHasUpdate(data.hasUpdate)
@@ -79,8 +87,6 @@ export default function About() {
               },
             ],
           )
-        } else {
-          ToastAndroid.show('暂无更新', ToastAndroid.SHORT)
         }
         setCheckingUpdate(false)
       },
@@ -135,6 +141,7 @@ export default function About() {
           <ListItem.Content>
             <ListItem.Title
               right
+              style={{ color: theme.colors.black }}
               onPress={() => {
                 Alert.alert(
                   '版本信息',
@@ -167,6 +174,7 @@ export default function About() {
           <ListItem.Content>
             <ListItem.Title
               right
+              style={{ color: theme.colors.black }}
               onPress={() => {
                 $userInfo?.mid &&
                   Clipboard.setStringAsync($userInfo.mid + '').then(() => {
@@ -182,7 +190,9 @@ export default function About() {
         </ListItem>
         <ListItem containerStyle={{ padding: 0, marginBottom: 5 }}>
           <ListItem.Content>
-            <ListItem.Title right>欢迎分享本应用 ❤</ListItem.Title>
+            <ListItem.Title right style={{ color: theme.colors.black }}>
+              欢迎分享本应用 ❤
+            </ListItem.Title>
           </ListItem.Content>
           <Button type="clear" size="sm" onPress={handleShare}>
             分享
@@ -200,7 +210,7 @@ export default function About() {
             setExpandedStatement(!expandedStatement)
           }}>
           <ListItem containerStyle={styles.statementContent}>
-            <ListItem.Subtitle right>
+            <ListItem.Subtitle right style={{ color: theme.colors.black }}>
               本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题可在Github中提出）
             </ListItem.Subtitle>
           </ListItem>
@@ -263,7 +273,11 @@ export default function About() {
           }}>
           <ListItem containerStyle={styles.blackContent}>
             {Object.values($blackUps).map(name => {
-              return <Text key={name}>{name}</Text>
+              return (
+                <Text key={name} style={{ color: theme.colors.grey3 }}>
+                  {name}
+                </Text>
+              )
             })}
             {Object.values($blackUps).length === 0 ? <Text>无</Text> : null}
           </ListItem>

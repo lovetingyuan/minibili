@@ -2,7 +2,6 @@ import React from 'react'
 import {
   StyleSheet,
   View,
-  Text,
   ToastAndroid,
   BackHandler,
   ActivityIndicator,
@@ -12,7 +11,7 @@ import { RootStackParamList } from '../../types'
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Icon } from '@rneui/themed'
+import { Icon, Text, useTheme } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useMounted from '../../hooks/useMounted'
 import { FlashList } from '@shopify/flash-list'
@@ -42,6 +41,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       ToastAndroid.show('请求动态失败', ToastAndroid.SHORT)
     }
   }, [upId, error])
+  const { theme } = useTheme()
 
   React.useEffect(() => {
     navigation.setOptions({
@@ -94,10 +94,13 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
               <Icon
                 name="billboard"
                 type="material-community"
-                size={16}
+                size={18}
                 style={styles.signMark}
+                color={theme.colors.grey0}
               />
-              <Text style={styles.signText}>{dynamicUser.sign.trim()}</Text>
+              <Text style={[styles.signText, { color: theme.colors.grey0 }]}>
+                {dynamicUser.sign.trim()}
+              </Text>
             </View>
           ) : null
         }
@@ -172,7 +175,8 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginLeft: 10,
     flexShrink: 1,
-    color: '#666',
+    opacity: 0.8,
+    // color: '#666',
   },
 
   signMark: {

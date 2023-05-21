@@ -1,13 +1,6 @@
-import { Avatar, Button, Icon } from '@rneui/themed'
+import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from 'react-native'
+import { View, StyleSheet, Pressable, StyleProp, ViewStyle } from 'react-native'
 import store, { useStore } from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
@@ -47,11 +40,11 @@ export function HeaderLeft(props: {
         onPress={() => {
           props.scrollTop()
         }}>
-        <Text adjustsFontSizeToFit numberOfLines={1} style={styles.titleText}>
+        <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.titleText]}>
           {(dynamicUser?.name || '') + '  '}
         </Text>
       </Pressable>
-      <Text style={styles.fansText}>{parseNumber(fans?.follower)}粉丝</Text>
+      <Text style={[styles.fansText]}>{parseNumber(fans?.follower)}粉丝</Text>
       {dynamicUser && livingUps[dynamicUser.mid] ? (
         <Button
           size="sm"
@@ -73,6 +66,7 @@ export function HeaderLeft(props: {
 }
 
 export function HeaderRight() {
+  const { theme } = useTheme()
   return (
     <Pressable
       style={styles.right}
@@ -82,7 +76,12 @@ export function HeaderRight() {
           handleShareUp(name, mid, sign)
         }
       }}>
-      <Icon type="fontisto" name="share-a" size={13} color="#666" />
+      <Icon
+        type="fontisto"
+        name="share-a"
+        size={13}
+        color={theme.colors.grey1}
+      />
     </Pressable>
   )
 }

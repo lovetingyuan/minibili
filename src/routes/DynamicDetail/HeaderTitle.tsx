@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Avatar } from '@rneui/themed'
-import { StyleSheet, Text, View } from 'react-native'
+import { Avatar, Text } from '@rneui/themed'
+import { StyleSheet, View } from 'react-native'
 import { RootStackParamList } from '../../types'
 import React from 'react'
 

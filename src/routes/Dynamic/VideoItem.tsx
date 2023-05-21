@@ -1,19 +1,10 @@
 import { useNavigation } from '@react-navigation/native'
 import React from 'react'
-import {
-  Image,
-  // Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
-// import RichText from '../../components/RichText'
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { NavigationProps } from '../../types'
-// import { SimpleVideoInfo } from '../../components/PlayInfo'
 import { DynamicItemType } from '../../api/dynamic-items'
 import store from '../../store'
-import { Icon } from '@rneui/themed'
+import { Icon, Text, useTheme } from '@rneui/themed'
 import { parseNumber } from '../../utils'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
@@ -26,7 +17,6 @@ export default function VideoItem(
     name,
     payload: { cover, title, bvid, play, duration, desc },
     date,
-    // text,
     face,
     commentId,
     likeCount,
@@ -34,6 +24,12 @@ export default function VideoItem(
   } = props
 
   const navigation = useNavigation<NavigationProps['navigation']>()
+  const { theme } = useTheme()
+  const gray = theme.colors.grey1
+  const textStyle = {
+    color: gray,
+    fontSize: 13,
+  }
 
   return (
     <TouchableOpacity
@@ -80,30 +76,28 @@ export default function VideoItem(
           </View>
         </View>
         <View style={styles.videoInfo}>
-          <Text style={styles.title} numberOfLines={3}>
+          <Text style={[styles.title]} numberOfLines={3}>
             {title}
           </Text>
           <View style={styles.VideoItem}>
             {play === undefined ? null : (
               <View style={styles.iconText}>
-                <Icon name="play-circle-outline" size={15} color="#666" />
-                <Text style={styles.VideoItemText}>{play}</Text>
+                <Icon name="play-circle-outline" size={15} color={gray} />
+                <Text style={textStyle}>{play}</Text>
               </View>
             )}
             <View style={styles.iconText}>
-              <Icon name="thumb-up-off-alt" size={15} color="#666" />
-              <Text style={styles.VideoItemText}>{parseNumber(likeCount)}</Text>
+              <Icon name="thumb-up-off-alt" size={15} color={gray} />
+              <Text style={textStyle}>{parseNumber(likeCount)}</Text>
             </View>
             <View style={styles.iconText}>
               <Icon
                 type="material-community"
                 name="share"
                 size={20}
-                color="#666"
+                color={gray}
               />
-              <Text style={styles.VideoItemText}>
-                {parseNumber(forwardCount)}
-              </Text>
+              <Text style={textStyle}>{parseNumber(forwardCount)}</Text>
             </View>
           </View>
         </View>
@@ -128,7 +122,6 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    // minHeight: 100,
     height: undefined,
     aspectRatio: 1.8,
     borderRadius: 5,
@@ -195,9 +188,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-  },
-  VideoItemText: {
-    color: '#666',
-    fontSize: 12,
   },
 })

@@ -1,6 +1,7 @@
 import React from 'react'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-import { TouchableOpacity, Image, StyleSheet, Text } from 'react-native'
+import { TouchableOpacity, Image, StyleSheet } from 'react-native'
+import { Text } from '@rneui/themed'
 import ForwardItem from './ForwardItem'
 import RichTextItem from './DrawItem'
 import VideoItem from './VideoItem'

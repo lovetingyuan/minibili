@@ -4,16 +4,15 @@ import {
   ScrollView,
   StyleSheet,
   View,
-  Text,
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
-// import RichText from '../../components/RichText'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import store from '../../store'
 import { useRoute } from '@react-navigation/native'
 import RichTexts from '../../components/RichTexts'
+import { Text } from '@rneui/themed'
 
 export default function RichTextItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW>,

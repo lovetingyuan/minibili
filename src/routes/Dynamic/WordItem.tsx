@@ -1,10 +1,10 @@
 import React from 'react'
-import { Text, View, Image } from 'react-native'
+import { View, Image } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
-// import RichText from '../../components/RichText'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 import { useRoute } from '@react-navigation/native'
+import { Text } from '@rneui/themed'
 
 export default function WordItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD>,
@@ -18,11 +18,6 @@ export default function WordItem(
         topic={props.topic}
         textProps={isDetail ? {} : { numberOfLines: 5 }}
       />
-      {/* <RichText
-        imageSize={16}
-        text={props.text}
-        textProps={{ style: { fontSize: 16, lineHeight: 24 } }}
-      /> */}
       {props.payload.text || props.payload.image ? (
         <View style={{ marginTop: 10 }}>
           {props.payload.text ? <Text>{props.payload.text}</Text> : null}

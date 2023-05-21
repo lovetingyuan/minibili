@@ -3,10 +3,10 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   useWindowDimensions,
   Pressable,
+  Linking,
 } from 'react-native'
 // import RichText from '../../components/RichText'
 import { DynamicItemType } from '../../api/dynamic-items'
@@ -14,16 +14,18 @@ import {
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
 } from '../../api/dynamic-items.type'
-import { Avatar } from '@rneui/themed'
+import { Avatar, Text } from '@rneui/themed'
 import RichTexts from '../../components/RichTexts'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
+import useIsDark from '../../hooks/useIsDark'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
   const { width } = useWindowDimensions()
   const navigation = useNavigation<NavigationProps['navigation']>()
+  const isDark = useIsDark()
 
   let forwardContent = <Text>暂不支持显示</Text>
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
@@ -46,7 +48,9 @@ export default function ForwardItem(
               <Text style={{ fontWeight: 'bold' }}>视频：</Text>
               {props.payload.title}
             </Text>
-            <Text style={{ marginTop: 10 }}>{props.payload.play}播放</Text>
+            <Text style={{ marginTop: 10, fontSize: 13 }}>
+              {props.payload.play}播放
+            </Text>
           </View>
         </View>
       </View>
@@ -148,22 +152,23 @@ export default function ForwardItem(
   return (
     <View style={[styles.textContainer]}>
       <RichTexts nodes={props.richTexts} textProps={{ numberOfLines: 3 }} />
-      <View style={styles.forwardContainer}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginBottom: 8,
+      <View
+        style={[
+          styles.forwardContainer,
+          { backgroundColor: isDark ? '#222' : '#dedede' },
+        ]}>
+        <Pressable
+          style={styles.forwardUp}
+          onPress={() => {
+            Linking.openURL('https://m.bilibili.com/space/' + props.payload.mid)
           }}>
           {props.payload.face && (
             <Avatar source={{ uri: props.payload.face }} size={22} rounded />
           )}
           {props.payload.name && (
-            <Text style={{ fontWeight: 'bold', fontSize: 15, marginLeft: 8 }}>
-              {props.payload.name}
-            </Text>
+            <Text style={styles.forwardUpName}>{props.payload.name}</Text>
           )}
-        </View>
+        </Pressable>
         <Pressable
           style={styles.forwardContent}
           onPress={() => {
@@ -197,10 +202,15 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 8,
     marginTop: 16,
-    backgroundColor: 'rgba(0,0,0,0.05)',
     padding: 10,
     borderRadius: 4,
   },
+  forwardUp: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  forwardUpName: { fontWeight: 'bold', fontSize: 15, marginLeft: 8 },
   forwardContent: {
     flex: 1,
     flexDirection: 'row',

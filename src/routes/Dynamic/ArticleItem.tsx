@@ -1,9 +1,10 @@
 import React from 'react'
-import { TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { TouchableOpacity, StyleSheet } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
+import { Text } from '@rneui/themed'
 
 export default function ArticleItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE>,

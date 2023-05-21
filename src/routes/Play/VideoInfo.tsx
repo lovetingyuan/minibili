@@ -1,8 +1,8 @@
 import React from 'react'
 import VideoHeader from './VideoHeader'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import { ListItem } from '@rneui/themed'
+import { ListItem, Text } from '@rneui/themed'
 import { useStore } from '../../store'
 
 export default function VideoInfo(props: {

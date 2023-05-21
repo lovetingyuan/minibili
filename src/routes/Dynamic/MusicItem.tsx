@@ -1,7 +1,8 @@
 import React from 'react'
-import { View, Text, Image } from 'react-native'
+import { View, Image } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+import { Text } from '@rneui/themed'
 
 export default function MusicItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC>,
