@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   date: { color: '#555', fontSize: 12 },
   postText: {
     marginTop: 5,
-    fontStyle: 'italic',
+    // fontStyle: 'italic',
     borderLeftWidth: 0.5,
     paddingLeft: 8,
     borderLeftColor: '#aaa',

@@ -105,6 +105,10 @@ export default function ForwardItem(
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC) {
     forwardContent = (
       <View style={{ flexDirection: 'row', gap: 12 }}>
+        <RichTexts
+          nodes={props.payload.richTexts}
+          textProps={{ numberOfLines: 3 }}
+        />
         <Image
           source={{ uri: props.payload.cover }}
           style={{

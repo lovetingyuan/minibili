@@ -78,10 +78,15 @@ export default function RichTexts(props: {
       reactNodes.push(
         <Text
           onPress={() => {
-            Linking.openURL(node.jump_url)
+            Linking.openURL(
+              node.jump_url.startsWith('//')
+                ? 'https:' + node.jump_url
+                : node.jump_url,
+            )
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
+          {' '}
           {node.text}
         </Text>,
       )
@@ -89,10 +94,15 @@ export default function RichTexts(props: {
       reactNodes.push(
         <Text
           onPress={() => {
-            Linking.openURL('https' + node.jump_url)
+            Linking.openURL(
+              node.jump_url.startsWith('//')
+                ? 'https:' + node.jump_url
+                : node.jump_url,
+            )
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
+          {' '}
           视频：{node.text}
         </Text>,
       )
@@ -104,6 +114,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
+          {' '}
           商品：{node.text}
         </Text>,
       )
@@ -115,6 +126,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
+          {' '}
           {node.text}
         </Text>,
       )
@@ -128,7 +140,29 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
+          {' '}
           投票：{node.text}
+        </Text>,
+      )
+    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_LOTTERY) {
+      reactNodes.push(
+        <Text key={key++} style={[styles.link, { fontSize }]}>
+          {' 抽奖：'}
+          {node.text}
+        </Text>,
+      )
+    } else if (
+      node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_OGV_SEASON
+    ) {
+      reactNodes.push(
+        <Text
+          onPress={() => {
+            Linking.openURL(node.jump_url)
+          }}
+          key={key++}
+          style={[styles.link, { fontSize }]}>
+          {' 番剧：'}
+          {node.text}
         </Text>,
       )
     } else {
@@ -147,7 +181,10 @@ export default function RichTexts(props: {
           <Icon name="tag" color="#178bcf" size={18} />
           <Text
             onPress={() => {
-              props.topic?.jump_url && Linking.openURL(props.topic?.jump_url)
+              const url = props.topic?.jump_url
+              if (url) {
+                Linking.openURL(url.startsWith('//') ? 'https:' + url : url)
+              }
             }}
             style={[styles.link, { fontSize }]}>
             {props.topic.name}
@@ -168,7 +205,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     color: 'red',
   },
-  topicContainer: { flexDirection: 'row', alignItems: 'center' },
+  topicContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   emoji: {
     width: 20,
     height: 20,

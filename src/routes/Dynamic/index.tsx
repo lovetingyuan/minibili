@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#999',
     textAlign: 'center',
-    fontStyle: 'italic',
+    // fontStyle: 'italic',
   },
   emptyText: {
     marginTop: 100,
