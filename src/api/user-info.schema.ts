@@ -34,3 +34,39 @@ export const UserInfoResponseSchema = z.object({
     })
     .nullable(),
 })
+
+export const UserCardInfoResponseSchema = z.object({
+  card: z.object({
+    mid: z.string(),
+    name: z.string(),
+    // approve: false,
+    sex: z.string(),
+    // rank: '10000',
+    face: z.string(),
+    // face_nft: 0,
+    // face_nft_type: 0,
+    // DisplayRank: '0',
+    // regtime: 0,
+    // spacesta: 0,
+    birthday: z.string(),
+    place: z.string(),
+    description: z.string(),
+    // article: 0,
+    // attentions: [],
+    fans: z.number(),
+    friend: z.number(),
+    attention: z.number(),
+    sign: z.string(),
+    level_info: z.object({
+      current_level: z.number(),
+    }),
+    vip: z.object({
+      status: z.number(),
+    }),
+  }),
+  following: z.boolean(),
+  // archive_count: 16,
+  // article_count: 0,
+  follower: z.number(),
+  // like_num: 6,
+})
