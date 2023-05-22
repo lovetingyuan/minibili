@@ -46,8 +46,10 @@ export default function VideoItem(
           cover,
           pubDate: date,
         }
-        navigation.push('Play', {
-          from: 'dynamic',
+        navigation.navigate('Play', {
+          from: {
+            mid,
+          },
         })
       }}>
       {props.richTexts ? (

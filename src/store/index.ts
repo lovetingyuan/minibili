@@ -22,7 +22,7 @@ const store = proxy<{
   $latestUpdateIds: Record<string, string>
   $ignoredVersions: string[]
   // ----------------------------
-  dynamicUser: UserInfo | null
+  // dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
   livingUps: Record<string, string>
   checkingUpUpdateMap: Record<string, boolean>
@@ -32,9 +32,9 @@ const store = proxy<{
     name: string
     face: string
     mid: number | string
-    pubDate: number | string
+    pubDate?: number | string
     title: string
-    aid: number
+    aid: number | string
     cover: string
     desc: string
   } | null
@@ -58,7 +58,7 @@ const store = proxy<{
   $latestUpdateIds: {},
   $ignoredVersions: [],
   // -------------------------
-  dynamicUser: null,
+  // dynamicUser: null,
   updatedUps: {},
   livingUps: {},
   checkingUpUpdateMap: {},

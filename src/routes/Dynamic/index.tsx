@@ -15,15 +15,15 @@ import { Icon, Text, useTheme } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useMounted from '../../hooks/useMounted'
 import { FlashList } from '@shopify/flash-list'
-import { useStore } from '../../store'
 import DynamicItem from './DynamicItem'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name)
-  const dynamicUser = useStore().dynamicUser!
-  const upId = dynamicUser.mid // || specialUser?.mid
+  // const dynamicUser = useStore().dynamicUser!
+  const dynamicUser = route.params?.user
+  const upId = dynamicUser?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<any>(null)
 
   const {
@@ -62,10 +62,10 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     })
   }, [navigation])
   const handleBack = useMemoizedFn(() => {
-    if (route.params?.from === 'followed' && navigation.isFocused()) {
-      navigation.navigate('Follow')
-      return true
-    }
+    // if (route.params?.from === 'followed' && navigation.isFocused()) {
+    //   navigation.navigate('Follow')
+    //   return true
+    // }
     return false
   })
   useMounted(() => {
@@ -89,7 +89,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         ref={dynamicListRef}
         estimatedItemSize={100}
         ListHeaderComponent={
-          dynamicUser.sign && dynamicUser.sign !== '-' ? (
+          dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
             <View style={styles.signTextContainer}>
               <Icon
                 name="billboard"
@@ -99,7 +99,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
                 color={theme.colors.grey0}
               />
               <Text style={[styles.signText, { color: theme.colors.grey0 }]}>
-                {dynamicUser.sign.trim()}
+                {dynamicUser?.sign.trim()}
               </Text>
             </View>
           ) : null

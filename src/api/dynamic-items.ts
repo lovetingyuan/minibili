@@ -208,11 +208,10 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         type: type,
         payload: {
           ...getForwardCommon(),
-          type: HandledForwardTypeEnum.DYNAMIC_TYPE_AV as const,
           text: forward.desc?.text,
-          cover: forward.major?.archive.cover,
-          title: forward.major?.archive.title,
           play: forward.major.archive.stat.play,
+          ...forward.major.archive,
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_AV as const,
         },
       }
     }
@@ -363,11 +362,14 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   }
 }
 
-export function useDynamicItems(mid: string | number) {
+export function useDynamicItems(mid?: string | number) {
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<DynamicListResponse>(
       (offset, response) => {
         if (response && (!response.has_more || !response.items.length)) {
+          return null
+        }
+        if (!mid) {
           return null
         }
         if (!offset) {
@@ -378,10 +380,8 @@ export function useDynamicItems(mid: string | number) {
       request,
       {
         revalidateFirstPage: false,
-        revalidateAll: false,
       },
     )
-
   const dynamicItems: DynamicListResponse['items'] =
     data?.reduce((a, b) => {
       return a.concat(b.items)

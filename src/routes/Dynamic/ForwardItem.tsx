@@ -6,9 +6,7 @@ import {
   View,
   useWindowDimensions,
   Pressable,
-  Linking,
 } from 'react-native'
-// import RichText from '../../components/RichText'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -19,6 +17,7 @@ import RichTexts from '../../components/RichTexts'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import useIsDark from '../../hooks/useIsDark'
+import store from '../../store'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
@@ -173,7 +172,17 @@ export default function ForwardItem(
         <Pressable
           style={styles.forwardUp}
           onPress={() => {
-            Linking.openURL('https://m.bilibili.com/space/' + props.payload.mid)
+            if (props.payload.mid === props.mid) {
+              return
+            }
+            navigation.push('Dynamic', {
+              user: {
+                face: props.payload.face,
+                name: props.payload.name,
+                mid: props.payload.mid,
+                sign: '-',
+              },
+            })
           }}>
           {props.payload.face && (
             <Avatar source={{ uri: props.payload.face }} size={22} rounded />
@@ -185,10 +194,29 @@ export default function ForwardItem(
         <Pressable
           style={styles.forwardContent}
           onPress={() => {
-            navigation.navigate('WebPage', {
-              title: props.payload.name + '的动态',
-              url: `https://m.bilibili.com/dynamic/${props.payload.id}`,
-            })
+            if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
+              store.currentVideo = {
+                bvid: props.payload.bvid,
+                name: props.payload.name,
+                face: props.payload.face,
+                mid: props.payload.mid,
+                // pubDate: props.payload.
+                title: props.payload.title,
+                aid: props.payload.aid,
+                cover: props.payload.cover,
+                desc: props.payload.desc,
+              }
+              navigation.push('Play', {
+                from: {
+                  mid: props.mid,
+                },
+              })
+            } else {
+              navigation.navigate('WebPage', {
+                title: props.payload.name + '的动态',
+                url: `https://m.bilibili.com/dynamic/${props.payload.id}`,
+              })
+            }
           }}>
           {forwardContent}
         </Pressable>

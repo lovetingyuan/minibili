@@ -27,11 +27,11 @@ export default function Header() {
         size={50}
         onPress={() => {
           if (store.$userInfo) {
-            store.dynamicUser = {
-              ...store.$userInfo,
-            }
+            // store.dynamicUser = {
+            //   ...store.$userInfo,
+            // }
             navigation.navigate('Dynamic', {
-              from: 'followed',
+              user: store.$userInfo,
             })
           }
         }}

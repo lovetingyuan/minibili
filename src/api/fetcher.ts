@@ -12,7 +12,7 @@ export default function request<D extends any>(url: string, referer?: string) {
     ? url
     : 'https://api.bilibili.com' + url
   const { origin, hostname } = new URL(requestUrl)
-  return fetch(requestUrl + '&_t=' + Date.now(), {
+  return fetch(requestUrl + '&__t=' + Date.now(), {
     headers: {
       // authority: host,
       // referer: 'https://api.bilibili.com/',

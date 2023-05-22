@@ -33,14 +33,19 @@ export default React.memo(
     // const livingInfo =
     const [modalVisible, setModalVisible] = React.useState(false)
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
-      store.dynamicUser = {
-        mid,
-        face,
-        name,
-        sign,
-      }
+      // store.dynamicUser = {
+      //   mid,
+      //   face,
+      //   name,
+      //   sign,
+      // }
       navigation.navigate('Dynamic', {
-        from: 'followed',
+        user: {
+          mid,
+          face,
+          name,
+          sign,
+        },
       })
       if (clearUpdate) {
         store.$latestUpdateIds[mid] = updateId

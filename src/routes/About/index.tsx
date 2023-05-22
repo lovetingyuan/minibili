@@ -1,6 +1,5 @@
 import React from 'react'
 import { Linking, Alert, ToastAndroid, Share, ScrollView } from 'react-native'
-// import {  } from 'react-native'
 import { StyleSheet } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
 
@@ -19,18 +18,19 @@ import {
   currentVersion,
 } from '../../api/check-update'
 import { githubLink, site } from '../../constants'
-import { NavigationProps } from '../../types'
-import { useNavigation } from '@react-navigation/native'
+import { RootStackParamList } from '../../types'
 import { Action, clearUser, reportUserAction } from '../../utils/report'
 import Constants from 'expo-constants'
 import * as Updates from 'expo-updates'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-export default function About() {
+export default function About({
+  navigation,
+}: NativeStackScreenProps<RootStackParamList, 'About'>) {
   const { $userInfo, $blackTags, $blackUps } = useStore()
   const [expanded, setExpanded] = React.useState(false)
   const [expandedUp, setExpandedUp] = React.useState(false)
   const [expandedStatement, setExpandedStatement] = React.useState(true)
-  const navigation = useNavigation<NavigationProps['navigation']>()
   const [checkingUpdate, setCheckingUpdate] = React.useState(false)
   const [hasUpdate, setHasUpdate] = React.useState<boolean | null>(null)
   const { theme } = useTheme()
@@ -49,7 +49,7 @@ export default function About() {
           })
           store.$userInfo = null
           store.updatedUps = {}
-          store.dynamicUser = null
+          // store.dynamicUser = null
           store.$followedUps = []
           store.livingUps = {}
           store.$ignoredVersions = []

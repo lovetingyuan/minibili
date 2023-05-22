@@ -93,7 +93,7 @@ function Player(props: Props & { wifi: boolean }) {
   const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
   Object.entries({
     bvid: videoInfo.bvid,
-    autoplay: wifi ? 1 : 0,
+    autoplay: 0,
     highQuality: wifi ? 1 : 0,
     quality: wifi ? 100 : 16,
     portraitFullScreen: true,

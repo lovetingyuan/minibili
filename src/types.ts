@@ -7,10 +7,18 @@ export type RootStackParamList = {
   Main: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
   Play?: {
-    from?: 'dynamic'
+    from?: {
+      mid: string | number
+    }
   }
   Dynamic?: {
     from?: string
+    user: {
+      mid: string | number
+      name: string
+      face: string
+      sign: string
+    }
   }
   DynamicDetail: {
     detail: DynamicItemAllType

@@ -31,7 +31,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { currentVideo } = useStore()
-  const isFromDynamic = route.params?.from === 'dynamic'
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: vi } = useVideoInfo(currentVideo?.bvid)
   const { theme } = useTheme()
@@ -59,11 +58,7 @@ const PlayPage = ({ route, navigation }: Props) => {
     <View style={styles.container}>
       <Player page={currentPage} />
       <ScrollView style={styles.videoInfoContainer}>
-        <VideoInfo
-          page={currentPage}
-          changePage={setCurrentPage}
-          isFromDynamic={isFromDynamic}
-        />
+        <VideoInfo page={currentPage} changePage={setCurrentPage} />
         <View style={{ marginTop: 10 }}>
           <CommentList
             upName={videoInfo.name}

@@ -1,26 +1,29 @@
 import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
 import { View, StyleSheet, Pressable, StyleProp, ViewStyle } from 'react-native'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
 
-import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../../types'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { NavigationProps, RootStackParamList } from '../../types'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 export function HeaderLeft(props: {
   scrollTop: () => void
   style?: StyleProp<ViewStyle>
 }) {
-  const { dynamicUser, livingUps } = useStore()
+  const { livingUps } = useStore()
+  const route =
+    useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
+  const dynamicUser = route.params?.user
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const gotoWebPage = () => {
-    const user = store.dynamicUser
-    if (user) {
+    if (dynamicUser) {
       navigation.navigate('WebPage', {
-        url: `https://space.bilibili.com/${user?.mid}`,
-        title: user?.name + '的主页',
+        url: `https://space.bilibili.com/${dynamicUser.mid}`,
+        title: dynamicUser.name + '的主页',
       })
     }
   }
@@ -67,12 +70,15 @@ export function HeaderLeft(props: {
 
 export function HeaderRight() {
   const { theme } = useTheme()
+  const route =
+    useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
+  const dynamicUser = route.params?.user
   return (
     <Pressable
       style={styles.right}
       onPress={() => {
-        if (store.dynamicUser) {
-          const { name, mid, sign } = store.dynamicUser
+        if (dynamicUser) {
+          const { name, mid, sign } = dynamicUser
           handleShareUp(name, mid, sign)
         }
       }}>

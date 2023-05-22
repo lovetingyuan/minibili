@@ -1,15 +1,15 @@
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useNavigationState } from '@react-navigation/native'
 import { Avatar, Icon, Text } from '@rneui/themed'
 import React from 'react'
 import { View, Pressable, StyleSheet, ToastAndroid } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 import { NavigationProps } from '../../types'
 import { handleShareVideo, parseDate, parseNumber } from '../../utils'
 import useMounted from '../../hooks/useMounted'
 
-export default function VideoHeader(props: { isFromDynamic: boolean }) {
-  const { isFromDynamic } = props
+export default function VideoHeader() {
+  // const { from: {mid} } = props
   const { currentVideo } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: vi } = useVideoInfo(currentVideo?.bvid)
@@ -19,6 +19,10 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
   }
   const { bvid, name, face, mid, pubDate, title } = videoInfo
   const [nameTextKey, setNameTextKey] = React.useState('-')
+  const state = useNavigationState(state => state)
+
+  // const route =
+  //   useRoute<NativeStackScreenProps<RootStackParamList, 'Play'>['route']>()
   // const { theme } = useTheme()
   useMounted(() => {
     for (let i = 0; i < 2; i++) {
@@ -31,25 +35,39 @@ export default function VideoHeader(props: { isFromDynamic: boolean }) {
     <View style={styles.videoHeader}>
       <Pressable
         onPress={() => {
-          if (isFromDynamic) {
-            navigation.goBack()
-            return
-          }
           if (!mid || !face || !name) {
             return
           }
-          store.dynamicUser = {
+          // store.dynamicUser = {
+          //   mid,
+          //   face,
+          //   name,
+          //   sign: '-',
+          // }
+          const { routes } = state
+          const prevRoute = routes[routes.length - 2]
+          const user = {
             mid,
             face,
             name,
             sign: '-',
           }
-          navigation.navigate('Dynamic')
+          if (prevRoute && prevRoute.name === 'Dynamic') {
+            const same = (prevRoute.params as any)?.user.mid === mid
+            if (same) {
+              navigation.goBack()
+            } else {
+              navigation.push('Dynamic', { user })
+            }
+          } else {
+            navigation.navigate('Dynamic', {
+              user,
+            })
+          }
         }}
         style={styles.upInfoContainer}>
         <Avatar size={32} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
         <Text
-          // adjustsFontSizeToFit
           numberOfLines={1}
           ellipsizeMode="tail"
           style={styles.upName}
