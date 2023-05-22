@@ -15,7 +15,7 @@ export default function DefaultItem(
         text={props.text}
         textProps={{ style: { fontSize: 16, lineHeight: 24 } }}
       /> */}
-      <RichTexts nodes={props.richTexts} />
+      <RichTexts idStr={props.id} nodes={props.richTexts} />
       {/* <Text style={{ marginTop: 10 }}>{props.payload.text}</Text> */}
     </View>
   )

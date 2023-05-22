@@ -9,7 +9,7 @@ export default function CommonItem(
 ) {
   return (
     <View style={{ gap: 10 }}>
-      <RichTexts nodes={props.richTexts} topic={props.topic} />
+      <RichTexts idStr={props.id} nodes={props.richTexts} topic={props.topic} />
       <View style={{ flexDirection: 'row', gap: 12 }}>
         <Image
           source={{ uri: props.payload.cover }}

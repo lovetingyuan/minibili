@@ -91,6 +91,7 @@ export default function RichTextItem(
   return (
     <View style={[styles.textContainer]}>
       <RichTexts
+        idStr={props.id}
         nodes={props.richTexts}
         topic={props.topic}
         textProps={isDetail ? {} : { numberOfLines: 4 }}

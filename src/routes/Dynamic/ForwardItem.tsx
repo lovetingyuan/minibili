@@ -33,6 +33,7 @@ export default function ForwardItem(
       <View style={{ flexDirection: 'column', flex: 1 }}>
         {props.payload.text ? (
           <RichTexts
+            idStr={props.payload.id}
             nodes={props.payload.richTexts}
             style={{ marginBottom: 10 }}
             textProps={{ numberOfLines: 3 }}
@@ -59,6 +60,7 @@ export default function ForwardItem(
     forwardContent = (
       <View style={{ flexDirection: 'column' }}>
         <RichTexts
+          idStr={props.payload.id}
           nodes={props.payload.richTexts}
           textProps={{ numberOfLines: 3 }}
         />
@@ -91,7 +93,9 @@ export default function ForwardItem(
       </View>
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
-    forwardContent = <RichTexts nodes={props.payload.richTexts} />
+    forwardContent = (
+      <RichTexts idStr={props.payload.id} nodes={props.payload.richTexts} />
+    )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE) {
     forwardContent = (
       <View>
@@ -106,6 +110,7 @@ export default function ForwardItem(
     forwardContent = (
       <View style={{ flexDirection: 'row', gap: 12 }}>
         <RichTexts
+          idStr={props.payload.id}
           nodes={props.payload.richTexts}
           textProps={{ numberOfLines: 3 }}
         />
@@ -155,7 +160,11 @@ export default function ForwardItem(
   }
   return (
     <View style={[styles.textContainer]}>
-      <RichTexts nodes={props.richTexts} textProps={{ numberOfLines: 3 }} />
+      <RichTexts
+        idStr={props.id}
+        nodes={props.richTexts}
+        textProps={{ numberOfLines: 3 }}
+      />
       <View
         style={[
           styles.forwardContainer,

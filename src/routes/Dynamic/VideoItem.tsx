@@ -52,6 +52,7 @@ export default function VideoItem(
       }}>
       {props.richTexts ? (
         <RichTexts
+          idStr={props.id}
           nodes={props.richTexts}
           style={{ marginBottom: 12 }}
           textProps={{ numberOfLines: 3 }}

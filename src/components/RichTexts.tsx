@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 
 export default function RichTexts(props: {
+  idStr: string | null
   nodes?: RichTextNode[]
   topic?: {
     name: string
@@ -146,7 +147,14 @@ export default function RichTexts(props: {
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_LOTTERY) {
       reactNodes.push(
-        <Text key={key++} style={[styles.link, { fontSize }]}>
+        <Text
+          key={key++}
+          style={[styles.link, { fontSize }]}
+          onPress={() => {
+            Linking.openURL(
+              `https://t.bilibili.com/lottery/h5/index/#/result?business_type=1&business_id=${props.idStr}&isWeb=1`,
+            )
+          }}>
           {' 抽奖：'}
           {node.text}
         </Text>,

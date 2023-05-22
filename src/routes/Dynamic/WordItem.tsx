@@ -14,6 +14,7 @@ export default function WordItem(
   return (
     <>
       <RichTexts
+        idStr={props.id}
         nodes={props.richTexts}
         topic={props.topic}
         textProps={isDetail ? {} : { numberOfLines: 5 }}
