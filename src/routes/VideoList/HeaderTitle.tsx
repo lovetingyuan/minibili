@@ -35,7 +35,6 @@ const HeaderTitle = () => {
         {__DEV__ ? (
           <Text
             onPress={() => {
-              console.log(3333, mode)
               setMode(mode === 'dark' ? 'light' : 'dark')
             }}>
             {' '}
@@ -51,16 +50,12 @@ const HeaderTitle = () => {
           setVisible(false)
         }}>
         <ScrollView style={styles.typeList}>
-          {ranksList.map((item, i) => {
+          {ranksList.map(item => {
             return (
               <Button
                 type={item.rid === videosType.rid ? 'solid' : 'clear'}
                 key={item.rid}
-                titleStyle={
-                  i
-                    ? { marginVertical: 3 }
-                    : { fontWeight: 'bold', marginVertical: 3 }
-                }
+                titleStyle={{ marginVertical: 3 }}
                 onPress={() => {
                   store.videosType = item
                   setVisible(false)

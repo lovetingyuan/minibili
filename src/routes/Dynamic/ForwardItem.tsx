@@ -108,7 +108,7 @@ export default function ForwardItem(
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC) {
     forwardContent = (
-      <View style={{ flexDirection: 'row', gap: 12 }}>
+      <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' }}>
         <RichTexts
           idStr={props.payload.id}
           nodes={props.payload.richTexts}
