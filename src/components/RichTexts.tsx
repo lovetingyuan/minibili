@@ -94,6 +94,7 @@ export default function RichTexts(props: {
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_BV) {
       reactNodes.push(
         <Text
+          numberOfLines={1}
           onPress={() => {
             Linking.openURL(
               node.jump_url.startsWith('//')
@@ -110,6 +111,7 @@ export default function RichTexts(props: {
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_GOODS) {
       reactNodes.push(
         <Text
+          numberOfLines={1}
           onPress={() => {
             Linking.openURL(node.jump_url)
           }}
@@ -167,9 +169,27 @@ export default function RichTexts(props: {
           onPress={() => {
             Linking.openURL(node.jump_url)
           }}
+          numberOfLines={1}
           key={key++}
           style={[styles.link, { fontSize }]}>
           {' 番剧：'}
+          {node.text}
+        </Text>,
+      )
+    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AV) {
+      reactNodes.push(
+        <Text
+          numberOfLines={1}
+          onPress={() => {
+            Linking.openURL(
+              node.jump_url.startsWith('//')
+                ? 'https:' + node.jump_url
+                : node.jump_url,
+            )
+          }}
+          key={key++}
+          style={[styles.link, { fontSize }]}>
+          {' 视频：'}
           {node.text}
         </Text>,
       )
