@@ -70,3 +70,50 @@ export const UserCardInfoResponseSchema = z.object({
   follower: z.number(),
   // like_num: 6,
 })
+
+export const UserBatchInfoResponseSchema = z
+  .object({
+    mid: z.number(),
+    name: z.string(),
+    sex: z.string(),
+    face: z.string(),
+    sign: z.string(),
+    // rank: 10000,
+    level: z.number(),
+    birthday: z.number(),
+    // silence: 0,
+    vip: z.object({
+      status: z.number(),
+    }),
+    // pendant: {
+    //   pid: 0,
+    //   name: '',
+    //   image: '',
+    //   expire: 0,
+    //   image_enhance: '',
+    //   image_enhance_frame: '',
+    // },
+    // nameplate: {
+    //   nid: 0,
+    //   name: '',
+    //   image: '',
+    //   image_small: '',
+    //   level: '',
+    //   condition: '',
+    // },
+    // official: {
+    //   role: 0,
+    //   title: '',
+    //   desc: '',
+    //   type: -1,
+    // },
+    // is_fake_account: 0,
+    // is_deleted: 0,
+    // in_reg_audit: 0,
+    // face_nft: 0,
+    // face_nft_new: 0,
+    // is_senior_member: 0,
+    // digital_id: '',
+    // digital_type: -2,
+  })
+  .array()

@@ -47,7 +47,9 @@ export default function Login() {
     }
     setUser(data.mid, data.name)
     reportUserAction(Action.LOGIN, data)
-    navigation.navigate('Follow')
+    setTimeout(() => {
+      navigation.navigate('Follow')
+    }, 100)
   }
   React.useEffect(() => {
     if (error) {
