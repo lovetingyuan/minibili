@@ -214,6 +214,28 @@ const RichTextSchema = z.discriminatedUnion('type', [
     text: z.string(),
   }),
   z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_BV]),
+    jump_url: z.string(),
+    orig_text: z.string(),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_GOODS]),
+    jump_url: z.string(),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_MAIL]),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_VOTE]),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
     type: z.nativeEnum(OtherRichTextType),
     text: z.string(),
   }),

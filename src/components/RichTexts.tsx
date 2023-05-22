@@ -85,6 +85,52 @@ export default function RichTexts(props: {
           {node.text}
         </Text>,
       )
+    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_BV) {
+      reactNodes.push(
+        <Text
+          onPress={() => {
+            Linking.openURL('https' + node.jump_url)
+          }}
+          key={key++}
+          style={[styles.link, { fontSize }]}>
+          视频：{node.text}
+        </Text>,
+      )
+    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_GOODS) {
+      reactNodes.push(
+        <Text
+          onPress={() => {
+            Linking.openURL(node.jump_url)
+          }}
+          key={key++}
+          style={[styles.link, { fontSize }]}>
+          商品：{node.text}
+        </Text>,
+      )
+    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_MAIL) {
+      reactNodes.push(
+        <Text
+          onPress={() => {
+            Linking.openURL(`mailto:${node.text}`)
+          }}
+          key={key++}
+          style={[styles.link, { fontSize }]}>
+          {node.text}
+        </Text>,
+      )
+    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_VOTE) {
+      reactNodes.push(
+        <Text
+          onPress={() => {
+            Linking.openURL(
+              `https://t.bilibili.com/vote/h5/index/#/result?vote_id=${node.rid}`,
+            )
+          }}
+          key={key++}
+          style={[styles.link, { fontSize }]}>
+          投票：{node.text}
+        </Text>,
+      )
     } else {
       reportUnknownRichTextItem(node)
       reactNodes.push(
