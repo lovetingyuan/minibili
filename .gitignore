@@ -15,3 +15,4 @@ web-build/
 
 *.log
 .env
+tmp

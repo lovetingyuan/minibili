@@ -10,8 +10,15 @@ const gitHash = cp
   .trim()
   .slice(0, 8)
 
+const appId =
+  process.env.APP_VARIANT === 'preview'
+    ? 'com.tingyuan.minibili.preview'
+    : 'com.tingyuan.minibili'
+
+const name = process.env.APP_VARIANT === 'preview' ? 'MiniBili-pre' : 'MiniBili'
+
 module.exports = {
-  name: 'MiniBili',
+  name,
   slug: 'minibili',
   version,
   githubUrl: 'https://github.com/lovetingyuan/minibili',
@@ -26,7 +33,7 @@ module.exports = {
   assetBundlePatterns: ['assets/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.tingyuan.minibili',
+    bundleIdentifier: appId,
     buildNumber: version,
   },
   android: {
@@ -34,7 +41,7 @@ module.exports = {
       foregroundImage: './assets/icon.png',
       backgroundColor: '#FFFFFF',
     },
-    package: 'com.tingyuan.minibili',
+    package: appId,
     versionCode: Number(versionCode),
   },
   plugins: [
