@@ -340,6 +340,21 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE) {
+      const { common } = item.orig.modules.module_dynamic.major
+      // const { name } = item.orig.modules.module_author
+      return {
+        ...getCommon(item),
+        type: type,
+        payload: {
+          ...getForwardCommon(),
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE as const,
+          title: common.title,
+          cover: common.cover,
+          text: `${common.badge.text}: ${common.desc}`,
+        },
+      }
+    }
     reportUnknownDynamicItem(item)
     return {
       ...getCommon(item),

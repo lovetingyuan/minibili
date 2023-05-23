@@ -152,6 +152,25 @@ export default function ForwardItem(
         </View>
       </View>
     )
+  } else if (
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE
+  ) {
+    forwardContent = (
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        <Image
+          source={{ uri: props.payload.cover }}
+          style={{
+            width: 120,
+            height: 70,
+            borderRadius: 4,
+          }}
+        />
+        <View style={{ gap: 10 }}>
+          <Text style={{ fontWeight: 'bold' }}>{props.payload.title}</Text>
+          <Text>{props.payload.text}</Text>
+        </View>
+      </View>
+    )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {
     forwardContent = (
       <Text style={{ fontStyle: 'italic' }}>{props.payload.text}</Text>
@@ -169,28 +188,28 @@ export default function ForwardItem(
           styles.forwardContainer,
           { backgroundColor: isDark ? '#222' : '#dedede' },
         ]}>
-        <Pressable
-          style={styles.forwardUp}
-          onPress={() => {
-            if (props.payload.mid === props.mid) {
-              return
-            }
-            navigation.push('Dynamic', {
-              user: {
-                face: props.payload.face,
-                name: props.payload.name,
-                mid: props.payload.mid,
-                sign: '-',
-              },
-            })
-          }}>
-          {props.payload.face && (
-            <Avatar source={{ uri: props.payload.face }} size={22} rounded />
-          )}
-          {props.payload.name && (
+        {props.payload.name ? (
+          <Pressable
+            style={styles.forwardUp}
+            onPress={() => {
+              if (props.payload.mid === props.mid) {
+                return
+              }
+              navigation.push('Dynamic', {
+                user: {
+                  face: props.payload.face,
+                  name: props.payload.name,
+                  mid: props.payload.mid,
+                  sign: '-',
+                },
+              })
+            }}>
+            {props.payload.face ? (
+              <Avatar source={{ uri: props.payload.face }} size={22} rounded />
+            ) : null}
             <Text style={styles.forwardUpName}>{props.payload.name}</Text>
-          )}
-        </Pressable>
+          </Pressable>
+        ) : null}
         <Pressable
           style={styles.forwardContent}
           onPress={() => {

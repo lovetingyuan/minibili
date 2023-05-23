@@ -48,8 +48,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 🔗'}
-          {node.text}{' '}
+          {' 🔗' + node.text + ' '}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AT) {
@@ -63,7 +62,6 @@ export default function RichTexts(props: {
             })
           }}
           style={[styles.link, { fontSize }]}>
-          {' '}
           {node.text}
         </Text>,
       )
@@ -87,11 +85,14 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' '}
           {node.text}
         </Text>,
       )
-    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_BV) {
+    } else if (
+      node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_BV ||
+      node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AV ||
+      node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_OGV_EP
+    ) {
       reactNodes.push(
         <Text
           numberOfLines={1}
@@ -104,8 +105,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' '}
-          视频：{node.text}
+          {' 视频：' + node.text}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_GOODS) {
@@ -117,8 +117,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' '}
-          商品：{node.text}
+          {' 商品：' + node.text}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_MAIL) {
@@ -129,7 +128,6 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' '}
           {node.text}
         </Text>,
       )
@@ -143,8 +141,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' '}
-          投票：{node.text}
+          {' 投票：' + node.text}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_LOTTERY) {
@@ -157,8 +154,7 @@ export default function RichTexts(props: {
               `https://t.bilibili.com/lottery/h5/index/#/result?business_type=1&business_id=${props.idStr}&isWeb=1`,
             )
           }}>
-          {' 抽奖：'}
-          {node.text}
+          {' 抽奖：' + node.text}
         </Text>,
       )
     } else if (
@@ -172,11 +168,10 @@ export default function RichTexts(props: {
           numberOfLines={1}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 番剧：'}
-          {node.text}
+          {' 剧集：' + node.text}
         </Text>,
       )
-    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AV) {
+    } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_CV) {
       reactNodes.push(
         <Text
           numberOfLines={1}
@@ -189,8 +184,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 视频：'}
-          {node.text}
+          {' 文章：' + node.text}
         </Text>,
       )
     } else {

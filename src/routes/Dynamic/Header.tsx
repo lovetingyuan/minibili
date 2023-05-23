@@ -30,7 +30,7 @@ export function HeaderLeft(props: {
   return (
     <View style={[styles.left, props.style]}>
       <Avatar
-        size={36}
+        size={33}
         rounded
         onPress={gotoWebPage}
         source={{

@@ -57,7 +57,6 @@ export default function VideoItem(
           idStr={props.id}
           nodes={props.richTexts}
           style={{ marginBottom: 12 }}
-          textProps={{ numberOfLines: 3 }}
         />
       ) : null}
       <View style={styles.videoContainer}>

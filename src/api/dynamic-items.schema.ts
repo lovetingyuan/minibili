@@ -125,7 +125,7 @@ const MajorSchema = {
     common: z.object({
       badge: z.object({
         // bg_color: '#FB7299',
-        // color: '#ffffff',
+        color: z.string(),
         text: z.string(),
       }),
       biz_type: z.number(),
@@ -248,6 +248,18 @@ const RichTextSchema = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_AV]),
+    rid: z.string(),
+    jump_url: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_OGV_EP]),
+    rid: z.string(),
+    jump_url: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_CV]),
     rid: z.string(),
     jump_url: z.string(),
     text: z.string(),
@@ -546,6 +558,20 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
                 z.object({
                   // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.PGC,
+                }),
+              ),
+            }),
+          }),
+        ),
+        BaseOrigSchema.merge(
+          z.object({
+            type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE]),
+            modules: z.object({
+              module_author: AuthorSchema,
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.Common,
                 }),
               ),
             }),
