@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  Image,
   ScrollView,
   StyleSheet,
   View,
@@ -13,6 +12,7 @@ import store from '../../store'
 import { useRoute } from '@react-navigation/native'
 import RichTexts from '../../components/RichTexts'
 import { Text } from '@rneui/themed'
+import { Image } from 'expo-image'
 
 export default function RichTextItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW>,
@@ -33,8 +33,8 @@ export default function RichTextItem(
         const ImageCmp = (
           <Image
             key={img.src}
-            style={[styles.image, { aspectRatio: img.ratio }]}
-            resizeMode="cover"
+            style={[styles.image]}
+            contentFit="cover"
             source={{
               uri: img.src + '@240w_240h_1c.webp',
             }}
@@ -65,7 +65,7 @@ export default function RichTextItem(
           <Image
             key={img.src}
             style={[{ aspectRatio: 1, width: imageListWidth, borderRadius: 4 }]}
-            resizeMode="cover"
+            contentFit="cover"
             source={{
               uri: img.src + '@240w_240h_1c.webp',
             }}
@@ -110,8 +110,9 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
   image: {
-    height: 110,
-    marginRight: 10,
+    height: 100,
+    width: 100,
+    marginRight: 5,
     marginVertical: 10,
     borderRadius: 4,
   },

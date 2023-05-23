@@ -19,32 +19,6 @@ export default function HeaderRight(props: {
 
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-      {/* <Icon
-        onPress={() => {
-          store.$webViewMode = store.$webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
-        }}
-        name={$webViewMode === 'MOBILE' ? 'mobile-friendly' : 'computer'}
-        color="#666"
-        size={18}
-      /> */}
-      {/* <Icon
-  name="refresh"
-  size={20}
-  color="#666"
-  style={{ marginLeft: 8 }}
-  onPress={() => {
-    webviewRef.current?.reload()
-  }}
-/> */}
-      {/* <Icon
-        name="open-in-browser"
-        size={20}
-        color="#666"
-        style={{ marginLeft: 8 }}
-        onPress={() => {
-          Linking.openURL(props.url)
-        }}
-      /> */}
       <Menu
         visible={visible}
         anchor={

@@ -1,15 +1,23 @@
 import React from 'react'
-import { View, Image, Text, Linking, StyleSheet } from 'react-native'
+import {
+  View,
+  Text,
+  Linking,
+  StyleSheet,
+  ScrollView,
+  useWindowDimensions,
+} from 'react-native'
 import { Icon, Overlay } from '@rneui/themed'
 import { useNetInfo } from '@react-native-community/netinfo'
 import PagerView from 'react-native-pager-view'
 import store, { useStore } from '../../store'
+import { Image } from 'expo-image'
 
 export default function ImagesView() {
-  // const { images, imageIndex } = props
   const { imagesList, currentImageIndex } = useStore()
   const netinfo = useNetInfo()
-  // const [visible, setVisible] = React.useState(false)
+  const { width, height } = useWindowDimensions()
+  const ratio = width / height
   if (!imagesList.length) {
     return null
   }
@@ -19,7 +27,6 @@ export default function ImagesView() {
       fullScreen
       overlayStyle={styles.overlay}
       onBackdropPress={() => {
-        // setVisible(false)
         store.imagesList = []
         store.currentImageIndex = 0
       }}>
@@ -27,23 +34,35 @@ export default function ImagesView() {
         style={styles.viewPager}
         initialPage={currentImageIndex}
         onPageSelected={e => {
-          // props.setImageIndex(e.nativeEvent.position)
           store.currentImageIndex = e.nativeEvent.position
         }}>
         {imagesList.map(img => {
+          const url =
+            netinfo.type === 'wifi' ? img.src : img.src + '@640w_640h_2c.webp'
           return (
-            <View key={img.src} style={styles.page}>
-              <Image
-                style={[styles.pagerImage, { aspectRatio: img.ratio }]}
-                loadingIndicatorSource={require('../../../assets/loading.png')}
-                source={{
-                  uri:
-                    netinfo.type === 'wifi'
-                      ? img.src
-                      : img.src + '@640w_640h_2c.webp',
-                }}
-              />
-            </View>
+            <ScrollView
+              key={img.src}
+              contentContainerStyle={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                ...(img.ratio < ratio ? {} : { flex: 1 }),
+              }}>
+              <View style={[styles.page]}>
+                <Image
+                  style={[
+                    styles.pagerImage,
+                    {
+                      aspectRatio: img.ratio,
+                    },
+                  ]}
+                  placeholderContentFit="contain"
+                  // placeholder={{ uri: '../../assets/loading.png' }}
+                  source={{
+                    uri: url,
+                  }}
+                />
+              </View>
+            </ScrollView>
           )
         })}
       </PagerView>
@@ -68,12 +87,11 @@ export default function ImagesView() {
 const styles = StyleSheet.create({
   pagerImage: {
     width: '100%',
-    maxHeight: '100%',
   },
   overlay: {
     padding: 0,
     margin: 0,
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'rgba(0,0,0,0.85)',
   },
   viewPager: {
     flex: 1,

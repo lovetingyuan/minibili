@@ -1,71 +1,73 @@
-import {
-  Button,
-  Icon,
-  Overlay,
-  Text,
-  useTheme,
-  useThemeMode,
-} from '@rneui/themed'
+import { Icon, Text, useTheme, useThemeMode } from '@rneui/themed'
 import { Pressable, ScrollView, View } from 'react-native'
 import store, { useStore } from '../../store'
 import React from 'react'
 import { StyleSheet } from 'react-native'
+import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 
 const HeaderTitle = () => {
-  const [visible, setVisible] = React.useState(false)
   const { videosType, ranksList } = useStore()
   const { theme } = useTheme()
   const { mode, setMode } = useThemeMode()
+  const [visible, setVisible] = React.useState(false)
+  const hideMenu = () => setVisible(false)
+  const showMenu = () => setVisible(true)
   return (
     <View>
-      <Pressable
-        style={styles.titleContainer}
-        onPress={() => {
-          setVisible(true)
-        }}>
-        <Text style={[styles.title, { color: theme.colors.grey1 }]}>
-          {videosType.label + (videosType.rid === -1 ? '' : '排行')}{' '}
-        </Text>
-        <Icon
-          name="triangle-down"
-          type="octicon"
-          size={28}
-          color={theme.colors.grey1}
-        />
-        {__DEV__ ? (
-          <Text
-            onPress={() => {
-              setMode(mode === 'dark' ? 'light' : 'dark')
-            }}>
-            {' '}
-            dev
-          </Text>
-        ) : null}
-      </Pressable>
-      <Overlay
-        isVisible={visible}
-        backdropStyle={styles.backdrop}
-        overlayStyle={[styles.overlay]}
-        onBackdropPress={() => {
-          setVisible(false)
-        }}>
+      <Menu
+        visible={visible}
+        style={{ ...styles.menu, backgroundColor: theme.colors.background }}
+        anchor={
+          <Pressable onPress={showMenu} style={styles.titleContainer}>
+            <Text style={[styles.title, { color: theme.colors.grey1 }]}>
+              {videosType.label + (videosType.rid === -1 ? '' : '排行')}{' '}
+            </Text>
+            <Icon
+              name="triangle-down"
+              type="octicon"
+              size={28}
+              color={theme.colors.grey1}
+            />
+            {__DEV__ ? (
+              <Text
+                onPress={() => {
+                  setMode(mode === 'dark' ? 'light' : 'dark')
+                }}>
+                {' '}
+                dev
+              </Text>
+            ) : null}
+          </Pressable>
+        }
+        onRequestClose={hideMenu}>
         <ScrollView style={styles.typeList}>
-          {ranksList.map(item => {
-            return (
-              <Button
-                type={item.rid === videosType.rid ? 'solid' : 'clear'}
-                key={item.rid}
-                titleStyle={{ marginVertical: 3 }}
+          {ranksList.map((item, i) => {
+            const Item = (
+              <MenuItem
+                textStyle={{
+                  fontSize: 16,
+                  fontWeight: i ? 'normal' : 'bold',
+                  color:
+                    store.videosType.rid === item.rid
+                      ? theme.colors.primary
+                      : theme.colors.black,
+                }}
                 onPress={() => {
                   store.videosType = item
-                  setVisible(false)
+                  hideMenu()
                 }}>
                 {item.label}
-              </Button>
+              </MenuItem>
+            )
+            return (
+              <View key={item.rid}>
+                {Item}
+                {i ? null : <MenuDivider color={theme.colors.divider} />}
+              </View>
             )
           })}
         </ScrollView>
-      </Overlay>
+      </Menu>
     </View>
   )
 }
@@ -73,16 +75,6 @@ const HeaderTitle = () => {
 export default HeaderTitle
 
 const styles = StyleSheet.create({
-  overlay: {
-    paddingHorizontal: 0,
-    // paddingVertical: 10,
-    position: 'absolute',
-    top: 50,
-    left: 15,
-  },
-  backdrop: {
-    backgroundColor: 'rgba(0,0,0,0.0001)',
-  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -92,5 +84,6 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: 'bold',
   },
-  typeList: { width: 100, maxHeight: 400 },
+  menu: { position: 'relative', top: 50, width: 90 },
+  typeList: { maxHeight: 400, width: 90 },
 })

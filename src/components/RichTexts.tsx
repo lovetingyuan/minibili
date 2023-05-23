@@ -1,11 +1,11 @@
 import React from 'react'
 import {
   View,
-  Image,
   Linking,
   StyleSheet,
   ViewStyle,
   TextProps,
+  Image,
 } from 'react-native'
 import { RichTextNode } from '../api/dynamic-items.schema'
 import { HandledRichTextType } from '../api/dynamic-items.type'
@@ -13,6 +13,7 @@ import { reportUnknownRichTextItem } from '../utils/report'
 import { Icon, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
+// import { Image } from 'expo-image'
 
 export default function RichTexts(props: {
   idStr: string | null
@@ -70,7 +71,7 @@ export default function RichTexts(props: {
         <Image
           key={key++}
           source={{ uri: node.emoji.icon_url }}
-          style={[styles.emoji]}
+          style={[styles.emoji, { alignSelf: 'center' }]}
         />,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC) {
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    color: 'red',
+    flex: 1,
   },
   topicContainer: {
     flexDirection: 'row',
@@ -235,7 +236,6 @@ const styles = StyleSheet.create({
   emoji: {
     width: 20,
     height: 20,
-    marginHorizontal: 2,
   },
   link: {
     color: '#178bcf',
@@ -244,6 +244,6 @@ const styles = StyleSheet.create({
   text: {
     lineHeight: 24,
     fontSize: 15,
-    borderWidth: 0.5,
+    // borderWidth: 0.5,
   },
 })

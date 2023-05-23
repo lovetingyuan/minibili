@@ -184,7 +184,8 @@ const styles = StyleSheet.create({
     minWidth: 80,
     color: '#666',
     alignItems: 'center',
-    gap: 10,
+    columnGap: 10,
+    flexWrap: 'wrap',
   },
   iconText: {
     flexDirection: 'row',

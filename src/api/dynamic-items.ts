@@ -17,6 +17,7 @@ import {
   HandledForwardTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
+import { parseUrl } from '../utils'
 
 type OmitUndef<T> = {
   [K in keyof T as T[K] extends undefined ? never : K]: T[K]
@@ -219,18 +220,17 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       const additional = item.orig.modules.module_dynamic.additional
       const text = [item.orig.modules.module_dynamic.desc?.text]
       // let additionalText = ''/
-      if (additional) {
-        if (
-          additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE
-        ) {
-          text.push(
-            ...[
-              additional.reserve.title || '',
-              additional.reserve.desc1?.text || '',
-              additional.reserve.desc2?.text || '',
-            ],
-          )
-        }
+      if (
+        additional?.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE
+      ) {
+        text.push(
+          ...[
+            '',
+            additional.reserve.title || '',
+            additional.reserve.desc1?.text || '',
+            additional.reserve.desc2?.text || '',
+          ],
+        )
       }
       return {
         ...getCommon(item),
@@ -291,9 +291,9 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         payload: {
           ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE as const,
-          text: forward.desc?.text,
           title:
-            forward.major.live.title + '\n' + forward.major.live.badge.text,
+            forward.major.live.badge.text + '：' + forward.major.live.title,
+          text: forward.desc?.text,
           cover: forward.major.live.cover,
         },
       }
@@ -319,30 +319,29 @@ const getDynamicItem = (item: DynamicItemResponse) => {
           ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC as const,
           title,
-          label,
+          text: label,
           cover,
-          url: jump_url,
+          url: parseUrl(jump_url),
         },
       }
     }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC) {
       const { pgc } = item.orig.modules.module_dynamic.major
-      const { name } = item.orig.modules.module_author
       return {
         ...getCommon(item),
         type: type,
         payload: {
           ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_PGC as const,
-          title: name,
+          title: pgc.title,
           cover: pgc.cover,
-          text: `${pgc.badge.text}: ${pgc.title} (${pgc.stat.play}播放)`,
+          text: `${pgc.badge.text} (${pgc.stat.play}播放)`,
+          url: parseUrl(pgc.jump_url),
         },
       }
     }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE) {
       const { common } = item.orig.modules.module_dynamic.major
-      // const { name } = item.orig.modules.module_author
       return {
         ...getCommon(item),
         type: type,
@@ -351,7 +350,10 @@ const getDynamicItem = (item: DynamicItemResponse) => {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE as const,
           title: common.title,
           cover: common.cover,
-          text: `${common.badge.text}: ${common.desc}`,
+          text: `${common.badge.text ? common.badge.text + '：' : ''}${
+            common.desc
+          }`,
+          url: parseUrl(common.jump_url),
         },
       }
     }

@@ -124,3 +124,7 @@ export async function checkWifi() {
     )
   }
 }
+
+export const parseUrl = (url: string) => {
+  return url.startsWith('//') ? 'https:' + url : url
+}

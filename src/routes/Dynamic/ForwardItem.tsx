@@ -1,11 +1,11 @@
 import React from 'react'
 import {
-  Image,
   ScrollView,
   StyleSheet,
   View,
   useWindowDimensions,
   Pressable,
+  Linking,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
@@ -18,11 +18,76 @@ import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import useIsDark from '../../hooks/useIsDark'
 import store from '../../store'
+import { Image } from 'expo-image'
+
+const CommonContent = (props: {
+  url?: string
+  title: string
+  text: string
+  cover: string
+}) => {
+  const { width } = useWindowDimensions()
+  const { url, title, text, cover } = props
+  const containerStyle: any = {
+    flexDirection: 'row',
+    gap: 12,
+  }
+  const coverContent = cover ? (
+    <Image
+      source={{ uri: cover }}
+      style={{
+        width: width * 0.4,
+        height: width * 0.22,
+        borderRadius: 4,
+      }}
+    />
+  ) : null
+  const textContent = (
+    <View
+      style={{
+        gap: 8,
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        flexShrink: 1,
+      }}>
+      <View style={{ gap: 10 }}>
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: 'bold',
+          }}
+          numberOfLines={2}>
+          {title}
+        </Text>
+        <Text style={{ fontSize: 14 }} numberOfLines={3}>
+          {text}
+        </Text>
+      </View>
+    </View>
+  )
+  if (url) {
+    return (
+      <Pressable
+        style={containerStyle}
+        onPress={() => {
+          url && Linking.openURL(url)
+        }}>
+        {coverContent}
+        {textContent}
+      </Pressable>
+    )
+  }
+  return (
+    <View style={containerStyle}>
+      {coverContent}
+      {textContent}
+    </View>
+  )
+}
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
 ) {
-  const { width } = useWindowDimensions()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const isDark = useIsDark()
 
@@ -44,7 +109,7 @@ export default function ForwardItem(
             source={{ uri: props.payload.cover + '@240w_240h_1c.webp' }}
           />
           <View style={{ flex: 6 }}>
-            <Text numberOfLines={2} style={{ lineHeight: 20 }}>
+            <Text numberOfLines={2} style={{ lineHeight: 20, fontSize: 15 }}>
               <Text style={{ fontWeight: 'bold' }}>视频：</Text>
               {props.payload.title}
             </Text>
@@ -80,95 +145,30 @@ export default function ForwardItem(
         {/* {props.payload.text2 ? <Text>{props.payload.text2}</Text> : null} */}
       </View>
     )
-  } else if (
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE
-  ) {
-    forwardContent = (
-      <View>
-        <Text style={{ fontSize: 15, marginBottom: 10, fontWeight: 'bold' }}>
-          {props.payload.title}
-        </Text>
-        <Text numberOfLines={3}>{props.payload.text}</Text>
-      </View>
-    )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
     forwardContent = (
       <RichTexts idStr={props.payload.id} nodes={props.payload.richTexts} />
     )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE) {
+  } else if (
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE
+  ) {
     forwardContent = (
-      <View>
-        <Text>{props.payload.title}</Text>
-        <Image
-          source={{ uri: props.payload.cover }}
-          style={{ width: 100, height: 50, marginTop: 5, borderRadius: 4 }}
-        />
-      </View>
-    )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC) {
-    forwardContent = (
-      <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' }}>
+      <View style={{ gap: 10, flexShrink: 1 }}>
         <RichTexts
           idStr={props.payload.id}
           nodes={props.payload.richTexts}
           textProps={{ numberOfLines: 3 }}
         />
-        <Image
-          source={{ uri: props.payload.cover }}
-          style={{
-            width: 100,
-            height: 80,
-            borderRadius: 4,
-          }}
+        <CommonContent
+          title={props.payload.title}
+          url={'url' in props.payload ? props.payload.url : ''}
+          text={props.payload.text || ''}
+          cover={props.payload.cover}
         />
-        <View style={{ gap: 8 }}>
-          <Text style={{ fontSize: 15, fontWeight: 'bold' }}>
-            {props.payload.title}
-          </Text>
-          <Text style={{ fontSize: 14, fontWeight: 'normal' }}>
-            {props.payload.label}
-          </Text>
-        </View>
-      </View>
-    )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC) {
-    forwardContent = (
-      <View style={{ gap: 10, flexDirection: 'row', flexShrink: 1 }}>
-        <Image
-          source={{ uri: props.payload.cover }}
-          style={{
-            width: width * 0.4,
-            height: 80,
-            borderRadius: 4,
-          }}
-        />
-        <View style={{ flexShrink: 1 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-            {props.payload.title}
-          </Text>
-          <Text style={{ marginTop: 12, lineHeight: 23 }}>
-            {props.payload.text}
-          </Text>
-        </View>
-      </View>
-    )
-  } else if (
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE
-  ) {
-    forwardContent = (
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <Image
-          source={{ uri: props.payload.cover }}
-          style={{
-            width: 120,
-            height: 70,
-            borderRadius: 4,
-          }}
-        />
-        <View style={{ gap: 10 }}>
-          <Text style={{ fontWeight: 'bold' }}>{props.payload.title}</Text>
-          <Text>{props.payload.text}</Text>
-        </View>
       </View>
     )
   } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {

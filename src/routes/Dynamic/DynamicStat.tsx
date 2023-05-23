@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     minWidth: 80,
     color: '#666',
     alignItems: 'center',
-    gap: 10,
+    gap: 20,
     marginTop: 5,
   },
   iconText: {

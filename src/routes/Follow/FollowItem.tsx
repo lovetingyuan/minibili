@@ -9,6 +9,7 @@ import ButtonsOverlay from '../../components/ButtonsOverlay'
 import store, { useStore } from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
 import { useHasUpdate } from '../../api/dynamic-items'
+import { Image } from 'expo-image'
 
 export default React.memo(
   function FollowItem(props: { item: FollowedUpItem; width?: number }) {
@@ -86,6 +87,7 @@ export default React.memo(
             <Avatar
               size={45}
               rounded
+              ImageComponent={Image}
               source={{ uri: face + '@120w_120h_1c.webp' }}
             />
           </TouchableOpacity>
