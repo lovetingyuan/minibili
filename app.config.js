@@ -4,11 +4,13 @@ const [version, versionCode] = pkg.version.split('-')
 const cp = require('child_process')
 
 const dev = process.argv.includes('start')
-const gitHash = cp
-  .execSync('git rev-parse HEAD')
-  .toString('utf-8')
-  .trim()
-  .slice(0, 8)
+const gitHash = (() => {
+  try {
+    return cp.execSync('git rev-parse --short HEAD').toString('utf-8').trim()
+  } catch {
+    return '-'
+  }
+})()
 
 const appId =
   process.env.APP_VARIANT === 'preview'
