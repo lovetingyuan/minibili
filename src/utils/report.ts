@@ -2,13 +2,13 @@ import * as SentryExpo from 'sentry-expo'
 import getLocation from '../api/get-location'
 import { HandledDynamicTypeEnum } from '../api/dynamic-items.type'
 
-export enum ReportType {
+enum ReportType {
   USER_ACTION = 'user_action',
   USER_DATA = 'user_data',
   API = 'api',
 }
 
-export enum Category {
+enum Category {
   API_ERR = 'api.error',
   NAVIGATION = 'action.navigation',
   LOGIN = 'action.login',

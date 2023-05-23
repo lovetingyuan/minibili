@@ -6,7 +6,7 @@ import {
   FollowedUpResponseSchema,
 } from './followed-ups.schema'
 
-export type FollowedUpResponse = z.infer<typeof FollowedUpResponseSchema>
+type FollowedUpResponse = z.infer<typeof FollowedUpResponseSchema>
 
 const getFollowedUp = (up: FollowedUpResponse) => {
   return {

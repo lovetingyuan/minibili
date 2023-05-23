@@ -8,8 +8,8 @@ import {
   UserInfoResponseSchema,
 } from './user-info.schema'
 
-export type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
-export type UserInfo = {
+type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
+type UserInfo = {
   face: string
   name: string
   sign: string
@@ -18,8 +18,8 @@ export type UserInfo = {
   sex: string
 }
 
-export type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>
-export type UserBatchInfoResponse = z.infer<typeof UserBatchInfoResponseSchema>
+type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>
+type UserBatchInfoResponse = z.infer<typeof UserBatchInfoResponseSchema>
 
 const getUserInfo1 = (mid: number | string): Promise<UserInfo> => {
   return fetcher<UserInfoResponse>(

@@ -35,7 +35,7 @@ export const DynamicTypes = {
   ...OtherDynamicTypeEnum,
 } as const
 
-export type DynamicTypeEnum = typeof DynamicTypes
+// export type DynamicTypeEnum = typeof DynamicTypes
 
 export enum HandledAdditionalTypeEnum {
   ADDITIONAL_TYPE_RESERVE = 'ADDITIONAL_TYPE_RESERVE',

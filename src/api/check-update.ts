@@ -3,7 +3,7 @@ import { changelogUrl } from '../constants'
 
 export const currentVersion = Application.nativeApplicationVersion
 
-export interface BuildInfo {
+interface BuildInfo {
   id: string
   status: 'PENDING' | 'FINISHED'
   platform: 'ANDROID' | 'IOS' | 'ALL'

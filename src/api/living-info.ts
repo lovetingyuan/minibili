@@ -3,9 +3,9 @@ import { z } from 'zod'
 import request from './fetcher'
 import {
   LiveInfoBatchItemSchema,
-  LiveInfoResponseSchema,
-  LiveRoomInfoResponseSchema,
-  LiveUserInfoResponseSchema,
+  //   LiveInfoResponseSchema,
+  //   LiveRoomInfoResponseSchema,
+  //   LiveUserInfoResponseSchema,
 } from './living-info.schema'
 import useSWR from 'swr'
 // import useSWRImmutable from 'swr/immutable'
@@ -15,10 +15,10 @@ import { useStore } from '../store'
 // import { Vibration } from 'react-native'
 // import { throttle } from 'throttle-debounce'
 
-export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
-export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
-export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
-export type LiveInfoBatchItem = z.infer<typeof LiveInfoBatchItemSchema>
+// export type LiveRoomInfo = z.infer<typeof LiveRoomInfoResponseSchema>
+// export type LiveInfo = z.infer<typeof LiveInfoResponseSchema>
+// export type LiveUserInfo = z.infer<typeof LiveUserInfoResponseSchema>
+type LiveInfoBatchItem = z.infer<typeof LiveInfoBatchItemSchema>
 
 // const useLiveRoomInfo = (mid: number | string) => {
 //   const { data } = useSWRImmutable<LiveRoomInfo>(

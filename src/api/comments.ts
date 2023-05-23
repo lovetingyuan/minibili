@@ -3,7 +3,7 @@ import useSWR from 'swr'
 import { z } from 'zod'
 import { ReplayItem, ReplyResponseSchema } from './comments.schema'
 
-export type ReplyResponse = z.infer<typeof ReplyResponseSchema>
+type ReplyResponse = z.infer<typeof ReplyResponseSchema>
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/
 
 const parseMessage = (content: ReplayItem['content']) => {

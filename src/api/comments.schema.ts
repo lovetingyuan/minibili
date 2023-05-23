@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const MemberSchema = z.object({
+const MemberSchema = z.object({
   avatar: z.string(),
   is_senior_member: z.union([z.literal(0), z.literal(1)]),
   level_info: z.object({

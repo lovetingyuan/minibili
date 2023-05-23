@@ -2,7 +2,7 @@ import useSWR from 'swr'
 import { z } from 'zod'
 import { VideoInfoResponseSchema } from './video-info.schema'
 
-export type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>
+type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>
 
 const getVideoItem = (data: VideoInfoResponse) => {
   return {
@@ -40,7 +40,6 @@ const getVideoItem = (data: VideoInfoResponse) => {
     }),
   }
 }
-export type VideoInfo = ReturnType<typeof getVideoItem>
 
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
 export function useVideoInfo(bvid?: string) {

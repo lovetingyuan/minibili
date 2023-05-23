@@ -31,7 +31,7 @@ export type RootStackParamList = {
   Login: undefined
 }
 
-export type GetFuncPromiseType<F extends (...a: any) => any> =
-  ReturnType<F> extends Promise<infer R> ? R : never
+// export type GetFuncPromiseType<F extends (...a: any) => any> =
+//   ReturnType<F> extends Promise<infer R> ? R : never
 
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>
