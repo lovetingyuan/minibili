@@ -8,7 +8,7 @@ const gitHash = (() => {
   try {
     return cp.execSync('git rev-parse --short HEAD').toString('utf-8').trim()
   } catch {
-    return '-'
+    return process.env.COMMIT_HASH || '-'
   }
 })()
 
