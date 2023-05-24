@@ -1,16 +1,10 @@
 require('dotenv').config()
 const pkg = require('./package.json')
 const [version, versionCode] = pkg.version.split('-')
-const cp = require('child_process')
+// const cp = require('child_process')
 
 const dev = process.argv.includes('start')
-const gitHash = (() => {
-  try {
-    return cp.execSync('git rev-parse --short HEAD').toString('utf-8').trim()
-  } catch {
-    return process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || '-'
-  }
-})()
+const gitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || '-'
 
 const appId =
   process.env.APP_VARIANT === 'preview'
