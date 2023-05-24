@@ -31,5 +31,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Set up environment variables
+        run: echo "EAS_BUILD_GIT_COMMIT_HASH=${{ github.sha }}" >> $GITHUB_ENV
+
       - name: Publish update
         run: eas update --auto

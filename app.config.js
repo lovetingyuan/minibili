@@ -1,17 +1,20 @@
 require('dotenv').config()
 const pkg = require('./package.json')
 const [version, versionCode] = pkg.version.split('-')
-const cp = require('child_process')
+// const cp = require('child_process')
 
 const dev = process.argv.includes('start')
-const gitHash = cp
-  .execSync('git rev-parse HEAD')
-  .toString('utf-8')
-  .trim()
-  .slice(0, 8)
+const gitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || '-'
+
+const appId =
+  process.env.APP_VARIANT === 'preview'
+    ? 'com.tingyuan.minibili.preview'
+    : 'com.tingyuan.minibili'
+
+const name = process.env.APP_VARIANT === 'preview' ? 'MiniBili-pre' : 'MiniBili'
 
 module.exports = {
-  name: 'MiniBili',
+  name,
   slug: 'minibili',
   version,
   githubUrl: 'https://github.com/lovetingyuan/minibili',
@@ -26,7 +29,7 @@ module.exports = {
   assetBundlePatterns: ['assets/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.tingyuan.minibili',
+    bundleIdentifier: appId,
     buildNumber: version,
   },
   android: {
@@ -34,7 +37,7 @@ module.exports = {
       foregroundImage: './assets/icon.png',
       backgroundColor: '#FFFFFF',
     },
-    package: 'com.tingyuan.minibili',
+    package: appId,
     versionCode: Number(versionCode),
   },
   plugins: [
