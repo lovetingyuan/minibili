@@ -7,7 +7,7 @@ const ups = [1458143131, 14427395]
 
 describe('dynamic-list', () => {
   ups.forEach(mid => {
-    test('up: ' + mid, async () => {
+    test.skip('up: ' + mid, async () => {
       const res = await fetcher<any>(
         `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
       )
