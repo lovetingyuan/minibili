@@ -84,7 +84,7 @@ function Player(props: Props & { wifi: boolean }) {
       <Image
         style={styles.loadingImage}
         resizeMode="cover"
-        source={{ uri: videoInfo.cover }}
+        source={{ uri: videoInfo.cover + '@672w_378h_1c.webp' }}
       />
     </View>
   )

@@ -3,7 +3,7 @@ import {
   StyleSheet,
   View,
   ToastAndroid,
-  BackHandler,
+  // BackHandler,
   ActivityIndicator,
 } from 'react-native'
 import { RootStackParamList } from '../../types'
@@ -12,8 +12,8 @@ import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Icon, Text, useTheme } from '@rneui/themed'
-import useMemoizedFn from '../../hooks/useMemoizedFn'
-import useMounted from '../../hooks/useMounted'
+// import useMemoizedFn from '../../hooks/useMemoizedFn'
+// import useMounted from '../../hooks/useMounted'
 import { FlashList } from '@shopify/flash-list'
 import DynamicItem from './DynamicItem'
 
@@ -61,19 +61,19 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       headerRight: () => <HeaderRight />,
     })
   }, [navigation])
-  const handleBack = useMemoizedFn(() => {
-    // if (route.params?.from === 'followed' && navigation.isFocused()) {
-    //   navigation.navigate('Follow')
-    //   return true
-    // }
-    return false
-  })
-  useMounted(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBack)
-    return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handleBack)
-    }
-  })
+  // const handleBack = useMemoizedFn(() => {
+  //   // if (route.params?.from === 'followed' && navigation.isFocused()) {
+  //   //   navigation.navigate('Follow')
+  //   //   return true
+  //   // }
+  //   return false
+  // })
+  // useMounted(() => {
+  //   BackHandler.addEventListener('hardwareBackPress', handleBack)
+  //   return () => {
+  //     BackHandler.removeEventListener('hardwareBackPress', handleBack)
+  //   }
+  // })
 
   const renderItem = ({ item }: { item: DynamicItemAllType }) => {
     return <DynamicItem item={item} />

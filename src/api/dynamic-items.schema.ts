@@ -139,6 +139,37 @@ const MajorSchema = {
       title: z.string(),
     }),
   }),
+  MediaList: z.object({
+    type: z.enum([MajorTypeEnum.MAJOR_TYPE_MEDIALIST]),
+    medialist: z.object({
+      badge: z.object({
+        // bg_color: '#FB7299',
+        color: z.string(),
+        text: z.string(),
+      }),
+      cover: z.string(),
+      id: z.string(),
+      jump_url: z.string(),
+      sub_title: z.string(),
+      title: z.string(),
+    }),
+  }),
+  CoursesSeason: z.object({
+    type: z.enum([MajorTypeEnum.MAJOR_TYPE_COURSES]),
+    courses: z.object({
+      badge: z.object({
+        // bg_color: '#FB7299',
+        color: z.string(),
+        text: z.string(),
+      }),
+      cover: z.string(),
+      id: z.string(),
+      desc: z.string(),
+      jump_url: z.string(),
+      sub_title: z.string(),
+      title: z.string(),
+    }),
+  }),
 }
 
 const AdditionalUGCSchema = z.object({
@@ -383,20 +414,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
   ),
   DynamicItemBaseSchema.merge(
     z.object({
-      type: z.enum([HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD]),
-      modules: DynamicModulesBaseSchema.merge(
-        z.object({
-          module_dynamic: ModuleDynamicBaseSchema.merge(
-            z.object({
-              major: MajorSchema.Living,
-            }),
-          ),
-        }),
-      ),
-    }),
-  ),
-  DynamicItemBaseSchema.merge(
-    z.object({
       type: z.enum([HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC]),
       modules: DynamicModulesBaseSchema.merge(
         z.object({
@@ -572,6 +589,34 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
                 z.object({
                   // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.Common,
+                }),
+              ),
+            }),
+          }),
+        ),
+        BaseOrigSchema.merge(
+          z.object({
+            type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_MEDIALIST]),
+            modules: z.object({
+              module_author: AuthorSchema,
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.MediaList,
+                }),
+              ),
+            }),
+          }),
+        ),
+        BaseOrigSchema.merge(
+          z.object({
+            type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON]),
+            modules: z.object({
+              module_author: AuthorSchema,
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.CoursesSeason,
                 }),
               ),
             }),

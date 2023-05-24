@@ -26,7 +26,9 @@ export default function DynamicStat(props: {
       </View>
       <View style={styles.iconText}>
         <Icon name="thumb-up-off-alt" size={15} color={gray} />
-        <Text style={textStyle}>{parseNumber(props.like)}</Text>
+        {props.like ? (
+          <Text style={textStyle}>{parseNumber(props.like)}</Text>
+        ) : null}
       </View>
       <Pressable
         style={styles.shareBtn}

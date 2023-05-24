@@ -24,7 +24,7 @@ export default function WordItem(
           {props.payload.text ? <Text>{props.payload.text}</Text> : null}
           {props.payload.image ? (
             <Image
-              source={{ uri: props.payload.image }}
+              source={{ uri: props.payload.image + '@240w_240h_1c.webp' }}
               style={{ width: 150, height: 80, marginTop: 10 }}
             />
           ) : null}

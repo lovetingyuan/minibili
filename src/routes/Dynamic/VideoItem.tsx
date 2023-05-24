@@ -63,7 +63,7 @@ export default function VideoItem(
         <View style={styles.imageContainer}>
           <Image
             style={styles.image}
-            source={{ uri: cover + '@702w_394h.webp' }}
+            source={{ uri: cover + '@421w_236h.webp' }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image

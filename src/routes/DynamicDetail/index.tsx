@@ -54,9 +54,11 @@ const DynamicDetail: React.FC<
                   size={15}
                   color={theme.colors.grey1}
                 />
-                <Text style={[styles.text, { color: theme.colors.grey1 }]}>
-                  {parseNumber(likeCount)}
-                </Text>
+                {likeCount ? (
+                  <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                    {parseNumber(likeCount)}
+                  </Text>
+                ) : null}
               </Pressable>
               <Pressable
                 style={styles.share}

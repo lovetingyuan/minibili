@@ -3,15 +3,10 @@ import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import { TouchableOpacity, Image, StyleSheet } from 'react-native'
 import { Text } from '@rneui/themed'
 import ForwardItem from './ForwardItem'
-import RichTextItem from './DrawItem'
+import DrawItem from './DrawItem'
 import VideoItem from './VideoItem'
-// import LivingItem from './LivingItem'
 import WordItem from './WordItem'
-import MusicItem from './MusicItem'
-
 import DefaultItem from './DefaultItem'
-import ArticleItem from './ArticleItem'
-import PGCItem from './PGCItem'
 import CommonItem from './CommonItem'
 import DynamicStat from './DynamicStat'
 import { useRoute } from '@react-navigation/native'
@@ -23,9 +18,6 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   let Item: React.FC<any> = DefaultItem
   const route = useRoute()
   const navigation = useNavigation<NavigationProps['navigation']>()
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-    return null
-  }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
     Item = VideoItem
   }
@@ -33,24 +25,17 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
     Item = WordItem
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
-    Item = RichTextItem
-  }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
-    Item = ArticleItem
+    Item = DrawItem
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     Item = ForwardItem
   }
-  // if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-  //   Item = LivingItem
-  // }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC) {
-    Item = MusicItem
-  }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC) {
-    Item = PGCItem
-  }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE) {
+  if (
+    item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE ||
+    item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC ||
+    item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC ||
+    item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
+  ) {
     Item = CommonItem
   }
   if (route.name === 'DynamicDetail') {
@@ -62,12 +47,6 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
       activeOpacity={0.8}
       style={[styles.itemContainer]}
       onPress={() => {
-        if (
-          item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV ||
-          item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
-        ) {
-          return
-        }
         if (
           item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW ||
           item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD

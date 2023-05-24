@@ -138,29 +138,20 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         title: article.title,
         text: article.desc,
         cover: article.covers[0],
-        url: 'https:' + article.jump_url,
-      },
-    }
-  }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-    return {
-      ...getCommon(item),
-      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD as const,
-      payload: {
-        name: item.modules.module_author.name, // + '正在直播',
-        mid: item.modules.module_author.mid,
+        url: parseUrl(article.jump_url),
       },
     }
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC) {
+    const { music } = item.modules.module_dynamic.major
     return {
       ...getCommon(item),
       type: HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC as const,
       payload: {
-        title: item.modules.module_dynamic.major.music.title,
-        label: item.modules.module_dynamic.major.music.label,
-        cover: item.modules.module_dynamic.major.music.cover,
-        url: item.modules.module_dynamic.major.music.jump_url,
+        title: music.title,
+        text: music.label,
+        cover: music.cover,
+        url: music.jump_url,
       },
     }
   }
@@ -173,6 +164,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         title: item.modules.module_author.name,
         cover: pgc.cover,
         text: `${pgc.badge.text}: ${pgc.title} (${pgc.stat.play}播放)`,
+        url: parseUrl(pgc.jump_url),
       },
     }
   }
@@ -186,6 +178,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         title: common.title,
         cover: common.cover,
         text: `${label ? label + ': ' : ''}${common.desc}`,
+        url: parseUrl(common.jump_url),
       },
     }
   }
@@ -269,17 +262,17 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       }
     }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE) {
-      const forward = item.orig.modules.module_dynamic
+      const { article } = item.orig.modules.module_dynamic.major
       return {
         ...getCommon(item),
         type: type,
         payload: {
           ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
-          text: forward.major.article.desc,
-          title: forward.major.article.title,
-          cover: forward.major.article.covers[0],
-          url: forward.major.article.jump_url,
+          text: article.desc,
+          title: article.title,
+          cover: article.covers?.[0],
+          url: parseUrl(article.jump_url),
         },
       }
     }
@@ -354,6 +347,40 @@ const getDynamicItem = (item: DynamicItemResponse) => {
             common.desc
           }`,
           url: parseUrl(common.jump_url),
+        },
+      }
+    }
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MEDIALIST) {
+      const { medialist } = item.orig.modules.module_dynamic.major
+      return {
+        ...getCommon(item),
+        type,
+        payload: {
+          ...getForwardCommon(),
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_MEDIALIST as const,
+          title: medialist.title,
+          cover: medialist.cover,
+          text: `${medialist.badge.text ? medialist.badge.text + '：' : ''}${
+            medialist.sub_title
+          }`,
+          url: parseUrl(medialist.jump_url),
+        },
+      }
+    }
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON) {
+      const { courses } = item.orig.modules.module_dynamic.major
+      return {
+        ...getCommon(item),
+        type,
+        payload: {
+          ...getForwardCommon(),
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON as const,
+          title: courses.title,
+          cover: courses.cover,
+          text: `${courses.badge.text ? courses.badge.text + '：' : ''}${
+            courses.sub_title
+          }\n${courses.desc}`,
+          url: parseUrl(courses.jump_url),
         },
       }
     }

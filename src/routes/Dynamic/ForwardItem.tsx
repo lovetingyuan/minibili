@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-  Pressable,
-  Linking,
-} from 'react-native'
+import { ScrollView, StyleSheet, View, Pressable } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -19,71 +12,7 @@ import { useNavigation } from '@react-navigation/native'
 import useIsDark from '../../hooks/useIsDark'
 import store from '../../store'
 import { Image } from 'expo-image'
-
-const CommonContent = (props: {
-  url?: string
-  title: string
-  text: string
-  cover: string
-}) => {
-  const { width } = useWindowDimensions()
-  const { url, title, text, cover } = props
-  const containerStyle: any = {
-    flexDirection: 'row',
-    gap: 12,
-  }
-  const coverContent = cover ? (
-    <Image
-      source={{ uri: cover }}
-      style={{
-        width: width * 0.4,
-        height: width * 0.22,
-        borderRadius: 4,
-      }}
-    />
-  ) : null
-  const textContent = (
-    <View
-      style={{
-        gap: 8,
-        flexWrap: 'wrap',
-        flexDirection: 'row',
-        flexShrink: 1,
-      }}>
-      <View style={{ gap: 10 }}>
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: 'bold',
-          }}
-          numberOfLines={2}>
-          {title}
-        </Text>
-        <Text style={{ fontSize: 14 }} numberOfLines={3}>
-          {text}
-        </Text>
-      </View>
-    </View>
-  )
-  if (url) {
-    return (
-      <Pressable
-        style={containerStyle}
-        onPress={() => {
-          url && Linking.openURL(url)
-        }}>
-        {coverContent}
-        {textContent}
-      </Pressable>
-    )
-  }
-  return (
-    <View style={containerStyle}>
-      {coverContent}
-      {textContent}
-    </View>
-  )
-}
+import { CommonContent } from './CommonItem'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
@@ -91,18 +20,16 @@ export default function ForwardItem(
   const navigation = useNavigation<NavigationProps['navigation']>()
   const isDark = useIsDark()
 
-  let forwardContent = <Text>暂不支持显示</Text>
+  let forwardContent = <Text>暂不支持显示此动态</Text>
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
-        {props.payload.text ? (
-          <RichTexts
-            idStr={props.payload.id}
-            nodes={props.payload.richTexts}
-            style={{ marginBottom: 10 }}
-            textProps={{ numberOfLines: 3 }}
-          />
-        ) : null}
+        <RichTexts
+          idStr={props.payload.id}
+          nodes={props.payload.richTexts}
+          style={{ marginBottom: 10 }}
+          textProps={{ numberOfLines: 3 }}
+        />
         <View style={{ flexDirection: 'row' }}>
           <Image
             style={styles.forwardContentImage}
@@ -154,7 +81,9 @@ export default function ForwardItem(
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE ||
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE ||
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MEDIALIST ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON
   ) {
     forwardContent = (
       <View style={{ gap: 10, flexShrink: 1 }}>
@@ -168,6 +97,7 @@ export default function ForwardItem(
           url={'url' in props.payload ? props.payload.url : ''}
           text={props.payload.text || ''}
           cover={props.payload.cover}
+          forward
         />
       </View>
     )
@@ -205,7 +135,11 @@ export default function ForwardItem(
               })
             }}>
             {props.payload.face ? (
-              <Avatar source={{ uri: props.payload.face }} size={22} rounded />
+              <Avatar
+                source={{ uri: props.payload.face + '@50w_50h_1c.webp' }}
+                size={22}
+                rounded
+              />
             ) : null}
             <Text style={styles.forwardUpName}>{props.payload.name}</Text>
           </Pressable>
