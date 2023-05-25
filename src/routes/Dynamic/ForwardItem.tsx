@@ -5,7 +5,7 @@ import {
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
 } from '../../api/dynamic-items.type'
-import { Avatar, Text } from '@rneui/themed'
+import { Avatar, Text, useTheme } from '@rneui/themed'
 import RichTexts from '../../components/RichTexts'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
@@ -19,6 +19,7 @@ export default function ForwardItem(
 ) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const isDark = useIsDark()
+  const { theme } = useTheme()
 
   let forwardContent = <Text>暂不支持显示此动态</Text>
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
@@ -141,7 +142,10 @@ export default function ForwardItem(
                 rounded
               />
             ) : null}
-            <Text style={styles.forwardUpName}>{props.payload.name}</Text>
+            <Text
+              style={[styles.forwardUpName, { color: theme.colors.primary }]}>
+              {props.payload.name}
+            </Text>
           </Pressable>
         ) : null}
         <Pressable
@@ -204,7 +208,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
-  forwardUpName: { fontWeight: 'bold', fontSize: 15, marginLeft: 8 },
+  forwardUpName: { fontSize: 15, marginLeft: 8 },
   forwardContent: {
     flex: 1,
     flexDirection: 'row',

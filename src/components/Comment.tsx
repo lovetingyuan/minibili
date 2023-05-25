@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  commentText: { fontSize: 15, lineHeight: 23 },
+  commentText: { fontSize: 16, lineHeight: 23 },
   commentContent: {
     flexDirection: 'row',
     alignItems: 'center',
