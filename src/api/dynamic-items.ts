@@ -384,6 +384,35 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+      const {
+        live_rcmd: { content },
+      } = item.orig.modules.module_dynamic.major
+      type Content = {
+        live_play_info: {
+          area_name: string
+          cover: string
+          link: string
+          title: string
+          live_status: number
+        }
+      }
+      const { live_play_info } = JSON.parse(content) as Content
+      return {
+        ...getCommon(item),
+        type,
+        payload: {
+          ...getForwardCommon(),
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE_RCMD as const,
+          title: live_play_info.title,
+          cover: live_play_info.cover,
+          text: `${live_play_info.area_name + '：'}${
+            live_play_info.live_status === 1 ? '正在直播' : '直播结束'
+          }`,
+          url: parseUrl(live_play_info.link),
+        },
+      }
+    }
     reportUnknownDynamicItem(item)
     return {
       ...getCommon(item),

@@ -84,7 +84,8 @@ export default function ForwardItem(
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC ||
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE ||
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MEDIALIST ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE_RCMD
   ) {
     forwardContent = (
       <View style={{ gap: 10, flexShrink: 1 }}>

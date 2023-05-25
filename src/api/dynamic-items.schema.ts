@@ -624,6 +624,20 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         ),
         BaseOrigSchema.merge(
           z.object({
+            type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE_RCMD]),
+            modules: z.object({
+              module_author: AuthorSchema,
+              module_dynamic: ModuleDynamicBaseSchema.merge(
+                z.object({
+                  // desc: z.object({ text: z.string() }).nullable(),
+                  major: MajorSchema.Living,
+                }),
+              ),
+            }),
+          }),
+        ),
+        BaseOrigSchema.merge(
+          z.object({
             type: z.nativeEnum(OtherForwardTypeEnum),
             modules: z.object({
               module_author: AuthorSchema,

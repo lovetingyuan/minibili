@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginTop: 5,
     marginBottom: 10,
-    opacity: 0.7,
+    opacity: 0.8,
     flex: 1,
   },
   replyItem: {
@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexWrap: 'wrap',
     lineHeight: 20,
+    fontSize: 15,
   },
   replyName: {
     // fontWeight: 'bold',
