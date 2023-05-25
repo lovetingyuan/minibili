@@ -122,7 +122,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   return (
     <View style={styles.container}>
       <FlashList
-        data={[] || list}
+        data={list}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         onEndReachedThreshold={1}
@@ -150,23 +150,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         refreshing={isRefreshing}
         onRefresh={refresh}
         ListEmptyComponent={
-          <>
-            {/* <Text style={styles.emptyText}>
-              哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
-            </Text> */}
-            <Loading />
-            {loading && !isReachingEnd ? <Loading /> : null}
-            {/* {loading && !isReachingEnd ? (
-              <View>
-                <ActivityIndicator
-                  color="blue"
-                  animating
-                  size={'large'}
-                  style={{ marginTop: 30 }}
-                />
-              </View>
-            ) : null} */}
-          </>
+          <>{loading && !isReachingEnd ? <Loading /> : null}</>
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
