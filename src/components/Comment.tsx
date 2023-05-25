@@ -11,15 +11,16 @@ interface Props {
 function CommentText(props: {
   nodes: MessageContent
   style?: TextStyle | TextStyle[]
+  idStr: string
 }) {
-  const { nodes, style } = props
+  const { nodes, style, idStr } = props
   return (
     <Text style={style} selectable>
       {nodes.map((node, i) => {
         if (node.type === 'at') {
           return (
             <Text
-              key={i}
+              key={idStr + i}
               style={styles.link}
               onPress={() => {
                 Linking.openURL('https://m.bilibili.com/space/' + node.mid)
@@ -31,7 +32,7 @@ function CommentText(props: {
         if (node.type === 'url') {
           return (
             <Text
-              key={i}
+              key={idStr + i}
               style={styles.link}
               onPress={() => {
                 Linking.openURL(node.url)
@@ -42,13 +43,17 @@ function CommentText(props: {
         }
         if (node.type === 'emoji') {
           return (
-            <Image key={i} source={{ uri: node.url }} style={styles.emoji} />
+            <Image
+              key={idStr + i}
+              source={{ uri: node.url }}
+              style={styles.emoji}
+            />
           )
         }
         if (node.type === 'av') {
           return (
             <Text
-              key={i}
+              key={idStr + i}
               style={styles.link}
               onPress={() => {
                 Linking.openURL(node.url)
@@ -58,7 +63,7 @@ function CommentText(props: {
           )
         }
         return (
-          <Text selectable key={i}>
+          <Text selectable key={idStr + i}>
             {node.text}
           </Text>
         )
@@ -101,6 +106,7 @@ export default function Comment(props: Props) {
             comment.upLike ? styles.upLike : {},
             comment.top ? styles.top : {},
           ]}
+          idStr={comment.id + '_'}
         />
         {comment.like ? (
           <Text style={styles.likeNum}> {comment.like}</Text>
@@ -110,7 +116,7 @@ export default function Comment(props: Props) {
         <View style={[styles.reply]}>
           {comment.replies.map(reply => {
             return (
-              <Text key={reply.id} style={styles.replyItem}>
+              <Text key={reply.id + '#'} style={styles.replyItem}>
                 <Text
                   style={[styles.replyName, upStyle(reply.name)]}
                   onPress={() => {
@@ -118,7 +124,7 @@ export default function Comment(props: Props) {
                   }}>
                   {reply.name}：
                 </Text>
-                <CommentText nodes={reply.message} />
+                <CommentText nodes={reply.message} idStr={reply.id + '_'} />
                 {reply.like ? (
                   <Text style={styles.likeNum}> {reply.like}</Text>
                 ) : null}

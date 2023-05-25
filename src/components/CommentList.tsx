@@ -45,9 +45,9 @@ const CommentList: React.FC<{
         </View>
       ) : null}
       {comments?.length ? (
-        comments.map(comment => {
+        comments.map((comment, i) => {
           return (
-            <View key={comment.id} style={{ marginBottom: 10 }}>
+            <View key={comment.id + '@' + i} style={{ marginBottom: 10 }}>
               <Comment upName={props.upName} comment={comment} />
             </View>
           )

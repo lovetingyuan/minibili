@@ -23,6 +23,94 @@ const AuthorSchema = z.object({
   pub_ts: z.number(),
 })
 
+const RichTextSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT]),
+    // orig_text: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_WEB]),
+    jump_url: z.string(),
+    // orig_text: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_EMOJI]),
+    // orig_text: z.string(),
+    text: z.string(),
+    emoji: z.object({
+      icon_url: z.string(),
+      text: z.string(),
+    }),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_AT]),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC]),
+    jump_url: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_BV]),
+    jump_url: z.string(),
+    orig_text: z.string(),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_GOODS]),
+    jump_url: z.string(),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_MAIL]),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_VOTE]),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_LOTTERY]),
+    rid: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_OGV_SEASON]),
+    rid: z.string(),
+    jump_url: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_AV]),
+    rid: z.string(),
+    jump_url: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_OGV_EP]),
+    rid: z.string(),
+    jump_url: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_CV]),
+    rid: z.string(),
+    jump_url: z.string(),
+    text: z.string(),
+  }),
+  z.object({
+    type: z.nativeEnum(OtherRichTextType),
+    text: z.string(),
+  }),
+])
+
 const MajorSchema = {
   AV: z.object({
     type: z.enum([MajorTypeEnum.MAJOR_TYPE_ARCHIVE]),
@@ -68,6 +156,10 @@ const MajorSchema = {
       badge: z.object({ text: z.string() }),
       cover: z.string(),
       title: z.string(),
+      desc_first: z.string(),
+      desc_second: z.string(),
+      jump_url: z.string(),
+      live_state: z.number(),
     }),
   }),
   Word: z.object({
@@ -170,6 +262,24 @@ const MajorSchema = {
       title: z.string(),
     }),
   }),
+  Opus: z.object({
+    type: z.enum([MajorTypeEnum.MAJOR_TYPE_OPUS]),
+    opus: z.object({
+      jump_url: z.string(),
+      pics: z
+        .object({
+          height: z.number(),
+          url: z.string(),
+          width: z.number(),
+        })
+        .array(),
+      summary: z.object({
+        rich_text_nodes: RichTextSchema.array(),
+        text: z.string(),
+      }),
+      title: z.string(),
+    }),
+  }),
 }
 
 const AdditionalUGCSchema = z.object({
@@ -212,94 +322,6 @@ const DynamicModulesBaseSchema = z.object({
     }),
   }),
 })
-
-const RichTextSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT]),
-    // orig_text: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_WEB]),
-    jump_url: z.string(),
-    // orig_text: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_EMOJI]),
-    // orig_text: z.string(),
-    text: z.string(),
-    emoji: z.object({
-      icon_url: z.string(),
-      text: z.string(),
-    }),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_AT]),
-    rid: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC]),
-    jump_url: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_BV]),
-    jump_url: z.string(),
-    orig_text: z.string(),
-    rid: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_GOODS]),
-    jump_url: z.string(),
-    rid: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_MAIL]),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_VOTE]),
-    rid: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_LOTTERY]),
-    rid: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_OGV_SEASON]),
-    rid: z.string(),
-    jump_url: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_AV]),
-    rid: z.string(),
-    jump_url: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_OGV_EP]),
-    rid: z.string(),
-    jump_url: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_CV]),
-    rid: z.string(),
-    jump_url: z.string(),
-    text: z.string(),
-  }),
-  z.object({
-    type: z.nativeEnum(OtherRichTextType),
-    text: z.string(),
-  }),
-])
 
 const ModuleDynamicBaseSchema = z.object({
   desc: z
@@ -398,7 +420,10 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: MajorSchema.Article,
+              major: z.discriminatedUnion('type', [
+                MajorSchema.Article,
+                MajorSchema.Opus,
+              ]),
             }),
           ),
         }),
@@ -506,7 +531,10 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.Article,
+                  major: z.discriminatedUnion('type', [
+                    MajorSchema.Article,
+                    MajorSchema.Opus,
+                  ]),
                 }),
               ),
             }),

@@ -42,15 +42,13 @@ const HeaderTitle = () => {
         onRequestClose={hideMenu}>
         <ScrollView style={styles.typeList}>
           {ranksList.map((item, i) => {
+            const selected = store.videosType.rid === item.rid
             const Item = (
               <MenuItem
                 textStyle={{
                   fontSize: 16,
-                  fontWeight: i ? 'normal' : 'bold',
-                  color:
-                    store.videosType.rid === item.rid
-                      ? theme.colors.primary
-                      : theme.colors.black,
+                  fontWeight: i && !selected ? 'normal' : 'bold',
+                  color: selected ? theme.colors.primary : theme.colors.black,
                 }}
                 onPress={() => {
                   store.videosType = item

@@ -4,20 +4,60 @@ import {
   View,
   ToastAndroid,
   // BackHandler,
-  ActivityIndicator,
+  // ActivityIndicator,
+  // LinearGradient,
 } from 'react-native'
 import { RootStackParamList } from '../../types'
 
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Icon, Text, useTheme } from '@rneui/themed'
+import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
 // import useMemoizedFn from '../../hooks/useMemoizedFn'
 // import useMounted from '../../hooks/useMounted'
 import { FlashList } from '@shopify/flash-list'
 import DynamicItem from './DynamicItem'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
+
+const Loading = () => {
+  return (
+    <View>
+      <Text style={styles.emptyText}>哔哩哔哩 (゜-゜)つロ 干杯~-bilibili</Text>
+      {Array(6)
+        .fill(null)
+        .map((_, i) => {
+          return (
+            <View
+              style={{ padding: 10, gap: 15, marginBottom: 10, marginTop: 10 }}
+              key={i}>
+              <View style={{ gap: 8 }}>
+                <Skeleton animation="pulse" width={'80%' as any} height={15} />
+                <Skeleton animation="pulse" width={'33%' as any} height={15} />
+                <Skeleton animation="pulse" height={15} />
+              </View>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <Skeleton animation="pulse" width={'45%' as any} height={80} />
+                <View
+                  style={{ gap: 10, justifyContent: 'space-between', flex: 1 }}>
+                  <Skeleton
+                    animation="pulse"
+                    width={'70%' as any}
+                    height={15}
+                  />
+                  <Skeleton
+                    animation="pulse"
+                    width={'50%' as any}
+                    height={15}
+                  />
+                </View>
+              </View>
+            </View>
+          )
+        })}
+    </View>
+  )
+}
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name)
@@ -82,7 +122,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   return (
     <View style={styles.container}>
       <FlashList
-        data={list}
+        data={[] || list}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         onEndReachedThreshold={1}
@@ -111,10 +151,12 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         onRefresh={refresh}
         ListEmptyComponent={
           <>
-            <Text style={styles.emptyText}>
+            {/* <Text style={styles.emptyText}>
               哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
-            </Text>
-            {loading && !isReachingEnd ? (
+            </Text> */}
+            <Loading />
+            {loading && !isReachingEnd ? <Loading /> : null}
+            {/* {loading && !isReachingEnd ? (
               <View>
                 <ActivityIndicator
                   color="blue"
@@ -123,7 +165,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
                   style={{ marginTop: 30 }}
                 />
               </View>
-            ) : null}
+            ) : null} */}
           </>
         }
         ListFooterComponent={
@@ -147,7 +189,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bottomEnd: {
-    fontSize: 16,
+    fontSize: 14,
     marginTop: 10,
     marginBottom: 20,
     color: '#999',
@@ -155,8 +197,8 @@ const styles = StyleSheet.create({
     // fontStyle: 'italic',
   },
   emptyText: {
-    marginTop: 100,
-    marginBottom: 100,
+    marginTop: 30,
+    marginBottom: 10,
     fontSize: 18,
     color: '#fb7299',
     textAlign: 'center',

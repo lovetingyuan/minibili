@@ -15,6 +15,7 @@ import {
   HandledAdditionalTypeEnum,
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
+  MajorTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
 import { parseUrl } from '../utils'
@@ -133,15 +134,30 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     }
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE) {
-    const { article } = item.modules.module_dynamic.major
+    const { type: t } = item.modules.module_dynamic.major
+    if (t === MajorTypeEnum.MAJOR_TYPE_ARTICLE) {
+      const { article } = item.modules.module_dynamic.major
+      return {
+        ...getCommon(item),
+        type: HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
+        payload: {
+          title: article.title,
+          text: article.desc,
+          cover: article.covers[0],
+          url: parseUrl(article.jump_url),
+        },
+      }
+    }
+    const { opus } = item.modules.module_dynamic.major
+    // console.log(999, JSON.stringify(opus, null, 2))
     return {
       ...getCommon(item),
       type: HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
       payload: {
-        title: article.title,
-        text: article.desc,
-        cover: article.covers[0],
-        url: parseUrl(article.jump_url),
+        text: opus.summary.text,
+        title: opus.title,
+        cover: opus.pics?.[0]?.url,
+        url: parseUrl(opus.jump_url),
       },
     }
   }
@@ -265,32 +281,51 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       }
     }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE) {
-      const { article } = item.orig.modules.module_dynamic.major
+      if (
+        item.orig.modules.module_dynamic.major.type ===
+        MajorTypeEnum.MAJOR_TYPE_ARTICLE
+      ) {
+        const { article } = item.orig.modules.module_dynamic.major
+        return {
+          ...getCommon(item),
+          type,
+          payload: {
+            ...getForwardCommon(),
+            type: HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
+            text: article.desc,
+            title: article.title,
+            cover: article.covers?.[0],
+            url: parseUrl(article.jump_url),
+          },
+        }
+      }
+      const { opus } = item.orig.modules.module_dynamic.major
       return {
         ...getCommon(item),
-        type: type,
+        type,
         payload: {
           ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE as const,
-          text: article.desc,
-          title: article.title,
-          cover: article.covers?.[0],
-          url: parseUrl(article.jump_url),
+          text: opus.summary.text,
+          title: opus.title,
+          cover: opus.pics?.[0]?.url,
+          url: parseUrl(opus.jump_url),
         },
       }
     }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE) {
-      const forward = item.orig.modules.module_dynamic
+      const { live } = item.orig.modules.module_dynamic.major
       return {
         ...getCommon(item),
         type: type,
         payload: {
           ...getForwardCommon(),
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE as const,
-          title:
-            forward.major.live.badge.text + '：' + forward.major.live.title,
-          text: forward.desc?.text,
-          cover: forward.major.live.cover,
+          title: live.title,
+          text:
+            live.badge.text + '：' + live.desc_first + '\n' + live.desc_second,
+          cover: live.cover,
+          url: parseUrl(live.jump_url),
         },
       }
     }
@@ -448,10 +483,11 @@ export function useDynamicItems(mid?: string | number) {
         if (!mid) {
           return null
         }
+        // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=14427395&timezone_offset=-480&features=itemOpusStyle
         if (!offset) {
-          return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
+          return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480&features=itemOpusStyle`
         }
-        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480`
+        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480&features=itemOpusStyle`
       },
       request,
       {
