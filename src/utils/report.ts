@@ -34,6 +34,7 @@ export function reportApiError(api: {
     tags: {
       type: ReportType.API,
       'type.category': Category.API_ERR,
+      'api.url': api.url,
     },
     contexts: {
       api,
@@ -67,11 +68,13 @@ export function reportUserAction(action: Action, extraData: any = null) {
   })
   if (action === Action.LOGIN || action === Action.OPEN_APP) {
     getLocation().then(loc => {
+      const locationStr = [loc.country, loc.province, loc.city].join('/')
+      SentryExpo.Native.setTag('user.location', locationStr)
       SentryExpo.Native.captureMessage('user:data', {
         tags: {
           type: ReportType.USER_DATA,
           'type.category': Category.LOCATION,
-          location: [loc.country, loc.province, loc.city].join('/'),
+          location: locationStr,
         },
         contexts: {
           data: {
@@ -83,30 +86,19 @@ export function reportUserAction(action: Action, extraData: any = null) {
   }
 }
 
-// export function reportUserLocation() {
-//   getLocation().then(loc => {
-//     SentryExpo.Native.captureMessage('user:data', {
-//       tags: {
-//         type: ReportType.USER_DATA,
-//         'type.category': Category.LOCATION,
-//       },
-//       contexts: {
-//         data: {
-//           location: loc,
-//         },
-//       },
-//     })
-//   })
-// }
-
 export function setUser(mid: string | number, name: string) {
   SentryExpo.Native.setUser({ id: mid + '', username: name })
-  SentryExpo.Native.setTag('biliUrl', `https://space.bilibili.com/${mid}`)
+  SentryExpo.Native.setTag('user.url', `https://space.bilibili.com/${mid}`)
+  SentryExpo.Native.setTag('user.name', name)
 }
 
 export function clearUser() {
   SentryExpo.Native.setUser(null)
-  SentryExpo.Native.setTag('biliUrl', null)
+  SentryExpo.Native.setTags({
+    'user.url': null,
+    'user.name': null,
+    'user.location': null,
+  })
 }
 
 export function reportUnknownDynamicItem(item: any) {

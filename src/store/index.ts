@@ -87,8 +87,8 @@ Object.keys(store)
       .then(data => {
         if (data) {
           store[key] = JSON.parse(data)
-          if (key === '$userInfo') {
-            setUser(store.$userInfo?.mid + '', store.$userInfo?.name + '')
+          if (key === '$userInfo' && store.$userInfo) {
+            setUser(store.$userInfo.mid + '', store.$userInfo.name + '')
             reportUserAction(Action.OPEN_APP)
           }
         }
