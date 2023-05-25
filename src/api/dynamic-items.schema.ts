@@ -306,6 +306,13 @@ const ModuleDynamicBaseSchema = z.object({
     .object({ text: z.string(), rich_text_nodes: RichTextSchema.array() })
     .nullable(),
   topic: z.object({ name: z.string(), jump_url: z.string() }).nullable(),
+  additional: z
+    .discriminatedUnion('type', [
+      AdditionalReserveSchema,
+      AdditionalUGCSchema,
+      AdditionalOtherSchema,
+    ])
+    .nullish(),
 })
 
 export type RichTextNode = z.infer<typeof RichTextSchema>
@@ -364,13 +371,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
               major: MajorSchema.Word.nullable(),
-              additional: z
-                .discriminatedUnion('type', [
-                  AdditionalReserveSchema,
-                  AdditionalUGCSchema,
-                  AdditionalOtherSchema,
-                ])
-                .nullish(),
             }),
           ),
         }),
@@ -385,13 +385,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
               major: MajorSchema.Draw,
-              additional: z
-                .discriminatedUnion('type', [
-                  AdditionalReserveSchema,
-                  AdditionalUGCSchema,
-                  AdditionalOtherSchema,
-                ])
-                .nullish(),
             }),
           ),
         }),
@@ -474,8 +467,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  additional: AdditionalReserveSchema.nullable(),
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: z.null(),
                 }),
               ),
@@ -489,7 +480,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.AV,
                 }),
               ),
@@ -503,7 +493,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.Draw,
                 }),
               ),
@@ -517,7 +506,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.Article,
                 }),
               ),
@@ -531,7 +519,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.Live,
                 }),
               ),
@@ -545,7 +532,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.None,
                 }),
               ),
@@ -559,7 +545,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.Music,
                 }),
               ),
@@ -573,7 +558,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.PGC,
                 }),
               ),
@@ -587,7 +571,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.Common,
                 }),
               ),
@@ -601,7 +584,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.MediaList,
                 }),
               ),
@@ -615,7 +597,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.CoursesSeason,
                 }),
               ),
@@ -629,7 +610,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: MajorSchema.Living,
                 }),
               ),
@@ -643,7 +623,6 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  // desc: z.object({ text: z.string() }).nullable(),
                   major: z.unknown().nullable(),
                 }),
               ),

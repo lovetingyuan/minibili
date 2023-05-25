@@ -1,1 +1,3 @@
-export { default } from './src/App'
+import './src/init'
+
+export { default } from './src/routes/Index'

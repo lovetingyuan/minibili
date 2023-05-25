@@ -9,7 +9,7 @@ import {
   DynamicListResponse,
 } from './dynamic-items.schema'
 import useSWRInfinite from 'swr/infinite'
-import { reportUnknownDynamicItem } from '../utils/report'
+import { reportAdditional, reportUnknownDynamicItem } from '../utils/report'
 import {
   DynamicTypes,
   HandledAdditionalTypeEnum,
@@ -62,6 +62,9 @@ const getCommon = (item: DynamicItemBaseType) => {
 }
 
 const getDynamicItem = (item: DynamicItemResponse) => {
+  if (item.modules.module_dynamic.additional) {
+    reportAdditional(item)
+  }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD) {
     const additional = item.modules.module_dynamic.additional
     let text: string = ''

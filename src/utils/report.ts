@@ -16,6 +16,7 @@ enum Category {
   COMMON_ACTION = 'action.common',
   UNKNOWN_ITEM = 'data.unknownitem',
   UNKNOWN_RICH_TEXT = 'data.unknown_rich_text',
+  ADDITIONAL = 'data.additional',
 }
 
 export enum Action {
@@ -23,6 +24,13 @@ export enum Action {
   LOGIN = 'login',
   LOGOUT = 'logout',
   ADD_BLACK_UP = 'add-black-up',
+}
+
+export const Tags = {
+  username: 'user.name',
+  userLocation: 'user.location',
+  userUrl: 'user.url',
+  apiUrl: 'api.url',
 }
 
 export function reportApiError(api: {
@@ -34,7 +42,7 @@ export function reportApiError(api: {
     tags: {
       type: ReportType.API,
       'type.category': Category.API_ERR,
-      'api.url': api.url,
+      [Tags.apiUrl]: api.url,
     },
     contexts: {
       api,
@@ -69,12 +77,11 @@ export function reportUserAction(action: Action, extraData: any = null) {
   if (action === Action.LOGIN || action === Action.OPEN_APP) {
     getLocation().then(loc => {
       const locationStr = [loc.country, loc.province, loc.city].join('/')
-      SentryExpo.Native.setTag('user.location', locationStr)
+      SentryExpo.Native.setTag(Tags.userLocation, locationStr)
       SentryExpo.Native.captureMessage('user:data', {
         tags: {
           type: ReportType.USER_DATA,
           'type.category': Category.LOCATION,
-          location: locationStr,
         },
         contexts: {
           data: {
@@ -88,16 +95,16 @@ export function reportUserAction(action: Action, extraData: any = null) {
 
 export function setUser(mid: string | number, name: string) {
   SentryExpo.Native.setUser({ id: mid + '', username: name })
-  SentryExpo.Native.setTag('user.url', `https://space.bilibili.com/${mid}`)
-  SentryExpo.Native.setTag('user.name', name)
+  SentryExpo.Native.setTag(Tags.userUrl, `https://space.bilibili.com/${mid}`)
+  SentryExpo.Native.setTag(Tags.username, name)
 }
 
 export function clearUser() {
   SentryExpo.Native.setUser(null)
   SentryExpo.Native.setTags({
-    'user.url': null,
-    'user.name': null,
-    'user.location': null,
+    [Tags.userUrl]: null,
+    [Tags.username]: null,
+    [Tags.userLocation]: null,
   })
 }
 
@@ -130,4 +137,23 @@ export function reportUnknownRichTextItem(item: any) {
       dynamicItem: JSON.stringify(item, null, 2),
     },
   })
+}
+
+export function reportAdditional(item: any) {
+  SentryExpo.Native.captureMessage(
+    'item additional:' +
+      item.type +
+      '@' +
+      item.modules.module_dynamic.additional.type,
+    {
+      level: 'warning',
+      tags: {
+        type: ReportType.USER_DATA,
+        'type.category': Category.ADDITIONAL,
+      },
+      extra: {
+        dynamicItem: JSON.stringify(item, null, 2),
+      },
+    },
+  )
 }

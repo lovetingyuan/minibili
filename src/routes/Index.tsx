@@ -57,6 +57,7 @@ export default () => {
     <SWRConfig
       value={{
         fetcher,
+        errorRetryCount: 2,
         isVisible() {
           return focus
         },
