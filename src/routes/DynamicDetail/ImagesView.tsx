@@ -36,12 +36,12 @@ export default function ImagesView() {
         onPageSelected={e => {
           store.currentImageIndex = e.nativeEvent.position
         }}>
-        {imagesList.map(img => {
+        {imagesList.map((img, i) => {
           const url =
             netinfo.type === 'wifi' ? img.src : img.src + '@640w_640h_2c.webp'
           return (
             <ScrollView
-              key={img.src}
+              key={img.src + i}
               contentContainerStyle={{
                 alignItems: 'center',
                 justifyContent: 'center',

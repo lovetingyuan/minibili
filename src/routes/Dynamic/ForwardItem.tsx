@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, StyleSheet, View, Pressable } from 'react-native'
+import { StyleSheet, View, Pressable } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -13,6 +13,7 @@ import useIsDark from '../../hooks/useIsDark'
 import store from '../../store'
 import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
+import { Additional } from './WordDrawItem'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
@@ -21,7 +22,9 @@ export default function ForwardItem(
   const isDark = useIsDark()
   const { theme } = useTheme()
 
-  let forwardContent = <Text>暂不支持显示此动态</Text>
+  let forwardContent = (
+    <Text style={{ fontStyle: 'italic' }}>{props.payload.text}</Text>
+  )
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
@@ -48,34 +51,31 @@ export default function ForwardItem(
         </View>
       </View>
     )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW) {
+  } else if (
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD
+  ) {
     forwardContent = (
       <View style={{ flexDirection: 'column' }}>
         <RichTexts
           idStr={props.payload.id}
           nodes={props.payload.richTexts}
+          topic={props.payload.topic}
           textProps={{ numberOfLines: 3 }}
         />
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator
-          style={styles.imagesContainer}>
-          {props.payload.images.map(img => {
+        <View style={styles.imagesContainer}>
+          {props.payload.images.map((img, i) => {
             return (
               <Image
                 style={[styles.image, { aspectRatio: img.ratio }]}
-                key={img.src}
+                key={img.src + i}
                 source={{ uri: img.src + '@240w_240h_1c.webp' }}
               />
             )
           })}
-        </ScrollView>
-        {/* {props.payload.text2 ? <Text>{props.payload.text2}</Text> : null} */}
+        </View>
+        <Additional additional={props.payload.additional} />
       </View>
-    )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
-    forwardContent = (
-      <RichTexts idStr={props.payload.id} nodes={props.payload.richTexts} />
     )
   } else if (
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC ||
@@ -92,6 +92,7 @@ export default function ForwardItem(
         <RichTexts
           idStr={props.payload.id}
           nodes={props.payload.richTexts}
+          topic={props.payload.topic}
           textProps={{ numberOfLines: 3 }}
         />
         <CommonContent
@@ -102,10 +103,6 @@ export default function ForwardItem(
           forward
         />
       </View>
-    )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {
-    forwardContent = (
-      <Text style={{ fontStyle: 'italic' }}>{props.payload.text}</Text>
     )
   }
   return (
@@ -120,13 +117,10 @@ export default function ForwardItem(
           styles.forwardContainer,
           { backgroundColor: isDark ? '#222' : '#dedede' },
         ]}>
-        {props.payload.name ? (
+        {props.payload.name && props.payload.mid !== props.mid ? (
           <Pressable
             style={styles.forwardUp}
             onPress={() => {
-              if (props.payload.mid === props.mid) {
-                return
-              }
               navigation.push('Dynamic', {
                 user: {
                   face: props.payload.face,
@@ -190,7 +184,6 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 80,
-    marginRight: 20,
     marginVertical: 10,
     borderRadius: 4,
   },
@@ -203,6 +196,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     padding: 10,
     borderRadius: 4,
+    overflow: 'hidden',
   },
   forwardUp: {
     flexDirection: 'row',
@@ -227,5 +221,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   date: { color: '#555', fontSize: 12 },
-  imagesContainer: {},
+  imagesContainer: {
+    flexDirection: 'row',
+    overflow: 'hidden',
+    gap: 10,
+  },
 })

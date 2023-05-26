@@ -23,7 +23,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 const Loading = () => {
   return (
     <View>
-      <Text style={styles.emptyText}>哔哩哔哩 (゜-゜)つロ 干杯~-bilibili</Text>
+      {/* <Text style={styles.emptyText}>哔哩哔哩 (゜-゜)つロ 干杯~-bilibili</Text> */}
       {Array(6)
         .fill(null)
         .map((_, i) => {
