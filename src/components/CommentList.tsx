@@ -41,7 +41,7 @@ const CommentList: React.FC<{
       {commentLoading ? (
         <View>
           <Text style={styles.commentTipText}>评论加载中...</Text>
-          <ActivityIndicator color="blue" animating />
+          <ActivityIndicator color={theme.colors.primary} animating />
         </View>
       ) : null}
       {comments?.length ? (

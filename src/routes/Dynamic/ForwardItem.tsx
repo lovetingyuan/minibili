@@ -13,7 +13,7 @@ import useIsDark from '../../hooks/useIsDark'
 import store from '../../store'
 import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
-import { Additional } from './WordDrawItem'
+import { Additional } from '../../components/Additional'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,

@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   Alert,
   Vibration,
+  ActivityIndicator,
 } from 'react-native'
 import FollowItem from './FollowItem'
 
@@ -158,13 +159,22 @@ export default function Follow({ navigation, route }: Props) {
           }}
           ListEmptyComponent={
             <Text style={styles.listEmptyText}>
-              {isLoading
-                ? '加载中...'
-                : '暂无关注（需要在隐私设置中公开你的关注）'}
+              {isLoading ? (
+                <View>
+                  <Text style={styles.emptyText}>
+                    哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
+                  </Text>
+                  <ActivityIndicator color="#00AEEC" animating size={'large'} />
+                </View>
+              ) : (
+                '暂无关注（需要在隐私设置中公开你的关注）'
+              )}
             </Text>
           }
           ListFooterComponent={
-            <Text style={styles.bottomText}>{'到底了~'}</Text>
+            <Text style={styles.bottomText}>
+              {isLoading ? '加载中...' : displayUps.length ? '到底了~' : ''}
+            </Text>
           }
         />
       </View>
@@ -199,5 +209,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 15,
     top: 10,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginVertical: 100,
+    fontSize: 18,
+    color: '#fb7299',
   },
 })
