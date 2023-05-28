@@ -25,27 +25,33 @@ export default function ForwardItem(
   let forwardContent = (
     <Text style={{ fontStyle: 'italic' }}>{props.payload.text}</Text>
   )
+  const forwardRichTextContent = (
+    <RichTexts
+      idStr={props.payload.id}
+      nodes={props.payload.desc?.rich_text_nodes}
+      style={{ marginBottom: 10 }}
+      topic={props.payload.topic}
+      textProps={{ numberOfLines: 3 }}
+    />
+  )
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
+    const { title, cover, stat } = props.payload.video
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
-        <RichTexts
-          idStr={props.payload.id}
-          nodes={props.payload.richTexts}
-          style={{ marginBottom: 10 }}
-          textProps={{ numberOfLines: 3 }}
-        />
+        {forwardRichTextContent}
         <View style={{ flexDirection: 'row' }}>
           <Image
             style={styles.forwardContentImage}
-            source={{ uri: props.payload.cover + '@240w_240h_1c.webp' }}
+            source={{ uri: cover + '@240w_240h_1c.webp' }}
           />
           <View style={{ flex: 6 }}>
             <Text numberOfLines={2} style={{ lineHeight: 20, fontSize: 15 }}>
               <Text style={{ fontWeight: 'bold' }}>视频：</Text>
-              {props.payload.title}
+              {title}
             </Text>
             <Text style={{ marginTop: 10, fontSize: 13 }}>
-              {props.payload.play}播放
+              {stat.play}播放{'  '}
+              {stat.danmaku}弹幕
             </Text>
           </View>
         </View>
@@ -56,13 +62,8 @@ export default function ForwardItem(
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD
   ) {
     forwardContent = (
-      <View style={{ flexDirection: 'column' }}>
-        <RichTexts
-          idStr={props.payload.id}
-          nodes={props.payload.richTexts}
-          topic={props.payload.topic}
-          textProps={{ numberOfLines: 3 }}
-        />
+      <View style={{ flexDirection: 'column', flex: 1 }}>
+        {forwardRichTextContent}
         <View style={styles.imagesContainer}>
           {props.payload.images.map((img, i) => {
             return (
@@ -89,12 +90,7 @@ export default function ForwardItem(
   ) {
     forwardContent = (
       <View style={{ gap: 10, flexShrink: 1 }}>
-        <RichTexts
-          idStr={props.payload.id}
-          nodes={props.payload.richTexts}
-          topic={props.payload.topic}
-          textProps={{ numberOfLines: 3 }}
-        />
+        {forwardRichTextContent}
         <CommonContent
           title={props.payload.title}
           url={'url' in props.payload ? props.payload.url : ''}
@@ -108,8 +104,10 @@ export default function ForwardItem(
   return (
     <View style={[styles.textContainer]}>
       <RichTexts
-        idStr={props.id}
-        nodes={props.richTexts}
+        idStr={props.payload.id}
+        nodes={props.desc?.rich_text_nodes}
+        style={{ marginBottom: 10 }}
+        topic={props.topic}
         textProps={{ numberOfLines: 3 }}
       />
       <View
@@ -147,16 +145,17 @@ export default function ForwardItem(
           style={styles.forwardContent}
           onPress={() => {
             if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
+              const { video } = props.payload
               store.currentVideo = {
-                bvid: props.payload.bvid,
+                bvid: video.bvid,
                 name: props.payload.name,
                 face: props.payload.face,
                 mid: props.payload.mid,
                 // pubDate: props.payload.
-                title: props.payload.title,
-                aid: props.payload.aid,
-                cover: props.payload.cover,
-                desc: props.payload.desc,
+                title: video.title,
+                aid: video.aid,
+                cover: video.cover,
+                desc: video.desc,
               }
               navigation.push('Play', {
                 from: {

@@ -30,6 +30,7 @@ export default function VideoItem(
     color: gray,
     fontSize: 13,
   }
+  const nodes = props.desc?.rich_text_nodes
 
   return (
     <TouchableOpacity
@@ -52,10 +53,11 @@ export default function VideoItem(
           },
         })
       }}>
-      {props.richTexts ? (
+      {nodes ? (
         <RichTexts
           idStr={props.id}
-          nodes={props.richTexts}
+          nodes={nodes}
+          topic={props.topic}
           style={{ marginBottom: 12 }}
         />
       ) : null}

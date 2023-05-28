@@ -51,7 +51,7 @@ const getCommon = (item: DynamicItemBaseType) => {
     mid: author.mid,
     name: author.name,
     text: dynamic.desc?.text,
-    richTexts: dynamic.desc?.rich_text_nodes,
+    desc: dynamic.desc,
     topic: dynamic.topic,
     top: tag?.text === '置顶',
     commentId: item.basic.comment_id_str,
@@ -186,14 +186,14 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     const getForwardCommon = () => {
       const author = item.orig.modules.module_author
       const topic = item.orig.modules.module_dynamic.topic
-      const richTexts = item.orig.modules.module_dynamic.desc?.rich_text_nodes
+      const desc = item.orig.modules.module_dynamic.desc
       const additional = item.orig.modules.module_dynamic.additional
       return {
         name: author.name,
         face: author.face,
-        richTexts,
         id: item.orig.id_str,
         mid: author.mid,
+        desc,
         topic,
         additional,
       }
@@ -205,9 +205,8 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         type: type,
         payload: {
           ...getForwardCommon(),
-          text: forward.desc?.text,
-          play: forward.major.archive.stat.play,
-          ...forward.major.archive,
+          text: '',
+          video: forward.major.archive,
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_AV as const,
         },
       }

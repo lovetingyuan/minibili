@@ -22,10 +22,11 @@ export default function WordDrawItem(
 ) {
   const {
     id,
-    richTexts,
+    desc,
     topic,
     payload: { images, additional },
   } = props
+  const richTextNodes = desc?.rich_text_nodes
   const route = useRoute()
   const isDetail = route.name === 'DynamicDetail'
   const { width } = useWindowDimensions()
@@ -102,7 +103,7 @@ export default function WordDrawItem(
     <View style={[styles.textContainer]}>
       <RichTexts
         idStr={id}
-        nodes={richTexts}
+        nodes={richTextNodes}
         topic={topic}
         textProps={isDetail ? {} : { numberOfLines: 4 }}
       />
@@ -118,8 +119,8 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
   image: {
-    height: 110,
-    width: 110,
+    height: 100,
+    width: 100,
     marginRight: 5,
     marginVertical: 10,
     borderRadius: 4,

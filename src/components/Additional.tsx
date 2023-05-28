@@ -41,11 +41,11 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
     additionalContent = (
       <View style={{ gap: 10, flexDirection: 'row', paddingRight: 10 }}>
         <Image
-          source={{ uri: additional.ugc.cover + '@240w_140h_1c.webp' }}
-          style={{ width: 120, minHeight: 70, borderRadius: 4 }}
+          source={{ uri: additional.ugc.cover + '@200w_100h_1c.webp' }}
+          style={{ width: 100, minHeight: 50, borderRadius: 4 }}
         />
-        <View style={{ flexShrink: 1, gap: 8 }}>
-          <Text numberOfLines={2}>{additional.ugc.title}</Text>
+        <View style={{ flexShrink: 1, gap: 8, flex: 1 }}>
+          <Text numberOfLines={1}>{additional.ugc.title}</Text>
           {text ? <Text numberOfLines={2}>{text}</Text> : null}
         </View>
       </View>
@@ -62,14 +62,23 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join('  ')
     url = additional.common.jump_url
     additionalContent = (
-      <View style={{ gap: 10, flexDirection: 'row', paddingRight: 10 }}>
+      <View
+        style={{
+          gap: 10,
+          flexDirection: 'row',
+          paddingRight: 10,
+        }}>
         <Image
-          source={{ uri: additional.common.cover + '@240w_140h_1c.webp' }}
-          style={{ width: 120, minHeight: 70, borderRadius: 4 }}
+          source={{ uri: additional.common.cover + '@200w_100h_1c.webp' }}
+          style={{ width: 100, minHeight: 50, borderRadius: 4 }}
         />
-        <View style={{ flexShrink: 1, gap: 8 }}>
-          <Text numberOfLines={2}>{additional.common.title}</Text>
-          {text ? <Text numberOfLines={2}>{text}</Text> : null}
+        <View style={{ flexShrink: 1, gap: 6, flex: 1 }}>
+          <Text numberOfLines={1}>{additional.common.title}</Text>
+          {text ? (
+            <Text numberOfLines={2} style={{ fontSize: 13 }}>
+              {text}
+            </Text>
+          ) : null}
         </View>
       </View>
     )
@@ -84,8 +93,8 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join(' ')
     url = additional.goods.jump_url || additional.goods.items[0].jump_url
     additionalContent = (
-      <View style={{ gap: 4 }}>
-        <Text>商品：{additional.goods.head_text}</Text>
+      <View style={{ gap: 4, flex: 1 }}>
+        <Text numberOfLines={1}>商品：{additional.goods.head_text}</Text>
         {text ? <Text numberOfLines={1}>{text}</Text> : null}
       </View>
     )
