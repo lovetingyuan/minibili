@@ -8,7 +8,6 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import { useUserRelation } from '../../api/user-relation'
 import { parseNumber } from '../../utils'
-import { reportNavigation } from '../../utils/report'
 
 export default function Header() {
   const { $userInfo } = useStore()
@@ -50,10 +49,6 @@ export default function Header() {
             </Text>
           </Text>
           <Icon
-            onPress={() => {
-              navigation.navigate('About')
-              reportNavigation('About')
-            }}
             style={styles.snow}
             name="snow"
             type="ionicon"
