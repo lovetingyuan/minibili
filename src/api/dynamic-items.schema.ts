@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import {
-  AdditionalTypeEnum,
+  HandledAdditionalTypeEnum,
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
   HandledRichTextType,
@@ -111,7 +111,7 @@ const RichTextSchema = z.discriminatedUnion('type', [
   }),
 ])
 
-const MajorSchema = {
+const MajorSchemaMap = {
   AV: z.object({
     type: z.enum([MajorTypeEnum.MAJOR_TYPE_ARCHIVE]),
     archive: z.object({
@@ -282,22 +282,66 @@ const MajorSchema = {
   }),
 }
 
-const AdditionalUGCSchema = z.object({
-  type: z.enum([AdditionalTypeEnum.ADDITIONAL_TYPE_UGC]),
-  ugc: z.object({
-    cover: z.string(),
-    title: z.string(),
+const AdditionalSchemaMap = {
+  UGC: z.object({
+    type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UGC]),
+    ugc: z.object({
+      cover: z.string(),
+      head_text: z.string(),
+      desc_second: z.string(),
+      duration: z.string(),
+      title: z.string(),
+      jump_url: z.string(),
+    }),
   }),
-})
-
-const AdditionalReserveSchema = z.object({
-  type: z.enum([AdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE]),
-  reserve: z.object({
-    title: z.string(),
-    desc1: z.object({ text: z.string() }).optional(),
-    desc2: z.object({ text: z.string() }).optional(),
+  Reserve: z.object({
+    type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE]),
+    reserve: z.object({
+      title: z.string(),
+      jump_url: z.string(),
+      desc1: z.object({ text: z.string() }).optional(),
+      desc2: z.object({ text: z.string() }).optional(),
+    }),
   }),
-})
+  Common: z.object({
+    type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_COMMON]),
+    common: z.object({
+      cover: z.string(),
+      desc1: z.string(),
+      desc2: z.string(),
+      head_text: z.string(),
+      jump_url: z.string(),
+      title: z.string(),
+    }),
+  }),
+  Goods: z.object({
+    type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_GOODS]),
+    goods: z.object({
+      head_text: z.string(),
+      items: z
+        .object({
+          brief: z.string(),
+          cover: z.string(),
+          jump_desc: z.string(),
+          jump_url: z.string(),
+          name: z.string(),
+          price: z.string(),
+        })
+        .array(),
+      jump_url: z.string(),
+    }),
+  }),
+  Vote: z.object({
+    type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_VOTE]),
+    vote: z.object({
+      desc: z.string(),
+      end_time: z.number(),
+      join_num: z.number(),
+      uid: z.number(),
+      vote_id: z.number(),
+    }),
+  }),
+}
 
 const AdditionalOtherSchema = z.object({
   type: z.nativeEnum(OtherAdditionalTypeEnum),
@@ -323,21 +367,26 @@ const DynamicModulesBaseSchema = z.object({
   }),
 })
 
+const AdditionalSchema = z.discriminatedUnion('type', [
+  AdditionalSchemaMap.Reserve,
+  AdditionalSchemaMap.UGC,
+  AdditionalSchemaMap.Common,
+  AdditionalSchemaMap.Goods,
+  AdditionalSchemaMap.Vote,
+  AdditionalOtherSchema,
+])
+
 const ModuleDynamicBaseSchema = z.object({
   desc: z
     .object({ text: z.string(), rich_text_nodes: RichTextSchema.array() })
     .nullable(),
   topic: z.object({ name: z.string(), jump_url: z.string() }).nullable(),
-  additional: z
-    .discriminatedUnion('type', [
-      AdditionalReserveSchema,
-      AdditionalUGCSchema,
-      AdditionalOtherSchema,
-    ])
-    .nullish(),
+  additional: AdditionalSchema.nullish(),
 })
 
 export type RichTextNode = z.infer<typeof RichTextSchema>
+
+export type AdditionalType = z.infer<typeof AdditionalSchema>
 
 const DynamicItemBaseSchema = z.object({
   id_str: z.string(),
@@ -378,7 +427,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: MajorSchema.AV,
+              major: MajorSchemaMap.AV,
             }),
           ),
         }),
@@ -392,7 +441,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: MajorSchema.Word.nullable(),
+              major: MajorSchemaMap.Word.nullable(),
             }),
           ),
         }),
@@ -406,7 +455,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: MajorSchema.Draw,
+              major: MajorSchemaMap.Draw,
             }),
           ),
         }),
@@ -421,8 +470,8 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
               major: z.discriminatedUnion('type', [
-                MajorSchema.Article,
-                MajorSchema.Opus,
+                MajorSchemaMap.Article,
+                MajorSchemaMap.Opus,
               ]),
             }),
           ),
@@ -437,7 +486,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: MajorSchema.Music,
+              major: MajorSchemaMap.Music,
             }),
           ),
         }),
@@ -451,7 +500,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: MajorSchema.PGC,
+              major: MajorSchemaMap.PGC,
             }),
           ),
         }),
@@ -465,7 +514,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: MajorSchema.Common,
+              major: MajorSchemaMap.Common,
             }),
           ),
         }),
@@ -505,7 +554,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.AV,
+                  major: MajorSchemaMap.AV,
                 }),
               ),
             }),
@@ -518,7 +567,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.Draw,
+                  major: MajorSchemaMap.Draw,
                 }),
               ),
             }),
@@ -532,8 +581,8 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
                   major: z.discriminatedUnion('type', [
-                    MajorSchema.Article,
-                    MajorSchema.Opus,
+                    MajorSchemaMap.Article,
+                    MajorSchemaMap.Opus,
                   ]),
                 }),
               ),
@@ -547,7 +596,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.Live,
+                  major: MajorSchemaMap.Live,
                 }),
               ),
             }),
@@ -560,7 +609,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.None,
+                  major: MajorSchemaMap.None,
                 }),
               ),
             }),
@@ -573,7 +622,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.Music,
+                  major: MajorSchemaMap.Music,
                 }),
               ),
             }),
@@ -586,7 +635,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.PGC,
+                  major: MajorSchemaMap.PGC,
                 }),
               ),
             }),
@@ -599,7 +648,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.Common,
+                  major: MajorSchemaMap.Common,
                 }),
               ),
             }),
@@ -612,7 +661,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.MediaList,
+                  major: MajorSchemaMap.MediaList,
                 }),
               ),
             }),
@@ -625,7 +674,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.CoursesSeason,
+                  major: MajorSchemaMap.CoursesSeason,
                 }),
               ),
             }),
@@ -638,7 +687,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchema.Living,
+                  major: MajorSchemaMap.Living,
                 }),
               ),
             }),

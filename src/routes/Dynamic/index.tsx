@@ -1,20 +1,11 @@
 import React from 'react'
-import {
-  StyleSheet,
-  View,
-  ToastAndroid,
-  // BackHandler,
-  // ActivityIndicator,
-  // LinearGradient,
-} from 'react-native'
+import { StyleSheet, View, ToastAndroid } from 'react-native'
 import { RootStackParamList } from '../../types'
 
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, HeaderRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
-// import useMemoizedFn from '../../hooks/useMemoizedFn'
-// import useMounted from '../../hooks/useMounted'
 import { FlashList } from '@shopify/flash-list'
 import DynamicItem from './DynamicItem'
 
@@ -23,19 +14,28 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 const Loading = () => {
   return (
     <View>
-      <Text style={styles.emptyText}>哔哩哔哩 (゜-゜)つロ 干杯~-bilibili</Text>
-      {Array(6)
+      {Array(10)
         .fill(null)
         .map((_, i) => {
           return (
             <View
               style={{ padding: 10, gap: 15, marginBottom: 10, marginTop: 10 }}
               key={i}>
-              <View style={{ gap: 8 }}>
-                <Skeleton animation="pulse" width={'80%' as any} height={15} />
-                <Skeleton animation="pulse" width={'33%' as any} height={15} />
-                <Skeleton animation="pulse" height={15} />
-              </View>
+              {i % 2 === 0 ? (
+                <View style={{ gap: 8 }}>
+                  <Skeleton
+                    animation="pulse"
+                    width={'80%' as any}
+                    height={15}
+                  />
+                  <Skeleton
+                    animation="pulse"
+                    width={'33%' as any}
+                    height={15}
+                  />
+                  <Skeleton animation="pulse" height={15} />
+                </View>
+              ) : null}
               <View style={{ flexDirection: 'row', gap: 10 }}>
                 <Skeleton animation="pulse" width={'45%' as any} height={80} />
                 <View

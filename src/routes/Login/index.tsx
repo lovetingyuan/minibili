@@ -74,33 +74,42 @@ export default function Login() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}>
       <ScrollView style={{ backgroundColor: '#ededed' }}>
-        <Card
-          containerStyle={{
-            marginHorizontal: 10,
+        <View
+          style={{
+            marginHorizontal: 20,
             marginTop: 50,
           }}>
           <View style={styles.logoContainer}>
-            <Card.Image source={tvImg ? leftTv : rightTv} style={styles.logo} />
+            <View>
+              <Card.Image
+                source={tvImg ? leftTv : rightTv}
+                style={styles.logo}
+              />
+              <Card.Title style={{ fontSize: 25 }}>MiniBili</Card.Title>
+            </View>
+            <Text style={styles.text}>
+              你好，欢迎使用MiniBili，请访问你自己的B站主页（需登录）：
+              <Text
+                onPress={() => {
+                  Linking.openURL('https://space.bilibili.com/')
+                }}
+                style={styles.linkText}
+                selectable>
+                {'\n'}https://space.bilibili.com/{'\n'}
+              </Text>
+              然后在浏览器地址栏查找并输入你的B站ID(uid)
+            </Text>
           </View>
-          <Card.Title style={{ fontSize: 30 }}>MiniBili</Card.Title>
           <Card.Divider />
-          <Text style={styles.text}>访问你的B站账号的主页并登录：</Text>
-          <Text
-            onPress={() => {
-              Linking.openURL('https://space.bilibili.com/')
-            }}
-            style={styles.linkText}
-            selectable>
-            https://space.bilibili.com/
-          </Text>
-          <Text style={styles.text}>然后输入你的B站ID(uid)</Text>
           <Text
             style={{
               marginTop: 10,
               fontSize: 16,
               lineHeight: 25,
             }}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>说明：</Text>
+            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+              💡 帮助说明：
+            </Text>
             B站ID为个人页面地址栏中的一串数字，如下图所示（ID为公开信息，请放心输入；另外
             <Text style={{ fontWeight: 'bold' }}>
               你需要在隐私设置中设置你的关注列表为公开
@@ -132,7 +141,7 @@ export default function Login() {
               loading={isLoading}
             />
           </View>
-        </Card>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   )
@@ -140,15 +149,18 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   logoContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 10,
   },
   logo: {
-    width: 130,
-    height: 130,
+    width: 110,
+    height: 110,
   },
   text: {
     fontSize: 18,
+    flexShrink: 1,
+    lineHeight: 30,
   },
   linkText: {
     margin: 10,
@@ -159,7 +171,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'column',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonStyle: {
     backgroundColor: 'rgba(90, 154, 230, 1)',

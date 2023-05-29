@@ -20,9 +20,10 @@ export default function CommonItem(
     | HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC
   >,
 ) {
+  const nodes = props.desc?.rich_text_nodes
   return (
     <View style={styles.container}>
-      <RichTexts idStr={props.id} nodes={props.richTexts} topic={props.topic} />
+      <RichTexts idStr={props.id} nodes={nodes} topic={props.topic} />
       <CommonContent {...props.payload} />
     </View>
   )
@@ -49,40 +50,38 @@ export function CommonContent(props: {
       }
     : {}
   return (
-    <View style={styles.container}>
-      <View style={styles.contentContainer}>
-        {cover ? (
-          <Image
-            source={{ uri: cover + '@240w_140h_1c.webp' }}
-            style={{
-              width: width * 0.4,
-              height: width * 0.23,
-              borderRadius: 4,
-            }}
-          />
+    <View style={styles.contentContainer}>
+      {cover ? (
+        <Image
+          source={{ uri: cover + '@240w_140h_1c.webp' }}
+          style={{
+            width: width * 0.4,
+            height: width * 0.23,
+            borderRadius: 4,
+          }}
+        />
+      ) : null}
+      <Foo style={styles.textContainer} {...linkProp}>
+        {title ? (
+          <Text style={styles.title} numberOfLines={2}>
+            {title}
+          </Text>
         ) : null}
-        <Foo style={styles.textContainer} {...linkProp}>
-          {title ? (
-            <Text style={styles.title} numberOfLines={2}>
-              {title}
-            </Text>
-          ) : null}
-          {text ? (
-            <Text
-              style={[forward ? styles.forwardContent : styles.content]}
-              numberOfLines={3}>
-              {text}
-            </Text>
-          ) : null}
-        </Foo>
-      </View>
+        {text ? (
+          <Text
+            style={[forward ? styles.forwardContent : styles.content]}
+            numberOfLines={3}>
+            {text}
+          </Text>
+        ) : null}
+      </Foo>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: { gap: 10 },
-  title: { fontWeight: 'bold', fontSize: 15 },
+  title: { fontSize: 15 },
   textContainer: { gap: 6, flexShrink: 1 },
   content: { fontSize: 15 },
   forwardContent: { fontSize: 14 },

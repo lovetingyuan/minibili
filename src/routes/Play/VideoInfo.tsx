@@ -6,14 +6,7 @@ import { ListItem, Text } from '@rneui/themed'
 import { useStore } from '../../store'
 
 export default function VideoInfo(props: {
-  // bvid: string
   page: number
-  // title: string
-  // desc: string
-  // face: string
-  // name: string
-  // mid: number | string
-  // date: string
   changePage: (p: number) => void
 }) {
   const { page, changePage } = props
@@ -87,7 +80,7 @@ export default function VideoInfo(props: {
 const styles = StyleSheet.create({
   videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
   videoTitle: { fontSize: 16, marginTop: 12 },
-  videoDesc: { marginTop: 10 },
+  videoDesc: { marginTop: 10, color: '#666' },
   pagesTitle: {
     paddingVertical: 5,
     paddingHorizontal: 10,

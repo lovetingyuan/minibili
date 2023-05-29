@@ -71,7 +71,6 @@ export default function Hot({ navigation }: Props) {
   }
   const gotoPlay = (data: VideoItem) => {
     store.currentVideo = data
-    // const { mid, bvid, name, aid, face, cover, desc, title, pubDate } = data
     navigation.navigate('Play')
   }
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {

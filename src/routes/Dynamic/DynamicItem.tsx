@@ -3,9 +3,8 @@ import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import { TouchableOpacity, Image, StyleSheet } from 'react-native'
 import { Text } from '@rneui/themed'
 import ForwardItem from './ForwardItem'
-import DrawItem from './DrawItem'
 import VideoItem from './VideoItem'
-import WordItem from './WordItem'
+import WordDrawItem from './WordDrawItem'
 import DefaultItem from './DefaultItem'
 import CommonItem from './CommonItem'
 import DynamicStat from './DynamicStat'
@@ -20,17 +19,14 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
     Item = VideoItem
-  }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD) {
-    Item = WordItem
-  }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW) {
-    Item = DrawItem
-  }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
+  } else if (
+    item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD ||
+    item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW
+  ) {
+    Item = WordDrawItem
+  } else if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     Item = ForwardItem
-  }
-  if (
+  } else if (
     item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE ||
     item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC ||
     item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC ||

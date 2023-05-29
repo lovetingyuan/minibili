@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, StyleSheet, View, Pressable } from 'react-native'
+import { StyleSheet, View, Pressable } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -13,6 +13,7 @@ import useIsDark from '../../hooks/useIsDark'
 import store from '../../store'
 import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
+import { Additional } from '../../components/Additional'
 
 export default function ForwardItem(
   props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
@@ -21,61 +22,61 @@ export default function ForwardItem(
   const isDark = useIsDark()
   const { theme } = useTheme()
 
-  let forwardContent = <Text>暂不支持显示此动态</Text>
+  let forwardContent = (
+    <Text style={{ fontStyle: 'italic' }}>{props.payload.text}</Text>
+  )
+  const forwardRichTextContent = (
+    <RichTexts
+      idStr={props.payload.id}
+      nodes={props.payload.desc?.rich_text_nodes}
+      style={{ marginBottom: 10 }}
+      topic={props.payload.topic}
+      textProps={{ numberOfLines: 3 }}
+    />
+  )
   if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
+    const { title, cover, stat } = props.payload.video
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
-        <RichTexts
-          idStr={props.payload.id}
-          nodes={props.payload.richTexts}
-          style={{ marginBottom: 10 }}
-          textProps={{ numberOfLines: 3 }}
-        />
+        {forwardRichTextContent}
         <View style={{ flexDirection: 'row' }}>
           <Image
             style={styles.forwardContentImage}
-            source={{ uri: props.payload.cover + '@240w_240h_1c.webp' }}
+            source={{ uri: cover + '@240w_240h_1c.webp' }}
           />
           <View style={{ flex: 6 }}>
             <Text numberOfLines={2} style={{ lineHeight: 20, fontSize: 15 }}>
               <Text style={{ fontWeight: 'bold' }}>视频：</Text>
-              {props.payload.title}
+              {title}
             </Text>
             <Text style={{ marginTop: 10, fontSize: 13 }}>
-              {props.payload.play}播放
+              {stat.play}播放{'  '}
+              {stat.danmaku}弹幕
             </Text>
           </View>
         </View>
       </View>
     )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW) {
+  } else if (
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW ||
+    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD
+  ) {
     forwardContent = (
-      <View style={{ flexDirection: 'column' }}>
-        <RichTexts
-          idStr={props.payload.id}
-          nodes={props.payload.richTexts}
-          textProps={{ numberOfLines: 3 }}
-        />
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator
-          style={styles.imagesContainer}>
-          {props.payload.images.map(img => {
+      <View style={{ flexDirection: 'column', flex: 1 }}>
+        {forwardRichTextContent}
+        <View style={styles.imagesContainer}>
+          {props.payload.images.map((img, i) => {
             return (
               <Image
                 style={[styles.image, { aspectRatio: img.ratio }]}
-                key={img.src}
+                key={img.src + i}
                 source={{ uri: img.src + '@240w_240h_1c.webp' }}
               />
             )
           })}
-        </ScrollView>
-        {/* {props.payload.text2 ? <Text>{props.payload.text2}</Text> : null} */}
+        </View>
+        <Additional additional={props.payload.additional} />
       </View>
-    )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD) {
-    forwardContent = (
-      <RichTexts idStr={props.payload.id} nodes={props.payload.richTexts} />
     )
   } else if (
     props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC ||
@@ -89,11 +90,7 @@ export default function ForwardItem(
   ) {
     forwardContent = (
       <View style={{ gap: 10, flexShrink: 1 }}>
-        <RichTexts
-          idStr={props.payload.id}
-          nodes={props.payload.richTexts}
-          textProps={{ numberOfLines: 3 }}
-        />
+        {forwardRichTextContent}
         <CommonContent
           title={props.payload.title}
           url={'url' in props.payload ? props.payload.url : ''}
@@ -103,16 +100,14 @@ export default function ForwardItem(
         />
       </View>
     )
-  } else if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_NONE) {
-    forwardContent = (
-      <Text style={{ fontStyle: 'italic' }}>{props.payload.text}</Text>
-    )
   }
   return (
     <View style={[styles.textContainer]}>
       <RichTexts
-        idStr={props.id}
-        nodes={props.richTexts}
+        idStr={props.payload.id}
+        nodes={props.desc?.rich_text_nodes}
+        style={{ marginBottom: 10 }}
+        topic={props.topic}
         textProps={{ numberOfLines: 3 }}
       />
       <View
@@ -120,13 +115,10 @@ export default function ForwardItem(
           styles.forwardContainer,
           { backgroundColor: isDark ? '#222' : '#dedede' },
         ]}>
-        {props.payload.name ? (
+        {props.payload.name && props.payload.mid !== props.mid ? (
           <Pressable
             style={styles.forwardUp}
             onPress={() => {
-              if (props.payload.mid === props.mid) {
-                return
-              }
               navigation.push('Dynamic', {
                 user: {
                   face: props.payload.face,
@@ -153,16 +145,17 @@ export default function ForwardItem(
           style={styles.forwardContent}
           onPress={() => {
             if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
+              const { video } = props.payload
               store.currentVideo = {
-                bvid: props.payload.bvid,
+                bvid: video.bvid,
                 name: props.payload.name,
                 face: props.payload.face,
                 mid: props.payload.mid,
                 // pubDate: props.payload.
-                title: props.payload.title,
-                aid: props.payload.aid,
-                cover: props.payload.cover,
-                desc: props.payload.desc,
+                title: video.title,
+                aid: video.aid,
+                cover: video.cover,
+                desc: video.desc,
               }
               navigation.push('Play', {
                 from: {
@@ -190,7 +183,6 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 80,
-    marginRight: 20,
     marginVertical: 10,
     borderRadius: 4,
   },
@@ -203,6 +195,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     padding: 10,
     borderRadius: 4,
+    overflow: 'hidden',
   },
   forwardUp: {
     flexDirection: 'row',
@@ -227,5 +220,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   date: { color: '#555', fontSize: 12 },
-  imagesContainer: {},
+  imagesContainer: {
+    flexDirection: 'row',
+    overflow: 'hidden',
+    gap: 10,
+  },
 })

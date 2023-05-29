@@ -11,16 +11,22 @@ import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import store from '../../store'
 import { useRoute } from '@react-navigation/native'
 import RichTexts from '../../components/RichTexts'
-import { Text } from '@rneui/themed'
 import { Image } from 'expo-image'
+import { Additional } from '../../components/Additional'
 
-export default function RichTextItem(
-  props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW>,
+export default function WordDrawItem(
+  props: DynamicItemType<
+    | HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW
+    | HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD
+  >,
 ) {
   const {
-    // text,
-    payload: { images },
+    id,
+    desc,
+    topic,
+    payload: { images, additional },
   } = props
+  const richTextNodes = desc?.rich_text_nodes
   const route = useRoute()
   const isDetail = route.name === 'DynamicDetail'
   const { width } = useWindowDimensions()
@@ -32,7 +38,7 @@ export default function RichTextItem(
       {images.map((img, i) => {
         const ImageCmp = (
           <Image
-            key={img.src}
+            key={img.src + i}
             style={[styles.image]}
             contentFit="cover"
             source={{
@@ -45,7 +51,7 @@ export default function RichTextItem(
         }
         return (
           <TouchableOpacity
-            key={img.src}
+            key={img.src + i}
             activeOpacity={0.8}
             onPress={() => {
               store.imagesList = images.slice()
@@ -57,13 +63,18 @@ export default function RichTextItem(
       })}
     </ScrollView>
   )
-  const imageListWidth = images.length > 2 ? width / 3 - 10 : width / 2 - 15
+  const imageListWidth =
+    images.length > 2
+      ? width / 3 - 10
+      : images.length === 2
+      ? width / 2 - 15
+      : width / 2
   const imageList = (
     <View style={styles.imageListContainer}>
       {images.map((img, i) => {
         const ImageCmp = (
           <Image
-            key={img.src}
+            key={img.src + i}
             style={[{ aspectRatio: 1, width: imageListWidth, borderRadius: 4 }]}
             contentFit="cover"
             source={{
@@ -76,7 +87,7 @@ export default function RichTextItem(
         }
         return (
           <TouchableOpacity
-            key={img.src}
+            key={img.src + i}
             activeOpacity={0.8}
             onPress={() => {
               store.imagesList = images.slice()
@@ -91,15 +102,13 @@ export default function RichTextItem(
   return (
     <View style={[styles.textContainer]}>
       <RichTexts
-        idStr={props.id}
-        nodes={props.richTexts}
-        topic={props.topic}
+        idStr={id}
+        nodes={richTextNodes}
+        topic={topic}
         textProps={isDetail ? {} : { numberOfLines: 4 }}
       />
       {images.length ? (isDetail ? imageList : scrollImages) : null}
-      {props.payload.text ? (
-        <Text style={styles.postText}>{props.payload.text}</Text>
-      ) : null}
+      <Additional additional={additional} />
     </View>
   )
 }
@@ -139,8 +148,15 @@ const styles = StyleSheet.create({
   imageListContainer: {
     flexWrap: 'wrap',
     flexDirection: 'row',
-    gap: 5,
+    gap: 4,
     // justifyContent: 'center',
     marginVertical: 20,
+  },
+  additionalContainer: {
+    borderLeftWidth: 1,
+    borderLeftColor: '#bbb',
+    paddingLeft: 8,
+    marginTop: 8,
+    paddingVertical: 2,
   },
 })
