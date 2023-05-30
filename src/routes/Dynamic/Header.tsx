@@ -8,6 +8,7 @@ import { useUserRelation } from '../../api/user-relation'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { NavigationProps, RootStackParamList } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useUserInfo } from '../../api/user-info'
 
 export function HeaderLeft(props: {
   scrollTop: () => void
@@ -16,7 +17,11 @@ export function HeaderLeft(props: {
   const { livingUps } = useStore()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
-  const dynamicUser = route.params?.user
+  const { data: userInfo } = useUserInfo(route.params?.user.mid)
+  const dynamicUser = {
+    ...route.params?.user,
+    ...userInfo,
+  }
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const gotoWebPage = () => {
@@ -29,14 +34,16 @@ export function HeaderLeft(props: {
   }
   return (
     <View style={[styles.left, props.style]}>
-      <Avatar
-        size={33}
-        rounded
-        onPress={gotoWebPage}
-        source={{
-          uri: dynamicUser?.face + '@240w_240h_1c.webp',
-        }}
-      />
+      {dynamicUser?.face ? (
+        <Avatar
+          size={33}
+          rounded
+          onPress={gotoWebPage}
+          source={{
+            uri: dynamicUser?.face + '@120w_120h_1c.webp',
+          }}
+        />
+      ) : null}
       <Pressable
         style={styles.titleContainer}
         key={fans?.follower || '-'}
@@ -47,14 +54,16 @@ export function HeaderLeft(props: {
           {(dynamicUser?.name || '') + '  '}
         </Text>
       </Pressable>
-      <Text style={[styles.fansText]}>{parseNumber(fans?.follower)}粉丝</Text>
-      {dynamicUser && livingUps[dynamicUser.mid] ? (
+      {fans ? (
+        <Text style={[styles.fansText]}>{parseNumber(fans.follower)}粉丝</Text>
+      ) : null}
+      {dynamicUser.mid && livingUps[dynamicUser.mid] ? (
         <Button
           size="sm"
           type="clear"
           buttonStyle={{ marginLeft: 10 }}
           onPress={() => {
-            if (dynamicUser) {
+            if (dynamicUser.mid) {
               navigation.navigate('WebPage', {
                 title: dynamicUser.name + '的直播间',
                 url: livingUps[dynamicUser.mid],

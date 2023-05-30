@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  ScrollView,
   StyleSheet,
   View,
   TouchableOpacity,
@@ -31,10 +30,7 @@ export default function WordDrawItem(
   const isDetail = route.name === 'DynamicDetail'
   const { width } = useWindowDimensions()
   const scrollImages = (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator
-      style={styles.imagesContainer}>
+    <View style={styles.imagesContainer}>
       {images.map((img, i) => {
         const ImageCmp = (
           <Image
@@ -61,7 +57,7 @@ export default function WordDrawItem(
           </TouchableOpacity>
         )
       })}
-    </ScrollView>
+    </View>
   )
   const imageListWidth =
     images.length > 2
@@ -130,6 +126,8 @@ const styles = StyleSheet.create({
   },
   imagesContainer: {
     flex: 1,
+    flexDirection: 'row',
+    overflow: 'hidden',
   },
   info: {
     flexDirection: 'row',

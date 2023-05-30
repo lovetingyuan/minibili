@@ -1,6 +1,12 @@
 import { useNavigation } from '@react-navigation/native'
 import React from 'react'
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import {
+  Image,
+  Linking,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { NavigationProps } from '../../types'
 import { DynamicItemType } from '../../api/dynamic-items'
 import store from '../../store'
@@ -35,6 +41,16 @@ export default function VideoItem(
   return (
     <TouchableOpacity
       activeOpacity={0.8}
+      onLongPress={() => {
+        store.overlayButtons = [
+          {
+            text: '查看封面',
+            onPress: () => {
+              Linking.openURL(cover)
+            },
+          },
+        ]
+      }}
       onPress={() => {
         store.currentVideo = {
           bvid,

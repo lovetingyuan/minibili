@@ -8,10 +8,11 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import DynamicItem from './DynamicItem'
+import { useUserInfo } from '../../api/user-info'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
-const Loading = () => {
+const Loading = React.memo(() => {
   return (
     <View>
       {Array(10)
@@ -57,14 +58,18 @@ const Loading = () => {
         })}
     </View>
   )
-}
+})
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name)
   // const dynamicUser = useStore().dynamicUser!
-  const dynamicUser = route.params?.user
-  const upId = dynamicUser?.mid // || specialUser?.mid
+  const upId = route.params?.user?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<any>(null)
+  const { data: userInfo } = useUserInfo(upId)
+  const dynamicUser = {
+    ...route.params?.user,
+    ...userInfo,
+  }
 
   const {
     list,

@@ -25,7 +25,17 @@ export default function VideoInfo(props: {
       <VideoHeader />
       <View>
         <Text style={styles.videoTitle}>{title}</Text>
-        {videoDesc ? <Text style={styles.videoDesc}>{videoDesc}</Text> : null}
+        {videoDesc ? (
+          <Text
+            style={[
+              styles.videoDesc,
+              // {
+              //   color: '#444',
+              // },
+            ]}>
+            {videoDesc}
+          </Text>
+        ) : null}
         {(videoInfo?.videosNum || 0) > 1 ? (
           <ListItem.Accordion
             containerStyle={styles.pagesTitle}
@@ -80,7 +90,7 @@ export default function VideoInfo(props: {
 const styles = StyleSheet.create({
   videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
   videoTitle: { fontSize: 16, marginTop: 12 },
-  videoDesc: { marginTop: 10, color: '#666' },
+  videoDesc: { marginTop: 10 },
   pagesTitle: {
     paddingVertical: 5,
     paddingHorizontal: 10,

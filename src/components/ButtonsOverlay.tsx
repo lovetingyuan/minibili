@@ -1,20 +1,14 @@
 import { Button, Overlay } from '@rneui/themed'
 import React from 'react'
 import { StyleSheet } from 'react-native'
+import store, { useStore } from '../store'
 
-export default function ButtonsOverlay(props: {
-  visible: boolean
-  buttons: ({
-    text: string
-    name: string
-    longPress?: boolean
-  } | null)[]
-  onPress: (name: string) => void
-  overlayStyle?: any
-  buttonStyle?: any
-  dismiss: () => void
-}) {
-  const Buttons = props.buttons
+export default function ButtonsOverlay() {
+  const { overlayButtons } = useStore()
+  const dismiss = () => {
+    store.overlayButtons = []
+  }
+  const Buttons = overlayButtons
     .map(button => {
       if (!button) {
         return null
@@ -24,20 +18,11 @@ export default function ButtonsOverlay(props: {
           type="clear"
           buttonStyle={styles.button}
           title={button.text}
-          key={button.name}
-          {...(button.longPress
-            ? {
-                onLongPress: () => {
-                  props.onPress(button.name)
-                  props.dismiss()
-                },
-              }
-            : {
-                onPress: () => {
-                  props.onPress(button.name)
-                  props.dismiss()
-                },
-              })}
+          key={button.text}
+          onPress={() => {
+            button.onPress()
+            dismiss()
+          }}
         />
       )
     })
@@ -48,9 +33,9 @@ export default function ButtonsOverlay(props: {
   }
   return (
     <Overlay
-      isVisible={props.visible}
+      isVisible={overlayButtons.length > 0}
       overlayStyle={styles.overlay}
-      onBackdropPress={props.dismiss}>
+      onBackdropPress={dismiss}>
       {Buttons}
     </Overlay>
   )

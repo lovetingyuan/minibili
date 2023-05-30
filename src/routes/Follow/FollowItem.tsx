@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import { Button } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
-import ButtonsOverlay from '../../components/ButtonsOverlay'
 import store, { useStore } from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
 import { useHasUpdate } from '../../api/dynamic-items'
@@ -27,19 +26,9 @@ export default React.memo(
         store.updatedUps[mid] = false
       }
     }, [updateId, mid])
-    // store.updatedUps[mid] = !!updateId
     const navigation = useNavigation<NavigationProps['navigation']>()
     const { livingUps } = useStore()
-    // const { data: livingInfo } = useLivingInfo2(mid)
-    // const livingInfo =
-    const [modalVisible, setModalVisible] = React.useState(false)
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
-      // store.dynamicUser = {
-      //   mid,
-      //   face,
-      //   name,
-      //   sign,
-      // }
       navigation.navigate('Dynamic', {
         user: {
           mid,
@@ -62,27 +51,33 @@ export default React.memo(
         })
       }
     })
-    const buttons = [
-      updateId
-        ? null
-        : {
-            text: '标记为未读',
-            name: 'unread',
-          },
-    ].filter(Boolean)
-    const handleOverlayClick = useMemoizedFn((n: string) => {
-      if (n === 'unread') {
-        store.$latestUpdateIds[mid] = Math.random() + ''
-        store.updatedUps[mid] = true
-        setModalVisible(false)
-      }
-    })
+    const buttons = () =>
+      [
+        updateId
+          ? {
+              text: '标记为已读',
+              onPress: () => {
+                store.$latestUpdateIds[mid] = updateId
+                store.updatedUps[mid] = false
+              },
+            }
+          : {
+              text: '标记为未读',
+              onPress: () => {
+                store.$latestUpdateIds[mid] = Math.random() + ''
+                store.updatedUps[mid] = true
+              },
+            },
+      ].filter(Boolean)
+
     return (
       <>
         <View style={[{ ...styles.container }]}>
           <TouchableOpacity
             activeOpacity={0.8}
-            onLongPress={() => setModalVisible(true)}
+            onLongPress={() => {
+              store.overlayButtons = buttons()
+            }}
             onPress={() => gotoDynamic(true)}>
             <Avatar
               size={45}
@@ -97,7 +92,9 @@ export default React.memo(
           <TouchableOpacity
             activeOpacity={0.8}
             style={{ width: '100%' }}
-            onLongPress={() => setModalVisible(true)}
+            onLongPress={() => {
+              store.overlayButtons = buttons()
+            }}
             onPress={() => gotoDynamic(false)}>
             <Text2 style={[styles.name]} numberOfLines={2} ellipsizeMode="tail">
               {name}
@@ -117,14 +114,6 @@ export default React.memo(
             />
           ) : null}
         </View>
-        <ButtonsOverlay
-          buttons={buttons}
-          onPress={handleOverlayClick}
-          visible={modalVisible}
-          dismiss={() => {
-            setModalVisible(false)
-          }}
-        />
       </>
     )
   },

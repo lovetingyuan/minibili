@@ -1,8 +1,32 @@
-import { Icon, Text, useTheme } from '@rneui/themed'
+import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
 import React from 'react'
-import { View, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
+
+const Loading = React.memo(() => {
+  return (
+    <View>
+      {Array(10)
+        .fill(0)
+        .map((_, i) => {
+          return (
+            <View style={{ flex: 1, gap: 5, marginBottom: 20 }} key={i}>
+              <Skeleton animation="pulse" width={'100%' as any} height={16} />
+              {i % 2 ? (
+                <Skeleton animation="pulse" width={'100%' as any} height={16} />
+              ) : null}
+              <Skeleton
+                animation="pulse"
+                width={(Math.random() * 100 + '%') as any}
+                height={16}
+              />
+            </View>
+          )
+        })}
+    </View>
+  )
+})
 
 const CommentList: React.FC<{
   commentId: string | number
@@ -38,12 +62,7 @@ const CommentList: React.FC<{
           <Text style={styles.commentTipText}>评论已关闭或加载失败</Text>
         </View>
       ) : null}
-      {commentLoading ? (
-        <View>
-          <Text style={styles.commentTipText}>评论加载中...</Text>
-          <ActivityIndicator color={theme.colors.primary} animating />
-        </View>
-      ) : null}
+      {commentLoading ? <Loading /> : null}
       {comments?.length ? (
         comments.map((comment, i) => {
           return (

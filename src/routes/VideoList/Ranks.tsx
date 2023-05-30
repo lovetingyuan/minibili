@@ -11,8 +11,6 @@ import {
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import ButtonsOverlay from '../../components/ButtonsOverlay'
-import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
@@ -48,7 +46,7 @@ const VideoLoading = (props: { index: number; a: boolean }) => {
     </View>
   )
 }
-const Loading = () => {
+const Loading = React.memo(() => {
   return (
     <View>
       {Array(10)
@@ -71,7 +69,7 @@ const Loading = () => {
         })}
     </View>
   )
-}
+})
 
 export default function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)
@@ -94,7 +92,6 @@ export default function Ranks({ navigation }: Props) {
   }, [navigation])
 
   const currentVideoRef = React.useRef<VideoItem | null>(null)
-  const [modalVisible, setModalVisible] = React.useState(false)
   const addBlackUp = () => {
     if (!currentVideoRef.current) {
       return
@@ -123,53 +120,52 @@ export default function Ranks({ navigation }: Props) {
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item
-          setModalVisible(true)
+          store.overlayButtons = buttons()
         }}>
         <HotItem video={item} />
       </TouchableOpacity>
     )
   }
 
-  const handleOverlayClick = useMemoizedFn((action: string) => {
-    if (action === 'black') {
-      setModalVisible(false)
-      Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
-        {
-          text: '取消',
-          style: 'cancel',
+  const buttons = () =>
+    [
+      currentVideoRef.current?.mid == TracyId
+        ? null
+        : {
+            text: `不再看 ${currentVideoRef.current?.name} 的视频`,
+            onPress: () => {
+              Alert.alert(
+                `不再看 ${currentVideoRef.current?.name} 的视频？`,
+                '',
+                [
+                  {
+                    text: '取消',
+                    style: 'cancel',
+                  },
+                  { text: '确定', onPress: addBlackUp },
+                ],
+              )
+            },
+          },
+      {
+        text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
+        onPress: () => {
+          if (currentVideoRef.current) {
+            const { name, title, bvid } = currentVideoRef.current
+            handleShareVideo(name, title, bvid)
+          }
         },
-        { text: '确定', onPress: addBlackUp },
-      ])
-    } else if (action === 'share') {
-      if (currentVideoRef.current) {
-        setModalVisible(false)
-        const { name, title, bvid } = currentVideoRef.current
-        handleShareVideo(name, title, bvid)
-      }
-    } else if (action === 'openApp') {
-      if (!currentVideoRef.current) {
-        return
-      }
-      setModalVisible(false)
-      openBiliVideo(currentVideoRef.current.bvid)
-    }
-  })
-  const buttons = [
-    currentVideoRef.current?.mid == TracyId
-      ? null
-      : {
-          text: `不再看 ${currentVideoRef.current?.name} 的视频`,
-          name: 'black',
+      },
+      {
+        text: '在B站打开',
+        onPress: () => {
+          if (!currentVideoRef.current) {
+            return
+          }
+          openBiliVideo(currentVideoRef.current.bvid)
         },
-    {
-      text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
-      name: 'share',
-    },
-    {
-      text: '在B站打开',
-      name: 'openApp',
-    },
-  ].filter(Boolean)
+      },
+    ].filter(Boolean)
   const videoList: VideoItem[] = []
   const uniqVideosMap: Record<string, boolean> = {}
   for (const item of list) {
@@ -188,12 +184,6 @@ export default function Ranks({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <ButtonsOverlay
-        visible={modalVisible}
-        buttons={buttons}
-        onPress={handleOverlayClick}
-        dismiss={() => setModalVisible(false)}
-      />
       <FlashList
         ref={v => {
           videoListRef.current = v

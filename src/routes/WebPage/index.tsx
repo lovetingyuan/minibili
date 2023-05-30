@@ -95,7 +95,7 @@ export default ({ route, navigation }: Props) => {
         userAgent={$webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
         ref={webviewRef}
         onMessage={evt => {
-          const data = JSON.parse(evt.nativeEvent.data)
+          const data = JSON.parse(evt.nativeEvent.data) as any
           if (data.action === 'set-title' && !title) {
             navigation.setOptions({
               headerTitle: data.payload,

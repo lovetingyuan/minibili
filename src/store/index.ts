@@ -49,6 +49,7 @@ const store = proxy<{
   }[]
   currentImageIndex: number
   checkingUpUpdate: boolean
+  overlayButtons: { text: string; onPress: () => void }[]
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -72,6 +73,7 @@ const store = proxy<{
   updateInfo: checkUpdate(),
   imagesList: [],
   currentImageIndex: 0,
+  overlayButtons: [],
 })
 
 const StoragePrefix = 'Store:'
@@ -86,7 +88,7 @@ Object.keys(store)
     AsyncStorage.getItem(StoragePrefix + key)
       .then(data => {
         if (data) {
-          store[key] = JSON.parse(data)
+          store[key] = JSON.parse(data) as any
           if (key === '$userInfo' && store.$userInfo) {
             setUser(store.$userInfo.mid + '', store.$userInfo.name + '')
             reportUserAction(Action.OPEN_APP)

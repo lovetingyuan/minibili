@@ -25,6 +25,7 @@ import PlayHeaderRight from './Play/HeaderRight'
 import NetInfo from '@react-native-community/netinfo'
 import useIsDark from '../hooks/useIsDark'
 import ThemeResponse from '../components/ThemeResponse'
+import ButtonsOverlay2 from '../components/ButtonsOverlay'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -48,7 +49,7 @@ export default () => {
         dark: true,
         colors: {
           ...DarkTheme.colors,
-          background: '#333',
+          background: '#222',
         },
       }
     : DefaultTheme
@@ -101,6 +102,7 @@ export default () => {
         <StatusBar style="auto" />
         <NetToast />
         <ThemeResponse />
+        <ButtonsOverlay2 />
         <NavigationContainer theme={MyTheme}>
           <Stack.Navigator
             initialRouteName="Main"

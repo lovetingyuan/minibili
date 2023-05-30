@@ -36,8 +36,11 @@ export default function request<D extends any>(url: string, referer?: string) {
       if (index > -1) {
         resText = resText.substring(index + 1)
       }
-      const res: { code: number; message: string; data: D } =
-        JSON.parse(resText)
+      const res = JSON.parse(resText) as {
+        code: number
+        message: string
+        data: D
+      }
       return res.data
     })
 }

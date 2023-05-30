@@ -43,7 +43,7 @@ function Player(props: Props & { wifi: boolean }) {
 
   const handleMessage = (evt: WebViewMessageEvent) => {
     try {
-      const data = JSON.parse(evt.nativeEvent.data)
+      const data = JSON.parse(evt.nativeEvent.data) as any
       if (data.action === 'playState') {
         playStateRef.current = data.action
         if (data.payload === 'play' || data.payload === 'waiting') {

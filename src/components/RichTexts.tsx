@@ -13,7 +13,6 @@ import { reportUnknownRichTextItem } from '../utils/report'
 import { Icon, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-// import { Image } from 'expo-image'
 
 export default function RichTexts(props: {
   idStr: string | null
@@ -57,10 +56,18 @@ export default function RichTexts(props: {
         <Text
           key={key++}
           onPress={() => {
-            navigation.navigate('WebPage', {
-              title: `${node.text.substring(1)}的主页`,
-              url: `https://m.bilibili.com/space/${node.rid}`,
+            navigation.push('Dynamic', {
+              user: {
+                face: '',
+                name: node.text.substring(1),
+                mid: node.rid,
+                sign: '-',
+              },
             })
+            // navigation.navigate('WebPage', {
+            //   title: `${node.text.substring(1)}的主页`,
+            //   url: `https://m.bilibili.com/space/${node.rid}`,
+            // })
           }}
           style={[styles.link, { fontSize }]}>
           {node.text}

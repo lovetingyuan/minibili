@@ -56,7 +56,12 @@ const BaseReplySchema = z.object({
   parent: z.number(),
   rcount: z.number(),
   // replies: z.lazy(() => ReplySchema.array()).nullable(),
-  // reply_control: { time_desc: z.string(),; location: z.string(), }
+  reply_control: z.object({
+    time_desc: z.string(),
+    location: z.string(),
+    sub_reply_entry_text: z.string(),
+    sub_reply_title_text: z.string(),
+  }),
   root: z.number(),
   // root_str: z.string(),
   rpid: z.number(),

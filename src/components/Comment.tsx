@@ -1,7 +1,17 @@
 import React from 'react'
-import { Linking, StyleSheet, View, Image, TextStyle } from 'react-native'
+import {
+  Linking,
+  StyleSheet,
+  View,
+  Image,
+  TextStyle,
+  TouchableOpacity,
+} from 'react-native'
 import { MessageContent, ReplyItem } from '../api/comments'
 import { Text, useTheme } from '@rneui/themed'
+import useIsDark from '../hooks/useIsDark'
+import { useNavigation } from '@react-navigation/native'
+import { NavigationProps } from '../types'
 
 interface Props {
   upName: string
@@ -75,6 +85,7 @@ function CommentText(props: {
 export default function Comment(props: Props) {
   const { comment, upName } = props
   const { theme } = useTheme()
+  const dark = useIsDark()
   const upStyle = (name: string) => {
     return upName === name
       ? styles.pinkName
@@ -82,6 +93,7 @@ export default function Comment(props: Props) {
           color: theme.colors.primary,
         }
   }
+  const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (
     <View>
@@ -112,8 +124,22 @@ export default function Comment(props: Props) {
           <Text style={styles.likeNum}> {comment.like}</Text>
         ) : null}
       </Text>
-      {comment.replies ? (
-        <View style={[styles.reply]}>
+      {comment.replies?.length ? (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={[
+            styles.reply,
+            {
+              backgroundColor: dark ? '#333' : '#ddd',
+            },
+          ]}
+          onPress={() => {
+            const root = comment.replies[0].root
+            navigation.navigate('WebPage', {
+              title: '评论详情',
+              url: `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=1&root=${root}`,
+            })
+          }}>
           {comment.replies.map(reply => {
             return (
               <Text key={reply.id + '#'} style={styles.replyItem}>
@@ -131,7 +157,12 @@ export default function Comment(props: Props) {
               </Text>
             )
           })}
-        </View>
+          {comment.rcount > 3 ? (
+            <Text style={{ color: theme.colors.primary }}>
+              {comment.moreText ? comment.moreText + '...' : '...'}
+            </Text>
+          ) : null}
+        </TouchableOpacity>
       ) : null}
     </View>
   )
@@ -164,14 +195,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   reply: {
-    marginLeft: 8,
+    padding: 8,
+    borderRadius: 4,
     marginTop: 5,
-    marginBottom: 10,
-    opacity: 0.8,
+    marginBottom: 15,
+    gap: 5,
+    opacity: 0.9,
     flex: 1,
   },
   replyItem: {
-    marginBottom: 5,
+    // marginBottom: 5,
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
