@@ -113,6 +113,21 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
         </Text>
       </View>
     )
+  } else if (
+    additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_MATCH
+  ) {
+    url = parseUrl(additional.match.jump_url)
+    const { title, center_top, center_bottom, left_team, right_team } =
+      additional.match.match_info
+    additionalContent = (
+      <View style={{ gap: 2 }}>
+        <Text>赛事：{additional.match.head_text}</Text>
+        <Text>
+          {title} {left_team.name} VS {right_team.name}{' '}
+          {center_bottom + '-' + center_top.join('')}
+        </Text>
+      </View>
+    )
   }
   const Foo = url ? Pressable : View
   const linkProp = url

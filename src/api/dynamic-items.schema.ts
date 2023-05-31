@@ -341,6 +341,38 @@ const AdditionalSchemaMap = {
       vote_id: z.number(),
     }),
   }),
+  Match: z.object({
+    type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_MATCH]),
+    match: z.object({
+      // button: {
+      //   jump_style: {
+      //     text: '回放',
+      //   },
+      //   jump_url: '//www.bilibili.com/video/BV1nM4y1i7rt/',
+      //   type: 1,
+      // },
+      head_text: z.string(),
+      id_str: z.string(),
+      jump_url: z.string(),
+      match_info: z.object({
+        center_bottom: z.string(),
+        center_top: z.string().array(),
+        left_team: z.object({
+          id: z.number(),
+          name: z.string(),
+          pic: z.string(),
+        }),
+        right_team: z.object({
+          id: z.number(),
+          name: z.string(),
+          pic: z.string(),
+        }),
+        status: z.number(),
+        sub_title: z.string().nullable(),
+        title: z.string(),
+      }),
+    }),
+  }),
 }
 
 const AdditionalOtherSchema = z.object({
@@ -373,6 +405,7 @@ const AdditionalSchema = z.discriminatedUnion('type', [
   AdditionalSchemaMap.Common,
   AdditionalSchemaMap.Goods,
   AdditionalSchemaMap.Vote,
+  AdditionalSchemaMap.Match,
   AdditionalOtherSchema,
 ])
 

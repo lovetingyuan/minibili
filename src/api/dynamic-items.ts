@@ -64,8 +64,9 @@ const getCommon = (item: DynamicItemBaseType) => {
 
 const getDynamicItem = (item: DynamicItemResponse) => {
   if (
+    item.modules.module_dynamic.additional?.type &&
     !Object.keys(HandledAdditionalTypeEnum).includes(
-      item.modules.module_dynamic.additional?.type || '',
+      item.modules.module_dynamic.additional?.type,
     )
   ) {
     reportAdditional(item)
@@ -182,6 +183,13 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         text: `${label ? label + ': ' : ''}${common.desc}`,
         url: parseUrl(common.jump_url),
       },
+    }
+  }
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+    return {
+      ...getCommon(item),
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD as const,
+      payload: {},
     }
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
@@ -427,13 +435,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         text: '暂不支持显示此动态',
         type: item.type as unknown as OtherForwardTypeEnum,
       },
-    }
-  }
-  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-    return {
-      ...getCommon(item),
-      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD as const,
-      payload: {},
     }
   }
 
