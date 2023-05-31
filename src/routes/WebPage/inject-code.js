@@ -25,7 +25,10 @@ function __$hack(dev) {
       max-height: none!important;
     }
     `
-  } else if (window.location.pathname.startsWith('/dynamic/')) {
+  } else if (
+    window.location.pathname.startsWith('/dynamic') ||
+    window.location.pathname.startsWith('/opus')
+  ) {
     style.textContent = `
     #app .dyn-header__right {
       display: none!important;
@@ -134,6 +137,21 @@ function __$hack(dev) {
       `
       liveInfo.appendChild(liveTimeSpan)
     } catch (err) {}
+  } else if (window.location.pathname.startsWith('/topic-detail')) {
+    style.textContent = `
+    .topic-detail .m-navbar {
+      display: none!important;
+    }
+    .topic-detail .topic-detail-container {
+      top: 0;
+    }
+    .launch-app-btn.m-topic-float-openapp {
+      display: none!important;
+    }
+    .bili-dyn-item-header__following {
+      display: none!important;
+    }
+    `
   } else {
     style.textContent = `
     #app .m-navbar {

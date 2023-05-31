@@ -1,6 +1,6 @@
 import React from 'react'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-import { TouchableOpacity, Image, StyleSheet } from 'react-native'
+import { View, Image, StyleSheet } from 'react-native'
 import { Text } from '@rneui/themed'
 import ForwardItem from './ForwardItem'
 import VideoItem from './VideoItem'
@@ -9,14 +9,14 @@ import DefaultItem from './DefaultItem'
 import CommonItem from './CommonItem'
 import DynamicStat from './DynamicStat'
 import { useRoute } from '@react-navigation/native'
-import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../../types'
+// import { useNavigation } from '@react-navigation/native'
+// import { NavigationProps } from '../../types'
 import { DynamicItemAllType } from '../../api/dynamic-items'
 
 export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   let Item: React.FC<any> = DefaultItem
   const route = useRoute()
-  const navigation = useNavigation<NavigationProps['navigation']>()
+  // const navigation = useNavigation<NavigationProps['navigation']>()
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
     return null
   }
@@ -38,35 +38,18 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
     Item = CommonItem
   }
   if (route.name === 'DynamicDetail') {
-    return <Item {...item} />
+    return <Item item={item} />
   }
   // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      style={[styles.itemContainer]}
-      onPress={() => {
-        if (
-          item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW ||
-          item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD
-        ) {
-          navigation?.navigate('DynamicDetail', {
-            detail: item,
-          })
-        } else {
-          navigation.navigate('WebPage', {
-            title: item.name + '的动态',
-            url: `https://m.bilibili.com/dynamic/${item.id}`,
-          })
-        }
-      }}>
+    <View style={[styles.itemContainer]}>
       {item.top ? (
         <Image
           source={require('../../../assets/top.png')}
           style={styles.topMark}
         />
       ) : null}
-      <Item {...item} />
+      <Item item={item} />
       {__DEV__ && <Text>{item.type}</Text>}
       {item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_AV && (
         <DynamicStat
@@ -78,7 +61,7 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
           share={item.forwardCount}
         />
       )}
-    </TouchableOpacity>
+    </View>
   )
 }
 

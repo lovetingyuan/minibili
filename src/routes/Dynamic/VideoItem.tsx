@@ -15,18 +15,20 @@ import { parseNumber } from '../../utils'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 
-export default function VideoItem(
-  props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>,
-) {
+export default function VideoItem(props: {
+  item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>
+}) {
   const {
-    mid,
-    name,
-    payload: { cover, title, bvid, play, duration, desc },
-    date,
-    face,
-    commentId,
-    likeCount,
-    forwardCount,
+    item: {
+      mid,
+      name,
+      payload: { cover, title, bvid, play, duration, desc },
+      date,
+      face,
+      commentId,
+      likeCount,
+      forwardCount,
+    },
   } = props
 
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -36,7 +38,7 @@ export default function VideoItem(
     color: gray,
     fontSize: 13,
   }
-  const nodes = props.desc?.rich_text_nodes
+  const nodes = props.item.desc?.rich_text_nodes
 
   return (
     <TouchableOpacity
@@ -69,14 +71,13 @@ export default function VideoItem(
           },
         })
       }}>
-      {nodes ? (
-        <RichTexts
-          idStr={props.id}
-          nodes={nodes}
-          topic={props.topic}
-          style={{ marginBottom: 12 }}
-        />
-      ) : null}
+      <RichTexts
+        idStr={props.item.id}
+        nodes={nodes}
+        topic={props.item.topic}
+        style={{ marginBottom: 12 }}
+      />
+
       <View style={styles.videoContainer}>
         <View style={styles.imageContainer}>
           <Image
@@ -92,7 +93,7 @@ export default function VideoItem(
             <Text style={styles.videoLengthText}>{duration}</Text>
           </View>
           <View style={styles.videoDate}>
-            <Text style={styles.videoLengthText}>{props.date}</Text>
+            <Text style={styles.videoLengthText}>{props.item.date}</Text>
           </View>
         </View>
         <View style={styles.videoInfo}>

@@ -155,7 +155,15 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         refreshing={isRefreshing}
         onRefresh={refresh}
         ListEmptyComponent={
-          <>{loading && !isReachingEnd ? <Loading /> : null}</>
+          <>
+            {loading && !isReachingEnd ? (
+              <Loading />
+            ) : error ? (
+              <Text style={{ margin: 50, textAlign: 'center', fontSize: 16 }}>
+                加载失败
+              </Text>
+            ) : null}
+          </>
         }
         ListFooterComponent={
           <Text style={styles.bottomEnd}>

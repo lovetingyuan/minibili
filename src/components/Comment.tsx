@@ -1,14 +1,7 @@
 import React from 'react'
-import {
-  Linking,
-  StyleSheet,
-  View,
-  Image,
-  TextStyle,
-  TouchableOpacity,
-} from 'react-native'
+import { Linking, StyleSheet, View, Image, TextStyle } from 'react-native'
 import { MessageContent, ReplyItem } from '../api/comments'
-import { Text, useTheme } from '@rneui/themed'
+import { Button, Text, useTheme } from '@rneui/themed'
 import useIsDark from '../hooks/useIsDark'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
@@ -152,21 +145,13 @@ export default function Comment(props: Props) {
         ) : null}
       </Text>
       {comment.replies?.length ? (
-        <TouchableOpacity
-          activeOpacity={0.7}
+        <View
           style={[
             styles.reply,
             {
               backgroundColor: dark ? '#333' : '#ddd',
             },
-          ]}
-          onPress={() => {
-            const root = comment.replies[0].root
-            navigation.navigate('WebPage', {
-              title: '评论详情',
-              url: `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=1&root=${root}`,
-            })
-          }}>
+          ]}>
           {comment.replies.map(reply => {
             return (
               <Text key={reply.id + '#'} style={styles.replyItem}>
@@ -206,11 +191,23 @@ export default function Comment(props: Props) {
             )
           })}
           {comment.rcount > 3 ? (
-            <Text style={{ color: theme.colors.primary }}>
-              {comment.moreText ? comment.moreText + '...' : '...'}
-            </Text>
+            <Button
+              type="clear"
+              size="sm"
+              onPress={() => {
+                const root = comment.replies[0].root
+                navigation.navigate('WebPage', {
+                  title: '评论详情',
+                  url: `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=1&root=${root}`,
+                })
+              }}
+              buttonStyle={styles.moreButton}>
+              <Text style={{ color: theme.colors.primary }}>
+                {comment.moreText ? comment.moreText + '...' : '...'}
+              </Text>
+            </Button>
           ) : null}
-        </TouchableOpacity>
+        </View>
       ) : null}
     </View>
   )
@@ -280,5 +277,9 @@ const styles = StyleSheet.create({
   },
   pinkName: {
     color: '#FF6699',
+  },
+  moreButton: {
+    justifyContent: 'flex-start',
+    paddingHorizontal: 1,
   },
 })

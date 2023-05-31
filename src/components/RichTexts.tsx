@@ -13,6 +13,7 @@ import { reportUnknownRichTextItem } from '../utils/report'
 import { Icon, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
+import { parseUrl } from '../utils'
 
 export default function RichTexts(props: {
   idStr: string | null
@@ -27,11 +28,29 @@ export default function RichTexts(props: {
 }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const reactNodes: React.ReactNode[] = []
-  if (!props.nodes) {
-    return null
-  }
   let key = 0
   const fontSize = props.fontSize || 16
+  const Topic = props.topic ? (
+    <View style={styles.topicContainer}>
+      <Icon name="tag" color="#178bcf" size={18} />
+      <Text
+        onPress={() => {
+          if (props.topic?.jump_url) {
+            navigation.navigate('WebPage', {
+              title: '话题：' + props.topic?.name,
+              url: parseUrl(props.topic?.jump_url),
+            })
+            // Linking.openURL(url.startsWith('//') ? 'https:' + url : url)
+          }
+        }}
+        style={[styles.link, { fontSize }]}>
+        {props.topic.name}
+      </Text>
+    </View>
+  ) : null
+  if (!props.nodes) {
+    return Topic
+  }
 
   for (const node of props.nodes) {
     if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT) {
@@ -85,11 +104,7 @@ export default function RichTexts(props: {
       reactNodes.push(
         <Text
           onPress={() => {
-            Linking.openURL(
-              node.jump_url.startsWith('//')
-                ? 'https:' + node.jump_url
-                : node.jump_url,
-            )
+            Linking.openURL(parseUrl(node.jump_url))
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
@@ -105,11 +120,7 @@ export default function RichTexts(props: {
         <Text
           numberOfLines={1}
           onPress={() => {
-            Linking.openURL(
-              node.jump_url.startsWith('//')
-                ? 'https:' + node.jump_url
-                : node.jump_url,
-            )
+            Linking.openURL(parseUrl(node.jump_url))
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
@@ -184,11 +195,7 @@ export default function RichTexts(props: {
         <Text
           numberOfLines={1}
           onPress={() => {
-            Linking.openURL(
-              node.jump_url.startsWith('//')
-                ? 'https:' + node.jump_url
-                : node.jump_url,
-            )
+            Linking.openURL(parseUrl(node.jump_url))
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
@@ -206,21 +213,7 @@ export default function RichTexts(props: {
   }
   return (
     <View style={props.style}>
-      {props.topic ? (
-        <View style={styles.topicContainer}>
-          <Icon name="tag" color="#178bcf" size={18} />
-          <Text
-            onPress={() => {
-              const url = props.topic?.jump_url
-              if (url) {
-                Linking.openURL(url.startsWith('//') ? 'https:' + url : url)
-              }
-            }}
-            style={[styles.link, { fontSize }]}>
-            {props.topic.name}
-          </Text>
-        </View>
-      ) : null}
+      {Topic}
       <Text style={styles.textContainer} {...props.textProps}>
         {reactNodes}
       </Text>

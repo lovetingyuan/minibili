@@ -5,6 +5,7 @@ import {
   Linking,
   useWindowDimensions,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
@@ -14,6 +15,8 @@ import {
 import RichTexts from '../../components/RichTexts'
 import { Text } from '@rneui/themed'
 import { Image } from 'expo-image'
+import { useNavigation } from '@react-navigation/native'
+import { NavigationProps } from '../../types'
 
 type ItemType =
   | HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE
@@ -21,13 +24,28 @@ type ItemType =
   | HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
   | HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC
 
-export default function CommonItem(props: DynamicItemType<ItemType>) {
-  const nodes = props.desc?.rich_text_nodes
+export default function CommonItem(props: { item: DynamicItemType<ItemType> }) {
+  const { item } = props
+  const nodes = item.desc?.rich_text_nodes
+  const navigation = useNavigation<NavigationProps['navigation']>()
+
   return (
-    <View style={styles.container}>
-      <RichTexts idStr={props.id} nodes={nodes} topic={props.topic} />
-      <CommonContent type={props.type} {...props.payload} />
-    </View>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      style={styles.container}
+      onPress={() => {
+        navigation.navigate('WebPage', {
+          title: item.name + '的动态',
+          url: `https://m.bilibili.com/dynamic/${item.id}`,
+        })
+      }}>
+      <RichTexts idStr={item.id} nodes={nodes} topic={item.topic} />
+      <CommonContent type={item.type} {...item.payload} />
+    </TouchableOpacity>
+    // <View style={styles.container}>
+    //   <RichTexts idStr={item.id} nodes={nodes} topic={item.topic} />
+    //   <CommonContent type={item.type} {...item.payload} />
+    // </View>
   )
 }
 
@@ -45,10 +63,19 @@ export function CommonContent(props: {
   const { url, title, text, cover, forward } = props
   const Foo = url ? Pressable : View
   const { width } = useWindowDimensions()
+  const navigation = useNavigation<NavigationProps['navigation']>()
+
   const linkProp = url
     ? {
         onPress: () => {
-          Linking.openURL(url)
+          if (props.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE) {
+            navigation.push('WebPage', {
+              title,
+              url,
+            })
+          } else {
+            Linking.openURL(url)
+          }
         },
       }
     : {}
@@ -58,8 +85,8 @@ export function CommonContent(props: {
         <Image
           source={{ uri: cover + '@240w_140h_1c.webp' }}
           style={{
-            width: width * 0.4,
-            height: width * 0.23,
+            width: forward ? width * 0.3 : width * 0.4,
+            height: forward ? width * 0.18 : width * 0.2,
             borderRadius: 4,
           }}
         />

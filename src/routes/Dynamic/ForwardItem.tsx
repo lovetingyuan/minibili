@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Pressable } from 'react-native'
+import { StyleSheet, View, Pressable, TouchableOpacity } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -15,33 +15,36 @@ import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
 
-export default function ForwardItem(
-  props: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>,
-) {
+export default function ForwardItem(props: {
+  item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>
+}) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const isDark = useIsDark()
   const { theme } = useTheme()
+  const { item } = props
+  const { payload } = item
 
   let forwardContent = (
-    <Text style={{ fontStyle: 'italic' }}>{props.payload.text}</Text>
+    <Text style={{ fontStyle: 'italic' }}>{payload.text}</Text>
   )
   const forwardRichTextContent = (
     <RichTexts
-      idStr={props.payload.id}
-      nodes={props.payload.desc?.rich_text_nodes}
+      idStr={payload.id}
+      nodes={payload.desc?.rich_text_nodes}
       style={{ marginBottom: 10 }}
-      topic={props.payload.topic}
+      topic={payload.topic}
+      fontSize={15}
       textProps={{ numberOfLines: 3 }}
     />
   )
-  if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
-    const { title, cover, stat } = props.payload.video
+  if (payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
+    const { title, cover, stat } = payload.video
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
         {forwardRichTextContent}
         <View style={{ flexDirection: 'row' }}>
           <Image
-            style={styles.forwardContentImage}
+            style={styles.videoCover}
             source={{ uri: cover + '@240w_240h_1c.webp' }}
           />
           <View style={{ flex: 6 }}>
@@ -58,14 +61,14 @@ export default function ForwardItem(
       </View>
     )
   } else if (
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD
   ) {
     forwardContent = (
       <View style={{ flexDirection: 'column', flex: 1 }}>
         {forwardRichTextContent}
         <View style={styles.imagesContainer}>
-          {props.payload.images.map((img, i) => {
+          {payload.images.map((img, i) => {
             return (
               <Image
                 style={[styles.image, { aspectRatio: img.ratio }]}
@@ -75,40 +78,49 @@ export default function ForwardItem(
             )
           })}
         </View>
-        <Additional additional={props.payload.additional} />
+        <Additional additional={payload.additional} />
       </View>
     )
   } else if (
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MEDIALIST ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON ||
-    props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE_RCMD
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MEDIALIST ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE_RCMD
   ) {
     forwardContent = (
       <View style={{ gap: 10, flexShrink: 1 }}>
         {forwardRichTextContent}
         <CommonContent
-          type={props.payload.type}
-          title={props.payload.title}
-          url={'url' in props.payload ? props.payload.url : ''}
-          text={props.payload.text || ''}
-          cover={props.payload.cover}
+          type={payload.type}
+          title={payload.title}
+          url={'url' in payload ? payload.url : ''}
+          text={payload.text || ''}
+          cover={payload.cover}
           forward
         />
       </View>
     )
   }
   return (
-    <View style={[styles.textContainer]}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      style={styles.textContainer}
+      onPress={() => {
+        navigation.navigate('WebPage', {
+          title: item.name + '的动态',
+          url: `https://m.bilibili.com/dynamic/${item.id}`,
+        })
+      }}>
+      {/* <View style={[styles.textContainer]}> */}
       <RichTexts
-        idStr={props.payload.id}
-        nodes={props.desc?.rich_text_nodes}
+        idStr={payload.id}
+        nodes={item.desc?.rich_text_nodes}
         style={{ marginBottom: 10 }}
-        topic={props.topic}
+        topic={item.topic}
         textProps={{ numberOfLines: 3 }}
       />
       <View
@@ -116,43 +128,44 @@ export default function ForwardItem(
           styles.forwardContainer,
           { backgroundColor: isDark ? '#222' : '#dedede' },
         ]}>
-        {props.payload.name && props.payload.mid !== props.mid ? (
+        {payload.name && payload.mid !== item.mid ? (
           <Pressable
             style={styles.forwardUp}
             onPress={() => {
               navigation.push('Dynamic', {
                 user: {
-                  face: props.payload.face,
-                  name: props.payload.name,
-                  mid: props.payload.mid,
+                  face: payload.face,
+                  name: payload.name,
+                  mid: payload.mid,
                   sign: '-',
                 },
               })
             }}>
-            {props.payload.face ? (
+            {payload.face ? (
               <Avatar
-                source={{ uri: props.payload.face + '@50w_50h_1c.webp' }}
+                source={{ uri: payload.face + '@50w_50h_1c.webp' }}
                 size={22}
                 rounded
               />
             ) : null}
             <Text
               style={[styles.forwardUpName, { color: theme.colors.primary }]}>
-              {props.payload.name}
+              {payload.name}
             </Text>
           </Pressable>
         ) : null}
-        <Pressable
+        <TouchableOpacity
+          activeOpacity={0.7}
           style={styles.forwardContent}
           onPress={() => {
-            if (props.payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
-              const { video } = props.payload
+            if (payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
+              const { video } = payload
               store.currentVideo = {
                 bvid: video.bvid,
-                name: props.payload.name,
-                face: props.payload.face,
-                mid: props.payload.mid,
-                // pubDate: props.payload.
+                name: payload.name,
+                face: payload.face,
+                mid: payload.mid,
+                // pubDate: payload.
                 title: video.title,
                 aid: video.aid,
                 cover: video.cover,
@@ -160,20 +173,20 @@ export default function ForwardItem(
               }
               navigation.push('Play', {
                 from: {
-                  mid: props.mid,
+                  mid: item.mid,
                 },
               })
             } else {
               navigation.navigate('WebPage', {
-                title: props.payload.name + '的动态',
-                url: `https://m.bilibili.com/dynamic/${props.payload.id}`,
+                title: payload.name + '的动态',
+                url: `https://m.bilibili.com/dynamic/${payload.id}`,
               })
             }
           }}>
           {forwardContent}
-        </Pressable>
+        </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
@@ -183,7 +196,7 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
   image: {
-    height: 80,
+    height: 70,
     marginVertical: 10,
     borderRadius: 4,
   },
@@ -193,7 +206,7 @@ const styles = StyleSheet.create({
   forwardContainer: {
     flex: 1,
     marginBottom: 8,
-    marginTop: 16,
+    // marginTop: 16,
     padding: 10,
     borderRadius: 4,
     overflow: 'hidden',
@@ -208,9 +221,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
   },
-  forwardContentImage: {
-    width: 150,
-    height: 80,
+  videoCover: {
+    width: 120,
+    height: 70,
     marginRight: 10,
     flex: 4,
     borderRadius: 4,

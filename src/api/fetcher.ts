@@ -39,7 +39,7 @@ export default function request<D extends any>(url: string, referer?: string) {
       TE: 'trailers',
       // 'user-agent': getUserAgent(3),
       'user-agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.50',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
     },
     referrer: referer || 'https://space.bilibili.com',
     referrerPolicy: 'no-referrer-when-downgrade',

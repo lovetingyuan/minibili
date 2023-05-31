@@ -8,27 +8,32 @@ import {
 import { DynamicItemType } from '../../api/dynamic-items'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import store from '../../store'
-import { useRoute } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import RichTexts from '../../components/RichTexts'
 import { Image } from 'expo-image'
 import { Additional } from '../../components/Additional'
+import { NavigationProps } from '../../types'
 
-export default function WordDrawItem(
-  props: DynamicItemType<
+export default function WordDrawItem(props: {
+  item: DynamicItemType<
     | HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW
     | HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD
-  >,
-) {
+  >
+}) {
   const {
-    id,
-    desc,
-    topic,
-    payload: { images, additional },
+    item: {
+      id,
+      desc,
+      topic,
+      payload: { images, additional },
+    },
   } = props
   const richTextNodes = desc?.rich_text_nodes
   const route = useRoute()
   const isDetail = route.name === 'DynamicDetail'
   const { width } = useWindowDimensions()
+  const navigation = useNavigation<NavigationProps['navigation']>()
+
   const scrollImages = (
     <View style={styles.imagesContainer}>
       {images.map((img, i) => {
@@ -95,8 +100,8 @@ export default function WordDrawItem(
       })}
     </View>
   )
-  return (
-    <View style={[styles.textContainer]}>
+  const content = (
+    <>
       <RichTexts
         idStr={id}
         nodes={richTextNodes}
@@ -105,7 +110,22 @@ export default function WordDrawItem(
       />
       {images.length ? (isDetail ? imageList : scrollImages) : null}
       <Additional additional={additional} />
-    </View>
+    </>
+  )
+  if (isDetail) {
+    return <View style={[styles.textContainer]}>{content}</View>
+  }
+  return (
+    <TouchableOpacity
+      activeOpacity={0.8}
+      style={[styles.textContainer]}
+      onPress={() => {
+        navigation?.navigate('DynamicDetail', {
+          detail: props.item,
+        })
+      }}>
+      {content}
+    </TouchableOpacity>
   )
 }
 

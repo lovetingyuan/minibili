@@ -54,7 +54,7 @@ export default function HeaderRight(props: {
         <MenuItem
           onPress={() => {
             Clipboard.setStringAsync(props.url).then(() => {
-              ToastAndroid.show('已复制链接', ToastAndroid.SHORT)
+              ToastAndroid.show('已复制链接：' + props.url, ToastAndroid.SHORT)
               hideMenu()
             })
           }}>
