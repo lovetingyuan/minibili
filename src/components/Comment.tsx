@@ -24,6 +24,8 @@ function CommentText(props: {
   idStr: string
 }) {
   const { nodes, style, idStr } = props
+  const navigation = useNavigation<NavigationProps['navigation']>()
+
   return (
     <Text style={style} selectable>
       {nodes.map((node, i) => {
@@ -33,7 +35,15 @@ function CommentText(props: {
               key={idStr + i}
               style={styles.link}
               onPress={() => {
-                Linking.openURL('https://m.bilibili.com/space/' + node.mid)
+                navigation.push('Dynamic', {
+                  user: {
+                    face: '',
+                    name: node.text.substring(1),
+                    mid: node.mid,
+                    sign: '-',
+                  },
+                })
+                // Linking.openURL('https://m.bilibili.com/space/' + node.mid)
               }}>
               {node.text}
             </Text>
@@ -157,7 +167,7 @@ export default function Comment(props: Props) {
                   onPress={() => {
                     Linking.openURL('https://m.bilibili.com/space/' + reply.mid)
                   }}>
-                  {reply.name}：
+                  {reply.name}
                 </Text>
                 <Text style={reply.sex === '女' ? styles.pinkName : null}>
                   {reply.sex === '男' ? '♂' : reply.sex === '女' ? '♀' : ''}
@@ -171,6 +181,7 @@ export default function Comment(props: Props) {
                     )
                   </Text>
                 ) : null}
+                ：
                 <CommentText nodes={reply.message} idStr={reply.id + '_'} />
                 {reply.like ? (
                   <Text style={styles.likeNum}> {reply.like}</Text>
