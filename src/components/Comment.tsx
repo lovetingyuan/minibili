@@ -109,6 +109,15 @@ export default function Comment(props: Props) {
           <Text style={comment.sex === '女' ? styles.pinkName : null}>
             {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}
           </Text>
+          {comment.location ? (
+            <Text style={{ fontSize: 13 }}>
+              (
+              {comment.location.includes('：')
+                ? comment.location.split('：')[1]
+                : comment.location}
+              )
+            </Text>
+          ) : null}
           ：
         </Text>
         <CommentText
@@ -150,6 +159,18 @@ export default function Comment(props: Props) {
                   }}>
                   {reply.name}：
                 </Text>
+                <Text style={reply.sex === '女' ? styles.pinkName : null}>
+                  {reply.sex === '男' ? '♂' : reply.sex === '女' ? '♀' : ''}
+                </Text>
+                {reply.location ? (
+                  <Text style={{ fontSize: 13 }}>
+                    (
+                    {reply.location.includes('：')
+                      ? reply.location.split('：')[1]
+                      : reply.location}
+                    )
+                  </Text>
+                ) : null}
                 <CommentText nodes={reply.message} idStr={reply.id + '_'} />
                 {reply.like ? (
                   <Text style={styles.likeNum}> {reply.like}</Text>
