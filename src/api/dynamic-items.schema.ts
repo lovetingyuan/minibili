@@ -255,7 +255,7 @@ const MajorSchemaMap = {
         text: z.string(),
       }),
       cover: z.string(),
-      id: z.string(),
+      id: z.number(),
       desc: z.string(),
       jump_url: z.string(),
       sub_title: z.string(),

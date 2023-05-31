@@ -190,7 +190,7 @@ export default function Comment(props: Props) {
               </Text>
             )
           })}
-          {comment.rcount > 3 ? (
+          {comment.moreText ? (
             <Button
               type="clear"
               size="sm"
@@ -203,7 +203,7 @@ export default function Comment(props: Props) {
               }}
               buttonStyle={styles.moreButton}>
               <Text style={{ color: theme.colors.primary }}>
-                {comment.moreText ? comment.moreText + '...' : '...'}
+                {comment.moreText + '...'}
               </Text>
             </Button>
           ) : null}

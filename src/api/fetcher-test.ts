@@ -19,7 +19,8 @@ export default function request<D extends any>(url: string, referer?: string) {
       'sec-fetch-mode': 'cors',
       'sec-fetch-site': 'same-site',
       // 'upgrade-insecure-requests': '1',
-      'user-agent': 'BiLiBiLi ANDROID Client/8.0.0 (orz@****.my)',
+      'user-agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
     },
     referrer: referer || 'https://space.bilibili.com',
     referrerPolicy: 'no-referrer-when-downgrade',
