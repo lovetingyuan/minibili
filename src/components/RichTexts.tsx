@@ -48,7 +48,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 🔗' + node.text + ' '}
+          {'🔗' + node.text + ' '}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AT) {
@@ -113,7 +113,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 视频：' + node.text}
+          {'📺 ' + node.text}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_GOODS) {
@@ -125,7 +125,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 商品：' + node.text}
+          {'🛒 ' + node.text}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_MAIL) {
@@ -136,7 +136,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {node.text}
+          {'📧 ' + node.text}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_VOTE) {
@@ -149,7 +149,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 投票：' + node.text}
+          {'🗳️ ' + node.text}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_LOTTERY) {
@@ -162,7 +162,7 @@ export default function RichTexts(props: {
               `https://t.bilibili.com/lottery/h5/index/#/result?business_type=1&business_id=${props.idStr}&isWeb=1`,
             )
           }}>
-          {' 抽奖：' + node.text}
+          {'🎁 ' + node.text}
         </Text>,
       )
     } else if (
@@ -176,7 +176,7 @@ export default function RichTexts(props: {
           numberOfLines={1}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 剧集：' + node.text}
+          {'📹 ' + node.text}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_CV) {
@@ -192,7 +192,7 @@ export default function RichTexts(props: {
           }}
           key={key++}
           style={[styles.link, { fontSize }]}>
-          {' 文章：' + node.text}
+          {'📝 ' + node.text}
         </Text>,
       )
     } else {
