@@ -26,9 +26,6 @@ export default function Header() {
         size={50}
         onPress={() => {
           if (store.$userInfo) {
-            // store.dynamicUser = {
-            //   ...store.$userInfo,
-            // }
             navigation.navigate('Dynamic', {
               user: store.$userInfo,
             })
@@ -54,6 +51,9 @@ export default function Header() {
             type="ionicon"
             size={18}
             color="#00AEEC"
+            onPress={() => {
+              navigation.navigate('About')
+            }}
           />
         </View>
         <Text style={[styles.mySign, { color: theme.colors.grey1 }]}>

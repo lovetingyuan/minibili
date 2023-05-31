@@ -7,24 +7,26 @@ import {
   StyleSheet,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
-import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+import {
+  HandledDynamicTypeEnum,
+  HandledForwardTypeEnum,
+} from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 import { Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 
-export default function CommonItem(
-  props: DynamicItemType<
-    | HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE
-    | HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC
-    | HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
-    | HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC
-  >,
-) {
+type ItemType =
+  | HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE
+  | HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC
+  | HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
+  | HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC
+
+export default function CommonItem(props: DynamicItemType<ItemType>) {
   const nodes = props.desc?.rich_text_nodes
   return (
     <View style={styles.container}>
       <RichTexts idStr={props.id} nodes={nodes} topic={props.topic} />
-      <CommonContent {...props.payload} />
+      <CommonContent type={props.type} {...props.payload} />
     </View>
   )
 }
@@ -33,6 +35,7 @@ export default function CommonItem(
  * 这个组件为普通动态和转发动态共同使用
  */
 export function CommonContent(props: {
+  type: HandledDynamicTypeEnum | HandledForwardTypeEnum
   url: string
   title: string
   text: string
@@ -63,7 +66,16 @@ export function CommonContent(props: {
       ) : null}
       <Foo style={styles.textContainer} {...linkProp}>
         {title ? (
-          <Text style={styles.title} numberOfLines={2}>
+          <Text
+            style={[
+              styles.title,
+              props.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
+                ? {
+                    fontWeight: 'bold',
+                  }
+                : null,
+            ]}
+            numberOfLines={2}>
             {title}
           </Text>
         ) : null}

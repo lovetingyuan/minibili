@@ -92,6 +92,7 @@ export default function ForwardItem(
       <View style={{ gap: 10, flexShrink: 1 }}>
         {forwardRichTextContent}
         <CommonContent
+          type={props.payload.type}
           title={props.payload.title}
           url={'url' in props.payload ? props.payload.url : ''}
           text={props.payload.text || ''}
