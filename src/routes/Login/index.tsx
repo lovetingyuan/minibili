@@ -62,7 +62,7 @@ export default function Login() {
       ToastAndroid.show('请输入ID', ToastAndroid.SHORT)
       return
     }
-    if (!/^\d{3,}$/.test(inputUserIdRef.current)) {
+    if (!/^\d+$/.test(inputUserIdRef.current)) {
       ToastAndroid.show('请输入正确的UID', ToastAndroid.SHORT)
       return
     }
