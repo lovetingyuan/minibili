@@ -20,7 +20,7 @@ module.exports = {
   githubUrl: 'https://github.com/lovetingyuan/minibili',
   orientation: 'portrait',
   icon: './assets/icon.png',
-  userInterfaceStyle: 'light',
+  userInterfaceStyle: 'automatic',
   splash: {
     image: './assets/splash.png',
     resizeMode: 'contain',
