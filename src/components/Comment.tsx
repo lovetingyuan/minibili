@@ -112,7 +112,15 @@ export default function Comment(props: Props) {
           <Text
             style={upStyle(comment.name)}
             onPress={() => {
-              Linking.openURL('https://m.bilibili.com/space/' + comment.mid)
+              navigation.push('Dynamic', {
+                user: {
+                  face: comment.face,
+                  name: comment.name,
+                  mid: comment.mid,
+                  sign: comment.sign || '-',
+                },
+              })
+              // Linking.openURL('https://m.bilibili.com/space/' + comment.mid)
             }}>
             {comment.name}
           </Text>
@@ -165,7 +173,15 @@ export default function Comment(props: Props) {
                 <Text
                   style={[styles.replyName, upStyle(reply.name)]}
                   onPress={() => {
-                    Linking.openURL('https://m.bilibili.com/space/' + reply.mid)
+                    navigation.push('Dynamic', {
+                      user: {
+                        face: reply.face,
+                        name: reply.name,
+                        mid: reply.mid,
+                        sign: reply.sign || '-',
+                      },
+                    })
+                    // Linking.openURL('https://m.bilibili.com/space/' + reply.mid)
                   }}>
                   {reply.name}
                 </Text>
