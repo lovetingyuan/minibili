@@ -49,16 +49,18 @@ export default function Header() {
             style={styles.snow}
             name="snow"
             type="ionicon"
-            size={18}
+            size={20}
             color="#00AEEC"
             onPress={() => {
               navigation.navigate('About')
             }}
           />
         </View>
-        <Text style={[styles.mySign, { color: theme.colors.grey1 }]}>
-          {$userInfo?.sign}
-        </Text>
+        {$userInfo?.sign ? (
+          <Text style={[styles.mySign, { color: theme.colors.grey1 }]}>
+            {$userInfo.sign}
+          </Text>
+        ) : null}
       </View>
     </View>
   )
