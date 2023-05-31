@@ -521,6 +521,21 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
       ),
     }),
   ),
+  // DYNAMIC_TYPE_LIVE_RCMD 不做渲染
+  DynamicItemBaseSchema.merge(
+    z.object({
+      type: z.enum([HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD]),
+      modules: DynamicModulesBaseSchema.merge(
+        z.object({
+          module_dynamic: ModuleDynamicBaseSchema.merge(
+            z.object({
+              major: MajorSchemaMap.Living,
+            }),
+          ),
+        }),
+      ),
+    }),
+  ),
   DynamicItemBaseSchema.merge(
     z.object({
       type: z.enum([HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD]),

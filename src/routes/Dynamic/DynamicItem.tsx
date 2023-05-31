@@ -17,6 +17,9 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   let Item: React.FC<any> = DefaultItem
   const route = useRoute()
   const navigation = useNavigation<NavigationProps['navigation']>()
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+    return null
+  }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
     Item = VideoItem
   } else if (

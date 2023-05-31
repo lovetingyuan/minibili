@@ -12,10 +12,10 @@ import useSWRInfinite from 'swr/infinite'
 import { reportAdditional, reportUnknownDynamicItem } from '../utils/report'
 import {
   DynamicTypes,
+  HandledAdditionalTypeEnum,
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
   MajorTypeEnum,
-  OtherAdditionalTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
 import { parseUrl } from '../utils'
@@ -63,8 +63,11 @@ const getCommon = (item: DynamicItemBaseType) => {
 }
 
 const getDynamicItem = (item: DynamicItemResponse) => {
-  const otherTypes = Object.keys(OtherAdditionalTypeEnum)
-  if (otherTypes.includes(item.modules.module_dynamic.additional?.type || '')) {
+  if (
+    !Object.keys(HandledAdditionalTypeEnum).includes(
+      item.modules.module_dynamic.additional?.type || '',
+    )
+  ) {
     reportAdditional(item)
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
@@ -426,6 +429,14 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       },
     }
   }
+  if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+    return {
+      ...getCommon(item),
+      type: HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD as const,
+      payload: {},
+    }
+  }
+
   reportUnknownDynamicItem(item)
   return {
     ...getCommon(item),
