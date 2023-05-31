@@ -78,7 +78,7 @@ function CommentText(props: {
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
-              ▶{node.text}
+              {'📺 ' + node.text}
             </Text>
           )
         }
