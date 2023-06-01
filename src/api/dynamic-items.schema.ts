@@ -282,8 +282,28 @@ const MajorSchemaMap = {
   }),
 }
 
-const AdditionalSchemaMap = {
-  UGC: z.object({
+const DynamicModulesBaseSchema = z.object({
+  module_author: AuthorSchema,
+  module_tag: z.object({ text: z.string() }).optional(),
+  module_stat: z.object({
+    comment: z.object({
+      count: z.number(),
+      forbidden: z.boolean(),
+    }),
+    forward: z.object({
+      count: z.number(),
+      forbidden: z.boolean(),
+    }),
+    like: z.object({
+      count: z.number(),
+      forbidden: z.boolean(),
+      status: z.boolean(),
+    }),
+  }),
+})
+
+const AdditionalSchema = z.discriminatedUnion('type', [
+  z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UGC]),
     ugc: z.object({
       cover: z.string(),
@@ -294,7 +314,7 @@ const AdditionalSchemaMap = {
       jump_url: z.string(),
     }),
   }),
-  Reserve: z.object({
+  z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE]),
     reserve: z.object({
       title: z.string(),
@@ -303,7 +323,7 @@ const AdditionalSchemaMap = {
       desc2: z.object({ text: z.string() }).optional(),
     }),
   }),
-  Common: z.object({
+  z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_COMMON]),
     common: z.object({
       cover: z.string(),
@@ -314,7 +334,7 @@ const AdditionalSchemaMap = {
       title: z.string(),
     }),
   }),
-  Goods: z.object({
+  z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_GOODS]),
     goods: z.object({
       head_text: z.string(),
@@ -331,7 +351,7 @@ const AdditionalSchemaMap = {
       jump_url: z.string(),
     }),
   }),
-  Vote: z.object({
+  z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_VOTE]),
     vote: z.object({
       desc: z.string(),
@@ -341,16 +361,9 @@ const AdditionalSchemaMap = {
       vote_id: z.number(),
     }),
   }),
-  Match: z.object({
+  z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_MATCH]),
     match: z.object({
-      // button: {
-      //   jump_style: {
-      //     text: '回放',
-      //   },
-      //   jump_url: '//www.bilibili.com/video/BV1nM4y1i7rt/',
-      //   type: 1,
-      // },
       head_text: z.string(),
       id_str: z.string(),
       jump_url: z.string(),
@@ -373,7 +386,7 @@ const AdditionalSchemaMap = {
       }),
     }),
   }),
-  Lottery: z.object({
+  z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UPOWER_LOTTERY]),
     upower_lottery: z.object({
       button: z.object({
@@ -397,41 +410,9 @@ const AdditionalSchemaMap = {
       up_mid: z.number(),
     }),
   }),
-}
-
-const AdditionalOtherSchema = z.object({
-  type: z.nativeEnum(OtherAdditionalTypeEnum),
-})
-
-const DynamicModulesBaseSchema = z.object({
-  module_author: AuthorSchema,
-  module_tag: z.object({ text: z.string() }).optional(),
-  module_stat: z.object({
-    comment: z.object({
-      count: z.number(),
-      forbidden: z.boolean(),
-    }),
-    forward: z.object({
-      count: z.number(),
-      forbidden: z.boolean(),
-    }),
-    like: z.object({
-      count: z.number(),
-      forbidden: z.boolean(),
-      status: z.boolean(),
-    }),
+  z.object({
+    type: z.nativeEnum(OtherAdditionalTypeEnum),
   }),
-})
-
-const AdditionalSchema = z.discriminatedUnion('type', [
-  AdditionalSchemaMap.Reserve,
-  AdditionalSchemaMap.UGC,
-  AdditionalSchemaMap.Common,
-  AdditionalSchemaMap.Goods,
-  AdditionalSchemaMap.Vote,
-  AdditionalSchemaMap.Match,
-  AdditionalSchemaMap.Lottery,
-  AdditionalOtherSchema,
 ])
 
 const ModuleDynamicBaseSchema = z.object({
