@@ -1,23 +1,25 @@
-import { Image, Pressable, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import React from 'react'
 import { openBiliVideo } from '../../utils'
 import store from '../../store'
+import { Icon } from '@rneui/themed'
 
 export default function HeaderRight() {
   return (
-    <Pressable
-      style={{ padding: 8 }}
+    <Icon
+      name="open-in-new"
+      color="#F85A54"
+      style={styles.container}
+      size={20}
       onPress={() => {
         const bvid = store.currentVideo?.bvid
         if (bvid) {
           openBiliVideo(bvid)
         }
-      }}>
-      <Image style={styles.image} source={require('../../../assets/to.png')} />
-    </Pressable>
+      }}
+    />
   )
 }
-
 const styles = StyleSheet.create({
-  image: { width: 32, height: 20 },
+  container: { padding: 5 },
 })

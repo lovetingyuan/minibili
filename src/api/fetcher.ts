@@ -33,7 +33,6 @@ export default function request<D extends any>(url: string) {
     // referrer: 'https://space.bilibili.com/326081112/dynamic',
     // referrerPolicy: 'no-referrer-when-downgrade',
     // referrerPolicy: 'strict-origin-when-cross-origin',
-    body: null,
     method: 'GET',
     mode: 'cors',
     credentials: 'omit',
