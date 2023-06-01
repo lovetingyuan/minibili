@@ -34,7 +34,7 @@ export function HeaderLeft(props: {
       })
     }
   }
-  const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
+  const level = dynamicUser?.level ? 'ᴸ' + levelList[dynamicUser.level] : ''
   const userName = dynamicUser?.name ? dynamicUser.name + level : ''
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
@@ -66,7 +66,7 @@ export function HeaderLeft(props: {
       {sex ? (
         <Text
           style={[
-            { fontSize: 14 },
+            { fontSize: 13 },
             dynamicUser?.sex === '女'
               ? {
                   color: '#FF6699',
