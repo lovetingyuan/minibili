@@ -18,6 +18,7 @@ describe('dynamic-list', () => {
       const offset = res.offset
       DynamicListResponseSchema.parse(res)
       const res2 = await fetcher(
+        // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=14427395&timezone_offset=-480
         `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${mid}&timezone_offset=-480`,
       )
       DynamicListResponseSchema.parse(res2)

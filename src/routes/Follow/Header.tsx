@@ -16,11 +16,13 @@ export default function Header() {
   const fansCount = parseNumber(relation?.follower)
   const followedCount = parseNumber(relation?.following)
   const { theme } = useTheme()
+  const sign = $userInfo?.sign
   return (
     <View
       style={[
         styles.userContainer,
         { backgroundColor: theme.colors.background },
+        sign ? {} : { alignItems: 'center' },
       ]}>
       <Avatar
         size={50}
@@ -56,9 +58,11 @@ export default function Header() {
             }}
           />
         </View>
-        {$userInfo?.sign ? (
-          <Text style={[styles.mySign, { color: theme.colors.grey1 }]}>
-            {$userInfo.sign}
+        {sign ? (
+          <Text
+            style={[styles.mySign, { color: theme.colors.grey1 }]}
+            numberOfLines={2}>
+            {sign}
           </Text>
         ) : null}
       </View>
@@ -72,14 +76,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    flex: 1,
+    // flex: 1,
   },
   myName: { fontSize: 20, fontWeight: 'bold' },
-  mySign: { color: '#555', fontSize: 15 },
+  mySign: { color: '#888', fontSize: 15 },
   fansNumText: { fontSize: 14 },
   userContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    // borderWidth: 1,
     paddingHorizontal: 18,
     paddingTop: 45,
     paddingBottom: 15,

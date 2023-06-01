@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy, useSnapshot } from 'valtio'
 import { watch } from 'valtio/utils'
 import { RanksConfig } from '../constants'
-import { Action, reportUserAction, setUser } from '../utils/report'
+import { reportUserOpenApp } from '../utils/report'
 // import { RemoteConfig, getRemoteConfig } from '../api/get-config'
 import { checkUpdate } from '../api/check-update'
 
@@ -90,8 +90,7 @@ Object.keys(store)
         if (data) {
           store[key] = JSON.parse(data) as any
           if (key === '$userInfo' && store.$userInfo) {
-            setUser(store.$userInfo.mid + '', store.$userInfo.name + '')
-            reportUserAction(Action.OPEN_APP)
+            reportUserOpenApp(store.$userInfo.mid, store.$userInfo.name)
           }
         }
       })

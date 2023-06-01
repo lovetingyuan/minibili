@@ -19,7 +19,7 @@ import {
 } from '../../api/check-update'
 import { githubLink, site } from '../../constants'
 import { RootStackParamList } from '../../types'
-import { Action, clearUser, reportUserAction } from '../../utils/report'
+import { clearUser, reportUserLogout } from '../../utils/report'
 import Constants from 'expo-constants'
 import * as Updates from 'expo-updates'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -43,10 +43,7 @@ export default function About({
       {
         text: '确定',
         onPress: () => {
-          reportUserAction(Action.LOGOUT, {
-            mid: store.$userInfo?.mid,
-            name: store.$userInfo?.name,
-          })
+          reportUserLogout()
           store.$userInfo = null
           store.updatedUps = {}
           // store.dynamicUser = null

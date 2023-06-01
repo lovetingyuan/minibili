@@ -16,7 +16,7 @@ import store, { useStore } from '../../store'
 import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
 
-import { Action, reportUserAction, setUser } from '../../utils/report'
+import { reportUserLogin } from '../../utils/report'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 
@@ -45,8 +45,7 @@ export default function Login() {
       face: data.face,
       sign: data.sign,
     }
-    setUser(data.mid, data.name)
-    reportUserAction(Action.LOGIN, data)
+    reportUserLogin(data.mid, data.name)
     setTimeout(() => {
       navigation.navigate('Follow')
     }, 100)

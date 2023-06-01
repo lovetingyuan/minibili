@@ -18,8 +18,8 @@ import store, { useStore } from '../../store'
 import { VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, openBiliVideo, parseNumber } from '../../utils'
 import { useRankList } from '../../api/rank-list'
-import { Action, reportUserAction } from '../../utils/report'
 import { Skeleton } from '@rneui/themed'
+import { Action, reportUserAction } from '../../utils/report'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
@@ -98,7 +98,7 @@ export default function Ranks({ navigation }: Props) {
     }
     const { mid, name } = currentVideoRef.current
     store.$blackUps['_' + mid] = name
-    reportUserAction(Action.ADD_BLACK_UP, { mid, name })
+    reportUserAction(Action.add_black_user, { mid, name })
   }
   const gotoPlay = (data: VideoItem) => {
     store.currentVideo = data

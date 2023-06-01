@@ -59,7 +59,7 @@ export default function Hot({ navigation }: Props) {
     }
     const { mid, name } = currentVideoRef.current
     store.$blackUps['_' + mid] = name
-    reportUserAction(Action.ADD_BLACK_UP, { mid, name })
+    reportUserAction(Action.add_black_user, { mid, name })
   }
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
