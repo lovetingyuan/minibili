@@ -171,11 +171,7 @@ export default function ForwardItem(props: {
                 cover: video.cover,
                 desc: video.desc,
               }
-              navigation.push('Play', {
-                from: {
-                  mid: item.mid,
-                },
-              })
+              navigation.push('Play')
             } else {
               navigation.navigate('WebPage', {
                 title: payload.name + '的动态',

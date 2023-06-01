@@ -1,6 +1,6 @@
 import { Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import { StyleSheet, View, Pressable } from 'react-native'
+import { StyleSheet, View, Pressable, ToastAndroid } from 'react-native'
 import { handleShareVideo, parseNumber } from '../../utils'
 
 export default function DynamicStat(props: {
@@ -27,7 +27,13 @@ export default function DynamicStat(props: {
       <View style={styles.iconText}>
         <Icon name="thumb-up-off-alt" size={15} color={gray} />
         {props.like ? (
-          <Text style={textStyle}>{parseNumber(props.like)}</Text>
+          <Text
+            style={textStyle}
+            onPress={() => {
+              ToastAndroid.show('不支持点赞', ToastAndroid.SHORT)
+            }}>
+            {parseNumber(props.like)}
+          </Text>
         ) : null}
       </View>
       <Pressable

@@ -65,11 +65,7 @@ export default function VideoItem(props: {
           cover,
           pubDate: date,
         }
-        navigation.navigate('Play', {
-          from: {
-            mid,
-          },
-        })
+        navigation.push('Play')
       }}>
       <RichTexts
         idStr={props.item.id}

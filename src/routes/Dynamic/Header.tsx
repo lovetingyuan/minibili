@@ -10,6 +10,8 @@ import { NavigationProps, RootStackParamList } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useUserInfo } from '../../api/user-info'
 
+const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
+
 export function HeaderLeft(props: {
   scrollTop: () => void
   style?: StyleProp<ViewStyle>
@@ -32,6 +34,10 @@ export function HeaderLeft(props: {
       })
     }
   }
+  const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
+  const userName = dynamicUser?.name ? dynamicUser.name + level : ''
+  const sex =
+    dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   return (
     <View style={[styles.left, props.style]}>
       {dynamicUser?.face ? (
@@ -51,11 +57,24 @@ export function HeaderLeft(props: {
           props.scrollTop()
         }}>
         <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.titleText]}>
-          {(dynamicUser?.name || '') + '  '}
+          {userName + '  '}
         </Text>
       </Pressable>
       {fans ? (
         <Text style={[styles.fansText]}>{parseNumber(fans.follower)}粉丝</Text>
+      ) : null}
+      {sex ? (
+        <Text
+          style={[
+            { fontSize: 14 },
+            dynamicUser?.sex === '女'
+              ? {
+                  color: '#FF6699',
+                }
+              : null,
+          ]}>
+          {' ' + sex}
+        </Text>
       ) : null}
       {dynamicUser.mid && livingUps[dynamicUser.mid] ? (
         <Button
