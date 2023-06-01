@@ -1,7 +1,14 @@
 import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import { View, StyleSheet, Pressable, StyleProp, ViewStyle } from 'react-native'
-import { useStore } from '../../store'
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+  Linking,
+} from 'react-native'
+import store, { useStore } from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
 
@@ -45,6 +52,18 @@ export function HeaderLeft(props: {
           size={33}
           rounded
           onPress={gotoWebPage}
+          onLongPress={() => {
+            store.overlayButtons = [
+              {
+                text: '查看头像',
+                onPress: () => {
+                  if (dynamicUser?.face) {
+                    Linking.openURL(dynamicUser.face)
+                  }
+                },
+              },
+            ]
+          }}
           source={{
             uri: dynamicUser?.face + '@120w_120h_1c.webp',
           }}
