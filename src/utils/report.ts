@@ -139,7 +139,7 @@ export function reportUnknownRichTextItem(item: any) {
   })
 }
 
-export function reportAdditional(item: any) {
+export function reportUnknownAdditional(item: any) {
   SentryExpo.Native.captureMessage(
     'item additional:' +
       item.type +

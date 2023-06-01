@@ -11,7 +11,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
   if (!additional) {
     return null
   }
-  let additionalContent = <Text>暂不支持</Text>
+  let additionalContent = <Text>暂不支持显示</Text>
   let url = ''
   if (additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE) {
     const desc = [
@@ -126,6 +126,16 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
           {title} {left_team.name} VS {right_team.name}{' '}
           {center_bottom + '-' + center_top.join('')}
         </Text>
+      </View>
+    )
+  } else if (
+    additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UPOWER_LOTTERY
+  ) {
+    url = parseUrl(additional.upower_lottery.jump_url)
+    additionalContent = (
+      <View style={{ gap: 2 }}>
+        <Text>抽奖：{additional.upower_lottery.title}</Text>
+        <Text>{additional.upower_lottery.desc.text}</Text>
       </View>
     )
   }

@@ -373,6 +373,30 @@ const AdditionalSchemaMap = {
       }),
     }),
   }),
+  Lottery: z.object({
+    type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UPOWER_LOTTERY]),
+    upower_lottery: z.object({
+      button: z.object({
+        jump_style: z.object({
+          icon_url: z.string(),
+          text: z.string(),
+        }),
+        jump_url: z.string(),
+        type: z.number(),
+      }),
+      desc: z.object({
+        jump_url: z.string(),
+        style: z.number(),
+        text: z.string(),
+      }),
+      // is_upower_active: false,
+      jump_url: z.string(),
+      rid: z.number(),
+      state: z.number(),
+      title: z.string(),
+      up_mid: z.number(),
+    }),
+  }),
 }
 
 const AdditionalOtherSchema = z.object({
@@ -406,6 +430,7 @@ const AdditionalSchema = z.discriminatedUnion('type', [
   AdditionalSchemaMap.Goods,
   AdditionalSchemaMap.Vote,
   AdditionalSchemaMap.Match,
+  AdditionalSchemaMap.Lottery,
   AdditionalOtherSchema,
 ])
 

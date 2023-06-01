@@ -9,7 +9,10 @@ import {
   DynamicListResponse,
 } from './dynamic-items.schema'
 import useSWRInfinite from 'swr/infinite'
-import { reportAdditional, reportUnknownDynamicItem } from '../utils/report'
+import {
+  reportUnknownAdditional,
+  reportUnknownDynamicItem,
+} from '../utils/report'
 import {
   DynamicTypes,
   HandledAdditionalTypeEnum,
@@ -66,10 +69,10 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   if (
     item.modules.module_dynamic.additional?.type &&
     !Object.keys(HandledAdditionalTypeEnum).includes(
-      item.modules.module_dynamic.additional?.type,
+      item.modules.module_dynamic.additional.type,
     )
   ) {
-    reportAdditional(item)
+    reportUnknownAdditional(item)
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
     const video = item.modules.module_dynamic.major.archive
