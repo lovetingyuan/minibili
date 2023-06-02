@@ -17,30 +17,32 @@ export default function request<D extends any>(url: string) {
   const isDynamic = pathname.startsWith('/x/polymer/web-dynamic/')
   return fetch(requestUrl, {
     headers: {
-      Host,
+      // Host,
       pragma: 'no-cache',
       'cache-control': 'no-cache',
       'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.57',
       Accept: 'application/json, text/plain, */*',
       'Accept-Language': 'zh-CN,zh;q=0.9',
       // Connection: 'keep-alive',
-      'Upgrade-Insecure-Requests': '1',
-      'Sec-Fetch-Dest': 'document',
-      'Sec-Fetch-Mode': 'navigate',
+      // 'Upgrade-Insecure-Requests': '1',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
       'Sec-Fetch-Site': 'none',
       'Sec-Fetch-User': '?1',
-      origin: isDynamic ? 'https://space.bilibili.com' : Host,
+      // origin: isDynamic ? 'https://space.bilibili.com' : Host,
       ...(store.cookie ? { cookie: store.cookie } : {}),
-      Referer: isDynamic
-        ? `https://space.bilibili.com/${
-            store.$userInfo?.mid || TracyId
-          }/dynamic`
-        : Host,
-      'Referrer-Policy': 'no-referrer-when-downgrade',
+      // Referer: isDynamic
+      //   ? `https://space.bilibili.com/${
+      //       store.$userInfo?.mid || TracyId
+      //     }/dynamic`
+      //   : Host,
+      // 'Referrer-Policy': 'no-referrer-when-downgrade',
     },
-    // referrer: 'https://space.bilibili.com/326081112/dynamic',
-    // referrerPolicy: 'no-referrer-when-downgrade',
+    referrer: isDynamic
+      ? `https://space.bilibili.com/${store.$userInfo?.mid || TracyId}/dynamic`
+      : Host,
+    referrerPolicy: 'no-referrer-when-downgrade',
     // referrerPolicy: 'strict-origin-when-cross-origin',
     method: 'GET',
     mode: 'cors',
@@ -64,7 +66,7 @@ export default function request<D extends any>(url: string) {
         reportApiError({
           url,
           code: -1,
-          message: 'Failed to JSON.parse(response)',
+          message: 'Failed to JSON.parse(response): ' + resText,
           method: 'GET',
         })
       }
