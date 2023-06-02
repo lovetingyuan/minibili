@@ -23,9 +23,7 @@ export function reportApiError(api: {
   method?: string
 }) {
   SentryExpo.Native.captureException(
-    {
-      name: 'API Error',
-    },
+    new Error('API Error: ' + api.url.split('?')[0]),
     {
       contexts: {
         api,
