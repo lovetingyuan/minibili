@@ -27,6 +27,7 @@ import useIsDark from '../hooks/useIsDark'
 import ThemeResponse from '../components/ThemeResponse'
 import ButtonsOverlay from '../components/ButtonsOverlay'
 import CookieProxy from '../components/CookieProxy'
+import { setScreenTag } from '../utils/report'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -113,7 +114,12 @@ export default () => {
                 fontSize: 18,
                 color: isDark ? '#ccc' : '#333',
               },
-            }}>
+            }}
+            screenListeners={({ route }) => ({
+              state: () => {
+                setScreenTag(route.name, 'stack')
+              },
+            })}>
             <Stack.Screen
               name="Main"
               component={MainTab}

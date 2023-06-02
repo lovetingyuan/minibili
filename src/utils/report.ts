@@ -8,6 +8,8 @@ export enum Tags {
   user_url = 'user.url',
   api_url = 'api.url',
   user_action = 'user.action',
+  stack_route_name = 'route.stack',
+  tab_route_name = 'route.tab',
 }
 
 export enum Action {
@@ -20,11 +22,16 @@ export function reportApiError(api: {
   message: string
   method?: string
 }) {
-  SentryExpo.Native.captureException('Api Error ' + api.url.split('?')[0], {
-    contexts: {
-      api,
+  SentryExpo.Native.captureException(
+    {
+      name: 'API Error',
     },
-  })
+    {
+      contexts: {
+        api,
+      },
+    },
+  )
 }
 
 export function reportUserAction(action: Action, actionPayload: any = null) {
@@ -114,5 +121,12 @@ export function reportUnknownAdditional(item: any) {
         dynamicItem: JSON.stringify(item, null, 2),
       },
     },
+  )
+}
+
+export function setScreenTag(name: string, type: 'tab' | 'stack') {
+  SentryExpo.Native.setTag(
+    type === 'tab' ? Tags.tab_route_name : Tags.stack_route_name,
+    name,
   )
 }

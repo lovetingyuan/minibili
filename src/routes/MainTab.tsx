@@ -10,6 +10,7 @@ import { Text, View, StyleSheet, ActivityIndicator } from 'react-native'
 import { Badge } from '@rneui/themed'
 import { RootStackParamList } from '../types'
 import HeaderTitle from './VideoList/HeaderTitle'
+import { setScreenTag } from '../utils/report'
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
 
@@ -87,6 +88,11 @@ const MainTab = () => {
   return (
     <Tab.Navigator
       initialRouteName="VideoList"
+      screenListeners={({ route }) => ({
+        state: () => {
+          setScreenTag(route.name, 'tab')
+        },
+      })}
       screenOptions={{
         headerShown: false,
         tabBarIconStyle: {
