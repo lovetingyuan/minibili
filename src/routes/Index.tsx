@@ -25,7 +25,8 @@ import PlayHeaderRight from './Play/HeaderRight'
 import NetInfo from '@react-native-community/netinfo'
 import useIsDark from '../hooks/useIsDark'
 import ThemeResponse from '../components/ThemeResponse'
-import ButtonsOverlay2 from '../components/ButtonsOverlay'
+import ButtonsOverlay from '../components/ButtonsOverlay'
+import CookieProxy from '../components/CookieProxy'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -102,7 +103,8 @@ export default () => {
         <StatusBar style="auto" />
         <NetToast />
         <ThemeResponse />
-        <ButtonsOverlay2 />
+        <ButtonsOverlay />
+        <CookieProxy />
         <NavigationContainer theme={MyTheme}>
           <Stack.Navigator
             initialRouteName="Main"

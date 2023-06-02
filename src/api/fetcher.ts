@@ -1,42 +1,49 @@
 import { ToastAndroid } from 'react-native'
 import { URL } from 'react-native-url-polyfill'
 import { reportApiError } from '../utils/report'
+import store from '../store'
+import { TracyId } from '../constants'
 // import getUserAgent from '../utils/user-agent'
 
 let errorTime = Date.now()
 
-// https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=326081112&timezone_offset=-480
 export default function request<D extends any>(url: string) {
   // __DEV__ && console.log('request url: ', url)
   const requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
-  const { hostname } = new URL(requestUrl)
-  // const isDynamic = pathname.startsWith('/x/polymer/web-dynamic/')
+  const { pathname } = new URL(requestUrl)
+  const isDynamic = pathname.startsWith('/x/polymer/web-dynamic/')
   return fetch(requestUrl, {
     headers: {
-      Host: hostname,
+      Host: 'https://bilibili.com',
+      pragma: 'no-cache',
+      'cache-control': 'no-cache',
       'User-Agent':
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
-      Accept:
-        'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-      'Accept-Language':
-        'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-      Connection: 'keep-alive',
+      Accept: 'application/json, text/plain, */*',
+      'Accept-Language': 'zh-CN,zh;q=0.9',
+      // Connection: 'keep-alive',
       'Upgrade-Insecure-Requests': '1',
       'Sec-Fetch-Dest': 'document',
       'Sec-Fetch-Mode': 'navigate',
       'Sec-Fetch-Site': 'none',
       'Sec-Fetch-User': '?1',
-      // ...(isDynamic ? { 'Accept-Encoding': 'gzip, deflate, br' } : {}),
+      origin: isDynamic ? 'https://space.bilibili.com' : 'https://bilibili.com',
+      ...(store.cookie ? { cookie: store.cookie } : {}),
+      Referer: isDynamic
+        ? `https://space.bilibili.com/${
+            store.$userInfo?.mid || TracyId
+          }/dynamic`
+        : 'https://bilibili.com',
+      'Referrer-Policy': 'no-referrer-when-downgrade',
     },
     // referrer: 'https://space.bilibili.com/326081112/dynamic',
     // referrerPolicy: 'no-referrer-when-downgrade',
     // referrerPolicy: 'strict-origin-when-cross-origin',
     method: 'GET',
     mode: 'cors',
-    credentials: 'omit',
-    // credentials: 'include',
+    credentials: store.cookie ? 'include' : 'omit',
   })
     .then(r => r.text())
     .then(resText => {
@@ -44,10 +51,21 @@ export default function request<D extends any>(url: string) {
       if (index > -1) {
         resText = resText.substring(index + 1)
       }
-      const res = JSON.parse(resText) as {
+      type Res = {
         code: number
         message: string
         data: D
+      }
+      let res = {} as Res
+      try {
+        res = JSON.parse(resText) as Res
+      } catch (err) {
+        reportApiError({
+          url,
+          code: -1,
+          message: 'Failed to JSON.parse(response)',
+          method: 'GET',
+        })
       }
       if (res.code) {
         if (__DEV__) {

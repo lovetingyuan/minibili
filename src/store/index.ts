@@ -50,6 +50,7 @@ const store = proxy<{
   currentImageIndex: number
   checkingUpUpdate: boolean
   overlayButtons: { text: string; onPress: () => void }[]
+  cookie: string
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -74,6 +75,7 @@ const store = proxy<{
   imagesList: [],
   currentImageIndex: 0,
   overlayButtons: [],
+  cookie: '',
 })
 
 const StoragePrefix = 'Store:'

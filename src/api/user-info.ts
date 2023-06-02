@@ -22,19 +22,18 @@ type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>
 type UserBatchInfoResponse = z.infer<typeof UserBatchInfoResponseSchema>
 
 const getUserInfo1 = (mid: number | string): Promise<UserInfo> => {
-  return fetcher<UserInfoResponse>(
-    '/x/space/acc/info?mid=' + mid,
-    'https://space.bilibili.com/',
-  ).then(userInfo => {
-    return {
-      face: userInfo.face,
-      name: userInfo.name,
-      sign: userInfo.sign,
-      mid: userInfo.mid.toString(),
-      level: userInfo.level,
-      sex: userInfo.sex,
-    }
-  })
+  return fetcher<UserInfoResponse>('/x/space/acc/info?mid=' + mid).then(
+    userInfo => {
+      return {
+        face: userInfo.face,
+        name: userInfo.name,
+        sign: userInfo.sign,
+        mid: userInfo.mid.toString(),
+        level: userInfo.level,
+        sex: userInfo.sex,
+      }
+    },
+  )
 }
 
 const getUserInfo2 = (mid: number | string): Promise<UserInfo> => {

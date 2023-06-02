@@ -453,13 +453,14 @@ const getDynamicItem = (item: DynamicItemResponse) => {
 }
 
 export function useDynamicItems(mid?: string | number) {
+  const { cookie } = useStore()
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<DynamicListResponse>(
       (offset, response) => {
         if (response && (!response.has_more || !response.items.length)) {
           return null
         }
-        if (!mid) {
+        if (!mid || !cookie) {
           return null
         }
         // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=14427395&timezone_offset=-480&features=itemOpusStyle
@@ -499,8 +500,11 @@ const queue = new PQueue({ concurrency: 50 })
 
 export function useHasUpdate(mid: number | string) {
   const delay = mid.toString().slice(0, 5)
+  const { cookie } = useStore()
   const { data, isLoading } = useSWR<any>(
-    `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
+    cookie
+      ? `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
+      : null,
     (url: string) => {
       return queue.add(() => request(url))
     },
