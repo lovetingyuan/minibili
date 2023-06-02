@@ -32,29 +32,6 @@ const HeaderTitle = () => {
               <Text
                 onPress={() => {
                   setMode(mode === 'dark' ? 'light' : 'dark')
-                  fetch(
-                    'https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=14427395&timezone_offset=-480',
-                    {
-                      headers: {
-                        Host: 'api.bilibili.com',
-                        'User-Agent':
-                          'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
-                        Accept:
-                          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                        'Accept-Language':
-                          'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-                        // 'Accept-Encoding': 'gzip, deflate, br',
-                        Connection: 'keep-alive',
-                        'Upgrade-Insecure-Requests': '1',
-                        'Sec-Fetch-Dest': 'document',
-                        'Sec-Fetch-Mode': 'navigate',
-                        'Sec-Fetch-Site': 'none',
-                        'Sec-Fetch-User': '?1',
-                      },
-                    },
-                  )
-                    .then(r => r.text())
-                    .then(r => console.log(1111, r))
                 }}>
                 {'    '}
                 dev

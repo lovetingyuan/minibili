@@ -9,7 +9,7 @@ let errorTime = Date.now()
 const Host = 'https://www.bilibili.com'
 
 export default function request<D extends any>(url: string) {
-  // __DEV__ && console.log('request url: ', url)
+  __DEV__ && console.log('request url: ', url, store.cookie)
   const requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url

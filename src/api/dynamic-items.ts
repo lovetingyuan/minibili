@@ -496,7 +496,7 @@ export function useDynamicItems(mid?: string | number) {
   }
 }
 
-const queue = new PQueue({ concurrency: 50 })
+const queue = new PQueue({ concurrency: 10 })
 
 export function useHasUpdate(mid: number | string) {
   const delay = mid.toString().slice(0, 5)
