@@ -73,8 +73,12 @@ const Loading = React.memo(() => {
 
 export default function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)
-  const { videosType, $blackUps } = useStore()
-  const { data: list = [], isLoading, mutate } = useRankList(videosType?.rid)
+  const { currentVideosCate, $blackUps } = useStore()
+  const {
+    data: list = [],
+    isLoading,
+    mutate,
+  } = useRankList(currentVideosCate?.rid)
   const [isRefreshing] = React.useState(false)
 
   React.useEffect(() => {
@@ -101,8 +105,7 @@ export default function Ranks({ navigation }: Props) {
     reportUserAction(Action.add_black_user, { mid, name })
   }
   const gotoPlay = (data: VideoItem) => {
-    store.currentVideo = data
-    navigation.navigate('Play')
+    navigation.navigate('Play', { video: data, bvid: data.bvid })
   }
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
     const key = item.bvid

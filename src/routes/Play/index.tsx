@@ -24,19 +24,21 @@ import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
 import { checkWifi } from '../../utils'
 import useMounted from '../../hooks/useMounted'
-import { useStore } from '../../store'
+import VideoInfoContext from './videoContext'
+// import { useStore } from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
-  const { currentVideo } = useStore()
+  const { video } = route.params
+  const bvid = route.params.bvid
   const [currentPage, setCurrentPage] = React.useState(1)
-  const { data: vi } = useVideoInfo(currentVideo?.bvid)
+  const { data: video2 } = useVideoInfo(bvid)
   const { theme } = useTheme()
   const videoInfo = {
-    ...currentVideo,
-    ...vi,
+    ...video,
+    ...video2,
   }
   React.useEffect(() => {
     videoInfo.name &&
@@ -51,48 +53,55 @@ const PlayPage = ({ route, navigation }: Props) => {
     }
   })
 
-  if (!videoInfo.aid || !videoInfo.name) {
-    return null
-  }
+  // if (!videoInfo.aid || !videoInfo.name) {
+  //   return null
+  // }
   return (
-    <View style={styles.container}>
-      <Player page={currentPage} />
-      <ScrollView style={styles.videoInfoContainer}>
-        <VideoInfo page={currentPage} changePage={setCurrentPage} />
-        <View style={{ marginTop: 10 }}>
-          <CommentList
-            upName={videoInfo.name}
-            commentId={videoInfo.aid}
-            commentType={1}
-            dividerRight={
-              <View style={styles.right}>
-                <Pressable
-                  onPress={() => {
-                    videoInfo.bvid &&
-                      Clipboard.setStringAsync(videoInfo.bvid).then(() => {
-                        ToastAndroid.show('已复制', ToastAndroid.SHORT)
-                      })
-                  }}>
-                  <Text style={[styles.text, { color: theme.colors.grey1 }]}>
-                    {videoInfo.bvid}
+    <VideoInfoContext.Provider
+      value={{
+        bvid,
+        video: videoInfo,
+        page: currentPage,
+      }}>
+      <View style={styles.container}>
+        <Player />
+        <ScrollView style={styles.videoInfoContainer}>
+          <VideoInfo changePage={setCurrentPage} />
+          <View style={{ marginTop: 10 }}>
+            <CommentList
+              upName={videoInfo.name}
+              commentId={videoInfo.aid}
+              commentType={1}
+              dividerRight={
+                <View style={styles.right}>
+                  <Pressable
+                    onPress={() => {
+                      videoInfo.bvid &&
+                        Clipboard.setStringAsync(videoInfo.bvid).then(() => {
+                          ToastAndroid.show('已复制', ToastAndroid.SHORT)
+                        })
+                    }}>
+                    <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                      {videoInfo.bvid}
+                    </Text>
+                  </Pressable>
+                  <Text
+                    style={[
+                      styles.text,
+                      { color: theme.colors.grey1, fontWeight: 'bold' },
+                    ]}>
+                    {' · '}
                   </Text>
-                </Pressable>
-                <Text
-                  style={[
-                    styles.text,
-                    { color: theme.colors.grey1, fontWeight: 'bold' },
-                  ]}>
-                  {' · '}
-                </Text>
-                <Text style={[styles.text, { color: theme.colors.grey1 }]}>
-                  {videoInfo?.tname}
-                </Text>
-              </View>
-            }
-          />
-        </View>
-      </ScrollView>
-    </View>
+                  <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                    {videoInfo?.tname}
+                  </Text>
+                </View>
+              }
+            />
+          </View>
+        </ScrollView>
+      </View>
+    </VideoInfoContext.Provider>
   )
 }
 

@@ -3,17 +3,18 @@ import VideoHeader from './VideoHeader'
 import { View, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { ListItem, Text } from '@rneui/themed'
-import { useStore } from '../../store'
+import VideoInfoContext from './videoContext'
 
-export default function VideoInfo(props: {
-  page: number
-  changePage: (p: number) => void
-}) {
-  const { page, changePage } = props
-  const { currentVideo } = useStore()
-  const { data: videoInfo } = useVideoInfo(currentVideo?.bvid)
+export default function VideoInfo(props: { changePage: (p: number) => void }) {
+  const { changePage } = props
+  const { video, bvid, page } = React.useContext(VideoInfoContext)
+  const { data: video2 } = useVideoInfo(bvid)
   const [expanded, setExpanded] = React.useState(false)
-  const { title, desc } = currentVideo || videoInfo || {}
+  const videoInfo = {
+    ...video,
+    ...video2,
+  }
+  const { title, desc } = videoInfo || {}
   let videoDesc = desc
   if (videoDesc === '-') {
     videoDesc = ''
@@ -25,18 +26,8 @@ export default function VideoInfo(props: {
       <VideoHeader />
       <View>
         <Text style={styles.videoTitle}>{title}</Text>
-        {videoDesc ? (
-          <Text
-            style={[
-              styles.videoDesc,
-              // {
-              //   color: '#444',
-              // },
-            ]}>
-            {videoDesc}
-          </Text>
-        ) : null}
-        {(videoInfo?.videosNum || 0) > 1 ? (
+        {videoDesc ? <Text style={[styles.videoDesc]}>{videoDesc}</Text> : null}
+        {(videoInfo?.videosNum || 0) > 1 && videoInfo?.pages ? (
           <ListItem.Accordion
             containerStyle={styles.pagesTitle}
             content={

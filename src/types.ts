@@ -2,14 +2,28 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { DynamicItemAllType } from './api/dynamic-items'
 // import { HandledDynamicTypeEnum } from './api/dynamic-items.type'
 
+export type VideoInfo = {
+  bvid: string
+  name: string
+  face: string
+  mid: number | string
+  pubDate?: number | string
+  title: string
+  aid: number | string
+  cover: string
+  desc: string
+}
+
 export type RootStackParamList = {
   Home: undefined
   Main: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
-  Play?: {
-    from?: {
-      mid: string | number
-    }
+  Play: {
+    // from?: {
+    //   mid: string | number
+    // }
+    bvid: string
+    video: VideoInfo
   }
   Dynamic?: {
     from?: string

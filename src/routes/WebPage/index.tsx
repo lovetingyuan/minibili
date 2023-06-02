@@ -18,6 +18,7 @@ import { useStore } from '../../store'
 
 import HeaderRight from './HeaderRight'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
+import useIsDark from '../../hooks/useIsDark'
 
 const Loading = () => {
   return (
@@ -40,7 +41,8 @@ export default ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
   const { url, title } = route.params
   const webviewRef = React.useRef<WebView | null>(null)
-  const { $webViewMode } = useStore()
+  const { webViewMode } = useStore()
+  const isDark = useIsDark()
   const [height, setHeight] = React.useState(Dimensions.get('screen').height)
   const [isEnabled, setEnabled] = React.useState(true)
   const [isRefreshing, setRefreshing] = React.useState(false)
@@ -59,7 +61,7 @@ export default ({ route, navigation }: Props) => {
         return <HeaderRight title={title} url={url} reload={onRefresh} />
       },
     })
-  }, [navigation, $webViewMode, url, onRefresh, title])
+  }, [navigation, webViewMode, url, onRefresh, title])
   return (
     <ScrollView
       onLayout={e => setHeight(e.nativeEvent.layout.height)}
@@ -74,7 +76,7 @@ export default ({ route, navigation }: Props) => {
       <WebView
         style={[styles.container, { height }]}
         source={{ uri: url }}
-        key={$webViewMode}
+        key={webViewMode}
         onScroll={e =>
           setEnabled(
             typeof onRefresh === 'function' &&
@@ -92,7 +94,7 @@ export default ({ route, navigation }: Props) => {
         mediaPlaybackRequiresUserAction={false}
         injectedJavaScript={INJECTED_JAVASCRIPT}
         renderLoading={Loading}
-        userAgent={$webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
+        userAgent={webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
         ref={webviewRef}
         onMessage={evt => {
           const data = JSON.parse(evt.nativeEvent.data) as any
@@ -101,6 +103,26 @@ export default ({ route, navigation }: Props) => {
               headerTitle: data.payload,
             })
           }
+        }}
+        onLoad={() => {
+          isDark &&
+            webviewRef.current?.injectJavaScript(`
+              const style = document.createElement('style');
+              style.textContent = \`
+              body {background-color: #222; color: #ccc; }
+              .reply-item {
+                  border-color: black;
+              }
+              .reply-item .info .content {
+                color: #ccc;
+              }
+              .reply-item .info .name .left .uname {
+                  color: #ddd;
+              }
+              \`;
+              document.head.appendChild(style);
+            true;
+         `)
         }}
         onError={() => {
           ToastAndroid.show('加载失败', ToastAndroid.SHORT)

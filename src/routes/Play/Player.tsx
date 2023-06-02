@@ -16,22 +16,22 @@ import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
 import { isWifi, parseDuration } from '../../utils'
 
-import { useStore } from '../../store'
+// import { useStore } from '../../store'
 import { Icon } from '@rneui/themed'
-type Props = { page: number }
+import VideoInfoContext from './videoContext'
 
-function Player(props: Props & { wifi: boolean }) {
-  const { page, wifi } = props
+function VideoPlayer(props: { wifi: boolean }) {
+  const { wifi } = props
+  const { page, video, bvid } = React.useContext(VideoInfoContext)
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
-  const { currentVideo } = useStore()
-  const { data: vi, error } = useVideoInfo(currentVideo?.bvid)
+  const { data: video2, error } = useVideoInfo(bvid)
   const [loadPlayer, setLoadPlayer] = React.useState(wifi)
   const videoInfo = {
-    ...currentVideo,
-    ...vi,
+    ...video,
+    ...video2,
   }
   let videoWidth = 0
   let videoHeight = 0
@@ -168,7 +168,7 @@ function Player(props: Props & { wifi: boolean }) {
   )
 }
 
-export default (props: Props) => {
+export default function Player() {
   const [wifi, setWifi] = React.useState<boolean | null>(null)
   useMounted(() => {
     isWifi().then(setWifi)
@@ -176,7 +176,7 @@ export default (props: Props) => {
   if (wifi === null) {
     return <View style={{ width: '100%', height: '40%' }} />
   }
-  return <Player {...props} wifi={wifi} />
+  return <VideoPlayer wifi={wifi} />
 }
 const styles = StyleSheet.create({
   loadingView: {

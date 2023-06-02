@@ -6,7 +6,7 @@ import { StyleSheet } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 
 const HeaderTitle = () => {
-  const { videosType, ranksList } = useStore()
+  const { currentVideosCate, $ranksList } = useStore()
   const { theme } = useTheme()
   const { mode, setMode } = useThemeMode()
   const [visible, setVisible] = React.useState(false)
@@ -20,7 +20,8 @@ const HeaderTitle = () => {
         anchor={
           <Pressable onPress={showMenu} style={styles.titleContainer}>
             <Text style={[styles.title, { color: theme.colors.grey1 }]}>
-              {videosType.label + (videosType.rid === -1 ? '' : '排行')}{' '}
+              {currentVideosCate.label +
+                (currentVideosCate.rid === -1 ? '' : '排行')}{' '}
             </Text>
             <Icon
               name="triangle-down"
@@ -41,8 +42,8 @@ const HeaderTitle = () => {
         }
         onRequestClose={hideMenu}>
         <ScrollView style={styles.typeList}>
-          {ranksList.map((item, i) => {
-            const selected = store.videosType.rid === item.rid
+          {$ranksList.map((item, i) => {
+            const selected = store.currentVideosCate.rid === item.rid
             const Item = (
               <MenuItem
                 textStyle={{
@@ -51,7 +52,7 @@ const HeaderTitle = () => {
                   color: selected ? theme.colors.primary : theme.colors.black,
                 }}
                 onPress={() => {
-                  store.videosType = item
+                  store.currentVideosCate = item
                   hideMenu()
                 }}>
                 {item.label}

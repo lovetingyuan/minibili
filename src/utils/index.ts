@@ -128,3 +128,9 @@ export async function checkWifi() {
 export const parseUrl = (url: string) => {
   return url.startsWith('//') ? 'https:' + url : url
 }
+
+export function delay(ms: number) {
+  return new Promise(r => {
+    setTimeout(r, ms)
+  })
+}

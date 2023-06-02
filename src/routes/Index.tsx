@@ -35,10 +35,12 @@ let online = true
 let focus = true
 
 const theme = createTheme({
-  // lightColors: {
-  // },
-  // darkColors: {
-  // },
+  lightColors: {
+    black: '#333',
+  },
+  darkColors: {
+    black: '#bbb',
+  },
   mode: 'dark',
 })
 

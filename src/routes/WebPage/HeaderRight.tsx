@@ -10,7 +10,7 @@ export default function HeaderRight(props: {
   title?: string
   reload: () => void
 }) {
-  const { $webViewMode } = useStore()
+  const { webViewMode } = useStore()
   const [visible, setVisible] = React.useState(false)
 
   const hideMenu = () => setVisible(false)
@@ -31,11 +31,10 @@ export default function HeaderRight(props: {
         onRequestClose={hideMenu}>
         <MenuItem
           onPress={() => {
-            store.$webViewMode =
-              store.$webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
+            store.webViewMode = store.webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
             hideMenu()
           }}>
-          {$webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
+          {webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
         </MenuItem>
         <MenuItem
           onPress={() => {

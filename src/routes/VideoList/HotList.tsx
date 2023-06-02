@@ -69,8 +69,10 @@ export default function Hot({ navigation }: Props) {
     store.$blackTags[tag] = tag
   }
   const gotoPlay = (data: VideoItem) => {
-    store.currentVideo = data
-    navigation.navigate('Play')
+    navigation.navigate('Play', {
+      bvid: data.bvid,
+      video: data,
+    })
   }
   const buttons = () =>
     [

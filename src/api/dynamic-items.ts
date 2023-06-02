@@ -496,13 +496,19 @@ export function useDynamicItems(mid?: string | number) {
   }
 }
 
-const queue = new PQueue({ concurrency: 10 })
+const queue = new PQueue({
+  concurrency: 10,
+  intervalCap: 10,
+  interval: 100,
+})
 
 export function useHasUpdate(mid: number | string) {
   const delay = mid.toString().slice(0, 5)
-  const { cookie } = useStore()
+  const { $latestUpdateIds, cookie } = useStore()
   const { data, isLoading } = useSWR<any>(
-    cookie
+    __DEV__
+      ? null
+      : cookie
       ? `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
       : null,
     (url: string) => {
@@ -512,8 +518,10 @@ export function useHasUpdate(mid: number | string) {
       refreshInterval: 6 * 60 * 1000 + Number(delay),
     },
   )
-  const { $latestUpdateIds } = useStore()
   React.useEffect(() => {
+    if (__DEV__) {
+      return
+    }
     store.checkingUpUpdateMap[mid] = isLoading
   }, [mid, isLoading])
 

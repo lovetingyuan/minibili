@@ -10,7 +10,6 @@ import RichTexts from '../../components/RichTexts'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import useIsDark from '../../hooks/useIsDark'
-import store from '../../store'
 import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
@@ -115,7 +114,6 @@ export default function ForwardItem(props: {
           url: `https://m.bilibili.com/dynamic/${item.id}`,
         })
       }}>
-      {/* <View style={[styles.textContainer]}> */}
       <RichTexts
         idStr={payload.id}
         nodes={item.desc?.rich_text_nodes}
@@ -126,7 +124,7 @@ export default function ForwardItem(props: {
       <View
         style={[
           styles.forwardContainer,
-          { backgroundColor: isDark ? '#222' : '#dedede' },
+          { backgroundColor: isDark ? '#111' : '#dedede' },
         ]}>
         {payload.name && payload.mid !== item.mid ? (
           <Pressable
@@ -160,18 +158,20 @@ export default function ForwardItem(props: {
           onPress={() => {
             if (payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
               const { video } = payload
-              store.currentVideo = {
+              navigation.push('Play', {
                 bvid: video.bvid,
-                name: payload.name,
-                face: payload.face,
-                mid: payload.mid,
-                // pubDate: payload.
-                title: video.title,
-                aid: video.aid,
-                cover: video.cover,
-                desc: video.desc,
-              }
-              navigation.push('Play')
+                video: {
+                  bvid: video.bvid,
+                  name: payload.name,
+                  face: payload.face,
+                  mid: payload.mid,
+                  // pubDate: payload.
+                  title: video.title,
+                  aid: video.aid,
+                  cover: video.cover,
+                  desc: video.desc,
+                },
+              })
             } else {
               navigation.navigate('WebPage', {
                 title: payload.name + '的动态',

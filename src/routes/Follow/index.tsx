@@ -140,6 +140,10 @@ export default function Follow({ navigation, route }: Props) {
     )
   }
 
+  if (__DEV__) {
+    displayUps = displayUps.slice(0, 10)
+  }
+
   return (
     <View style={styles.container}>
       <Header />

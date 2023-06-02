@@ -1,5 +1,12 @@
 import React from 'react'
-import { Linking, Alert, ToastAndroid, Share, ScrollView } from 'react-native'
+import {
+  Linking,
+  Alert,
+  ToastAndroid,
+  Share,
+  ScrollView,
+  View,
+} from 'react-native'
 import { StyleSheet } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
 
@@ -27,13 +34,20 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 export default function About({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, 'About'>) {
-  const { $userInfo, $blackTags, $blackUps } = useStore()
+  const { $userInfo, $blackTags, $blackUps, $ranksList } = useStore()
   const [expanded, setExpanded] = React.useState(false)
   const [expandedUp, setExpandedUp] = React.useState(false)
+  const [expandedCate, setExpandedCate] = React.useState(false)
   const [expandedStatement, setExpandedStatement] = React.useState(true)
   const [checkingUpdate, setCheckingUpdate] = React.useState(false)
   const [hasUpdate, setHasUpdate] = React.useState<boolean | null>(null)
   const { theme } = useTheme()
+  const [sortedRankList, setSortedRankList] = React.useState<
+    { rid: number; label: string }[]
+  >([])
+  const [, ...initUnsortedRankList] = $ranksList
+  const [unsortedRankList, setUnSortedRankList] =
+    React.useState(initUnsortedRankList)
 
   const handleLogOut = () => {
     Alert.alert('确定退出吗？', '', [
@@ -208,7 +222,18 @@ export default function About({
           }}>
           <ListItem containerStyle={styles.statementContent}>
             <ListItem.Subtitle right style={{ color: theme.colors.black }}>
-              本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题可在Github中提出）
+              本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题可在
+              <Text
+                style={{ color: theme.colors.primary }}
+                onPress={() => {
+                  Linking.openURL(githubLink)
+                }}>
+                {' Github '}
+              </Text>
+              中提出）
+              <Text style={{ fontWeight: 'bold' }}>
+                {'\n'}⚠️ 切勿频繁刷新数据！
+              </Text>
             </ListItem.Subtitle>
           </ListItem>
         </ListItem.Accordion>
@@ -279,6 +304,84 @@ export default function About({
             {Object.values($blackUps).length === 0 ? <Text>无</Text> : null}
           </ListItem>
         </ListItem.Accordion>
+        <ListItem.Accordion
+          containerStyle={styles.blackTitle}
+          content={
+            <ListItem.Content>
+              <ListItem.Title>调整分区顺序</ListItem.Title>
+            </ListItem.Content>
+          }
+          isExpanded={expandedCate}
+          onPress={() => {
+            setExpandedCate(!expandedCate)
+          }}>
+          <ListItem containerStyle={styles.blackContent}>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                borderBottomWidth: 0.5,
+                borderBottomColor: '#888',
+                marginBottom: 10,
+                flex: 1,
+                flexGrow: 1,
+                width: '100%',
+                columnGap: 10,
+              }}>
+              {sortedRankList.map(cate => {
+                return (
+                  <Chip
+                    title={cate.label}
+                    key={cate.rid}
+                    type="outline"
+                    onPress={() => {
+                      const a = sortedRankList.filter(v => v.rid !== cate.rid)
+                      const b = unsortedRankList.concat(cate)
+                      setSortedRankList(a)
+                      setUnSortedRankList(b)
+                      store.$ranksList = [$ranksList[0], ...a, ...b]
+                    }}
+                    containerStyle={{ marginBottom: 8 }}
+                    buttonStyle={{
+                      padding: 0,
+                      paddingVertical: 2,
+                    }}
+                  />
+                )
+              })}
+              {sortedRankList.length === 0 && (
+                <Text style={{ flex: 1, marginBottom: 5 }}>
+                  {' '}
+                  点击名称调整顺序
+                </Text>
+              )}
+            </View>
+            <View
+              style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10 }}>
+              {unsortedRankList.map(cate => {
+                return (
+                  <Chip
+                    title={cate.label}
+                    key={cate.rid}
+                    type="outline"
+                    onPress={() => {
+                      const a = sortedRankList.concat(cate)
+                      const b = unsortedRankList.filter(v => v.rid !== cate.rid)
+                      setSortedRankList(a)
+                      setUnSortedRankList(b)
+                      store.$ranksList = [$ranksList[0], ...a, ...b]
+                    }}
+                    containerStyle={{ marginBottom: 8 }}
+                    buttonStyle={{
+                      padding: 0,
+                      paddingVertical: 2,
+                    }}
+                  />
+                )
+              })}
+            </View>
+          </ListItem>
+        </ListItem.Accordion>
       </Card>
     </ScrollView>
   )
@@ -319,6 +422,7 @@ const styles = StyleSheet.create({
   blackContent: {
     flexWrap: 'wrap',
     padding: 0,
+    flexDirection: 'column',
     paddingHorizontal: 5,
     // paddingBottom: 10,
     // paddingHorizontal: 10,

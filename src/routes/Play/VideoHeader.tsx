@@ -3,27 +3,23 @@ import { Avatar, Icon, Text } from '@rneui/themed'
 import React from 'react'
 import { View, Pressable, StyleSheet, ToastAndroid } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import { useStore } from '../../store'
 import { NavigationProps } from '../../types'
 import { handleShareVideo, parseDate, parseNumber } from '../../utils'
 import useMounted from '../../hooks/useMounted'
+import VideoInfoContext from './videoContext'
 
 export default function VideoHeader() {
-  // const { from: {mid} } = props
-  const { currentVideo } = useStore()
+  const { video, bvid } = React.useContext(VideoInfoContext)
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { data: vi } = useVideoInfo(currentVideo?.bvid)
+  const { data: video2 } = useVideoInfo(bvid)
   const videoInfo = {
-    ...currentVideo,
-    ...vi,
+    ...video,
+    ...video2,
   }
-  const { bvid, name, face, mid, pubDate, title } = videoInfo
+  const { name, face, mid, pubDate, title } = videoInfo
   const [nameTextKey, setNameTextKey] = React.useState('-')
-  const state = useNavigationState(state => state)
+  const routes = useNavigationState(state => state.routes)
 
-  // const route =
-  //   useRoute<NativeStackScreenProps<RootStackParamList, 'Play'>['route']>()
-  // const { theme } = useTheme()
   useMounted(() => {
     for (let i = 0; i < 2; i++) {
       setTimeout(() => {
@@ -38,13 +34,6 @@ export default function VideoHeader() {
           if (!mid || !face || !name) {
             return
           }
-          // store.dynamicUser = {
-          //   mid,
-          //   face,
-          //   name,
-          //   sign: '-',
-          // }
-          const { routes } = state
           const prevRoute = routes[routes.length - 2]
           const user = {
             mid,

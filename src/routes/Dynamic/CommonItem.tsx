@@ -42,10 +42,6 @@ export default function CommonItem(props: { item: DynamicItemType<ItemType> }) {
       <RichTexts idStr={item.id} nodes={nodes} topic={item.topic} />
       <CommonContent type={item.type} {...item.payload} />
     </TouchableOpacity>
-    // <View style={styles.container}>
-    //   <RichTexts idStr={item.id} nodes={nodes} topic={item.topic} />
-    //   <CommonContent type={item.type} {...item.payload} />
-    // </View>
   )
 }
 

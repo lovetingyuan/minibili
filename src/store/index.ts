@@ -18,27 +18,15 @@ const store = proxy<{
   $followedUps: UserInfo[]
   $blackTags: Record<string, string>
   $userInfo: UserInfo | null
-  $webViewMode: 'PC' | 'MOBILE'
+  webViewMode: 'PC' | 'MOBILE'
   $latestUpdateIds: Record<string, string>
   $ignoredVersions: string[]
   // ----------------------------
-  // dynamicUser: UserInfo | null
   updatedUps: Record<string, boolean>
   livingUps: Record<string, string>
   checkingUpUpdateMap: Record<string, boolean>
-  videosType: (typeof RanksConfig)[number]
-  currentVideo: {
-    bvid: string
-    name: string
-    face: string
-    mid: number | string
-    pubDate?: number | string
-    title: string
-    aid: number | string
-    cover: string
-    desc: string
-  } | null
-  ranksList: { rid: number; label: string }[]
+  currentVideosCate: (typeof RanksConfig)[number]
+  $ranksList: { rid: number; label: string }[]
   // remoteConfig: Promise<RemoteConfig>
   updateInfo: ReturnType<typeof checkUpdate>
   imagesList: {
@@ -56,20 +44,18 @@ const store = proxy<{
   $followedUps: [],
   $blackTags: {},
   $userInfo: null,
-  $webViewMode: 'PC',
   $latestUpdateIds: {},
   $ignoredVersions: [],
   // -------------------------
-  // dynamicUser: null,
+  webViewMode: 'PC',
   updatedUps: {},
   livingUps: {},
   checkingUpUpdateMap: {},
   get checkingUpUpdate() {
     return Object.values(this.checkingUpUpdateMap).filter(Boolean).length > 0
   },
-  videosType: RanksConfig[0],
-  currentVideo: null,
-  ranksList: RanksConfig,
+  currentVideosCate: RanksConfig[0],
+  $ranksList: RanksConfig,
   // remoteConfig: getRemoteConfig(),
   updateInfo: checkUpdate(),
   imagesList: [],

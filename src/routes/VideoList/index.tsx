@@ -7,8 +7,8 @@ import { useStore } from '../../store'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 export default function (props: Props) {
-  const { videosType } = useStore()
-  if (videosType.rid === -1) {
+  const { currentVideosCate } = useStore()
+  if (currentVideosCate.rid === -1) {
     return <HotList {...props} />
   }
   return <Ranks {...props} />
