@@ -13,7 +13,7 @@ export default function request<D extends any>(url: string) {
   const requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
-  const { pathname } = new URL(requestUrl)
+  const { pathname, searchParams } = new URL(requestUrl)
   const isDynamic = pathname.startsWith('/x/polymer/web-dynamic/')
   return fetch(requestUrl, {
     headers: {
@@ -31,7 +31,13 @@ export default function request<D extends any>(url: string) {
       'Sec-Fetch-Site': 'none',
       'Sec-Fetch-User': '?1',
       // origin: isDynamic ? 'https://space.bilibili.com' : Host,
-      ...(store.cookie ? { cookie: store.cookie } : {}),
+      ...(isDynamic
+        ? {
+            cookie: store.cookie
+              ? store.cookie + `; DedeUserID=${searchParams.get('host_mid')}`
+              : `DedeUserID=${searchParams.get('host_mid')}`,
+          }
+        : {}),
       // Referer: isDynamic
       //   ? `https://space.bilibili.com/${
       //       store.$userInfo?.mid || TracyId

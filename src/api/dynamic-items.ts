@@ -506,9 +506,7 @@ export function useHasUpdate(mid: number | string) {
   const delay = mid.toString().slice(0, 5)
   const { $latestUpdateIds, cookie } = useStore()
   const { data, isLoading } = useSWR<any>(
-    __DEV__
-      ? null
-      : cookie
+    cookie
       ? `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
       : null,
     (url: string) => {
@@ -519,9 +517,6 @@ export function useHasUpdate(mid: number | string) {
     },
   )
   React.useEffect(() => {
-    if (__DEV__) {
-      return
-    }
     store.checkingUpUpdateMap[mid] = isLoading
   }, [mid, isLoading])
 

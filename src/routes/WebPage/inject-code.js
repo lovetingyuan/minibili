@@ -185,12 +185,6 @@ function __$hack(dev, dark) {
 
     `
   }
-
-  // dev && alert(location.href)
-  // dev &&
-  //   setTimeout(() => {
-  //     alert(location.href)
-  //   }, 3000)
 }
 
 export const INJECTED_JAVASCRIPT = `(${__$hack})(${__DEV__});true;`

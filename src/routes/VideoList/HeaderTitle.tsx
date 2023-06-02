@@ -33,6 +33,7 @@ const HeaderTitle = () => {
               <Text
                 onPress={() => {
                   setMode(mode === 'dark' ? 'light' : 'dark')
+                  alert(store.cookie)
                 }}>
                 {'    '}
                 dev
