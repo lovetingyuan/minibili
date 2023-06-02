@@ -6,6 +6,7 @@ import { TracyId } from '../constants'
 // import getUserAgent from '../utils/user-agent'
 
 let errorTime = Date.now()
+const Host = 'https://www.bilibili.com'
 
 export default function request<D extends any>(url: string) {
   // __DEV__ && console.log('request url: ', url)
@@ -16,7 +17,7 @@ export default function request<D extends any>(url: string) {
   const isDynamic = pathname.startsWith('/x/polymer/web-dynamic/')
   return fetch(requestUrl, {
     headers: {
-      Host: 'https://bilibili.com',
+      Host,
       pragma: 'no-cache',
       'cache-control': 'no-cache',
       'User-Agent':
@@ -29,13 +30,13 @@ export default function request<D extends any>(url: string) {
       'Sec-Fetch-Mode': 'navigate',
       'Sec-Fetch-Site': 'none',
       'Sec-Fetch-User': '?1',
-      origin: isDynamic ? 'https://space.bilibili.com' : 'https://bilibili.com',
+      origin: isDynamic ? 'https://space.bilibili.com' : Host,
       ...(store.cookie ? { cookie: store.cookie } : {}),
       Referer: isDynamic
         ? `https://space.bilibili.com/${
             store.$userInfo?.mid || TracyId
           }/dynamic`
-        : 'https://bilibili.com',
+        : Host,
       'Referrer-Policy': 'no-referrer-when-downgrade',
     },
     // referrer: 'https://space.bilibili.com/326081112/dynamic',
