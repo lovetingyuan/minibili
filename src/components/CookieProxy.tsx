@@ -124,12 +124,7 @@ export default () => {
     />
   )
   return (
-    <Dialog
-      isVisible={visible}
-      // fullScreen
-      onBackdropPress={() => {
-        // setVisible(false)
-      }}>
+    <Dialog isVisible={visible}>
       <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍后...'} />
       {ready ? (
         <View style={[styles.container, { height: 300 }]}>{webview}</View>
