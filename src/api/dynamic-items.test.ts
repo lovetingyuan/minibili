@@ -11,10 +11,6 @@ describe('dynamic-list', () => {
       const res = await fetcher<any>(
         `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
       )
-      // fs.writeFileSync(
-      //   './src/api/dynamic-items.json',
-      //   JSON.stringify(res, null, 2),
-      // )
       const offset = res.offset
       DynamicListResponseSchema.parse(res)
       const res2 = await fetcher(

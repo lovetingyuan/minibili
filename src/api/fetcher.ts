@@ -7,14 +7,18 @@ import { TracyId } from '../constants'
 
 let errorTime = Date.now()
 const Host = 'https://www.bilibili.com'
+const midKeys = ['mid', 'host_mid', 'uid', 'vmid']
 
 export default function request<D extends any>(url: string) {
-  __DEV__ && console.log('request url: ', url, store.cookie)
   const requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
-  const { pathname, searchParams } = new URL(requestUrl)
-  const isDynamic = pathname.startsWith('/x/polymer/web-dynamic/')
+  const { searchParams } = new URL(requestUrl)
+  // const isDynamic = pathname.startsWith('/x/polymer/web-dynamic/')
+  const midKey = midKeys.find(k => searchParams.get(k))
+  const mid = midKey ? searchParams.get(midKey) : null
+  __DEV__ && console.log('request url: ', url, 'mid: ' + mid)
+
   return fetch(requestUrl, {
     headers: {
       // Host,
@@ -30,14 +34,15 @@ export default function request<D extends any>(url: string) {
       'sec-fetch-mode': 'cors',
       'Sec-Fetch-Site': 'none',
       'Sec-Fetch-User': '?1',
+      ...(mid ? { Cookie: 'DedeUserID=' + mid } : null),
       // origin: isDynamic ? 'https://space.bilibili.com' : Host,
-      ...(isDynamic
-        ? {
-            cookie: store.cookie
-              ? store.cookie + `; DedeUserID=${searchParams.get('host_mid')}`
-              : `DedeUserID=${searchParams.get('host_mid')}`,
-          }
-        : {}),
+      // ...(isDynamic
+      //   ? {
+      //       cookie: store.cookie
+      //         ? store.cookie + `; DedeUserID=${searchParams.get('host_mid')}`
+      //         : `DedeUserID=${searchParams.get('host_mid')}`,
+      //     }
+      //   : {}),
       // Referer: isDynamic
       //   ? `https://space.bilibili.com/${
       //       store.$userInfo?.mid || TracyId
@@ -45,14 +50,12 @@ export default function request<D extends any>(url: string) {
       //   : Host,
       // 'Referrer-Policy': 'no-referrer-when-downgrade',
     },
-    referrer: isDynamic
-      ? `https://space.bilibili.com/${store.$userInfo?.mid || TracyId}/dynamic`
-      : Host,
+    referrer: mid ? `https://space.bilibili.com/${mid}/dynamic` : Host,
     referrerPolicy: 'no-referrer-when-downgrade',
     // referrerPolicy: 'strict-origin-when-cross-origin',
     method: 'GET',
     mode: 'cors',
-    credentials: store.cookie ? 'include' : 'omit',
+    credentials: mid ? 'include' : 'omit',
   })
     .then(r => r.text())
     .then(resText => {
