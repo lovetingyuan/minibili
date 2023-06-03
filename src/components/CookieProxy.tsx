@@ -41,6 +41,16 @@ function __$hack() {
     `
     document.head.appendChild(style)
     let ready = false
+    setTimeout(() => {
+      ready = true
+      // @ts-ignore
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          action: 'ready',
+          payload: document.cookie,
+        }),
+      )
+    }, 10000)
     setInterval(() => {
       if (document.querySelector('.geetest_wind.geetest_panel') && !ready) {
         // @ts-ignore
@@ -107,7 +117,6 @@ export default () => {
           __DEV__ && console.log('cookie: ', store.cookie)
         } else if (data.action === 'ready') {
           setReady(true)
-          console.log(999, data.payload)
         }
       }}
       onShouldStartLoadWithRequest={request => {
@@ -122,7 +131,11 @@ export default () => {
     />
   )
   return (
-    <Dialog isVisible={visible}>
+    <Dialog
+      isVisible={visible}
+      onBackdropPress={() => {
+        setVisible(false)
+      }}>
       <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍后...'} />
       {ready ? (
         <View style={[styles.container, { height: 310 }]}>{webview}</View>
