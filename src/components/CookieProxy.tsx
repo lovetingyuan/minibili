@@ -14,6 +14,7 @@ function __$hack() {
       }),
     )
   }
+  // document.cookie = ''
   if (document.readyState !== 'loading') {
     sendCookie()
   } else {
@@ -23,8 +24,12 @@ function __$hack() {
   }
 }
 
+const showIframe = __DEV__ ? false : false
+
 const styles = StyleSheet.create({
-  container: { height: 0, width: 0, overflow: 'hidden' },
+  container: showIframe
+    ? { flex: 1 }
+    : { height: 0, width: 0, overflow: 'hidden' },
 })
 
 export default () => {
@@ -33,7 +38,7 @@ export default () => {
   // if (!$userInfo?.mid) {
   //   return null
   // }
-  if (cookie) {
+  if (cookie && !showIframe) {
     return null
   }
   const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`

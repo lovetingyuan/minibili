@@ -26,7 +26,7 @@ import NetInfo from '@react-native-community/netinfo'
 import useIsDark from '../hooks/useIsDark'
 import ThemeResponse from '../components/ThemeResponse'
 import ButtonsOverlay from '../components/ButtonsOverlay'
-// import CookieProxy from '../components/CookieProxy'
+import CookieProxy from '../components/CookieProxy'
 import { setScreenTag } from '../utils/report'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -107,7 +107,7 @@ export default () => {
         <NetToast />
         <ThemeResponse />
         <ButtonsOverlay />
-        {/* <CookieProxy /> */}
+        <CookieProxy />
         <NavigationContainer theme={MyTheme}>
           <Stack.Navigator
             initialRouteName="Main"
