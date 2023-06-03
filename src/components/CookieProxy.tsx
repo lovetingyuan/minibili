@@ -126,8 +126,9 @@ export default () => {
   return (
     <Dialog
       isVisible={visible}
+      // fullScreen
       onBackdropPress={() => {
-        setVisible(false)
+        // setVisible(false)
       }}>
       <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍后...'} />
       {ready ? (
