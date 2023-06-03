@@ -70,10 +70,8 @@ function __$hack() {
   }
 }
 
-const showIframe = __DEV__ ? true : false
-
 const styles = StyleSheet.create({
-  container: showIframe ? {} : { height: 0, width: 0, overflow: 'hidden' },
+  container: {},
 })
 
 export default () => {
@@ -81,12 +79,6 @@ export default () => {
   const { $userInfo } = useStore()
   const [visible, setVisible] = React.useState(true)
   const [ready, setReady] = React.useState(false)
-  // if (!$userInfo?.mid) {
-  //   return null
-  // }
-  // if (cookie && !showIframe) {
-  //   return null
-  // }
   const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`
   const webview = (
     <WebView
@@ -127,7 +119,7 @@ export default () => {
     <Dialog isVisible={visible}>
       <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍后...'} />
       {ready ? (
-        <View style={[styles.container, { height: 300 }]}>{webview}</View>
+        <View style={[styles.container, { height: 310 }]}>{webview}</View>
       ) : (
         <View>
           {webview}
