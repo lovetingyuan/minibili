@@ -47,7 +47,7 @@ const store = proxy<{
   $latestUpdateIds: {},
   $ignoredVersions: [],
   // -------------------------
-  webViewMode: 'PC',
+  webViewMode: 'MOBILE',
   updatedUps: {},
   livingUps: {},
   checkingUpUpdateMap: {},
