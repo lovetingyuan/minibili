@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy, useSnapshot } from 'valtio'
 import { watch } from 'valtio/utils'
-import { RanksConfig } from '../constants'
+import { RanksConfig, TracyId } from '../constants'
 import { reportUserOpenApp } from '../utils/report'
 // import { RemoteConfig, getRemoteConfig } from '../api/get-config'
 import { checkUpdate } from '../api/check-update'
@@ -61,7 +61,7 @@ const store = proxy<{
   imagesList: [],
   currentImageIndex: 0,
   overlayButtons: [],
-  cookie: '',
+  cookie: 'DedeUserID=' + TracyId,
 })
 
 const StoragePrefix = 'Store:'
@@ -78,6 +78,7 @@ Object.keys(store)
         if (data) {
           store[key] = JSON.parse(data) as any
           if (key === '$userInfo' && store.$userInfo) {
+            store.cookie = 'DedeUserID=' + store.$userInfo.mid
             reportUserOpenApp(store.$userInfo.mid, store.$userInfo.name)
           }
         }

@@ -454,6 +454,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
 
 export function useDynamicItems(mid?: string | number) {
   const { cookie } = useStore()
+  console.log(123432411, cookie)
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<DynamicListResponse>(
       (offset, response) => {
