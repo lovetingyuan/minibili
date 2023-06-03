@@ -39,6 +39,7 @@ const store = proxy<{
   checkingUpUpdate: boolean
   overlayButtons: { text: string; onPress: () => void }[]
   cookie: string
+  showCaptcha: boolean
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -62,6 +63,7 @@ const store = proxy<{
   currentImageIndex: 0,
   overlayButtons: [],
   cookie: 'DedeUserID=' + TracyId,
+  showCaptcha: false,
 })
 
 const StoragePrefix = 'Store:'

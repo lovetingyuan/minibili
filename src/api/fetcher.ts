@@ -10,7 +10,7 @@ export default function request<D extends any>(url: string) {
     ? url
     : 'https://api.bilibili.com' + url
   __DEV__ && console.log('request url: ', url)
-
+  const isDynamic = url.startsWith('/x/polymer/web-dynamic/v1/feed/space')
   return fetch(requestUrl, {
     headers: {
       'cache-control': 'no-cache',
@@ -36,18 +36,18 @@ export default function request<D extends any>(url: string) {
         message: string
         data: D
       }
-      let res = {} as Res
+      let res = {
+        code: -1,
+        message: '解析json失败:' + resText,
+        data: {},
+      } as Res
       try {
         res = JSON.parse(resText) as Res
-      } catch (err) {
-        reportApiError({
-          url,
-          code: -1,
-          message: 'Failed to JSON.parse(response): ' + resText,
-          method: 'GET',
-        })
-      }
+      } catch (err) {}
       if (res.code) {
+        if (isDynamic) {
+          store.showCaptcha = true
+        }
         if (__DEV__) {
           ToastAndroid.show(
             ` 数据获取失败:${url}, ${res.code} ${res.message}`,

@@ -22,6 +22,7 @@ import {
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
 import { parseUrl } from '../utils'
+import { TracyId } from '../constants'
 
 type OmitUndef<T> = {
   [K in keyof T as T[K] extends undefined ? never : K]: T[K]
@@ -454,7 +455,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
 
 export function useDynamicItems(mid?: string | number) {
   const { cookie } = useStore()
-  console.log(123432411, cookie)
+  // console.log(123432411, cookie)
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<DynamicListResponse>(
       (offset, response) => {
@@ -466,9 +467,9 @@ export function useDynamicItems(mid?: string | number) {
         }
         // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=14427395&timezone_offset=-480&features=itemOpusStyle
         if (!offset) {
-          return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480&features=itemOpusStyle`
+          return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
         }
-        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480&features=itemOpusStyle`
+        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480`
       },
       request,
       {
@@ -540,4 +541,13 @@ export function useHasUpdate(mid: number | string) {
     }
   }
   return ''
+}
+
+export async function checkDynamicsApi() {
+  const { offset } = await request<DynamicListResponse>(
+    `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${TracyId}&timezone_offset=-480`,
+  )
+  await request<DynamicListResponse>(
+    `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${TracyId}&timezone_offset=-480`,
+  )
 }

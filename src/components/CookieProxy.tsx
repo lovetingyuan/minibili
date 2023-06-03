@@ -1,14 +1,14 @@
 import React from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, View, Alert } from 'react-native'
 import { WebView } from 'react-native-webview'
 import store, { useStore } from '../store'
 import { TracyId } from '../constants'
-import { Dialog } from '@rneui/themed'
+import { Dialog, Icon } from '@rneui/themed'
+import { checkDynamicsApi } from '../api/dynamic-items'
+import useIsDark from '../hooks/useIsDark'
 
-function __$hack() {
-  // setInterval(() => {})
+function __$hack(dark: boolean) {
   const validate = () => {
-    // document.body.style.display = 'none'
     const style = document.createElement('style')
     style.textContent = `
     body {
@@ -38,41 +38,59 @@ function __$hack() {
     body .geetest_holder.geetest_silver .geetest_panel a.geetest_close {
       display: none;
     }
+    ${
+      dark
+        ? `
+       body .geetest_panel_box.geetest_panelshowclick div {
+        background-color: #222;
+        color: white;
+       }
+       body .geetest_holder.geetest_silver .geetest_panel .geetest_commit .geetest_commit_tip {
+        background-color: transparent;
+       }
+      body .geetest_holder.geetest_silver .geetest_table_box .geetest_window .geetest_item .geetest_big_mark .geetest_mark_no, .geetest_holder.geetest_silver .geetest_table_box .geetest_window .geetest_item .geetest_square_mark .geetest_mark_no, .geetest_holder.geetest_silver .geetest_table_box .geetest_window .geetest_item .geetest_space_mark .geetest_mark_no {
+        background-color: transparent;
+      }
+      `
+        : ''
+    }
     `
     document.head.appendChild(style)
+    const time = Date.now()
     let ready = false
-    setTimeout(() => {
-      ready = true
-      // @ts-ignore
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          action: 'ready',
-          payload: document.cookie,
-        }),
-      )
-    }, 10000)
     setInterval(() => {
-      if (document.querySelector('.geetest_wind.geetest_panel') && !ready) {
-        // @ts-ignore
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            action: 'ready',
-            payload: document.cookie,
-          }),
-        )
-        ready = true
+      const captcha = document.querySelector('.geetest_wind.geetest_panel')
+      if (captcha) {
+        // clearInterval(timer)
+        if (!ready) {
+          // @ts-ignore
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              action: 'ready',
+              payload: document.cookie,
+            }),
+          )
+          ready = true
+        }
       } else {
+        // document.cookie = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+        // const hasToken = document.cookie.includes('x-bili-gaia-vtoken=')
+        // if (Date.now() - time > 4000) {
+        //   document.cookie = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+        // }
+        if (ready || Date.now() - time > 10000) {
+          // @ts-ignore
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              action: 'cookie',
+              payload: document.cookie,
+            }),
+          )
+        }
         window.scrollTo(0, 100000)
       }
-      if (document.cookie.includes('x-bili-gaia-vtoken=')) {
-        // @ts-ignore
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            action: 'cookie',
-            payload: document.cookie,
-          }),
-        )
-      }
+      // if (timeout || document.cookie.includes('x-bili-gaia-vtoken=')) {
+      // }
     }, 100)
   }
   // document.cookie = ''
@@ -91,52 +109,77 @@ const styles = StyleSheet.create({
 
 export default () => {
   const webviewRef = React.useRef<WebView | null>(null)
-  const { $userInfo } = useStore()
-  const [visible, setVisible] = React.useState(true)
+  const { $userInfo, showCaptcha } = useStore()
   const [ready, setReady] = React.useState(false)
+  React.useEffect(() => {
+    checkDynamicsApi().catch(() => {
+      store.showCaptcha = true
+    })
+  }, [])
+  const dark = useIsDark()
   const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`
-  const webview = (
-    <WebView
-      style={{ flex: 1 }}
-      source={{ uri: url }}
-      key={url}
-      originWhitelist={['http://*', 'https://*', 'bilibili://*']}
-      injectedJavaScriptForMainFrameOnly
-      injectedJavaScript={`(${__$hack})(${__DEV__});true;`}
-      ref={webviewRef}
-      userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.1774.57 Safari/537.36 Edg/113.0.1774.57"
-      onMessage={evt => {
-        const data = JSON.parse(evt.nativeEvent.data) as {
-          action: string
-          payload: any
-        }
-        if (data.action === 'cookie') {
-          store.cookie =
-            data.payload + '; DedeUserID=' + ($userInfo?.mid || TracyId)
-          setVisible(false)
-          __DEV__ && console.log('cookie: ', store.cookie)
-        } else if (data.action === 'ready') {
-          setReady(true)
-        }
-      }}
-      onShouldStartLoadWithRequest={request => {
-        if (request.url.startsWith('bilibili://')) {
-          return false
-        }
-        if (request.url.includes('.apk')) {
-          return false
-        }
-        return true
-      }}
-    />
-  )
+  const webview = React.useMemo(() => {
+    return (
+      <WebView
+        style={{ flex: 1 }}
+        source={{ uri: url }}
+        key={url}
+        originWhitelist={['http://*', 'https://*', 'bilibili://*']}
+        injectedJavaScriptForMainFrameOnly
+        injectedJavaScript={`(${__$hack})(${dark});true;`}
+        ref={webviewRef}
+        userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.1774.57 Safari/537.36 Edg/113.0.1774.57"
+        onMessage={evt => {
+          const data = JSON.parse(evt.nativeEvent.data) as {
+            action: string
+            payload: any
+          }
+          if (data.action === 'cookie') {
+            store.cookie =
+              data.payload + '; DedeUserID=' + (store.$userInfo?.mid || TracyId)
+            store.showCaptcha = false
+            __DEV__ && console.log('cookie: ', store.cookie)
+          } else if (data.action === 'ready') {
+            setReady(true)
+          } else if (data.action === 'print') {
+            console.log('print', data.payload)
+          }
+        }}
+        onShouldStartLoadWithRequest={request => {
+          if (request.url.startsWith('bilibili://')) {
+            return false
+          }
+          if (request.url.includes('.apk')) {
+            return false
+          }
+          return true
+        }}
+      />
+    )
+  }, [url, dark])
   return (
-    <Dialog
-      isVisible={visible}
-      onBackdropPress={() => {
-        setVisible(false)
-      }}>
-      <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍后...'} />
+    <Dialog isVisible={showCaptcha}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍后...'} />
+        <Icon
+          name="close"
+          size={20}
+          onPress={() => {
+            Alert.alert('如果不验证则应用获取数据可能会失败', '', [
+              {
+                text: '返回',
+              },
+              {
+                text: '关闭验证',
+                onPress: () => {
+                  store.showCaptcha = false
+                },
+              },
+            ])
+          }}
+        />
+      </View>
+
       {ready ? (
         <View style={[styles.container, { height: 310 }]}>{webview}</View>
       ) : (
