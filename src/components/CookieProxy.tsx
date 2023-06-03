@@ -78,15 +78,15 @@ const styles = StyleSheet.create({
 
 export default () => {
   const webviewRef = React.useRef<WebView | null>(null)
-  const { $userInfo, cookie } = useStore()
+  const { $userInfo } = useStore()
   const [visible, setVisible] = React.useState(true)
   const [ready, setReady] = React.useState(false)
   // if (!$userInfo?.mid) {
   //   return null
   // }
-  if (cookie && !showIframe) {
-    return null
-  }
+  // if (cookie && !showIframe) {
+  //   return null
+  // }
   const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`
   const webview = (
     <WebView
