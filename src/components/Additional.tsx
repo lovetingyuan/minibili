@@ -22,7 +22,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join('  ')
     url = additional.reserve.jump_url
     additionalContent = (
-      <View style={{ gap: 2 }}>
+      <View style={{ flex: 1 }}>
         <Text>{additional.reserve.title}</Text>
         {desc ? <Text>{desc}</Text> : null}
       </View>
@@ -39,12 +39,12 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join('  ')
     url = additional.ugc.jump_url
     additionalContent = (
-      <View style={{ gap: 10, flexDirection: 'row', paddingRight: 10 }}>
+      <View style={styles.content}>
         <Image
           source={{ uri: additional.ugc.cover + '@200w_100h_1c.webp' }}
-          style={{ width: 100, minHeight: 50, borderRadius: 4 }}
+          style={styles.image}
         />
-        <View style={{ flexShrink: 1, gap: 4, flex: 1 }}>
+        <View style={styles.text}>
           <Text numberOfLines={1}>{additional.ugc.title}</Text>
           {text ? <Text numberOfLines={2}>{text}</Text> : null}
         </View>
@@ -62,17 +62,12 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join('  ')
     url = additional.common.jump_url
     additionalContent = (
-      <View
-        style={{
-          gap: 10,
-          flexDirection: 'row',
-          paddingRight: 10,
-        }}>
+      <View style={styles.content}>
         <Image
           source={{ uri: additional.common.cover + '@200w_100h_1c.webp' }}
-          style={{ width: 100, minHeight: 50, borderRadius: 4 }}
+          style={styles.image}
         />
-        <View style={{ flexShrink: 1, gap: 4, flex: 1 }}>
+        <View style={styles.text}>
           <Text numberOfLines={1}>{additional.common.title}</Text>
           {text ? (
             <Text numberOfLines={2} style={{ fontSize: 13 }}>
@@ -93,7 +88,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join(' ')
     url = additional.goods.jump_url || additional.goods.items[0].jump_url
     additionalContent = (
-      <View style={{ gap: 2, flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <Text numberOfLines={1}>商品：{additional.goods.head_text}</Text>
         {text ? <Text numberOfLines={1}>{text}</Text> : null}
       </View>
@@ -105,7 +100,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       'https://t.bilibili.com/vote/h5/index/#/result?vote_id=' +
       additional.vote.vote_id
     additionalContent = (
-      <View style={{ gap: 2 }}>
+      <View style={{ flex: 1 }}>
         <Text>投票：{additional.vote.desc}</Text>
         <Text>
           {parseDate(additional.vote.end_time)}截至，
@@ -162,4 +157,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingVertical: 2,
   },
+  content: {
+    gap: 10,
+    flexDirection: 'row',
+    paddingRight: 10,
+  },
+  text: { flexShrink: 1, gap: 4, flex: 1 },
+  image: { width: 100, minHeight: 50, borderRadius: 4 },
 })

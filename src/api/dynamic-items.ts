@@ -498,8 +498,8 @@ export function useDynamicItems(mid?: string | number) {
 
 const queue = new PQueue({
   concurrency: 10,
-  intervalCap: 10,
-  interval: 100,
+  intervalCap: 5,
+  interval: 1000,
 })
 
 export function useHasUpdate(mid: number | string) {

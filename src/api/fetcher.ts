@@ -1,61 +1,48 @@
 import { ToastAndroid } from 'react-native'
-import { URL } from 'react-native-url-polyfill'
+// import { URL } from 'react-native-url-polyfill'
 import { reportApiError } from '../utils/report'
-import store from '../store'
+// import store from '../store'
 import { TracyId } from '../constants'
+// import { TracyId } from '../constants'
 // import getUserAgent from '../utils/user-agent'
 
 let errorTime = Date.now()
-const Host = 'https://www.bilibili.com'
-const midKeys = ['mid', 'host_mid', 'uid', 'vmid']
+// const Host = 'https://www.bilibili.com'
+// const midKeys = ['mid', 'host_mid', 'uid', 'vmid']
 
 export default function request<D extends any>(url: string) {
   const requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
-  const { searchParams } = new URL(requestUrl)
+  // const { searchParams } = new URL(requestUrl)
   // const isDynamic = pathname.startsWith('/x/polymer/web-dynamic/')
-  const midKey = midKeys.find(k => searchParams.get(k))
-  const mid = midKey ? searchParams.get(midKey) : null
-  __DEV__ && console.log('request url: ', url, 'mid: ' + mid)
+  // const midKey = midKeys.find(k => searchParams.get(k))
+  // const mid = midKey ? searchParams.get(midKey) : null
+  __DEV__ && console.log('request url: ', url)
 
   return fetch(requestUrl, {
     headers: {
       // Host,
       pragma: 'no-cache',
       'cache-control': 'no-cache',
-      'User-Agent':
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.57',
-      Accept: 'application/json, text/plain, */*',
-      'Accept-Language': 'zh-CN,zh;q=0.9',
-      // Connection: 'keep-alive',
-      // 'Upgrade-Insecure-Requests': '1',
+      'user-agent':
+        Math.random() >= 0.5
+          ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
+          : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
+      accept: 'application/json, text/plain, */*',
+      'accept-language': 'zh-CN,zh;q=0.9',
       'sec-fetch-dest': 'empty',
       'sec-fetch-mode': 'cors',
-      'Sec-Fetch-Site': 'none',
-      'Sec-Fetch-User': '?1',
-      ...(mid ? { Cookie: 'DedeUserID=' + mid } : null),
-      // origin: isDynamic ? 'https://space.bilibili.com' : Host,
-      // ...(isDynamic
-      //   ? {
-      //       cookie: store.cookie
-      //         ? store.cookie + `; DedeUserID=${searchParams.get('host_mid')}`
-      //         : `DedeUserID=${searchParams.get('host_mid')}`,
-      //     }
-      //   : {}),
-      // Referer: isDynamic
-      //   ? `https://space.bilibili.com/${
-      //       store.$userInfo?.mid || TracyId
-      //     }/dynamic`
-      //   : Host,
-      // 'Referrer-Policy': 'no-referrer-when-downgrade',
+      'sec-fetch-site': 'none',
+      'sec-fetch-user': '?1',
+      cookie: 'DedeUserID=' + TracyId, // store.cookie,
     },
-    referrer: mid ? `https://space.bilibili.com/${mid}/dynamic` : Host,
-    referrerPolicy: 'no-referrer-when-downgrade',
+    // referrer:  `https://space.bilibili.com/${mid}/dynamic` : Host,
+    // referrerPolicy: 'no-referrer-when-downgrade',
     // referrerPolicy: 'strict-origin-when-cross-origin',
     method: 'GET',
     mode: 'cors',
-    credentials: mid ? 'include' : 'omit',
+    credentials: 'include', //: 'omit',
   })
     .then(r => r.text())
     .then(resText => {

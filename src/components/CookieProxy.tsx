@@ -1,5 +1,5 @@
 import React from 'react'
-import { View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { WebView } from 'react-native-webview'
 import store, { useStore } from '../store'
 import { TracyId } from '../constants'
@@ -23,6 +23,10 @@ function __$hack() {
   }
 }
 
+const styles = StyleSheet.create({
+  container: { height: 0, width: 0, overflow: 'hidden' },
+})
+
 export default () => {
   const webviewRef = React.useRef<WebView | null>(null)
   const { $userInfo, cookie } = useStore()
@@ -34,7 +38,7 @@ export default () => {
   }
   const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`
   return (
-    <View style={{ height: 0, width: 0, overflow: 'hidden' }}>
+    <View style={styles.container}>
       <WebView
         source={{ uri: url }}
         key={url}
@@ -42,13 +46,17 @@ export default () => {
         injectedJavaScriptForMainFrameOnly
         injectedJavaScript={`(${__$hack})(${__DEV__});true;`}
         ref={webviewRef}
+        userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.1774.57 Safari/537.36 Edg/113.0.1774.57"
         onMessage={evt => {
           const data = JSON.parse(evt.nativeEvent.data) as {
             action: string
             payload: any
           }
           if (data.action === 'cookie') {
-            store.cookie = data.payload
+            store.cookie =
+              data.payload + '; DedeUserID=' + ($userInfo?.mid || TracyId)
+
+            __DEV__ && console.log('cookie: ', store.cookie)
           }
         }}
         onShouldStartLoadWithRequest={request => {
