@@ -35,6 +35,9 @@ function __$hack() {
       bottom: 0;
       transform-origin: 0 0;
     }
+    body .geetest_holder.geetest_silver .geetest_panel a.geetest_close {
+      display: none;
+    }
     `
     document.head.appendChild(style)
     let ready = false
@@ -44,10 +47,12 @@ function __$hack() {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             action: 'ready',
-            // payload: document.cookie,
+            payload: document.cookie,
           }),
         )
         ready = true
+      } else {
+        window.scrollTo(0, 100000)
       }
       if (document.cookie.includes('x-bili-gaia-vtoken=')) {
         // @ts-ignore
@@ -102,6 +107,7 @@ export default () => {
           __DEV__ && console.log('cookie: ', store.cookie)
         } else if (data.action === 'ready') {
           setReady(true)
+          console.log(999, data.payload)
         }
       }}
       onShouldStartLoadWithRequest={request => {
@@ -121,7 +127,7 @@ export default () => {
       {ready ? (
         <View style={[styles.container, { height: 310 }]}>{webview}</View>
       ) : (
-        <View>
+        <View style={{}}>
           {webview}
           <ActivityIndicator
             color="#00AEEC"
