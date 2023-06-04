@@ -61,7 +61,6 @@ function __$hack(dark: boolean) {
     setInterval(() => {
       const captcha = document.querySelector('.geetest_wind.geetest_panel')
       if (captcha) {
-        // clearInterval(timer)
         if (!ready) {
           // @ts-ignore
           window.ReactNativeWebView.postMessage(
@@ -123,7 +122,7 @@ export default () => {
       <WebView
         style={{ flex: 1 }}
         source={{ uri: url }}
-        key={url}
+        key={url + showCaptcha}
         originWhitelist={['http://*', 'https://*', 'bilibili://*']}
         injectedJavaScriptForMainFrameOnly
         injectedJavaScript={`(${__$hack})(${dark});true;`}
@@ -156,7 +155,7 @@ export default () => {
         }}
       />
     )
-  }, [url, dark])
+  }, [url, dark, showCaptcha])
   return (
     <Dialog isVisible={showCaptcha}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
