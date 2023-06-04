@@ -111,10 +111,14 @@ export default () => {
   const { $userInfo, showCaptcha } = useStore()
   const [ready, setReady] = React.useState(false)
   React.useEffect(() => {
-    checkDynamicsApi().catch(() => {
-      store.showCaptcha = true
-    })
-  }, [])
+    checkDynamicsApi()
+      .then(() => {
+        store.showCaptcha = false
+      })
+      .catch(() => {
+        store.showCaptcha = true
+      })
+  }, [showCaptcha])
   const dark = useIsDark()
   const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`
   const webview = React.useMemo(() => {
