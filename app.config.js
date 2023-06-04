@@ -24,11 +24,11 @@ module.exports = {
   splash: {
     image: './assets/splash.png',
     resizeMode: 'cover',
-    backgroundColor: '#dddddd',
+    backgroundColor: '#ffffff',
     dark: {
       image: './assets/splash-dark.png',
       resizeMode: 'cover',
-      backgroundColor: '#222222',
+      backgroundColor: '#000000',
     },
   },
   assetBundlePatterns: ['assets/*'],
