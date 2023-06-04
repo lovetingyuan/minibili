@@ -23,8 +23,13 @@ module.exports = {
   userInterfaceStyle: 'automatic',
   splash: {
     image: './assets/splash.png',
-    resizeMode: 'contain',
-    backgroundColor: '#ffffff',
+    resizeMode: 'cover',
+    backgroundColor: '#77e946',
+    dark: {
+      image: './assets/splash-dark.png',
+      resizeMode: 'cover',
+      backgroundColor: '#614485',
+    },
   },
   assetBundlePatterns: ['assets/*'],
   ios: {

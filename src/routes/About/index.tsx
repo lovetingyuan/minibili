@@ -190,7 +190,7 @@ export default function About({
               onPress={() => {
                 $userInfo?.mid &&
                   Clipboard.setStringAsync($userInfo.mid + '').then(() => {
-                    ToastAndroid.show('已复制uid', ToastAndroid.SHORT)
+                    ToastAndroid.show('已复制用户ID', ToastAndroid.SHORT)
                   })
               }}>
               当前用户ID：{$userInfo?.mid}
@@ -252,7 +252,8 @@ export default function About({
           onPress={() => {
             setExpanded(!expanded)
           }}>
-          <ListItem containerStyle={styles.blackContent}>
+          <ListItem containerStyle={[styles.blackContent]}>
+            {/* <View> */}
             {Object.values($blackTags).map(tag => {
               return (
                 <Chip
@@ -270,7 +271,10 @@ export default function About({
                   }}
                   iconRight
                   titleStyle={{ textAlign: 'left' }}
-                  containerStyle={{ marginBottom: 7, alignSelf: 'flex-start' }}
+                  containerStyle={{
+                    marginBottom: 7,
+                    alignSelf: 'flex-start',
+                  }}
                   buttonStyle={{
                     padding: 0,
                     paddingVertical: 2,
@@ -278,6 +282,7 @@ export default function About({
                 />
               )
             })}
+            {/* </View> */}
             {Object.values($blackTags).length === 0 ? <Text>无</Text> : null}
           </ListItem>
         </ListItem.Accordion>
@@ -317,18 +322,7 @@ export default function About({
             setExpandedCate(!expandedCate)
           }}>
           <ListItem containerStyle={styles.blackContent}>
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                borderBottomWidth: 0.5,
-                borderBottomColor: '#888',
-                marginBottom: 10,
-                flex: 1,
-                flexGrow: 1,
-                width: '100%',
-                columnGap: 10,
-              }}>
+            <View style={styles.sortedCates}>
               {sortedRankList.map(cate => {
                 return (
                   <Chip
@@ -423,7 +417,7 @@ const styles = StyleSheet.create({
   blackContent: {
     flexWrap: 'wrap',
     padding: 0,
-    flexDirection: 'column',
+    flexDirection: 'row',
     paddingHorizontal: 5,
     // paddingBottom: 10,
     // paddingHorizontal: 10,
@@ -438,5 +432,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#888',
     marginTop: 20,
+  },
+  sortedCates: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#888',
+    marginBottom: 10,
+    flex: 1,
+    flexGrow: 1,
+    width: '100%',
+    columnGap: 10,
   },
 })

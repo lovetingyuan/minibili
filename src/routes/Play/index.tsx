@@ -79,7 +79,7 @@ const PlayPage = ({ route, navigation }: Props) => {
                     onPress={() => {
                       videoInfo.bvid &&
                         Clipboard.setStringAsync(videoInfo.bvid).then(() => {
-                          ToastAndroid.show('已复制', ToastAndroid.SHORT)
+                          ToastAndroid.show('已复制视频ID', ToastAndroid.SHORT)
                         })
                     }}>
                     <Text style={[styles.text, { color: theme.colors.grey1 }]}>

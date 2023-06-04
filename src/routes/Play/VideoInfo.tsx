@@ -53,13 +53,13 @@ export default function VideoInfo(props: { changePage: (p: number) => void }) {
                   containerStyle={{
                     paddingVertical: 10,
                     paddingHorizontal: 20,
-                    backgroundColor: selected ? '#00AEEC' : 'white',
                   }}
                   bottomDivider>
                   <ListItem.Content>
                     <ListItem.Title
                       style={{
-                        color: selected ? 'white' : '#555',
+                        color: selected ? '#00a1d6' : '#888',
+                        fontWeight: selected ? 'bold' : 'normal',
                       }}>
                       {v.page}. {v.title}
                     </ListItem.Title>

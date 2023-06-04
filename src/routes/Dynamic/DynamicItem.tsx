@@ -66,7 +66,7 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
 }
 
 const styles = StyleSheet.create({
-  topMark: { width: 30, height: 15, marginBottom: 5 },
+  topMark: { width: 32.5, height: 16, marginBottom: 5 },
   itemContainer: {
     paddingVertical: 18,
     paddingHorizontal: 12,

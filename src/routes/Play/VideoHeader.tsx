@@ -1,4 +1,4 @@
-import { useNavigation, useNavigationState } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { Avatar, Icon, Text } from '@rneui/themed'
 import React from 'react'
 import { View, Pressable, StyleSheet, ToastAndroid } from 'react-native'
@@ -16,9 +16,9 @@ export default function VideoHeader() {
     ...video,
     ...video2,
   }
-  const { name, face, mid, pubDate, title } = videoInfo
+  const { name, face, mid, pubDate, pubTime, title } = videoInfo
   const [nameTextKey, setNameTextKey] = React.useState('-')
-  const routes = useNavigationState(state => state.routes)
+  // const routes = useNavigationState(state => state.routes)
 
   useMounted(() => {
     for (let i = 0; i < 2; i++) {
@@ -34,25 +34,27 @@ export default function VideoHeader() {
           if (!mid || !face || !name) {
             return
           }
-          const prevRoute = routes[routes.length - 2]
+          // const prevRoute = routes[routes.length - 2]
           const user = {
             mid,
             face,
             name,
             sign: '-',
           }
-          if (prevRoute && prevRoute.name === 'Dynamic') {
-            const same = (prevRoute.params as any)?.user.mid === mid
-            if (same) {
-              navigation.goBack()
-            } else {
-              navigation.push('Dynamic', { user })
-            }
-          } else {
-            navigation.navigate('Dynamic', {
-              user,
-            })
-          }
+          navigation.push('Dynamic', { user })
+
+          // if (prevRoute && prevRoute.name === 'Dynamic') {
+          //   const same = (prevRoute.params as any)?.user.mid === mid
+          //   if (same) {
+          //     navigation.goBack()
+          //   } else {
+          //     navigation.push('Dynamic', { user })
+          //   }
+          // } else {
+          //   navigation.navigate('Dynamic', {
+          //     user,
+          //   })
+          // }
         }}
         style={styles.upInfoContainer}>
         <Avatar size={32} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
@@ -67,7 +69,9 @@ export default function VideoHeader() {
       <View style={styles.VideoItem}>
         <View style={styles.iconText}>
           <Icon name="date-range" size={15} />
-          <Text style={styles.VideoItemText}>{parseDate(pubDate)}</Text>
+          <Text style={styles.VideoItemText}>
+            {parseDate(pubDate || pubTime)}
+          </Text>
         </View>
         <View style={styles.iconText}>
           <Icon name="play-circle-outline" size={15} />
