@@ -72,6 +72,7 @@ function __$hack(dark: boolean) {
           ready = true
         }
       } else {
+        window.scrollTo(0, 100000)
         // document.cookie = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
         // const hasToken = document.cookie.includes('x-bili-gaia-vtoken=')
         // if (Date.now() - time > 4000) {
@@ -86,7 +87,6 @@ function __$hack(dark: boolean) {
             }),
           )
         }
-        window.scrollTo(0, 100000)
       }
       // if (timeout || document.cookie.includes('x-bili-gaia-vtoken=')) {
       // }

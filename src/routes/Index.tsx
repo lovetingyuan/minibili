@@ -21,7 +21,6 @@ import { Button, createTheme, ThemeProvider } from '@rneui/themed'
 import { site } from '../constants'
 import HeaderTitle from './DynamicDetail/HeaderTitle'
 import HeaderRight from './DynamicDetail/HeaderRight'
-import PlayHeaderRight from './Play/HeaderRight'
 import NetInfo from '@react-native-community/netinfo'
 import useIsDark from '../hooks/useIsDark'
 import ThemeResponse from '../components/ThemeResponse'
@@ -134,16 +133,7 @@ export default () => {
                 headerTitle: '动态',
               }}
             />
-            <Stack.Screen
-              name="Play"
-              component={Play}
-              options={() => {
-                return {
-                  headerTitle: '',
-                  headerRight: () => PlayHeaderRight(),
-                }
-              }}
-            />
+            <Stack.Screen name="Play" component={Play} />
             <Stack.Screen
               name="DynamicDetail"
               component={DynamicDetail}

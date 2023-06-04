@@ -2,10 +2,8 @@ import { StyleSheet } from 'react-native'
 import React from 'react'
 import { openBiliVideo } from '../../utils'
 import { Icon } from '@rneui/themed'
-import VideoInfoContext from './videoContext'
 
-export default function HeaderRight() {
-  const { bvid } = React.useContext(VideoInfoContext)
+export default function HeaderRight(props: { bvid: string }) {
   return (
     <Icon
       name="open-in-new"
@@ -13,9 +11,7 @@ export default function HeaderRight() {
       style={styles.container}
       size={20}
       onPress={() => {
-        if (bvid) {
-          openBiliVideo(bvid)
-        }
+        openBiliVideo(props.bvid)
       }}
     />
   )

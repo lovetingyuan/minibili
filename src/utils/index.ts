@@ -62,7 +62,9 @@ export const openBiliVideo = async (bvid: string) => {
   const url = `bilibili://video/${bvid}`
   Linking.canOpenURL(url).then(openable => {
     if (!openable) {
-      Linking.openURL('https://m.bilibili.com/video/' + bvid)
+      Linking.openURL(`https://b23.tv/${bvid}`)
+    } else {
+      Linking.openURL(url)
     }
   })
 }

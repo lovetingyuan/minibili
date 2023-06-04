@@ -25,14 +25,14 @@ import VideoInfo from './VideoInfo'
 import { checkWifi } from '../../utils'
 import useMounted from '../../hooks/useMounted'
 import VideoInfoContext from './videoContext'
+import HeaderRight from './HeaderRight'
 // import { useStore } from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 const PlayPage = ({ route, navigation }: Props) => {
   __DEV__ && console.log(route.name)
-  const { video } = route.params
-  const bvid = route.params.bvid
+  const { video, bvid } = route.params
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: video2 } = useVideoInfo(bvid)
   const { theme } = useTheme()
@@ -44,8 +44,9 @@ const PlayPage = ({ route, navigation }: Props) => {
     videoInfo.name &&
       navigation.setOptions({
         headerTitle: videoInfo.name,
+        headerRight: () => <HeaderRight bvid={bvid} />,
       })
-  }, [navigation, videoInfo.name])
+  }, [navigation, videoInfo.name, bvid])
   useMounted(() => {
     checkWifi()
     return () => {
