@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
-import { Avatar, Badge, Text as Text2 } from '@rneui/themed'
+import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import { Button } from '@rneui/themed'
@@ -17,15 +17,16 @@ export default React.memo(
       item: { face, name, sign, mid },
     } = props
     const updateId = useHasUpdate(mid)
-    React.useEffect(() => {
-      if (updateId) {
-        if (!store.updatedUps[mid]) {
-          store.updatedUps[mid] = true
-        }
-      } else if (store.updatedUps[mid]) {
-        store.updatedUps[mid] = false
-      }
-    }, [updateId, mid])
+    store.updatedUps[mid] = !!updateId
+    // React.useEffect(() => {
+    //   if (updateId) {
+    //     if (!store.updatedUps[mid]) {
+    //       store.updatedUps[mid] = true
+    //     }
+    //   } else if (store.updatedUps[mid]) {
+    //     store.updatedUps[mid] = false
+    //   }
+    // }, [updateId, mid])
     const navigation = useNavigation<NavigationProps['navigation']>()
     const { livingUps } = useStore()
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
@@ -96,9 +97,9 @@ export default React.memo(
               store.overlayButtons = buttons()
             }}
             onPress={() => gotoDynamic(false)}>
-            <Text2 style={[styles.name]} numberOfLines={2} ellipsizeMode="tail">
+            <Text style={[styles.name]} numberOfLines={2} ellipsizeMode="tail">
               {name}
-            </Text2>
+            </Text>
           </TouchableOpacity>
           {livingUps[mid] ? (
             <Button
