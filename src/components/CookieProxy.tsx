@@ -7,15 +7,20 @@ import { Dialog, Icon } from '@rneui/themed'
 import { checkDynamicsApi } from '../api/dynamic-items'
 import useIsDark from '../hooks/useIsDark'
 
-function __$hack(dark: boolean) {
+// @ts-ignore
+function __$hack(dark) {
   const validate = () => {
     const style = document.createElement('style')
     style.textContent = `
-    body {
-      overflow: hidden;
+    * {
+      visibility: hidden;
     }
-    #biliMainHeader, #app {
-      display: none!important;
+    html, body {
+      overflow-x: hidden;
+      visibility: visible;
+    }
+    body .geetest_panel.geetest_wind, body .geetest_panel.geetest_wind * {
+      visibility: visible;
     }
     body .geetest_wind.geetest_panel .geetest_panel_ghost {
       display: none;
@@ -60,8 +65,10 @@ function __$hack(dark: boolean) {
     let ready = false
     setInterval(() => {
       const captcha = document.querySelector('.geetest_wind.geetest_panel')
+
       if (captcha) {
         if (!ready) {
+          ready = true
           // @ts-ignore
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
@@ -69,7 +76,6 @@ function __$hack(dark: boolean) {
               payload: document.cookie,
             }),
           )
-          ready = true
         }
       } else {
         window.scrollTo(0, 100000)
@@ -79,6 +85,12 @@ function __$hack(dark: boolean) {
         //   document.cookie = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
         // }
         if (ready || Date.now() - time > 10000) {
+          // window.ReactNativeWebView.postMessage(
+          //   JSON.stringify({
+          //     action: 'print',
+          //     payload: '111' + captcha + '-' + ready,
+          //   }),
+          // )
           // @ts-ignore
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
@@ -90,7 +102,7 @@ function __$hack(dark: boolean) {
       }
       // if (timeout || document.cookie.includes('x-bili-gaia-vtoken=')) {
       // }
-    }, 100)
+    }, 2000)
   }
   // document.cookie = ''
   if (document.readyState !== 'loading') {
@@ -101,10 +113,6 @@ function __$hack(dark: boolean) {
     })
   }
 }
-
-const styles = StyleSheet.create({
-  container: {},
-})
 
 export default () => {
   const webviewRef = React.useRef<WebView | null>(null)
@@ -121,48 +129,47 @@ export default () => {
   }, [showCaptcha])
   const dark = useIsDark()
   const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`
-  const webview = React.useMemo(() => {
-    return (
-      <WebView
-        style={{ flex: 1 }}
-        source={{ uri: url }}
-        key={url + showCaptcha}
-        originWhitelist={['http://*', 'https://*', 'bilibili://*']}
-        injectedJavaScriptForMainFrameOnly
-        injectedJavaScript={`(${__$hack})(${dark});true;`}
-        ref={webviewRef}
-        userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.1774.57 Safari/537.36 Edg/113.0.1774.57"
-        onMessage={evt => {
-          const data = JSON.parse(evt.nativeEvent.data) as {
-            action: string
-            payload: any
-          }
-          if (data.action === 'cookie') {
-            store.cookie =
-              data.payload + '; DedeUserID=' + (store.$userInfo?.mid || TracyId)
-            store.showCaptcha = false
-            __DEV__ && console.log('cookie: ', store.cookie)
-          } else if (data.action === 'ready') {
-            setReady(true)
-          } else if (data.action === 'print') {
-            console.log('print', data.payload)
-          }
-        }}
-        onShouldStartLoadWithRequest={request => {
-          if (request.url.startsWith('bilibili://')) {
-            return false
-          }
-          if (request.url.includes('.apk')) {
-            return false
-          }
-          return true
-        }}
-      />
-    )
-  }, [url, dark, showCaptcha])
+  const webview = (
+    <WebView
+      style={{ flex: 1 }}
+      source={{ uri: url }}
+      key={url + showCaptcha}
+      originWhitelist={['http://*', 'https://*']}
+      injectedJavaScriptForMainFrameOnly
+      injectedJavaScript={`(${__$hack})(${dark});true;`}
+      ref={webviewRef}
+      userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.1774.57 Safari/537.36 Edg/113.0.1774.57"
+      onMessage={evt => {
+        const data = JSON.parse(evt.nativeEvent.data) as {
+          action: string
+          payload: any
+        }
+        // console.log(333, data.action)
+        if (data.action === 'cookie') {
+          store.cookie =
+            data.payload + '; DedeUserID=' + (store.$userInfo?.mid || TracyId)
+          store.showCaptcha = false
+          __DEV__ && console.log('cookie: ', store.cookie)
+        } else if (data.action === 'ready') {
+          setReady(true)
+        } else if (data.action === 'print') {
+          console.log('print', data.payload)
+        }
+      }}
+      onShouldStartLoadWithRequest={request => {
+        if (request.url.startsWith('bilibili://')) {
+          return false
+        }
+        if (request.url.includes('.apk')) {
+          return false
+        }
+        return true
+      }}
+    />
+  )
   return (
     <Dialog isVisible={showCaptcha}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={styles.container}>
         <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍后...'} />
         <Icon
           name="close"
@@ -182,9 +189,9 @@ export default () => {
           }}
         />
       </View>
-
+      {/* <View style={{ height: 300 }}>{webview}</View> */}
       {ready ? (
-        <View style={[styles.container, { height: 310 }]}>{webview}</View>
+        <View style={styles.webview}>{webview}</View>
       ) : (
         <View style={{}}>
           {webview}
@@ -192,10 +199,16 @@ export default () => {
             color="#00AEEC"
             animating
             size={'large'}
-            style={{ marginVertical: 40 }}
+            style={styles.loading}
           />
         </View>
       )}
     </Dialog>
   )
 }
+
+const styles = StyleSheet.create({
+  container: { flexDirection: 'row', justifyContent: 'space-between' },
+  loading: { marginVertical: 40 },
+  webview: { height: 310 },
+})

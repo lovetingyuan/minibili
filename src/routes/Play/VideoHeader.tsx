@@ -5,7 +5,6 @@ import { View, Pressable, StyleSheet, ToastAndroid } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { NavigationProps } from '../../types'
 import { handleShareVideo, parseDate, parseNumber } from '../../utils'
-import useMounted from '../../hooks/useMounted'
 import VideoInfoContext from './videoContext'
 
 export default function VideoHeader() {
@@ -17,16 +16,7 @@ export default function VideoHeader() {
     ...video2,
   }
   const { name, face, mid, pubDate, pubTime, title } = videoInfo
-  const [nameTextKey, setNameTextKey] = React.useState('-')
   // const routes = useNavigationState(state => state.routes)
-
-  useMounted(() => {
-    for (let i = 0; i < 2; i++) {
-      setTimeout(() => {
-        setNameTextKey('--' + Math.random())
-      }, (i + 1) * 100)
-    }
-  })
   return (
     <View style={styles.videoHeader}>
       <Pressable
@@ -34,7 +24,6 @@ export default function VideoHeader() {
           if (!mid || !face || !name) {
             return
           }
-          // const prevRoute = routes[routes.length - 2]
           const user = {
             mid,
             face,
@@ -42,27 +31,10 @@ export default function VideoHeader() {
             sign: '-',
           }
           navigation.push('Dynamic', { user })
-
-          // if (prevRoute && prevRoute.name === 'Dynamic') {
-          //   const same = (prevRoute.params as any)?.user.mid === mid
-          //   if (same) {
-          //     navigation.goBack()
-          //   } else {
-          //     navigation.push('Dynamic', { user })
-          //   }
-          // } else {
-          //   navigation.navigate('Dynamic', {
-          //     user,
-          //   })
-          // }
         }}
         style={styles.upInfoContainer}>
         <Avatar size={32} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
-        <Text
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          style={styles.upName}
-          key={nameTextKey}>
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.upName}>
           {name + ' '}
         </Text>
       </Pressable>

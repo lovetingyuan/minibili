@@ -69,20 +69,20 @@ export default function Follow({ navigation, route }: Props) {
     }
   }, [livingError])
   React.useEffect(() => {
-    livingMap &&
+    if (livingMap) {
+      const livingMap2: Record<string, string> = {}
       Object.keys(livingMap).forEach(mid => {
         // https://live.bilibili.com/h5/24446464
         const { live_status, room_id } = livingMap[mid]
         const living = live_status === 1
         const url = 'https://live.bilibili.com/h5/' + room_id
-
-        if (!!store.livingUps[mid] !== living) {
-          store.livingUps[mid] = living ? url : ''
-          if (living) {
-            vibrate()
-          }
+        livingMap2[mid] = living ? url : ''
+        if (living) {
+          vibrate()
         }
       })
+      store.livingUps = livingMap2
+    }
   }, [livingMap])
   const columns = Math.floor(width / 90)
   const rest = columns - (data?.list.length ? data.list.length % columns : 0)

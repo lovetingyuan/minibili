@@ -6,19 +6,20 @@ import {
   Share,
   ScrollView,
   View,
+  Image,
 } from 'react-native'
 import { StyleSheet } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
 
 import store, { useStore } from '../../store'
 import {
-  Card,
   Chip,
   ListItem,
   Button,
   Icon,
   Text,
   useTheme,
+  Divider,
 } from '@rneui/themed'
 import {
   checkUpdate as checkUpdateApi,
@@ -114,167 +115,220 @@ export default function About({
   }
   return (
     <ScrollView style={styles.container}>
-      <Card>
-        <Card.FeaturedTitle>
-          <Text
-            onPress={() => {
-              Linking.openURL(site)
-            }}
-            style={styles.appName}>
-            MiniBili{' '}
-          </Text>
-        </Card.FeaturedTitle>
-        <Card.FeaturedSubtitle style={{ borderWidth: 0 }}>
-          <ListItem
-            containerStyle={{
-              padding: 0,
-              paddingBottom: 10,
-            }}>
-            <ListItem.Content>
-              <ListItem.Title style={{ fontSize: 18 }}>
-                一款简单的B站浏览App
-              </ListItem.Title>
-            </ListItem.Content>
-            <Icon
-              name="github"
-              type="material-community"
-              size={20}
-              color={theme.colors.grey1}
+      <View style={{ marginBottom: 10, flex: 1, alignItems: 'center' }}>
+        <Image
+          source={require('../../../assets/minibili.png')}
+          style={{ width: 300, height: 90 }}
+        />
+      </View>
+      <View style={styles.infoItem}>
+        <Text style={{ fontSize: 18 }}>一款简单的B站浏览App</Text>
+        <Icon
+          name="github"
+          type="material-community"
+          size={20}
+          color={theme.colors.grey1}
+          onPress={() => {
+            Linking.openURL(githubLink)
+          }}
+        />
+      </View>
+      <Divider style={{ marginBottom: 10 }} />
+      <View style={styles.infoItem}>
+        <Text
+          style={{ fontSize: 16 }}
+          onPress={() => {
+            Alert.alert(
+              '版本信息',
+              [
+                `当前版本：${currentVersion} (${
+                  Constants.expoConfig?.extra?.gitHash || '-'
+                })`,
+                `更新时间：${Updates.createdAt?.toLocaleDateString()} ${Updates.createdAt?.toLocaleTimeString()}`,
+                `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
+                Updates.updateId && `更新ID: ${Updates.updateId}`,
+              ]
+                .filter(Boolean)
+                .join('\n'),
+            )
+          }}>
+          当前版本：{currentVersion}
+        </Text>
+        <Button
+          type="clear"
+          size="sm"
+          loading={checkingUpdate}
+          onPress={() => {
+            checkUpdate()
+          }}>
+          {hasUpdate === false ? '暂无更新' : '检查更新'}
+        </Button>
+      </View>
+      <View style={styles.infoItem}>
+        <Text
+          style={{ fontSize: 16 }}
+          onPress={() => {
+            $userInfo?.mid &&
+              Clipboard.setStringAsync($userInfo.mid + '').then(() => {
+                ToastAndroid.show('已复制用户ID', ToastAndroid.SHORT)
+              })
+          }}>
+          当前用户ID：{$userInfo?.mid}
+        </Text>
+        <Button type="clear" size="sm" onPress={handleLogOut}>
+          退出
+        </Button>
+      </View>
+      <View style={styles.infoItem}>
+        <Text
+          style={{ fontSize: 16 }}
+          onPress={() => {
+            Alert.alert(
+              '版本信息',
+              [
+                `当前版本：${currentVersion} (${
+                  Constants.expoConfig?.extra?.gitHash || '-'
+                })`,
+                `更新时间：${Updates.createdAt?.toLocaleDateString()} ${Updates.createdAt?.toLocaleTimeString()}`,
+                `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
+                Updates.updateId && `更新ID: ${Updates.updateId}`,
+              ]
+                .filter(Boolean)
+                .join('\n'),
+            )
+          }}>
+          欢迎分享本应用 ❤
+        </Text>
+        <Button type="clear" size="sm" onPress={handleShare}>
+          分享
+        </Button>
+      </View>
+
+      <ListItem.Accordion
+        containerStyle={[styles.blackTitle]}
+        content={
+          <ListItem.Content>
+            <ListItem.Title style={{ fontWeight: 'bold' }}>声明</ListItem.Title>
+          </ListItem.Content>
+        }
+        isExpanded={expandedStatement}
+        onPress={() => {
+          setExpandedStatement(!expandedStatement)
+        }}>
+        <ListItem containerStyle={[styles.statementContent]}>
+          <ListItem.Subtitle right style={{ color: theme.colors.black }}>
+            🔈本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题可在
+            <Text
+              style={{ color: theme.colors.primary }}
               onPress={() => {
                 Linking.openURL(githubLink)
-              }}
-            />
-          </ListItem>
-        </Card.FeaturedSubtitle>
-        <Card.Divider />
-
-        <ListItem containerStyle={{ padding: 0, marginBottom: 5 }}>
-          <ListItem.Content>
-            <ListItem.Title
-              right
-              style={{ color: theme.colors.black }}
-              onPress={() => {
-                Alert.alert(
-                  '版本信息',
-                  [
-                    `当前版本：${currentVersion} (${
-                      Constants.expoConfig?.extra?.gitHash || '-'
-                    })`,
-                    `更新时间：${Updates.createdAt?.toLocaleDateString()} ${Updates.createdAt?.toLocaleTimeString()}`,
-                    `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
-                    Updates.updateId && `更新ID: ${Updates.updateId}`,
-                    store.cookie,
-                  ]
-                    .filter(Boolean)
-                    .join('\n'),
-                )
               }}>
-              当前版本：{currentVersion}
-            </ListItem.Title>
-          </ListItem.Content>
-          <Button
-            type="clear"
-            size="sm"
-            loading={checkingUpdate}
-            onPress={() => {
-              checkUpdate()
-            }}>
-            {hasUpdate === false ? '暂无更新' : '检查更新'}
-          </Button>
+              {' Github '}
+            </Text>
+            中提出）
+            <Text>{'\n'}⚠️ 切勿频繁刷新数据！</Text>
+          </ListItem.Subtitle>
         </ListItem>
-        <ListItem containerStyle={{ padding: 0, marginBottom: 5 }}>
+      </ListItem.Accordion>
+      <Divider style={{ marginBottom: 10 }} />
+      <ListItem.Accordion
+        containerStyle={styles.blackTitle}
+        content={
           <ListItem.Content>
-            <ListItem.Title
-              right
-              style={{ color: theme.colors.black }}
-              onPress={() => {
-                $userInfo?.mid &&
-                  Clipboard.setStringAsync($userInfo.mid + '').then(() => {
-                    ToastAndroid.show('已复制用户ID', ToastAndroid.SHORT)
-                  })
-              }}>
-              当前用户ID：{$userInfo?.mid}
+            <ListItem.Title>
+              不感兴趣的分类（{Object.keys($blackTags).length}）
             </ListItem.Title>
           </ListItem.Content>
-          <Button type="clear" size="sm" onPress={handleLogOut}>
-            退出
-          </Button>
+        }
+        isExpanded={expanded}
+        onPress={() => {
+          setExpanded(!expanded)
+        }}>
+        <ListItem containerStyle={[styles.blackContent]}>
+          {/* <View> */}
+          {Object.values($blackTags).map(tag => {
+            return (
+              <Chip
+                title={tag}
+                key={tag}
+                type="outline"
+                icon={{
+                  name: 'close',
+                  type: 'Ionicons',
+                  size: 18,
+                  color: '#666',
+                  onPress: () => {
+                    delete store.$blackTags[tag]
+                  },
+                }}
+                iconRight
+                titleStyle={{ textAlign: 'left' }}
+                containerStyle={{
+                  marginBottom: 7,
+                  alignSelf: 'flex-start',
+                }}
+                buttonStyle={{
+                  padding: 0,
+                  paddingVertical: 2,
+                }}
+              />
+            )
+          })}
+          {/* </View> */}
+          {Object.values($blackTags).length === 0 ? <Text>无</Text> : null}
         </ListItem>
-        <ListItem containerStyle={{ padding: 0, marginBottom: 5 }}>
+      </ListItem.Accordion>
+      <ListItem.Accordion
+        containerStyle={styles.blackTitle}
+        content={
           <ListItem.Content>
-            <ListItem.Title right style={{ color: theme.colors.black }}>
-              欢迎分享本应用 ❤
+            <ListItem.Title>
+              不喜欢的UP（{Object.keys($blackUps).length}）
             </ListItem.Title>
           </ListItem.Content>
-          <Button type="clear" size="sm" onPress={handleShare}>
-            分享
-          </Button>
+        }
+        isExpanded={expandedUp}
+        onPress={() => {
+          setExpandedUp(!expandedUp)
+        }}>
+        <ListItem containerStyle={[styles.blackContent, { marginBottom: 10 }]}>
+          {Object.values($blackUps).map(name => {
+            return (
+              <Text key={name} style={{ color: theme.colors.grey3 }}>
+                {name}
+              </Text>
+            )
+          })}
+          {Object.values($blackUps).length === 0 ? <Text>无</Text> : null}
         </ListItem>
-        <ListItem.Accordion
-          containerStyle={styles.blackTitle}
-          content={
-            <ListItem.Content>
-              <ListItem.Title>声明</ListItem.Title>
-            </ListItem.Content>
-          }
-          isExpanded={expandedStatement}
-          onPress={() => {
-            setExpandedStatement(!expandedStatement)
-          }}>
-          <ListItem containerStyle={styles.statementContent}>
-            <ListItem.Subtitle right style={{ color: theme.colors.black }}>
-              本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题可在
-              <Text
-                style={{ color: theme.colors.primary }}
-                onPress={() => {
-                  Linking.openURL(githubLink)
-                }}>
-                {' Github '}
-              </Text>
-              中提出）
-              <Text style={{ fontWeight: 'bold' }}>
-                {'\n'}⚠️ 切勿频繁刷新数据！
-              </Text>
-            </ListItem.Subtitle>
-          </ListItem>
-        </ListItem.Accordion>
-        <Card.Divider />
-        <ListItem.Accordion
-          containerStyle={styles.blackTitle}
-          content={
-            <ListItem.Content>
-              <ListItem.Title>
-                不感兴趣的分类（{Object.keys($blackTags).length}）
-              </ListItem.Title>
-            </ListItem.Content>
-          }
-          isExpanded={expanded}
-          onPress={() => {
-            setExpanded(!expanded)
-          }}>
-          <ListItem containerStyle={[styles.blackContent]}>
-            {/* <View> */}
-            {Object.values($blackTags).map(tag => {
+      </ListItem.Accordion>
+      <ListItem.Accordion
+        containerStyle={styles.blackTitle}
+        content={
+          <ListItem.Content>
+            <ListItem.Title>调整分区顺序</ListItem.Title>
+          </ListItem.Content>
+        }
+        isExpanded={expandedCate}
+        onPress={() => {
+          setExpandedCate(!expandedCate)
+        }}>
+        <ListItem containerStyle={styles.blackContent}>
+          <View style={styles.sortedCates}>
+            {sortedRankList.map(cate => {
               return (
                 <Chip
-                  title={tag}
-                  key={tag}
+                  title={cate.label}
+                  key={cate.rid}
                   type="outline"
-                  icon={{
-                    name: 'close',
-                    type: 'Ionicons',
-                    size: 18,
-                    color: '#666',
-                    onPress: () => {
-                      delete store.$blackTags[tag]
-                    },
+                  onPress={() => {
+                    const a = sortedRankList.filter(v => v.rid !== cate.rid)
+                    const b = unsortedRankList.concat(cate)
+                    setSortedRankList(a)
+                    setUnSortedRankList(b)
+                    store.$ranksList = [$ranksList[0], ...a, ...b]
                   }}
-                  iconRight
-                  titleStyle={{ textAlign: 'left' }}
-                  containerStyle={{
-                    marginBottom: 7,
-                    alignSelf: 'flex-start',
-                  }}
+                  containerStyle={{ marginBottom: 8 }}
                   buttonStyle={{
                     padding: 0,
                     paddingVertical: 2,
@@ -282,102 +336,45 @@ export default function About({
                 />
               )
             })}
-            {/* </View> */}
-            {Object.values($blackTags).length === 0 ? <Text>无</Text> : null}
-          </ListItem>
-        </ListItem.Accordion>
-        <ListItem.Accordion
-          containerStyle={styles.blackTitle}
-          content={
-            <ListItem.Content>
-              <ListItem.Title>
-                不喜欢的UP（{Object.keys($blackUps).length}）
-              </ListItem.Title>
-            </ListItem.Content>
-          }
-          isExpanded={expandedUp}
-          onPress={() => {
-            setExpandedUp(!expandedUp)
-          }}>
-          <ListItem containerStyle={styles.blackContent}>
-            {Object.values($blackUps).map(name => {
+            {sortedRankList.length === 0 && (
+              <Text style={{ flex: 1, marginBottom: 5 }}>
+                {' '}
+                点击名称调整顺序
+              </Text>
+            )}
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              columnGap: 10,
+              marginTop: 20,
+            }}>
+            {unsortedRankList.map(cate => {
               return (
-                <Text key={name} style={{ color: theme.colors.grey3 }}>
-                  {name}
-                </Text>
+                <Chip
+                  title={cate.label}
+                  key={cate.rid}
+                  type="outline"
+                  onPress={() => {
+                    const a = sortedRankList.concat(cate)
+                    const b = unsortedRankList.filter(v => v.rid !== cate.rid)
+                    setSortedRankList(a)
+                    setUnSortedRankList(b)
+                    store.$ranksList = [$ranksList[0], ...a, ...b]
+                  }}
+                  containerStyle={{ marginBottom: 8 }}
+                  buttonStyle={{
+                    padding: 0,
+                    paddingVertical: 2,
+                  }}
+                />
               )
             })}
-            {Object.values($blackUps).length === 0 ? <Text>无</Text> : null}
-          </ListItem>
-        </ListItem.Accordion>
-        <ListItem.Accordion
-          containerStyle={styles.blackTitle}
-          content={
-            <ListItem.Content>
-              <ListItem.Title>调整分区顺序</ListItem.Title>
-            </ListItem.Content>
-          }
-          isExpanded={expandedCate}
-          onPress={() => {
-            setExpandedCate(!expandedCate)
-          }}>
-          <ListItem containerStyle={styles.blackContent}>
-            <View style={styles.sortedCates}>
-              {sortedRankList.map(cate => {
-                return (
-                  <Chip
-                    title={cate.label}
-                    key={cate.rid}
-                    type="outline"
-                    onPress={() => {
-                      const a = sortedRankList.filter(v => v.rid !== cate.rid)
-                      const b = unsortedRankList.concat(cate)
-                      setSortedRankList(a)
-                      setUnSortedRankList(b)
-                      store.$ranksList = [$ranksList[0], ...a, ...b]
-                    }}
-                    containerStyle={{ marginBottom: 8 }}
-                    buttonStyle={{
-                      padding: 0,
-                      paddingVertical: 2,
-                    }}
-                  />
-                )
-              })}
-              {sortedRankList.length === 0 && (
-                <Text style={{ flex: 1, marginBottom: 5 }}>
-                  {' '}
-                  点击名称调整顺序
-                </Text>
-              )}
-            </View>
-            <View
-              style={{ flexDirection: 'row', flexWrap: 'wrap', columnGap: 10 }}>
-              {unsortedRankList.map(cate => {
-                return (
-                  <Chip
-                    title={cate.label}
-                    key={cate.rid}
-                    type="outline"
-                    onPress={() => {
-                      const a = sortedRankList.concat(cate)
-                      const b = unsortedRankList.filter(v => v.rid !== cate.rid)
-                      setSortedRankList(a)
-                      setUnSortedRankList(b)
-                      store.$ranksList = [$ranksList[0], ...a, ...b]
-                    }}
-                    containerStyle={{ marginBottom: 8 }}
-                    buttonStyle={{
-                      padding: 0,
-                      paddingVertical: 2,
-                    }}
-                  />
-                )
-              })}
-            </View>
-          </ListItem>
-        </ListItem.Accordion>
-      </Card>
+          </View>
+        </ListItem>
+      </ListItem.Accordion>
+      <View style={{ height: 40 }} />
     </ScrollView>
   )
 }
@@ -385,7 +382,13 @@ export default function About({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginBottom: 15,
+    padding: 20,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -413,12 +416,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     marginTop: 5,
     marginBottom: 10,
+    backgroundColor: 'transparent',
   },
   blackContent: {
     flexWrap: 'wrap',
     padding: 0,
     flexDirection: 'row',
     paddingHorizontal: 5,
+    backgroundColor: 'transparent',
     // paddingBottom: 10,
     // paddingHorizontal: 10,
   },
@@ -426,6 +431,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingHorizontal: 10,
     marginBottom: 20,
+    backgroundColor: 'transparent',
   },
   buildTime: {
     textAlign: 'right',
@@ -438,7 +444,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     borderBottomWidth: 0.5,
     borderBottomColor: '#888',
-    marginBottom: 10,
+    // marginBottom: ,
     flex: 1,
     flexGrow: 1,
     width: '100%',

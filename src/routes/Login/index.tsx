@@ -1,8 +1,7 @@
 import React from 'react'
-import { Button, Card, Input } from '@rneui/themed'
+import { Button, Card, Input, Text } from '@rneui/themed'
 import {
   View,
-  Text,
   Image,
   Linking,
   StyleSheet,
@@ -17,11 +16,13 @@ import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
 
 import { reportUserLogin } from '../../utils/report'
-import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
+import { useNavigation } from '@react-navigation/native'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
+
+// type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 export default function Login() {
   const inputUserIdRef = React.useRef('')
@@ -72,7 +73,7 @@ export default function Login() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}>
-      <ScrollView style={{ backgroundColor: '#ededed' }}>
+      <ScrollView>
         <View
           style={{
             marginHorizontal: 20,
@@ -96,7 +97,7 @@ export default function Login() {
                 selectable>
                 {'\n'}https://space.bilibili.com/{'\n'}
               </Text>
-              然后在浏览器地址栏查找并输入你的B站ID(uid)
+              然后在浏览器地址栏查找并在下方输入你的B站ID(uid)
             </Text>
           </View>
           <Card.Divider />
@@ -115,6 +116,14 @@ export default function Login() {
             </Text>
             ）
           </Text>
+          <Button
+            title={'视频帮助'}
+            onPress={() => {
+              navigation.navigate('Play', {
+                bvid: 'BV1p54y1X7SH',
+              })
+            }}
+          />
           <Image
             source={require('../../../assets/login-example.png')}
             resizeMode="contain"

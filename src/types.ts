@@ -19,11 +19,8 @@ export type RootStackParamList = {
   Main: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
   Play: {
-    // from?: {
-    //   mid: string | number
-    // }
     bvid: string
-    video: VideoInfo
+    video?: VideoInfo
   }
   Dynamic?: {
     from?: string

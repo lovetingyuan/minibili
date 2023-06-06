@@ -15,10 +15,12 @@ import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
 import { isWifi, parseDuration } from '../../utils'
+import { useFocusEffect } from '@react-navigation/native'
 
 // import { useStore } from '../../store'
 import { Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
+import useMemoizedFn from '../../hooks/useMemoizedFn'
 
 function VideoPlayer(props: { wifi: boolean }) {
   const { wifi } = props
@@ -29,6 +31,16 @@ function VideoPlayer(props: { wifi: boolean }) {
   const playStateRef = React.useRef('')
   const { data: video2, error } = useVideoInfo(bvid)
   const [loadPlayer, setLoadPlayer] = React.useState(wifi)
+  const loadingErrorRef = React.useRef(false)
+  const webviewRef = React.useRef<WebView | null>(null)
+  useFocusEffect(
+    useMemoizedFn(() => {
+      if (loadingErrorRef.current && webviewRef.current) {
+        loadingErrorRef.current = false
+        webviewRef.current.reload()
+      }
+    }),
+  )
   const videoInfo = {
     ...video,
     ...video2,
@@ -106,6 +118,7 @@ function VideoPlayer(props: { wifi: boolean }) {
       source={{
         uri: `${playUrl}?${search}`,
       }}
+      ref={webviewRef}
       originWhitelist={['https://*', 'bilibili://*']}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
@@ -117,6 +130,7 @@ function VideoPlayer(props: { wifi: boolean }) {
       onMessage={handleMessage}
       onError={() => {
         ToastAndroid.show('加载失败', ToastAndroid.SHORT)
+        loadingErrorRef.current = true
       }}
       onShouldStartLoadWithRequest={request => {
         // Only allow navigating within this website

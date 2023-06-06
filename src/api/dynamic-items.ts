@@ -21,7 +21,7 @@ import {
   MajorTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
-import { parseUrl } from '../utils'
+import { delay, parseUrl } from '../utils'
 import { TracyId } from '../constants'
 
 type OmitUndef<T> = {
@@ -543,11 +543,17 @@ export function useHasUpdate(mid: number | string) {
   return ''
 }
 
-export async function checkDynamicsApi() {
-  const { offset } = await request<DynamicListResponse>(
+function _checkDynamicsApi() {
+  return request<DynamicListResponse>(
     `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${TracyId}&timezone_offset=-480`,
   )
-  await request<DynamicListResponse>(
-    `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${TracyId}&timezone_offset=-480`,
-  )
+  // await request<DynamicListResponse>(
+  //   `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${TracyId}&timezone_offset=-480`,
+  // )
+}
+
+export function checkDynamicsApi() {
+  return _checkDynamicsApi()
+    .catch(() => delay(1000))
+    .then(() => _checkDynamicsApi())
 }

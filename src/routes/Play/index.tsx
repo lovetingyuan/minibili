@@ -39,6 +39,7 @@ const PlayPage = ({ route, navigation }: Props) => {
   const videoInfo = {
     ...video,
     ...video2,
+    bvid,
   }
   React.useEffect(() => {
     videoInfo.name &&
@@ -53,15 +54,27 @@ const PlayPage = ({ route, navigation }: Props) => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
-
-  // if (!videoInfo.aid || !videoInfo.name) {
+  if (!videoInfo.name) {
+    return null
+  }
+  if (!videoInfo.aid) {
+    return null
+  }
+  // if (
+  //   typeof videoInfo.aid !== 'string' ||
+  //   typeof videoInfo.name !== 'string' ||
+  //   typeof videoInfo.bvid !== 'string'
+  // ) {
   //   return null
   // }
+  if (typeof videoInfo.name !== 'string') {
+    return null
+  }
   return (
     <VideoInfoContext.Provider
       value={{
         bvid,
-        video: videoInfo,
+        video: videoInfo as any, // what the fuck!!!
         page: currentPage,
       }}>
       <View style={styles.container}>
