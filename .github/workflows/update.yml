@@ -36,3 +36,6 @@ jobs:
 
       - name: Publish update
         run: eas update --auto
+
+      - name: Done
+        run: echo "Build done!"
