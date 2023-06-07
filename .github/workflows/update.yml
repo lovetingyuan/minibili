@@ -1,5 +1,8 @@
 name: update
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   update:
@@ -37,5 +40,5 @@ jobs:
       - name: Publish update
         run: eas update --auto
 
-      - name: Done
+      - name: Publish update
         run: echo "Build done!"
