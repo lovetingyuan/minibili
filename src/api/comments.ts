@@ -85,6 +85,14 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
     .map(item => {
       return {
         message: parseMessage(item.content),
+        images: item.content.pictures?.map(img => {
+          return {
+            src: img.img_src,
+            width: img.img_width,
+            height: img.img_height,
+            ratio: img.img_width / img.img_height,
+          }
+        }),
         name: item.member.uname,
         mid: item.member.mid,
         face: item.member.avatar,
@@ -122,6 +130,14 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
     const item = res1.top.upper
     replies.unshift({
       message: parseMessage(item.content),
+      images: item.content.pictures?.map(img => {
+        return {
+          src: img.img_src,
+          width: img.img_width,
+          height: img.img_height,
+          ratio: img.img_width / img.img_height,
+        }
+      }),
       name: item.member.uname,
       face: item.member.avatar,
       id: item.rpid_str,

@@ -454,15 +454,13 @@ const getDynamicItem = (item: DynamicItemResponse) => {
 }
 
 export function useDynamicItems(mid?: string | number) {
-  const { cookie } = useStore()
-  // console.log(123432411, cookie)
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<DynamicListResponse>(
       (offset, response) => {
         if (response && (!response.has_more || !response.items.length)) {
           return null
         }
-        if (!mid || !cookie) {
+        if (!mid) {
           return null
         }
         // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=14427395&timezone_offset=-480&features=itemOpusStyle

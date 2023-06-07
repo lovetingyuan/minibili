@@ -5,9 +5,12 @@ import { HandledAdditionalTypeEnum } from '../api/dynamic-items.type'
 import { Image } from 'expo-image'
 import { parseDate, parseNumber, parseUrl } from '../utils'
 import { Text } from '@rneui/themed'
+import { useNavigation } from '@react-navigation/native'
+import { NavigationProps } from '../types'
 
 export const Additional = (props: { additional?: AdditionalType | null }) => {
   const { additional } = props
+  const navigation = useNavigation<NavigationProps['navigation']>()
   if (!additional) {
     return null
   }
@@ -138,6 +141,15 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
   const linkProp = url
     ? {
         onPress: () => {
+          if (
+            additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UGC
+          ) {
+            const bvid = url.match(/\/(BV[0-9a-zA-Z]+)\//)?.[1]
+            if (bvid) {
+              navigation.push('Play', { bvid })
+              return
+            }
+          }
           Linking.openURL(parseUrl(url))
         },
       }

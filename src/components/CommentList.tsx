@@ -40,7 +40,6 @@ const CommentList: React.FC<{
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)
   const { theme } = useTheme()
-
   return (
     <View>
       <View style={styles.divider}>

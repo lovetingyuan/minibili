@@ -26,6 +26,9 @@ import { checkWifi } from '../../utils'
 import useMounted from '../../hooks/useMounted'
 import VideoInfoContext from './videoContext'
 import HeaderRight from './HeaderRight'
+import { useFocusEffect } from '@react-navigation/native'
+import useMemoizedFn from '../../hooks/useMemoizedFn'
+import { setViewingVideoId } from '../../utils/report'
 // import { useStore } from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
@@ -54,6 +57,14 @@ const PlayPage = ({ route, navigation }: Props) => {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
+  useFocusEffect(
+    useMemoizedFn(() => {
+      setViewingVideoId(bvid)
+      return () => {
+        setViewingVideoId(null)
+      }
+    }),
+  )
   if (!videoInfo.name) {
     return null
   }

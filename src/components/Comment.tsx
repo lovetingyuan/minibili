@@ -5,6 +5,7 @@ import { Button, Text, useTheme } from '@rneui/themed'
 import useIsDark from '../hooks/useIsDark'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
+import store from '../store'
 
 interface Props {
   upName: string
@@ -76,7 +77,7 @@ function CommentText(props: {
           )
         }
         return (
-          <Text selectable key={idStr + i}>
+          <Text style={style} selectable key={idStr + i}>
             {node.text}
           </Text>
         )
@@ -113,7 +114,6 @@ export default function Comment(props: Props) {
                   sign: comment.sign || '-',
                 },
               })
-              // Linking.openURL('https://m.bilibili.com/space/' + comment.mid)
             }}>
             {comment.name}
           </Text>
@@ -131,6 +131,16 @@ export default function Comment(props: Props) {
           ) : null}
           ：
         </Text>
+        {comment.top ? (
+          <>
+            <Text> </Text>
+            <Image
+              source={require('../../assets/top.png')}
+              style={{ width: 24, height: 15, marginLeft: 5 }}
+            />
+            <Text> </Text>
+          </>
+        ) : null}
         <CommentText
           nodes={comment.message}
           style={[
@@ -142,6 +152,18 @@ export default function Comment(props: Props) {
         />
         {comment.like ? (
           <Text style={styles.likeNum}> {comment.like}</Text>
+        ) : null}
+        {comment.images?.length ? (
+          <Text
+            style={{ color: theme.colors.primary }}
+            onPress={() => {
+              if (comment.images) {
+                store.imagesList = comment.images
+                store.currentImageIndex = 0
+              }
+            }}>
+            {'  '}查看图片
+          </Text>
         ) : null}
       </Text>
       {comment.replies?.length ? (
@@ -234,6 +256,7 @@ const styles = StyleSheet.create({
   top: {
     color: '#00699D',
     fontWeight: 'bold',
+    // textDecorationLine: 'underline',
   },
   upLike: {
     color: '#4f7d00',
@@ -277,6 +300,7 @@ const styles = StyleSheet.create({
   },
   pinkName: {
     color: '#FF6699',
+    fontWeight: 'bold',
   },
   moreButton: {
     justifyContent: 'flex-start',

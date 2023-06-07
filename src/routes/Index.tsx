@@ -27,6 +27,7 @@ import ThemeResponse from '../components/ThemeResponse'
 import ButtonsOverlay from '../components/ButtonsOverlay'
 import CookieProxy from '../components/CookieProxy'
 import { setScreenTag } from '../utils/report'
+import ImagesView from '../components/ImagesView'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -107,6 +108,7 @@ export default () => {
         <ThemeResponse />
         <ButtonsOverlay />
         <CookieProxy />
+        <ImagesView />
         <NavigationContainer theme={MyTheme}>
           <Stack.Navigator
             initialRouteName="Main"

@@ -144,7 +144,6 @@ export default () => {
           action: string
           payload: any
         }
-        // console.log(333, data.action)
         if (data.action === 'cookie') {
           store.cookie =
             data.payload + '; DedeUserID=' + (store.$userInfo?.mid || TracyId)

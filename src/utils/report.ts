@@ -10,6 +10,9 @@ export enum Tags {
   user_action = 'user.action',
   stack_route_name = 'route.stack',
   tab_route_name = 'route.tab',
+  set_up_mid = 'up.mid',
+  set_bvid = 'video.id',
+  set_dynamic_id = 'dynamic.id',
 }
 
 export enum Action {
@@ -127,4 +130,16 @@ export function setScreenTag(name: string, type: 'tab' | 'stack') {
     type === 'tab' ? Tags.tab_route_name : Tags.stack_route_name,
     name,
   )
+}
+
+export function setViewingUpMid(mid: string | number | null) {
+  SentryExpo.Native.setTag(Tags.set_up_mid, mid)
+}
+
+export function setViewingVideoId(bvid: string | null) {
+  SentryExpo.Native.setTag(Tags.set_bvid, bvid)
+}
+
+export function setViewingDynamicId(id: string | null) {
+  SentryExpo.Native.setTag(Tags.set_dynamic_id, id)
 }

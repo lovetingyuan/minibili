@@ -42,6 +42,17 @@ const ContentSchema = z.object({
       }),
     )
     .nullish(),
+  picture_scale: z.number().nullish(),
+  pictures: z
+    .object({
+      img_src: z.string(),
+      img_width: z.number(),
+      img_height: z.number(),
+      img_size: z.number(),
+      // play_gif_thumbnail: true,
+    })
+    .array()
+    .nullish(),
 })
 
 const BaseReplySchema = z.object({

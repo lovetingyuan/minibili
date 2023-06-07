@@ -9,6 +9,9 @@ import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import DynamicItem from './DynamicItem'
 import { useUserInfo } from '../../api/user-info'
+import { useFocusEffect } from '@react-navigation/native'
+import useMemoizedFn from '../../hooks/useMemoizedFn'
+import { setViewingUpMid } from '../../utils/report'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -70,6 +73,24 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     ...route.params?.user,
     ...userInfo,
   }
+  useFocusEffect(
+    useMemoizedFn(() => {
+      upId && setViewingUpMid(upId)
+      return () => {
+        setViewingUpMid(null)
+      }
+    }),
+  )
+  // React.useEffect(() => {
+  //   const unsubscribe2 = navigation.addListener('focus', () => {
+  //     console.log('进入路由')
+  //   })
+
+  //   return () => {
+  //     unsubscribe2()
+  //     console.log('离开路由')
+  //   }
+  // }, [navigation])
 
   const {
     list,

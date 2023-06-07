@@ -122,7 +122,7 @@ export default function About({
         />
       </View>
       <View style={styles.infoItem}>
-        <Text style={{ fontSize: 18 }}>一款简单的B站浏览App</Text>
+        <Text style={{ fontSize: 24 }}>一款简单的B站浏览App</Text>
         <Icon
           name="github"
           type="material-community"
@@ -217,7 +217,7 @@ export default function About({
         }}>
         <ListItem containerStyle={[styles.statementContent]}>
           <ListItem.Subtitle right style={{ color: theme.colors.black }}>
-            🔈本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题可在
+            🔈本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题欢迎在
             <Text
               style={{ color: theme.colors.primary }}
               onPress={() => {
@@ -225,8 +225,8 @@ export default function About({
               }}>
               {' Github '}
             </Text>
-            中提出）
-            <Text>{'\n'}⚠️ 切勿频繁刷新数据！</Text>
+            中提出 😀）
+            <Text>{'\n'}⚠️ 切勿频繁刷新数据！🙏</Text>
           </ListItem.Subtitle>
         </ListItem>
       </ListItem.Accordion>
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 6,
   },
   itemContainer: {
     flexDirection: 'row',

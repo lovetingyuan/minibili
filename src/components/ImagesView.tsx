@@ -10,7 +10,7 @@ import {
 import { Icon, Overlay } from '@rneui/themed'
 import { useNetInfo } from '@react-native-community/netinfo'
 import PagerView from 'react-native-pager-view'
-import store, { useStore } from '../../store'
+import store, { useStore } from '../store'
 import { Image } from 'expo-image'
 
 export default function ImagesView() {

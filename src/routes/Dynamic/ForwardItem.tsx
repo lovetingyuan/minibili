@@ -233,6 +233,6 @@ const styles = StyleSheet.create({
   imagesContainer: {
     flexDirection: 'row',
     overflow: 'hidden',
-    gap: 10,
+    gap: 5,
   },
 })
