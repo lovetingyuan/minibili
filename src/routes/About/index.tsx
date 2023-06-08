@@ -7,6 +7,7 @@ import {
   ScrollView,
   View,
   Image,
+  Appearance,
 } from 'react-native'
 import { StyleSheet } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
@@ -146,7 +147,10 @@ export default function About({
                 })`,
                 `更新时间：${Updates.createdAt?.toLocaleDateString()} ${Updates.createdAt?.toLocaleTimeString()}`,
                 `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
-                Updates.updateId && `更新ID: ${Updates.updateId}`,
+                Updates.updateId &&
+                  `更新ID: ${Updates.updateId} - ${
+                    Appearance.getColorScheme() === 'dark' ? 1 : 0
+                  }`,
               ]
                 .filter(Boolean)
                 .join('\n'),

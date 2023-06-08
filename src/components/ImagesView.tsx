@@ -69,7 +69,6 @@ export default function ImagesView() {
       <View style={styles.pagerNum}>
         <Text style={styles.pagerNumText}>
           {currentImageIndex + 1}/{imagesList.length}
-          {'    '}
         </Text>
         <Icon
           name="open-in-browser"
@@ -77,6 +76,15 @@ export default function ImagesView() {
           color={'white'}
           onPress={() => {
             Linking.openURL(imagesList[currentImageIndex].src)
+          }}
+        />
+        <Icon
+          name="close"
+          size={22}
+          color={'white'}
+          onPress={() => {
+            store.imagesList = []
+            store.currentImageIndex = 0
           }}
         />
       </View>
@@ -104,6 +112,7 @@ const styles = StyleSheet.create({
   pagerNum: {
     position: 'absolute',
     bottom: 40,
+    gap: 20,
     paddingHorizontal: 8,
     borderRadius: 4,
     paddingVertical: 3,

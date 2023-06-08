@@ -111,7 +111,7 @@ const MainTab = () => {
         name="VideoList"
         component={VideoList}
         options={({ navigation }) => ({
-          tabBarLabel: getLabel('视频'),
+          tabBarLabel: getLabel('视频' + (__DEV__ ? ' dev' : '')),
           headerTitle: () => <HeaderTitle />,
           headerRight: () => {
             const face = $userInfo?.face

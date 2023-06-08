@@ -1,4 +1,4 @@
-import { Icon, Text, useTheme, useThemeMode, Button } from '@rneui/themed'
+import { Icon, Text, useTheme, Button } from '@rneui/themed'
 import { Linking, Pressable, ScrollView, View } from 'react-native'
 import store, { useStore } from '../../store'
 import React from 'react'
@@ -14,7 +14,6 @@ const HeaderTitle = () => {
     })
   }, [])
   const { theme } = useTheme()
-  const { mode, setMode } = useThemeMode()
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
@@ -35,16 +34,6 @@ const HeaderTitle = () => {
               size={28}
               color={theme.colors.grey1}
             />
-            {__DEV__ ? (
-              <Text
-                onPress={() => {
-                  setMode(mode === 'dark' ? 'light' : 'dark')
-                  alert(store.cookie)
-                }}>
-                {'    '}
-                dev
-              </Text>
-            ) : null}
           </Pressable>
         }
         onRequestClose={hideMenu}>
@@ -83,6 +72,7 @@ const HeaderTitle = () => {
             Linking.openURL(newVersion.downloadLink)
           }}>
           有新版本
+          <Icon name="fiber-new" color="#f25985" size={20} />
         </Button>
       ) : null}
     </View>
