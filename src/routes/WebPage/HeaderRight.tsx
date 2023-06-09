@@ -4,14 +4,14 @@ import { View, Linking, ToastAndroid, Share } from 'react-native'
 import store, { useStore } from '../../store'
 import { Menu, MenuItem } from 'react-native-material-menu'
 import * as Clipboard from 'expo-clipboard'
+import { RouteProp, useRoute } from '@react-navigation/native'
+import { RootStackParamList } from '../../types'
 
-export default function HeaderRight(props: {
-  url: string
-  title?: string
-  reload: () => void
-}) {
+export default function HeaderRight(props: { reload: () => void }) {
   const { webViewMode } = useStore()
   const [visible, setVisible] = React.useState(false)
+  const route = useRoute<RouteProp<RootStackParamList, 'WebPage'>>()
+  const { url, title } = route.params
 
   const hideMenu = () => setVisible(false)
 
@@ -39,7 +39,7 @@ export default function HeaderRight(props: {
         <MenuItem
           onPress={() => {
             hideMenu()
-            Linking.openURL(props.url)
+            Linking.openURL(url)
           }}>
           浏览器打开
         </MenuItem>
@@ -52,8 +52,8 @@ export default function HeaderRight(props: {
         </MenuItem>
         <MenuItem
           onPress={() => {
-            Clipboard.setStringAsync(props.url).then(() => {
-              ToastAndroid.show('已复制链接：' + props.url, ToastAndroid.SHORT)
+            Clipboard.setStringAsync(url).then(() => {
+              ToastAndroid.show('已复制链接：' + url, ToastAndroid.SHORT)
               hideMenu()
             })
           }}>
@@ -63,14 +63,11 @@ export default function HeaderRight(props: {
           onPress={() => {
             hideMenu()
             Share.share({
-              message: [props.title, props.url].filter(Boolean).join('\n'),
+              message: [title, url].filter(Boolean).join('\n'),
             })
           }}>
           分享页面
         </MenuItem>
-        {/* <MenuItem disabled>Disabled item</MenuItem> */}
-        {/* <MenuDivider />
-        <MenuItem onPress={hideMenu}>Menu item 4</MenuItem> */}
       </Menu>
     </View>
   )

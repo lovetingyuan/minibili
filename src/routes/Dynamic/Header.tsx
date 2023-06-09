@@ -1,13 +1,6 @@
 import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import {
-  View,
-  StyleSheet,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-  Linking,
-} from 'react-native'
+import { View, StyleSheet, Pressable, Linking } from 'react-native'
 import store, { useStore } from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
@@ -19,10 +12,7 @@ import { useUserInfo } from '../../api/user-info'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
-export function HeaderLeft(props: {
-  scrollTop: () => void
-  style?: StyleProp<ViewStyle>
-}) {
+export function HeaderLeft(props: { scrollTop: () => void }) {
   const { livingUps } = useStore()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
@@ -46,7 +36,7 @@ export function HeaderLeft(props: {
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   return (
-    <View style={[styles.left, props.style]}>
+    <View style={[styles.left]}>
       {dynamicUser?.face ? (
         <Avatar
           size={33}
@@ -144,6 +134,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: 110,
+    position: 'relative',
+    left: -10,
   },
   titleContainer: { flexShrink: 1, marginLeft: 12 },
   titleText: {

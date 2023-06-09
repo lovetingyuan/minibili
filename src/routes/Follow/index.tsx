@@ -18,7 +18,7 @@ import store, { useStore } from '../../store'
 
 import Header from './Header'
 import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
-import { useLivingInfo3 } from '../../api/living-info'
+import { useLivingInfo } from '../../api/living-info'
 import { throttle } from 'throttle-debounce'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
@@ -62,7 +62,7 @@ export default function Follow({ navigation, route }: Props) {
   }, [data?.list])
 
   const { width } = useWindowDimensions()
-  const { data: livingMap, error: livingError } = useLivingInfo3()
+  const { data: livingMap, error: livingError } = useLivingInfo()
   React.useEffect(() => {
     if (livingError) {
       ToastAndroid.show('检查直播失败', ToastAndroid.SHORT)

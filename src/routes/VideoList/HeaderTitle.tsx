@@ -4,15 +4,18 @@ import store, { useStore } from '../../store'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
+import { PromiseResult } from '../../types'
 
 const HeaderTitle = () => {
   const { currentVideosCate, $ranksList } = useStore()
-  const [newVersion, setNewVersion] = React.useState<any>({})
-  React.useEffect(() => {
+  const [newVersion, setNewVersion] = React.useState<PromiseResult<
+    typeof store.updateInfo
+  > | null>(null)
+  if (!newVersion) {
     store.updateInfo.then(res => {
       setNewVersion(res)
     })
-  }, [])
+  }
   const { theme } = useTheme()
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
@@ -63,7 +66,7 @@ const HeaderTitle = () => {
           })}
         </ScrollView>
       </Menu>
-      {newVersion.hasUpdate ? (
+      {newVersion?.hasUpdate ? (
         <Button
           type="clear"
           size="sm"

@@ -65,7 +65,6 @@ const Loading = React.memo(() => {
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   __DEV__ && console.log(route.name)
-  // const dynamicUser = useStore().dynamicUser!
   const upId = route.params?.user?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<any>(null)
   const { data: userInfo } = useUserInfo(upId)
@@ -81,17 +80,6 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       }
     }),
   )
-  // React.useEffect(() => {
-  //   const unsubscribe2 = navigation.addListener('focus', () => {
-  //     console.log('进入路由')
-  //   })
-
-  //   return () => {
-  //     unsubscribe2()
-  //     console.log('离开路由')
-  //   }
-  // }, [navigation])
-
   const {
     list,
     page,
@@ -114,33 +102,19 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       headerTitle: () => {
         return (
           <HeaderLeft
-            style={{ position: 'relative', left: -10 }}
             scrollTop={() => {
-              dynamicListRef.current?.scrollToOffset({
-                offset: 0,
-              })
+              try {
+                dynamicListRef.current?.scrollToOffset({
+                  offset: 0,
+                })
+              } catch (err) {}
             }}
           />
         )
       },
-      headerTitleAlign: 'left',
       headerRight: () => <HeaderRight />,
     })
   }, [navigation])
-  // const handleBack = useMemoizedFn(() => {
-  //   // if (route.params?.from === 'followed' && navigation.isFocused()) {
-  //   //   navigation.navigate('Follow')
-  //   //   return true
-  //   // }
-  //   return false
-  // })
-  // useMounted(() => {
-  //   BackHandler.addEventListener('hardwareBackPress', handleBack)
-  //   return () => {
-  //     BackHandler.removeEventListener('hardwareBackPress', handleBack)
-  //   }
-  // })
-
   const renderItem = ({ item }: { item: DynamicItemAllType }) => {
     return <DynamicItem item={item} />
   }

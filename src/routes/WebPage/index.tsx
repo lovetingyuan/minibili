@@ -19,6 +19,7 @@ import { useStore } from '../../store'
 import HeaderRight from './HeaderRight'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useIsDark from '../../hooks/useIsDark'
+import { UA } from '../../constants'
 
 const Loading = () => {
   return (
@@ -58,10 +59,10 @@ export default ({ route, navigation }: Props) => {
   React.useEffect(() => {
     navigation.setOptions({
       headerRight: () => {
-        return <HeaderRight title={title} url={url} reload={onRefresh} />
+        return <HeaderRight reload={onRefresh} />
       },
     })
-  }, [navigation, webViewMode, url, onRefresh, title])
+  }, [navigation, onRefresh])
   return (
     <ScrollView
       onLayout={e => setHeight(e.nativeEvent.layout.height)}
@@ -94,7 +95,7 @@ export default ({ route, navigation }: Props) => {
         mediaPlaybackRequiresUserAction={false}
         injectedJavaScript={INJECTED_JAVASCRIPT}
         renderLoading={Loading}
-        userAgent={webViewMode === 'MOBILE' ? '' : 'BILIBILI 8.0.0'}
+        userAgent={webViewMode === 'MOBILE' ? '' : UA}
         ref={webviewRef}
         onMessage={evt => {
           const data = JSON.parse(evt.nativeEvent.data) as any

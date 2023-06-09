@@ -18,15 +18,6 @@ export default React.memo(
     } = props
     const updateId = useHasUpdate(mid)
     store.updatedUps[mid] = !!updateId
-    // React.useEffect(() => {
-    //   if (updateId) {
-    //     if (!store.updatedUps[mid]) {
-    //       store.updatedUps[mid] = true
-    //     }
-    //   } else if (store.updatedUps[mid]) {
-    //     store.updatedUps[mid] = false
-    //   }
-    // }, [updateId, mid])
     const navigation = useNavigation<NavigationProps['navigation']>()
     const { livingUps } = useStore()
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
@@ -126,8 +117,6 @@ export default React.memo(
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    // marginVertical: 12,
-    // marginHorizontal: 10,
     marginBottom: 10,
     flex: 1,
   },
@@ -135,10 +124,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     padding: 10,
     textAlign: 'center',
-    // flex: 1,
-    // flexGrow: 1,
-    // width: '100%',
-    // marginTop: 8,
   },
   updateMark: {
     height: 14,

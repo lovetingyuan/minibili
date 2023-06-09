@@ -2,6 +2,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { DynamicItemAllType } from './api/dynamic-items'
 // import { HandledDynamicTypeEnum } from './api/dynamic-items.type'
 
+export type PromiseResult<T extends Promise<any>> = T extends Promise<infer R>
+  ? R
+  : never
+
 export type VideoInfo = {
   bvid: string
   name: string

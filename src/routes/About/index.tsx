@@ -144,13 +144,10 @@ export default function About({
               [
                 `当前版本：${currentVersion} (${
                   Constants.expoConfig?.extra?.gitHash || '-'
-                })`,
+                }-${Appearance.getColorScheme() === 'dark' ? 1 : 0})`,
                 `更新时间：${Updates.createdAt?.toLocaleDateString()} ${Updates.createdAt?.toLocaleTimeString()}`,
                 `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
-                Updates.updateId &&
-                  `更新ID: ${Updates.updateId} - ${
-                    Appearance.getColorScheme() === 'dark' ? 1 : 0
-                  }`,
+                Updates.updateId && `更新ID: ${Updates.updateId}`,
               ]
                 .filter(Boolean)
                 .join('\n'),

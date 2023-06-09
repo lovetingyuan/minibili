@@ -19,8 +19,7 @@ import DynamicDetail from './DynamicDetail'
 import { Linking, AppState } from 'react-native'
 import { Button, createTheme, ThemeProvider } from '@rneui/themed'
 import { site } from '../constants'
-import HeaderTitle from './DynamicDetail/HeaderTitle'
-import HeaderRight from './DynamicDetail/HeaderRight'
+import { HeaderTitle, HeaderRight } from './DynamicDetail/Header'
 import NetInfo from '@react-native-community/netinfo'
 import useIsDark from '../hooks/useIsDark'
 import ThemeResponse from '../components/ThemeResponse'
@@ -139,11 +138,9 @@ export default () => {
             <Stack.Screen
               name="DynamicDetail"
               component={DynamicDetail}
-              options={props => {
-                return {
-                  headerTitle: () => HeaderTitle(props),
-                  headerRight: () => HeaderRight(props),
-                }
+              options={{
+                headerTitle: () => <HeaderTitle />,
+                headerRight: () => <HeaderRight />,
               }}
             />
             <Stack.Screen

@@ -79,11 +79,6 @@ function __$hack(dark) {
         }
       } else {
         window.scrollTo(0, 100000)
-        // document.cookie = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
-        // const hasToken = document.cookie.includes('x-bili-gaia-vtoken=')
-        // if (Date.now() - time > 4000) {
-        //   document.cookie = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
-        // }
         if (ready || Date.now() - time > 10000) {
           // window.ReactNativeWebView.postMessage(
           //   JSON.stringify({
@@ -100,8 +95,6 @@ function __$hack(dark) {
           )
         }
       }
-      // if (timeout || document.cookie.includes('x-bili-gaia-vtoken=')) {
-      // }
     }, 2000)
   }
   // document.cookie = ''

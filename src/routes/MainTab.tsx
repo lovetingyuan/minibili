@@ -47,9 +47,6 @@ const getLabel = (
         left: 30,
         top: -5,
         scale: 0.9,
-        // transform: {
-        //   scale: 0.9,
-        // },
       },
     })
     const label = <Text style={style.label}>{text}</Text>
