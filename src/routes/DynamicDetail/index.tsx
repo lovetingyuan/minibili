@@ -1,16 +1,10 @@
 import React from 'react'
-import {
-  View,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  ToastAndroid,
-} from 'react-native'
+import { View, Pressable, ScrollView, StyleSheet } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 import CommentList from '../../components/CommentList'
 import { Icon, Text, useTheme } from '@rneui/themed'
-import { handleShareVideo, parseNumber } from '../../utils'
+import { handleShareVideo, parseNumber, showToast } from '../../utils'
 import DynamicItem from '../Dynamic/DynamicItem'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
@@ -56,7 +50,7 @@ const DynamicDetail: React.FC<
             <Pressable
               style={styles.iconText}
               onPress={() => {
-                ToastAndroid.show('不支持点赞', ToastAndroid.SHORT)
+                showToast('不支持点赞')
               }}>
               <Icon
                 name="thumb-up-off-alt"

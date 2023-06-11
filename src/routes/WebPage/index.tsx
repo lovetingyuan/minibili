@@ -2,7 +2,6 @@ import React from 'react'
 import {
   StyleSheet,
   View,
-  ToastAndroid,
   Linking,
   Image,
   ScrollView,
@@ -20,6 +19,7 @@ import HeaderRight from './HeaderRight'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useIsDark from '../../hooks/useIsDark'
 import { UA } from '../../constants'
+import { showToast } from '../../utils'
 
 const Loading = () => {
   return (
@@ -126,8 +126,7 @@ export default ({ route, navigation }: Props) => {
          `)
         }}
         onError={() => {
-          ToastAndroid.show('加载失败', ToastAndroid.SHORT)
-          // webviewRef && webviewRef.current?.reload()
+          showToast('加载失败')
         }}
         onShouldStartLoadWithRequest={request => {
           if (request.url.startsWith('bilibili://')) {

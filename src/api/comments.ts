@@ -7,7 +7,7 @@ type ReplyResponse = z.infer<typeof ReplyResponseSchema>
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/
 
 const parseMessage = (content: ReplayItem['content']) => {
-  const keys: string[] = []
+  let keys: string[] = []
   if (content.at_name_to_mid) {
     Object.keys(content.at_name_to_mid).forEach(name => {
       keys.push('@' + name)
@@ -25,6 +25,10 @@ const parseMessage = (content: ReplayItem['content']) => {
       }
     })
   }
+  if (content.vote) {
+    keys.push(`{vote:${content.vote.id}}`)
+  }
+  keys = keys.filter(Boolean)
   if (keys.length) {
     const reg = new RegExp(`(${keys.join('|')})`)
     return content.message
@@ -42,6 +46,13 @@ const parseMessage = (content: ReplayItem['content']) => {
             return {
               type: 'emoji' as const,
               url: content.emote![part].url,
+            }
+          }
+          if (part.startsWith('{vote:') && part.endsWith('}')) {
+            return {
+              type: 'vote' as const,
+              text: content.vote!.title,
+              url: content.vote!.url,
             }
           }
           return {
@@ -204,6 +215,7 @@ export function useDynamicComments(oid: string | number, type: number) {
     }
     return []
   }, [res1, res2])
+  console.log(22255, res1)
   return {
     data: {
       allCount: res1?.cursor.all_count,

@@ -74,6 +74,7 @@ export default function ImagesView() {
           name="open-in-browser"
           size={22}
           color={'white'}
+          style={{ padding: 5 }}
           onPress={() => {
             Linking.openURL(imagesList[currentImageIndex].src)
           }}
@@ -81,6 +82,7 @@ export default function ImagesView() {
         <Icon
           name="close"
           size={22}
+          style={{ padding: 5 }}
           color={'white'}
           onPress={() => {
             store.imagesList = []
@@ -113,14 +115,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 40,
     gap: 20,
-    paddingHorizontal: 8,
+    paddingLeft: 18,
+    paddingRight: 10,
     borderRadius: 4,
-    paddingVertical: 3,
+    // paddingVertical: 3,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
     flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,.3)',
+    backgroundColor: 'rgba(0,0,0,.6)',
   },
   pagerNumText: {
     color: 'white',

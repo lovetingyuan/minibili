@@ -1,11 +1,12 @@
 import { Icon } from '@rneui/themed'
 import React from 'react'
-import { View, Linking, ToastAndroid, Share } from 'react-native'
+import { View, Linking, Share } from 'react-native'
 import store, { useStore } from '../../store'
 import { Menu, MenuItem } from 'react-native-material-menu'
 import * as Clipboard from 'expo-clipboard'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import { RootStackParamList } from '../../types'
+import { showToast } from '../../utils'
 
 export default function HeaderRight(props: { reload: () => void }) {
   const { webViewMode } = useStore()
@@ -53,7 +54,7 @@ export default function HeaderRight(props: { reload: () => void }) {
         <MenuItem
           onPress={() => {
             Clipboard.setStringAsync(url).then(() => {
-              ToastAndroid.show('已复制链接：' + url, ToastAndroid.SHORT)
+              showToast('已复制链接：' + url)
               hideMenu()
             })
           }}>

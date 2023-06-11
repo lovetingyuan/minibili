@@ -4,7 +4,6 @@ import {
   View,
   FlatList,
   StyleSheet,
-  ToastAndroid,
   useWindowDimensions,
   Alert,
   Vibration,
@@ -20,13 +19,14 @@ import Header from './Header'
 import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
 import { useLivingInfo } from '../../api/living-info'
 import { throttle } from 'throttle-debounce'
+import { showToast } from '../../utils'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 const vibrate = throttle(
   10000,
   () => {
-    Vibration.vibrate(1000)
+    Vibration.vibrate(900)
   },
   {
     noLeading: false,
@@ -49,10 +49,7 @@ export default function Follow({ navigation, route }: Props) {
 
   React.useEffect(() => {
     if (error) {
-      ToastAndroid.show(
-        '获取关注列表失败（用户需要设置关注列表公开）',
-        ToastAndroid.SHORT,
-      )
+      showToast('获取关注列表失败（用户需要设置关注列表公开）')
     }
   }, [error])
   React.useEffect(() => {
@@ -65,7 +62,7 @@ export default function Follow({ navigation, route }: Props) {
   const { data: livingMap, error: livingError } = useLivingInfo()
   React.useEffect(() => {
     if (livingError) {
-      ToastAndroid.show('检查直播失败', ToastAndroid.SHORT)
+      showToast('检查直播失败')
     }
   }, [livingError])
   React.useEffect(() => {

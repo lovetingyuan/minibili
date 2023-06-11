@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  StyleSheet,
-  View,
-  ToastAndroid,
-  ScrollView,
-  Pressable,
-} from 'react-native'
+import { StyleSheet, View, ScrollView, Pressable } from 'react-native'
 import { Text, useTheme } from '@rneui/themed'
 import * as KeepAwake from 'expo-keep-awake'
 import * as Clipboard from 'expo-clipboard'
@@ -22,7 +16,7 @@ import Player from './Player'
 import { useVideoInfo } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
-import { checkWifi } from '../../utils'
+import { checkWifi, showToast } from '../../utils'
 import useMounted from '../../hooks/useMounted'
 import VideoInfoContext from './videoContext'
 import HeaderRight from './HeaderRight'
@@ -103,7 +97,7 @@ const PlayPage = ({ route, navigation }: Props) => {
                     onPress={() => {
                       videoInfo.bvid &&
                         Clipboard.setStringAsync(videoInfo.bvid).then(() => {
-                          ToastAndroid.show('已复制视频ID', ToastAndroid.SHORT)
+                          showToast('已复制视频ID')
                         })
                     }}>
                     <Text style={[styles.text, { color: theme.colors.grey1 }]}>

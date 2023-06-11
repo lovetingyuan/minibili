@@ -2,7 +2,6 @@ import React from 'react'
 import {
   Linking,
   Alert,
-  ToastAndroid,
   Share,
   ScrollView,
   View,
@@ -32,6 +31,7 @@ import { clearUser, reportUserLogout } from '../../utils/report'
 import Constants from 'expo-constants'
 import * as Updates from 'expo-updates'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { showToast } from '../../utils'
 
 export default function About({
   navigation,
@@ -104,7 +104,7 @@ export default function About({
         setCheckingUpdate(false)
       },
       () => {
-        ToastAndroid.show('检查更新失败', ToastAndroid.SHORT)
+        showToast('检查更新失败')
         setCheckingUpdate(false)
       },
     )
@@ -171,7 +171,7 @@ export default function About({
           onPress={() => {
             $userInfo?.mid &&
               Clipboard.setStringAsync($userInfo.mid + '').then(() => {
-                ToastAndroid.show('已复制用户ID', ToastAndroid.SHORT)
+                showToast('已复制用户ID')
               })
           }}>
           当前用户ID：{$userInfo?.mid}

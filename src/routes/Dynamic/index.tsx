@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, ToastAndroid } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { RootStackParamList } from '../../types'
 
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
@@ -12,6 +12,7 @@ import { useUserInfo } from '../../api/user-info'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingUpMid } from '../../utils/report'
+import { showToast } from '../../utils'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -92,7 +93,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   } = useDynamicItems(upId)
   React.useEffect(() => {
     if (error) {
-      ToastAndroid.show('请求动态失败', ToastAndroid.SHORT)
+      showToast('请求动态失败')
     }
   }, [upId, error])
   const { theme } = useTheme()

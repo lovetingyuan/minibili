@@ -56,7 +56,7 @@ const getLabel = (
         <View>
           {checkingUpUpdate ? (
             <ActivityIndicator
-              color="#00AEEC"
+              color="#fb7299"
               animating
               size={'small'}
               style={style.checkingUpdate}

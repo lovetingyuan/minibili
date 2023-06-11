@@ -70,7 +70,7 @@ const HeaderTitle = () => {
         <Button
           type="clear"
           size="sm"
-          titleStyle={styles.updateBtnText}
+          titleStyle={[styles.updateBtnText, { color: '#f25985' }]}
           onPress={() => {
             Linking.openURL(newVersion.downloadLink)
           }}>
@@ -97,5 +97,5 @@ const styles = StyleSheet.create({
   },
   menu: { position: 'relative', top: 50, width: 90 },
   typeList: { maxHeight: 400, width: 90 },
-  updateBtnText: { fontSize: 14, color: '#689F38' },
+  updateBtnText: { fontSize: 14 },
 })

@@ -5,7 +5,6 @@ import {
   Image,
   Linking,
   StyleSheet,
-  ToastAndroid,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -18,6 +17,7 @@ import useMounted from '../../hooks/useMounted'
 import { reportUserLogin } from '../../utils/report'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
+import { showToast } from '../../utils'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
@@ -53,21 +53,17 @@ export default function Login() {
   }
   React.useEffect(() => {
     if (error) {
-      ToastAndroid.show('获取用户信息失败', ToastAndroid.SHORT)
+      showToast('获取用户信息失败')
     }
   }, [error])
 
   const login = () => {
-    if (!inputUserIdRef.current) {
-      ToastAndroid.show('请输入ID', ToastAndroid.SHORT)
-      return
-    }
     if (!/^\d+$/.test(inputUserIdRef.current)) {
-      ToastAndroid.show('请输入正确的UID', ToastAndroid.SHORT)
+      showToast('请输入正确的UID')
       return
     }
     setUserId(inputUserIdRef.current)
-    ToastAndroid.show('请稍候...', ToastAndroid.SHORT)
+    showToast('请稍候...')
   }
   return (
     <KeyboardAvoidingView

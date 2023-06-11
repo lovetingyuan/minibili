@@ -53,6 +53,16 @@ const ContentSchema = z.object({
     })
     .array()
     .nullish(),
+  vote: z
+    .object({
+      id: z.number(),
+      title: z.string(),
+      cnt: z.number(),
+      desc: z.string(),
+      deleted: z.boolean(),
+      url: z.string(),
+    })
+    .nullish(),
 })
 
 const BaseReplySchema = z.object({

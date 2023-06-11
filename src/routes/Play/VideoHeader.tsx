@@ -1,10 +1,15 @@
 import { useNavigation } from '@react-navigation/native'
 import { Avatar, Icon, Text } from '@rneui/themed'
 import React from 'react'
-import { View, Pressable, StyleSheet, ToastAndroid } from 'react-native'
+import { View, Pressable, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { NavigationProps } from '../../types'
-import { handleShareVideo, parseDate, parseNumber } from '../../utils'
+import {
+  handleShareVideo,
+  parseDate,
+  parseNumber,
+  showToast,
+} from '../../utils'
 import VideoInfoContext from './videoContext'
 
 export default function VideoHeader() {
@@ -54,7 +59,7 @@ export default function VideoHeader() {
         <Pressable
           style={styles.iconText}
           onPress={() => {
-            ToastAndroid.show('不支持点赞', ToastAndroid.SHORT)
+            showToast('不支持点赞')
           }}>
           <Icon name="thumb-up-off-alt" size={15} />
           <Text style={styles.VideoItemText}>

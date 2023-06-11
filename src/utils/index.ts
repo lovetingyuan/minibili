@@ -1,5 +1,6 @@
 import NetInfo from '@react-native-community/netinfo'
 import { Linking, Share, ToastAndroid } from 'react-native'
+import { throttle } from 'throttle-debounce'
 
 export const parseNumber = (num?: number) => {
   if (num == null) {
@@ -87,7 +88,7 @@ export async function handleShareVideo(
       ].join('\n'),
     })
   } catch (error) {
-    ToastAndroid.show('分享失败', ToastAndroid.SHORT)
+    showToast('分享失败')
   }
 }
 
@@ -107,7 +108,7 @@ export async function handleShareUp(
       ].join('\n'),
     })
   } catch (error) {
-    ToastAndroid.show('分享失败', ToastAndroid.SHORT)
+    showToast('分享失败')
   }
 }
 
@@ -119,11 +120,7 @@ export function isWifi() {
 export async function checkWifi() {
   const wifi = await isWifi()
   if (!wifi) {
-    ToastAndroid.showWithGravity(
-      ' 请注意当前网络不是 Wifi ',
-      ToastAndroid.LONG,
-      ToastAndroid.CENTER,
-    )
+    showToast(' 请注意当前网络不是Wifi ')
   }
 }
 
@@ -135,4 +132,25 @@ export function delay(ms: number) {
   return new Promise(r => {
     setTimeout(r, ms)
   })
+}
+
+const showedMessage: Record<string, () => void> = {}
+
+export function showToast(message: string, long = false) {
+  if (message in showedMessage) {
+    showedMessage[message]()
+  } else {
+    showedMessage[message] = throttle(
+      2000,
+      () => {
+        ToastAndroid.show(
+          message,
+          long ? ToastAndroid.LONG : ToastAndroid.SHORT,
+        )
+      },
+      {
+        noLeading: false,
+      },
+    )
+  }
 }

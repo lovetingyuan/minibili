@@ -1,19 +1,15 @@
 import { useNetInfo } from '@react-native-community/netinfo'
 import React from 'react'
-import { ToastAndroid } from 'react-native'
+import { showToast } from '../utils'
 
 export function NetToast() {
   const netInfo = useNetInfo()
   React.useEffect(() => {
     if (netInfo.isConnected === false) {
-      ToastAndroid.show(' 网络状况不佳 ', ToastAndroid.SHORT)
+      showToast(' 网络状况不佳 ')
     } else {
       if (netInfo.type !== 'wifi' && netInfo.type !== 'unknown') {
-        ToastAndroid.showWithGravity(
-          ' 请注意当前网络不是 wifi ',
-          ToastAndroid.LONG,
-          ToastAndroid.CENTER,
-        )
+        showToast(' 请注意当前网络不是 wifi ')
       }
     }
   }, [netInfo.isConnected, netInfo.type])

@@ -64,6 +64,18 @@ function CommentText(props: {
             />
           )
         }
+        if (node.type === 'vote') {
+          return (
+            <Text
+              key={idStr + i}
+              style={styles.link}
+              onPress={() => {
+                Linking.openURL(node.url)
+              }}>
+              {'🗳️ ' + node.text}
+            </Text>
+          )
+        }
         if (node.type === 'av') {
           return (
             <Text

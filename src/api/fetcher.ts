@@ -1,6 +1,5 @@
 import { ToastAndroid } from 'react-native'
 import { reportApiError } from '../utils/report'
-// import { TracyId } from '../constants'
 import store from '../store'
 
 let errorTime = Date.now()

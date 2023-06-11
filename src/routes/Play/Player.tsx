@@ -1,7 +1,6 @@
 import * as KeepAwake from 'expo-keep-awake'
 import React from 'react'
 import {
-  ToastAndroid,
   useWindowDimensions,
   View,
   Image,
@@ -14,7 +13,7 @@ import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
-import { isWifi, parseDuration } from '../../utils'
+import { isWifi, parseDuration, showToast } from '../../utils'
 import { useFocusEffect } from '@react-navigation/native'
 
 // import { useStore } from '../../store'
@@ -129,7 +128,7 @@ function VideoPlayer(props: { wifi: boolean }) {
       renderLoading={renderLoading}
       onMessage={handleMessage}
       onError={() => {
-        ToastAndroid.show('加载失败', ToastAndroid.SHORT)
+        showToast('加载失败')
         loadingErrorRef.current = true
       }}
       onShouldStartLoadWithRequest={request => {

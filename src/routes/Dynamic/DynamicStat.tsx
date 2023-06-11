@@ -1,7 +1,7 @@
 import { Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import { StyleSheet, View, Pressable, ToastAndroid } from 'react-native'
-import { handleShareVideo, parseNumber } from '../../utils'
+import { StyleSheet, View, Pressable } from 'react-native'
+import { handleShareVideo, parseNumber, showToast } from '../../utils'
 
 export default function DynamicStat(props: {
   id: string | number
@@ -30,7 +30,7 @@ export default function DynamicStat(props: {
           <Text
             style={textStyle}
             onPress={() => {
-              ToastAndroid.show('不支持点赞', ToastAndroid.SHORT)
+              showToast('不支持点赞')
             }}>
             {parseNumber(props.like)}
           </Text>

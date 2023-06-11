@@ -141,6 +141,7 @@ export default () => {
           store.cookie =
             data.payload + '; DedeUserID=' + (store.$userInfo?.mid || TracyId)
           store.showCaptcha = false
+          setReady(false)
           __DEV__ && console.log('cookie: ', store.cookie)
         } else if (data.action === 'ready') {
           setReady(true)
