@@ -50,8 +50,6 @@
     "expo-status-bar": "~1.4.4",
     "expo-system-ui": "~2.2.1",
     "expo-updates": "~0.16.4",
-    "install": "^0.13.0",
-    "npm": "^9.7.1",
     "p-queue": "6.6.2",
     "react": "18.2.0",
     "react-native": "0.71.8",
