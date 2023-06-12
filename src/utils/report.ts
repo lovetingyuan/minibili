@@ -19,20 +19,24 @@ export enum Action {
   add_black_user = 'add_black_user',
 }
 
+class ApiError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'API Error'
+  }
+}
+
 export function reportApiError(api: {
   url: string
   code: number
   message: string
   method?: string
 }) {
-  SentryExpo.Native.captureException(
-    new Error('API Error: ' + api.url.split('?')[0]),
-    {
-      contexts: {
-        api,
-      },
+  SentryExpo.Native.captureException(new ApiError(api.url.split('?')[0]), {
+    contexts: {
+      api,
     },
-  )
+  })
 }
 
 export function reportUserAction(action: Action, actionPayload: any = null) {
