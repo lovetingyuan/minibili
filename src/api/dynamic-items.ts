@@ -550,6 +550,6 @@ function _checkDynamicsApi() {
 
 export function checkDynamicsApi() {
   return _checkDynamicsApi()
-    .catch(() => delay(1000))
+    .catch(() => delay(1500))
     .then(() => _checkDynamicsApi())
 }

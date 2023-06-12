@@ -138,9 +138,7 @@ export function delay(ms: number) {
 const showedMessage: Record<string, () => void> = {}
 
 export function showToast(message: string, long = false) {
-  if (message in showedMessage) {
-    showedMessage[message]()
-  } else {
+  if (!(message in showedMessage)) {
     showedMessage[message] = debounce(
       2000,
       () => {
@@ -153,4 +151,5 @@ export function showToast(message: string, long = false) {
       },
     )
   }
+  showedMessage[message]()
 }
