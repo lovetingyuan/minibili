@@ -119,6 +119,7 @@ export default function About({
     : Constants.expoConfig?.extra?.buildTime
   return (
     <ScrollView style={styles.container}>
+      <Text>111, {Constants.expoConfig?.extra?.dsn}</Text>
       <View style={{ marginBottom: 10, flex: 1, alignItems: 'center' }}>
         <Image
           source={require('../../../assets/minibili.png')}
