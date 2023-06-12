@@ -18,58 +18,10 @@ import store, { useStore } from '../../store'
 import { VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, openBiliVideo, parseNumber } from '../../utils'
 import { useRankList } from '../../api/rank-list'
-import { Skeleton } from '@rneui/themed'
+import Loading from './Loading'
 import { Action, reportUserAction } from '../../utils/report'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
-
-const VideoLoading = (props: { index: number; a: boolean }) => {
-  return (
-    <View style={{ flex: 1, gap: 10 }}>
-      <Skeleton animation="pulse" width={'100%' as any} height={90} />
-      <View style={{ gap: 8 }}>
-        <Skeleton animation="pulse" width={'80%' as any} height={15} />
-        {props.index % 2 ? (
-          <Skeleton animation="pulse" width={'50%' as any} height={15} />
-        ) : (
-          <View style={{ height: 10 }} />
-        )}
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
-        <Skeleton animation="pulse" width={60} height={12} />
-        <Skeleton animation="pulse" width={50} height={12} />
-      </View>
-    </View>
-  )
-}
-const Loading = React.memo(() => {
-  return (
-    <View>
-      {Array(10)
-        .fill(null)
-        .map((_, i) => {
-          return (
-            <View
-              style={{
-                padding: 10,
-                gap: 15,
-                marginBottom: 10,
-                marginTop: 10,
-                flexDirection: 'row',
-              }}
-              key={i}>
-              <VideoLoading index={i} a />
-              <VideoLoading index={i} a={false} />
-            </View>
-          )
-        })}
-    </View>
-  )
-})
 
 export default function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)

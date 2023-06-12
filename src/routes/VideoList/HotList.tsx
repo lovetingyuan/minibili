@@ -15,7 +15,7 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
-
+import Loading from './Loading'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import {
   handleShareVideo,
@@ -204,11 +204,7 @@ export default function Hot({ navigation }: Props) {
         data={hotVideoList}
         renderItem={renderItem}
         estimatedItemSize={estimatedItemSize}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
-          </Text>
-        }
+        ListEmptyComponent={<Loading />}
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
             {loading ? '加载中...' : isReachingEnd ? '到底了~' : ''}
