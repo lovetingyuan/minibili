@@ -38,7 +38,9 @@ jobs:
         run: echo "EAS_BUILD_GIT_COMMIT_HASH=${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Publish update
-        run: eas update --auto
-
-      - name: Publish update
-        run: echo "Build done!"
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        run: npm run update

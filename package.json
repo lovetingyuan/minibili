@@ -20,7 +20,7 @@
     "web": "expo start --web",
     "build:android": "npm run test && zx scripts/build.mjs",
     "build:android:preview": "cross-env APP_VARIANT=preview zx scripts/build-preview.mjs",
-    "sp": "zx scripts/upload-sourcemap.mjs",
+    "update": "zx scripts/hot-update.mjs",
     "doctor": "expo-cli doctor --fix-dependencies",
     "docs": "npx vite docs",
     "format": "npx prettier src --write",

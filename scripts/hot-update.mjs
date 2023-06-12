@@ -2,6 +2,12 @@
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
 require('dotenv').config()
 
+const updateOutput =
+  await $`eas update --branch main --json --non-interactive --platform android --message ${'upload sourcemap'}`
+
+const output = updateOutput.toString('utf8')
+const updateInfo = JSON.parse(output.substring(output.lastIndexOf('[')))[0]
+
 const bundlesDir = path.join(__dirname, '../dist/bundles')
 
 const files = fs.readdirSync(bundlesDir)
@@ -18,12 +24,6 @@ const androidSourceMap = files.find(
 )
 const appConfig = require('../app.config')
 
-const updateOutput =
-  await $`eas update --branch main --json --non-interactive --platform android --message ${'upload sourcemap'}`
-
-const output = updateOutput.toString('utf8')
-const updateInfo = JSON.parse(output.substring(output.lastIndexOf('[')))[0]
-
 // await $`npx sentry-cli releases \
 // files ${appConfig.android.package}@${appConfig.version}+${appConfig.android.versionCode} \
 // upload-sourcemaps \
@@ -39,4 +39,5 @@ upload-sourcemaps \
 --dist=${updateInfo.id} \
 --rewrite ${'dist/bundles/' + android} ${'dist/bundles/' + androidSourceMap}
 `
-echo('upload sourcemap done')
+
+echo('Hot update uploaded done')
