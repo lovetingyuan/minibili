@@ -70,6 +70,7 @@ module.exports = {
       timeZone: 'Asia/Shanghai',
     }).format(new Date()),
     gitHash,
+    dsn: process.env.DSN,
   },
   hooks: {
     postPublish: [

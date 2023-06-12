@@ -114,6 +114,9 @@ export default function About({
       message: 'MiniBili - 简单的B站浏览\n点击下载：' + site,
     })
   }
+  const updateTime: string = Updates.createdAt
+    ? `${Updates.createdAt.toLocaleDateString()} ${Updates.createdAt.toLocaleTimeString()}`
+    : Constants.expoConfig?.extra?.buildTime
   return (
     <ScrollView style={styles.container}>
       <View style={{ marginBottom: 10, flex: 1, alignItems: 'center' }}>
@@ -145,9 +148,9 @@ export default function About({
                 `当前版本：${currentVersion} (${
                   Constants.expoConfig?.extra?.gitHash || '-'
                 }-${Appearance.getColorScheme() === 'dark' ? 1 : 0})`,
-                `更新时间：${Updates.createdAt?.toLocaleDateString()} ${Updates.createdAt?.toLocaleTimeString()}`,
+                `更新时间：${updateTime || '-'}`,
                 `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
-                Updates.updateId && `更新ID: ${Updates.updateId}`,
+                Updates.updateId && `更新ID：${Updates.updateId}`,
               ]
                 .filter(Boolean)
                 .join('\n'),

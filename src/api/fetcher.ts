@@ -1,7 +1,6 @@
 import { reportApiError } from '../utils/report'
 import store from '../store'
 import Toast from 'react-native-root-toast'
-import { checkDynamicsApi } from './dynamic-items'
 
 let errorTime = Date.now()
 
@@ -47,9 +46,7 @@ export default function request<D extends any>(url: string) {
       } catch (err) {}
       if (res.code) {
         if (isDynamic) {
-          checkDynamicsApi().catch(() => {
-            store.showCaptcha = true
-          })
+          store.showCaptcha = true
         }
         if (__DEV__) {
           Toast.show(` 数据获取失败:${url}, ${res.code} ${res.message}`)
