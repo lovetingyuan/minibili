@@ -18,15 +18,16 @@ const store = proxy<{
   $followedUps: UserInfo[]
   $blackTags: Record<string, string>
   $userInfo: UserInfo | null
-  webViewMode: 'PC' | 'MOBILE'
   $latestUpdateIds: Record<string, string>
+  $ranksList: { rid: number; label: string }[]
   $ignoredVersions: string[]
+  $cookie: string
   // ----------------------------
+  webViewMode: 'PC' | 'MOBILE'
   updatedUps: Record<string, boolean>
   livingUps: Record<string, string>
   checkingUpUpdateMap: Record<string, boolean>
   currentVideosCate: (typeof RanksConfig)[number]
-  $ranksList: { rid: number; label: string }[]
   // remoteConfig: Promise<RemoteConfig>
   updateInfo: ReturnType<typeof checkUpdate>
   imagesList: {
@@ -38,7 +39,6 @@ const store = proxy<{
   currentImageIndex: number
   checkingUpUpdate: boolean
   overlayButtons: { text: string; onPress: () => void }[]
-  cookie: string
   showCaptcha: boolean
 }>({
   $blackUps: {},
@@ -47,6 +47,8 @@ const store = proxy<{
   $userInfo: null,
   $latestUpdateIds: {},
   $ignoredVersions: [],
+  $ranksList: RanksConfig,
+  $cookie: 'DedeUserID=' + TracyId,
   // -------------------------
   webViewMode: 'MOBILE',
   updatedUps: {},
@@ -56,31 +58,29 @@ const store = proxy<{
     return Object.values(this.checkingUpUpdateMap).filter(Boolean).length > 0
   },
   currentVideosCate: RanksConfig[0],
-  $ranksList: RanksConfig,
   // remoteConfig: getRemoteConfig(),
   updateInfo: checkUpdate(),
   imagesList: [],
   currentImageIndex: 0,
   overlayButtons: [],
-  cookie: 'DedeUserID=' + TracyId,
   showCaptcha: false,
 })
 
 const StoragePrefix = 'Store:'
 
+type StoredKeys<K = keyof typeof store> = K extends `$${string}` ? K : never
+
 Object.keys(store)
   // 以$开头的数据表示需要持久化存储
   .filter(k => k.startsWith('$'))
-  .forEach((k: string) => {
-    type Keys = keyof typeof store
-    type StoredKeys<K extends Keys> = K extends `$${string}` ? K : never
-    const key = k as StoredKeys<Keys>
+  .forEach(k => {
+    const key = k as StoredKeys
     AsyncStorage.getItem(StoragePrefix + key)
       .then(data => {
         if (data) {
           store[key] = JSON.parse(data) as any
           if (key === '$userInfo' && store.$userInfo) {
-            store.cookie = 'DedeUserID=' + store.$userInfo.mid
+            // store.cookie = 'DedeUserID=' + store.$userInfo.mid
             reportUserOpenApp(store.$userInfo.mid, store.$userInfo.name)
           }
         }

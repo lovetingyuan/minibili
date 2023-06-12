@@ -34,8 +34,9 @@ const vibrate = throttle(
   },
 )
 
-export default function Follow({ navigation, route }: Props) {
-  __DEV__ && console.log(111, route.name)
+export default function Follow({ navigation }: Props) {
+  // eslint-disable-next-line no-console
+  __DEV__ && console.log('Follow page')
   const { $userInfo, $followedUps, livingUps, updatedUps, checkingUpUpdate } =
     useStore()
   const followListRef = React.useRef<FlatList | null>(null)

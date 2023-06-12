@@ -28,7 +28,6 @@ import { setViewingVideoId } from '../../utils/report'
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 const PlayPage = ({ route, navigation }: Props) => {
-  __DEV__ && console.log(route.name)
   const { video, bvid } = route.params
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: video2 } = useVideoInfo(bvid)

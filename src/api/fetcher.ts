@@ -8,6 +8,7 @@ export default function request<D extends any>(url: string) {
   const requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
+  // eslint-disable-next-line no-console
   __DEV__ && console.log('request url: ', url)
   const isDynamic = url.startsWith('/x/polymer/web-dynamic/v1/feed/space')
   return fetch(requestUrl, {
@@ -18,7 +19,7 @@ export default function request<D extends any>(url: string) {
           ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
           : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
       accept: 'application/json, text/plain, */*',
-      cookie: store.cookie,
+      cookie: store.$cookie,
     },
     method: 'GET',
     mode: 'cors',
@@ -49,6 +50,7 @@ export default function request<D extends any>(url: string) {
         }
         if (__DEV__) {
           Toast.show(` 数据获取失败:${url}, ${res.code} ${res.message}`)
+          // eslint-disable-next-line no-console
           console.log('error', url, res.code, res.message)
         } else if (Date.now() - errorTime > 10000) {
           Toast.show(' 数据获取失败 ')

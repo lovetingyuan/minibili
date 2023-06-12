@@ -215,7 +215,6 @@ export function useDynamicComments(oid: string | number, type: number) {
     }
     return []
   }, [res1, res2])
-  console.log(22255, res1)
   return {
     data: {
       allCount: res1?.cursor.all_count,

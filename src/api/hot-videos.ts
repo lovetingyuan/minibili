@@ -4,6 +4,7 @@ import fetcher from './fetcher'
 import { VideoItemResponseSchema } from './hot-videos.schema'
 
 const fetcher2 = (url: string) => {
+  // eslint-disable-next-line no-console
   __DEV__ && console.log('fetch hot videos: ' + url)
 
   return fetcher<{ list: HotVideoResponse[]; no_more: boolean }>(url)

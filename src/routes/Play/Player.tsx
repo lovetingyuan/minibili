@@ -75,6 +75,7 @@ function VideoPlayer(props: { wifi: boolean }) {
         setVerticalScale(data.payload === 'up' ? 0.4 : 0.7)
       }
       if (data.action === 'console.log') {
+        // eslint-disable-next-line no-console
         __DEV__ && console.log('message', data.payload)
       }
     } catch (e) {}

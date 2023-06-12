@@ -2,7 +2,7 @@ import React from 'react'
 import {
   StyleSheet,
   View,
-  Linking,
+  // Linking,
   Image,
   ScrollView,
   Dimensions,
@@ -39,7 +39,6 @@ const Loading = () => {
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
 export default ({ route, navigation }: Props) => {
-  __DEV__ && console.log(route.name)
   const { url, title } = route.params
   const webviewRef = React.useRef<WebView | null>(null)
   const { webViewMode } = useStore()
@@ -130,9 +129,9 @@ export default ({ route, navigation }: Props) => {
         }}
         onShouldStartLoadWithRequest={request => {
           if (request.url.startsWith('bilibili://')) {
-            Linking.openURL(request.url).catch(err => {
-              __DEV__ && console.error(err)
-            })
+            // Linking.openURL(request.url).catch(err => {
+            //   __DEV__ && console.error(err)
+            // })
             return false
           }
           if (request.url.includes('.apk')) {

@@ -12,5 +12,6 @@ module.exports = {
     semi: 'off',
     'valtio/state-snapshot-rule': 'error',
     'valtio/avoid-this-in-proxy': 'error',
+    'no-console': 'error',
   },
 }

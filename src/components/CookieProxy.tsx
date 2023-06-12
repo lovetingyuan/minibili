@@ -138,14 +138,20 @@ export default () => {
           payload: any
         }
         if (data.action === 'cookie') {
-          store.cookie =
-            data.payload + '; DedeUserID=' + (store.$userInfo?.mid || TracyId)
+          if (data.payload.includes('DedeUserID')) {
+            store.$cookie = data.payload
+          } else {
+            store.$cookie =
+              data.payload + '; DedeUserID=' + (store.$userInfo?.mid || TracyId)
+          }
           store.showCaptcha = false
           setReady(false)
-          __DEV__ && console.log('cookie: ', store.cookie)
+          // eslint-disable-next-line no-console
+          __DEV__ && console.log('cookie: ', store.$cookie)
         } else if (data.action === 'ready') {
           setReady(true)
         } else if (data.action === 'print') {
+          // eslint-disable-next-line no-console
           console.log('print', data.payload)
         }
       }}
