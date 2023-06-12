@@ -1,6 +1,7 @@
 import NetInfo from '@react-native-community/netinfo'
-import { Linking, Share, ToastAndroid } from 'react-native'
+import { Linking, Share } from 'react-native'
 import { throttle } from 'throttle-debounce'
+import Toast from 'react-native-root-toast'
 
 export const parseNumber = (num?: number) => {
   if (num == null) {
@@ -143,10 +144,9 @@ export function showToast(message: string, long = false) {
     showedMessage[message] = throttle(
       2000,
       () => {
-        ToastAndroid.show(
-          message,
-          long ? ToastAndroid.LONG : ToastAndroid.SHORT,
-        )
+        Toast.show(message, {
+          duration: long ? Toast.durations.LONG : Toast.durations.SHORT,
+        })
       },
       {
         noLeading: false,

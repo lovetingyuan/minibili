@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
   Linking,
 } from 'react-native'
-import * as SplashScreen from 'expo-splash-screen'
+// import * as SplashScreen from 'expo-splash-screen'
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
@@ -17,7 +17,12 @@ import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, openBiliVideo, parseNumber } from '../../utils'
+import {
+  handleShareVideo,
+  openBiliVideo,
+  parseNumber,
+  showToast,
+} from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
@@ -50,6 +55,12 @@ export default function Hot({ navigation }: Props) {
     })
     return unsubscribe
   }, [navigation])
+
+  React.useEffect(() => {
+    if (error) {
+      showToast('加载视频列表失败')
+    }
+  }, [error])
 
   const currentVideoRef = React.useRef<VideoItem | null>(null)
   // const [modalVisible, setModalVisible] = React.useState(false)
@@ -173,11 +184,11 @@ export default function Hot({ navigation }: Props) {
       hotVideoList.push(item)
     }
   }
-  if (hotVideoList.length || error) {
-    try {
-      SplashScreen.hideAsync()
-    } catch (err) {}
-  }
+  // if (hotVideoList.length || error) {
+  //   try {
+  //     SplashScreen.hideAsync()
+  //   } catch (err) {}
+  // }
 
   const { width } = useWindowDimensions()
 

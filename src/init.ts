@@ -1,11 +1,11 @@
 import './sentry'
-import * as SplashScreen from 'expo-splash-screen'
+// import * as SplashScreen from 'expo-splash-screen'
 import { Linking, Alert } from 'react-native'
 // import { currentVersion } from './api/check-update'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import store from './store'
 
-SplashScreen.preventAutoHideAsync()
+// SplashScreen.preventAutoHideAsync()
 
 async function init() {
   await new Promise(r => {
@@ -78,9 +78,12 @@ async function init() {
     updateInfo.latestVersion,
   )
   if (updateInfo.hasUpdate && !isIgnoredVersion) {
+    const isBigUpdate =
+      updateInfo.currentVersion?.split('.')[0] !==
+      updateInfo.latestVersion.split('.')[0]
     await new Promise(r => {
       Alert.alert(
-        '有新版本',
+        '有新版本' + (isBigUpdate ? '（建议更新 🎉）' : ''),
         `${updateInfo.currentVersion} ⟶ ${
           updateInfo.latestVersion
         }\n\n${updateInfo.changes.join('\n')}`,

@@ -85,7 +85,11 @@ const HeaderTitle = () => {
 export default HeaderTitle
 
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',

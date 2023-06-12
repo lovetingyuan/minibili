@@ -1,6 +1,6 @@
-import { ToastAndroid } from 'react-native'
 import { reportApiError } from '../utils/report'
 import store from '../store'
+import Toast from 'react-native-root-toast'
 
 let errorTime = Date.now()
 
@@ -48,13 +48,10 @@ export default function request<D extends any>(url: string) {
           store.showCaptcha = true
         }
         if (__DEV__) {
-          ToastAndroid.show(
-            ` 数据获取失败:${url}, ${res.code} ${res.message}`,
-            ToastAndroid.SHORT,
-          )
+          Toast.show(` 数据获取失败:${url}, ${res.code} ${res.message}`)
           console.log('error', url, res.code, res.message)
         } else if (Date.now() - errorTime > 10000) {
-          ToastAndroid.show(' 数据获取失败 ', ToastAndroid.SHORT)
+          Toast.show(' 数据获取失败 ')
           errorTime = Date.now()
         }
         reportApiError({

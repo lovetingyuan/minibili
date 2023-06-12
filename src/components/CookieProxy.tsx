@@ -163,14 +163,14 @@ export default () => {
   return (
     <Dialog isVisible={showCaptcha}>
       <View style={styles.container}>
-        <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍后...'} />
+        <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍候...'} />
         <Icon
           name="close"
           size={20}
           onPress={() => {
             Alert.alert('如果不验证则应用获取数据可能会失败', '', [
               {
-                text: '返回',
+                text: '继续验证',
               },
               {
                 text: '关闭验证',

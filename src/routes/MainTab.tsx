@@ -110,6 +110,7 @@ const MainTab = () => {
         options={({ navigation }) => ({
           tabBarLabel: getLabel('视频' + (__DEV__ ? ' dev' : '')),
           headerTitle: () => <HeaderTitle />,
+          headerTitleAlign: 'left',
           headerRight: () => {
             const face = $userInfo?.face
             if (!face) {
