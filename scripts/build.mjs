@@ -89,7 +89,7 @@ echo(
 
 try {
   await spinner('eas building...', async () => {
-    await $`eas build --platform android --profile production --json --non-interactive`
+    // await $`eas build --platform android --profile production --json --non-interactive`
     // const buildList = getBuildList(res)
     // if (buildList[0].appVersion !== newVersion) {
     //   throw new Error(
