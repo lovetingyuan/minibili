@@ -8,18 +8,34 @@ const assert = require('assert')
 
 const getBuildList = buildStr => {
   let buildListStr = buildStr.toString('utf8')
-  buildListStr = buildListStr.substring(buildListStr.indexOf('['))
+  buildListStr = buildListStr.substring(buildListStr.lastIndexOf('['))
   const list = JSON.parse(buildListStr)
   // BuildListSchema.parse(list)
   list.toString = () => buildListStr.trim()
   return list
 }
 
+$.verbose = false
+
+echo('checking env...')
+
 await fetch('https://api.expo.dev')
   .then(res => res.text())
   .then(d => {
     assert.equal(d, 'OK', 'Can not access Expo Api')
   })
+
+await $`npm whoami --registry=https://registry.npmjs.org/`
+
+await $`npm ping`
+
+await $`git ls-remote https://github.com/lovetingyuan/minibili.git`
+
+const branch = await $`git rev-parse --abbrev-ref HEAD`
+
+assert.equal(branch.toString('utf8'), 'main', 'Current branch is not main')
+
+echo('fetching current build list...')
 
 const latestBuild =
   await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
@@ -38,6 +54,8 @@ const changes = await question('更新日志（使用双空格分开）')
 if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
+
+echo('update npm version...')
 
 await $`npm version ${newVersion}-${
   Number(appBuildVersion) + 1
@@ -113,7 +131,7 @@ try {
 }
 
 try {
-  await retry(3, () => $`npm publish`)
+  await retry(3, () => $`npm publish --registry=https://registry.npmjs.org/`)
 } catch (err) {
   echo(chalk.red('Failed to publish to npm.'))
   throw err
