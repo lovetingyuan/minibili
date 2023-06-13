@@ -5,7 +5,7 @@
   "description": "minimum bilibili apk",
   "unpkg": "docs/version.json",
   "files": [
-    "dist",
+    "apk",
     "docs"
   ],
   "publishConfig": {

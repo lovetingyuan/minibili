@@ -73,7 +73,6 @@ export default function About({
         },
       },
     ])
-    throw new Error('sdfs')
   }
   const checkUpdate = () => {
     if (checkingUpdate) {

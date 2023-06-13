@@ -4,6 +4,7 @@
 // import { BuildListSchema } from '../src/api/check-update.schema.ts'
 const { version } = require('../package.json')
 const semver = require('semver')
+const assert = require('assert')
 
 const getBuildList = buildStr => {
   let buildListStr = buildStr.toString('utf8')
@@ -13,6 +14,12 @@ const getBuildList = buildStr => {
   list.toString = () => buildListStr.trim()
   return list
 }
+
+await fetch('https://api.expo.dev')
+  .then(res => res.text())
+  .then(d => {
+    assert.equal(d, 'OK', 'Can not access Expo Api')
+  })
 
 const latestBuild =
   await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
@@ -84,11 +91,11 @@ if (buildList[0].appVersion !== newVersion) {
 await fs.outputFile(path.resolve(__dirname, '../docs/version.json'), buildList)
 
 try {
-  await $`rm -rf dist && mkdir -p dist`
+  await $`rm -rf apk && mkdir -p apk`
   await retry(
     3,
     () =>
-      $`wget ${buildList[0].artifacts.buildUrl} -q -O ./dist/minibili-${buildList[0].appVersion}.apk`,
+      $`wget ${buildList[0].artifacts.buildUrl} -q -O ./apk/minibili-${buildList[0].appVersion}.apk`,
   )
 } catch (err) {
   echo(chalk.red('Failed to download latest apk.'))

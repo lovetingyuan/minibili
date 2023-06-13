@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
 require('dotenv').config()
-
+// const fs = require('fs')
 const updateOutput =
   await $`eas update --branch main --json --non-interactive --platform android --message ${'upload sourcemap'}`
 
@@ -14,10 +14,10 @@ const files = fs.readdirSync(bundlesDir)
 
 const android = files.find(f => f.startsWith('android-') && f.endsWith('.js'))
 
-// fs.copyFileSync(
-//   path.join(bundlesDir, android),
-//   path.join(bundlesDir, 'index.android.bundle'),
-// )
+fs.renameSync(
+  path.join(bundlesDir, android),
+  path.join(bundlesDir, 'index.android.bundle'),
+)
 
 const androidSourceMap = files.find(
   f => f.startsWith('android-') && f.endsWith('.map'),
@@ -37,7 +37,9 @@ files ${appConfig.android.package}@${appConfig.version}+${
 } \
 upload-sourcemaps \
 --dist=${updateInfo.id} \
---rewrite ${'dist/bundles/' + android} ${'dist/bundles/' + androidSourceMap}
+--rewrite dist/bundles/index.android.bundle ${
+  'dist/bundles/' + androidSourceMap
+}
 `
 
 echo('Hot update uploaded done')
