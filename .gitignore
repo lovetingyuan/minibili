@@ -16,3 +16,4 @@ web-build/
 *.log
 .env
 tmp
+apk
