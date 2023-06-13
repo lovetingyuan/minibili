@@ -1,12 +1,14 @@
-import { Icon, Text, useTheme, Button } from '@rneui/themed'
+import { Icon, Text, useTheme, Button, Avatar } from '@rneui/themed'
 import { Linking, Pressable, ScrollView, View } from 'react-native'
 import store, { useStore } from '../../store'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
-import { PromiseResult } from '../../types'
+import { NavigationProps, PromiseResult } from '../../types'
+import { Image } from 'expo-image'
+import { useNavigation } from '@react-navigation/native'
 
-const HeaderTitle = () => {
+export const HeaderTitle = () => {
   const { currentVideosCate, $ranksList } = useStore()
   const [newVersion, setNewVersion] = React.useState<PromiseResult<
     typeof store.updateInfo
@@ -82,7 +84,28 @@ const HeaderTitle = () => {
   )
 }
 
-export default HeaderTitle
+export const HeaderRight = () => {
+  const { $userInfo } = useStore()
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const face = $userInfo?.face
+  if (!face) {
+    return null
+  }
+  return (
+    <Avatar
+      size={30}
+      rounded
+      containerStyle={styles.avatar}
+      ImageComponent={Image}
+      source={{ uri: face + '@80w_80h_1c.webp' }}
+      onPress={() => {
+        navigation.navigate('Dynamic', {
+          user: { ...$userInfo },
+        })
+      }}
+    />
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -102,4 +125,7 @@ const styles = StyleSheet.create({
   menu: { position: 'relative', top: 50, width: 90 },
   typeList: { maxHeight: 400, width: 90 },
   updateBtnText: { fontSize: 14 },
+  avatar: {
+    marginHorizontal: 20,
+  },
 })

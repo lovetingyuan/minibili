@@ -3,13 +3,12 @@ import Follow from './Follow'
 import VideoList from './VideoList'
 import Login from './Login'
 import { useStore } from '../store'
-
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
 import { Text, View, StyleSheet, ActivityIndicator } from 'react-native'
-import { Avatar, Badge } from '@rneui/themed'
+import { Badge } from '@rneui/themed'
 import { RootStackParamList } from '../types'
-import HeaderTitle from './VideoList/HeaderTitle'
+import { HeaderTitle, HeaderRight } from './VideoList/Header'
 import { setScreenTag } from '../utils/report'
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
@@ -107,33 +106,13 @@ const MainTab = () => {
       <Tab.Screen
         name="VideoList"
         component={VideoList}
-        options={({ navigation }) => ({
+        options={{
           tabBarLabel: getLabel('视频' + (__DEV__ ? ' dev' : '')),
           headerTitle: () => <HeaderTitle />,
           headerTitleAlign: 'left',
-          headerRight: () => {
-            const face = $userInfo?.face
-            if (!face) {
-              return null
-            }
-            return (
-              <Avatar
-                size={30}
-                rounded
-                containerStyle={{
-                  marginHorizontal: 20,
-                }}
-                source={{ uri: face + '@80w_80h_1c.webp' }}
-                onPress={() => {
-                  navigation.navigate('Dynamic', {
-                    user: { ...$userInfo },
-                  })
-                }}
-              />
-            )
-          },
+          headerRight: () => <HeaderRight />,
           headerShown: true,
-        })}
+        }}
       />
       {$userInfo ? (
         <Tab.Screen
