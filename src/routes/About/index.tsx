@@ -7,10 +7,9 @@ import {
   View,
   Image,
   Appearance,
+  StyleSheet,
 } from 'react-native'
-import { StyleSheet } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
-
 import store, { useStore } from '../../store'
 import {
   Chip,
@@ -19,7 +18,9 @@ import {
   Icon,
   Text,
   useTheme,
+  Dialog,
   Divider,
+  Input,
 } from '@rneui/themed'
 import {
   checkUpdate as checkUpdateApi,
@@ -27,7 +28,11 @@ import {
 } from '../../api/check-update'
 import { githubLink, site } from '../../constants'
 import { RootStackParamList } from '../../types'
-import { clearUser, reportUserLogout } from '../../utils/report'
+import {
+  clearUser,
+  reportUserFeedback,
+  reportUserLogout,
+} from '../../utils/report'
 import Constants from 'expo-constants'
 import * as Updates from 'expo-updates'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -50,7 +55,28 @@ export default function About({
   const [, ...initUnsortedRankList] = $ranksList
   const [unsortedRankList, setUnSortedRankList] =
     React.useState(initUnsortedRankList)
+  const [feedBackVisible, setFeedbackVisible] = React.useState(false)
+  const hideFeedback = () => {
+    setFeedbackVisible(false)
+  }
+  const showFeedback = () => {
+    setFeedbackVisible(true)
+  }
 
+  const feedbackRef = React.useRef('')
+  const feedbackContactRef = React.useRef('')
+  const submitFeedback = () => {
+    const message = feedbackRef.current.trim()
+    if (message.length === 0) {
+      hideFeedback()
+      return
+    }
+    reportUserFeedback(
+      message,
+      feedbackContactRef.current || 'uid:' + $userInfo?.mid,
+    )
+    hideFeedback()
+  }
   const handleLogOut = () => {
     Alert.alert('确定退出吗？', '', [
       {
@@ -137,7 +163,7 @@ export default function About({
           }}
         />
       </View>
-      <Divider style={{ marginBottom: 10 }} />
+      <Divider style={{ marginBottom: 18, marginTop: 12 }} />
       <View style={styles.infoItem}>
         <Text
           style={{ fontSize: 16 }}
@@ -184,31 +210,39 @@ export default function About({
         </Button>
       </View>
       <View style={styles.infoItem}>
-        <Text
-          style={{ fontSize: 16 }}
-          onPress={() => {
-            Alert.alert(
-              '版本信息',
-              [
-                `当前版本：${currentVersion} (${
-                  Constants.expoConfig?.extra?.gitHash || '-'
-                })`,
-                `更新时间：${Updates.createdAt?.toLocaleDateString()} ${Updates.createdAt?.toLocaleTimeString()}`,
-                `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
-                Updates.updateId && `更新ID: ${Updates.updateId}`,
-                'dsn: ' + Constants.expoConfig?.extra?.dsn,
-              ]
-                .filter(Boolean)
-                .join('\n'),
-            )
-          }}>
-          欢迎分享本应用 ❤
-        </Text>
-        <Button type="clear" size="sm" onPress={handleShare}>
-          分享
-        </Button>
+        <Text style={{ fontSize: 16 }}>欢迎分享本应用 ❤</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Button type="clear" size="sm" onPress={handleShare}>
+            分享
+          </Button>
+          <Button type="clear" size="sm" onPress={showFeedback}>
+            意见反馈
+          </Button>
+          <Dialog isVisible={feedBackVisible} onBackdropPress={hideFeedback}>
+            <Dialog.Title title="欢迎反馈意见" />
+            <View>
+              <Input
+                placeholder="填写意见"
+                multiline
+                style={{ marginTop: 20, height: 100 }}
+                maxLength={500}
+                // leftIcon={{ type: 'font-awesome', name: 'comment' }}
+                onChangeText={value => (feedbackRef.current = value)}
+              />
+              <Input
+                placeholder="联系方式"
+                maxLength={100}
+                // leftIcon={{ type: 'font-awesome', name: 'comment' }}
+                onChangeText={value => (feedbackContactRef.current = value)}
+              />
+            </View>
+            <Dialog.Actions>
+              <Dialog.Button title="提交" onPress={submitFeedback} />
+              <Dialog.Button title="取消" onPress={hideFeedback} />
+            </Dialog.Actions>
+          </Dialog>
+        </View>
       </View>
-
       <ListItem.Accordion
         containerStyle={[styles.blackTitle]}
         content={

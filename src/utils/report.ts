@@ -147,3 +147,12 @@ export function setViewingVideoId(bvid: string | null) {
 export function setViewingDynamicId(id: string | null) {
   SentryExpo.Native.setTag(Tags.set_dynamic_id, id)
 }
+
+export function reportUserFeedback(message: string, contact?: string) {
+  SentryExpo.Native.captureMessage('User Feedback', {
+    extra: {
+      message,
+      contact,
+    },
+  })
+}
