@@ -59,7 +59,9 @@ const latestBuild =
   await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
 const [{ appVersion, appBuildVersion }] = getBuildList(latestBuild)
 if (`${appVersion}-${appBuildVersion}` !== version) {
-  throw new Error('Package version is not same as the latest build version')
+  throw new Error(
+    'Package version is not same as the latest build version: ' + appVersion,
+  )
 }
 
 const newVersion = await question(`更新版本（${appVersion} -> ?）`)
