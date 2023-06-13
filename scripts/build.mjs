@@ -25,15 +25,16 @@ await fetch('https://api.expo.dev')
     assert.equal(d, 'OK', 'Can not access Expo Api')
   })
 
-await $`npm whoami --registry=https://registry.npmjs.org/`
-
-await $`npm ping`
+await $`npm ping && npm whoami --registry=https://registry.npmjs.org/`
 
 await $`git ls-remote https://github.com/lovetingyuan/minibili.git`
 
 const branch = await $`git rev-parse --abbrev-ref HEAD`
-
-assert.equal(branch.toString('utf8'), 'main', 'Current branch is not main')
+assert.equal(
+  branch.toString('utf8').trim(),
+  'main',
+  'Current branch is not main',
+)
 
 echo('fetching current build list...')
 
