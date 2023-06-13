@@ -75,7 +75,9 @@ if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
 
-echo(chalk.blue('update npm version...'))
+echo(
+  chalk.blue(`update npm version ${newVersion}-${appBuildVersion - 0 + 1}...`),
+)
 
 await $`npm version ${newVersion}-${
   Number(appBuildVersion) + 1
@@ -126,7 +128,7 @@ try {
 
   echo(chalk.blue('writing version file...'))
 
-  await fs.outputFile(
+  await fs.outputJsonSync(
     path.resolve(__dirname, '../docs/version.json'),
     buildList.map(item => {
       return item
