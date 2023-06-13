@@ -1,7 +1,5 @@
 require('dotenv').config()
 
-// eslint-disable-next-line no-console
-console.log('----- using app.config.js ---------')
 const pkg = require('./package.json')
 const [version, versionCode] = pkg.version.split('-')
 
@@ -90,7 +88,7 @@ module.exports = {
         config: {
           organization: process.env.SENTRY_ORG,
           project: process.env.SENTRY_PROJECT,
-          authToken: process.env.SENTRY_AUTH_TOKEN,
+          // authToken: process.env.SENTRY_AUTH_TOKEN,
         },
       },
     ],

@@ -8,6 +8,7 @@ import {
   ImageBackground,
   Pressable,
   Text,
+  Linking,
 } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
@@ -15,8 +16,6 @@ import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
 import { isWifi, parseDuration, showToast } from '../../utils'
 import { useFocusEffect } from '@react-navigation/native'
-
-// import { useStore } from '../../store'
 import { Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
@@ -73,6 +72,9 @@ function VideoPlayer(props: { wifi: boolean }) {
       }
       if (data.action === 'change-video-height') {
         setVerticalScale(data.payload === 'up' ? 0.4 : 0.7)
+      }
+      if (data.action === 'downloadVideo') {
+        Linking.openURL(data.payload)
       }
       if (data.action === 'console.log') {
         // eslint-disable-next-line no-console

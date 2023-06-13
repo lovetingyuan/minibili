@@ -48,31 +48,40 @@ function __$hack() {
     })
     postPlayState(video.paused ? 'pause' : 'play')
   }, 200)
-  // const timer4 = setInterval(() => {
-  //   const right = document.querySelector('.mplayer-right')
-  //   if (!right) {
-  //     return
-  //   }
-  //   clearInterval(timer4)
-  //   if (right.getElementById('reload-button')) {
-  //     return
-  //   }
-  //   const reloadBtn = document.createElement('div')
-  //   reloadBtn.id = 'reload-button'
-  //   reloadBtn.innerHTML = '&orarr;'
-  //   reloadBtn.style.cssText = `
-  //   width: 36px;
-  //   height: 36px;
-  //   color: white;
-  //   font-size: 28px;
-  //   text-align: center;
-  //   transform: rotate(90deg);
-  //   `
-  //   reloadBtn.addEventListener('click', () => {
-  //     window.location.reload()
-  //   })
-  //   right.appendChild(reloadBtn)
-  // }, 100)
+  const timer4 = setInterval(() => {
+    const video = document.querySelector('video')
+
+    const right = document.querySelector('.mplayer-right')
+    if (!right || !video) {
+      return
+    }
+    clearInterval(timer4)
+    if (right.querySelector('#download-button')) {
+      return
+    }
+    const reloadBtn = document.createElement('div')
+    reloadBtn.id = 'download-button'
+    reloadBtn.innerHTML = '⇓'
+    reloadBtn.style.cssText = `
+    width: 24px;
+    height: 24px;
+    color: white;
+    font-size: 28px;
+    line-height: 24px;
+    text-align: center;
+    background: rgba(0,0,0,.2);
+    border-radius: 50%;
+    `
+    reloadBtn.addEventListener('click', () => {
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          action: 'downloadVideo',
+          payload: video.src,
+        }),
+      )
+    })
+    right.appendChild(reloadBtn)
+  }, 100)
   const timer5 = setInterval(() => {
     const poster = document.querySelector('img.mplayer-poster')
     if (poster && !poster.dataset.patched) {
@@ -110,7 +119,7 @@ function __$hack() {
   setTimeout(() => {
     clearInterval(timer2)
     clearInterval(timer3)
-    // clearInterval(timer4)
+    clearInterval(timer4)
     clearInterval(timer5)
   }, 4000)
   let startY
