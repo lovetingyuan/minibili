@@ -88,7 +88,17 @@ if (buildList[0].appVersion !== newVersion) {
   throw new Error('EAS latest version is not same as updated version.')
 }
 
-await fs.outputFile(path.resolve(__dirname, '../docs/version.json'), buildList)
+await fs.outputFile(
+  path.resolve(__dirname, '../docs/version.json'),
+  buildList.map(item => {
+    return item
+    // return {
+    //   version: item.appVersion,
+    //   changelog: item.gitCommitMessage.split('  '),
+    //   date: item.createdAt,
+    // }
+  }),
+)
 
 try {
   await $`rm -rf apk && mkdir -p apk`

@@ -75,10 +75,10 @@
       details[open] summary::before {
         content: '▼';
       }
-      #changelog {
-        padding: 0 20px;
+      details ul {
+        /* margin: 20px; */
+        padding: 0 24px;
       }
-
       details ul li {
         word-break: break-all;
         font-size: 14px;
@@ -99,7 +99,13 @@
 
       <div id="app">
         <img src="./minibili.png" class="logo" alt="minibili logo" />
-        <a href="" download="MiniBili.apk" id="download-btn"> 下载APP </a>
+        <a
+          href=""
+          download="MiniBili.apk"
+          id="download-btn"
+          onclick="this.textContent = '下载中，请稍候...';">
+          下载APP
+        </a>
         <details>
           <summary>
             <span>更新日志：</span>
@@ -231,46 +237,56 @@
       <script>
         // unpkg: https://www.unpkg.com/minibili@0.0.30-34/dist/mibilibi-0.0.30.apk
         const loading = document.querySelector('.loading')
-        fetch('./version.json?_t=' + Date.now())
+        loading.style.display = 'block'
+        const a = fetch('./version.json?_t=' + Date.now())
           .then(r => r.json())
           .then(list => {
-            loading.remove()
-            const latestBuild = list[0]
-            document.getElementById('download-btn').href =
-              latestBuild.artifacts.applicationArchiveUrl ||
-              latestBuild.artifacts.buildUrl
+            loading.style.display = 'none'
+            // const latestBuild = list[0]
+            // document.getElementById('download-btn').href =
+            //   latestBuild.artifacts.applicationArchiveUrl ||
+            //   latestBuild.artifacts.buildUrl
 
-            document.getElementById(
-              'download-btn',
-            ).textContent += ` (${latestBuild.appVersion})`
+            // document.getElementById(
+            //   'download-btn',
+            // ).textContent += ` (${latestBuild.appVersion})`
             document.getElementById('changelog').innerHTML = `
+            <ul>
             ${list
               .map(change => {
-                const apkUrl =
-                  change.artifacts.applicationArchiveUrl ||
-                  change.artifacts.buildUrl
-                const updateMessage = change.gitCommitMessage
-                  .replace('[force]', '')
-                  .split('  ')
+                // const apkUrl =
+                //   change.artifacts.applicationArchiveUrl ||
+                //   change.artifacts.buildUrl
+                const updateMessage = change.gitCommitMessage.split('  ')
                 const buildDate = change.completedAt.split('T')[0]
                 const version = change.appVersion
                 return `
-                  <p><a href="${apkUrl}" target="_blank">${version}</a> (${buildDate})</p>
+                <li>
+                  <p style="font-size: 14px">${version} (${buildDate})</p>
                   <ul>
-                    ${updateMessage
-                      .map(msg => {
-                        return `<li>${msg}</li>`
-                      })
-                      .join('\n')}
-                    </ul>`
+                    ${updateMessage.map(msg => `<li>${msg}</li>`).join('\n')}
+                  </ul>
+                  </li>
+                `
               })
               .join('\n')}
+            </ul>
             `
           })
-          .catch(() => {
-            loading.remove()
-            alert('出错了，请刷新重试')
+        const b = fetch('https://unpkg.com/minibili/package.json')
+          .then(r => r.json())
+          .then(r => {
+            const version = r.version.split('-')[0]
+            const apkUrl = `https://unpkg.com/minibili@${r.version}/dist/minibili-${version}.apk`
+            document.getElementById('download-btn').href = apkUrl
+            document.getElementById(
+              'download-btn',
+            ).textContent += ` (${version})`
           })
+        Promise.all([a, b]).finally(() => {
+          loading.style.display = 'none'
+          alert('出错了，请刷新重试')
+        })
         if (location.search.includes('showchangelog=true')) {
           document.querySelector('details').setAttribute('open', '')
         }
