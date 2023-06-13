@@ -17,12 +17,19 @@ const getBuildList = buildStr => {
 
 $.verbose = false
 
-echo('checking env...')
+echo(chalk.blue('checking env...'))
+
+const gitStatus = await $`git status --porcelain`
+assert.equal(
+  gitStatus.toString('utf8').trim(),
+  '',
+  chalk.red('Current git workspace is not clean'),
+)
 
 await fetch('https://api.expo.dev')
   .then(res => res.text())
   .then(d => {
-    assert.equal(d, 'OK', 'Can not access Expo Api')
+    assert.equal(d, 'OK', chalk.red('Can not access Expo Api'))
   })
 
 await $`npm ping && npm whoami --registry=https://registry.npmjs.org/`
@@ -33,10 +40,10 @@ const branch = await $`git rev-parse --abbrev-ref HEAD`
 assert.equal(
   branch.toString('utf8').trim(),
   'main',
-  'Current branch is not main',
+  chalk.red('Current branch is not main'),
 )
 
-echo('fetching current build list...')
+echo(chalk.blue('fetching current build list...'))
 
 const latestBuild =
   await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
@@ -56,7 +63,7 @@ if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
 
-echo('update npm version...')
+echo(chalk.blue('update npm version...'))
 
 await $`npm version ${newVersion}-${
   Number(appBuildVersion) + 1
