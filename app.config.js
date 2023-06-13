@@ -24,6 +24,12 @@ module.exports = {
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
+  androidStatusBar: {
+    backgroundColor: '#94E0D8',
+    barStyle: 'light-content',
+    translucent: true,
+    hidden: true,
+  },
   splash: {
     image: './assets/splash.png',
     resizeMode: 'cover',
