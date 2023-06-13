@@ -2,6 +2,10 @@
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
 
 // import { BuildListSchema } from '../src/api/check-update.schema.ts'
+require('dotenv').config({
+  path: path.resolve(__dirname, '../.env'),
+})
+
 const { version } = require('../package.json')
 const semver = require('semver')
 const assert = require('assert')
@@ -18,6 +22,12 @@ const getBuildList = buildStr => {
 $.verbose = false
 
 echo(chalk.blue('checking env...'))
+
+assert.equal(
+  typeof process.env.SENTRY_AUTH_TOKEN,
+  'string',
+  chalk.red('Missing process.env.SENTRY_AUTH_TOKEN'),
+)
 
 const gitStatus = await $`git status --porcelain`
 assert.equal(

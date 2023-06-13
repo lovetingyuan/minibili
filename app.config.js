@@ -1,4 +1,7 @@
 require('dotenv').config()
+
+// eslint-disable-next-line no-console
+console.log('----- using app.config.js ---------')
 const pkg = require('./package.json')
 const [version, versionCode] = pkg.version.split('-')
 
@@ -9,6 +12,7 @@ const appId =
   process.env.APP_VARIANT === 'preview'
     ? 'com.tingyuan.minibili.preview'
     : 'com.tingyuan.minibili'
+
 const release = `${appId}@${version}+${versionCode}`
 
 const name = process.env.APP_VARIANT === 'preview' ? 'MiniBili-pre' : 'MiniBili'
