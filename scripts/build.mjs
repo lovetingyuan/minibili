@@ -88,7 +88,7 @@ try {
   await $`git checkout -- .`
   await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
   echo(chalk.red('Failed to build new apk on EAS.'))
-  throw err
+  process.exit(-1)
 }
 let buildListStr = ''
 
