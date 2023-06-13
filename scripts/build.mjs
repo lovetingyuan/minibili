@@ -60,7 +60,7 @@ try {
 let buildListStr = ''
 
 await new Promise(r => {
-  setTimeout(r, 5000)
+  setTimeout(r, 3000)
 })
 
 try {
@@ -112,9 +112,9 @@ try {
   throw err
 }
 
-try {
-  await $`expo-cli publish`
-} catch (err) {
-  echo(chalk.red('Failed to publish sourcemap.'))
-  throw err
-}
+// try {
+//   await $`expo-cli publish`
+// } catch (err) {
+//   echo(chalk.red('Failed to publish sourcemap.'))
+//   throw err
+// }

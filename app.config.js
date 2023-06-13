@@ -6,10 +6,13 @@ const [version, versionCode] = pkg.version.split('-')
 const dev = process.argv.includes('start')
 const gitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || '-'
 
+// const release = `appConfig.android.package}@${appConfig.version}+${appConfig.android.versionCode`
+
 const appId =
   process.env.APP_VARIANT === 'preview'
     ? 'com.tingyuan.minibili.preview'
     : 'com.tingyuan.minibili'
+const release = `${appId}@${version}+${versionCode}`
 
 const name = process.env.APP_VARIANT === 'preview' ? 'MiniBili-pre' : 'MiniBili'
 
@@ -71,6 +74,7 @@ module.exports = {
     }).format(new Date()),
     gitHash,
     dsn: process.env.SENTRY_DSN,
+    releaseName: release,
   },
   hooks: {
     postPublish: [
