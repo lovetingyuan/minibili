@@ -76,6 +76,7 @@ export default function About({
       feedbackContactRef.current || 'uid:' + $userInfo?.mid,
     )
     hideFeedback()
+    showToast('感谢反馈 😊')
   }
   const handleLogOut = () => {
     Alert.alert('确定退出吗？', '', [
@@ -219,7 +220,7 @@ export default function About({
             意见反馈
           </Button>
           <Dialog isVisible={feedBackVisible} onBackdropPress={hideFeedback}>
-            <Dialog.Title title="欢迎反馈意见" />
+            <Dialog.Title title="欢迎反馈意见 😊" />
             <View>
               <Input
                 placeholder="填写意见"
@@ -256,7 +257,7 @@ export default function About({
         }}>
         <ListItem containerStyle={[styles.statementContent]}>
           <ListItem.Subtitle right style={{ color: theme.colors.black }}>
-            🔈本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题欢迎在
+            🔈本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题欢迎使用意见反馈或者在
             <Text
               style={{ color: theme.colors.primary }}
               onPress={() => {

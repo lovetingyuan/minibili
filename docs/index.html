@@ -3,6 +3,7 @@
     <meta charset="UTF-8" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ed6daf" />
     <title>MiniBili</title>
     <meta name="description" content="简单的B站浏览APP" />
     <style>
@@ -277,16 +278,19 @@
           .then(r => r.json())
           .then(r => {
             const version = r.version.split('-')[0]
-            const apkUrl = `https://unpkg.com/minibili@${r.version}/dist/minibili-${version}.apk`
+            const apkUrl = `https://unpkg.com/minibili@${r.version}/apk/minibili-${version}.apk`
             document.getElementById('download-btn').href = apkUrl
             document.getElementById(
               'download-btn',
             ).textContent += ` (${version})`
           })
-        Promise.all([a, b]).finally(() => {
-          loading.style.display = 'none'
-          alert('出错了，请刷新重试')
-        })
+        Promise.all([a, b])
+          .catch(() => {
+            alert('出错了，请刷新重试')
+          })
+          .finally(() => {
+            loading.style.display = 'none'
+          })
         if (location.search.includes('showchangelog=true')) {
           document.querySelector('details').setAttribute('open', '')
         }

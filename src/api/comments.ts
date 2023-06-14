@@ -89,9 +89,9 @@ const parseMessage = (content: ReplayItem['content']) => {
 }
 export type MessageContent = ReturnType<typeof parseMessage>
 
-const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
-  const replies = res1.replies
-    .concat(res2.replies)
+const getReplies = (res1?: ReplyResponse, res2?: ReplyResponse) => {
+  const replies = (res1?.replies || [])
+    .concat(res2?.replies || [])
     .filter(v => !v.invisible)
     .map(item => {
       return {
@@ -137,7 +137,7 @@ const getReplies = (res1: ReplyResponse, res2: ReplyResponse) => {
           }) || [],
       }
     })
-  if (res1.top.upper) {
+  if (res1?.top.upper) {
     const item = res1.top.upper
     replies.unshift({
       message: parseMessage(item.content),
@@ -204,17 +204,10 @@ export function useDynamicComments(oid: string | number, type: number) {
   } = useSWR<ReplyResponse>(() => {
     return `/x/v2/reply/main?type=${type}&next=2&oid=${oid}`
   })
-  const replies: ReplyItem[] = React.useMemo(() => {
-    if (
-      res1 &&
-      res2 &&
-      Array.isArray(res1?.replies) &&
-      Array.isArray(res2?.replies)
-    ) {
-      return getReplies(res1, res2)
-    }
-    return []
-  }, [res1, res2])
+  const replies: ReplyItem[] = React.useMemo(
+    () => getReplies(res1, res2),
+    [res1, res2],
+  )
   return {
     data: {
       allCount: res1?.cursor.all_count,
