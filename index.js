@@ -1,5 +1,5 @@
 import './src/init'
 import { registerRootComponent } from 'expo'
-import App from './src/routes/Index'
+import App from './src/App'
 
 registerRootComponent(App)
