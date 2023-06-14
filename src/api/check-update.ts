@@ -1,60 +1,57 @@
 import * as Application from 'expo-application'
-import { changelogUrl } from '../constants'
+// import { changelogUrl } from '../constants'
 
 export const currentVersion = Application.nativeApplicationVersion
 
-interface BuildInfo {
-  id: string
-  status: 'PENDING' | 'FINISHED'
-  platform: 'ANDROID' | 'IOS' | 'ALL'
-  artifacts: {
-    buildUrl: string
-    applicationArchiveUrl: string
-  }
-  initiatingActor: {
-    id: string
-    displayName: string
-  }
-  project: {
-    id: string
-    name: string
-    slug: string
-    ownerAccount: {
-      id: string
-      name: string
-    }
-  }
-  releaseChannel: 'production'
-  distribution: 'STORE'
-  buildProfile: 'production'
-  sdkVersion: string
-  appVersion: string
-  appBuildVersion: string
-  gitCommitHash: string
-  gitCommitMessage: string
-  priority: 'NORMAL'
-  createdAt: string
-  updatedAt: string
-  completedAt: string
-  resourceClass: 'ANDROID_MEDIUM'
-}
+// interface BuildInfo {
+//   id: string
+//   status: 'PENDING' | 'FINISHED'
+//   platform: 'ANDROID' | 'IOS' | 'ALL'
+//   artifacts: {
+//     buildUrl: string
+//     applicationArchiveUrl: string
+//   }
+//   initiatingActor: {
+//     id: string
+//     displayName: string
+//   }
+//   project: {
+//     id: string
+//     name: string
+//     slug: string
+//     ownerAccount: {
+//       id: string
+//       name: string
+//     }
+//   }
+//   releaseChannel: 'production'
+//   distribution: 'STORE'
+//   buildProfile: 'production'
+//   sdkVersion: string
+//   appVersion: string
+//   appBuildVersion: string
+//   gitCommitHash: string
+//   gitCommitMessage: string
+//   priority: 'NORMAL'
+//   createdAt: string
+//   updatedAt: string
+//   completedAt: string
+//   resourceClass: 'ANDROID_MEDIUM'
+// }
 
-export const checkUpdate = (url = changelogUrl) => {
-  return fetch(url + '?_t=' + Date.now())
+export const checkUpdate = () => {
+  return fetch('https://unpkg.com/minibili/package.json?_t=' + Date.now())
     .then(r => r.json())
-    .then((res: BuildInfo[]) => {
-      const latestVersion = res[0].appVersion
-      const hasUpdate = res[0].appVersion
-        ? res[0].appVersion !== currentVersion
-        : false
-      const downloadLink = res[0].artifacts.applicationArchiveUrl
-      const changes = res[0].gitCommitMessage.split('  ')
+    .then((res: { name: string; version: string }) => {
+      const latestVersion = res.version.split('-')[0]
+      // const latestVersion = res[0].appVersion
+      const hasUpdate = latestVersion !== currentVersion
+      const downloadLink = `https://unpkg.com/minibili@${res.version}/apk/minibili-${latestVersion}.apk`
       return {
         hasUpdate,
         latestVersion,
         downloadLink,
         currentVersion,
-        changes,
       }
     })
 }

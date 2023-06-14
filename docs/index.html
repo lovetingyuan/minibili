@@ -242,7 +242,7 @@
         const a = fetch('./version.json?_t=' + Date.now())
           .then(r => r.json())
           .then(list => {
-            loading.style.display = 'none'
+            // loading.style.display = 'none'
             // const latestBuild = list[0]
             // document.getElementById('download-btn').href =
             //   latestBuild.artifacts.applicationArchiveUrl ||

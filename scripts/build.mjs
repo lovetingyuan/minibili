@@ -144,10 +144,13 @@ try {
 
   try {
     await $`rm -rf apk && mkdir -p apk`
-    await retry(
-      3,
-      () =>
-        $`wget ${buildList[0].artifacts.buildUrl} -q -O ./apk/minibili-${buildList[0].appVersion}.apk`,
+    await spinner(
+      'download apk file...',
+      retry(
+        3,
+        () =>
+          $`wget ${buildList[0].artifacts.buildUrl} -q -O ./apk/minibili-${buildList[0].appVersion}.apk`,
+      ),
     )
   } catch (err) {
     echo(chalk.red('Failed to download latest apk.'))
@@ -157,7 +160,10 @@ try {
   echo(chalk.blue('publish to npm...'))
 
   try {
-    await retry(3, () => $`npm publish --registry=https://registry.npmjs.org/`)
+    await spinner(
+      'publish to npm...',
+      retry(3, () => $`npm publish --registry=https://registry.npmjs.org/`),
+    )
   } catch (err) {
     echo(chalk.red('Failed to publish to npm.'))
     throw err

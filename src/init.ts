@@ -84,9 +84,7 @@ async function init() {
     await new Promise(r => {
       Alert.alert(
         '有新版本' + (isBigUpdate ? '（建议更新 🎉）' : ''),
-        `${updateInfo.currentVersion} ⟶ ${
-          updateInfo.latestVersion
-        }\n\n${updateInfo.changes.join('\n')}`,
+        `${updateInfo.currentVersion} ⟶ ${updateInfo.latestVersion}`,
         [
           {
             text: '取消',
