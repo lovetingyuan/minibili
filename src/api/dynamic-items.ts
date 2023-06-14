@@ -529,8 +529,8 @@ export function useHasUpdate(mid: number | string) {
       }
     })
     if (!$latestUpdateIds[mid]) {
-      setStore(store => {
-        store.$latestUpdateIds[mid] = latestId
+      setStore(s => {
+        s.$latestUpdateIds[mid] = latestId
       })
     } else if ($latestUpdateIds[mid] !== latestId) {
       return latestId

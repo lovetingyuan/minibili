@@ -274,7 +274,9 @@
             </ul>
             `
           })
-        const b = fetch('https://unpkg.com/minibili/package.json')
+        const b = fetch(
+          'https://unpkg.com/minibili/package.json?_t=' + Date.now(),
+        )
           .then(r => r.json())
           .then(r => {
             const version = r.version.split('-')[0]

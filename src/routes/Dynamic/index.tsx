@@ -65,7 +65,6 @@ const Loading = React.memo(() => {
 })
 
 const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
-  // eslint-disable-next-line no-console
   const upId = route.params?.user?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<any>(null)
   const { data: userInfo } = useUserInfo(upId)
