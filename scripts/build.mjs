@@ -6,7 +6,8 @@ require('dotenv').config({
   path: path.resolve(__dirname, '../.env'),
 })
 
-const { version } = require('../package.json')
+const pkg = require('../package.json')
+const version = pkg.version
 const semver = require('semver')
 const assert = require('assert')
 
@@ -57,10 +58,10 @@ echo(chalk.blue('fetching current build list...'))
 
 const latestBuild =
   await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
-const [{ appVersion, appBuildVersion }] = getBuildList(latestBuild)
-if (`${appVersion}-${appBuildVersion}` !== version) {
+const [{ appVersion }] = getBuildList(latestBuild)
+if (appVersion !== version) {
   throw new Error(
-    'Package version is not same as the latest build version: ' + appVersion,
+    `Package version ${version} is not same as the latest build version ${appVersion}`,
   )
 }
 
@@ -74,14 +75,7 @@ const changes = await question('更新日志（使用双空格分开）')
 if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
-
-echo(
-  chalk.blue(`update npm version ${newVersion}-${appBuildVersion - 0 + 1}...`),
-)
-
-await $`npm version ${newVersion}-${
-  Number(appBuildVersion) + 1
-} -m ${changes} --allow-same-version`
+// pkg.config.versionCode++
 
 echo(
   chalk.cyan(
@@ -125,6 +119,10 @@ try {
   if (buildList[0].appVersion !== newVersion) {
     throw new Error('EAS latest version is not same as updated version.')
   }
+
+  echo(chalk.blue(`update npm version ${newVersion}`))
+  await $`git commit -am "update version to ${newVersion}"`
+  await $`npm version ${newVersion} -m ${changes} --allow-same-version`
 
   echo(chalk.blue('writing version file...'))
 

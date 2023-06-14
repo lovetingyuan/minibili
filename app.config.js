@@ -1,7 +1,9 @@
 require('dotenv').config()
 
 const pkg = require('./package.json')
-const [version, versionCode] = pkg.version.split('-')
+const version = pkg.version
+const versionCode = pkg.config.versionCode
+// const [version, versionCode] = pkg.version.split('-')
 
 const dev = process.argv.includes('start')
 const gitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || '-'

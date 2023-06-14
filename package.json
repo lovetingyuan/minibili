@@ -96,5 +96,10 @@
       "src/**/*.tsx",
       "scripts/*"
     ]
+  },
+  "config": {
+    "versionCode": 50,
+    "changeMessage": "优化细节",
+    "commit": ""
   }
 }
