@@ -143,7 +143,7 @@ await fs.outputJsonSync(
   latestBuildList.map(item => {
     return {
       version: item.appVersion,
-      changelog: item.gitCommitMessage.split('  '),
+      changelog: (item.message || item.gitCommitMessage).split('  '),
       date: item.createdAt,
     }
   }),
