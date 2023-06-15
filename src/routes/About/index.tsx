@@ -41,7 +41,7 @@ import { showToast } from '../../utils'
 export default function About({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, 'About'>) {
-  const { $userInfo, $blackTags, $blackUps, $ranksList } = useStore()
+  const { $userInfo, $blackTags, $blackUps, $videoCatesList } = useStore()
   const [expanded, setExpanded] = React.useState(false)
   const [expandedUp, setExpandedUp] = React.useState(false)
   const [expandedCate, setExpandedCate] = React.useState(false)
@@ -52,7 +52,7 @@ export default function About({
   const [sortedRankList, setSortedRankList] = React.useState<
     { rid: number; label: string }[]
   >([])
-  const [, ...initUnsortedRankList] = $ranksList
+  const [, ...initUnsortedRankList] = $videoCatesList
   const [unsortedRankList, setUnSortedRankList] =
     React.useState(initUnsortedRankList)
   const [feedBackVisible, setFeedbackVisible] = React.useState(false)
@@ -88,10 +88,10 @@ export default function About({
         onPress: () => {
           reportUserLogout()
           store.$userInfo = null
-          store.updatedUps = {}
+          // store.updatedUps = {}
           // store.dynamicUser = null
           store.$followedUps = []
-          store.livingUps = {}
+          // store.livingUps = {}
           store.$ignoredVersions = []
           clearUser()
           setTimeout(() => {
@@ -364,7 +364,7 @@ export default function About({
                     const b = unsortedRankList.concat(cate)
                     setSortedRankList(a)
                     setUnSortedRankList(b)
-                    store.$ranksList = [$ranksList[0], ...a, ...b]
+                    store.$videoCatesList = [$videoCatesList[0], ...a, ...b]
                   }}
                   containerStyle={{ marginBottom: 8 }}
                   buttonStyle={{
@@ -399,7 +399,7 @@ export default function About({
                     const b = unsortedRankList.filter(v => v.rid !== cate.rid)
                     setSortedRankList(a)
                     setUnSortedRankList(b)
-                    store.$ranksList = [$ranksList[0], ...a, ...b]
+                    store.$videoCatesList = [$videoCatesList[0], ...a, ...b]
                   }}
                   containerStyle={{ marginBottom: 8 }}
                   buttonStyle={{

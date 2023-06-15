@@ -107,11 +107,16 @@ function __$hack(dark) {
   }
 }
 
-export default () => {
+export default React.memo(() => {
   const webviewRef = React.useRef<WebView | null>(null)
   const { $userInfo, showCaptcha } = useStore()
   const [ready, setReady] = React.useState(false)
+  const init = React.useRef(0)
+  init.current++
   React.useEffect(() => {
+    if (init.current === 1) {
+      return
+    }
     checkDynamicsApi()
       .then(() => {
         store.showCaptcha = false
@@ -204,7 +209,7 @@ export default () => {
       )}
     </Dialog>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', justifyContent: 'space-between' },

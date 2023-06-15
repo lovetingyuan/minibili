@@ -1,7 +1,7 @@
 import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
 import { View, StyleSheet, Pressable, Linking } from 'react-native'
-import store, { useStore } from '../../store'
+import store from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
 import { Image } from 'expo-image'
@@ -9,11 +9,13 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { NavigationProps, RootStackParamList } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useUserInfo } from '../../api/user-info'
+import { useLivingInfo } from '../../api/living-info'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
 export function HeaderLeft(props: { scrollTop: () => void }) {
-  const { livingUps } = useStore()
+  // const { livingUps } = useStore()
+  const { data: livingUps } = useLivingInfo()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const { data: userInfo } = useUserInfo(route.params?.user.mid)

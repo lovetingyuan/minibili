@@ -10,6 +10,7 @@ import { Badge } from '@rneui/themed'
 import { RootStackParamList } from '../types'
 import { HeaderTitle, HeaderRight } from './VideoList/Header'
 import { setScreenTag } from '../utils/report'
+import { useLivingInfo } from '../api/living-info'
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
 
@@ -78,8 +79,11 @@ const getLabel = (
 }
 
 const MainTab = () => {
-  const { updatedUps, livingUps, checkingUpUpdate, $userInfo } = useStore()
-  const updateCount = Object.values(updatedUps).filter(Boolean).length
+  const { $upUpdateMap, checkingUpUpdate, $userInfo } = useStore()
+  const { data: livingUps } = useLivingInfo()
+  const updateCount = Object.values($upUpdateMap).filter(item => {
+    return item.latestId && item.latestId !== item.currentLatestId
+  }).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
     <Tab.Navigator

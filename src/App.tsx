@@ -1,7 +1,7 @@
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 
-import { NetToast } from './components/NetToast'
+import NetToast from './components/NetToast'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
 import { AppState } from 'react-native'

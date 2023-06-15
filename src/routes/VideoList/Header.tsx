@@ -9,12 +9,12 @@ import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 
 export const HeaderTitle = () => {
-  const { currentVideosCate, $ranksList } = useStore()
+  const { currentVideosCate, $videoCatesList } = useStore()
   const [newVersion, setNewVersion] = React.useState<PromiseResult<
-    typeof store.updateInfo
+    typeof store.appUpdateInfo
   > | null>(null)
   if (!newVersion) {
-    store.updateInfo.then(res => {
+    store.appUpdateInfo.then(res => {
       setNewVersion(res)
     })
   }
@@ -52,7 +52,7 @@ export const HeaderTitle = () => {
         }
         onRequestClose={hideMenu}>
         <ScrollView style={styles.typeList}>
-          {$ranksList.map((item, i) => {
+          {$videoCatesList.map((item, i) => {
             const selected = store.currentVideosCate.rid === item.rid
             const Item = (
               <MenuItem

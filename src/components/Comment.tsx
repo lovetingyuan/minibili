@@ -98,7 +98,7 @@ function CommentText(props: {
   )
 }
 
-export default function Comment(props: Props) {
+export default React.memo(function Comment(props: Props) {
   const { comment, upName } = props
   const { theme } = useTheme()
   const dark = useIsDark()
@@ -245,7 +245,7 @@ export default function Comment(props: Props) {
       ) : null}
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   comment: {

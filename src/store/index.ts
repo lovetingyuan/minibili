@@ -18,18 +18,19 @@ const store = proxy<{
   $followedUps: UserInfo[]
   $blackTags: Record<string, string>
   $userInfo: UserInfo | null
-  $latestUpdateIds: Record<string, string>
-  $ranksList: { rid: number; label: string }[]
+  $upUpdateMap: Record<string, { latestId?: string; currentLatestId: string }>
+  $videoCatesList: { rid: number; label: string }[]
   $ignoredVersions: string[]
   $cookie: string
   // ----------------------------
   webViewMode: 'PC' | 'MOBILE'
-  updatedUps: Record<string, boolean>
-  livingUps: Record<string, string>
-  checkingUpUpdateMap: Record<string, boolean>
+  // updatedUps: Record<string, boolean>
+  // livingUps: Record<string, string>
+  // checkingUpUpdateMap: Record<string, boolean>
+  // updateUpCount: number
   currentVideosCate: (typeof RanksConfig)[number]
   // remoteConfig: Promise<RemoteConfig>
-  updateInfo: ReturnType<typeof checkUpdate>
+  appUpdateInfo: ReturnType<typeof checkUpdate>
   imagesList: {
     src: string
     width: number
@@ -45,21 +46,27 @@ const store = proxy<{
   $followedUps: [],
   $blackTags: {},
   $userInfo: null,
-  $latestUpdateIds: {},
+  $upUpdateMap: {},
   $ignoredVersions: [],
-  $ranksList: RanksConfig,
+  $videoCatesList: RanksConfig,
   $cookie: 'DedeUserID=' + TracyId,
   // -------------------------
   webViewMode: 'MOBILE',
-  updatedUps: {},
-  livingUps: {},
-  checkingUpUpdateMap: {},
-  get checkingUpUpdate() {
-    return Object.values(this.checkingUpUpdateMap).filter(Boolean).length > 0
-  },
+  // updatedUps: {},
+  // livingUps: {},
+  // checkingUpUpdateMap: {},
+  // get updateUpCount() {
+  //   return Object.values(store.$upUpdateMap).filter(item => {
+  //     return item.latestId && item.latestId !== item.currentLatestId
+  //   }).length
+  // },
+  checkingUpUpdate: false,
+  // get checkingUpUpdate() {
+  //   return Object.values(this.checkingUpUpdateMap).filter(Boolean).length > 0
+  // },
   currentVideosCate: RanksConfig[0],
   // remoteConfig: getRemoteConfig(),
-  updateInfo: checkUpdate(),
+  appUpdateInfo: checkUpdate(),
   imagesList: [],
   currentImageIndex: 0,
   overlayButtons: [],

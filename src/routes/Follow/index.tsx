@@ -20,6 +20,7 @@ import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
 import { useLivingInfo } from '../../api/living-info'
 import { throttle } from 'throttle-debounce'
 import { showToast } from '../../utils'
+import { checkUpUpdate } from '../../api/dynamic-items'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
@@ -37,11 +38,23 @@ const vibrate = throttle(
 export default function Follow({ navigation }: Props) {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
-  const { $userInfo, $followedUps, livingUps, updatedUps, checkingUpUpdate } =
-    useStore()
+  const { $userInfo, $followedUps, checkingUpUpdate, $upUpdateMap } = useStore()
+  const { data: livingUps, error: livingError } = useLivingInfo()
+  // const updatedUps = {}
+  // const checkingUpUpdate = false
+  // console.log(1234, $upUpdateMap)
   const followListRef = React.useRef<FlatList | null>(null)
 
   const { data, error, isLoading } = useFollowedUps($userInfo?.mid)
+  React.useEffect(() => {
+    // const timer = setInterval(() => {
+    //   checkUpUpdate(false)
+    // }, 20 * 60 * 1000)
+    checkUpUpdate(true)
+    // return () => {
+    //   clearInterval(timer)
+    // }
+  }, [])
   React.useEffect(() => {
     if (data?.total && data?.total / 50 > 5) {
       Alert.alert('系统限制最多只能加载前250个关注的UP')
@@ -53,35 +66,35 @@ export default function Follow({ navigation }: Props) {
       showToast('获取关注列表失败（用户需要设置关注列表公开）')
     }
   }, [error])
-  React.useEffect(() => {
-    if (data?.list && store.$followedUps !== data.list) {
-      store.$followedUps = data.list
-    }
-  }, [data?.list])
+  // React.useEffect(() => {
+  //   if (data?.list) {
+  //     store.$followedUps = data.list
+  //   }
+  // }, [data?.list])
 
   const { width } = useWindowDimensions()
-  const { data: livingMap, error: livingError } = useLivingInfo()
+  // const { data: livingMap, error: livingError } = useLivingInfo()
   React.useEffect(() => {
     if (livingError) {
       showToast('检查直播失败')
     }
   }, [livingError])
-  React.useEffect(() => {
-    if (livingMap) {
-      const livingMap2: Record<string, string> = {}
-      Object.keys(livingMap).forEach(mid => {
-        // https://live.bilibili.com/h5/24446464
-        const { live_status, room_id } = livingMap[mid]
-        const living = live_status === 1
-        const url = 'https://live.bilibili.com/h5/' + room_id
-        livingMap2[mid] = living ? url : ''
-        if (living) {
-          vibrate()
-        }
-      })
-      store.livingUps = livingMap2
-    }
-  }, [livingMap])
+  // React.useEffect(() => {
+  //   if (livingMap) {
+  //     const livingMap2: Record<string, string> = {}
+  //     Object.keys(livingMap).forEach(mid => {
+  //       // https://live.bilibili.com/h5/24446464
+  //       const { live_status, room_id } = livingMap[mid]
+  //       const living = live_status === 1
+  //       const url = 'https://live.bilibili.com/h5/' + room_id
+  //       livingMap2[mid] = living ? url : ''
+  //       if (living) {
+  //         vibrate()
+  //       }
+  //     })
+  //     store.livingUps = livingMap2
+  //   }
+  // }, [livingMap])
   const columns = Math.floor(width / 90)
   const rest = columns - (data?.list.length ? data.list.length % columns : 0)
   React.useEffect(() => {
@@ -102,12 +115,13 @@ export default function Follow({ navigation }: Props) {
 
   const renderItem = ({
     item,
+    index,
   }: {
     item: FollowedUpItem | null
     index: number
   }) => {
     if (item) {
-      return <FollowItem item={item} />
+      return <FollowItem item={item} index={index} />
     }
     return <View style={{ flex: 1 }} />
   }
@@ -117,6 +131,12 @@ export default function Follow({ navigation }: Props) {
     const topUps: FollowedUpItem[] = []
     const updateUps: FollowedUpItem[] = []
     const noUpdateUps: FollowedUpItem[] = []
+    const updatedUps: Record<string, boolean> = {}
+    for (const mid in $upUpdateMap) {
+      updatedUps[mid] =
+        !!$upUpdateMap[mid].latestId &&
+        $upUpdateMap[mid].latestId !== $upUpdateMap[mid].currentLatestId
+    }
     for (const up of $followedUps) {
       if (livingUps[up.mid]) {
         topUps.push({ ...up })

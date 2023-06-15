@@ -9,7 +9,7 @@ export default function request<D extends any>(url: string) {
     ? url
     : 'https://api.bilibili.com' + url
   // eslint-disable-next-line no-console
-  __DEV__ && console.log('request url: ', url)
+  __DEV__ && console.log('request url: ', url.slice(0, 150))
   const isDynamic = url.startsWith('/x/polymer/web-dynamic/v1/feed/space')
   return fetch(requestUrl, {
     headers: {

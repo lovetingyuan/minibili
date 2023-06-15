@@ -73,18 +73,18 @@ async function init() {
   //     )
   //   })
   // }
-  const updateInfo = await store.updateInfo
+  const appUpdateInfo = await store.appUpdateInfo
   const isIgnoredVersion = store.$ignoredVersions.includes(
-    updateInfo.latestVersion,
+    appUpdateInfo.latestVersion,
   )
-  if (updateInfo.hasUpdate && !isIgnoredVersion) {
+  if (appUpdateInfo.hasUpdate && !isIgnoredVersion) {
     const isBigUpdate =
-      updateInfo.currentVersion?.split('.')[0] !==
-      updateInfo.latestVersion.split('.')[0]
+      appUpdateInfo.currentVersion?.split('.')[0] !==
+      appUpdateInfo.latestVersion.split('.')[0]
     await new Promise(r => {
       Alert.alert(
         '有新版本' + (isBigUpdate ? '（建议更新 🎉）' : ''),
-        `${updateInfo.currentVersion} ⟶ ${updateInfo.latestVersion}`,
+        `${appUpdateInfo.currentVersion} ⟶ ${appUpdateInfo.latestVersion}`,
         [
           {
             text: '取消',
@@ -92,7 +92,7 @@ async function init() {
           {
             text: '忽略',
             onPress: () => {
-              store.$ignoredVersions.push(updateInfo.latestVersion!)
+              store.$ignoredVersions.push(appUpdateInfo.latestVersion!)
               r(null)
             },
           },
@@ -100,7 +100,7 @@ async function init() {
             text: '下载更新',
             onPress: () => {
               r(null)
-              Linking.openURL(updateInfo.downloadLink)
+              Linking.openURL(appUpdateInfo.downloadLink)
             },
           },
         ],

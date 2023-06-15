@@ -13,7 +13,7 @@ import PagerView from 'react-native-pager-view'
 import store, { useStore } from '../store'
 import { Image } from 'expo-image'
 
-export default function ImagesView() {
+export default React.memo(function ImagesView() {
   const { imagesList, currentImageIndex } = useStore()
   const netinfo = useNetInfo()
   const { width, height } = useWindowDimensions()
@@ -92,7 +92,7 @@ export default function ImagesView() {
       </View>
     </Overlay>
   )
-}
+})
 
 const styles = StyleSheet.create({
   pagerImage: {

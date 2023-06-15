@@ -1,7 +1,7 @@
 import request from './fetcher'
-import useSWR from 'swr'
-import React from 'react'
-import store, { setStore, useStore } from '../store'
+// import useSWR from 'swr'
+// import React from 'react'
+import store from '../store'
 import PQueue from 'p-queue'
 import {
   DynamicItemBaseType,
@@ -502,41 +502,94 @@ const queue = new PQueue({
   interval: 1000,
 })
 
-export function useHasUpdate(mid: number | string) {
-  const timeout = mid.toString().slice(0, 5)
-  const { $latestUpdateIds } = useStore()
-  const { data, isLoading } = useSWR<any>(
-    `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
-    (url: string) => {
-      return queue.add(() => request(url))
-    },
-    {
-      refreshInterval: 6 * 60 * 1000 + Number(timeout),
-    },
-  )
-  React.useEffect(() => {
-    store.checkingUpUpdateMap[mid] = isLoading
-  }, [mid, isLoading])
-
-  let latestTime = 0
-  let latestId = ''
-  if (data?.items) {
-    data.items.forEach((item: any) => {
-      const pubTime = item.modules?.module_author?.pub_ts
-      if (pubTime > latestTime) {
-        latestTime = pubTime
-        latestId = item.id_str
+function checkSingleUpUpdate(mid: string | number) {
+  const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
+  return request<DynamicListResponse>(url)
+    .then(data => {
+      let latestTime = 0
+      let latestId = ''
+      if (data?.items) {
+        data.items.forEach(item => {
+          const pubTime = item.modules?.module_author?.pub_ts
+          if (pubTime > latestTime) {
+            latestTime = pubTime
+            latestId = item.id_str
+          }
+        })
+        // if (!$upUpdateMap[mid]) {
+        //   setStore(s => {
+        //     s.$upUpdateMap[mid] = latestId
+        //   })
+        // } else if ($upUpdateMap[mid] !== latestId) {
+        //   return latestId
+        // }
       }
-    })
-    if (!$latestUpdateIds[mid]) {
-      setStore(s => {
-        s.$latestUpdateIds[mid] = latestId
-      })
-    } else if ($latestUpdateIds[mid] !== latestId) {
       return latestId
-    }
+    })
+    .catch(() => {
+      // 忽略失败
+      return ''
+    })
+}
+
+export function checkUpUpdate(first: boolean) {
+  // const timeout = mid.toString().slice(0, 5)
+  // const { $upUpdateMap, $followedUps } = useStore()
+  const upUpdateMap = JSON.parse(
+    JSON.stringify(store.$upUpdateMap),
+  ) as typeof store.$upUpdateMap
+  if (first) {
+    store.checkingUpUpdate = true
   }
-  return ''
+  store.$followedUps.forEach(up => {
+    queue.add(() =>
+      checkSingleUpUpdate(up.mid).then(id => {
+        if (!id) {
+          return
+        }
+        if (up.mid in upUpdateMap) {
+          upUpdateMap[up.mid].currentLatestId = id
+        } else {
+          upUpdateMap[up.mid] = {
+            latestId: id,
+            currentLatestId: id,
+          }
+        }
+        // const watched =
+        //   up.mid in store.$upUpdateMap &&
+        //   store.$upUpdateMap[up.mid].latestId !== latestId
+        // upUpdateMap[up.mid] = upUpdateMap[up.mid] || {}
+      }),
+    )
+  })
+  queue.onIdle().then(() => {
+    // eslint-disable-next-line no-console
+    console.log(1111111111)
+    store.checkingUpUpdate = false
+    store.$upUpdateMap = upUpdateMap
+    setTimeout(() => {
+      checkUpUpdate(false)
+    }, 10 * 60 * 1000)
+    // checkUpUpdate(false)
+  })
+  // let latestTime = 0
+  // let latestId = ''
+  // if (data?.items) {
+  //   data.items.forEach((item: any) => {
+  //     const pubTime = item.modules?.module_author?.pub_ts
+  //     if (pubTime > latestTime) {
+  //       latestTime = pubTime
+  //       latestId = item.id_str
+  //     }
+  //   })
+  //   if (!$upUpdateMap[mid]) {
+  //     setStore(s => {
+  //       s.$upUpdateMap[mid] = latestId
+  //     })
+  //   } else if ($upUpdateMap[mid] !== latestId) {
+  //     return latestId
+  //   }
+  // }
 }
 
 function _checkDynamicsApi() {

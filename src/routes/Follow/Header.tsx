@@ -9,7 +9,7 @@ import { NavigationProps } from '../../types'
 import { useUserRelation } from '../../api/user-relation'
 import { parseNumber } from '../../utils'
 
-export default function Header() {
+export default React.memo(function Header() {
   const { $userInfo } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: relation } = useUserRelation($userInfo?.mid)
@@ -68,7 +68,7 @@ export default function Header() {
       </View>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   right: { flex: 1, marginLeft: 16 },

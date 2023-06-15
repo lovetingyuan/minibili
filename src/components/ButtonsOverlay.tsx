@@ -3,7 +3,7 @@ import React from 'react'
 import { StyleSheet } from 'react-native'
 import store, { useStore } from '../store'
 
-export default function ButtonsOverlay() {
+export default React.memo(function ButtonsOverlay() {
   const { overlayButtons } = useStore()
   const dismiss = () => {
     store.overlayButtons = []
@@ -39,7 +39,7 @@ export default function ButtonsOverlay() {
       {Buttons}
     </Overlay>
   )
-}
+})
 
 const styles = StyleSheet.create({
   button: {

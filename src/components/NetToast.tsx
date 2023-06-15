@@ -2,7 +2,7 @@ import { useNetInfo } from '@react-native-community/netinfo'
 import React from 'react'
 import { showToast } from '../utils'
 
-export function NetToast() {
+export default React.memo(function NetToast() {
   const netInfo = useNetInfo()
   React.useEffect(() => {
     if (netInfo.isConnected === false) {
@@ -14,4 +14,4 @@ export function NetToast() {
     }
   }, [netInfo.isConnected, netInfo.type])
   return null
-}
+})
