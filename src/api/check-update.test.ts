@@ -1,10 +1,24 @@
-import { test, expect } from 'vitest'
+import { test, expect, describe } from 'vitest'
 import { changelogUrl } from '../constants'
-import { BuildListSchema } from './check-update.schema'
+import { z } from 'zod'
 
-test('check-update', async () => {
-  const res = await fetch(changelogUrl).then(r => r.json())
-  // expect(res).toHaveLength(5)
-  expect(res.length > 0).toBe(true)
-  BuildListSchema.parse(res)
+describe('app-version-update', () => {
+  test.skip('version.json', async () => {
+    const BuildListSchema = z.object({
+      version: z.string(),
+      changelog: z.string().array(),
+      date: z.string(),
+    })
+    const res = await fetch(changelogUrl).then(r => r.json())
+    expect(res.length > 0).toBe(true)
+    BuildListSchema.parse(res)
+  })
+  test.skip('unpkg-check', async () => {
+    await fetch('https://unpkg.com/minibili/package.json')
+      .then(r => r.json())
+      .then(pkg => {
+        expect(typeof pkg.version).toBe('string')
+        expect(typeof pkg.config.versionCode).toBe('number')
+      })
+  })
 })

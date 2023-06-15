@@ -242,32 +242,20 @@
         const a = fetch('./version.json?_t=' + Date.now())
           .then(r => r.json())
           .then(list => {
-            // loading.style.display = 'none'
-            // const latestBuild = list[0]
-            // document.getElementById('download-btn').href =
-            //   latestBuild.artifacts.applicationArchiveUrl ||
-            //   latestBuild.artifacts.buildUrl
-
-            // document.getElementById(
-            //   'download-btn',
-            // ).textContent += ` (${latestBuild.appVersion})`
             document.getElementById('changelog').innerHTML = `
             <ul>
             ${list
               .map(change => {
-                // const apkUrl =
-                //   change.artifacts.applicationArchiveUrl ||
-                //   change.artifacts.buildUrl
-                const updateMessage = change.gitCommitMessage.split('  ')
-                const buildDate = change.completedAt.split('T')[0]
-                const version = change.appVersion
+                const changelog = change.changelog
+                const buildDate = change.date.split('T')[0]
+                const version = change.version
                 return `
                 <li>
                   <p style="font-size: 14px">${version} (${buildDate})</p>
                   <ul>
-                    ${updateMessage.map(msg => `<li>${msg}</li>`).join('\n')}
+                    ${changelog.map(msg => `<li>${msg}</li>`).join('\n')}
                   </ul>
-                  </li>
+                </li>
                 `
               })
               .join('\n')}

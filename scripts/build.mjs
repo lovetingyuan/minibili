@@ -2,10 +2,12 @@
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
 
 // import { BuildListSchema } from '../src/api/check-update.schema.ts'
+// 1 检查环境 2 写入版本 3 eas构建 4 写入更新日志 5 下载apk 6 git推送
 require('dotenv').config({
   path: path.resolve(__dirname, '../.env'),
 })
 
+const pkgPath = require.resolve('../package.json')
 const pkg = require('../package.json')
 const version = pkg.version
 const semver = require('semver')
@@ -56,14 +58,16 @@ assert.equal(
 
 echo(chalk.blue('fetching current build list...'))
 
-const latestBuild =
+const currentBuild =
   await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
-const [{ appVersion }] = getBuildList(latestBuild)
+const [{ appVersion }] = getBuildList(currentBuild)
 if (appVersion !== version) {
   throw new Error(
     `Package version ${version} is not same as the latest build version ${appVersion}`,
   )
 }
+
+// -------------------------------------------
 
 const newVersion = await question(`更新版本（${appVersion} -> ?）`)
 
@@ -75,7 +79,14 @@ const changes = await question('更新日志（使用双空格分开）')
 if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
-// pkg.config.versionCode++
+
+pkg.config.versionCode++
+pkg.version = newVersion
+pkg.config.changelog = changes
+const commitHash = (await $`git rev-parse --short HEAD`).toString('utf8').trim()
+pkg.gitHead = commitHash
+
+fs.outputJsonSync(pkgPath, pkg)
 
 echo(
   chalk.cyan(
@@ -83,18 +94,11 @@ echo(
   ),
 )
 
+let latestBuildList
+
 try {
   await spinner('eas building...', async () => {
-    await $`eas build --platform android --profile production --json --non-interactive`
-    // const buildList = getBuildList(res)
-    // if (buildList[0].appVersion !== newVersion) {
-    //   throw new Error(
-    //     'Something wrong with the build, version does not match ' +
-    //       buildList[0].appVersion +
-    //       ' vs ' +
-    //       newVersion,
-    //   )
-    // }
+    await $`eas build --platform android --profile production --message ${changes} --json --non-interactive`
   })
   echo(chalk.blue('check eas build list...'))
   await new Promise(r => {
@@ -105,7 +109,7 @@ try {
   try {
     buildListStr = await spinner('get eas build list...', () =>
       retry(
-        5,
+        3,
         () =>
           $`eas build:list --platform android --limit 5 --json --non-interactive --status finished --channel production`,
       ),
@@ -115,71 +119,77 @@ try {
     throw err
   }
 
-  const buildList = getBuildList(buildListStr)
-  if (buildList[0].appVersion !== newVersion) {
-    throw new Error('EAS latest version is not same as updated version.')
-  }
-
-  echo(chalk.blue(`update npm version ${newVersion}`))
-  await $`git commit -am "update version to ${newVersion}"`
-  await $`npm version ${newVersion} -m ${changes} --allow-same-version`
-
-  echo(chalk.blue('writing version file...'))
-
-  await fs.outputJsonSync(
-    path.resolve(__dirname, '../docs/version.json'),
-    buildList.map(item => {
-      return item
-      // return {
-      //   version: item.appVersion,
-      //   changelog: item.gitCommitMessage.split('  '),
-      //   date: item.createdAt,
-      // }
-    }),
-  )
-
-  echo(chalk.blue('download apk file...'))
-
-  try {
-    await $`rm -rf apk && mkdir -p apk`
-    await spinner(
-      'download apk file...',
-      retry(
-        3,
-        () =>
-          $`wget ${buildList[0].artifacts.buildUrl} -q -O ./apk/minibili-${buildList[0].appVersion}.apk`,
-      ),
+  latestBuildList = getBuildList(buildListStr)
+  if (latestBuildList[0].appVersion !== newVersion) {
+    throw new Error(
+      `EAS latest version ${latestBuildList[0].appVersion} is not same as updated version ${newVersion}`,
     )
-  } catch (err) {
-    echo(chalk.red('Failed to download latest apk.'))
-    throw err
-  }
-
-  echo(chalk.blue('publish to npm...'))
-
-  try {
-    await spinner(
-      'publish to npm...',
-      retry(3, () => $`npm publish --registry=https://registry.npmjs.org/`),
-    )
-  } catch (err) {
-    echo(chalk.red('Failed to publish to npm.'))
-    throw err
-  }
-
-  echo(chalk.blue('commit to github...'))
-
-  try {
-    await $`git commit -a --amend -C HEAD`
-    await spinner('git push...', () => retry(5, () => $`git push`))
-  } catch (err) {
-    echo(chalk.red('Failed to push build list to git.'))
-    throw err
   }
 } catch (err) {
   await $`git checkout -- .`
-  await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
+  // await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
   echo(chalk.red('Failed to build new apk on EAS.'))
+  throw err
+}
+
+// ---------------------------------------------
+
+echo(chalk.blue('writing version file...'))
+
+await fs.outputJsonSync(
+  path.resolve(__dirname, '../docs/version.json'),
+  latestBuildList.map(item => {
+    return {
+      version: item.appVersion,
+      changelog: item.gitCommitMessage.split('  '),
+      date: item.createdAt,
+    }
+  }),
+  {
+    spaces: 2,
+  },
+)
+
+const apkUrl = latestBuildList[0].artifacts.buildUrl
+echo(chalk.blue('download apk file...'))
+echo(chalk.cyan(apkUrl))
+
+try {
+  await $`rm -rf apk && mkdir -p apk`
+  await spinner(
+    'downloading...',
+    retry(3, () => $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`),
+  )
+} catch (err) {
+  echo(chalk.red('Failed to download latest apk.'))
+  throw err
+}
+
+echo(chalk.blue('publish to npm...'))
+
+try {
+  await spinner(
+    'publish to npm...',
+    retry(3, () => $`npm publish --registry=https://registry.npmjs.org/`),
+  )
+} catch (err) {
+  echo(chalk.red('Failed to publish to npm.'))
+  throw err
+}
+
+echo(chalk.blue('commit to github...'))
+
+try {
+  // await $`git commit -a --amend -C HEAD`
+  const message = `release(v${newVersion}): ${changes}`
+  await $`git commit -am ${message}`
+  await spinner('git push change...', () => retry(5, () => $`git push`))
+  await $`git tag -a v${newVersion} -m ${changes}`
+  await spinner('git push tag...', () =>
+    retry(5, () => $`git push origin v${newVersion}`),
+  )
+} catch (err) {
+  echo(chalk.red('Failed to push to git.'))
   throw err
 }
 

@@ -99,7 +99,6 @@
   },
   "config": {
     "versionCode": 50,
-    "changeMessage": "优化细节",
-    "commit": ""
+    "changelog": "优化细节"
   }
 }
