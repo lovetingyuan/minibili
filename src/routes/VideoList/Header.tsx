@@ -29,7 +29,16 @@ export const HeaderTitle = () => {
         style={{ ...styles.menu, backgroundColor: theme.colors.background }}
         anchor={
           <Pressable onPress={showMenu} style={styles.titleContainer}>
-            <Text style={[styles.title, { color: theme.colors.grey1 }]}>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color:
+                    currentVideosCate.rid === -1
+                      ? '#F85A54'
+                      : theme.colors.grey1,
+                },
+              ]}>
               {currentVideosCate.label +
                 (currentVideosCate.rid === -1 ? '' : '排行')}{' '}
             </Text>
@@ -50,7 +59,12 @@ export const HeaderTitle = () => {
                 textStyle={{
                   fontSize: 16,
                   fontWeight: i && !selected ? 'normal' : 'bold',
-                  color: selected ? theme.colors.primary : theme.colors.black,
+                  color:
+                    item.rid === -1
+                      ? '#F85A54'
+                      : selected
+                      ? theme.colors.primary
+                      : theme.colors.black,
                 }}
                 onPress={() => {
                   store.currentVideosCate = item
