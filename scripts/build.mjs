@@ -86,7 +86,9 @@ pkg.config.changelog = changes
 const commitHash = (await $`git rev-parse --short HEAD`).toString('utf8').trim()
 pkg.gitHead = commitHash
 
-fs.outputJsonSync(pkgPath, pkg)
+fs.outputJsonSync(pkgPath, pkg, {
+  spaces: 2,
+})
 
 echo(
   chalk.cyan(
@@ -156,8 +158,7 @@ echo(chalk.cyan(apkUrl))
 
 try {
   await $`rm -rf apk && mkdir -p apk`
-  await spinner(
-    'downloading...',
+  await spinner('downloading...', () =>
     retry(3, () => $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`),
   )
 } catch (err) {
@@ -168,8 +169,7 @@ try {
 echo(chalk.blue('publish to npm...'))
 
 try {
-  await spinner(
-    'publish to npm...',
+  await spinner('publish to npm...', () =>
     retry(3, () => $`npm publish --registry=https://registry.npmjs.org/`),
   )
 } catch (err) {
