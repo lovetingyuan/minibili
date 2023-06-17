@@ -1,6 +1,7 @@
 import * as SentryExpo from 'sentry-expo'
 import getLocation from '../api/get-location'
 import { HandledDynamicTypeEnum } from '../api/dynamic-items.type'
+import { ApiError } from '../api/fetcher'
 
 export enum Tags {
   user_name = 'user.name',
@@ -19,24 +20,25 @@ export enum Action {
   add_black_user = 'add_black_user',
 }
 
-class ApiError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'API Error'
-  }
-}
-
-export function reportApiError(api: {
-  url: string
-  code: number
-  message: string
-  method?: string
-}) {
-  SentryExpo.Native.captureException(new ApiError(api.url.split('?')[0]), {
-    contexts: {
-      api,
+export function reportApiError(
+  url: string,
+  res: {
+    code: number
+    message: string
+    data: any
+  },
+) {
+  SentryExpo.Native.captureException(
+    new ApiError(url.split('?')[0], url, res),
+    {
+      contexts: {
+        url: {
+          value: url,
+        },
+        res,
+      },
     },
-  })
+  )
 }
 
 export function reportUserAction(action: Action, actionPayload: any = null) {

@@ -23,6 +23,7 @@ import {
 } from './dynamic-items.type'
 import { delay, parseUrl } from '../utils'
 import { TracyId } from '../constants'
+import { subscribeKey } from 'valtio/utils'
 
 type OmitUndef<T> = {
   [K in keyof T as T[K] extends undefined ? never : K]: T[K]
@@ -479,8 +480,6 @@ export function useDynamicItems(mid?: string | number) {
       return a.concat(b.items)
     }, [] as DynamicListResponse['items']) || []
 
-  const isLoadingMore =
-    isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')
   const isEmpty = data?.[0]?.items.length === 0
   const isReachingEnd = isEmpty || (data && !data[data.length - 1]?.has_more)
   const isRefreshing = isValidating && !!data && data.length === size
@@ -491,15 +490,22 @@ export function useDynamicItems(mid?: string | number) {
     error,
     isRefreshing,
     isReachingEnd,
-    loading: isLoadingMore,
+    isLoading,
+    isValidating,
     refresh: mutate,
   }
 }
 
-const queue = new PQueue({
+export const upUpdateQueue = new PQueue({
   concurrency: 15,
   intervalCap: 5,
   interval: 1000,
+})
+
+subscribeKey(store, '$followedUps' as const, ups => {
+  if (!ups.length) {
+    upUpdateQueue.clear()
+  }
 })
 
 function checkSingleUpUpdate(mid: string | number) {
@@ -516,13 +522,6 @@ function checkSingleUpUpdate(mid: string | number) {
             latestId = item.id_str
           }
         })
-        // if (!$upUpdateMap[mid]) {
-        //   setStore(s => {
-        //     s.$upUpdateMap[mid] = latestId
-        //   })
-        // } else if ($upUpdateMap[mid] !== latestId) {
-        //   return latestId
-        // }
       }
       return latestId
     })
@@ -532,64 +531,50 @@ function checkSingleUpUpdate(mid: string | number) {
     })
 }
 
-export function checkUpUpdate(first: boolean) {
-  // const timeout = mid.toString().slice(0, 5)
-  // const { $upUpdateMap, $followedUps } = useStore()
-  const upUpdateMap = JSON.parse(
-    JSON.stringify(store.$upUpdateMap),
-  ) as typeof store.$upUpdateMap
+export async function checkUpdateUps(first: boolean) {
+  // await checkQueue()
+  // upUpdateQueue.clear()
+  if (upUpdateQueue.size || upUpdateQueue.pending) {
+    return
+  }
+  if (!store.$followedUps.length) {
+    upUpdateQueue.clear()
+    if (store.checkingUpUpdate) {
+      store.checkingUpUpdate = false
+    }
+    store.$upUpdateMap = {}
+    return
+  }
   if (first) {
     store.checkingUpUpdate = true
   }
-  store.$followedUps.forEach(up => {
-    queue.add(() =>
-      checkSingleUpUpdate(up.mid).then(id => {
-        if (!id) {
-          return
-        }
-        if (up.mid in upUpdateMap) {
-          upUpdateMap[up.mid].currentLatestId = id
-        } else {
-          upUpdateMap[up.mid] = {
-            latestId: id,
+  const upUpdateMap: typeof store.$upUpdateMap = {}
+  for (const up of store.$followedUps) {
+    upUpdateQueue.add(async () => {
+      const id = await checkSingleUpUpdate(up.mid)
+      upUpdateMap[up.mid] = id
+        ? {
+            latestId: store.$upUpdateMap[up.mid]?.latestId ?? id,
             currentLatestId: id,
           }
-        }
-        // const watched =
-        //   up.mid in store.$upUpdateMap &&
-        //   store.$upUpdateMap[up.mid].latestId !== latestId
-        // upUpdateMap[up.mid] = upUpdateMap[up.mid] || {}
-      }),
-    )
+        : {
+            latestId: '',
+            currentLatestId: '',
+          }
+    })
+  }
+
+  return upUpdateQueue.onIdle().then(() => {
+    if (store.checkingUpUpdate) {
+      store.checkingUpUpdate = false
+    }
+    if (!store.$followedUps.length) {
+      // 退出的时候
+      store.$upUpdateMap = {}
+    } else {
+      store.$upUpdateMap = upUpdateMap
+    }
   })
-  queue.onIdle().then(() => {
-    // eslint-disable-next-line no-console
-    console.log(1111111111)
-    store.checkingUpUpdate = false
-    store.$upUpdateMap = upUpdateMap
-    setTimeout(() => {
-      checkUpUpdate(false)
-    }, 10 * 60 * 1000)
-    // checkUpUpdate(false)
-  })
-  // let latestTime = 0
-  // let latestId = ''
-  // if (data?.items) {
-  //   data.items.forEach((item: any) => {
-  //     const pubTime = item.modules?.module_author?.pub_ts
-  //     if (pubTime > latestTime) {
-  //       latestTime = pubTime
-  //       latestId = item.id_str
-  //     }
-  //   })
-  //   if (!$upUpdateMap[mid]) {
-  //     setStore(s => {
-  //       s.$upUpdateMap[mid] = latestId
-  //     })
-  //   } else if ($upUpdateMap[mid] !== latestId) {
-  //     return latestId
-  //   }
-  // }
 }
 
 function _checkDynamicsApi() {

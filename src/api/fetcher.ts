@@ -1,15 +1,29 @@
 import { reportApiError } from '../utils/report'
 import store from '../store'
-import Toast from 'react-native-root-toast'
 
-let errorTime = Date.now()
+type Res<D = any> = {
+  code: number
+  message: string
+  data: D
+}
+
+export class ApiError extends Error {
+  response: Res
+  url: string
+  constructor(message: string, url: string, res: Res) {
+    super(message)
+    this.name = 'API Error'
+    this.response = res
+    this.url = url
+  }
+}
 
 export default function request<D extends any>(url: string) {
   const requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
-  // eslint-disable-next-line no-console
-  __DEV__ && console.log('request url: ', url.slice(0, 150))
+
+  // __DEV__ && console.log('request url: ', url.slice(0, 150))
   const isDynamic = url.startsWith('/x/polymer/web-dynamic/v1/feed/space')
   return fetch(requestUrl, {
     headers: {
@@ -31,39 +45,28 @@ export default function request<D extends any>(url: string) {
       if (index > -1) {
         resText = resText.substring(index + 1)
       }
-      type Res = {
-        code: number
-        message: string
-        data: D
-      }
       let res = {
         code: -1,
         message: '解析json失败:' + resText,
-        data: {},
-      } as Res
+        data: resText,
+      } as Res<D>
       try {
-        res = JSON.parse(resText) as Res
+        res = JSON.parse(resText) as Res<D>
       } catch (err) {}
       if (res.code) {
         if (isDynamic) {
-          store.showCaptcha = true
+          store.loadingDynamicError = true
+        } else if (store.loadingDynamicError) {
+          store.loadingDynamicError = false
         }
-        if (__DEV__) {
-          Toast.show(` 数据获取失败:${url}, ${res.code} ${res.message}`)
-          // eslint-disable-next-line no-console
-          console.log('error', url, res.code, res.message)
-        } else if (Date.now() - errorTime > 10000) {
-          Toast.show(' 数据获取失败 ')
-          errorTime = Date.now()
-        }
-        reportApiError({
-          url,
-          code: res.code,
-          message: res.message,
-          method: 'GET',
-        })
+        reportApiError(url, res)
+
         return Promise.reject(
-          new Error('未能获取当前数据' + (__DEV__ ? ' ' + url : '')),
+          new ApiError(
+            '未能获取当前数据' + (__DEV__ ? ' ' + url : ''),
+            url,
+            res,
+          ),
         )
       }
       return res.data

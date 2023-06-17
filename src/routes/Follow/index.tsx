@@ -1,102 +1,80 @@
 import React from 'react'
 import {
-  Text,
   View,
   FlatList,
   StyleSheet,
   useWindowDimensions,
   Alert,
-  Vibration,
   ActivityIndicator,
 } from 'react-native'
+import { Text } from '@rneui/themed'
 import FollowItem from './FollowItem'
 
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 
 import Header from './Header'
-import { FollowedUpItem, useFollowedUps } from '../../api/followed-ups'
-import { useLivingInfo } from '../../api/living-info'
-import { throttle } from 'throttle-debounce'
+import { FollowedUpItem, getFollowedUps } from '../../api/followed-ups'
 import { showToast } from '../../utils'
-import { checkUpUpdate } from '../../api/dynamic-items'
+import { checkUpdateUps } from '../../api/dynamic-items'
+import { useUserRelation } from '../../api/user-relation'
+import { ApiError } from '../../api/fetcher'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
-
-const vibrate = throttle(
-  10000,
-  () => {
-    Vibration.vibrate(900)
-  },
-  {
-    noLeading: false,
-    noTrailing: false,
-  },
-)
 
 export default function Follow({ navigation }: Props) {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
-  const { $userInfo, $followedUps, checkingUpUpdate, $upUpdateMap } = useStore()
-  const { data: livingUps, error: livingError } = useLivingInfo()
-  // const updatedUps = {}
-  // const checkingUpUpdate = false
-  // console.log(1234, $upUpdateMap)
+  const { $userInfo, $followedUps, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
-
-  const { data, error, isLoading } = useFollowedUps($userInfo?.mid)
-  React.useEffect(() => {
-    // const timer = setInterval(() => {
-    //   checkUpUpdate(false)
-    // }, 20 * 60 * 1000)
-    checkUpUpdate(true)
-    // return () => {
-    //   clearInterval(timer)
-    // }
-  }, [])
-  React.useEffect(() => {
-    if (data?.total && data?.total / 50 > 5) {
-      Alert.alert('系统限制最多只能加载前250个关注的UP')
-    }
-  }, [data?.total])
+  const [isLoading, setIsLoading] = React.useState(false)
+  // const [error, setError] = React.useState('')
+  const { data: relation } = useUserRelation($userInfo?.mid)
 
   React.useEffect(() => {
-    if (error) {
-      showToast('获取关注列表失败（用户需要设置关注列表公开）')
+    if (!$userInfo?.mid) {
+      return
     }
-  }, [error])
-  // React.useEffect(() => {
-  //   if (data?.list) {
-  //     store.$followedUps = data.list
-  //   }
-  // }, [data?.list])
+    let checkUpUpdateTimer: number | null = null
+    setIsLoading(true)
+    getFollowedUps($userInfo.mid)
+      .then(
+        total => {
+          if (total > 250) {
+            Alert.alert('系统限制最多只能加载前250个关注的UP')
+          }
+        },
+        err => {
+          if (err instanceof ApiError) {
+            if (err.response.code === 22115) {
+              showToast(err.response.message)
+            } else {
+              showToast('获取关注列表失败')
+            }
+          }
+        },
+      )
+      .finally(() => {
+        setIsLoading(false)
+        checkUpdateUps(true)
+        checkUpUpdateTimer = window.setInterval(() => {
+          checkUpdateUps(false)
+        }, 10 * 60 * 1000)
+      })
+    return () => {
+      if (typeof checkUpUpdateTimer === 'number') {
+        clearInterval(checkUpUpdateTimer)
+      }
+    }
+  }, [$userInfo?.mid])
 
   const { width } = useWindowDimensions()
-  // const { data: livingMap, error: livingError } = useLivingInfo()
-  React.useEffect(() => {
-    if (livingError) {
-      showToast('检查直播失败')
-    }
-  }, [livingError])
-  // React.useEffect(() => {
-  //   if (livingMap) {
-  //     const livingMap2: Record<string, string> = {}
-  //     Object.keys(livingMap).forEach(mid => {
-  //       // https://live.bilibili.com/h5/24446464
-  //       const { live_status, room_id } = livingMap[mid]
-  //       const living = live_status === 1
-  //       const url = 'https://live.bilibili.com/h5/' + room_id
-  //       livingMap2[mid] = living ? url : ''
-  //       if (living) {
-  //         vibrate()
-  //       }
-  //     })
-  //     store.livingUps = livingMap2
-  //   }
-  // }, [livingMap])
   const columns = Math.floor(width / 90)
-  const rest = columns - (data?.list.length ? data.list.length % columns : 0)
+  const followedUpListLen = $followedUps.length
+  const rest = followedUpListLen
+    ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
+    : 0
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
       // Prevent default behavior
@@ -126,41 +104,52 @@ export default function Follow({ navigation }: Props) {
     return <View style={{ flex: 1 }} />
   }
 
-  let displayUps: (FollowedUpItem | null)[] = $followedUps.slice()
-  if (!checkingUpUpdate) {
-    const topUps: FollowedUpItem[] = []
-    const updateUps: FollowedUpItem[] = []
-    const noUpdateUps: FollowedUpItem[] = []
-    const updatedUps: Record<string, boolean> = {}
-    for (const mid in $upUpdateMap) {
-      updatedUps[mid] =
-        !!$upUpdateMap[mid].latestId &&
-        $upUpdateMap[mid].latestId !== $upUpdateMap[mid].currentLatestId
+  let displayUps: (FollowedUpItem | null)[] = []
+  const topUps: FollowedUpItem[] = []
+  const updateUps: FollowedUpItem[] = []
+  const noUpdateUps: FollowedUpItem[] = []
+  const updatedUps: Record<string, boolean> = {}
+  for (const mid in $upUpdateMap) {
+    updatedUps[mid] =
+      !!$upUpdateMap[mid].latestId &&
+      $upUpdateMap[mid].latestId !== $upUpdateMap[mid].currentLatestId
+  }
+  for (const up of $followedUps) {
+    if (livingUps[up.mid]) {
+      topUps.push({ ...up })
+    } else if (updatedUps[up.mid]) {
+      updateUps.push({ ...up })
+    } else {
+      noUpdateUps.push({ ...up })
     }
-    for (const up of $followedUps) {
-      if (livingUps[up.mid]) {
-        topUps.push({ ...up })
-      } else if (updatedUps[up.mid]) {
-        updateUps.push({ ...up })
-      } else {
-        noUpdateUps.push({ ...up })
-      }
+  }
+  displayUps = [
+    ...topUps,
+    ...updateUps,
+    ...noUpdateUps,
+    ...(rest ? Array.from({ length: rest }).map(() => null) : []),
+  ]
+
+  const emptyContent = () => {
+    if (isLoading) {
+      return (
+        <View>
+          <Text style={[styles.emptyText, { color: '#fb7299' }]}>
+            哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
+          </Text>
+          <ActivityIndicator color="#00AEEC" animating size={'large'} />
+        </View>
+      )
     }
-    displayUps = [
-      ...topUps,
-      ...updateUps,
-      ...noUpdateUps,
-      ...(rest ? Array.from({ length: rest }).map(() => null) : []),
-    ]
-  } else {
-    displayUps.push(
-      ...(rest ? Array.from({ length: rest }).map(() => null) : []),
+    if (relation?.following === 0) {
+      return <Text style={styles.emptyText}>暂无关注</Text>
+    }
+    return (
+      <Text style={styles.emptyText}>
+        无法获取关注列表{'\n'}（需要在隐私设置中公开你的关注）
+      </Text>
     )
   }
-
-  // if (__DEV__) {
-  //   displayUps = displayUps.slice(0, 10)
-  // }
 
   return (
     <View style={styles.container}>
@@ -179,23 +168,10 @@ export default function Follow({ navigation }: Props) {
           contentContainerStyle={{
             paddingTop: 30,
           }}
-          ListEmptyComponent={
-            <Text style={styles.listEmptyText}>
-              {isLoading ? (
-                <View>
-                  <Text style={styles.emptyText}>
-                    哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
-                  </Text>
-                  <ActivityIndicator color="#00AEEC" animating size={'large'} />
-                </View>
-              ) : (
-                '暂无关注（需要在隐私设置中公开你的关注）'
-              )}
-            </Text>
-          }
+          ListEmptyComponent={emptyContent()}
           ListFooterComponent={
             <Text style={styles.bottomText}>
-              {isLoading ? '加载中...' : displayUps.length ? '到底了~' : ''}
+              {isLoading ? '加载中...' : $followedUps.length ? '到底了~' : ''}
             </Text>
           }
         />
@@ -236,6 +212,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 100,
     fontSize: 18,
-    color: '#fb7299',
+    lineHeight: 30,
   },
 })

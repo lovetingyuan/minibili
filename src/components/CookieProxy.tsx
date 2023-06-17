@@ -95,7 +95,7 @@ function __$hack(dark) {
           )
         }
       }
-    }, 2000)
+    }, 200)
   }
   // document.cookie = ''
   if (document.readyState !== 'loading') {
@@ -109,7 +109,7 @@ function __$hack(dark) {
 
 export default React.memo(() => {
   const webviewRef = React.useRef<WebView | null>(null)
-  const { $userInfo, showCaptcha } = useStore()
+  const { $userInfo, showCaptcha, loadingDynamicError } = useStore()
   const [ready, setReady] = React.useState(false)
   const init = React.useRef(0)
   init.current++
@@ -125,6 +125,17 @@ export default React.memo(() => {
         store.showCaptcha = true
       })
   }, [showCaptcha])
+  React.useEffect(() => {
+    if (loadingDynamicError) {
+      checkDynamicsApi()
+        .then(() => {
+          store.showCaptcha = false
+        })
+        .catch(() => {
+          store.showCaptcha = true
+        })
+    }
+  }, [loadingDynamicError])
   const dark = useIsDark()
   const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`
   const webview = (

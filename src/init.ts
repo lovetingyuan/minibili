@@ -4,6 +4,9 @@ import { Linking, Alert } from 'react-native'
 // import { currentVersion } from './api/check-update'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import store from './store'
+import { subscribeKey } from 'valtio/utils'
+import { checkLivingUps } from './api/living-info'
+// import { checkUpdateUps, upUpdateQueue } from './api/dynamic-items'
 
 // SplashScreen.preventAutoHideAsync()
 
@@ -114,5 +117,22 @@ async function init() {
     })
   }
 }
+
+/**
+ * 1 如果是未登录则不检查
+ * 2 如果关注为空则不检查
+ * 3 如果关注发生变化，则立即重新检查
+ */
+let checkLivingTimer: number | null = null
+
+subscribeKey(store, '$followedUps' as const, () => {
+  if (typeof checkLivingTimer === 'number') {
+    clearInterval(checkLivingTimer)
+  }
+  checkLivingUps()
+  checkLivingTimer = window.setInterval(() => {
+    checkLivingUps()
+  }, 10 * 60 * 1000)
+})
 
 init()

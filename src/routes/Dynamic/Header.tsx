@@ -1,7 +1,7 @@
 import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
 import { View, StyleSheet, Pressable, Linking } from 'react-native'
-import store from '../../store'
+import store, { useStore } from '../../store'
 import { handleShareUp, parseNumber } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
 import { Image } from 'expo-image'
@@ -14,11 +14,11 @@ import { useLivingInfo } from '../../api/living-info'
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
 export function HeaderLeft(props: { scrollTop: () => void }) {
-  // const { livingUps } = useStore()
-  const { data: livingUps } = useLivingInfo()
+  const { livingUps } = useStore()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const { data: userInfo } = useUserInfo(route.params?.user.mid)
+  const { livingUrl } = useLivingInfo(route.params?.user.mid)
   const dynamicUser = {
     ...route.params?.user,
     ...userInfo,
@@ -88,7 +88,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           {' ' + sex}
         </Text>
       ) : null}
-      {dynamicUser.mid && livingUps[dynamicUser.mid] ? (
+      {dynamicUser.mid && (livingUps[dynamicUser.mid] || livingUrl) ? (
         <Button
           size="sm"
           type="clear"
@@ -97,7 +97,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             if (dynamicUser.mid) {
               navigation.navigate('WebPage', {
                 title: dynamicUser.name + '的直播间',
-                url: livingUps[dynamicUser.mid],
+                url: livingUps[dynamicUser.mid] || livingUrl,
               })
             }
           }}>

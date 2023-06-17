@@ -7,12 +7,8 @@ import { Button } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import store, { useStore } from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
-// import { useHasUpdate } from '../../api/dynamic-items'
 import { Image } from 'expo-image'
-import { useLivingInfo } from '../../api/living-info'
-// export default function aa() {
-//   return <Text>dfsd</Text>
-// }
+
 export default React.memo(
   function FollowItem(props: {
     item: FollowedUpItem
@@ -23,18 +19,13 @@ export default React.memo(
     const {
       item: { face, name, sign, mid },
     } = props
-    // const updateId = '' // useHasUpdate(mid)
-    // store.updatedUps[mid] = !!updateId
-    const { $upUpdateMap } = useStore()
-    // const $upUpdateMap = {}
+    const { $upUpdateMap, livingUps } = useStore()
     let hasUpdate = false
     if ($upUpdateMap[mid]) {
       const { latestId, currentLatestId } = $upUpdateMap[mid]
       hasUpdate = !!latestId && latestId !== currentLatestId
     }
     const navigation = useNavigation<NavigationProps['navigation']>()
-    const { data: livingUps } = useLivingInfo()
-    // const livingUps = {}
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {
       navigation.navigate('Dynamic', {
         user: {
@@ -49,8 +40,6 @@ export default React.memo(
           store.$upUpdateMap[mid].latestId =
             store.$upUpdateMap[mid].currentLatestId
         }
-
-        // store.updatedUps[mid] = false
       }
     })
     const gotoLivePage = useMemoizedFn(() => {
@@ -67,10 +56,8 @@ export default React.memo(
         ? {
             text: '标记为已读',
             onPress: () => {
-              // store.$upUpdateMap[mid] = updateId
               store.$upUpdateMap[mid].latestId =
                 store.$upUpdateMap[mid].currentLatestId
-              // store.updatedUps[mid] = false
             },
           }
         : {
@@ -79,8 +66,6 @@ export default React.memo(
               if (mid in store.$upUpdateMap) {
                 store.$upUpdateMap[mid].latestId = Math.random().toString()
               }
-              // store.$upUpdateMap[mid].latestId = Math.random().toString()
-              // store.updatedUps[mid] = true
             },
           },
     ]

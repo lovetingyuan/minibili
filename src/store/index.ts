@@ -1,9 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { proxy, useSnapshot } from 'valtio'
-import { watch } from 'valtio/utils'
+import { proxy, subscribe, useSnapshot } from 'valtio'
 import { RanksConfig, TracyId } from '../constants'
 import { reportUserOpenApp } from '../utils/report'
-// import { RemoteConfig, getRemoteConfig } from '../api/get-config'
 import { checkUpdate } from '../api/check-update'
 
 interface UserInfo {
@@ -24,10 +22,8 @@ const store = proxy<{
   $cookie: string
   // ----------------------------
   webViewMode: 'PC' | 'MOBILE'
-  // updatedUps: Record<string, boolean>
-  // livingUps: Record<string, string>
-  // checkingUpUpdateMap: Record<string, boolean>
-  // updateUpCount: number
+  loadingDynamicError: boolean
+  livingUps: Record<string, string>
   currentVideosCate: (typeof RanksConfig)[number]
   // remoteConfig: Promise<RemoteConfig>
   appUpdateInfo: ReturnType<typeof checkUpdate>
@@ -52,18 +48,9 @@ const store = proxy<{
   $cookie: 'DedeUserID=' + TracyId,
   // -------------------------
   webViewMode: 'MOBILE',
-  // updatedUps: {},
-  // livingUps: {},
-  // checkingUpUpdateMap: {},
-  // get updateUpCount() {
-  //   return Object.values(store.$upUpdateMap).filter(item => {
-  //     return item.latestId && item.latestId !== item.currentLatestId
-  //   }).length
-  // },
+  loadingDynamicError: false,
+  livingUps: {},
   checkingUpUpdate: false,
-  // get checkingUpUpdate() {
-  //   return Object.values(this.checkingUpUpdateMap).filter(Boolean).length > 0
-  // },
   currentVideosCate: RanksConfig[0],
   // remoteConfig: getRemoteConfig(),
   appUpdateInfo: checkUpdate(),
@@ -77,28 +64,35 @@ const StoragePrefix = 'Store:'
 
 type StoredKeys<K = keyof typeof store> = K extends `$${string}` ? K : never
 
-Object.keys(store)
+const storedKeys = Object.keys(store)
   // 以$开头的数据表示需要持久化存储
-  .filter(k => k.startsWith('$'))
-  .forEach(k => {
+  .filter(k => k.startsWith('$')) as StoredKeys[]
+Promise.all(
+  storedKeys.map(k => {
     const key = k as StoredKeys
-    AsyncStorage.getItem(StoragePrefix + key)
-      .then(data => {
-        if (data) {
-          store[key] = JSON.parse(data) as any
-          if (key === '$userInfo' && store.$userInfo) {
-            // store.cookie = 'DedeUserID=' + store.$userInfo.mid
-            reportUserOpenApp(store.$userInfo.mid, store.$userInfo.name)
-          }
+    return AsyncStorage.getItem(StoragePrefix + key).then(data => {
+      if (data) {
+        store[key] = JSON.parse(data) as any
+        if (key === '$userInfo' && store.$userInfo) {
+          reportUserOpenApp(store.$userInfo.mid, store.$userInfo.name)
         }
-      })
-      .then(() => {
-        watch(get => {
-          const data = get(store)[key]
-          AsyncStorage.setItem(StoragePrefix + key, JSON.stringify(data))
-        })
-      })
+      }
+    })
+  }),
+).then(() => {
+  subscribe(store, changes => {
+    const changedKeys = new Set<StoredKeys>()
+    for (const op of changes) {
+      const ck = op[1][0]
+      if (typeof ck === 'string' && ck.startsWith('$')) {
+        changedKeys.add(ck as StoredKeys)
+      }
+    }
+    for (const ck of changedKeys) {
+      AsyncStorage.setItem(StoragePrefix + ck, JSON.stringify(store[ck]))
+    }
   })
+})
 
 export function useStore() {
   return useSnapshot(store)

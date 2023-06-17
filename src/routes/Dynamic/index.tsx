@@ -85,7 +85,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     page,
     setSize,
     isRefreshing,
-    loading,
+    isLoading,
+    isValidating,
     refresh,
     isReachingEnd,
     error,
@@ -118,6 +119,33 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   const renderItem = ({ item }: { item: DynamicItemAllType }) => {
     return <DynamicItem item={item} />
   }
+  const footerContent = () => {
+    if (!list.length) {
+      return null
+    }
+    return (
+      <Text style={styles.bottomEnd}>
+        {isReachingEnd ? '到底了~' : isValidating ? '加载中...' : ''}
+      </Text>
+    )
+  }
+  const emptyContent = () => {
+    if (isLoading) {
+      return <Loading />
+    }
+    if (error) {
+      return (
+        <Text style={{ margin: 50, textAlign: 'center', fontSize: 16 }}>
+          加载动态失败
+        </Text>
+      )
+    }
+    return (
+      <Text style={{ margin: 150, textAlign: 'center', fontSize: 18 }}>
+        暂无动态
+      </Text>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -149,28 +177,8 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         }}
         refreshing={isRefreshing}
         onRefresh={refresh}
-        ListEmptyComponent={
-          <>
-            {loading && !isReachingEnd ? (
-              <Loading />
-            ) : error ? (
-              <Text style={{ margin: 50, textAlign: 'center', fontSize: 16 }}>
-                加载失败
-              </Text>
-            ) : null}
-          </>
-        }
-        ListFooterComponent={
-          <Text style={styles.bottomEnd}>
-            {isReachingEnd
-              ? list.length
-                ? '到底了~'
-                : '暂无动态'
-              : loading
-              ? '加载中...'
-              : ''}
-          </Text>
-        }
+        ListEmptyComponent={emptyContent()}
+        ListFooterComponent={footerContent()}
       />
     </View>
   )
