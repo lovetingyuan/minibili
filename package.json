@@ -24,7 +24,7 @@
     "docs": "npx vite docs",
     "format": "npx prettier src --write",
     "test": "npx vitest run",
-    "lint": "eslint --ext ts,tsx,js,jsx --fix src"
+    "lint": "eslint --ext ts,tsx,js,jsx --fix src scripts"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.17.11",

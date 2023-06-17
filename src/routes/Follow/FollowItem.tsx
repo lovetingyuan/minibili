@@ -10,11 +10,7 @@ import { FollowedUpItem } from '../../api/followed-ups'
 import { Image } from 'expo-image'
 
 export default React.memo(
-  function FollowItem(props: {
-    item: FollowedUpItem
-    width?: number
-    index: number
-  }) {
+  function FollowItem(props: { item: FollowedUpItem; width?: number }) {
     // __DEV__ && console.log('follow item', props.item.name)
     const {
       item: { face, name, sign, mid },
@@ -101,7 +97,7 @@ export default React.memo(
                 style={[styles.name]}
                 numberOfLines={2}
                 ellipsizeMode="tail">
-                {props.index}: {name}
+                {name}
               </Text>
             </TouchableOpacity>
           </View>

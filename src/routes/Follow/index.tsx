@@ -93,13 +93,13 @@ export default function Follow({ navigation }: Props) {
 
   const renderItem = ({
     item,
-    index,
-  }: {
+  }: // index,
+  {
     item: FollowedUpItem | null
     index: number
   }) => {
     if (item) {
-      return <FollowItem item={item} index={index} />
+      return <FollowItem item={item} />
     }
     return <View style={{ flex: 1 }} />
   }
