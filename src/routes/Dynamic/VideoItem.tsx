@@ -128,14 +128,14 @@ export default function VideoItem(props: {
 const styles = StyleSheet.create({
   shareIcon: { width: 15, height: 15, marginLeft: 16 },
   imageContainer: {
-    flex: 5,
+    flex: 6,
     marginRight: 12,
     justifyContent: 'center',
     alignContent: 'center',
   },
   tvIcon: {
-    width: 50,
-    height: 40,
+    width: 60,
+    height: 50,
     position: 'absolute',
     alignSelf: 'center',
   },
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   videoInfo: {
-    flex: 6,
+    flex: 5,
     justifyContent: 'space-around',
   },
   title: {

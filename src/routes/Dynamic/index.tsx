@@ -42,7 +42,7 @@ const Loading = React.memo(() => {
                 </View>
               ) : null}
               <View style={{ flexDirection: 'row', gap: 10 }}>
-                <Skeleton animation="pulse" width={'45%' as any} height={80} />
+                <Skeleton animation="pulse" width={'55%' as any} height={110} />
                 <View
                   style={{ gap: 10, justifyContent: 'space-between', flex: 1 }}>
                   <Skeleton
