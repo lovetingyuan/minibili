@@ -4,18 +4,38 @@ import { z } from 'zod'
 import { ReplayItem, ReplyResponseSchema } from './comments.schema'
 
 type ReplyResponse = z.infer<typeof ReplyResponseSchema>
+
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/
 
 const parseMessage = (content: ReplayItem['content']) => {
   let keys: string[] = []
-  if (content.at_name_to_mid) {
-    Object.keys(content.at_name_to_mid).forEach(name => {
-      keys.push('@' + name)
-    })
-  }
+  let message = content.message
+  const emojiMap: Record<
+    string,
+    {
+      id: number
+      url: string
+      text: string
+    }
+  > = {}
+  const atMap: Record<string, { mid: number; name: string }> = {}
   if (content.emote) {
     Object.keys(content.emote).forEach(emoji => {
-      keys.push(emoji.replace('[', '\\[').replace(']', '\\]'))
+      const id = 'emoji' + Math.random().toString().substring(2)
+      emojiMap[id] = content.emote![emoji]
+      message = message.replaceAll(emoji, id)
+      keys.push(id)
+    })
+  }
+  if (content.at_name_to_mid) {
+    Object.keys(content.at_name_to_mid).forEach(name => {
+      const id = '@' + Math.random().toString().substring(2)
+      atMap[id] = {
+        mid: content.at_name_to_mid![name],
+        name: '@' + name,
+      }
+      message = message.replaceAll('@' + name, id)
+      keys.push(id)
     })
   }
   if (content.jump_url) {
@@ -31,23 +51,18 @@ const parseMessage = (content: ReplayItem['content']) => {
   keys = keys.filter(Boolean)
   if (keys.length) {
     const reg = new RegExp(`(${keys.join('|')})`)
-    return content.message
+    return message
       .split(reg)
       .map((part, i) => {
         if (i % 2) {
-          if (part[0] === '@') {
+          if (part[0] === '@' && atMap[part]) {
             return {
               type: 'at' as const,
-              text: part,
-              mid: content.at_name_to_mid![part.substring(1)],
+              text: atMap[part].name,
+              mid: atMap[part].mid,
             }
           }
-          if (part.startsWith('[') && part.endsWith(']')) {
-            return {
-              type: 'emoji' as const,
-              url: content.emote![part].url,
-            }
-          }
+
           if (part.startsWith('{vote:') && part.endsWith('}')) {
             return {
               type: 'vote' as const,
@@ -55,11 +70,22 @@ const parseMessage = (content: ReplayItem['content']) => {
               url: content.vote!.url,
             }
           }
-          return {
-            type: 'av' as const,
-            text: content.jump_url![part].title,
-            url: 'https://b23.tv/' + part,
+          if (part.startsWith('emoji')) {
+            return {
+              type: 'emoji' as const,
+              url: emojiMap[part].url,
+            }
           }
+          if (content.jump_url && part in content.jump_url) {
+            return {
+              type: 'av' as const,
+              text: content.jump_url[part].title,
+              url: 'https://b23.tv/' + part,
+            }
+          }
+        }
+        if (!part) {
+          return null
         }
         return part.split(urlReg).map((part2, j) => {
           return j % 2
@@ -73,6 +99,7 @@ const parseMessage = (content: ReplayItem['content']) => {
               }
         })
       })
+      .filter(Boolean)
       .flat()
   }
   return content.message.split(urlReg).map((part2, j) => {
