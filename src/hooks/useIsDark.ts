@@ -1,5 +1,4 @@
 import { useColorScheme } from 'react-native'
-// import useUpdate from './useUpdate'
 import { Appearance } from 'react-native'
 import React from 'react'
 

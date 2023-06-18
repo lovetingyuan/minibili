@@ -2,7 +2,7 @@ import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
 import { View, StyleSheet, Pressable, Linking } from 'react-native'
 import store, { useStore } from '../../store'
-import { handleShareUp, parseNumber } from '../../utils'
+import { handleShareUp, parseNumber, showToast } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
 import { Image } from 'expo-image'
 import { useNavigation, useRoute } from '@react-navigation/native'
@@ -10,6 +10,7 @@ import { NavigationProps, RootStackParamList } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useUserInfo } from '../../api/user-info'
 import { useLivingInfo } from '../../api/living-info'
+import * as Clipboard from 'expo-clipboard'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
@@ -65,6 +66,13 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
       <Pressable
         style={styles.titleContainer}
         key={fans?.follower || '-'}
+        onLongPress={() => {
+          Clipboard.setStringAsync(
+            dynamicUser.name + ' ' + dynamicUser.mid,
+          ).then(() => {
+            showToast('已复制用户名和ID')
+          })
+        }}
         onPress={() => {
           props.scrollTop()
         }}>

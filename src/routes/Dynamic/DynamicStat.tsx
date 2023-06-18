@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     color: '#666',
     alignItems: 'center',
     gap: 20,
-    marginTop: 5,
+    marginTop: 15,
   },
   iconText: {
     flexDirection: 'row',

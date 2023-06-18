@@ -1,7 +1,6 @@
 import React from 'react'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import { View, Image, StyleSheet } from 'react-native'
-import { Text } from '@rneui/themed'
 import ForwardItem from './ForwardItem'
 import VideoItem from './VideoItem'
 import WordDrawItem from './WordDrawItem'
@@ -50,7 +49,7 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
         />
       ) : null}
       <Item item={item} />
-      {__DEV__ && <Text>{item.type}</Text>}
+      {/* {__DEV__ && <Text>{item.type}</Text>} */}
       {item.type !== HandledDynamicTypeEnum.DYNAMIC_TYPE_AV && (
         <DynamicStat
           title={item.text || ''}
@@ -68,7 +67,7 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
 const styles = StyleSheet.create({
   topMark: { width: 30, height: 18.5, marginBottom: 5 },
   itemContainer: {
-    paddingVertical: 18,
+    paddingVertical: 20,
     paddingHorizontal: 12,
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,

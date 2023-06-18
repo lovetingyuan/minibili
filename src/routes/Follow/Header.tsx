@@ -83,7 +83,11 @@ const styles = StyleSheet.create({
   fansNumText: { fontSize: 14 },
   userContainer: {
     flexDirection: 'row',
-    // borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 3, // 仅在 Android 平台上需要设置
     paddingHorizontal: 18,
     paddingTop: 45,
     paddingBottom: 15,

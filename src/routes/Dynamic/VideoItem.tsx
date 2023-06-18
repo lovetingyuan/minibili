@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  // useWindowDimensions
 } from 'react-native'
 import { NavigationProps } from '../../types'
 import { DynamicItemType } from '../../api/dynamic-items'
@@ -33,6 +34,7 @@ export default function VideoItem(props: {
 
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { theme } = useTheme()
+  // const {width} = useWindowDimensions()
   const gray = theme.colors.grey1
   const textStyle = {
     color: gray,

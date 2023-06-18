@@ -33,7 +33,7 @@ export default React.memo(
     const fontSize = props.fontSize || 16
     const Topic = props.topic ? (
       <View style={styles.topicContainer}>
-        <Icon name="tag" color="#178bcf" size={18} />
+        <Icon name="hashtag" type="fontisto" color="#178bcf" size={14} />
         <Text
           onPress={() => {
             if (props.topic?.jump_url) {
@@ -45,6 +45,7 @@ export default React.memo(
             }
           }}
           style={[styles.link, { fontSize }]}>
+          {' '}
           {props.topic.name}
         </Text>
       </View>
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
   topicContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   emoji: {
     width: 20,
