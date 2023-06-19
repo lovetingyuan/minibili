@@ -23,12 +23,12 @@ export default function VideoItem(props: {
     item: {
       mid,
       name,
-      payload: { cover, title, bvid, play, duration, desc },
+      payload: { cover, title, bvid, play, duration, desc, danmu },
       date,
       face,
       commentId,
       likeCount,
-      forwardCount,
+      // forwardCount,
     },
   } = props
 
@@ -93,7 +93,10 @@ export default function VideoItem(props: {
             <Text style={styles.videoLengthText}>{duration}</Text>
           </View>
           <View style={styles.videoDate}>
-            <Text style={styles.videoLengthText}>{props.item.date}</Text>
+            <Text style={styles.videoLengthText}>{date}</Text>
+          </View>
+          <View style={styles.videoDanmu}>
+            <Text style={styles.videoLengthText}>{danmu}弹</Text>
           </View>
         </View>
         <View style={styles.videoInfo}>
@@ -111,7 +114,7 @@ export default function VideoItem(props: {
               <Icon name="thumb-up-off-alt" size={15} color={gray} />
               <Text style={textStyle}>{parseNumber(likeCount)}</Text>
             </View>
-            <View style={styles.iconText}>
+            {/* <View style={styles.iconText}>
               <Icon
                 type="material-community"
                 name="share"
@@ -119,7 +122,7 @@ export default function VideoItem(props: {
                 color={gray}
               />
               <Text style={textStyle}>{parseNumber(forwardCount)}</Text>
-            </View>
+            </View> */}
           </View>
         </View>
       </View>
@@ -178,6 +181,7 @@ const styles = StyleSheet.create({
   videoLength: {
     position: 'absolute',
     paddingHorizontal: 4,
+    paddingVertical: 1,
     backgroundColor: 'rgba(0,0,0,.7)',
     bottom: 0,
     left: 0,
@@ -186,9 +190,20 @@ const styles = StyleSheet.create({
   },
   videoDate: {
     position: 'absolute',
+    paddingVertical: 1,
     paddingHorizontal: 4,
     backgroundColor: 'rgba(0,0,0,.7)',
     top: 0,
+    borderRadius: 2,
+    margin: 5,
+  },
+  videoDanmu: {
+    position: 'absolute',
+    paddingVertical: 1,
+    paddingHorizontal: 4,
+    backgroundColor: 'rgba(0,0,0,.7)',
+    bottom: 0,
+    right: 0,
     borderRadius: 2,
     margin: 5,
   },

@@ -1,4 +1,4 @@
-import { ListItem, Text } from '@rneui/themed'
+import { ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import { StyleSheet, Linking } from 'react-native'
 import { githubLink } from '../../constants'
@@ -9,6 +9,7 @@ export default React.memo(function Statement() {
   return (
     <ListItem.Accordion
       containerStyle={[styles.blackTitle]}
+      icon={<Icon name={'chevron-down'} type="material-community" />}
       content={
         <ListItem.Content>
           <ListItem.Title style={styles.title}>声明</ListItem.Title>

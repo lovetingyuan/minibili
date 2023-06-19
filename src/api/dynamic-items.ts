@@ -89,6 +89,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         aid: video.aid,
         duration: video.duration_text,
         desc: video.desc,
+        danmu: video.stat.danmaku,
       },
     }
   }
@@ -187,6 +188,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         cover: common.cover,
         text: `${label ? label + ': ' : ''}${common.desc}`,
         url: parseUrl(common.jump_url),
+        // badge: common.badge.text,
       },
     }
   }
@@ -365,6 +367,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
             common.desc
           }`,
           url: parseUrl(common.jump_url),
+          // badge: common.badge.text,
         },
       }
     }

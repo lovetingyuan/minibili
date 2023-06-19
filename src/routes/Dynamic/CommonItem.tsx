@@ -45,6 +45,16 @@ export default function CommonItem(props: { item: DynamicItemType<ItemType> }) {
   )
 }
 
+const cateMap = {
+  [HandledDynamicTypeEnum.DYNAMIC_TYPE_PGC]: '影视',
+  [HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE]: '文章',
+  [HandledForwardTypeEnum.DYNAMIC_TYPE_COURSES_SEASON]: '课程',
+  [HandledForwardTypeEnum.DYNAMIC_TYPE_MEDIALIST]: '收藏夹',
+  [HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE]: '直播',
+  [HandledDynamicTypeEnum.DYNAMIC_TYPE_MUSIC]: '音乐',
+  [HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE]: '其它',
+}
+
 /**
  * 这个组件为普通动态和转发动态共同使用
  */
@@ -54,9 +64,10 @@ export function CommonContent(props: {
   title: string
   text: string
   cover: string
+  badge?: string
   forward?: boolean
 }) {
-  const { url, title, text, cover, forward } = props
+  const { type, url, title, text, cover, forward } = props
   const Foo = url ? Pressable : View
   const { width } = useWindowDimensions()
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -81,8 +92,8 @@ export function CommonContent(props: {
         <Image
           source={{ uri: cover + '@240w_140h_1c.webp' }}
           style={{
-            width: forward ? width * 0.3 : width * 0.4,
-            height: forward ? width * 0.18 : width * 0.2,
+            width: width * 0.35,
+            height: width * 0.2,
             borderRadius: 4,
           }}
         />
@@ -105,11 +116,30 @@ export function CommonContent(props: {
         {text ? (
           <Text
             style={[forward ? styles.forwardContent : styles.content]}
-            numberOfLines={3}>
+            numberOfLines={2}>
             {text}
           </Text>
         ) : null}
       </Foo>
+      <Text
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          backgroundColor: '#f56c6c',
+          color: 'white',
+          paddingHorizontal: 8,
+          paddingVertical: 1,
+          borderRadius: 4,
+          borderTopLeftRadius: 0,
+          borderBottomRightRadius: 0,
+          fontSize: 11,
+        }}>
+        {
+          // @ts-ignore
+          cateMap[type] || ''
+        }
+      </Text>
     </View>
   )
 }
@@ -120,5 +150,11 @@ const styles = StyleSheet.create({
   textContainer: { gap: 6, flexShrink: 1 },
   content: { fontSize: 15 },
   forwardContent: { fontSize: 14 },
-  contentContainer: { flexDirection: 'row', gap: 10 },
+  contentContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    // borderWidth: 0.5,
+    borderRadius: 4,
+    paddingRight: 10,
+  },
 })
