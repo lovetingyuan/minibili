@@ -23,7 +23,7 @@ import { ApiError } from '../../api/fetcher'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
-export default function Follow({ navigation }: Props) {
+export default React.memo(function Follow({ navigation }: Props) {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
   const { $userInfo, $followedUps, $upUpdateMap, livingUps } = useStore()
@@ -178,7 +178,7 @@ export default function Follow({ navigation }: Props) {
       </View>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {

@@ -8,14 +8,11 @@ import DefaultItem from './DefaultItem'
 import CommonItem from './CommonItem'
 import DynamicStat from './DynamicStat'
 import { useRoute } from '@react-navigation/native'
-// import { useNavigation } from '@react-navigation/native'
-// import { NavigationProps } from '../../types'
 import { DynamicItemAllType } from '../../api/dynamic-items'
 
 export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   let Item: React.FC<any> = DefaultItem
   const route = useRoute()
-  // const navigation = useNavigation<NavigationProps['navigation']>()
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
     return null
   }

@@ -21,7 +21,7 @@ import { setScreenTag } from '../utils/report'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-export default () => {
+export default function Route() {
   const isDark = useIsDark()
 
   const RouteTheme = isDark

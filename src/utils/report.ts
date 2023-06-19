@@ -8,6 +8,7 @@ export enum Tags {
   user_location = 'user.location',
   user_url = 'user.url',
   api_url = 'api.url',
+  api_code = 'api.code',
   user_action = 'user.action',
   stack_route_name = 'route.stack',
   tab_route_name = 'route.tab',
@@ -28,17 +29,19 @@ export function reportApiError(
     data: any
   },
 ) {
-  SentryExpo.Native.captureException(
-    new ApiError(url.split('?')[0], url, res),
-    {
-      contexts: {
-        url: {
-          value: url,
-        },
-        res,
+  const path = url.split('?')[0]
+  SentryExpo.Native.captureException(new ApiError(path, url, res), {
+    contexts: {
+      url: {
+        value: url,
       },
+      res,
     },
-  )
+    tags: {
+      [Tags.api_url]: path,
+      [Tags.api_code]: res.code,
+    },
+  })
 }
 
 export function reportUserAction(action: Action, actionPayload: any = null) {

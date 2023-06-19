@@ -27,10 +27,7 @@ const Loading = () => {
       <Image
         source={require('../../../assets/video-loading.png')}
         resizeMode="center"
-        style={{
-          width: '100%',
-          // height: '100%',
-        }}
+        style={styles.loadingImage}
       />
     </View>
   )
@@ -38,7 +35,7 @@ const Loading = () => {
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
-export default ({ route, navigation }: Props) => {
+export default function WebPage({ route, navigation }: Props) {
   const { url, title } = route.params
   const webviewRef = React.useRef<WebView | null>(null)
   const { webViewMode } = useStore()
@@ -157,9 +154,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingImage: {
-    flex: 1,
-    width: undefined,
-    position: 'relative',
-    top: -80,
+    width: '100%',
   },
 })

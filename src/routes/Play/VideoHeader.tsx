@@ -12,7 +12,7 @@ import {
 } from '../../utils'
 import VideoInfoContext from './videoContext'
 
-export default function VideoHeader() {
+export default React.memo(function VideoHeader() {
   const { video, bvid } = React.useContext(VideoInfoContext)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: video2 } = useVideoInfo(bvid)
@@ -82,7 +82,7 @@ export default function VideoHeader() {
       </View>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   videoHeader: {

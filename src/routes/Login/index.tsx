@@ -9,11 +9,9 @@ import {
   Platform,
   ScrollView,
 } from 'react-native'
-
 import store, { useStore } from '../../store'
 import { useUserInfo } from '../../api/user-info'
 import useMounted from '../../hooks/useMounted'
-
 import { reportUserLogin } from '../../utils/report'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
@@ -21,8 +19,6 @@ import { showToast } from '../../utils'
 
 const leftTv = require('../../../assets/tv-left.png')
 const rightTv = require('../../../assets/tv-right.png')
-
-// type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 export default function Login() {
   const inputUserIdRef = React.useRef('')

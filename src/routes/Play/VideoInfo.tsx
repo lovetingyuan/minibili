@@ -5,7 +5,9 @@ import { useVideoInfo } from '../../api/video-info'
 import { ListItem, Text } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
 
-export default function VideoInfo(props: { changePage: (p: number) => void }) {
+export default React.memo(function VideoInfo(props: {
+  changePage: (p: number) => void
+}) {
   const { changePage } = props
   const { video, bvid, page } = React.useContext(VideoInfoContext)
   const { data: video2 } = useVideoInfo(bvid)
@@ -76,7 +78,7 @@ export default function VideoInfo(props: { changePage: (p: number) => void }) {
       </View>
     </>
   )
-}
+})
 
 const styles = StyleSheet.create({
   videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },

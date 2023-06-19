@@ -27,7 +27,7 @@ import { Action, reportUserAction } from '../../utils/report'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
-export default function Hot({ navigation }: Props) {
+export default React.memo(function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
   const { $blackUps, $blackTags } = useStore()
 
@@ -220,7 +220,7 @@ export default function Hot({ navigation }: Props) {
       />
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {

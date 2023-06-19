@@ -20,7 +20,7 @@ import { Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 
-function VideoPlayer(props: { wifi: boolean }) {
+const VideoPlayer = React.memo((props: { wifi: boolean }) => {
   const { wifi } = props
   const { page, video, bvid } = React.useContext(VideoInfoContext)
   const { width, height } = useWindowDimensions()
@@ -182,7 +182,7 @@ function VideoPlayer(props: { wifi: boolean }) {
       )}
     </View>
   )
-}
+})
 
 export default function Player() {
   const [wifi, setWifi] = React.useState<boolean | null>(null)

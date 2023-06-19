@@ -23,7 +23,7 @@ import { Action, reportUserAction } from '../../utils/report'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 
-export default function Ranks({ navigation }: Props) {
+export default React.memo(function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)
   const { currentVideosCate, $blackUps } = useStore()
   const {
@@ -169,7 +169,7 @@ export default function Ranks({ navigation }: Props) {
       />
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {
