@@ -18,7 +18,7 @@
     "ios": "adb devices -l && npx expo start --ios",
     "web": "expo start --web",
     "build:android": "npm run test && zx scripts/build.mjs",
-    "build:android:preview": "cross-env APP_VARIANT=preview zx scripts/build-preview.mjs",
+    "build:android:preview": "cross-env APP_VARIANT=preview eas build --platform android --profile preview --non-interactive",
     "update": "zx scripts/hot-update.mjs",
     "doctor": "npx expo-doctor",
     "docs": "npx vite docs",
