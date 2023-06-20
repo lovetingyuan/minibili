@@ -9,7 +9,6 @@ export default React.memo(function Header() {
       <Pressable
         style={styles.container}
         onPress={() => {
-          throw new Error('sdf')
           Linking.openURL(site)
         }}>
         <Image
