@@ -117,8 +117,8 @@ const parseMessage = (content: ReplayItem['content']) => {
 }
 export type MessageContent = ReturnType<typeof parseMessage>
 
-const getReplies = (res1?: ReplyResponse, res2?: ReplyResponse) => {
-  const replies = (res1?.replies || [])
+const getReplies = (res1: ReplyResponse, res2?: ReplyResponse) => {
+  const replies = (res1.replies || [])
     .concat(res2?.replies || [])
     .filter(v => !v.invisible)
     .map(item => {
@@ -215,18 +215,18 @@ const getReplies = (res1?: ReplyResponse, res2?: ReplyResponse) => {
 
 export type ReplyItem = ReturnType<typeof getReplies>[0]
 
-const fetcher = (url: string) => {
-  return Promise.all([
-    request<ReplyResponse>(url),
-    request<ReplyResponse>(url.replace('next=1', 'next=2')),
-  ]).then(([res1, res2]) => {
-    return {
-      allCount: res1?.cursor.all_count,
-      res1,
-      res2,
-    }
-  })
-}
+// const fetcher = (url: string) => {
+//   return Promise.all([
+//     request<ReplyResponse>(url),
+//     request<ReplyResponse>(url.replace('next=1', 'next=2')),
+//   ]).then(([res1, res2]) => {
+//     return {
+//       allCount: res1?.cursor.all_count,
+//       res1,
+//       res2,
+//     }
+//   })
+// }
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
@@ -235,13 +235,9 @@ export function useDynamicComments(oid: string | number, type: number) {
     error,
     // isValidating,
     isLoading,
-  } = useSWR<{
-    allCount?: number
-    res1: ReplyResponse
-    res2: ReplyResponse
-  }>(() => {
-    return `/x/v2/reply/main?type=${type}&next=1&oid=${oid}`
-  }, fetcher)
+  } = useSWR<ReplyResponse>(() => {
+    return `/x/v2/reply/main?type=${type}&oid=${oid}&ps=30`
+  }, request)
   // const {
   //   data: res2,
   //   error: error2,
@@ -253,11 +249,11 @@ export function useDynamicComments(oid: string | number, type: number) {
     if (!data) {
       return []
     }
-    return getReplies(data.res1, data.res2)
+    return getReplies(data)
   }, [data])
   return {
     data: {
-      allCount: data?.allCount,
+      allCount: data?.cursor.all_count,
       replies,
     },
     isLoading,
