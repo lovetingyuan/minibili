@@ -78,7 +78,7 @@ const CommentList: React.FC<{
       ) : null}
       {comments?.length ? (
         <View style={styles.footerContainer}>
-          <Text style={styles.footerText}>只加载前40条</Text>
+          <Text style={styles.footerText}>只加载前30条</Text>
           <Text />
         </View>
       ) : null}
