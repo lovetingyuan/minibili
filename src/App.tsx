@@ -37,7 +37,7 @@ const errorFallback: FallbackRender = errorData => {
       if (info.hasUpdate) {
         Alert.alert(
           '抱歉，应用发生了错误😅',
-          '我们会处理这个错误\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误',
+          '我们会处理这个错误\n\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误',
           [
             {
               text: '下载新版',

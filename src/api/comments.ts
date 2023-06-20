@@ -2,6 +2,7 @@ import React from 'react'
 import useSWR from 'swr'
 import { z } from 'zod'
 import { ReplayItem, ReplyResponseSchema } from './comments.schema'
+import request from './fetcher'
 
 type ReplyResponse = z.infer<typeof ReplyResponseSchema>
 
@@ -214,33 +215,52 @@ const getReplies = (res1?: ReplyResponse, res2?: ReplyResponse) => {
 
 export type ReplyItem = ReturnType<typeof getReplies>[0]
 
+const fetcher = (url: string) => {
+  return Promise.all([
+    request<ReplyResponse>(url),
+    request<ReplyResponse>(url.replace('next=1', 'next=2')),
+  ]).then(([res1, res2]) => {
+    return {
+      allCount: res1?.cursor.all_count,
+      res1,
+      res2,
+    }
+  })
+}
+
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
   const {
-    data: res1,
-    error: error1,
+    data,
+    error,
     // isValidating,
     isLoading,
-  } = useSWR<ReplyResponse>(() => {
+  } = useSWR<{
+    allCount?: number
+    res1: ReplyResponse
+    res2: ReplyResponse
+  }>(() => {
     return `/x/v2/reply/main?type=${type}&next=1&oid=${oid}`
-  })
-  const {
-    data: res2,
-    error: error2,
-    isLoading: isLoading2,
-  } = useSWR<ReplyResponse>(() => {
-    return `/x/v2/reply/main?type=${type}&next=2&oid=${oid}`
-  })
-  const replies: ReplyItem[] = React.useMemo(
-    () => getReplies(res1, res2),
-    [res1, res2],
-  )
+  }, fetcher)
+  // const {
+  //   data: res2,
+  //   error: error2,
+  //   isLoading: isLoading2,
+  // } = useSWR<ReplyResponse>(() => {
+  //   return `/x/v2/reply/main?type=${type}&next=2&oid=${oid}`
+  // })
+  const replies: ReplyItem[] = React.useMemo(() => {
+    if (!data) {
+      return []
+    }
+    return getReplies(data.res1, data.res2)
+  }, [data])
   return {
     data: {
-      allCount: res1?.cursor.all_count,
-      replies: replies,
+      allCount: data?.allCount,
+      replies,
     },
-    isLoading: isLoading || isLoading2,
-    error: error1 || error2,
+    isLoading,
+    error,
   }
 }

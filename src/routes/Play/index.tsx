@@ -30,11 +30,15 @@ const PlayPage = ({ route, navigation }: Props) => {
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: video2 } = useVideoInfo(bvid)
   const { theme } = useTheme()
-  const videoInfo = {
-    ...video,
-    ...video2,
-    bvid,
-  }
+  const videoInfo = React.useMemo(() => {
+    return {
+      ...video,
+      ...video2,
+      bvid,
+    }
+  }, [bvid, video, video2])
+  // console.log(222, 'play page', videoInfo.aid)
+
   React.useEffect(() => {
     if (videoInfo.name) {
       const headerRight = () => (
@@ -72,6 +76,13 @@ const PlayPage = ({ route, navigation }: Props) => {
       }
     }),
   )
+  const VI = React.useMemo(() => {
+    return {
+      bvid,
+      video: videoInfo as any, // what the fuck!!!
+      page: currentPage,
+    }
+  }, [videoInfo, bvid, currentPage])
   if (!videoInfo.name) {
     return null
   }
@@ -89,12 +100,7 @@ const PlayPage = ({ route, navigation }: Props) => {
     return null
   }
   return (
-    <VideoInfoContext.Provider
-      value={{
-        bvid,
-        video: videoInfo as any, // what the fuck!!!
-        page: currentPage,
-      }}>
+    <VideoInfoContext.Provider value={VI}>
       <View style={styles.container}>
         <Player />
         <ScrollView style={styles.videoInfoContainer}>

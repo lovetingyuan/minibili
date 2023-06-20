@@ -53,6 +53,9 @@ export default function request<D extends any>(url: string) {
       try {
         res = JSON.parse(resText) as Res<D>
       } catch (err) {}
+      // if (url.startsWith('/x/v2/reply')) {
+      //   console.log(111, requestUrl, res)
+      // }
       if (res.code) {
         if (isDynamic) {
           store.loadingDynamicError = true

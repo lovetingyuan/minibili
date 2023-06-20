@@ -39,6 +39,7 @@ const CommentList: React.FC<{
     isLoading: commentLoading,
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)
+
   const { theme } = useTheme()
   return (
     <View>

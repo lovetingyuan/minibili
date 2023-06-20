@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  // useWindowDimensions
 } from 'react-native'
 import { NavigationProps } from '../../types'
 import { DynamicItemType } from '../../api/dynamic-items'
