@@ -140,6 +140,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
         numColumns={2}
         data={videoList}
         renderItem={renderItem}
+        persistentScrollbar
         estimatedItemSize={estimatedItemSize}
         refreshing={isRefreshing}
         onRefresh={() => mutate()}

@@ -186,6 +186,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         numColumns={2}
         data={hotVideoList}
         renderItem={renderItem}
+        persistentScrollbar
         estimatedItemSize={estimatedItemSize}
         ListEmptyComponent={<Loading />}
         ListFooterComponent={

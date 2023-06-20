@@ -107,7 +107,7 @@ export default React.memo(function Follow({ navigation }: Props) {
   let displayUps: (FollowedUpItem | null)[] = []
   const topUps: FollowedUpItem[] = []
   const updateUps: FollowedUpItem[] = []
-  const noUpdateUps: FollowedUpItem[] = []
+  const otherUps: FollowedUpItem[] = []
   const updatedUps: Record<string, boolean> = {}
   for (const mid in $upUpdateMap) {
     updatedUps[mid] =
@@ -120,13 +120,13 @@ export default React.memo(function Follow({ navigation }: Props) {
     } else if (updatedUps[up.mid]) {
       updateUps.push({ ...up })
     } else {
-      noUpdateUps.push({ ...up })
+      otherUps.push({ ...up })
     }
   }
   displayUps = [
     ...topUps,
     ...updateUps,
-    ...noUpdateUps,
+    ...otherUps,
     ...(rest ? Array.from({ length: rest }).map(() => null) : []),
   ]
 
@@ -160,6 +160,7 @@ export default React.memo(function Follow({ navigation }: Props) {
           renderItem={renderItem}
           keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
           onEndReachedThreshold={1}
+          persistentScrollbar
           numColumns={columns}
           ref={followListRef}
           columnWrapperStyle={{

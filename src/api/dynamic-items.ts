@@ -540,7 +540,7 @@ export async function checkUpdateUps(first: boolean) {
   if (upUpdateQueue.size || upUpdateQueue.pending) {
     return
   }
-  if (!store.$followedUps.length) {
+  if (!store.$userInfo) {
     upUpdateQueue.clear()
     if (store.checkingUpUpdate) {
       store.checkingUpUpdate = false
@@ -571,7 +571,7 @@ export async function checkUpdateUps(first: boolean) {
     if (store.checkingUpUpdate) {
       store.checkingUpUpdate = false
     }
-    if (!store.$followedUps.length) {
+    if (!store.$userInfo) {
       // 退出的时候
       store.$upUpdateMap = {}
     } else {

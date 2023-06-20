@@ -31,11 +31,9 @@ export default React.memo(
           sign,
         },
       })
-      if (clearUpdate) {
-        if (mid in store.$upUpdateMap) {
-          store.$upUpdateMap[mid].latestId =
-            store.$upUpdateMap[mid].currentLatestId
-        }
+      if (clearUpdate && mid in store.$upUpdateMap) {
+        store.$upUpdateMap[mid].latestId =
+          store.$upUpdateMap[mid].currentLatestId
       }
     })
     const gotoLivePage = useMemoizedFn(() => {

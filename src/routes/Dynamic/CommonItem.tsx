@@ -121,20 +121,7 @@ export function CommonContent(props: {
           </Text>
         ) : null}
       </Foo>
-      <Text
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          backgroundColor: '#f56c6c',
-          color: 'white',
-          paddingHorizontal: 8,
-          paddingVertical: 1,
-          borderRadius: 4,
-          borderTopLeftRadius: 0,
-          borderBottomRightRadius: 0,
-          fontSize: 11,
-        }}>
+      <Text style={styles.tagName}>
         {
           // @ts-ignore
           cateMap[type] || ''
@@ -156,5 +143,18 @@ const styles = StyleSheet.create({
     // borderWidth: 0.5,
     borderRadius: 4,
     paddingRight: 10,
+  },
+  tagName: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    backgroundColor: '#f56c6c',
+    color: 'white',
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    borderRadius: 4,
+    borderTopLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    fontSize: 11,
   },
 })
