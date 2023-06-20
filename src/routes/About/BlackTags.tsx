@@ -1,4 +1,4 @@
-import { Chip, ListItem, Text } from '@rneui/themed'
+import { Chip, ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import store, { useStore } from '../../store'
@@ -8,6 +8,7 @@ export default React.memo(function BlackTags() {
   const { $blackTags } = useStore()
   return (
     <ListItem.Accordion
+      icon={<Icon name={'chevron-down'} type="material-community" />}
       containerStyle={styles.blackTitle}
       content={
         <ListItem.Content>

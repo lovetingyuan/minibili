@@ -2,7 +2,7 @@ import React from 'react'
 import VideoHeader from './VideoHeader'
 import { View, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import { ListItem, Text } from '@rneui/themed'
+import { ListItem, Text, Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
 
 export default React.memo(function VideoInfo(props: {
@@ -31,6 +31,7 @@ export default React.memo(function VideoInfo(props: {
         {videoDesc ? <Text style={[styles.videoDesc]}>{videoDesc}</Text> : null}
         {(videoInfo?.videosNum || 0) > 1 && videoInfo?.pages ? (
           <ListItem.Accordion
+            icon={<Icon name={'chevron-down'} type="material-community" />}
             containerStyle={styles.pagesTitle}
             content={
               <ListItem.Content>

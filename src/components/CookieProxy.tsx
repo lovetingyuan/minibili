@@ -185,7 +185,12 @@ export default React.memo(() => {
   return (
     <Dialog isVisible={showCaptcha}>
       <View style={styles.container}>
-        <Dialog.Title title={ready ? '抱歉，需要验证' : '请稍候...'} />
+        <Dialog.Title
+          title={ready ? '抱歉，需要验证' : '请稍候...'}
+          titleStyle={{
+            color: dark ? 'white' : '#333',
+          }}
+        />
         <Icon
           name="close"
           size={20}

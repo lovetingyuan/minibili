@@ -1,4 +1,4 @@
-import { Chip, ListItem, Text } from '@rneui/themed'
+import { Chip, ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import store, { useStore } from '../../store'
 import { View, StyleSheet } from 'react-native'
@@ -14,6 +14,7 @@ export default React.memo(function SortCate() {
     React.useState(initUnsortedRankList)
   return (
     <ListItem.Accordion
+      icon={<Icon name={'chevron-down'} type="material-community" />}
       containerStyle={styles.blackTitle}
       content={
         <ListItem.Content>
