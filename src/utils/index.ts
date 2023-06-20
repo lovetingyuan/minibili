@@ -1,5 +1,5 @@
 import NetInfo from '@react-native-community/netinfo'
-import { Linking, Share } from 'react-native'
+import { Share } from 'react-native'
 import { debounce } from 'throttle-debounce'
 import Toast from 'react-native-root-toast'
 
@@ -60,16 +60,16 @@ export const parseDuration = (seconds?: number | string) => {
   )
 }
 
-export const openBiliVideo = async (bvid: string) => {
-  const url = `bilibili://video/${bvid}`
-  Linking.canOpenURL(url).then(openable => {
-    if (!openable) {
-      Linking.openURL(`https://b23.tv/${bvid}`)
-    } else {
-      Linking.openURL(url)
-    }
-  })
-}
+// export const openBiliVideo = async (bvid: string) => {
+//   const url = `bilibili://video/${bvid}`
+//   Linking.canOpenURL(url).then(openable => {
+//     if (!openable) {
+//       Linking.openURL(`https://b23.tv/${bvid}`)
+//     } else {
+//       Linking.openURL(url)
+//     }
+//   })
+// }
 
 export async function handleShareVideo(
   name: string,

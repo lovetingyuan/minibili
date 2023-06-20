@@ -4,7 +4,7 @@ import React from 'react'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { Icon, Avatar, Text } from '@rneui/themed'
 
-export function HeaderRight() {
+function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const route = useRoute<RouteProp<RootStackParamList, 'DynamicDetail'>>()
   const { id, name } = route.params.detail
@@ -34,6 +34,9 @@ export function HeaderTitle() {
     </View>
   )
 }
+
+export const dynamicDetailHeaderRight = () => <HeaderRight />
+export const dynamicDetailHeaderTitle = () => <HeaderTitle />
 
 const styles = StyleSheet.create({
   container: {

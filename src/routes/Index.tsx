@@ -12,12 +12,13 @@ import { RootStackParamList } from '../types'
 import MainTab from './MainTab'
 import Dynamic from './Dynamic'
 import DynamicDetail from './DynamicDetail'
-import { Linking } from 'react-native'
-import { Button } from '@rneui/themed'
-import { site } from '../constants'
-import { HeaderTitle, HeaderRight } from './DynamicDetail/Header'
+import aboutHeaderRight from './About/headerRight'
 import useIsDark from '../hooks/useIsDark'
 import { setScreenTag } from '../utils/report'
+import {
+  dynamicDetailHeaderRight,
+  dynamicDetailHeaderTitle,
+} from './DynamicDetail/Header'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -67,8 +68,8 @@ export default function Route() {
           name="DynamicDetail"
           component={DynamicDetail}
           options={{
-            headerTitle: () => <HeaderTitle />,
-            headerRight: () => <HeaderRight />,
+            headerTitle: dynamicDetailHeaderTitle,
+            headerRight: dynamicDetailHeaderRight,
           }}
         />
         <Stack.Screen
@@ -85,16 +86,7 @@ export default function Route() {
           component={About}
           options={{
             headerTitle: '关于',
-            headerRight: () => (
-              <Button
-                type="clear"
-                size="sm"
-                onPress={() => {
-                  Linking.openURL(site + '?showchangelog=true')
-                }}>
-                更新日志
-              </Button>
-            ),
+            headerRight: aboutHeaderRight,
           }}
         />
       </Stack.Navigator>

@@ -53,10 +53,11 @@ export default function WebPage({ route, navigation }: Props) {
     }
   })
   React.useEffect(() => {
+    const headerRight = () => {
+      return <HeaderRight reload={onRefresh} />
+    }
     navigation.setOptions({
-      headerRight: () => {
-        return <HeaderRight reload={onRefresh} />
-      },
+      headerRight,
     })
   }, [navigation, onRefresh])
   return (

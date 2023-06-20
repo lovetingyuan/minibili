@@ -116,7 +116,9 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   )
 }
 
-export function HeaderRight() {
+export const headerRight = () => <HeaderRight />
+
+function HeaderRight() {
   const { theme } = useTheme()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()

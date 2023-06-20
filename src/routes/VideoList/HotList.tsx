@@ -8,21 +8,14 @@ import {
   useWindowDimensions,
   Linking,
 } from 'react-native'
-// import * as SplashScreen from 'expo-splash-screen'
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 import Loading from './Loading'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import {
-  handleShareVideo,
-  openBiliVideo,
-  parseNumber,
-  showToast,
-} from '../../utils'
+import { handleShareVideo, parseNumber, showToast } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
@@ -30,7 +23,6 @@ type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
 export default React.memo(function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
   const { $blackUps, $blackTags } = useStore()
-
   const {
     list,
     page,
@@ -63,7 +55,6 @@ export default React.memo(function Hot({ navigation }: Props) {
   }, [error])
 
   const currentVideoRef = React.useRef<VideoItem | null>(null)
-  // const [modalVisible, setModalVisible] = React.useState(false)
   const addBlackUp = () => {
     if (!currentVideoRef.current) {
       return
@@ -87,42 +78,34 @@ export default React.memo(function Hot({ navigation }: Props) {
   }
   const buttons = () =>
     [
-      currentVideoRef.current?.mid == TracyId
-        ? null
-        : {
-            text: `不再看 ${currentVideoRef.current?.name} 的视频`,
-            onPress: () => {
-              Alert.alert(
-                `不再看 ${currentVideoRef.current?.name} 的视频？`,
-                '',
-                [
-                  {
-                    text: '取消',
-                    style: 'cancel',
-                  },
-                  { text: '确定', onPress: addBlackUp },
-                ],
-              )
+      {
+        text: `不再看 ${currentVideoRef.current?.name} 的视频`,
+        onPress: () => {
+          Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
+            {
+              text: '取消',
+              style: 'cancel',
             },
-          },
-      currentVideoRef.current?.mid == TracyId
-        ? null
-        : {
-            text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
-            onPress: () => {
-              Alert.alert(
-                `不再看 ${currentVideoRef.current?.tag} 类型的视频？`,
-                '',
-                [
-                  {
-                    text: '取消',
-                    style: 'cancel',
-                  },
-                  { text: '确定', onPress: addBlackTagName },
-                ],
-              )
-            },
-          },
+            { text: '确定', onPress: addBlackUp },
+          ])
+        },
+      },
+      {
+        text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
+        onPress: () => {
+          Alert.alert(
+            `不再看 ${currentVideoRef.current?.tag} 类型的视频？`,
+            '',
+            [
+              {
+                text: '取消',
+                style: 'cancel',
+              },
+              { text: '确定', onPress: addBlackTagName },
+            ],
+          )
+        },
+      },
       {
         text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
         onPress: () => {
@@ -132,15 +115,15 @@ export default React.memo(function Hot({ navigation }: Props) {
           }
         },
       },
-      {
-        text: '在B站打开',
-        onPress: () => {
-          if (!currentVideoRef.current) {
-            return
-          }
-          openBiliVideo(currentVideoRef.current.bvid)
-        },
-      },
+      // {
+      //   text: '在B站打开',
+      //   onPress: () => {
+      //     if (!currentVideoRef.current) {
+      //       return
+      //     }
+      //     openBiliVideo(currentVideoRef.current.bvid)
+      //   },
+      // },
       {
         text: '查看封面',
         onPress: () => {

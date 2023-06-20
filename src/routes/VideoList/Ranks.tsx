@@ -11,12 +11,12 @@ import {
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { TracyId } from '../../constants'
+// import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 
 import { VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, openBiliVideo, parseNumber } from '../../utils'
+import { handleShareVideo, parseNumber } from '../../utils'
 import { useRankList } from '../../api/rank-list'
 import Loading from './Loading'
 import { Action, reportUserAction } from '../../utils/report'
@@ -84,24 +84,18 @@ export default React.memo(function Ranks({ navigation }: Props) {
 
   const buttons = () =>
     [
-      currentVideoRef.current?.mid == TracyId
-        ? null
-        : {
-            text: `不再看 ${currentVideoRef.current?.name} 的视频`,
-            onPress: () => {
-              Alert.alert(
-                `不再看 ${currentVideoRef.current?.name} 的视频？`,
-                '',
-                [
-                  {
-                    text: '取消',
-                    style: 'cancel',
-                  },
-                  { text: '确定', onPress: addBlackUp },
-                ],
-              )
+      {
+        text: `不再看 ${currentVideoRef.current?.name} 的视频`,
+        onPress: () => {
+          Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
+            {
+              text: '取消',
+              style: 'cancel',
             },
-          },
+            { text: '确定', onPress: addBlackUp },
+          ])
+        },
+      },
       {
         text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
         onPress: () => {
@@ -111,15 +105,15 @@ export default React.memo(function Ranks({ navigation }: Props) {
           }
         },
       },
-      {
-        text: '在B站打开',
-        onPress: () => {
-          if (!currentVideoRef.current) {
-            return
-          }
-          openBiliVideo(currentVideoRef.current.bvid)
-        },
-      },
+      // {
+      //   text: '在B站打开',
+      //   onPress: () => {
+      //     if (!currentVideoRef.current) {
+      //       return
+      //     }
+      //     openBiliVideo(currentVideoRef.current.bvid)
+      //   },
+      // },
     ].filter(Boolean)
   const videoList: VideoItem[] = []
   const uniqVideosMap: Record<string, boolean> = {}

@@ -8,7 +8,7 @@ import { LabelPosition } from '@react-navigation/bottom-tabs/lib/typescript/src/
 import { Text, View, StyleSheet, ActivityIndicator } from 'react-native'
 import { Badge } from '@rneui/themed'
 import { RootStackParamList } from '../types'
-import { HeaderTitle, HeaderRight } from './VideoList/Header'
+import { videoListHeaderTitle, videoListHeaderRight } from './VideoList/Header'
 import { setScreenTag } from '../utils/report'
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
@@ -110,9 +110,9 @@ const MainTab = () => {
         component={VideoList}
         options={{
           tabBarLabel: getLabel('视频' + (__DEV__ ? ' dev' : '')),
-          headerTitle: () => <HeaderTitle />,
+          headerTitle: videoListHeaderTitle,
           headerTitleAlign: 'left',
-          headerRight: () => <HeaderRight />,
+          headerRight: videoListHeaderRight,
           headerShown: true,
           headerStyle: {
             shadowColor: '#000',

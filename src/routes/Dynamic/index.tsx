@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native'
 import { RootStackParamList } from '../../types'
 
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
-import { HeaderLeft, HeaderRight } from './Header'
+import { HeaderLeft, headerRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
@@ -99,21 +99,22 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   const { theme } = useTheme()
 
   React.useEffect(() => {
+    const headerTitle = () => {
+      return (
+        <HeaderLeft
+          scrollTop={() => {
+            try {
+              dynamicListRef.current?.scrollToOffset({
+                offset: 0,
+              })
+            } catch (err) {}
+          }}
+        />
+      )
+    }
     navigation.setOptions({
-      headerTitle: () => {
-        return (
-          <HeaderLeft
-            scrollTop={() => {
-              try {
-                dynamicListRef.current?.scrollToOffset({
-                  offset: 0,
-                })
-              } catch (err) {}
-            }}
-          />
-        )
-      },
-      headerRight: () => <HeaderRight />,
+      headerTitle,
+      headerRight,
     })
   }, [navigation])
   const renderItem = ({ item }: { item: DynamicItemAllType }) => {

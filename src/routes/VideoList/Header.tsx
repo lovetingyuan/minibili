@@ -8,7 +8,7 @@ import { NavigationProps, PromiseResult } from '../../types'
 import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 
-export const HeaderTitle = () => {
+const HeaderTitle = React.memo(() => {
   const { currentVideosCate, $videoCatesList } = useStore()
   const [newVersion, setNewVersion] = React.useState<PromiseResult<
     typeof store.appUpdateInfo
@@ -96,9 +96,9 @@ export const HeaderTitle = () => {
       ) : null}
     </View>
   )
-}
+})
 
-export const HeaderRight = () => {
+const HeaderRight = () => {
   const { $userInfo } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const face = $userInfo?.face
@@ -120,6 +120,8 @@ export const HeaderRight = () => {
     />
   )
 }
+export const videoListHeaderTitle = () => <HeaderTitle />
+export const videoListHeaderRight = () => <HeaderRight />
 
 const styles = StyleSheet.create({
   container: {

@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, ScrollView, Pressable } from 'react-native'
-import { Text, useTheme } from '@rneui/themed'
+import { Icon, Text, useTheme } from '@rneui/themed'
 import * as KeepAwake from 'expo-keep-awake'
 import * as Clipboard from 'expo-clipboard'
 
@@ -19,11 +19,9 @@ import VideoInfo from './VideoInfo'
 import { checkWifi, showToast } from '../../utils'
 import useMounted from '../../hooks/useMounted'
 import VideoInfoContext from './videoContext'
-import HeaderRight from './HeaderRight'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingVideoId } from '../../utils/report'
-// import { useStore } from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
@@ -38,11 +36,27 @@ const PlayPage = ({ route, navigation }: Props) => {
     bvid,
   }
   React.useEffect(() => {
-    videoInfo.name &&
+    if (videoInfo.name) {
+      const headerRight = () => (
+        <Icon
+          name="open-in-new"
+          color="#F85A54"
+          style={{ padding: 5 }}
+          size={20}
+          onPress={() => {
+            navigation.navigate('WebPage', {
+              url: `https://b23.tv/${bvid}`,
+              title: videoInfo.name,
+            })
+            // Linking.openURL(`https://b23.tv/${bvid}`)
+          }}
+        />
+      )
       navigation.setOptions({
         headerTitle: videoInfo.name,
-        headerRight: () => <HeaderRight bvid={bvid} />,
+        headerRight,
       })
+    }
   }, [navigation, videoInfo.name, bvid])
   useMounted(() => {
     checkWifi()
