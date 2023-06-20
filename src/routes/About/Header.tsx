@@ -1,17 +1,22 @@
 import React from 'react'
-import { View, Linking, StyleSheet, Image } from 'react-native'
+import { View, Linking, StyleSheet, Image, Pressable } from 'react-native'
 import { Icon, Text } from '@rneui/themed'
-import { githubLink } from '../../constants'
+import { githubLink, site } from '../../constants'
 
 export default React.memo(function Header() {
   return (
     <>
-      <View style={styles.container}>
+      <Pressable
+        style={styles.container}
+        onPress={() => {
+          throw new Error('sdf')
+          Linking.openURL(site)
+        }}>
         <Image
           source={require('../../../assets/minibili.png')}
           style={styles.logo}
         />
-      </View>
+      </Pressable>
       <View style={styles.infoItem}>
         <Text style={styles.title}>一款简单的B站浏览App</Text>
         <Icon
