@@ -5,11 +5,9 @@ import React from 'react'
 export default function useIsDark() {
   const [color, setColor] = React.useState(useColorScheme())
   // return true
-  const color2 = Appearance.getColorScheme()
+  // const color2 = Appearance.getColorScheme()
   React.useEffect(() => {
-    if (color2 !== color) {
-      setColor(color2)
-    }
-  }, [color2, color])
+    Appearance.addChangeListener(({ colorScheme }) => setColor(colorScheme))
+  }, [])
   return color === 'dark'
 }

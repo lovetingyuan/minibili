@@ -1,5 +1,5 @@
 import NetInfo from '@react-native-community/netinfo'
-import { Share } from 'react-native'
+import { Share, Platform, ToastAndroid } from 'react-native'
 import { debounce } from 'throttle-debounce'
 import Toast from 'react-native-root-toast'
 
@@ -142,9 +142,14 @@ export function showToast(message: string, long = false) {
     showedMessage[message] = debounce(
       2000,
       () => {
-        Toast.show(message, {
-          duration: long ? Toast.durations.LONG : Toast.durations.SHORT,
-        })
+        Platform.OS === 'android'
+          ? ToastAndroid.show(
+              message,
+              long ? ToastAndroid.LONG : ToastAndroid.SHORT,
+            )
+          : Toast.show(message, {
+              duration: long ? Toast.durations.LONG : Toast.durations.SHORT,
+            })
       },
       {
         atBegin: true,
