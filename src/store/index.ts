@@ -21,6 +21,7 @@ const store = proxy<{
   $ignoredVersions: string[]
   $cookie: string
   // ----------------------------
+  initialed: boolean
   webViewMode: 'PC' | 'MOBILE'
   loadingDynamicError: boolean
   livingUps: Record<string, string>
@@ -47,6 +48,7 @@ const store = proxy<{
   $videoCatesList: RanksConfig,
   $cookie: 'DedeUserID=' + TracyId,
   // -------------------------
+  initialed: false,
   webViewMode: 'MOBILE',
   loadingDynamicError: false,
   livingUps: {},
@@ -80,6 +82,7 @@ Promise.all(
     })
   }),
 ).then(() => {
+  store.initialed = true
   subscribe(store, changes => {
     const changedKeys = new Set<StoredKeys>()
     for (const op of changes) {

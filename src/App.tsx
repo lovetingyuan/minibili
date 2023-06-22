@@ -1,20 +1,21 @@
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
-import NetToast from './components/NetToast'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
 import { Alert, AppState, Linking, Text } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
-import NetInfo from '@react-native-community/netinfo'
-import ThemeResponse from './components/ThemeResponse'
+import NetInfo, { useNetInfo } from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
 import CookieProxy from './components/CookieProxy'
-import ImagesView from './components/ImagesView'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import Route from './routes/Index'
 import * as SentryExpo from 'sentry-expo'
 import type { FallbackRender } from '@sentry/react'
 import store from './store'
+import useIsDark from './hooks/useIsDark'
+import { showToast } from './utils'
+import ThemeResponse from './components/ThemeResponse'
+import ImagesView from './components/ImagesView'
 
 const theme = createTheme({
   lightColors: {
@@ -63,6 +64,23 @@ const errorFallback: FallbackRender = errorData => {
 }
 
 export default function App() {
+  useIsDark()
+  const netInfo = useNetInfo()
+  React.useEffect(() => {
+    if (netInfo.isConnected === false) {
+      setTimeout(() => {
+        NetInfo.fetch().then(state => {
+          if (!state.isConnected) {
+            showToast(' 网络状况不佳 ')
+          }
+        })
+      }, 1000)
+    } else {
+      if (netInfo.type !== 'wifi' && netInfo.type !== 'unknown') {
+        showToast(' 请注意当前网络不是 wifi ')
+      }
+    }
+  }, [netInfo.isConnected, netInfo.type])
   return (
     <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
       <RootSiblingParent>
@@ -111,7 +129,6 @@ export default function App() {
               },
             }}>
             <StatusBar style="auto" />
-            <NetToast />
             <ThemeResponse />
             <ButtonsOverlay />
             <CookieProxy />

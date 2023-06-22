@@ -1,15 +1,17 @@
 import React from 'react'
 import useIsDark from '../hooks/useIsDark'
 import { useThemeMode } from '@rneui/themed'
-// import useMemoizedFn from '../hooks/useMemoizedFn'
+import useMemoizedFn from '../hooks/useMemoizedFn'
 
 export default function ThemeResponse() {
-  const dark = useIsDark()
   const { setMode } = useThemeMode()
+  const isDark = useIsDark()
+  const setMode2 = useMemoizedFn((t: 'light' | 'dark') => {
+    setMode(t)
+  })
 
   React.useEffect(() => {
-    setMode(dark ? 'dark' : 'light')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dark])
+    setMode2(isDark ? 'dark' : 'light')
+  }, [isDark, setMode2])
   return null
 }

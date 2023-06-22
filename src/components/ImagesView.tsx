@@ -1,23 +1,16 @@
 import React from 'react'
-import {
-  View,
-  Text,
-  Linking,
-  StyleSheet,
-  ScrollView,
-  useWindowDimensions,
-} from 'react-native'
-import { Icon, Overlay } from '@rneui/themed'
+import { Linking, StyleSheet } from 'react-native'
+import { Overlay } from '@rneui/themed'
 import { useNetInfo } from '@react-native-community/netinfo'
-import PagerView from 'react-native-pager-view'
 import store, { useStore } from '../store'
-import { Image } from 'expo-image'
+import WebView from 'react-native-webview'
+
+const html = inlineRequire('./images-viewer.html')
 
 export default React.memo(function ImagesView() {
   const { imagesList, currentImageIndex } = useStore()
   const netinfo = useNetInfo()
-  const { width, height } = useWindowDimensions()
-  const ratio = width / height
+  const webviewRef = React.useRef<WebView | null>(null)
   if (!imagesList.length) {
     return null
   }
@@ -30,66 +23,30 @@ export default React.memo(function ImagesView() {
         store.imagesList = []
         store.currentImageIndex = 0
       }}>
-      <PagerView
-        style={styles.viewPager}
-        initialPage={currentImageIndex}
-        onPageSelected={e => {
-          store.currentImageIndex = e.nativeEvent.position
-        }}>
-        {imagesList.map((img, i) => {
-          const url =
-            netinfo.type === 'wifi' ? img.src : img.src + '@640w_640h_2c.webp'
-          return (
-            <ScrollView
-              key={img.src + i}
-              contentContainerStyle={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                ...(img.ratio < ratio ? {} : { flex: 1 }),
-              }}>
-              <View style={[styles.page]}>
-                <Image
-                  style={[
-                    styles.pagerImage,
-                    {
-                      aspectRatio: img.ratio,
-                    },
-                  ]}
-                  placeholderContentFit="contain"
-                  // placeholder={{ uri: '../../assets/loading.png' }}
-                  source={{
-                    uri: url,
-                  }}
-                />
-              </View>
-            </ScrollView>
-          )
-        })}
-      </PagerView>
-      <View style={styles.pagerNum}>
-        <Text style={styles.pagerNumText}>
-          {currentImageIndex + 1}/{imagesList.length}
-        </Text>
-        <Icon
-          name="open-in-browser"
-          size={22}
-          color={'white'}
-          style={{ padding: 5 }}
-          onPress={() => {
-            Linking.openURL(imagesList[currentImageIndex].src)
-          }}
-        />
-        <Icon
-          name="close"
-          size={22}
-          style={{ padding: 5 }}
-          color={'white'}
-          onPress={() => {
+      <WebView
+        originWhitelist={['*']}
+        ref={webviewRef}
+        source={{ html }}
+        onLoad={() => {
+          webviewRef.current?.injectJavaScript(`
+          window.images = ${JSON.stringify(imagesList)};
+          window.currentImgIndex = ${currentImageIndex};
+          window.isWifi = ${netinfo.type === 'wifi'};
+          window.setImages && window.setImages();
+          true;
+        `)
+        }}
+        onMessage={evt => {
+          const data = JSON.parse(evt.nativeEvent.data) as any
+          if (data.action === 'current-index') {
+            Linking.openURL(imagesList[data.payload].src)
+          }
+          if (data.action === 'close') {
             store.imagesList = []
             store.currentImageIndex = 0
-          }}
-        />
-      </View>
+          }
+        }}
+      />
     </Overlay>
   )
 })
@@ -102,31 +59,5 @@ const styles = StyleSheet.create({
     padding: 0,
     margin: 0,
     backgroundColor: 'rgba(0,0,0,0.85)',
-  },
-  viewPager: {
-    flex: 1,
-  },
-  page: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pagerNum: {
-    position: 'absolute',
-    bottom: 40,
-    gap: 20,
-    paddingLeft: 18,
-    paddingRight: 10,
-    borderRadius: 4,
-    // paddingVertical: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
-    flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,.6)',
-  },
-  pagerNumText: {
-    color: 'white',
-    fontSize: 16,
   },
 })

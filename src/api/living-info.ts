@@ -4,20 +4,13 @@ import { LiveInfoBatchItemSchema } from './living-info.schema'
 import store from '../store'
 import { throttle } from 'throttle-debounce'
 import { Vibration } from 'react-native'
-// import { subscribeKey } from 'valtio/utils'
 import useSWR from 'swr'
-// import store, { useStore } from '../store'
-// import React from 'react'
 
 // https://api.live.bilibili.com/live_user/v1/Master/info?uid=
 // https://api.live.bilibili.com/room/v1/Room/get_info?room_id=
-// api.bilibili.com/x/space/wbi/acc/info?mid=3493257772272614&token=&platform=web
-// const livingMapRef: { current: Record<string, string> } = {
-//   current: {},
-// }
+// https://api.bilibili.com/x/space/wbi/acc/info?mid=3493257772272614&token=&platform=web
 
 export const useLivingInfo = (mid?: string | number) => {
-  // api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?uids[]=672328094&uids[]=322892
   const { data } = useSWR<
     Record<string, z.infer<typeof LiveInfoBatchItemSchema>>
   >(
@@ -55,7 +48,6 @@ const vibrate = throttle(
 )
 
 export const checkLivingUps = () => {
-  // api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?uids[]=672328094&uids[]=322892
   if (!store.$followedUps.length) {
     store.livingUps = {}
     return

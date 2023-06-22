@@ -76,9 +76,7 @@ export default React.memo(function Follow({ navigation }: Props) {
     ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
     : 0
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener('tabPress', () => {
-      // Prevent default behavior
-      // e.preventDefault();
+    return navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return
       }
@@ -88,7 +86,6 @@ export default React.memo(function Follow({ navigation }: Props) {
         })
       } catch (err) {}
     })
-    return unsubscribe
   }, [navigation])
 
   const renderItem = ({

@@ -126,6 +126,9 @@ async function init() {
 let checkLivingTimer: number | null = null
 
 subscribeKey(store, '$followedUps' as const, () => {
+  if (!store.initialed) {
+    return
+  }
   if (typeof checkLivingTimer === 'number') {
     clearInterval(checkLivingTimer)
   }

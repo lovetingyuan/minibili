@@ -34,7 +34,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
   const [isRefreshing] = React.useState(false)
 
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener('tabPress', () => {
+    return navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return
       }
@@ -44,7 +44,6 @@ export default React.memo(function Ranks({ navigation }: Props) {
         })
       } catch (err) {}
     })
-    return unsubscribe
   }, [navigation])
 
   const currentVideoRef = React.useRef<VideoItem | null>(null)

@@ -35,7 +35,7 @@ export default React.memo(function Hot({ navigation }: Props) {
   } = useHotVideos()
 
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener('tabPress', () => {
+    return navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return
       }
@@ -45,7 +45,6 @@ export default React.memo(function Hot({ navigation }: Props) {
         })
       } catch (err) {}
     })
-    return unsubscribe
   }, [navigation])
 
   React.useEffect(() => {

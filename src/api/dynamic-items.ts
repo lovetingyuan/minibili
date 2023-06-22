@@ -499,15 +499,24 @@ export function useDynamicItems(mid?: string | number) {
   }
 }
 
-export const upUpdateQueue = new PQueue({
+const upUpdateQueue = new PQueue({
   concurrency: 15,
   intervalCap: 5,
   interval: 1000,
 })
 
-subscribeKey(store, '$followedUps' as const, ups => {
-  if (!ups.length) {
+subscribeKey(store, '$userInfo' as const, user => {
+  if (!store.initialed) {
+    return
+  }
+  if (!user) {
     upUpdateQueue.clear()
+    setTimeout(() => {
+      store.$upUpdateMap = {}
+      if (store.checkingUpUpdate) {
+        store.checkingUpUpdate = false
+      }
+    })
   }
 })
 
@@ -529,23 +538,12 @@ function checkSingleUpUpdate(mid: string | number) {
       return latestId
     })
     .catch(() => {
-      // 忽略失败
-      return ''
+      return '' // 忽略失败
     })
 }
 
 export async function checkUpdateUps(first: boolean) {
-  // await checkQueue()
-  // upUpdateQueue.clear()
-  if (upUpdateQueue.size || upUpdateQueue.pending) {
-    return
-  }
-  if (!store.$userInfo) {
-    upUpdateQueue.clear()
-    if (store.checkingUpUpdate) {
-      store.checkingUpUpdate = false
-    }
-    store.$upUpdateMap = {}
+  if (upUpdateQueue.size || upUpdateQueue.pending || !store.$userInfo) {
     return
   }
   if (first) {
@@ -555,15 +553,18 @@ export async function checkUpdateUps(first: boolean) {
   for (const up of store.$followedUps) {
     upUpdateQueue.add(async () => {
       const id = await checkSingleUpUpdate(up.mid)
-      upUpdateMap[up.mid] = id
-        ? {
-            latestId: store.$upUpdateMap[up.mid]?.latestId ?? id,
-            currentLatestId: id,
-          }
-        : {
-            latestId: '',
-            currentLatestId: '',
-          }
+      if (id && store.$upUpdateMap[up.mid]) {
+        const { latestId } = store.$upUpdateMap[up.mid]
+        upUpdateMap[up.mid] = {
+          latestId: latestId || Math.random().toString(),
+          currentLatestId: id,
+        }
+      } else {
+        upUpdateMap[up.mid] = {
+          latestId: id,
+          currentLatestId: id,
+        }
+      }
     })
   }
 
@@ -571,26 +572,13 @@ export async function checkUpdateUps(first: boolean) {
     if (store.checkingUpUpdate) {
       store.checkingUpUpdate = false
     }
-    if (!store.$userInfo) {
-      // 退出的时候
-      store.$upUpdateMap = {}
-    } else {
-      store.$upUpdateMap = upUpdateMap
-    }
+    store.$upUpdateMap = upUpdateMap
   })
 }
 
-function _checkDynamicsApi() {
-  return request<DynamicListResponse>(
-    `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${TracyId}&timezone_offset=-480`,
-  )
-  // await request<DynamicListResponse>(
-  //   `/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${TracyId}&timezone_offset=-480`,
-  // )
-}
-
 export function checkDynamicsApi() {
-  return _checkDynamicsApi()
+  const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${TracyId}&timezone_offset=-480`
+  return request<DynamicListResponse>(url)
     .catch(() => delay(1500))
-    .then(() => _checkDynamicsApi())
+    .then(() => request<DynamicListResponse>(url))
 }
