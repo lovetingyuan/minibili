@@ -26,10 +26,20 @@ module.exports = function (babel) {
           path.node.arguments[0].type === 'StringLiteral'
         ) {
           const filePath = path.node.arguments[0].value
-          const absolutePath = nodePath.resolve(
-            nodePath.dirname(state.file.opts.filename),
-            filePath,
-          )
+          let absolutePath
+          if (filePath.startsWith('.')) {
+            absolutePath = nodePath.resolve(
+              nodePath.dirname(state.file.opts.filename),
+              filePath,
+            )
+          } else if (filePath.startsWith('/')) {
+            absolutePath = filePath
+          } else {
+            absolutePath = nodePath.resolve(
+              __dirname,
+              '../node_modules/' + filePath,
+            )
+          }
           const fileContent = fs.readFileSync(absolutePath, 'utf8')
           path.replaceWith(t.stringLiteral(fileContent))
         }

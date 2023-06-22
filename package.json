@@ -51,6 +51,7 @@
     "expo-system-ui": "~2.2.1",
     "expo-updates": "~0.16.4",
     "p-queue": "6.6.2",
+    "photoswipe": "^5.3.7",
     "react": "18.2.0",
     "react-native": "0.71.8",
     "react-native-material-menu": "^2.0.0",
