@@ -81,7 +81,7 @@ export default function VideoItem(props: {
         <View style={styles.imageContainer}>
           <Image
             style={styles.image}
-            source={{ uri: cover + '@421w_236h.webp' }}
+            source={{ uri: cover + '@421w_234h.webp' }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: undefined,
+    height: 'auto',
     aspectRatio: 1.8,
     borderRadius: 5,
   },

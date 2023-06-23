@@ -1,22 +1,50 @@
 import './sentry'
-// import * as SplashScreen from 'expo-splash-screen'
+import * as SentryExpo from 'sentry-expo'
 import { Linking, Alert } from 'react-native'
-// import { currentVersion } from './api/check-update'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import store from './store'
-import { subscribeKey } from 'valtio/utils'
-import { checkLivingUps } from './api/living-info'
-// import { checkUpdateUps, upUpdateQueue } from './api/dynamic-items'
-
-// SplashScreen.preventAutoHideAsync()
+import { showToast } from './utils'
+import { getRemoteConfig } from './api/get-config'
 
 async function init() {
+  if (typeof ErrorUtils === 'object') {
+    ErrorUtils.setGlobalHandler((error, isFatal) => {
+      SentryExpo.Native.captureException(error)
+      if (!isFatal) {
+        showToast('发生了未知错误')
+        return
+      }
+      store.appUpdateInfo.then(info => {
+        Alert.alert(
+          '抱歉，应用发生了错误😅',
+          '我们会处理这个错误' +
+            (info.hasUpdate
+              ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
+              : ''),
+          [
+            {
+              text: '下载新版',
+              onPress: () => {
+                Linking.openURL(info.downloadLink)
+              },
+            },
+          ],
+          {
+            cancelable: false,
+          },
+        )
+      })
+    })
+  }
   await new Promise(r => {
     AsyncStorage.getItem('FIRST_RUN').then(res => {
       if (!res) {
         Alert.alert(
           '使用说明',
-          '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
+          [
+            '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
+            '如果遇到闪退情况，请及时更新版本',
+          ].join('\n'),
           [
             {
               text: '确定',
@@ -34,48 +62,6 @@ async function init() {
       }
     })
   })
-  // const remoteConfig = await store.remoteConfig
-  // let isBroken = false
-  // if (currentVersion && remoteConfig.brokenVersions.includes(currentVersion)) {
-  //   isBroken = true
-  //   await new Promise(r => {
-  //     Alert.alert(
-  //       '注意',
-  //       '当前版本存在问题，请更新APP后使用',
-  //       [
-  //         {
-  //           text: '确定',
-  //           onPress: () => {
-  //             r(null)
-  //           },
-  //         },
-  //       ],
-  //       {
-  //         onDismiss: () => r(null),
-  //       },
-  //     )
-  //   })
-  // }
-  // if (remoteConfig.statement.show) {
-  //   await new Promise(r => {
-  //     Alert.alert(
-  //       remoteConfig.statement.title,
-  //       remoteConfig.statement.content,
-  //       [
-  //         {
-  //           text: '确定',
-  //           onPress: () => {
-  //             r(null)
-  //           },
-  //         },
-  //       ],
-  //       {
-  //         cancelable: remoteConfig.statement.dismiss,
-  //         onDismiss: () => r(null),
-  //       },
-  //     )
-  //   })
-  // }
   const appUpdateInfo = await store.appUpdateInfo
   const isIgnoredVersion = store.$ignoredVersions.includes(
     appUpdateInfo.latestVersion,
@@ -110,32 +96,33 @@ async function init() {
         {
           onDismiss: () => r(null),
         },
-        // {
-        //   cancelable: isBroken ? false : true,
-        // },
       )
     })
   }
+  await getRemoteConfig()
+    .then(config => {
+      if (config.statement.show) {
+        return new Promise(r => {
+          Alert.alert(
+            config.statement.title,
+            config.statement.content,
+            [
+              {
+                text: '确定',
+                onPress: () => {
+                  r(null)
+                },
+              },
+            ],
+            {
+              cancelable: config.statement.dismiss,
+              onDismiss: () => r(null),
+            },
+          )
+        })
+      }
+    })
+    .catch(() => {})
 }
-
-/**
- * 1 如果是未登录则不检查
- * 2 如果关注为空则不检查
- * 3 如果关注发生变化，则立即重新检查
- */
-let checkLivingTimer: number | null = null
-
-subscribeKey(store, '$followedUps' as const, () => {
-  if (!store.initialed) {
-    return
-  }
-  if (typeof checkLivingTimer === 'number') {
-    clearInterval(checkLivingTimer)
-  }
-  checkLivingUps()
-  checkLivingTimer = window.setInterval(() => {
-    checkLivingUps()
-  }, 10 * 60 * 1000)
-})
 
 init()

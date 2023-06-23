@@ -80,12 +80,6 @@ function __$hack(dark) {
       } else {
         window.scrollTo(0, 100000)
         if (ready || Date.now() - time > 10000) {
-          // window.ReactNativeWebView.postMessage(
-          //   JSON.stringify({
-          //     action: 'print',
-          //     payload: '111' + captcha + '-' + ready,
-          //   }),
-          // )
           // @ts-ignore
           window.ReactNativeWebView.postMessage(
             JSON.stringify({

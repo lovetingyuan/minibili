@@ -2,7 +2,6 @@ import React from 'react'
 import { Linking, StyleSheet, View, Image, TextStyle } from 'react-native'
 import { MessageContent, ReplyItem } from '../api/comments'
 import { Button, Text, useTheme } from '@rneui/themed'
-import useIsDark from '../hooks/useIsDark'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 import store from '../store'
@@ -101,7 +100,6 @@ function CommentText(props: {
 export default React.memo(function Comment(props: Props) {
   const { comment, upName } = props
   const { theme } = useTheme()
-  const dark = useIsDark()
   const upStyle = (name: string) => {
     return upName === name
       ? styles.pinkName
@@ -183,7 +181,7 @@ export default React.memo(function Comment(props: Props) {
           style={[
             styles.reply,
             {
-              backgroundColor: dark ? '#333' : '#ddd',
+              backgroundColor: theme.colors.grey5,
             },
           ]}>
           {comment.replies.map(reply => {

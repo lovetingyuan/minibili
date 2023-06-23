@@ -9,7 +9,6 @@ import { Avatar, Text, useTheme } from '@rneui/themed'
 import RichTexts from '../../components/RichTexts'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
-import useIsDark from '../../hooks/useIsDark'
 import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
@@ -18,7 +17,6 @@ export default function ForwardItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>
 }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const isDark = useIsDark()
   const { theme } = useTheme()
   const { item } = props
   const { payload } = item
@@ -124,7 +122,7 @@ export default function ForwardItem(props: {
       <View
         style={[
           styles.forwardContainer,
-          { backgroundColor: isDark ? '#111' : '#dedede' },
+          { backgroundColor: theme.colors.grey5 },
         ]}>
         {payload.name && payload.mid !== item.mid ? (
           <Pressable

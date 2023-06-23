@@ -5,12 +5,19 @@ import { githubLink, site } from '../../constants'
 import MyImage from '../../components/MyImage'
 
 export default React.memo(function Header() {
+  // React.useEffect(() => {
+  //   console.log(ErrorUtils)
+  // }, [])
   return (
     <>
       <Pressable
         style={styles.container}
         onPress={() => {
-          Linking.openURL(site)
+          if (__DEV__) {
+            throw new Error('error happens')
+          } else {
+            Linking.openURL(site)
+          }
         }}>
         <MyImage
           source={require('../../../assets/minibili.png')}

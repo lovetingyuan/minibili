@@ -3,12 +3,12 @@ import React from 'react'
 import {
   useWindowDimensions,
   View,
-  Image,
   StyleSheet,
   ImageBackground,
   Pressable,
   Text,
   Linking,
+  ActivityIndicator,
 } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
@@ -19,6 +19,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import { Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
+import MyImage from '../../components/MyImage'
 
 const VideoPlayer = React.memo((props: { wifi: boolean }) => {
   const { wifi } = props
@@ -95,10 +96,18 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
   }
   const renderLoading = () => (
     <View style={styles.loadingView}>
-      <Image
-        style={styles.loadingImage}
-        resizeMode="cover"
+      <MyImage
         source={{ uri: videoInfo.cover + '@672w_378h_1c.webp' }}
+        style={{ flex: 1 }}
+        widthScale={1}
+      />
+      <ActivityIndicator
+        size={'large'}
+        color={'#F85A54'}
+        style={{
+          position: 'absolute',
+          top: '45%',
+        }}
       />
     </View>
   )

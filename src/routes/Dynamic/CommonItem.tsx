@@ -156,5 +156,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 0,
     borderBottomRightRadius: 0,
     fontSize: 11,
+    opacity: 0.9,
   },
 })

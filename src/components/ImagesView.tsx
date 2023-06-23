@@ -105,6 +105,9 @@ export default React.memo(function ImagesView() {
   // if (!imagesList.length) {
   //   return null
   // }
+  // React.useEffect(() => {
+  //   throw new Error('sdfsdf')
+  // }, [])
   return (
     <Overlay
       isVisible={imagesList.length > 0}

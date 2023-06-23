@@ -1,10 +1,9 @@
 import React from 'react'
 import { View, Share, StyleSheet } from 'react-native'
-import { Button, Dialog, Input, Text } from '@rneui/themed'
+import { Button, Dialog, Input, Text, useTheme } from '@rneui/themed'
 import { reportUserFeedback } from '../../utils/report'
 import { showToast } from '../../utils'
 import { useStore } from '../../store'
-import useIsDark from '../../hooks/useIsDark'
 import { site } from '../../constants'
 
 export default React.memo(function Feedback() {
@@ -32,7 +31,7 @@ export default React.memo(function Feedback() {
     hideFeedback()
     showToast('感谢反馈 😊')
   }
-  const dark = useIsDark()
+  const { theme } = useTheme()
   return (
     <View style={styles.infoItem}>
       <Text style={styles.title}>欢迎分享本应用 ❤</Text>
@@ -53,7 +52,7 @@ export default React.memo(function Feedback() {
         <Dialog isVisible={feedBackVisible} onBackdropPress={hideFeedback}>
           <Dialog.Title
             title="欢迎反馈意见 😊"
-            titleStyle={dark ? { color: 'white' } : {}}
+            titleStyle={{ color: theme.colors.black }}
           />
           <View>
             <Input
@@ -63,13 +62,13 @@ export default React.memo(function Feedback() {
               style={styles.adviceInput}
               maxLength={500}
               textAlignVertical="top"
-              placeholderTextColor={dark ? '#bbb' : 'gray'}
+              placeholderTextColor={theme.colors.grey3}
               onChangeText={value => (feedbackRef.current = value)}
             />
             <Input
               placeholder="联系方式"
               maxLength={100}
-              placeholderTextColor={dark ? '#bbb' : 'gray'}
+              placeholderTextColor={theme.colors.grey3}
               onChangeText={value => (feedbackContactRef.current = value)}
             />
           </View>
