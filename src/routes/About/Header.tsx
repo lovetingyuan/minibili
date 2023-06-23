@@ -3,6 +3,8 @@ import { View, Linking, StyleSheet, Pressable } from 'react-native'
 import { Icon, Text } from '@rneui/themed'
 import { githubLink, site } from '../../constants'
 import MyImage from '../../components/MyImage'
+import * as Clipboard from 'expo-clipboard'
+import store from '../../store'
 
 export default React.memo(function Header() {
   // React.useEffect(() => {
@@ -33,6 +35,9 @@ export default React.memo(function Header() {
           size={20}
           onPress={() => {
             Linking.openURL(githubLink)
+          }}
+          onLongPress={() => {
+            Clipboard.setStringAsync(JSON.stringify(store))
           }}
         />
       </View>
