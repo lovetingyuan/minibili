@@ -9,7 +9,9 @@ function __$hack() {
   const gallery = document.createElement('div')
   document.body.appendChild(gallery)
   const style = document.createElement('style')
-  style.textContent = 'body .pswp__counter { font-size: 18px; }'
+  style.textContent = `
+  body .pswp__counter { font-size: 18px; }
+  `
   document.head.appendChild(style)
   gallery.style.display = 'none'
   // @ts-ignore
@@ -34,38 +36,29 @@ function __$hack() {
     pinchToClose: false,
     loop: false,
   })
-  // @ts-ignore
-  lightbox.loadAndOpen(window.currentImgIndex, {
-    gallery,
-  })
-  lightbox.on('openingAnimationEnd', () => {
-    const zoomButton = document.querySelector('.pswp__button')
-    // @ts-ignore
-    const openButton = zoomButton.cloneNode(true)
-    // @ts-ignore
-    openButton.className = 'pswp__button'
-    // @ts-ignore
-    zoomButton.parentElement.insertBefore(openButton, zoomButton)
-    // @ts-ignore
-    openButton.title = 'open'
-    // @ts-ignore
-    openButton.setAttribute('aria-label', 'open')
-    // @ts-ignore
-    openButton.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 512 512">
-    <path fill="white" stroke="black" stroke-width="1" d="M224 304a16 16 0 0 1-11.31-27.31l157.94-157.94A55.7 55.7 0 0 0 344 112H104a56.06 56.06 0 0 0-56 56v240a56.06 56.06 0 0 0 56 56h240a56.06 56.06 0 0 0 56-56V168a55.7 55.7 0 0 0-6.75-26.63L235.31 299.31A15.92 15.92 0 0 1 224 304Z"/>
-    <path fill="white" stroke="black" stroke-width="1" d="M448 48H336a16 16 0 0 0 0 32h73.37l-38.74 38.75a56.35 56.35 0 0 1 22.62 22.62L432 102.63V176a16 16 0 0 0 32 0V64a16 16 0 0 0-16-16Z"/></svg>
-    `
-    // @ts-ignore
-    openButton.addEventListener('click', () => {
+  lightbox.on('uiRegister', function () {
+    lightbox.pswp.ui.registerElement({
+      name: 'download-button',
+      order: 8,
+      isButton: true,
+      tagName: 'a',
+      html: {
+        isCustomSVG: true,
+        inner:
+          '<path d="M20.5 14.3 17.1 18V10h-2.2v7.9l-3.4-3.6L10 16l6 6.1 6-6.1ZM23 23H9v2h14Z" id="pswp__icn-download"/>',
+        outlineID: 'pswp__icn-download',
+      },
       // @ts-ignore
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          action: 'current-index',
-          // @ts-ignore
-          payload: window.pswp.currIndex,
-        }),
-      )
+      onInit: (el, pswp) => {
+        el.setAttribute('download', '')
+        el.setAttribute('target', '_blank')
+        el.setAttribute('rel', 'noopener')
+
+        pswp.on('change', () => {
+          console.log('change')
+          el.href = pswp.currSlide.data.src
+        })
+      },
     })
   })
   lightbox.on('close', () => {
@@ -77,14 +70,9 @@ function __$hack() {
       }),
     )
   })
-  lightbox.on('destroy', () => {
-    // @ts-ignore
-    window.ReactNativeWebView.postMessage(
-      JSON.stringify({
-        action: 'close',
-        payload: '',
-      }),
-    )
+  // @ts-ignore
+  lightbox.loadAndOpen(window.currentImgIndex, {
+    gallery,
   })
 }
 
@@ -114,12 +102,12 @@ export default React.memo(function ImagesView() {
   const { imagesList, currentImageIndex } = useStore()
   const netinfo = useNetInfo()
   const webviewRef = React.useRef<WebView | null>(null)
-  if (!imagesList.length) {
-    return null
-  }
+  // if (!imagesList.length) {
+  //   return null
+  // }
   return (
     <Overlay
-      isVisible={true}
+      isVisible={imagesList.length > 0}
       fullScreen
       overlayStyle={styles.overlay}
       onBackdropPress={() => {

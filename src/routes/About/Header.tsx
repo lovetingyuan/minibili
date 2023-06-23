@@ -1,7 +1,8 @@
 import React from 'react'
-import { View, Linking, StyleSheet, Image, Pressable } from 'react-native'
+import { View, Linking, StyleSheet, Pressable } from 'react-native'
 import { Icon, Text } from '@rneui/themed'
 import { githubLink, site } from '../../constants'
+import MyImage from '../../components/MyImage'
 
 export default React.memo(function Header() {
   return (
@@ -11,9 +12,10 @@ export default React.memo(function Header() {
         onPress={() => {
           Linking.openURL(site)
         }}>
-        <Image
+        <MyImage
           source={require('../../../assets/minibili.png')}
-          style={styles.logo}
+          widthScale={0.85}
+          style={{ marginTop: 10 }}
         />
       </Pressable>
       <View style={styles.infoItem}>
@@ -39,6 +41,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 6,
   },
-  logo: { width: 300, height: 90 },
   title: { fontSize: 24 },
 })

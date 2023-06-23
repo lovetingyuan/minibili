@@ -29,7 +29,7 @@ export default React.memo(function Follow({ navigation }: Props) {
   const { $userInfo, $followedUps, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
   const [isLoading, setIsLoading] = React.useState(false)
-  // const [error, setError] = React.useState('')
+  const [total, setTotal] = React.useState(0)
   const { data: relation } = useUserRelation($userInfo?.mid)
 
   React.useEffect(() => {
@@ -41,6 +41,7 @@ export default React.memo(function Follow({ navigation }: Props) {
     getFollowedUps($userInfo.mid)
       .then(
         total => {
+          setTotal(total)
           if (total > 250) {
             Alert.alert('系统限制最多只能加载前250个关注的UP')
           }
@@ -169,7 +170,13 @@ export default React.memo(function Follow({ navigation }: Props) {
           ListEmptyComponent={emptyContent()}
           ListFooterComponent={
             <Text style={styles.bottomText}>
-              {isLoading ? '加载中...' : $followedUps.length ? '到底了~' : ''}
+              {isLoading
+                ? '加载中...'
+                : $followedUps.length
+                ? total > 250
+                  ? '只能加载前250个(´･_･`)'
+                  : '到底了~'
+                : ''}
             </Text>
           }
         />
