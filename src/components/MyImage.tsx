@@ -4,7 +4,7 @@ import type { ImageProps } from 'react-native'
 
 export default function MyImage(props: ImageProps & { widthScale?: number }) {
   const { width } = useWindowDimensions()
-  const { source, widthScale = 0.9, ...otherProps } = props
+  const { source, style, widthScale = 0.9, ...otherProps } = props
   const [ratio, setRatio] = React.useState<number>(1)
   React.useEffect(() => {
     if (typeof source === 'object' && source && 'uri' in source && source.uri) {
@@ -25,7 +25,7 @@ export default function MyImage(props: ImageProps & { widthScale?: number }) {
           height: 'auto',
           aspectRatio: ratio,
         },
-        props.style,
+        style,
       ]}
       {...otherProps}
     />
