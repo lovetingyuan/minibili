@@ -1,5 +1,4 @@
 import React from 'react'
-import { Text } from '@rneui/themed'
 import {
   DefaultTheme,
   DarkTheme,
@@ -36,17 +35,6 @@ export default function Route() {
         },
       }
     : DefaultTheme
-  const aboutTitle = React.useCallback(() => {
-    return (
-      <Text
-        onLongPress={() => {
-          throw new Error('just for test, ignore this')
-        }}>
-        关于
-      </Text>
-    )
-  }, [])
-
   return (
     <NavigationContainer theme={RouteTheme}>
       <Stack.Navigator
@@ -96,7 +84,7 @@ export default function Route() {
           name="About"
           component={About}
           options={{
-            headerTitle: aboutTitle,
+            headerTitle: '关于',
             headerRight: aboutHeaderRight,
           }}
         />
