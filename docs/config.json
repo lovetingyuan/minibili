@@ -6,6 +6,6 @@
     "title": "你好",
     "content": "欢迎使用",
     "dismiss": true,
-    "show": true
+    "show": false
   }
 }
