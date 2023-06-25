@@ -2,7 +2,7 @@ import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
-import { Alert, AppState, Linking, Text, Appearance } from 'react-native'
+import { AppState, Linking, Text, Appearance } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo, { useNetInfo } from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
@@ -12,20 +12,12 @@ import Route from './routes/Index'
 import * as SentryExpo from 'sentry-expo'
 import type { FallbackRender } from '@sentry/react'
 import store from './store'
-import { showToast } from './utils'
+import { showFatalError, showToast } from './utils'
 import ThemeResponse from './components/ThemeResponse'
 import ImagesView from './components/ImagesView'
 import { subscribeKey } from 'valtio/utils'
 import { checkLivingUps } from './api/living-info'
-
-SentryExpo.React.addGlobalEventProcessor(() => {
-  console.log('error 434534')
-  return null
-})
-SentryExpo.Native.addGlobalEventProcessor(() => {
-  console.log('error 5345345')
-  return null
-})
+import { site } from './constants'
 
 /**
  * 1 如果是未登录则不检查
@@ -66,35 +58,31 @@ let checkUpdateForError = false
 const errorFallback: FallbackRender = errorData => {
   if (!checkUpdateForError) {
     checkUpdateForError = true
-    store.appUpdateInfo.then(info => {
-      Alert.alert(
-        '抱歉，应用发生了错误😅',
-        '我们会处理这个错误\n' +
-          (info.hasUpdate
-            ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
-            : ''),
-        [
-          {
-            text: '下载新版',
-            onPress: () => {
-              Linking.openURL(info.downloadLink)
-            },
-          },
-        ],
-        {
-          cancelable: false,
-        },
-      )
-    })
+    showFatalError()
   }
   return (
-    <Text style={{ color: 'red', marginVertical: 100, marginHorizontal: 30 }}>
-      抱歉，应用发生了错误{'\n'}
+    <Text
+      style={{
+        color: 'red',
+        marginVertical: 100,
+        marginHorizontal: 30,
+        fontSize: 16,
+      }}>
+      抱歉，应用发生了未知错误{'\n'}
       {'\n'}
       {errorData.error?.message}
       {'\n'}
       {'\n'}
       我们会处理这个错误，感谢您的理解和支持
+      {'\n'}
+      您可以在此
+      <Text
+        style={{ color: '#0070C6' }}
+        onPress={() => {
+          Linking.openURL(site)
+        }}>
+        下载最新版本
+      </Text>
     </Text>
   )
 }

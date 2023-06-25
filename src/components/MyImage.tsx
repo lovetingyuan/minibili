@@ -4,12 +4,12 @@ import type { ImageProps } from 'react-native'
 
 export default function MyImage(props: ImageProps & { widthScale?: number }) {
   const { width } = useWindowDimensions()
-  const { source, style, widthScale = 0.9, ...otherProps } = props
+  const { source, widthScale = 0.9, ...otherProps } = props
   const [ratio, setRatio] = React.useState<number>(1)
   React.useEffect(() => {
     if (typeof source === 'object' && source && 'uri' in source && source.uri) {
-      Image.getSize(source.uri, (width, height) => {
-        setRatio(width / height)
+      Image.getSize(source.uri, (w, h) => {
+        setRatio(w / h)
       })
     } else {
       const imageSize = Image.resolveAssetSource(source)

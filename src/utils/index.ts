@@ -1,7 +1,8 @@
 import NetInfo from '@react-native-community/netinfo'
-import { Share, Platform, ToastAndroid } from 'react-native'
+import { Share, Platform, ToastAndroid, Alert, Linking } from 'react-native'
 import { debounce } from 'throttle-debounce'
 import Toast from 'react-native-root-toast'
+import store from '../store'
 
 export const parseNumber = (num?: number) => {
   if (num == null) {
@@ -157,4 +158,40 @@ export function showToast(message: string, long = false) {
     )
   }
   showedMessage[message]()
+}
+
+let showedFatalError = false
+
+export function showFatalError() {
+  if (showedFatalError) {
+    return
+  }
+  store.appUpdateInfo.then(info => {
+    showedFatalError = true
+    Alert.alert(
+      '抱歉，应用发生了错误😅',
+      '我们会处理这个错误\n' +
+        (info.hasUpdate
+          ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
+          : ''),
+      [
+        info.hasUpdate
+          ? {
+              text: '下载新版',
+              onPress: () => {
+                Linking.openURL(info.downloadLink)
+              },
+            }
+          : {
+              text: '确定',
+            },
+      ],
+      {
+        cancelable: false,
+        onDismiss() {
+          showedFatalError = false
+        },
+      },
+    )
+  })
 }

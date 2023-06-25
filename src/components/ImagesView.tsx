@@ -26,10 +26,12 @@ function __$hack() {
     })
     .join('')
   // @ts-ignore
+  // eslint-disable-next-line no-undef
   const lightbox = new PhotoSwipeLightbox({
     gallery,
     children: 'a',
     // @ts-ignore
+    // eslint-disable-next-line no-undef
     pswpModule: PhotoSwipe,
     closeOnVerticalDrag: false,
     clickToCloseNonZoomable: false,
@@ -55,7 +57,6 @@ function __$hack() {
         el.setAttribute('rel', 'noopener')
 
         pswp.on('change', () => {
-          console.log('change')
           el.href = pswp.currSlide.data.src
         })
       },

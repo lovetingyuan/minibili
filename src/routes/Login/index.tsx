@@ -1,12 +1,6 @@
 import React from 'react'
 import { Button, Input, Text } from '@rneui/themed'
-import {
-  View,
-  Linking,
-  StyleSheet,
-  ScrollView,
-  Keyboard,
-} from 'react-native'
+import { View, Linking, StyleSheet, ScrollView, Keyboard } from 'react-native'
 import store, { useStore } from '../../store'
 import { useUserInfo } from '../../api/user-info'
 import { reportUserLogin } from '../../utils/report'

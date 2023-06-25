@@ -3,7 +3,7 @@ import * as SentryExpo from 'sentry-expo'
 import { Linking, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import store from './store'
-import { showToast } from './utils'
+import { showFatalError, showToast } from './utils'
 import { getRemoteConfig } from './api/get-config'
 
 async function init() {
@@ -14,26 +14,7 @@ async function init() {
         showToast('发生了未知错误')
         return
       }
-      store.appUpdateInfo.then(info => {
-        Alert.alert(
-          '抱歉，应用发生了错误😅',
-          '我们会处理这个错误' +
-            (info.hasUpdate
-              ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
-              : ''),
-          [
-            {
-              text: '下载新版',
-              onPress: () => {
-                Linking.openURL(info.downloadLink)
-              },
-            },
-          ],
-          {
-            cancelable: false,
-          },
-        )
-      })
+      showFatalError()
     })
   }
   await new Promise(r => {
