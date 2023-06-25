@@ -43,7 +43,7 @@ export type RootStackParamList = {
   }
   Follow: undefined
   About: undefined
-  Login: undefined
+  // Login: undefined
 }
 
 // export type GetFuncPromiseType<F extends (...a: any) => any> =

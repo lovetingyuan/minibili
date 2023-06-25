@@ -3,10 +3,7 @@ import Follow from './Follow'
 import VideoList from './VideoList'
 import { useStore } from '../store'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import {
-  BottomTabNavigationOptions,
-  LabelPosition,
-} from '@react-navigation/bottom-tabs/lib/typescript/src/types'
+import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs/lib/typescript/src/types'
 import { View, ActivityIndicator } from 'react-native'
 import { Badge, Text } from '@rneui/themed'
 import { RootStackParamList } from '../types'
@@ -15,12 +12,6 @@ import { setScreenTag } from '../utils/report'
 import { RouteProp } from '@react-navigation/native'
 
 const Tab = createBottomTabNavigator<RootStackParamList>()
-
-type BottomLabelProps = {
-  focused: boolean
-  color: string
-  position: LabelPosition
-}
 
 function BottomLabel(props: { name: string; color: string; focused: boolean }) {
   const { $upUpdateMap, $userInfo, checkingUpUpdate, livingUps } = useStore()
@@ -86,12 +77,12 @@ function BottomLabel(props: { name: string; color: string; focused: boolean }) {
 }
 
 const getLabel = (name: string) => {
-  return (p: BottomLabelProps) => (
+  return (p: { focused: boolean; color: string }) => (
     <BottomLabel name={name} focused={p.focused} color={p.color} />
   )
 }
 
-export default function MainTab() {
+export default React.memo(function MainTab() {
   const options = React.useMemo<BottomTabNavigationOptions>(() => {
     return {
       headerShown: false,
@@ -152,4 +143,4 @@ export default function MainTab() {
       <Tab.Screen name="Follow" component={Follow} options={followOptions} />
     </Tab.Navigator>
   )
-}
+})

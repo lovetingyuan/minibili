@@ -8,6 +8,7 @@ import useMemoizedFn from '../../hooks/useMemoizedFn'
 import store, { useStore } from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
 import { Image } from 'expo-image'
+import { showToast } from '../../utils'
 
 export default React.memo(
   function FollowItem(props: { item: FollowedUpItem; width?: number }) {
@@ -60,10 +61,7 @@ export default React.memo(
               if (mid in store.$upUpdateMap) {
                 store.$upUpdateMap[mid].latestId = Math.random().toString()
               } else {
-                store.$upUpdateMap[mid] = {
-                  latestId: Math.random().toString(),
-                  currentLatestId: '-',
-                }
+                showToast('请稍候再操作')
               }
             },
           },

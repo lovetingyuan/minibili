@@ -9,17 +9,16 @@ import {
 } from 'react-native'
 import { Text } from '@rneui/themed'
 import FollowItem from './FollowItem'
-
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { useStore } from '../../store'
-
 import Header from './Header'
 import { FollowedUpItem, getFollowedUps } from '../../api/followed-ups'
 import { showToast } from '../../utils'
 import { checkUpdateUps } from '../../api/dynamic-items'
 import { useUserRelation } from '../../api/user-relation'
 import { ApiError } from '../../api/fetcher'
+import Login from './Login'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
@@ -71,11 +70,7 @@ export default React.memo(function Follow({ navigation }: Props) {
   }, [$userInfo])
 
   const { width } = useWindowDimensions()
-  const columns = Math.floor(width / 90)
-  const followedUpListLen = $followedUps.length
-  const rest = followedUpListLen
-    ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
-    : 0
+
   React.useEffect(() => {
     return navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
@@ -88,6 +83,16 @@ export default React.memo(function Follow({ navigation }: Props) {
       } catch (err) {}
     })
   }, [navigation])
+
+  if (!$userInfo) {
+    return <Login />
+  }
+
+  const columns = Math.floor(width / 90)
+  const followedUpListLen = $followedUps.length
+  const rest = followedUpListLen
+    ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
+    : 0
 
   const renderItem = ({
     item,

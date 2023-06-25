@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native'
 import { showToast } from '../../utils'
 import MyImage from '../../components/MyImage'
 
-export default function Login() {
+export default React.memo(function Login() {
   const inputUserIdRef = React.useRef('')
   const [userId, setUserId] = React.useState('')
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -118,7 +118,7 @@ export default function Login() {
       </View>
     </ScrollView>
   )
-}
+})
 
 const styles = StyleSheet.create({
   logoContainer: {
