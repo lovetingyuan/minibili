@@ -16,7 +16,7 @@ const store = proxy<{
   $followedUps: UserInfo[]
   $blackTags: Record<string, string>
   $userInfo: UserInfo | null
-  $upUpdateMap: Record<string, { latestId?: string; currentLatestId: string }>
+  $upUpdateMap: Record<string, { latestId: string; currentLatestId: string }>
   $videoCatesList: { rid: number; label: string }[]
   $ignoredVersions: string[]
   $cookie: string
@@ -26,7 +26,6 @@ const store = proxy<{
   loadingDynamicError: boolean
   livingUps: Record<string, string>
   currentVideosCate: (typeof RanksConfig)[number]
-  // remoteConfig: Promise<RemoteConfig>
   appUpdateInfo: ReturnType<typeof checkUpdate>
   imagesList: {
     src: string
@@ -54,7 +53,6 @@ const store = proxy<{
   livingUps: {},
   checkingUpUpdate: false,
   currentVideosCate: RanksConfig[0],
-  // remoteConfig: getRemoteConfig(),
   appUpdateInfo: checkUpdate(),
   imagesList: [],
   currentImageIndex: 0,

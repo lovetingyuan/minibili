@@ -553,15 +553,26 @@ export async function checkUpdateUps(first: boolean) {
   for (const up of store.$followedUps) {
     upUpdateQueue.add(async () => {
       const id = await checkSingleUpUpdate(up.mid)
-      if (id && store.$upUpdateMap[up.mid]) {
-        const { latestId } = store.$upUpdateMap[up.mid]
+      if (!id) {
+        // 失败全部忽略
+        if (store.$upUpdateMap[up.mid]) {
+          upUpdateMap[up.mid] = {
+            ...store.$upUpdateMap[up.mid],
+          }
+        }
+        return
+      }
+      if (!store.$upUpdateMap[up.mid]) {
+        // 没有检查过
         upUpdateMap[up.mid] = {
-          latestId: latestId || Math.random().toString(),
+          latestId: id,
           currentLatestId: id,
         }
       } else {
+        // 检查过
+        const { latestId } = store.$upUpdateMap[up.mid]
         upUpdateMap[up.mid] = {
-          latestId: id,
+          latestId,
           currentLatestId: id,
         }
       }

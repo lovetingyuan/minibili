@@ -80,7 +80,7 @@ const getLabel = (
 const MainTab = () => {
   const { $upUpdateMap, checkingUpUpdate, $userInfo, livingUps } = useStore()
   const updateCount = Object.values($upUpdateMap).filter(item => {
-    return item.latestId && item.latestId !== item.currentLatestId
+    return item.latestId !== item.currentLatestId
   }).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (

@@ -19,7 +19,7 @@ export default React.memo(
     let hasUpdate = false
     if ($upUpdateMap[mid]) {
       const { latestId, currentLatestId } = $upUpdateMap[mid]
-      hasUpdate = !!latestId && latestId !== currentLatestId
+      hasUpdate = latestId !== currentLatestId
     }
     const navigation = useNavigation<NavigationProps['navigation']>()
     const gotoDynamic = useMemoizedFn((clearUpdate?: boolean) => {

@@ -109,7 +109,6 @@ export default React.memo(function Follow({ navigation }: Props) {
   const updatedUps: Record<string, boolean> = {}
   for (const mid in $upUpdateMap) {
     updatedUps[mid] =
-      !!$upUpdateMap[mid].latestId &&
       $upUpdateMap[mid].latestId !== $upUpdateMap[mid].currentLatestId
   }
   for (const up of $followedUps) {
