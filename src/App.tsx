@@ -2,7 +2,7 @@ import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
-import { AppState, Linking, Text, Appearance } from 'react-native'
+import { AppState, Linking, Text, View, Appearance } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo, { useNetInfo } from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
@@ -18,6 +18,8 @@ import ImagesView from './components/ImagesView'
 import { subscribeKey } from 'valtio/utils'
 import { checkLivingUps } from './api/living-info'
 import { site } from './constants'
+import MyImage from './components/MyImage'
+import { ProviderConfiguration } from 'swr/_internal'
 
 /**
  * 1 如果是未登录则不检查
@@ -61,28 +63,30 @@ const errorFallback: FallbackRender = errorData => {
     showFatalError()
   }
   return (
-    <Text
-      style={{
-        color: 'red',
-        marginVertical: 100,
-        marginHorizontal: 30,
-        fontSize: 16,
-      }}>
-      抱歉，应用发生了未知错误
-      {'\n\n'}
-      {errorData.error?.message}
-      {'\n\n'}
-      我们会处理这个错误，感谢您的理解和支持
-      {'\n\n'}
-      您可以在此
+    <View>
+      <MyImage source={require('../assets/error.png')} widthScale={0.8} />
       <Text
-        style={{ color: '#0070C6' }}
-        onPress={() => {
-          Linking.openURL(site)
+        style={{
+          color: 'red',
+          marginHorizontal: 30,
+          fontSize: 16,
         }}>
-        下载最新版本
+        非常抱歉，应用发生了未知错误
+        {'\n\n'}
+        {errorData.error?.message}
+        {'\n\n'}
+        我们会处理这个错误，感谢您的理解和支持
+        {'\n\n'}
+        您可以退出应用并重新打开{'\n'}我们推荐您
+        <Text
+          style={{ color: '#0070C6', fontWeight: 'bold' }}
+          onPress={() => {
+            Linking.openURL(site)
+          }}>
+          下载最新版本
+        </Text>
       </Text>
-    </Text>
+    </View>
   )
 }
 
@@ -103,53 +107,55 @@ export default function App() {
       }
     }
   }, [netInfo.isConnected, netInfo.type])
+  const swrConfig = React.useMemo<ProviderConfiguration>(() => {
+    return {
+      fetcher,
+      errorRetryCount: 2,
+      isVisible() {
+        return focus
+      },
+      isOnline() {
+        return online
+      },
+      initFocus(callback) {
+        /* 向状态 provider 注册侦听器 */
+        let appState = AppState.currentState
+
+        // 订阅 app 状态更改事件
+        const subscription = AppState.addEventListener(
+          'change',
+          nextAppState => {
+            online = nextAppState === 'active'
+            /* 如果正在从后台或非 active 模式恢复到 active 模式 */
+            if (appState.match(/inactive|background/) && online) {
+              callback()
+            }
+            appState = nextAppState
+          },
+        )
+
+        return () => {
+          subscription.remove()
+        }
+      },
+      initReconnect(callback) {
+        /* 向状态 provider 注册侦听器 */
+        return NetInfo.addEventListener(state => {
+          if (state.isConnected) {
+            online = true
+            callback()
+          } else {
+            online = false
+          }
+        })
+      },
+    }
+  }, [])
   return (
     <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
       <RootSiblingParent>
         <ThemeProvider theme={theme}>
-          <SWRConfig
-            value={{
-              fetcher,
-              errorRetryCount: 2,
-              isVisible() {
-                return focus
-              },
-              isOnline() {
-                return online
-              },
-              initFocus(callback) {
-                /* 向状态 provider 注册侦听器 */
-                let appState = AppState.currentState
-
-                // 订阅 app 状态更改事件
-                const subscription = AppState.addEventListener(
-                  'change',
-                  nextAppState => {
-                    online = nextAppState === 'active'
-                    /* 如果正在从后台或非 active 模式恢复到 active 模式 */
-                    if (appState.match(/inactive|background/) && online) {
-                      callback()
-                    }
-                    appState = nextAppState
-                  },
-                )
-
-                return () => {
-                  subscription.remove()
-                }
-              },
-              initReconnect(callback) {
-                /* 向状态 provider 注册侦听器 */
-                return NetInfo.addEventListener(state => {
-                  if (state.isConnected) {
-                    online = true
-                    callback()
-                  } else {
-                    online = false
-                  }
-                })
-              },
-            }}>
+          <SWRConfig value={swrConfig}>
             <StatusBar style="auto" />
             <ThemeResponse />
             <ButtonsOverlay />

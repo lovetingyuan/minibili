@@ -3,6 +3,7 @@ import {
   DefaultTheme,
   DarkTheme,
   NavigationContainer,
+  RouteProp,
 } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Play from './Play'
@@ -35,44 +36,59 @@ export default function Route() {
         },
       }
     : DefaultTheme
+
+  const onRouteChange = React.useCallback(
+    ({ route }: { route: RouteProp<RootStackParamList> }) => {
+      return {
+        state: () => {
+          setScreenTag(route.name, 'stack')
+        },
+      }
+    },
+    [],
+  )
   return (
     <NavigationContainer theme={RouteTheme}>
       <Stack.Navigator
         initialRouteName="Main"
-        screenOptions={{
-          headerTitleStyle: {
-            fontSize: 18,
-            color: isDark ? '#ccc' : '#333',
-          },
-        }}
-        screenListeners={({ route }) => ({
-          state: () => {
-            setScreenTag(route.name, 'stack')
-          },
-        })}>
+        screenOptions={React.useMemo(() => {
+          return {
+            headerTitleStyle: {
+              fontSize: 18,
+              color: isDark ? '#ccc' : '#333',
+            },
+          }
+        }, [isDark])}
+        screenListeners={onRouteChange}>
         <Stack.Screen
           name="Main"
           component={MainTab}
-          options={{ headerShown: false }}
+          options={React.useMemo(() => {
+            return { headerShown: false }
+          }, [])}
         />
         <Stack.Screen
           name="Dynamic"
           component={Dynamic}
-          options={{
-            headerTitle: '动态',
-          }}
+          options={React.useMemo(() => {
+            return {
+              headerTitle: '动态',
+            }
+          }, [])}
         />
         <Stack.Screen name="Play" component={Play} />
         <Stack.Screen
           name="DynamicDetail"
           component={DynamicDetail}
-          options={{
-            headerTitle: dynamicDetailHeaderTitle,
-            headerRight: dynamicDetailHeaderRight,
-          }}
+          options={React.useMemo(() => {
+            return {
+              headerTitle: dynamicDetailHeaderTitle,
+              headerRight: dynamicDetailHeaderRight,
+            }
+          }, [])}
         />
         <Stack.Screen
-          name="WebPage"
+          name={'WebPage'}
           component={WebPage}
           options={props => {
             return {
@@ -83,10 +99,12 @@ export default function Route() {
         <Stack.Screen
           name="About"
           component={About}
-          options={{
-            headerTitle: '关于',
-            headerRight: aboutHeaderRight,
-          }}
+          options={React.useMemo(() => {
+            return {
+              headerTitle: '关于',
+              headerRight: aboutHeaderRight,
+            }
+          }, [])}
         />
       </Stack.Navigator>
     </NavigationContainer>
