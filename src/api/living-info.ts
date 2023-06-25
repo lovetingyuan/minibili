@@ -49,7 +49,9 @@ const vibrate = throttle(
 
 export const checkLivingUps = () => {
   if (!store.$followedUps.length) {
-    store.livingUps = {}
+    if (Object.keys(store.livingUps).length > 0) {
+      store.livingUps = {}
+    }
     return
   }
   const uids = store.$followedUps.map(user => `uids[]=${user.mid}`).sort()

@@ -35,16 +35,16 @@ SentryExpo.Native.addGlobalEventProcessor(() => {
 let checkLivingTimer: number | null = null
 
 subscribeKey(store, '$followedUps' as const, () => {
-  if (!store.initialed) {
-    return
-  }
+  // if (!store.initialed) {
+  //   return
+  // }
   if (typeof checkLivingTimer === 'number') {
     clearInterval(checkLivingTimer)
   }
   checkLivingUps()
   checkLivingTimer = window.setInterval(() => {
     checkLivingUps()
-  }, 10 * 60 * 1000)
+  }, 9 * 60 * 1000)
 })
 
 const theme = createTheme({

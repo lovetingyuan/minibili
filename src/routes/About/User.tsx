@@ -24,6 +24,7 @@ export default React.memo(function User() {
           store.$userInfo = null
           store.$followedUps = []
           store.$ignoredVersions = []
+          store.$upUpdateMap = {}
           clearUser()
           setTimeout(() => {
             navigation.navigate('Login')
