@@ -68,13 +68,12 @@ const errorFallback: FallbackRender = errorData => {
         marginHorizontal: 30,
         fontSize: 16,
       }}>
-      抱歉，应用发生了未知错误{'\n'}
-      {'\n'}
+      抱歉，应用发生了未知错误
+      {'\n\n'}
       {errorData.error?.message}
-      {'\n'}
-      {'\n'}
+      {'\n\n'}
       我们会处理这个错误，感谢您的理解和支持
-      {'\n'}
+      {'\n\n'}
       您可以在此
       <Text
         style={{ color: '#0070C6' }}
