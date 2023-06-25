@@ -33,16 +33,16 @@ export default React.memo(function Follow({ navigation }: Props) {
   const { data: relation } = useUserRelation($userInfo?.mid)
 
   React.useEffect(() => {
-    if (!$userInfo?.mid) {
+    if (!$userInfo) {
       return
     }
     let checkUpUpdateTimer: number | null = null
     setIsLoading(true)
     getFollowedUps($userInfo.mid)
       .then(
-        total => {
-          setTotal(total)
-          if (total > 250) {
+        t => {
+          setTotal(t)
+          if (t > 250) {
             Alert.alert('系统限制最多只能加载前250个关注的UP')
           }
         },
@@ -68,7 +68,7 @@ export default React.memo(function Follow({ navigation }: Props) {
         clearInterval(checkUpUpdateTimer)
       }
     }
-  }, [$userInfo?.mid])
+  }, [$userInfo])
 
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
