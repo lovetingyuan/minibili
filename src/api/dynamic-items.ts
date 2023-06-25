@@ -583,6 +583,17 @@ export async function checkUpdateUps(first: boolean) {
     if (store.checkingUpUpdate) {
       store.checkingUpUpdate = false
     }
+    // 首次检查时如果用户手动标记为未读，可能upUpdateMap已经处理也可能没处理
+    for (const id in store.$upUpdateMap) {
+      if (store.$upUpdateMap[id].currentLatestId === '-') {
+        upUpdateMap[id] = {
+          latestId: Math.random().toString(),
+          currentLatestId: upUpdateMap[id]
+            ? upUpdateMap[id].currentLatestId
+            : Math.random().toString(),
+        }
+      }
+    }
     store.$upUpdateMap = upUpdateMap
   })
 }

@@ -59,6 +59,11 @@ export default React.memo(
             onPress: () => {
               if (mid in store.$upUpdateMap) {
                 store.$upUpdateMap[mid].latestId = Math.random().toString()
+              } else {
+                store.$upUpdateMap[mid] = {
+                  latestId: Math.random().toString(),
+                  currentLatestId: '-',
+                }
               }
             },
           },
