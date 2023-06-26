@@ -2,7 +2,6 @@ import React from 'react'
 import { View } from 'react-native'
 import { Avatar, Icon, Text, useTheme } from '@rneui/themed'
 import store, { useStore } from '../../store'
-
 import { StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'

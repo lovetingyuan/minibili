@@ -7,11 +7,11 @@ import {
   Alert,
   useWindowDimensions,
   ActivityIndicator,
+  Linking,
 } from 'react-native'
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-// import { TracyId } from '../../constants'
 import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 
@@ -102,6 +102,15 @@ export default React.memo(function Ranks({ navigation }: Props) {
             const { name, title, bvid } = currentVideoRef.current
             handleShareVideo(name, title, bvid)
           }
+        },
+      },
+      {
+        text: '查看封面',
+        onPress: () => {
+          if (!currentVideoRef.current) {
+            return
+          }
+          Linking.openURL(currentVideoRef.current.cover)
         },
       },
       // {

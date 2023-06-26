@@ -1,35 +1,28 @@
 import React from 'react'
 import { showFatalError } from '../utils'
-import {
-  BackHandler,
-  Button,
-  Linking,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
+import { Button, Linking, StyleSheet, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import MyImage from './MyImage'
 import { site } from '../constants'
 import useIsDark from '../hooks/useIsDark'
 
-class ExitError extends Error {
-  constructor(m: string) {
-    super(m)
-    this.name = 'IgnoreThisError'
-  }
-}
+// class ExitError extends Error {
+//   constructor(m: string) {
+//     super(m)
+//     this.name = 'IgnoreThisError'
+//   }
+// }
 
 export default function ErrorFallback(props: { message?: string }) {
   // const [, seta] = React.useState(null)
   React.useEffect(() => {
     showFatalError()
-    const handleBack = () => {
-      throw new ExitError('😢')
-      // BackHandler.exitApp()
-      // return true
-    }
-    BackHandler.addEventListener('hardwareBackPress', handleBack)
+    // const handleBack = () => {
+    //   throw new ExitError('😢')
+    // BackHandler.exitApp()
+    // return true
+    // }
+    // BackHandler.addEventListener('hardwareBackPress', handleBack)
   }, [])
   const dark = useIsDark()
   return (

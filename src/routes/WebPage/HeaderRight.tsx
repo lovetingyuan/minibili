@@ -1,4 +1,4 @@
-import { Icon } from '@rneui/themed'
+import { Icon, useTheme } from '@rneui/themed'
 import React from 'react'
 import { View, Linking, Share } from 'react-native'
 import store, { useStore } from '../../store'
@@ -13,7 +13,7 @@ export default function HeaderRight(props: { reload: () => void }) {
   const [visible, setVisible] = React.useState(false)
   const route = useRoute<RouteProp<RootStackParamList, 'WebPage'>>()
   const { url, title } = route.params
-
+  const { theme } = useTheme()
   const hideMenu = () => setVisible(false)
 
   const showMenu = () => setVisible(true)
@@ -22,6 +22,7 @@ export default function HeaderRight(props: { reload: () => void }) {
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
       <Menu
         visible={visible}
+        style={{ backgroundColor: theme.colors.background }}
         anchor={
           <Icon
             name="dots-vertical"
@@ -31,6 +32,7 @@ export default function HeaderRight(props: { reload: () => void }) {
         }
         onRequestClose={hideMenu}>
         <MenuItem
+          textStyle={{ color: theme.colors.black }}
           onPress={() => {
             store.webViewMode = store.webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
             hideMenu()
@@ -38,6 +40,7 @@ export default function HeaderRight(props: { reload: () => void }) {
           {webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
         </MenuItem>
         <MenuItem
+          textStyle={{ color: theme.colors.black }}
           onPress={() => {
             hideMenu()
             Linking.openURL(url)
@@ -45,6 +48,7 @@ export default function HeaderRight(props: { reload: () => void }) {
           浏览器打开
         </MenuItem>
         <MenuItem
+          textStyle={{ color: theme.colors.black }}
           onPress={() => {
             hideMenu()
             props.reload()
@@ -52,6 +56,7 @@ export default function HeaderRight(props: { reload: () => void }) {
           刷新页面
         </MenuItem>
         <MenuItem
+          textStyle={{ color: theme.colors.black }}
           onPress={() => {
             Clipboard.setStringAsync(url).then(() => {
               showToast('已复制链接：' + url)
@@ -61,6 +66,7 @@ export default function HeaderRight(props: { reload: () => void }) {
           复制链接
         </MenuItem>
         <MenuItem
+          textStyle={{ color: theme.colors.black }}
           onPress={() => {
             hideMenu()
             Share.share({
