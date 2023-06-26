@@ -476,6 +476,8 @@ export function useDynamicItems(mid?: string | number) {
       request,
       {
         revalidateFirstPage: false,
+        errorRetryCount: 3,
+        errorRetryInterval: 1000,
       },
     )
   const dynamicItems: DynamicListResponse['items'] =
