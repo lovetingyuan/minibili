@@ -89,20 +89,6 @@ export default React.memo(() => {
   const webviewRef = React.useRef<WebView | null>(null)
   const { $userInfo, showCaptcha, loadingDynamicError } = useStore()
   const [ready, setReady] = React.useState(false)
-  // const init = React.useRef(false)
-  // React.useEffect(() => {
-  //   if (init.current === false) {
-  //     return
-  //   }
-  //   init.current = true
-  //   checkDynamicsApi()
-  //     .then(() => {
-  //       store.showCaptcha = false
-  //     })
-  //     .catch(() => {
-  //       store.showCaptcha = true
-  //     })
-  // }, [showCaptcha])
   React.useEffect(() => {
     if (loadingDynamicError) {
       checkDynamicsApi()

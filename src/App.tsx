@@ -2,7 +2,7 @@ import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
-import { AppState, Linking, Text, Button, View, Appearance } from 'react-native'
+import { AppState, Appearance } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo, { useNetInfo } from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
@@ -11,12 +11,11 @@ import { RootSiblingParent } from 'react-native-root-siblings'
 import Route from './routes/Index'
 import * as SentryExpo from 'sentry-expo'
 import type { FallbackRender } from '@sentry/react'
-import { showFatalError, showToast } from './utils'
+import { showToast } from './utils'
 import ThemeResponse from './components/ThemeResponse'
 import ImagesView from './components/ImagesView'
-import { site } from './constants'
-import MyImage from './components/MyImage'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
+import ErrorFallback from './components/ErrorFallback'
 
 const theme = createTheme({
   lightColors: {
@@ -32,39 +31,9 @@ const theme = createTheme({
 
 let online = true
 let focus = true
-let showErrorAlert = false
 
 const errorFallback: FallbackRender = errorData => {
-  if (!showErrorAlert) {
-    showErrorAlert = true
-    showFatalError()
-  }
-  return (
-    <View>
-      <StatusBar style="auto" />
-      <MyImage source={require('../assets/error.png')} widthScale={0.8} />
-      <Text
-        style={{
-          color: 'red',
-          marginHorizontal: 30,
-          fontSize: 16,
-        }}>
-        非常抱歉，应用发生了未知错误
-        {'\n\n'}
-        {errorData.error?.message}
-        {'\n\n'}
-        我们会处理这个错误，感谢您的理解和支持
-        {'\n\n'}
-        您可以退出应用并重新打开{'\n'}我们推荐您
-        <Button
-          title="下载最新版本"
-          onPress={() => {
-            Linking.openURL(site)
-          }}
-        />
-      </Text>
-    </View>
-  )
+  return <ErrorFallback message={errorData.error.message} />
 }
 
 export default function App() {
