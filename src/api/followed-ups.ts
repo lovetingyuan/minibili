@@ -6,6 +6,7 @@ import {
   FollowedUpResponseSchema,
 } from './followed-ups.schema'
 import store from '../store'
+import { startCheckLivingUps } from './living-info'
 
 type FollowedUpResponse = z.infer<typeof FollowedUpResponseSchema>
 
@@ -91,6 +92,7 @@ export function getFollowedUps(mid: string | number) {
     })
     .then(() => {
       store.$followedUps = upList.flat().map(getFollowedUp)
+      startCheckLivingUps()
       return totalNum
     })
 }

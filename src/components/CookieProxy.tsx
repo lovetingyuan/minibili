@@ -8,7 +8,7 @@ import { checkDynamicsApi } from '../api/dynamic-items'
 import useIsDark from '../hooks/useIsDark'
 
 // @ts-ignore
-function __$hack(dark) {
+function __$hack() {
   const validate = () => {
     const style = document.createElement('style')
     style.textContent = `
@@ -42,22 +42,6 @@ function __$hack(dark) {
     }
     body .geetest_holder.geetest_silver .geetest_panel a.geetest_close {
       display: none;
-    }
-    ${
-      dark
-        ? `
-       body .geetest_panel_box.geetest_panelshowclick div {
-        background-color: #222;
-        color: white;
-       }
-       body .geetest_holder.geetest_silver .geetest_panel .geetest_commit .geetest_commit_tip {
-        background-color: transparent;
-       }
-      body .geetest_holder.geetest_silver .geetest_table_box .geetest_window .geetest_item .geetest_big_mark .geetest_mark_no, .geetest_holder.geetest_silver .geetest_table_box .geetest_window .geetest_item .geetest_square_mark .geetest_mark_no, .geetest_holder.geetest_silver .geetest_table_box .geetest_window .geetest_item .geetest_space_mark .geetest_mark_no {
-        background-color: transparent;
-      }
-      `
-        : ''
     }
     `
     document.head.appendChild(style)
@@ -105,20 +89,20 @@ export default React.memo(() => {
   const webviewRef = React.useRef<WebView | null>(null)
   const { $userInfo, showCaptcha, loadingDynamicError } = useStore()
   const [ready, setReady] = React.useState(false)
-  const init = React.useRef(0)
-  init.current++
-  React.useEffect(() => {
-    if (init.current === 1) {
-      return
-    }
-    checkDynamicsApi()
-      .then(() => {
-        store.showCaptcha = false
-      })
-      .catch(() => {
-        store.showCaptcha = true
-      })
-  }, [showCaptcha])
+  // const init = React.useRef(false)
+  // React.useEffect(() => {
+  //   if (init.current === false) {
+  //     return
+  //   }
+  //   init.current = true
+  //   checkDynamicsApi()
+  //     .then(() => {
+  //       store.showCaptcha = false
+  //     })
+  //     .catch(() => {
+  //       store.showCaptcha = true
+  //     })
+  // }, [showCaptcha])
   React.useEffect(() => {
     if (loadingDynamicError) {
       checkDynamicsApi()
@@ -131,53 +115,68 @@ export default React.memo(() => {
     }
   }, [loadingDynamicError])
   const dark = useIsDark()
-  const url = `https://space.bilibili.com/${$userInfo?.mid || TracyId}/dynamic`
-  const webview = (
-    <WebView
-      style={{ flex: 1 }}
-      source={{ uri: url }}
-      key={url + showCaptcha}
-      originWhitelist={['http://*', 'https://*']}
-      injectedJavaScriptForMainFrameOnly
-      injectedJavaScript={`(${__$hack})(${dark});true;`}
-      ref={webviewRef}
-      userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.1774.57 Safari/537.36 Edg/113.0.1774.57"
-      onMessage={evt => {
-        const data = JSON.parse(evt.nativeEvent.data) as {
-          action: string
-          payload: any
-        }
-        if (data.action === 'cookie') {
-          if (data.payload.includes('DedeUserID')) {
-            store.$cookie = data.payload
-          } else {
-            store.$cookie =
-              data.payload + '; DedeUserID=' + (store.$userInfo?.mid || TracyId)
+
+  const url = `https://space.bilibili.com/${
+    $userInfo?.mid || TracyId
+  }/dynamic?_sc=${showCaptcha}`
+  const webview = React.useMemo(() => {
+    return (
+      <WebView
+        style={{ flex: 1 }}
+        source={{ uri: url }}
+        key={url}
+        originWhitelist={['http://*', 'https://*']}
+        injectedJavaScriptForMainFrameOnly
+        mediaPlaybackRequiresUserAction
+        injectedJavaScript={`(${__$hack})();true;`}
+        ref={webviewRef}
+        userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.1774.57 Safari/537.36 Edg/113.0.1774.57"
+        onMessage={evt => {
+          const data = JSON.parse(evt.nativeEvent.data) as {
+            action: string
+            payload: any
           }
-          store.showCaptcha = false
-          setReady(false)
-          // eslint-disable-next-line no-console
-          __DEV__ && console.log('cookie: ', store.$cookie)
-        } else if (data.action === 'ready') {
-          setReady(true)
-        } else if (data.action === 'print') {
-          // eslint-disable-next-line no-console
-          console.log('print', data.payload)
-        }
-      }}
-      onShouldStartLoadWithRequest={request => {
-        if (request.url.startsWith('bilibili://')) {
-          return false
-        }
-        if (request.url.includes('.apk')) {
-          return false
-        }
-        return true
-      }}
-    />
-  )
+          if (data.action === 'cookie') {
+            if (data.payload.includes('DedeUserID')) {
+              store.$cookie = data.payload
+            } else {
+              store.$cookie =
+                data.payload +
+                '; DedeUserID=' +
+                (store.$userInfo?.mid || TracyId)
+            }
+            store.showCaptcha = false
+            setReady(false)
+            // eslint-disable-next-line no-console
+            __DEV__ && console.log('cookie: ', store.$cookie)
+          } else if (data.action === 'ready') {
+            setReady(true)
+          } else if (data.action === 'print') {
+            // eslint-disable-next-line no-console
+            console.log('print', data.payload)
+          }
+        }}
+        onShouldStartLoadWithRequest={request => {
+          if (request.url.startsWith('bilibili://')) {
+            return false
+          }
+          if (request.url.includes('.apk')) {
+            return false
+          }
+          return true
+        }}
+      />
+    )
+  }, [url])
+  if (!showCaptcha) {
+    return null
+  }
+  const hideWebView = <View style={styles.hide}>{webview}</View>
+  if (!ready) {
+    return hideWebView
+  }
   return (
-    <Dialog isVisible={showCaptcha}>
+    <Dialog isVisible={true}>
       <View style={styles.container}>
         <Dialog.Title
           title={ready ? '抱歉，需要验证' : '请稍候...'}
@@ -189,7 +188,7 @@ export default React.memo(() => {
           name="close"
           size={20}
           onPress={() => {
-            Alert.alert('如果不验证则应用获取数据可能会失败', '', [
+            Alert.alert('验证有助于避免错误', '', [
               {
                 text: '继续验证',
               },
@@ -207,8 +206,8 @@ export default React.memo(() => {
       {ready ? (
         <View style={styles.webview}>{webview}</View>
       ) : (
-        <View style={{}}>
-          {webview}
+        <View>
+          {hideWebView}
           <ActivityIndicator
             color="#00AEEC"
             animating
@@ -225,4 +224,5 @@ const styles = StyleSheet.create({
   container: { flexDirection: 'row', justifyContent: 'space-between' },
   loading: { marginVertical: 40 },
   webview: { height: 310 },
+  hide: { width: 0, height: 0 },
 })

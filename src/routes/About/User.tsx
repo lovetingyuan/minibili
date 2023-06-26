@@ -7,6 +7,7 @@ import * as Clipboard from 'expo-clipboard'
 import { clearUser, reportUserLogout } from '../../utils/report'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
+import { startCheckLivingUps } from '../../api/living-info'
 
 export default React.memo(function User() {
   const { $userInfo } = useStore()
@@ -23,6 +24,8 @@ export default React.memo(function User() {
           reportUserLogout()
           store.$userInfo = null
           store.$followedUps = []
+          store.livingUps = {}
+          startCheckLivingUps()
           store.$ignoredVersions = []
           store.$upUpdateMap = {}
           clearUser()

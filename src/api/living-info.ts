@@ -49,9 +49,6 @@ const vibrate = throttle(
 
 export const checkLivingUps = () => {
   if (!store.$followedUps.length) {
-    if (Object.keys(store.livingUps).length > 0) {
-      store.livingUps = {}
-    }
     return
   }
   const uids = store.$followedUps.map(user => `uids[]=${user.mid}`).sort()
@@ -78,4 +75,16 @@ export const checkLivingUps = () => {
     prevLivingMap = livingMap
     store.livingUps = livingMap
   })
+}
+
+let checkLivingTimer: number | null = null
+
+export function startCheckLivingUps() {
+  if (typeof checkLivingTimer === 'number') {
+    window.clearInterval(checkLivingTimer)
+  }
+  checkLivingUps()
+  checkLivingTimer = window.setInterval(() => {
+    checkLivingUps()
+  }, 9 * 60 * 1000)
 }

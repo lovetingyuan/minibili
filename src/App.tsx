@@ -2,7 +2,7 @@ import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
-import { AppState, Linking, Text, View, Appearance } from 'react-native'
+import { AppState, Linking, Text, Button, View, Appearance } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo, { useNetInfo } from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
@@ -11,35 +11,12 @@ import { RootSiblingParent } from 'react-native-root-siblings'
 import Route from './routes/Index'
 import * as SentryExpo from 'sentry-expo'
 import type { FallbackRender } from '@sentry/react'
-import store from './store'
 import { showFatalError, showToast } from './utils'
 import ThemeResponse from './components/ThemeResponse'
 import ImagesView from './components/ImagesView'
-import { subscribeKey } from 'valtio/utils'
-import { checkLivingUps } from './api/living-info'
 import { site } from './constants'
 import MyImage from './components/MyImage'
-import { ProviderConfiguration } from 'swr/_internal'
-
-/**
- * 1 如果是未登录则不检查
- * 2 如果关注为空则不检查
- * 3 如果关注发生变化，则立即重新检查
- */
-let checkLivingTimer: number | null = null
-
-subscribeKey(store, '$followedUps' as const, () => {
-  // if (!store.initialed) {
-  //   return
-  // }
-  if (typeof checkLivingTimer === 'number') {
-    clearInterval(checkLivingTimer)
-  }
-  checkLivingUps()
-  checkLivingTimer = window.setInterval(() => {
-    checkLivingUps()
-  }, 9 * 60 * 1000)
-})
+import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 
 const theme = createTheme({
   lightColors: {
@@ -55,15 +32,16 @@ const theme = createTheme({
 
 let online = true
 let focus = true
-let checkUpdateForError = false
+let showErrorAlert = false
 
 const errorFallback: FallbackRender = errorData => {
-  if (!checkUpdateForError) {
-    checkUpdateForError = true
+  if (!showErrorAlert) {
+    showErrorAlert = true
     showFatalError()
   }
   return (
     <View>
+      <StatusBar style="auto" />
       <MyImage source={require('../assets/error.png')} widthScale={0.8} />
       <Text
         style={{
@@ -78,13 +56,12 @@ const errorFallback: FallbackRender = errorData => {
         我们会处理这个错误，感谢您的理解和支持
         {'\n\n'}
         您可以退出应用并重新打开{'\n'}我们推荐您
-        <Text
-          style={{ color: '#0070C6', fontWeight: 'bold' }}
+        <Button
+          title="下载最新版本"
           onPress={() => {
             Linking.openURL(site)
-          }}>
-          下载最新版本
-        </Text>
+          }}
+        />
       </Text>
     </View>
   )
@@ -107,10 +84,13 @@ export default function App() {
       }
     }
   }, [netInfo.isConnected, netInfo.type])
-  const swrConfig = React.useMemo<ProviderConfiguration>(() => {
+  const swrConfig = React.useMemo<
+    SWRConfiguration & Partial<ProviderConfiguration>
+  >(() => {
     return {
       fetcher,
-      errorRetryCount: 2,
+      errorRetryCount: 4,
+      as: 8,
       isVisible() {
         return focus
       },
