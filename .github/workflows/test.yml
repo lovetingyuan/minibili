@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run test script
-        run: npm test
+        run: npm run a
       - name: Send failed message to wx
         env:
           WX_PUSHER_TOKEN: ${{ secrets.WX_PUSHER_TOKEN }}
@@ -32,5 +32,5 @@ jobs:
             -H 'Cache-Control: no-cache' \
             -H 'Content-Type: application/json;charset=utf-8' \
             -H 'Pragma: no-cache' \
-            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"https://baduc.opm","summary":"萨达萨达","content":"<p>sd<u>sa d</u></p>","contentType":2,"verifyPay":false}' \
+            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"https://github.com/lovetingyuan/minibili/actions","summary":"MiniBili测试报错","content":"<p>'"${{ env.GITHUB_JOB }}"': '"${{ env.GITHUB_RUN_ID }}"'</p>","contentType":2,"verifyPay":false}' \
             --compressed
