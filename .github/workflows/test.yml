@@ -36,5 +36,5 @@ jobs:
             -H 'Cache-Control: no-cache' \
             -H 'Content-Type: application/json;charset=utf-8' \
             -H 'Pragma: no-cache' \
-            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"https://github.com/lovetingyuan/minibili/actions","summary":"MiniBili测试报错","content":"<p>'"$run_no"': '"$run_url"'</p>","contentType":2,"verifyPay":false}' \
+            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"'"$run_url"'","summary":"MiniBili测试报错:#'"$run_no"'","content":"<p>#'"$run_no"'测试失败</p>","contentType":2,"verifyPay":false}' \
             --compressed
