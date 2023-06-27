@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar'
 import MyImage from './MyImage'
 import { site } from '../constants'
 import useIsDark from '../hooks/useIsDark'
+import * as Updates from 'expo-updates'
 
 // class ExitError extends Error {
 //   constructor(m: string) {
@@ -36,7 +37,15 @@ export default function ErrorFallback(props: { message?: string }) {
         {'\n\n'}
         我们会处理这个错误，感谢您的理解和支持
         {'\n\n'}
-        您可以退出应用并重新打开，我们推荐您安装新版
+        您可以
+        <Text
+          style={{ color: '#5d5cde' }}
+          onPress={() => {
+            Updates.reloadAsync()
+          }}>
+          退出应用并重新打开
+        </Text>
+        ，我们推荐您安装新版
       </Text>
       <View style={styles.downloadBtn}>
         <Button
