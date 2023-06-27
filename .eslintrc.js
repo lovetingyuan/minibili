@@ -15,4 +15,15 @@ module.exports = {
     'valtio/avoid-this-in-proxy': 'error',
     'no-console': 'error',
   },
+  overrides: [
+    {
+      files: ['scripts/*'],
+      env: {
+        node: true,
+      },
+      rules: {
+        'no-console': 'off',
+      },
+    },
+  ],
 }
