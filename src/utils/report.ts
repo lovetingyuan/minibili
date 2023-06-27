@@ -15,6 +15,7 @@ export enum Tags {
   set_up_mid = 'up.mid',
   set_bvid = 'video.id',
   set_dynamic_id = 'dynamic.id',
+  git_hash = 'git.hash',
 }
 
 export enum Action {

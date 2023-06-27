@@ -5,8 +5,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import store from './store'
 import { showFatalError, showToast } from './utils'
 import { getRemoteConfig } from './api/get-config'
+import Constants from 'expo-constants'
+import { Tags } from './utils/report'
 
 async function init() {
+  const gitHash = Constants.expoConfig?.extra?.gitHash
+  if (gitHash) {
+    SentryExpo.Native.setTag(Tags.git_hash, gitHash)
+  }
   if (typeof ErrorUtils === 'object') {
     ErrorUtils.setGlobalHandler((error, isFatal) => {
       SentryExpo.Native.captureException(error)
