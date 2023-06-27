@@ -5,7 +5,8 @@ on:
     - cron: '*/1 * * * *'
 
 jobs:
-  run-script:
+  my-job:
+    name: run api test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -28,6 +29,7 @@ jobs:
         run: |
           job_id=${{ env.GITHUB_JOB }}
           run_id=${{ env.GITHUB_RUN_ID }}
+          cc=aaa
           curl 'https://wxpusher.zjiecode.com/api/send/message' \
             -X POST \
             -H 'Accept: */*' \
@@ -35,5 +37,5 @@ jobs:
             -H 'Cache-Control: no-cache' \
             -H 'Content-Type: application/json;charset=utf-8' \
             -H 'Pragma: no-cache' \
-            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"https://github.com/lovetingyuan/minibili/actions","summary":"MiniBili测试报错","content":"<p>'"$job_id"': '"$run_id"'</p>","contentType":2,"verifyPay":false}' \
+            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"https://github.com/lovetingyuan/minibili/actions","summary":"MiniBili测试报错","content":"<p>'"$job_id"': '"$run_id"' : '"$cc"'</p>","contentType":2,"verifyPay":false}' \
             --compressed
