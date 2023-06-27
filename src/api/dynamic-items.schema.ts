@@ -390,11 +390,13 @@ const AdditionalSchema = z.discriminatedUnion('type', [
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UPOWER_LOTTERY]),
     upower_lottery: z.object({
       button: z.object({
-        jump_style: z.object({
-          icon_url: z.string(),
-          text: z.string(),
-        }),
-        jump_url: z.string(),
+        jump_style: z
+          .object({
+            icon_url: z.string(),
+            text: z.string(),
+          })
+          .nullish(),
+        jump_url: z.string().nullish(),
         type: z.number(),
       }),
       desc: z.object({
