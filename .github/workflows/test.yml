@@ -26,11 +26,14 @@ jobs:
           WX_PUSHER_APPID: ${{ secrets.WX_PUSHER_APPID }}
         if: ${{ failure() }}
         run: |
+          job_id=${{ env.GITHUB_JOB }}
+          run_id=${{ env.GITHUB_RUN_ID }}
           curl 'https://wxpusher.zjiecode.com/api/send/message' \
+            -X POST \
             -H 'Accept: */*' \
             -H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
             -H 'Cache-Control: no-cache' \
             -H 'Content-Type: application/json;charset=utf-8' \
             -H 'Pragma: no-cache' \
-            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"https://github.com/lovetingyuan/minibili/actions","summary":"MiniBili测试报错","content":"<p>'"${{ env.GITHUB_JOB }}"': '"${{ env.GITHUB_RUN_ID }}"'</p>","contentType":2,"verifyPay":false}' \
+            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"https://github.com/lovetingyuan/minibili/actions","summary":"MiniBili测试报错","content":"<p>'"$job_id"': '"$run_id"'</p>","contentType":2,"verifyPay":false}' \
             --compressed
