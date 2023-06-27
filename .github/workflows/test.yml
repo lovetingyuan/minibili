@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run test script
-        run: npm run a
+        run: npm test
       - name: Send failed message to wx
         env:
           WX_PUSHER_TOKEN: ${{ secrets.WX_PUSHER_TOKEN }}

@@ -7,23 +7,9 @@ import { site } from '../constants'
 import useIsDark from '../hooks/useIsDark'
 import * as Updates from 'expo-updates'
 
-// class ExitError extends Error {
-//   constructor(m: string) {
-//     super(m)
-//     this.name = 'IgnoreThisError'
-//   }
-// }
-
 export default function ErrorFallback(props: { message?: string }) {
-  // const [, seta] = React.useState(null)
   React.useEffect(() => {
     showFatalError()
-    // const handleBack = () => {
-    //   throw new ExitError('😢')
-    // BackHandler.exitApp()
-    // return true
-    // }
-    // BackHandler.addEventListener('hardwareBackPress', handleBack)
   }, [])
   const dark = useIsDark()
   return (
@@ -39,11 +25,11 @@ export default function ErrorFallback(props: { message?: string }) {
         {'\n\n'}
         您可以
         <Text
-          style={{ color: '#5d5cde' }}
+          style={styles.restartText}
           onPress={() => {
             Updates.reloadAsync()
           }}>
-          退出应用并重新打开
+          重启应用
         </Text>
         ，我们推荐您安装新版
       </Text>
@@ -65,5 +51,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
     fontSize: 16,
   },
+  restartText: { color: '#5d5cde', fontWeight: 'bold' },
   downloadBtn: { marginVertical: 30, paddingHorizontal: 30 },
 })
