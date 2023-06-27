@@ -2,11 +2,11 @@ name: test
 
 on:
   schedule:
-    - cron: '*/1 * * * *'
+    - cron: '0 */4 * * *'
 
 jobs:
-  my-job:
-    name: run api test
+  test-job:
+    name: run npm test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
