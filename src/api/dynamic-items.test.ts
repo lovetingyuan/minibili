@@ -1,23 +1,28 @@
 import fetcher from './fetcher-test'
-import { describe, test } from 'vitest'
+import { test } from 'vitest'
 import { DynamicListResponseSchema } from './dynamic-items.schema'
-// import fs from 'node:fs'
 
-const ups = [1458143131, 14427395]
-
-describe('dynamic-list', () => {
-  ups.forEach(mid => {
-    test('up: ' + mid, async () => {
-      const res = await fetcher<any>(
-        `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
-      )
-      const offset = res.offset
-      DynamicListResponseSchema.parse(res)
-      const res2 = await fetcher(
-        // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=14427395&timezone_offset=-480
-        `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=${offset}&host_mid=${mid}&timezone_offset=-480`,
-      )
-      DynamicListResponseSchema.parse(res2)
+test('dynamic-list', async () => {
+  const { data: list } = (await fetch(
+    'https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1',
+  ).then(r => r.json())) as any
+  const mids = list.list.map((v: any) => v.owner.mid).concat([14427395])
+  const failedList: string[] = []
+  for (const mid of mids) {
+    const res = await fetcher<any>(
+      `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
+    ).catch(() => {
+      failedList.push(mid)
     })
-  })
-})
+    try {
+      DynamicListResponseSchema.parse(res)
+    } catch {
+      failedList.push(mid)
+    }
+  }
+  // eslint-disable-next-line no-console
+  console.log('Failed mid list:', failedList)
+  if (Object.keys(failedList).length) {
+    throw new Error('dynamic list failed')
+  }
+}, 10000)

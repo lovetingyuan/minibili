@@ -3,22 +3,24 @@ import { changelogUrl } from '../constants'
 import { z } from 'zod'
 
 describe('app-version-update', () => {
-  test.skip('version.json', async () => {
-    const BuildListSchema = z.object({
-      version: z.string(),
-      changelog: z.string().array(),
-      date: z.string(),
-    })
+  test('version.json', async () => {
+    const BuildListSchema = z
+      .object({
+        version: z.string(),
+        changelog: z.string().array(),
+        date: z.string(),
+      })
+      .array()
     const res = await fetch(changelogUrl).then(r => r.json())
     expect(res.length > 0).toBe(true)
     BuildListSchema.parse(res)
   })
-  test.skip('unpkg-check', async () => {
+  test('unpkg-check', async () => {
     await fetch('https://unpkg.com/minibili/package.json')
       .then(r => r.json())
       .then(pkg => {
         expect(typeof pkg.version).toBe('string')
         expect(typeof pkg.config.versionCode).toBe('number')
       })
-  })
+  }, 8000)
 })

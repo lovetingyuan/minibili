@@ -99,7 +99,7 @@ export default React.memo(
           <Image
             key={key++}
             source={{ uri: node.emoji.icon_url }}
-            style={[styles.emoji, { alignSelf: 'center' }]}
+            style={[styles.emoji]}
           />,
         )
       } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC) {
@@ -220,6 +220,7 @@ export default React.memo(
         {Topic}
         <Text style={styles.textContainer} {...props.textProps}>
           {reactNodes}
+          {'\n'}
         </Text>
       </View>
     )
