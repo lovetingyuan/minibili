@@ -71,7 +71,7 @@ export default function WordDrawItem(props: {
       ? width / 2 - 15
       : width / 2
   const imageList = (
-    <View style={styles.imageListContainer}>
+    <View style={[styles.imageListContainer]}>
       {images.map((img, i) => {
         const ImageCmp = (
           <Image
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     height: 100,
     width: 100,
     marginRight: 5,
-    marginVertical: 10,
+    // marginVertical: 10,
     borderRadius: 4,
   },
   textContainer: {
@@ -168,7 +168,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
     // justifyContent: 'center',
-    marginVertical: 20,
+    // marginVertical: 20,
+    marginBottom: 20,
   },
   additionalContainer: {
     borderLeftWidth: 1,

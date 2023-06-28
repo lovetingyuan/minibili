@@ -28,7 +28,6 @@ export default function ForwardItem(props: {
     <RichTexts
       idStr={payload.id}
       nodes={payload.desc?.rich_text_nodes}
-      style={{ marginBottom: 10 }}
       topic={payload.topic}
       fontSize={15}
       textProps={{ numberOfLines: 3 }}
@@ -89,7 +88,7 @@ export default function ForwardItem(props: {
     payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE_RCMD
   ) {
     forwardContent = (
-      <View style={{ gap: 10, flexShrink: 1 }}>
+      <View style={{ flexShrink: 1 }}>
         {forwardRichTextContent}
         <CommonContent
           type={payload.type}
@@ -115,7 +114,6 @@ export default function ForwardItem(props: {
       <RichTexts
         idStr={payload.id}
         nodes={item.desc?.rich_text_nodes}
-        style={{ marginBottom: 10 }}
         topic={item.topic}
         textProps={{ numberOfLines: 3 }}
       />

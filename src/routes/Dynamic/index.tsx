@@ -165,7 +165,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
                 type="material-community"
                 size={18}
                 style={styles.signMark}
-                color={theme.colors.grey0}
+                color={theme.colors.grey1}
               />
               <Text style={[styles.signText, { color: theme.colors.grey0 }]}>
                 {dynamicUser?.sign.trim()}
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
 
   signMark: {
     position: 'relative',
-    top: 3,
+    top: 1,
   },
   itemContainer: {
     paddingVertical: 18,

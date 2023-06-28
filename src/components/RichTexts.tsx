@@ -85,10 +85,6 @@ export default React.memo(
                   sign: '-',
                 },
               })
-              // navigation.navigate('WebPage', {
-              //   title: `${node.text.substring(1)}的主页`,
-              //   url: `https://m.bilibili.com/space/${node.rid}`,
-              // })
             }}
             style={[styles.link, { fontSize }]}>
             {node.text}
@@ -216,11 +212,11 @@ export default React.memo(
       }
     }
     return (
-      <View style={props.style}>
+      <View style={[props.style]}>
         {Topic}
         <Text style={styles.textContainer} {...props.textProps}>
           {reactNodes}
-          {'\n'}
+          {reactNodes.length ? '\n' : ''}
         </Text>
       </View>
     )
@@ -253,6 +249,5 @@ const styles = StyleSheet.create({
   text: {
     lineHeight: 24,
     fontSize: 15,
-    // borderWidth: 0.5,
   },
 })

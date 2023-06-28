@@ -32,7 +32,6 @@ export default function CommonItem(props: { item: DynamicItemType<ItemType> }) {
   return (
     <TouchableOpacity
       activeOpacity={0.8}
-      style={styles.container}
       onPress={() => {
         navigation.navigate('WebPage', {
           title: item.name + '的动态',
@@ -132,7 +131,7 @@ export function CommonContent(props: {
 }
 
 const styles = StyleSheet.create({
-  container: { gap: 10 },
+  // container: { gap: 10 },
   title: { fontSize: 15 },
   textContainer: { gap: 6, flexShrink: 1 },
   content: { fontSize: 15 },
@@ -140,7 +139,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexDirection: 'row',
     gap: 10,
-    // borderWidth: 0.5,
     borderRadius: 4,
     paddingRight: 10,
   },

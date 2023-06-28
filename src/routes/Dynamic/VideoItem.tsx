@@ -70,12 +70,7 @@ export default function VideoItem(props: {
           },
         })
       }}>
-      <RichTexts
-        idStr={props.item.id}
-        nodes={nodes}
-        topic={props.item.topic}
-        style={{ marginBottom: 12 }}
-      />
+      <RichTexts idStr={props.item.id} nodes={nodes} topic={props.item.topic} />
 
       <View style={styles.videoContainer}>
         <View style={styles.imageContainer}>
