@@ -11,13 +11,15 @@ test('dynamic-list', async () => {
   for (const mid of mids) {
     const res = await fetcher<any>(
       `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
-    ).catch(() => {
-      failedList.push(mid)
-    })
-    try {
-      DynamicListResponseSchema.parse(res)
-    } catch {
-      failedList.push(mid)
+    )
+    if (!res) {
+      failedList.push('null' + mid)
+    } else {
+      try {
+        DynamicListResponseSchema.parse(res)
+      } catch (err) {
+        failedList.push('zod' + mid)
+      }
     }
   }
   // eslint-disable-next-line no-console
