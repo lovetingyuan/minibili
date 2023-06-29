@@ -44,3 +44,22 @@ jobs:
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         run: npm run update
+
+      - name: Send failed message to wx
+        env:
+          WX_PUSHER_TOKEN: ${{ secrets.WX_PUSHER_TOKEN }}
+          WX_PUSHER_UID: ${{ secrets.WX_PUSHER_UID }}
+          WX_PUSHER_APPID: ${{ secrets.WX_PUSHER_APPID }}
+        if: ${{ failure() }}
+        run: |
+          run_no=${{ github.run_number }}
+          run_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          curl 'https://wxpusher.zjiecode.com/api/send/message' \
+            -X POST \
+            -H 'Accept: */*' \
+            -H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
+            -H 'Cache-Control: no-cache' \
+            -H 'Content-Type: application/json;charset=utf-8' \
+            -H 'Pragma: no-cache' \
+            --data-raw '{"appId":"'"$WX_PUSHER_APPID"'","appToken":"'"$WX_PUSHER_TOKEN"'","uids":["'"$WX_PUSHER_UID"'"],"topicIds":[],"url":"'"$run_url"'","summary":"MiniBili热更新失败:#'"$run_no"'","content":"<p>#'"$run_no"'运行失败</p>","contentType":2,"verifyPay":false}' \
+            --compressed
