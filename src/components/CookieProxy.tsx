@@ -1,11 +1,12 @@
 import React from 'react'
-import { ActivityIndicator, StyleSheet, View, Alert } from 'react-native'
+import { StyleSheet, View, Alert } from 'react-native'
 import { WebView } from 'react-native-webview'
 import store, { useStore } from '../store'
 import { TracyId } from '../constants'
 import { Dialog, Icon } from '@rneui/themed'
 import { checkDynamicsApi } from '../api/dynamic-items'
 import useIsDark from '../hooks/useIsDark'
+import commonStyles from '../styles'
 
 // @ts-ignore
 function __$hack() {
@@ -108,7 +109,7 @@ export default React.memo(() => {
   const webview = React.useMemo(() => {
     return (
       <WebView
-        style={{ flex: 1 }}
+        style={commonStyles.flex1}
         source={{ uri: url }}
         key={url}
         originWhitelist={['http://*', 'https://*']}
@@ -165,7 +166,7 @@ export default React.memo(() => {
     <Dialog isVisible={true}>
       <View style={styles.container}>
         <Dialog.Title
-          title={ready ? '抱歉，需要验证' : '请稍候...'}
+          title={'抱歉，需要验证'}
           titleStyle={{
             color: dark ? 'white' : '#333',
           }}
@@ -174,7 +175,7 @@ export default React.memo(() => {
           name="close"
           size={20}
           onPress={() => {
-            Alert.alert('验证有助于避免错误', '', [
+            Alert.alert('验证可以避免错误', '', [
               {
                 text: '继续验证',
               },
@@ -188,20 +189,7 @@ export default React.memo(() => {
           }}
         />
       </View>
-      {/* <View style={{ height: 300 }}>{webview}</View> */}
-      {ready ? (
-        <View style={styles.webview}>{webview}</View>
-      ) : (
-        <View>
-          {hideWebView}
-          <ActivityIndicator
-            color="#00AEEC"
-            animating
-            size={'large'}
-            style={styles.loading}
-          />
-        </View>
-      )}
+      <View style={styles.webview}>{webview}</View>
     </Dialog>
   )
 })

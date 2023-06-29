@@ -14,12 +14,13 @@ import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import useMounted from '../../hooks/useMounted'
-import { isWifi, parseDuration, showToast } from '../../utils'
+import { parseDuration, showToast } from '../../utils'
 import { useFocusEffect } from '@react-navigation/native'
 import { Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import MyImage from '../../components/MyImage'
+import NetInfo from '@react-native-community/netinfo'
 
 const VideoPlayer = React.memo((props: { wifi: boolean }) => {
   const { wifi } = props
@@ -195,8 +196,16 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
 
 export default function Player() {
   const [wifi, setWifi] = React.useState<boolean | null>(null)
+
   useMounted(() => {
-    isWifi().then(setWifi)
+    NetInfo.fetch().then(state => {
+      if (state.type !== 'wifi') {
+        showToast(' 请注意当前网络不是Wifi ')
+        setWifi(false)
+      } else {
+        setWifi(true)
+      }
+    })
   })
   if (wifi === null) {
     return <View style={{ width: '100%', height: '40%' }} />

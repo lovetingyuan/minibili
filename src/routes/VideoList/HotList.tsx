@@ -75,8 +75,8 @@ export default React.memo(function Hot({ navigation }: Props) {
       video: data,
     })
   }
-  const buttons = () =>
-    [
+  const buttons = React.useMemo(() => {
+    return [
       {
         text: `不再看 ${currentVideoRef.current?.name} 的视频`,
         onPress: () => {
@@ -114,15 +114,6 @@ export default React.memo(function Hot({ navigation }: Props) {
           }
         },
       },
-      // {
-      //   text: '在B站打开',
-      //   onPress: () => {
-      //     if (!currentVideoRef.current) {
-      //       return
-      //     }
-      //     openBiliVideo(currentVideoRef.current.bvid)
-      //   },
-      // },
       {
         text: '查看封面',
         onPress: () => {
@@ -132,7 +123,8 @@ export default React.memo(function Hot({ navigation }: Props) {
           Linking.openURL(currentVideoRef.current.cover)
         },
       },
-    ].filter(Boolean)
+    ]
+  }, [])
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
     const key = item.bvid
     return (
@@ -149,7 +141,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item
-          store.overlayButtons = buttons()
+          store.overlayButtons = buttons
         }}>
         <HotItem video={item} />
       </TouchableOpacity>
@@ -166,11 +158,6 @@ export default React.memo(function Hot({ navigation }: Props) {
       hotVideoList.push(item)
     }
   }
-  // if (hotVideoList.length || error) {
-  //   try {
-  //     SplashScreen.hideAsync()
-  //   } catch (err) {}
-  // }
 
   const { width } = useWindowDimensions()
 

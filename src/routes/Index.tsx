@@ -26,16 +26,18 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 export default function Route() {
   const isDark = useIsDark()
 
-  const RouteTheme = isDark
-    ? {
-        ...DarkTheme,
-        dark: true,
-        colors: {
-          ...DarkTheme.colors,
-          background: '#222',
-        },
-      }
-    : DefaultTheme
+  const RouteTheme = React.useMemo(() => {
+    return isDark
+      ? {
+          ...DarkTheme,
+          dark: true,
+          colors: {
+            ...DarkTheme.colors,
+            background: '#222',
+          },
+        }
+      : DefaultTheme
+  }, [isDark])
 
   const onRouteChange = React.useCallback(
     ({ route }: { route: RouteProp<RootStackParamList> }) => {

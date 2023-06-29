@@ -8,6 +8,7 @@ import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import { showToast } from '../../utils'
 import MyImage from '../../components/MyImage'
+import commonStyles from '../../styles'
 
 export default React.memo(function Login() {
   const inputUserIdRef = React.useRef('')
@@ -42,10 +43,10 @@ export default React.memo(function Login() {
     }, 100)
   }
   React.useEffect(() => {
-    if (error) {
+    if (error && userId) {
       showToast('获取用户信息失败')
     }
-  }, [error])
+  }, [error, userId])
 
   const login = () => {
     if (!/^\d+$/.test(inputUserIdRef.current)) {
@@ -56,36 +57,26 @@ export default React.memo(function Login() {
     showToast('请稍候...')
   }
   return (
-    <ScrollView style={{ flex: 1 }} ref={scrollRef}>
-      <View
-        style={{
-          marginHorizontal: 20,
-          marginTop: 50,
-          alignItems: 'center',
-        }}>
+    <ScrollView style={commonStyles.flex1} ref={scrollRef}>
+      <View style={styles.topContainer}>
         <MyImage
           source={require('../../../assets/minibili.png')}
-          style={{ marginTop: 30 }}
+          style={styles.logo}
         />
-        <Text h2 style={{ marginVertical: 10, color: '#0083b1' }}>
+        <Text h2 style={styles.logoText}>
           欢迎使用MiniBili
         </Text>
-        <Text
-          style={{
-            marginTop: 10,
-            fontSize: 16,
-            lineHeight: 25,
-          }}>
-          <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+        <Text style={styles.helpText}>
+          <Text style={[commonStyles.font16, commonStyles.bold]}>
             💡 请在下方输入你的B站ID：
           </Text>
           B站ID为个人页面地址栏中的一串数字，如下图所示（ID为公开信息，请放心输入；另外
-          <Text style={{ fontWeight: 'bold' }}>
+          <Text style={commonStyles.bold}>
             你需要在隐私设置中设置你的关注列表为公开
           </Text>
           ）
           <Text
-            style={{ color: '#01717c' }}
+            style={commonStyles.link}
             onPress={() => {
               Linking.openURL('https://b23.tv/BV1p54y1X7SH')
             }}>
@@ -94,7 +85,7 @@ export default React.memo(function Login() {
         </Text>
         <MyImage
           source={require('../../../assets/login-example.png')}
-          style={{ marginVertical: 20 }}
+          style={styles.helpImage}
           widthScale={0.85}
         />
       </View>
@@ -121,26 +112,24 @@ export default React.memo(function Login() {
 })
 
 const styles = StyleSheet.create({
-  logoContainer: {
-    flexDirection: 'row',
+  topContainer: {
+    marginHorizontal: 20,
+    marginTop: 50,
     alignItems: 'center',
-    gap: 10,
   },
   logo: {
-    width: 110,
-    height: 110,
+    marginTop: 30,
   },
-  text: {
-    fontSize: 18,
-    flexShrink: 1,
-    lineHeight: 30,
+  logoText: {
+    marginVertical: 10,
+    color: '#0083b1',
   },
-  linkText: {
-    margin: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'rgba(90, 154, 230, 1)',
+  helpText: {
+    marginTop: 10,
+    fontSize: 16,
+    lineHeight: 25,
   },
+  helpImage: { marginVertical: 20 },
   inputContainer: {
     flexDirection: 'column',
     alignItems: 'center',

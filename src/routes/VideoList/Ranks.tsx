@@ -14,7 +14,6 @@ import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
-
 import { VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, parseNumber } from '../../utils'
 import { useRankList } from '../../api/rank-list'
@@ -74,15 +73,15 @@ export default React.memo(function Ranks({ navigation }: Props) {
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item
-          store.overlayButtons = buttons()
+          store.overlayButtons = buttons
         }}>
         <HotItem video={item} />
       </TouchableOpacity>
     )
   }
 
-  const buttons = () =>
-    [
+  const buttons = React.useMemo(() => {
+    return [
       {
         text: `不再看 ${currentVideoRef.current?.name} 的视频`,
         onPress: () => {
@@ -113,16 +112,8 @@ export default React.memo(function Ranks({ navigation }: Props) {
           Linking.openURL(currentVideoRef.current.cover)
         },
       },
-      // {
-      //   text: '在B站打开',
-      //   onPress: () => {
-      //     if (!currentVideoRef.current) {
-      //       return
-      //     }
-      //     openBiliVideo(currentVideoRef.current.bvid)
-      //   },
-      // },
-    ].filter(Boolean)
+    ]
+  }, [])
   const videoList: VideoItem[] = []
   const uniqVideosMap: Record<string, boolean> = {}
   for (const item of list) {

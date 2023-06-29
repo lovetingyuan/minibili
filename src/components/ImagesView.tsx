@@ -103,12 +103,6 @@ export default React.memo(function ImagesView() {
   const { imagesList, currentImageIndex } = useStore()
   const netinfo = useNetInfo()
   const webviewRef = React.useRef<WebView | null>(null)
-  // if (!imagesList.length) {
-  //   return null
-  // }
-  // React.useEffect(() => {
-  //   throw new Error('sdfsdf')
-  // }, [])
   return (
     <Overlay
       isVisible={imagesList.length > 0}

@@ -7,9 +7,6 @@ import * as Clipboard from 'expo-clipboard'
 import store from '../../store'
 
 export default React.memo(function Header() {
-  // React.useEffect(() => {
-  //   console.log(ErrorUtils)
-  // }, [])
   return (
     <>
       <Pressable

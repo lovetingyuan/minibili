@@ -38,19 +38,27 @@ const errorFallback: FallbackRender = errorData => {
 
 export default function App() {
   const netInfo = useNetInfo()
+  const netToastDelay = React.useRef<null | number>(null)
   React.useEffect(() => {
+    if (typeof netToastDelay.current === 'number') {
+      window.clearTimeout(netToastDelay.current)
+    }
     if (netInfo.isConnected === false) {
-      setTimeout(() => {
+      netToastDelay.current = window.setTimeout(() => {
         NetInfo.fetch().then(state => {
           if (!state.isConnected) {
             showToast(' 网络状况不佳 ')
           }
         })
       }, 1000)
-    } else {
-      if (netInfo.type !== 'wifi' && netInfo.type !== 'unknown') {
-        showToast(' 请注意当前网络不是 wifi ')
-      }
+    } else if (netInfo.type !== 'wifi') {
+      netToastDelay.current = window.setTimeout(() => {
+        NetInfo.fetch().then(state => {
+          if (state.type !== 'wifi') {
+            showToast(' 请注意当前网络不是 wifi ')
+          }
+        })
+      }, 1000)
     }
   }, [netInfo.isConnected, netInfo.type])
   const swrConfig = React.useMemo<

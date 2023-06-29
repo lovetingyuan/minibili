@@ -1,7 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, ScrollView, Pressable } from 'react-native'
 import { Icon, Text, useTheme } from '@rneui/themed'
-import * as KeepAwake from 'expo-keep-awake'
 import * as Clipboard from 'expo-clipboard'
 
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?&bvid=BV1aX4y1B7n7&cid=1103612055&wmode=transparent&as_wide=1&crossDomain=1&lite=0&danmaku=0
@@ -16,8 +15,7 @@ import Player from './Player'
 import { useVideoInfo } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
-import { checkWifi, showToast } from '../../utils'
-import useMounted from '../../hooks/useMounted'
+import { showToast } from '../../utils'
 import VideoInfoContext from './videoContext'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
@@ -37,7 +35,6 @@ const PlayPage = ({ route, navigation }: Props) => {
       bvid,
     }
   }, [bvid, video, video2])
-  // console.log(222, 'play page', videoInfo.aid)
 
   React.useEffect(() => {
     if (videoInfo.name) {
@@ -52,7 +49,6 @@ const PlayPage = ({ route, navigation }: Props) => {
               url: `https://b23.tv/${bvid}`,
               title: videoInfo.name,
             })
-            // Linking.openURL(`https://b23.tv/${bvid}`)
           }}
         />
       )
@@ -62,12 +58,6 @@ const PlayPage = ({ route, navigation }: Props) => {
       })
     }
   }, [navigation, videoInfo.name, bvid])
-  useMounted(() => {
-    checkWifi()
-    return () => {
-      KeepAwake.deactivateKeepAwake('PLAY')
-    }
-  })
   useFocusEffect(
     useMemoizedFn(() => {
       setViewingVideoId(bvid)
@@ -83,20 +73,7 @@ const PlayPage = ({ route, navigation }: Props) => {
       page: currentPage,
     }
   }, [videoInfo, bvid, currentPage])
-  if (!videoInfo.name) {
-    return null
-  }
-  if (!videoInfo.aid) {
-    return null
-  }
-  // if (
-  //   typeof videoInfo.aid !== 'string' ||
-  //   typeof videoInfo.name !== 'string' ||
-  //   typeof videoInfo.bvid !== 'string'
-  // ) {
-  //   return null
-  // }
-  if (typeof videoInfo.name !== 'string') {
+  if (!videoInfo.aid || typeof videoInfo.name !== 'string') {
     return null
   }
   return (

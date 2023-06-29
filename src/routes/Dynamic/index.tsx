@@ -98,25 +98,26 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
   }, [upId, error])
   const { theme } = useTheme()
 
+  const headerTitle = useMemoizedFn(() => {
+    return (
+      <HeaderLeft
+        scrollTop={() => {
+          try {
+            dynamicListRef.current?.scrollToOffset({
+              offset: 0,
+            })
+          } catch (err) {}
+        }}
+      />
+    )
+  })
+
   React.useEffect(() => {
-    const headerTitle = () => {
-      return (
-        <HeaderLeft
-          scrollTop={() => {
-            try {
-              dynamicListRef.current?.scrollToOffset({
-                offset: 0,
-              })
-            } catch (err) {}
-          }}
-        />
-      )
-    }
     navigation.setOptions({
       headerTitle,
       headerRight,
     })
-  }, [navigation])
+  }, [navigation, headerTitle])
   const renderItem = ({ item }: { item: DynamicItemAllType }) => {
     return <DynamicItem item={item} />
   }
