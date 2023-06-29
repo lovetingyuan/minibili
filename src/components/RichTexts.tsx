@@ -50,6 +50,7 @@ export default React.memo(
         </Text>
       </View>
     ) : null
+    const [lines, setLines] = React.useState(0)
     if (!props.nodes) {
       return Topic
     }
@@ -214,10 +215,21 @@ export default React.memo(
     return (
       <View style={[props.style]}>
         {Topic}
-        <Text style={styles.textContainer} {...props.textProps}>
+        <Text
+          style={styles.textContainer}
+          {...props.textProps}
+          onTextLayout={evt => {
+            setLines(evt.nativeEvent.lines.length)
+          }}>
           {reactNodes}
-          {reactNodes.length ? '\n' : ''}
+          <Text style={styles.hackText}>{reactNodes.length ? '\n ' : ''}</Text>
         </Text>
+        {typeof props.textProps?.numberOfLines === 'number' &&
+          lines - 1 > props.textProps.numberOfLines && (
+            <Text style={styles.hackText}>
+              {reactNodes.length ? '\n ' : ''}
+            </Text>
+          )}
       </View>
     )
   },
@@ -250,4 +262,5 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontSize: 15,
   },
+  hackText: { fontSize: 8 },
 })
