@@ -55,8 +55,9 @@ await spinner('checking env...', async () => {
     'main',
     chalk.red('Current branch is not main'),
   )
-  echo(chalk.green('env is alright'))
 })
+
+echo(chalk.green('env is alright'))
 
 let appVersion
 
@@ -69,7 +70,6 @@ await spinner('checking current build list...', async () => {
       `Package version ${version} is not same as the latest build version ${appVersion}`,
     )
   }
-  echo(`current version: ${chalk.green(appVersion)}`)
 })
 
 // -------------------------------------------
