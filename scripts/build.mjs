@@ -24,48 +24,53 @@ const getBuildList = buildStr => {
 
 $.verbose = false
 
-echo(chalk.blue('checking env...'))
-
-assert.equal(
-  typeof process.env.SENTRY_AUTH_TOKEN,
-  'string',
-  chalk.red('Missing process.env.SENTRY_AUTH_TOKEN'),
-)
-
-const gitStatus = await $`git status --porcelain`
-assert.equal(
-  gitStatus.toString('utf8').trim(),
-  '',
-  chalk.red('Current git workspace is not clean'),
-)
-
-await fetch('https://api.expo.dev')
-  .then(res => res.text())
-  .then(d => {
-    assert.equal(d, 'OK', chalk.red('Can not access Expo Api'))
-  })
-
-await $`npm ping && npm whoami --registry=https://registry.npmjs.org/`
-
-await $`git ls-remote https://github.com/lovetingyuan/minibili.git`
-
-const branch = await $`git rev-parse --abbrev-ref HEAD`
-assert.equal(
-  branch.toString('utf8').trim(),
-  'main',
-  chalk.red('Current branch is not main'),
-)
-
-echo(chalk.blue('fetching current build list...'))
-
-const currentBuild =
-  await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
-const [{ appVersion }] = getBuildList(currentBuild)
-if (appVersion !== version) {
-  throw new Error(
-    `Package version ${version} is not same as the latest build version ${appVersion}`,
+// echo(chalk.blue('checking env...'))
+await spinner('checking env...', async () => {
+  assert.equal(
+    typeof process.env.SENTRY_AUTH_TOKEN,
+    'string',
+    chalk.red('Missing process.env.SENTRY_AUTH_TOKEN'),
   )
-}
+
+  const gitStatus = await $`git status --porcelain`
+  assert.equal(
+    gitStatus.toString('utf8').trim(),
+    '',
+    chalk.red('Current git workspace is not clean'),
+  )
+
+  await fetch('https://api.expo.dev')
+    .then(res => res.text())
+    .then(d => {
+      assert.equal(d, 'OK', chalk.red('Can not access Expo Api'))
+    })
+
+  await $`npm ping && npm whoami --registry=https://registry.npmjs.org/`
+
+  await $`git ls-remote https://github.com/lovetingyuan/minibili.git`
+
+  const branch = await $`git rev-parse --abbrev-ref HEAD`
+  assert.equal(
+    branch.toString('utf8').trim(),
+    'main',
+    chalk.red('Current branch is not main'),
+  )
+  echo(chalk.green('env is alright'))
+})
+
+let appVersion
+
+await spinner('checking current build list...', async () => {
+  const currentBuild =
+    await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
+  appVersion = getBuildList(currentBuild)[0].appVersion
+  if (appVersion !== version) {
+    throw new Error(
+      `Package version ${version} is not same as the latest build version ${appVersion}`,
+    )
+  }
+  echo(`current version: ${chalk.green(appVersion)}`)
+})
 
 // -------------------------------------------
 
@@ -101,15 +106,13 @@ let latestBuildList
 try {
   await spinner('eas building...', async () => {
     await $`eas build --platform android --profile production --message ${changes} --json --non-interactive`
-  })
-  echo(chalk.blue('check eas build list...'))
-  await new Promise(r => {
-    setTimeout(r, 3000)
+    return new Promise(r => setTimeout(r, 3000))
   })
   let buildListStr = ''
+  echo(chalk.green('eas build done.'))
 
   try {
-    buildListStr = await spinner('get eas build list...', () =>
+    buildListStr = await spinner('checking eas build list...', () =>
       retry(
         3,
         () =>
@@ -127,6 +130,7 @@ try {
       `EAS latest version ${latestBuildList[0].appVersion} is not same as updated version ${newVersion}`,
     )
   }
+  echo(chalk.green('eas build success.'))
 } catch (err) {
   await $`git checkout -- .`
   // await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
@@ -135,9 +139,7 @@ try {
 }
 
 // ---------------------------------------------
-
-echo(chalk.blue('writing version file...'))
-
+echo(chalk.blue('Update version file...'))
 await fs.outputJsonSync(
   path.resolve(__dirname, '../docs/version.json'),
   latestBuildList.map(item => {
@@ -154,40 +156,44 @@ await fs.outputJsonSync(
 
 const apkUrl = latestBuildList[0].artifacts.buildUrl
 echo(chalk.blue('download apk file...'))
-echo(chalk.cyan(apkUrl))
 
 try {
-  await $`rm -rf apk && mkdir -p apk`
-  await spinner('downloading...', () =>
-    retry(3, () => $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`),
-  )
+  await spinner('downloading apk file...', async () => {
+    await $`rm -rf apk && mkdir -p apk`
+    return retry(
+      3,
+      () => $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`,
+    )
+  })
+  echo(chalk.blue(`saved to ./apk/minibili-${newVersion}.apk`))
 } catch (err) {
   echo(chalk.red('Failed to download latest apk.'))
   throw err
 }
 
-echo(chalk.blue('publish to npm...'))
-
 try {
   await spinner('publish to npm...', () =>
     retry(3, () => $`npm publish --registry=https://registry.npmjs.org/`),
   )
+  echo(chalk.blue('published to npm success.'))
 } catch (err) {
   echo(chalk.red('Failed to publish to npm.'))
   throw err
 }
 
-echo(chalk.blue('commit to github...'))
-
 try {
   // await $`git commit -a --amend -C HEAD`
   const message = `release(v${newVersion}): ${changes}`
-  await $`git commit -am ${message}`
-  await spinner('git push change...', () => retry(5, () => $`git push`))
-  await $`git tag -a v${newVersion} -m ${changes}`
-  await spinner('git push tag...', () =>
-    retry(5, () => $`git push origin v${newVersion}`),
-  )
+  await spinner('git push change...', async () => {
+    await $`git commit -am ${message}`
+    return retry(5, () => $`git push`)
+  })
+  echo(chalk.green('git push commit done.'))
+  await spinner('git push tag...', async () => {
+    await $`git tag -a v${newVersion} -m ${changes}`
+    return retry(5, () => $`git push origin v${newVersion}`)
+  })
+  echo(chalk.green('git push tags done.'))
 } catch (err) {
   echo(chalk.red('Failed to push to git.'))
   throw err
