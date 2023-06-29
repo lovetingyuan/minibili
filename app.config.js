@@ -35,17 +35,22 @@ module.exports = {
     image: './assets/splash.png',
     resizeMode: 'cover',
     backgroundColor: '#ffffff',
-    dark: {
-      image: './assets/splash-dark.png',
-      resizeMode: 'cover',
-      backgroundColor: '#000000',
-    },
   },
   assetBundlePatterns: ['assets/*'],
   ios: {
     supportsTablet: true,
     bundleIdentifier: appId,
     buildNumber: version,
+    splash: {
+      image: './assets/splash.png',
+      resizeMode: 'cover',
+      backgroundColor: '#ffffff',
+      dark: {
+        image: './assets/splash-dark.png',
+        resizeMode: 'cover',
+        backgroundColor: '#000000',
+      },
+    },
   },
   android: {
     adaptiveIcon: {
@@ -54,6 +59,16 @@ module.exports = {
     },
     package: appId,
     versionCode: Number(versionCode),
+    splash: {
+      image: './assets/splash.png',
+      resizeMode: 'cover',
+      backgroundColor: '#ffffff',
+      dark: {
+        image: './assets/splash-dark.png',
+        resizeMode: 'cover',
+        backgroundColor: '#000000',
+      },
+    },
   },
   plugins: [
     [
