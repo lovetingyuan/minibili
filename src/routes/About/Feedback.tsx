@@ -9,7 +9,6 @@ import { site } from '../../constants'
 export default React.memo(function Feedback() {
   const { $userInfo } = useStore()
   const [feedBackVisible, setFeedbackVisible] = React.useState(false)
-  const [, seta] = React.useState('')
   const hideFeedback = () => {
     setFeedbackVisible(false)
   }
@@ -35,15 +34,7 @@ export default React.memo(function Feedback() {
   const { theme } = useTheme()
   return (
     <View style={styles.infoItem}>
-      <Text
-        style={styles.title}
-        onLongPress={() => {
-          seta(() => {
-            throw new Error('ignore this error')
-          })
-        }}>
-        欢迎分享本应用 ❤
-      </Text>
+      <Text style={styles.title}>欢迎分享本应用 ❤</Text>
       <View style={styles.btns}>
         <Button
           type="clear"

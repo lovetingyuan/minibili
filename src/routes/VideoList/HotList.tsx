@@ -75,56 +75,50 @@ export default React.memo(function Hot({ navigation }: Props) {
       video: data,
     })
   }
-  const buttons = React.useMemo(() => {
-    return [
-      {
-        text: `不再看 ${currentVideoRef.current?.name} 的视频`,
-        onPress: () => {
-          Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
-            {
-              text: '取消',
-              style: 'cancel',
-            },
-            { text: '确定', onPress: addBlackUp },
-          ])
-        },
+  const buttons = () => [
+    {
+      text: `不再看 ${currentVideoRef.current?.name} 的视频`,
+      onPress: () => {
+        Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
+          {
+            text: '取消',
+            style: 'cancel',
+          },
+          { text: '确定', onPress: addBlackUp },
+        ])
       },
-      {
-        text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
-        onPress: () => {
-          Alert.alert(
-            `不再看 ${currentVideoRef.current?.tag} 类型的视频？`,
-            '',
-            [
-              {
-                text: '取消',
-                style: 'cancel',
-              },
-              { text: '确定', onPress: addBlackTagName },
-            ],
-          )
-        },
+    },
+    {
+      text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
+      onPress: () => {
+        Alert.alert(`不再看 ${currentVideoRef.current?.tag} 类型的视频？`, '', [
+          {
+            text: '取消',
+            style: 'cancel',
+          },
+          { text: '确定', onPress: addBlackTagName },
+        ])
       },
-      {
-        text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
-        onPress: () => {
-          if (currentVideoRef.current) {
-            const { name, title, bvid } = currentVideoRef.current
-            handleShareVideo(name, title, bvid)
-          }
-        },
+    },
+    {
+      text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
+      onPress: () => {
+        if (currentVideoRef.current) {
+          const { name, title, bvid } = currentVideoRef.current
+          handleShareVideo(name, title, bvid)
+        }
       },
-      {
-        text: '查看封面',
-        onPress: () => {
-          if (!currentVideoRef.current) {
-            return
-          }
-          Linking.openURL(currentVideoRef.current.cover)
-        },
+    },
+    {
+      text: '查看封面',
+      onPress: () => {
+        if (!currentVideoRef.current) {
+          return
+        }
+        Linking.openURL(currentVideoRef.current.cover)
       },
-    ]
-  }, [])
+    },
+  ]
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
     const key = item.bvid
     return (
@@ -141,7 +135,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item
-          store.overlayButtons = buttons
+          store.overlayButtons = buttons()
         }}>
         <HotItem video={item} />
       </TouchableOpacity>

@@ -212,11 +212,28 @@ export default React.memo(
         )
       }
     }
+    // reactNodes.push(
+    //   <View
+    //     key={reactNodes.length}
+    //     style={{
+    //       height: 10,
+    //       backgroundColor: 'pink',
+    //       paddingVertical: 10,
+    //       marginVertical: 10,
+    //       width: 100,
+    //     }}>
+    //     <Text>{'\n '}</Text>
+    //   </View>,
+    // )
+    const textOverflow =
+      typeof props.textProps?.numberOfLines === 'number' &&
+      lines - 1 > props.textProps.numberOfLines
+    // console.log(props.textProps)
     return (
-      <View style={[props.style]}>
+      <View style={[{ marginBottom: textOverflow ? 14 : 10 }, props.style]}>
         {Topic}
         <Text
-          style={styles.textContainer}
+          style={[styles.textContainer]}
           {...props.textProps}
           onTextLayout={evt => {
             setLines(evt.nativeEvent.lines.length)
@@ -224,12 +241,6 @@ export default React.memo(
           {reactNodes}
           <Text style={styles.hackText}>{reactNodes.length ? '\n ' : ''}</Text>
         </Text>
-        {typeof props.textProps?.numberOfLines === 'number' &&
-          lines - 1 > props.textProps.numberOfLines && (
-            <Text style={styles.hackText}>
-              {reactNodes.length ? '\n ' : ''}
-            </Text>
-          )}
       </View>
     )
   },
@@ -239,6 +250,7 @@ export default React.memo(
 )
 
 const styles = StyleSheet.create({
+  container: { marginBottom: 10 },
   textContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -262,5 +274,5 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontSize: 15,
   },
-  hackText: { fontSize: 8 },
+  hackText: { fontSize: 4 },
 })

@@ -73,14 +73,14 @@ export default React.memo(function Ranks({ navigation }: Props) {
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item
-          store.overlayButtons = buttons
+          store.overlayButtons = buttons()
         }}>
         <HotItem video={item} />
       </TouchableOpacity>
     )
   }
 
-  const buttons = React.useMemo(() => {
+  const buttons = () => {
     return [
       {
         text: `不再看 ${currentVideoRef.current?.name} 的视频`,
@@ -113,7 +113,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
         },
       },
     ]
-  }, [])
+  }
   const videoList: VideoItem[] = []
   const uniqVideosMap: Record<string, boolean> = {}
   for (const item of list) {
