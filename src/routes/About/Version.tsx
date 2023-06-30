@@ -8,6 +8,7 @@ import {
   currentVersion,
 } from '../../api/check-update'
 import { showToast } from '../../utils'
+import commonStyles from '../../styles'
 
 export default React.memo(function Version() {
   const updateTime: string = Updates.createdAt
@@ -51,7 +52,7 @@ export default React.memo(function Version() {
   return (
     <View style={styles.infoItem}>
       <Text
-        style={{ fontSize: 16 }}
+        style={commonStyles.font16}
         onPress={() => {
           Alert.alert(
             '版本信息',

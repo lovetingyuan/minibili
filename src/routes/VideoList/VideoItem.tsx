@@ -5,6 +5,7 @@ import { parseDate, parseDuration, parseNumber } from '../../utils'
 import { useTheme } from '@rneui/themed'
 import { Image } from 'expo-image'
 import { TracyId } from '../../constants'
+import commonStyles from '../../styles'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
@@ -12,7 +13,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   const { theme } = useTheme()
   return (
     <View style={styles.itemContainer}>
-      <View style={{ flex: 1 }}>
+      <View style={commonStyles.flex1}>
         <Image
           style={styles.image}
           source={{ uri: video.cover + '@480w_270h_1c.webp' }}

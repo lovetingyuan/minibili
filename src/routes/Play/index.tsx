@@ -20,6 +20,7 @@ import VideoInfoContext from './videoContext'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingVideoId } from '../../utils/report'
+import commonStyles from '../../styles'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
@@ -103,7 +104,8 @@ const PlayPage = ({ route, navigation }: Props) => {
                   <Text
                     style={[
                       styles.text,
-                      { color: theme.colors.grey1, fontWeight: 'bold' },
+                      commonStyles.bold,
+                      { color: theme.colors.grey1 },
                     ]}>
                     {' · '}
                   </Text>

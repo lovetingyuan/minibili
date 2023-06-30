@@ -9,6 +9,7 @@ import store, { useStore } from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
 import { Image } from 'expo-image'
 import { showToast } from '../../utils'
+import commonStyles from '../../styles'
 
 export default React.memo(
   function FollowItem(props: { item: FollowedUpItem; width?: number }) {
@@ -111,7 +112,7 @@ export default React.memo(
                 position: 'relative',
                 top: -5,
               }}
-              titleStyle={{ fontSize: 14 }}
+              titleStyle={commonStyles.font14}
               onPress={gotoLivePage}
             />
           ) : null}

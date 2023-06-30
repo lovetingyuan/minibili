@@ -20,7 +20,7 @@ export default function ErrorFallback(props: { message?: string }) {
       <Text style={styles.errorText}>
         非常抱歉，应用发生了未知错误
         {'\n\n'}
-        <Text style={{ fontStyle: 'italic' }}>{props.message || 'N/A'}</Text>
+        <Text style={styles.errorMsg}>{props.message || 'N/A'}</Text>
         {'\n\n'}
         我们会处理这个错误，感谢您的理解和支持
         {'\n\n'}
@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
     fontSize: 16,
   },
+  errorMsg: { fontStyle: 'italic', fontSize: 13 },
   restartText: { color: '#5d5cde', fontWeight: 'bold' },
   downloadBtn: { marginVertical: 30, paddingHorizontal: 30 },
 })

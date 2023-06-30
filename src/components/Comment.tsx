@@ -5,6 +5,7 @@ import { Button, Text, useTheme } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 import store from '../store'
+import commonStyles from '../styles'
 
 interface Props {
   upName: string
@@ -131,7 +132,7 @@ export default React.memo(function Comment(props: Props) {
             {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}
           </Text>
           {comment.location ? (
-            <Text style={{ fontSize: 13 }}>
+            <Text style={commonStyles.font13}>
               (
               {comment.location.includes('：')
                 ? comment.location.split('：')[1]
@@ -146,7 +147,7 @@ export default React.memo(function Comment(props: Props) {
             <Text> </Text>
             <Image
               source={require('../../assets/top.png')}
-              style={{ width: 24, height: 15, marginLeft: 5 }}
+              style={styles.topComment}
             />
             <Text> </Text>
           </>
@@ -206,7 +207,7 @@ export default React.memo(function Comment(props: Props) {
                   {reply.sex === '男' ? '♂' : reply.sex === '女' ? '♀' : ''}
                 </Text>
                 {reply.location ? (
-                  <Text style={{ fontSize: 13 }}>
+                  <Text style={commonStyles.font13}>
                     (
                     {reply.location.includes('：')
                       ? reply.location.split('：')[1]
@@ -316,4 +317,5 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingHorizontal: 1,
   },
+  topComment: { width: 24, height: 15, marginLeft: 5 },
 })

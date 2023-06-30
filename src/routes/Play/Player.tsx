@@ -21,6 +21,7 @@ import VideoInfoContext from './videoContext'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import MyImage from '../../components/MyImage'
 import NetInfo from '@react-native-community/netinfo'
+import commonStyles from '../../styles'
 
 const VideoPlayer = React.memo((props: { wifi: boolean }) => {
   const { wifi } = props
@@ -99,7 +100,7 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
     <View style={styles.loadingView}>
       <MyImage
         source={{ uri: videoInfo.cover + '@672w_378h_1c.webp' }}
-        style={{ flex: 1 }}
+        style={commonStyles.flex1}
         widthScale={1}
       />
       <ActivityIndicator
@@ -171,9 +172,7 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
           onPress={() => {
             setLoadPlayer(true)
           }}
-          style={{
-            flex: 1,
-          }}>
+          style={commonStyles.flex1}>
           <ImageBackground
             source={{ uri: videoInfo.cover + '@672w_378h_1c.webp' }}
             resizeMode="cover"

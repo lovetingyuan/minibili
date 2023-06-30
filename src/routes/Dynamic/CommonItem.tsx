@@ -17,6 +17,7 @@ import { Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
+import commonStyles from '../../styles'
 
 type ItemType =
   | HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE
@@ -103,9 +104,7 @@ export function CommonContent(props: {
             style={[
               styles.title,
               props.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
-                ? {
-                    fontWeight: 'bold',
-                  }
+                ? commonStyles.bold
                 : null,
             ]}
             numberOfLines={2}>

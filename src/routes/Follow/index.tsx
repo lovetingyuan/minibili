@@ -19,6 +19,7 @@ import { checkUpdateUps } from '../../api/dynamic-items'
 import { useUserRelation } from '../../api/user-relation'
 import { ApiError } from '../../api/fetcher'
 import Login from './Login'
+import commonStyles from '../../styles'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
@@ -104,7 +105,7 @@ export default React.memo(function Follow({ navigation }: Props) {
     if (item) {
       return <FollowItem item={item} />
     }
-    return <View style={{ flex: 1 }} />
+    return <View style={commonStyles.flex1} />
   }
 
   let displayUps: (FollowedUpItem | null)[] = []
@@ -156,7 +157,7 @@ export default React.memo(function Follow({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Header />
-      <View style={{ flex: 1 }}>
+      <View style={commonStyles.flex1}>
         <FlatList
           data={displayUps}
           renderItem={renderItem}

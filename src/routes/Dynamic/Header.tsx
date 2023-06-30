@@ -11,6 +11,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useUserInfo } from '../../api/user-info'
 import { useLivingInfo } from '../../api/living-info'
 import * as Clipboard from 'expo-clipboard'
+import commonStyles from '../../styles'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
@@ -86,7 +87,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
       {sex ? (
         <Text
           style={[
-            { fontSize: 13 },
+            commonStyles.font13,
             dynamicUser?.sex === '女'
               ? {
                   color: '#FF6699',
