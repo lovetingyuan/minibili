@@ -11,16 +11,22 @@ function __$hack() {
   const style = document.createElement('style')
   style.textContent = `
   body .pswp__counter { font-size: 18px; }
+  .picture {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
   `
   document.head.appendChild(style)
-  gallery.style.display = 'none'
+  gallery.style.opacity = '0'
   // @ts-ignore
   gallery.innerHTML = window.images
     // @ts-ignore
     .map(img => {
       return `
     <a href="${img.src}" data-pswp-width="${img.width}" data-pswp-height="${img.height}">
-      <img src="${img.src}" alt="" />
+      <img src="${img.src}" class="picture" alt="" />
     </a>
     `
     })
@@ -55,7 +61,6 @@ function __$hack() {
         el.setAttribute('download', '')
         el.setAttribute('target', '_blank')
         el.setAttribute('rel', 'noopener')
-
         pswp.on('change', () => {
           el.href = pswp.currSlide.data.src
         })
@@ -71,6 +76,7 @@ function __$hack() {
       }),
     )
   })
+  // lightbox.init()
   // @ts-ignore
   lightbox.loadAndOpen(window.currentImgIndex, {
     gallery,
