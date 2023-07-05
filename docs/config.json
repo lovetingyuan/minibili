@@ -4,8 +4,8 @@
   ],
   "statement": {
     "title": "你好",
-    "content": "欢迎使用",
+    "content": "动态内容可能显示不稳定",
     "dismiss": true,
-    "show": false
+    "show": true
   }
 }
