@@ -13,12 +13,12 @@ test('dynamic-list', async () => {
       `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
     )
     if (!res) {
-      failedList.push('null' + mid)
+      failedList.push('null-' + mid)
     } else {
       try {
         DynamicListResponseSchema.parse(res)
       } catch (err) {
-        failedList.push('zod' + mid)
+        failedList.push('zod-' + mid)
       }
     }
   }
@@ -27,4 +27,4 @@ test('dynamic-list', async () => {
   if (Object.keys(failedList).length) {
     throw new Error('dynamic list failed')
   }
-}, 10000)
+}, 15000)
