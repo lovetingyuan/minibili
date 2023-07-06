@@ -4,7 +4,7 @@ import { WebView } from 'react-native-webview'
 import store, { useStore } from '../store'
 import { TracyId } from '../constants'
 import { Dialog, Icon } from '@rneui/themed'
-import { checkDynamicsApi } from '../api/dynamic-items'
+// import { checkDynamicsApi } from '../api/dynamic-items'
 import useIsDark from '../hooks/useIsDark'
 import commonStyles from '../styles'
 
@@ -91,14 +91,15 @@ export default React.memo(() => {
   const { $userInfo, showCaptcha, loadingDynamicError } = useStore()
   const [ready, setReady] = React.useState(false)
   React.useEffect(() => {
-    if (loadingDynamicError) {
-      checkDynamicsApi()
-        .then(() => {
-          store.showCaptcha = false
-        })
-        .catch(() => {
-          store.showCaptcha = true
-        })
+    if (loadingDynamicError && !store.showCaptcha) {
+      store.showCaptcha = true
+      // checkDynamicsApi()
+      //   .then(() => {
+      //     store.showCaptcha = false
+      //   })
+      //   .catch(() => {
+      //     store.showCaptcha = true
+      //   })
     }
   }, [loadingDynamicError])
   const dark = useIsDark()

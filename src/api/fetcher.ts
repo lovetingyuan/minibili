@@ -1,11 +1,28 @@
 import { reportApiError } from '../utils/report'
 import store from '../store'
+import getCookie from './get-cookie'
+import { debounce } from 'throttle-debounce'
 
 type Res<D = any> = {
   code: number
   message: string
   data: D
 }
+
+let updatingCookie = false
+const updateCookie = debounce(1200, () => {
+  if (updatingCookie) {
+    return
+  }
+  updatingCookie = true
+  return getCookie()
+    .then(cookie => {
+      store.$cookie = cookie
+    })
+    .finally(() => {
+      updatingCookie = false
+    })
+})
 
 export class ApiError extends Error {
   response: Res
@@ -56,6 +73,7 @@ export default function request<D extends any>(url: string) {
       if (res.code) {
         if (isDynamic && !store.loadingDynamicError) {
           store.loadingDynamicError = true
+          updateCookie()
         }
         reportApiError(url, res)
 
