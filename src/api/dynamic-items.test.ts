@@ -8,23 +8,25 @@ test('dynamic-list', async () => {
   ).then(r => r.json())) as any
   const mids = list.list.map((v: any) => v.owner.mid).concat([14427395])
   const failedList: string[] = []
+  const list352: string[] = []
   for (const mid of mids) {
     const res = await fetcher<any>(
       `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
     )
-    if (!res) {
-      failedList.push('null-' + mid)
+    if (!res || res.offset === '-352') {
+      list352.push('null-' + mid)
     } else {
-      try {
-        DynamicListResponseSchema.parse(res)
-      } catch (err) {
+      const result = DynamicListResponseSchema.safeParse(res)
+      if (result.success === false) {
         failedList.push('zod-' + mid)
+        console.log(mid + ' zod error')
+        console.error(result.error)
       }
     }
   }
-  // eslint-disable-next-line no-console
-  console.log('Failed mid list:', failedList)
-  if (Object.keys(failedList).length) {
+  failedList.length && console.log('Failed mid list:', failedList)
+  list352.length && console.log('352 list:', list352)
+  if (failedList.length) {
     throw new Error('dynamic list failed')
   }
 }, 15000)

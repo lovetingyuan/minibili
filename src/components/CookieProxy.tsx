@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, View, Alert } from 'react-native'
 import { WebView } from 'react-native-webview'
 import store, { useStore } from '../store'
-import { TracyId } from '../constants'
+import { TracyId, UA } from '../constants'
 import { Dialog, Icon } from '@rneui/themed'
 // import { checkDynamicsApi } from '../api/dynamic-items'
 import useIsDark from '../hooks/useIsDark'
@@ -118,7 +118,7 @@ export default React.memo(() => {
         mediaPlaybackRequiresUserAction
         injectedJavaScript={`(${__$hack})();true;`}
         ref={webviewRef}
-        userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.1774.57 Safari/537.36 Edg/113.0.1774.57"
+        userAgent={UA}
         onMessage={evt => {
           const data = JSON.parse(evt.nativeEvent.data) as {
             action: string

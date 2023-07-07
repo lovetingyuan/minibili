@@ -71,7 +71,7 @@ function getbuvid3(mid = TracyId) {
   })
 }
 
-function getbuvid4(bvuid3: string, uuid: string) {
+function getbuvid4(buvid3: string, uuid: string) {
   return fetch('https://api.bilibili.com/x/frontend/finger/spi', {
     headers: {
       accept: '*/*',
@@ -79,7 +79,7 @@ function getbuvid4(bvuid3: string, uuid: string) {
       'cache-control': 'no-cache',
       pragma: 'no-cache',
       'user-agent': UA,
-      cookie: `${bvuid3}; _uuid=${uuid}`,
+      cookie: `${buvid3}; _uuid=${uuid}`,
     },
     referrer: 'https://api.bilibili.com/x/frontend/finger/spi',
     referrerPolicy: 'strict-origin-when-cross-origin',
@@ -90,7 +90,7 @@ function getbuvid4(bvuid3: string, uuid: string) {
   })
     .then(res => res.json())
     .then(res => {
-      return res.data.b_4
+      return res.data.b_4.replaceAll('=', '%3D')
     })
 }
 
@@ -98,7 +98,7 @@ function getPayload(now: number, uuid: string) {
   return {
     3064: 1,
     5062: now.toString(),
-    '03bf': 'https%3A%2F%2Fspace.bilibili.com%2F85997303%2Fdynamic',
+    '03bf': 'https%3A%2F%2Fspace.bilibili.com%2F' + TracyId + '%2Fdynamic',
     '39c8': '333.999.fp.risk',
     '34f1': '',
     d402: '',
@@ -279,7 +279,7 @@ function getPayload(now: number, uuid: string) {
   }
 }
 
-function wuzhi(now: number, bvuid3: string, uuid: string) {
+function wuzhi(now: number, buvid3: string, uuid: string) {
   const payload = getPayload(now, uuid)
   const body = JSON.stringify({ payload: JSON.stringify(payload) })
 
@@ -293,7 +293,7 @@ function wuzhi(now: number, bvuid3: string, uuid: string) {
         'content-type': 'application/json;charset=UTF-8',
         pragma: 'no-cache',
         'user-agent': UA,
-        cookie: `${bvuid3}; _uuid=${uuid}`,
+        cookie: `${buvid3}; _uuid=${uuid}`,
       },
       referrer: 'https://space.bilibili.com/85997303/dynamic',
       referrerPolicy: 'no-referrer-when-downgrade',
@@ -311,5 +311,5 @@ export default async function getCookie() {
   const uuid = getuuid(now)
   const buvid4 = await getbuvid4(buvid3, uuid)
   await wuzhi(now, buvid3, uuid)
-  return `${buvid3}; _uuid=${uuid}; bvuid4=${buvid4}`
+  return `${buvid3}; _uuid=${uuid}; buvid4=${buvid4}`
 }
