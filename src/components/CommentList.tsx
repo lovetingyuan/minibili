@@ -11,7 +11,7 @@ const Loading = React.memo(() => {
         .fill(0)
         .map((_, i) => {
           return (
-            <View style={{ flex: 1, gap: 5, marginBottom: 20 }} key={i}>
+            <View style={styles.skeleton} key={i}>
               <Skeleton animation="pulse" width={'100%' as any} height={16} />
               {i % 2 ? (
                 <Skeleton animation="pulse" width={'100%' as any} height={16} />
@@ -66,7 +66,7 @@ const CommentList: React.FC<{
       {comments?.length ? (
         comments.map((comment, i) => {
           return (
-            <View key={comment.id + '@' + i} style={{ marginBottom: 10 }}>
+            <View key={comment.id + '@' + i} style={styles.commentItem}>
               <Comment upName={props.upName} comment={comment} />
             </View>
           )
@@ -87,11 +87,7 @@ const CommentList: React.FC<{
 }
 
 const styles = StyleSheet.create({
-  commentItemContainer: {
-    marginTop: 20,
-    borderBottomColor: '#eee',
-    borderBottomWidth: 0.5,
-  },
+  commentItem: { marginBottom: 10 },
   footerContainer: { marginBottom: 10, alignItems: 'center' },
   footerText: { color: '#888', fontSize: 12 },
   commentTipText: {
@@ -120,6 +116,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginRight: 4,
   },
+  skeleton: { flex: 1, gap: 5, marginBottom: 20 },
 })
 
 export default CommentList
