@@ -91,3 +91,17 @@ export default function request<D extends any>(url: string) {
       return res.data
     })
 }
+
+// export default function request<D extends any>(url: string) {
+//   const isDynamic = url.startsWith('/x/polymer/web-dynamic/v1/feed/space')
+//   if (isDynamic) {
+//     return _request<D>(url)
+//       .catch(() => {
+//         return _request<D>(url)
+//       })
+//       .catch(() => {
+//         return _request<D>(url)
+//       })
+//   }
+//   return _request<D>(url)
+// }

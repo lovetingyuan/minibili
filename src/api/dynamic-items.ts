@@ -21,8 +21,8 @@ import {
   MajorTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
-import { delay, parseUrl } from '../utils'
-import { TracyId } from '../constants'
+import { parseUrl } from '../utils'
+// import { TracyId } from '../constants'
 import { subscribeKey } from 'valtio/utils'
 
 type OmitUndef<T> = {
@@ -457,6 +457,16 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   }
 }
 
+function requestDynamics(url: string) {
+  return request<DynamicListResponse>(url)
+    .catch(() => {
+      return request<DynamicListResponse>(url)
+    })
+    .catch(() => {
+      return request<DynamicListResponse>(url)
+    })
+}
+
 export function useDynamicItems(mid?: string | number) {
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<DynamicListResponse>(
@@ -473,10 +483,10 @@ export function useDynamicItems(mid?: string | number) {
         }
         return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480`
       },
-      request,
+      requestDynamics,
       {
         revalidateFirstPage: false,
-        errorRetryCount: 3,
+        errorRetryCount: 2,
         errorRetryInterval: 1000,
       },
     )
@@ -600,9 +610,9 @@ export async function checkUpdateUps(first: boolean) {
   })
 }
 
-export function checkDynamicsApi() {
-  const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${TracyId}&timezone_offset=-480`
-  return request<DynamicListResponse>(url)
-    .catch(() => delay(1500))
-    .then(() => request<DynamicListResponse>(url))
-}
+// export function checkDynamicsApi() {
+//   const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${TracyId}&timezone_offset=-480`
+//   return request<DynamicListResponse>(url)
+//     .catch(() => delay(1500))
+//     .then(() => request<DynamicListResponse>(url))
+// }
