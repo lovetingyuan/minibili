@@ -22,8 +22,7 @@ export default async function request<D extends any>(url: string) {
       'accept-language': 'zh-CN,zh;q=0.9',
       'cache-control': 'no-cache',
       pragma: 'no-cache',
-      cookie:
-        'buvid3=F43183B1-B312-92B9-5620-91EF217869BA58833infoc; b_nut=1688623058; _uuid=234859F6-5419-107CC-76D5-353845C4108D1060244infoc; buvid_fp=7deb95d2d7ae2def0691d6e5c1ae60aa; buvid4=08E0BD90-A43E-0E34-A463-35EE449A5CCD60745-023070613-iVkLZPkrhX6UaiD8BZoFTw%3D%3D; b_lsid=FD1D4736_1892E02D5BF; innersign=0; FEED_LIVE_VERSION=V8; header_theme_version=CLOSE; home_feed_column=4; browser_resolution=1392-770; PVID=1',
+      cookie,
       'user-agent': UA,
     },
     // referrer: 'https://space.bilibili.com',

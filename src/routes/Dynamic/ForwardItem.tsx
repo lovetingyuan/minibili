@@ -80,6 +80,7 @@ export default function ForwardItem(props: {
     )
   } else if (
     payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC ||
+    payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC_UNION ||
     payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE ||
     payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_ARTICLE ||
     payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_MUSIC ||

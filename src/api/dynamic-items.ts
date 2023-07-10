@@ -353,6 +353,21 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
+    if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_PGC_UNION) {
+      const { pgc } = item.orig.modules.module_dynamic.major
+      return {
+        ...getCommon(item),
+        type: type,
+        payload: {
+          ...getForwardCommon(),
+          type: HandledForwardTypeEnum.DYNAMIC_TYPE_PGC_UNION as const,
+          title: pgc.title,
+          cover: pgc.cover,
+          text: `${pgc.badge.text} (${pgc.stat.play}播放)`,
+          url: parseUrl(pgc.jump_url),
+        },
+      }
+    }
     if (item.orig.type === HandledForwardTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE) {
       const { common } = item.orig.modules.module_dynamic.major
       return {
