@@ -6,6 +6,6 @@
     "title": "你好",
     "content": "动态内容可能显示不稳定",
     "dismiss": true,
-    "show": true
+    "show": false
   }
 }
