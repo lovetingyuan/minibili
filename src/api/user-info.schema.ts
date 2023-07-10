@@ -20,17 +20,6 @@ export const UserInfoResponseSchema = z.object({
       cover: z.string(),
       roomid: z.number(),
       roundStatus: z.number(),
-      // broadcast_type: z.number(),
-      // watched_show: {
-      //   switch: true,
-      //   num: 12,
-      //   text_small: '12',
-      //   text_large: '12人看过',
-      //   icon: 'https://i0.hdslb.com/bfs/live/a725a9e61242ef44d764ac911691a7ce07f36c1d.png',
-      //   icon_location: '',
-      //   icon_web:
-      //     'https://i0.hdslb.com/bfs/live/8d9d0f33ef8bf6f308742752d13dd0df731df19c.png',
-      // },
     })
     .nullable(),
 })
@@ -39,20 +28,11 @@ export const UserCardInfoResponseSchema = z.object({
   card: z.object({
     mid: z.string(),
     name: z.string(),
-    // approve: false,
     sex: z.string(),
-    // rank: '10000',
     face: z.string(),
-    // face_nft: 0,
-    // face_nft_type: 0,
-    // DisplayRank: '0',
-    // regtime: 0,
-    // spacesta: 0,
     birthday: z.string(),
     place: z.string(),
     description: z.string(),
-    // article: 0,
-    // attentions: [],
     fans: z.number(),
     friend: z.number(),
     attention: z.number(),
@@ -65,10 +45,7 @@ export const UserCardInfoResponseSchema = z.object({
     }),
   }),
   following: z.boolean(),
-  // archive_count: 16,
-  // article_count: 0,
   follower: z.number(),
-  // like_num: 6,
 })
 
 export const UserBatchInfoResponseSchema = z
@@ -78,42 +55,10 @@ export const UserBatchInfoResponseSchema = z
     sex: z.string(),
     face: z.string(),
     sign: z.string(),
-    // rank: 10000,
     level: z.number(),
     birthday: z.number(),
-    // silence: 0,
     vip: z.object({
       status: z.number(),
     }),
-    // pendant: {
-    //   pid: 0,
-    //   name: '',
-    //   image: '',
-    //   expire: 0,
-    //   image_enhance: '',
-    //   image_enhance_frame: '',
-    // },
-    // nameplate: {
-    //   nid: 0,
-    //   name: '',
-    //   image: '',
-    //   image_small: '',
-    //   level: '',
-    //   condition: '',
-    // },
-    // official: {
-    //   role: 0,
-    //   title: '',
-    //   desc: '',
-    //   type: -1,
-    // },
-    // is_fake_account: 0,
-    // is_deleted: 0,
-    // in_reg_audit: 0,
-    // face_nft: 0,
-    // face_nft_new: 0,
-    // is_senior_member: 0,
-    // digital_id: '',
-    // digital_type: -2,
   })
   .array()
