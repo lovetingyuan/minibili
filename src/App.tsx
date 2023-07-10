@@ -4,7 +4,7 @@ import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
 import { AppState, Appearance } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
-import NetInfo, { useNetInfo } from '@react-native-community/netinfo'
+import NetInfo from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
 import CookieProxy from './components/CookieProxy'
 import { RootSiblingParent } from 'react-native-root-siblings'
@@ -37,30 +37,27 @@ const errorFallback: FallbackRender = errorData => {
 }
 
 export default function App() {
-  const netInfo = useNetInfo()
   const netToastDelay = React.useRef<null | number>(null)
   React.useEffect(() => {
-    if (typeof netToastDelay.current === 'number') {
-      window.clearTimeout(netToastDelay.current)
-    }
-    if (netInfo.isConnected === false) {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (state.isConnected && state.type === 'wifi') {
+        return
+      }
+      if (typeof netToastDelay.current === 'number') {
+        window.clearTimeout(netToastDelay.current)
+      }
       netToastDelay.current = window.setTimeout(() => {
-        NetInfo.fetch().then(state => {
-          if (!state.isConnected) {
+        NetInfo.fetch().then(state2 => {
+          if (!state2.isConnected) {
             showToast(' 网络状况不佳 ')
-          }
-        })
-      }, 1000)
-    } else if (netInfo.type !== 'wifi') {
-      netToastDelay.current = window.setTimeout(() => {
-        NetInfo.fetch().then(state => {
-          if (state.type !== 'wifi') {
+          } else if (state2.type !== 'wifi') {
             showToast(' 请注意当前网络不是 wifi ')
           }
         })
-      }, 1000)
-    }
-  }, [netInfo.isConnected, netInfo.type])
+      }, 1500)
+    })
+    return unsubscribe
+  }, [])
   const swrConfig = React.useMemo<
     SWRConfiguration & Partial<ProviderConfiguration>
   >(() => {
