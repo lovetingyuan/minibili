@@ -21,7 +21,7 @@ import {
   MajorTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
-import { parseUrl } from '../utils'
+import { delay, parseUrl } from '../utils'
 // import { TracyId } from '../constants'
 import { subscribeKey } from 'valtio/utils'
 
@@ -457,14 +457,15 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   }
 }
 
-function requestDynamics(url: string) {
-  return request<DynamicListResponse>(url)
-    .catch(() => {
-      return request<DynamicListResponse>(url)
-    })
-    .catch(() => {
-      return request<DynamicListResponse>(url)
-    })
+async function requestDynamics(url: string) {
+  for (let i = 0; i < 8; i++) {
+    const data = await request<DynamicListResponse>(url).catch(() => null)
+    if (data) {
+      return data
+    }
+    await delay(60 + i * 10)
+  }
+  return Promise.reject()
 }
 
 export function useDynamicItems(mid?: string | number) {
