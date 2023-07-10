@@ -7,5 +7,6 @@ export const ConfigSchema = z.object({
     content: z.string(),
     dismiss: z.boolean(),
     show: z.boolean(),
+    url: z.string().nullish(),
   }),
 })

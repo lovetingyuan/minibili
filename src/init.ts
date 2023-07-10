@@ -86,30 +86,32 @@ async function init() {
       )
     })
   }
-  await getRemoteConfig()
-    .then(config => {
-      if (config.statement.show) {
-        return new Promise(r => {
-          Alert.alert(
-            config.statement.title,
-            config.statement.content,
-            [
-              {
-                text: '确定',
-                onPress: () => {
-                  r(null)
-                },
-              },
-            ],
-            {
-              cancelable: config.statement.dismiss,
-              onDismiss: () => r(null),
+  await getRemoteConfig().then(config => {
+    if (!config.statement.show) {
+      return
+    }
+    return new Promise(r => {
+      Alert.alert(
+        config.statement.title,
+        config.statement.content,
+        [
+          {
+            text: config.statement.url ? '详情' : '确定',
+            onPress: () => {
+              if (config.statement.url) {
+                Linking.openURL(config.statement.url)
+              }
+              r(null)
             },
-          )
-        })
-      }
+          },
+        ],
+        {
+          cancelable: config.statement.dismiss,
+          onDismiss: () => r(null),
+        },
+      )
     })
-    .catch(() => {})
+  })
 }
 
 init()
