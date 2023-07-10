@@ -458,14 +458,14 @@ const getDynamicItem = (item: DynamicItemResponse) => {
 }
 
 async function requestDynamics(url: string) {
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 10; i++) {
     const data = await request<DynamicListResponse>(url).catch(() => null)
     if (data) {
       return data
     }
     await delay(60 + i * 10)
   }
-  return Promise.reject()
+  return Promise.reject(new Error('failed'))
 }
 
 export function useDynamicItems(mid?: string | number) {
@@ -487,8 +487,8 @@ export function useDynamicItems(mid?: string | number) {
       requestDynamics,
       {
         revalidateFirstPage: false,
-        errorRetryCount: 2,
-        errorRetryInterval: 1000,
+        errorRetryCount: 3,
+        errorRetryInterval: 500,
       },
     )
   const dynamicItems: DynamicListResponse['items'] =
