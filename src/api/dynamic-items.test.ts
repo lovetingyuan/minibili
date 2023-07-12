@@ -11,15 +11,17 @@ test('dynamic-list', async () => {
   const list352: string[] = []
   let count = 0
   for (const mid of mids) {
-    let res = null
-    for (let i = 0; i < 10; i++) {
-      res = await fetcher<any>(
-        `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
-      ).catch(() => null)
-      if (res) {
-        break
-      }
-    }
+    const res = await fetcher<any>(
+      `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
+    ).catch(() => null)
+    // for (let i = 0; i < 10; i++) {
+    //   res = await fetcher<any>(
+    //     `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
+    //   ).catch(() => null)
+    //   if (res) {
+    //     break
+    //   }
+    // }
     if (!res) {
       list352.push('null-' + mid)
     } else {
@@ -38,4 +40,4 @@ test('dynamic-list', async () => {
   if (failedList.length) {
     throw new Error('dynamic list failed')
   }
-}, 15000)
+}, 10000)
