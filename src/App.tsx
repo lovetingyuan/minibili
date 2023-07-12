@@ -6,7 +6,7 @@ import { AppState, Appearance } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
-import CookieProxy from './components/CookieProxy'
+// import CookieProxy from './components/CookieProxy'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import Route from './routes/Index'
 import * as SentryExpo from 'sentry-expo'
@@ -113,7 +113,7 @@ export default function App() {
             <StatusBar style="auto" />
             <ThemeResponse />
             <ButtonsOverlay />
-            <CookieProxy />
+            {/* <CookieProxy /> */}
             <ImagesView />
             <Route />
           </SWRConfig>
