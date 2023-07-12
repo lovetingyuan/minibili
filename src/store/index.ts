@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy, subscribe, useSnapshot } from 'valtio'
-import { RanksConfig, TracyId } from '../constants'
-import { reportUserOpenApp } from '../utils/report'
+import { RanksConfig } from '../constants'
+// import { reportUserOpenApp } from '../utils/report'
 import { checkUpdate } from '../api/check-update'
 
 interface UserInfo {
@@ -15,7 +15,7 @@ const store = proxy<{
   $blackUps: Record<string, string>
   $followedUps: UserInfo[]
   $blackTags: Record<string, string>
-  $userInfo: UserInfo | null
+  // $userInfo: UserInfo | null
   $upUpdateMap: Record<string, { latestId: string; currentLatestId: string }>
   $videoCatesList: { rid: number; label: string }[]
   $ignoredVersions: string[]
@@ -41,11 +41,11 @@ const store = proxy<{
   $blackUps: {},
   $followedUps: [],
   $blackTags: {},
-  $userInfo: null,
+  // $userInfo: null,
   $upUpdateMap: {},
   $ignoredVersions: [],
   $videoCatesList: RanksConfig,
-  $cookie: 'DedeUserID=' + TracyId,
+  $cookie: '',
   // -------------------------
   initialed: false,
   webViewMode: 'MOBILE',
@@ -73,9 +73,9 @@ Promise.all(
     return AsyncStorage.getItem(StoragePrefix + key).then(data => {
       if (data) {
         store[key] = JSON.parse(data) as any
-        if (key === '$userInfo' && store.$userInfo) {
-          reportUserOpenApp(store.$userInfo.mid, store.$userInfo.name)
-        }
+        // if (key === '$userInfo' && store.$userInfo) {
+        //   reportUserOpenApp(store.$userInfo.mid, store.$userInfo.name)
+        // }
       }
     })
   }),

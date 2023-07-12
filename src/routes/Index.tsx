@@ -5,12 +5,15 @@ import {
   NavigationContainer,
   RouteProp,
 } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import {
+  NativeStackNavigationOptions,
+  createNativeStackNavigator,
+} from '@react-navigation/native-stack'
 import Play from './Play'
 import About from './About'
 import WebPage from './WebPage'
 import { RootStackParamList } from '../types'
-import MainTab from './MainTab'
+// import MainTab from './MainTab'
 import Dynamic from './Dynamic'
 import DynamicDetail from './DynamicDetail'
 import aboutHeaderRight from './About/headerRight'
@@ -20,6 +23,9 @@ import {
   dynamicDetailHeaderRight,
   dynamicDetailHeaderTitle,
 } from './DynamicDetail/Header'
+import Follow from './Follow'
+import VideoList from './VideoList'
+import { videoListHeaderRight, videoListHeaderTitle } from './VideoList/Header'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -43,16 +49,31 @@ export default function Route() {
     ({ route }: { route: RouteProp<RootStackParamList> }) => {
       return {
         state: () => {
-          setScreenTag(route.name, 'stack')
+          setScreenTag(route.name)
         },
       }
     },
     [],
   )
+  const videosOptions = React.useMemo<NativeStackNavigationOptions>(() => {
+    return {
+      headerTitle: videoListHeaderTitle,
+      headerTitleAlign: 'left',
+      headerRight: videoListHeaderRight,
+      headerShown: true,
+      headerStyle: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.5,
+        shadowRadius: 2,
+        elevation: 3, // 仅在 Android 平台上需要设置
+      } as any,
+    }
+  }, [])
   return (
     <NavigationContainer theme={RouteTheme}>
       <Stack.Navigator
-        initialRouteName="Main"
+        initialRouteName="VideoList"
         screenOptions={React.useMemo(() => {
           return {
             headerTitleStyle: {
@@ -63,12 +84,18 @@ export default function Route() {
         }, [isDark])}
         screenListeners={onRouteChange}>
         <Stack.Screen
+          name="VideoList"
+          component={VideoList}
+          options={videosOptions}
+        />
+        <Stack.Screen name="Follow" component={Follow} />
+        {/* <Stack.Screen
           name="Main"
           component={MainTab}
           options={React.useMemo(() => {
             return { headerShown: false }
           }, [])}
-        />
+        /> */}
         <Stack.Screen
           name="Dynamic"
           component={Dynamic}

@@ -135,11 +135,8 @@ export function reportUnknownAdditional(item: any) {
   )
 }
 
-export function setScreenTag(name: string, type: 'tab' | 'stack') {
-  SentryExpo.Native.setTag(
-    type === 'tab' ? Tags.tab_route_name : Tags.stack_route_name,
-    name,
-  )
+export function setScreenTag(name: string) {
+  SentryExpo.Native.setTag(Tags.stack_route_name, name)
 }
 
 export function setViewingUpMid(mid: string | number | null) {

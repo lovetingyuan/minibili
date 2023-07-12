@@ -1,11 +1,11 @@
-import { Icon, Text, useTheme, Button, Avatar } from '@rneui/themed'
+import { Icon, Text, useTheme, Button, Badge } from '@rneui/themed'
 import { Linking, Pressable, ScrollView, View } from 'react-native'
 import store, { useStore } from '../../store'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 import { NavigationProps, PromiseResult } from '../../types'
-import { Image } from 'expo-image'
+// import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 
 const HeaderTitle = React.memo(() => {
@@ -99,25 +99,33 @@ const HeaderTitle = React.memo(() => {
 })
 
 const HeaderRight = () => {
-  const { $userInfo } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const face = $userInfo?.face
-  if (!face) {
-    return null
-  }
+  const { $upUpdateMap, livingUps } = useStore()
+  const updatedCount = Object.values($upUpdateMap).filter(item => {
+    return item.latestId !== item.currentLatestId
+  }).length
+  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
-    <Avatar
-      size={30}
-      rounded
-      containerStyle={styles.avatar}
-      ImageComponent={Image}
-      source={{ uri: face + '@80w_80h_1c.webp' }}
+    <Pressable
       onPress={() => {
-        navigation.navigate('Dynamic', {
-          user: { ...$userInfo },
-        })
-      }}
-    />
+        navigation.navigate('Follow')
+      }}>
+      <Badge
+        status="success"
+        value={updatedCount}
+        badgeStyle={{
+          height: 17,
+          backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
+          position: 'absolute',
+          left: 30,
+          top: -5,
+        }}
+        textStyle={{
+          fontSize: 11,
+        }}
+      />
+      <Text>关注</Text>
+    </Pressable>
   )
 }
 export const videoListHeaderTitle = () => <HeaderTitle />

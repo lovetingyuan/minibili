@@ -12,13 +12,12 @@ import FollowItem from './FollowItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { useStore } from '../../store'
-import Header from './Header'
+// import Header from './Header'
 import { FollowedUpItem, getFollowedUps } from '../../api/followed-ups'
 import { showToast } from '../../utils'
 import { checkUpdateUps } from '../../api/dynamic-items'
 import { useUserRelation } from '../../api/user-relation'
 import { ApiError } from '../../api/fetcher'
-import Login from './Login'
 import commonStyles from '../../styles'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
@@ -85,10 +84,6 @@ export default React.memo(function Follow({ navigation }: Props) {
     })
   }, [navigation])
 
-  if (!$userInfo) {
-    return <Login />
-  }
-
   const columns = Math.floor(width / 90)
   const followedUpListLen = $followedUps.length
   const rest = followedUpListLen
@@ -145,7 +140,7 @@ export default React.memo(function Follow({ navigation }: Props) {
       )
     }
     if (relation?.following === 0) {
-      return <Text style={styles.emptyText}>暂无关注</Text>
+      return <Text style={styles.emptyText}>暂无关注，请添加</Text>
     }
     return (
       <Text style={styles.emptyText}>
@@ -156,7 +151,7 @@ export default React.memo(function Follow({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Header />
+      {/* <Header /> */}
       <View style={commonStyles.flex1}>
         <FlatList
           data={displayUps}
