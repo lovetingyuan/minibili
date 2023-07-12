@@ -1,7 +1,7 @@
 import { reportApiError } from '../utils/report'
 import store from '../store'
-import getCookie from './get-cookie'
-import { debounce } from 'throttle-debounce'
+// import getCookie from './get-cookie'
+// import { debounce } from 'throttle-debounce'
 
 type Res<D = any> = {
   code: number
@@ -9,20 +9,20 @@ type Res<D = any> = {
   data: D
 }
 
-let updatingCookie = false
-const updateCookie = debounce(1200, () => {
-  if (updatingCookie) {
-    return
-  }
-  updatingCookie = true
-  return getCookie()
-    .then(cookie => {
-      store.$cookie = cookie
-    })
-    .finally(() => {
-      updatingCookie = false
-    })
-})
+// let updatingCookie = false
+// const updateCookie = debounce(1200, () => {
+//   if (updatingCookie) {
+//     return
+//   }
+//   updatingCookie = true
+//   return getCookie()
+//     .then(cookie => {
+//       store.$cookie = cookie
+//     })
+//     .finally(() => {
+//       updatingCookie = false
+//     })
+// })
 
 export class ApiError extends Error {
   response: Res
@@ -45,16 +45,16 @@ export default function request<D extends any>(url: string) {
   return fetch(requestUrl, {
     headers: {
       'cache-control': 'no-cache',
-      'user-agent':
-        Math.random() >= 0.5
-          ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
-          : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
+      'user-agent': 'Mozilla/5.0',
+      // Math.random() >= 0.5
+      //   ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
+      //   : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
       accept: 'application/json, text/plain, */*',
-      cookie: store.$cookie,
+      // cookie: store.$cookie,
     },
     method: 'GET',
     mode: 'cors',
-    credentials: 'include', //: 'omit',
+    credentials: 'include',
   })
     .then(r => r.text())
     .then(resText => {
@@ -73,7 +73,7 @@ export default function request<D extends any>(url: string) {
       if (res.code) {
         if (isDynamic && !store.loadingDynamicError) {
           store.loadingDynamicError = true
-          updateCookie()
+          // updateCookie()
         }
         reportApiError(url, res)
 
@@ -91,17 +91,3 @@ export default function request<D extends any>(url: string) {
       return res.data
     })
 }
-
-// export default function request<D extends any>(url: string) {
-//   const isDynamic = url.startsWith('/x/polymer/web-dynamic/v1/feed/space')
-//   if (isDynamic) {
-//     return _request<D>(url)
-//       .catch(() => {
-//         return _request<D>(url)
-//       })
-//       .catch(() => {
-//         return _request<D>(url)
-//       })
-//   }
-//   return _request<D>(url)
-// }

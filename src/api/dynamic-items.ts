@@ -21,8 +21,7 @@ import {
   MajorTypeEnum,
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
-import { delay, parseUrl } from '../utils'
-// import { TracyId } from '../constants'
+import { parseUrl } from '../utils'
 import { subscribeKey } from 'valtio/utils'
 
 type OmitUndef<T> = {
@@ -472,16 +471,16 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   }
 }
 
-async function requestDynamics(url: string) {
-  for (let i = 0; i < 10; i++) {
-    const data = await request<DynamicListResponse>(url).catch(() => null)
-    if (data) {
-      return data
-    }
-    await delay(60 + i * 10)
-  }
-  return Promise.reject(new Error('failed'))
-}
+// async function requestDynamics(url: string) {
+//   for (let i = 0; i < 10; i++) {
+//     const data = await request<DynamicListResponse>(url).catch(() => null)
+//     if (data) {
+//       return data
+//     }
+//     await delay(60 + i * 10)
+//   }
+//   return Promise.reject(new Error('failed'))
+// }
 
 export function useDynamicItems(mid?: string | number) {
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
@@ -499,11 +498,12 @@ export function useDynamicItems(mid?: string | number) {
         }
         return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480`
       },
-      requestDynamics,
+      request,
+      // requestDynamics,
       {
         revalidateFirstPage: false,
         errorRetryCount: 3,
-        errorRetryInterval: 500,
+        errorRetryInterval: 600,
       },
     )
   const dynamicItems: DynamicListResponse['items'] =
