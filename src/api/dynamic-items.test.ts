@@ -9,7 +9,6 @@ test('dynamic-list', async () => {
   const mids = list.list.map((v: any) => v.owner.mid).concat([14427395])
   const failedList: string[] = []
   const list352: string[] = []
-  let count = 0
   for (const mid of mids) {
     const res = await fetcher<any>(
       `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
@@ -30,8 +29,6 @@ test('dynamic-list', async () => {
         failedList.push('zod-' + mid)
         console.log(mid + ' zod error')
         console.error(result.error)
-      } else {
-        console.log(++count + ' success', mid)
       }
     }
   }
