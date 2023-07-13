@@ -4,70 +4,79 @@ import {
   FlatList,
   StyleSheet,
   useWindowDimensions,
-  Alert,
   ActivityIndicator,
 } from 'react-native'
-import { Text } from '@rneui/themed'
+import { Text, Icon, Dialog, SearchBar } from '@rneui/themed'
 import FollowItem from './FollowItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { useStore } from '../../store'
-// import Header from './Header'
-import { FollowedUpItem, getFollowedUps } from '../../api/followed-ups'
-import { showToast } from '../../utils'
+import { FollowedUpItem } from '../../api/followed-ups'
 import { checkUpdateUps } from '../../api/dynamic-items'
-import { useUserRelation } from '../../api/user-relation'
-import { ApiError } from '../../api/fetcher'
 import commonStyles from '../../styles'
+// import useIsDark from '../../hooks/useIsDark'
+// import { FAB } from '@rneui/themed'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
 export default React.memo(function Follow({ navigation }: Props) {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
-  const { $userInfo, $followedUps, $upUpdateMap, livingUps } = useStore()
+  const { $followedUps, $upUpdateMap, livingUps, checkingUpUpdate } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [total, setTotal] = React.useState(0)
-  const { data: relation } = useUserRelation($userInfo?.mid)
-
+  const [addUpVisible, setAddUpVisible] = React.useState(false)
+  const [searchValue, setSearchValue] = React.useState('')
+  const handleAddUpVisible = () => {
+    setSearchValue('')
+    setAddUpVisible(false)
+  }
   React.useEffect(() => {
-    if (!$userInfo) {
-      return
-    }
-    let checkUpUpdateTimer: number | null = null
-    setIsLoading(true)
-    getFollowedUps($userInfo.mid)
-      .then(
-        t => {
-          setTotal(t)
-          if (t > 250) {
-            Alert.alert('系统限制最多只能加载前250个关注的UP')
-          }
-        },
-        err => {
-          if (err instanceof ApiError) {
-            if (err.response.code === 22115) {
-              showToast(err.response.message)
-            } else {
-              showToast('获取关注列表失败')
-            }
-          }
-        },
-      )
-      .finally(() => {
-        setIsLoading(false)
-        checkUpdateUps(true)
-        checkUpUpdateTimer = window.setInterval(() => {
-          checkUpdateUps(false)
-        }, 10 * 60 * 1000)
-      })
+    checkUpdateUps(true)
+    const checkUpUpdateTimer = window.setInterval(() => {
+      checkUpdateUps(false)
+    }, 10 * 60 * 1000)
     return () => {
       if (typeof checkUpUpdateTimer === 'number') {
         clearInterval(checkUpUpdateTimer)
       }
     }
-  }, [$userInfo])
+  }, [])
+  React.useEffect(() => {
+    const count = $followedUps.length
+    navigation.setOptions({
+      headerTitle: () => {
+        return (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+              我的关注{count ? `(${count})` : ''}
+            </Text>
+            {checkingUpUpdate ? (
+              <ActivityIndicator
+                size={'small'}
+                color={'#F85A54'}
+                style={{ marginLeft: 10 }}
+              />
+            ) : null}
+          </View>
+        )
+      },
+      headerRight: () => {
+        return (
+          <Icon
+            name="add"
+            size={25}
+            onPress={() => {
+              setAddUpVisible(true)
+            }}
+          />
+        )
+      },
+    })
+  }, [navigation, $followedUps, checkingUpUpdate])
 
   const { width } = useWindowDimensions()
 
@@ -129,29 +138,11 @@ export default React.memo(function Follow({ navigation }: Props) {
   ]
 
   const emptyContent = () => {
-    if (isLoading) {
-      return (
-        <View>
-          <Text style={[styles.emptyText, { color: '#fb7299' }]}>
-            哔哩哔哩 (゜-゜)つロ 干杯~-bilibili
-          </Text>
-          <ActivityIndicator color="#00AEEC" animating size={'large'} />
-        </View>
-      )
-    }
-    if (relation?.following === 0) {
-      return <Text style={styles.emptyText}>暂无关注，请添加</Text>
-    }
-    return (
-      <Text style={styles.emptyText}>
-        无法获取关注列表{'\n'}（需要在隐私设置中公开你的关注）
-      </Text>
-    )
+    return <Text style={styles.emptyText}>暂无关注，请添加</Text>
   }
 
   return (
     <View style={styles.container}>
-      {/* <Header /> */}
       <View style={commonStyles.flex1}>
         <FlatList
           data={displayUps}
@@ -168,19 +159,32 @@ export default React.memo(function Follow({ navigation }: Props) {
             paddingTop: 30,
           }}
           ListEmptyComponent={emptyContent()}
-          ListFooterComponent={
-            <Text style={styles.bottomText}>
-              {isLoading
-                ? '加载中...'
-                : $followedUps.length
-                ? total > 250
-                  ? '只能加载前250个(´･_･`)'
-                  : '到底了~'
-                : ''}
-            </Text>
-          }
+          ListFooterComponent={<Text style={styles.bottomText}>到底了~</Text>}
         />
       </View>
+      {/* <FAB
+        visible
+        color="#f25d8e"
+        placement="right"
+        icon={{ name: 'add', color: 'white' }}
+        style={{ bottom: 10 }}
+        size="small"
+      /> */}
+      <Dialog isVisible={addUpVisible} onBackdropPress={handleAddUpVisible}>
+        <Dialog.Title title="搜索Up主" />
+        <SearchBar
+          placeholder="请输入Up主的名字"
+          onChangeText={v => {
+            setSearchValue(v)
+          }}
+          // lightTheme={!isDark}
+          platform="android"
+          value={searchValue}
+        />
+        <Dialog.Actions>
+          <Dialog.Button title="取消" onPress={handleAddUpVisible} />
+        </Dialog.Actions>
+      </Dialog>
     </View>
   )
 })
@@ -201,18 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  listTitle: {
-    fontSize: 16,
-    marginTop: 18,
-    marginBottom: 15,
-  },
-
-  listEmptyText: { textAlign: 'center', marginVertical: 40 },
-  loading: {
-    position: 'absolute',
-    right: 15,
-    top: 10,
-  },
   emptyText: {
     textAlign: 'center',
     marginVertical: 100,

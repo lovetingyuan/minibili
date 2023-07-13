@@ -1,5 +1,11 @@
 import { Icon, Text, useTheme, Button, Badge } from '@rneui/themed'
-import { Linking, Pressable, ScrollView, View } from 'react-native'
+import {
+  Linking,
+  TouchableOpacity,
+  ScrollView,
+  View,
+  Pressable,
+} from 'react-native'
 import store, { useStore } from '../../store'
 import React from 'react'
 import { StyleSheet } from 'react-native'
@@ -106,7 +112,8 @@ const HeaderRight = () => {
   }).length
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
-    <Pressable
+    <TouchableOpacity
+      activeOpacity={0.7}
       onPress={() => {
         navigation.navigate('Follow')
       }}>
@@ -118,14 +125,14 @@ const HeaderRight = () => {
           backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
           position: 'absolute',
           left: 30,
-          top: -5,
+          top: -2,
         }}
         textStyle={{
           fontSize: 11,
         }}
       />
-      <Text>关注</Text>
-    </Pressable>
+      <Text style={{ fontSize: 18, marginRight: 16 }}>关注</Text>
+    </TouchableOpacity>
   )
 }
 export const videoListHeaderTitle = () => <HeaderTitle />

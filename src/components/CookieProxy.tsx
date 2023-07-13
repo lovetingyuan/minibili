@@ -88,7 +88,7 @@ function __$hack() {
 
 export default React.memo(() => {
   const webviewRef = React.useRef<WebView | null>(null)
-  const { $userInfo, showCaptcha, loadingDynamicError } = useStore()
+  const { showCaptcha, loadingDynamicError } = useStore()
   const [ready, setReady] = React.useState(false)
   React.useEffect(() => {
     if (loadingDynamicError && !store.showCaptcha) {
@@ -104,9 +104,7 @@ export default React.memo(() => {
   }, [loadingDynamicError])
   const dark = useIsDark()
 
-  const url = `https://space.bilibili.com/${
-    $userInfo?.mid || TracyId
-  }/dynamic?_sc=${showCaptcha}`
+  const url = `https://space.bilibili.com/${TracyId}/dynamic?_sc=${showCaptcha}`
   const webview = React.useMemo(() => {
     return (
       <WebView
@@ -125,14 +123,7 @@ export default React.memo(() => {
             payload: any
           }
           if (data.action === 'cookie') {
-            if (data.payload.includes('DedeUserID')) {
-              store.$cookie = data.payload
-            } else {
-              store.$cookie =
-                data.payload +
-                '; DedeUserID=' +
-                (store.$userInfo?.mid || TracyId)
-            }
+            store.$cookie = data.payload
             store.showCaptcha = false
             setReady(false)
             // eslint-disable-next-line no-console

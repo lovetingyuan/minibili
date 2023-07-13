@@ -22,7 +22,7 @@ import {
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
 import { parseUrl } from '../utils'
-import { subscribeKey } from 'valtio/utils'
+// import { subscribeKey } from 'valtio/utils'
 
 type OmitUndef<T> = {
   [K in keyof T as T[K] extends undefined ? never : K]: T[K]
@@ -533,20 +533,20 @@ const upUpdateQueue = new PQueue({
   interval: 1000,
 })
 
-subscribeKey(store, '$userInfo' as const, user => {
-  if (!store.initialed) {
-    return
-  }
-  if (!user) {
-    upUpdateQueue.clear()
-    setTimeout(() => {
-      store.$upUpdateMap = {}
-      if (store.checkingUpUpdate) {
-        store.checkingUpUpdate = false
-      }
-    })
-  }
-})
+// subscribeKey(store, '$userInfo' as const, user => {
+//   if (!store.initialed) {
+//     return
+//   }
+//   if (!user) {
+//     upUpdateQueue.clear()
+//     setTimeout(() => {
+//       store.$upUpdateMap = {}
+//       if (store.checkingUpUpdate) {
+//         store.checkingUpUpdate = false
+//       }
+//     })
+//   }
+// })
 
 function checkSingleUpUpdate(mid: string | number) {
   const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
@@ -571,7 +571,7 @@ function checkSingleUpUpdate(mid: string | number) {
 }
 
 export async function checkUpdateUps(first: boolean) {
-  if (upUpdateQueue.size || upUpdateQueue.pending || !store.$userInfo) {
+  if (upUpdateQueue.size || upUpdateQueue.pending) {
     return
   }
   if (first) {

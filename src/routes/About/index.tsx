@@ -4,7 +4,7 @@ import { Divider } from '@rneui/themed'
 import Feedback from './Feedback'
 import Header from './Header'
 import Version from './Version'
-import User from './User'
+// import User from './User'
 import Statement from './Statement'
 import BlackUps from './BlackUps'
 import BlackTags from './BlackTags'
@@ -16,7 +16,7 @@ export default React.memo(function About() {
       <Header />
       <Divider style={{ marginBottom: 18, marginTop: 15 }} />
       <Version />
-      <User />
+      {/* <User /> */}
       <Feedback />
       <Statement />
       <Divider style={{ marginBottom: 18 }} />

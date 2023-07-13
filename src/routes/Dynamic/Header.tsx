@@ -16,7 +16,7 @@ import commonStyles from '../../styles'
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
 export function HeaderLeft(props: { scrollTop: () => void }) {
-  const { livingUps } = useStore()
+  const { livingUps, $followedUps } = useStore()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const { data: userInfo } = useUserInfo(route.params?.user.mid)
@@ -48,6 +48,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           ImageComponent={Image}
           onPress={gotoWebPage}
           onLongPress={() => {
+            const followed = $followedUps.find(up => up.mid == dynamicUser.mid)
             store.overlayButtons = [
               {
                 text: '查看头像',
@@ -57,7 +58,24 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
                   }
                 },
               },
-            ]
+              followed
+                ? null
+                : {
+                    text: '关注',
+                    onPress: () => {
+                      if (!userInfo) {
+                        return
+                      }
+                      store.$followedUps.unshift({
+                        mid: userInfo.mid,
+                        face: userInfo.face,
+                        name: userInfo.name,
+                        sign: userInfo.sign,
+                      })
+                      showToast('关注成功')
+                    },
+                  },
+            ].filter(Boolean)
           }}
           source={{
             uri: dynamicUser?.face + '@120w_120h_1c.webp',

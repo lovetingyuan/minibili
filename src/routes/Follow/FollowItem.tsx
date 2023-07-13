@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
@@ -66,6 +66,22 @@ export default React.memo(
               }
             },
           },
+      {
+        text: '取消关注',
+        onPress: () => {
+          Alert.alert('确定取消关注吗？', '', [
+            {
+              text: '确定',
+              onPress() {
+                store.$followedUps = store.$followedUps.filter(
+                  up => up.mid !== mid,
+                )
+              },
+            },
+            { text: '关闭' },
+          ])
+        },
+      },
     ]
 
     return (
