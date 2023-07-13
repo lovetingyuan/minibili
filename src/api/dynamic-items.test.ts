@@ -30,6 +30,21 @@ test('dynamic-list', async () => {
         console.log(mid + ' zod error')
         console.error(result.error)
       }
+      if (res.has_more) {
+        const res2 = await fetcher<any>(
+          `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=${res.offset}&host_mid=${mid}&timezone_offset=-480`,
+        ).catch(() => null)
+        if (!res2) {
+          list352.push('null2-' + mid)
+        } else {
+          const ret = DynamicListResponseSchema.safeParse(res2)
+          if (ret.success === false) {
+            failedList.push('zod2-' + mid)
+            console.log(mid + ' zod2 error')
+            console.error(ret.error)
+          }
+        }
+      }
     }
   }
   failedList.length && console.log('Failed mid list:', failedList)
@@ -37,4 +52,4 @@ test('dynamic-list', async () => {
   if (failedList.length) {
     throw new Error('dynamic list failed')
   }
-}, 10000)
+}, 15000)
