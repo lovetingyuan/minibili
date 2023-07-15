@@ -1,5 +1,5 @@
 import { test, assert } from 'vitest'
-import getCookie from './get-cookie'
+import { getCookie } from './get-cookie'
 
 test('get-cookie', async () => {
   const res = await getCookie()

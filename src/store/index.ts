@@ -11,12 +11,17 @@ interface UserInfo {
   sign: string
 }
 
+interface UpdateUpInfo {
+  latestId: string
+  currentLatestId: string
+}
+
 const store = proxy<{
   $blackUps: Record<string, string>
   $followedUps: UserInfo[]
   $blackTags: Record<string, string>
   // $userInfo: UserInfo | null
-  $upUpdateMap: Record<string, { latestId: string; currentLatestId: string }>
+  $upUpdateMap: Record<string, UpdateUpInfo>
   $videoCatesList: { rid: number; label: string }[]
   $ignoredVersions: string[]
   $cookie: string
@@ -37,6 +42,7 @@ const store = proxy<{
   checkingUpUpdate: boolean
   overlayButtons: { text: string; onPress: () => void }[]
   showCaptcha: boolean
+  updatedCount: number
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -58,6 +64,15 @@ const store = proxy<{
   currentImageIndex: 0,
   overlayButtons: [],
   showCaptcha: false,
+  get updatedCount() {
+    return Object.values(this.$upUpdateMap).filter(item => {
+      // wtf????
+      return (
+        (item as UpdateUpInfo).latestId !==
+        (item as UpdateUpInfo).currentLatestId
+      )
+    }).length
+  },
 })
 
 const StoragePrefix = 'Store:'

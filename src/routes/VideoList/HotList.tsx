@@ -163,6 +163,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         ref={v => {
           hotListRef.current = v
         }}
+        key={'hot'}
         numColumns={2}
         data={hotVideoList}
         renderItem={renderItem}

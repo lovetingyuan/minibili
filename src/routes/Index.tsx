@@ -76,6 +76,7 @@ export default function Route() {
         initialRouteName="VideoList"
         screenOptions={React.useMemo(() => {
           return {
+            // headerStatusBarHeight: 50,
             headerTitleStyle: {
               fontSize: 18,
               color: isDark ? '#ccc' : '#333',

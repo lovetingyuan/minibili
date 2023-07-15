@@ -1,11 +1,5 @@
 import { Icon, Text, useTheme, Button, Badge } from '@rneui/themed'
-import {
-  Linking,
-  TouchableOpacity,
-  ScrollView,
-  View,
-  Pressable,
-} from 'react-native'
+import { Linking, ScrollView, View, Pressable } from 'react-native'
 import store, { useStore } from '../../store'
 import React from 'react'
 import { StyleSheet } from 'react-native'
@@ -106,17 +100,10 @@ const HeaderTitle = React.memo(() => {
 
 const HeaderRight = () => {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { $upUpdateMap, livingUps } = useStore()
-  const updatedCount = Object.values($upUpdateMap).filter(item => {
-    return item.latestId !== item.currentLatestId
-  }).length
+  const { updatedCount, livingUps } = useStore()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={() => {
-        navigation.navigate('Follow')
-      }}>
+    <View>
       <Badge
         status="success"
         value={updatedCount}
@@ -124,15 +111,22 @@ const HeaderRight = () => {
           height: 17,
           backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
           position: 'absolute',
-          left: 30,
-          top: -2,
+          left: 35,
+          top: 2,
         }}
         textStyle={{
           fontSize: 11,
         }}
       />
-      <Text style={{ fontSize: 18, marginRight: 16 }}>关注</Text>
-    </TouchableOpacity>
+      <Button
+        type="clear"
+        onPress={() => {
+          navigation.navigate('Follow')
+        }}
+        titleStyle={{ fontSize: 18 }}>
+        关注
+      </Button>
+    </View>
   )
 }
 export const videoListHeaderTitle = () => <HeaderTitle />

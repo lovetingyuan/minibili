@@ -136,6 +136,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
         ref={v => {
           videoListRef.current = v
         }}
+        key={currentVideosCate.rid}
         numColumns={2}
         data={videoList}
         renderItem={renderItem}

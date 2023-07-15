@@ -12,6 +12,10 @@ export default function ErrorFallback(props: { message?: string }) {
   useMounted(() => {
     showFatalError()
   })
+  if (__DEV__ && props.message) {
+    // eslint-disable-next-line no-console
+    console.error(props.message)
+  }
   const dark = useIsDark()
   return (
     <View style={[dark ? { backgroundColor: '#333' } : {}, styles.container]}>

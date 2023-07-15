@@ -70,15 +70,15 @@ export default React.memo(
         text: '取消关注',
         onPress: () => {
           Alert.alert('确定取消关注吗？', '', [
+            { text: '关闭' },
             {
               text: '确定',
               onPress() {
                 store.$followedUps = store.$followedUps.filter(
-                  up => up.mid !== mid,
+                  up => up.mid != mid,
                 )
               },
             },
-            { text: '关闭' },
           ])
         },
       },

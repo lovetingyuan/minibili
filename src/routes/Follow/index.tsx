@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native'
-import { Text, Icon, Dialog, SearchBar } from '@rneui/themed'
+import { Text, Icon } from '@rneui/themed'
 import FollowItem from './FollowItem'
 import { RootStackParamList } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
@@ -14,31 +14,47 @@ import { useStore } from '../../store'
 import { FollowedUpItem } from '../../api/followed-ups'
 import { checkUpdateUps } from '../../api/dynamic-items'
 import commonStyles from '../../styles'
-// import useIsDark from '../../hooks/useIsDark'
-// import { FAB } from '@rneui/themed'
+import AddFollow from './AddFollow'
+import { FAB } from '@rneui/themed'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
+
+const renderItem = ({
+  item,
+}: // index,
+{
+  item: FollowedUpItem | null
+  index: number
+}) => {
+  if (item) {
+    return <FollowItem item={item} />
+  }
+  return <View style={commonStyles.flex1} />
+}
+
+let firstRender = true
 
 export default React.memo(function Follow({ navigation }: Props) {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
-  const { $followedUps, $upUpdateMap, livingUps, checkingUpUpdate } = useStore()
+  const {
+    $followedUps,
+    $upUpdateMap,
+    livingUps,
+    checkingUpUpdate,
+    updatedCount,
+  } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
-  const [addUpVisible, setAddUpVisible] = React.useState(false)
-  const [searchValue, setSearchValue] = React.useState('')
-  const handleAddUpVisible = () => {
-    setSearchValue('')
-    setAddUpVisible(false)
-  }
+  const [showAddUp, setShowAddUp] = React.useState(0)
+
   React.useEffect(() => {
-    checkUpdateUps(true)
-    const checkUpUpdateTimer = window.setInterval(() => {
-      checkUpdateUps(false)
-    }, 10 * 60 * 1000)
-    return () => {
-      if (typeof checkUpUpdateTimer === 'number') {
-        clearInterval(checkUpUpdateTimer)
-      }
+    if (firstRender) {
+      // console.log('updateing')
+      checkUpdateUps(true)
+      firstRender = false
+      window.setInterval(() => {
+        checkUpdateUps(false)
+      }, 10 * 60 * 1000)
     }
   }, [])
   React.useEffect(() => {
@@ -52,7 +68,12 @@ export default React.memo(function Follow({ navigation }: Props) {
               alignItems: 'center',
             }}>
             <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-              我的关注{count ? `(${count})` : ''}
+              我的关注
+              {count
+                ? updatedCount
+                  ? `(${updatedCount}/${count})`
+                  : `(${count})`
+                : ''}
             </Text>
             {checkingUpUpdate ? (
               <ActivityIndicator
@@ -67,16 +88,20 @@ export default React.memo(function Follow({ navigation }: Props) {
       headerRight: () => {
         return (
           <Icon
-            name="add"
-            size={25}
+            name="snow"
+            type="ionicon"
+            size={20}
+            color="#00AEEC"
+            style={{ padding: 8 }}
             onPress={() => {
-              setAddUpVisible(true)
+              navigation.navigate('About')
+              // setShowAddUp(s => s + 1)
             }}
           />
         )
       },
     })
-  }, [navigation, $followedUps, checkingUpUpdate])
+  }, [navigation, $followedUps, checkingUpUpdate, updatedCount])
 
   const { width } = useWindowDimensions()
 
@@ -98,19 +123,6 @@ export default React.memo(function Follow({ navigation }: Props) {
   const rest = followedUpListLen
     ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
     : 0
-
-  const renderItem = ({
-    item,
-  }: // index,
-  {
-    item: FollowedUpItem | null
-    index: number
-  }) => {
-    if (item) {
-      return <FollowItem item={item} />
-    }
-    return <View style={commonStyles.flex1} />
-  }
 
   let displayUps: (FollowedUpItem | null)[] = []
   const topUps: FollowedUpItem[] = []
@@ -162,29 +174,18 @@ export default React.memo(function Follow({ navigation }: Props) {
           ListFooterComponent={<Text style={styles.bottomText}>到底了~</Text>}
         />
       </View>
-      {/* <FAB
+      <FAB
         visible
         color="#f25d8e"
         placement="right"
         icon={{ name: 'add', color: 'white' }}
-        style={{ bottom: 10 }}
+        style={{ bottom: 10, opacity: 0.8 }}
         size="small"
-      /> */}
-      <Dialog isVisible={addUpVisible} onBackdropPress={handleAddUpVisible}>
-        <Dialog.Title title="搜索Up主" />
-        <SearchBar
-          placeholder="请输入Up主的名字"
-          onChangeText={v => {
-            setSearchValue(v)
-          }}
-          // lightTheme={!isDark}
-          platform="android"
-          value={searchValue}
-        />
-        <Dialog.Actions>
-          <Dialog.Button title="取消" onPress={handleAddUpVisible} />
-        </Dialog.Actions>
-      </Dialog>
+        onPress={() => {
+          setShowAddUp(s => s + 1)
+        }}
+      />
+      <AddFollow show={showAddUp} />
     </View>
   )
 })

@@ -1,28 +1,12 @@
 import { reportApiError } from '../utils/report'
 import store from '../store'
-// import getCookie from './get-cookie'
-// import { debounce } from 'throttle-debounce'
+import { getCookie } from './get-cookie'
 
 type Res<D = any> = {
   code: number
   message: string
   data: D
 }
-
-// let updatingCookie = false
-// const updateCookie = debounce(1200, () => {
-//   if (updatingCookie) {
-//     return
-//   }
-//   updatingCookie = true
-//   return getCookie()
-//     .then(cookie => {
-//       store.$cookie = cookie
-//     })
-//     .finally(() => {
-//       updatingCookie = false
-//     })
-// })
 
 export class ApiError extends Error {
   response: Res
@@ -33,6 +17,13 @@ export class ApiError extends Error {
     this.response = res
     this.url = url
   }
+}
+let cookie = ''
+
+if (!cookie) {
+  getCookie().then(c => {
+    cookie = c
+  })
 }
 
 export default function request<D extends any>(url: string) {
@@ -50,6 +41,7 @@ export default function request<D extends any>(url: string) {
       //   ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
       //   : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
       accept: 'application/json, text/plain, */*',
+      cookie,
       // cookie: store.$cookie,
     },
     method: 'GET',

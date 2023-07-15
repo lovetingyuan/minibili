@@ -1,7 +1,9 @@
 // import { UA } from '../constants'
 // import getCookie from './get-cookie'
 
-// let cookie = ''
+import { getCookie } from './get-cookie'
+
+let cookie = ''
 
 export default async function request<D extends any>(url: string) {
   const requestUrl = url.startsWith('http')
@@ -16,13 +18,16 @@ export default async function request<D extends any>(url: string) {
   //   cookie = await getCookie()
   // }
   // console.log(1234, cookie)
+  if (!cookie) {
+    cookie = await getCookie()
+  }
   return fetch(requestUrl + '&_t=' + Date.now(), {
     headers: {
       accept: 'application/json, text/plain, */*',
       'accept-language': 'zh-CN,zh;q=0.9',
       'cache-control': 'no-cache',
       pragma: 'no-cache',
-      // cookie,
+      cookie,
       'user-agent': 'Mozilla/5.0',
     },
     // referrer: 'https://space.bilibili.com',
