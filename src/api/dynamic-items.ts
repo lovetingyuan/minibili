@@ -1,6 +1,4 @@
 import request from './fetcher'
-// import useSWR from 'swr'
-// import React from 'react'
 import store from '../store'
 import PQueue from 'p-queue'
 import {
@@ -22,7 +20,6 @@ import {
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
 import { parseUrl } from '../utils'
-// import { subscribeKey } from 'valtio/utils'
 
 type OmitUndef<T> = {
   [K in keyof T as T[K] extends undefined ? never : K]: T[K]
@@ -33,7 +30,6 @@ type RemoveUndef<T> = T extends { type: string }
     }
   : never
 export type DynamicItemAllType = RemoveUndef<ReturnType<typeof getDynamicItem>>
-// export type DynamicType = keyof typeof DynamicTypes
 export type DynamicItemType<T extends keyof typeof DynamicTypes> = Extract<
   DynamicItemAllType,
   { type: T }
@@ -471,17 +467,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
   }
 }
 
-// async function requestDynamics(url: string) {
-//   for (let i = 0; i < 10; i++) {
-//     const data = await request<DynamicListResponse>(url).catch(() => null)
-//     if (data) {
-//       return data
-//     }
-//     await delay(60 + i * 10)
-//   }
-//   return Promise.reject(new Error('failed'))
-// }
-
 export function useDynamicItems(mid?: string | number) {
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<DynamicListResponse>(
@@ -499,7 +484,6 @@ export function useDynamicItems(mid?: string | number) {
         return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480`
       },
       request,
-      // requestDynamics,
       {
         revalidateFirstPage: false,
         errorRetryCount: 3,
@@ -533,21 +517,6 @@ const upUpdateQueue = new PQueue({
   interval: 1000,
 })
 
-// subscribeKey(store, '$userInfo' as const, user => {
-//   if (!store.initialed) {
-//     return
-//   }
-//   if (!user) {
-//     upUpdateQueue.clear()
-//     setTimeout(() => {
-//       store.$upUpdateMap = {}
-//       if (store.checkingUpUpdate) {
-//         store.checkingUpUpdate = false
-//       }
-//     })
-//   }
-// })
-
 function checkSingleUpUpdate(mid: string | number) {
   const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
   return request<DynamicListResponse>(url)
@@ -571,11 +540,11 @@ function checkSingleUpUpdate(mid: string | number) {
 }
 
 export async function checkUpdateUps(first: boolean) {
-  if (upUpdateQueue.size || upUpdateQueue.pending) {
-    return
-  }
   if (first) {
     store.checkingUpUpdate = true
+  }
+  if (upUpdateQueue.size || upUpdateQueue.pending) {
+    return
   }
   const upUpdateMap: typeof store.$upUpdateMap = {}
   for (const up of store.$followedUps) {
@@ -611,24 +580,6 @@ export async function checkUpdateUps(first: boolean) {
     if (store.checkingUpUpdate) {
       store.checkingUpUpdate = false
     }
-    // 首次检查时如果用户手动标记为未读，可能upUpdateMap已经处理也可能没处理
-    // for (const id in store.$upUpdateMap) {
-    //   if (store.$upUpdateMap[id].currentLatestId === '-') {
-    //     upUpdateMap[id] = {
-    //       latestId: Math.random().toString(),
-    //       currentLatestId: upUpdateMap[id]
-    //         ? upUpdateMap[id].currentLatestId
-    //         : Math.random().toString(),
-    //     }
-    //   }
-    // }
     store.$upUpdateMap = upUpdateMap
   })
 }
-
-// export function checkDynamicsApi() {
-//   const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${TracyId}&timezone_offset=-480`
-//   return request<DynamicListResponse>(url)
-//     .catch(() => delay(1500))
-//     .then(() => request<DynamicListResponse>(url))
-// }

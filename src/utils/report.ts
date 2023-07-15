@@ -58,45 +58,12 @@ export function reportUserAction(action: Action, actionPayload: any = null) {
   })
 }
 
-export function reportUserLogout() {
-  SentryExpo.Native.captureMessage('User Logout', {})
-  clearUser()
-}
-
-export function reportUserLogin(mid: string | number, name: string) {
-  setUser(mid, name)
-  SentryExpo.Native.captureMessage('User login')
-  // getLocation().then(loc => {
-  //   const locationStr = [loc.country, loc.province, loc.city].join('/')
-  //   SentryExpo.Native.setTag(Tags.user_location, locationStr)
-  //   SentryExpo.Native.setContext('location', loc)
-  // })
-}
-
-export function reportUserOpenApp(mid?: string | number, name?: string) {
-  if (mid && name) {
-    setUser(mid, name)
-  }
-  SentryExpo.Native.captureMessage('Open app')
+export function reportUserOpenApp() {
   getLocation().then(loc => {
     const locationStr = [loc.country, loc.province, loc.city].join('/')
     SentryExpo.Native.setTag(Tags.user_location, locationStr)
     SentryExpo.Native.setContext('location', loc)
-  })
-}
-
-export function setUser(mid: string | number, name: string) {
-  SentryExpo.Native.setUser({ id: mid + '', username: name })
-  SentryExpo.Native.setTag(Tags.user_url, `https://space.bilibili.com/${mid}`)
-  SentryExpo.Native.setTag(Tags.user_name, name)
-}
-
-export function clearUser() {
-  SentryExpo.Native.setUser(null)
-  SentryExpo.Native.setTags({
-    [Tags.user_url]: null,
-    [Tags.user_name]: null,
-    [Tags.user_location]: null,
+    SentryExpo.Native.captureMessage('Open app')
   })
 }
 

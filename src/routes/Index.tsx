@@ -13,7 +13,6 @@ import Play from './Play'
 import About from './About'
 import WebPage from './WebPage'
 import { RootStackParamList } from '../types'
-// import MainTab from './MainTab'
 import Dynamic from './Dynamic'
 import DynamicDetail from './DynamicDetail'
 import aboutHeaderRight from './About/headerRight'
@@ -90,13 +89,6 @@ export default function Route() {
           options={videosOptions}
         />
         <Stack.Screen name="Follow" component={Follow} />
-        {/* <Stack.Screen
-          name="Main"
-          component={MainTab}
-          options={React.useMemo(() => {
-            return { headerShown: false }
-          }, [])}
-        /> */}
         <Stack.Screen
           name="Dynamic"
           component={Dynamic}

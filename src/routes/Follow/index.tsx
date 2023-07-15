@@ -95,7 +95,6 @@ export default React.memo(function Follow({ navigation }: Props) {
             style={{ padding: 8 }}
             onPress={() => {
               navigation.navigate('About')
-              // setShowAddUp(s => s + 1)
             }}
           />
         )
@@ -171,7 +170,11 @@ export default React.memo(function Follow({ navigation }: Props) {
             paddingTop: 30,
           }}
           ListEmptyComponent={emptyContent()}
-          ListFooterComponent={<Text style={styles.bottomText}>到底了~</Text>}
+          ListFooterComponent={
+            $followedUps.length ? (
+              <Text style={styles.bottomText}>到底了~</Text>
+            ) : null
+          }
         />
       </View>
       <FAB

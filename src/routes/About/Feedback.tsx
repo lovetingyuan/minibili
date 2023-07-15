@@ -3,11 +3,9 @@ import { View, Share, StyleSheet } from 'react-native'
 import { Button, Dialog, Input, Text, useTheme } from '@rneui/themed'
 import { reportUserFeedback } from '../../utils/report'
 import { showToast } from '../../utils'
-// import { useStore } from '../../store'
 import { site } from '../../constants'
 
 export default React.memo(function Feedback() {
-  // const { $userInfo } = useStore()
   const [feedBackVisible, setFeedbackVisible] = React.useState(false)
   const hideFeedback = () => {
     setFeedbackVisible(false)

@@ -1,5 +1,4 @@
 import { reportApiError } from '../utils/report'
-import store from '../store'
 import { getCookie } from './get-cookie'
 
 type Res<D = any> = {
@@ -32,17 +31,12 @@ export default function request<D extends any>(url: string) {
     : 'https://api.bilibili.com' + url
 
   // __DEV__ && console.log('request url: ', url.slice(0, 150))
-  const isDynamic = url.startsWith('/x/polymer/web-dynamic/v1/feed/space')
   return fetch(requestUrl, {
     headers: {
       'cache-control': 'no-cache',
       'user-agent': 'Mozilla/5.0',
-      // Math.random() >= 0.5
-      //   ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
-      //   : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0',
       accept: 'application/json, text/plain, */*',
       cookie,
-      // cookie: store.$cookie,
     },
     method: 'GET',
     mode: 'cors',
@@ -63,10 +57,6 @@ export default function request<D extends any>(url: string) {
         res = JSON.parse(resText) as Res<D>
       } catch (err) {}
       if (res.code) {
-        if (isDynamic && !store.loadingDynamicError) {
-          store.loadingDynamicError = true
-          // updateCookie()
-        }
         reportApiError(url, res)
 
         return Promise.reject(
@@ -76,9 +66,6 @@ export default function request<D extends any>(url: string) {
             res,
           ),
         )
-      }
-      if (isDynamic && store.loadingDynamicError) {
-        store.loadingDynamicError = false
       }
       return res.data
     })

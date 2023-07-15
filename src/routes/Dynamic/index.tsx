@@ -1,7 +1,6 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { RootStackParamList } from '../../types'
-
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, headerRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'

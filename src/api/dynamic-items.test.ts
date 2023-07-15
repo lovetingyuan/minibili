@@ -13,14 +13,6 @@ test('dynamic-list', async () => {
     const res = await fetcher<any>(
       `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
     ).catch(() => null)
-    // for (let i = 0; i < 10; i++) {
-    //   res = await fetcher<any>(
-    //     `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
-    //   ).catch(() => null)
-    //   if (res) {
-    //     break
-    //   }
-    // }
     if (!res) {
       list352.push('null-' + mid)
     } else {

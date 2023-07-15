@@ -189,7 +189,7 @@ export default React.memo(function Comment(props: Props) {
             return (
               <Text key={reply.id + '#'} style={styles.replyItem}>
                 <Text
-                  style={[styles.replyName, upStyle(reply.name)]}
+                  style={upStyle(reply.name)}
                   onPress={() => {
                     navigation.push('Dynamic', {
                       user: {
@@ -199,7 +199,6 @@ export default React.memo(function Comment(props: Props) {
                         sign: reply.sign || '-',
                       },
                     })
-                    // Linking.openURL('https://m.bilibili.com/space/' + reply.mid)
                   }}>
                   {reply.name}
                 </Text>
@@ -267,7 +266,6 @@ const styles = StyleSheet.create({
   top: {
     color: '#00699D',
     fontWeight: 'bold',
-    // textDecorationLine: 'underline',
   },
   upLike: {
     color: '#4f7d00',
@@ -283,15 +281,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   replyItem: {
-    // marginBottom: 5,
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
     lineHeight: 20,
     fontSize: 15,
-  },
-  replyName: {
-    // fontWeight: 'bold',
   },
   likeNum: {
     fontSize: 12,

@@ -5,7 +5,6 @@ import React from 'react'
 import { StyleSheet } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 import { NavigationProps, PromiseResult } from '../../types'
-// import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 
 const HeaderTitle = React.memo(() => {
@@ -104,20 +103,22 @@ const HeaderRight = () => {
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
     <View>
-      <Badge
-        status="success"
-        value={updatedCount}
-        badgeStyle={{
-          height: 17,
-          backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
-          position: 'absolute',
-          left: 35,
-          top: 2,
-        }}
-        textStyle={{
-          fontSize: 11,
-        }}
-      />
+      {updatedCount ? (
+        <Badge
+          status="success"
+          value={updatedCount}
+          badgeStyle={{
+            height: 17,
+            backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
+            position: 'absolute',
+            left: 35,
+            top: 2,
+          }}
+          textStyle={{
+            fontSize: 11,
+          }}
+        />
+      ) : null}
       <Button
         type="clear"
         onPress={() => {

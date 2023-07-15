@@ -212,23 +212,9 @@ export default React.memo(
         )
       }
     }
-    // reactNodes.push(
-    //   <View
-    //     key={reactNodes.length}
-    //     style={{
-    //       height: 10,
-    //       backgroundColor: 'pink',
-    //       paddingVertical: 10,
-    //       marginVertical: 10,
-    //       width: 100,
-    //     }}>
-    //     <Text>{'\n '}</Text>
-    //   </View>,
-    // )
     const textOverflow =
       typeof props.textProps?.numberOfLines === 'number' &&
       lines - 1 > props.textProps.numberOfLines
-    // console.log(props.textProps)
     return (
       <View style={[{ marginBottom: textOverflow ? 14 : 10 }, props.style]}>
         {Topic}

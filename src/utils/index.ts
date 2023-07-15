@@ -61,17 +61,6 @@ export const parseDuration = (seconds?: number | string) => {
   )
 }
 
-// export const openBiliVideo = async (bvid: string) => {
-//   const url = `bilibili://video/${bvid}`
-//   Linking.canOpenURL(url).then(openable => {
-//     if (!openable) {
-//       Linking.openURL(`https://b23.tv/${bvid}`)
-//     } else {
-//       Linking.openURL(url)
-//     }
-//   })
-// }
-
 export async function handleShareVideo(
   name: string,
   title: string,

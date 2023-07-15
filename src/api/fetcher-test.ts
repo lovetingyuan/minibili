@@ -1,6 +1,3 @@
-// import { UA } from '../constants'
-// import getCookie from './get-cookie'
-
 import { getCookie } from './get-cookie'
 
 let cookie = ''
@@ -9,15 +6,6 @@ export default async function request<D extends any>(url: string) {
   const requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
-  // const { searchParams } = new URL(requestUrl)
-  // const isDynamic = url.includes('/x/polymer/web-dynamic/v1/feed/space')
-  // if (isDynamic) {
-  //   mid = searchParams.get('host_mid') || mid
-  // }
-  // if (!cookie && isDynamic) {
-  //   cookie = await getCookie()
-  // }
-  // console.log(1234, cookie)
   if (!cookie) {
     cookie = await getCookie()
   }
@@ -49,15 +37,6 @@ export default async function request<D extends any>(url: string) {
         message: string
         data: D
       }
-      // if (isDynamic && res.code === -352) {
-      //   return {
-      //     has_more: true,
-      //     offset: '-352',
-      //     items: [],
-      //     update_baseline: '',
-      //     update_num: 0,
-      //   }
-      // }
       return res.data
     })
 }

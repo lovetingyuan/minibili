@@ -215,36 +215,12 @@ const getReplies = (res1: ReplyResponse, res2?: ReplyResponse) => {
 
 export type ReplyItem = ReturnType<typeof getReplies>[0]
 
-// const fetcher = (url: string) => {
-//   return Promise.all([
-//     request<ReplyResponse>(url),
-//     request<ReplyResponse>(url.replace('next=1', 'next=2')),
-//   ]).then(([res1, res2]) => {
-//     return {
-//       allCount: res1?.cursor.all_count,
-//       res1,
-//       res2,
-//     }
-//   })
-// }
-
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
-  const {
-    data,
-    error,
-    // isValidating,
-    isLoading,
-  } = useSWR<ReplyResponse>(() => {
+  const { data, error, isLoading } = useSWR<ReplyResponse>(() => {
     return `/x/v2/reply/main?type=${type}&oid=${oid}&ps=30`
   }, request)
-  // const {
-  //   data: res2,
-  //   error: error2,
-  //   isLoading: isLoading2,
-  // } = useSWR<ReplyResponse>(() => {
-  //   return `/x/v2/reply/main?type=${type}&next=2&oid=${oid}`
-  // })
+
   const replies: ReplyItem[] = React.useMemo(() => {
     if (!data) {
       return []

@@ -1,6 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { DynamicItemAllType } from './api/dynamic-items'
-// import { HandledDynamicTypeEnum } from './api/dynamic-items.type'
 
 export type PromiseResult<T extends Promise<any>> = T extends Promise<infer R>
   ? R
@@ -20,7 +19,6 @@ export type VideoInfo = {
 
 export type RootStackParamList = {
   Home: undefined
-  Main: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
   Play: {
     bvid: string
@@ -43,7 +41,6 @@ export type RootStackParamList = {
   }
   Follow: undefined
   About: undefined
-  // Login: undefined
 }
 
 // export type GetFuncPromiseType<F extends (...a: any) => any> =

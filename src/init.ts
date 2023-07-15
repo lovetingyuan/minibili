@@ -6,9 +6,10 @@ import store from './store'
 import { showFatalError, showToast } from './utils'
 import { getRemoteConfig } from './api/get-config'
 import Constants from 'expo-constants'
-import { Tags } from './utils/report'
+import { Tags, reportUserOpenApp } from './utils/report'
 
 async function init() {
+  reportUserOpenApp()
   const gitHash = Constants.expoConfig?.extra?.gitHash
   if (gitHash) {
     SentryExpo.Native.setTag(Tags.git_hash, gitHash)
@@ -30,7 +31,8 @@ async function init() {
           '使用说明',
           [
             '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
-            '如果遇到闪退情况，请及时更新版本',
+            '\n',
+            '如果遇到闪退或报错情况，请及时更新版本',
           ].join('\n'),
           [
             {
