@@ -105,11 +105,8 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
       />
       <ActivityIndicator
         size={'large'}
-        color={'#F85A54'}
-        style={{
-          position: 'absolute',
-          top: '45%',
-        }}
+        color={'#ff746f'}
+        style={styles.videoLoading}
       />
     </View>
   )
@@ -238,5 +235,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     left: 0,
     borderRadius: 4,
+  },
+  videoLoading: {
+    position: 'absolute',
+    top: '45%',
+    transform: [{ scale: 1.5 }],
   },
 })

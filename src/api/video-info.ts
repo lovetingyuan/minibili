@@ -43,13 +43,12 @@ const getVideoItem = (data: VideoInfoResponse) => {
 
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
 export function useVideoInfo(bvid?: string) {
-  const { data, error, isValidating, isLoading } = useSWR<VideoInfoResponse>(
+  const { data, error, isLoading } = useSWR<VideoInfoResponse>(
     bvid ? '/x/web-interface/view?bvid=' + bvid : null,
   )
   return {
     data: data ? getVideoItem(data) : null,
     error,
-    isValidating,
     isLoading,
   }
 }

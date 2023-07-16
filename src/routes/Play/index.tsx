@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, ScrollView, Pressable } from 'react-native'
-import { Icon, Text, useTheme } from '@rneui/themed'
+import { Text, useTheme } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
 
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?&bvid=BV1aX4y1B7n7&cid=1103612055&wmode=transparent&as_wide=1&crossDomain=1&lite=0&danmaku=0
@@ -39,26 +39,26 @@ const PlayPage = ({ route, navigation }: Props) => {
 
   React.useEffect(() => {
     if (videoInfo.name) {
-      const headerRight = () => (
-        <Icon
-          name="open-in-new"
-          color="#F85A54"
-          style={{ padding: 5 }}
-          size={20}
-          onPress={() => {
-            navigation.navigate('WebPage', {
-              url: `https://b23.tv/${bvid}`,
-              title: videoInfo.name,
-            })
-          }}
-        />
-      )
+      //   const headerRight = () => (
+      //     <Icon
+      //       name="open-in-new"
+      //       color="#F85A54"
+      //       style={{ padding: 5 }}
+      //       size={20}
+      //       onPress={() => {
+      //         navigation.navigate('WebPage', {
+      //           url: `https://b23.tv/${bvid}`,
+      //           title: videoInfo.name,
+      //         })
+      //       }}
+      //     />
+      //   )
       navigation.setOptions({
         headerTitle: videoInfo.name,
-        headerRight,
+        // headerRight,
       })
     }
-  }, [navigation, videoInfo.name, bvid])
+  }, [navigation, videoInfo.name])
   useFocusEffect(
     useMemoizedFn(() => {
       setViewingVideoId(bvid)

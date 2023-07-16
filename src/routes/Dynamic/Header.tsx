@@ -12,11 +12,12 @@ import { useUserInfo } from '../../api/user-info'
 import { useLivingInfo } from '../../api/living-info'
 import * as Clipboard from 'expo-clipboard'
 import commonStyles from '../../styles'
+import { Menu, MenuItem } from 'react-native-material-menu'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
 export function HeaderLeft(props: { scrollTop: () => void }) {
-  const { livingUps, $followedUps } = useStore()
+  const { livingUps } = useStore()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const { data: userInfo } = useUserInfo(route.params?.user.mid)
@@ -47,36 +48,6 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           rounded
           ImageComponent={Image}
           onPress={gotoWebPage}
-          onLongPress={() => {
-            const followed = $followedUps.find(up => up.mid == dynamicUser.mid)
-            store.overlayButtons = [
-              {
-                text: '查看头像',
-                onPress: () => {
-                  if (dynamicUser?.face) {
-                    Linking.openURL(dynamicUser.face)
-                  }
-                },
-              },
-              followed
-                ? null
-                : {
-                    text: '关注',
-                    onPress: () => {
-                      if (!userInfo) {
-                        return
-                      }
-                      store.$followedUps.unshift({
-                        mid: userInfo.mid,
-                        face: userInfo.face,
-                        name: userInfo.name,
-                        sign: userInfo.sign,
-                      })
-                      showToast('关注成功')
-                    },
-                  },
-            ].filter(Boolean)
-          }}
           source={{
             uri: dynamicUser?.face + '@120w_120h_1c.webp',
           }}
@@ -84,14 +55,6 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
       ) : null}
       <Pressable
         style={styles.titleContainer}
-        key={fans?.follower || '-'}
-        onLongPress={() => {
-          Clipboard.setStringAsync(
-            dynamicUser.name + ' ' + dynamicUser.mid,
-          ).then(() => {
-            showToast('已复制用户名和ID')
-          })
-        }}
         onPress={() => {
           props.scrollTop()
         }}>
@@ -142,22 +105,109 @@ function HeaderRight() {
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const dynamicUser = route.params?.user
+  const [visible, setVisible] = React.useState(false)
+  const hideMenu = () => setVisible(false)
+  const showMenu = () => setVisible(true)
+  const { $followedUps } = useStore()
+  const followed = $followedUps.find(v => v.mid == dynamicUser?.mid)
+
   return (
-    <Pressable
-      style={styles.right}
-      onPress={() => {
-        if (dynamicUser) {
-          const { name, mid, sign } = dynamicUser
-          handleShareUp(name, mid, sign)
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <Menu
+        visible={visible}
+        style={{ backgroundColor: theme.colors.background }}
+        anchor={
+          <Icon
+            name="dots-vertical"
+            type="material-community"
+            onPress={showMenu}
+          />
         }
-      }}>
-      <Icon
-        type="fontisto"
-        name="share-a"
-        size={13}
-        color={theme.colors.grey1}
-      />
-    </Pressable>
+        onRequestClose={hideMenu}>
+        {!followed && (
+          <MenuItem
+            textStyle={{ color: theme.colors.black }}
+            pressColor={theme.colors.grey4}
+            onPress={() => {
+              if (dynamicUser) {
+                store.$followedUps.unshift({
+                  name: dynamicUser.name,
+                  mid: dynamicUser.mid,
+                  face: dynamicUser.face,
+                  sign: dynamicUser.sign,
+                })
+                showToast('已关注')
+              }
+              hideMenu()
+            }}>
+            关注Up
+          </MenuItem>
+        )}
+        <MenuItem
+          textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
+          onPress={() => {
+            if (dynamicUser) {
+              const { name, mid, sign } = dynamicUser
+              handleShareUp(name, mid, sign)
+            }
+            hideMenu()
+          }}>
+          分享Up
+        </MenuItem>
+        <MenuItem
+          textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
+          onPress={() => {
+            if (dynamicUser?.face) {
+              Linking.openURL(dynamicUser.face)
+            }
+            hideMenu()
+          }}>
+          查看头像
+        </MenuItem>
+        <MenuItem
+          textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
+          onPress={() => {
+            if (!dynamicUser) {
+              return
+            }
+            Clipboard.setStringAsync(dynamicUser.name).then(() => {
+              showToast('已复制用户名')
+              hideMenu()
+            })
+          }}>
+          复制用户名
+        </MenuItem>
+        <MenuItem
+          textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
+          onPress={() => {
+            if (!dynamicUser) {
+              return
+            }
+            Clipboard.setStringAsync(dynamicUser.mid + '').then(() => {
+              showToast('已复制用户ID')
+              hideMenu()
+            })
+          }}>
+          复制用户ID
+        </MenuItem>
+        <MenuItem
+          textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
+          onPress={() => {
+            if (!dynamicUser) {
+              return
+            }
+            Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`)
+            hideMenu()
+          }}>
+          浏览器打开
+        </MenuItem>
+      </Menu>
+    </View>
   )
 }
 
@@ -172,7 +222,6 @@ const styles = StyleSheet.create({
   titleContainer: { flexShrink: 1, marginLeft: 12 },
   titleText: {
     fontSize: 18,
-    // marginRight: 10,
   },
   fansText: { fontSize: 14 },
   right: {

@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 import { RanksConfig } from '../constants'
 import { checkUpdate } from '../api/check-update'
+import type { VideoItem } from '../api/hot-videos'
 
 interface UserInfo {
   mid: number | string
@@ -23,6 +24,7 @@ const store = proxy<{
   $videoCatesList: { rid: number; label: string }[]
   $ignoredVersions: string[]
   $cookie: string
+  $cachedHotVideos: VideoItem[]
   // ----------------------------
   initialed: boolean
   webViewMode: 'PC' | 'MOBILE'
@@ -40,6 +42,7 @@ const store = proxy<{
   overlayButtons: { text: string; onPress: () => void }[]
   showCaptcha: boolean
   updatedCount: number
+  moreRepliesUrl: string
 }>({
   $blackUps: {},
   $followedUps: [],
@@ -48,6 +51,7 @@ const store = proxy<{
   $ignoredVersions: [],
   $videoCatesList: RanksConfig,
   $cookie: '',
+  $cachedHotVideos: [],
   // -------------------------
   initialed: false,
   webViewMode: 'MOBILE',
@@ -68,6 +72,7 @@ const store = proxy<{
       )
     }).length
   },
+  moreRepliesUrl: '',
 })
 
 const StoragePrefix = 'Store:'

@@ -152,7 +152,7 @@ export function showToast(message: string, long = false) {
 let showedFatalError = false
 
 export function showFatalError() {
-  if (showedFatalError) {
+  if (showedFatalError || __DEV__) {
     return
   }
   store.appUpdateInfo.then(info => {

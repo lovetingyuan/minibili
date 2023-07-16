@@ -2,6 +2,7 @@ import useSWRInfinite from 'swr/infinite'
 import { z } from 'zod'
 import fetcher from './fetcher'
 import { VideoItemResponseSchema } from './hot-videos.schema'
+// import store from '../store'
 
 const fetcher2 = (url: string) => {
   // eslint-disable-next-line no-console
@@ -52,7 +53,6 @@ export function useHotVideos() {
         // 所以此处不再验证首页，而实直接按顺序请求下一页
       },
     )
-
   const hotVideos =
     data?.reduce((a, b) => {
       return a.concat(b.list)
@@ -62,9 +62,13 @@ export function useHotVideos() {
     isLoading || (size > 0 && !!data && typeof data[size - 1] === 'undefined')
   const isReachingEnd = !!data && !!data[data.length - 1]?.no_more
   const isRefreshing = isValidating && !!data && data.length === size
-
+  const list = hotVideos.map(getVideo)
+  // console.log(44444, size, list.length, list[0].name)
+  // if (size < 3 && list.length) {
+  //   store.$cachedHotVideos = list.slice()
+  // }
   return {
-    list: hotVideos.map(getVideo),
+    list: list, // list.length ? list : store.$cachedHotVideos,
     page: size,
     setSize,
     isRefreshing,

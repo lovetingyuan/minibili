@@ -9,7 +9,7 @@ import {
 } from '@rneui/themed'
 import React from 'react'
 import { SearchedUpType, useSearchUps } from '../../api/search-up'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { FlatList, Linking, StyleSheet, View } from 'react-native'
 import { Image } from 'expo-image'
 import { parseNumber } from '../../utils'
 import store, { useStore } from '../../store'
@@ -18,13 +18,17 @@ function SearchedItem(props: { up: SearchedUpType }) {
   const up = props.up
   const { $followedUps } = useStore()
   const followed = $followedUps.find(v => v.mid == up.mid)
+  const user = {
+    name: up.name,
+    face: up.face,
+    mid: up.mid,
+    sign: up.sign,
+  }
   const handler = () => {
-    store.$followedUps.unshift({
-      name: up.name,
-      face: up.face,
-      mid: up.mid,
-      sign: up.sign,
-    })
+    store.$followedUps.unshift(user)
+  }
+  const goToDynamic = () => {
+    Linking.openURL(`https://m.bilibili.com/space/${up.mid}`)
   }
   return (
     <View key={up.mid} style={styles.upItem}>
@@ -33,8 +37,9 @@ function SearchedItem(props: { up: SearchedUpType }) {
         size={40}
         rounded
         source={{ uri: up.face + '@100w_100h_1c.webp' }}
+        onPress={goToDynamic}
       />
-      <Text style={styles.upName}>
+      <Text style={styles.upName} onPress={goToDynamic}>
         {up.name}
         {'\n'}
         <Text style={styles.fansText}>{parseNumber(up.fans)}粉丝</Text>
@@ -145,7 +150,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  title: { fontSize: 18, fontWeight: 'bold' },
+  title: { fontSize: 18, fontWeight: 'bold', opacity: 0.85 },
   searchBar: {
     backgroundColor: 'transparent',
   },

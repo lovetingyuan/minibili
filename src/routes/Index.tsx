@@ -39,6 +39,7 @@ export default function Route() {
           colors: {
             ...DarkTheme.colors,
             background: '#222',
+            // backgroundColor: 'black',
           },
         }
       : DefaultTheme
@@ -80,6 +81,7 @@ export default function Route() {
               fontSize: 18,
               color: isDark ? '#ccc' : '#333',
             },
+            cardStyle: { backgroundColor: '#000' },
           }
         }, [isDark])}
         screenListeners={onRouteChange}>

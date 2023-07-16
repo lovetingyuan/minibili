@@ -2,7 +2,7 @@ import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
-import { AppState, Appearance } from 'react-native'
+import { AppState, Appearance, View } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
@@ -15,6 +15,7 @@ import ThemeResponse from './components/ThemeResponse'
 import ImagesView from './components/ImagesView'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 import ErrorFallback from './components/ErrorFallback'
+import useIsDark from './hooks/useIsDark'
 
 const theme = createTheme({
   lightColors: {
@@ -37,6 +38,7 @@ const errorFallback: FallbackRender = errorData => {
 
 export default function App() {
   const netToastDelay = React.useRef<null | number>(null)
+  const dark = useIsDark()
   React.useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       if (state.isConnected && state.type === 'wifi') {
@@ -104,17 +106,22 @@ export default function App() {
       },
     }
   }, [])
+  const containerStyle = React.useMemo(() => {
+    return { backgroundColor: dark ? 'black' : 'white', flex: 1 }
+  }, [dark])
   return (
     <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
       <RootSiblingParent>
         <ThemeProvider theme={theme}>
-          <SWRConfig value={swrConfig}>
-            <StatusBar style="auto" />
-            <ThemeResponse />
-            <ButtonsOverlay />
-            <ImagesView />
-            <Route />
-          </SWRConfig>
+          <View style={containerStyle}>
+            <SWRConfig value={swrConfig}>
+              <StatusBar style="auto" />
+              <ThemeResponse />
+              <ButtonsOverlay />
+              <ImagesView />
+              <Route />
+            </SWRConfig>
+          </View>
         </ThemeProvider>
       </RootSiblingParent>
     </SentryExpo.Native.ErrorBoundary>

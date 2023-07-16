@@ -10,7 +10,7 @@ export default React.memo(function VideoInfo(props: {
 }) {
   const { changePage } = props
   const { video, bvid, page } = React.useContext(VideoInfoContext)
-  const { data: video2 } = useVideoInfo(bvid)
+  const { data: video2, isLoading } = useVideoInfo(bvid)
   const [expanded, setExpanded] = React.useState(false)
   const videoInfo = {
     ...video,
@@ -71,8 +71,7 @@ export default React.memo(function VideoInfo(props: {
               )
             })}
           </ListItem.Accordion>
-        ) : typeof videoInfo.videosNum === 'number' &&
-          videoInfo.videos !== videoInfo.videosNum ? (
+        ) : !isLoading && videoInfo.videos !== videoInfo.videosNum ? (
           <Text style={{ marginTop: 10, color: '#FF7F24' }}>
             该视频为交互视频，暂不支持
           </Text>

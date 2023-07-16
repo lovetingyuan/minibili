@@ -16,6 +16,7 @@ import { checkUpdateUps } from '../../api/dynamic-items'
 import commonStyles from '../../styles'
 import AddFollow from './AddFollow'
 import { FAB } from '@rneui/themed'
+import { showToast } from '../../utils'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
 
@@ -49,7 +50,6 @@ export default React.memo(function Follow({ navigation }: Props) {
 
   React.useEffect(() => {
     if (firstRender) {
-      // console.log('updateing')
       checkUpdateUps(true)
       firstRender = false
       window.setInterval(() => {
@@ -161,6 +161,7 @@ export default React.memo(function Follow({ navigation }: Props) {
           keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
           onEndReachedThreshold={1}
           persistentScrollbar
+          key={columns} // FlatList不支持直接更改columns
           numColumns={columns}
           ref={followListRef}
           columnWrapperStyle={{
@@ -185,6 +186,10 @@ export default React.memo(function Follow({ navigation }: Props) {
         style={{ bottom: 10, opacity: 0.8 }}
         size="small"
         onPress={() => {
+          if ($followedUps.length > 200) {
+            showToast('暂时只支持最多200个关注')
+            return
+          }
           setShowAddUp(s => s + 1)
         }}
       />

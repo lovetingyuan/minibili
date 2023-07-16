@@ -33,7 +33,7 @@ export default React.memo(function Hot({ navigation }: Props) {
     isReachingEnd,
     error,
   } = useHotVideos()
-
+  // console.log(232323, list.length)
   React.useEffect(() => {
     return navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {

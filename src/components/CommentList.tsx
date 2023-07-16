@@ -3,6 +3,7 @@ import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
+import MoreReplies from './MoreReplies'
 
 const Loading = React.memo(() => {
   return (
@@ -82,6 +83,7 @@ const CommentList: React.FC<{
           <Text />
         </View>
       ) : null}
+      <MoreReplies />
     </View>
   )
 }

@@ -228,10 +228,15 @@ export default React.memo(function Comment(props: Props) {
               size="sm"
               onPress={() => {
                 const root = comment.replies[0].root
-                navigation.navigate('WebPage', {
-                  title: '评论详情',
-                  url: `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=1&root=${root}`,
-                })
+                store.moreRepliesUrl = `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=1&root=${root}`
+                // console.log(3333)
+                // props.onMoreReplies(
+                //   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=1&root=${root}`,
+                // )
+                // navigation.navigate('WebPage', {
+                //   title: '评论详情',
+                //   url: `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=1&root=${root}`,
+                // })
               }}
               buttonStyle={styles.moreButton}>
               <Text style={{ color: theme.colors.primary }}>

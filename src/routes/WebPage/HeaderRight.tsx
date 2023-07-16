@@ -33,6 +33,7 @@ export default function HeaderRight(props: { reload: () => void }) {
         onRequestClose={hideMenu}>
         <MenuItem
           textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
           onPress={() => {
             store.webViewMode = store.webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
             hideMenu()
@@ -41,6 +42,7 @@ export default function HeaderRight(props: { reload: () => void }) {
         </MenuItem>
         <MenuItem
           textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
           onPress={() => {
             hideMenu()
             Linking.openURL(url)
@@ -49,6 +51,7 @@ export default function HeaderRight(props: { reload: () => void }) {
         </MenuItem>
         <MenuItem
           textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
           onPress={() => {
             hideMenu()
             props.reload()
@@ -57,6 +60,7 @@ export default function HeaderRight(props: { reload: () => void }) {
         </MenuItem>
         <MenuItem
           textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
           onPress={() => {
             Clipboard.setStringAsync(url).then(() => {
               showToast('已复制链接：' + url)
@@ -67,6 +71,7 @@ export default function HeaderRight(props: { reload: () => void }) {
         </MenuItem>
         <MenuItem
           textStyle={{ color: theme.colors.black }}
+          pressColor={theme.colors.grey4}
           onPress={() => {
             hideMenu()
             Share.share({

@@ -7,7 +7,7 @@ export const useSearchUps = (name: string) => {
   const keyword = encodeURIComponent(name)
   const { data, error, isValidating } = useSWR<SearchResponse>(
     name
-      ? `/x/web-interface/wbi/search/type?page=1&page_size=36&platform=pc&keyword=${keyword}&search_type=bili_user&order_sort=0&user_type=0&dynamic_offset=0`
+      ? `/x/web-interface/wbi/search/type?page=1&page_size=50&platform=pc&keyword=${keyword}&search_type=bili_user&order_sort=0&user_type=0&dynamic_offset=0`
       : null,
     request,
     {
