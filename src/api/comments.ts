@@ -117,9 +117,8 @@ const parseMessage = (content: ReplayItem['content']) => {
 }
 export type MessageContent = ReturnType<typeof parseMessage>
 
-const getReplies = (res1: ReplyResponse, res2?: ReplyResponse) => {
+const getReplies = (res1: ReplyResponse, type: number) => {
   const replies = (res1.replies || [])
-    .concat(res2?.replies || [])
     .filter(v => !v.invisible)
     .map(item => {
       return {
@@ -146,6 +145,7 @@ const getReplies = (res1: ReplyResponse, res2?: ReplyResponse) => {
         top: false,
         like: item.like,
         sex: item.member.sex,
+        type,
         replies:
           item.replies?.map(v => {
             return {
@@ -191,6 +191,7 @@ const getReplies = (res1: ReplyResponse, res2?: ReplyResponse) => {
       like: item.like,
       top: true,
       sex: item.member.sex,
+      type,
       replies:
         item.replies?.map(v => {
           return {
@@ -225,8 +226,8 @@ export function useDynamicComments(oid: string | number, type: number) {
     if (!data) {
       return []
     }
-    return getReplies(data)
-  }, [data])
+    return getReplies(data, type)
+  }, [data, type])
   return {
     data: {
       allCount: data?.cursor.all_count,

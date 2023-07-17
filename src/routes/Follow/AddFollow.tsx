@@ -48,7 +48,7 @@ function SearchedItem(props: { up: SearchedUpType }) {
         <Button
           size="sm"
           type="clear"
-          onPress={handler}
+          disabled
           titleStyle={styles.followedText}>
           已关注
         </Button>
