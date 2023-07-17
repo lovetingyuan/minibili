@@ -6,6 +6,25 @@ import { showToast } from '../utils'
 import { useWindowDimensions, View } from 'react-native'
 import useIsDark from '../hooks/useIsDark'
 
+const injectCode = `
+const style = document.createElement('style');
+style.textContent = \`
+body {
+  padding-top: 18px;
+}
+body .reply-list {
+  padding-bottom: 20px;
+}
+.reply-item .info .toolbar .right {
+  display: none!important;
+}
+.sub-reply-input.sub-input {
+  display: none!important;
+}
+\`
+document.head.appendChild(style);
+true;
+`
 const darkCode = `const style = document.createElement('style');
   style.textContent = \`
      body { background-color: #222!important; color: #ccc!important; }
@@ -58,6 +77,7 @@ export default function MoreReplies() {
             originWhitelist={['http://*', 'https://*', 'bilibili://*']}
             injectedJavaScriptForMainFrameOnly
             startInLoadingState={false}
+            injectedJavaScript={injectCode}
             ref={webviewRef}
             applicationNameForUserAgent={'BILIBILI/8.0.0'}
             onLoadEnd={() => {

@@ -125,7 +125,7 @@ const HeaderRight = () => {
           navigation.navigate('Follow')
         }}
         titleStyle={{ fontSize: 18 }}>
-        关注
+        关注{__DEV__ ? 'dev' : ''}
       </Button>
     </View>
   )
