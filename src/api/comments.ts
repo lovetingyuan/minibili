@@ -159,6 +159,7 @@ const getReplies = (res1: ReplyResponse, type: number) => {
               oid: v.oid,
               location: v.reply_control.location,
               root: v.root,
+              root_str: v.root_str,
               upLike: v.up_action.like,
               like: v.like,
             }
@@ -204,6 +205,7 @@ const getReplies = (res1: ReplyResponse, type: number) => {
             oid: v.oid,
             location: v.reply_control.location,
             root: v.root,
+            root_str: v.root_str,
             mid: v.mid,
             upLike: v.up_action.like,
             like: v.like,

@@ -227,7 +227,7 @@ export default React.memo(function Comment(props: Props) {
               type="clear"
               size="sm"
               onPress={() => {
-                const root = comment.replies[0].root
+                const root = comment.replies[0].root_str
                 store.moreRepliesUrl = `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`
               }}
               buttonStyle={styles.moreButton}>

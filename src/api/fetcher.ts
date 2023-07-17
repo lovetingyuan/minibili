@@ -31,6 +31,7 @@ export default function request<D extends any>(url: string) {
     : 'https://api.bilibili.com' + url
 
   // __DEV__ && console.log('request url: ', url.slice(0, 150))
+  // console.log(444, requestUrl)
   return fetch(requestUrl, {
     headers: {
       'cache-control': 'no-cache',
@@ -54,6 +55,12 @@ export default function request<D extends any>(url: string) {
         data: resText,
       } as Res<D>
       try {
+        if (url.includes('/x/v2/reply/main?')) {
+          // oid这个属性是数字但是会溢出，所以这里处理成字符串
+          resText = resText.replaceAll(/"oid":(\d+),"/g, (_, num) => {
+            return `"oid":"${num}","`
+          })
+        }
         res = JSON.parse(resText) as Res<D>
       } catch (err) {}
       if (res.code) {
