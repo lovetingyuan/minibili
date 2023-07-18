@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native'
-import { Text, Icon } from '@rneui/themed'
+import { Text, Icon, Button } from '@rneui/themed'
 import FollowItem from './FollowItem'
 import { RootStackParamList, UpInfo } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
@@ -86,16 +86,14 @@ export default React.memo(function Follow({ navigation }: Props) {
       },
       headerRight: () => {
         return (
-          <Icon
-            name="snow"
-            type="ionicon"
-            size={20}
-            color="#00AEEC"
-            style={{ padding: 8 }}
+          <Button
+            radius={'sm'}
+            type="clear"
             onPress={() => {
               navigation.navigate('About')
-            }}
-          />
+            }}>
+            <Icon name="snow" type="ionicon" size={20} color="#00AEEC" />
+          </Button>
         )
       },
     })
