@@ -2,17 +2,16 @@ import React from 'react'
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../../types'
+import { NavigationProps, UpInfo } from '../../types'
 import { Button } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import store, { useStore } from '../../store'
-import { FollowedUpItem } from '../../api/followed-ups'
 import { Image } from 'expo-image'
 import { showToast } from '../../utils'
 import commonStyles from '../../styles'
 
 export default React.memo(
-  function FollowItem(props: { item: FollowedUpItem; width?: number }) {
+  function FollowItem(props: { item: UpInfo; width?: number }) {
     // __DEV__ && console.log('follow item', props.item.name)
     const {
       item: { face, name, sign, mid },

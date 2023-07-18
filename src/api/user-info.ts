@@ -6,13 +6,12 @@ import {
   UserCardInfoResponseSchema,
   UserInfoResponseSchema,
 } from './user-info.schema'
+import { UpInfo } from '../types'
+import store from '../store'
+import React from 'react'
 
 type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
-type UserInfo = {
-  face: string
-  name: string
-  sign: string
-  mid: string | number
+type UserInfo = UpInfo & {
   level: number
   sex: string
 }
@@ -83,6 +82,27 @@ export function useUserInfo(mid?: number | string) {
   const { data, error, isValidating, isLoading } = useSWRImmutable<
     UserInfo | undefined
   >(mid ? `/x/space/acc/info?mid=${mid}` : null, () => request(mid!))
+  React.useEffect(() => {
+    if (!data) {
+      return
+    }
+    const isFollowed = store.$followedUps.findIndex(up => {
+      return up.mid == data.mid
+    })
+    // 用户信息可能会变化
+    if (isFollowed >= 0) {
+      const up = store.$followedUps[isFollowed]
+      if (up.name !== data.name) {
+        up.name = data.name
+      }
+      if (up.sign !== data.sign) {
+        up.sign = data.sign
+      }
+      if (up.face !== data.face) {
+        up.face = data.face
+      }
+    }
+  }, [data])
   return {
     data,
     isValidating,

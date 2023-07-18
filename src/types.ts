@@ -17,6 +17,13 @@ export type VideoInfo = {
   desc: string
 }
 
+export interface UpInfo {
+  mid: number | string
+  name: string
+  face: string
+  sign: string
+}
+
 export type RootStackParamList = {
   Home: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
@@ -26,12 +33,7 @@ export type RootStackParamList = {
   }
   Dynamic?: {
     from?: string
-    user: {
-      mid: string | number
-      name: string
-      face: string
-      sign: string
-    }
+    user: UpInfo
   }
   DynamicDetail: {
     detail: DynamicItemAllType

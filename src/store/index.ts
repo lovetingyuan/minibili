@@ -3,13 +3,8 @@ import { proxy, subscribe, useSnapshot } from 'valtio'
 import { RanksConfig } from '../constants'
 import { checkUpdate } from '../api/check-update'
 import type { VideoItem } from '../api/hot-videos'
-
-interface UserInfo {
-  mid: number | string
-  name: string
-  face: string
-  sign: string
-}
+import { startCheckLivingUps } from '../api/living-info'
+import { UpInfo } from '../types'
 
 interface UpdateUpInfo {
   latestId: string
@@ -18,7 +13,7 @@ interface UpdateUpInfo {
 
 const store = proxy<{
   $blackUps: Record<string, string>
-  $followedUps: UserInfo[]
+  $followedUps: UpInfo[]
   $blackTags: Record<string, string>
   $upUpdateMap: Record<string, UpdateUpInfo>
   $videoCatesList: { rid: number; label: string }[]
@@ -91,21 +86,25 @@ Promise.all(
       }
     })
   }),
-).then(() => {
-  store.initialed = true
-  subscribe(store, changes => {
-    const changedKeys = new Set<StoredKeys>()
-    for (const op of changes) {
-      const ck = op[1][0]
-      if (typeof ck === 'string' && ck.startsWith('$')) {
-        changedKeys.add(ck as StoredKeys)
+)
+  .then(() => {
+    store.initialed = true
+    subscribe(store, changes => {
+      const changedKeys = new Set<StoredKeys>()
+      for (const op of changes) {
+        const ck = op[1][0]
+        if (typeof ck === 'string' && ck.startsWith('$')) {
+          changedKeys.add(ck as StoredKeys)
+        }
       }
-    }
-    for (const ck of changedKeys) {
-      AsyncStorage.setItem(StoragePrefix + ck, JSON.stringify(store[ck]))
-    }
+      for (const ck of changedKeys) {
+        AsyncStorage.setItem(StoragePrefix + ck, JSON.stringify(store[ck]))
+      }
+    })
   })
-})
+  .then(() => {
+    startCheckLivingUps()
+  })
 
 export function useStore() {
   return useSnapshot(store)

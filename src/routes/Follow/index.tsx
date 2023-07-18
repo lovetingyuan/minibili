@@ -8,10 +8,9 @@ import {
 } from 'react-native'
 import { Text, Icon } from '@rneui/themed'
 import FollowItem from './FollowItem'
-import { RootStackParamList } from '../../types'
+import { RootStackParamList, UpInfo } from '../../types'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { useStore } from '../../store'
-import { FollowedUpItem } from '../../api/followed-ups'
 import { checkUpdateUps } from '../../api/dynamic-items'
 import commonStyles from '../../styles'
 import AddFollow from './AddFollow'
@@ -24,7 +23,7 @@ const renderItem = ({
   item,
 }: // index,
 {
-  item: FollowedUpItem | null
+  item: UpInfo | null
   index: number
 }) => {
   if (item) {
@@ -123,10 +122,10 @@ export default React.memo(function Follow({ navigation }: Props) {
     ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
     : 0
 
-  let displayUps: (FollowedUpItem | null)[] = []
-  const topUps: FollowedUpItem[] = []
-  const updateUps: FollowedUpItem[] = []
-  const otherUps: FollowedUpItem[] = []
+  let displayUps: (UpInfo | null)[] = []
+  const topUps: UpInfo[] = []
+  const updateUps: UpInfo[] = []
+  const otherUps: UpInfo[] = []
   const updatedUps: Record<string, boolean> = {}
   for (const mid in $upUpdateMap) {
     updatedUps[mid] =
