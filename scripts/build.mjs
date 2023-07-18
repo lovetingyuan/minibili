@@ -85,8 +85,10 @@ if (!changes.trim()) {
   throw new Error('更新日志不能为空')
 }
 
-pkg.config.versionCode++
-pkg.version = newVersion
+if (newVersion !== pkg.version) {
+  pkg.config.versionCode++
+  pkg.version = newVersion
+}
 pkg.config.changelog = changes
 const commitHash = (await $`git rev-parse --short HEAD`).toString('utf8').trim()
 pkg.gitHead = commitHash
