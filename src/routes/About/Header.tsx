@@ -1,10 +1,8 @@
 import React from 'react'
 import { View, Linking, StyleSheet, Pressable } from 'react-native'
-import { Icon, Text } from '@rneui/themed'
+import { Button, Icon, Text } from '@rneui/themed'
 import { githubLink, site } from '../../constants'
 import MyImage from '../../components/MyImage'
-import * as Clipboard from 'expo-clipboard'
-import store from '../../store'
 
 export default React.memo(function Header() {
   return (
@@ -21,22 +19,19 @@ export default React.memo(function Header() {
         <MyImage
           source={require('../../../assets/minibili.png')}
           widthScale={0.85}
-          style={{ marginTop: 10 }}
         />
       </Pressable>
       <View style={styles.infoItem}>
         <Text style={styles.title}>一款简单的B站浏览App</Text>
-        <Icon
-          name="github"
-          type="material-community"
-          size={20}
+        <Button
+          radius={'sm'}
+          type="clear"
+          size="sm"
           onPress={() => {
             Linking.openURL(githubLink)
-          }}
-          onLongPress={() => {
-            Clipboard.setStringAsync(JSON.stringify(store))
-          }}
-        />
+          }}>
+          <Icon name="github" type="material-community" size={20} />
+        </Button>
       </View>
     </>
   )

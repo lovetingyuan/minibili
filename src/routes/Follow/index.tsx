@@ -66,7 +66,7 @@ export default React.memo(function Follow({ navigation }: Props) {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+            <Text style={{ fontSize: 18, fontWeight: '600' }}>
               我的关注
               {count
                 ? updatedCount

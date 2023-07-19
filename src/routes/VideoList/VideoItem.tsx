@@ -4,7 +4,6 @@ import { VideoItem } from '../../api/hot-videos'
 import { parseDate, parseDuration, parseNumber } from '../../utils'
 import { useTheme } from '@rneui/themed'
 import { Image } from 'expo-image'
-import { TracyId } from '../../constants'
 import commonStyles from '../../styles'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
@@ -62,7 +61,6 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
               styles.upNameText,
               {
                 color: theme.colors.primary,
-                fontWeight: video.mid === TracyId ? 'bold' : 'normal',
               },
             ]}>
             {video.name}

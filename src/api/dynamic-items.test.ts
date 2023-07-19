@@ -6,7 +6,7 @@ test('dynamic-list', async () => {
   const { data: list } = (await fetch(
     'https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1',
   ).then(r => r.json())) as any
-  const mids = list.list.map((v: any) => v.owner.mid).concat([14427395])
+  const mids = list.list.map((v: any) => v.owner.mid).concat([1458143131])
   const failedList: string[] = []
   const list352: string[] = []
   for (const mid of mids) {

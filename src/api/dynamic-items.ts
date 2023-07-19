@@ -477,7 +477,7 @@ export function useDynamicItems(mid?: string | number) {
         if (!mid) {
           return null
         }
-        // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=14427395&timezone_offset=-480&features=itemOpusStyle
+        // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480&features=itemOpusStyle
         if (!offset) {
           return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
         }
