@@ -4,7 +4,7 @@ import { debounce } from 'throttle-debounce'
 import Toast from 'react-native-root-toast'
 import store from '../store'
 
-export const parseNumber = (num?: number) => {
+export const parseNumber = (num?: number | null) => {
   if (num == null) {
     return ''
   }

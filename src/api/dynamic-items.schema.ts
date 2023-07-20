@@ -356,7 +356,7 @@ const AdditionalSchema = z.discriminatedUnion('type', [
     vote: z.object({
       desc: z.string(),
       end_time: z.number(),
-      join_num: z.number(),
+      join_num: z.number().nullable(),
       uid: z.number(),
       vote_id: z.number(),
     }),
