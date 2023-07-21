@@ -1,11 +1,11 @@
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import React from 'react'
 import HotList from './HotList'
 import Ranks from './Ranks'
 import { RootStackParamList } from '../../types'
 import { useStore } from '../../store'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
+type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 export default function (props: Props) {
   const { currentVideosCate } = useStore()
   if (currentVideosCate.rid === -1) {

@@ -2,6 +2,7 @@ import {
   Avatar,
   Button,
   Dialog,
+  FAB,
   Icon,
   SearchBar,
   Text,
@@ -11,7 +12,7 @@ import React from 'react'
 import { SearchedUpType, useSearchUps } from '../../api/search-up'
 import { FlatList, Linking, StyleSheet, View } from 'react-native'
 import { Image } from 'expo-image'
-import { parseNumber } from '../../utils'
+import { parseNumber, showToast } from '../../utils'
 import store, { useStore } from '../../store'
 
 function SearchedItem(props: { up: SearchedUpType }) {
@@ -66,62 +67,82 @@ const renderSearchItem = ({ item: up }: { item: SearchedUpType }) => {
   return <SearchedItem up={up} />
 }
 
-export default function AddFollow(props: { show: number }) {
+export default function AddFollow() {
   const [addUpVisible, setAddUpVisible] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState('')
+
+  const { $followedUps } = useStore()
   const handleAddUpVisible = () => {
     setSearchValue('')
     setAddUpVisible(false)
   }
   const { theme } = useTheme()
-  React.useEffect(() => {
-    if (props.show) {
-      setAddUpVisible(true)
-    }
-  }, [props.show])
   const { data: searchedUps, isValidating } = useSearchUps(searchValue)
   return (
-    <Dialog
-      isVisible={addUpVisible}
-      onBackdropPress={handleAddUpVisible}
-      overlayStyle={styles.dialog}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>新增关注</Text>
-        <Icon name="close" size={24} onPress={handleAddUpVisible} />
-      </View>
-      <SearchBar
-        placeholder="请输入Up主的名字"
-        autoFocus
-        onChangeText={v => {
-          setSearchValue(v.trim())
+    <>
+      <FAB
+        visible
+        color="#f25d8e"
+        placement="right"
+        icon={{ name: 'add', color: 'white' }}
+        style={styles.addBtn}
+        size="small"
+        onPress={() => {
+          if ($followedUps.length > 200) {
+            showToast('暂时只支持最多200个关注')
+            return
+          }
+          setAddUpVisible(true)
         }}
-        cancelIcon={<Icon name="search" size={24} />}
-        platform="android"
-        showLoading={isValidating}
-        value={searchValue}
-        inputStyle={{ color: theme.colors.black }}
-        containerStyle={styles.searchBar}
       />
-      {searchValue ? (
-        <FlatList
-          data={searchedUps || []}
-          renderItem={renderSearchItem}
-          keyExtractor={item => item.mid + ''}
-          ListEmptyComponent={
-            searchValue ? <Text style={styles.emptyText}>暂无结果</Text> : null
-          }
-          ListFooterComponent={
-            searchedUps?.length ? (
-              <Text style={styles.bottomText}>暂不支持更多结果~</Text>
-            ) : null
-          }
+      <Dialog
+        isVisible={addUpVisible}
+        onBackdropPress={handleAddUpVisible}
+        overlayStyle={styles.dialog}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>新增关注</Text>
+          <Icon name="close" size={24} onPress={handleAddUpVisible} />
+        </View>
+        <SearchBar
+          placeholder="请输入Up主的名字"
+          autoFocus
+          onChangeText={v => {
+            setSearchValue(v.trim())
+          }}
+          cancelIcon={<Icon name="search" size={24} />}
+          platform="android"
+          showLoading={isValidating}
+          value={searchValue}
+          inputStyle={{ color: theme.colors.black }}
+          containerStyle={styles.searchBar}
         />
-      ) : null}
-    </Dialog>
+        {searchValue ? (
+          <FlatList
+            data={searchedUps || []}
+            renderItem={renderSearchItem}
+            keyExtractor={item => item.mid + ''}
+            ListEmptyComponent={
+              searchValue && !isValidating ? (
+                <Text style={styles.emptyText}>暂无结果</Text>
+              ) : null
+            }
+            ListFooterComponent={
+              searchedUps?.length ? (
+                <Text style={styles.bottomText}>暂不支持更多结果~</Text>
+              ) : null
+            }
+          />
+        ) : null}
+      </Dialog>
+    </>
   )
 }
 
 const styles = StyleSheet.create({
+  addBtn: {
+    bottom: 10,
+    opacity: 0.8,
+  },
   dialog: { maxHeight: '60%', width: '85%' },
   upItem: {
     alignItems: 'center',

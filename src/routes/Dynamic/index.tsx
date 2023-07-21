@@ -94,10 +94,10 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     if (error) {
       showToast('请求动态失败')
     }
-  }, [upId, error])
+  }, [error])
   const { theme } = useTheme()
 
-  const headerTitle = useMemoizedFn(() => {
+  const headerTitle = React.useCallback(() => {
     return (
       <HeaderLeft
         scrollTop={() => {
@@ -109,7 +109,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
         }}
       />
     )
-  })
+  }, [])
 
   React.useEffect(() => {
     navigation.setOptions({

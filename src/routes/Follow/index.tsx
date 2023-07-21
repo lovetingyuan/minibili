@@ -1,23 +1,13 @@
 import React from 'react'
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  useWindowDimensions,
-  ActivityIndicator,
-} from 'react-native'
-import { Text, Icon, Button } from '@rneui/themed'
+import { View, FlatList, StyleSheet, useWindowDimensions } from 'react-native'
+import { Text } from '@rneui/themed'
 import FollowItem from './FollowItem'
-import { RootStackParamList, UpInfo } from '../../types'
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
+import { UpInfo } from '../../types'
 import { useStore } from '../../store'
 import { checkUpdateUps } from '../../api/dynamic-items'
 import commonStyles from '../../styles'
 import AddFollow from './AddFollow'
-import { FAB } from '@rneui/themed'
-import { showToast } from '../../utils'
-
-type Props = BottomTabScreenProps<RootStackParamList, 'Follow'>
+import useMounted from '../../hooks/useMounted'
 
 const renderItem = ({
   item,
@@ -34,20 +24,14 @@ const renderItem = ({
 
 let firstRender = true
 
-export default React.memo(function Follow({ navigation }: Props) {
+export default function Follow() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
-  const {
-    $followedUps,
-    $upUpdateMap,
-    livingUps,
-    checkingUpUpdate,
-    updatedCount,
-  } = useStore()
+  const { $followedUps, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
-  const [showAddUp, setShowAddUp] = React.useState(0)
 
-  React.useEffect(() => {
+  // 检查用户更新，由于组件会随路由重新创建，这里保证只运行一次
+  useMounted(() => {
     if (firstRender) {
       checkUpdateUps(true)
       firstRender = false
@@ -55,65 +39,9 @@ export default React.memo(function Follow({ navigation }: Props) {
         checkUpdateUps(false)
       }, 10 * 60 * 1000)
     }
-  }, [])
-  React.useEffect(() => {
-    const count = $followedUps.length
-    navigation.setOptions({
-      headerTitle: () => {
-        return (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <Text style={{ fontSize: 18, fontWeight: '600' }}>
-              我的关注
-              {count
-                ? updatedCount
-                  ? `(${updatedCount}/${count})`
-                  : `(${count})`
-                : ''}
-            </Text>
-            {checkingUpUpdate ? (
-              <ActivityIndicator
-                size={'small'}
-                color={'#F85A54'}
-                style={{ marginLeft: 10 }}
-              />
-            ) : null}
-          </View>
-        )
-      },
-      headerRight: () => {
-        return (
-          <Button
-            radius={'sm'}
-            type="clear"
-            onPress={() => {
-              navigation.navigate('About')
-            }}>
-            <Icon name="snow" type="ionicon" size={20} color="#00AEEC" />
-          </Button>
-        )
-      },
-    })
-  }, [navigation, $followedUps, checkingUpUpdate, updatedCount])
+  })
 
   const { width } = useWindowDimensions()
-
-  React.useEffect(() => {
-    return navigation.addListener('tabPress', () => {
-      if (!navigation.isFocused()) {
-        return
-      }
-      try {
-        followListRef.current?.scrollToOffset({
-          offset: 0,
-        })
-      } catch (err) {}
-    })
-  }, [navigation])
-
   const columns = Math.floor(width / 90)
   const followedUpListLen = $followedUps.length
   const rest = followedUpListLen
@@ -175,25 +103,10 @@ export default React.memo(function Follow({ navigation }: Props) {
           }
         />
       </View>
-      <FAB
-        visible
-        color="#f25d8e"
-        placement="right"
-        icon={{ name: 'add', color: 'white' }}
-        style={{ bottom: 10, opacity: 0.8 }}
-        size="small"
-        onPress={() => {
-          if ($followedUps.length > 200) {
-            showToast('暂时只支持最多200个关注')
-            return
-          }
-          setShowAddUp(s => s + 1)
-        }}
-      />
-      <AddFollow show={showAddUp} />
+      <AddFollow />
     </View>
   )
-})
+}
 
 const styles = StyleSheet.create({
   container: {

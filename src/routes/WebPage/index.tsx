@@ -9,13 +9,10 @@ import {
 } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { INJECTED_JAVASCRIPT } from './inject-code'
-
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../../types'
 import { useStore } from '../../store'
-
 import HeaderRight from './HeaderRight'
-import useMemoizedFn from '../../hooks/useMemoizedFn'
 import useIsDark from '../../hooks/useIsDark'
 import { UA } from '../../constants'
 import { showToast } from '../../utils'
@@ -42,7 +39,7 @@ export default function WebPage({ route, navigation }: Props) {
   const [height, setHeight] = React.useState(Dimensions.get('screen').height)
   const [isEnabled, setEnabled] = React.useState(true)
   const [isRefreshing, setRefreshing] = React.useState(false)
-  const onRefresh = useMemoizedFn(() => {
+  const onRefresh = React.useCallback(() => {
     if (webviewRef.current) {
       setRefreshing(true)
       webviewRef.current.reload()
@@ -50,7 +47,7 @@ export default function WebPage({ route, navigation }: Props) {
         setRefreshing(false)
       }, 1000)
     }
-  })
+  }, [])
   React.useEffect(() => {
     const headerRight = () => {
       return <HeaderRight reload={onRefresh} />
@@ -74,12 +71,7 @@ export default function WebPage({ route, navigation }: Props) {
         style={[styles.container, { height }]}
         source={{ uri: url }}
         key={webViewMode}
-        onScroll={e =>
-          setEnabled(
-            typeof onRefresh === 'function' &&
-              e.nativeEvent.contentOffset.y === 0,
-          )
-        }
+        onScroll={e => setEnabled(e.nativeEvent.contentOffset.y === 0)}
         originWhitelist={['http://*', 'https://*', 'bilibili://*']}
         allowsFullscreenVideo
         injectedJavaScriptForMainFrameOnly

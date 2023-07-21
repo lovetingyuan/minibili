@@ -11,7 +11,6 @@ import {
 } from 'react-native'
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 import { VideoItem } from '../../api/hot-videos'
@@ -19,8 +18,9 @@ import { handleShareVideo, parseNumber } from '../../utils'
 import { useRankList } from '../../api/rank-list'
 import Loading from './Loading'
 import { Action, reportUserAction } from '../../utils/report'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
+type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
 export default React.memo(function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)
@@ -31,20 +31,6 @@ export default React.memo(function Ranks({ navigation }: Props) {
     mutate,
   } = useRankList(currentVideosCate?.rid)
   const [isRefreshing] = React.useState(false)
-
-  React.useEffect(() => {
-    return navigation.addListener('tabPress', () => {
-      if (!navigation.isFocused()) {
-        return
-      }
-      try {
-        videoListRef.current?.scrollToOffset({
-          offset: 0,
-        })
-      } catch (err) {}
-    })
-  }, [navigation])
-
   const currentVideoRef = React.useRef<VideoItem | null>(null)
   const addBlackUp = () => {
     if (!currentVideoRef.current) {

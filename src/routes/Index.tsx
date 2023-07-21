@@ -25,6 +25,7 @@ import {
 import Follow from './Follow'
 import VideoList from './VideoList'
 import { videoListHeaderRight, videoListHeaderTitle } from './VideoList/Header'
+import { followHeaderRight, followHeaderTitle } from './Follow/Header'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -90,7 +91,16 @@ export default function Route() {
           component={VideoList}
           options={videosOptions}
         />
-        <Stack.Screen name="Follow" component={Follow} />
+        <Stack.Screen
+          name="Follow"
+          component={Follow}
+          options={React.useMemo(() => {
+            return {
+              headerTitle: followHeaderTitle,
+              headerRight: followHeaderRight,
+            }
+          }, [])}
+        />
         <Stack.Screen
           name="Dynamic"
           component={Dynamic}

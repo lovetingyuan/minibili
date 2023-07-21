@@ -39,23 +39,8 @@ const PlayPage = ({ route, navigation }: Props) => {
 
   React.useEffect(() => {
     if (videoInfo.name) {
-      //   const headerRight = () => (
-      //     <Icon
-      //       name="open-in-new"
-      //       color="#F85A54"
-      //       style={{ padding: 5 }}
-      //       size={20}
-      //       onPress={() => {
-      //         navigation.navigate('WebPage', {
-      //           url: `https://b23.tv/${bvid}`,
-      //           title: videoInfo.name,
-      //         })
-      //       }}
-      //     />
-      //   )
       navigation.setOptions({
         headerTitle: videoInfo.name,
-        // headerRight,
       })
     }
   }, [navigation, videoInfo.name])

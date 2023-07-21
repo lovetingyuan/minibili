@@ -10,15 +10,15 @@ import {
 } from 'react-native'
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 import Loading from './Loading'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, parseNumber, showToast } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
-type Props = BottomTabScreenProps<RootStackParamList, 'VideoList'>
+type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
 export default React.memo(function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
@@ -33,19 +33,6 @@ export default React.memo(function Hot({ navigation }: Props) {
     isReachingEnd,
     error,
   } = useHotVideos()
-  // console.log(232323, list.length)
-  React.useEffect(() => {
-    return navigation.addListener('tabPress', () => {
-      if (!navigation.isFocused()) {
-        return
-      }
-      try {
-        hotListRef.current?.scrollToOffset({
-          offset: 0,
-        })
-      } catch (err) {}
-    })
-  }, [navigation])
 
   React.useEffect(() => {
     if (error) {

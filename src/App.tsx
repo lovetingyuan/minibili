@@ -16,6 +16,7 @@ import ImagesView from './components/ImagesView'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 import ErrorFallback from './components/ErrorFallback'
 import useIsDark from './hooks/useIsDark'
+import useMounted from './hooks/useMounted'
 
 const theme = createTheme({
   lightColors: {
@@ -39,8 +40,8 @@ const errorFallback: FallbackRender = errorData => {
 export default function App() {
   const netToastDelay = React.useRef<null | number>(null)
   const dark = useIsDark()
-  React.useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
+  useMounted(() => {
+    return NetInfo.addEventListener(state => {
       if (state.isConnected && state.type === 'wifi') {
         return
       }
@@ -57,8 +58,7 @@ export default function App() {
         })
       }, 1500)
     })
-    return unsubscribe
-  }, [])
+  })
   const swrConfig = React.useMemo<
     SWRConfiguration & Partial<ProviderConfiguration>
   >(() => {

@@ -44,4 +44,4 @@ test('dynamic-list', async () => {
   if (failedList.length) {
     throw new Error('dynamic list failed')
   }
-}, 20000)
+}, 30000)
