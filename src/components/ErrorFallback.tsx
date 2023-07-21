@@ -1,8 +1,7 @@
 import React from 'react'
 import { showFatalError } from '../utils'
-import { Button, Linking, StyleSheet, Text, View } from 'react-native'
+import { Button, Image, Linking, StyleSheet, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
-import MyImage from './MyImage'
 import { site } from '../constants'
 import useIsDark from '../hooks/useIsDark'
 import * as Updates from 'expo-updates'
@@ -20,7 +19,14 @@ export default function ErrorFallback(props: { message?: string }) {
   return (
     <View style={[dark ? { backgroundColor: '#333' } : {}, styles.container]}>
       <StatusBar style="auto" />
-      <MyImage source={require('../../assets/error.png')} widthScale={0.8} />
+      <Image
+        source={require('../../assets/error.png')}
+        style={{
+          aspectRatio: 1,
+          width: 300,
+          height: undefined,
+        }}
+      />
       <Text style={styles.errorText}>
         非常抱歉，应用发生了未知错误
         {'\n\n'}

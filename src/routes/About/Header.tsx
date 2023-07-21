@@ -1,10 +1,17 @@
 import React from 'react'
-import { View, Linking, StyleSheet, Pressable } from 'react-native'
+import {
+  View,
+  Linking,
+  StyleSheet,
+  Pressable,
+  Image,
+  useWindowDimensions,
+} from 'react-native'
 import { Button, Icon, Text } from '@rneui/themed'
 import { githubLink, site } from '../../constants'
-import MyImage from '../../components/MyImage'
 
 export default React.memo(function Header() {
+  const { width } = useWindowDimensions()
   return (
     <>
       <Pressable
@@ -16,9 +23,9 @@ export default React.memo(function Header() {
             Linking.openURL(site)
           }
         }}>
-        <MyImage
+        <Image
           source={require('../../../assets/minibili.png')}
-          widthScale={0.85}
+          style={{ width: width * 0.8, height: undefined, aspectRatio: 3.3 }}
         />
       </Pressable>
       <View style={styles.infoItem}>

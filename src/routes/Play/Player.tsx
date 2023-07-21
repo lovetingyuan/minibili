@@ -9,6 +9,7 @@ import {
   Text,
   Linking,
   ActivityIndicator,
+  Image,
 } from 'react-native'
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
@@ -19,7 +20,6 @@ import { useFocusEffect } from '@react-navigation/native'
 import { Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
-import MyImage from '../../components/MyImage'
 import NetInfo from '@react-native-community/netinfo'
 import commonStyles from '../../styles'
 
@@ -98,10 +98,9 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
   }
   const renderLoading = () => (
     <View style={styles.loadingView}>
-      <MyImage
+      <Image
         source={{ uri: videoInfo.cover + '@672w_378h_1c.webp' }}
-        style={commonStyles.flex1}
-        widthScale={1}
+        style={styles.loadingImage}
       />
       <ActivityIndicator
         size={'large'}
@@ -218,6 +217,7 @@ const styles = StyleSheet.create({
   loadingImage: {
     flex: 1,
     width: '100%',
+    height: undefined,
   },
   videoCover: {
     flex: 1,
