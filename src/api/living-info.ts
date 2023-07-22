@@ -86,5 +86,5 @@ export function startCheckLivingUps() {
   checkLivingUps()
   checkLivingTimer = window.setInterval(() => {
     checkLivingUps()
-  }, 9 * 60 * 1000)
+  }, 5 * 60 * 1000)
 }
