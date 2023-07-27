@@ -108,11 +108,11 @@ const HeaderRight = () => {
           status="success"
           value={updatedCount}
           badgeStyle={{
-            height: 17,
+            height: 16,
             backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
             position: 'absolute',
-            left: 35,
-            top: 2,
+            left: 43,
+            top: 5,
           }}
           textStyle={{
             fontSize: 11,
@@ -125,7 +125,7 @@ const HeaderRight = () => {
           navigation.navigate('Follow')
         }}
         titleStyle={{ fontSize: 18 }}>
-        关注{__DEV__ ? 'dev' : ''}
+        {' 关注 '}
       </Button>
     </View>
   )

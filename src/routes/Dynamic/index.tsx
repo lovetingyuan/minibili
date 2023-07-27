@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Image, StyleSheet, View, useWindowDimensions } from 'react-native'
 import { RootStackParamList } from '../../types'
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, headerRight } from './Header'
@@ -96,6 +96,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     }
   }, [error])
   const { theme } = useTheme()
+  const { width } = useWindowDimensions()
 
   const headerTitle = React.useCallback(() => {
     return (
@@ -135,16 +136,20 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       return <Loading />
     }
     if (error) {
-      return (
-        <Text style={{ margin: 50, textAlign: 'center', fontSize: 16 }}>
-          加载动态失败
-        </Text>
-      )
+      return <Text style={styles.errorText}>加载动态失败</Text>
     }
     return (
-      <Text style={{ margin: 150, textAlign: 'center', fontSize: 18 }}>
-        暂无动态
-      </Text>
+      <View style={styles.emptyContainer}>
+        <Image
+          source={require('../../../assets/empty.png')}
+          style={{
+            width: width * 0.4,
+            height: undefined,
+            aspectRatio: 1,
+          }}
+        />
+        <Text style={styles.emptyText}>暂无动态</Text>
+      </View>
     )
   }
 
@@ -195,14 +200,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#999',
     textAlign: 'center',
-    // fontStyle: 'italic',
-  },
-  emptyText: {
-    marginTop: 30,
-    marginBottom: 10,
-    fontSize: 18,
-    color: '#fb7299',
-    textAlign: 'center',
   },
   listStyle: { paddingTop: 15 },
   signTextContainer: {
@@ -232,6 +229,12 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     borderBottomWidth: 0.5,
   },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 100,
+  },
+  emptyText: { margin: 40, textAlign: 'center', fontSize: 18 },
+  errorText: { margin: 50, textAlign: 'center', fontSize: 16 },
 })
 
 export default Dynamic

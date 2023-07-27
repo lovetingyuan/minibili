@@ -1,6 +1,6 @@
 import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Image, useWindowDimensions } from 'react-native'
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
@@ -40,7 +40,7 @@ const CommentList: React.FC<{
     isLoading: commentLoading,
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)
-
+  const { width } = useWindowDimensions()
   const { theme } = useTheme()
   return (
     <View>
@@ -74,6 +74,16 @@ const CommentList: React.FC<{
         })
       ) : comments?.length === 0 && !commentLoading ? (
         <View>
+          <Image
+            source={require('../../assets/empty.png')}
+            style={{
+              width: width * 0.3,
+              height: undefined,
+              aspectRatio: 1,
+              alignSelf: 'center',
+              marginTop: 50,
+            }}
+          />
           <Text style={styles.commentTipText}>暂无评论</Text>
         </View>
       ) : null}
@@ -94,7 +104,7 @@ const styles = StyleSheet.create({
   footerText: { color: '#888', fontSize: 12 },
   commentTipText: {
     textAlign: 'center',
-    marginVertical: 50,
+    marginVertical: 40,
   },
   divider: {
     marginVertical: 20,

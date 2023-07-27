@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import { StyleSheet, TouchableOpacity, Alert, View } from 'react-native'
 import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps, UpInfo } from '../../types'
@@ -89,13 +89,15 @@ export default React.memo(function FollowItem(props: {
       }}
       style={styles.container}
       onPress={gotoDynamic}>
-      <Avatar
-        size={46}
-        rounded
-        ImageComponent={Image}
-        source={{ uri: face + '@120w_120h_1c.webp' }}
-      />
-      {hasUpdate ? <Badge key={mid} badgeStyle={styles.updateMark} /> : null}
+      <View>
+        <Avatar
+          size={46}
+          rounded
+          ImageComponent={Image}
+          source={{ uri: face + '@120w_120h_1c.webp' }}
+        />
+        {hasUpdate ? <Badge key={mid} badgeStyle={styles.updateMark} /> : null}
+      </View>
       {livingUps[mid] ? (
         <Button
           title="直播中~"
@@ -121,6 +123,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     flex: 1,
     justifyContent: 'space-between',
+    position: 'relative',
   },
   name: {
     fontSize: 14,
@@ -134,12 +137,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fb7299',
     borderRadius: 14,
     position: 'absolute',
-    top: -40,
-    right: -30,
+    top: -38,
+    left: 38,
+    // top: -40,
+    // right: -30,
   },
-  liveText: { color: '#008AC5', fontSize: 14, marginLeft: 12, marginRight: 5 },
   livingBtn: {
-    position: 'relative',
-    marginTop: 8,
+    // borderWidth: 1,
+    top: -5,
+    // position: 'relative',
+    // marginTop: 8,
   },
 })

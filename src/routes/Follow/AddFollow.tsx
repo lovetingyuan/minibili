@@ -10,7 +10,13 @@ import {
 } from '@rneui/themed'
 import React from 'react'
 import { SearchedUpType, useSearchUps } from '../../api/search-up'
-import { FlatList, Linking, StyleSheet, View } from 'react-native'
+import {
+  FlatList,
+  Linking,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native'
 import { Image } from 'expo-image'
 import { parseNumber, showToast } from '../../utils'
 import store, { useStore } from '../../store'
@@ -72,11 +78,15 @@ export default function AddFollow() {
   const [searchValue, setSearchValue] = React.useState('')
 
   const { $followedUps } = useStore()
-  const handleAddUpVisible = () => {
+  const handleAddUpVisible = (...args: any) => {
+    if (args[0] && 'pageY' in args[0].nativeEvent) {
+      return
+    }
     setSearchValue('')
     setAddUpVisible(false)
   }
   const { theme } = useTheme()
+  const { width } = useWindowDimensions()
   const { data: searchedUps, isValidating } = useSearchUps(searchValue)
   return (
     <>
@@ -101,7 +111,7 @@ export default function AddFollow() {
         overlayStyle={styles.dialog}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>新增关注</Text>
-          <Icon name="close" size={24} onPress={handleAddUpVisible} />
+          <Icon name="close" size={24} onPress={() => handleAddUpVisible()} />
         </View>
         <SearchBar
           placeholder="请输入Up主的名字"
@@ -123,7 +133,19 @@ export default function AddFollow() {
             keyExtractor={item => item.mid + ''}
             ListEmptyComponent={
               searchValue && !isValidating ? (
-                <Text style={styles.emptyText}>暂无结果</Text>
+                <View>
+                  <Image
+                    source={require('../../../assets/ss.png')}
+                    style={{
+                      width: width * 0.3,
+                      height: undefined,
+                      aspectRatio: 1,
+                      alignSelf: 'center',
+                      marginTop: 30,
+                    }}
+                  />
+                  <Text style={styles.emptyText}>暂无结果</Text>
+                </View>
               ) : null
             }
             ListFooterComponent={

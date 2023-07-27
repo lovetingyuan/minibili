@@ -1,5 +1,12 @@
 import React from 'react'
-import { View, FlatList, StyleSheet, useWindowDimensions } from 'react-native'
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  useWindowDimensions,
+  Image,
+  ImageBackground,
+} from 'react-native'
 import { Text } from '@rneui/themed'
 import FollowItem from './FollowItem'
 import { UpInfo } from '../../types'
@@ -8,6 +15,7 @@ import { checkUpdateUps } from '../../api/dynamic-items'
 import commonStyles from '../../styles'
 import AddFollow from './AddFollow'
 import useMounted from '../../hooks/useMounted'
+import useIsDark from '../../hooks/useIsDark'
 
 const renderItem = ({
   item,
@@ -24,11 +32,41 @@ const renderItem = ({
 
 let firstRender = true
 
+const tvL = require('../../../assets/tv-l.png')
+const tvR = require('../../../assets/tv-r.png')
+
+const TvImg: React.FC = () => {
+  const [tvImg, setTvImg] = React.useState(false)
+  React.useEffect(() => {
+    const timer = window.setInterval(() => {
+      setTvImg(v => !v)
+    }, 700)
+    return () => {
+      timer && window.clearInterval(timer)
+    }
+  }, [])
+
+  const { width } = useWindowDimensions()
+  return (
+    <Image
+      source={tvImg ? tvL : tvR}
+      style={{
+        width: width * 0.5,
+        height: undefined,
+        aspectRatio: 1,
+        alignSelf: 'center',
+        marginTop: 50,
+      }}
+    />
+  )
+}
+
 export default function Follow() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
   const { $followedUps, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
+  const dark = useIsDark()
 
   // 检查用户更新，由于组件会随路由重新创建，这里保证只运行一次
   useMounted(() => {
@@ -72,13 +110,8 @@ export default function Follow() {
     ...otherUps,
     ...(rest ? Array.from({ length: rest }).map(() => null) : []),
   ]
-
-  const emptyContent = () => {
-    return <Text style={styles.emptyText}>暂无关注，请添加</Text>
-  }
-
-  return (
-    <View style={styles.container}>
+  const content = (
+    <>
       <View style={commonStyles.flex1}>
         <FlatList
           data={displayUps}
@@ -95,7 +128,12 @@ export default function Follow() {
           contentContainerStyle={{
             paddingTop: 30,
           }}
-          ListEmptyComponent={emptyContent()}
+          ListEmptyComponent={
+            <View>
+              <TvImg />
+              <Text style={styles.emptyText}>暂无关注，请添加</Text>
+            </View>
+          }
           ListFooterComponent={
             $followedUps.length ? (
               <Text style={styles.bottomText}>到底了~</Text>
@@ -104,6 +142,20 @@ export default function Follow() {
         />
       </View>
       <AddFollow />
+    </>
+  )
+  return (
+    <View style={styles.container}>
+      {dark ? (
+        content
+      ) : (
+        <ImageBackground
+          source={require('../../../assets/bg.webp')}
+          resizeMode="cover"
+          style={styles.bgImage}>
+          {content}
+        </ImageBackground>
+      )}
     </View>
   )
 }
@@ -117,6 +169,10 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
   },
+  bgImage: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   bottomText: {
     textAlign: 'center',
     paddingBottom: 10,
@@ -126,7 +182,7 @@ const styles = StyleSheet.create({
 
   emptyText: {
     textAlign: 'center',
-    marginVertical: 100,
+    marginVertical: 40,
     fontSize: 18,
     lineHeight: 30,
   },
