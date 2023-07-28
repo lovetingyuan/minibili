@@ -15,7 +15,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
   if (!additional) {
     return null
   }
-  let additionalContent = <Text>暂不支持显示</Text>
+  let additionalContent: React.ReactElement | null = <Text>暂不支持显示</Text>
   let url = ''
   if (additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE) {
     const desc = [
@@ -24,10 +24,14 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
     ]
       .filter(Boolean)
       .join('  ')
-    url = additional.reserve.jump_url
+    url = additional.reserve.jump_url || ''
+    const title = additional.reserve.title
+    if (!title && !desc) {
+      return null
+    }
     additionalContent = (
       <View style={commonStyles.flex1}>
-        <Text>{additional.reserve.title}</Text>
+        {title ? <Text>{title}</Text> : null}
         {desc ? <Text>{desc}</Text> : null}
       </View>
     )
