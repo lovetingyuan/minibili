@@ -2,7 +2,7 @@ import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
-import { AppState, Appearance, View } from 'react-native'
+import { AppState, View } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
@@ -17,18 +17,6 @@ import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 import ErrorFallback from './components/ErrorFallback'
 import useIsDark from './hooks/useIsDark'
 import useMounted from './hooks/useMounted'
-
-const theme = createTheme({
-  lightColors: {
-    black: '#333',
-    grey5: '#ddd',
-  },
-  darkColors: {
-    black: '#bbb',
-    grey5: '#181818',
-  },
-  mode: Appearance.getColorScheme() || 'light',
-})
 
 let online = true
 let focus = true
@@ -109,14 +97,27 @@ export default function App() {
   const containerStyle = React.useMemo(() => {
     return { backgroundColor: dark ? 'black' : 'white', flex: 1 }
   }, [dark])
+  const theme = React.useMemo(() => {
+    return createTheme({
+      lightColors: {
+        black: '#333',
+        grey5: '#ddd',
+      },
+      darkColors: {
+        black: '#bbb',
+        grey5: '#181818',
+      },
+      mode: dark ? 'dark' : 'light',
+    })
+  }, [dark])
   return (
     <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
       <RootSiblingParent>
         <ThemeProvider theme={theme}>
+          <ThemeResponse />
           <View style={containerStyle}>
             <SWRConfig value={swrConfig}>
               <StatusBar style="auto" />
-              <ThemeResponse />
               <ButtonsOverlay />
               <ImagesView />
               <Route />
