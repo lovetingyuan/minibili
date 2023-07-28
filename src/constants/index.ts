@@ -9,7 +9,7 @@ export const UA =
 export const RanksConfig = [
   {
     rid: -1,
-    label: '🔥 热门' + (__DEV__ ? 'dev' : ''),
+    label: '🔥 热门' + (typeof __DEV__ === 'boolean' && __DEV__ ? 'dev' : ''),
   },
   {
     rid: 0,
