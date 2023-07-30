@@ -76,7 +76,7 @@ export default function VideoItem(props: {
         <View style={styles.imageContainer}>
           <Image
             style={styles.image}
-            source={{ uri: cover + '@421w_234h.webp' }}
+            source={{ uri: cover + '@480w_300h.webp' }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image
@@ -127,7 +127,7 @@ export default function VideoItem(props: {
 const styles = StyleSheet.create({
   shareIcon: { width: 15, height: 15, marginLeft: 16 },
   imageContainer: {
-    flex: 6,
+    flex: 5.6,
     marginRight: 12,
     justifyContent: 'center',
     alignContent: 'center',
@@ -140,8 +140,8 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 'auto',
-    aspectRatio: 1.8,
+    height: undefined,
+    aspectRatio: 1.6,
     borderRadius: 5,
   },
   descText: {

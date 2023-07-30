@@ -17,7 +17,7 @@ import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, parseNumber, showToast } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-
+import { FAB } from '@rneui/themed'
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
 export default React.memo(function Hot({ navigation }: Props) {
@@ -106,18 +106,14 @@ export default React.memo(function Hot({ navigation }: Props) {
       },
     },
   ]
-  const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
+  const { width } = useWindowDimensions()
+  const itemWidth = (width - 24) / 2
+  const renderItem = ({ item }: { item: VideoItem }) => {
     const key = item.bvid
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        style={[
-          styles.itemContainer,
-          {
-            paddingLeft: index % 2 ? 5 : 8,
-            paddingRight: index % 2 ? 8 : 5,
-          },
-        ]}
+        style={[styles.itemContainer]}
         key={key}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
@@ -140,10 +136,6 @@ export default React.memo(function Hot({ navigation }: Props) {
     }
   }
 
-  const { width } = useWindowDimensions()
-
-  const estimatedItemSize = width / 2 - 10
-
   return (
     <View style={styles.container}>
       <FlashList
@@ -155,7 +147,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         data={hotVideoList}
         renderItem={renderItem}
         persistentScrollbar
-        estimatedItemSize={estimatedItemSize}
+        estimatedItemSize={itemWidth}
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
@@ -169,6 +161,22 @@ export default React.memo(function Hot({ navigation }: Props) {
         refreshing={isRefreshing}
         onRefresh={refresh}
         contentContainerStyle={styles.listContainerStyle}
+        estimatedFirstItemOffset={100}
+      />
+      <FAB
+        visible
+        color="#f25d8e"
+        placement="right"
+        icon={{ name: 'refresh', color: 'white' }}
+        style={{
+          bottom: 10,
+          opacity: 0.8,
+        }}
+        size="small"
+        onPress={() => {
+          refresh()
+          hotListRef.current?.scrollToOffset(0)
+        }}
       />
     </View>
   )
@@ -184,7 +192,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     // paddingHorizontal: 8,
   },
-  listContainerStyle: { paddingTop: 14 },
+  listContainerStyle: { paddingTop: 14, paddingHorizontal: 4 },
   bottomEnd: {
     textAlign: 'center',
     color: '#999',

@@ -124,7 +124,7 @@ const HeaderRight = () => {
         onPress={() => {
           navigation.navigate('Follow')
         }}
-        titleStyle={{ fontSize: 18 }}>
+        titleStyle={{ fontSize: 17 }}>
         {' 关注 '}
       </Button>
     </View>

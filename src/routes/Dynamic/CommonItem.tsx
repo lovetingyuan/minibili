@@ -90,10 +90,11 @@ export function CommonContent(props: {
     <View style={styles.contentContainer}>
       {cover ? (
         <Image
-          source={{ uri: cover + '@240w_140h_1c.webp' }}
+          source={{ uri: cover + '@240w_150h_1c.webp' }}
           style={{
             width: width * 0.35,
-            height: width * 0.2,
+            height: undefined,
+            aspectRatio: 1.6,
             borderRadius: 4,
           }}
         />

@@ -1,21 +1,26 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native'
 import { VideoItem } from '../../api/hot-videos'
 import { parseDate, parseDuration, parseNumber } from '../../utils'
 import { useTheme } from '@rneui/themed'
 import { Image } from 'expo-image'
 import commonStyles from '../../styles'
+import { useStore } from '../../store'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
   const { theme } = useTheme()
+  const { width } = useWindowDimensions()
+  const itemWidth = (width - 24) / 2
+  const { isWiFi } = useStore()
+  const ratio = isWiFi ? '@480w_300h_1c.webp' : '@320w_200h_1c.webp'
   return (
-    <View style={styles.itemContainer}>
+    <View style={[styles.itemContainer, { width: itemWidth }]}>
       <View style={commonStyles.flex1}>
         <Image
           style={styles.image}
-          source={{ uri: video.cover + '@480w_270h_1c.webp' }}
+          source={{ uri: video.cover + ratio }}
           contentFit="cover"
         />
         <View style={styles.textContainer}>
@@ -82,8 +87,9 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
 
 const styles = StyleSheet.create({
   itemContainer: {
-    flex: 1,
+    // flex: 1,
     marginVertical: 12,
+    alignSelf: 'center',
   },
   textContainer: {
     position: 'absolute',
@@ -106,7 +112,7 @@ const styles = StyleSheet.create({
     width: undefined,
     maxWidth: '100%',
     borderRadius: 5,
-    aspectRatio: 1.7,
+    aspectRatio: 1.6,
   },
   title: {
     fontSize: 15,

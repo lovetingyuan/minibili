@@ -42,7 +42,7 @@ export default function ForwardItem(props: {
         <View style={{ flexDirection: 'row' }}>
           <Image
             style={styles.videoCover}
-            source={{ uri: cover + '@240w_240h_1c.webp' }}
+            source={{ uri: cover + '@240w_150h_1c.webp' }}
           />
           <View style={{ flex: 6 }}>
             <Text numberOfLines={2} style={{ lineHeight: 20, fontSize: 15 }}>
@@ -217,9 +217,11 @@ const styles = StyleSheet.create({
   },
   videoCover: {
     width: 120,
-    height: 70,
+    // height: 70,
+    height: undefined,
+    aspectRatio: 1.6,
     marginRight: 10,
-    flex: 4,
+    // flex: 4,
     borderRadius: 4,
   },
   info: {

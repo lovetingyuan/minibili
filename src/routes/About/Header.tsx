@@ -29,11 +29,14 @@ export default React.memo(function Header() {
         />
       </Pressable>
       <View style={styles.infoItem}>
-        <Text style={styles.title}>一款简单的B站浏览App</Text>
+        <Text style={styles.title} numberOfLines={2}>
+          一款简单的B站浏览App
+        </Text>
         <Button
           radius={'sm'}
           type="clear"
           size="sm"
+          containerStyle={{ alignSelf: 'flex-start' }}
           onPress={() => {
             Linking.openURL(githubLink)
           }}>
@@ -52,5 +55,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 6,
   },
-  title: { fontSize: 24 },
+  title: { fontSize: 24, flexShrink: 1 },
 })
