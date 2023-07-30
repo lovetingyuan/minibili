@@ -5,6 +5,7 @@ import { checkUpdate } from '../api/check-update'
 import type { VideoItem } from '../api/hot-videos'
 import { startCheckLivingUps } from '../api/living-info'
 import { UpInfo } from '../types'
+import NetInfo from '@react-native-community/netinfo'
 
 interface UpdateUpInfo {
   latestId: string
@@ -22,6 +23,7 @@ const store = proxy<{
   $cachedHotVideos: VideoItem[]
   // ----------------------------
   initialed: boolean
+  isWiFi: boolean
   webViewMode: 'PC' | 'MOBILE'
   livingUps: Record<string, string>
   currentVideosCate: (typeof RanksConfig)[number]
@@ -49,6 +51,7 @@ const store = proxy<{
   $cachedHotVideos: [],
   // -------------------------
   initialed: false,
+  isWiFi: false,
   webViewMode: 'MOBILE',
   livingUps: {},
   checkingUpUpdate: false,
@@ -115,3 +118,15 @@ export function setStore(callback: (s: typeof store) => void) {
 }
 
 export default store
+
+NetInfo.fetch().then(state => {
+  store.isWiFi = !!state.isConnected && state.type === 'wifi'
+})
+
+NetInfo.addEventListener(state => {
+  if (state.isConnected && state.type === 'wifi') {
+    store.isWiFi = true
+  } else {
+    store.isWiFi = false
+  }
+})

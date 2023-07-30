@@ -1,4 +1,3 @@
-import NetInfo from '@react-native-community/netinfo'
 import { Share, Platform, ToastAndroid, Alert, Linking } from 'react-native'
 import { debounce } from 'throttle-debounce'
 import Toast from 'react-native-root-toast'
@@ -100,18 +99,6 @@ export async function handleShareUp(
     })
   } catch (error) {
     showToast('分享失败')
-  }
-}
-
-export function isWifi() {
-  return NetInfo.fetch().then(state => {
-    return state.type === 'wifi'
-  })
-}
-export async function checkWifi() {
-  const wifi = await isWifi()
-  if (!wifi) {
-    showToast(' 请注意当前网络不是Wifi ')
   }
 }
 

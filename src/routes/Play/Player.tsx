@@ -14,34 +14,39 @@ import {
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
-import useMounted from '../../hooks/useMounted'
 import { parseDuration, showToast } from '../../utils'
-import { useFocusEffect } from '@react-navigation/native'
 import { Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
-import useMemoizedFn from '../../hooks/useMemoizedFn'
-import NetInfo from '@react-native-community/netinfo'
 import commonStyles from '../../styles'
+import { useStore } from '../../store'
+import { useAppState } from '../../hooks/useAppState'
 
-const VideoPlayer = React.memo((props: { wifi: boolean }) => {
-  const { wifi } = props
+export default React.memo(function Player() {
+  const { isWiFi } = useStore()
   const { page, video, bvid } = React.useContext(VideoInfoContext)
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
   const { data: video2, error } = useVideoInfo(bvid)
-  const [loadPlayer, setLoadPlayer] = React.useState(wifi)
+  const [loadPlayer, setLoadPlayer] = React.useState(isWiFi)
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
-  useFocusEffect(
-    useMemoizedFn(() => {
-      if (loadingErrorRef.current && webviewRef.current) {
-        loadingErrorRef.current = false
-        webviewRef.current.reload()
-      }
-    }),
-  )
+  const currentAppState = useAppState()
+  React.useEffect(() => {
+    if (
+      currentAppState === 'active' &&
+      loadingErrorRef.current &&
+      webviewRef.current
+    ) {
+      webviewRef.current.reload()
+    }
+  }, [currentAppState])
+  React.useEffect(() => {
+    if (!isWiFi) {
+      showToast('请注意当前网络不是Wifi')
+    }
+  }, [isWiFi])
   const videoInfo = {
     ...video,
     ...video2,
@@ -115,8 +120,8 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
   Object.entries({
     bvid: videoInfo.bvid,
     autoplay: 0,
-    highQuality: wifi ? 1 : 0,
-    quality: wifi ? 100 : 16,
+    highQuality: isWiFi ? 1 : 0,
+    quality: isWiFi ? 100 : 16,
     portraitFullScreen: true,
     page,
   }).forEach(([k, v]) => {
@@ -137,8 +142,11 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
       injectedJavaScript={INJECTED_JAVASCRIPT}
       renderLoading={renderLoading}
       onMessage={handleMessage}
+      onLoad={() => {
+        loadingErrorRef.current = false
+      }}
       onError={() => {
-        showToast('加载失败')
+        showToast('当前视频加载失败/(ㄒoㄒ)/~~')
         loadingErrorRef.current = true
       }}
       onShouldStartLoadWithRequest={request => {
@@ -189,24 +197,6 @@ const VideoPlayer = React.memo((props: { wifi: boolean }) => {
   )
 })
 
-export default function Player() {
-  const [wifi, setWifi] = React.useState<boolean | null>(null)
-
-  useMounted(() => {
-    NetInfo.fetch().then(state => {
-      if (state.type !== 'wifi') {
-        showToast(' 请注意当前网络不是Wifi ')
-        setWifi(false)
-      } else {
-        setWifi(true)
-      }
-    })
-  })
-  if (wifi === null) {
-    return <View style={{ width: '100%', height: '40%' }} />
-  }
-  return <VideoPlayer wifi={wifi} />
-}
 const styles = StyleSheet.create({
   loadingView: {
     position: 'absolute',
