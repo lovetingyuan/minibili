@@ -10,9 +10,8 @@ test('dynamic-list', async () => {
   const failedList: string[] = []
   const list352: string[] = []
   for (const mid of mids) {
-    const res = await fetcher<any>(
-      `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`,
-    ).catch(() => null)
+    const url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
+    const res = await fetcher<any>(url).catch(() => null)
     if (!res) {
       list352.push('null-' + mid)
     } else {

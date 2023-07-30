@@ -317,8 +317,8 @@ const AdditionalSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_RESERVE]),
     reserve: z.object({
-      title: z.string(),
-      jump_url: z.string(),
+      title: z.string().optional(),
+      jump_url: z.string().optional(),
       desc1: z.object({ text: z.string() }).optional(),
       desc2: z.object({ text: z.string() }).optional(),
     }),
