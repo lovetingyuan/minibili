@@ -1,4 +1,4 @@
-function __$hack(dev, dark) {
+function __$hack() {
   const style = document.createElement('style')
   document.head.appendChild(style)
   window.ReactNativeWebView.postMessage(

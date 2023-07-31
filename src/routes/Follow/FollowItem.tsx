@@ -1,5 +1,11 @@
 import React from 'react'
-import { StyleSheet, TouchableOpacity, Alert, View } from 'react-native'
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  View,
+  Linking,
+} from 'react-native'
 import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps, UpInfo } from '../../types'
@@ -77,6 +83,12 @@ export default React.memo(function FollowItem(props: {
             },
           },
         ])
+      },
+    },
+    {
+      text: '查看头像',
+      onPress: () => {
+        Linking.openURL(face)
       },
     },
   ]

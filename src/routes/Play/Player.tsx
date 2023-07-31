@@ -32,8 +32,7 @@ export default React.memo(function Player() {
   const [loadPlayer, setLoadPlayer] = React.useState(isWiFi)
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
-  const currentAppState = useAppState()
-  React.useEffect(() => {
+  useAppState(currentAppState => {
     if (
       currentAppState === 'active' &&
       loadingErrorRef.current &&
@@ -41,7 +40,8 @@ export default React.memo(function Player() {
     ) {
       webviewRef.current.reload()
     }
-  }, [currentAppState])
+  })
+
   React.useEffect(() => {
     if (!isWiFi) {
       showToast('请注意当前网络不是Wifi')
@@ -104,7 +104,7 @@ export default React.memo(function Player() {
   const renderLoading = () => (
     <View style={styles.loadingView}>
       <Image
-        source={{ uri: videoInfo.cover + '@672w_378h_1c.webp' }}
+        source={{ uri: videoInfo.cover + '@672w_420h_1c.webp' }}
         style={styles.loadingImage}
       />
       <ActivityIndicator
@@ -178,7 +178,7 @@ export default React.memo(function Player() {
           }}
           style={commonStyles.flex1}>
           <ImageBackground
-            source={{ uri: videoInfo.cover + '@672w_378h_1c.webp' }}
+            source={{ uri: videoInfo.cover + '@672w_420h_1c.webp' }}
             resizeMode="cover"
             style={styles.videoCover}>
             <Icon

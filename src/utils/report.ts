@@ -16,6 +16,7 @@ export enum Tags {
   set_bvid = 'video.id',
   set_dynamic_id = 'dynamic.id',
   git_hash = 'git.hash',
+  user_feedback = 'user.feedback',
 }
 
 export enum Action {
@@ -120,6 +121,9 @@ export function setViewingDynamicId(id: string | null) {
 
 export function reportUserFeedback(message: string, contact?: string) {
   SentryExpo.Native.captureMessage('User Feedback', {
+    tags: {
+      [Tags.user_feedback]: 'UserFeedback',
+    },
     extra: {
       message,
       contact,

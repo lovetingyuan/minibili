@@ -8,6 +8,9 @@ const commonStyles = StyleSheet.create({
   font16: {
     fontSize: 16,
   },
+  font12: {
+    fontSize: 12,
+  },
   font13: {
     fontSize: 13,
   },

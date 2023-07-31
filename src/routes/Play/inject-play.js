@@ -94,28 +94,6 @@ function __$hack() {
       }
     }
   }, 100)
-  // setInterval(() => {
-  //   const sss = Array.from(
-  //     document.querySelectorAll('.mplayer-toast.mplayer-show'),
-  //   )
-  //   if (sss.length) {
-  //     const failed = sss.findIndex(
-  //       s =>
-  //         s.querySelector('.mplayer-toast-text')?.innerText.trim() ===
-  //         '播放失败',
-  //     )
-  //     if (failed !== -1) {
-  //       const jump = sss[failed].querySelector('.mplayer-toast-jump')
-  //       if (jump.innerText.trim() === '') {
-  //         jump.innerHTML = '✕'
-  //         jump.addEventListener('click', e => {
-  //           e.preventDefault()
-  //           jump.parentElement.classList.remove('mplayer-show')
-  //         })
-  //       }
-  //     }
-  //   }
-  // }, 1000)
   setTimeout(() => {
     clearInterval(timer2)
     clearInterval(timer3)

@@ -10,13 +10,11 @@ import { RootSiblingParent } from 'react-native-root-siblings'
 import Route from './routes/Index'
 import * as SentryExpo from 'sentry-expo'
 import type { FallbackRender } from '@sentry/react'
-import { showToast } from './utils'
-import ThemeResponse from './components/ThemeResponse'
+// import ThemeResponse from './components/ThemeResponse'
 import ImagesView from './components/ImagesView'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 import ErrorFallback from './components/ErrorFallback'
 import useIsDark from './hooks/useIsDark'
-import useMounted from './hooks/useMounted'
 
 let online = true
 let focus = true
@@ -26,27 +24,7 @@ const errorFallback: FallbackRender = errorData => {
 }
 
 export default function App() {
-  const netToastDelay = React.useRef<null | number>(null)
   const dark = useIsDark()
-  useMounted(() => {
-    return NetInfo.addEventListener(state => {
-      if (state.isConnected && state.type === 'wifi') {
-        return
-      }
-      if (typeof netToastDelay.current === 'number') {
-        window.clearTimeout(netToastDelay.current)
-      }
-      netToastDelay.current = window.setTimeout(() => {
-        NetInfo.fetch().then(state2 => {
-          if (!state2.isConnected) {
-            showToast(' 网络状况不佳 ')
-          } else if (state2.type !== 'wifi') {
-            showToast(' 请注意当前网络不是 wifi ')
-          }
-        })
-      }, 1500)
-    })
-  })
   const swrConfig = React.useMemo<
     SWRConfiguration & Partial<ProviderConfiguration>
   >(() => {
@@ -114,15 +92,15 @@ export default function App() {
     <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
       <RootSiblingParent>
         <ThemeProvider theme={theme}>
-          <ThemeResponse />
-          <View style={containerStyle}>
-            <SWRConfig value={swrConfig}>
+          {/* <ThemeResponse /> */}
+          <SWRConfig value={swrConfig}>
+            <View style={containerStyle}>
               <StatusBar style="auto" />
               <ButtonsOverlay />
               <ImagesView />
               <Route />
-            </SWRConfig>
-          </View>
+            </View>
+          </SWRConfig>
         </ThemeProvider>
       </RootSiblingParent>
     </SentryExpo.Native.ErrorBoundary>
