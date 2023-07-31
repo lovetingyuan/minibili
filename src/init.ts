@@ -30,9 +30,9 @@ async function init() {
         Alert.alert(
           '使用说明',
           [
-            '本App为简易版B站，所有数据均为官方公开，切勿频繁刷新',
+            '欢迎使用极简版B站，没有推荐，没有广告，只是简单的浏览',
             '\n',
-            '如果遇到闪退或报错情况，请及时更新版本',
+            '注：如果遇到闪退或报错请及时更新版本',
           ].join('\n'),
           [
             {
@@ -44,6 +44,8 @@ async function init() {
           ],
           {
             cancelable: false,
+            onDismiss: () =>
+              r(AsyncStorage.setItem('FIRST_RUN', Date.now() + '')),
           },
         )
       } else {
@@ -57,12 +59,12 @@ async function init() {
   )
   if (appUpdateInfo.hasUpdate && !isIgnoredVersion) {
     const isBigUpdate =
-      appUpdateInfo.currentVersion?.split('.')[0] !==
+      appUpdateInfo.currentVersion.split('.')[0] !==
       appUpdateInfo.latestVersion.split('.')[0]
     await new Promise(r => {
       Alert.alert(
         '有新版本' + (isBigUpdate ? '（建议更新 🎉）' : ''),
-        `${appUpdateInfo.currentVersion} ⟶ ${appUpdateInfo.latestVersion}`,
+        `${appUpdateInfo.currentVersion}  ⟶  ${appUpdateInfo.latestVersion}`,
         [
           {
             text: '取消',

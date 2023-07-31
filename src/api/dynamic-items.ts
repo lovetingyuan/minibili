@@ -580,6 +580,12 @@ export async function checkUpdateUps(first: boolean) {
     if (store.checkingUpUpdate) {
       store.checkingUpUpdate = false
     }
+    for (const mid in upUpdateMap) {
+      const info = store.$upUpdateMap[mid]
+      if (info) {
+        upUpdateMap[mid].latestId = info.latestId
+      }
+    }
     store.$upUpdateMap = upUpdateMap
   })
 }

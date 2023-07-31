@@ -72,7 +72,8 @@ export default React.memo(function VideoInfo(props: {
             })}
           </ListItem.Accordion>
         ) : !isLoading && videoInfo.videos !== videoInfo.videosNum ? (
-          <Text style={{ marginTop: 10, color: '#FF7F24' }}>
+          <Text
+            style={{ marginTop: 12, color: '#FF7F24', fontStyle: 'italic' }}>
             该视频为交互视频，暂不支持
           </Text>
         ) : null}

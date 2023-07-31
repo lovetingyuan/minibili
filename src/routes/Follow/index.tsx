@@ -37,14 +37,14 @@ const tvR = require('../../../assets/tv-r.png')
 
 const TvImg: React.FC = () => {
   const [tvImg, setTvImg] = React.useState(false)
-  React.useEffect(() => {
+  useMounted(() => {
     const timer = window.setInterval(() => {
       setTvImg(v => !v)
     }, 700)
     return () => {
       timer && window.clearInterval(timer)
     }
-  }, [])
+  })
 
   const { width } = useWindowDimensions()
   return (

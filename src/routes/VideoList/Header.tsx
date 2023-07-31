@@ -114,9 +114,7 @@ const HeaderRight = () => {
             left: 43,
             top: 5,
           }}
-          textStyle={{
-            fontSize: 11,
-          }}
+          textStyle={styles.updateCountText}
         />
       ) : null}
       <Button
@@ -153,5 +151,8 @@ const styles = StyleSheet.create({
   updateBtnText: { fontSize: 14 },
   avatar: {
     marginHorizontal: 20,
+  },
+  updateCountText: {
+    fontSize: 11,
   },
 })

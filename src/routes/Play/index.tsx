@@ -24,7 +24,7 @@ import commonStyles from '../../styles'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
-const PlayPage = ({ route, navigation }: Props) => {
+const PlayPage: React.FC<Props> = ({ route, navigation }) => {
   const { video, bvid } = route.params
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: video2 } = useVideoInfo(bvid)
@@ -64,7 +64,7 @@ const PlayPage = ({ route, navigation }: Props) => {
   }
   return (
     <VideoInfoContext.Provider value={VI}>
-      <View style={styles.container}>
+      <View style={commonStyles.flex1}>
         <Player />
         <ScrollView style={styles.videoInfoContainer}>
           <VideoInfo changePage={setCurrentPage} />
@@ -82,19 +82,27 @@ const PlayPage = ({ route, navigation }: Props) => {
                           showToast('已复制视频ID')
                         })
                     }}>
-                    <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                    <Text
+                      style={[
+                        commonStyles.font12,
+                        { color: theme.colors.grey1 },
+                      ]}>
                       {videoInfo.bvid}
                     </Text>
                   </Pressable>
                   <Text
                     style={[
-                      styles.text,
+                      commonStyles.font12,
                       commonStyles.bold,
                       { color: theme.colors.grey1 },
                     ]}>
                     {' · '}
                   </Text>
-                  <Text style={[styles.text, { color: theme.colors.grey1 }]}>
+                  <Text
+                    style={[
+                      commonStyles.font12,
+                      { color: theme.colors.grey1 },
+                    ]}>
                     {videoInfo?.tname}
                   </Text>
                 </View>
@@ -110,10 +118,6 @@ const PlayPage = ({ route, navigation }: Props) => {
 export default PlayPage
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
-  text: { fontSize: 12 },
   right: { flexDirection: 'row', alignItems: 'center' },
 })
