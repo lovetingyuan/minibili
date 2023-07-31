@@ -79,7 +79,10 @@ export default React.memo(function FollowItem(props: {
         ])
       },
     },
-  ]
+    __DEV__ && {
+      text: `${$upUpdateMap[mid]?.latestId} - ${$upUpdateMap[mid]?.currentLatestId}`,
+    },
+  ].filter(Boolean)
 
   return (
     <TouchableOpacity
