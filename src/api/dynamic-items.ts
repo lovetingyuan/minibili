@@ -546,33 +546,36 @@ export async function checkUpdateUps(first: boolean) {
   if (upUpdateQueue.size || upUpdateQueue.pending) {
     return
   }
-  const upUpdateMap: typeof store.$upUpdateMap = {}
+  const upUpdateIdMap: Record<string, string> = {}
   for (const up of store.$followedUps) {
     upUpdateQueue.add(async () => {
       const id = await checkSingleUpUpdate(up.mid)
-      if (!id) {
-        // 失败全部忽略
-        if (store.$upUpdateMap[up.mid]) {
-          upUpdateMap[up.mid] = {
-            ...store.$upUpdateMap[up.mid],
-          }
-        }
-        return
+      if (id) {
+        upUpdateIdMap[up.mid] = id
       }
-      if (!store.$upUpdateMap[up.mid]) {
-        // 没有检查过
-        upUpdateMap[up.mid] = {
-          latestId: id,
-          currentLatestId: id,
-        }
-      } else {
-        // 检查过
-        const { latestId } = store.$upUpdateMap[up.mid]
-        upUpdateMap[up.mid] = {
-          latestId,
-          currentLatestId: id,
-        }
-      }
+      // if (!id) {
+      //   // 失败全部忽略
+      //   if (store.$upUpdateMap[up.mid]) {
+      //     upUpdateIdMap[up.mid] = {
+      //       ...store.$upUpdateMap[up.mid],
+      //     }
+      //   }
+      //   return
+      // }
+      // if (!store.$upUpdateMap[up.mid]) {
+      //   // 没有检查过
+      //   upUpdateIdMap[up.mid] = {
+      //     latestId: id,
+      //     currentLatestId: id,
+      //   }
+      // } else {
+      //   // 检查过
+      //   const { latestId } = store.$upUpdateMap[up.mid]
+      //   upUpdateMap[up.mid] = {
+      //     latestId,
+      //     currentLatestId: id,
+      //   }
+      // }
     })
   }
 
@@ -580,12 +583,20 @@ export async function checkUpdateUps(first: boolean) {
     if (store.checkingUpUpdate) {
       store.checkingUpUpdate = false
     }
-    for (const mid in upUpdateMap) {
-      const info = store.$upUpdateMap[mid]
-      if (info) {
-        upUpdateMap[mid].latestId = info.latestId
+    for (const mid in upUpdateIdMap) {
+      const id = upUpdateIdMap[mid]
+      if (mid in store.$upUpdateMap) {
+        store.$upUpdateMap[mid].currentLatestId = id
+      } else {
+        store.$upUpdateMap[mid] = {
+          latestId: id,
+          currentLatestId: id,
+        }
       }
+      // if (info) {
+      //   upUpdateMap[mid].latestId = info.latestId
+      // }
     }
-    store.$upUpdateMap = upUpdateMap
+    // store.$upUpdateMap = upUpdateMap
   })
 }
