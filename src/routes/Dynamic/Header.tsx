@@ -155,7 +155,7 @@ function HeaderRight() {
             }
             hideMenu()
           }}>
-          分享Up
+          分享UP
         </MenuItem>
         <MenuItem
           textStyle={{ color: theme.colors.black }}

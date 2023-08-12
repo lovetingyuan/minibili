@@ -10,7 +10,7 @@ import { RootSiblingParent } from 'react-native-root-siblings'
 import Route from './routes/Index'
 import * as SentryExpo from 'sentry-expo'
 import type { FallbackRender } from '@sentry/react'
-// import ThemeResponse from './components/ThemeResponse'
+import ThemeResponse from './components/ThemeResponse'
 import ImagesView from './components/ImagesView'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 import ErrorFallback from './components/ErrorFallback'
@@ -92,7 +92,7 @@ export default function App() {
     <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
       <RootSiblingParent>
         <ThemeProvider theme={theme}>
-          {/* <ThemeResponse /> */}
+          <ThemeResponse />
           <SWRConfig value={swrConfig}>
             <View style={containerStyle}>
               <StatusBar style="auto" />
