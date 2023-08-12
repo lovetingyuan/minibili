@@ -525,6 +525,9 @@ function checkSingleUpUpdate(mid: string | number) {
       let latestId = ''
       if (data?.items) {
         data.items.forEach(item => {
+          if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+            return
+          }
           const pubTime = item.modules?.module_author?.pub_ts
           if (pubTime > latestTime) {
             latestTime = pubTime

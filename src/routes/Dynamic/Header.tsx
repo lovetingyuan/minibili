@@ -142,7 +142,7 @@ function HeaderRight() {
               }
               hideMenu()
             }}>
-            关注Up
+            关注UP
           </MenuItem>
         )}
         <MenuItem

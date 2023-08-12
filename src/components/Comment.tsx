@@ -162,7 +162,11 @@ export default React.memo(function Comment(props: Props) {
           idStr={comment.id + '_'}
         />
         {comment.like ? (
-          <Text style={styles.likeNum}> {comment.like}</Text>
+          <Text style={styles.likeNum}>
+            {' '}
+            {comment.like}
+            <Text>{comment.upLike ? '  UP👍' : ''}</Text>
+          </Text>
         ) : null}
         {comment.images?.length ? (
           <Text
@@ -174,6 +178,7 @@ export default React.memo(function Comment(props: Props) {
               }
             }}>
             {'  '}查看图片
+            {comment.images.length > 1 ? `(${comment.images.length})` : ''}
           </Text>
         ) : null}
       </Text>

@@ -9,12 +9,12 @@ import {
 import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps, UpInfo } from '../../types'
-import { Button } from '@rneui/themed'
+// import { Button } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import store, { useStore } from '../../store'
 import { Image } from 'expo-image'
 import { showToast } from '../../utils'
-import commonStyles from '../../styles'
+// import commonStyles from '../../styles'
 
 export default React.memo(function FollowItem(props: {
   item: UpInfo
@@ -115,17 +115,30 @@ export default React.memo(function FollowItem(props: {
         {hasUpdate ? <Badge key={mid} badgeStyle={styles.updateMark} /> : null}
       </View>
       {livingUps[mid] ? (
-        <Button
-          title="直播中~"
-          type="clear"
-          size="sm"
-          radius={'sm'}
-          containerStyle={styles.livingBtn}
-          titleStyle={commonStyles.font14}
-          onPress={gotoLivePage}
-        />
+        <Text style={[styles.name, styles.liveText]} onPress={gotoLivePage}>
+          直播中~
+        </Text>
       ) : (
-        <Text style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+        // <Button
+        //   title="直播中~"
+        //   type="clear"
+        //   size="sm"
+        //   radius={'sm'}
+        //   containerStyle={styles.livingBtn}
+        //   titleStyle={commonStyles.font14}
+        //   onPress={gotoLivePage}
+        // />
+        <Text
+          style={[
+            styles.name,
+            hasUpdate
+              ? {
+                  color: '#E84B85',
+                }
+              : null,
+          ]}
+          numberOfLines={2}
+          ellipsizeMode="tail">
           {name}
         </Text>
       )}
@@ -158,10 +171,14 @@ const styles = StyleSheet.create({
     // top: -40,
     // right: -30,
   },
-  livingBtn: {
-    // borderWidth: 1,
-    top: -5,
-    // position: 'relative',
-    // marginTop: 8,
+  // livingBtn: {
+  //   // borderWidth: 1,
+  //   top: -5,
+  //   // position: 'relative',
+  //   // marginTop: 8,
+  // },
+  liveText: {
+    color: '#008AC5',
+    fontWeight: 'bold',
   },
 })

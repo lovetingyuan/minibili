@@ -118,25 +118,31 @@ function __$hack() {
       display: none!important;
     }
     `
-    const liveInfo = document.querySelector('.room-info')
-    const liveTimeSpan = document.createElement('span')
-    try {
-      const liveTime = new Date(
-        window.__NEPTUNE_IS_MY_WAIFU__.roomInfoRes.data.room_info
-          .live_start_time * 1000,
-      )
-      const minute = liveTime.getMinutes()
-      liveTimeSpan.textContent = `${liveTime.getHours()}:${
-        minute < 10 ? '0' + minute : minute
-      }开始`
-      liveTimeSpan.style.cssText = `
-      font-size: 12px;
-      color: white;
-      margin-left: 10px;
-      margin-right: 5px;
-      `
-      liveInfo.appendChild(liveTimeSpan)
-    } catch (err) {}
+    //https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=23716652
+    const roomId = window.location.pathname.split('/').pop()
+    fetch(
+      'https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=' +
+        roomId,
+    )
+      .then(res => res.json())
+      .then(res => {
+        if (res.code === 0) {
+          const liveTime = new Date(res.data.room_info.live_start_time * 1000)
+          const minute = liveTime.getMinutes()
+          const liveInfo = document.querySelector('.room-info')
+          const liveTimeSpan = document.createElement('span')
+          liveTimeSpan.textContent = `${liveTime.getHours()}:${
+            minute < 10 ? '0' + minute : minute
+          }开始`
+          liveTimeSpan.style.cssText = `
+            font-size: 12px;
+            color: white;
+            margin-left: 10px;
+            margin-right: 6px;
+            `
+          liveInfo.appendChild(liveTimeSpan)
+        }
+      })
   } else if (window.location.pathname.startsWith('/topic-detail')) {
     style.textContent = `
     .topic-detail .m-navbar {
