@@ -59,12 +59,14 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           props.scrollTop()
         }}>
         <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.titleText]}>
-          {userName + '  '}
+          {userName + '   '}
+          {fans ? (
+            <Text style={[styles.fansText]}>
+              {parseNumber(fans.follower)}粉丝
+            </Text>
+          ) : null}
         </Text>
       </Pressable>
-      {fans ? (
-        <Text style={[styles.fansText]}>{parseNumber(fans.follower)}粉丝</Text>
-      ) : null}
       {sex ? (
         <Text
           style={[

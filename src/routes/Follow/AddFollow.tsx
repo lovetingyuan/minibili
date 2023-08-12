@@ -46,11 +46,11 @@ function SearchedItem(props: { up: SearchedUpType }) {
         source={{ uri: up.face + '@100w_100h_1c.webp' }}
         onPress={goToDynamic}
       />
-      <Text style={styles.upName} onPress={goToDynamic}>
+      <Text style={styles.upName} onPress={goToDynamic} numberOfLines={2}>
         {up.name}
-        {'\n'}
-        <Text style={styles.fansText}>{parseNumber(up.fans)}粉丝</Text>
       </Text>
+      <Text style={styles.fansText}>{parseNumber(up.fans)}粉丝</Text>
+
       {followed ? (
         <Button
           size="sm"
@@ -178,15 +178,16 @@ const styles = StyleSheet.create({
     color: '#555',
     fontSize: 12,
   },
-  upName: { marginLeft: 10, fontSize: 15, flexGrow: 1 },
+  upName: { marginLeft: 10, fontSize: 15, flexGrow: 1, flexShrink: 1 },
   emptyText: {
     textAlign: 'center',
     marginVertical: 30,
   },
   fansText: {
     fontSize: 12,
-    color: '#888',
+    color: '#666',
     lineHeight: 20,
+    marginLeft: 8,
   },
   titleContainer: {
     flexDirection: 'row',
