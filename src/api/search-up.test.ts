@@ -18,8 +18,8 @@ describe('search ups', () => {
     const res = await fetcher(url('zkjaskdjkaldsad'))
     SearchResponseSchema.parse(res)
   })
-  test('search-ups-这我是第三方', async () => {
-    const res = await fetcher(url('这我是第三方'))
+  test('search-ups-这我是第三方忽视对方i hi哦', async () => {
+    const res = await fetcher(url('这我是第三方忽视对方i hi哦'))
     SearchResponseSchema.parse(res)
   })
 })

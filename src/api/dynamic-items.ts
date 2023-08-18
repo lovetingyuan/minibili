@@ -512,8 +512,8 @@ export function useDynamicItems(mid?: string | number) {
 }
 
 const upUpdateQueue = new PQueue({
-  concurrency: 15,
-  intervalCap: 5,
+  concurrency: 20,
+  intervalCap: 8,
   interval: 1000,
 })
 

@@ -14,10 +14,11 @@ import { FlashList } from '@shopify/flash-list'
 import store, { useStore } from '../../store'
 import Loading from './Loading'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, parseNumber, showToast } from '../../utils'
+import { handleShareVideo, parseNumber } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { FAB } from '@rneui/themed'
+import useErrToast from '../../hooks/useErrToast'
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
 export default React.memo(function Hot({ navigation }: Props) {
@@ -33,12 +34,7 @@ export default React.memo(function Hot({ navigation }: Props) {
     isReachingEnd,
     error,
   } = useHotVideos()
-
-  React.useEffect(() => {
-    if (error) {
-      showToast('加载视频列表失败')
-    }
-  }, [error])
+  useErrToast('加载视频列表失败', error)
 
   const currentVideoRef = React.useRef<VideoItem | null>(null)
   const addBlackUp = () => {

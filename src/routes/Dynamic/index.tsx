@@ -11,7 +11,7 @@ import { useUserInfo } from '../../api/user-info'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingUpMid } from '../../utils/report'
-import { showToast } from '../../utils'
+import useErrToast from '../../hooks/useErrToast'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -90,11 +90,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
     isReachingEnd,
     error,
   } = useDynamicItems(upId)
-  React.useEffect(() => {
-    if (error) {
-      showToast('请求动态失败')
-    }
-  }, [error])
+  useErrToast('请求动态失败', error)
   const { theme } = useTheme()
   const { width } = useWindowDimensions()
 

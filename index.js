@@ -1,4 +1,4 @@
-import './src/init'
+import './src/bootstrap'
 import { registerRootComponent } from 'expo'
 import App from './src/App'
 
