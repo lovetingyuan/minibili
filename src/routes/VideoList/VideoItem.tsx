@@ -24,7 +24,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           contentFit="cover"
         />
         <View style={styles.textContainer}>
-          <Text style={styles.text} className="text-green-500">
+          <Text className="text-white text-bold text-xs">
             {parseDuration(video.duration)}
           </Text>
         </View>
