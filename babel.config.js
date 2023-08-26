@@ -5,7 +5,10 @@ module.exports = function (api) {
     plugins: ['./scripts/babel-plugin-function-source.js'],
     env: {
       production: {
-        plugins: ['transform-remove-console'],
+        plugins: [
+          'transform-remove-console',
+          ['nativewind/babel', { blockModuleTransform: [] }],
+        ],
       },
     },
   }

@@ -12,7 +12,7 @@ const HeaderTitle = () => {
   return (
     <View style={styles.titleContainer}>
       <Text style={styles.titleText}>
-        我的关注
+        我关注的UP
         {count
           ? updatedCount
             ? `(${updatedCount}/${count})`
