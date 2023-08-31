@@ -3,13 +3,34 @@ import * as SentryExpo from 'sentry-expo'
 import { Linking, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import store from './store'
-import { showFatalError, showToast } from './utils'
+import { showFatalError, showToast, delay } from './utils'
 import { getRemoteConfig } from './api/get-config'
 import Constants from 'expo-constants'
 import { Tags, reportUserOpenApp } from './utils/report'
+import NetInfo from '@react-native-community/netinfo'
 
 async function init() {
   reportUserOpenApp()
+
+  NetInfo.addEventListener(state => {
+    if (state.isConnected && state.type === 'wifi') {
+      store.isWiFi = true
+    } else {
+      store.isWiFi = false
+      if (!state.isConnected) {
+        delay(1500)
+          .then(() => NetInfo.fetch())
+          .then(state2 => {
+            if (!state2.isConnected) {
+              showToast('当前网络状况不佳')
+            }
+          })
+      } else {
+        showToast('请注意当前网络不是Wifi')
+      }
+    }
+  })
+
   const gitHash = Constants.expoConfig?.extra?.gitHash
   if (gitHash) {
     SentryExpo.Native.setTag(Tags.git_hash, gitHash)
