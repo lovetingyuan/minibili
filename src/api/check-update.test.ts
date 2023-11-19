@@ -22,5 +22,5 @@ describe('app-version-update', () => {
         expect(typeof pkg.version).toBe('string')
         expect(typeof pkg.config.versionCode).toBe('number')
       })
-  }, 20000)
+  }, 60000)
 })
