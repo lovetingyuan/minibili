@@ -355,7 +355,7 @@ const AdditionalSchema = z.discriminatedUnion('type', [
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_VOTE]),
     vote: z.object({
       desc: z.string(),
-      end_time: z.number(),
+      end_time: z.union([z.number(), z.string()]),
       join_num: z.number().nullable(),
       uid: z.number(),
       vote_id: z.number(),
@@ -447,7 +447,7 @@ const DynamicItemBaseSchema = z.object({
 export type DynamicItemBaseType = z.infer<typeof DynamicItemBaseSchema>
 
 const BaseOrigSchema = z.object({
-  id_str: z.string().nullable(), // MajorNoneSchema
+  id_str: z.union([z.string().nullable(), z.number().nullable()]), // MajorNoneSchema
   basic: z.object({
     comment_id_str: z.string(),
     comment_type: z.number(),

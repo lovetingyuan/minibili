@@ -3,7 +3,7 @@ module.exports = {
   env: {
     es2022: true,
   },
-  extends: ['@react-native-community', 'plugin:valtio/recommended'],
+  extends: ['@react-native', 'plugin:valtio/recommended'],
   parserOptions: {
     ecmaVersion: 2022,
   },

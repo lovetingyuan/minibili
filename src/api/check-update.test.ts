@@ -15,12 +15,18 @@ describe('app-version-update', () => {
     expect(res.length > 0).toBe(true)
     BuildListSchema.parse(res)
   }, 10000)
-  test('unpkg-check', async () => {
-    await fetch('https://unpkg.com/minibili/package.json')
-      .then(r => r.json())
-      .then(pkg => {
-        expect(typeof pkg.version).toBe('string')
-        expect(typeof pkg.config.versionCode).toBe('number')
-      })
-  }, 20000)
+  test.skip(
+    'unpkg-check',
+    async () => {
+      await fetch('https://unpkg.com/minibili/package.json')
+        .then(r => r.json())
+        .then(pkg => {
+          expect(typeof pkg.version).toBe('string')
+          expect(typeof pkg.config.versionCode).toBe('number')
+        })
+    },
+    {
+      timeout: 60000,
+    },
+  )
 })

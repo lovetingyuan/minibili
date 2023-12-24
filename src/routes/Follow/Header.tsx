@@ -12,11 +12,11 @@ const HeaderTitle = () => {
   return (
     <View style={styles.titleContainer}>
       <Text style={styles.titleText}>
-        我关注的UP
+        关注的UP
         {count
           ? updatedCount
-            ? `(${updatedCount}/${count})`
-            : `(${count})`
+            ? ` (${updatedCount}/${count})`
+            : ` (${count})`
           : ''}
       </Text>
       {checkingUpUpdate ? (

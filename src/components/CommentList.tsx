@@ -53,7 +53,7 @@ const CommentList: React.FC<{
             color={theme.colors.grey1}
           />
           <Text style={[styles.commentCount, { color: theme.colors.grey1 }]}>
-            {allCount || 0}条评论
+            {allCount ? allCount + '条评论' : '暂无评论'}
           </Text>
         </View>
         <View style={styles.right}>{props.dividerRight}</View>
@@ -73,19 +73,16 @@ const CommentList: React.FC<{
           )
         })
       ) : comments?.length === 0 && !commentLoading ? (
-        <View>
-          <Image
-            source={require('../../assets/empty.png')}
-            style={{
-              width: width * 0.3,
-              height: undefined,
-              aspectRatio: 1,
-              alignSelf: 'center',
-              marginTop: 50,
-            }}
-          />
-          <Text style={styles.commentTipText}>暂无评论</Text>
-        </View>
+        <Image
+          source={require('../../assets/empty.png')}
+          style={{
+            width: width * 0.2,
+            height: undefined,
+            aspectRatio: 1,
+            alignSelf: 'center',
+            marginTop: 30,
+          }}
+        />
       ) : null}
       {comments?.length ? (
         <View style={styles.footerContainer}>
@@ -104,7 +101,7 @@ const styles = StyleSheet.create({
   footerText: { color: '#888', fontSize: 12 },
   commentTipText: {
     textAlign: 'center',
-    marginVertical: 40,
+    marginVertical: 20,
   },
   divider: {
     marginVertical: 20,

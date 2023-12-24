@@ -61,12 +61,9 @@ const store = proxy<{
   overlayButtons: [],
   showCaptcha: false,
   get updatedCount() {
-    return Object.values(this.$upUpdateMap).filter(item => {
-      // wtf????
-      return (
-        (item as UpdateUpInfo).latestId !==
-        (item as UpdateUpInfo).currentLatestId
-      )
+    const aa = Object.values<UpdateUpInfo>(this.$upUpdateMap)
+    return aa.filter(item => {
+      return item.latestId !== item.currentLatestId
     }).length
   },
   moreRepliesUrl: '',

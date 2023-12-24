@@ -485,11 +485,12 @@ export function useDynamicItems(mid?: string | number) {
       },
       request,
       {
-        revalidateFirstPage: false,
+        revalidateFirstPage: true,
         errorRetryCount: 3,
         errorRetryInterval: 600,
       },
     )
+
   const dynamicItems: DynamicListResponse['items'] =
     data?.reduce((a, b) => {
       return a.concat(b.items)
@@ -556,29 +557,6 @@ export async function checkUpdateUps(first: boolean) {
       if (id) {
         upUpdateIdMap[up.mid] = id
       }
-      // if (!id) {
-      //   // 失败全部忽略
-      //   if (store.$upUpdateMap[up.mid]) {
-      //     upUpdateIdMap[up.mid] = {
-      //       ...store.$upUpdateMap[up.mid],
-      //     }
-      //   }
-      //   return
-      // }
-      // if (!store.$upUpdateMap[up.mid]) {
-      //   // 没有检查过
-      //   upUpdateIdMap[up.mid] = {
-      //     latestId: id,
-      //     currentLatestId: id,
-      //   }
-      // } else {
-      //   // 检查过
-      //   const { latestId } = store.$upUpdateMap[up.mid]
-      //   upUpdateMap[up.mid] = {
-      //     latestId,
-      //     currentLatestId: id,
-      //   }
-      // }
     })
   }
 
@@ -596,10 +574,9 @@ export async function checkUpdateUps(first: boolean) {
           currentLatestId: id,
         }
       }
-      // if (info) {
-      //   upUpdateMap[mid].latestId = info.latestId
-      // }
     }
-    // store.$upUpdateMap = upUpdateMap
+    store.$upUpdateMap = {
+      ...store.$upUpdateMap,
+    }
   })
 }

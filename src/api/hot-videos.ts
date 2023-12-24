@@ -7,7 +7,9 @@ const fetcher2 = (url: string) => {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('fetch hot videos: ' + url)
 
-  return fetcher<{ list: HotVideoResponse[]; no_more: boolean }>(url)
+  return fetcher<{ list: HotVideoResponse[]; no_more: boolean }>(
+    url + '&_t=' + Date.now(),
+  )
 }
 
 export type HotVideoResponse = z.infer<typeof VideoItemResponseSchema>
@@ -47,9 +49,10 @@ export function useHotVideos() {
       fetcher2,
       {
         revalidateFirstPage: false,
+        // revalidateAll: true,
         // 热门的请求结果并不是严格按照pn来返回的，而是跟请求顺序有关，
         // 比如请求第一页再请求第三页，这个第三页返回的数据其实是第二页
-        // 所以此处不再验证首页，而实直接按顺序请求下一页
+        // 所以此处不再验证首页，否则后续请求又是第二页了，而是直接按顺序请求下一页
       },
     )
   const hotVideos =
@@ -70,6 +73,7 @@ export function useHotVideos() {
     isRefreshing,
     isReachingEnd,
     loading: isLoadingMore,
+    mutate,
     refresh: () => {
       mutate()
     },
