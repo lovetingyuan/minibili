@@ -45,7 +45,8 @@ await spinner('checking env...', async () => {
       assert.equal(d, 'OK', chalk.red('Can not access Expo Api'))
     })
 
-  await $`npm ping && npm whoami --registry=https://registry.npmjs.org/`
+  await $`npm ping`
+  await $`npm whoami --registry=https://registry.npmjs.org/`
 
   await $`git ls-remote https://github.com/lovetingyuan/minibili.git`
 
@@ -161,7 +162,12 @@ echo(chalk.blue('download apk file...'))
 
 try {
   await spinner('downloading apk file...', async () => {
-    await $`rm -rf apk && mkdir -p apk`
+    if (process.platform === 'win32') {
+      await $`rd /s /q apk`
+      await $`mkdir apk`
+    } else {
+      await $`rm -rf apk && mkdir -p apk`
+    }
     return retry(
       3,
       () => $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`,
