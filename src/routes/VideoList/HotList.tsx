@@ -19,6 +19,7 @@ import { Action, reportUserAction } from '../../utils/report'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { FAB } from '@rneui/themed'
 import useErrToast from '../../hooks/useErrToast'
+
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
 export default React.memo(function Hot({ navigation }: Props) {
@@ -30,10 +31,13 @@ export default React.memo(function Hot({ navigation }: Props) {
     setSize,
     isRefreshing,
     loading,
-    refresh,
+    mutate,
     isReachingEnd,
     error,
   } = useHotVideos()
+  React.useEffect(() => {
+    mutate()
+  }, [mutate])
   useErrToast('加载视频列表失败', error)
 
   const currentVideoRef = React.useRef<VideoItem | null>(null)
@@ -147,7 +151,11 @@ export default React.memo(function Hot({ navigation }: Props) {
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
-            {loading ? '加载中...' : isReachingEnd ? '到底了~' : ''}
+            {loading
+              ? `加载中(${list.length})...`
+              : isReachingEnd
+              ? `到底了(${list.length})~`
+              : ''}
           </Text>
         }
         onEndReached={() => {
@@ -155,7 +163,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         }}
         onEndReachedThreshold={0.5}
         refreshing={isRefreshing}
-        onRefresh={refresh}
+        onRefresh={() => mutate()}
         contentContainerStyle={styles.listContainerStyle}
         estimatedFirstItemOffset={100}
       />
@@ -170,7 +178,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         }}
         size="small"
         onPress={() => {
-          refresh()
+          mutate()
           hotListRef.current?.scrollToOffset(0)
         }}
       />

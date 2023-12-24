@@ -5,8 +5,6 @@ import { checkUpdate } from '../api/check-update'
 import type { VideoItem } from '../api/hot-videos'
 import { startCheckLivingUps } from '../api/living-info'
 import { UpInfo } from '../types'
-import NetInfo from '@react-native-community/netinfo'
-import { delay, showToast } from '../utils'
 
 interface UpdateUpInfo {
   latestId: string
@@ -63,12 +61,9 @@ const store = proxy<{
   overlayButtons: [],
   showCaptcha: false,
   get updatedCount() {
-    return Object.values(this.$upUpdateMap).filter(item => {
-      // wtf????
-      return (
-        (item as UpdateUpInfo).latestId !==
-        (item as UpdateUpInfo).currentLatestId
-      )
+    const aa = Object.values<UpdateUpInfo>(this.$upUpdateMap)
+    return aa.filter(item => {
+      return item.latestId !== item.currentLatestId
     }).length
   },
   moreRepliesUrl: '',
@@ -119,22 +114,3 @@ export function setStore(callback: (s: typeof store) => void) {
 }
 
 export default store
-
-NetInfo.addEventListener(state => {
-  if (state.isConnected && state.type === 'wifi') {
-    store.isWiFi = true
-  } else {
-    store.isWiFi = false
-    if (!state.isConnected) {
-      delay(1500)
-        .then(() => NetInfo.fetch())
-        .then(state2 => {
-          if (!state2.isConnected) {
-            showToast('当前网络状况不佳')
-          }
-        })
-    } else {
-      showToast('请注意当前网络不是Wifi')
-    }
-  }
-})

@@ -15,12 +15,13 @@ import Player from './Player'
 import { useVideoInfo } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
-import { showToast } from '../../utils'
+import { parseNumber, showToast } from '../../utils'
 import VideoInfoContext from './videoContext'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingVideoId } from '../../utils/report'
 import commonStyles from '../../styles'
+import { useUserRelation } from '../../api/user-relation'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
@@ -36,14 +37,26 @@ const PlayPage: React.FC<Props> = ({ route, navigation }) => {
       bvid,
     }
   }, [bvid, video, video2])
+  const { data: fans } = useUserRelation(videoInfo?.mid)
 
   React.useEffect(() => {
     if (videoInfo.name) {
       navigation.setOptions({
-        headerTitle: videoInfo.name,
+        headerTitle: () => {
+          return (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ fontSize: 18, fontWeight: '600' }}>
+                {videoInfo.name}
+              </Text>
+              <Text style={{ marginLeft: 10 }}>
+                {` ${fans ? parseNumber(fans.follower) : ''}粉丝`}
+              </Text>
+            </View>
+          )
+        },
       })
     }
-  }, [navigation, videoInfo.name])
+  }, [navigation, videoInfo.name, fans])
   useFocusEffect(
     useMemoizedFn(() => {
       setViewingVideoId(bvid)
