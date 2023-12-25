@@ -1,15 +1,9 @@
 import React from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  useWindowDimensions,
-} from 'react-native'
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native'
 import { VideoItem } from '../../api/hot-videos'
 import { parseDate, parseDuration, parseNumber } from '../../utils'
 import { useTheme } from '@rneui/themed'
-// import { Image } from 'expo-image'
+import { Image } from 'expo-image'
 import commonStyles from '../../styles'
 import { useStore } from '../../store'
 
@@ -26,8 +20,9 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
       <View style={commonStyles.flex1}>
         <Image
           width={itemWidth}
+          contentFit="cover"
           style={[styles.image, { width: itemWidth }]}
-          source={{ uri: video.cover + ratio }}
+          source={video.cover + ratio}
         />
         <View style={styles.textContainer}>
           <Text className="text-white text-bold text-xs">
@@ -117,6 +112,7 @@ const styles = StyleSheet.create({
   },
   image: {
     flex: 1,
+    width: '100%',
     borderRadius: 5,
     aspectRatio: 1.6,
   },
