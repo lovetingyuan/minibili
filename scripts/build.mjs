@@ -76,7 +76,7 @@ let appVersion
 
 await spinner('checking current build list...', async () => {
   const currentBuild =
-    await $`eas build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
+    await $`npx -y eas-cli@latest build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
   appVersion = getBuildList(currentBuild)[0].appVersion
   if (appVersion !== version) {
     throw new Error(
@@ -120,7 +120,7 @@ let latestBuildList
 
 try {
   await spinner('eas building...', async () => {
-    await $`eas build --platform android --profile production --message ${changes} --json --non-interactive`
+    await $`npx -y eas-cli@latest build --platform android --profile production --message ${changes} --json --non-interactive`
     return new Promise(r => setTimeout(r, 1000))
   })
   let buildListStr = ''
@@ -131,7 +131,7 @@ try {
       retry(
         3,
         () =>
-          $`eas build:list --platform android --limit 5 --json --non-interactive --status finished --channel production`,
+          $`npx -y eas-cli@latest build:list --platform android --limit 5 --json --non-interactive --status finished --channel production`,
       ),
     )
   } catch (err) {
