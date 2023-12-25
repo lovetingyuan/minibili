@@ -47,6 +47,7 @@ export default function ForwardItem(props: {
         {forwardRichTextContent}
         <View style={{ flexDirection: 'row' }}>
           <Image
+            width={120}
             style={styles.videoCover}
             source={{ uri: cover + '@240w_150h_1c.webp' }}
           />
@@ -74,6 +75,7 @@ export default function ForwardItem(props: {
           {payload.images.map((img, i) => {
             return (
               <Image
+                height={70}
                 style={[styles.image, { aspectRatio: img.ratio }]}
                 key={img.src + i}
                 source={{ uri: img.src + '@240w_240h_1c.webp' }}

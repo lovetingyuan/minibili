@@ -24,7 +24,11 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   return (
     <View style={[styles.itemContainer, { width: itemWidth }]}>
       <View style={commonStyles.flex1}>
-        <Image style={styles.image} source={{ uri: video.cover + ratio }} />
+        <Image
+          width={itemWidth}
+          style={[styles.image, { width: itemWidth }]}
+          source={{ uri: video.cover + ratio }}
+        />
         <View style={styles.textContainer}>
           <Text className="text-white text-bold text-xs">
             {parseDuration(video.duration)}
@@ -113,8 +117,6 @@ const styles = StyleSheet.create({
   },
   image: {
     flex: 1,
-    width: undefined,
-    maxWidth: '100%',
     borderRadius: 5,
     aspectRatio: 1.6,
   },
