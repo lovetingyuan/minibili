@@ -13,12 +13,12 @@ const bundlesDir = path.join(__dirname, '../dist/bundles')
 const files = fs.readdirSync(bundlesDir)
 console.log('build paths:', bundlesDir, files)
 
-const android = files.find(f => f.startsWith('android-') && f.endsWith('.js'))
+// const android = files.find(f => f.startsWith('android-') && f.endsWith('.js'))
 
-fs.renameSync(
-  path.join(bundlesDir, android),
-  path.join(bundlesDir, 'index.android.bundle'),
-)
+// fs.renameSync(
+//   path.join(bundlesDir, android),
+//   path.join(bundlesDir, 'index.android.bundle'),
+// )
 
 const androidSourceMap = files.find(
   f => f.startsWith('android-') && f.endsWith('.map'),
