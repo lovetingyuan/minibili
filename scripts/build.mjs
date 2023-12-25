@@ -3,6 +3,7 @@
 
 // import { BuildListSchema } from '../src/api/check-update.schema.ts'
 // 1 检查环境 2 写入版本 3 eas构建 4 写入更新日志 5 下载apk 6 git推送
+
 require('dotenv').config({
   path: path.resolve(__dirname, '../.env'),
 })
@@ -25,7 +26,7 @@ const getBuildList = buildStr => {
 $.verbose = false
 
 // echo(chalk.blue('checking env...'))
-await spinner('checking env...', async () => {
+await spinner('Checking build env...', async () => {
   assert.equal(
     typeof process.env.SENTRY_AUTH_TOKEN,
     'string',
@@ -46,7 +47,17 @@ await spinner('checking env...', async () => {
     })
 
   await $`npm ping`
-  await $`npm whoami --registry=https://registry.npmjs.org/`
+  const npmuser = await $`npm whoami --registry=https://registry.npmjs.org/`
+  assert.ok(
+    npmuser && npmuser.toString('utf8').trim().length > 0,
+    chalk.red('npm user not login.'),
+  )
+
+  const easuser = await $`npx --yes eas-cli@latest whoami`
+  assert.ok(
+    easuser && easuser.toString('utf8').trim().length > 0,
+    chalk.red('EAS cli not login.'),
+  )
 
   await $`git ls-remote https://github.com/lovetingyuan/minibili.git`
 
@@ -56,9 +67,10 @@ await spinner('checking env...', async () => {
     'main',
     chalk.red('Current branch is not main'),
   )
+  await $`git push`
 })
 
-echo(chalk.green('env is alright'))
+echo(chalk.green('environment is alright.'))
 
 let appVersion
 
@@ -109,7 +121,7 @@ let latestBuildList
 try {
   await spinner('eas building...', async () => {
     await $`eas build --platform android --profile production --message ${changes} --json --non-interactive`
-    return new Promise(r => setTimeout(r, 3000))
+    return new Promise(r => setTimeout(r, 1000))
   })
   let buildListStr = ''
   echo(chalk.green('eas build done.'))
@@ -176,6 +188,7 @@ try {
   echo(chalk.blue(`saved to ./apk/minibili-${newVersion}.apk`))
 } catch (err) {
   echo(chalk.red('Failed to download latest apk.'))
+  echo(`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`)
   throw err
 }
 
@@ -186,25 +199,39 @@ try {
   echo(chalk.blue('published to npm success.'))
 } catch (err) {
   echo(chalk.red('Failed to publish to npm.'))
+  echo('npm publish --registry=https://registry.npmjs.org/')
   throw err
 }
 
 try {
-  // await $`git commit -a --amend -C HEAD`
   const message = `release(v${newVersion}): ${changes}`
   await spinner('git push change...', async () => {
     await $`git commit -am ${message}`
     return retry(5, () => $`git push`)
   })
   echo(chalk.green('git push commit done.'))
+} catch (err) {
+  echo(chalk.red('Failed to publish to github.'))
+  echo('git push')
+  throw err
+}
+
+try {
   await spinner('git push tag...', async () => {
     await $`git tag -a v${newVersion} -m ${changes}`
     return retry(5, () => $`git push origin v${newVersion}`)
   })
   echo(chalk.green('git push tags done.'))
 } catch (err) {
-  echo(chalk.red('Failed to push to git.'))
+  echo(chalk.red('Failed to push tags to git.'))
+  echo(`git push origin v${newVersion}`)
   throw err
+}
+
+if (process.platform === 'win32') {
+  await $`start https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${changes}`
+} else {
+  await $`open https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${changes}`
 }
 
 echo(chalk.green('Build done!'))

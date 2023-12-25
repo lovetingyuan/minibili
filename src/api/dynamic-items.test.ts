@@ -3,10 +3,10 @@ import { test } from 'vitest'
 import { DynamicListResponseSchema } from './dynamic-items.schema'
 
 test('dynamic-list', async () => {
-  const { data: list } = (await fetch(
+  const { list } = (await fetcher(
     'https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1',
-  ).then(r => r.json())) as any
-  const mids = list.list.map((v: any) => v.owner.mid).concat([1458143131])
+  )) as any
+  const mids = list.map((v: any) => v.owner.mid).concat([1458143131])
   const failedList: string[] = []
   const list352: string[] = []
   for (const mid of mids) {

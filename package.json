@@ -88,9 +88,7 @@
   "knip": {
     "$schema": "https://unpkg.com/knip@2/schema.json",
     "entry": [
-      "app.config.js",
-      "babel.config.js",
-      "src/App.tsx"
+      "*.js"
     ],
     "project": [
       "src/**/*.ts",
