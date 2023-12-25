@@ -21,7 +21,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
         <Image
           width={itemWidth}
           contentFit="cover"
-          style={[styles.image, { width: itemWidth }]}
+          style={[styles.image]}
           source={video.cover + ratio}
         />
         <View style={styles.textContainer}>
