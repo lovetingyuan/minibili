@@ -2,7 +2,6 @@ import { z } from 'zod'
 import request from './fetcher'
 import { LiveInfoBatchItemSchema } from './living-info.schema'
 import store from '../store'
-import { throttle } from 'throttle-debounce'
 import { Vibration } from 'react-native'
 import useSWR from 'swr'
 
@@ -36,17 +35,6 @@ export const useLivingInfo = (mid?: string | number) => {
 
 let prevLivingMap: Record<string, string> = {}
 
-const vibrate = throttle(
-  10000,
-  () => {
-    Vibration.vibrate(900)
-  },
-  {
-    noLeading: false,
-    noTrailing: false,
-  },
-)
-
 export const checkLivingUps = () => {
   if (!store.$followedUps.length) {
     return
@@ -66,9 +54,11 @@ export const checkLivingUps = () => {
         livingMap[mid] = 'https://live.bilibili.com/h5/' + room_id
       }
     })
+    let notVibrate = true
     for (const id in livingMap) {
-      if (!(id in prevLivingMap)) {
-        vibrate()
+      if (!(id in prevLivingMap) && notVibrate) {
+        Vibration.vibrate(900)
+        notVibrate = false
         break
       }
     }

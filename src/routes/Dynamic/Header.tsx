@@ -4,7 +4,7 @@ import { View, StyleSheet, Pressable, Linking } from 'react-native'
 import store, { useStore } from '../../store'
 import { handleShareUp, parseNumber, showToast } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
-import { Image } from 'expo-image'
+// import { Image } from 'expo-image'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { NavigationProps, RootStackParamList } from '../../types'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -46,7 +46,6 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
         <Avatar
           size={33}
           rounded
-          ImageComponent={Image}
           onPress={gotoWebPage}
           source={{
             uri: dynamicUser?.face + '@120w_120h_1c.webp',

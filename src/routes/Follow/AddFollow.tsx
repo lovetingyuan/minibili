@@ -16,8 +16,9 @@ import {
   StyleSheet,
   View,
   useWindowDimensions,
+  Image,
 } from 'react-native'
-import { Image } from 'expo-image'
+// import { Image } from 'expo-image'
 import { parseNumber, showToast } from '../../utils'
 import store, { useStore } from '../../store'
 
@@ -40,7 +41,6 @@ function SearchedItem(props: { up: SearchedUpType }) {
   return (
     <View key={up.mid} style={styles.upItem}>
       <Avatar
-        ImageComponent={Image}
         size={40}
         rounded
         source={{ uri: up.face + '@100w_100h_1c.webp' }}

@@ -12,7 +12,7 @@ import { NavigationProps, UpInfo } from '../../types'
 // import { Button } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import store, { useStore } from '../../store'
-import { Image } from 'expo-image'
+// import { Image } from 'expo-image'
 import { showToast } from '../../utils'
 // import commonStyles from '../../styles'
 
@@ -109,7 +109,6 @@ export default React.memo(function FollowItem(props: {
         <Avatar
           size={46}
           rounded
-          ImageComponent={Image}
           source={{ uri: face + '@120w_120h_1c.webp' }}
         />
         {hasUpdate ? <Badge key={mid} badgeStyle={styles.updateMark} /> : null}

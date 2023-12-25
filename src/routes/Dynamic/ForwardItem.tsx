@@ -1,5 +1,11 @@
 import React from 'react'
-import { StyleSheet, View, Pressable, TouchableOpacity } from 'react-native'
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  TouchableOpacity,
+  Image,
+} from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -9,7 +15,7 @@ import { Avatar, Text, useTheme } from '@rneui/themed'
 import RichTexts from '../../components/RichTexts'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
-import { Image } from 'expo-image'
+// import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
 import commonStyles from '../../styles'

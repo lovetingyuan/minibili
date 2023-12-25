@@ -1,9 +1,15 @@
 import React from 'react'
-import { View, Text, StyleSheet, useWindowDimensions } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  useWindowDimensions,
+} from 'react-native'
 import { VideoItem } from '../../api/hot-videos'
 import { parseDate, parseDuration, parseNumber } from '../../utils'
 import { useTheme } from '@rneui/themed'
-import { Image } from 'expo-image'
+// import { Image } from 'expo-image'
 import commonStyles from '../../styles'
 import { useStore } from '../../store'
 
@@ -18,11 +24,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   return (
     <View style={[styles.itemContainer, { width: itemWidth }]}>
       <View style={commonStyles.flex1}>
-        <Image
-          style={styles.image}
-          source={{ uri: video.cover + ratio }}
-          contentFit="cover"
-        />
+        <Image style={styles.image} source={{ uri: video.cover + ratio }} />
         <View style={styles.textContainer}>
           <Text className="text-white text-bold text-xs">
             {parseDuration(video.duration)}

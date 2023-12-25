@@ -89,20 +89,20 @@ export default function App() {
     })
   }, [dark])
   return (
-    <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
-      <RootSiblingParent>
+    <RootSiblingParent>
+      <StatusBar style="auto" />
+      <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
         <ThemeProvider theme={theme}>
           <ThemeResponse />
           <SWRConfig value={swrConfig}>
             <View style={containerStyle}>
-              <StatusBar style="auto" />
               <ButtonsOverlay />
               <ImagesView />
               <Route />
             </View>
           </SWRConfig>
         </ThemeProvider>
-      </RootSiblingParent>
-    </SentryExpo.Native.ErrorBoundary>
+      </SentryExpo.Native.ErrorBoundary>
+    </RootSiblingParent>
   )
 }

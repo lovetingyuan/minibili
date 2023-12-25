@@ -4,13 +4,14 @@ import {
   View,
   TouchableOpacity,
   useWindowDimensions,
+  Image,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import store from '../../store'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import RichTexts from '../../components/RichTexts'
-import { Image } from 'expo-image'
+// import { Image } from 'expo-image'
 import { Additional } from '../../components/Additional'
 import { NavigationProps } from '../../types'
 
@@ -41,7 +42,6 @@ export default function WordDrawItem(props: {
           <Image
             key={img.src + i}
             style={[styles.image]}
-            contentFit="cover"
             source={{
               uri: img.src + '@240w_240h_1c.webp',
             }}
@@ -77,7 +77,6 @@ export default function WordDrawItem(props: {
           <Image
             key={img.src + i}
             style={[{ aspectRatio: 1, width: imageListWidth, borderRadius: 4 }]}
-            contentFit="cover"
             source={{
               uri: img.src + '@240w_240h_1c.webp',
             }}

@@ -17,7 +17,7 @@ import { parseUrl } from '../utils'
 
 export default React.memo(
   function RichTexts(props: {
-    idStr: string | null
+    idStr: string | number | null
     nodes?: RichTextNode[]
     topic?: {
       name: string

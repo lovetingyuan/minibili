@@ -1,5 +1,4 @@
 import { Share, Platform, ToastAndroid, Alert, Linking } from 'react-native'
-import { debounce } from 'throttle-debounce'
 import Toast from 'react-native-root-toast'
 import store from '../store'
 
@@ -116,22 +115,16 @@ const showedMessage: Record<string, () => void> = {}
 
 export function showToast(message: string, long = false) {
   if (!(message in showedMessage)) {
-    showedMessage[message] = debounce(
-      2000,
-      () => {
-        Platform.OS === 'android'
-          ? ToastAndroid.show(
-              message,
-              long ? ToastAndroid.LONG : ToastAndroid.SHORT,
-            )
-          : Toast.show(message, {
-              duration: long ? Toast.durations.LONG : Toast.durations.SHORT,
-            })
-      },
-      {
-        atBegin: true,
-      },
-    )
+    showedMessage[message] = () => {
+      Platform.OS === 'android'
+        ? ToastAndroid.show(
+            message,
+            long ? ToastAndroid.LONG : ToastAndroid.SHORT,
+          )
+        : Toast.show(message, {
+            duration: long ? Toast.durations.LONG : Toast.durations.SHORT,
+          })
+    }
   }
   showedMessage[message]()
 }
