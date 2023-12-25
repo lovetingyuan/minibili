@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
 } from 'react-native'
 import { Button, Icon, Text } from '@rneui/themed'
-import { githubLink, site } from '../../constants'
+import { githubLink } from '../../constants'
 
 export default React.memo(function Header() {
   const { width } = useWindowDimensions()
@@ -17,11 +17,11 @@ export default React.memo(function Header() {
       <Pressable
         style={styles.container}
         onPress={() => {
-          if (__DEV__) {
-            throw new Error('error happens')
-          } else {
-            Linking.openURL(site)
-          }
+          // if (__DEV__) {
+          //   throw new Error('error happens')
+          // } else {
+          //   Linking.openURL(site)
+          // }
         }}>
         <Image
           source={require('../../../assets/minibili.png')}
