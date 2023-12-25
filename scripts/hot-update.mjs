@@ -11,6 +11,7 @@ const updateInfo = JSON.parse(output.substring(output.lastIndexOf('[')))[0]
 const bundlesDir = path.join(__dirname, '../dist/bundles')
 
 const files = fs.readdirSync(bundlesDir)
+console.log('build paths:', bundlesDir, files)
 
 const android = files.find(f => f.startsWith('android-') && f.endsWith('.js'))
 
