@@ -185,7 +185,10 @@ try {
       () => $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`,
     )
   })
-  echo(chalk.blue(`saved to ./apk/minibili-${newVersion}.apk`))
+  echo(chalk.blue(`Saved apk to ./apk/minibili-${newVersion}.apk`))
+  try {
+    await $`du -h apk/minibili-${newVersion}.apk`
+  } catch (e) {}
 } catch (err) {
   echo(chalk.red('Failed to download latest apk.'))
   echo(`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`)
