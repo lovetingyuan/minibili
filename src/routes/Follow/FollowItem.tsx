@@ -12,7 +12,7 @@ import { NavigationProps, UpInfo } from '../../types'
 // import { Button } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import store, { useStore } from '../../store'
-// import { Image } from 'expo-image'
+import { Image } from 'expo-image'
 import { showToast } from '../../utils'
 // import commonStyles from '../../styles'
 
@@ -108,6 +108,7 @@ export default React.memo(function FollowItem(props: {
       <View>
         <Avatar
           size={46}
+          ImageComponent={Image}
           rounded
           source={{ uri: face + '@120w_120h_1c.webp' }}
         />
@@ -118,15 +119,6 @@ export default React.memo(function FollowItem(props: {
           直播中~
         </Text>
       ) : (
-        // <Button
-        //   title="直播中~"
-        //   type="clear"
-        //   size="sm"
-        //   radius={'sm'}
-        //   containerStyle={styles.livingBtn}
-        //   titleStyle={commonStyles.font14}
-        //   onPress={gotoLivePage}
-        // />
         <Text
           style={[
             styles.name,

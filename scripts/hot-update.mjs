@@ -23,7 +23,7 @@ console.log('build paths:', bundlesDir, files)
 const androidSourceMap = files.find(
   f => f.startsWith('android-') && f.endsWith('.map'),
 )
-const appConfig = require('../app.config')
+const appConfig = require('../app.config').default
 
 // await $`npx sentry-cli releases \
 // files ${appConfig.android.package}@${appConfig.version}+${appConfig.android.versionCode} \

@@ -71,14 +71,14 @@ module.exports = {
     },
   },
   plugins: [
-    [
-      'expo-notifications',
-      {
-        icon: './assets/icon.png',
-        color: '#ffffff',
-        sounds: [],
-      },
-    ],
+    // [
+    //   'expo-notifications',
+    //   {
+    //     icon: './assets/icon.png',
+    //     color: '#ffffff',
+    //     sounds: [],
+    //   },
+    // ],
     'sentry-expo',
   ],
   extra: {

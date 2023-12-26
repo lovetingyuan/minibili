@@ -18,14 +18,9 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   return (
     <View style={[styles.itemContainer, { width: itemWidth }]}>
       <View style={commonStyles.flex1}>
-        <Image
-          width={itemWidth}
-          contentFit="cover"
-          style={[styles.image]}
-          source={video.cover + ratio}
-        />
+        <Image style={[styles.image]} source={video.cover + ratio} />
         <View style={styles.textContainer}>
-          <Text className="text-white text-bold text-xs">
+          <Text style={{ color: 'white', fontSize: 12 }}>
             {parseDuration(video.duration)}
           </Text>
         </View>
