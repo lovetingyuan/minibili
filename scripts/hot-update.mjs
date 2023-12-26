@@ -3,7 +3,7 @@
 require('dotenv').config()
 // const fs = require('fs')
 const updateOutput =
-  await $`eas update --branch main --json --non-interactive --platform android --message ${'upload sourcemap'}`
+  await $`npx -y eas-cli@latest update --branch main --json --non-interactive --platform android --message ${'upload sourcemap'}`
 
 const output = updateOutput.toString('utf8')
 const updateInfo = JSON.parse(output.substring(output.lastIndexOf('[')))[0]
@@ -23,8 +23,8 @@ console.log('build paths:', bundlesDir, files)
 const androidSourceMap = files.find(
   f => f.startsWith('android-') && f.endsWith('.map'),
 )
-const appConfig = require('../app.config').default
-
+const appConfig = require('../app.config')
+console.log(appConfig)
 // await $`npx sentry-cli releases \
 // files ${appConfig.android.package}@${appConfig.version}+${appConfig.android.versionCode} \
 // upload-sourcemaps \
@@ -32,7 +32,7 @@ const appConfig = require('../app.config').default
 // --org tingyuan123 \
 // --rewrite dist/bundles/${android} dist/bundles/${androidSourceMap}`
 
-await $`npx sentry-cli releases --org=tingyuan123 \
+await $`npx -y sentry-cli releases --org=tingyuan123 \
 files ${appConfig.android.package}@${appConfig.version}+${
   appConfig.android.versionCode
 } \
