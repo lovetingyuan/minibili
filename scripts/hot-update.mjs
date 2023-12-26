@@ -24,7 +24,6 @@ const androidSourceMap = files.find(
   f => f.startsWith('android-') && f.endsWith('.map'),
 )
 const appConfig = require('../app.config')
-console.log(appConfig)
 // await $`npx sentry-cli releases \
 // files ${appConfig.android.package}@${appConfig.version}+${appConfig.android.versionCode} \
 // upload-sourcemaps \

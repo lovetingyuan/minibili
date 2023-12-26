@@ -8,6 +8,7 @@ import Statement from './Statement'
 import BlackUps from './BlackUps'
 import BlackTags from './BlackTags'
 import SortCate from './SortCate'
+import Backup from './Backup'
 
 export default React.memo(function About() {
   const content = (
@@ -16,6 +17,7 @@ export default React.memo(function About() {
       <Divider style={{ marginBottom: 18, marginTop: 15 }} />
       <Version />
       <Feedback />
+      <Backup />
       <Statement />
       <Divider style={{ marginBottom: 18 }} />
       <BlackTags />
