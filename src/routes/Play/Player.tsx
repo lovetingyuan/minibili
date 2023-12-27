@@ -14,7 +14,7 @@ import {
 import WebView, { WebViewMessageEvent } from 'react-native-webview'
 import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
-import { parseDuration, showToast } from '../../utils'
+import { imgUrl, parseDuration, showToast } from '../../utils'
 import { Icon } from '@rneui/themed'
 import VideoInfoContext from './videoContext'
 import commonStyles from '../../styles'
@@ -103,10 +103,12 @@ export default React.memo(function Player() {
   }
   const renderLoading = () => (
     <View style={styles.loadingView}>
-      <Image
-        source={{ uri: videoInfo.cover + '@672w_420h_1c.webp' }}
-        style={styles.loadingImage}
-      />
+      {videoInfo.cover ? (
+        <Image
+          source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
+          style={styles.loadingImage}
+        />
+      ) : null}
       <ActivityIndicator
         size={'large'}
         color={'#ff746f'}
@@ -177,20 +179,22 @@ export default React.memo(function Player() {
             setLoadPlayer(true)
           }}
           style={commonStyles.flex1}>
-          <ImageBackground
-            source={{ uri: videoInfo.cover + '@672w_420h_1c.webp' }}
-            resizeMode="cover"
-            style={styles.videoCover}>
-            <Icon
-              name="television-play"
-              type="material-community"
-              size={60}
-              color={'white'}
-            />
-            <Text style={styles.duration}>
-              {parseDuration(videoInfo?.duration)}
-            </Text>
-          </ImageBackground>
+          {videoInfo.cover ? (
+            <ImageBackground
+              source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
+              resizeMode="cover"
+              style={styles.videoCover}>
+              <Icon
+                name="television-play"
+                type="material-community"
+                size={60}
+                color={'white'}
+              />
+              <Text style={styles.duration}>
+                {parseDuration(videoInfo?.duration)}
+              </Text>
+            </ImageBackground>
+          ) : null}
         </Pressable>
       )}
     </View>

@@ -4,16 +4,16 @@ import {
   View,
   TouchableOpacity,
   useWindowDimensions,
-  Image,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import store from '../../store'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import RichTexts from '../../components/RichTexts'
-// import { Image } from 'expo-image'
+import { Image } from 'expo-image'
 import { Additional } from '../../components/Additional'
 import { NavigationProps } from '../../types'
+import { imgUrl } from '../../utils'
 
 export default function WordDrawItem(props: {
   item: DynamicItemType<
@@ -43,7 +43,7 @@ export default function WordDrawItem(props: {
             key={img.src + i}
             style={[styles.image]}
             source={{
-              uri: img.src + '@240w_240h_1c.webp',
+              uri: imgUrl(img.src, 240),
             }}
           />
         )
@@ -68,8 +68,8 @@ export default function WordDrawItem(props: {
     images.length > 2
       ? width / 3 - 10
       : images.length === 2
-      ? width / 2 - 15
-      : width / 2
+        ? width / 2 - 15
+        : width / 2
   const imageList = (
     <View style={[styles.imageListContainer]}>
       {images.map((img, i) => {
@@ -78,7 +78,7 @@ export default function WordDrawItem(props: {
             key={img.src + i}
             style={[{ aspectRatio: 1, width: imageListWidth, borderRadius: 4 }]}
             source={{
-              uri: img.src + '@240w_240h_1c.webp',
+              uri: imgUrl(img.src, 240),
             }}
           />
         )

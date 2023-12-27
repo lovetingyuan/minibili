@@ -19,6 +19,7 @@ import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import commonStyles from '../../styles'
+import { imgUrl } from '../../utils'
 
 type ItemType =
   | HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE
@@ -91,7 +92,7 @@ export function CommonContent(props: {
     <View style={styles.contentContainer}>
       {cover ? (
         <Image
-          source={{ uri: cover + '@240w_150h_1c.webp' }}
+          source={{ uri: imgUrl(cover, 240, 150) }}
           style={{
             width: width * 0.35,
             height: undefined,

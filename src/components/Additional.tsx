@@ -3,7 +3,7 @@ import { StyleSheet, View, Pressable, Linking } from 'react-native'
 import { AdditionalType } from '../api/dynamic-items.schema'
 import { HandledAdditionalTypeEnum } from '../api/dynamic-items.type'
 import { Image } from 'expo-image'
-import { parseDate, parseNumber, parseUrl } from '../utils'
+import { imgUrl, parseDate, parseNumber, parseUrl } from '../utils'
 import { Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
@@ -49,7 +49,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
     additionalContent = (
       <View style={styles.content}>
         <Image
-          source={{ uri: additional.ugc.cover + '@200w_100h_1c.webp' }}
+          source={{ uri: imgUrl(additional.ugc.cover, 200, 100) }}
           style={styles.image}
         />
         <View style={styles.text}>
@@ -72,7 +72,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
     additionalContent = (
       <View style={styles.content}>
         <Image
-          source={{ uri: additional.common.cover + '@200w_100h_1c.webp' }}
+          source={{ uri: imgUrl(additional.common.cover, 200, 100) }}
           style={styles.image}
         />
         <View style={styles.text}>
