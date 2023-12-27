@@ -6,7 +6,7 @@ import {
   useWindowDimensions,
   StyleSheet,
   TouchableOpacity,
-  Image,
+  // Image,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 import { Text } from '@rneui/themed'
-// import { Image } from 'expo-image'
+import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 import commonStyles from '../../styles'
