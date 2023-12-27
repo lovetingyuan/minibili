@@ -174,7 +174,10 @@ export default React.memo(function Comment(props: Props) {
             style={{ color: theme.colors.primary }}
             onPress={() => {
               if (comment.images) {
-                store.imagesList = comment.images
+                store.imagesList = comment.images.map(img => {
+                  img.src = imgUrl(img.src)
+                  return img
+                })
                 store.currentImageIndex = 0
               }
             }}>
