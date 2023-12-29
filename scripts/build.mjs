@@ -180,10 +180,12 @@ try {
     } else {
       await $`rm -rf apk && mkdir -p apk`
     }
-    return retry(
-      3,
-      () => $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`,
-    )
+    return retry(3, () => {
+      if (process.platform === 'win32') {
+        return $`certutil -urlcache -split -f ${apkUrl} ./apk/minibili-${newVersion}.apk`
+      }
+      return $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`
+    })
   })
   echo(chalk.blue(`Saved apk to ./apk/minibili-${newVersion}.apk`))
   try {
@@ -232,9 +234,13 @@ try {
 }
 
 if (process.platform === 'win32') {
-  await $`start https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${changes}`
+  await $`start https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
+    changes,
+  )}`
 } else {
-  await $`open https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${changes}`
+  await $`open https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
+    changes,
+  )}`
 }
 
 echo(chalk.green('Build done!'))
