@@ -19,7 +19,7 @@ const store = proxy<{
   $videoCatesList: { rid: number; label: string }[]
   $ignoredVersions: string[]
   $cookie: string
-  $cachedHotVideos: VideoItem[]
+  // $cachedHotVideos: VideoItem[]
   // $pinUps: Record<string, number>
   // ----------------------------
   initialed: boolean
@@ -48,7 +48,7 @@ const store = proxy<{
   $ignoredVersions: [],
   $videoCatesList: RanksConfig,
   $cookie: '',
-  $cachedHotVideos: [],
+  // $cachedHotVideos: [],
   // $pinUps: {},
   // -------------------------
   initialed: false,

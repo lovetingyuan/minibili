@@ -44,7 +44,7 @@ export function useHotVideos() {
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite(
       index => {
-        return `/x/web-interface/popular?ps=20&pn=${index + 1}`
+        return `/x/web-interface/popular?ps=30&pn=${index + 1}`
       },
       fetcher2,
       {
