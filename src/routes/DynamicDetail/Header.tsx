@@ -3,6 +3,8 @@ import { NavigationProps, RootStackParamList } from '../../types'
 import React from 'react'
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { Icon, Avatar, Text } from '@rneui/themed'
+import { imgUrl } from '../../utils'
+import { Image } from 'expo-image'
 
 function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -29,7 +31,12 @@ export function HeaderTitle() {
   const { face, name } = route.params.detail
   return (
     <View style={styles.container}>
-      <Avatar size={33} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
+      <Avatar
+        size={33}
+        rounded
+        source={{ uri: imgUrl(face, 80) }}
+        ImageComponent={Image}
+      />
       <Text style={styles.text}>{name}的动态</Text>
     </View>
   )

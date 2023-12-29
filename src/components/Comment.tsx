@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 import store from '../store'
 import commonStyles from '../styles'
+import { imgUrl } from '../utils'
 
 interface Props {
   upName: string
@@ -59,7 +60,7 @@ function CommentText(props: {
           return (
             <Image
               key={idStr + i}
-              source={{ uri: node.url }}
+              source={{ uri: imgUrl(node.url) }}
               style={styles.emoji}
             />
           )
@@ -173,7 +174,10 @@ export default React.memo(function Comment(props: Props) {
             style={{ color: theme.colors.primary }}
             onPress={() => {
               if (comment.images) {
-                store.imagesList = comment.images
+                store.imagesList = comment.images.map(img => {
+                  img.src = imgUrl(img.src)
+                  return img
+                })
                 store.currentImageIndex = 0
               }
             }}>

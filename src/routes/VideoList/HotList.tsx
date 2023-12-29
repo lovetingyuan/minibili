@@ -22,6 +22,8 @@ import useErrToast from '../../hooks/useErrToast'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
+let refreshTime = Date.now()
+
 export default React.memo(function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
   const { $blackUps, $blackTags } = useStore()
@@ -36,7 +38,10 @@ export default React.memo(function Hot({ navigation }: Props) {
     error,
   } = useHotVideos()
   React.useEffect(() => {
-    mutate()
+    if (Date.now() - refreshTime > 5 * 60 * 1000) {
+      mutate()
+      refreshTime = Date.now()
+    }
   }, [mutate])
   useErrToast('加载视频列表失败', error)
 

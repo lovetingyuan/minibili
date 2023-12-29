@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native'
 import { VideoItem } from '../../api/hot-videos'
-import { parseDate, parseDuration, parseNumber } from '../../utils'
+import { imgUrl, parseDate, parseDuration, parseNumber } from '../../utils'
 import { useTheme } from '@rneui/themed'
 import { Image } from 'expo-image'
 import commonStyles from '../../styles'
@@ -14,11 +14,13 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   const { width } = useWindowDimensions()
   const itemWidth = (width - 24) / 2
   const { isWiFi } = useStore()
-  const ratio = isWiFi ? '@480w_300h_1c.webp' : '@320w_200h_1c.webp'
   return (
     <View style={[styles.itemContainer, { width: itemWidth }]}>
       <View style={commonStyles.flex1}>
-        <Image style={[styles.image]} source={video.cover + ratio} />
+        <Image
+          style={[styles.image]}
+          source={imgUrl(video.cover, ...(isWiFi ? [480, 300] : [320, 200]))}
+        />
         <View style={styles.textContainer}>
           <Text style={{ color: 'white', fontSize: 12 }}>
             {parseDuration(video.duration)}

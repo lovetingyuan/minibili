@@ -11,7 +11,7 @@ import { NavigationProps } from '../../types'
 import { DynamicItemType } from '../../api/dynamic-items'
 import store from '../../store'
 import { Icon, Text, useTheme } from '@rneui/themed'
-import { parseNumber } from '../../utils'
+import { imgUrl, parseNumber } from '../../utils'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 
@@ -76,7 +76,7 @@ export default function VideoItem(props: {
         <View style={styles.imageContainer}>
           <Image
             style={styles.image}
-            source={{ uri: cover + '@480w_300h.webp' }}
+            source={{ uri: imgUrl(cover, 480, 300) }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image

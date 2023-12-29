@@ -13,7 +13,7 @@ import { reportUnknownRichTextItem } from '../utils/report'
 import { Icon, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-import { parseUrl } from '../utils'
+import { imgUrl, parseUrl } from '../utils'
 
 export default React.memo(
   function RichTexts(props: {
@@ -95,7 +95,7 @@ export default React.memo(
         reactNodes.push(
           <Image
             key={key++}
-            source={{ uri: node.emoji.icon_url }}
+            source={{ uri: imgUrl(node.emoji.icon_url) }}
             style={[styles.emoji]}
           />,
         )

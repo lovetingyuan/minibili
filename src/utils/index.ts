@@ -164,3 +164,10 @@ export function showFatalError() {
     )
   })
 }
+
+export function imgUrl(url: string, size?: number, h = size) {
+  return (
+    url.replace('http://', 'https://') +
+    (typeof size === 'number' ? `@${size}w_${h}h_1c.webp` : '')
+  )
+}

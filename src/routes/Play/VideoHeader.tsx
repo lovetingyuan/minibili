@@ -6,11 +6,13 @@ import { useVideoInfo } from '../../api/video-info'
 import { NavigationProps } from '../../types'
 import {
   handleShareVideo,
+  imgUrl,
   parseDate,
   parseNumber,
   showToast,
 } from '../../utils'
 import VideoInfoContext from './videoContext'
+import { Image } from 'expo-image'
 
 export default React.memo(function VideoHeader() {
   const { video, bvid } = React.useContext(VideoInfoContext)
@@ -38,7 +40,14 @@ export default React.memo(function VideoHeader() {
           navigation.push('Dynamic', { user })
         }}
         style={styles.upInfoContainer}>
-        <Avatar size={32} rounded source={{ uri: face + '@80w_80h_1c.webp' }} />
+        {face ? (
+          <Avatar
+            size={32}
+            rounded
+            source={{ uri: imgUrl(face, 80) }}
+            ImageComponent={Image}
+          />
+        ) : null}
         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.upName}>
           {name + ' '}
         </Text>

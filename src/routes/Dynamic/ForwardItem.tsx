@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  StyleSheet,
-  View,
-  Pressable,
-  TouchableOpacity,
-  Image,
-} from 'react-native'
+import { StyleSheet, View, Pressable, TouchableOpacity } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -15,10 +9,11 @@ import { Avatar, Text, useTheme } from '@rneui/themed'
 import RichTexts from '../../components/RichTexts'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
-// import { Image } from 'expo-image'
+import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
 import commonStyles from '../../styles'
+import { imgUrl } from '../../utils'
 
 export default function ForwardItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>
@@ -47,9 +42,8 @@ export default function ForwardItem(props: {
         {forwardRichTextContent}
         <View style={{ flexDirection: 'row' }}>
           <Image
-            width={120}
             style={styles.videoCover}
-            source={{ uri: cover + '@240w_150h_1c.webp' }}
+            source={{ uri: imgUrl(cover, 240, 150) }}
           />
           <View style={{ flex: 6 }}>
             <Text numberOfLines={2} style={{ lineHeight: 20, fontSize: 15 }}>
@@ -75,10 +69,9 @@ export default function ForwardItem(props: {
           {payload.images.map((img, i) => {
             return (
               <Image
-                height={70}
                 style={[styles.image, { aspectRatio: img.ratio }]}
                 key={img.src + i}
-                source={{ uri: img.src + '@240w_240h_1c.webp' }}
+                source={{ uri: imgUrl(img.src, 240) }}
               />
             )
           })}
@@ -147,8 +140,9 @@ export default function ForwardItem(props: {
             }}>
             {payload.face ? (
               <Avatar
-                source={{ uri: payload.face + '@50w_50h_1c.webp' }}
+                source={{ uri: imgUrl(payload.face, 50) }}
                 size={22}
+                ImageComponent={Image}
                 rounded
               />
             ) : null}

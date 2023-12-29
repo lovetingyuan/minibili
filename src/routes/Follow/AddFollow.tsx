@@ -16,10 +16,9 @@ import {
   StyleSheet,
   View,
   useWindowDimensions,
-  Image,
 } from 'react-native'
-// import { Image } from 'expo-image'
-import { parseNumber, showToast } from '../../utils'
+import { Image } from 'expo-image'
+import { imgUrl, parseNumber, showToast } from '../../utils'
 import store, { useStore } from '../../store'
 
 function SearchedItem(props: { up: SearchedUpType }) {
@@ -43,7 +42,8 @@ function SearchedItem(props: { up: SearchedUpType }) {
       <Avatar
         size={40}
         rounded
-        source={{ uri: up.face + '@100w_100h_1c.webp' }}
+        source={{ uri: imgUrl(up.face, 80) }}
+        ImageComponent={Image}
         onPress={goToDynamic}
       />
       <Text style={styles.upName} onPress={goToDynamic} numberOfLines={2}>

@@ -13,7 +13,7 @@ import { NavigationProps, UpInfo } from '../../types'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import store, { useStore } from '../../store'
 import { Image } from 'expo-image'
-import { showToast } from '../../utils'
+import { imgUrl, showToast } from '../../utils'
 // import commonStyles from '../../styles'
 
 export default React.memo(function FollowItem(props: {
@@ -130,7 +130,9 @@ export default React.memo(function FollowItem(props: {
           size={46}
           ImageComponent={Image}
           rounded
-          source={{ uri: face + '@120w_120h_1c.webp' }}
+          source={{
+            uri: imgUrl(face, 120),
+          }}
         />
         {hasUpdate ? <Badge key={mid} badgeStyle={styles.updateMark} /> : null}
       </View>
