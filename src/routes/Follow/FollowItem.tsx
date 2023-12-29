@@ -22,7 +22,7 @@ export default React.memo(function FollowItem(props: {
 }) {
   // __DEV__ && console.log('follow item', props.item.name)
   const {
-    item: { face, name, sign, mid },
+    item: { face, name, sign, mid, pin },
   } = props
   const { $upUpdateMap, livingUps } = useStore()
   let hasUpdate = false
@@ -91,6 +91,26 @@ export default React.memo(function FollowItem(props: {
         Linking.openURL(face)
       },
     },
+    {
+      text: '置顶UP',
+      onPress: () => {
+        const index = store.$followedUps.findIndex(u => u.mid === mid)
+        store.$followedUps[index] = {
+          ...store.$followedUps[index],
+          pin: Date.now(),
+        }
+      },
+    },
+    pin && {
+      text: '取消置顶',
+      onPress: () => {
+        const index = store.$followedUps.findIndex(u => u.mid === mid)
+        store.$followedUps[index] = {
+          ...store.$followedUps[index],
+          pin: 0,
+        }
+      },
+    },
     __DEV__ && {
       text: `${$upUpdateMap[mid]?.latestId} - ${$upUpdateMap[mid]?.currentLatestId}`,
       onPress: () => {},
@@ -125,6 +145,11 @@ export default React.memo(function FollowItem(props: {
             hasUpdate
               ? {
                   color: '#E84B85',
+                }
+              : null,
+            pin
+              ? {
+                  fontWeight: 'bold',
                 }
               : null,
           ]}

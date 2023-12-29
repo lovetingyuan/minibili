@@ -20,6 +20,7 @@ const store = proxy<{
   $ignoredVersions: string[]
   $cookie: string
   $cachedHotVideos: VideoItem[]
+  // $pinUps: Record<string, number>
   // ----------------------------
   initialed: boolean
   isWiFi: boolean
@@ -48,6 +49,7 @@ const store = proxy<{
   $videoCatesList: RanksConfig,
   $cookie: '',
   $cachedHotVideos: [],
+  // $pinUps: {},
   // -------------------------
   initialed: false,
   isWiFi: false,

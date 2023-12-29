@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Alert } from 'react-native'
 import { Button, Text } from '@rneui/themed'
 import { showToast } from '../../utils'
 import { useStore } from '../../store'
@@ -42,8 +42,22 @@ export default React.memo(function Backup() {
                 if (type !== 'minibili-settings') {
                   throw new Error(res)
                 }
-                Object.assign(store, data)
-                showToast('导入完成')
+                Alert.alert(
+                  '导入粘贴板中的设置',
+                  '确认要导入吗，会覆盖当前设置',
+                  [
+                    {
+                      text: '取消',
+                    },
+                    {
+                      text: '确定',
+                      onPress: () => {
+                        Object.assign(store, data)
+                        showToast('导入完成')
+                      },
+                    },
+                  ],
+                )
               } catch (e) {
                 showToast('导入失败，数据错误')
               }

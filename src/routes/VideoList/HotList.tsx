@@ -64,7 +64,7 @@ export default React.memo(function Hot({ navigation }: Props) {
   }
   const buttons = () => [
     {
-      text: `不再看 ${currentVideoRef.current?.name} 的视频`,
+      text: `不再看「${currentVideoRef.current?.name}」的视频`,
       onPress: () => {
         Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
           {
@@ -76,7 +76,7 @@ export default React.memo(function Hot({ navigation }: Props) {
       },
     },
     {
-      text: `不再看 ${currentVideoRef.current?.tag} 类型的视频`,
+      text: `不再看「${currentVideoRef.current?.tag}」类型的视频`,
       onPress: () => {
         Alert.alert(`不再看 ${currentVideoRef.current?.tag} 类型的视频？`, '', [
           {
@@ -152,10 +152,10 @@ export default React.memo(function Hot({ navigation }: Props) {
         ListFooterComponent={
           <Text style={styles.bottomEnd}>
             {loading
-              ? `加载中(${list.length})...`
+              ? `加载中(${hotVideoList.length})...`
               : isReachingEnd
-              ? `到底了(${list.length})~`
-              : ''}
+                ? `到底了(${hotVideoList.length})~`
+                : ''}
           </Text>
         }
         onEndReached={() => {

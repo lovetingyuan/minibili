@@ -73,9 +73,12 @@ export default function Follow() {
     if (firstRender) {
       checkUpdateUps(true)
       firstRender = false
-      window.setInterval(() => {
-        checkUpdateUps(false)
-      }, 10 * 60 * 1000)
+      window.setInterval(
+        () => {
+          checkUpdateUps(false)
+        },
+        10 * 60 * 1000,
+      )
     }
   })
 
@@ -87,25 +90,30 @@ export default function Follow() {
     : 0
 
   let displayUps: (UpInfo | null)[] = []
-  const topUps: UpInfo[] = []
+  const pinUps: UpInfo[] = []
+  const liveUps: UpInfo[] = []
   const updateUps: UpInfo[] = []
   const otherUps: UpInfo[] = []
-  const updatedUps: Record<string, boolean> = {}
-  for (const mid in $upUpdateMap) {
-    updatedUps[mid] =
-      $upUpdateMap[mid].latestId !== $upUpdateMap[mid].currentLatestId
-  }
+
   for (const up of $followedUps) {
-    if (livingUps[up.mid]) {
-      topUps.push({ ...up })
-    } else if (updatedUps[up.mid]) {
-      updateUps.push({ ...up })
+    if (up.pin) {
+      pinUps.push({ ...up })
+    } else if (livingUps[up.mid]) {
+      liveUps.push({ ...up })
     } else {
-      otherUps.push({ ...up })
+      if (
+        up.mid in $upUpdateMap &&
+        $upUpdateMap[up.mid].latestId !== $upUpdateMap[up.mid].currentLatestId
+      ) {
+        updateUps.push({ ...up })
+      } else {
+        otherUps.push({ ...up })
+      }
     }
   }
   displayUps = [
-    ...topUps,
+    ...pinUps.sort((a, b) => b.pin! - a.pin!),
+    ...liveUps,
     ...updateUps,
     ...otherUps,
     ...(rest ? Array.from({ length: rest }).map(() => null) : []),

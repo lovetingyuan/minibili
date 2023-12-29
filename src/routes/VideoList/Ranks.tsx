@@ -69,7 +69,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
   const buttons = () => {
     return [
       {
-        text: `不再看 ${currentVideoRef.current?.name} 的视频`,
+        text: `不再看「${currentVideoRef.current?.name}」的视频`,
         onPress: () => {
           Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
             {

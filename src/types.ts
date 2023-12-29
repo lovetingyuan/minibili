@@ -22,6 +22,7 @@ export interface UpInfo {
   name: string
   face: string
   sign: string
+  pin?: number
 }
 
 export type RootStackParamList = {
