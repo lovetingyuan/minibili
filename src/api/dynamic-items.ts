@@ -492,9 +492,12 @@ export function useDynamicItems(mid?: string | number) {
     )
 
   const dynamicItems: DynamicListResponse['items'] =
-    data?.reduce((a, b) => {
-      return a.concat(b.items)
-    }, [] as DynamicListResponse['items']) || []
+    data?.reduce(
+      (a, b) => {
+        return a.concat(b.items)
+      },
+      [] as DynamicListResponse['items'],
+    ) || []
 
   const isEmpty = data?.[0]?.items.length === 0
   const isReachingEnd = isEmpty || (data && !data[data.length - 1]?.has_more)
@@ -579,4 +582,19 @@ export async function checkUpdateUps(first: boolean) {
       ...store.$upUpdateMap,
     }
   })
+}
+
+let checkUpdateUpsTimer: number | null = null
+
+export function startCheckUpdateUps() {
+  if (typeof checkUpdateUpsTimer === 'number') {
+    window.clearInterval(checkUpdateUpsTimer)
+  }
+  checkUpdateUps(false)
+  checkUpdateUpsTimer = window.setInterval(
+    () => {
+      checkUpdateUps(false)
+    },
+    10 * 60 * 1000,
+  )
 }

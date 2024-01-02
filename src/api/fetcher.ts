@@ -30,7 +30,7 @@ export default function request<D extends any>(url: string) {
     ? url
     : 'https://api.bilibili.com' + url
 
-  // __DEV__ && console.log('request url: ', url.slice(0, 150))
+  __DEV__ && console.log('request url: ', url.slice(0, 150))
   // console.log(444, requestUrl)
   return fetch(requestUrl, {
     headers: {

@@ -2,9 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 import { RanksConfig } from '../constants'
 import { checkUpdate } from '../api/check-update'
-import type { VideoItem } from '../api/hot-videos'
-import { startCheckLivingUps } from '../api/living-info'
 import { UpInfo } from '../types'
+// import { registerCheckLivingUps } from '../utils/check-live'
+// import { showToast } from '../utils'
+// import { subscribeKey } from 'valtio/utils'
+import { startCheckLivingUps } from '../api/living-info'
+import { startCheckUpdateUps } from '../api/dynamic-items'
 
 interface UpdateUpInfo {
   latestId: string
@@ -22,6 +25,7 @@ const store = proxy<{
   // $cachedHotVideos: VideoItem[]
   // $pinUps: Record<string, number>
   // ----------------------------
+  followedUpsMap: Record<string, UpInfo>
   initialed: boolean
   isWiFi: boolean
   webViewMode: 'PC' | 'MOBILE'
@@ -40,9 +44,18 @@ const store = proxy<{
   showCaptcha: boolean
   updatedCount: number
   moreRepliesUrl: string
+  testid: number
 }>({
   $blackUps: {},
   $followedUps: [],
+  get followedUpsMap() {
+    // console.log('followedUpsMapfollowedUpsMapfollowedUpsMap')
+    const ups: Record<string, UpInfo> = {}
+    for (const up of this.$followedUps) {
+      ups[up.mid] = up
+    }
+    return ups
+  },
   $blackTags: {},
   $upUpdateMap: {},
   $ignoredVersions: [],
@@ -62,6 +75,7 @@ const store = proxy<{
   currentImageIndex: 0,
   overlayButtons: [],
   showCaptcha: false,
+  testid: 0,
   get updatedCount() {
     const aa = Object.values<UpdateUpInfo>(this.$upUpdateMap)
     return aa.filter(item => {
@@ -90,6 +104,9 @@ Promise.all(
 )
   .then(() => {
     store.initialed = true
+    // subscribeKey(store, '$followedUps', v =>
+    //   console.log('$followedUps has changed to', v),
+    // )
     subscribe(store, changes => {
       const changedKeys = new Set<StoredKeys>()
       for (const op of changes) {
@@ -98,6 +115,7 @@ Promise.all(
           changedKeys.add(ck as StoredKeys)
         }
       }
+      // console.log('chencged', [...changedKeys])
       for (const ck of changedKeys) {
         AsyncStorage.setItem(StoragePrefix + ck, JSON.stringify(store[ck]))
       }
@@ -105,6 +123,12 @@ Promise.all(
   })
   .then(() => {
     startCheckLivingUps()
+    startCheckUpdateUps()
+    // return registerCheckLivingUps().then(good => {
+    //   if (!good) {
+    //     showToast('检查直播失败')
+    //   }
+    // })
   })
 
 export function useStore() {

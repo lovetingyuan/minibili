@@ -9,10 +9,13 @@ import BlackUps from './BlackUps'
 import BlackTags from './BlackTags'
 import SortCate from './SortCate'
 import Backup from './Backup'
+import { useStore } from '../../store'
 
 export default React.memo(function About() {
+  // const { testid } = useStore()
   const content = (
     <ScrollView style={styles.container}>
+      {/* <Text>testid: {testid}</Text> */}
       <Header />
       <Divider style={{ marginBottom: 18, marginTop: 15 }} />
       <Version />

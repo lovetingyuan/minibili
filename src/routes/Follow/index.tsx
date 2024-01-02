@@ -16,6 +16,7 @@ import commonStyles from '../../styles'
 import AddFollow from './AddFollow'
 import useMounted from '../../hooks/useMounted'
 import useIsDark from '../../hooks/useIsDark'
+import { checkLivingUps } from '../../api/living-info'
 
 const renderItem = ({
   item,
@@ -29,8 +30,6 @@ const renderItem = ({
   }
   return <View style={commonStyles.flex1} />
 }
-
-let firstRender = true
 
 const tvL = require('../../../assets/tv-l.png')
 const tvR = require('../../../assets/tv-r.png')
@@ -60,25 +59,18 @@ const TvImg: React.FC = () => {
     />
   )
 }
-
-export default function Follow() {
+let checkLiveTime = 0
+function Follow() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
   const { $followedUps, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
   const dark = useIsDark()
 
-  // 检查用户更新，由于组件会随路由重新创建，这里保证只运行一次
   useMounted(() => {
-    if (firstRender) {
-      checkUpdateUps(true)
-      firstRender = false
-      window.setInterval(
-        () => {
-          checkUpdateUps(false)
-        },
-        10 * 60 * 1000,
-      )
+    if (Date.now() - checkLiveTime > 60 * 1000) {
+      checkLivingUps()
+      checkLiveTime = Date.now()
     }
   })
 
@@ -167,6 +159,8 @@ export default function Follow() {
     </View>
   )
 }
+
+export default React.memo(Follow)
 
 const styles = StyleSheet.create({
   container: {

@@ -15,6 +15,7 @@ import ImagesView from './components/ImagesView'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 import ErrorFallback from './components/ErrorFallback'
 import useIsDark from './hooks/useIsDark'
+// import { useCheckLivingUps } from './api/living-info'
 
 let online = true
 let focus = true
@@ -88,6 +89,7 @@ export default function App() {
       mode: dark ? 'dark' : 'light',
     })
   }, [dark])
+  // useCheckLivingUps()
   return (
     <RootSiblingParent>
       <StatusBar style="auto" />
