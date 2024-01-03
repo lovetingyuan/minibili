@@ -15,7 +15,7 @@ import ImagesView from './components/ImagesView'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 import ErrorFallback from './components/ErrorFallback'
 import useIsDark from './hooks/useIsDark'
-// import { useCheckLivingUps } from './api/living-info'
+import CheckLive from './components/CheckLive'
 
 let online = true
 let focus = true
@@ -32,7 +32,8 @@ export default function App() {
     return {
       fetcher,
       errorRetryCount: 4,
-      as: 8,
+      errorRetryInterval: 2000,
+      dedupingInterval: 3000,
       isVisible() {
         return focus
       },
@@ -89,7 +90,7 @@ export default function App() {
       mode: dark ? 'dark' : 'light',
     })
   }, [dark])
-  // useCheckLivingUps()
+
   return (
     <RootSiblingParent>
       <StatusBar style="auto" />
@@ -101,6 +102,7 @@ export default function App() {
               <ButtonsOverlay />
               <ImagesView />
               <Route />
+              <CheckLive />
             </View>
           </SWRConfig>
         </ThemeProvider>

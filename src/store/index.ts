@@ -6,7 +6,7 @@ import { UpInfo } from '../types'
 // import { registerCheckLivingUps } from '../utils/check-live'
 // import { showToast } from '../utils'
 // import { subscribeKey } from 'valtio/utils'
-import { startCheckLivingUps } from '../api/living-info'
+// import { startCheckLivingUps } from '../api/living-info'
 import { startCheckUpdateUps } from '../api/dynamic-items'
 
 interface UpdateUpInfo {
@@ -16,6 +16,9 @@ interface UpdateUpInfo {
 
 const store = proxy<{
   $blackUps: Record<string, string>
+  /**
+   * 关注列表
+   */
   $followedUps: UpInfo[]
   $blackTags: Record<string, string>
   $upUpdateMap: Record<string, UpdateUpInfo>
@@ -122,7 +125,7 @@ Promise.all(
     })
   })
   .then(() => {
-    startCheckLivingUps()
+    // startCheckLivingUps()
     startCheckUpdateUps()
     // return registerCheckLivingUps().then(good => {
     //   if (!good) {

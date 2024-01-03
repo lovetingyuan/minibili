@@ -67,20 +67,22 @@ export const checkLivingUps = () => {
   })
 }
 
-export const useCheckLivingUps = () => {
+export const useCheckLivingUps = (time?: number) => {
   const { $followedUps } = useStore()
-  const url =
-    $followedUps.length > 0
-      ? `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${$followedUps
-          .map(user => `uids[]=${user.mid}`)
-          .sort()
-          .join('&')}`
-      : null
+  const uids = $followedUps.map(user => `uids[]=${user.mid}`).join('&')
+  const url = uids
+    ? `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}`
+    : null
   const { data } = useSWR<
     Record<string, z.infer<typeof LiveInfoBatchItemSchema>>
   >(url, request, {
-    refreshInterval: 5 * 60 * 1000,
+    refreshInterval: time || 5 * 60 * 1000,
+    errorRetryCount: 2,
   })
+  console.log(
+    '111111111, checklivingchecklivingchecklivingcheckliving',
+    $followedUps.map(u => u.mid),
+  )
   const livingMap: Record<string, string> = {}
   if (!data) {
     return
@@ -102,19 +104,20 @@ export const useCheckLivingUps = () => {
   }
   prevLivingMap = livingMap
   store.livingUps = livingMap
+  return livingMap
 }
 
-let checkLivingTimer: number | null = null
+// let checkLivingTimer: number | null = null
 
-export function startCheckLivingUps() {
-  if (typeof checkLivingTimer === 'number') {
-    window.clearInterval(checkLivingTimer)
-  }
-  checkLivingUps()
-  checkLivingTimer = window.setInterval(
-    () => {
-      checkLivingUps()
-    },
-    5 * 60 * 1000,
-  )
-}
+// export function startCheckLivingUps() {
+//   if (typeof checkLivingTimer === 'number') {
+//     window.clearInterval(checkLivingTimer)
+//   }
+//   checkLivingUps()
+//   checkLivingTimer = window.setInterval(
+//     () => {
+//       checkLivingUps()
+//     },
+//     5 * 60 * 1000,
+//   )
+// }

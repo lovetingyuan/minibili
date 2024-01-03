@@ -62,8 +62,8 @@ const HeaderTitle = React.memo(() => {
                     item.rid === -1
                       ? '#F85A54'
                       : selected
-                      ? theme.colors.primary
-                      : theme.colors.black,
+                        ? theme.colors.primary
+                        : theme.colors.black,
                 }}
                 onPress={() => {
                   store.currentVideosCate = item
@@ -97,9 +97,10 @@ const HeaderTitle = React.memo(() => {
   )
 })
 
-const HeaderRight = () => {
+const HeaderRight = React.memo(() => {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { updatedCount, livingUps } = useStore()
+  // const livingUps = {}
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
     <View>
@@ -127,7 +128,8 @@ const HeaderRight = () => {
       </Button>
     </View>
   )
-}
+})
+
 export const videoListHeaderTitle = () => <HeaderTitle />
 export const videoListHeaderRight = () => <HeaderRight />
 

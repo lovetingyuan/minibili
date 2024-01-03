@@ -11,7 +11,7 @@ import { Text } from '@rneui/themed'
 import FollowItem from './FollowItem'
 import { UpInfo } from '../../types'
 import { useStore } from '../../store'
-import { checkUpdateUps } from '../../api/dynamic-items'
+// import { checkUpdateUps } from '../../api/dynamic-items'
 import commonStyles from '../../styles'
 import AddFollow from './AddFollow'
 import useMounted from '../../hooks/useMounted'
@@ -66,6 +66,7 @@ function Follow() {
   const { $followedUps, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
   const dark = useIsDark()
+  // useCheckLivingUps()
 
   useMounted(() => {
     if (Date.now() - checkLiveTime > 60 * 1000) {
