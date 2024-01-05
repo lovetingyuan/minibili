@@ -4,10 +4,19 @@ import { Button, Text } from '@rneui/themed'
 import { showToast } from '../../utils'
 import { useStore } from '../../store'
 import * as Clipboard from 'expo-clipboard'
-import store from '../../store'
+// import store from '../../store'
 
 export default React.memo(function Backup() {
-  const { $blackUps, $followedUps, $blackTags, $videoCatesList } = useStore()
+  const {
+    $blackUps,
+    $followedUps,
+    $blackTags,
+    $videoCatesList,
+    set$blackTags,
+    set$followedUps,
+    set$blackUps,
+    set$videoCatesList,
+  } = useStore()
 
   return (
     <View style={styles.infoItem}>
@@ -52,7 +61,11 @@ export default React.memo(function Backup() {
                     {
                       text: '确定',
                       onPress: () => {
-                        Object.assign(store, data)
+                        set$blackTags(data.$blackTags)
+                        set$followedUps(data.$followedUps)
+                        set$blackUps(data.$blackUps)
+                        set$videoCatesList(data.$videoCatesList)
+                        // Object.assign(store, data)
                         showToast('导入完成')
                       },
                     },

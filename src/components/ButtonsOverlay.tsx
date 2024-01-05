@@ -1,12 +1,13 @@
 import { Button, Overlay } from '@rneui/themed'
 import React from 'react'
 import { StyleSheet } from 'react-native'
-import store, { useStore } from '../store'
+import { useStore } from '../store'
 
 export default React.memo(function ButtonsOverlay() {
-  const { overlayButtons } = useStore()
+  const { overlayButtons, setOverlayButtons } = useStore()
   const dismiss = () => {
-    store.overlayButtons = []
+    setOverlayButtons([])
+    // store.overlayButtons = []
   }
   const Buttons = overlayButtons
     .map(button => {

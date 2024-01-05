@@ -1,6 +1,6 @@
 import { Icon, Text, useTheme, Button, Badge } from '@rneui/themed'
 import { Linking, ScrollView, View, Pressable } from 'react-native'
-import store, { useStore } from '../../store'
+import { getAppUpdateInfo, useStore } from '../../store'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
@@ -8,14 +8,22 @@ import { NavigationProps, PromiseResult } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 
 const HeaderTitle = React.memo(() => {
-  const { currentVideosCate, $videoCatesList } = useStore()
+  const {
+    currentVideosCate,
+    $videoCatesList,
+    // getAppUpdateInfo,
+    setCurrentVideosCate,
+  } = useStore()
   const [newVersion, setNewVersion] = React.useState<PromiseResult<
-    typeof store.appUpdateInfo
+    typeof getAppUpdateInfo
   > | null>(null)
   if (!newVersion) {
-    store.appUpdateInfo.then(res => {
-      setNewVersion(res)
+    getAppUpdateInfo.then(r => {
+      setNewVersion(r)
     })
+    // store.appUpdateInfo.then(res => {
+    //   setNewVersion(res)
+    // })
   }
   const { theme } = useTheme()
   const [visible, setVisible] = React.useState(false)
@@ -52,7 +60,7 @@ const HeaderTitle = React.memo(() => {
         onRequestClose={hideMenu}>
         <ScrollView style={styles.typeList}>
           {$videoCatesList.map((item, i) => {
-            const selected = store.currentVideosCate.rid === item.rid
+            const selected = currentVideosCate.rid === item.rid
             const Item = (
               <MenuItem
                 textStyle={{
@@ -66,7 +74,8 @@ const HeaderTitle = React.memo(() => {
                         : theme.colors.black,
                 }}
                 onPress={() => {
-                  store.currentVideosCate = item
+                  setCurrentVideosCate(item)
+                  // store.currentVideosCate = item
                   hideMenu()
                 }}>
                 {item.label}
@@ -99,15 +108,15 @@ const HeaderTitle = React.memo(() => {
 
 const HeaderRight = React.memo(() => {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { updatedCount, livingUps } = useStore()
+  const { _updatedCount, livingUps } = useStore()
   // const livingUps = {}
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
     <View>
-      {updatedCount ? (
+      {_updatedCount ? (
         <Badge
           status="success"
-          value={updatedCount}
+          value={_updatedCount}
           badgeStyle={{
             height: 16,
             backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',

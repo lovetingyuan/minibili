@@ -12,9 +12,9 @@ import {
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { FlashList } from '@shopify/flash-list'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 import { VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, parseNumber } from '../../utils'
+import { handleShareVideo, parseNumber, parseUrl } from '../../utils'
 import { useRankList } from '../../api/rank-list'
 import Loading from './Loading'
 import { Action, reportUserAction } from '../../utils/report'
@@ -24,7 +24,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
 export default React.memo(function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)
-  const { currentVideosCate, $blackUps } = useStore()
+  const { currentVideosCate, $blackUps, set$blackUps, setOverlayButtons } =
+    useStore()
   const {
     data: list = [],
     isLoading,
@@ -37,7 +38,11 @@ export default React.memo(function Ranks({ navigation }: Props) {
       return
     }
     const { mid, name } = currentVideoRef.current
-    store.$blackUps['_' + mid] = name
+    set$blackUps({
+      ...$blackUps,
+      ['_' + mid]: name,
+    })
+    // store.$blackUps['_' + mid] = name
     reportUserAction(Action.add_black_user, { mid, name })
   }
   const gotoPlay = (data: VideoItem) => {
@@ -59,7 +64,8 @@ export default React.memo(function Ranks({ navigation }: Props) {
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item
-          store.overlayButtons = buttons()
+          setOverlayButtons(buttons())
+          // store.overlayButtons = buttons()
         }}>
         <HotItem video={item} />
       </TouchableOpacity>
@@ -95,7 +101,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
           if (!currentVideoRef.current) {
             return
           }
-          Linking.openURL(currentVideoRef.current.cover)
+          Linking.openURL(parseUrl(currentVideoRef.current.cover))
         },
       },
     ]

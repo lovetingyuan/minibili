@@ -3,13 +3,16 @@ import VideoHeader from './VideoHeader'
 import { View, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { ListItem, Text, Icon } from '@rneui/themed'
-import VideoInfoContext from './videoContext'
+import { useStore } from '../../store'
+// import VideoInfoContext from './videoContext'
 
 export default React.memo(function VideoInfo(props: {
   changePage: (p: number) => void
 }) {
   const { changePage } = props
-  const { video, bvid, page } = React.useContext(VideoInfoContext)
+  // const { video, bvid, page } = React.useContext(VideoInfoContext)
+  const { playingVideo } = useStore()
+  const { video, bvid, page } = playingVideo || {}
   const { data: video2, isLoading } = useVideoInfo(bvid)
   const [expanded, setExpanded] = React.useState(false)
   const videoInfo = {
@@ -29,7 +32,7 @@ export default React.memo(function VideoInfo(props: {
       <View>
         <Text style={styles.videoTitle}>{title}</Text>
         {videoDesc ? <Text style={[styles.videoDesc]}>{videoDesc}</Text> : null}
-        {(videoInfo.videosNum || 0) > 1 && videoInfo.pages ? (
+        {(videoInfo.videosNum || 0) > 1 && videoInfo.pages && page ? (
           <ListItem.Accordion
             icon={<Icon name={'chevron-down'} type="material-community" />}
             containerStyle={styles.pagesTitle}

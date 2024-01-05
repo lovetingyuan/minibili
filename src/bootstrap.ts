@@ -2,35 +2,16 @@ import './sentry'
 import * as SentryExpo from 'sentry-expo'
 import { Linking, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import store from './store'
+// import store from './store'
 import { showFatalError, showToast, delay } from './utils'
 import { getRemoteConfig } from './api/get-config'
 import Constants from 'expo-constants'
 import { Tags, reportUserOpenApp } from './utils/report'
-import NetInfo from '@react-native-community/netinfo'
+// import { getAppUpdateInfo } from './store'
+// import NetInfo from '@react-native-community/netinfo'
 
 async function init() {
   reportUserOpenApp()
-
-  NetInfo.addEventListener(state => {
-    if (state.isConnected && state.type === 'wifi') {
-      store.isWiFi = true
-    } else {
-      store.isWiFi = false
-      if (!state.isConnected) {
-        delay(1500)
-          .then(() => NetInfo.fetch())
-          .then(state2 => {
-            if (!state2.isConnected) {
-              showToast('当前网络状况不佳')
-            }
-          })
-      } else {
-        showToast('请注意当前网络不是Wifi')
-      }
-    }
-  })
-
   const gitHash = Constants.expoConfig?.extra?.gitHash
   if (gitHash) {
     SentryExpo.Native.setTag(Tags.git_hash, gitHash)
@@ -74,43 +55,7 @@ async function init() {
       }
     })
   })
-  const appUpdateInfo = await store.appUpdateInfo
-  const isIgnoredVersion = store.$ignoredVersions.includes(
-    appUpdateInfo.latestVersion,
-  )
-  if (appUpdateInfo.hasUpdate && !isIgnoredVersion) {
-    const isBigUpdate =
-      appUpdateInfo.currentVersion.split('.')[0] !==
-      appUpdateInfo.latestVersion.split('.')[0]
-    await new Promise(r => {
-      Alert.alert(
-        '有新版本' + (isBigUpdate ? '（建议更新 🎉）' : ''),
-        `${appUpdateInfo.currentVersion}  ⟶  ${appUpdateInfo.latestVersion}`,
-        [
-          {
-            text: '取消',
-          },
-          {
-            text: '忽略',
-            onPress: () => {
-              store.$ignoredVersions.push(appUpdateInfo.latestVersion!)
-              r(null)
-            },
-          },
-          {
-            text: '下载更新',
-            onPress: () => {
-              r(null)
-              Linking.openURL(appUpdateInfo.downloadLink)
-            },
-          },
-        ],
-        {
-          onDismiss: () => r(null),
-        },
-      )
-    })
-  }
+
   await getRemoteConfig().then(config => {
     if (!config.statement.show) {
       return

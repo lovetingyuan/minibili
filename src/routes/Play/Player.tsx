@@ -16,14 +16,14 @@ import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import { imgUrl, parseDuration, showToast } from '../../utils'
 import { Icon } from '@rneui/themed'
-import VideoInfoContext from './videoContext'
+// import VideoInfoContext from './videoContext'
 import commonStyles from '../../styles'
 import { useStore } from '../../store'
 import { useAppState } from '../../hooks/useAppState'
 
 export default React.memo(function Player() {
-  const { isWiFi } = useStore()
-  const { page, video, bvid } = React.useContext(VideoInfoContext)
+  const { isWiFi, playingVideo } = useStore()
+  const { page, video, bvid } = playingVideo || {}
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)

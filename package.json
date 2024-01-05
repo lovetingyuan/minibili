@@ -52,6 +52,7 @@
     "p-queue": "6.6.2",
     "photoswipe": "^5.4.3",
     "react": "18.2.0",
+    "react-atomic-context": "^2.0.0",
     "react-native": "0.72.6",
     "react-native-material-menu": "^2.0.0",
     "react-native-root-toast": "^3.5.1",
@@ -60,7 +61,6 @@
     "react-native-webview": "13.2.2",
     "sentry-expo": "~7.1.0",
     "swr": "^2.2.4",
-    "valtio": "1.10.6",
     "zod": "^3.21.4"
   },
   "devDependencies": {

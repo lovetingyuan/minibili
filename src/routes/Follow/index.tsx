@@ -16,17 +16,18 @@ import commonStyles from '../../styles'
 import AddFollow from './AddFollow'
 import useMounted from '../../hooks/useMounted'
 import useIsDark from '../../hooks/useIsDark'
-import { checkLivingUps } from '../../api/living-info'
+// import { checkLivingUps } from '../../api/living-info'
 
 const renderItem = ({
   item,
+  index,
 }: // index,
 {
   item: UpInfo | null
   index: number
 }) => {
   if (item) {
-    return <FollowItem item={item} />
+    return <FollowItem item={item} index={index} />
   }
   return <View style={commonStyles.flex1} />
 }
@@ -59,7 +60,7 @@ const TvImg: React.FC = () => {
     />
   )
 }
-let checkLiveTime = 0
+// let checkLiveTime = 0
 function Follow() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
@@ -68,12 +69,12 @@ function Follow() {
   const dark = useIsDark()
   // useCheckLivingUps()
 
-  useMounted(() => {
-    if (Date.now() - checkLiveTime > 60 * 1000) {
-      checkLivingUps()
-      checkLiveTime = Date.now()
-    }
-  })
+  // useMounted(() => {
+  //   if (Date.now() - checkLiveTime > 60 * 1000) {
+  //     checkLivingUps()
+  //     checkLiveTime = Date.now()
+  //   }
+  // })
 
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)

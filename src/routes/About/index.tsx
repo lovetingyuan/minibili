@@ -9,7 +9,7 @@ import BlackUps from './BlackUps'
 import BlackTags from './BlackTags'
 import SortCate from './SortCate'
 import Backup from './Backup'
-import { useStore } from '../../store'
+// import { useStore } from '../../store'
 
 export default React.memo(function About() {
   // const { testid } = useStore()

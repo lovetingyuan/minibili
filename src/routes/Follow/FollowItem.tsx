@@ -11,20 +11,28 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps, UpInfo } from '../../types'
 // import { Button } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 import { Image } from 'expo-image'
-import { imgUrl, showToast } from '../../utils'
+import { imgUrl, parseUrl, showToast } from '../../utils'
 // import commonStyles from '../../styles'
 
 export default React.memo(function FollowItem(props: {
   item: UpInfo
-  width?: number
+  index?: number
 }) {
   // __DEV__ && console.log('follow item', props.item.name)
   const {
     item: { face, name, sign, mid, pin },
+    index,
   } = props
-  const { $upUpdateMap, livingUps } = useStore()
+  const {
+    $upUpdateMap,
+    set$upUpdateMap,
+    livingUps,
+    setOverlayButtons,
+    set$followedUps,
+    get$followedUps,
+  } = useStore()
   let hasUpdate = false
   if ($upUpdateMap[mid]) {
     const { latestId, currentLatestId } = $upUpdateMap[mid]
@@ -55,15 +63,31 @@ export default React.memo(function FollowItem(props: {
       ? {
           text: '标记为已读',
           onPress: () => {
-            store.$upUpdateMap[mid].latestId =
-              store.$upUpdateMap[mid].currentLatestId
+            const update = $upUpdateMap[mid]
+            set$upUpdateMap({
+              ...$upUpdateMap,
+              [mid]: {
+                latestId: update.latestId,
+                currentLatestId: update.latestId,
+              },
+            })
+            // store.$upUpdateMap[mid].latestId =
+            //   store.$upUpdateMap[mid].currentLatestId
           },
         }
       : {
           text: '标记为未读',
           onPress: () => {
-            if (mid in store.$upUpdateMap) {
-              store.$upUpdateMap[mid].latestId = Math.random().toString()
+            if (mid in $upUpdateMap) {
+              const update = $upUpdateMap[mid]
+              set$upUpdateMap({
+                ...$upUpdateMap,
+                [mid]: {
+                  latestId: update.latestId,
+                  currentLatestId: Math.random().toString(),
+                },
+              })
+              // store.$upUpdateMap[mid].latestId = Math.random().toString()
             } else {
               showToast('请稍候再操作')
             }
@@ -77,9 +101,10 @@ export default React.memo(function FollowItem(props: {
           {
             text: '确定',
             onPress() {
-              store.$followedUps = store.$followedUps.filter(
-                up => up.mid != mid,
-              )
+              set$followedUps(get$followedUps().filter(u => u.mid != mid))
+              // store.$followedUps = store.$followedUps.filter(
+              //   up => up.mid != mid,
+              // )
             },
           },
         ])
@@ -88,27 +113,37 @@ export default React.memo(function FollowItem(props: {
     {
       text: '查看头像',
       onPress: () => {
-        Linking.openURL(face)
+        Linking.openURL(parseUrl(face))
       },
     },
-    {
-      text: '置顶UP',
-      onPress: () => {
-        const index = store.$followedUps.findIndex(u => u.mid === mid)
-        store.$followedUps[index] = {
-          ...store.$followedUps[index],
-          pin: Date.now(),
-        }
-      },
-    },
+    pin && index === 0
+      ? null
+      : {
+          text: '置顶UP',
+          onPress: () => {
+            const followedUps = get$followedUps()
+            const index = followedUps.findIndex(u => u.mid == mid)
+            followedUps[index] = {
+              ...followedUps[index],
+              pin: Date.now(),
+            }
+            set$followedUps(followedUps.slice())
+            // store.$followedUps[index] = {
+            //   ...store.$followedUps[index],
+            //   pin: Date.now(),
+            // }
+          },
+        },
     pin && {
       text: '取消置顶',
       onPress: () => {
-        const index = store.$followedUps.findIndex(u => u.mid === mid)
-        store.$followedUps[index] = {
-          ...store.$followedUps[index],
+        const followedUps = get$followedUps()
+        const index = followedUps.findIndex(u => u.mid == mid)
+        followedUps[index] = {
+          ...followedUps[index],
           pin: 0,
         }
+        set$followedUps(followedUps.slice())
       },
     },
     __DEV__ && {
@@ -121,7 +156,8 @@ export default React.memo(function FollowItem(props: {
     <TouchableOpacity
       activeOpacity={0.6}
       onLongPress={() => {
-        store.overlayButtons = buttons
+        setOverlayButtons(buttons)
+        // store.overlayButtons = buttons
       }}
       style={styles.container}
       onPress={gotoDynamic}>

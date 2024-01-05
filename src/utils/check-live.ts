@@ -1,7 +1,7 @@
 import * as BackgroundFetch from 'expo-background-fetch'
 import * as TaskManager from 'expo-task-manager'
-import { checkLivingUps } from '../api/living-info'
-import store from '../store'
+// import { checkLivingUps } from '../api/living-info'
+// import store from '../store'
 
 const CHECK_LIVING_UPS = 'check-living-ups'
 
@@ -10,7 +10,7 @@ const CHECK_LIVING_UPS = 'check-living-ups'
 TaskManager.defineTask(CHECK_LIVING_UPS, async () => {
   // const now = Date.now();
   console.log(4353453453)
-  store.testid++
+  // store.testid++
   // console.log(`Got background fetch call at date: ${new Date(now).toISOString()}`);
   // await checkLivingUps()
   // Be sure to return the successful result type!

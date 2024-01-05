@@ -1,11 +1,11 @@
 import { Chip, ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import { StyleSheet } from 'react-native'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 
 export default React.memo(function BlackTags() {
   const [expanded, setExpanded] = React.useState(false)
-  const { $blackTags } = useStore()
+  const { $blackTags, set$blackTags } = useStore()
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
@@ -34,7 +34,10 @@ export default React.memo(function BlackTags() {
                 size: 18,
                 color: '#666',
                 onPress: () => {
-                  delete store.$blackTags[tag]
+                  const blackTags = { ...$blackTags }
+                  delete blackTags[tag]
+                  set$blackTags(blackTags)
+                  // delete store.$blackTags[tag]
                 },
               }}
               iconRight

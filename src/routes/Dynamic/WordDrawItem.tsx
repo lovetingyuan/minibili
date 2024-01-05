@@ -7,13 +7,14 @@ import {
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-import store from '../../store'
+// import store from '../../store'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import RichTexts from '../../components/RichTexts'
 import { Image } from 'expo-image'
 import { Additional } from '../../components/Additional'
 import { NavigationProps } from '../../types'
 import { imgUrl } from '../../utils'
+import { useStore } from '../../store'
 
 export default function WordDrawItem(props: {
   item: DynamicItemType<
@@ -34,6 +35,7 @@ export default function WordDrawItem(props: {
   const isDetail = route.name === 'DynamicDetail'
   const { width } = useWindowDimensions()
   const navigation = useNavigation<NavigationProps['navigation']>()
+  const { setImagesList, setCurrentImageIndex } = useStore()
 
   const scrollImages = (
     <View style={styles.imagesContainer}>
@@ -55,8 +57,10 @@ export default function WordDrawItem(props: {
             key={img.src + i}
             activeOpacity={0.8}
             onPress={() => {
-              store.imagesList = images.slice()
-              store.currentImageIndex = i
+              setImagesList(images.slice())
+              setCurrentImageIndex(i)
+              // store.imagesList = images.slice()
+              // store.currentImageIndex = i
             }}>
             {ImageCmp}
           </TouchableOpacity>
@@ -90,8 +94,10 @@ export default function WordDrawItem(props: {
             key={img.src + i}
             activeOpacity={0.8}
             onPress={() => {
-              store.imagesList = images.slice()
-              store.currentImageIndex = i
+              setImagesList(images.slice())
+              setCurrentImageIndex(i)
+              // store.imagesList = images.slice()
+              // store.currentImageIndex = i
             }}>
             {ImageCmp}
           </TouchableOpacity>

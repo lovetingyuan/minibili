@@ -11,10 +11,10 @@ import {
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
 import { FlashList } from '@shopify/flash-list'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 import Loading from './Loading'
 import { useHotVideos, VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, parseNumber } from '../../utils'
+import { handleShareVideo, parseNumber, parseUrl } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { FAB } from '@rneui/themed'
@@ -26,7 +26,13 @@ let refreshTime = Date.now()
 
 export default React.memo(function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
-  const { $blackUps, $blackTags } = useStore()
+  const {
+    $blackUps,
+    $blackTags,
+    set$blackTags,
+    set$blackUps,
+    setOverlayButtons,
+  } = useStore()
   const {
     list,
     page,
@@ -51,7 +57,11 @@ export default React.memo(function Hot({ navigation }: Props) {
       return
     }
     const { mid, name } = currentVideoRef.current
-    store.$blackUps['_' + mid] = name
+    set$blackUps({
+      ...$blackUps,
+      ['_' + mid]: name,
+    })
+    // store.$blackUps['_' + mid] = name
     reportUserAction(Action.add_black_user, { mid, name })
   }
   const addBlackTagName = () => {
@@ -59,7 +69,11 @@ export default React.memo(function Hot({ navigation }: Props) {
       return
     }
     const { tag } = currentVideoRef.current
-    store.$blackTags[tag] = tag
+    set$blackTags({
+      ...$blackTags,
+      [tag]: tag,
+    })
+    // store.$blackTags[tag] = tag
   }
   const gotoPlay = (data: VideoItem) => {
     navigation.navigate('Play', {
@@ -107,7 +121,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         if (!currentVideoRef.current) {
           return
         }
-        Linking.openURL(currentVideoRef.current.cover)
+        Linking.openURL(parseUrl(currentVideoRef.current.cover))
       },
     },
   ]
@@ -123,7 +137,8 @@ export default React.memo(function Hot({ navigation }: Props) {
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item
-          store.overlayButtons = buttons()
+          setOverlayButtons(buttons())
+          // store.overlayButtons = buttons()
         }}>
         <HotItem video={item} />
       </TouchableOpacity>

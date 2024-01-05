@@ -14,15 +14,7 @@ export default React.memo(function Header() {
   const { width } = useWindowDimensions()
   return (
     <>
-      <Pressable
-        style={styles.container}
-        onPress={() => {
-          // if (__DEV__) {
-          //   throw new Error('error happens')
-          // } else {
-          //   Linking.openURL(site)
-          // }
-        }}>
+      <Pressable style={styles.container}>
         <Image
           source={require('../../../assets/minibili.png')}
           style={{ width: width * 0.8, height: undefined, aspectRatio: 3.3 }}
@@ -48,7 +40,7 @@ export default React.memo(function Header() {
 })
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 10, flex: 1, alignItems: 'center' },
+  container: { marginBottom: 20, marginTop: 10, flex: 1, alignItems: 'center' },
   infoItem: {
     flexDirection: 'row',
     alignItems: 'center',

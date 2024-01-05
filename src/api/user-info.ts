@@ -7,8 +7,9 @@ import {
   UserInfoResponseSchema,
 } from './user-info.schema'
 import { UpInfo } from '../types'
-import store from '../store'
+// import store from '../store'
 import React from 'react'
+import { useStore } from '../store'
 
 type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
 type UserInfo = UpInfo & {
@@ -83,27 +84,35 @@ export function useUserInfo(mid?: number | string) {
     mid ? `/x/space/acc/info?mid=${mid}` : null,
     () => request(mid!),
   )
+  const { get$followedUps, set$followedUps } = useStore()
   React.useEffect(() => {
     if (!data) {
       return
     }
-    const isFollowed = store.$followedUps.findIndex(up => {
-      return up.mid == data.mid
-    })
+    const followedUps = get$followedUps()
+    const index = followedUps.findIndex(u => u.mid == data.mid)
     // 用户信息可能会变化
-    if (isFollowed >= 0) {
-      const up = store.$followedUps[isFollowed]
+    if (index >= 0) {
+      // const up = store.$followedUps[isFollowed]
+      const followedUp = followedUps[index]
       if (
-        up.name !== data.name ||
-        up.sign !== data.sign ||
-        up.face !== data.face
+        followedUp.name !== data.name ||
+        followedUp.sign !== data.sign ||
+        followedUp.face !== data.face
       ) {
-        store.$followedUps[isFollowed] = {
-          ...up,
+        followedUps[index] = {
+          ...followedUp,
           name: data.name,
           sign: data.sign,
           face: data.face,
         }
+        set$followedUps(followedUps.slice())
+        // store.$followedUps[isFollowed] = {
+        //   ...up,
+        //   name: data.name,
+        //   sign: data.sign,
+        //   face: data.face,
+        // }
       }
     }
   }, [data])

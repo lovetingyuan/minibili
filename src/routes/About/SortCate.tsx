@@ -1,11 +1,11 @@
 import { Chip, ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 import { View, StyleSheet } from 'react-native'
 
 export default React.memo(function SortCate() {
   const [expandedCate, setExpandedCate] = React.useState(false)
-  const { $videoCatesList } = useStore()
+  const { $videoCatesList, set$videoCatesList } = useStore()
   const [sortedRankList, setSortedRankList] = React.useState<
     { rid: number; label: string }[]
   >([])
@@ -38,7 +38,8 @@ export default React.memo(function SortCate() {
                   const b = unsortedRankList.concat(cate)
                   setSortedRankList(a)
                   setUnSortedRankList(b)
-                  store.$videoCatesList = [$videoCatesList[0], ...a, ...b]
+                  set$videoCatesList([$videoCatesList[0], ...a, ...b])
+                  // store.$videoCatesList = [$videoCatesList[0], ...a, ...b]
                 }}
                 containerStyle={styles.chip}
                 buttonStyle={styles.chipButton}
@@ -61,7 +62,8 @@ export default React.memo(function SortCate() {
                   const b = unsortedRankList.filter(v => v.rid !== cate.rid)
                   setSortedRankList(a)
                   setUnSortedRankList(b)
-                  store.$videoCatesList = [$videoCatesList[0], ...a, ...b]
+                  set$videoCatesList([$videoCatesList[0], ...a, ...b])
+                  // store.$videoCatesList = [$videoCatesList[0], ...a, ...b]
                 }}
                 containerStyle={styles.chip}
                 buttonStyle={styles.chipButton}

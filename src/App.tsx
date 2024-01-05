@@ -15,7 +15,17 @@ import ImagesView from './components/ImagesView'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 import ErrorFallback from './components/ErrorFallback'
 import useIsDark from './hooks/useIsDark'
-import CheckLive from './components/CheckLive'
+import CheckLiveUps from './components/CheckLiveUps'
+import {
+  AppContextProvider,
+  InitContextComp,
+  getAppValue,
+  onChange,
+} from './store'
+import CheckNetState from './components/CheckNetState'
+import CheckAppUpdate from './components/CheckAppUpdate'
+import CheckUpUpdate from './components/CheckUpUpdate'
+// import { ProviderOnChangeType } from 'react-atomic-context'
 
 let online = true
 let focus = true
@@ -74,9 +84,7 @@ export default function App() {
       },
     }
   }, [])
-  const containerStyle = React.useMemo(() => {
-    return { backgroundColor: dark ? 'black' : 'white', flex: 1 }
-  }, [dark])
+
   const theme = React.useMemo(() => {
     return createTheme({
       lightColors: {
@@ -90,6 +98,9 @@ export default function App() {
       mode: dark ? 'dark' : 'light',
     })
   }, [dark])
+  const appValue = React.useMemo(() => {
+    return getAppValue()
+  }, [])
 
   return (
     <RootSiblingParent>
@@ -98,12 +109,16 @@ export default function App() {
         <ThemeProvider theme={theme}>
           <ThemeResponse />
           <SWRConfig value={swrConfig}>
-            <View style={containerStyle}>
+            <AppContextProvider value={appValue} onChange={onChange}>
+              <InitContextComp />
+              <CheckAppUpdate />
+              <CheckUpUpdate />
+              <CheckNetState />
+              <CheckLiveUps />
               <ButtonsOverlay />
               <ImagesView />
               <Route />
-              <CheckLive />
-            </View>
+            </AppContextProvider>
           </SWRConfig>
         </ThemeProvider>
       </SentryExpo.Native.ErrorBoundary>

@@ -11,11 +11,14 @@ import {
   parseNumber,
   showToast,
 } from '../../utils'
-import VideoInfoContext from './videoContext'
+// import VideoInfoContext from './videoContext'
 import { Image } from 'expo-image'
+import { useStore } from '../../store'
 
 export default React.memo(function VideoHeader() {
-  const { video, bvid } = React.useContext(VideoInfoContext)
+  // const { video, bvid } = React.useContext(VideoInfoContext)
+  const { playingVideo } = useStore()
+  const { video, bvid } = playingVideo || {}
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: video2 } = useVideoInfo(bvid)
   const videoInfo = {

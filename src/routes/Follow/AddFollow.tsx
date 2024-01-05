@@ -19,11 +19,11 @@ import {
 } from 'react-native'
 import { Image } from 'expo-image'
 import { imgUrl, parseNumber, showToast } from '../../utils'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 
 function SearchedItem(props: { up: SearchedUpType }) {
   const up = props.up
-  const { $followedUps } = useStore()
+  const { $followedUps, set$followedUps } = useStore()
   const followed = $followedUps.find(v => v.mid == up.mid)
   const user = {
     name: up.name,
@@ -32,8 +32,8 @@ function SearchedItem(props: { up: SearchedUpType }) {
     sign: up.sign,
   }
   const handler = () => {
-    store.$followedUps.unshift(user)
-    // store.$followedUps = [user, ...store.$followedUps]
+    set$followedUps([user, ...$followedUps])
+    // store.$followedUps.unshift(user)
   }
   const goToDynamic = () => {
     Linking.openURL(`https://m.bilibili.com/space/${up.mid}`)
@@ -74,7 +74,7 @@ const renderSearchItem = ({ item: up }: { item: SearchedUpType }) => {
   return <SearchedItem up={up} />
 }
 
-export default function AddFollow() {
+export default React.memo(function AddFollow() {
   const [addUpVisible, setAddUpVisible] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState('')
 
@@ -159,7 +159,7 @@ export default function AddFollow() {
       </Dialog>
     </>
   )
-}
+})
 
 const styles = StyleSheet.create({
   addBtn: {

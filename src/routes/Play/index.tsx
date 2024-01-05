@@ -16,20 +16,22 @@ import { useVideoInfo } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
 import { parseNumber, showToast } from '../../utils'
-import VideoInfoContext from './videoContext'
+// import VideoInfoContext from './videoContext'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingVideoId } from '../../utils/report'
 import commonStyles from '../../styles'
 import { useUserRelation } from '../../api/user-relation'
+import { useStore } from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
-const PlayPage: React.FC<Props> = ({ route, navigation }) => {
+export default React.memo(function PlayPage({ route, navigation }: Props) {
   const { video, bvid } = route.params
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: video2 } = useVideoInfo(bvid)
   const { theme } = useTheme()
+  const { setPlayingVideo } = useStore()
   const videoInfo = React.useMemo(() => {
     return {
       ...video,
@@ -65,70 +67,64 @@ const PlayPage: React.FC<Props> = ({ route, navigation }) => {
       }
     }),
   )
-  const VI = React.useMemo(() => {
-    return {
+  React.useEffect(() => {
+    // return
+    setPlayingVideo({
       bvid,
       video: videoInfo as any, // what the fuck!!!
       page: currentPage,
-    }
+    })
   }, [videoInfo, bvid, currentPage])
   if (!videoInfo.aid || typeof videoInfo.name !== 'string') {
     return null
   }
   return (
-    <VideoInfoContext.Provider value={VI}>
-      <View style={commonStyles.flex1}>
-        <Player />
-        <ScrollView style={styles.videoInfoContainer}>
-          <VideoInfo changePage={setCurrentPage} />
-          <View style={{ marginTop: 10 }}>
-            <CommentList
-              upName={videoInfo.name}
-              commentId={videoInfo.aid}
-              commentType={1}
-              dividerRight={
-                <View style={styles.right}>
-                  <Pressable
-                    onPress={() => {
-                      videoInfo.bvid &&
-                        Clipboard.setStringAsync(videoInfo.bvid).then(() => {
-                          showToast('已复制视频ID')
-                        })
-                    }}>
-                    <Text
-                      style={[
-                        commonStyles.font12,
-                        { color: theme.colors.grey1 },
-                      ]}>
-                      {videoInfo.bvid}
-                    </Text>
-                  </Pressable>
-                  <Text
-                    style={[
-                      commonStyles.font12,
-                      commonStyles.bold,
-                      { color: theme.colors.grey1 },
-                    ]}>
-                    {' · '}
-                  </Text>
+    <View style={commonStyles.flex1}>
+      <Player />
+      <ScrollView style={styles.videoInfoContainer}>
+        <VideoInfo changePage={setCurrentPage} />
+        <View style={{ marginTop: 10 }}>
+          <CommentList
+            upName={videoInfo.name}
+            commentId={videoInfo.aid}
+            commentType={1}
+            dividerRight={
+              <View style={styles.right}>
+                <Pressable
+                  onPress={() => {
+                    videoInfo.bvid &&
+                      Clipboard.setStringAsync(videoInfo.bvid).then(() => {
+                        showToast('已复制视频ID')
+                      })
+                  }}>
                   <Text
                     style={[
                       commonStyles.font12,
                       { color: theme.colors.grey1 },
                     ]}>
-                    {videoInfo?.tname}
+                    {videoInfo.bvid}
                   </Text>
-                </View>
-              }
-            />
-          </View>
-        </ScrollView>
-      </View>
-    </VideoInfoContext.Provider>
+                </Pressable>
+                <Text
+                  style={[
+                    commonStyles.font12,
+                    commonStyles.bold,
+                    { color: theme.colors.grey1 },
+                  ]}>
+                  {' · '}
+                </Text>
+                <Text
+                  style={[commonStyles.font12, { color: theme.colors.grey1 }]}>
+                  {videoInfo?.tname}
+                </Text>
+              </View>
+            }
+          />
+        </View>
+      </ScrollView>
+    </View>
   )
-}
-
-export default PlayPage
+})
 
 const styles = StyleSheet.create({
   videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },

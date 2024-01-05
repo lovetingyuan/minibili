@@ -9,11 +9,12 @@ import {
 } from 'react-native'
 import { NavigationProps } from '../../types'
 import { DynamicItemType } from '../../api/dynamic-items'
-import store from '../../store'
+// import store from '../../store'
 import { Icon, Text, useTheme } from '@rneui/themed'
-import { imgUrl, parseNumber } from '../../utils'
+import { imgUrl, parseNumber, parseUrl } from '../../utils'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
+import { useStore } from '../../store'
 
 export default function VideoItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>
@@ -30,7 +31,7 @@ export default function VideoItem(props: {
       // forwardCount,
     },
   } = props
-
+  const { setOverlayButtons } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { theme } = useTheme()
   // const {width} = useWindowDimensions()
@@ -45,14 +46,22 @@ export default function VideoItem(props: {
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={() => {
-        store.overlayButtons = [
+        setOverlayButtons([
           {
             text: '查看封面',
             onPress: () => {
-              Linking.openURL(cover)
+              Linking.openURL(parseUrl(cover))
             },
           },
-        ]
+        ])
+        // store.overlayButtons = [
+        //   {
+        //     text: '查看封面',
+        //     onPress: () => {
+        //       Linking.openURL(cover)
+        //     },
+        //   },
+        // ]
       }}
       onPress={() => {
         navigation.push('Play', {

@@ -63,7 +63,7 @@ const Loading = React.memo(() => {
   )
 })
 
-const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
+export default React.memo(function Dynamic({ navigation, route }: Props) {
   const upId = route.params?.user?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<any>(null)
   const { data: userInfo } = useUserInfo(upId)
@@ -184,7 +184,7 @@ const Dynamic: React.FC<Props> = function Dynamic({ navigation, route }) {
       />
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {
@@ -232,5 +232,3 @@ const styles = StyleSheet.create({
   emptyText: { margin: 40, textAlign: 'center', fontSize: 18 },
   errorText: { margin: 50, textAlign: 'center', fontSize: 16 },
 })
-
-export default Dynamic

@@ -29,7 +29,7 @@ import { followHeaderRight, followHeaderTitle } from './Follow/Header'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-export default function Route() {
+export default React.memo(function Route() {
   const isDark = useIsDark()
 
   const RouteTheme = React.useMemo(() => {
@@ -143,4 +143,4 @@ export default function Route() {
       </Stack.Navigator>
     </NavigationContainer>
   )
-}
+})

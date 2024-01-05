@@ -2,7 +2,7 @@ import React from 'react'
 import { Linking, StyleSheet } from 'react-native'
 import { Overlay } from '@rneui/themed'
 import { useNetInfo } from '@react-native-community/netinfo'
-import store, { useStore } from '../store'
+import { useStore } from '../store'
 import WebView from 'react-native-webview'
 
 function __$hack() {
@@ -106,7 +106,8 @@ const html = `
 `
 
 export default React.memo(function ImagesView() {
-  const { imagesList, currentImageIndex } = useStore()
+  const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } =
+    useStore()
   const netinfo = useNetInfo()
   const webviewRef = React.useRef<WebView | null>(null)
   return (
@@ -115,8 +116,10 @@ export default React.memo(function ImagesView() {
       fullScreen
       overlayStyle={styles.overlay}
       onBackdropPress={() => {
-        store.imagesList = []
-        store.currentImageIndex = 0
+        setImagesList([])
+        setCurrentImageIndex(0)
+        // store.imagesList = []
+        // store.currentImageIndex = 0
       }}>
       <WebView
         originWhitelist={['*']}
@@ -137,8 +140,10 @@ export default React.memo(function ImagesView() {
             Linking.openURL(imagesList[data.payload].src)
           }
           if (data.action === 'close') {
-            store.imagesList = []
-            store.currentImageIndex = 0
+            setImagesList([])
+            setCurrentImageIndex(0)
+            // store.imagesList = []
+            // store.currentImageIndex = 0
           }
         }}
       />

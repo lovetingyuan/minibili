@@ -13,7 +13,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   const { theme } = useTheme()
   const { width } = useWindowDimensions()
   const itemWidth = (width - 24) / 2
-  const { isWiFi, followedUpsMap } = useStore()
+  const { isWiFi, _followedUpsMap } = useStore()
   return (
     <View style={[styles.itemContainer, { width: itemWidth }]}>
       <View style={commonStyles.flex1}>
@@ -66,10 +66,10 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
               styles.upNameText,
               {
                 color:
-                  video.mid in followedUpsMap
+                  video.mid in _followedUpsMap
                     ? theme.colors.secondary
                     : theme.colors.primary,
-                fontWeight: video.mid in followedUpsMap ? 'bold' : 'normal',
+                fontWeight: video.mid in _followedUpsMap ? 'bold' : 'normal',
               },
             ]}>
             {video.name}

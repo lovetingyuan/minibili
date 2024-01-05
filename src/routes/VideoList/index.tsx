@@ -6,10 +6,11 @@ import { useStore } from '../../store'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
-export default function (props: Props) {
+
+export default React.memo(function (props: Props) {
   const { currentVideosCate } = useStore()
   if (currentVideosCate.rid === -1) {
     return <HotList {...props} />
   }
   return <Ranks {...props} />
-}
+})

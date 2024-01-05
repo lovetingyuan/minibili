@@ -10,9 +10,9 @@ import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingDynamicId } from '../../utils/report'
 
-const DynamicDetail: React.FC<
-  NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>
-> = ({ route }) => {
+export default React.memo(function DynamicDetail({
+  route,
+}: NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>) {
   const {
     text,
     name,
@@ -85,7 +85,7 @@ const DynamicDetail: React.FC<
       />
     </ScrollView>
   )
-}
+})
 
 const styles = StyleSheet.create({
   textContainer: {
@@ -163,5 +163,3 @@ const styles = StyleSheet.create({
   },
   share: { flexDirection: 'row', alignItems: 'center', gap: 3 },
 })
-
-export default DynamicDetail

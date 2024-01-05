@@ -7,15 +7,15 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 
 const HeaderTitle = () => {
-  const { checkingUpUpdate, $followedUps, updatedCount } = useStore()
+  const { checkingUpUpdate, $followedUps, _updatedCount } = useStore()
   const count = $followedUps.length
   return (
     <View style={styles.titleContainer}>
       <Text style={styles.titleText}>
         关注的UP
         {count
-          ? updatedCount
-            ? ` (${updatedCount}/${count})`
+          ? _updatedCount
+            ? ` (${_updatedCount}/${count})`
             : ` (${count})`
           : ''}
       </Text>

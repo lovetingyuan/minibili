@@ -1,6 +1,6 @@
 import { BottomSheet } from '@rneui/themed'
 import React from 'react'
-import store, { useStore } from '../store'
+import { useStore } from '../store'
 import WebView from 'react-native-webview'
 import { showToast } from '../utils'
 import { useWindowDimensions, View } from 'react-native'
@@ -42,8 +42,8 @@ const darkCode = `const style = document.createElement('style');
   true;
 `
 
-export default function MoreReplies() {
-  const { moreRepliesUrl } = useStore()
+export default React.memo(function MoreReplies() {
+  const { moreRepliesUrl, setMoreRepliesUrl } = useStore()
   const { height } = useWindowDimensions()
   const isDark = useIsDark()
   const webviewRef = React.useRef<WebView | null>(null)
@@ -54,11 +54,13 @@ export default function MoreReplies() {
   return (
     <BottomSheet
       onBackdropPress={() => {
-        store.moreRepliesUrl = ''
+        setMoreRepliesUrl('')
+        // store.moreRepliesUrl = ''
       }}
       modalProps={{
         onRequestClose: () => {
-          store.moreRepliesUrl = ''
+          setMoreRepliesUrl('')
+          // store.moreRepliesUrl = ''
         },
       }}
       isVisible={!!moreRepliesUrl}>
@@ -105,4 +107,4 @@ export default function MoreReplies() {
       ) : null}
     </BottomSheet>
   )
-}
+})

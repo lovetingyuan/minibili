@@ -67,7 +67,7 @@ export function useHotVideos() {
   const list = hotVideos.map(getVideo)
 
   return {
-    list: list, // list.length ? list : store.$cachedHotVideos,
+    list,
     page: size,
     setSize,
     isRefreshing,

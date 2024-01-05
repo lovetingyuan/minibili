@@ -4,9 +4,10 @@ import { MessageContent, ReplyItem } from '../api/comments'
 import { Button, Text, useTheme } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-import store from '../store'
+// import store from '../store'
 import commonStyles from '../styles'
 import { imgUrl } from '../utils'
+import { useStore } from '../store'
 
 interface Props {
   upName: string
@@ -102,6 +103,7 @@ function CommentText(props: {
 export default React.memo(function Comment(props: Props) {
   const { comment, upName } = props
   const { theme } = useTheme()
+  const { setImagesList, setCurrentImageIndex, setMoreRepliesUrl } = useStore()
   const upStyle = (name: string) => {
     return upName === name
       ? styles.pinkName
@@ -174,11 +176,18 @@ export default React.memo(function Comment(props: Props) {
             style={{ color: theme.colors.primary }}
             onPress={() => {
               if (comment.images) {
-                store.imagesList = comment.images.map(img => {
-                  img.src = imgUrl(img.src)
-                  return img
-                })
-                store.currentImageIndex = 0
+                setImagesList(
+                  comment.images.map(img => {
+                    img.src = imgUrl(img.src)
+                    return img
+                  }),
+                )
+                setCurrentImageIndex(0)
+                // store.imagesList = comment.images.map(img => {
+                //   img.src = imgUrl(img.src)
+                //   return img
+                // })
+                // store.currentImageIndex = 0
               }
             }}>
             {'  '}查看图片
@@ -237,7 +246,10 @@ export default React.memo(function Comment(props: Props) {
               size="sm"
               onPress={() => {
                 const root = comment.replies[0].root_str
-                store.moreRepliesUrl = `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`
+                setMoreRepliesUrl(
+                  `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
+                )
+                // store.moreRepliesUrl = `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`
               }}
               buttonStyle={styles.moreButton}>
               <Text style={{ color: theme.colors.primary }}>

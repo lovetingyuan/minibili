@@ -29,12 +29,12 @@ const Loading = React.memo(() => {
   )
 })
 
-const CommentList: React.FC<{
+export default function CommentList(props: {
   commentId: string | number
   commentType: number
   upName: string
   dividerRight?: React.ReactNode
-}> = props => {
+}) {
   const {
     data: { replies: comments, allCount },
     isLoading: commentLoading,
@@ -127,5 +127,3 @@ const styles = StyleSheet.create({
   },
   skeleton: { flex: 1, gap: 5, marginBottom: 20 },
 })
-
-export default CommentList

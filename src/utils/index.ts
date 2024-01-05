@@ -1,6 +1,6 @@
 import { Share, Platform, ToastAndroid, Alert, Linking } from 'react-native'
 import Toast from 'react-native-root-toast'
-import store from '../store'
+import { getAppUpdateInfo } from '../store'
 
 export const parseNumber = (num?: number | null) => {
   if (num == null) {
@@ -102,7 +102,8 @@ export async function handleShareUp(
 }
 
 export const parseUrl = (url: string) => {
-  return url.startsWith('//') ? 'https:' + url : url
+  const u = url.startsWith('//') ? 'https:' + url : url
+  return u.replace('http://', 'https://')
 }
 
 export function delay(ms: number) {
@@ -135,7 +136,7 @@ export function showFatalError() {
   if (showedFatalError || __DEV__) {
     return
   }
-  store.appUpdateInfo.then(info => {
+  getAppUpdateInfo.then(info => {
     showedFatalError = true
     Alert.alert(
       '抱歉，应用发生了错误😅',

@@ -1,7 +1,7 @@
 import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
 import { View, StyleSheet, Pressable, Linking } from 'react-native'
-import store, { useStore } from '../../store'
+import { useStore } from '../../store'
 import { handleShareUp, imgUrl, parseNumber, showToast } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
 import { useNavigation, useRoute } from '@react-navigation/native'
@@ -110,7 +110,7 @@ function HeaderRight() {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
-  const { $followedUps } = useStore()
+  const { $followedUps, set$followedUps } = useStore()
   const followed = $followedUps.find(v => v.mid == dynamicUser?.mid)
 
   return (
@@ -132,12 +132,21 @@ function HeaderRight() {
             pressColor={theme.colors.grey4}
             onPress={() => {
               if (dynamicUser) {
-                store.$followedUps.unshift({
-                  name: dynamicUser.name,
-                  mid: dynamicUser.mid,
-                  face: dynamicUser.face,
-                  sign: dynamicUser.sign,
-                })
+                set$followedUps([
+                  {
+                    name: dynamicUser.name,
+                    mid: dynamicUser.mid,
+                    face: dynamicUser.face,
+                    sign: dynamicUser.sign,
+                  },
+                  ...$followedUps,
+                ])
+                // store.$followedUps.unshift({
+                //   name: dynamicUser.name,
+                //   mid: dynamicUser.mid,
+                //   face: dynamicUser.face,
+                //   sign: dynamicUser.sign,
+                // })
                 showToast('已关注')
               }
               hideMenu()

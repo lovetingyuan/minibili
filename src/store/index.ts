@@ -1,145 +1,120 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { proxy, subscribe, useSnapshot } from 'valtio'
 import { RanksConfig } from '../constants'
 import { checkUpdate } from '../api/check-update'
-import { UpInfo } from '../types'
-// import { registerCheckLivingUps } from '../utils/check-live'
-// import { showToast } from '../utils'
-// import { subscribeKey } from 'valtio/utils'
-// import { startCheckLivingUps } from '../api/living-info'
-import { startCheckUpdateUps } from '../api/dynamic-items'
+import { UpInfo, VideoInfo } from '../types'
+import {
+  ProviderOnChangeType,
+  createAtomicContext,
+  useAtomicContext,
+  useAtomicContextMethods,
+} from 'react-atomic-context'
+import React from 'react'
+import useMounted from '../hooks/useMounted'
 
 interface UpdateUpInfo {
   latestId: string
   currentLatestId: string
 }
 
-const store = proxy<{
-  $blackUps: Record<string, string>
-  /**
-   * 关注列表
-   */
-  $followedUps: UpInfo[]
-  $blackTags: Record<string, string>
-  $upUpdateMap: Record<string, UpdateUpInfo>
-  $videoCatesList: { rid: number; label: string }[]
-  $ignoredVersions: string[]
-  $cookie: string
-  // $cachedHotVideos: VideoItem[]
-  // $pinUps: Record<string, number>
-  // ----------------------------
-  followedUpsMap: Record<string, UpInfo>
-  initialed: boolean
-  isWiFi: boolean
-  webViewMode: 'PC' | 'MOBILE'
-  livingUps: Record<string, string>
-  currentVideosCate: (typeof RanksConfig)[number]
-  appUpdateInfo: ReturnType<typeof checkUpdate>
-  imagesList: {
-    src: string
-    width: number
-    height: number
-    ratio: number
-  }[]
-  currentImageIndex: number
-  checkingUpUpdate: boolean
-  overlayButtons: { text: string; onPress: () => void }[]
-  showCaptcha: boolean
-  updatedCount: number
-  moreRepliesUrl: string
-  testid: number
-}>({
-  $blackUps: {},
-  $followedUps: [],
-  get followedUpsMap() {
-    // console.log('followedUpsMapfollowedUpsMapfollowedUpsMap')
+export const getAppValue = () => {
+  return {
+    $blackUps: {} as Record<string, string>,
+    $followedUps: [] as UpInfo[],
+    $blackTags: {} as Record<string, string>,
+    $upUpdateMap: {} as Record<string, UpdateUpInfo>,
+    $ignoredVersions: [] as string[],
+    $videoCatesList: RanksConfig,
+    // -------------------------
+    initialed: false,
+    isWiFi: false,
+    webViewMode: 'MOBILE' as 'PC' | 'MOBILE',
+    livingUps: {} as Record<string, string>,
+    checkingUpUpdate: false,
+    currentVideosCate: RanksConfig[0] as (typeof RanksConfig)[number],
+    imagesList: [] as {
+      src: string
+      width: number
+      height: number
+      ratio: number
+    }[],
+    currentImageIndex: 0,
+    overlayButtons: [] as { text: string; onPress: () => void }[],
+    _followedUpsMap: {} as Record<string, UpInfo>,
+    _updatedCount: 0,
+    moreRepliesUrl: '',
+    /**
+     * 正在播放的视频
+     */
+    playingVideo: null as {
+      bvid: string
+      page: number
+      video?: VideoInfo
+    } | null,
+  }
+}
+
+const initValue = getAppValue()
+const AppContext = createAtomicContext(initValue)
+const storedKeys = Object.keys(initValue).filter(k =>
+  k.startsWith('$'),
+) as StoredKeys[]
+
+export const getAppUpdateInfo = checkUpdate()
+
+export function useStore() {
+  return useAtomicContext(AppContext)
+}
+
+export const AppContextProvider = AppContext.Provider
+
+export type AppContextValueType = ReturnType<typeof getAppValue>
+
+export const onChange: ProviderOnChangeType<AppContextValueType> = (
+  info,
+  ctx,
+) => {
+  const { key, value } = info
+  if (key === '$followedUps') {
     const ups: Record<string, UpInfo> = {}
-    for (const up of this.$followedUps) {
+    for (const up of value) {
       ups[up.mid] = up
     }
-    return ups
-  },
-  $blackTags: {},
-  $upUpdateMap: {},
-  $ignoredVersions: [],
-  $videoCatesList: RanksConfig,
-  $cookie: '',
-  // $cachedHotVideos: [],
-  // $pinUps: {},
-  // -------------------------
-  initialed: false,
-  isWiFi: false,
-  webViewMode: 'MOBILE',
-  livingUps: {},
-  checkingUpUpdate: false,
-  currentVideosCate: RanksConfig[0],
-  appUpdateInfo: checkUpdate(),
-  imagesList: [],
-  currentImageIndex: 0,
-  overlayButtons: [],
-  showCaptcha: false,
-  testid: 0,
-  get updatedCount() {
-    const aa = Object.values<UpdateUpInfo>(this.$upUpdateMap)
-    return aa.filter(item => {
+    ctx.set_followedUpsMap(ups)
+  }
+  if (key === '$upUpdateMap') {
+    const aa = Object.values<UpdateUpInfo>(value)
+    const count = aa.filter(item => {
       return item.latestId !== item.currentLatestId
     }).length
-  },
-  moreRepliesUrl: '',
-})
+    ctx.set_updatedCount(count)
+  }
+  if (key.startsWith('$')) {
+    AsyncStorage.setItem(StoragePrefix + key, JSON.stringify(value))
+  }
+}
 
 const StoragePrefix = 'Store:'
 
-type StoredKeys<K = keyof typeof store> = K extends `$${string}` ? K : never
+type StoredKeys<K = keyof AppContextValueType> = K extends `$${string}`
+  ? K
+  : never
 
-const storedKeys = Object.keys(store)
-  // 以$开头的数据表示需要持久化存储
-  .filter(k => k.startsWith('$')) as StoredKeys[]
-Promise.all(
-  storedKeys.map(k => {
-    const key = k as StoredKeys
-    return AsyncStorage.getItem(StoragePrefix + key).then(data => {
-      if (data) {
-        store[key] = JSON.parse(data) as any
-      }
-    })
-  }),
-)
-  .then(() => {
-    store.initialed = true
-    // subscribeKey(store, '$followedUps', v =>
-    //   console.log('$followedUps has changed to', v),
-    // )
-    subscribe(store, changes => {
-      const changedKeys = new Set<StoredKeys>()
-      for (const op of changes) {
-        const ck = op[1][0]
-        if (typeof ck === 'string' && ck.startsWith('$')) {
-          changedKeys.add(ck as StoredKeys)
-        }
-      }
-      // console.log('chencged', [...changedKeys])
-      for (const ck of changedKeys) {
-        AsyncStorage.setItem(StoragePrefix + ck, JSON.stringify(store[ck]))
-      }
+export const InitContextComp = React.memo(() => {
+  const methods = useAtomicContextMethods(AppContext)
+  useMounted(() => {
+    Promise.all(
+      storedKeys.map(k => {
+        const key = k as StoredKeys
+        const setKey = `set${key}` as const
+        return AsyncStorage.getItem(StoragePrefix + key).then(data => {
+          if (data) {
+            methods[setKey](JSON.parse(data) as any)
+          }
+        })
+      }),
+    ).then(() => {
+      methods.setInitialed(true)
     })
   })
-  .then(() => {
-    // startCheckLivingUps()
-    startCheckUpdateUps()
-    // return registerCheckLivingUps().then(good => {
-    //   if (!good) {
-    //     showToast('检查直播失败')
-    //   }
-    // })
-  })
-
-export function useStore() {
-  return useSnapshot(store)
-}
-
-export function setStore(callback: (s: typeof store) => void) {
-  callback(store)
-}
-
-export default store
+  return null
+})
