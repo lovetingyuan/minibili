@@ -16,7 +16,6 @@ import { useVideoInfo } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
 import VideoInfo from './VideoInfo'
 import { parseNumber, showToast } from '../../utils'
-// import VideoInfoContext from './videoContext'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingVideoId } from '../../utils/report'
@@ -68,7 +67,6 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
     }),
   )
   React.useEffect(() => {
-    // return
     setPlayingVideo({
       bvid,
       video: videoInfo as any, // what the fuck!!!

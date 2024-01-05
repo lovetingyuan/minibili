@@ -37,7 +37,6 @@ export default React.memo(function BlackTags() {
                   const blackTags = { ...$blackTags }
                   delete blackTags[tag]
                   set$blackTags(blackTags)
-                  // delete store.$blackTags[tag]
                 },
               }}
               iconRight

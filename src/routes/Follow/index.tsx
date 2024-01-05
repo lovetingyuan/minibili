@@ -11,12 +11,10 @@ import { Text } from '@rneui/themed'
 import FollowItem from './FollowItem'
 import { UpInfo } from '../../types'
 import { useStore } from '../../store'
-// import { checkUpdateUps } from '../../api/dynamic-items'
 import commonStyles from '../../styles'
 import AddFollow from './AddFollow'
 import useMounted from '../../hooks/useMounted'
 import useIsDark from '../../hooks/useIsDark'
-// import { checkLivingUps } from '../../api/living-info'
 
 const renderItem = ({
   item,
@@ -60,22 +58,12 @@ const TvImg: React.FC = () => {
     />
   )
 }
-// let checkLiveTime = 0
 function Follow() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
   const { $followedUps, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
   const dark = useIsDark()
-  // useCheckLivingUps()
-
-  // useMounted(() => {
-  //   if (Date.now() - checkLiveTime > 60 * 1000) {
-  //     checkLivingUps()
-  //     checkLiveTime = Date.now()
-  //   }
-  // })
-
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
   const followedUpListLen = $followedUps.length

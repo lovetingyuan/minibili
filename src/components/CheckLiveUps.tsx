@@ -7,6 +7,7 @@ import { Vibration } from 'react-native'
 import { z } from 'zod'
 
 let prevLivingMap = {}
+
 const useCheckLivingUps = (time?: number) => {
   const { $followedUps, setLivingUps } = useStore()
   const uids = $followedUps.map(user => `uids[]=${user.mid}`).join('&')

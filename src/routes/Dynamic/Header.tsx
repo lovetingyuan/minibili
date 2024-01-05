@@ -17,7 +17,6 @@ import { Menu, MenuItem } from 'react-native-material-menu'
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
 export function HeaderLeft(props: { scrollTop: () => void }) {
-  const { livingUps } = useStore()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const { data: userInfo } = useUserInfo(route.params?.user.mid)
@@ -80,7 +79,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           {' ' + sex}
         </Text>
       ) : null}
-      {dynamicUser.mid && (livingUps[dynamicUser.mid] || livingUrl) ? (
+      {dynamicUser.mid && livingUrl ? (
         <Button
           size="sm"
           type="clear"
@@ -89,7 +88,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             if (dynamicUser.mid) {
               navigation.navigate('WebPage', {
                 title: dynamicUser.name + '的直播间',
-                url: livingUps[dynamicUser.mid] || livingUrl,
+                url: livingUrl,
               })
             }
           }}>
@@ -141,12 +140,6 @@ function HeaderRight() {
                   },
                   ...$followedUps,
                 ])
-                // store.$followedUps.unshift({
-                //   name: dynamicUser.name,
-                //   mid: dynamicUser.mid,
-                //   face: dynamicUser.face,
-                //   sign: dynamicUser.sign,
-                // })
                 showToast('已关注')
               }
               hideMenu()

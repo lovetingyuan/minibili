@@ -9,12 +9,10 @@ import {
 import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps, UpInfo } from '../../types'
-// import { Button } from '@rneui/themed'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { useStore } from '../../store'
 import { Image } from 'expo-image'
 import { imgUrl, parseUrl, showToast } from '../../utils'
-// import commonStyles from '../../styles'
 
 export default React.memo(function FollowItem(props: {
   item: UpInfo
@@ -71,8 +69,6 @@ export default React.memo(function FollowItem(props: {
                 currentLatestId: update.latestId,
               },
             })
-            // store.$upUpdateMap[mid].latestId =
-            //   store.$upUpdateMap[mid].currentLatestId
           },
         }
       : {
@@ -87,7 +83,6 @@ export default React.memo(function FollowItem(props: {
                   currentLatestId: Math.random().toString(),
                 },
               })
-              // store.$upUpdateMap[mid].latestId = Math.random().toString()
             } else {
               showToast('请稍候再操作')
             }
@@ -102,9 +97,6 @@ export default React.memo(function FollowItem(props: {
             text: '确定',
             onPress() {
               set$followedUps(get$followedUps().filter(u => u.mid != mid))
-              // store.$followedUps = store.$followedUps.filter(
-              //   up => up.mid != mid,
-              // )
             },
           },
         ])

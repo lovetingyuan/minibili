@@ -36,7 +36,6 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
           pressColor={theme.colors.grey4}
           onPress={() => {
             setWebViewMode(webViewMode === 'MOBILE' ? 'PC' : 'MOBILE')
-            // store.webViewMode = store.webViewMode === 'MOBILE' ? 'PC' : 'MOBILE'
             hideMenu()
           }}>
           {webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}

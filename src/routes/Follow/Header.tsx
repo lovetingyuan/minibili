@@ -1,4 +1,4 @@
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { useStore } from '../../store'
 import { Button, Text } from '@rneui/themed'
 import React from 'react'
@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 
 const HeaderTitle = () => {
-  const { checkingUpUpdate, $followedUps, _updatedCount } = useStore()
+  const { $followedUps, _updatedCount } = useStore()
   const count = $followedUps.length
   return (
     <View style={styles.titleContainer}>
@@ -19,9 +19,9 @@ const HeaderTitle = () => {
             : ` (${count})`
           : ''}
       </Text>
-      {checkingUpUpdate ? (
+      {/* {checkingUpUpdate ? (
         <ActivityIndicator size={'small'} color={'#F85A54'} />
-      ) : null}
+      ) : null} */}
     </View>
   )
 }

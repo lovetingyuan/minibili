@@ -55,12 +55,10 @@ export default React.memo(function MoreReplies() {
     <BottomSheet
       onBackdropPress={() => {
         setMoreRepliesUrl('')
-        // store.moreRepliesUrl = ''
       }}
       modalProps={{
         onRequestClose: () => {
           setMoreRepliesUrl('')
-          // store.moreRepliesUrl = ''
         },
       }}
       isVisible={!!moreRepliesUrl}>

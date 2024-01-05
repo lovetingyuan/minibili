@@ -61,7 +61,6 @@ export default React.memo(function Hot({ navigation }: Props) {
       ...$blackUps,
       ['_' + mid]: name,
     })
-    // store.$blackUps['_' + mid] = name
     reportUserAction(Action.add_black_user, { mid, name })
   }
   const addBlackTagName = () => {
@@ -73,7 +72,6 @@ export default React.memo(function Hot({ navigation }: Props) {
       ...$blackTags,
       [tag]: tag,
     })
-    // store.$blackTags[tag] = tag
   }
   const gotoPlay = (data: VideoItem) => {
     navigation.navigate('Play', {
@@ -138,7 +136,6 @@ export default React.memo(function Hot({ navigation }: Props) {
         onLongPress={() => {
           currentVideoRef.current = item
           setOverlayButtons(buttons())
-          // store.overlayButtons = buttons()
         }}>
         <HotItem video={item} />
       </TouchableOpacity>

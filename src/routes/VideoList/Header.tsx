@@ -6,25 +6,19 @@ import { StyleSheet } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 import { NavigationProps, PromiseResult } from '../../types'
 import { useNavigation } from '@react-navigation/native'
+import useMounted from '../../hooks/useMounted'
 
 const HeaderTitle = React.memo(() => {
-  const {
-    currentVideosCate,
-    $videoCatesList,
-    // getAppUpdateInfo,
-    setCurrentVideosCate,
-  } = useStore()
+  const { currentVideosCate, $videoCatesList, setCurrentVideosCate } =
+    useStore()
   const [newVersion, setNewVersion] = React.useState<PromiseResult<
     typeof getAppUpdateInfo
   > | null>(null)
-  if (!newVersion) {
+  useMounted(() => {
     getAppUpdateInfo.then(r => {
       setNewVersion(r)
     })
-    // store.appUpdateInfo.then(res => {
-    //   setNewVersion(res)
-    // })
-  }
+  })
   const { theme } = useTheme()
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
@@ -109,7 +103,6 @@ const HeaderTitle = React.memo(() => {
 const HeaderRight = React.memo(() => {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { _updatedCount, livingUps } = useStore()
-  // const livingUps = {}
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
     <View>

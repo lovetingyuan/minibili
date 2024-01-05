@@ -4,13 +4,11 @@ import { View, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { ListItem, Text, Icon } from '@rneui/themed'
 import { useStore } from '../../store'
-// import VideoInfoContext from './videoContext'
 
 export default React.memo(function VideoInfo(props: {
   changePage: (p: number) => void
 }) {
   const { changePage } = props
-  // const { video, bvid, page } = React.useContext(VideoInfoContext)
   const { playingVideo } = useStore()
   const { video, bvid, page } = playingVideo || {}
   const { data: video2, isLoading } = useVideoInfo(bvid)

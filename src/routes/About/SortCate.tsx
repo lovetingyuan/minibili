@@ -39,7 +39,6 @@ export default React.memo(function SortCate() {
                   setSortedRankList(a)
                   setUnSortedRankList(b)
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
-                  // store.$videoCatesList = [$videoCatesList[0], ...a, ...b]
                 }}
                 containerStyle={styles.chip}
                 buttonStyle={styles.chipButton}
@@ -63,7 +62,6 @@ export default React.memo(function SortCate() {
                   setSortedRankList(a)
                   setUnSortedRankList(b)
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
-                  // store.$videoCatesList = [$videoCatesList[0], ...a, ...b]
                 }}
                 containerStyle={styles.chip}
                 buttonStyle={styles.chipButton}

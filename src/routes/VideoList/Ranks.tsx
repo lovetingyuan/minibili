@@ -42,7 +42,6 @@ export default React.memo(function Ranks({ navigation }: Props) {
       ...$blackUps,
       ['_' + mid]: name,
     })
-    // store.$blackUps['_' + mid] = name
     reportUserAction(Action.add_black_user, { mid, name })
   }
   const gotoPlay = (data: VideoItem) => {
@@ -65,7 +64,6 @@ export default React.memo(function Ranks({ navigation }: Props) {
         onLongPress={() => {
           currentVideoRef.current = item
           setOverlayButtons(buttons())
-          // store.overlayButtons = buttons()
         }}>
         <HotItem video={item} />
       </TouchableOpacity>

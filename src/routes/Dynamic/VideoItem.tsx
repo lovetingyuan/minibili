@@ -9,7 +9,6 @@ import {
 } from 'react-native'
 import { NavigationProps } from '../../types'
 import { DynamicItemType } from '../../api/dynamic-items'
-// import store from '../../store'
 import { Icon, Text, useTheme } from '@rneui/themed'
 import { imgUrl, parseNumber, parseUrl } from '../../utils'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
@@ -34,7 +33,6 @@ export default function VideoItem(props: {
   const { setOverlayButtons } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { theme } = useTheme()
-  // const {width} = useWindowDimensions()
   const gray = theme.colors.grey1
   const textStyle = {
     color: gray,
@@ -54,14 +52,6 @@ export default function VideoItem(props: {
             },
           },
         ])
-        // store.overlayButtons = [
-        //   {
-        //     text: '查看封面',
-        //     onPress: () => {
-        //       Linking.openURL(cover)
-        //     },
-        //   },
-        // ]
       }}
       onPress={() => {
         navigation.push('Play', {

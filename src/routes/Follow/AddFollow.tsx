@@ -33,7 +33,6 @@ function SearchedItem(props: { up: SearchedUpType }) {
   }
   const handler = () => {
     set$followedUps([user, ...$followedUps])
-    // store.$followedUps.unshift(user)
   }
   const goToDynamic = () => {
     Linking.openURL(`https://m.bilibili.com/space/${up.mid}`)

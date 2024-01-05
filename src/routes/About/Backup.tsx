@@ -4,14 +4,13 @@ import { Button, Text } from '@rneui/themed'
 import { showToast } from '../../utils'
 import { useStore } from '../../store'
 import * as Clipboard from 'expo-clipboard'
-// import store from '../../store'
 
 export default React.memo(function Backup() {
   const {
-    $blackUps,
-    $followedUps,
-    $blackTags,
-    $videoCatesList,
+    get$blackUps,
+    get$followedUps,
+    get$blackTags,
+    get$videoCatesList,
     set$blackTags,
     set$followedUps,
     set$blackUps,
@@ -29,14 +28,14 @@ export default React.memo(function Backup() {
             const settings = JSON.stringify({
               type: 'minibili-settings',
               data: {
-                $blackUps,
-                $followedUps,
-                $blackTags,
-                $videoCatesList,
+                $blackUps: get$blackUps(),
+                $followedUps: get$followedUps(),
+                $blackTags: get$blackTags(),
+                $videoCatesList: get$videoCatesList(),
               },
             })
             Clipboard.setStringAsync(settings).then(() => {
-              showToast('已复制当前设置，您可以粘贴到便签中')
+              showToast('已复制当前设置，您可以粘贴到便签或备忘录中')
             })
           }}>
           导出
@@ -65,7 +64,6 @@ export default React.memo(function Backup() {
                         set$followedUps(data.$followedUps)
                         set$blackUps(data.$blackUps)
                         set$videoCatesList(data.$videoCatesList)
-                        // Object.assign(store, data)
                         showToast('导入完成')
                       },
                     },

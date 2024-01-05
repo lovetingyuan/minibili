@@ -1,6 +1,4 @@
 import request from './fetcher'
-// import store from '../store'
-import PQueue from 'p-queue'
 import {
   DynamicItemBaseType,
   DynamicItemResponse,
@@ -20,9 +18,6 @@ import {
   OtherForwardTypeEnum,
 } from './dynamic-items.type'
 import { parseUrl } from '../utils'
-import useSWR from 'swr'
-import { useStore } from '../store'
-import React from 'react'
 
 type OmitUndef<T> = {
   [K in keyof T as T[K] extends undefined ? never : K]: T[K]
@@ -518,32 +513,6 @@ export function useDynamicItems(mid?: string | number) {
   }
 }
 
-// const upUpdateQueue = new PQueue({
-//   concurrency: 20,
-//   intervalCap: 8,
-//   interval: 1000,
-// })
-
-// function useUpLatestId(mid: string | number) {
-//   const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
-//   const { data } = useSWR<DynamicListResponse>(url)
-//   let latestTime = 0
-//   let latestId = ''
-//   if (data?.items) {
-//     data.items.forEach(item => {
-//       if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-//         return
-//       }
-//       const pubTime = item.modules?.module_author?.pub_ts
-//       if (pubTime > latestTime) {
-//         latestTime = pubTime
-//         latestId = item.id_str
-//       }
-//     })
-//   }
-//   return latestId
-// }
-
 export function checkSingleUpUpdate(mid: string | number) {
   const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
   return request<DynamicListResponse>(url)
@@ -568,61 +537,3 @@ export function checkSingleUpUpdate(mid: string | number) {
       return '' // 忽略失败
     })
 }
-
-// export async function checkUpdateUps() {
-//   // if (first) {
-//   //   store.checkingUpUpdate = true
-//   // }
-//   if (upUpdateQueue.size || upUpdateQueue.pending) {
-//     return
-//   }
-//   const upUpdateIdMap: Record<string, string> = {}
-//   for (const up of store.$followedUps) {
-//     upUpdateQueue.add(async () => {
-//       const id = await checkSingleUpUpdate(up.mid)
-//       if (id) {
-//         upUpdateIdMap[up.mid] = id
-//       }
-//     })
-//   }
-
-//   return upUpdateQueue.onIdle().then(() => {
-//     if (store.checkingUpUpdate) {
-//       store.checkingUpUpdate = false
-//     }
-//     for (const mid in upUpdateIdMap) {
-//       const id = upUpdateIdMap[mid]
-//       if (mid in store.$upUpdateMap) {
-//         store.$upUpdateMap[mid].currentLatestId = id
-//       } else {
-//         store.$upUpdateMap[mid] = {
-//           latestId: id,
-//           currentLatestId: id,
-//         }
-//       }
-//     }
-//     store.$upUpdateMap = {
-//       ...store.$upUpdateMap,
-//     }
-//   })
-// }
-
-// let checkUpdateUpsTimer: number | null = null
-
-// export function startCheckUpdateUps() {
-//   if (typeof checkUpdateUpsTimer === 'number') {
-//     window.clearInterval(checkUpdateUpsTimer)
-//   }
-//   checkUpdateUps(false)
-//   checkUpdateUpsTimer = window.setInterval(
-//     () => {
-//       checkUpdateUps(false)
-//     },
-//     10 * 60 * 1000,
-//   )
-// }
-
-// function CheckUpUpdate(props: { mid: string | number }) {
-//   const latestId = useUpLatestId(props.mid)
-//   return null
-// }

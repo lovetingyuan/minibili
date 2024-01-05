@@ -118,8 +118,6 @@ export default React.memo(function ImagesView() {
       onBackdropPress={() => {
         setImagesList([])
         setCurrentImageIndex(0)
-        // store.imagesList = []
-        // store.currentImageIndex = 0
       }}>
       <WebView
         originWhitelist={['*']}
@@ -142,8 +140,6 @@ export default React.memo(function ImagesView() {
           if (data.action === 'close') {
             setImagesList([])
             setCurrentImageIndex(0)
-            // store.imagesList = []
-            // store.currentImageIndex = 0
           }
         }}
       />

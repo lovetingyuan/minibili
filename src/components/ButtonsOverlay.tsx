@@ -7,7 +7,6 @@ export default React.memo(function ButtonsOverlay() {
   const { overlayButtons, setOverlayButtons } = useStore()
   const dismiss = () => {
     setOverlayButtons([])
-    // store.overlayButtons = []
   }
   const Buttons = overlayButtons
     .map(button => {

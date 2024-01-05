@@ -29,7 +29,6 @@ export const getAppValue = () => {
     isWiFi: false,
     webViewMode: 'MOBILE' as 'PC' | 'MOBILE',
     livingUps: {} as Record<string, string>,
-    checkingUpUpdate: false,
     currentVideosCate: RanksConfig[0] as (typeof RanksConfig)[number],
     imagesList: [] as {
       src: string
