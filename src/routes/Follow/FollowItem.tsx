@@ -120,10 +120,6 @@ export default React.memo(function FollowItem(props: {
               pin: Date.now(),
             }
             set$followedUps(followedUps.slice())
-            // store.$followedUps[index] = {
-            //   ...store.$followedUps[index],
-            //   pin: Date.now(),
-            // }
           },
         },
     pin && {

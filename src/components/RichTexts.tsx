@@ -119,7 +119,6 @@ export default React.memo(
           <Text
             numberOfLines={1}
             onPress={() => {
-              console.log(99, parseUrl(node.jump_url))
               Linking.openURL(parseUrl(node.jump_url))
             }}
             key={key++}

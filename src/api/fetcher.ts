@@ -30,8 +30,8 @@ export default function request<D extends any>(url: string) {
     ? url
     : 'https://api.bilibili.com' + url
 
+  // eslint-disable-next-line no-console
   __DEV__ && console.log('request url: ', url.slice(0, 150))
-  // console.log(444, requestUrl)
   return fetch(requestUrl, {
     headers: {
       'cache-control': 'no-cache',

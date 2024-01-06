@@ -9,7 +9,7 @@ const CHECK_LIVING_UPS = 'check-living-ups'
 // Note: This needs to be called in the global scope (e.g outside of your React components)
 TaskManager.defineTask(CHECK_LIVING_UPS, async () => {
   // const now = Date.now();
-  console.log(4353453453)
+  // console.log(4353453453)
   // store.testid++
   // console.log(`Got background fetch call at date: ${new Date(now).toISOString()}`);
   // await checkLivingUps()

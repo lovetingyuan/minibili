@@ -3,7 +3,7 @@ module.exports = {
   env: {
     es2022: true,
   },
-  extends: ['@react-native', 'plugin:valtio/recommended'],
+  extends: ['@react-native'],
   parserOptions: {
     ecmaVersion: 2022,
   },
@@ -11,8 +11,6 @@ module.exports = {
   rules: {
     'no-undef': 'error',
     semi: 'off',
-    'valtio/state-snapshot-rule': 'error',
-    'valtio/avoid-this-in-proxy': 'error',
     'no-console': 'error',
   },
   overrides: [

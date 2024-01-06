@@ -2,7 +2,7 @@ import React from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { SWRConfig } from 'swr'
 import fetcher from './api/fetcher'
-import { AppState, View } from 'react-native'
+import { AppState } from 'react-native'
 import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
@@ -25,7 +25,6 @@ import {
 import CheckNetState from './components/CheckNetState'
 import CheckAppUpdate from './components/CheckAppUpdate'
 import CheckUpUpdate from './components/CheckUpUpdate'
-// import { ProviderOnChangeType } from 'react-atomic-context'
 
 let online = true
 let focus = true
