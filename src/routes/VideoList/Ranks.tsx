@@ -45,7 +45,15 @@ export default React.memo(function Ranks({ navigation }: Props) {
     reportUserAction(Action.add_black_user, { mid, name })
   }
   const gotoPlay = (data: VideoItem) => {
-    navigation.navigate('Play', { video: data, bvid: data.bvid })
+    navigation.navigate('Play', {
+      bvid: data.bvid,
+      title: data.title,
+      desc: data.desc,
+      mid: data.mid,
+      face: data.face,
+      name: data.name,
+      date: data.date,
+    })
   }
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
     const key = item.bvid

@@ -172,3 +172,7 @@ export function imgUrl(url: string, size?: number, h = size) {
     (typeof size === 'number' ? `@${size}w_${h}h_1c.webp` : '')
   )
 }
+
+export function openUrl(url: string) {
+  Linking.openURL(url)
+}

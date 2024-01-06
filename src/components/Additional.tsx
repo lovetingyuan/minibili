@@ -151,7 +151,11 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
           ) {
             const bvid = url.match(/\/(BV[0-9a-zA-Z]+)\//)?.[1]
             if (bvid) {
-              navigation.push('Play', { bvid })
+              navigation.push('Play', {
+                bvid,
+                title: additional.ugc.title,
+                desc: additional.ugc.head_text,
+              })
               return
             }
           }

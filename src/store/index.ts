@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RanksConfig } from '../constants'
 import { checkUpdate } from '../api/check-update'
-import { UpInfo, VideoInfo } from '../types'
+import { UpInfo } from '../types'
 import {
   ProviderOnChangeType,
   createAtomicContext,
@@ -18,9 +18,21 @@ interface UpdateUpInfo {
 
 export const getAppValue = () => {
   return {
+    /**
+     * 拉黑的up主
+     */
     $blackUps: {} as Record<string, string>,
+    /**
+     * 关注的up主
+     */
     $followedUps: [] as UpInfo[],
+    /**
+     * 不感兴趣的分类
+     */
     $blackTags: {} as Record<string, string>,
+    /**
+     * 有更新的up主
+     */
     $upUpdateMap: {} as Record<string, UpdateUpInfo>,
     $ignoredVersions: [] as string[],
     $videoCatesList: RanksConfig,
@@ -41,14 +53,6 @@ export const getAppValue = () => {
     _followedUpsMap: {} as Record<string, UpInfo>,
     _updatedCount: 0,
     moreRepliesUrl: '',
-    /**
-     * 正在播放的视频
-     */
-    playingVideo: null as {
-      bvid: string
-      page: number
-      video?: VideoInfo
-    } | null,
   }
 }
 
@@ -63,16 +67,17 @@ export const getAppUpdateInfo = checkUpdate()
 export function useStore() {
   return useAtomicContext(AppContext)
 }
-
+export function useMethods() {
+  return useAtomicContextMethods(AppContext)
+}
 export const AppContextProvider = AppContext.Provider
 
 export type AppContextValueType = ReturnType<typeof getAppValue>
 
 export const onChange: ProviderOnChangeType<AppContextValueType> = (
-  info,
+  { key, value },
   ctx,
 ) => {
-  const { key, value } = info
   if (key === '$followedUps') {
     const ups: Record<string, UpInfo> = {}
     for (const up of value) {

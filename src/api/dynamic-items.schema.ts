@@ -115,7 +115,7 @@ const MajorSchemaMap = {
   AV: z.object({
     type: z.enum([MajorTypeEnum.MAJOR_TYPE_ARCHIVE]),
     archive: z.object({
-      aid: z.string(),
+      aid: z.union([z.string(), z.number()]),
       bvid: z.string(),
       cover: z.string(),
       desc: z.string(),

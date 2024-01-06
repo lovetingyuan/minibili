@@ -12,18 +12,12 @@ import {
   showToast,
 } from '../../utils'
 import { Image } from 'expo-image'
-import { useStore } from '../../store'
 
-export default React.memo(function VideoHeader() {
-  const { playingVideo } = useStore()
-  const { video, bvid } = playingVideo || {}
+export default React.memo(function VideoHeader(props: { bvid: string }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { data: video2 } = useVideoInfo(bvid)
-  const videoInfo = {
-    ...video,
-    ...video2,
-  }
-  const { name, face, mid, pubDate, pubTime, title } = videoInfo
+  const { data: videoInfo } = useVideoInfo(props.bvid)
+
+  const { name, face, mid, date, title } = videoInfo || {}
   return (
     <View style={styles.videoHeader}>
       <Pressable
@@ -55,14 +49,12 @@ export default React.memo(function VideoHeader() {
       <View style={styles.VideoItem}>
         <View style={styles.iconText}>
           <Icon name="date-range" size={15} />
-          <Text style={styles.VideoItemText}>
-            {parseDate(pubDate || pubTime)}
-          </Text>
+          <Text style={styles.VideoItemText}>{parseDate(date)}</Text>
         </View>
         <View style={styles.iconText}>
           <Icon name="play-circle-outline" size={15} />
           <Text style={styles.VideoItemText}>
-            {parseNumber(videoInfo?.viewNum)}
+            {parseNumber(videoInfo?.playNum)}
           </Text>
         </View>
         <Pressable
@@ -79,8 +71,8 @@ export default React.memo(function VideoHeader() {
         <Pressable
           style={styles.shareBtn}
           onPress={() => {
-            if (name && title && bvid) {
-              handleShareVideo(name, title, bvid)
+            if (name && title && props.bvid) {
+              handleShareVideo(name, title, props.bvid)
             }
           }}>
           <Icon type="material-community" name="share" size={20} />

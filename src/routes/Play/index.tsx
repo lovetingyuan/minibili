@@ -21,33 +21,25 @@ import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingVideoId } from '../../utils/report'
 import commonStyles from '../../styles'
 import { useUserRelation } from '../../api/user-relation'
-import { useStore } from '../../store'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
 export default React.memo(function PlayPage({ route, navigation }: Props) {
-  const { video, bvid } = route.params
+  const { bvid } = route.params
   const [currentPage, setCurrentPage] = React.useState(1)
-  const { data: video2 } = useVideoInfo(bvid)
+  const { data: videoInfo } = useVideoInfo(bvid, route.params)
   const { theme } = useTheme()
-  const { setPlayingVideo } = useStore()
-  const videoInfo = React.useMemo(() => {
-    return {
-      ...video,
-      ...video2,
-      bvid,
-    }
-  }, [bvid, video, video2])
+
   const { data: fans } = useUserRelation(videoInfo?.mid)
 
   React.useEffect(() => {
-    if (videoInfo.name) {
+    if (videoInfo?.name) {
       navigation.setOptions({
         headerTitle: () => {
           return (
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{ fontSize: 18, fontWeight: '600' }}>
-                {videoInfo.name}
+                {videoInfo?.name}
               </Text>
               <Text style={{ marginLeft: 10 }}>
                 {` ${fans ? parseNumber(fans.follower) : ''}粉丝`}
@@ -57,7 +49,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
         },
       })
     }
-  }, [navigation, videoInfo.name, fans])
+  }, [navigation, videoInfo?.name, fans])
   useFocusEffect(
     useMemoizedFn(() => {
       setViewingVideoId(bvid)
@@ -66,41 +58,31 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
       }
     }),
   )
-  React.useEffect(() => {
-    setPlayingVideo({
-      bvid,
-      video: videoInfo as any, // what the fuck!!!
-      page: currentPage,
-    })
-  }, [videoInfo, bvid, currentPage])
-  if (!videoInfo.aid || typeof videoInfo.name !== 'string') {
-    return null
-  }
+
   return (
     <View style={commonStyles.flex1}>
-      <Player />
+      <Player page={currentPage} bvid={bvid} />
       <ScrollView style={styles.videoInfoContainer}>
-        <VideoInfo changePage={setCurrentPage} />
+        <VideoInfo changePage={setCurrentPage} bvid={bvid} page={currentPage} />
         <View style={{ marginTop: 10 }}>
           <CommentList
-            upName={videoInfo.name}
-            commentId={videoInfo.aid}
+            upName={videoInfo?.name || ''}
+            commentId={videoInfo?.aid || ''}
             commentType={1}
             dividerRight={
               <View style={styles.right}>
                 <Pressable
                   onPress={() => {
-                    videoInfo.bvid &&
-                      Clipboard.setStringAsync(videoInfo.bvid).then(() => {
-                        showToast('已复制视频ID')
-                      })
+                    Clipboard.setStringAsync(bvid).then(() => {
+                      showToast('已复制视频ID')
+                    })
                   }}>
                   <Text
                     style={[
                       commonStyles.font12,
                       { color: theme.colors.grey1 },
                     ]}>
-                    {videoInfo.bvid}
+                    {bvid}
                   </Text>
                 </Pressable>
                 <Text
@@ -113,7 +95,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
                 </Text>
                 <Text
                   style={[commonStyles.font12, { color: theme.colors.grey1 }]}>
-                  {videoInfo?.tname}
+                  {videoInfo?.tag}
                 </Text>
               </View>
             }

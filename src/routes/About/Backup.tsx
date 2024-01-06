@@ -2,7 +2,7 @@ import React from 'react'
 import { View, StyleSheet, Alert } from 'react-native'
 import { Button, Text } from '@rneui/themed'
 import { showToast } from '../../utils'
-import { useStore } from '../../store'
+import { useMethods } from '../../store'
 import * as Clipboard from 'expo-clipboard'
 
 export default React.memo(function Backup() {
@@ -15,7 +15,7 @@ export default React.memo(function Backup() {
     set$followedUps,
     set$blackUps,
     set$videoCatesList,
-  } = useStore()
+  } = useMethods()
 
   return (
     <View style={styles.infoItem}>
@@ -27,6 +27,7 @@ export default React.memo(function Backup() {
           onPress={() => {
             const settings = JSON.stringify({
               type: 'minibili-settings',
+              date: Date.now(),
               data: {
                 $blackUps: get$blackUps(),
                 $followedUps: get$followedUps(),

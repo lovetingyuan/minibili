@@ -4,7 +4,6 @@ import { MessageContent, ReplyItem } from '../api/comments'
 import { Button, Text, useTheme } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-// import store from '../store'
 import commonStyles from '../styles'
 import { imgUrl } from '../utils'
 import { useStore } from '../store'
@@ -39,7 +38,6 @@ function CommentText(props: {
                     sign: '-',
                   },
                 })
-                // Linking.openURL('https://m.bilibili.com/space/' + node.mid)
               }}>
               {node.text}
             </Text>
@@ -84,7 +82,15 @@ function CommentText(props: {
               key={idStr + i}
               style={styles.link}
               onPress={() => {
-                Linking.openURL(node.url)
+                const bvid = node.url.split('/').pop()
+                if (bvid?.startsWith('BV')) {
+                  navigation.push('Play', {
+                    bvid,
+                    title: node.text,
+                  })
+                } else {
+                  Linking.openURL(node.url)
+                }
               }}>
               {'📺 ' + node.text}
             </Text>
@@ -183,11 +189,6 @@ export default React.memo(function Comment(props: Props) {
                   }),
                 )
                 setCurrentImageIndex(0)
-                // store.imagesList = comment.images.map(img => {
-                //   img.src = imgUrl(img.src)
-                //   return img
-                // })
-                // store.currentImageIndex = 0
               }
             }}>
             {'  '}查看图片
@@ -249,7 +250,6 @@ export default React.memo(function Comment(props: Props) {
                 setMoreRepliesUrl(
                   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
                 )
-                // store.moreRepliesUrl = `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`
               }}
               buttonStyle={styles.moreButton}>
               <Text style={{ color: theme.colors.primary }}>

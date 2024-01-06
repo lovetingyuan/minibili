@@ -1,6 +1,7 @@
 import useSWR from 'swr'
 import { z } from 'zod'
 import { VideoInfoResponseSchema } from './video-info.schema'
+import request from './fetcher'
 
 type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>
 
@@ -8,11 +9,8 @@ const getVideoItem = (data: VideoInfoResponse) => {
   return {
     aid: data.aid,
     bvid: data.bvid,
-    // cid: data.cid,
-    // copyright: number;
-    pubTime: data.pubdate,
+    date: data.pubdate,
     desc: data.desc,
-    // desc_v2: [{…}]
     width: data.dimension.width,
     height: data.dimension.height,
     rotate: data.dimension.rotate,
@@ -24,16 +22,18 @@ const getVideoItem = (data: VideoInfoResponse) => {
     likeNum: data.stat.like,
     replyNum: data.stat.reply,
     shareNum: data.stat.share,
-    viewNum: data.stat.view,
+    playNum: data.stat.view,
+    danmuNum: data.stat.danmaku,
     cover: data.pic,
-    videosNum: data.pages?.length || 0,
-    videos: data.videos,
-    tname: data.tname,
-    pages: data.pages?.map(v => {
+    videos: data.videos, // 如果是分片视频或者互动视频，这个videos会是大于1的数字
+    tag: data.tname,
+    pages: data.pages.map(v => {
+      // 如果是分片视频，那么length会是分片数量，否则是1
       return {
         width: v.dimension.width,
         height: v.dimension.height,
-        // cid: v.cid,
+        duration: v.duration,
+        cover: v.first_frame,
         title: v.part,
         page: v.page,
       }
@@ -41,13 +41,19 @@ const getVideoItem = (data: VideoInfoResponse) => {
   }
 }
 
+export type VideoInfo = ReturnType<typeof getVideoItem>
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
-export function useVideoInfo(bvid?: string) {
+export function useVideoInfo(
+  bvid: string,
+  fallbackData?: { bvid: string } & Partial<VideoInfo>,
+) {
+  // const { getPlayingVideo } = useStore()
   const { data, error, isLoading } = useSWR<VideoInfoResponse>(
     bvid ? '/x/web-interface/view?bvid=' + bvid : null,
+    request,
   )
   return {
-    data: data ? getVideoItem(data) : null,
+    data: data ? getVideoItem(data) : fallbackData,
     error,
     isLoading,
   }

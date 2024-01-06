@@ -56,17 +56,14 @@ export default function VideoItem(props: {
       onPress={() => {
         navigation.push('Play', {
           bvid,
-          video: {
-            bvid,
-            title,
-            aid: +commentId,
-            mid,
-            name,
-            face,
-            desc,
-            cover,
-            pubDate: date,
-          },
+          title,
+          aid: commentId,
+          mid,
+          name,
+          face,
+          desc,
+          // cover,
+          // date,
         })
       }}>
       <RichTexts idStr={props.item.id} nodes={nodes} topic={props.item.topic} />

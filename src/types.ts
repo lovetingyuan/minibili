@@ -1,21 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { DynamicItemAllType } from './api/dynamic-items'
+import { VideoInfo } from './api/video-info'
 
 export type PromiseResult<T extends Promise<any>> = T extends Promise<infer R>
   ? R
   : never
-
-export type VideoInfo = {
-  bvid: string
-  name: string
-  face: string
-  mid: number | string
-  pubDate?: number | string
-  title: string
-  aid: number | string
-  cover: string
-  desc: string
-}
 
 export interface UpInfo {
   mid: number | string
@@ -28,10 +17,7 @@ export interface UpInfo {
 export type RootStackParamList = {
   Home: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
-  Play: {
-    bvid: string
-    video?: VideoInfo
-  }
+  Play: { bvid: string } & Partial<VideoInfo>
   Dynamic?: {
     from?: string
     user: UpInfo

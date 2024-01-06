@@ -160,17 +160,17 @@ export default function ForwardItem(props: {
               const { video } = payload
               navigation.push('Play', {
                 bvid: video.bvid,
-                video: {
-                  bvid: video.bvid,
-                  name: payload.name,
-                  face: payload.face,
-                  mid: payload.mid,
-                  // pubDate: payload.
-                  title: video.title,
-                  aid: video.aid,
-                  cover: video.cover,
-                  desc: video.desc,
-                },
+                name: payload.name,
+                face: payload.face,
+                mid: payload.mid,
+                aid: video.aid,
+                // date: payload.date,
+                // pubDate: payload.
+                title: video.title,
+                // aid: video.aid,
+                // cover: video.cover,
+                desc: video.desc,
+                // play: video.stat.play,
               })
             } else {
               navigation.navigate('WebPage', {

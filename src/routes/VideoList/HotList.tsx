@@ -76,7 +76,12 @@ export default React.memo(function Hot({ navigation }: Props) {
   const gotoPlay = (data: VideoItem) => {
     navigation.navigate('Play', {
       bvid: data.bvid,
-      video: data,
+      title: data.title,
+      desc: data.desc,
+      mid: data.mid,
+      face: data.face,
+      name: data.name,
+      // video: data,
     })
   }
   const buttons = () => [

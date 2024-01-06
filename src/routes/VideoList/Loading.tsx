@@ -2,14 +2,24 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Skeleton } from '@rneui/themed'
 
-const VideoLoading = (props: { index: number; a: boolean }) => {
+const getWidth = () => Math.floor(Math.random() * (100 - 10 + 1)) + 10
+
+const VideoLoading = () => {
   return (
     <View style={styles.item}>
       <Skeleton animation="pulse" width={'100%' as any} height={90} />
       <View style={styles.text}>
-        <Skeleton animation="pulse" width={'80%' as any} height={15} />
-        {props.index % 2 ? (
-          <Skeleton animation="pulse" width={'50%' as any} height={15} />
+        <Skeleton
+          animation="pulse"
+          width={(getWidth() + '%') as any}
+          height={15}
+        />
+        {Math.random() > 0.5 ? (
+          <Skeleton
+            animation="pulse"
+            width={(getWidth() + '%') as any}
+            height={15}
+          />
         ) : (
           <View style={styles.empty} />
         )}
@@ -30,8 +40,8 @@ export default React.memo(() => {
         .map((_, i) => {
           return (
             <View style={styles.itemContainer} key={i}>
-              <VideoLoading index={i} a />
-              <VideoLoading index={i} a={false} />
+              <VideoLoading />
+              <VideoLoading />
             </View>
           )
         })}

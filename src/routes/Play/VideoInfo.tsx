@@ -3,20 +3,16 @@ import VideoHeader from './VideoHeader'
 import { View, StyleSheet } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { ListItem, Text, Icon } from '@rneui/themed'
-import { useStore } from '../../store'
 
 export default React.memo(function VideoInfo(props: {
   changePage: (p: number) => void
+  bvid: string
+  page: number
 }) {
   const { changePage } = props
-  const { playingVideo } = useStore()
-  const { video, bvid, page } = playingVideo || {}
-  const { data: video2, isLoading } = useVideoInfo(bvid)
+  const { data: videoInfo, isLoading } = useVideoInfo(props.bvid)
   const [expanded, setExpanded] = React.useState(false)
-  const videoInfo = {
-    ...video,
-    ...video2,
-  }
+
   const { title, desc } = videoInfo || {}
   let videoDesc = desc
   if (videoDesc === '-') {
@@ -26,19 +22,19 @@ export default React.memo(function VideoInfo(props: {
   }
   return (
     <>
-      <VideoHeader />
+      <VideoHeader bvid={props.bvid} />
       <View>
         <Text style={styles.videoTitle}>{title}</Text>
         {videoDesc ? <Text style={[styles.videoDesc]}>{videoDesc}</Text> : null}
-        {(videoInfo.videosNum || 0) > 1 && videoInfo.pages && page ? (
+        {(videoInfo?.pages?.length || 0) > 1 && props.page ? (
           <ListItem.Accordion
             icon={<Icon name={'chevron-down'} type="material-community" />}
             containerStyle={styles.pagesTitle}
             content={
               <ListItem.Content>
                 <ListItem.Title>
-                  视频分集（{videoInfo.videosNum}） {page}:{' '}
-                  {videoInfo.pages[page - 1].title}
+                  视频分集（{videoInfo?.pages?.length}） {props.page}:{' '}
+                  {videoInfo?.pages?.[props.page - 1].title}
                 </ListItem.Title>
               </ListItem.Content>
             }
@@ -46,8 +42,8 @@ export default React.memo(function VideoInfo(props: {
             onPress={() => {
               setExpanded(!expanded)
             }}>
-            {videoInfo.pages.map(v => {
-              const selected = v.page === page
+            {videoInfo?.pages?.map(v => {
+              const selected = v.page === props.page
               return (
                 <ListItem
                   key={v.page}
@@ -72,7 +68,9 @@ export default React.memo(function VideoInfo(props: {
               )
             })}
           </ListItem.Accordion>
-        ) : !isLoading && videoInfo.videos !== videoInfo.videosNum ? (
+        ) : !isLoading &&
+          videoInfo?.videos &&
+          videoInfo?.videos !== videoInfo?.pages?.length ? (
           <Text
             style={{ marginTop: 12, color: '#FF7F24', fontStyle: 'italic' }}>
             该视频为交互视频，暂不支持

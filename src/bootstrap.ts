@@ -2,13 +2,10 @@ import './sentry'
 import * as SentryExpo from 'sentry-expo'
 import { Linking, Alert } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-// import store from './store'
 import { showFatalError, showToast, delay } from './utils'
 import { getRemoteConfig } from './api/get-config'
 import Constants from 'expo-constants'
 import { Tags, reportUserOpenApp } from './utils/report'
-// import { getAppUpdateInfo } from './store'
-// import NetInfo from '@react-native-community/netinfo'
 
 async function init() {
   reportUserOpenApp()

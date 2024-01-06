@@ -23,7 +23,7 @@ export const getVideo = (item: HotVideoResponse) => {
     desc: item.desc,
     cover: item.pic,
     duration: item.duration,
-    pubDate: item.pubdate,
+    date: item.pubdate,
     name: item.owner.name,
     mid: item.owner.mid,
     face: item.owner.face,

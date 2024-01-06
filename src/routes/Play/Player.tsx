@@ -19,16 +19,19 @@ import { Icon } from '@rneui/themed'
 import commonStyles from '../../styles'
 import { useStore } from '../../store'
 import { useAppState } from '../../hooks/useAppState'
+import useMounted from '../../hooks/useMounted'
 
-export default React.memo(function Player() {
-  const { isWiFi, playingVideo } = useStore()
-  const { page, video, bvid } = playingVideo || {}
+export default React.memo(function Player(props: {
+  bvid: string
+  page: number
+}) {
+  const { getIsWiFi } = useStore()
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
-  const { data: video2, error } = useVideoInfo(bvid)
-  const [loadPlayer, setLoadPlayer] = React.useState(isWiFi)
+  const { data: videoInfo, error } = useVideoInfo(props.bvid)
+  const [loadPlayer, setLoadPlayer] = React.useState(getIsWiFi())
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
   useAppState(currentAppState => {
@@ -39,20 +42,22 @@ export default React.memo(function Player() {
     ) {
       webviewRef.current.reload()
     }
+    if (currentAppState !== 'active') {
+      KeepAwake.deactivateKeepAwake('PLAY')
+    }
+  })
+  useMounted(() => {
+    if (!getIsWiFi()) {
+      showToast('注意流量')
+    }
+    return () => {
+      KeepAwake.deactivateKeepAwake('PLAY')
+    }
   })
 
-  React.useEffect(() => {
-    if (!isWiFi) {
-      showToast('请注意当前网络不是Wifi')
-    }
-  }, [isWiFi])
-  const videoInfo = {
-    ...video,
-    ...video2,
-  }
   let videoWidth = 0
   let videoHeight = 0
-  if (!error && videoInfo?.bvid && videoInfo.width && videoInfo.height) {
+  if (!error && videoInfo?.bvid && videoInfo?.width && videoInfo?.height) {
     videoWidth = videoInfo.width
     videoHeight = videoInfo.height
   }
@@ -63,7 +68,7 @@ export default React.memo(function Player() {
       const data = JSON.parse(evt.nativeEvent.data) as any
       if (data.action === 'playState') {
         playStateRef.current = data.action
-        if (data.payload === 'play' || data.payload === 'waiting') {
+        if (data.payload === 'play') {
           KeepAwake.activateKeepAwakeAsync('PLAY')
           setExtraHeight(40)
           if (isVerticalVideo && !verticalScale) {
@@ -102,7 +107,7 @@ export default React.memo(function Player() {
   }
   const renderLoading = () => (
     <View style={styles.loadingView}>
-      {videoInfo.cover ? (
+      {videoInfo?.cover ? (
         <Image
           source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
           style={styles.loadingImage}
@@ -119,12 +124,12 @@ export default React.memo(function Player() {
   const search = new URLSearchParams()
   const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
   Object.entries({
-    bvid: videoInfo.bvid,
+    bvid: props.bvid,
     autoplay: 0,
-    highQuality: isWiFi ? 1 : 0,
-    quality: isWiFi ? 100 : 16,
+    highQuality: getIsWiFi() ? 1 : 0,
+    quality: getIsWiFi() ? 100 : 16,
     portraitFullScreen: true,
-    page,
+    page: props.page,
   }).forEach(([k, v]) => {
     search.append(k, v + '')
   })
@@ -178,7 +183,7 @@ export default React.memo(function Player() {
             setLoadPlayer(true)
           }}
           style={commonStyles.flex1}>
-          {videoInfo.cover ? (
+          {videoInfo?.cover ? (
             <ImageBackground
               source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
               resizeMode="cover"

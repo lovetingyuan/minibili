@@ -221,7 +221,7 @@ export type ReplyItem = ReturnType<typeof getReplies>[0]
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
   const { data, error, isLoading } = useSWR<ReplyResponse>(() => {
-    return `/x/v2/reply/main?type=${type}&oid=${oid}&ps=30`
+    return oid ? `/x/v2/reply/main?type=${type}&oid=${oid}&ps=30` : null
   }, request)
 
   const replies: ReplyItem[] = React.useMemo(() => {

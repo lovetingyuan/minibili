@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 export const VideoInfoResponseSchema = z.object({
-  aid: z.number(),
-  bvid: z.string(),
+  aid: z.union([z.string(), z.number()]),
+  bvid: z.union([z.string(), z.number()]),
   cid: z.number(),
   copyright: z.number(),
   ctime: z.number(),
@@ -30,6 +30,7 @@ export const VideoInfoResponseSchema = z.object({
         height: z.number(),
         rotate: z.number(),
       }),
+      first_frame: z.string(),
       duration: z.number(),
       from: z.string(),
       page: z.number(),

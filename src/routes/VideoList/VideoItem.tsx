@@ -33,7 +33,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
               bottom: 0,
             },
           ]}>
-          <Text style={styles.text}>{parseDate(video.pubDate)}</Text>
+          <Text style={styles.text}>{parseDate(video.date)}</Text>
         </View>
         {video.tag ? (
           <View

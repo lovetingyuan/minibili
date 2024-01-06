@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const VideoItemResponseSchema = z.object({
-  aid: z.number(),
+  aid: z.union([z.string(), z.number()]),
   bvid: z.string(),
   cid: z.number(),
   copyright: z.number(),
@@ -26,7 +26,7 @@ export const VideoItemResponseSchema = z.object({
   // short_link: z.string().nullable(),
   // short_link_v2: z.string(),
   stat: z.object({
-    aid: z.number(),
+    aid: z.union([z.string(), z.number()]),
     view: z.number(),
     danmaku: z.number(),
     favorite: z.number(),
