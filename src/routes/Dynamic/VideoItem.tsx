@@ -62,7 +62,7 @@ export default function VideoItem(props: {
           name,
           face,
           desc,
-          // cover,
+          cover,
           // date,
         })
       }}>

@@ -81,6 +81,7 @@ export default React.memo(function Hot({ navigation }: Props) {
       mid: data.mid,
       face: data.face,
       name: data.name,
+      cover: data.cover,
       // video: data,
     })
   }

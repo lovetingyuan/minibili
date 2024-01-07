@@ -12,7 +12,7 @@ import { NavigationProps, UpInfo } from '../../types'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { useStore } from '../../store'
 import { Image } from 'expo-image'
-import { imgUrl, parseUrl, showToast } from '../../utils'
+import { imgUrl, parseUrl } from '../../utils'
 
 export default React.memo(function FollowItem(props: {
   item: UpInfo
@@ -65,8 +65,8 @@ export default React.memo(function FollowItem(props: {
             set$upUpdateMap({
               ...$upUpdateMap,
               [mid]: {
-                latestId: update.latestId,
-                currentLatestId: update.latestId,
+                latestId: update.currentLatestId,
+                currentLatestId: update.currentLatestId,
               },
             })
           },
@@ -79,12 +79,19 @@ export default React.memo(function FollowItem(props: {
               set$upUpdateMap({
                 ...$upUpdateMap,
                 [mid]: {
-                  latestId: update.latestId,
-                  currentLatestId: Math.random().toString(),
+                  latestId: Math.random().toString(),
+                  currentLatestId: update.currentLatestId,
                 },
               })
             } else {
-              showToast('请稍候再操作')
+              set$upUpdateMap({
+                ...$upUpdateMap,
+                [mid]: {
+                  latestId: Math.random().toString(),
+                  currentLatestId: Math.random().toString(),
+                },
+              })
+              // showToast('请稍候再操作')
             }
           },
         },
