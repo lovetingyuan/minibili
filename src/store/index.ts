@@ -19,6 +19,10 @@ interface UpdateUpInfo {
 export const getAppValue = () => {
   return {
     /**
+     * 首次运行的时间
+     */
+    $firstRun: 0,
+    /**
      * 拉黑的up主
      */
     $blackUps: {} as Record<string, string>,

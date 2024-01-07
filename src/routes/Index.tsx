@@ -26,6 +26,8 @@ import Follow from './Follow'
 import VideoList from './VideoList'
 import { videoListHeaderRight, videoListHeaderTitle } from './VideoList/Header'
 import { followHeaderRight, followHeaderTitle } from './Follow/Header'
+import Welcome from './Welcome'
+import { useStore } from '../store'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -71,10 +73,17 @@ export default React.memo(function Route() {
       } as any,
     }
   }, [])
+  const welcomeOptions = React.useMemo(() => {
+    return {
+      headerTitle: '欢迎使用 MiniBili',
+    }
+  }, [])
+  const { $firstRun } = useStore()
+  const isFirstRun = $firstRun === 0
   return (
     <NavigationContainer theme={RouteTheme}>
       <Stack.Navigator
-        initialRouteName="VideoList"
+        initialRouteName={isFirstRun ? 'Welcome' : 'VideoList'}
         screenOptions={React.useMemo(() => {
           return {
             // headerStatusBarHeight: 50,
@@ -86,6 +95,11 @@ export default React.memo(function Route() {
           }
         }, [isDark])}
         screenListeners={onRouteChange}>
+        <Stack.Screen
+          name="Welcome"
+          component={Welcome}
+          options={welcomeOptions}
+        />
         <Stack.Screen
           name="VideoList"
           component={VideoList}

@@ -15,6 +15,7 @@ export interface UpInfo {
 }
 
 export type RootStackParamList = {
+  Welcome: undefined
   Home: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
   Play: { bvid: string } & Partial<VideoInfo>
@@ -25,14 +26,9 @@ export type RootStackParamList = {
   DynamicDetail: {
     detail: DynamicItemAllType
   }
-  VideoList: {
-    query: number
-  }
+  VideoList: undefined
   Follow: undefined
   About: undefined
 }
-
-// export type GetFuncPromiseType<F extends (...a: any) => any> =
-//   ReturnType<F> extends Promise<infer R> ? R : never
 
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>

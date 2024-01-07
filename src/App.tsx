@@ -25,6 +25,7 @@ import {
 import CheckNetState from './components/CheckNetState'
 import CheckAppUpdate from './components/CheckAppUpdate'
 import CheckUpUpdate from './components/CheckUpUpdate'
+import ShowRemoteConfig from './components/ShowRemoteConfig'
 
 let online = true
 let focus = true
@@ -110,6 +111,7 @@ export default function App() {
           <SWRConfig value={swrConfig}>
             <AppContextProvider value={appValue} onChange={onChange}>
               <InitContextComp />
+              <ShowRemoteConfig />
               <CheckAppUpdate />
               <CheckUpUpdate />
               <CheckNetState />
