@@ -1,5 +1,5 @@
 import { Icon, Text, useTheme, Button, Badge } from '@rneui/themed'
-import { Linking, ScrollView, View, Pressable } from 'react-native'
+import { Linking, ScrollView, View, TouchableOpacity } from 'react-native'
 import { getAppUpdateInfo, useStore } from '../../store'
 import React from 'react'
 import { StyleSheet } from 'react-native'
@@ -7,6 +7,15 @@ import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 import { NavigationProps, PromiseResult } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import useMounted from '../../hooks/useMounted'
+
+function splitArrayIntoChunks(arr: any[]) {
+  const result = [[arr[0]]]
+  for (let i = 1; i < arr.length; i += 2) {
+    result.push(arr.slice(i, i + 2))
+  }
+
+  return result
+}
 
 const HeaderTitle = React.memo(() => {
   const { currentVideosCate, $videoCatesList, setCurrentVideosCate } =
@@ -23,13 +32,43 @@ const HeaderTitle = React.memo(() => {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
+  const list = splitArrayIntoChunks($videoCatesList)
+  const getItem = (item: any) => {
+    const selected = currentVideosCate.rid === item.rid
+    return (
+      <MenuItem
+        key={item.rid}
+        style={{
+          maxWidth: item.rid === -1 ? 120 : 90,
+        }}
+        textStyle={{
+          fontSize: 16,
+          fontWeight: selected ? 'bold' : 'normal',
+          color:
+            item.rid === -1
+              ? '#F85A54'
+              : selected
+                ? theme.colors.primary
+                : theme.colors.black,
+        }}
+        onPress={() => {
+          setCurrentVideosCate(item)
+          hideMenu()
+        }}>
+        {item.label}
+      </MenuItem>
+    )
+  }
   return (
     <View style={styles.container}>
       <Menu
         visible={visible}
         style={{ ...styles.menu, backgroundColor: theme.colors.background }}
         anchor={
-          <Pressable onPress={showMenu} style={styles.titleContainer}>
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={showMenu}
+            style={styles.titleContainer}>
             <Text
               style={[
                 styles.title,
@@ -49,36 +88,31 @@ const HeaderTitle = React.memo(() => {
               size={28}
               color={theme.colors.grey1}
             />
-          </Pressable>
+          </TouchableOpacity>
         }
         onRequestClose={hideMenu}>
         <ScrollView style={styles.typeList}>
-          {$videoCatesList.map((item, i) => {
-            const selected = currentVideosCate.rid === item.rid
-            const Item = (
-              <MenuItem
-                textStyle={{
-                  fontSize: 16,
-                  fontWeight: i && !selected ? 'normal' : 'bold',
-                  color:
-                    item.rid === -1
-                      ? '#F85A54'
-                      : selected
-                        ? theme.colors.primary
-                        : theme.colors.black,
-                }}
-                onPress={() => {
-                  setCurrentVideosCate(item)
-                  // store.currentVideosCate = item
-                  hideMenu()
-                }}>
-                {item.label}
-              </MenuItem>
-            )
+          {list.map((items, i) => {
+            if (i === 0) {
+              return (
+                <View
+                  key={i}
+                  style={{
+                    flex: 1,
+                  }}>
+                  {getItem(items[0])}
+                  <MenuDivider color={theme.colors.divider} />
+                </View>
+              )
+            }
             return (
-              <View key={item.rid}>
-                {Item}
-                {i ? null : <MenuDivider color={theme.colors.divider} />}
+              <View
+                key={i}
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                }}>
+                {items.map(item => getItem(item))}
               </View>
             )
           })}
@@ -150,8 +184,8 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: 'bold',
   },
-  menu: { position: 'relative', top: 50, width: 90 },
-  typeList: { maxHeight: 400, width: 90 },
+  menu: { position: 'relative', top: 50, width: 180 },
+  typeList: { maxHeight: 400, width: 180 },
   updateBtnText: { fontSize: 14 },
   avatar: {
     marginHorizontal: 20,

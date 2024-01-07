@@ -486,6 +486,7 @@ export function useDynamicItems(mid?: string | number) {
         revalidateFirstPage: true,
         errorRetryCount: 3,
         errorRetryInterval: 600,
+        dedupingInterval: 60 * 1000,
       },
     )
 
