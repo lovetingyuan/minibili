@@ -3,8 +3,11 @@ import * as SentryExpo from 'sentry-expo'
 import { showFatalError, showToast } from './utils'
 import Constants from 'expo-constants'
 import { Tags, reportUserOpenApp } from './utils/report'
+import * as SplashScreen from 'expo-splash-screen'
 
 function init() {
+  SplashScreen.preventAutoHideAsync()
+
   reportUserOpenApp()
   const gitHash = Constants.expoConfig?.extra?.gitHash
   if (gitHash) {

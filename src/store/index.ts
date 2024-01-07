@@ -10,6 +10,7 @@ import {
 } from 'react-atomic-context'
 import React from 'react'
 import useMounted from '../hooks/useMounted'
+import * as SplashScreen from 'expo-splash-screen'
 
 interface UpdateUpInfo {
   latestId: string
@@ -122,6 +123,9 @@ export const InitContextComp = React.memo(() => {
       }),
     ).then(() => {
       methods.setInitialed(true)
+      setTimeout(() => {
+        SplashScreen.hideAsync()
+      }, 100)
     })
   })
   return null

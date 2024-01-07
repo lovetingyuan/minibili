@@ -81,7 +81,7 @@ export default React.memo(function Route() {
   const { $firstRun } = useStore()
   const isFirstRun = $firstRun === 0
   return (
-    <NavigationContainer theme={RouteTheme}>
+    <NavigationContainer theme={RouteTheme} key={$firstRun}>
       <Stack.Navigator
         initialRouteName={isFirstRun ? 'Welcome' : 'VideoList'}
         screenOptions={React.useMemo(() => {
