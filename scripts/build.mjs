@@ -246,9 +246,12 @@ if (process.platform === 'win32') {
   )}`
 }
 
-echo(`npm dist-tag add ${pkg.name}@${newVersion} latest`)
 echo(
   chalk.green(
     'Build done, please test your app and set npm tag to latest to publish new version finally!',
   ),
+)
+
+echo(
+  `npm dist-tag add ${pkg.name}@${newVersion} latest --registry=https://registry.npmjs.org/`,
 )
