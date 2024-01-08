@@ -236,10 +236,9 @@
         }
       </style>
       <script>
-        // unpkg: https://www.unpkg.com/minibili@0.0.30-34/dist/mibilibi-0.0.30.apk
         const loading = document.querySelector('.loading')
         loading.style.display = 'block'
-        const a = fetch('./version.json?_t=' + Date.now())
+        const a = fetch('https://www.unpkg.com/minibili')
           .then(r => r.json())
           .then(list => {
             document.getElementById('changelog').innerHTML = `
@@ -270,9 +269,8 @@
             const version = r.version.split('-')[0]
             const apkUrl = `https://unpkg.com/minibili@${r.version}/apk/minibili-${version}.apk`
             document.getElementById('download-btn').href = apkUrl
-            document.getElementById(
-              'download-btn',
-            ).textContent += ` (${version})`
+            document.getElementById('download-btn').textContent +=
+              ` (${version})`
           })
         Promise.all([a, b])
           .catch(() => {
