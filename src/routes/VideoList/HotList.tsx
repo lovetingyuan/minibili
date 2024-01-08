@@ -197,12 +197,14 @@ export default React.memo(function Hot({ navigation }: Props) {
         icon={{ name: 'refresh', color: 'white' }}
         style={{
           bottom: 10,
-          opacity: 0.8,
+          opacity: 0.9,
         }}
         size="small"
         onPress={() => {
-          mutate()
           hotListRef.current?.scrollToOffset(0)
+          setTimeout(() => {
+            mutate()
+          }, 50)
         }}
       />
     </View>

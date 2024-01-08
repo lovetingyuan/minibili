@@ -82,4 +82,12 @@ export const RanksConfig = [
     rid: 168,
     label: '🏯 国创',
   },
+  {
+    rid: -2,
+    label: '💡 原创',
+  },
+  {
+    rid: -3,
+    label: '🌱 新人',
+  },
 ]

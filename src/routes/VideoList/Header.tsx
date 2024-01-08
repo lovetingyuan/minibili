@@ -75,7 +75,7 @@ const HeaderTitle = React.memo(() => {
                 {
                   color:
                     currentVideosCate.rid === -1
-                      ? '#F85A54'
+                      ? theme.colors.secondary
                       : theme.colors.grey1,
                 },
               ]}>
@@ -181,8 +181,8 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   title: {
-    fontSize: 19,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
   },
   menu: { position: 'relative', top: 50, width: 180 },
   typeList: { maxHeight: 400, width: 180 },
