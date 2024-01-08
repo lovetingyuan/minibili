@@ -27,7 +27,7 @@ export default React.memo(function Version() {
         if (data.hasUpdate) {
           Alert.alert(
             '有新版本',
-            `${data.currentVersion} --> ${data.latestVersion}`,
+            `${data.currentVersion}  ⟶  ${data.latestVersion} \n ${data.changelog}`,
             [
               {
                 text: '取消',

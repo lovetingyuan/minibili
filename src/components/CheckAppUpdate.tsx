@@ -20,7 +20,7 @@ export default React.memo(function CheckAppUpdate() {
         }
         Alert.alert(
           '有新版本',
-          `${appUpdateInfo.currentVersion}  ⟶  ${appUpdateInfo.latestVersion}`,
+          `${appUpdateInfo.currentVersion}  ⟶  ${appUpdateInfo.latestVersion}\n${appUpdateInfo.changelog}`,
           [
             {
               text: '取消',
