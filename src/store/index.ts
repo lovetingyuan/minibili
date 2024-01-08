@@ -83,6 +83,9 @@ export const onChange: ProviderOnChangeType<AppContextValueType> = (
   { key, value },
   ctx,
 ) => {
+  if (!ctx.getInitialed()) {
+    return
+  }
   if (key === '$followedUps') {
     const ups: Record<string, UpInfo> = {}
     for (const up of value) {
@@ -117,15 +120,23 @@ export const InitContextComp = React.memo(() => {
         const setKey = `set${key}` as const
         return AsyncStorage.getItem(StoragePrefix + key).then(data => {
           if (data) {
-            methods[setKey](JSON.parse(data) as any)
+            if (key === '$videoCatesList') {
+              const list = JSON.parse(data) as typeof RanksConfig
+              RanksConfig.forEach(r => {
+                if (!list.find(v => v.rid !== r.rid)) {
+                  list.push({ ...r })
+                }
+              })
+              methods.set$videoCatesList(list)
+            } else {
+              methods[setKey](JSON.parse(data) as any)
+            }
           }
         })
       }),
     ).then(() => {
       methods.setInitialed(true)
-      setTimeout(() => {
-        SplashScreen.hideAsync()
-      }, 100)
+      SplashScreen.hideAsync()
     })
   })
   return null
