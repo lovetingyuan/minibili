@@ -20,6 +20,7 @@ function CommentText(props: {
 }) {
   const { nodes, style, idStr } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
+  const { theme } = useTheme()
 
   return (
     <Text style={style} selectable>
@@ -28,7 +29,13 @@ function CommentText(props: {
           return (
             <Text
               key={idStr + i}
-              style={styles.link}
+              style={{
+                color: theme.colors.primary,
+                // fontWeight: '600',
+                textShadowColor: theme.colors.primary,
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 0.2, // 阴影模糊程度
+              }}
               onPress={() => {
                 navigation.push('Dynamic', {
                   user: {
@@ -47,7 +54,7 @@ function CommentText(props: {
           return (
             <Text
               key={idStr + i}
-              style={styles.link}
+              style={{ color: theme.colors.primary }}
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
@@ -68,7 +75,7 @@ function CommentText(props: {
           return (
             <Text
               key={idStr + i}
-              style={styles.link}
+              style={{ color: theme.colors.primary }}
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
@@ -80,7 +87,7 @@ function CommentText(props: {
           return (
             <Text
               key={idStr + i}
-              style={styles.link}
+              style={{ color: theme.colors.primary }}
               onPress={() => {
                 const bvid = node.url.split('/').pop()
                 if (bvid?.startsWith('BV')) {
@@ -111,11 +118,9 @@ export default React.memo(function Comment(props: Props) {
   const { theme } = useTheme()
   const { setImagesList, setCurrentImageIndex, setMoreRepliesUrl } = useStore()
   const upStyle = (name: string) => {
-    return upName === name
-      ? styles.pinkName
-      : {
-          color: theme.colors.primary,
-        }
+    return {
+      color: upName === name ? theme.colors.secondary : theme.colors.primary,
+    }
   }
   const navigation = useNavigation<NavigationProps['navigation']>()
 
@@ -137,7 +142,7 @@ export default React.memo(function Comment(props: Props) {
             }}>
             {comment.name}
           </Text>
-          <Text style={comment.sex === '女' ? styles.pinkName : null}>
+          <Text>
             {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}
           </Text>
           {comment.location ? (
@@ -165,13 +170,13 @@ export default React.memo(function Comment(props: Props) {
           nodes={comment.message}
           style={[
             styles.commentText,
-            comment.upLike ? styles.upLike : {},
-            comment.top ? styles.top : {},
+            comment.upLike ? { color: theme.colors.success } : {},
+            comment.top ? { color: theme.colors.primary } : {},
           ]}
           idStr={comment.id + '_'}
         />
         {comment.like ? (
-          <Text style={styles.likeNum}>
+          <Text style={[styles.likeNum, { color: theme.colors.secondary }]}>
             {' '}
             {comment.like}
             <Text>{comment.upLike ? '  UP👍' : ''}</Text>
@@ -221,7 +226,7 @@ export default React.memo(function Comment(props: Props) {
                   }}>
                   {reply.name}
                 </Text>
-                <Text style={reply.sex === '女' ? styles.pinkName : null}>
+                <Text>
                   {reply.sex === '男' ? '♂' : reply.sex === '女' ? '♀' : ''}
                 </Text>
                 {reply.location ? (
@@ -236,7 +241,11 @@ export default React.memo(function Comment(props: Props) {
                 ：
                 <CommentText nodes={reply.message} idStr={reply.id + '_'} />
                 {reply.like ? (
-                  <Text style={styles.likeNum}> {reply.like}</Text>
+                  <Text
+                    style={[styles.likeNum, { color: theme.colors.secondary }]}>
+                    {' '}
+                    {reply.like}
+                  </Text>
                 ) : null}
               </Text>
             )
@@ -307,23 +316,14 @@ const styles = StyleSheet.create({
   },
   likeNum: {
     fontSize: 12,
-    fontStyle: 'italic',
-    color: '#fa5a57',
   },
   topImg: {
     width: 24,
     height: 12,
   },
-  link: {
-    color: '#008AC5',
-  },
   emoji: {
     width: 18,
     height: 18,
-  },
-  pinkName: {
-    color: '#FF6699',
-    fontWeight: 'bold',
   },
   moreButton: {
     justifyContent: 'flex-start',

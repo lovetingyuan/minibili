@@ -31,6 +31,7 @@ function SearchedItem(props: { up: SearchedUpType }) {
     mid: up.mid,
     sign: up.sign,
   }
+  const { theme } = useTheme()
   const handler = () => {
     set$followedUps([user, ...get$followedUps()])
   }
@@ -49,14 +50,16 @@ function SearchedItem(props: { up: SearchedUpType }) {
       <Text style={styles.upName} onPress={goToDynamic} numberOfLines={2}>
         {up.name}
       </Text>
-      <Text style={styles.fansText}>{parseNumber(up.fans)}粉丝</Text>
+      <Text style={[styles.fansText, { color: theme.colors.grey2 }]}>
+        {parseNumber(up.fans)}粉丝
+      </Text>
 
       {followed ? (
         <Button
           size="sm"
           type="clear"
           disabled
-          titleStyle={styles.followedText}>
+          titleStyle={{ color: theme.colors.grey3 }}>
           已关注
         </Button>
       ) : (
@@ -92,7 +95,7 @@ export default React.memo(function AddFollow() {
     <>
       <FAB
         visible
-        color="#f25d8e"
+        color={theme.colors.secondary}
         placement="right"
         icon={{ name: 'add', color: 'white' }}
         style={styles.addBtn}
@@ -150,7 +153,10 @@ export default React.memo(function AddFollow() {
             }
             ListFooterComponent={
               searchedUps?.length ? (
-                <Text style={styles.bottomText}>暂不支持更多结果~</Text>
+                <Text
+                  style={[styles.bottomText, { color: theme.colors.grey3 }]}>
+                  暂不支持更多结果~
+                </Text>
               ) : null
             }
           />
@@ -175,7 +181,7 @@ const styles = StyleSheet.create({
   bottomText: {
     textAlign: 'center',
     paddingBottom: 10,
-    color: '#555',
+
     fontSize: 12,
   },
   upName: { marginLeft: 10, fontSize: 15, flexGrow: 1, flexShrink: 1 },
@@ -185,7 +191,6 @@ const styles = StyleSheet.create({
   },
   fansText: {
     fontSize: 12,
-    color: '#666',
     lineHeight: 20,
     marginLeft: 8,
   },
@@ -198,5 +203,4 @@ const styles = StyleSheet.create({
   searchBar: {
     backgroundColor: 'transparent',
   },
-  followedText: { color: '#888' },
 })

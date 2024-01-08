@@ -6,18 +6,24 @@ import { site } from '../constants'
 import useIsDark from '../hooks/useIsDark'
 import * as Updates from 'expo-updates'
 import useMounted from '../hooks/useMounted'
+import { useTheme } from '@rneui/themed'
 
 export default function ErrorFallback(props: { message?: string }) {
   useMounted(() => {
     showFatalError()
   })
+  const { theme } = useTheme()
   if (__DEV__ && props.message) {
     // eslint-disable-next-line no-console
     console.error(props.message)
   }
   const dark = useIsDark()
   return (
-    <View style={[dark ? { backgroundColor: '#333' } : {}, styles.container]}>
+    <View
+      style={[
+        dark ? { backgroundColor: theme.colors.black } : {},
+        styles.container,
+      ]}>
       <StatusBar style="auto" />
       <Image
         source={require('../../assets/error.png')}
@@ -27,7 +33,7 @@ export default function ErrorFallback(props: { message?: string }) {
           height: undefined,
         }}
       />
-      <Text style={styles.errorText}>
+      <Text style={[styles.errorText, { color: theme.colors.error }]}>
         非常抱歉，应用发生了未知错误
         {'\n\n'}
         <Text style={styles.errorMsg}>{props.message || 'N/A'}</Text>
@@ -36,11 +42,11 @@ export default function ErrorFallback(props: { message?: string }) {
         {'\n\n'}
         您可以
         <Text
-          style={styles.restartText}
+          style={[styles.restartText, { color: theme.colors.primary }]}
           onPress={() => {
             Updates.reloadAsync()
           }}>
-          重启应用
+          {' 重启应用 '}
         </Text>
         ，我们推荐您安装新版
       </Text>
@@ -59,11 +65,10 @@ export default function ErrorFallback(props: { message?: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   errorText: {
-    color: '#ff4834',
     marginHorizontal: 30,
     fontSize: 16,
   },
   errorMsg: { fontStyle: 'italic', fontSize: 13 },
-  restartText: { color: '#5d5cde', fontWeight: 'bold' },
+  restartText: { fontWeight: 'bold' },
   downloadBtn: { marginVertical: 30, paddingHorizontal: 30 },
 })

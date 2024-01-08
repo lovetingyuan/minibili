@@ -26,9 +26,6 @@ const commonStyles = StyleSheet.create({
   font20: {
     fontSize: 20,
   },
-  link: {
-    color: '#006dc7',
-  },
   gap2: {
     gap: 2,
   },

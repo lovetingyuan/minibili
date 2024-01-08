@@ -90,10 +90,12 @@ export default function App() {
       lightColors: {
         black: '#333',
         grey5: '#ddd',
+        secondary: '#d85380',
       },
       darkColors: {
         black: '#bbb',
         grey5: '#181818',
+        secondary: '#d85380',
       },
       mode: dark ? 'dark' : 'light',
     })

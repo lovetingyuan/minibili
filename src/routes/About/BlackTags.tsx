@@ -1,4 +1,4 @@
-import { Chip, ListItem, Text, Icon } from '@rneui/themed'
+import { Chip, ListItem, Text, Icon, useTheme } from '@rneui/themed'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 import { useStore } from '../../store'
@@ -6,6 +6,7 @@ import { useStore } from '../../store'
 export default React.memo(function BlackTags() {
   const [expanded, setExpanded] = React.useState(false)
   const { $blackTags, set$blackTags } = useStore()
+  const { theme } = useTheme()
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
@@ -32,7 +33,7 @@ export default React.memo(function BlackTags() {
                 name: 'close',
                 type: 'Ionicons',
                 size: 18,
-                color: '#666',
+                color: theme.colors.grey2,
                 onPress: () => {
                   const blackTags = { ...$blackTags }
                   delete blackTags[tag]

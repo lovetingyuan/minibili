@@ -1,6 +1,5 @@
 import React from 'react'
-import { View, StyleSheet, Alert, Appearance, Linking } from 'react-native'
-import { Button, Text } from '@rneui/themed'
+import { Alert, Appearance, Linking } from 'react-native'
 import Constants from 'expo-constants'
 import * as Updates from 'expo-updates'
 import {
@@ -8,7 +7,7 @@ import {
   currentVersion,
 } from '../../api/check-update'
 import { showToast } from '../../utils'
-import commonStyles from '../../styles'
+import TextAction from './TextAction'
 
 export default React.memo(function Version() {
   const updateTime: string = Updates.createdAt
@@ -50,44 +49,30 @@ export default React.memo(function Version() {
     )
   }
   return (
-    <View style={styles.infoItem}>
-      <Text
-        style={commonStyles.font16}
-        onPress={() => {
-          Alert.alert(
-            '版本信息',
-            [
-              `当前版本：${currentVersion} (${
-                Constants.expoConfig?.extra?.gitHash || '-'
-              }-${Appearance.getColorScheme() === 'dark' ? 1 : 0})`,
-              `更新时间：${updateTime || '-'}`,
-              `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
-              Updates.updateId && `更新ID：${Updates.updateId}`,
-            ]
-              .filter(Boolean)
-              .join('\n'),
-          )
-        }}>
-        当前版本：{currentVersion}
-      </Text>
-      <Button
-        type="clear"
-        size="sm"
-        loading={checkingUpdate}
-        onPress={() => {
-          checkUpdate()
-        }}>
-        {hasUpdate === false ? '暂无更新' : '检查更新'}
-      </Button>
-    </View>
+    <TextAction
+      text={`当前版本：${currentVersion}`}
+      onTextPress={() => {
+        Alert.alert(
+          '版本信息',
+          [
+            `当前版本：${currentVersion} (${
+              Constants.expoConfig?.extra?.gitHash || '-'
+            }-${Appearance.getColorScheme() === 'dark' ? 1 : 0})`,
+            `更新时间：${updateTime || '-'}`,
+            `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
+            Updates.updateId && `更新ID：${Updates.updateId}`,
+          ]
+            .filter(Boolean)
+            .join('\n'),
+        )
+      }}
+      buttons={[
+        {
+          text: hasUpdate === false ? '暂无更新' : '检查更新',
+          loading: checkingUpdate,
+          onPress: checkUpdate,
+        },
+      ]}
+    />
   )
-})
-
-const styles = StyleSheet.create({
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
 })

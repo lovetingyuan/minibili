@@ -164,6 +164,7 @@ export default function ForwardItem(props: {
                 face: payload.face,
                 mid: payload.mid,
                 aid: video.aid,
+                cover: video.cover,
                 // date: payload.date,
                 // pubDate: payload.
                 title: video.title,
@@ -231,7 +232,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  date: { color: '#555', fontSize: 12 },
   imagesContainer: {
     flexDirection: 'row',
     overflow: 'hidden',

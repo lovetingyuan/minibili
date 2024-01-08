@@ -9,8 +9,10 @@ import CommonItem from './CommonItem'
 import DynamicStat from './DynamicStat'
 import { useRoute } from '@react-navigation/native'
 import { DynamicItemAllType } from '../../api/dynamic-items'
+import { useTheme } from '@rneui/themed'
 
 export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
+  const { theme } = useTheme()
   let Item: React.FC<any> = DefaultItem
   const route = useRoute()
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
@@ -38,7 +40,11 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   }
   // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
   return (
-    <View style={[styles.itemContainer]}>
+    <View
+      style={[
+        styles.itemContainer,
+        { borderBottomColor: theme.colors.divider },
+      ]}>
       {item.top ? (
         <Image
           source={require('../../../assets/top.png')}
@@ -66,7 +72,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     paddingVertical: 20,
     paddingHorizontal: 12,
-    borderBottomColor: '#888',
     borderBottomWidth: 0.5,
   },
 })

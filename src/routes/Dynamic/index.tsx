@@ -122,7 +122,7 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
       return null
     }
     return (
-      <Text style={styles.bottomEnd}>
+      <Text style={[styles.bottomEnd, { color: theme.colors.grey3 }]}>
         {isReachingEnd ? '到底了~' : isValidating ? '加载中...' : ''}
       </Text>
     )
@@ -160,7 +160,11 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
         estimatedItemSize={100}
         ListHeaderComponent={
           dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
-            <View style={styles.signTextContainer}>
+            <View
+              style={[
+                styles.signTextContainer,
+                { borderBottomColor: theme.colors.divider },
+              ]}>
               <Icon
                 name="billboard"
                 type="material-community"
@@ -194,14 +198,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 10,
     marginBottom: 20,
-    color: '#999',
     textAlign: 'center',
   },
   listStyle: { paddingTop: 15 },
   signTextContainer: {
     paddingHorizontal: 12,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#aaa',
     paddingVertical: 10,
     flex: 1,
     flexDirection: 'row',
@@ -212,18 +214,11 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     flexShrink: 1,
     opacity: 0.8,
-    // color: '#666',
   },
 
   signMark: {
     position: 'relative',
     top: 1,
-  },
-  itemContainer: {
-    paddingVertical: 18,
-    paddingHorizontal: 12,
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 0.5,
   },
   emptyContainer: {
     alignItems: 'center',
