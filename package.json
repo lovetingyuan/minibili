@@ -23,7 +23,7 @@
     "doctor": "npx -y expo-doctor@latest",
     "docs": "npx vite docs",
     "format": "npx prettier src --write",
-    "test": "npx vitest run",
+    "test": "npx vitest run --reporter=verbose",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src scripts"
   },
   "dependencies": {
