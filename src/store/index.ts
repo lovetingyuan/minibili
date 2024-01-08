@@ -123,7 +123,7 @@ export const InitContextComp = React.memo(() => {
             if (key === '$videoCatesList') {
               const list = JSON.parse(data) as typeof RanksConfig
               RanksConfig.forEach(r => {
-                if (!list.find(v => v.rid !== r.rid)) {
+                if (!list.find(v => v.rid === r.rid)) {
                   list.push({ ...r })
                 }
               })
