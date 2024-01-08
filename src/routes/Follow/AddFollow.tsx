@@ -23,8 +23,8 @@ import { useStore } from '../../store'
 
 function SearchedItem(props: { up: SearchedUpType }) {
   const up = props.up
-  const { $followedUps, set$followedUps } = useStore()
-  const followed = $followedUps.find(v => v.mid == up.mid)
+  const { _followedUpsMap, get$followedUps, set$followedUps } = useStore()
+  const followed = up.mid in _followedUpsMap
   const user = {
     name: up.name,
     face: up.face,
@@ -32,7 +32,7 @@ function SearchedItem(props: { up: SearchedUpType }) {
     sign: up.sign,
   }
   const handler = () => {
-    set$followedUps([user, ...$followedUps])
+    set$followedUps([user, ...get$followedUps()])
   }
   const goToDynamic = () => {
     Linking.openURL(`https://m.bilibili.com/space/${up.mid}`)

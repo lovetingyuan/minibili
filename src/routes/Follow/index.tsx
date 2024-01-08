@@ -58,82 +58,85 @@ const TvImg: React.FC = () => {
     />
   )
 }
-function Follow() {
+export default React.memo(function Follow() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
   const { $followedUps, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
   const dark = useIsDark()
+
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
-  const followedUpListLen = $followedUps.length
-  const rest = followedUpListLen
-    ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
-    : 0
 
-  let displayUps: (UpInfo | null)[] = []
-  const pinUps: UpInfo[] = []
-  const liveUps: UpInfo[] = []
-  const updateUps: UpInfo[] = []
-  const otherUps: UpInfo[] = []
+  const content = React.useMemo(() => {
+    const followedUpListLen = $followedUps.length
+    const rest = followedUpListLen
+      ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
+      : 0
+    const pinUps: UpInfo[] = []
+    const liveUps: UpInfo[] = []
+    const updateUps: UpInfo[] = []
+    const otherUps: UpInfo[] = []
 
-  for (const up of $followedUps) {
-    if (up.pin) {
-      pinUps.push({ ...up })
-    } else if (livingUps[up.mid]) {
-      liveUps.push({ ...up })
-    } else {
-      if (
-        up.mid in $upUpdateMap &&
-        $upUpdateMap[up.mid].latestId !== $upUpdateMap[up.mid].currentLatestId
-      ) {
-        updateUps.push({ ...up })
+    for (const up of $followedUps) {
+      if (up.pin) {
+        pinUps.push({ ...up })
+      } else if (livingUps[up.mid]) {
+        liveUps.push({ ...up })
       } else {
-        otherUps.push({ ...up })
+        if (
+          up.mid in $upUpdateMap &&
+          $upUpdateMap[up.mid].latestId !== $upUpdateMap[up.mid].currentLatestId
+        ) {
+          updateUps.push({ ...up })
+        } else {
+          otherUps.push({ ...up })
+        }
       }
     }
-  }
-  displayUps = [
-    ...pinUps.sort((a, b) => b.pin! - a.pin!),
-    ...liveUps,
-    ...updateUps,
-    ...otherUps,
-    ...(rest ? Array.from({ length: rest }).map(() => null) : []),
-  ]
-  const content = (
-    <>
-      <View style={commonStyles.flex1}>
-        <FlatList
-          data={displayUps}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
-          onEndReachedThreshold={1}
-          persistentScrollbar
-          key={columns} // FlatList不支持直接更改columns
-          numColumns={columns}
-          ref={followListRef}
-          columnWrapperStyle={{
-            paddingHorizontal: 10,
-          }}
-          contentContainerStyle={{
-            paddingTop: 30,
-          }}
-          ListEmptyComponent={
-            <View>
-              <TvImg />
-              <Text style={styles.emptyText}>暂无关注，请添加</Text>
-            </View>
-          }
-          ListFooterComponent={
-            $followedUps.length ? (
-              <Text style={styles.bottomText}>到底了~</Text>
-            ) : null
-          }
-        />
-      </View>
-      <AddFollow />
-    </>
-  )
+    const displayUps = [
+      ...pinUps.sort((a, b) => b.pin! - a.pin!),
+      ...liveUps,
+      ...updateUps,
+      ...otherUps,
+      ...(rest ? Array.from({ length: rest }).map(() => null) : []),
+    ]
+    return (
+      <>
+        <View style={commonStyles.flex1}>
+          <FlatList
+            data={displayUps}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
+            onEndReachedThreshold={1}
+            persistentScrollbar
+            key={columns} // FlatList不支持直接更改columns
+            numColumns={columns}
+            ref={followListRef}
+            columnWrapperStyle={{
+              paddingHorizontal: 10,
+            }}
+            contentContainerStyle={{
+              paddingTop: 30,
+            }}
+            ListEmptyComponent={
+              <View>
+                <TvImg />
+                <Text style={styles.emptyText}>暂无关注，请添加</Text>
+              </View>
+            }
+            ListFooterComponent={
+              $followedUps.length ? (
+                <Text style={styles.bottomText}>到底了~</Text>
+              ) : null
+            }
+          />
+        </View>
+        <AddFollow />
+      </>
+    )
+  }, [$followedUps, $upUpdateMap, livingUps, columns])
+
   return (
     <View style={styles.container}>
       {dark ? (
@@ -148,9 +151,7 @@ function Follow() {
       )}
     </View>
   )
-}
-
-export default React.memo(Follow)
+})
 
 const styles = StyleSheet.create({
   container: {
