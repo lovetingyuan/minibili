@@ -199,12 +199,15 @@ try {
 
 try {
   await spinner('publish to npm...', () =>
-    retry(3, () => $`npm publish --registry=https://registry.npmjs.org/`),
+    retry(
+      3,
+      () => $`npm publish --tag beta --registry=https://registry.npmjs.org/`,
+    ),
   )
-  echo(chalk.blue('published to npm success.'))
+  echo(chalk.blue('published as beta tag to npm success.'))
 } catch (err) {
   echo(chalk.red('Failed to publish to npm.'))
-  echo('npm publish --registry=https://registry.npmjs.org/')
+  echo('npm publish --tag beta --registry=https://registry.npmjs.org/')
   throw err
 }
 
@@ -243,4 +246,9 @@ if (process.platform === 'win32') {
   )}`
 }
 
-echo(chalk.green('Build done!'))
+echo(`npm dist-tag add ${pkg.name}@${newVersion} latest`)
+echo(
+  chalk.green(
+    'Build done, please test your app and set npm tag to latest to publish new version finally!',
+  ),
+)
