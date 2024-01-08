@@ -14,7 +14,7 @@ describe('app-version-update', () => {
     const res = await fetch(changelogUrl).then(r => r.json())
     expect(res.length > 0).toBe(true)
     BuildListSchema.parse(res)
-  }, 10000)
+  }, 20000)
   test.skip(
     'unpkg-check',
     async () => {
