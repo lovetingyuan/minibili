@@ -48,7 +48,9 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           </View>
         ) : null}
       </View>
-      <Text style={{ color: theme.colors.black }} numberOfLines={2}>
+      <Text
+        style={{ color: theme.colors.black, marginTop: 10, minHeight: 33 }}
+        numberOfLines={2}>
         {video.title}
       </Text>
       <View style={[styles.videoInfo]}>
@@ -78,7 +80,10 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
             style={styles.icon}
             source={require('../../../assets/play-mark.png')}
           />
-          <Text style={{ color: theme.colors.grey1 }}>{playNum}</Text>
+          <Text
+            style={{ color: theme.colors.grey1, marginLeft: 4, fontSize: 12 }}>
+            {playNum}
+          </Text>
         </View>
       </View>
     </View>

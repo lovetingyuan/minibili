@@ -14,7 +14,8 @@
   "homepage": "https://lovetingyuan.github.io/minibili/",
   "scripts": {
     "start": "expo start",
-    "tailwind": "npx tailwindcss -i ./node_modules/tailwindcss/tailwind.css -o ./node_modules/tailwindcss/output.css --watch",
+    "tailwind": "echo 1",
+    "_tailwind": "npx tailwindcss -i ./node_modules/tailwindcss/tailwind.css -o ./node_modules/tailwindcss/output.css --watch",
     "android": "adb devices -l && npm run tailwind && npx expo start --android",
     "ios": "adb devices -l && npx expo start --ios",
     "web": "expo start --web",
@@ -61,6 +62,7 @@
     "react-native-screens": "~3.22.0",
     "react-native-webview": "13.2.2",
     "sentry-expo": "~7.1.0",
+    "spark-md5": "^3.0.2",
     "swr": "^2.2.4",
     "zod": "^3.21.4"
   },

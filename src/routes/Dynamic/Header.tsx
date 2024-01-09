@@ -27,6 +27,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   }
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
+  const { theme } = useTheme()
   const gotoWebPage = () => {
     if (dynamicUser) {
       navigation.navigate('WebPage', {
@@ -60,7 +61,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
         <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.titleText]}>
           {userName + '   '}
           {fans ? (
-            <Text style={[styles.fansText]}>
+            <Text style={[styles.fansText, { color: theme.colors.grey2 }]}>
               {parseNumber(fans.follower)}粉丝
             </Text>
           ) : null}
