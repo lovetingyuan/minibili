@@ -16,11 +16,11 @@ export const SearchUpItemSchema = z.object({
 })
 
 export const SearchResponseSchema = z.object({
-  seid: z.string(),
-  page: z.number(),
-  pagesize: z.number(),
-  numResults: z.number(),
-  numPages: z.number(),
+  // seid: z.string(),
+  // page: z.number(),
+  // pagesize: z.number(),
+  // numResults: z.number(),
+  // numPages: z.number(),
   result: SearchUpItemSchema.array().nullish(),
 })
 
