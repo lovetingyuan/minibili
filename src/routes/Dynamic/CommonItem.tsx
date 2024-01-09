@@ -122,18 +122,11 @@ export function CommonContent(props: {
           </Text>
         ) : null}
       </Foo>
-      {/* <Text style={styles.tagName}>
-        {
-          // @ts-ignore
-          cateMap[type] || ''
-        }
-      </Text> */}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  // container: { gap: 10 },
   title: { fontSize: 15 },
   textContainer: { gap: 6, flexShrink: 1 },
   content: { fontSize: 15 },
@@ -143,19 +136,5 @@ const styles = StyleSheet.create({
     gap: 10,
     borderRadius: 4,
     paddingRight: 10,
-  },
-  tagName: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    backgroundColor: '#f56c6c',
-    color: 'white',
-    paddingHorizontal: 8,
-    paddingVertical: 1,
-    borderRadius: 4,
-    borderTopLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    fontSize: 11,
-    opacity: 0.9,
   },
 })

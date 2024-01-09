@@ -19,7 +19,7 @@ export default function DynamicStat(props: {
     fontSize: 13,
   }
   return (
-    <View style={styles.VideoItem}>
+    <View style={[styles.VideoItem]}>
       <View style={styles.iconText}>
         <Icon name="date-range" size={15} color={gray} />
         <Text style={textStyle}>{props.date}</Text>
@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexShrink: 0,
     minWidth: 80,
-    color: '#666',
     alignItems: 'center',
     gap: 20,
     marginTop: 12,

@@ -66,19 +66,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           ) : null}
         </Text>
       </Pressable>
-      {sex ? (
-        <Text
-          style={[
-            commonStyles.font13,
-            dynamicUser?.sex === '女'
-              ? {
-                  color: '#FF6699',
-                }
-              : null,
-          ]}>
-          {' ' + sex}
-        </Text>
-      ) : null}
+      {sex ? <Text style={[commonStyles.font13]}>{'  ' + sex}</Text> : null}
       {dynamicUser.mid && livingUrl ? (
         <Button
           size="sm"

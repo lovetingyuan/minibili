@@ -216,7 +216,6 @@ const MajorSchemaMap = {
     type: z.enum([MajorTypeEnum.MAJOR_TYPE_COMMON]),
     common: z.object({
       badge: z.object({
-        // bg_color: '#FB7299',
         color: z.string(),
         text: z.string(),
       }),
@@ -235,7 +234,6 @@ const MajorSchemaMap = {
     type: z.enum([MajorTypeEnum.MAJOR_TYPE_MEDIALIST]),
     medialist: z.object({
       badge: z.object({
-        // bg_color: '#FB7299',
         color: z.string(),
         text: z.string(),
       }),
@@ -250,7 +248,6 @@ const MajorSchemaMap = {
     type: z.enum([MajorTypeEnum.MAJOR_TYPE_COURSES]),
     courses: z.object({
       badge: z.object({
-        // bg_color: '#FB7299',
         color: z.string(),
         text: z.string(),
       }),

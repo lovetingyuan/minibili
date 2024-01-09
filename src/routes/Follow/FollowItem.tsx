@@ -6,7 +6,7 @@ import {
   View,
   Linking,
 } from 'react-native'
-import { Avatar, Badge, Text } from '@rneui/themed'
+import { Avatar, Badge, Text, useTheme } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps, UpInfo } from '../../types'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
@@ -56,6 +56,7 @@ export default React.memo(function FollowItem(props: {
       })
     }
   })
+  const { theme } = useTheme()
   const buttons = [
     hasUpdate
       ? {
@@ -165,10 +166,24 @@ export default React.memo(function FollowItem(props: {
             uri: imgUrl(face, 120),
           }}
         />
-        {hasUpdate ? <Badge key={mid} badgeStyle={styles.updateMark} /> : null}
+        {hasUpdate ? (
+          <Badge
+            key={mid}
+            badgeStyle={[
+              styles.updateMark,
+              { backgroundColor: theme.colors.secondary },
+            ]}
+          />
+        ) : null}
       </View>
       {livingUps[mid] ? (
-        <Text style={[styles.name, styles.liveText]} onPress={gotoLivePage}>
+        <Text
+          style={[
+            styles.name,
+            styles.liveText,
+            { color: theme.colors.primary },
+          ]}
+          onPress={gotoLivePage}>
           直播中~
         </Text>
       ) : (
@@ -177,7 +192,7 @@ export default React.memo(function FollowItem(props: {
             styles.name,
             hasUpdate
               ? {
-                  color: '#E84B85',
+                  color: theme.colors.secondary,
                 }
               : null,
             pin
@@ -212,22 +227,12 @@ const styles = StyleSheet.create({
   updateMark: {
     height: 14,
     width: 14,
-    backgroundColor: '#fb7299',
     borderRadius: 14,
     position: 'absolute',
     top: -38,
     left: 38,
-    // top: -40,
-    // right: -30,
   },
-  // livingBtn: {
-  //   // borderWidth: 1,
-  //   top: -5,
-  //   // position: 'relative',
-  //   // marginTop: 8,
-  // },
   liveText: {
-    color: '#008AC5',
     fontWeight: 'bold',
   },
 })

@@ -46,7 +46,7 @@ const HeaderTitle = React.memo(() => {
           fontWeight: selected ? 'bold' : 'normal',
           color:
             item.rid === -1
-              ? '#F85A54'
+              ? theme.colors.secondary
               : selected
                 ? theme.colors.primary
                 : theme.colors.black,
@@ -122,12 +122,12 @@ const HeaderTitle = React.memo(() => {
         <Button
           type="clear"
           size="sm"
-          titleStyle={[styles.updateBtnText, { color: '#f25985' }]}
+          titleStyle={[styles.updateBtnText, { color: theme.colors.secondary }]}
           onPress={() => {
             Linking.openURL(newVersion.downloadLink)
           }}>
           有新版本
-          <Icon name="fiber-new" color="#f25985" size={20} />
+          <Icon name="fiber-new" color={theme.colors.secondary} size={20} />
         </Button>
       ) : null}
     </View>
@@ -138,6 +138,7 @@ const HeaderRight = React.memo(() => {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { _updatedCount, livingUps } = useStore()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
+  const { theme } = useTheme()
   return (
     <View>
       {_updatedCount ? (
@@ -146,7 +147,9 @@ const HeaderRight = React.memo(() => {
           value={_updatedCount}
           badgeStyle={{
             height: 16,
-            backgroundColor: hasLiving ? '#00a1d6' : '#fb7299',
+            backgroundColor: hasLiving
+              ? theme.colors.primary
+              : theme.colors.secondary,
             position: 'absolute',
             left: 43,
             top: 5,

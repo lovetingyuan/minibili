@@ -8,7 +8,7 @@ import {
   Linking,
 } from 'react-native'
 import { RootStackParamList } from '../types'
-import { Button, Text } from '@rneui/themed'
+import { Button, Text, useTheme } from '@rneui/themed'
 import { useStore } from '../store'
 import { githubLink } from '../constants'
 
@@ -17,6 +17,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>
 export default React.memo(function Welcome({ navigation }: Props) {
   const { set$firstRun } = useStore()
   const { width } = useWindowDimensions()
+  const { theme } = useTheme()
   return (
     <View style={styles.container}>
       <View
@@ -37,7 +38,7 @@ export default React.memo(function Welcome({ navigation }: Props) {
         <Text style={styles.statement}>
           🔈本应用为个人兴趣作品并完全开源(
           <Text
-            style={{ color: '#008AC5' }}
+            style={{ color: theme.colors.primary }}
             onPress={() => {
               Linking.openURL(githubLink)
             }}>
@@ -45,7 +46,8 @@ export default React.memo(function Welcome({ navigation }: Props) {
           </Text>
           )，所有数据均为B站官网公开，不会读取、存储、公开任何个人隐私数据，仅供学习交流!
         </Text>
-        <Text style={{ color: '#888', fontSize: 16, marginTop: 20 }}>
+        <Text
+          style={{ color: theme.colors.grey2, fontSize: 16, marginTop: 20 }}>
           如果遇到闪退或报错请及时更新最新版本。
         </Text>
       </View>

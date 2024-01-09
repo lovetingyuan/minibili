@@ -41,7 +41,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
               <Text style={{ fontSize: 18, fontWeight: '600' }}>
                 {videoInfo?.name}
               </Text>
-              <Text style={{ marginLeft: 10 }}>
+              <Text style={{ marginLeft: 10, color: theme.colors.grey2 }}>
                 {` ${fans ? parseNumber(fans.follower) : ''}粉丝`}
               </Text>
             </View>
@@ -49,7 +49,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
         },
       })
     }
-  }, [navigation, videoInfo?.name, fans])
+  }, [navigation, videoInfo?.name, fans, theme.colors.grey2])
   useFocusEffect(
     useMemoizedFn(() => {
       setViewingVideoId(bvid)

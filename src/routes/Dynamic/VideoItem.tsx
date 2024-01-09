@@ -93,7 +93,7 @@ export default function VideoItem(props: {
           <Text style={[styles.title]} numberOfLines={3}>
             {title}
           </Text>
-          <View style={styles.VideoItem}>
+          <View style={[styles.VideoItem]}>
             {play === undefined ? null : (
               <View style={styles.iconText}>
                 <Icon name="play-circle-outline" size={15} color={gray} />
@@ -104,15 +104,6 @@ export default function VideoItem(props: {
               <Icon name="thumb-up-off-alt" size={15} color={gray} />
               <Text style={textStyle}>{parseNumber(likeCount)}</Text>
             </View>
-            {/* <View style={styles.iconText}>
-              <Icon
-                type="material-community"
-                name="share"
-                size={20}
-                color={gray}
-              />
-              <Text style={textStyle}>{parseNumber(forwardCount)}</Text>
-            </View> */}
           </View>
         </View>
       </View>
@@ -164,10 +155,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  videoInfoText: {
-    color: '#666',
-    fontSize: 12,
-  },
   videoLength: {
     position: 'absolute',
     paddingHorizontal: 4,
@@ -206,7 +193,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexShrink: 0,
     minWidth: 80,
-    color: '#666',
     alignItems: 'center',
     columnGap: 10,
     flexWrap: 'wrap',

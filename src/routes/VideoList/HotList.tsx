@@ -17,7 +17,7 @@ import { useHotVideos, VideoItem } from '../../api/hot-videos'
 import { handleShareVideo, parseNumber, parseUrl } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { FAB } from '@rneui/themed'
+import { FAB, useTheme } from '@rneui/themed'
 import useErrToast from '../../hooks/useErrToast'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
@@ -26,6 +26,7 @@ let refreshTime = Date.now()
 
 export default React.memo(function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
+  const { theme } = useTheme()
   const {
     $blackUps,
     $blackTags,
@@ -192,7 +193,7 @@ export default React.memo(function Hot({ navigation }: Props) {
       />
       <FAB
         visible
-        color="#f25d8e"
+        color={theme.colors.secondary}
         placement="right"
         icon={{ name: 'refresh', color: 'white' }}
         style={{

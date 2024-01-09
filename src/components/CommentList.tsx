@@ -86,7 +86,9 @@ export default function CommentList(props: {
       ) : null}
       {comments?.length ? (
         <View style={styles.footerContainer}>
-          <Text style={styles.footerText}>只加载前30条</Text>
+          <Text style={[styles.footerText, { color: theme.colors.grey3 }]}>
+            只加载前30条
+          </Text>
           <Text />
         </View>
       ) : null}
@@ -98,7 +100,7 @@ export default function CommentList(props: {
 const styles = StyleSheet.create({
   commentItem: { marginBottom: 10 },
   footerContainer: { marginBottom: 10, alignItems: 'center' },
-  footerText: { color: '#888', fontSize: 12 },
+  footerText: { fontSize: 12, marginTop: 10 },
   commentTipText: {
     textAlign: 'center',
     marginVertical: 20,
