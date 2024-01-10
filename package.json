@@ -14,8 +14,8 @@
   "homepage": "https://lovetingyuan.github.io/minibili/",
   "scripts": {
     "start": "expo start",
-    "_tailwind": "npx tailwindcss --no-autoprefixer -i ./node_modules/tailwindcss/tailwind.css -o ./node_modules/tailwindcss/output.css --watch",
-    "android": "adb devices -l && npm run _tailwind && npx expo start --android",
+    "_tailwind": "npx tailwindcss --no-autoprefixer -i ./node_modules/tailwindcss/tailwind.css -o ./src/style.tw.css --watch",
+    "android": "adb devices -l && npx expo start --android",
     "ios": "adb devices -l && npx expo start --ios",
     "web": "expo start --web",
     "build:android": "npm run test && zx scripts/build.mjs",
@@ -73,6 +73,7 @@
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
     "css-to-react-native-transform": "^2.0.0",
     "dotenv": "^16.0.3",

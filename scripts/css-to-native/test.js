@@ -1,4 +1,4 @@
-import transform from './index.js'
+const transform = require('./index')
 
 const stylesheet = transform(
   `
@@ -18,6 +18,7 @@ const stylesheet = transform(
   },
 )
 
+// eslint-disable-next-line no-console
 console.log(stylesheet, {
   'text-\\[17px\\]': {
     fontSize: 17,

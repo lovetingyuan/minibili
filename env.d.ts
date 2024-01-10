@@ -4,3 +4,8 @@
 /// <reference types="nativewind/types" />
 
 declare var inlineRequire: (f: string) => string
+
+declare module '*.tw.css' {
+  const css: any
+  export default css
+}

@@ -1,1 +1,14 @@
-export const allEqual = arr => arr.every(v => v === arr[0])
+'use strict'
+
+Object.defineProperty(exports, '__esModule', {
+  value: true,
+})
+exports.allEqual = void 0
+
+var allEqual = function allEqual(arr) {
+  return arr.every(function (v) {
+    return v === arr[0]
+  })
+}
+
+exports.allEqual = allEqual

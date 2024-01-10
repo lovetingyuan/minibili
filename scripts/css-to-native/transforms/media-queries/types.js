@@ -1,4 +1,14 @@
-export const defaultTypes = [
+'use strict'
+
+Object.defineProperty(exports, '__esModule', {
+  value: true,
+})
+exports.mediaQueryTypes =
+  exports.reactNativeMediaQueryTypes =
+  exports.cssnextMediaQueryTypes =
+  exports.defaultTypes =
+    void 0
+var defaultTypes = [
   'all',
   'braille',
   'embossed',
@@ -10,8 +20,10 @@ export const defaultTypes = [
   'tty',
   'tv',
 ]
-export const cssnextMediaQueryTypes = ['pointer', 'hover', 'block-overflow']
-export const reactNativeMediaQueryTypes = [
+exports.defaultTypes = defaultTypes
+var cssnextMediaQueryTypes = ['pointer', 'hover', 'block-overflow']
+exports.cssnextMediaQueryTypes = cssnextMediaQueryTypes
+var reactNativeMediaQueryTypes = [
   'android',
   'dom',
   'ios',
@@ -19,6 +31,8 @@ export const reactNativeMediaQueryTypes = [
   'web',
   'windows',
 ]
-export const mediaQueryTypes = defaultTypes
+exports.reactNativeMediaQueryTypes = reactNativeMediaQueryTypes
+var mediaQueryTypes = defaultTypes
   .concat(cssnextMediaQueryTypes)
   .concat(reactNativeMediaQueryTypes)
+exports.mediaQueryTypes = mediaQueryTypes

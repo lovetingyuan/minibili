@@ -1,10 +1,12 @@
-export const dimensionFeatures = [
-  'width',
-  'height',
-  'device-width',
-  'device-height',
-]
-export const mediaQueryFeatures = [
+'use strict'
+
+Object.defineProperty(exports, '__esModule', {
+  value: true,
+})
+exports.mediaQueryFeatures = exports.dimensionFeatures = void 0
+var dimensionFeatures = ['width', 'height', 'device-width', 'device-height']
+exports.dimensionFeatures = dimensionFeatures
+var mediaQueryFeatures = [
   'orientation',
   'scan',
   'resolution',
@@ -15,3 +17,4 @@ export const mediaQueryFeatures = [
   'color-index',
   'monochrome',
 ].concat(dimensionFeatures)
+exports.mediaQueryFeatures = mediaQueryFeatures
