@@ -1,6 +1,6 @@
 {
   "name": "minibili",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "minimum bilibili apk",
   "unpkg": "docs/version.json",
   "files": [
@@ -14,9 +14,8 @@
   "homepage": "https://lovetingyuan.github.io/minibili/",
   "scripts": {
     "start": "expo start",
-    "tailwind": "echo 1",
     "_tailwind": "npx tailwindcss -i ./node_modules/tailwindcss/tailwind.css -o ./node_modules/tailwindcss/output.css --watch",
-    "android": "adb devices -l && npm run tailwind && npx expo start --android",
+    "android": "adb devices -l && npx expo start --android",
     "ios": "adb devices -l && npx expo start --ios",
     "web": "expo start --web",
     "build:android": "npm run test && zx scripts/build.mjs",
@@ -98,8 +97,8 @@
     ]
   },
   "config": {
-    "versionCode": 58,
-    "changelog": "修复已知问题"
+    "versionCode": 59,
+    "changelog": "修复动态列表问题"
   },
-  "gitHead": "93283a3"
+  "gitHead": "07bf34e"
 }
