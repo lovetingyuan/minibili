@@ -2,42 +2,64 @@ import { StyleProp, StyleSheet } from 'react-native'
 
 const commonStyles = StyleSheet.create(
   /** start */
-  {
-    flex1: {
-      flex: 1,
-    },
-    bold: { fontWeight: 'bold' },
-    font16: {
-      fontSize: 16,
-    },
-    font12: {
-      fontSize: 12,
-    },
-    font13: {
-      fontSize: 13,
-    },
-    font14: {
-      fontSize: 14,
-    },
-    font15: {
-      fontSize: 15,
-    },
-    font18: {
-      fontSize: 18,
-    },
-    font20: {
-      fontSize: 20,
-    },
-    gap2: {
-      gap: 2,
-    },
+{
+  "container": {
+    "width": "100%"
   },
-  /** end */
+  "visible": {
+    "visibility": "visible"
+  },
+  "fixed": {
+    "position": "fixed"
+  },
+  "absolute": {
+    "position": "absolute"
+  },
+  "relative": {
+    "position": "relative"
+  },
+  "mt-7": {
+    "marginTop": 28
+  },
+  "flex": {
+    "display": "flex"
+  },
+  "hidden": {
+    "display": "none"
+  },
+  "aspect-square": {
+    "aspectRatio": 1
+  },
+  "flex-1": {
+    "flexGrow": 1,
+    "flexShrink": 1,
+    "flexBasis": "0%"
+  },
+  "self-center": {
+    "alignSelf": "center"
+  },
+  "rounded": {
+    "borderRadius": 4
+  },
+  "text-\\[17px\\]": {
+    "fontSize": 17
+  },
+  "italic": {
+    "fontStyle": "italic"
+  },
+  "outline": {
+    "outlineStyle": "solid"
+  },
+  "filter": {
+    "filter": ""
+  }
+}
+/** end */
 )
 
 const cache: Record<string, StyleProp<unknown>> = {}
 
-export function s(classes: string) {
+export function s(classes: string): StyleProp<unknown> {
   if (classes in cache) {
     return cache[classes]
   }

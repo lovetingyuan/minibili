@@ -14,8 +14,8 @@
   "homepage": "https://lovetingyuan.github.io/minibili/",
   "scripts": {
     "start": "expo start",
-    "_tailwind": "npx tailwindcss -i ./node_modules/tailwindcss/tailwind.css -o ./node_modules/tailwindcss/output.css --watch",
-    "android": "adb devices -l && npx expo start --android",
+    "_tailwind": "npx tailwindcss -i ./src/tailwind.css -o ./node_modules/tailwindcss/output.css --watch",
+    "android": "adb devices -l && npm run _tailwind && npx expo start --android",
     "ios": "adb devices -l && npx expo start --ios",
     "web": "expo start --web",
     "build:android": "npm run test && zx scripts/build.mjs",
@@ -23,7 +23,7 @@
     "update": "zx scripts/hot-update.mjs",
     "doctor": "npx -y expo-doctor@latest",
     "docs": "npx vite docs",
-    "format": "npx prettier src --write",
+    "format": "npx prettier src scripts --write",
     "test": "npx vitest run",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src scripts"
   },

@@ -7,7 +7,7 @@ import { imgUrl, parseDate, parseNumber, parseUrl } from '../utils'
 import { Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-import commonStyles from '../styles'
+import commonStyles, { s } from '../styles'
 
 export const Additional = (props: { additional?: AdditionalType | null }) => {
   const { additional } = props
@@ -30,7 +30,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       return null
     }
     additionalContent = (
-      <View style={commonStyles.flex1}>
+      <View style={s('flex-1')}>
         {title ? <Text>{title}</Text> : null}
         {desc ? <Text>{desc}</Text> : null}
       </View>

@@ -1,6 +1,8 @@
-const transform = require('css-to-react-native-transform')
+const transform = require('./scripts/css-to-native')
 const path = require('path')
 const fs = require('fs')
+const postcss = require('postcss')
+const cssvariables = require('postcss-css-variables')
 
 const outputcss = path.resolve(__dirname, 'node_modules/tailwindcss/output.css')
 if (!fs.existsSync(outputcss)) {
@@ -12,7 +14,18 @@ const regex = /\/\*\* start \*\/([\s\S]*?)\/\*\* end \*\//
 fs.watch(outputcss, eventType => {
   if (eventType === 'change') {
     const css = fs.readFileSync(outputcss, 'utf-8')
-    const stylesheet = transform.default(css)
+
+    // Process your CSS with postcss-css-variables
+    const output = postcss([cssvariables(/*options*/)]).process(css).css
+
+    // console.log(11, output)
+    const stylesheet = transform.default(output, {
+      ignoreRule(s) {
+        if (s === '.transform') {
+          return true
+        }
+      },
+    })
     const styles = fs.readFileSync(stylefile, 'utf-8')
 
     fs.writeFileSync(

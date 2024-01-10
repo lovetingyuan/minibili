@@ -7,6 +7,7 @@ import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 import { NavigationProps, PromiseResult } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import useMounted from '../../hooks/useMounted'
+import { s } from '../../styles'
 
 function splitArrayIntoChunks(arr: any[]) {
   const result = [[arr[0]]]
@@ -162,7 +163,7 @@ const HeaderRight = React.memo(() => {
         onPress={() => {
           navigation.navigate('Follow')
         }}
-        titleStyle={{ fontSize: 17 }}>
+        titleStyle={s('text-[17px]')}>
         {' 关注 '}
       </Button>
     </View>
