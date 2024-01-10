@@ -6,7 +6,7 @@ import { useStore } from '../../store'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
-
+// rounded font-bold mm
 export default React.memo(function (props: Props) {
   const { currentVideosCate } = useStore()
   if (currentVideosCate.rid === -1) {

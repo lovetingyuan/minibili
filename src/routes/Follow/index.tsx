@@ -11,7 +11,7 @@ import { Text } from '@rneui/themed'
 import FollowItem from './FollowItem'
 import { UpInfo } from '../../types'
 import { useStore } from '../../store'
-import commonStyles from '../../styles'
+import { s } from '../../styles'
 import AddFollow from './AddFollow'
 import useMounted from '../../hooks/useMounted'
 import useIsDark from '../../hooks/useIsDark'
@@ -27,7 +27,7 @@ const renderItem = ({
   if (item) {
     return <FollowItem item={item} index={index} />
   }
-  return <View style={commonStyles.flex1} />
+  return <View style={s.v('flex-1')} />
 }
 
 const tvL = require('../../../assets/tv-l.png')
@@ -103,7 +103,7 @@ export default React.memo(function Follow() {
     ]
     return (
       <>
-        <View style={commonStyles.flex1}>
+        <View style={s.v('flex-1')}>
           <FlatList
             data={displayUps}
             renderItem={renderItem}

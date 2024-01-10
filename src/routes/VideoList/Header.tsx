@@ -163,7 +163,7 @@ const HeaderRight = React.memo(() => {
         onPress={() => {
           navigation.navigate('Follow')
         }}
-        titleStyle={s('text-[17px]')}>
+        titleStyle={s.t('text-[17px]')}>
         {' 关注 '}
       </Button>
     </View>

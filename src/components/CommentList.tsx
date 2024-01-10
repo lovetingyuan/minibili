@@ -84,7 +84,7 @@ export default function CommentList(props: {
               // alignSelf: 'center',
               // marginTop: 30,
             },
-            s('aspect-square mt-7 self-center'),
+            s.i('aspect-square mt-7 self-center'),
           ]}
         />
       ) : null}

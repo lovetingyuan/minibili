@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Button, Text } from '@rneui/themed'
-import commonStyles from '../../styles'
+import { s } from '../../styles'
 
 export default React.memo(function TextAction(
   props: React.PropsWithChildren<{
@@ -12,7 +12,7 @@ export default React.memo(function TextAction(
 ) {
   return (
     <View style={styles.infoItem}>
-      <Text style={commonStyles.font16} onPress={props.onTextPress}>
+      <Text style={s.t('text-base')} onPress={props.onTextPress}>
         {props.text}
       </Text>
       <View style={styles.btns}>

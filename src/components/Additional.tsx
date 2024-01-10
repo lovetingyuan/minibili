@@ -7,7 +7,7 @@ import { imgUrl, parseDate, parseNumber, parseUrl } from '../utils'
 import { Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-import commonStyles, { s } from '../styles'
+import { s } from '../styles'
 
 export const Additional = (props: { additional?: AdditionalType | null }) => {
   const { additional } = props
@@ -30,7 +30,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       return null
     }
     additionalContent = (
-      <View style={s('flex-1')}>
+      <View style={s.v('flex-1')}>
         {title ? <Text>{title}</Text> : null}
         {desc ? <Text>{desc}</Text> : null}
       </View>
@@ -78,7 +78,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
         <View style={styles.text}>
           <Text numberOfLines={1}>{additional.common.title}</Text>
           {text ? (
-            <Text numberOfLines={2} style={commonStyles.font13}>
+            <Text numberOfLines={2} style={s.t('text-sm')}>
               {text}
             </Text>
           ) : null}
@@ -96,7 +96,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join(' ')
     url = additional.goods.jump_url || additional.goods.items[0].jump_url
     additionalContent = (
-      <View style={commonStyles.flex1}>
+      <View style={s.v('flex-1')}>
         <Text numberOfLines={1}>商品：{additional.goods.head_text}</Text>
         {text ? <Text numberOfLines={1}>{text}</Text> : null}
       </View>
@@ -108,7 +108,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       'https://t.bilibili.com/vote/h5/index/#/result?vote_id=' +
       additional.vote.vote_id
     additionalContent = (
-      <View style={commonStyles.flex1}>
+      <View style={s.v('flex-1')}>
         <Text>投票：{additional.vote.desc}</Text>
         <Text>
           {parseDate(additional.vote.end_time)}截至，
@@ -123,7 +123,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
     const { title, center_top, center_bottom, left_team, right_team } =
       additional.match.match_info
     additionalContent = (
-      <View style={commonStyles.gap2}>
+      <View style={s.v('gap-2')}>
         <Text>赛事：{additional.match.head_text}</Text>
         <Text>
           {title} {left_team.name} VS {right_team.name}{' '}
@@ -136,7 +136,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
   ) {
     url = parseUrl(additional.upower_lottery.jump_url)
     additionalContent = (
-      <View style={commonStyles.gap2}>
+      <View style={s.v('gap-2')}>
         <Text>抽奖：{additional.upower_lottery.title}</Text>
         <Text>{additional.upower_lottery.desc.text}</Text>
       </View>

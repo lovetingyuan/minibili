@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native'
 import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
-import commonStyles from '../../styles'
+import { s } from '../../styles'
 import { imgUrl } from '../../utils'
 
 export default function ForwardItem(props: {
@@ -47,7 +47,7 @@ export default function ForwardItem(props: {
           />
           <View style={{ flex: 6 }}>
             <Text numberOfLines={2} style={{ lineHeight: 20, fontSize: 15 }}>
-              <Text style={commonStyles.bold}>视频：</Text>
+              <Text style={s.t('font-bold')}>视频：</Text>
               {title}
             </Text>
             <Text style={{ marginTop: 10, fontSize: 13 }}>

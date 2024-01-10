@@ -1,65 +1,67 @@
-import { StyleProp, StyleSheet } from 'react-native'
+import {
+  ImageStyle,
+  StyleProp,
+  StyleSheet,
+  TextStyle,
+  ViewStyle,
+} from 'react-native'
 
 const commonStyles = StyleSheet.create(
   /** start */
-{
-  "container": {
-    "width": "100%"
+  {
+    'mt-4': {
+      marginTop: 16,
+    },
+    'mt-7': {
+      marginTop: 28,
+    },
+    'aspect-square': {
+      aspectRatio: 1,
+    },
+    'flex-1': {
+      flexGrow: 1,
+      flexShrink: 1,
+      flexBasis: '0%',
+    },
+    'gap-2': {
+      gap: 8,
+    },
+    'self-center': {
+      alignSelf: 'center',
+    },
+    'text-\\[17px\\]': {
+      fontSize: 17,
+    },
+    'text-base': {
+      fontSize: 16,
+      lineHeight: 24,
+    },
+    'text-sm': {
+      fontSize: 14,
+      lineHeight: 20,
+    },
+    'font-bold': {
+      fontWeight: '700',
+    },
   },
-  "visible": {
-    "visibility": "visible"
-  },
-  "fixed": {
-    "position": "fixed"
-  },
-  "absolute": {
-    "position": "absolute"
-  },
-  "relative": {
-    "position": "relative"
-  },
-  "mt-7": {
-    "marginTop": 28
-  },
-  "flex": {
-    "display": "flex"
-  },
-  "hidden": {
-    "display": "none"
-  },
-  "aspect-square": {
-    "aspectRatio": 1
-  },
-  "flex-1": {
-    "flexGrow": 1,
-    "flexShrink": 1,
-    "flexBasis": "0%"
-  },
-  "self-center": {
-    "alignSelf": "center"
-  },
-  "rounded": {
-    "borderRadius": 4
-  },
-  "text-\\[17px\\]": {
-    "fontSize": 17
-  },
-  "italic": {
-    "fontStyle": "italic"
-  },
-  "outline": {
-    "outlineStyle": "solid"
-  },
-  "filter": {
-    "filter": ""
-  }
-}
-/** end */
+  /** end */
 )
 
 const cache: Record<string, StyleProp<unknown>> = {}
 
-export function s(classes: string): StyleProp<unknown> {
+export const s = {
+  i(classes: string) {
+    return _s(classes) as StyleProp<ImageStyle>
+  },
+  t(classes: string) {
+    return _s(classes) as StyleProp<TextStyle>
+  },
+  v(classes: string) {
+    return _s(classes) as StyleProp<ViewStyle>
+  },
+}
+
+function _s(classes: string): any {
   if (classes in cache) {
     return cache[classes]
   }
@@ -70,5 +72,3 @@ export function s(classes: string): StyleProp<unknown> {
   cache[classes] = r
   return r
 }
-
-export default commonStyles
