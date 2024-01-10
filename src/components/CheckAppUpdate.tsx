@@ -6,7 +6,10 @@ import { delay } from '../utils'
 export default React.memo(function CheckAppUpdate() {
   const { get$ignoredVersions, set$ignoredVersions } = useStore()
   React.useEffect(() => {
-    delay(5000)
+    if (__DEV__) {
+      return
+    }
+    delay(20000)
       .then(() => {
         return getAppUpdateInfo
       })
@@ -43,6 +46,6 @@ export default React.memo(function CheckAppUpdate() {
           ],
         )
       })
-  }, [])
+  }, [get$ignoredVersions, set$ignoredVersions])
   return null
 })

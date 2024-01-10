@@ -34,12 +34,13 @@ export default function request<D extends any>(url: string) {
   __DEV__ && console.log('request url: ', url.slice(0, 150))
   return fetch(requestUrl, {
     headers: {
+      accept: 'application/json, text/plain, */*',
+      'accept-language': 'zh-CN,zh;q=0.9',
       'cache-control': 'no-cache',
+      cookie,
       'user-agent':
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
       // 'user-agent': 'Mozilla/5.0',
-      accept: 'application/json, text/plain, */*',
-      cookie,
     },
     method: 'GET',
     mode: 'cors',
@@ -65,6 +66,9 @@ export default function request<D extends any>(url: string) {
         }
         res = JSON.parse(resText) as Res<D>
       } catch (err) {}
+      if (url === '/x/web-interface/nav') {
+        return res.data
+      }
       if (res.code) {
         reportApiError(url, res)
 

@@ -9,19 +9,18 @@ export default async function request<D extends any>(url: string) {
   if (!cookie) {
     cookie = await getCookie()
   }
-  return fetch(requestUrl + '&_t=' + Date.now(), {
+  return fetch(requestUrl, {
     headers: {
       accept: 'application/json, text/plain, */*',
       'accept-language': 'zh-CN,zh;q=0.9',
       'cache-control': 'no-cache',
-      pragma: 'no-cache',
       cookie,
-      'user-agent': 'Mozilla/5.0',
+      'user-agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
     },
     // referrer: 'https://space.bilibili.com',
     // referrerPolicy: 'no-referrer-when-downgrade',
     // referrerPolicy: 'strict-origin-when-cross-origin',
-    body: null,
     method: 'GET',
     mode: 'cors',
     credentials: 'include',

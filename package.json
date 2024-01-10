@@ -25,7 +25,7 @@
     "doctor": "npx -y expo-doctor@latest",
     "docs": "npx vite docs",
     "format": "npx prettier src --write",
-    "test": "npx vitest run --reporter=verbose",
+    "test": "npx vitest run",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src scripts"
   },
   "dependencies": {
@@ -70,6 +70,7 @@
     "@babel/core": "^7.20.0",
     "@react-native/eslint-config": "^0.74.0",
     "@types/react": "~18.2.14",
+    "@types/spark-md5": "^3.0.4",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
