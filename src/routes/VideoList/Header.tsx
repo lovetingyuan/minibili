@@ -160,7 +160,7 @@ const HeaderRight = React.memo(() => {
       ) : null}
       <Button
         type="clear"
-        titleStyle={s.t('text-emerald-600')}
+        titleStyle={s.t`text-lg`}
         onPress={() => {
           navigation.navigate('Follow')
         }}>

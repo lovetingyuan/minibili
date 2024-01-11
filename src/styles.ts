@@ -8,21 +8,14 @@ import {
 
 import tailwindStyles from './style.tw.css'
 
+// console.log('tailwindStyles', tailwindStyles)
+
 const cache: Record<string, StyleProp<unknown>> = {}
 
-export const s = {
-  i(classes: string) {
-    return _s(classes) as StyleProp<ImageStyle>
-  },
-  t(classes: string) {
-    return _s(classes) as StyleProp<TextStyle>
-  },
-  v(classes: string) {
-    return _s(classes) as StyleProp<ViewStyle>
-  },
-}
-
-function _s(classes: string): any {
+function _s(classes: string | TemplateStringsArray): any {
+  if (typeof classes !== 'string') {
+    classes = classes[0]
+  }
   if (classes in cache) {
     return cache[classes]
   }
@@ -32,4 +25,15 @@ function _s(classes: string): any {
   const r = StyleSheet.compose(...styles)
   cache[classes] = r
   return r
+}
+export const s = {
+  i(classes: string | TemplateStringsArray) {
+    return _s(classes) as StyleProp<ImageStyle>
+  },
+  t(classes: string | TemplateStringsArray) {
+    return _s(classes) as StyleProp<TextStyle>
+  },
+  v(classes: string | TemplateStringsArray) {
+    return _s(classes) as StyleProp<ViewStyle>
+  },
 }

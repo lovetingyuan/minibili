@@ -35,6 +35,6 @@ if (process.env.NODE_ENV === 'development') {
 
   child.stderr.on('data', data => {
     const input = data.toString().trim()
-    console.error('tailwindcss error: ' + input)
+    console.log('TailwindCSS: ' + input)
   })
 }
