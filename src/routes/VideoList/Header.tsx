@@ -7,6 +7,7 @@ import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 import { NavigationProps, PromiseResult } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import useMounted from '../../hooks/useMounted'
+import { s } from '../../styles'
 
 function splitArrayIntoChunks(arr: any[]) {
   const result = [[arr[0]]]
@@ -159,6 +160,7 @@ const HeaderRight = React.memo(() => {
       ) : null}
       <Button
         type="clear"
+        titleStyle={s.t('text-emerald-600')}
         onPress={() => {
           navigation.navigate('Follow')
         }}>

@@ -14,7 +14,6 @@
   "homepage": "https://lovetingyuan.github.io/minibili/",
   "scripts": {
     "start": "expo start",
-    "_tailwind": "npx tailwindcss --no-autoprefixer -i ./node_modules/tailwindcss/tailwind.css -o ./src/style.tw.css --watch",
     "android": "adb devices -l && npx expo start --android",
     "ios": "adb devices -l && npx expo start --ios",
     "web": "expo start --web",
