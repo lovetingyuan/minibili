@@ -21,7 +21,7 @@ Object.defineProperty(config, '__babelTransformer', {
   },
 })
 
-if (config.server.port && config.watcher) {
+if (process.env.NODE_ENV === 'development') {
   // 启动tailwindcss进程
   const child = spawn(
     'npx',
@@ -33,8 +33,9 @@ if (config.server.port && config.watcher) {
     },
   )
 
-  // child.stdout.on('data', data => {
-  //   const input = data.toString().trim()
-  //   console.log('tailwindcss: ' + input)
-  // })
+  child.stderr.on('data', data => {
+    const input = data.toString().trim()
+    // eslint-disable-next-line no-console
+    console.error('tailwindcss error: ' + input)
+  })
 }
