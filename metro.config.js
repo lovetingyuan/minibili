@@ -5,7 +5,7 @@ const { spawn } = require('child_process')
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname)
 
-config.resolver.sourceExts.push('css')
+config.resolver.sourceExts.push('tw.css')
 
 const babelTransformer = require(config.transformer.babelTransformerPath)
 
@@ -35,7 +35,6 @@ if (process.env.NODE_ENV === 'development') {
 
   child.stderr.on('data', data => {
     const input = data.toString().trim()
-    // eslint-disable-next-line no-console
     console.error('tailwindcss error: ' + input)
   })
 }
