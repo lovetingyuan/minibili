@@ -4,7 +4,7 @@ import { View, StyleSheet, Image, useWindowDimensions } from 'react-native'
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
-import { s } from '../styles'
+// import { s } from '../styles'
 
 const Loading = React.memo(() => {
   return (
@@ -76,16 +76,11 @@ export default function CommentList(props: {
       ) : comments?.length === 0 && !commentLoading ? (
         <Image
           source={require('../../assets/empty.png')}
-          style={[
-            {
-              width: width * 0.2,
-              height: undefined,
-              // aspectRatio: 1,
-              // alignSelf: 'center',
-              // marginTop: 30,
-            },
-            s.i('aspect-square mt-7 self-center'),
-          ]}
+          className="aspect-square mt-7 self-center"
+          style={{
+            width: width * 0.2,
+            height: undefined,
+          }}
         />
       ) : null}
       {comments?.length ? (

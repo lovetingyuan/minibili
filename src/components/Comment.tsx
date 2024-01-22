@@ -4,7 +4,7 @@ import { MessageContent, ReplyItem } from '../api/comments'
 import { Button, Text, useTheme } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-import { s } from '../styles'
+// import { s } from '../styles'
 import { imgUrl } from '../utils'
 import { useStore } from '../store'
 
@@ -146,7 +146,7 @@ export default React.memo(function Comment(props: Props) {
             {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}
           </Text>
           {comment.location ? (
-            <Text style={s.t('text-sm')}>
+            <Text className="text-sm">
               (
               {comment.location.includes('：')
                 ? comment.location.split('：')[1]
@@ -230,7 +230,7 @@ export default React.memo(function Comment(props: Props) {
                   {reply.sex === '男' ? '♂' : reply.sex === '女' ? '♀' : ''}
                 </Text>
                 {reply.location ? (
-                  <Text style={s.t('text-sm')}>
+                  <Text className="text-sm">
                     (
                     {reply.location.includes('：')
                       ? reply.location.split('：')[1]

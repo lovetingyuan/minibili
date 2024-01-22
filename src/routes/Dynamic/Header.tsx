@@ -10,7 +10,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useUserInfo } from '../../api/user-info'
 import { useLivingInfo } from '../../api/living-info'
 import * as Clipboard from 'expo-clipboard'
-import { s } from '../../styles'
+// import { s } from '../../styles'
 import { Image } from 'expo-image'
 import { Menu, MenuItem } from 'react-native-material-menu'
 
@@ -67,7 +67,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           ) : null}
         </Text>
       </Pressable>
-      {sex ? <Text style={s.t('text-sm')}>{'  ' + sex}</Text> : null}
+      {sex ? <Text className="text-sm">{'  ' + sex}</Text> : null}
       {dynamicUser.mid && livingUrl ? (
         <Button
           size="sm"

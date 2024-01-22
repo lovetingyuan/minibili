@@ -18,7 +18,7 @@ import { Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
-import { s } from '../../styles'
+// import { s } from '../../styles'
 import { imgUrl } from '../../utils'
 
 type ItemType =
@@ -104,12 +104,12 @@ export function CommonContent(props: {
       <Foo style={styles.textContainer} {...linkProp}>
         {title ? (
           <Text
-            style={[
-              styles.title,
+            className={
               props.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
-                ? s.t('font-bold')
-                : null,
-            ]}
+                ? 'font-bold'
+                : ''
+            }
+            style={styles.title}
             numberOfLines={2}>
             {title}
           </Text>

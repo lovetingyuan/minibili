@@ -19,7 +19,7 @@ import { parseNumber, showToast } from '../../utils'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingVideoId } from '../../utils/report'
-import { s } from '../../styles'
+// import { s } from '../../styles'
 import { useUserRelation } from '../../api/user-relation'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
@@ -60,11 +60,11 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
   )
 
   return (
-    <View style={s.v('flex-1')}>
+    <View className="flex-1">
       <Player page={currentPage} bvid={bvid} />
       <ScrollView style={styles.videoInfoContainer}>
         <VideoInfo changePage={setCurrentPage} bvid={bvid} page={currentPage} />
-        <View style={s.v('mt-4')}>
+        <View className="mt-4">
           <CommentList
             upName={videoInfo?.name || ''}
             commentId={videoInfo?.aid || ''}
@@ -77,18 +77,18 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
                       showToast('已复制视频ID')
                     })
                   }}>
-                  <Text style={[s.t('text-sm'), { color: theme.colors.grey1 }]}>
+                  <Text
+                    style={{ color: theme.colors.grey1 }}
+                    className="text-sm">
                     {bvid}
                   </Text>
                 </Pressable>
                 <Text
-                  style={[
-                    s.t('text-sm font-bold'),
-                    { color: theme.colors.grey1 },
-                  ]}>
+                  className="text-sm font-bold"
+                  style={{ color: theme.colors.grey1 }}>
                   {' · '}
                 </Text>
-                <Text style={[s.t('text-lg'), { color: theme.colors.grey1 }]}>
+                <Text className="text-lg" style={{ color: theme.colors.grey1 }}>
                   {videoInfo?.tag}
                 </Text>
               </View>

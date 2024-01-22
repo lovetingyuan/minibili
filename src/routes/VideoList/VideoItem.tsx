@@ -4,7 +4,7 @@ import { VideoItem } from '../../api/hot-videos'
 import { imgUrl, parseDate, parseDuration, parseNumber } from '../../utils'
 import { useTheme } from '@rneui/themed'
 import { Image } from 'expo-image'
-import { s } from '../../styles'
+// import { s } from '../../styles'
 import { useStore } from '../../store'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
@@ -16,7 +16,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   const { isWiFi, _followedUpsMap } = useStore()
   return (
     <View style={[styles.itemContainer, { width: itemWidth }]}>
-      <View style={s.v('flex-1')}>
+      <View className="flex-1">
         <Image
           style={[styles.image]}
           source={imgUrl(video.cover, ...(isWiFi ? [480, 300] : [320, 200]))}

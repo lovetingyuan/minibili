@@ -16,7 +16,7 @@ import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import { imgUrl, parseDuration, showToast } from '../../utils'
 import { Icon } from '@rneui/themed'
-import { s } from '../../styles'
+// import { s } from '../../styles'
 import { useStore } from '../../store'
 import { useAppState } from '../../hooks/useAppState'
 import useMounted from '../../hooks/useMounted'
@@ -182,7 +182,7 @@ export default React.memo(function Player(props: {
           onPress={() => {
             setLoadPlayer(true)
           }}
-          style={s.v('flex-1')}>
+          className="flex-1">
           {videoInfo?.cover ? (
             <ImageBackground
               source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
