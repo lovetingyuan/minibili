@@ -88,7 +88,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
                   style={{ color: theme.colors.grey1 }}>
                   {' · '}
                 </Text>
-                <Text className="text-lg" style={{ color: theme.colors.grey1 }}>
+                <Text className="text-sm" style={{ color: theme.colors.grey1 }}>
                   {videoInfo?.tag}
                 </Text>
               </View>
