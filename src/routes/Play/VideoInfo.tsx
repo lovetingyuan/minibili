@@ -1,8 +1,8 @@
 import React from 'react'
 import VideoHeader from './VideoHeader'
-import { View, StyleSheet } from 'react-native'
+import { View } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import { ListItem, Text, Icon } from '@rneui/themed'
+import { ListItem, Text, Icon, useTheme } from '@rneui/themed'
 
 export default React.memo(function VideoInfo(props: {
   changePage: (p: number) => void
@@ -12,6 +12,7 @@ export default React.memo(function VideoInfo(props: {
   const { changePage } = props
   const { data: videoInfo, isLoading } = useVideoInfo(props.bvid)
   const [expanded, setExpanded] = React.useState(false)
+  const { theme } = useTheme()
 
   const { title, desc } = videoInfo || {}
   let videoDesc = desc
@@ -24,12 +25,12 @@ export default React.memo(function VideoInfo(props: {
     <>
       <VideoHeader bvid={props.bvid} />
       <View>
-        <Text style={styles.videoTitle}>{title}</Text>
-        {videoDesc ? <Text style={[styles.videoDesc]}>{videoDesc}</Text> : null}
+        <Text className="text-base mt-3">{title}</Text>
+        {videoDesc ? <Text className="mt-3">{videoDesc}</Text> : null}
         {(videoInfo?.pages?.length || 0) > 1 && props.page ? (
           <ListItem.Accordion
             icon={<Icon name={'chevron-down'} type="material-community" />}
-            containerStyle={styles.pagesTitle}
+            containerStyle={tw('py-1 px-3 mt-5')}
             content={
               <ListItem.Content>
                 <ListItem.Title>
@@ -50,16 +51,15 @@ export default React.memo(function VideoInfo(props: {
                   onPress={() => {
                     changePage(v.page)
                   }}
-                  containerStyle={{
-                    paddingVertical: 10,
-                    paddingHorizontal: 20,
-                  }}
+                  containerStyle={tw('py-3 px-5')}
                   bottomDivider>
                   <ListItem.Content>
                     <ListItem.Title
+                      className={selected ? 'font-bold' : ''}
                       style={{
-                        color: selected ? '#00a1d6' : '#888',
-                        fontWeight: selected ? 'bold' : 'normal',
+                        color: selected
+                          ? theme.colors.primary
+                          : theme.colors.grey2,
                       }}>
                       {v.page}. {v.title}
                     </ListItem.Title>
@@ -71,23 +71,11 @@ export default React.memo(function VideoInfo(props: {
         ) : !isLoading &&
           videoInfo?.videos &&
           videoInfo?.videos !== videoInfo?.pages?.length ? (
-          <Text
-            style={{ marginTop: 12, color: '#FF7F24', fontStyle: 'italic' }}>
+          <Text className="mt-3 italic" style={{ color: theme.colors.warning }}>
             该视频为交互视频，暂不支持
           </Text>
         ) : null}
       </View>
     </>
   )
-})
-
-const styles = StyleSheet.create({
-  videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
-  videoTitle: { fontSize: 16, marginTop: 12 },
-  videoDesc: { marginTop: 10 },
-  pagesTitle: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    marginTop: 20,
-  },
 })

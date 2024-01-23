@@ -1,10 +1,9 @@
 import React from 'react'
-import { View, Text, StyleSheet, useWindowDimensions } from 'react-native'
+import { View, Text, useWindowDimensions } from 'react-native'
 import { VideoItem } from '../../api/hot-videos'
 import { imgUrl, parseDate, parseDuration, parseNumber } from '../../utils'
 import { useTheme } from '@rneui/themed'
 import { Image } from 'expo-image'
-// import { s } from '../../styles'
 import { useStore } from '../../store'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
@@ -15,134 +14,60 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   const itemWidth = (width - 24) / 2
   const { isWiFi, _followedUpsMap } = useStore()
   return (
-    <View style={[styles.itemContainer, { width: itemWidth }]}>
+    <View className="my-3 self-center" style={{ width: itemWidth }}>
       <View className="flex-1">
         <Image
-          style={[styles.image]}
+          className="flex-1 w-full rounded aspect-[8/5]"
           source={imgUrl(video.cover, ...(isWiFi ? [480, 300] : [320, 200]))}
         />
-        <View style={styles.textContainer}>
-          <Text style={{ color: 'white', fontSize: 12 }}>
+        <View className=" absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
+          <Text className="text-white text-xs">
             {parseDuration(video.duration)}
           </Text>
         </View>
-        <View
-          style={[
-            styles.textContainer,
-            {
-              bottom: 0,
-            },
-          ]}>
-          <Text style={styles.text}>{parseDate(video.date)}</Text>
+        <View className="bottom-0 absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
+          <Text className="text-white text-xs">{parseDate(video.date)}</Text>
         </View>
         {video.tag ? (
-          <View
-            style={[
-              styles.textContainer,
-              {
-                right: 0,
-                bottom: 0,
-              },
-            ]}>
-            <Text style={styles.text}>{video.tag}</Text>
+          <View className="right-0 bottom-0 absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
+            <Text className="text-white text-xs">{video.tag}</Text>
           </View>
         ) : null}
       </View>
-      <Text
-        style={{ color: theme.colors.black, marginTop: 10, minHeight: 33 }}
-        numberOfLines={2}>
+      <Text className="mt-3 min-h-8" numberOfLines={2}>
         {video.title}
       </Text>
-      <View style={[styles.videoInfo]}>
-        <View style={[styles.upName]}>
+      <View className="flex-row items-center mt-2 justify-between">
+        <View className="flex-row items-center shrink">
           <Image
-            style={styles.icon}
+            className="w-[13px] h-[11px]"
             source={require('../../../assets/up-mark.png')}
           />
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"
-            style={[
-              styles.upNameText,
-              {
-                color:
-                  video.mid in _followedUpsMap
-                    ? theme.colors.secondary
-                    : theme.colors.primary,
-                fontWeight: video.mid in _followedUpsMap ? 'bold' : 'normal',
-              },
-            ]}>
+            className={`ml-1 text-xs grow shrink ${
+              video.mid in _followedUpsMap ? 'font-bold' : ''
+            }`}
+            style={{
+              color:
+                video.mid in _followedUpsMap
+                  ? theme.colors.secondary
+                  : theme.colors.primary,
+            }}>
             {video.name}
           </Text>
         </View>
-        <View style={[styles.playNum]}>
+        <View className="flex-row items-center shrink-0">
           <Image
-            style={styles.icon}
+            className="w-[13px] h-[11px]"
             source={require('../../../assets/play-mark.png')}
           />
-          <Text
-            style={{ color: theme.colors.grey1, marginLeft: 4, fontSize: 12 }}>
+          <Text className="ml-1 text-xs" style={{ color: theme.colors.grey1 }}>
             {playNum}
           </Text>
         </View>
       </View>
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  itemContainer: {
-    // flex: 1,
-    marginVertical: 12,
-    alignSelf: 'center',
-  },
-  textContainer: {
-    position: 'absolute',
-    paddingHorizontal: 4,
-    backgroundColor: 'rgba(0,0,0,.7)',
-    alignItems: 'center',
-    borderRadius: 2,
-    margin: 5,
-  },
-  videoTag: {
-    right: 0,
-    bottom: 0,
-  },
-  text: {
-    color: 'white',
-    fontSize: 12,
-  },
-  image: {
-    flex: 1,
-    width: '100%',
-    borderRadius: 5,
-    aspectRatio: 1.6,
-  },
-  title: {
-    fontSize: 15,
-    marginTop: 8,
-    minHeight: 35,
-  },
-  videoInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 8,
-  },
-  upNameText: {
-    marginLeft: 4,
-    fontSize: 13,
-    flexGrow: 1,
-    flexShrink: 1,
-  },
-  playNumText: {
-    marginLeft: 4,
-    fontSize: 13,
-  },
-  icon: {
-    width: 13,
-    height: 11,
-  },
-  upName: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
-  playNum: { flexDirection: 'row', alignItems: 'center', flexShrink: 0 },
 })

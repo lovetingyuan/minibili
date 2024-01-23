@@ -1,6 +1,6 @@
 import { Icon, useTheme } from '@rneui/themed'
 import React from 'react'
-import { View, Linking, Share, StyleSheet } from 'react-native'
+import { View, Linking, Share } from 'react-native'
 import { useStore } from '../../store'
 import { Menu, MenuItem } from 'react-native-material-menu'
 import * as Clipboard from 'expo-clipboard'
@@ -19,7 +19,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
   const showMenu = () => setVisible(true)
 
   return (
-    <View style={styles.container}>
+    <View className="flex-row items-center gap-3">
       <Menu
         visible={visible}
         style={{ backgroundColor: theme.colors.background }}
@@ -83,8 +83,4 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
       </Menu>
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  container: { flexDirection: 'row', alignItems: 'center', gap: 10 },
 })

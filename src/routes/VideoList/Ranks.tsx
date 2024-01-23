@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   Alert,
   useWindowDimensions,
   ActivityIndicator,
@@ -61,13 +60,9 @@ export default React.memo(function Ranks({ navigation }: Props) {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        style={[
-          styles.itemContainer,
-          {
-            paddingLeft: index % 2 ? 5 : 8,
-            paddingRight: index % 2 ? 8 : 5,
-          },
-        ]}
+        className={`flex-1 flex-row justify-around ${
+          index % 2 ? 'pl-1 pr-2' : 'pl-2 pr-1'
+        }`}
         key={key}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
@@ -131,7 +126,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
   const estimatedItemSize = width / 2 - 10
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       <FlashList
         ref={v => {
           videoListRef.current = v
@@ -147,7 +142,9 @@ export default React.memo(function Ranks({ navigation }: Props) {
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
           <View>
-            <Text style={[styles.bottomEnd, { color: theme.colors.grey3 }]}>
+            <Text
+              className="text-center my-3"
+              style={{ color: theme.colors.grey3 }}>
               {isLoading ? '加载中...' : '到底了~'}
             </Text>
             {isLoading ? (
@@ -155,52 +152,13 @@ export default React.memo(function Ranks({ navigation }: Props) {
                 color="#00AEEC"
                 animating
                 size={'large'}
-                style={{ marginTop: 30 }}
+                className="mt-8"
               />
             ) : null}
           </View>
         }
-        contentContainerStyle={styles.listContainerStyle}
+        contentContainerStyle={tw('pt-4')}
       />
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  itemContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  listContainerStyle: { paddingTop: 14 },
-  bottomEnd: {
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-
-  videoCount: {
-    fontSize: 16,
-    marginRight: 20,
-  },
-  rankContainer: {
-    margin: 10,
-    flexDirection: 'row',
-    gap: 15,
-    flexWrap: 'wrap',
-  },
-  rankItem: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
-    backgroundColor: 'pink',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rankItemText: {
-    fontSize: 18,
-  },
 })

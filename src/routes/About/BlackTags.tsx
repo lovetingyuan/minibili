@@ -43,7 +43,7 @@ export default React.memo(function BlackTags() {
               iconRight
               titleStyle={tw('text-left')}
               containerStyle={tw('mb-2 self-start')}
-              buttonStyle={tw('px-0 py-[2]')}
+              buttonStyle={tw('px-0 py-[2px]')}
             />
           )
         })}

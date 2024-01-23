@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Avatar, Icon, Text } from '@rneui/themed'
 import React from 'react'
-import { View, Pressable, StyleSheet } from 'react-native'
+import { View, Pressable } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { NavigationProps } from '../../types'
 import {
@@ -16,10 +16,9 @@ import { Image } from 'expo-image'
 export default React.memo(function VideoHeader(props: { bvid: string }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { data: videoInfo } = useVideoInfo(props.bvid)
-
   const { name, face, mid, date, title } = videoInfo || {}
   return (
-    <View style={styles.videoHeader}>
+    <View className="flex-row items-center flex-wrap justify-between">
       <Pressable
         onPress={() => {
           if (!mid || !face || !name) {
@@ -33,7 +32,7 @@ export default React.memo(function VideoHeader(props: { bvid: string }) {
           }
           navigation.push('Dynamic', { user })
         }}
-        style={styles.upInfoContainer}>
+        className="flex-row items-center mr-1 flex-1">
         {face ? (
           <Avatar
             size={32}
@@ -42,84 +41,42 @@ export default React.memo(function VideoHeader(props: { bvid: string }) {
             ImageComponent={Image}
           />
         ) : null}
-        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.upName}>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          className="ml-3 mr-1 text-lg grow shrink font-bold">
           {name + ' '}
         </Text>
       </Pressable>
-      <View style={styles.VideoItem}>
-        <View style={styles.iconText}>
+      <View className="flex-row shrink-0 items-center gap-3">
+        <View className="flex-row items-center gap-1">
           <Icon name="date-range" size={15} />
-          <Text style={styles.VideoItemText}>{parseDate(date)}</Text>
+          <Text className="text-xs">{parseDate(date)}</Text>
         </View>
-        <View style={styles.iconText}>
+        <View className="flex-row items-center gap-1">
           <Icon name="play-circle-outline" size={15} />
-          <Text style={styles.VideoItemText}>
-            {parseNumber(videoInfo?.playNum)}
-          </Text>
+          <Text className="text-xs">{parseNumber(videoInfo?.playNum)}</Text>
         </View>
         <Pressable
-          style={styles.iconText}
+          className="flex-row items-center gap-1"
           onPress={() => {
             showToast('不支持点赞')
           }}>
           <Icon name="thumb-up-off-alt" size={15} />
-          <Text style={styles.VideoItemText}>
-            {parseNumber(videoInfo?.likeNum)}
-          </Text>
+          <Text className="text-xs">{parseNumber(videoInfo?.likeNum)}</Text>
         </Pressable>
 
         <Pressable
-          style={styles.shareBtn}
+          className="flex-row items-center"
           onPress={() => {
             if (name && title && props.bvid) {
               handleShareVideo(name, title, props.bvid)
             }
           }}>
           <Icon type="material-community" name="share" size={20} />
-          <Text style={[styles.VideoItemText]}>
-            {parseNumber(videoInfo?.shareNum)}
-          </Text>
+          <Text className="text-xs">{parseNumber(videoInfo?.shareNum)}</Text>
         </Pressable>
       </View>
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  videoHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-  },
-  upInfoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 5,
-    flex: 1,
-  },
-  upName: {
-    marginLeft: 10,
-    marginRight: 5,
-    fontSize: 17,
-    fontWeight: 'bold',
-    flexGrow: 1,
-    flexShrink: 1,
-  },
-  VideoItem: {
-    flexDirection: 'row',
-    flexShrink: 0,
-    color: '#666',
-    alignItems: 'center',
-    gap: 10,
-  },
-  iconText: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  VideoItemText: {
-    fontSize: 13,
-  },
-  shareBtn: { flexDirection: 'row', alignItems: 'center' },
 })

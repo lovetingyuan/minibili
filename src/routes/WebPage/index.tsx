@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  StyleSheet,
   View,
   Image,
   ScrollView,
@@ -19,11 +18,11 @@ import { showToast } from '../../utils'
 
 const Loading = () => {
   return (
-    <View style={styles.loadingView}>
+    <View className="absolute w-full h-full justify-center items-center">
       <Image
         source={require('../../../assets/video-loading.png')}
         resizeMode="center"
-        style={styles.loadingImage}
+        className="w-full"
       />
     </View>
   )
@@ -66,9 +65,10 @@ export default React.memo(function WebPage({ route, navigation }: Props) {
           enabled={isEnabled}
         />
       }
-      style={styles.container}>
+      className="flex-1 h-full">
       <WebView
-        style={[styles.container, { height }]}
+        className="flex-1"
+        style={{ height }}
         source={{ uri: url }}
         key={webViewMode}
         onScroll={e => setEnabled(e.nativeEvent.contentOffset.y === 0)}
@@ -131,21 +131,4 @@ export default React.memo(function WebPage({ route, navigation }: Props) {
       />
     </ScrollView>
   )
-})
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: '100%',
-  },
-  loadingView: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingImage: {
-    width: '100%',
-  },
 })

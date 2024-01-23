@@ -14,8 +14,8 @@ module.exports = {
     const { filename, src } = arg
     if (filename.endsWith('.tw.css')) {
       const cssObject = {}
-      const { css } = postcss([
-        cssvariables(/*options*/),
+      postcss([
+        cssvariables(),
         totailwind({
           cssObject,
           ignoreClasses: ['transform', 'filter'],

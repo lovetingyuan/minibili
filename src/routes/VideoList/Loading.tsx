@@ -1,14 +1,14 @@
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import { Skeleton } from '@rneui/themed'
 
 const getWidth = () => Math.floor(Math.random() * (100 - 10 + 1)) + 10
 
 const VideoLoading = () => {
   return (
-    <View style={styles.item}>
+    <View className="flex-1 gap-3">
       <Skeleton animation="pulse" width={'100%' as any} height={90} />
-      <View style={styles.text}>
+      <View className="gap-2">
         <Skeleton
           animation="pulse"
           width={(getWidth() + '%') as any}
@@ -21,10 +21,10 @@ const VideoLoading = () => {
             height={15}
           />
         ) : (
-          <View style={styles.empty} />
+          <View className="h-3" />
         )}
       </View>
-      <View style={styles.user}>
+      <View className="flex-row justify-between">
         <Skeleton animation="pulse" width={60} height={12} />
         <Skeleton animation="pulse" width={50} height={12} />
       </View>
@@ -39,7 +39,7 @@ export default React.memo(() => {
         .fill(null)
         .map((_, i) => {
           return (
-            <View style={styles.itemContainer} key={i}>
+            <View className="p-3 gap-4 my-3 flex-row" key={i}>
               <VideoLoading />
               <VideoLoading />
             </View>
@@ -47,21 +47,4 @@ export default React.memo(() => {
         })}
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  itemContainer: {
-    padding: 10,
-    gap: 15,
-    marginBottom: 10,
-    marginTop: 10,
-    flexDirection: 'row',
-  },
-  item: { flex: 1, gap: 10 },
-  user: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  text: { gap: 8 },
-  empty: { height: 10 },
 })

@@ -1,13 +1,7 @@
 import React from 'react'
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native'
+import { View, TouchableOpacity, useWindowDimensions } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-// import store from '../../store'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import RichTexts from '../../components/RichTexts'
 import { Image } from 'expo-image'
@@ -38,12 +32,12 @@ export default function WordDrawItem(props: {
   const { setImagesList, setCurrentImageIndex } = useStore()
 
   const scrollImages = (
-    <View style={styles.imagesContainer}>
+    <View className="flex-1 flex-row overflow-hidden">
       {images.map((img, i) => {
         const ImageCmp = (
           <Image
             key={img.src + i}
-            style={[styles.image]}
+            className="w-24 h-24 mr-1 rounded"
             source={{
               uri: imgUrl(img.src, 240),
             }}
@@ -59,8 +53,6 @@ export default function WordDrawItem(props: {
             onPress={() => {
               setImagesList(images.slice())
               setCurrentImageIndex(i)
-              // store.imagesList = images.slice()
-              // store.currentImageIndex = i
             }}>
             {ImageCmp}
           </TouchableOpacity>
@@ -75,12 +67,13 @@ export default function WordDrawItem(props: {
         ? width / 2 - 15
         : width / 2
   const imageList = (
-    <View style={[styles.imageListContainer]}>
+    <View className="flex-wrap flex-row gap-1 mb-5">
       {images.map((img, i) => {
         const ImageCmp = (
           <Image
             key={img.src + i}
-            style={[{ aspectRatio: 1, width: imageListWidth, borderRadius: 4 }]}
+            className="aspect-square rounded"
+            style={{ width: imageListWidth }}
             source={{
               uri: imgUrl(img.src, 240),
             }}
@@ -96,8 +89,6 @@ export default function WordDrawItem(props: {
             onPress={() => {
               setImagesList(images.slice())
               setCurrentImageIndex(i)
-              // store.imagesList = images.slice()
-              // store.currentImageIndex = i
             }}>
             {ImageCmp}
           </TouchableOpacity>
@@ -118,12 +109,12 @@ export default function WordDrawItem(props: {
     </>
   )
   if (isDetail) {
-    return <View style={[styles.textContainer]}>{content}</View>
+    return <View className="flex-1">{content}</View>
   }
   return (
     <TouchableOpacity
       activeOpacity={0.8}
-      style={[styles.textContainer]}
+      className="flex-1"
       onPress={() => {
         navigation?.navigate('DynamicDetail', {
           detail: props.item,
@@ -133,54 +124,3 @@ export default function WordDrawItem(props: {
     </TouchableOpacity>
   )
 }
-
-const styles = StyleSheet.create({
-  textItem: {
-    fontSize: 16,
-    lineHeight: 26,
-  },
-  image: {
-    height: 100,
-    width: 100,
-    marginRight: 5,
-    // marginVertical: 10,
-    borderRadius: 4,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  imagesContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    overflow: 'hidden',
-  },
-  info: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  date: { color: '#555', fontSize: 12 },
-  postText: {
-    marginTop: 5,
-    // fontStyle: 'italic',
-    borderLeftWidth: 0.5,
-    paddingLeft: 8,
-    borderLeftColor: '#aaa',
-    lineHeight: 20,
-  },
-  imageListContainer: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    gap: 4,
-    // justifyContent: 'center',
-    // marginVertical: 20,
-    marginBottom: 20,
-  },
-  additionalContainer: {
-    borderLeftWidth: 1,
-    borderLeftColor: '#bbb',
-    paddingLeft: 8,
-    marginTop: 8,
-    paddingVertical: 2,
-  },
-})

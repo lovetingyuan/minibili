@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, ScrollView, Pressable } from 'react-native'
+import { View, ScrollView, Pressable } from 'react-native'
 import { Text, useTheme } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
 
@@ -31,25 +31,23 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
   const { theme } = useTheme()
 
   const { data: fans } = useUserRelation(videoInfo?.mid)
-
+  const headerTitle = React.useCallback(() => {
+    return (
+      <View className="flex-row items-center">
+        <Text className="text-lg font-semibold">{videoInfo?.name}</Text>
+        <Text className="ml-3" style={{ color: theme.colors.grey2 }}>
+          {` ${fans ? parseNumber(fans.follower) : ''}粉丝`}
+        </Text>
+      </View>
+    )
+  }, [videoInfo?.name, fans, theme.colors.grey2])
   React.useEffect(() => {
     if (videoInfo?.name) {
       navigation.setOptions({
-        headerTitle: () => {
-          return (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ fontSize: 18, fontWeight: '600' }}>
-                {videoInfo?.name}
-              </Text>
-              <Text style={{ marginLeft: 10, color: theme.colors.grey2 }}>
-                {` ${fans ? parseNumber(fans.follower) : ''}粉丝`}
-              </Text>
-            </View>
-          )
-        },
+        headerTitle,
       })
     }
-  }, [navigation, videoInfo?.name, fans, theme.colors.grey2])
+  }, [navigation, videoInfo?.name, headerTitle])
   useFocusEffect(
     useMemoizedFn(() => {
       setViewingVideoId(bvid)
@@ -62,7 +60,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
   return (
     <View className="flex-1">
       <Player page={currentPage} bvid={bvid} />
-      <ScrollView style={styles.videoInfoContainer}>
+      <ScrollView className="py-4 px-3">
         <VideoInfo changePage={setCurrentPage} bvid={bvid} page={currentPage} />
         <View className="mt-4">
           <CommentList
@@ -70,7 +68,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
             commentId={videoInfo?.aid || ''}
             commentType={1}
             dividerRight={
-              <View style={styles.right}>
+              <View className="flex-row items-center">
                 <Pressable
                   onPress={() => {
                     Clipboard.setStringAsync(bvid).then(() => {
@@ -79,7 +77,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
                   }}>
                   <Text
                     style={{ color: theme.colors.grey1 }}
-                    className="text-sm">
+                    className="text-xs">
                     {bvid}
                   </Text>
                 </Pressable>
@@ -88,7 +86,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
                   style={{ color: theme.colors.grey1 }}>
                   {' · '}
                 </Text>
-                <Text className="text-sm" style={{ color: theme.colors.grey1 }}>
+                <Text className="text-xs" style={{ color: theme.colors.grey1 }}>
                   {videoInfo?.tag}
                 </Text>
               </View>
@@ -98,9 +96,4 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
       </ScrollView>
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  videoInfoContainer: { paddingVertical: 18, paddingHorizontal: 12 },
-  right: { flexDirection: 'row', alignItems: 'center' },
 })

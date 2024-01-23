@@ -55,7 +55,7 @@ export default React.memo(function Feedback() {
             placeholder="填写意见"
             multiline
             autoFocus
-            style={{ marginTop: 20, height: 80 }}
+            className="mt-5 h-20"
             maxLength={500}
             textAlignVertical="top"
             placeholderTextColor={theme.colors.grey3}

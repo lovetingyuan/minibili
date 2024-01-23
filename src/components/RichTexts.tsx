@@ -210,7 +210,7 @@ export default React.memo(
       typeof props.textProps?.numberOfLines === 'number' &&
       lines - 1 > props.textProps.numberOfLines
     return (
-      <View style={[{ marginBottom: textOverflow ? 14 : 10 }, props.style]}>
+      <View className={textOverflow ? 'mb-4' : 'mb-3'} style={props.style}>
         {Topic}
         <Text
           className="flex-row flex-wrap items-center flex-1"

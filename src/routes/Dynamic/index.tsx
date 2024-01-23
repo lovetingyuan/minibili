@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image, StyleSheet, View, useWindowDimensions } from 'react-native'
+import { Image, View, useWindowDimensions } from 'react-native'
 import { RootStackParamList } from '../../types'
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, headerRight } from './Header'
@@ -22,11 +22,9 @@ const Loading = React.memo(() => {
         .fill(null)
         .map((_, i) => {
           return (
-            <View
-              style={{ padding: 10, gap: 15, marginBottom: 10, marginTop: 10 }}
-              key={i}>
+            <View className="p-3 gap-4 my-3" key={i}>
               {i % 2 === 0 ? (
-                <View style={{ gap: 8 }}>
+                <View className="gap-2">
                   <Skeleton
                     animation="pulse"
                     width={'80%' as any}
@@ -40,10 +38,9 @@ const Loading = React.memo(() => {
                   <Skeleton animation="pulse" height={15} />
                 </View>
               ) : null}
-              <View style={{ flexDirection: 'row', gap: 10 }}>
+              <View className="flex-row gap-3">
                 <Skeleton animation="pulse" width={'55%' as any} height={110} />
-                <View
-                  style={{ gap: 10, justifyContent: 'space-between', flex: 1 }}>
+                <View className="gap-3 justify-between flex-1">
                   <Skeleton
                     animation="pulse"
                     width={'70%' as any}
@@ -122,7 +119,9 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
       return null
     }
     return (
-      <Text style={[styles.bottomEnd, { color: theme.colors.grey3 }]}>
+      <Text
+        className="text-sm mt-3 mb-5 text-center"
+        style={{ color: theme.colors.grey3 }}>
         {isReachingEnd ? '到底了~' : isValidating ? '加载中...' : ''}
       </Text>
     )
@@ -132,25 +131,24 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
       return <Loading />
     }
     if (error) {
-      return <Text style={styles.errorText}>加载动态失败</Text>
+      return <Text className="m-12 text-base text-center">加载动态失败</Text>
     }
     return (
-      <View style={styles.emptyContainer}>
+      <View className="items-center py-24">
         <Image
           source={require('../../../assets/empty.png')}
+          className="aspect-square"
           style={{
             width: width * 0.4,
-            height: undefined,
-            aspectRatio: 1,
           }}
         />
-        <Text style={styles.emptyText}>暂无动态</Text>
+        <Text className="m-10 text-lg text-center">暂无动态</Text>
       </View>
     )
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       <FlashList
         data={list}
         renderItem={renderItem}
@@ -161,18 +159,18 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
         ListHeaderComponent={
           dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
             <View
-              style={[
-                styles.signTextContainer,
-                { borderBottomColor: theme.colors.divider },
-              ]}>
+              className="px-3 border-b-[0.5px] py-3 flex-1 flex-row"
+              style={{ borderBottomColor: theme.colors.divider }}>
               <Icon
                 name="billboard"
                 type="material-community"
                 size={18}
-                style={styles.signMark}
+                className="relative top-[1px]"
                 color={theme.colors.grey1}
               />
-              <Text style={[styles.signText, { color: theme.colors.grey0 }]}>
+              <Text
+                className="text-sm ml-3 shrink opacity-80"
+                style={{ color: theme.colors.grey0 }}>
                 {dynamicUser?.sign.trim()}
               </Text>
             </View>
@@ -188,42 +186,4 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
       />
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  bottomEnd: {
-    fontSize: 14,
-    marginTop: 10,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  listStyle: { paddingTop: 15 },
-  signTextContainer: {
-    paddingHorizontal: 12,
-    borderBottomWidth: 0.5,
-    paddingVertical: 10,
-    flex: 1,
-    flexDirection: 'row',
-  },
-  signText: {
-    fontSize: 14,
-    lineHeight: 22,
-    marginLeft: 10,
-    flexShrink: 1,
-    opacity: 0.8,
-  },
-
-  signMark: {
-    position: 'relative',
-    top: 1,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: 100,
-  },
-  emptyText: { margin: 40, textAlign: 'center', fontSize: 18 },
-  errorText: { margin: 50, textAlign: 'center', fontSize: 16 },
 })

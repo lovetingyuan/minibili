@@ -2,7 +2,6 @@ import React from 'react'
 import {
   View,
   FlatList,
-  StyleSheet,
   useWindowDimensions,
   Image,
   ImageBackground,
@@ -48,12 +47,9 @@ const TvImg: React.FC = () => {
   return (
     <Image
       source={tvImg ? tvL : tvR}
+      className="aspect-square mt-12 self-center"
       style={{
         width: width * 0.5,
-        height: undefined,
-        aspectRatio: 1,
-        alignSelf: 'center',
-        marginTop: 50,
       }}
     />
   )
@@ -113,21 +109,21 @@ export default React.memo(function Follow() {
             key={columns} // FlatList不支持直接更改columns
             numColumns={columns}
             ref={followListRef}
-            columnWrapperStyle={{
-              paddingHorizontal: 10,
-            }}
-            contentContainerStyle={{
-              paddingTop: 30,
-            }}
+            columnWrapperStyle={tw('px-3')}
+            contentContainerStyle={tw('pt-8')}
             ListEmptyComponent={
               <View>
                 <TvImg />
-                <Text style={styles.emptyText}>暂无关注，请添加</Text>
+                <Text className="text-center my-10 text-lg">
+                  暂无关注，请添加
+                </Text>
               </View>
             }
             ListFooterComponent={
               $followedUps.length ? (
-                <Text style={styles.bottomText}>到底了~</Text>
+                <Text className="text-center pb-3 text-xs text-gray-500">
+                  到底了~
+                </Text>
               ) : null
             }
           />
@@ -138,45 +134,17 @@ export default React.memo(function Follow() {
   }, [$followedUps, $upUpdateMap, livingUps, columns])
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 flex-col">
       {dark ? (
         content
       ) : (
         <ImageBackground
           source={require('../../../assets/bg.webp')}
           resizeMode="cover"
-          style={styles.bgImage}>
+          className="flex-1 justify-center">
           {content}
         </ImageBackground>
       )}
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-  logo: {
-    width: 160,
-    height: 160,
-  },
-  bgImage: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  bottomText: {
-    textAlign: 'center',
-    paddingBottom: 10,
-    color: '#555',
-    fontSize: 12,
-  },
-
-  emptyText: {
-    textAlign: 'center',
-    marginVertical: 40,
-    fontSize: 18,
-    lineHeight: 30,
-  },
 })

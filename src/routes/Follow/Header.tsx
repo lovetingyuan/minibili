@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native'
+import { View } from 'react-native'
 import { useStore } from '../../store'
 import { Button, Text } from '@rneui/themed'
 import React from 'react'
@@ -10,8 +10,8 @@ const HeaderTitle = () => {
   const { $followedUps, _updatedCount } = useStore()
   const count = $followedUps.length
   return (
-    <View style={styles.titleContainer}>
-      <Text style={styles.titleText}>
+    <View className="flex-row items-center">
+      <Text className="text-lg font-semibold mr-3">
         关注的UP
         {count
           ? _updatedCount
@@ -44,11 +44,3 @@ const HeaderRight = () => {
 }
 
 export const followHeaderRight = () => <HeaderRight />
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  titleText: { fontSize: 18, fontWeight: '600', marginRight: 10 },
-})

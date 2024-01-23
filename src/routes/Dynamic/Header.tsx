@@ -1,6 +1,6 @@
 import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import { View, StyleSheet, Pressable, Linking } from 'react-native'
+import { View, Pressable, Linking } from 'react-native'
 import { useStore } from '../../store'
 import { handleShareUp, imgUrl, parseNumber, showToast } from '../../utils'
 import { useUserRelation } from '../../api/user-relation'
@@ -10,7 +10,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useUserInfo } from '../../api/user-info'
 import { useLivingInfo } from '../../api/living-info'
 import * as Clipboard from 'expo-clipboard'
-// import { s } from '../../styles'
 import { Image } from 'expo-image'
 import { Menu, MenuItem } from 'react-native-material-menu'
 
@@ -41,7 +40,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   return (
-    <View style={[styles.left]}>
+    <View className="flex-row items-center mr-27 left-[-10px] relative">
       {dynamicUser?.face ? (
         <Avatar
           size={33}
@@ -54,14 +53,14 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
         />
       ) : null}
       <Pressable
-        style={styles.titleContainer}
+        className="shrink ml-3"
         onPress={() => {
           props.scrollTop()
         }}>
-        <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.titleText]}>
+        <Text className="text-lg" adjustsFontSizeToFit numberOfLines={1}>
           {userName + '   '}
           {fans ? (
-            <Text style={[styles.fansText, { color: theme.colors.grey2 }]}>
+            <Text className="text-sm" style={{ color: theme.colors.grey2 }}>
               {parseNumber(fans.follower)}粉丝
             </Text>
           ) : null}
@@ -72,7 +71,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
         <Button
           size="sm"
           type="clear"
-          buttonStyle={{ marginLeft: 10 }}
+          buttonStyle={tw('ml-[10px]')}
           onPress={() => {
             if (dynamicUser.mid) {
               navigation.navigate('WebPage', {
@@ -102,7 +101,7 @@ function HeaderRight() {
   const followed = $followedUps.find(v => v.mid == dynamicUser?.mid)
 
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+    <View className="flex-row items-center gap-2">
       <Menu
         visible={visible}
         style={{ backgroundColor: theme.colors.background }}
@@ -203,22 +202,3 @@ function HeaderRight() {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  left: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 110,
-    position: 'relative',
-    left: -10,
-  },
-  titleContainer: { flexShrink: 1, marginLeft: 12 },
-  titleText: {
-    fontSize: 18,
-  },
-  fansText: { fontSize: 14 },
-  right: {
-    marginLeft: 10,
-    padding: 5,
-  },
-})

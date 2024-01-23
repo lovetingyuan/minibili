@@ -103,14 +103,14 @@ export function CommonContent(props: {
               props.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
                 ? 'font-bold'
                 : '',
-              'font-[15]',
+              'text-base',
             ].join(' ')}
             numberOfLines={2}>
             {title}
           </Text>
         ) : null}
         {text ? (
-          <Text className={forward ? 'text-sm' : 'text-[15]'} numberOfLines={2}>
+          <Text className={forward ? 'text-sm' : 'text-base'} numberOfLines={2}>
             {text}
           </Text>
         ) : null}

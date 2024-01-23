@@ -3,7 +3,6 @@ import React from 'react'
 import {
   useWindowDimensions,
   View,
-  StyleSheet,
   ImageBackground,
   Pressable,
   Text,
@@ -16,7 +15,6 @@ import { useVideoInfo } from '../../api/video-info'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import { imgUrl, parseDuration, showToast } from '../../utils'
 import { Icon } from '@rneui/themed'
-// import { s } from '../../styles'
 import { useStore } from '../../store'
 import { useAppState } from '../../hooks/useAppState'
 import useMounted from '../../hooks/useMounted'
@@ -106,17 +104,17 @@ export default React.memo(function Player(props: {
     }
   }
   const renderLoading = () => (
-    <View style={styles.loadingView}>
+    <View className="absolute items-center w-full h-full">
       {videoInfo?.cover ? (
         <Image
           source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
-          style={styles.loadingImage}
+          className="flex-1 w-full"
         />
       ) : null}
       <ActivityIndicator
         size={'large'}
         color={'#ff746f'}
-        style={styles.videoLoading}
+        className="absolute top-[45%] scale-150"
       />
     </View>
   )
@@ -170,10 +168,9 @@ export default React.memo(function Player(props: {
   return (
     <View
       renderToHardwareTextureAndroid
+      className="w-full shrink-0"
       style={{
-        width: '100%',
         height: videoViewHeight + extraHeight,
-        flexShrink: 0,
       }}>
       {loadPlayer ? (
         webview
@@ -187,14 +184,14 @@ export default React.memo(function Player(props: {
             <ImageBackground
               source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
               resizeMode="cover"
-              style={styles.videoCover}>
+              className="flex-1 justify-center items-center">
               <Icon
                 name="television-play"
                 type="material-community"
                 size={60}
                 color={'white'}
               />
-              <Text style={styles.duration}>
+              <Text className="absolute bottom-0 m-3 rounded bg-gray-900/60 py-[2px] px-2 left-0 text-white font-bold">
                 {parseDuration(videoInfo?.duration)}
               </Text>
             </ImageBackground>
@@ -203,40 +200,4 @@ export default React.memo(function Player(props: {
       )}
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  loadingView: {
-    position: 'absolute',
-    height: '100%',
-    width: '100%',
-    alignItems: 'center',
-  },
-  loadingImage: {
-    flex: 1,
-    width: '100%',
-    height: undefined,
-  },
-  videoCover: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  duration: {
-    position: 'absolute',
-    bottom: 0,
-    margin: 10,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingVertical: 2,
-    paddingHorizontal: 8,
-    color: 'white',
-    fontWeight: 'bold',
-    left: 0,
-    borderRadius: 4,
-  },
-  videoLoading: {
-    position: 'absolute',
-    top: '45%',
-    transform: [{ scale: 1.5 }],
-  },
 })

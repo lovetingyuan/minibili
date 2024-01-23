@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  View,
-  Linking,
-} from 'react-native'
+import { TouchableOpacity, Alert, View, Linking } from 'react-native'
 import { Avatar, Badge, Text, useTheme } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps, UpInfo } from '../../types'
@@ -153,9 +147,8 @@ export default React.memo(function FollowItem(props: {
       activeOpacity={0.6}
       onLongPress={() => {
         setOverlayButtons(buttons)
-        // store.overlayButtons = buttons
       }}
-      style={styles.container}
+      className="items-center mb-4 flex-1 justify-between relative"
       onPress={gotoDynamic}>
       <View>
         <Avatar
@@ -169,38 +162,30 @@ export default React.memo(function FollowItem(props: {
         {hasUpdate ? (
           <Badge
             key={mid}
-            badgeStyle={[
-              styles.updateMark,
+            badgeStyle={tw(
+              'h-4 w-4 rounded-[16px] absolute top-[-38px] left-[38px]',
               { backgroundColor: theme.colors.secondary },
-            ]}
+            )}
           />
         ) : null}
       </View>
       {livingUps[mid] ? (
         <Text
-          style={[
-            styles.name,
-            styles.liveText,
-            { color: theme.colors.primary },
-          ]}
+          className="font-bold text-sm p-3 flex-1 text-center"
+          style={{ color: theme.colors.primary }}
           onPress={gotoLivePage}>
           直播中~
         </Text>
       ) : (
         <Text
-          style={[
-            styles.name,
+          className={`text-sm p-3 flex-1 text-center ${pin ? 'font-bold' : ''}`}
+          style={
             hasUpdate
               ? {
                   color: theme.colors.secondary,
                 }
-              : null,
-            pin
-              ? {
-                  fontWeight: 'bold',
-                }
-              : null,
-          ]}
+              : null
+          }
           numberOfLines={2}
           ellipsizeMode="tail">
           {name}
@@ -208,31 +193,4 @@ export default React.memo(function FollowItem(props: {
       )}
     </TouchableOpacity>
   )
-})
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    marginBottom: 15,
-    flex: 1,
-    justifyContent: 'space-between',
-    position: 'relative',
-  },
-  name: {
-    fontSize: 14,
-    padding: 10,
-    textAlign: 'center',
-    flex: 1,
-  },
-  updateMark: {
-    height: 14,
-    width: 14,
-    borderRadius: 14,
-    position: 'absolute',
-    top: -38,
-    left: 38,
-  },
-  liveText: {
-    fontWeight: 'bold',
-  },
 })

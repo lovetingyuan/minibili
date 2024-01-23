@@ -10,13 +10,7 @@ import {
 } from '@rneui/themed'
 import React from 'react'
 import { SearchedUpType, useSearchUps } from '../../api/search-up'
-import {
-  FlatList,
-  Linking,
-  StyleSheet,
-  View,
-  useWindowDimensions,
-} from 'react-native'
+import { FlatList, Linking, View, useWindowDimensions } from 'react-native'
 import { Image } from 'expo-image'
 import { imgUrl, parseNumber, showToast } from '../../utils'
 import { useStore } from '../../store'
@@ -39,7 +33,7 @@ function SearchedItem(props: { up: SearchedUpType }) {
     Linking.openURL(`https://m.bilibili.com/space/${up.mid}`)
   }
   return (
-    <View key={up.mid} style={styles.upItem}>
+    <View key={up.mid} className="mb-3 flex-row flex-1 items-center">
       <Avatar
         size={40}
         rounded
@@ -47,10 +41,13 @@ function SearchedItem(props: { up: SearchedUpType }) {
         ImageComponent={Image}
         onPress={goToDynamic}
       />
-      <Text style={styles.upName} onPress={goToDynamic} numberOfLines={2}>
+      <Text
+        className="ml-3 text-base grow shrink"
+        onPress={goToDynamic}
+        numberOfLines={2}>
         {up.name}
       </Text>
-      <Text style={[styles.fansText, { color: theme.colors.grey2 }]}>
+      <Text className="text-xs ml-2" style={{ color: theme.colors.grey2 }}>
         {parseNumber(up.fans)}粉丝
       </Text>
 
@@ -98,7 +95,7 @@ export default React.memo(function AddFollow() {
         color={theme.colors.secondary}
         placement="right"
         icon={{ name: 'add', color: 'white' }}
-        style={styles.addBtn}
+        className="bottom-[10px] opacity-80"
         size="small"
         onPress={() => {
           if ($followedUps.length > 200) {
@@ -111,9 +108,9 @@ export default React.memo(function AddFollow() {
       <Dialog
         isVisible={addUpVisible}
         onBackdropPress={handleAddUpVisible}
-        overlayStyle={styles.dialog}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>新增关注</Text>
+        overlayStyle={tw('max-h-[60%] w-[85%]')}>
+        <View className="flex-row justify-between items-center">
+          <Text className="font-bold text-lg opacity-85">新增关注</Text>
           <Icon name="close" size={24} onPress={() => handleAddUpVisible()} />
         </View>
         <SearchBar
@@ -127,7 +124,7 @@ export default React.memo(function AddFollow() {
           showLoading={isValidating}
           value={searchValue}
           inputStyle={{ color: theme.colors.black }}
-          containerStyle={styles.searchBar}
+          containerStyle={tw('bg-transparent')}
         />
         {searchValue ? (
           <FlatList
@@ -139,22 +136,20 @@ export default React.memo(function AddFollow() {
                 <View>
                   <Image
                     source={require('../../../assets/ss.png')}
+                    className="aspect-square self-center mt-8"
                     style={{
                       width: width * 0.3,
-                      height: undefined,
-                      aspectRatio: 1,
-                      alignSelf: 'center',
-                      marginTop: 30,
                     }}
                   />
-                  <Text style={styles.emptyText}>暂无结果</Text>
+                  <Text className="text-center my-8">暂无结果</Text>
                 </View>
               ) : null
             }
             ListFooterComponent={
               searchedUps?.length ? (
                 <Text
-                  style={[styles.bottomText, { color: theme.colors.grey3 }]}>
+                  className="text-center pb-3 text-xs"
+                  style={{ color: theme.colors.grey3 }}>
                   暂不支持更多结果~
                 </Text>
               ) : null
@@ -164,43 +159,4 @@ export default React.memo(function AddFollow() {
       </Dialog>
     </>
   )
-})
-
-const styles = StyleSheet.create({
-  addBtn: {
-    bottom: 10,
-    opacity: 0.8,
-  },
-  dialog: { maxHeight: '60%', width: '85%' },
-  upItem: {
-    alignItems: 'center',
-    flex: 1,
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  bottomText: {
-    textAlign: 'center',
-    paddingBottom: 10,
-
-    fontSize: 12,
-  },
-  upName: { marginLeft: 10, fontSize: 15, flexGrow: 1, flexShrink: 1 },
-  emptyText: {
-    textAlign: 'center',
-    marginVertical: 30,
-  },
-  fansText: {
-    fontSize: 12,
-    lineHeight: 20,
-    marginLeft: 8,
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: { fontSize: 18, fontWeight: 'bold', opacity: 0.85 },
-  searchBar: {
-    backgroundColor: 'transparent',
-  },
 })

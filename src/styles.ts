@@ -37,7 +37,9 @@ function _s(classes: string | TemplateStringsArray): any {
 }
 
 // @ts-ignore
-window.tw = function tw(classes: string, style: any) {
+window.tw = tw
+
+function tw(classes: string, style: any) {
   if (!classes) {
     return null
   }
@@ -51,3 +53,5 @@ window.tw = function tw(classes: string, style: any) {
   }
   return [...twStyles, style]
 }
+
+// export { tw }

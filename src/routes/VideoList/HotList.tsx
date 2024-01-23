@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   Alert,
   useWindowDimensions,
   Linking,
@@ -137,7 +136,7 @@ export default React.memo(function Hot({ navigation }: Props) {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        style={[styles.itemContainer]}
+        className="flex-1 flex-row justify-around"
         key={key}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
@@ -161,7 +160,7 @@ export default React.memo(function Hot({ navigation }: Props) {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       <FlashList
         ref={v => {
           hotListRef.current = v
@@ -174,7 +173,9 @@ export default React.memo(function Hot({ navigation }: Props) {
         estimatedItemSize={itemWidth}
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
-          <Text style={styles.bottomEnd}>
+          <Text
+            style={{ color: theme.colors.grey2 }}
+            className="text-center my-3">
             {loading
               ? `加载中(${hotVideoList.length})...`
               : isReachingEnd
@@ -188,7 +189,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         onEndReachedThreshold={0.5}
         refreshing={isRefreshing}
         onRefresh={() => mutate()}
-        contentContainerStyle={styles.listContainerStyle}
+        contentContainerStyle={tw('pt-4 px-1')}
         estimatedFirstItemOffset={100}
       />
       <FAB
@@ -196,10 +197,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         color={theme.colors.secondary}
         placement="right"
         icon={{ name: 'refresh', color: 'white' }}
-        style={{
-          bottom: 10,
-          opacity: 0.9,
-        }}
+        className="bottom-3 opacity-90"
         size="small"
         onPress={() => {
           hotListRef.current?.scrollToOffset(0)
@@ -210,50 +208,4 @@ export default React.memo(function Hot({ navigation }: Props) {
       />
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  itemContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    // paddingHorizontal: 8,
-  },
-  listContainerStyle: { paddingTop: 14, paddingHorizontal: 4 },
-  bottomEnd: {
-    textAlign: 'center',
-    color: '#999',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginVertical: 100,
-    fontSize: 18,
-    color: '#fb7299',
-  },
-  videoCount: {
-    fontSize: 16,
-    marginRight: 20,
-  },
-  rankContainer: {
-    margin: 10,
-    flexDirection: 'row',
-    gap: 15,
-    flexWrap: 'wrap',
-  },
-  rankItem: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
-    backgroundColor: 'pink',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rankItemText: {
-    fontSize: 18,
-  },
 })

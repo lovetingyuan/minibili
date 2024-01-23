@@ -1,12 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
 import React from 'react'
-import {
-  Image,
-  Linking,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Image, Linking, TouchableOpacity, View } from 'react-native'
 import { NavigationProps } from '../../types'
 import { DynamicItemType } from '../../api/dynamic-items'
 import { Icon, Text, useTheme } from '@rneui/themed'
@@ -68,39 +62,39 @@ export default function VideoItem(props: {
       }}>
       <RichTexts idStr={props.item.id} nodes={nodes} topic={props.item.topic} />
 
-      <View style={styles.videoContainer}>
-        <View style={styles.imageContainer}>
+      <View className="flex-1 flex-row">
+        <View className="grow-[6] mr-3 justify-center content-center">
           <Image
-            style={styles.image}
+            className="w-full rounded aspect-[8/5]"
             source={{ uri: imgUrl(cover, 480, 300) }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image
-            style={styles.tvIcon}
+            className="w-14 h-12 absolute self-center"
             source={require('../../../assets/tv.png')}
           />
-          <View style={styles.videoLength}>
-            <Text style={styles.videoLengthText}>{duration}</Text>
+          <View className="absolute px-1 py-[1px] bg-gray-900/70 bottom-0 left-0 rounded-sm m-1">
+            <Text className="text-xs font-bold text-white">{duration}</Text>
           </View>
-          <View style={styles.videoDate}>
-            <Text style={styles.videoLengthText}>{date}</Text>
+          <View className="absolute px-1 py-[1px] top-0 rounded-sm m-1 bg-gray-900/70">
+            <Text className="text-xs font-bold text-white">{date}</Text>
           </View>
-          <View style={styles.videoDanmu}>
-            <Text style={styles.videoLengthText}>{danmu}弹</Text>
+          <View className="absolute px-1 py-[1px] bottom-0 right-0 m-1 rounded-sm bg-gray-900/70">
+            <Text className="text-xs font-bold text-white">{danmu}弹</Text>
           </View>
         </View>
-        <View style={styles.videoInfo}>
-          <Text style={[styles.title]} numberOfLines={3}>
+        <View className="grow-[5] justify-around">
+          <Text className="flex-1 text-base mb-3" numberOfLines={3}>
             {title}
           </Text>
-          <View style={[styles.VideoItem]}>
+          <View className="flex-row shrink-0 min-w-20 items-center gap-x-3 flex-wrap">
             {play === undefined ? null : (
-              <View style={styles.iconText}>
+              <View className="flex-row items-center gap-1">
                 <Icon name="play-circle-outline" size={15} color={gray} />
                 <Text style={textStyle}>{play}</Text>
               </View>
             )}
-            <View style={styles.iconText}>
+            <View className="flex-row gap-1 items-center">
               <Icon name="thumb-up-off-alt" size={15} color={gray} />
               <Text style={textStyle}>{parseNumber(likeCount)}</Text>
             </View>
@@ -110,96 +104,3 @@ export default function VideoItem(props: {
     </TouchableOpacity>
   )
 }
-
-const styles = StyleSheet.create({
-  shareIcon: { width: 15, height: 15, marginLeft: 16 },
-  imageContainer: {
-    flex: 5.6,
-    marginRight: 12,
-    justifyContent: 'center',
-    alignContent: 'center',
-  },
-  tvIcon: {
-    width: 60,
-    height: 50,
-    position: 'absolute',
-    alignSelf: 'center',
-  },
-  image: {
-    width: '100%',
-    height: undefined,
-    aspectRatio: 1.6,
-    borderRadius: 5,
-  },
-  descText: {
-    fontSize: 15,
-    marginBottom: 10,
-    lineHeight: 24,
-  },
-  videoContainer: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  videoInfo: {
-    flex: 5,
-    justifyContent: 'space-around',
-  },
-  title: {
-    flex: 1,
-    fontSize: 15,
-    marginBottom: 12,
-    lineHeight: 22,
-  },
-  videoInfoItem: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  videoLength: {
-    position: 'absolute',
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    backgroundColor: 'rgba(0,0,0,.7)',
-    bottom: 0,
-    left: 0,
-    borderRadius: 2,
-    margin: 5,
-  },
-  videoDate: {
-    position: 'absolute',
-    paddingVertical: 1,
-    paddingHorizontal: 4,
-    backgroundColor: 'rgba(0,0,0,.7)',
-    top: 0,
-    borderRadius: 2,
-    margin: 5,
-  },
-  videoDanmu: {
-    position: 'absolute',
-    paddingVertical: 1,
-    paddingHorizontal: 4,
-    backgroundColor: 'rgba(0,0,0,.7)',
-    bottom: 0,
-    right: 0,
-    borderRadius: 2,
-    margin: 5,
-  },
-  videoLengthText: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  VideoItem: {
-    flexDirection: 'row',
-    flexShrink: 0,
-    minWidth: 80,
-    alignItems: 'center',
-    columnGap: 10,
-    flexWrap: 'wrap',
-  },
-  iconText: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-})

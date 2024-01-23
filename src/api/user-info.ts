@@ -107,19 +107,10 @@ export function useUserInfo(mid?: number | string) {
           face: data.face,
         }
         set$followedUps(followedUps.slice())
-        // store.$followedUps[isFollowed] = {
-        //   ...up,
-        //   name: data.name,
-        //   sign: data.sign,
-        //   face: data.face,
-        // }
       }
     }
-  }, [data])
+  }, [data, get$followedUps, set$followedUps])
   return {
     data,
-    // isValidating,
-    // isLoading,
-    // error,
   }
 }

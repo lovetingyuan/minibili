@@ -23,7 +23,7 @@ export default React.memo(function NetState() {
     return () => {
       clearTimeout(timer)
     }
-  }, [type, isConnected])
+  }, [type, isConnected, setIsWiFi])
 
   return null
 })

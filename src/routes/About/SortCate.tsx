@@ -29,7 +29,7 @@ export default React.memo(function SortCate() {
       <ListItem
         containerStyle={tw('flex-wrap p-0 flex-row px-1 bg-transparent')}>
         <View
-          className="flex-row flex-wrap border-b-[0.5] flex-1 w-full gap-x-3"
+          className="flex-row flex-wrap border-b-[0.5px] flex-1 w-full gap-x-3"
           style={{ borderBottomColor: theme.colors.divider }}>
           {sortedRankList.map(cate => {
             return (
@@ -45,7 +45,7 @@ export default React.memo(function SortCate() {
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
                 }}
                 containerStyle={tw('mb-2')}
-                buttonStyle={tw('px-0 py-[2]')}
+                buttonStyle={tw('px-0 py-[2px]')}
               />
             )
           })}
@@ -68,7 +68,7 @@ export default React.memo(function SortCate() {
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
                 }}
                 containerStyle={tw('mb-2')}
-                buttonStyle={tw('px-0 py-[2]')}
+                buttonStyle={tw('px-0 py-[2px]')}
               />
             )
           })}

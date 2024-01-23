@@ -64,15 +64,12 @@ export default React.memo(function MoreReplies() {
       isVisible={!!moreRepliesUrl}>
       {moreRepliesUrl ? (
         <View
+          className="flex-1"
           style={{
             height: height * 0.7,
-            flex: 1,
           }}>
           <WebView
-            style={{
-              flex: 1,
-              backgroundColor: isDark ? '#222' : 'white',
-            }}
+            className={`flex-1 ${isDark ? 'bg-gray-800' : 'bg-white'}`}
             source={{ uri: moreRepliesUrl }}
             originWhitelist={['http://*', 'https://*', 'bilibili://*']}
             injectedJavaScriptForMainFrameOnly

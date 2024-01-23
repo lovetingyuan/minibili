@@ -1,6 +1,6 @@
 import { Icon, Text, useTheme } from '@rneui/themed'
 import React from 'react'
-import { StyleSheet, View, Pressable } from 'react-native'
+import { View, Pressable } from 'react-native'
 import { handleShareVideo, parseNumber, showToast } from '../../utils'
 
 export default function DynamicStat(props: {
@@ -19,12 +19,12 @@ export default function DynamicStat(props: {
     fontSize: 13,
   }
   return (
-    <View style={[styles.VideoItem]}>
-      <View style={styles.iconText}>
+    <View className="flex-row shrink-0 min-w-20 items-center gap-5 mt-3">
+      <View className="flex-row items-center gap-1">
         <Icon name="date-range" size={15} color={gray} />
         <Text style={textStyle}>{props.date}</Text>
       </View>
-      <View style={styles.iconText}>
+      <View className="flex-row items-center gap-1">
         <Icon name="thumb-up-off-alt" size={15} color={gray} />
         {props.like ? (
           <Text
@@ -37,7 +37,7 @@ export default function DynamicStat(props: {
         ) : null}
       </View>
       <Pressable
-        style={styles.shareBtn}
+        className="flex-row items-center"
         onPress={() => {
           handleShareVideo(props.name, props.title, props.id)
         }}>
@@ -49,23 +49,3 @@ export default function DynamicStat(props: {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  VideoItem: {
-    flexDirection: 'row',
-    flexShrink: 0,
-    minWidth: 80,
-    alignItems: 'center',
-    gap: 20,
-    marginTop: 12,
-  },
-  iconText: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  VideoItemText: {
-    fontSize: 12,
-  },
-  shareBtn: { flexDirection: 'row', alignItems: 'center' },
-})

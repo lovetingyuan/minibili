@@ -1,6 +1,6 @@
 import React from 'react'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-import { View, Image, StyleSheet } from 'react-native'
+import { View, Image } from 'react-native'
 import ForwardItem from './ForwardItem'
 import VideoItem from './VideoItem'
 import WordDrawItem from './WordDrawItem'
@@ -41,14 +41,12 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
   return (
     <View
-      style={[
-        styles.itemContainer,
-        { borderBottomColor: theme.colors.divider },
-      ]}>
+      className="py-5 px-3 border-b-[0.5px]"
+      style={{ borderBottomColor: theme.colors.divider }}>
       {item.top ? (
         <Image
           source={require('../../../assets/top.png')}
-          style={styles.topMark}
+          className="w-8 h-5 mb-1"
         />
       ) : null}
       <Item item={item} />
@@ -66,12 +64,3 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  topMark: { width: 30, height: 18.5, marginBottom: 5 },
-  itemContainer: {
-    paddingVertical: 20,
-    paddingHorizontal: 12,
-    borderBottomWidth: 0.5,
-  },
-})
