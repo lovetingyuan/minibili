@@ -794,6 +794,10 @@ video {
   gap: 0.625rem;
 }
 
+.gap-3 {
+  gap: 0.75rem;
+}
+
 .gap-x-3 {
   column-gap: 0.75rem;
 }
@@ -947,6 +951,10 @@ video {
   padding-bottom: 0.25rem;
 }
 
+.pr-3 {
+  padding-right: 0.75rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -1005,6 +1013,10 @@ video {
   font-weight: 700;
 }
 
+.font-\[15\] {
+  font-weight: 15;
+}
+
 .italic {
   font-style: italic;
 }
@@ -1028,6 +1040,10 @@ video {
 .text-lime-600 {
   --tw-text-opacity: 1;
   color: rgb(101 163 13 / var(--tw-text-opacity));
+}
+
+.text-\[15\] {
+  color: 15;
 }
 
 .opacity-90 {

@@ -4,9 +4,7 @@ import {
   Pressable,
   Linking,
   useWindowDimensions,
-  StyleSheet,
   TouchableOpacity,
-  // Image,
 } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
@@ -18,7 +16,6 @@ import { Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
-// import { s } from '../../styles'
 import { imgUrl } from '../../utils'
 
 type ItemType =
@@ -89,7 +86,7 @@ export function CommonContent(props: {
       }
     : {}
   return (
-    <View style={styles.contentContainer}>
+    <View className="flex-row gap-3 rounded pr-3">
       {cover ? (
         <Image
           source={{ uri: imgUrl(cover, 240, 150) }}
@@ -99,23 +96,21 @@ export function CommonContent(props: {
           }}
         />
       ) : null}
-      <Foo style={styles.textContainer} {...linkProp}>
+      <Foo className="gap-2 shrink" {...linkProp}>
         {title ? (
           <Text
-            className={
+            className={[
               props.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
                 ? 'font-bold'
-                : ''
-            }
-            style={styles.title}
+                : '',
+              'font-[15]',
+            ].join(' ')}
             numberOfLines={2}>
             {title}
           </Text>
         ) : null}
         {text ? (
-          <Text
-            style={[forward ? styles.forwardContent : styles.content]}
-            numberOfLines={2}>
+          <Text className={forward ? 'text-sm' : 'text-[15]'} numberOfLines={2}>
             {text}
           </Text>
         ) : null}
@@ -123,16 +118,3 @@ export function CommonContent(props: {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  title: { fontSize: 15 },
-  textContainer: { gap: 6, flexShrink: 1 },
-  content: { fontSize: 15 },
-  forwardContent: { fontSize: 14 },
-  contentContainer: {
-    flexDirection: 'row',
-    gap: 10,
-    borderRadius: 4,
-    paddingRight: 10,
-  },
-})
