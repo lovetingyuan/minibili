@@ -23,5 +23,3 @@ if (typeof ErrorUtils === 'object') {
     showFatalError()
   })
 }
-
-console.log(tw)
