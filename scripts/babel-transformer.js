@@ -8,12 +8,14 @@ module.exports = {
   ...metro.__babelTransformer,
   transform: arg => {
     const { filename, src } = arg
+
     if (filename.endsWith('.tw.css')) {
       const cssObject = {}
       const { css } = postcss([
         cssvariables(/*options*/),
         totailwind({
           cssObject,
+          ignoreClasses: ['transform', 'filter'],
         }),
       ]).process(src)
       // console.log(33, cssObject)

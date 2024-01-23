@@ -1,7 +1,7 @@
 import {
   // ImageStyle,
-  StyleProp,
-  StyleSheet,
+  type StyleProp,
+  // StyleSheet,
   // TextStyle,
   // ViewStyle,
 } from 'react-native'
@@ -19,12 +19,21 @@ function _s(classes: string | TemplateStringsArray): any {
   if (classes in cache) {
     return cache[classes]
   }
-  const classList = classes.split(' ') as (keyof typeof tailwindStyles)[]
-  const styles = classList.map(c => tailwindStyles[c])
+  const classList = classes.split(' ')
+  const styles = classList.map(c => {
+    const ret = tailwindStyles[c]
+    if (!ret) {
+      throw new Error(`class ${c} does not exist in generated tailwindStyles`)
+    }
+    return ret
+  })
+
   // @ts-ignore
-  const r = StyleSheet.compose(...styles)
-  cache[classes] = r
-  return r
+  // const r = StyleSheet.compose(...styles)
+  // console.log(33, classList, styles, r)
+
+  cache[classes] = styles
+  return styles
 }
 
 // @ts-ignore
@@ -32,12 +41,13 @@ window.tw = function tw(classes: string, style: any) {
   if (!classes) {
     return null
   }
-  const twStyle = _s(classes)
+  const twStyles = _s(classes)
+  // console.log(classes, twStyle)
   if (!style) {
-    return twStyle
+    return twStyles
   }
   if (Array.isArray(style)) {
-    return [twStyle, ...style]
+    return [...twStyles, ...style]
   }
-  return [twStyle, style]
+  return [...twStyles, style]
 }

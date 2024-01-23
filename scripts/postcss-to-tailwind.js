@@ -10,6 +10,7 @@ const transform = require('css-to-react-native')
 module.exports = (
   opts = {
     cssObject: {},
+    ignoreClasses: [],
   },
 ) => {
   // Work with options here
@@ -29,7 +30,10 @@ module.exports = (
         decl.parent.selector.startsWith('.')
       ) {
         let { prop, value } = decl
-        console.log('DeclarationExit', decl.parent.selector, prop, value)
+        if (opts.ignoreClasses?.includes(prop)) {
+          return
+        }
+        // console.log('DeclarationExit', decl.parent.selector, prop, value)
 
         if (value.startsWith('rgb(')) {
           const val = value.slice(4, -1)
@@ -52,6 +56,7 @@ module.exports = (
           .slice(1)
           .replace('\\[', '[')
           .replace('\\]', ']')
+          .replace('\\.', '.')
         if (!opts.cssObject[classname]) {
           opts.cssObject[classname] = result
         } else {

@@ -12,7 +12,7 @@ export default React.memo(function TextAction(
 ) {
   return (
     <View style={styles.infoItem}>
-      <Text className="text-base text-lime-500" onPress={props.onTextPress}>
+      <Text className="text-base text-lime-600" onPress={props.onTextPress}>
         {props.text}
       </Text>
       <View style={styles.btns}>

@@ -47,7 +47,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join('  ')
     url = additional.ugc.jump_url
     additionalContent = (
-      <View style={styles.content}>
+      <View className="gap-2.5 flex-row pr-2.5">
         <Image
           source={{ uri: imgUrl(additional.ugc.cover, 200, 100) }}
           style={styles.image}
@@ -70,7 +70,7 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       .join('  ')
     url = additional.common.jump_url
     additionalContent = (
-      <View style={styles.content}>
+      <View className="gap-2.5 flex-row pr-2.5">
         <Image
           source={{ uri: imgUrl(additional.common.cover, 200, 100) }}
           style={styles.image}
@@ -164,25 +164,13 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       }
     : {}
   return (
-    <Foo {...linkProp} style={styles.additionalContainer}>
+    <Foo {...linkProp} className="border-l border-zinc-200 pl-2 mt-5 py-1">
       {additionalContent}
     </Foo>
   )
 }
 
 const styles = StyleSheet.create({
-  additionalContainer: {
-    borderLeftWidth: 1,
-    borderLeftColor: '#bbb',
-    paddingLeft: 8,
-    marginTop: 12,
-    paddingVertical: 2,
-  },
-  content: {
-    gap: 10,
-    flexDirection: 'row',
-    paddingRight: 10,
-  },
   text: { flexShrink: 1, gap: 4, flex: 1 },
   image: { width: 100, minHeight: 50, borderRadius: 4 },
 })

@@ -2,8 +2,8 @@
 module.exports = {
   content: {
     files: ['src/**/*.tsx'],
-    extract: {
-      tsx: content => {
+    transform: {
+      _tsx: content => {
         const regex = /className=(?:(?:"([^"]*)")|(?:{([^}]*)}))/g
 
         let match
@@ -13,8 +13,8 @@ module.exports = {
           const classNameValue = match[1] || match[2]
           classNames.push(classNameValue)
         }
-
-        return classNames
+        // classNames.length && console.log(44, classNames)
+        return classNames.join(' ')
         // const regex = /s\.[i|v|t]\('([^']+)'\)/g
         // const matches = content.match(regex) || []
         // const strings = matches
