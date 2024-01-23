@@ -7,7 +7,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2022,
   },
-  globals: { inlineRequire: 'readonly' },
+  globals: { inlineRequire: 'readonly', tw: 'readonly' },
   rules: {
     'no-undef': 'error',
     semi: 'off',

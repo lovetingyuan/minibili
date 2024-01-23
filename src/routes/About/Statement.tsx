@@ -1,6 +1,6 @@
 import { ListItem, Text, Icon, useTheme } from '@rneui/themed'
 import React from 'react'
-import { StyleSheet, Linking } from 'react-native'
+import { Linking } from 'react-native'
 import { githubLink } from '../../constants'
 
 export default React.memo(function Statement() {
@@ -8,18 +8,18 @@ export default React.memo(function Statement() {
   const { theme } = useTheme()
   return (
     <ListItem.Accordion
-      containerStyle={[styles.blackTitle]}
+      containerStyle={tw('p-0 mt-1 mb-3 bg-transparent')}
       icon={<Icon name={'chevron-down'} type="material-community" />}
       content={
         <ListItem.Content>
-          <ListItem.Title style={styles.title}>声明</ListItem.Title>
+          <ListItem.Title className="font-bold">声明</ListItem.Title>
         </ListItem.Content>
       }
       isExpanded={expandedStatement}
       onPress={() => {
         setExpandedStatement(!expandedStatement)
       }}>
-      <ListItem containerStyle={[styles.statementContent]}>
+      <ListItem containerStyle={tw('py-0 px-3 mb-5 bg-transparent')}>
         <ListItem.Subtitle right>
           <Text>
             🔈本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题欢迎使用意见反馈或者在
@@ -37,22 +37,4 @@ export default React.memo(function Statement() {
       </ListItem>
     </ListItem.Accordion>
   )
-})
-
-const styles = StyleSheet.create({
-  blackTitle: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    marginTop: 5,
-    marginBottom: 10,
-    backgroundColor: 'transparent',
-  },
-
-  title: { fontWeight: 'bold' },
-  statementContent: {
-    paddingVertical: 0,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: 'transparent',
-  },
 })

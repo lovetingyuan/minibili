@@ -1,6 +1,5 @@
 import { ListItem, Text, Icon, useTheme } from '@rneui/themed'
 import React from 'react'
-import { StyleSheet } from 'react-native'
 import { useStore } from '../../store'
 
 export default React.memo(function BlackUps() {
@@ -10,7 +9,7 @@ export default React.memo(function BlackUps() {
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
-      containerStyle={styles.blackTitle}
+      containerStyle={tw('p-0 mt-1 mb-3 bg-transparent')}
       content={
         <ListItem.Content>
           <ListItem.Title>
@@ -22,7 +21,8 @@ export default React.memo(function BlackUps() {
       onPress={() => {
         setExpandedUp(!expandedUp)
       }}>
-      <ListItem containerStyle={[styles.blackContent]}>
+      <ListItem
+        containerStyle={tw('flex-wrap p-0 flex-row px-1 mb-3 bg-transparent')}>
         {Object.values($blackUps).map(name => {
           return (
             <Text key={name} style={{ color: theme.colors.grey2 }}>
@@ -34,22 +34,4 @@ export default React.memo(function BlackUps() {
       </ListItem>
     </ListItem.Accordion>
   )
-})
-
-const styles = StyleSheet.create({
-  blackTitle: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    marginTop: 5,
-    marginBottom: 10,
-    backgroundColor: 'transparent',
-  },
-  blackContent: {
-    flexWrap: 'wrap',
-    padding: 0,
-    flexDirection: 'row',
-    paddingHorizontal: 5,
-    backgroundColor: 'transparent',
-    marginBottom: 10,
-  },
 })

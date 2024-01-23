@@ -4,6 +4,7 @@
 /// <reference types="nativewind/types" />
 
 declare var inlineRequire: (f: string) => string
+declare var tw: (c: string, s?: any) => import('react-native').StyleProp
 
 declare module '*.tw.css' {
   const css: any

@@ -1,10 +1,9 @@
 import React from 'react'
-import { Linking, StyleSheet, View, Image, TextStyle } from 'react-native'
+import { Linking, View, Image, TextStyle } from 'react-native'
 import { MessageContent, ReplyItem } from '../api/comments'
 import { Button, Text, useTheme } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-// import { s } from '../styles'
 import { imgUrl } from '../utils'
 import { useStore } from '../store'
 
@@ -15,6 +14,7 @@ interface Props {
 
 function CommentText(props: {
   nodes: MessageContent
+  className?: string
   style?: TextStyle | TextStyle[]
   idStr: string
 }) {
@@ -67,7 +67,7 @@ function CommentText(props: {
             <Image
               key={idStr + i}
               source={{ uri: imgUrl(node.url) }}
-              style={styles.emoji}
+              className="w-4 h-4"
             />
           )
         }
@@ -126,8 +126,8 @@ export default React.memo(function Comment(props: Props) {
 
   return (
     <View>
-      <Text style={[styles.commentContent]}>
-        <Text style={[styles.commentName]}>
+      <Text className="flex-row items-center mb-1">
+        <Text className="font-bold text-base align-middle">
           <Text
             style={upStyle(comment.name)}
             onPress={() => {
@@ -161,22 +161,22 @@ export default React.memo(function Comment(props: Props) {
             <Text> </Text>
             <Image
               source={require('../../assets/top.png')}
-              style={styles.topComment}
+              className="w-6 h-4 ml-1"
             />
             <Text> </Text>
           </>
         ) : null}
         <CommentText
           nodes={comment.message}
+          className="text-base"
           style={[
-            styles.commentText,
             comment.upLike ? { color: theme.colors.success } : {},
             comment.top ? { color: theme.colors.primary } : {},
           ]}
           idStr={comment.id + '_'}
         />
         {comment.like ? (
-          <Text style={[styles.likeNum, { color: theme.colors.secondary }]}>
+          <Text className="text-xs" style={{ color: theme.colors.secondary }}>
             {' '}
             {comment.like}
             <Text>{comment.upLike ? '  UP👍' : ''}</Text>
@@ -203,15 +203,15 @@ export default React.memo(function Comment(props: Props) {
       </Text>
       {comment.replies?.length ? (
         <View
-          style={[
-            styles.reply,
-            {
-              backgroundColor: theme.colors.grey5,
-            },
-          ]}>
+          className="p-2 rounded mt-1 mb-4 gap-1 opacity-90 flex-1"
+          style={{
+            backgroundColor: theme.colors.grey5,
+          }}>
           {comment.replies.map(reply => {
             return (
-              <Text key={reply.id + '#'} style={styles.replyItem}>
+              <Text
+                key={reply.id + '#'}
+                className="flex-row items-center flex-wrap text-sm leading-5">
                 <Text
                   style={upStyle(reply.name)}
                   onPress={() => {
@@ -242,7 +242,8 @@ export default React.memo(function Comment(props: Props) {
                 <CommentText nodes={reply.message} idStr={reply.id + '_'} />
                 {reply.like ? (
                   <Text
-                    style={[styles.likeNum, { color: theme.colors.secondary }]}>
+                    className="text-xs"
+                    style={{ color: theme.colors.secondary }}>
                     {' '}
                     {reply.like}
                   </Text>
@@ -260,7 +261,7 @@ export default React.memo(function Comment(props: Props) {
                   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
                 )
               }}
-              buttonStyle={styles.moreButton}>
+              buttonStyle={tw('justify-start px-0')}>
               <Text style={{ color: theme.colors.primary }}>
                 {comment.moreText + '...'}
               </Text>
@@ -270,64 +271,4 @@ export default React.memo(function Comment(props: Props) {
       ) : null}
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  comment: {
-    marginTop: 20,
-    marginBottom: 3,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  commentText: { fontSize: 16, lineHeight: 23 },
-  commentContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 3,
-  },
-  commentName: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    verticalAlign: 'middle',
-  },
-  top: {
-    color: '#00699D',
-    fontWeight: 'bold',
-  },
-  upLike: {
-    color: '#4f7d00',
-    fontWeight: 'bold',
-  },
-  reply: {
-    padding: 8,
-    borderRadius: 4,
-    marginTop: 5,
-    marginBottom: 15,
-    gap: 5,
-    opacity: 0.9,
-    flex: 1,
-  },
-  replyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    lineHeight: 20,
-    fontSize: 15,
-  },
-  likeNum: {
-    fontSize: 12,
-  },
-  topImg: {
-    width: 24,
-    height: 12,
-  },
-  emoji: {
-    width: 18,
-    height: 18,
-  },
-  moreButton: {
-    justifyContent: 'flex-start',
-    paddingHorizontal: 1,
-  },
-  topComment: { width: 24, height: 15, marginLeft: 5 },
 })

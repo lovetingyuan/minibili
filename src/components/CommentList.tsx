@@ -1,10 +1,9 @@
 import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
 import React from 'react'
-import { View, StyleSheet, Image, useWindowDimensions } from 'react-native'
+import { View, Image, useWindowDimensions } from 'react-native'
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
-// import { s } from '../styles'
 
 const Loading = React.memo(() => {
   return (
@@ -13,7 +12,7 @@ const Loading = React.memo(() => {
         .fill(0)
         .map((_, i) => {
           return (
-            <View style={styles.skeleton} key={i}>
+            <View className="flex-1 gap-1 mb-5" key={i}>
               <Skeleton animation="pulse" width={'100%' as any} height={16} />
               {i % 2 ? (
                 <Skeleton animation="pulse" width={'100%' as any} height={16} />
@@ -45,30 +44,32 @@ export default function CommentList(props: {
   const { theme } = useTheme()
   return (
     <View>
-      <View style={styles.divider}>
-        <View style={styles.commentCountContainer}>
+      <View className="my-5 border-b-[0.5px] border-gray-400 pb-1 flex-row justify-between">
+        <View className="flex-row items-center mr-1">
           <Icon
             name="comment-text-outline"
             type="material-community"
             size={15}
             color={theme.colors.grey1}
           />
-          <Text style={[styles.commentCount, { color: theme.colors.grey1 }]}>
+          <Text
+            className="text-xs mr-3 px-2"
+            style={{ color: theme.colors.grey1 }}>
             {allCount ? allCount + '条评论' : '暂无评论'}
           </Text>
         </View>
-        <View style={styles.right}>{props.dividerRight}</View>
+        <View className="ml-2 mr-1">{props.dividerRight}</View>
       </View>
       {commentError ? (
         <View>
-          <Text style={styles.commentTipText}>评论已关闭或加载失败</Text>
+          <Text className="text-center my-5">评论已关闭或加载失败</Text>
         </View>
       ) : null}
       {commentLoading ? <Loading /> : null}
       {comments?.length ? (
         comments.map((comment, i) => {
           return (
-            <View key={comment.id + '@' + i} style={styles.commentItem}>
+            <View key={comment.id + '@' + i} className="mb-3">
               <Comment upName={props.upName} comment={comment} />
             </View>
           )
@@ -84,8 +85,8 @@ export default function CommentList(props: {
         />
       ) : null}
       {comments?.length ? (
-        <View style={styles.footerContainer}>
-          <Text style={[styles.footerText, { color: theme.colors.grey3 }]}>
+        <View className="mb-3 items-center">
+          <Text className="text-xs mt-3" style={{ color: theme.colors.grey3 }}>
             只加载前30条
           </Text>
           <Text />
@@ -95,36 +96,3 @@ export default function CommentList(props: {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  commentItem: { marginBottom: 10 },
-  footerContainer: { marginBottom: 10, alignItems: 'center' },
-  footerText: { fontSize: 12, marginTop: 10 },
-  commentTipText: {
-    textAlign: 'center',
-    marginVertical: 20,
-  },
-  divider: {
-    marginVertical: 20,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#aaa',
-    paddingBottom: 3,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  commentCountContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 4,
-  },
-  commentCount: {
-    fontSize: 13,
-    marginRight: 12,
-    paddingHorizontal: 8,
-  },
-  right: {
-    marginLeft: 8,
-    marginRight: 4,
-  },
-  skeleton: { flex: 1, gap: 5, marginBottom: 20 },
-})

@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, View, StyleSheet } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { Divider } from '@rneui/themed'
 import Feedback from './Feedback'
 import Header from './Header'
@@ -12,29 +12,19 @@ import Backup from './Backup'
 
 export default React.memo(function About() {
   const content = (
-    <ScrollView style={styles.container}>
+    <ScrollView className="p-5">
       <Header />
-      <Divider style={{ marginBottom: 18, marginTop: 15 }} />
+      <Divider className="my-4" />
       <Version />
       <Feedback />
       <Backup />
       <Statement />
-      <Divider style={{ marginBottom: 18 }} />
+      <Divider className="mb-4" />
       <BlackTags />
       <BlackUps />
       <SortCate />
-      <View style={{ height: 40 }} />
+      <View className="h-10" />
     </ScrollView>
   )
   return content
-})
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-  bgImage: {
-    flex: 1,
-    justifyContent: 'center',
-  },
 })

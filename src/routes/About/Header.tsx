@@ -2,7 +2,6 @@ import React from 'react'
 import {
   View,
   Linking,
-  StyleSheet,
   Pressable,
   Image,
   useWindowDimensions,
@@ -14,21 +13,22 @@ export default React.memo(function Header() {
   const { width } = useWindowDimensions()
   return (
     <>
-      <Pressable style={styles.container}>
+      <Pressable className="mb-5 mt-3 flex-1 items-center">
         <Image
           source={require('../../../assets/minibili.png')}
-          style={{ width: width * 0.8, height: undefined, aspectRatio: 3.3 }}
+          className="aspect-[33/10]"
+          style={{ width: width * 0.8 }}
         />
       </Pressable>
-      <View style={styles.infoItem}>
-        <Text style={styles.title} numberOfLines={2}>
+      <View className="flex-row items-center justify-between mb-2">
+        <Text className="text-2xl shrink" numberOfLines={2}>
           一款简单的B站浏览App
         </Text>
         <Button
           radius={'sm'}
           type="clear"
           size="sm"
-          containerStyle={{ alignSelf: 'flex-start' }}
+          containerStyle={tw('self-start')}
           onPress={() => {
             Linking.openURL(githubLink)
           }}>
@@ -37,15 +37,4 @@ export default React.memo(function Header() {
       </View>
     </>
   )
-})
-
-const styles = StyleSheet.create({
-  container: { marginBottom: 20, marginTop: 10, flex: 1, alignItems: 'center' },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  title: { fontSize: 24, flexShrink: 1 },
 })

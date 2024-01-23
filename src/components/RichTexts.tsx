@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  View,
-  Linking,
-  StyleSheet,
-  ViewStyle,
-  TextProps,
-  Image,
-} from 'react-native'
+import { View, Linking, ViewStyle, TextProps, Image } from 'react-native'
 import { RichTextNode } from '../api/dynamic-items.schema'
 import { HandledRichTextType } from '../api/dynamic-items.type'
 import { reportUnknownRichTextItem } from '../utils/report'
@@ -33,7 +26,7 @@ export default React.memo(
     let key = 0
     const fontSize = props.fontSize || 16
     const Topic = props.topic ? (
-      <View style={styles.topicContainer}>
+      <View className="flex-row items-center mb-3">
         <Icon name="hashtag" type="fontisto" color="#178bcf" size={14} />
         <Text
           onPress={() => {
@@ -59,7 +52,7 @@ export default React.memo(
     for (const node of props.nodes) {
       if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT) {
         reactNodes.push(
-          <Text style={[styles.text, { fontSize }]} key={key++}>
+          <Text style={{ fontSize, lineHeight: fontSize * 1.6 }} key={key++}>
             {node.text}
           </Text>,
         )
@@ -97,7 +90,7 @@ export default React.memo(
           <Image
             key={key++}
             source={{ uri: imgUrl(node.emoji.icon_url) }}
-            style={[styles.emoji]}
+            className="w-5 h-5"
           />,
         )
       } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC) {
@@ -207,7 +200,7 @@ export default React.memo(
       } else {
         reportUnknownRichTextItem(node)
         reactNodes.push(
-          <Text style={[styles.text, { fontSize }]} key={key++}>
+          <Text style={{ fontSize, lineHeight: fontSize * 1.6 }} key={key++}>
             {node.text}
           </Text>,
         )
@@ -220,13 +213,13 @@ export default React.memo(
       <View style={[{ marginBottom: textOverflow ? 14 : 10 }, props.style]}>
         {Topic}
         <Text
-          style={[styles.textContainer]}
+          className="flex-row flex-wrap items-center flex-1"
           {...props.textProps}
           onTextLayout={evt => {
             setLines(evt.nativeEvent.lines.length)
           }}>
           {reactNodes}
-          <Text style={styles.hackText}>{reactNodes.length ? '\n ' : ''}</Text>
+          <Text className="text-[4px]">{reactNodes.length ? '\n ' : ''}</Text>
         </Text>
       </View>
     )
@@ -235,27 +228,3 @@ export default React.memo(
     return a.idStr === b.idStr
   },
 )
-
-const styles = StyleSheet.create({
-  container: { marginBottom: 10 },
-  textContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    flex: 1,
-  },
-  topicContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  emoji: {
-    width: 20,
-    height: 20,
-  },
-  text: {
-    lineHeight: 24,
-    fontSize: 15,
-  },
-  hackText: { fontSize: 4 },
-})

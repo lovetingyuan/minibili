@@ -1,5 +1,5 @@
 import React from 'react'
-import { Linking, StyleSheet } from 'react-native'
+import { Linking } from 'react-native'
 import { Overlay } from '@rneui/themed'
 import { useNetInfo } from '@react-native-community/netinfo'
 import { useStore } from '../store'
@@ -114,7 +114,7 @@ export default React.memo(function ImagesView() {
     <Overlay
       isVisible={imagesList.length > 0}
       fullScreen
-      overlayStyle={styles.overlay}
+      overlayStyle={tw('p-0 m-0')}
       onBackdropPress={() => {
         setImagesList([])
         setCurrentImageIndex(0)
@@ -145,15 +145,4 @@ export default React.memo(function ImagesView() {
       />
     </Overlay>
   )
-})
-
-const styles = StyleSheet.create({
-  pagerImage: {
-    width: '100%',
-  },
-  overlay: {
-    padding: 0,
-    margin: 0,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-  },
 })

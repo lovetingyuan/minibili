@@ -1,27 +1,22 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require('expo/metro-config')
-const spawn = require('cross-spawn')
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname)
 
-config.resolver.sourceExts.push('tw.css')
-
-const babelTransformer = require(config.transformer.babelTransformerPath)
+if (!config.resolver.sourceExts.includes('tw.css')) {
+  config.resolver.sourceExts.push('tw.css')
+}
 
 config.transformer.babelTransformerPath = require.resolve(
-  './scripts/babel-transformer.js',
+  './scripts/babel-transformer',
 )
 
 module.exports = config
 
-Object.defineProperty(config, '__babelTransformer', {
-  get() {
-    return babelTransformer
-  },
-})
-
 if (process.env.NODE_ENV === 'development') {
+  const spawn = require('cross-spawn')
+
   // 启动tailwindcss进程
   const child = spawn(
     'npx',

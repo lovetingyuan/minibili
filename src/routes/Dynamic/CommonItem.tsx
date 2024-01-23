@@ -93,11 +93,9 @@ export function CommonContent(props: {
       {cover ? (
         <Image
           source={{ uri: imgUrl(cover, 240, 150) }}
+          className="aspect-[8/5] rounded"
           style={{
             width: width * 0.35,
-            height: undefined,
-            aspectRatio: 1.6,
-            borderRadius: 4,
           }}
         />
       ) : null}

@@ -1,7 +1,7 @@
 import { Chip, ListItem, Text, Icon, useTheme } from '@rneui/themed'
 import React from 'react'
 import { useStore } from '../../store'
-import { View, StyleSheet } from 'react-native'
+import { View } from 'react-native'
 
 export default React.memo(function SortCate() {
   const [expandedCate, setExpandedCate] = React.useState(false)
@@ -16,7 +16,7 @@ export default React.memo(function SortCate() {
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
-      containerStyle={styles.blackTitle}
+      containerStyle={tw('p-0 mt-1 mb-3 bg-transparent')}
       content={
         <ListItem.Content>
           <ListItem.Title>调整分区顺序</ListItem.Title>
@@ -26,12 +26,11 @@ export default React.memo(function SortCate() {
       onPress={() => {
         setExpandedCate(!expandedCate)
       }}>
-      <ListItem containerStyle={styles.blackContent}>
+      <ListItem
+        containerStyle={tw('flex-wrap p-0 flex-row px-1 bg-transparent')}>
         <View
-          style={[
-            styles.sortedCates,
-            { borderBottomColor: theme.colors.divider },
-          ]}>
+          className="flex-row flex-wrap border-b-[0.5] flex-1 w-full gap-x-3"
+          style={{ borderBottomColor: theme.colors.divider }}>
           {sortedRankList.map(cate => {
             return (
               <Chip
@@ -45,16 +44,16 @@ export default React.memo(function SortCate() {
                   setUnSortedRankList(b)
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
                 }}
-                containerStyle={styles.chip}
-                buttonStyle={styles.chipButton}
+                containerStyle={tw('mb-2')}
+                buttonStyle={tw('px-0 py-[2]')}
               />
             )
           })}
           {sortedRankList.length === 0 && (
-            <Text style={styles.tipText}> 点击名称调整顺序</Text>
+            <Text className="flex-1 mb-1"> 点击名称调整顺序</Text>
           )}
         </View>
-        <View style={styles.cateList}>
+        <View className="flex-row flex-wrap gap-x-3 mt-5">
           {unsortedRankList.map(cate => {
             return (
               <Chip
@@ -68,8 +67,8 @@ export default React.memo(function SortCate() {
                   setUnSortedRankList(b)
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
                 }}
-                containerStyle={styles.chip}
-                buttonStyle={styles.chipButton}
+                containerStyle={tw('mb-2')}
+                buttonStyle={tw('px-0 py-[2]')}
               />
             )
           })}
@@ -77,42 +76,4 @@ export default React.memo(function SortCate() {
       </ListItem>
     </ListItem.Accordion>
   )
-})
-
-const styles = StyleSheet.create({
-  blackContent: {
-    flexWrap: 'wrap',
-    padding: 0,
-    flexDirection: 'row',
-    paddingHorizontal: 5,
-    backgroundColor: 'transparent',
-  },
-  blackTitle: {
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    marginTop: 5,
-    marginBottom: 10,
-    backgroundColor: 'transparent',
-  },
-  sortedCates: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    borderBottomWidth: 0.5,
-    flex: 1,
-    flexGrow: 1,
-    width: '100%',
-    columnGap: 10,
-  },
-  tipText: { flex: 1, marginBottom: 5 },
-  cateList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    columnGap: 10,
-    marginTop: 20,
-  },
-  chip: { marginBottom: 8 },
-  chipButton: {
-    padding: 0,
-    paddingVertical: 2,
-  },
 })

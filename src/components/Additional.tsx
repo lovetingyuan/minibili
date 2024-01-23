@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Pressable, Linking } from 'react-native'
+import { View, Pressable, Linking } from 'react-native'
 import { AdditionalType } from '../api/dynamic-items.schema'
 import { HandledAdditionalTypeEnum } from '../api/dynamic-items.type'
 import { Image } from 'expo-image'
@@ -7,7 +7,6 @@ import { imgUrl, parseDate, parseNumber, parseUrl } from '../utils'
 import { Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
-// import { s } from '../styles'
 
 export const Additional = (props: { additional?: AdditionalType | null }) => {
   const { additional } = props
@@ -50,9 +49,9 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       <View className="gap-2.5 flex-row pr-2.5">
         <Image
           source={{ uri: imgUrl(additional.ugc.cover, 200, 100) }}
-          style={styles.image}
+          className="w-24 min-h-12 rounded"
         />
-        <View style={styles.text}>
+        <View className="shrink flex-1 gap-1">
           <Text numberOfLines={1}>{additional.ugc.title}</Text>
           {text ? <Text numberOfLines={2}>{text}</Text> : null}
         </View>
@@ -73,9 +72,9 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       <View className="gap-2.5 flex-row pr-2.5">
         <Image
           source={{ uri: imgUrl(additional.common.cover, 200, 100) }}
-          style={styles.image}
+          className="w-24 min-h-12 rounded"
         />
-        <View style={styles.text}>
+        <View className="shrink flex-1 gap-1">
           <Text numberOfLines={1}>{additional.common.title}</Text>
           {text ? (
             <Text numberOfLines={2} className="text-sm">
@@ -169,8 +168,3 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
     </Foo>
   )
 }
-
-const styles = StyleSheet.create({
-  text: { flexShrink: 1, gap: 4, flex: 1 },
-  image: { width: 100, minHeight: 50, borderRadius: 4 },
-})

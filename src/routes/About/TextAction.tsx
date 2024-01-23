@@ -1,7 +1,6 @@
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { View } from 'react-native'
 import { Button, Text } from '@rneui/themed'
-// import { s } from '../../styles'
 
 export default React.memo(function TextAction(
   props: React.PropsWithChildren<{
@@ -11,11 +10,11 @@ export default React.memo(function TextAction(
   }>,
 ) {
   return (
-    <View style={styles.infoItem}>
+    <View className="flex-row items-center justify-between mb-2">
       <Text className="text-base text-lime-600" onPress={props.onTextPress}>
         {props.text}
       </Text>
-      <View style={styles.btns}>
+      <View className="flex-row">
         {props.buttons.map(button => {
           return (
             <Button
@@ -34,14 +33,4 @@ export default React.memo(function TextAction(
       {props.children}
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  btns: { flexDirection: 'row' },
 })

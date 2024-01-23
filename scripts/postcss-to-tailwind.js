@@ -52,11 +52,8 @@ module.exports = (
           )
         }
         const result = transform.default([[prop, value]])
-        const classname = decl.parent.selector
-          .slice(1)
-          .replace('\\[', '[')
-          .replace('\\]', ']')
-          .replace('\\.', '.')
+        const classname = decl.parent.selector.slice(1).replace(/\\/g, '')
+
         if (!opts.cssObject[classname]) {
           opts.cssObject[classname] = result
         } else {

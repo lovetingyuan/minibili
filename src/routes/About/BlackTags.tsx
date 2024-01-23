@@ -1,6 +1,5 @@
 import { Chip, ListItem, Text, Icon, useTheme } from '@rneui/themed'
 import React from 'react'
-import { StyleSheet } from 'react-native'
 import { useStore } from '../../store'
 
 export default React.memo(function BlackTags() {
@@ -10,7 +9,7 @@ export default React.memo(function BlackTags() {
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
-      containerStyle={styles.blackTitle}
+      containerStyle={tw('p-0 mt-1 mb-3 bg-transparent')}
       content={
         <ListItem.Content>
           <ListItem.Title>
@@ -22,7 +21,8 @@ export default React.memo(function BlackTags() {
       onPress={() => {
         setExpanded(!expanded)
       }}>
-      <ListItem containerStyle={[styles.blackContent]}>
+      <ListItem
+        containerStyle={tw('flex-wrap p-0 flex-row px-1 bg-transparent')}>
         {Object.values($blackTags).map(tag => {
           return (
             <Chip
@@ -41,9 +41,9 @@ export default React.memo(function BlackTags() {
                 },
               }}
               iconRight
-              titleStyle={styles.chipTitle}
-              containerStyle={styles.chip}
-              buttonStyle={styles.chipButton}
+              titleStyle={tw('text-left')}
+              containerStyle={tw('mb-2 self-start')}
+              buttonStyle={tw('px-0 py-[2]')}
             />
           )
         })}
@@ -51,29 +51,4 @@ export default React.memo(function BlackTags() {
       </ListItem>
     </ListItem.Accordion>
   )
-})
-
-const styles = StyleSheet.create({
-  blackTitle: {
-    padding: 0,
-    marginTop: 5,
-    marginBottom: 10,
-    backgroundColor: 'transparent',
-  },
-  blackContent: {
-    flexWrap: 'wrap',
-    padding: 0,
-    flexDirection: 'row',
-    paddingHorizontal: 5,
-    backgroundColor: 'transparent',
-  },
-  chip: {
-    marginBottom: 7,
-    alignSelf: 'flex-start',
-  },
-  chipTitle: { textAlign: 'left' },
-  chipButton: {
-    padding: 0,
-    paddingVertical: 2,
-  },
 })
