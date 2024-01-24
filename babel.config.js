@@ -4,7 +4,7 @@ module.exports = function (api) {
     presets: ['babel-preset-expo'],
     plugins: [
       './scripts/babel-plugin-function-source.js',
-      './scripts/babel-plugin-tailwind-classname.js',
+      '@tingyuan/react-native-tailwindcss/babel',
     ],
     env: {
       production: {

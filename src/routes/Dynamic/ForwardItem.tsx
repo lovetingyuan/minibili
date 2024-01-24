@@ -40,7 +40,7 @@ export default function ForwardItem(props: {
         {forwardRichTextContent}
         <View className="flex-row">
           <Image
-            className="w-30 aspect-[8/5] mr-3 rounded"
+            className="w-28 aspect-[8/5] mr-3 rounded"
             source={{ uri: imgUrl(cover, 240, 150) }}
           />
           <View className="grow-[6]">

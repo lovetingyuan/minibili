@@ -32,7 +32,7 @@ export default React.memo(function BlackTags() {
               icon={{
                 name: 'close',
                 type: 'Ionicons',
-                size: 18,
+                size: 16,
                 color: theme.colors.grey2,
                 onPress: () => {
                   const blackTags = { ...$blackTags }
@@ -41,9 +41,9 @@ export default React.memo(function BlackTags() {
                 },
               }}
               iconRight
-              titleStyle={tw('text-left')}
+              titleStyle={tw('text-left text-sm font-thin')}
               containerStyle={tw('mb-2 self-start')}
-              buttonStyle={tw('px-0 py-[2px]')}
+              buttonStyle={tw('pl-1 py-[2px]')}
             />
           )
         })}

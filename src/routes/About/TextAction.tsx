@@ -11,7 +11,7 @@ export default React.memo(function TextAction(
 ) {
   return (
     <View className="flex-row items-center justify-between mb-2">
-      <Text className="text-base text-lime-600" onPress={props.onTextPress}>
+      <Text className="text-base" onPress={props.onTextPress}>
         {props.text}
       </Text>
       <View className="flex-row">

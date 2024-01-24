@@ -40,7 +40,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   return (
-    <View className="flex-row items-center mr-27 left-[-10px] relative">
+    <View className="flex-row items-center mr-28 left-[-10px] relative">
       {dynamicUser?.face ? (
         <Avatar
           size={33}

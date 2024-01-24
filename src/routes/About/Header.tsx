@@ -16,7 +16,7 @@ export default React.memo(function Header() {
       <Pressable className="mb-5 mt-3 flex-1 items-center">
         <Image
           source={require('../../../assets/minibili.png')}
-          className="aspect-[33/10]"
+          className="aspect-[33/10] h-auto"
           style={{ width: width * 0.8 }}
         />
       </Pressable>
