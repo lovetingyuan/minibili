@@ -211,7 +211,7 @@ export default React.memo(function Comment(props: Props) {
             return (
               <Text
                 key={reply.id + '#'}
-                className="flex-row items-center flex-wrap text-sm leading-5">
+                className="flex-row items-center flex-wrap text-sm my-[2px] leading-5">
                 <Text
                   style={upStyle(reply.name)}
                   onPress={() => {

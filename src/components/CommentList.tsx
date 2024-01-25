@@ -49,7 +49,7 @@ export default function CommentList(props: {
           <Icon
             name="comment-text-outline"
             type="material-community"
-            size={15}
+            size={14}
             color={theme.colors.grey1}
           />
           <Text
@@ -86,7 +86,7 @@ export default function CommentList(props: {
       ) : null}
       {comments?.length ? (
         <View className="mb-3 items-center">
-          <Text className="text-xs mt-3" style={{ color: theme.colors.grey3 }}>
+          <Text className="text-xs mt-2" style={{ color: theme.colors.grey3 }}>
             只加载前30条
           </Text>
           <Text />

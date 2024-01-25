@@ -40,7 +40,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   return (
-    <View className="flex-row items-center mr-28 left-[-10px] relative">
+    <View className="flex-row items-center mr-28 left-[-12px] relative">
       {dynamicUser?.face ? (
         <Avatar
           size={33}
@@ -57,7 +57,10 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
         onPress={() => {
           props.scrollTop()
         }}>
-        <Text className="text-lg" adjustsFontSizeToFit numberOfLines={1}>
+        <Text
+          className="text-lg relative top-[2px] leading-5"
+          adjustsFontSizeToFit
+          numberOfLines={1}>
           {userName + '   '}
           {fans ? (
             <Text className="text-sm" style={{ color: theme.colors.grey2 }}>
@@ -66,7 +69,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           ) : null}
         </Text>
       </Pressable>
-      {sex ? <Text className="text-sm">{'  ' + sex}</Text> : null}
+      {sex ? <Text className="text-sm ml-3 opacity-80">{sex}</Text> : null}
       {dynamicUser.mid && livingUrl ? (
         <Button
           size="sm"

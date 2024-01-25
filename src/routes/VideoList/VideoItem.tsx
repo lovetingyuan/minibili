@@ -1,8 +1,8 @@
 import React from 'react'
-import { View, Text, useWindowDimensions } from 'react-native'
+import { View, useWindowDimensions } from 'react-native'
 import { VideoItem } from '../../api/hot-videos'
 import { imgUrl, parseDate, parseDuration, parseNumber } from '../../utils'
-import { useTheme } from '@rneui/themed'
+import { useTheme, Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 import { useStore } from '../../store'
 

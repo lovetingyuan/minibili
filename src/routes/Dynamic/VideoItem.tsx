@@ -63,9 +63,9 @@ export default function VideoItem(props: {
       <RichTexts idStr={props.item.id} nodes={nodes} topic={props.item.topic} />
 
       <View className="flex-1 flex-row">
-        <View className="grow-[6] mr-3 justify-center content-center">
+        <View className="w-[52%] mr-3 justify-center content-center">
           <Image
-            className="w-[70%] rounded aspect-[8/5] h-auto"
+            className="w-full rounded aspect-[8/5] h-auto"
             source={{ uri: imgUrl(cover, 480, 300) }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
@@ -83,7 +83,7 @@ export default function VideoItem(props: {
             <Text className="text-xs font-bold text-white">{danmu}弹</Text>
           </View>
         </View>
-        <View className="grow-[5] justify-around">
+        <View className="flex-1 justify-around">
           <Text className="flex-1 text-base mb-3" numberOfLines={3}>
             {title}
           </Text>

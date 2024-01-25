@@ -91,11 +91,13 @@ export default function App() {
         black: '#333',
         grey5: '#ddd',
         secondary: '#d85380',
+        success: '#008700',
       },
       darkColors: {
         black: '#bbb',
         grey5: '#181818',
         secondary: '#d85380',
+        success: '#008700',
       },
       mode: dark ? 'dark' : 'light',
     })

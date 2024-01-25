@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  View,
-  Pressable,
-  Linking,
-  useWindowDimensions,
-  TouchableOpacity,
-} from 'react-native'
+import { View, Pressable, Linking, TouchableOpacity } from 'react-native'
 import { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
@@ -68,7 +62,6 @@ export function CommonContent(props: {
 }) {
   const { url, title, text, cover, forward } = props
   const Foo = url ? Pressable : View
-  const { width } = useWindowDimensions()
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   const linkProp = url
@@ -90,27 +83,24 @@ export function CommonContent(props: {
       {cover ? (
         <Image
           source={{ uri: imgUrl(cover, 240, 150) }}
-          className="aspect-[8/5] rounded"
-          style={{
-            width: width * 0.35,
-          }}
+          className="aspect-[8/5] rounded h-auto w-[45%]"
         />
       ) : null}
-      <Foo className="gap-2 shrink" {...linkProp}>
+      <Foo className="gap-2 flex-1" {...linkProp}>
         {title ? (
           <Text
             className={[
               props.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
                 ? 'font-bold'
                 : '',
-              'text-base',
+              'text-[15px]',
             ].join(' ')}
             numberOfLines={2}>
             {title}
           </Text>
         ) : null}
         {text ? (
-          <Text className={forward ? 'text-sm' : 'text-base'} numberOfLines={2}>
+          <Text className={forward ? 'text-sm' : 'text-sm'} numberOfLines={2}>
             {text}
           </Text>
         ) : null}

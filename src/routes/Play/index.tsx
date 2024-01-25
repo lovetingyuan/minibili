@@ -82,7 +82,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
                   </Text>
                 </Pressable>
                 <Text
-                  className="text-sm font-bold"
+                  className="text-base font-bold"
                   style={{ color: theme.colors.grey1 }}>
                   {' · '}
                 </Text>

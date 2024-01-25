@@ -163,7 +163,9 @@ export const Additional = (props: { additional?: AdditionalType | null }) => {
       }
     : {}
   return (
-    <Foo {...linkProp} className="border-l border-zinc-200 pl-2 mt-5 py-1">
+    <Foo
+      {...linkProp}
+      className="border-l flex-1 border-zinc-200 pl-2 mt-5 py-1">
       {additionalContent}
     </Foo>
   )

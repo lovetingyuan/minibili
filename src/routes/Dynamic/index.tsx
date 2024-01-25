@@ -22,7 +22,7 @@ const Loading = React.memo(() => {
         .fill(null)
         .map((_, i) => {
           return (
-            <View className="p-3 gap-4 my-3" key={i}>
+            <View className="p-3 gap-4 my-2" key={i}>
               {i % 2 === 0 ? (
                 <View className="gap-2">
                   <Skeleton
@@ -159,18 +159,17 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
         ListHeaderComponent={
           dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
             <View
-              className="px-3 border-b-[0.5px] py-3 flex-1 flex-row"
+              className="px-3 border-b-[0.5px] py-3 flex-1 shrink-0 flex-row"
               style={{ borderBottomColor: theme.colors.divider }}>
               <Icon
                 name="billboard"
                 type="material-community"
                 size={18}
-                className="relative top-[1px]"
-                color={theme.colors.grey1}
+                color={theme.colors.grey2}
               />
               <Text
-                className="text-sm ml-3 shrink opacity-80"
-                style={{ color: theme.colors.grey0 }}>
+                className="text-sm ml-2"
+                style={{ color: theme.colors.grey2 }}>
                 {dynamicUser?.sign.trim()}
               </Text>
             </View>

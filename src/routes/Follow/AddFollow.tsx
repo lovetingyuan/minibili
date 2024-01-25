@@ -10,7 +10,7 @@ import {
 } from '@rneui/themed'
 import React from 'react'
 import { SearchedUpType, useSearchUps } from '../../api/search-up'
-import { FlatList, Linking, View, useWindowDimensions } from 'react-native'
+import { FlatList, Linking, View } from 'react-native'
 import { Image } from 'expo-image'
 import { imgUrl, parseNumber, showToast } from '../../utils'
 import { useStore } from '../../store'
@@ -33,9 +33,9 @@ function SearchedItem(props: { up: SearchedUpType }) {
     Linking.openURL(`https://m.bilibili.com/space/${up.mid}`)
   }
   return (
-    <View key={up.mid} className="mb-3 flex-row flex-1 items-center">
+    <View key={up.mid} className="mb-3 flex-row flex-1 items-center shrink-0">
       <Avatar
-        size={40}
+        size={36}
         rounded
         source={{ uri: imgUrl(up.face, 80) }}
         ImageComponent={Image}
@@ -86,7 +86,6 @@ export default React.memo(function AddFollow() {
     setAddUpVisible(false)
   }
   const { theme } = useTheme()
-  const { width } = useWindowDimensions()
   const { data: searchedUps, isValidating } = useSearchUps(searchValue)
   return (
     <>
@@ -136,10 +135,7 @@ export default React.memo(function AddFollow() {
                 <View>
                   <Image
                     source={require('../../../assets/ss.png')}
-                    className="aspect-square self-center mt-8"
-                    style={{
-                      width: width * 0.3,
-                    }}
+                    className="aspect-square w-[40%] self-center mt-8"
                   />
                   <Text className="text-center my-8">暂无结果</Text>
                 </View>

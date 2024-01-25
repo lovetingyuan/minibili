@@ -39,15 +39,17 @@ export default function ForwardItem(props: {
         {forwardRichTextContent}
         <View className="flex-row">
           <Image
-            className="w-28 aspect-[8/5] mr-3 rounded"
+            className="w-[45%] aspect-[8/5] h-auto mr-3 rounded"
             source={{ uri: imgUrl(cover, 240, 150) }}
           />
-          <View className="grow-[6]">
-            <Text numberOfLines={2} className="text-base">
+          <View className="flex-1">
+            <Text numberOfLines={3} className="text-sm">
               <Text className="font-bold">视频：</Text>
               {title}
             </Text>
-            <Text className="mt-3 text-sm">
+            <Text
+              className="mt-3 text-xs"
+              style={{ color: theme.colors.grey2 }}>
               {stat.play}播放{'  '}
               {stat.danmaku}弹幕
             </Text>
@@ -62,11 +64,11 @@ export default function ForwardItem(props: {
     forwardContent = (
       <View className="flex-1 flex-col">
         {forwardRichTextContent}
-        <View className="flex-row overflow-hidden gap-1">
+        <View className="flex-row overflow-hidden gap-2">
           {payload.images.map((img, i) => {
             return (
               <Image
-                className="h-18 my-3 rounded"
+                className="h-24 w-auto mt-2 rounded"
                 style={{ aspectRatio: img.ratio }}
                 key={img.src + i}
                 source={{ uri: imgUrl(img.src, 240) }}
@@ -89,7 +91,7 @@ export default function ForwardItem(props: {
     payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_LIVE_RCMD
   ) {
     forwardContent = (
-      <View className="shrink">
+      <View className="flex-1">
         {forwardRichTextContent}
         <CommonContent
           type={payload.type}
@@ -151,7 +153,6 @@ export default function ForwardItem(props: {
         ) : null}
         <TouchableOpacity
           activeOpacity={0.7}
-          className="flex-1 flex-row"
           onPress={() => {
             if (payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
               const { video } = payload

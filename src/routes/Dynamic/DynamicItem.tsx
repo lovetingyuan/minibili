@@ -1,6 +1,6 @@
 import React from 'react'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-import { View, Image } from 'react-native'
+import { View, Text } from 'react-native'
 import ForwardItem from './ForwardItem'
 import VideoItem from './VideoItem'
 import WordDrawItem from './WordDrawItem'
@@ -44,10 +44,11 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
       className="py-5 px-3 border-b-[0.5px]"
       style={{ borderBottomColor: theme.colors.divider }}>
       {item.top ? (
-        <Image
-          source={require('../../../assets/top.png')}
-          className="w-8 h-5 mb-1"
-        />
+        <View className="border-[0.5px] w-9 rounded mb-3 px-1 border-rose-600">
+          <Text className="text-center font-thin text-sm text-rose-500">
+            置顶
+          </Text>
+        </View>
       ) : null}
       <Item item={item} />
       {/* {__DEV__ && <Text>{item.type}</Text>} */}

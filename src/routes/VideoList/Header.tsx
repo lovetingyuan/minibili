@@ -38,6 +38,7 @@ const HeaderTitle = React.memo(() => {
       <MenuItem
         key={item.rid}
         className={item.rid === -1 ? 'max-w-32' : 'max-w-24'}
+        pressColor={theme.colors.grey5}
         textStyle={tw(`text-base ${selected ? 'font-bold' : ''}`, {
           color:
             item.rid === -1
@@ -59,7 +60,7 @@ const HeaderTitle = React.memo(() => {
       <Menu
         visible={visible}
         // @ts-ignore
-        className="relative top-12 w-48"
+        className="relative top-14 w-48"
         style={{ backgroundColor: theme.colors.background }}
         anchor={
           <TouchableOpacity
@@ -86,7 +87,7 @@ const HeaderTitle = React.memo(() => {
           </TouchableOpacity>
         }
         onRequestClose={hideMenu}>
-        <ScrollView className="max-h-96 w-44">
+        <ScrollView className="max-h-96 w-48">
           {list.map((items, i) => {
             if (i === 0) {
               return (

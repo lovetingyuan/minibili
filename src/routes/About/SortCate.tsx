@@ -68,7 +68,7 @@ export default React.memo(function SortCate() {
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
                 }}
                 containerStyle={tw('mb-2')}
-                buttonStyle={tw('px-0 py-[2px]')}
+                buttonStyle={tw('px-[6px] py-[2px]')}
               />
             )
           })}

@@ -35,7 +35,7 @@ export default React.memo(function VideoHeader(props: { bvid: string }) {
         className="flex-row items-center mr-1 flex-1">
         {face ? (
           <Avatar
-            size={32}
+            size={34}
             rounded
             source={{ uri: imgUrl(face, 80) }}
             ImageComponent={Image}
@@ -44,7 +44,7 @@ export default React.memo(function VideoHeader(props: { bvid: string }) {
         <Text
           numberOfLines={1}
           ellipsizeMode="tail"
-          className="ml-3 mr-1 text-lg grow shrink font-bold">
+          className="ml-3 mr-1 text-base grow shrink font-bold">
           {name + ' '}
         </Text>
       </Pressable>
