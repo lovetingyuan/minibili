@@ -3,6 +3,7 @@ module.exports = {
   content: {
     files: ['src/**/*.tsx'],
   },
+  mode: 'jit',
   theme: {
     extend: {},
   },

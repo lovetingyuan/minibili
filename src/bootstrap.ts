@@ -1,5 +1,5 @@
 import './sentry'
-import '@tingyuan/react-native-tailwindcss'
+// import '@tingyuan/react-native-tailwindcss'
 import * as SentryExpo from 'sentry-expo'
 import { showFatalError, showToast } from './utils'
 import Constants from 'expo-constants'

@@ -158,7 +158,6 @@ export default React.memo(function Hot({ navigation }: Props) {
       hotVideoList.push(item)
     }
   }
-
   return (
     <View className="flex-1">
       <FlashList
