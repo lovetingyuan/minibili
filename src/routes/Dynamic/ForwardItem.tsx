@@ -12,7 +12,6 @@ import { useNavigation } from '@react-navigation/native'
 import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
-// import { s } from '../../styles'
 import { imgUrl } from '../../utils'
 
 export default function ForwardItem(props: {

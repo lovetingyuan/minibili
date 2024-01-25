@@ -65,7 +65,7 @@ export default function VideoItem(props: {
       <View className="flex-1 flex-row">
         <View className="grow-[6] mr-3 justify-center content-center">
           <Image
-            className="w-full rounded aspect-[8/5]"
+            className="w-[70%] rounded aspect-[8/5] h-auto"
             source={{ uri: imgUrl(cover, 480, 300) }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
