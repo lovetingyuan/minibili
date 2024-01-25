@@ -85,6 +85,8 @@ await spinner('checking current build list...', async () => {
   }
 })
 
+await $`npx react-native-tailwindcss-build`
+
 // -------------------------------------------
 
 const newVersion = await question(`更新版本（${appVersion} -> ?）`)

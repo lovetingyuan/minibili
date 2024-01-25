@@ -1,5 +1,4 @@
 import './sentry'
-// import '@tingyuan/react-native-tailwindcss'
 import * as SentryExpo from 'sentry-expo'
 import { showFatalError, showToast } from './utils'
 import Constants from 'expo-constants'
@@ -20,6 +19,6 @@ if (typeof ErrorUtils === 'object') {
       showToast('抱歉，发生了未知错误')
       return
     }
-    showFatalError()
+    showFatalError(error)
   })
 }

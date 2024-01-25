@@ -132,7 +132,7 @@ export function showToast(message: string, long = false) {
 
 let showedFatalError = false
 
-export function showFatalError() {
+export function showFatalError(error: any) {
   if (showedFatalError || __DEV__) {
     return
   }
@@ -141,6 +141,7 @@ export function showFatalError() {
     Alert.alert(
       '抱歉，应用发生了错误😅',
       '我们会处理这个错误\n' +
+        (error?.message || error) +
         (info.hasUpdate
           ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
           : ''),

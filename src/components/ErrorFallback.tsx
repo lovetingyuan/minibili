@@ -10,7 +10,7 @@ import { useTheme } from '@rneui/themed'
 
 export default function ErrorFallback(props: { message?: string }) {
   useMounted(() => {
-    showFatalError()
+    showFatalError(props)
   })
   const { theme } = useTheme()
   if (__DEV__ && props.message) {

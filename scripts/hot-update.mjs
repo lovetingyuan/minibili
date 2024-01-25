@@ -2,6 +2,8 @@
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
 require('dotenv').config()
 
+await $`npx react-native-tailwindcss-build`
+
 const updateOutput =
   await $`npx -y eas-cli@latest update --branch main --json --non-interactive --platform android --message ${'upload sourcemap'}`
 
