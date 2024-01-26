@@ -1,6 +1,6 @@
 import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
 import React from 'react'
-import { View, Image, useWindowDimensions } from 'react-native'
+import { View, Image } from 'react-native'
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
@@ -40,7 +40,6 @@ export default function CommentList(props: {
     isLoading: commentLoading,
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)
-  const { width } = useWindowDimensions()
   const { theme } = useTheme()
   return (
     <View>
@@ -77,11 +76,7 @@ export default function CommentList(props: {
       ) : comments?.length === 0 && !commentLoading ? (
         <Image
           source={require('../../assets/empty.png')}
-          className="aspect-square mt-7 self-center"
-          style={{
-            width: width * 0.2,
-            height: undefined,
-          }}
+          className="aspect-square mt-8 w-24 h-auto self-center"
         />
       ) : null}
       {comments?.length ? (

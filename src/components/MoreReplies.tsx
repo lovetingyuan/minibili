@@ -47,10 +47,7 @@ export default React.memo(function MoreReplies() {
   const { height } = useWindowDimensions()
   const isDark = useIsDark()
   const webviewRef = React.useRef<WebView | null>(null)
-  const [webviewHeight, setWebviewHeight] = React.useState(0)
-  if (!moreRepliesUrl && webviewHeight) {
-    setWebviewHeight(0)
-  }
+
   return (
     <BottomSheet
       onBackdropPress={() => {

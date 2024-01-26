@@ -19,9 +19,7 @@ export default function ErrorFallback(props: { message?: string }) {
   }
   const dark = useIsDark()
   return (
-    <View
-      className="flex-1"
-      style={dark ? { backgroundColor: theme.colors.black } : {}}>
+    <View className={`flex-1 ${dark ? `bg-[${theme.colors.black}]` : ''}`}>
       <StatusBar style="auto" />
       <Image
         source={require('../../assets/error.png')}
@@ -36,8 +34,7 @@ export default function ErrorFallback(props: { message?: string }) {
         {'\n\n'}
         您可以
         <Text
-          className="font-bold"
-          style={{ color: theme.colors.primary }}
+          className={`font-bold text-[${theme.colors.primary}]`}
           onPress={() => {
             Updates.reloadAsync()
           }}>

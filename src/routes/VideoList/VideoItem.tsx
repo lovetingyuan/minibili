@@ -47,14 +47,10 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
             numberOfLines={1}
             ellipsizeMode="tail"
             className={`ml-1 text-xs grow shrink ${
-              video.mid in _followedUpsMap ? 'font-bold' : ''
-            }`}
-            style={{
-              color:
-                video.mid in _followedUpsMap
-                  ? theme.colors.secondary
-                  : theme.colors.primary,
-            }}>
+              video.mid in _followedUpsMap
+                ? `font-bold text-[${theme.colors.secondary}]`
+                : `text-[${theme.colors.primary}]`
+            }`}>
             {video.name}
           </Text>
         </View>

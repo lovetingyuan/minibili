@@ -93,7 +93,7 @@ export default React.memo(function FollowItem(props: {
     {
       text: '取消关注',
       onPress: () => {
-        Alert.alert('确定取消关注吗？', '', [
+        Alert.alert(`确定取消关注「${name}」吗？`, '', [
           { text: '关闭' },
           {
             text: '确定',
@@ -163,7 +163,7 @@ export default React.memo(function FollowItem(props: {
           <Badge
             key={mid}
             badgeStyle={tw(
-              'h-4 w-4 rounded-[16px] absolute top-[-38px] left-[38px]',
+              'h-4 w-4 rounded-[16px] absolute top-[-40px] left-[38px]',
               { backgroundColor: theme.colors.secondary },
             )}
           />
@@ -171,21 +171,15 @@ export default React.memo(function FollowItem(props: {
       </View>
       {livingUps[mid] ? (
         <Text
-          className="font-bold text-sm p-3 flex-1 text-center"
-          style={{ color: theme.colors.primary }}
+          className={`font-bold text-sm p-3 flex-1 text-center text-[${theme.colors.primary}]`}
           onPress={gotoLivePage}>
           直播中~
         </Text>
       ) : (
         <Text
-          className={`text-sm p-3 flex-1 text-center ${pin ? 'font-bold' : ''}`}
-          style={
-            hasUpdate
-              ? {
-                  color: theme.colors.secondary,
-                }
-              : null
-          }
+          className={`text-sm p-3 flex-1 text-center ${
+            pin ? 'font-bold' : ''
+          } ${hasUpdate ? `text-[${theme.colors.secondary}]` : ''}`}
           numberOfLines={2}
           ellipsizeMode="tail">
           {name}

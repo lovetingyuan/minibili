@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image, View, useWindowDimensions } from 'react-native'
+import { Image, View } from 'react-native'
 import { RootStackParamList } from '../../types'
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, headerRight } from './Header'
@@ -89,8 +89,6 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
   } = useDynamicItems(upId)
   useErrToast('请求动态失败', error)
   const { theme } = useTheme()
-  const { width } = useWindowDimensions()
-
   const headerTitle = React.useCallback(() => {
     return (
       <HeaderLeft
@@ -137,10 +135,7 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
       <View className="items-center py-24">
         <Image
           source={require('../../../assets/empty.png')}
-          className="aspect-square"
-          style={{
-            width: width * 0.4,
-          }}
+          className="aspect-square h-auto w-[40%]"
         />
         <Text className="m-10 text-lg text-center">暂无动态</Text>
       </View>
@@ -159,7 +154,7 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
         ListHeaderComponent={
           dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
             <View
-              className="px-3 border-b-[0.5px] py-3 flex-1 shrink-0 flex-row"
+              className="px-3 border-b-[0.5px] py-3 flex-row"
               style={{ borderBottomColor: theme.colors.divider }}>
               <Icon
                 name="billboard"
@@ -168,7 +163,7 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
                 color={theme.colors.grey2}
               />
               <Text
-                className="text-sm ml-2"
+                className="text-sm ml-2 shrink-0 flex-1"
                 style={{ color: theme.colors.grey2 }}>
                 {dynamicUser?.sign.trim()}
               </Text>

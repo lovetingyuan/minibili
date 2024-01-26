@@ -43,14 +43,10 @@ const TvImg: React.FC = () => {
     }
   })
 
-  const { width } = useWindowDimensions()
   return (
     <Image
       source={tvImg ? tvL : tvR}
-      className="aspect-square mt-12 self-center"
-      style={{
-        width: width * 0.5,
-      }}
+      className="aspect-square h-auto mt-12 self-center w-[50%]"
     />
   )
 }

@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
-import { View, Image, useWindowDimensions, Linking } from 'react-native'
+import { View, Image, Linking } from 'react-native'
 import { RootStackParamList } from '../types'
 import { Button, Text, useTheme } from '@rneui/themed'
 import { useStore } from '../store'
@@ -10,15 +10,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>
 
 export default React.memo(function Welcome({ navigation }: Props) {
   const { set$firstRun } = useStore()
-  const { width } = useWindowDimensions()
   const { theme } = useTheme()
   return (
     <View className="flex-1 h-full py-10">
       <View className="flex-row justify-center">
         <Image
           source={require('../../assets/minibili.png')}
-          className="aspect-[33/10] h-auto"
-          style={{ width: width * 0.8 }}
+          className="aspect-[33/10] h-auto w-[80%]"
         />
       </View>
       <View className="p-8 flex-1">
@@ -29,7 +27,7 @@ export default React.memo(function Welcome({ navigation }: Props) {
         <Text className="text-base">
           🔈本应用为个人兴趣作品并完全开源(
           <Text
-            style={{ color: theme.colors.primary }}
+            className={`text-[${theme.colors.primary}]`}
             onPress={() => {
               Linking.openURL(githubLink)
             }}>

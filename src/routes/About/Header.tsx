@@ -1,23 +1,15 @@
 import React from 'react'
-import {
-  View,
-  Linking,
-  Pressable,
-  Image,
-  useWindowDimensions,
-} from 'react-native'
+import { View, Linking, Pressable, Image } from 'react-native'
 import { Button, Icon, Text } from '@rneui/themed'
 import { githubLink } from '../../constants'
 
 export default React.memo(function Header() {
-  const { width } = useWindowDimensions()
   return (
     <>
       <Pressable className="mb-5 mt-3 flex-1 items-center">
         <Image
           source={require('../../../assets/minibili.png')}
-          className="aspect-[33/10] h-auto"
-          style={{ width: width * 0.8 }}
+          className="aspect-[33/10] h-auto w-[85%]"
         />
       </Pressable>
       <View className="flex-row items-center justify-between mb-2">

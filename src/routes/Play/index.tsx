@@ -19,7 +19,6 @@ import { parseNumber, showToast } from '../../utils'
 import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingVideoId } from '../../utils/report'
-// import { s } from '../../styles'
 import { useUserRelation } from '../../api/user-relation'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
@@ -33,9 +32,14 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
   const { data: fans } = useUserRelation(videoInfo?.mid)
   const headerTitle = React.useCallback(() => {
     return (
-      <View className="flex-row items-center">
+      <View className="flex-row items-center relative left-[-10px]">
         <Text className="text-lg font-semibold">{videoInfo?.name}</Text>
-        <Text className="ml-3" style={{ color: theme.colors.grey2 }}>
+        <Text
+          className="ml-3"
+          style={{ color: theme.colors.grey2 }}
+          onPress={() => {
+            showToast(`粉丝：${fans?.follower}`)
+          }}>
           {` ${fans ? parseNumber(fans.follower) : ''}粉丝`}
         </Text>
       </View>

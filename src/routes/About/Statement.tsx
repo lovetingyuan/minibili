@@ -25,7 +25,7 @@ export default React.memo(function Statement() {
             🔈本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题欢迎使用意见反馈或者在
           </Text>
           <Text
-            style={{ color: theme.colors.primary }}
+            className={`text-[${theme.colors.primary}]`}
             onPress={() => {
               Linking.openURL(githubLink)
             }}>

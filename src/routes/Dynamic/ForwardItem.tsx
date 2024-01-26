@@ -144,9 +144,7 @@ export default function ForwardItem(props: {
                 rounded
               />
             ) : null}
-            <Text
-              className="text-base ml-2"
-              style={{ color: theme.colors.primary }}>
+            <Text className={`text-base ml-2 text-[${theme.colors.primary}]`}>
               {payload.name}
             </Text>
           </Pressable>

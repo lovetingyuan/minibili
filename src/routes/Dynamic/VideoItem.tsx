@@ -74,13 +74,13 @@ export default function VideoItem(props: {
             source={require('../../../assets/tv.png')}
           />
           <View className="absolute px-1 py-[1px] bg-gray-900/70 bottom-0 left-0 rounded-sm m-1">
-            <Text className="text-xs font-bold text-white">{duration}</Text>
+            <Text className="text-xs font-thin text-white">{duration}</Text>
           </View>
           <View className="absolute px-1 py-[1px] top-0 rounded-sm m-1 bg-gray-900/70">
-            <Text className="text-xs font-bold text-white">{date}</Text>
+            <Text className="text-xs font-thin text-white">{date}</Text>
           </View>
           <View className="absolute px-1 py-[1px] bottom-0 right-0 m-1 rounded-sm bg-gray-900/70">
-            <Text className="text-xs font-bold text-white">{danmu}弹</Text>
+            <Text className="text-xs font-thin text-white">{danmu}弹</Text>
           </View>
         </View>
         <View className="flex-1 justify-around">

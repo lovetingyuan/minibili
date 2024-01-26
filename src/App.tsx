@@ -88,16 +88,20 @@ export default function App() {
   const theme = React.useMemo(() => {
     return createTheme({
       lightColors: {
-        black: '#333',
-        grey5: '#ddd',
-        secondary: '#d85380',
-        success: '#008700',
+        white: '#ffffff', // text-[#ffffff]
+        black: '#333333', // text-[#333333]
+        primary: '#008AC5', // text-[#008AC5]
+        grey5: '#dddddd', // text-[#dddddd]
+        secondary: '#d85380', // text-[#d85380]
+        success: '#089043', // text-[#089043]
       },
       darkColors: {
-        black: '#bbb',
-        grey5: '#181818',
+        white: '#080808', // text-[#080808]
+        black: '#bbbbbb', // text-[#bbbbbb]
+        primary: '#008AC5',
+        grey5: '#181818', // text-[#181818]
         secondary: '#d85380',
-        success: '#008700',
+        success: '#0EB350', // text-[#0EB350]
       },
       mode: dark ? 'dark' : 'light',
     })

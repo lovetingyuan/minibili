@@ -63,7 +63,12 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           numberOfLines={1}>
           {userName + '   '}
           {fans ? (
-            <Text className="text-sm" style={{ color: theme.colors.grey2 }}>
+            <Text
+              className="text-sm"
+              style={{ color: theme.colors.grey2 }}
+              onPress={() => {
+                showToast(`粉丝：${fans.follower}`)
+              }}>
               {parseNumber(fans.follower)}粉丝
             </Text>
           ) : null}
