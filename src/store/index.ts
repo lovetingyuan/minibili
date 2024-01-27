@@ -83,9 +83,6 @@ export const onChange: ProviderOnChangeType<AppContextValueType> = (
   { key, value },
   ctx,
 ) => {
-  if (!ctx.getInitialed()) {
-    return
-  }
   if (key === '$followedUps') {
     const ups: Record<string, UpInfo> = {}
     for (const up of value) {
@@ -99,6 +96,9 @@ export const onChange: ProviderOnChangeType<AppContextValueType> = (
       return item.latestId !== item.currentLatestId
     }).length
     ctx.set_updatedCount(count)
+  }
+  if (!ctx.getInitialed()) {
+    return
   }
   if (key.startsWith('$')) {
     AsyncStorage.setItem(StoragePrefix + key, JSON.stringify(value))
