@@ -3,6 +3,7 @@ import useSWR from 'swr'
 import { z } from 'zod'
 import { ReplayItem, ReplyResponseSchema } from './comments.schema'
 import request from './fetcher'
+import { useWbiQuery } from './get-wbi'
 
 type ReplyResponse = z.infer<typeof ReplyResponseSchema>
 
@@ -220,8 +221,18 @@ export type ReplyItem = ReturnType<typeof getReplies>[0]
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
+  const query = useWbiQuery(
+    oid
+      ? {
+          oid,
+          type,
+        }
+      : null,
+  )
   const { data, error, isLoading } = useSWR<ReplyResponse>(() => {
-    return oid ? `/x/v2/reply/main?oid=${oid}&type=${type}` : null
+    // return 'https://api.bilibili.com/x/v2/reply/wbi/main?oid=490300290&type=1&wts=1706365588&w_rid=ce031a1b8c4a16e54e741c13b8d8e506'
+    return oid ? `/x/v2/reply/wbi/main?${query}` : null
+    // return oid ? `/x/v2/reply/main?oid=${oid}&type=${type}` : null
   }, request)
   // /x/v2/reply/main?oid=490300290&type=1
   // console.log(9999, data?.replies.length)

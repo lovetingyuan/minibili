@@ -8,7 +8,7 @@ import { Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 
-export const Additional = (props: { additional?: AdditionalType | null }) => {
+export function Additional(props: { additional?: AdditionalType | null }) {
   const { additional } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
   if (!additional) {

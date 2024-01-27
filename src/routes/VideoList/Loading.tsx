@@ -4,7 +4,7 @@ import { Skeleton } from '@rneui/themed'
 
 const getWidth = () => Math.floor(Math.random() * (100 - 10 + 1)) + 10
 
-const VideoLoading = () => {
+function VideoLoading() {
   return (
     <View className="flex-1 gap-3">
       <Skeleton animation="pulse" width={'100%' as any} height={90} />
@@ -32,7 +32,7 @@ const VideoLoading = () => {
   )
 }
 
-export default React.memo(() => {
+export default React.memo(function VLoading() {
   return (
     <View>
       {Array(10)

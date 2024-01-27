@@ -22,7 +22,8 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
     <View className="flex-row items-center gap-3">
       <Menu
         visible={visible}
-        style={{ backgroundColor: theme.colors.background }}
+        // @ts-expect-error className will be handled
+        className="bg-white dark:bg-zinc-900"
         anchor={
           <Icon
             name="dots-vertical"
@@ -32,7 +33,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
         }
         onRequestClose={hideMenu}>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw('text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             setWebViewMode(webViewMode === 'MOBILE' ? 'PC' : 'MOBILE')
@@ -41,7 +42,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
           {webViewMode === 'MOBILE' ? '电脑模式' : '手机模式'}
         </MenuItem>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw('text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             hideMenu()
@@ -50,7 +51,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
           浏览器打开
         </MenuItem>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw('text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             hideMenu()
@@ -59,7 +60,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
           刷新页面
         </MenuItem>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw('text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             Clipboard.setStringAsync(url).then(() => {
@@ -70,7 +71,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
           复制链接
         </MenuItem>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw('text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             hideMenu()

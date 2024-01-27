@@ -15,7 +15,7 @@ import useErrToast from '../../hooks/useErrToast'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
-const Loading = React.memo(() => {
+const Loading = React.memo(function Loading() {
   return (
     <View>
       {Array(10)
@@ -117,9 +117,7 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
       return null
     }
     return (
-      <Text
-        className="text-sm mt-3 mb-5 text-center"
-        style={{ color: theme.colors.grey3 }}>
+      <Text className="text-sm mt-3 mb-5 text-center text-gray-500">
         {isReachingEnd ? '到底了~' : isValidating ? '加载中...' : ''}
       </Text>
     )
@@ -153,18 +151,14 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
         estimatedItemSize={100}
         ListHeaderComponent={
           dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
-            <View
-              className="px-3 border-b-[0.5px] py-3 flex-row"
-              style={{ borderBottomColor: theme.colors.divider }}>
+            <View className="px-3 border-b-[0.5px] py-3 flex-row border-b-gray-400">
               <Icon
                 name="billboard"
                 type="material-community"
                 size={18}
                 color={theme.colors.grey2}
               />
-              <Text
-                className="text-sm ml-2 shrink-0 flex-1"
-                style={{ color: theme.colors.grey2 }}>
+              <Text className="text-sm ml-2 shrink-0 flex-1 text-gray-600 dark:text-gray-400">
                 {dynamicUser?.sign.trim()}
               </Text>
             </View>

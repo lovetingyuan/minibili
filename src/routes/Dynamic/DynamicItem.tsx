@@ -9,10 +9,10 @@ import CommonItem from './CommonItem'
 import DynamicStat from './DynamicStat'
 import { useRoute } from '@react-navigation/native'
 import { DynamicItemAllType } from '../../api/dynamic-items'
-import { useTheme } from '@rneui/themed'
+// import { useTheme } from '@rneui/themed'
 
 export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
-  const { theme } = useTheme()
+  // const { theme } = useTheme()
   let Item: React.FC<any> = DefaultItem
   const route = useRoute()
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
@@ -40,9 +40,7 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   }
   // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
   return (
-    <View
-      className="py-5 px-3 border-b-[0.5px]"
-      style={{ borderBottomColor: theme.colors.divider }}>
+    <View className="py-5 px-3 border-b-[0.5px] border-b-gray-400">
       {item.top ? (
         <View className="border-[0.5px] w-9 rounded mb-3 px-1 border-rose-600">
           <Text className="text-center font-thin text-sm text-rose-500">

@@ -52,15 +52,15 @@ export default React.memo(function VideoInfo(props: {
                     changePage(v.page)
                   }}
                   containerStyle={tw('py-3 px-5')}
-                  bottomDivider>
+                  bottomDivider
+                  topDivider>
                   <ListItem.Content>
                     <ListItem.Title
-                      className={selected ? 'font-bold' : ''}
-                      style={{
-                        color: selected
-                          ? theme.colors.primary
-                          : theme.colors.grey2,
-                      }}>
+                      className={
+                        selected
+                          ? `font-bold text-[${theme.colors.success}]`
+                          : 'text-gray-500'
+                      }>
                       {v.page}. {v.title}
                     </ListItem.Title>
                   </ListItem.Content>
@@ -71,7 +71,7 @@ export default React.memo(function VideoInfo(props: {
         ) : !isLoading &&
           videoInfo?.videos &&
           videoInfo?.videos !== videoInfo?.pages?.length ? (
-          <Text className="mt-3 italic" style={{ color: theme.colors.warning }}>
+          <Text className="mt-3 italic text-orange-600">
             该视频为交互视频，暂不支持
           </Text>
         ) : null}

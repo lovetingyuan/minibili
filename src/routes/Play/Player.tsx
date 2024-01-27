@@ -169,9 +169,7 @@ export default React.memo(function Player(props: {
     <View
       renderToHardwareTextureAndroid
       className="w-full shrink-0"
-      style={{
-        height: videoViewHeight + extraHeight,
-      }}>
+      style={{ height: videoViewHeight + extraHeight }}>
       {loadPlayer ? (
         webview
       ) : (

@@ -35,7 +35,7 @@ export default React.memo(function Welcome({ navigation }: Props) {
           </Text>
           )，所有数据均为B站官网公开，不会读取、存储、公开任何个人隐私数据，仅供学习交流!
         </Text>
-        <Text className="text-base mt-5" style={{ color: theme.colors.grey2 }}>
+        <Text className="text-base mt-5 text-gray-600 dark:text-gray-400">
           如果遇到闪退或报错请及时更新最新版本。
         </Text>
       </View>

@@ -10,29 +10,14 @@ import { Text } from '@rneui/themed'
 import FollowItem from './FollowItem'
 import { UpInfo } from '../../types'
 import { useStore } from '../../store'
-// import { s } from '../../styles'
 import AddFollow from './AddFollow'
 import useMounted from '../../hooks/useMounted'
 import useIsDark from '../../hooks/useIsDark'
 
-const renderItem = ({
-  item,
-  index,
-}: // index,
-{
-  item: UpInfo | null
-  index: number
-}) => {
-  if (item) {
-    return <FollowItem item={item} index={index} />
-  }
-  return <View className="flex-1" />
-}
-
 const tvL = require('../../../assets/tv-l.png')
 const tvR = require('../../../assets/tv-r.png')
 
-const TvImg: React.FC = () => {
+function TvImg() {
   const [tvImg, setTvImg] = React.useState(false)
   useMounted(() => {
     const timer = window.setInterval(() => {
@@ -59,6 +44,22 @@ export default React.memo(function Follow() {
 
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
+  const renderItem = React.useCallback(
+    ({
+      item,
+      index,
+    }: // index,
+    {
+      item: UpInfo | null
+      index: number
+    }) => {
+      if (item) {
+        return <FollowItem item={item} index={index} />
+      }
+      return <View className="flex-1" />
+    },
+    [],
+  )
 
   const content = React.useMemo(() => {
     const followedUpListLen = $followedUps.length
@@ -93,6 +94,7 @@ export default React.memo(function Follow() {
       ...otherUps,
       ...(rest ? Array.from({ length: rest }).map(() => null) : []),
     ]
+
     return (
       <>
         <View className="flex-1">
@@ -127,7 +129,7 @@ export default React.memo(function Follow() {
         <AddFollow />
       </>
     )
-  }, [$followedUps, $upUpdateMap, livingUps, columns])
+  }, [$followedUps, $upUpdateMap, livingUps, columns, renderItem])
 
   return (
     <View className="flex-1 flex-col">

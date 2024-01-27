@@ -200,11 +200,7 @@ export default React.memo(function Comment(props: Props) {
         ) : null}
       </Text>
       {comment.replies?.length ? (
-        <View
-          className="p-2 rounded mt-1 mb-4 gap-1 opacity-90 flex-1"
-          style={{
-            backgroundColor: theme.colors.grey5,
-          }}>
+        <View className="p-2 rounded mt-1 mb-4 gap-1 opacity-90 flex-1 shrink-0 bg-gray-300 dark:bg-gray-900">
           {comment.replies.map(reply => {
             return (
               <Text

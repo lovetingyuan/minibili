@@ -25,7 +25,7 @@ export default function ErrorFallback(props: { message?: string }) {
         source={require('../../assets/error.png')}
         className="aspect-square w-80"
       />
-      <Text className="mx-7 text-base" style={{ color: theme.colors.error }}>
+      <Text className="mx-7 text-base text-red-600">
         非常抱歉，应用发生了未知错误
         {'\n\n'}
         <Text className="italic text-xs">{props.message || 'N/A'}</Text>

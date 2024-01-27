@@ -26,7 +26,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   }
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { theme } = useTheme()
+  // const { theme } = useTheme()
   const gotoWebPage = () => {
     if (dynamicUser) {
       navigation.navigate('WebPage', {
@@ -64,8 +64,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           {userName + '   '}
           {fans ? (
             <Text
-              className="text-sm"
-              style={{ color: theme.colors.grey2 }}
+              className="text-sm text-gray-500 dark:text-gray-400"
               onPress={() => {
                 showToast(`粉丝：${fans.follower}`)
               }}>
@@ -112,7 +111,8 @@ function HeaderRight() {
     <View className="flex-row items-center gap-2">
       <Menu
         visible={visible}
-        style={{ backgroundColor: theme.colors.background }}
+        // @ts-expect-error className will be handled
+        className="bg-white dark:bg-zinc-900"
         anchor={
           <Icon
             name="dots-vertical"
@@ -123,7 +123,7 @@ function HeaderRight() {
         onRequestClose={hideMenu}>
         {!followed && (
           <MenuItem
-            textStyle={{ color: theme.colors.black }}
+            textStyle={tw('text-black dark:text-gray-300')}
             pressColor={theme.colors.grey4}
             onPress={() => {
               if (dynamicUser) {
@@ -144,7 +144,7 @@ function HeaderRight() {
           </MenuItem>
         )}
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw('text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             if (dynamicUser) {
@@ -156,7 +156,7 @@ function HeaderRight() {
           分享UP
         </MenuItem>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             if (dynamicUser?.face) {
@@ -167,7 +167,7 @@ function HeaderRight() {
           查看头像
         </MenuItem>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             if (!dynamicUser) {
@@ -181,7 +181,7 @@ function HeaderRight() {
           复制用户名
         </MenuItem>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             if (!dynamicUser) {
@@ -195,7 +195,7 @@ function HeaderRight() {
           复制用户ID
         </MenuItem>
         <MenuItem
-          textStyle={{ color: theme.colors.black }}
+          textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={theme.colors.grey4}
           onPress={() => {
             if (!dynamicUser) {

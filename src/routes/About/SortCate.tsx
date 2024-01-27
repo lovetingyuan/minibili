@@ -1,4 +1,4 @@
-import { Chip, ListItem, Text, Icon, useTheme } from '@rneui/themed'
+import { Chip, ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import { useStore } from '../../store'
 import { View } from 'react-native'
@@ -12,7 +12,7 @@ export default React.memo(function SortCate() {
   const [, ...initUnsortedRankList] = $videoCatesList
   const [unsortedRankList, setUnSortedRankList] =
     React.useState(initUnsortedRankList)
-  const { theme } = useTheme()
+  // const { theme } = useTheme()
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
@@ -28,9 +28,7 @@ export default React.memo(function SortCate() {
       }}>
       <ListItem
         containerStyle={tw('flex-wrap p-0 flex-row px-1 bg-transparent')}>
-        <View
-          className="flex-row flex-wrap border-b-[0.5px] flex-1 w-full gap-x-3"
-          style={{ borderBottomColor: theme.colors.divider }}>
+        <View className="flex-row flex-wrap border-b-[0.5px] flex-1 w-full gap-x-3 border-b-gray-400	">
           {sortedRankList.map(cate => {
             return (
               <Chip
@@ -45,7 +43,7 @@ export default React.memo(function SortCate() {
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
                 }}
                 containerStyle={tw('mb-2')}
-                buttonStyle={tw('px-0 py-[2px]')}
+                buttonStyle={tw('px-[6px] py-[2px]')}
               />
             )
           })}

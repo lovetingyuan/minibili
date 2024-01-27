@@ -16,7 +16,7 @@ function splitArrayIntoChunks(arr: any[]) {
   return result
 }
 
-const HeaderTitle = React.memo(() => {
+const HeaderTitle = React.memo(function HeaderTitle() {
   const { currentVideosCate, $videoCatesList, setCurrentVideosCate } =
     useStore()
   const [newVersion, setNewVersion] = React.useState<PromiseResult<
@@ -59,22 +59,19 @@ const HeaderTitle = React.memo(() => {
     <View className="flex-row items-center gap-4">
       <Menu
         visible={visible}
-        // @ts-ignore
-        className="relative top-14 w-48"
-        style={{ backgroundColor: theme.colors.background }}
+        // @ts-expect-error className will be handled
+        className="relative top-14 w-48 bg-white dark:bg-zinc-900"
         anchor={
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={showMenu}
             className="flex-row items-center h-full">
             <Text
-              className="text-lg font-semibold"
-              style={{
-                color:
-                  currentVideosCate.rid === -1
-                    ? theme.colors.secondary
-                    : theme.colors.grey1,
-              }}>
+              className={`text-lg font-semibold ${
+                currentVideosCate.rid === -1
+                  ? 'text-pink-500'
+                  : 'text-gray-800 dark:text-gray-300'
+              }`}>
               {currentVideosCate.label +
                 (currentVideosCate.rid === -1 ? '' : '排行')}{' '}
             </Text>
@@ -121,7 +118,7 @@ const HeaderTitle = React.memo(() => {
   )
 })
 
-const HeaderRight = React.memo(() => {
+const HeaderRight = React.memo(function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { _updatedCount, livingUps } = useStore()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0

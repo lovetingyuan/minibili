@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, ScrollView, Pressable } from 'react-native'
-import { Text, useTheme } from '@rneui/themed'
+import { Text } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
 
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?&bvid=BV1aX4y1B7n7&cid=1103612055&wmode=transparent&as_wide=1&crossDomain=1&lite=0&danmaku=0
@@ -27,7 +27,6 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
   const { bvid } = route.params
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data: videoInfo } = useVideoInfo(bvid, route.params)
-  const { theme } = useTheme()
 
   const { data: fans } = useUserRelation(videoInfo?.mid)
   const headerTitle = React.useCallback(() => {
@@ -35,8 +34,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
       <View className="flex-row items-center relative left-[-10px]">
         <Text className="text-lg font-semibold">{videoInfo?.name}</Text>
         <Text
-          className="ml-3"
-          style={{ color: theme.colors.grey2 }}
+          className="ml-3 text-gray-500"
           onPress={() => {
             showToast(`粉丝：${fans?.follower}`)
           }}>
@@ -44,7 +42,7 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
         </Text>
       </View>
     )
-  }, [videoInfo?.name, fans, theme.colors.grey2])
+  }, [videoInfo?.name, fans])
   React.useEffect(() => {
     if (videoInfo?.name) {
       navigation.setOptions({
@@ -79,18 +77,14 @@ export default React.memo(function PlayPage({ route, navigation }: Props) {
                       showToast('已复制视频ID')
                     })
                   }}>
-                  <Text
-                    style={{ color: theme.colors.grey1 }}
-                    className="text-xs">
+                  <Text className="text-xs text-gray-500 dark:text-gray-400">
                     {bvid}
                   </Text>
                 </Pressable>
-                <Text
-                  className="text-base font-bold"
-                  style={{ color: theme.colors.grey1 }}>
+                <Text className="text-base font-bold text-gray-500 dark:text-gray-400">
                   {' · '}
                 </Text>
-                <Text className="text-xs" style={{ color: theme.colors.grey1 }}>
+                <Text className="text-xs text-gray-500 dark:text-gray-400">
                   {videoInfo?.tag}
                 </Text>
               </View>

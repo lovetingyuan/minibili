@@ -32,17 +32,25 @@ export default function request<D extends any>(url: string) {
 
   // eslint-disable-next-line no-console
   __DEV__ && console.log('request url: ', url.slice(0, 150))
+  const headers = {
+    accept: 'application/json, text/plain, */*',
+    'accept-language': 'zh-CN,zh;q=0.9',
+    'cache-control': 'no-cache',
+    cookie,
+    'user-agent':
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+    // 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+    // 'user-agent': 'Mozilla/5.0',
+  }
+  if (url.includes('/reply/')) {
+    // console.log(99, url)
+    // @ts-ignore
+    delete headers.cookie
+  }
   return fetch(requestUrl, {
-    headers: {
-      accept: 'application/json, text/plain, */*',
-      'accept-language': 'zh-CN,zh;q=0.9',
-      'cache-control': 'no-cache',
-      cookie,
-      'user-agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0',
-      // 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-      // 'user-agent': 'Mozilla/5.0',
-    },
+    headers,
+    referrerPolicy: 'strict-origin-when-cross-origin',
+    body: null,
     method: 'GET',
     mode: 'cors',
     credentials: 'include',

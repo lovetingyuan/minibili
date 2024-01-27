@@ -172,9 +172,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         estimatedItemSize={itemWidth}
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
-          <Text
-            style={{ color: theme.colors.grey2 }}
-            className="text-center my-3">
+          <Text className="text-center my-3 text-gray-500">
             {loading
               ? `加载中(${hotVideoList.length})...`
               : isReachingEnd

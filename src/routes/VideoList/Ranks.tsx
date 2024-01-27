@@ -18,7 +18,6 @@ import { useRankList } from '../../api/rank-list'
 import Loading from './Loading'
 import { Action, reportUserAction } from '../../utils/report'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useTheme } from '@rneui/themed'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
@@ -121,7 +120,6 @@ export default React.memo(function Ranks({ navigation }: Props) {
   }
 
   const { width } = useWindowDimensions()
-  const { theme } = useTheme()
 
   const estimatedItemSize = width / 2 - 10
 
@@ -142,9 +140,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
           <View>
-            <Text
-              className="text-center my-3"
-              style={{ color: theme.colors.grey3 }}>
+            <Text className="text-center my-3 text-gray-500">
               {isLoading ? '加载中...' : '到底了~'}
             </Text>
             {isLoading ? (

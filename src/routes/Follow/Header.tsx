@@ -6,7 +6,7 @@ import { Icon } from '@rneui/base'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../../types'
 
-const HeaderTitle = () => {
+function HeaderTitle() {
   const { $followedUps, _updatedCount } = useStore()
   const count = $followedUps.length
   return (
@@ -28,7 +28,7 @@ const HeaderTitle = () => {
 
 export const followHeaderTitle = () => <HeaderTitle />
 
-const HeaderRight = () => {
+function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (

@@ -26,7 +26,7 @@ function HeaderRight() {
   )
 }
 
-export function HeaderTitle() {
+function HeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, 'DynamicDetail'>>()
   const { face, name } = route.params.detail
   return (

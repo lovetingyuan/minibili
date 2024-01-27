@@ -5,7 +5,7 @@ import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
 
-const Loading = React.memo(() => {
+const Loading = React.memo(function Loading() {
   return (
     <View>
       {Array(10)
@@ -41,6 +41,7 @@ export default function CommentList(props: {
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)
   const { theme } = useTheme()
+  // useColorScheme()
   return (
     <View>
       <View className="my-5 border-b-[0.5px] border-gray-400 pb-1 flex-row justify-between">
@@ -51,9 +52,7 @@ export default function CommentList(props: {
             size={14}
             color={theme.colors.grey1}
           />
-          <Text
-            className="text-xs mr-3 px-2"
-            style={{ color: theme.colors.grey1 }}>
+          <Text className="text-xs mr-3 px-2 text-gray-700 dark:text-gray-300">
             {allCount ? allCount + '条评论' : '暂无评论'}
           </Text>
         </View>
@@ -81,9 +80,7 @@ export default function CommentList(props: {
       ) : null}
       {comments?.length ? (
         <View className="mb-3 items-center">
-          <Text className="text-xs mt-2" style={{ color: theme.colors.grey3 }}>
-            只加载前30条
-          </Text>
+          <Text className="text-xs mt-2 text-gray-500">只加载前30条</Text>
           <Text />
         </View>
       ) : null}

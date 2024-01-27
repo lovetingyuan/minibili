@@ -59,7 +59,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
             className="w-[13px] h-[11px]"
             source={require('../../../assets/play-mark.png')}
           />
-          <Text className="ml-1 text-xs" style={{ color: theme.colors.grey1 }}>
+          <Text className="ml-1 text-xs text-gray-600 dark:text-gray-400">
             {playNum}
           </Text>
         </View>

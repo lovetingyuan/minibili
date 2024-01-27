@@ -47,7 +47,7 @@ function SearchedItem(props: { up: SearchedUpType }) {
         numberOfLines={2}>
         {up.name}
       </Text>
-      <Text className="text-xs ml-2" style={{ color: theme.colors.grey2 }}>
+      <Text className="text-xs ml-2 text-gray-400">
         {parseNumber(up.fans)}粉丝
       </Text>
 
@@ -143,9 +143,7 @@ export default React.memo(function AddFollow() {
             }
             ListFooterComponent={
               searchedUps?.length ? (
-                <Text
-                  className="text-center pb-3 text-xs"
-                  style={{ color: theme.colors.grey3 }}>
+                <Text className="text-center pb-3 text-xs text-gray-500">
                   暂不支持更多结果~
                 </Text>
               ) : null

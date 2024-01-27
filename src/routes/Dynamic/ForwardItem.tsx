@@ -47,10 +47,8 @@ export default function ForwardItem(props: {
               <Text className="font-bold">视频：</Text>
               {title}
             </Text>
-            <Text
-              className="mt-3 text-xs"
-              style={{ color: theme.colors.grey2 }}>
-              {stat.play}播放{'  '}
+            <Text className="mt-3 text-xs text-gray-600 dark:text-gray-400">
+              {stat.play}播放{'   '}
               {stat.danmaku}弹幕
             </Text>
           </View>
@@ -120,9 +118,7 @@ export default function ForwardItem(props: {
         topic={item.topic}
         textProps={{ numberOfLines: 3 }}
       />
-      <View
-        className="flex-1 mb-2 rounded p-3 overflow-hidden"
-        style={{ backgroundColor: theme.colors.grey5 }}>
+      <View className="flex-1 mb-2 rounded p-3 overflow-hidden bg-stone-200 dark:bg-stone-900">
         {payload.name && payload.mid !== item.mid ? (
           <Pressable
             className="flex-row items-center mb-2"

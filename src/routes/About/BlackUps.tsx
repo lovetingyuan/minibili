@@ -1,11 +1,11 @@
-import { ListItem, Text, Icon, useTheme } from '@rneui/themed'
+import { ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import { useStore } from '../../store'
 
 export default React.memo(function BlackUps() {
   const [expandedUp, setExpandedUp] = React.useState(false)
   const { $blackUps } = useStore()
-  const { theme } = useTheme()
+  // const { theme } = useTheme()
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
@@ -25,7 +25,7 @@ export default React.memo(function BlackUps() {
         containerStyle={tw('flex-wrap p-0 flex-row px-1 mb-3 bg-transparent')}>
         {Object.values($blackUps).map(name => {
           return (
-            <Text key={name} style={{ color: theme.colors.grey2 }}>
+            <Text key={name} className="text-gray-500">
               {name}
             </Text>
           )
