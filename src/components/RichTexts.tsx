@@ -7,6 +7,7 @@ import { Icon, Text, useTheme } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 import { imgUrl, parseUrl } from '../utils'
+import { useStore } from '../store'
 
 export default React.memo(
   function RichTexts(props: {
@@ -23,6 +24,7 @@ export default React.memo(
     const navigation = useNavigation<NavigationProps['navigation']>()
     const reactNodes: React.ReactNode[] = []
     const { theme } = useTheme()
+    const { setImagesList } = useStore()
     let key = 0
     const fontSize = props.fontSize || 16
     const Topic = props.topic ? (
@@ -197,6 +199,21 @@ export default React.memo(
             {'📝 ' + node.text}
           </Text>,
         )
+      } else if (
+        node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_VIEW_PICTURE
+      ) {
+        reactNodes.push(
+          <Text
+            numberOfLines={1}
+            onPress={() => {
+              // Linking.openURL(parseUrl(node.jump_url))
+              setImagesList(node.pics)
+            }}
+            key={key++}
+            style={{ fontSize, color: theme.colors.primary }}>
+            {'📝 ' + node.text}
+          </Text>,
+        )
       } else {
         reportUnknownRichTextItem(node)
         reactNodes.push(
@@ -210,7 +227,9 @@ export default React.memo(
       typeof props.textProps?.numberOfLines === 'number' &&
       lines - 1 > props.textProps.numberOfLines
     return (
-      <View className={textOverflow ? 'mb-4' : 'mb-3'} style={props.style}>
+      <View
+        className={`flex-1 ${textOverflow ? 'mb-4' : 'mb-3'}`}
+        style={props.style}>
         {Topic}
         <Text
           className="flex-row flex-wrap items-center flex-1"

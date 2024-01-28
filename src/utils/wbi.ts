@@ -31,7 +31,7 @@ export default function encWbi(
     ),
   }
   const mixin_key = getMixinKey(img_key + sub_key),
-    curr_time = Math.round(Date.now() / 1000),
+    curr_time = 1706448642, //Math.round(Date.now() / 1000),
     chr_filter = /[!'()*]/g
 
   Object.assign(params, { wts: curr_time }) // 添加 wts 字段

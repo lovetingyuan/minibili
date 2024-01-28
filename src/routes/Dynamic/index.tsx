@@ -116,6 +116,7 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
     if (!list.length) {
       return null
     }
+    // console.log(333, list[1])
     return (
       <Text className="text-sm mt-3 mb-5 text-center text-gray-500">
         {isReachingEnd ? '到底了~' : isValidating ? '加载中...' : ''}

@@ -51,7 +51,7 @@ export const getAppValue = () => {
       src: string
       width: number
       height: number
-      ratio: number
+      ratio?: number
     }[],
     currentImageIndex: 0,
     overlayButtons: [] as { text: string; onPress: () => void }[],

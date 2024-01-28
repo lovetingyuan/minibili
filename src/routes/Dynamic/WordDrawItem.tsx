@@ -9,6 +9,7 @@ import { Additional } from '../../components/Additional'
 import { NavigationProps } from '../../types'
 import { imgUrl } from '../../utils'
 import { useStore } from '../../store'
+import { Text } from '@rneui/themed'
 
 export default function WordDrawItem(props: {
   item: DynamicItemType<
@@ -17,12 +18,7 @@ export default function WordDrawItem(props: {
   >
 }) {
   const {
-    item: {
-      id,
-      desc,
-      topic,
-      payload: { images, additional },
-    },
+    item: { id, desc, topic, payload },
   } = props
   const richTextNodes = desc?.rich_text_nodes
   const route = useRoute()
@@ -30,7 +26,7 @@ export default function WordDrawItem(props: {
   const { width } = useWindowDimensions()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { setImagesList, setCurrentImageIndex } = useStore()
-
+  const { images, additional, title, texts } = payload
   const scrollImages = (
     <View className="flex-1 flex-row overflow-hidden">
       {images.map((img, i) => {
@@ -104,6 +100,14 @@ export default function WordDrawItem(props: {
         topic={topic}
         textProps={isDetail ? {} : { numberOfLines: 4 }}
       />
+      {title ? <Text className="font-bold text-base">{title}</Text> : null}
+      {texts.length ? (
+        <RichTexts
+          idStr={id}
+          nodes={texts}
+          textProps={isDetail ? {} : { numberOfLines: 4 }}
+        />
+      ) : null}
       {images.length ? (isDetail ? imageList : scrollImages) : null}
       <Additional additional={additional} />
     </>

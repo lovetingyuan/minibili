@@ -3,6 +3,7 @@ import {
   DynamicItemBaseType,
   DynamicItemResponse,
   DynamicListResponse,
+  RichTextItem,
 } from './dynamic-items.schema'
 import useSWRInfinite from 'swr/infinite'
 import {
@@ -87,13 +88,25 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     }
   }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD) {
-    const additional = item.modules.module_dynamic.additional
+    const { additional, major } = item.modules.module_dynamic
+    let title = ''
+    let texts: RichTextItem[] = []
+    let images: { height: number; width: number; src: string }[] = []
+    if (major?.type === MajorTypeEnum.MAJOR_TYPE_OPUS) {
+      title = major.opus.title
+      texts = major.opus.summary.rich_text_nodes
+      images = major.opus.pics.map(p => {
+        return { width: p.width, height: p.height, src: p.url }
+      })
+    }
     return {
       ...getCommon(item),
       type: HandledDynamicTypeEnum.DYNAMIC_TYPE_WORD as const,
       payload: {
         additional,
-        images: [],
+        images,
+        title,
+        texts,
       },
     }
   }
@@ -103,7 +116,8 @@ const getDynamicItem = (item: DynamicItemResponse) => {
       ...getCommon(item),
       type: HandledDynamicTypeEnum.DYNAMIC_TYPE_DRAW as const,
       payload: {
-        // text,
+        texts: [],
+        title: '',
         additional,
         images:
           item.modules?.module_dynamic?.major?.draw?.items?.map(v => {
@@ -477,9 +491,9 @@ export function useDynamicItems(mid?: string | number) {
         }
         // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480&features=itemOpusStyle
         if (!offset) {
-          return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
+          return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480&features=itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote`
         }
-        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480`
+        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}&timezone_offset=-480&features=itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote`
       },
       request,
       {
@@ -489,7 +503,7 @@ export function useDynamicItems(mid?: string | number) {
         dedupingInterval: 60 * 1000,
       },
     )
-
+  // console.log(4444, data)
   const dynamicItems: DynamicListResponse['items'] =
     data?.reduce(
       (a, b) => {

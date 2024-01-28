@@ -36,25 +36,33 @@ export default function request<D extends any>(url: string) {
     accept: 'application/json, text/plain, */*',
     'accept-language': 'zh-CN,zh;q=0.9',
     'cache-control': 'no-cache',
+    // 'sec-fetch-dest': 'empty',
+    // 'sec-fetch-mode': 'cors',
+    // 'sec-fetch-site': 'same-site',
+    // Cookie: '',
     cookie,
+    origin: 'https://www.bilibili.com',
     'user-agent':
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
     // 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
     // 'user-agent': 'Mozilla/5.0',
   }
-  if (url.includes('/reply/')) {
-    // console.log(99, url)
-    // @ts-ignore
-    delete headers.cookie
-  }
-  return fetch(requestUrl, {
+  const options = {
     headers,
+    // referrerPolicy: 'no-referrer-when-downgrade',
     referrerPolicy: 'strict-origin-when-cross-origin',
     body: null,
     method: 'GET',
     mode: 'cors',
     credentials: 'include',
-  })
+  } satisfies Parameters<typeof fetch>[1]
+  if (url.includes('/reply/')) {
+    // @ts-ignore
+    delete headers.cookie
+    // @ts-ignore
+    options.credentials = 'omit'
+  }
+  return fetch(requestUrl, options)
     .then(r => r.text())
     .then(resText => {
       const index = resText.indexOf('}{"code":')
@@ -67,7 +75,7 @@ export default function request<D extends any>(url: string) {
         data: resText,
       } as Res<D>
       try {
-        if (url.includes('/x/v2/reply/main?')) {
+        if (url.includes('/x/v2/reply/wbi/main?')) {
           // oid这个属性是数字但是会溢出，所以这里处理成字符串
           resText = resText.replaceAll(/"oid":(\d+),"/g, (_, num) => {
             return `"oid":"${num}","`

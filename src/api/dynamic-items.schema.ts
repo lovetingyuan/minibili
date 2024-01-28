@@ -106,6 +106,15 @@ const RichTextSchema = z.discriminatedUnion('type', [
     text: z.string(),
   }),
   z.object({
+    type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_VIEW_PICTURE]),
+    rid: z.string(),
+    jump_url: z.string(),
+    text: z.string(),
+    pics: z
+      .object({ height: z.number(), width: z.number(), src: z.string() })
+      .array(),
+  }),
+  z.object({
     type: z.nativeEnum(OtherRichTextType),
     text: z.string(),
   }),
@@ -479,7 +488,12 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: MajorSchemaMap.Word.nullable(),
+              major: z
+                .discriminatedUnion('type', [
+                  MajorSchemaMap.Word,
+                  MajorSchemaMap.Opus,
+                ])
+                .nullable(),
             }),
           ),
         }),
@@ -793,3 +807,5 @@ export const DynamicListResponseSchema = z.object({
 })
 
 export type DynamicListResponse = z.infer<typeof DynamicListResponseSchema>
+
+export type RichTextItem = z.infer<typeof RichTextSchema>

@@ -16,7 +16,7 @@ import useIsDark from '../../hooks/useIsDark'
 import { UA } from '../../constants'
 import { showToast } from '../../utils'
 
-const Loading = () => {
+function Loading() {
   return (
     <View className="absolute w-full h-full justify-center items-center">
       <Image
@@ -32,6 +32,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
 export default React.memo(function WebPage({ route, navigation }: Props) {
   const { url, title } = route.params
+
   const webviewRef = React.useRef<WebView | null>(null)
   const { webViewMode } = useStore()
   const isDark = useIsDark()
@@ -82,7 +83,7 @@ export default React.memo(function WebPage({ route, navigation }: Props) {
         // allowsBackForwardNavigationGestures
         mediaPlaybackRequiresUserAction={false}
         injectedJavaScript={INJECTED_JAVASCRIPT}
-        renderLoading={Loading}
+        renderLoading={() => <Loading />}
         userAgent={webViewMode === 'MOBILE' ? '' : UA}
         ref={webviewRef}
         onMessage={evt => {
