@@ -133,7 +133,7 @@ export function showToast(message: string, long = false) {
 let showedFatalError = false
 
 export function showFatalError(error: any) {
-  if (showedFatalError || __DEV__) {
+  if (showedFatalError) {
     return
   }
   getAppUpdateInfo.then(info => {

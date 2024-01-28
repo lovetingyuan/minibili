@@ -28,7 +28,7 @@ export default function WordDrawItem(props: {
   const { setImagesList, setCurrentImageIndex } = useStore()
   const { images, additional, title, texts } = payload
   const scrollImages = (
-    <View className="flex-1 flex-row overflow-hidden">
+    <View className="flex-1 flex-row gap-2 overflow-hidden">
       {images.map((img, i) => {
         const ImageCmp = (
           <Image
@@ -58,12 +58,12 @@ export default function WordDrawItem(props: {
   )
   const imageListWidth =
     images.length > 2
-      ? width / 3 - 10
+      ? width / 3 - 14
       : images.length === 2
-        ? width / 2 - 15
+        ? width / 2 - 16
         : width / 2
   const imageList = (
-    <View className="flex-wrap flex-row gap-1 mb-5">
+    <View className="flex-wrap flex-row gap-2 mb-5">
       {images.map((img, i) => {
         const ImageCmp = (
           <Image

@@ -5,13 +5,13 @@ import { StatusBar } from 'expo-status-bar'
 import { site } from '../constants'
 import useIsDark from '../hooks/useIsDark'
 import * as Updates from 'expo-updates'
-import useMounted from '../hooks/useMounted'
 import { useTheme } from '@rneui/themed'
 
 export default function ErrorFallback(props: { message?: string }) {
-  useMounted(() => {
+  React.useEffect(() => {
     showFatalError(props)
-  })
+  }, [props])
+
   const { theme } = useTheme()
   if (__DEV__ && props.message) {
     // eslint-disable-next-line no-console
