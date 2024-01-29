@@ -231,10 +231,6 @@ try {
   throw err
 }
 
-await $`npx open-cli https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
-  changes,
-)}`
-
 echo(
   chalk.green(
     'Build done, please test your app and set npm tag to latest to publish new version finally!',
@@ -243,4 +239,8 @@ echo(
 
 echo(
   `npm dist-tag add ${pkg.name}@${newVersion} latest --registry=https://registry.npmjs.org/`,
+)
+const open = require('open')
+open(
+  `https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(changes.map(c => `- ${c}`).join('\n'))}`,
 )
