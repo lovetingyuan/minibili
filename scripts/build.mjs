@@ -176,17 +176,10 @@ echo(chalk.blue('download apk file...'))
 
 try {
   await spinner('downloading apk file...', async () => {
-    if (process.platform === 'win32') {
-      await $`rd /s /q apk`
-      await $`mkdir apk`
-    } else {
-      await $`rm -rf apk && mkdir -p apk`
-    }
+    await $`npx rimraf apk`
+    await $`mkdir apk`
     return retry(3, () => {
-      if (process.platform === 'win32') {
-        return $`certutil -urlcache -split -f ${apkUrl} ./apk/minibili-${newVersion}.apk`
-      }
-      return $`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`
+      return $`npx download --out apk ${apkUrl} --filename minibili-${newVersion}.apk`
     })
   })
   echo(chalk.blue(`Saved apk to ./apk/minibili-${newVersion}.apk`))
@@ -238,15 +231,9 @@ try {
   throw err
 }
 
-if (process.platform === 'win32') {
-  await $`start https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
-    changes,
-  )}`
-} else {
-  await $`open https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
-    changes,
-  )}`
-}
+await $`npx open-cli https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
+  changes,
+)}`
 
 echo(
   chalk.green(
