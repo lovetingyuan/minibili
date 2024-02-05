@@ -1,10 +1,10 @@
 import React from 'react'
 import { View, useWindowDimensions } from 'react-native'
-import { VideoItem } from '../../api/hot-videos'
-import { imgUrl, parseDate, parseDuration, parseNumber } from '../../utils'
-import { useTheme, Text } from '@rneui/themed'
+import { VideoItem } from '@/api/hot-videos'
+import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'
+import { useTheme, Text, Icon } from '@rneui/themed'
 import { Image } from 'expo-image'
-import { useStore } from '../../store'
+import { useStore } from '@/store'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
@@ -13,6 +13,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   const { width } = useWindowDimensions()
   const itemWidth = (width - 24) / 2
   const { isWiFi, _followedUpsMap } = useStore()
+  const isFollowed = video.mid in _followedUpsMap
   return (
     <View className="my-3 self-center" style={{ width: itemWidth }}>
       <View className="flex-1">
@@ -34,20 +35,31 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
           </View>
         ) : null}
       </View>
-      <Text className="mt-3 min-h-8" numberOfLines={2}>
+      <Text
+        className={`mt-3 min-h-8 ${isFollowed ? 'text-emerald-600 font-bold' : ''}`}
+        numberOfLines={2}>
         {video.title}
       </Text>
       <View className="flex-row items-center mt-2 justify-between">
         <View className="flex-row items-center shrink">
-          <Image
-            className="w-[13px] h-[11px]"
-            source={require('../../../assets/up-mark.png')}
-          />
+          {isFollowed ? (
+            <Icon
+              size={15}
+              name="checkbox-marked-circle-outline"
+              type="material-community"
+              color={theme.colors.secondary}
+            />
+          ) : (
+            <Image
+              className="w-[13px] h-[11px]"
+              source={require('../../../assets/up-mark.png')}
+            />
+          )}
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"
             className={`ml-1 text-xs grow shrink ${
-              video.mid in _followedUpsMap
+              isFollowed
                 ? `font-bold text-[${theme.colors.secondary}]`
                 : `text-[${theme.colors.primary}]`
             }`}>

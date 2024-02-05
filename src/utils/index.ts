@@ -139,6 +139,9 @@ export function showFatalError(error: any) {
   }
   getAppUpdateInfo.then(info => {
     showedFatalError = true
+    if (__DEV__) {
+      return
+    }
     Alert.alert(
       '抱歉，应用发生了错误😅',
       '我们会处理这个错误\n' +

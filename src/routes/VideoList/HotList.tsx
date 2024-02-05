@@ -160,9 +160,7 @@ export default React.memo(function Hot({ navigation }: Props) {
   }
   return (
     <View className="flex-1">
-      <View className="w-[50%] h-3 border">
-        {/* <View className="bg-red-500 w-[50vw] h-3 border" /> */}
-      </View>
+      {/* <View><View className="bg-red-500 w-[50vw] h-3 border" /></View> */}
       <FlashList
         ref={v => {
           hotListRef.current = v

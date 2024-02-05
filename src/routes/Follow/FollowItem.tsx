@@ -171,13 +171,13 @@ export default React.memo(function FollowItem(props: {
       </View>
       {livingUps[mid] ? (
         <Text
-          className={`font-bold text-sm p-3 flex-1 text-center text-[${theme.colors.primary}]`}
+          className={`font-bold shrink-0 text-sm p-3 flex-1 text-center text-[${theme.colors.primary}]`}
           onPress={gotoLivePage}>
           直播中~
         </Text>
       ) : (
         <Text
-          className={`text-sm p-3 flex-1 text-center ${
+          className={`text-sm p-3 shrink-0 flex-1 text-center ${
             pin ? 'font-bold' : ''
           } ${hasUpdate ? `text-[${theme.colors.secondary}]` : ''}`}
           numberOfLines={2}
