@@ -3,7 +3,6 @@ import { showFatalError } from '../utils'
 import { Button, Image, Linking, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { site } from '../constants'
-import useIsDark from '../hooks/useIsDark'
 import * as Updates from 'expo-updates'
 import { useTheme } from '@rneui/themed'
 
@@ -17,9 +16,8 @@ export default function ErrorFallback(props: { message?: string }) {
     // eslint-disable-next-line no-console
     console.error(props.message)
   }
-  const dark = useIsDark()
   return (
-    <View className={`flex-1 ${dark ? `bg-[${theme.colors.black}]` : ''}`}>
+    <View className="flex-1 dark:bg-neutral-900">
       <StatusBar style="auto" />
       <Image
         source={require('../../assets/error.png')}

@@ -105,7 +105,9 @@ function HeaderRight() {
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
   const { $followedUps, set$followedUps } = useStore()
-  const followed = $followedUps.find(v => v.mid == dynamicUser?.mid)
+  const followed = $followedUps.find(
+    v => v.mid.toString() === dynamicUser?.mid.toString(),
+  )
 
   return (
     <View className="flex-row items-center gap-2">

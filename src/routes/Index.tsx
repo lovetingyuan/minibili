@@ -41,7 +41,7 @@ export default React.memo(function Route() {
           dark: true,
           colors: {
             ...DarkTheme.colors,
-            background: '#222',
+            background: '#222222',
             // backgroundColor: 'black',
           },
         }

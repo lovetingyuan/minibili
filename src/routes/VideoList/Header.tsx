@@ -90,7 +90,7 @@ const HeaderTitle = React.memo(function HeaderTitle() {
               return (
                 <View key={i} className="flex-1">
                   {getItem(items[0])}
-                  <MenuDivider color={theme.colors.divider} />
+                  <MenuDivider color={tw('text-gray-500').color} />
                 </View>
               )
             }

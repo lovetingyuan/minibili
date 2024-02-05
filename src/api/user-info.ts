@@ -90,10 +90,11 @@ export function useUserInfo(mid?: number | string) {
       return
     }
     const followedUps = get$followedUps()
-    const index = followedUps.findIndex(u => u.mid == data.mid)
+    const index = followedUps.findIndex(
+      u => u.mid.toString() === data.mid.toString(),
+    )
     // 用户信息可能会变化
     if (index >= 0) {
-      // const up = store.$followedUps[isFollowed]
       const followedUp = followedUps[index]
       if (
         followedUp.name !== data.name ||

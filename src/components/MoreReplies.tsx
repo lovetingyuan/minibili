@@ -25,7 +25,8 @@ body .reply-list {
 document.head.appendChild(style);
 true;
 `
-const darkCode = `const style = document.createElement('style');
+const darkCode = `
+const style = document.createElement('style');
   style.textContent = \`
      body { background-color: #222!important; color: #ccc!important; }
     .reply-item {
@@ -67,14 +68,14 @@ export default React.memo(function MoreReplies() {
             originWhitelist={['http://*', 'https://*', 'bilibili://*']}
             injectedJavaScriptForMainFrameOnly
             startInLoadingState={false}
-            injectedJavaScript={injectCode}
+            injectedJavaScript={injectCode + (isDark ? darkCode : '')}
             ref={webviewRef}
             applicationNameForUserAgent={'BILIBILI/8.0.0'}
-            onLoadEnd={() => {
-              if (isDark) {
-                webviewRef.current?.injectJavaScript(darkCode)
-              }
-            }}
+            // onLoadEnd={() => {
+            //   if (isDark) {
+            //     webviewRef.current?.injectJavaScript(darkCode)
+            //   }
+            // }}
             onError={() => {
               showToast('加载更多回复失败')
             }}

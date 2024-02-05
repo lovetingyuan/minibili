@@ -98,7 +98,11 @@ export default React.memo(function FollowItem(props: {
           {
             text: '确定',
             onPress() {
-              set$followedUps(get$followedUps().filter(u => u.mid != mid))
+              set$followedUps(
+                get$followedUps().filter(
+                  u => u.mid.toString() !== mid.toString(),
+                ),
+              )
             },
           },
         ])
@@ -116,9 +120,11 @@ export default React.memo(function FollowItem(props: {
           text: '置顶UP',
           onPress: () => {
             const followedUps = get$followedUps()
-            const index = followedUps.findIndex(u => u.mid == mid)
-            followedUps[index] = {
-              ...followedUps[index],
+            const i = followedUps.findIndex(
+              u => u.mid.toString() === mid.toString(),
+            )
+            followedUps[i] = {
+              ...followedUps[i],
               pin: Date.now(),
             }
             set$followedUps(followedUps.slice())
@@ -128,9 +134,11 @@ export default React.memo(function FollowItem(props: {
       text: '取消置顶',
       onPress: () => {
         const followedUps = get$followedUps()
-        const index = followedUps.findIndex(u => u.mid == mid)
-        followedUps[index] = {
-          ...followedUps[index],
+        const i = followedUps.findIndex(
+          u => u.mid.toString() === mid.toString(),
+        )
+        followedUps[i] = {
+          ...followedUps[i],
           pin: 0,
         }
         set$followedUps(followedUps.slice())
