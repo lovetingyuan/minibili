@@ -1,6 +1,7 @@
 import { Share, Platform, ToastAndroid, Alert, Linking } from 'react-native'
 import Toast from 'react-native-root-toast'
 import { getAppUpdateInfo } from '../store'
+import * as Updates from 'expo-updates'
 
 export const parseNumber = (num?: number | null) => {
   if (num == null) {
@@ -153,10 +154,14 @@ export function showFatalError(error: any) {
                 Linking.openURL(info.downloadLink)
               },
             }
-          : {
-              text: '确定',
-            },
-      ],
+          : null,
+        {
+          text: '确定',
+          onPress() {
+            Updates.reloadAsync()
+          },
+        },
+      ].filter(Boolean),
       {
         cancelable: false,
         onDismiss() {
