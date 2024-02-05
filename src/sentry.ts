@@ -1,10 +1,10 @@
-import * as SentryExpo from 'sentry-expo'
+import * as SentryExpo from '@sentry/react-native'
 import Constants from 'expo-constants'
 
 SentryExpo.init({
   dsn: Constants.expoConfig?.extra?.dsn,
   release: Constants.expoConfig?.extra?.releaseName,
-  enableInExpoDevelopment: false,
+  // enableInExpoDevelopment: false,
   debug: __DEV__,
   // integrations: [
   //   new Sentry.ReactNativeTracing({

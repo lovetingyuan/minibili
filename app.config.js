@@ -71,15 +71,15 @@ module.exports = {
     },
   },
   plugins: [
-    // [
-    //   'expo-notifications',
-    //   {
-    //     icon: './assets/icon.png',
-    //     color: '#ffffff',
-    //     sounds: [],
-    //   },
-    // ],
-    'sentry-expo',
+    [
+      '@sentry/react-native/expo',
+      {
+        url: 'https://sentry.io/',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        project: process.env.SENTRY_PROJECT,
+        organization: process.env.SENTRY_ORG,
+      },
+    ],
   ],
   extra: {
     eas: {

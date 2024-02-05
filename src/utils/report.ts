@@ -1,4 +1,4 @@
-import * as SentryExpo from 'sentry-expo'
+import * as SentryExpo from '@sentry/react-native'
 import getLocation from '../api/get-location'
 import { HandledDynamicTypeEnum } from '../api/dynamic-items.type'
 import { ApiError } from '../api/fetcher'
@@ -32,7 +32,7 @@ export function reportApiError(
   },
 ) {
   const path = url.split('?')[0]
-  SentryExpo.Native.captureException(new ApiError(path, url, res), {
+  SentryExpo.captureException(new ApiError(path, url, res), {
     contexts: {
       url: {
         value: url,
@@ -47,7 +47,7 @@ export function reportApiError(
 }
 
 export function reportUserAction(action: Action, actionPayload: any = null) {
-  SentryExpo.Native.captureMessage('User action', {
+  SentryExpo.captureMessage('User action', {
     tags: {
       'type.category': Tags.user_action,
       'user.action': action,
@@ -62,9 +62,9 @@ export function reportUserAction(action: Action, actionPayload: any = null) {
 export function reportUserOpenApp() {
   getLocation().then(loc => {
     const locationStr = [loc.country, loc.province, loc.city].join('/')
-    SentryExpo.Native.setTag(Tags.user_location, locationStr)
-    SentryExpo.Native.setContext('location', loc)
-    SentryExpo.Native.captureMessage('Open app')
+    SentryExpo.setTag(Tags.user_location, locationStr)
+    SentryExpo.setContext('location', loc)
+    SentryExpo.captureMessage('Open app')
   })
 }
 
@@ -73,7 +73,7 @@ export function reportUnknownDynamicItem(item: any) {
   if (type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
     type = 'FORWARD:' + item.orig?.type
   }
-  SentryExpo.Native.captureMessage('unknown dynamic item:' + type, {
+  SentryExpo.captureMessage('unknown dynamic item:' + type, {
     extra: {
       dynamicItem: JSON.stringify(item, null, 2),
     },
@@ -82,7 +82,7 @@ export function reportUnknownDynamicItem(item: any) {
 
 export function reportUnknownRichTextItem(item: any) {
   const type = item.type
-  SentryExpo.Native.captureMessage('unknown rich text item:' + type, {
+  SentryExpo.captureMessage('unknown rich text item:' + type, {
     extra: {
       dynamicItem: JSON.stringify(item, null, 2),
     },
@@ -90,7 +90,7 @@ export function reportUnknownRichTextItem(item: any) {
 }
 
 export function reportUnknownAdditional(item: any) {
-  SentryExpo.Native.captureMessage(
+  SentryExpo.captureMessage(
     'item additional:' +
       item.type +
       '@' +
@@ -104,23 +104,23 @@ export function reportUnknownAdditional(item: any) {
 }
 
 export function setScreenTag(name: string) {
-  SentryExpo.Native.setTag(Tags.stack_route_name, name)
+  SentryExpo.setTag(Tags.stack_route_name, name)
 }
 
 export function setViewingUpMid(mid: string | number | null) {
-  SentryExpo.Native.setTag(Tags.set_up_mid, mid)
+  SentryExpo.setTag(Tags.set_up_mid, mid)
 }
 
 export function setViewingVideoId(bvid: string | null) {
-  SentryExpo.Native.setTag(Tags.set_bvid, bvid)
+  SentryExpo.setTag(Tags.set_bvid, bvid)
 }
 
 export function setViewingDynamicId(id: string | null) {
-  SentryExpo.Native.setTag(Tags.set_dynamic_id, id)
+  SentryExpo.setTag(Tags.set_dynamic_id, id)
 }
 
 export function reportUserFeedback(message: string, contact?: string) {
-  SentryExpo.Native.captureMessage('User Feedback', {
+  SentryExpo.captureMessage('User Feedback', {
     tags: {
       [Tags.user_feedback]: 'UserFeedback',
     },

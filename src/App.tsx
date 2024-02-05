@@ -8,8 +8,7 @@ import NetInfo from '@react-native-community/netinfo'
 import ButtonsOverlay from './components/ButtonsOverlay'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import Route from './routes/Index'
-import * as SentryExpo from 'sentry-expo'
-import type { FallbackRender } from '@sentry/react'
+import * as SentryExpo from '@sentry/react-native'
 import ThemeResponse from './components/ThemeResponse'
 import ImagesView from './components/ImagesView'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
@@ -30,7 +29,9 @@ import ShowRemoteConfig from './components/ShowRemoteConfig'
 let online = true
 let focus = true
 
-const errorFallback: FallbackRender = errorData => {
+const errorFallback: React.ComponentProps<
+  typeof SentryExpo.ErrorBoundary
+>['fallback'] = errorData => {
   return <ErrorFallback message={errorData.error.message} />
 }
 
@@ -113,7 +114,7 @@ export default function App() {
   return (
     <RootSiblingParent>
       <StatusBar style="auto" />
-      <SentryExpo.Native.ErrorBoundary fallback={errorFallback}>
+      <SentryExpo.ErrorBoundary fallback={errorFallback}>
         <ThemeProvider theme={theme}>
           <ThemeResponse />
           <SWRConfig value={swrConfig}>
@@ -130,7 +131,7 @@ export default function App() {
             </AppContextProvider>
           </SWRConfig>
         </ThemeProvider>
-      </SentryExpo.Native.ErrorBoundary>
+      </SentryExpo.ErrorBoundary>
     </RootSiblingParent>
   )
 }

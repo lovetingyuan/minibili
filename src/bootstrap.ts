@@ -1,5 +1,5 @@
 import './sentry'
-import * as SentryExpo from 'sentry-expo'
+import * as SentryExpo from '@sentry/react-native'
 import { showFatalError, showToast } from './utils'
 import Constants from 'expo-constants'
 import { Tags, reportUserOpenApp } from './utils/report'
@@ -10,11 +10,11 @@ SplashScreen.preventAutoHideAsync()
 reportUserOpenApp()
 const gitHash = Constants.expoConfig?.extra?.gitHash
 if (gitHash) {
-  SentryExpo.Native.setTag(Tags.git_hash, gitHash)
+  SentryExpo.setTag(Tags.git_hash, gitHash)
 }
 if (typeof ErrorUtils === 'object') {
   ErrorUtils.setGlobalHandler((error, isFatal) => {
-    SentryExpo.Native.captureException(error)
+    SentryExpo.captureException(error)
     if (!isFatal) {
       showToast('抱歉，发生了未知错误')
       return

@@ -1,8 +1,9 @@
 # MiniBili
 
 The minimum bilibili app.
+(Android 6 or above)
 
-![minibili](./docs/minibili.png)
+<img src="./docs/minibili.png" alt="minibili" width="200" >
 
 https://lovetingyuan.github.io/minibili/
 
