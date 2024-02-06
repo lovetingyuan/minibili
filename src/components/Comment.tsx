@@ -1,11 +1,12 @@
 import React from 'react'
 import { Linking, View, Image, TextStyle } from 'react-native'
 import { MessageContent, ReplyItem } from '../api/comments'
-import { Button, Text, useTheme } from '@rneui/themed'
+import { Button, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 import { imgUrl } from '../utils'
 import { useStore } from '../store'
+import { colors } from '@/constants/colors.tw'
 
 interface Props {
   upName: string
@@ -20,7 +21,6 @@ function CommentText(props: {
 }) {
   const { nodes, style, idStr } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { theme } = useTheme()
 
   return (
     <Text style={style} selectable>
@@ -29,9 +29,9 @@ function CommentText(props: {
           return (
             <Text
               key={idStr + i}
-              className={`text-[${theme.colors.primary}]`}
+              className={colors.primary.text}
               style={{
-                textShadowColor: theme.colors.primary,
+                textShadowColor: tw(colors.primary.text).color,
                 textShadowOffset: { width: 0, height: 0 },
                 textShadowRadius: 0.2, // 阴影模糊程度
               }}
@@ -53,7 +53,7 @@ function CommentText(props: {
           return (
             <Text
               key={idStr + i}
-              className={`text-[${theme.colors.primary}]`}
+              className={colors.primary.text}
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
@@ -74,7 +74,7 @@ function CommentText(props: {
           return (
             <Text
               key={idStr + i}
-              className={`text-[${theme.colors.primary}]`}
+              className={colors.primary.text}
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
@@ -86,7 +86,7 @@ function CommentText(props: {
           return (
             <Text
               key={idStr + i}
-              className={`text-[${theme.colors.primary}]`}
+              className={colors.primary.text}
               onPress={() => {
                 const bvid = node.url.split('/').pop()
                 if (bvid?.startsWith('BV')) {
@@ -114,7 +114,6 @@ function CommentText(props: {
 
 export default React.memo(function Comment(props: Props) {
   const { comment, upName } = props
-  const { theme } = useTheme()
   const { setImagesList, setCurrentImageIndex, setMoreRepliesUrl } = useStore()
 
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -126,8 +125,8 @@ export default React.memo(function Comment(props: Props) {
           <Text
             className={
               upName === comment.name
-                ? `text-[${theme.colors.secondary}]`
-                : `text-[${theme.colors.primary}]`
+                ? colors.secondary.text
+                : colors.primary.text
             }
             onPress={() => {
               navigation.push('Dynamic', {
@@ -159,7 +158,8 @@ export default React.memo(function Comment(props: Props) {
           <>
             <Text> </Text>
             <View className="border-[0.5px] w-7 rounded border-rose-600">
-              <Text className="text-center font-thin text-xs text-rose-500">
+              <Text
+                className={`text-center font-thin text-xs ${colors.secondary.text}`}>
                 置顶
               </Text>
             </View>
@@ -169,12 +169,12 @@ export default React.memo(function Comment(props: Props) {
         <CommentText
           nodes={comment.message}
           className={`text-base ${
-            comment.upLike ? `text-[${theme.colors.success}]` : ''
-          } ${comment.top ? `text-[${theme.colors.primary}]` : ''}`}
+            comment.upLike ? colors.success.text : ''
+          } ${comment.top ? colors.primary.text : ''}`}
           idStr={comment.id + '_'}
         />
         {comment.like ? (
-          <Text className={`text-xs text-[${theme.colors.secondary}]`}>
+          <Text className={`text-xs ${colors.secondary.text}`}>
             {' '}
             {comment.like}
             <Text>{comment.upLike ? '  UP👍' : ''}</Text>
@@ -182,7 +182,7 @@ export default React.memo(function Comment(props: Props) {
         ) : null}
         {comment.images?.length ? (
           <Text
-            className={`text-[${theme.colors.primary}]`}
+            className={colors.primary.text}
             onPress={() => {
               if (comment.images) {
                 setImagesList(
@@ -209,8 +209,8 @@ export default React.memo(function Comment(props: Props) {
                 <Text
                   className={
                     upName === reply.name
-                      ? `text-[${theme.colors.secondary}]`
-                      : `text-[${theme.colors.primary}]`
+                      ? colors.secondary.text
+                      : colors.primary.text
                   }
                   onPress={() => {
                     navigation.push('Dynamic', {
@@ -239,7 +239,7 @@ export default React.memo(function Comment(props: Props) {
                 ：
                 <CommentText nodes={reply.message} idStr={reply.id + '_'} />
                 {reply.like ? (
-                  <Text className={`text-xs text-[${theme.colors.secondary}]`}>
+                  <Text className={`text-xs ${colors.secondary.text}`}>
                     {' '}
                     {reply.like}
                   </Text>
@@ -258,7 +258,7 @@ export default React.memo(function Comment(props: Props) {
                 )
               }}
               buttonStyle={tw('justify-start px-0')}>
-              <Text className={`text-[${theme.colors.primary}]`}>
+              <Text className={colors.primary.text}>
                 {comment.moreText + '...'}
               </Text>
             </Button>

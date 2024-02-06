@@ -1,13 +1,39 @@
+import encWbi from '../utils/wbi'
 import { getCookie } from './get-cookie'
+import { getUserNav } from './get-user-nav'
+import { UserNavType } from './get-user-nav.schema'
 
 let cookie = ''
 
+let wbiImg: UserNavType['wbi_img'] | null = null
+
+// const getWbiImg = () => {
+//   return getUserNav().then(res => {
+//     wbiImg = res
+//     return res
+//   })
+// }
+
 export default async function request<D extends any>(url: string) {
-  const requestUrl = url.startsWith('http')
+  let requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
   if (!cookie) {
     cookie = await getCookie()
+  }
+  if (url.includes('/wbi/')) {
+    if (!wbiImg) {
+      wbiImg = await getUserNav()
+    }
+    const [_url, _query] = requestUrl.split('?')
+    const params = new URLSearchParams(_query)
+    const queryParams: Record<string, string> = {}
+
+    for (const [key, value] of params.entries()) {
+      queryParams[key] = value
+    }
+    const query = encWbi(queryParams, wbiImg.img_url, wbiImg.sub_url)
+    requestUrl = _url + '?' + query
   }
   const options = {
     headers: {
@@ -36,15 +62,5 @@ export default async function request<D extends any>(url: string) {
     .then(r => r.json())
     .then(res => {
       return res.data as D
-      // const index = resText.indexOf('}{"code":')
-      // if (index > -1) {
-      //   resText = resText.substring(index + 1)
-      // }
-      // const res = JSON.parse(resText) as {
-      //   code: number
-      //   message: string
-      //   data: D
-      // }
-      // return res.data
     })
 }

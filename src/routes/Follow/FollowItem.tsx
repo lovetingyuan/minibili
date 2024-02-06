@@ -1,12 +1,13 @@
 import React from 'react'
 import { TouchableOpacity, Alert, View, Linking } from 'react-native'
-import { Avatar, Badge, Text, useTheme } from '@rneui/themed'
+import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps, UpInfo } from '../../types'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { useStore } from '../../store'
 import { Image } from 'expo-image'
 import { imgUrl, parseUrl } from '../../utils'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function FollowItem(props: {
   item: UpInfo
@@ -50,7 +51,6 @@ export default React.memo(function FollowItem(props: {
       })
     }
   })
-  const { theme } = useTheme()
   const buttons = [
     hasUpdate
       ? {
@@ -171,15 +171,14 @@ export default React.memo(function FollowItem(props: {
           <Badge
             key={mid}
             badgeStyle={tw(
-              'h-4 w-4 rounded-[16px] absolute top-[-40px] left-[38px]',
-              { backgroundColor: theme.colors.secondary },
+              `h-4 w-4 rounded-[16px] absolute top-[-40px] left-[38px] ${colors.secondary.bg}`,
             )}
           />
         ) : null}
       </View>
       {livingUps[mid] ? (
         <Text
-          className={`font-bold shrink-0 text-sm p-3 flex-1 text-center text-[${theme.colors.primary}]`}
+          className={`font-bold shrink-0 text-sm p-3 flex-1 text-center ${colors.primary.text}`}
           onPress={gotoLivePage}>
           直播中~
         </Text>
@@ -187,7 +186,7 @@ export default React.memo(function FollowItem(props: {
         <Text
           className={`text-sm p-3 shrink-0 flex-1 text-center ${
             pin ? 'font-bold' : ''
-          } ${hasUpdate ? `text-[${theme.colors.secondary}]` : ''}`}
+          } ${hasUpdate ? colors.secondary.text : ''}`}
           numberOfLines={2}
           ellipsizeMode="tail">
           {name}

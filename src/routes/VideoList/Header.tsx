@@ -1,4 +1,4 @@
-import { Icon, Text, useTheme, Button, Badge } from '@rneui/themed'
+import { Icon, Text, Button, Badge } from '@rneui/themed'
 import { Linking, ScrollView, View, TouchableOpacity } from 'react-native'
 import { getAppUpdateInfo, useStore } from '../../store'
 import React from 'react'
@@ -6,6 +6,7 @@ import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 import { NavigationProps, PromiseResult } from '../../types'
 import { useNavigation } from '@react-navigation/native'
 import useMounted from '../../hooks/useMounted'
+import { colors } from '@/constants/colors.tw'
 
 function splitArrayIntoChunks(arr: any[]) {
   const result = [[arr[0]]]
@@ -27,7 +28,6 @@ const HeaderTitle = React.memo(function HeaderTitle() {
       setNewVersion(r)
     })
   })
-  const { theme } = useTheme()
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
@@ -38,15 +38,10 @@ const HeaderTitle = React.memo(function HeaderTitle() {
       <MenuItem
         key={item.rid}
         className={item.rid === -1 ? 'max-w-32' : 'max-w-24'}
-        pressColor={theme.colors.grey5}
-        textStyle={tw(`text-base ${selected ? 'font-bold' : ''}`, {
-          color:
-            item.rid === -1
-              ? theme.colors.secondary
-              : selected
-                ? theme.colors.primary
-                : theme.colors.black,
-        })}
+        pressColor={tw(colors.gray5.text).color}
+        textStyle={tw(
+          `text-base ${selected ? 'font-bold' : ''} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`,
+        )}
         onPress={() => {
           setCurrentVideosCate(item)
           hideMenu()
@@ -69,8 +64,8 @@ const HeaderTitle = React.memo(function HeaderTitle() {
             <Text
               className={`text-lg font-semibold ${
                 currentVideosCate.rid === -1
-                  ? 'text-pink-500'
-                  : 'text-gray-800 dark:text-gray-300'
+                  ? colors.secondary.text
+                  : colors.gray7.text
               }`}>
               {currentVideosCate.label +
                 (currentVideosCate.rid === -1 ? '' : '排行')}{' '}
@@ -79,7 +74,7 @@ const HeaderTitle = React.memo(function HeaderTitle() {
               name="triangle-down"
               type="octicon"
               size={28}
-              color={theme.colors.grey1}
+              color={tw(colors.gray6.text).color}
             />
           </TouchableOpacity>
         }
@@ -90,7 +85,7 @@ const HeaderTitle = React.memo(function HeaderTitle() {
               return (
                 <View key={i} className="flex-1">
                   {getItem(items[0])}
-                  <MenuDivider color={tw('text-gray-500').color} />
+                  <MenuDivider color={tw(colors.gray3.text).color} />
                 </View>
               )
             }
@@ -106,12 +101,16 @@ const HeaderTitle = React.memo(function HeaderTitle() {
         <Button
           type="clear"
           size="sm"
-          titleStyle={tw('text-sm', { color: theme.colors.secondary })}
+          titleStyle={tw(`text-sm ${colors.secondary.text}`)}
           onPress={() => {
             Linking.openURL(newVersion.downloadLink)
           }}>
           有新版本
-          <Icon name="fiber-new" color={theme.colors.secondary} size={20} />
+          <Icon
+            name="fiber-new"
+            color={tw(colors.secondary.text).color}
+            size={20}
+          />
         </Button>
       ) : null}
     </View>
@@ -122,18 +121,15 @@ const HeaderRight = React.memo(function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { _updatedCount, livingUps } = useStore()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
-  const { theme } = useTheme()
   return (
     <View>
       {_updatedCount ? (
         <Badge
           status="success"
           value={_updatedCount}
-          badgeStyle={tw('h-4 absolute left-10 top-1', {
-            backgroundColor: hasLiving
-              ? theme.colors.primary
-              : theme.colors.secondary,
-          })}
+          badgeStyle={tw(
+            `h-4 absolute left-10 top-1 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`,
+          )}
           textStyle={tw('text-[11px]')}
         />
       ) : null}

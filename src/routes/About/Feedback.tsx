@@ -1,10 +1,11 @@
 import React from 'react'
 import { View, Share } from 'react-native'
-import { Dialog, Input, useTheme } from '@rneui/themed'
+import { Dialog, Input } from '@rneui/themed'
 import { reportUserFeedback } from '../../utils/report'
 import { showToast } from '../../utils'
 import { site } from '../../constants'
 import TextAction from './TextAction'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function Feedback() {
   const [feedBackVisible, setFeedbackVisible] = React.useState(false)
@@ -27,7 +28,6 @@ export default React.memo(function Feedback() {
     hideFeedback()
     showToast('感谢反馈 😊')
   }
-  const { theme } = useTheme()
   return (
     <TextAction
       text="欢迎分享本应用 ❤"
@@ -48,7 +48,7 @@ export default React.memo(function Feedback() {
       <Dialog isVisible={feedBackVisible} onBackdropPress={hideFeedback}>
         <Dialog.Title
           title="欢迎反馈意见 😊"
-          titleStyle={{ color: theme.colors.black }}
+          titleStyle={tw(colors.black.text)}
         />
         <View>
           <Input
@@ -58,13 +58,13 @@ export default React.memo(function Feedback() {
             className="mt-5 h-20"
             maxLength={500}
             textAlignVertical="top"
-            placeholderTextColor={theme.colors.grey3}
+            placeholderTextColor={tw(colors.gray3.text).color}
             onChangeText={value => (feedbackRef.current = value)}
           />
           <Input
             placeholder="联系方式"
             maxLength={100}
-            placeholderTextColor={theme.colors.grey3}
+            placeholderTextColor={tw(colors.gray3.text).color}
             onChangeText={value => (feedbackContactRef.current = value)}
           />
         </View>

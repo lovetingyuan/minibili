@@ -28,5 +28,5 @@ test('wbi-generate', async () => {
     data.wbi_img.sub_url,
   )
   assert.ok(/w_rid=[a-z0-9]{32}$/.test(query))
-  console.log(query)
+  // console.log(query)
 })

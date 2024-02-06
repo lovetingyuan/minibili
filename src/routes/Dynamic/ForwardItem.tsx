@@ -5,7 +5,7 @@ import {
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
 } from '../../api/dynamic-items.type'
-import { Avatar, Text, useTheme } from '@rneui/themed'
+import { Avatar, Text } from '@rneui/themed'
 import RichTexts from '../../components/RichTexts'
 import { NavigationProps } from '../../types'
 import { useNavigation } from '@react-navigation/native'
@@ -13,12 +13,12 @@ import { Image } from 'expo-image'
 import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
 import { imgUrl } from '../../utils'
+import { colors } from '@/constants/colors.tw'
 
 export default function ForwardItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>
 }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { theme } = useTheme()
   const { item } = props
   const { payload } = item
 
@@ -140,7 +140,7 @@ export default function ForwardItem(props: {
                 rounded
               />
             ) : null}
-            <Text className={`text-base ml-2 text-[${theme.colors.primary}]`}>
+            <Text className={`text-base ml-2 ${colors.primary.text}`}>
               {payload.name}
             </Text>
           </Pressable>

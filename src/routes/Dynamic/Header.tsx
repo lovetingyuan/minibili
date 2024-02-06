@@ -1,4 +1,4 @@
-import { Avatar, Button, Icon, Text, useTheme } from '@rneui/themed'
+import { Avatar, Button, Icon, Text } from '@rneui/themed'
 import React from 'react'
 import { View, Pressable, Linking } from 'react-native'
 import { useStore } from '../../store'
@@ -12,6 +12,7 @@ import { useLivingInfo } from '../../api/living-info'
 import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import { Menu, MenuItem } from 'react-native-material-menu'
+import { colors } from '@/constants/colors.tw'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
@@ -26,7 +27,6 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   }
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
-  // const { theme } = useTheme()
   const gotoWebPage = () => {
     if (dynamicUser) {
       navigation.navigate('WebPage', {
@@ -97,7 +97,6 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
 export const headerRight = () => <HeaderRight />
 
 function HeaderRight() {
-  const { theme } = useTheme()
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const dynamicUser = route.params?.user
@@ -126,7 +125,7 @@ function HeaderRight() {
         {!followed && (
           <MenuItem
             textStyle={tw('text-black dark:text-gray-300')}
-            pressColor={theme.colors.grey4}
+            pressColor={tw(colors.gray4.text).color}
             onPress={() => {
               if (dynamicUser) {
                 set$followedUps([
@@ -147,7 +146,7 @@ function HeaderRight() {
         )}
         <MenuItem
           textStyle={tw('text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (dynamicUser) {
               const { name, mid, sign } = dynamicUser
@@ -159,7 +158,7 @@ function HeaderRight() {
         </MenuItem>
         <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (dynamicUser?.face) {
               Linking.openURL(dynamicUser.face)
@@ -170,7 +169,7 @@ function HeaderRight() {
         </MenuItem>
         <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (!dynamicUser) {
               return
@@ -184,7 +183,7 @@ function HeaderRight() {
         </MenuItem>
         <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (!dynamicUser) {
               return
@@ -198,7 +197,7 @@ function HeaderRight() {
         </MenuItem>
         <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (!dynamicUser) {
               return

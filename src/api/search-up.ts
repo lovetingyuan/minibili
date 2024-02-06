@@ -2,22 +2,12 @@ import useSWR from 'swr'
 import { SearchResponse } from './search-up.schema'
 import { parseUrl } from '../utils'
 import request from './fetcher'
-import { useWbiQuery } from './get-wbi'
 
 export const useSearchUps = (name: string) => {
-  const query = useWbiQuery(
-    name
-      ? {
-          keyword: name,
-          page: 1,
-          page_size: 50,
-          platform: 'pc',
-          search_type: 'bili_user',
-        }
-      : null,
-  )
   const { data, error, isValidating } = useSWR<SearchResponse>(
-    query ? `/x/web-interface/wbi/search/type?${query}` : null,
+    name
+      ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=1&page_size=50&platform=pc&search_type=bili_user`
+      : null,
     request,
     {
       dedupingInterval: 30 * 1000,

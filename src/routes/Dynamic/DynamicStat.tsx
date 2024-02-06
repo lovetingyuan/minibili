@@ -1,7 +1,8 @@
-import { Icon, Text, useTheme } from '@rneui/themed'
+import { Icon, Text } from '@rneui/themed'
 import React from 'react'
 import { View, Pressable } from 'react-native'
 import { handleShareVideo, parseNumber, showToast } from '../../utils'
+import { colors } from '@/constants/colors.tw'
 
 export default function DynamicStat(props: {
   id: string | number
@@ -12,8 +13,7 @@ export default function DynamicStat(props: {
   share: number
   title: string
 }) {
-  const { theme } = useTheme()
-  const gray = theme.colors.grey1
+  const gray = tw(colors.gray6.text).color
   const textStyle = {
     color: gray,
     fontSize: 13,

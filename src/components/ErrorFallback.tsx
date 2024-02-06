@@ -4,14 +4,13 @@ import { Button, Image, Linking, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { site } from '../constants'
 import * as Updates from 'expo-updates'
-import { useTheme } from '@rneui/themed'
+import { colors } from '@/constants/colors.tw'
 
 export default function ErrorFallback(props: { message?: string }) {
   React.useEffect(() => {
     showFatalError(props)
   }, [props])
 
-  const { theme } = useTheme()
   if (__DEV__ && props.message) {
     // eslint-disable-next-line no-console
     console.error(props.message)
@@ -32,7 +31,7 @@ export default function ErrorFallback(props: { message?: string }) {
         {'\n\n'}
         您可以
         <Text
-          className={`font-bold text-[${theme.colors.primary}]`}
+          className={`font-bold ${colors.primary.text}`}
           onPress={() => {
             Updates.reloadAsync()
           }}>

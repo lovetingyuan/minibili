@@ -2,7 +2,8 @@ import React from 'react'
 import VideoHeader from './VideoHeader'
 import { View } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import { ListItem, Text, Icon, useTheme } from '@rneui/themed'
+import { ListItem, Text, Icon } from '@rneui/themed'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function VideoInfo(props: {
   changePage: (p: number) => void
@@ -12,7 +13,6 @@ export default React.memo(function VideoInfo(props: {
   const { changePage } = props
   const { data: videoInfo, isLoading } = useVideoInfo(props.bvid)
   const [expanded, setExpanded] = React.useState(false)
-  const { theme } = useTheme()
 
   const { title, desc } = videoInfo || {}
   let videoDesc = desc
@@ -58,7 +58,7 @@ export default React.memo(function VideoInfo(props: {
                     <ListItem.Title
                       className={
                         selected
-                          ? `font-bold text-[${theme.colors.success}]`
+                          ? `font-bold ${colors.success.text}`
                           : 'text-gray-500'
                       }>
                       {v.page}. {v.title}

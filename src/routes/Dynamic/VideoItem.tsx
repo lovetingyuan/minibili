@@ -3,11 +3,12 @@ import React from 'react'
 import { Image, Linking, TouchableOpacity, View } from 'react-native'
 import { NavigationProps } from '../../types'
 import { DynamicItemType } from '../../api/dynamic-items'
-import { Icon, Text, useTheme } from '@rneui/themed'
+import { Icon, Text } from '@rneui/themed'
 import { imgUrl, parseNumber, parseUrl } from '../../utils'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 import { useStore } from '../../store'
+import { colors } from '@/constants/colors.tw'
 
 export default function VideoItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>
@@ -26,8 +27,7 @@ export default function VideoItem(props: {
   } = props
   const { setOverlayButtons } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { theme } = useTheme()
-  const gray = theme.colors.grey1
+  const gray = tw(colors.gray6.text).color
   const textStyle = {
     color: gray,
     fontSize: 13,

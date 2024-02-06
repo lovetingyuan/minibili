@@ -2,14 +2,14 @@ import React from 'react'
 import { View, useWindowDimensions } from 'react-native'
 import { VideoItem } from '@/api/hot-videos'
 import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'
-import { useTheme, Text, Icon } from '@rneui/themed'
+import { Text, Icon } from '@rneui/themed'
 import { Image } from 'expo-image'
 import { useStore } from '@/store'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
-  const { theme } = useTheme()
   const { width } = useWindowDimensions()
   const itemWidth = (width - 24) / 2
   const { isWiFi, _followedUpsMap } = useStore()
@@ -36,7 +36,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
         ) : null}
       </View>
       <Text
-        className={`mt-3 min-h-8 ${isFollowed ? 'text-emerald-600 font-bold' : ''}`}
+        className={`mt-3 min-h-8 ${isFollowed ? 'font-bold underline' : ''}`}
         numberOfLines={2}>
         {video.title}
       </Text>
@@ -47,7 +47,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
               size={15}
               name="checkbox-marked-circle-outline"
               type="material-community"
-              color={theme.colors.secondary}
+              color={tw(colors.secondary.text).color}
             />
           ) : (
             <Image
@@ -60,8 +60,8 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
             ellipsizeMode="tail"
             className={`ml-1 text-xs grow shrink ${
               isFollowed
-                ? `font-bold text-[${theme.colors.secondary}]`
-                : `text-[${theme.colors.primary}]`
+                ? `font-bold ${colors.secondary.text}`
+                : colors.primary.text
             }`}>
             {video.name}
           </Text>

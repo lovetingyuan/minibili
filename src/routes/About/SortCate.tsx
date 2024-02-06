@@ -2,6 +2,7 @@ import { Chip, ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import { useStore } from '../../store'
 import { View } from 'react-native'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function SortCate() {
   const [expandedCate, setExpandedCate] = React.useState(false)
@@ -12,7 +13,6 @@ export default React.memo(function SortCate() {
   const [, ...initUnsortedRankList] = $videoCatesList
   const [unsortedRankList, setUnSortedRankList] =
     React.useState(initUnsortedRankList)
-  // const { theme } = useTheme()
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
@@ -48,7 +48,10 @@ export default React.memo(function SortCate() {
             )
           })}
           {sortedRankList.length === 0 && (
-            <Text className="flex-1 mb-1"> 点击名称调整顺序</Text>
+            <Text className={`flex-1 mb-1 ${colors.gray6.text}`}>
+              {' '}
+              点击名称调整顺序
+            </Text>
           )}
         </View>
         <View className="flex-row flex-wrap gap-x-3 mt-5">
@@ -66,7 +69,7 @@ export default React.memo(function SortCate() {
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])
                 }}
                 containerStyle={tw('mb-2')}
-                buttonStyle={tw('px-[6px] py-[2px]')}
+                buttonStyle={tw('px-2 py-[2px]')}
               />
             )
           })}

@@ -25,7 +25,8 @@
     "docs": "npx vite docs",
     "format": "npx prettier src scripts --write",
     "test": "npx vitest run",
-    "lint": "eslint --ext ts,tsx,js,jsx --fix src scripts"
+    "lint": "eslint --ext ts,tsx,js,jsx --fix src scripts",
+    "update-expo": "npm i -g eas-cli && npm install expo && npx expo install --fix && npm run doctor"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.21.0",
@@ -43,12 +44,12 @@
     "expo-clipboard": "~5.0.1",
     "expo-constants": "~15.4.5",
     "expo-device": "~5.9.3",
-    "expo-image": "~1.10.5",
+    "expo-image": "~1.10.6",
     "expo-keep-awake": "~12.8.2",
     "expo-splash-screen": "~0.26.4",
     "expo-status-bar": "~1.11.1",
     "expo-system-ui": "~2.9.3",
-    "expo-updates": "~0.24.9",
+    "expo-updates": "~0.24.10",
     "nativewind": "^2.0.11",
     "p-queue": "6.6.2",
     "photoswipe": "^5.4.3",

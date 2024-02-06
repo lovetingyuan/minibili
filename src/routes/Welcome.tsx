@@ -2,15 +2,15 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import { View, Image, Linking } from 'react-native'
 import { RootStackParamList } from '../types'
-import { Button, Text, useTheme } from '@rneui/themed'
+import { Button, Text } from '@rneui/themed'
 import { useStore } from '../store'
 import { githubLink } from '../constants'
+import { colors } from '@/constants/colors.tw'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>
 
 export default React.memo(function Welcome({ navigation }: Props) {
   const { set$firstRun } = useStore()
-  const { theme } = useTheme()
   return (
     <View className="flex-1 h-full py-10">
       <View className="flex-row justify-center">
@@ -27,7 +27,7 @@ export default React.memo(function Welcome({ navigation }: Props) {
         <Text className="text-base">
           🔈本应用为个人兴趣作品并完全开源(
           <Text
-            className={`text-[${theme.colors.primary}]`}
+            className={colors.primary.text}
             onPress={() => {
               Linking.openURL(githubLink)
             }}>

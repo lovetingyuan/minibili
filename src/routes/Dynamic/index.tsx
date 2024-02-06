@@ -4,7 +4,7 @@ import { RootStackParamList } from '../../types'
 import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
 import { HeaderLeft, headerRight } from './Header'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
+import { Icon, Text, Skeleton } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import DynamicItem from './DynamicItem'
 import { useUserInfo } from '../../api/user-info'
@@ -12,6 +12,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { setViewingUpMid } from '../../utils/report'
 import useErrToast from '../../hooks/useErrToast'
+import { colors } from '@/constants/colors.tw'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
@@ -88,7 +89,6 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
     error,
   } = useDynamicItems(upId)
   useErrToast('请求动态失败', error)
-  const { theme } = useTheme()
   const headerTitle = React.useCallback(() => {
     return (
       <HeaderLeft
@@ -116,7 +116,6 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
     if (!list.length) {
       return null
     }
-    // console.log(333, list[1])
     return (
       <Text className="text-sm mt-3 mb-5 text-center text-gray-500">
         {isReachingEnd ? '到底了~' : isValidating ? '加载中...' : ''}
@@ -157,7 +156,7 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
                 name="billboard"
                 type="material-community"
                 size={18}
-                color={theme.colors.grey2}
+                color={tw(colors.gray6.text).color}
               />
               <Text className="text-sm ml-2 shrink-0 flex-1 text-gray-600 dark:text-gray-400">
                 {dynamicUser?.sign.trim()}

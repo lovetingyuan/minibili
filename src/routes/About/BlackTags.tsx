@@ -1,11 +1,11 @@
-import { Chip, ListItem, Text, Icon, useTheme } from '@rneui/themed'
+import { Chip, ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import { useStore } from '@/store'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function BlackTags() {
   const [expanded, setExpanded] = React.useState(false)
   const { $blackTags, set$blackTags } = useStore()
-  const { theme } = useTheme()
   return (
     <ListItem.Accordion
       icon={<Icon name={'chevron-down'} type="material-community" />}
@@ -33,7 +33,7 @@ export default React.memo(function BlackTags() {
                 name: 'close',
                 type: 'Ionicons',
                 size: 16,
-                color: theme.colors.grey2,
+                ...tw(colors.gray5.text),
                 onPress: () => {
                   const blackTags = { ...$blackTags }
                   delete blackTags[tag]

@@ -3,7 +3,6 @@ import useSWR from 'swr'
 import { z } from 'zod'
 import { ReplayItem, ReplyResponseSchema } from './comments.schema'
 import request from './fetcher'
-import { useWbiQuery } from './get-wbi'
 
 type ReplyResponse = z.infer<typeof ReplyResponseSchema>
 
@@ -221,31 +220,11 @@ export type ReplyItem = ReturnType<typeof getReplies>[0]
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
-  const query = useWbiQuery(
-    oid
-      ? {
-          oid,
-          type,
-          // pagination_str: '{"offset":""}',
-          // plat: 1,
-          mode: 3,
-          // web_location: 1315875,
-          pn: 1,
-          ps: 30,
-          // next: 1,
-        }
-      : null,
-  )
-  // const query =
-  //   'oid=881710232&type=1&mode=3&pagination_str=%7B%22offset%22:%22%22%7D&plat=1&seek_rpid=&web_location=1315875&w_rid=df06a6405367bd655d02a5492bcca227&wts=1706451482'
   const { data, error, isLoading } = useSWR<ReplyResponse>(() => {
-    // return 'https://api.bilibili.com/x/v2/reply/wbi/main?oid=408524772&type=1&mode=3&pagination_str=%7B%22offset%22:%22%22%7D&plat=1&seek_rpid=&web_location=1315875&w_rid=ccc12d280565a362554fd2ddaa834919&wts=1706453031'
-    // return 'https://api.bilibili.com/x/v2/reply/wbi/main?oid=490300290&type=1&wts=1706365588&w_rid=ce031a1b8c4a16e54e741c13b8d8e506'
-    return oid ? `/x/v2/reply/wbi/main?${query}` : null
-    // return oid ? `/x/v2/reply/main?oid=${oid}&type=${type}` : null
+    return oid
+      ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=3&pn=1&ps=30`
+      : null
   }, request)
-  // /x/v2/reply/main?oid=490300290&type=1
-  // console.log(9999, data?.replies.length)
   const replies: ReplyItem[] = React.useMemo(() => {
     if (!data) {
       return []

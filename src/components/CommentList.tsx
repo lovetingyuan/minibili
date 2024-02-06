@@ -1,9 +1,10 @@
-import { Icon, Text, useTheme, Skeleton } from '@rneui/themed'
+import { Icon, Text, Skeleton } from '@rneui/themed'
 import React from 'react'
 import { View, Image } from 'react-native'
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
+import { colors } from '@/constants/colors.tw'
 
 const Loading = React.memo(function Loading() {
   return (
@@ -40,8 +41,7 @@ export default function CommentList(props: {
     isLoading: commentLoading,
     error: commentError,
   } = useDynamicComments(props.commentId, props.commentType)
-  const { theme } = useTheme()
-  // useColorScheme()
+
   return (
     <View>
       <View className="my-5 border-b-[0.5px] border-gray-400 pb-1 flex-row justify-between">
@@ -50,7 +50,7 @@ export default function CommentList(props: {
             name="comment-text-outline"
             type="material-community"
             size={14}
-            color={theme.colors.grey1}
+            color={tw(colors.gray1.text).color}
           />
           <Text className="text-xs mr-3 px-2 text-gray-700 dark:text-gray-300">
             {allCount ? allCount + '条评论' : '暂无评论'}

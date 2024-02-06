@@ -6,7 +6,6 @@ import {
   Icon,
   SearchBar,
   Text,
-  useTheme,
 } from '@rneui/themed'
 import React from 'react'
 import { SearchedUpType, useSearchUps } from '../../api/search-up'
@@ -14,6 +13,7 @@ import { FlatList, Linking, View } from 'react-native'
 import { Image } from 'expo-image'
 import { imgUrl, parseNumber, showToast } from '../../utils'
 import { useStore } from '../../store'
+import { colors } from '@/constants/colors.tw'
 
 function SearchedItem(props: { up: SearchedUpType }) {
   const up = props.up
@@ -25,7 +25,6 @@ function SearchedItem(props: { up: SearchedUpType }) {
     mid: up.mid,
     sign: up.sign,
   }
-  const { theme } = useTheme()
   const handler = () => {
     set$followedUps([user, ...get$followedUps()])
   }
@@ -56,7 +55,7 @@ function SearchedItem(props: { up: SearchedUpType }) {
           size="sm"
           type="clear"
           disabled
-          titleStyle={{ color: theme.colors.grey3 }}>
+          titleStyle={tw(colors.gray3.text)}>
           已关注
         </Button>
       ) : (
@@ -85,13 +84,12 @@ export default React.memo(function AddFollow() {
     setSearchValue('')
     setAddUpVisible(false)
   }
-  const { theme } = useTheme()
   const { data: searchedUps, isValidating } = useSearchUps(searchValue)
   return (
     <>
       <FAB
         visible
-        color={theme.colors.secondary}
+        color={tw(colors.secondary.text).color}
         placement="right"
         icon={{ name: 'add', color: 'white' }}
         className="bottom-[10px] opacity-80"
@@ -109,7 +107,7 @@ export default React.memo(function AddFollow() {
         onBackdropPress={handleAddUpVisible}
         overlayStyle={tw('max-h-[60%] w-[85%]')}>
         <View className="flex-row justify-between items-center">
-          <Text className="font-bold text-lg opacity-85">新增关注</Text>
+          <Text className="font-bold text-lg">新增关注</Text>
           <Icon name="close" size={24} onPress={() => handleAddUpVisible()} />
         </View>
         <SearchBar
@@ -122,7 +120,7 @@ export default React.memo(function AddFollow() {
           platform="android"
           showLoading={isValidating}
           value={searchValue}
-          inputStyle={{ color: theme.colors.black }}
+          inputStyle={tw(colors.black.text)}
           containerStyle={tw('bg-transparent')}
         />
         {searchValue ? (

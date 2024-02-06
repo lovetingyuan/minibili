@@ -1,9 +1,17 @@
-import fetcher from './fetcher-test'
+import fetcher from './fetcher'
 import { test } from 'vitest'
 import {
   UserBatchInfoResponseSchema,
   UserCardInfoResponseSchema,
+  UserInfoResponseSchema,
 } from './user-info.schema'
+
+test('user-info', async () => {
+  const res = await fetcher(
+    'https://api.bilibili.com/x/space/wbi/acc/info?mid=1458143131',
+  )
+  UserInfoResponseSchema.parse(res)
+})
 
 test('user-card-info', async () => {
   const res = await fetcher(

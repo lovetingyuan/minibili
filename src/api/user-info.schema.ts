@@ -11,6 +11,7 @@ export const UserInfoResponseSchema = z.object({
   sign: z.string(),
   is_followed: z.boolean(),
   is_risk: z.boolean(),
+  silence: z.union([z.literal(0), z.literal(1)]),
   live_room: z
     .object({
       roomStatus: z.number(),

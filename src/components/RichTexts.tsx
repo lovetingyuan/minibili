@@ -3,11 +3,12 @@ import { View, Linking, ViewStyle, TextProps, Image } from 'react-native'
 import { RichTextNode } from '../api/dynamic-items.schema'
 import { HandledRichTextType } from '../api/dynamic-items.type'
 import { reportUnknownRichTextItem } from '../utils/report'
-import { Icon, Text, useTheme } from '@rneui/themed'
+import { Icon, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
 import { NavigationProps } from '../types'
 import { imgUrl, parseUrl } from '../utils'
 import { useStore } from '../store'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(
   function RichTexts(props: {
@@ -23,7 +24,6 @@ export default React.memo(
   }) {
     const navigation = useNavigation<NavigationProps['navigation']>()
     const reactNodes: React.ReactNode[] = []
-    const { theme } = useTheme()
     const { setImagesList } = useStore()
     let key = 0
     const fontSize = props.fontSize || 16
@@ -37,10 +37,10 @@ export default React.memo(
                 title: '话题：' + props.topic?.name,
                 url: parseUrl(props.topic?.jump_url),
               })
-              // Linking.openURL(url.startsWith('//') ? 'https:' + url : url)
             }
           }}
-          style={{ fontSize, color: theme.colors.primary }}>
+          className={colors.primary.text}
+          style={{ fontSize }}>
           {' '}
           {props.topic.name}
         </Text>
@@ -65,7 +65,8 @@ export default React.memo(
               Linking.openURL(node.jump_url)
             }}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {'🔗' + node.text + ' '}
           </Text>,
         )
@@ -83,7 +84,8 @@ export default React.memo(
                 },
               })
             }}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {node.text}
           </Text>,
         )
@@ -102,7 +104,8 @@ export default React.memo(
               Linking.openURL(parseUrl(node.jump_url))
             }}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {node.text}
           </Text>,
         )
@@ -118,7 +121,8 @@ export default React.memo(
               Linking.openURL(parseUrl(node.jump_url))
             }}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {'📺 ' + node.text}
           </Text>,
         )
@@ -130,7 +134,8 @@ export default React.memo(
               Linking.openURL(node.jump_url)
             }}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {'🛒 ' + node.text}
           </Text>,
         )
@@ -141,7 +146,8 @@ export default React.memo(
               Linking.openURL(`mailto:${node.text}`)
             }}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {'📧 ' + node.text}
           </Text>,
         )
@@ -154,7 +160,8 @@ export default React.memo(
               )
             }}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {'🗳️ ' + node.text}
           </Text>,
         )
@@ -164,7 +171,8 @@ export default React.memo(
         reactNodes.push(
           <Text
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}
+            className={colors.primary.text}
+            style={{ fontSize }}
             onPress={() => {
               Linking.openURL(
                 `https://t.bilibili.com/lottery/h5/index/#/result?business_type=1&business_id=${props.idStr}&isWeb=1`,
@@ -183,7 +191,8 @@ export default React.memo(
             }}
             numberOfLines={1}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {'📹 ' + node.text}
           </Text>,
         )
@@ -195,7 +204,8 @@ export default React.memo(
               Linking.openURL(parseUrl(node.jump_url))
             }}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {'📝 ' + node.text}
           </Text>,
         )
@@ -210,7 +220,8 @@ export default React.memo(
               setImagesList(node.pics)
             }}
             key={key++}
-            style={{ fontSize, color: theme.colors.primary }}>
+            className={colors.primary.text}
+            style={{ fontSize }}>
             {'📝 ' + node.text}
           </Text>,
         )

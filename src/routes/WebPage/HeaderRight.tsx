@@ -1,4 +1,4 @@
-import { Icon, useTheme } from '@rneui/themed'
+import { Icon } from '@rneui/themed'
 import React from 'react'
 import { View, Linking, Share } from 'react-native'
 import { useStore } from '../../store'
@@ -7,13 +7,13 @@ import * as Clipboard from 'expo-clipboard'
 import { RouteProp, useRoute } from '@react-navigation/native'
 import { RootStackParamList } from '../../types'
 import { showToast } from '../../utils'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function HeaderRight(props: { reload: () => void }) {
   const { webViewMode, setWebViewMode } = useStore()
   const [visible, setVisible] = React.useState(false)
   const route = useRoute<RouteProp<RootStackParamList, 'WebPage'>>()
   const { url, title } = route.params
-  const { theme } = useTheme()
   const hideMenu = () => setVisible(false)
 
   const showMenu = () => setVisible(true)
@@ -34,7 +34,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
         onRequestClose={hideMenu}>
         <MenuItem
           textStyle={tw('text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             setWebViewMode(webViewMode === 'MOBILE' ? 'PC' : 'MOBILE')
             hideMenu()
@@ -43,7 +43,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
         </MenuItem>
         <MenuItem
           textStyle={tw('text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             hideMenu()
             Linking.openURL(url)
@@ -52,7 +52,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
         </MenuItem>
         <MenuItem
           textStyle={tw('text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             hideMenu()
             props.reload()
@@ -61,7 +61,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
         </MenuItem>
         <MenuItem
           textStyle={tw('text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             Clipboard.setStringAsync(url).then(() => {
               showToast('已复制链接：' + url)
@@ -72,7 +72,7 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
         </MenuItem>
         <MenuItem
           textStyle={tw('text-black dark:text-gray-300')}
-          pressColor={theme.colors.grey4}
+          pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             hideMenu()
             Share.share({

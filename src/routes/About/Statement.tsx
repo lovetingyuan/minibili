@@ -1,11 +1,11 @@
-import { ListItem, Text, Icon, useTheme } from '@rneui/themed'
+import { ListItem, Text, Icon } from '@rneui/themed'
 import React from 'react'
 import { Linking } from 'react-native'
 import { githubLink } from '../../constants'
+import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function Statement() {
   const [expandedStatement, setExpandedStatement] = React.useState(true)
-  const { theme } = useTheme()
   return (
     <ListItem.Accordion
       containerStyle={tw('p-0 mt-1 mb-3 bg-transparent')}
@@ -25,7 +25,7 @@ export default React.memo(function Statement() {
             🔈本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!（有问题欢迎使用意见反馈或者在
           </Text>
           <Text
-            className={`text-[${theme.colors.primary}]`}
+            className={colors.primary.text}
             onPress={() => {
               Linking.openURL(githubLink)
             }}>
