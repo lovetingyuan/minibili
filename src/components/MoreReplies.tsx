@@ -71,11 +71,11 @@ export default React.memo(function MoreReplies() {
             injectedJavaScript={injectCode + (isDark ? darkCode : '')}
             ref={webviewRef}
             applicationNameForUserAgent={'BILIBILI/8.0.0'}
-            // onLoadEnd={() => {
-            //   if (isDark) {
-            //     webviewRef.current?.injectJavaScript(darkCode)
-            //   }
-            // }}
+            onLoadEnd={() => {
+              if (isDark) {
+                webviewRef.current?.injectJavaScript(darkCode)
+              }
+            }}
             onError={() => {
               showToast('加载更多回复失败')
             }}
