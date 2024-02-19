@@ -50,9 +50,9 @@ export default function CommentList(props: {
             name="comment-text-outline"
             type="material-community"
             size={14}
-            color={tw(colors.gray1.text).color}
+            color={tw(colors.gray6.text).color}
           />
-          <Text className="text-xs mr-3 px-2 text-gray-700 dark:text-gray-300">
+          <Text className={`text-xs mr-3 px-2 ${colors.gray6.text}`}>
             {allCount ? allCount + '条评论' : '暂无评论'}
           </Text>
         </View>

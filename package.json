@@ -16,6 +16,7 @@
     "start": "expo start",
     "android": "adb devices -l && npx expo start --android",
     "tw": "npx react-native-tailwindcss-start",
+    "tw:dev": "npx yalc update && npm run tw -- --write=styles.tw.css",
     "ios": "adb devices -l && npx expo start --ios",
     "web": "expo start --web",
     "build:android": "npm run test && zx scripts/build.mjs",

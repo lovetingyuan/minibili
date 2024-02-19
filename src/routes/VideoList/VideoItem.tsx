@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, useWindowDimensions } from 'react-native'
+import { View } from 'react-native'
 import { VideoItem } from '@/api/hot-videos'
 import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'
 import { Text, Icon } from '@rneui/themed'
@@ -10,12 +10,10 @@ import { colors } from '@/constants/colors.tw'
 export default React.memo(function HotItem({ video }: { video: VideoItem }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
-  const { width } = useWindowDimensions()
-  const itemWidth = (width - 24) / 2
   const { isWiFi, _followedUpsMap } = useStore()
   const isFollowed = video.mid in _followedUpsMap
   return (
-    <View className="my-3 self-center" style={{ width: itemWidth }}>
+    <View className="self-center w-full flex-1">
       <View className="flex-1">
         <Image
           className="flex-1 w-full rounded aspect-[8/5]"
@@ -36,7 +34,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
         ) : null}
       </View>
       <Text
-        className={`mt-3 min-h-8 ${isFollowed ? 'font-bold underline' : ''}`}
+        className={`mt-3 min-h-8 ${isFollowed ? 'font-bold' : ''}`}
         numberOfLines={2}>
         {video.title}
       </Text>

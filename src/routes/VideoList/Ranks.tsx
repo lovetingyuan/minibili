@@ -4,9 +4,9 @@ import {
   Text,
   TouchableOpacity,
   Alert,
-  useWindowDimensions,
   ActivityIndicator,
   Linking,
+  Dimensions,
 } from 'react-native'
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
@@ -119,10 +119,6 @@ export default React.memo(function Ranks({ navigation }: Props) {
     }
   }
 
-  const { width } = useWindowDimensions()
-
-  const estimatedItemSize = width / 2 - 10
-
   return (
     <View className="flex-1">
       <FlashList
@@ -134,7 +130,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
         data={videoList}
         renderItem={renderItem}
         persistentScrollbar
-        estimatedItemSize={estimatedItemSize}
+        estimatedItemSize={Dimensions.get('window').width / 2}
         refreshing={isRefreshing}
         onRefresh={() => mutate()}
         ListEmptyComponent={<Loading />}

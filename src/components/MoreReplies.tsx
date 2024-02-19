@@ -3,7 +3,7 @@ import React from 'react'
 import { useStore } from '../store'
 import WebView from 'react-native-webview'
 import { showToast } from '../utils'
-import { useWindowDimensions, View } from 'react-native'
+import { View } from 'react-native'
 import useIsDark from '../hooks/useIsDark'
 
 const injectCode = `
@@ -45,7 +45,6 @@ const style = document.createElement('style');
 
 export default React.memo(function MoreReplies() {
   const { moreRepliesUrl, setMoreRepliesUrl } = useStore()
-  const { height } = useWindowDimensions()
   const isDark = useIsDark()
   const webviewRef = React.useRef<WebView | null>(null)
 
@@ -61,7 +60,7 @@ export default React.memo(function MoreReplies() {
       }}
       isVisible={!!moreRepliesUrl}>
       {moreRepliesUrl ? (
-        <View className="flex-1" style={{ height: height * 0.68 }}>
+        <View className="flex-1 h-[68vh]">
           <WebView
             className={'flex-1 bg-white dark:bg-gray-800'}
             source={{ uri: moreRepliesUrl }}

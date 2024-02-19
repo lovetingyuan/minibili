@@ -1,3 +1,5 @@
+// w-[21vw] sm:text-[#738945] md:border lg:font-bold xl:text-lg 2xl:text-white md:max-xl:flex
+
 export const colors = {
   primary: {
     text: 'text-sky-600 dark:text-sky-500',
@@ -12,8 +14,8 @@ export const colors = {
     bg: 'bg-black dark:bg-neutral-300',
   },
   success: {
-    text: 'text-emerald-500',
-    bg: 'bg-emerald-500',
+    text: 'text-emerald-600',
+    bg: 'bg-emerald-600',
   },
   warning: {
     text: 'text-orange-500',

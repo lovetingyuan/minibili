@@ -4,8 +4,8 @@ import {
   Text,
   TouchableOpacity,
   Alert,
-  useWindowDimensions,
   Linking,
+  Dimensions,
 } from 'react-native'
 import HotItem from './VideoItem'
 import { RootStackParamList } from '../../types'
@@ -129,14 +129,12 @@ export default React.memo(function Hot({ navigation }: Props) {
       },
     },
   ]
-  const { width } = useWindowDimensions()
-  const itemWidth = (width - 24) / 2
   const renderItem = ({ item }: { item: VideoItem }) => {
     const key = item.bvid
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        className="flex-1 flex-row justify-around"
+        className="flex-1 flex-row justify-around mx-1 my-2"
         key={key}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
@@ -161,6 +159,9 @@ export default React.memo(function Hot({ navigation }: Props) {
   return (
     <View className="flex-1">
       {/* <View><View className="bg-red-500 w-[50vw] h-3 border" /></View> */}
+      {/* <Text className="bg-red-300 h-[33vh] w-[50vw]">
+        sdf: {width} - {height}
+      </Text> */}
       <FlashList
         ref={v => {
           hotListRef.current = v
@@ -170,7 +171,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         data={hotVideoList}
         renderItem={renderItem}
         persistentScrollbar
-        estimatedItemSize={itemWidth}
+        estimatedItemSize={Dimensions.get('window').width / 2}
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
           <Text className="text-center my-3 text-gray-500">
