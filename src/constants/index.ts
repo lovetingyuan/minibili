@@ -1,7 +1,7 @@
 export const TracyId = 1458143131
 export const githubLink = 'https://github.com/lovetingyuan/minibili'
 export const site = 'https://lovetingyuan.github.io/minibili/'
-export const changelogUrl = site + 'version.json'
+// export const changelogUrl = site + 'version.json'
 export const configUrl = site + 'config.json'
 export const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
