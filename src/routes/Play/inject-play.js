@@ -1,5 +1,4 @@
 function __$hack() {
-  let videoDom
   const timer2 = setInterval(() => {
     const dom = document.querySelector('.mplayer-display')
     if (dom) {
@@ -17,7 +16,6 @@ function __$hack() {
     if (!video) {
       return
     }
-    videoDom = video
     clearInterval(timer3)
     const postPlayState = state => {
       window.ReactNativeWebView.postMessage(
@@ -30,7 +28,8 @@ function __$hack() {
     video.addEventListener('play', () => {
       postPlayState('play')
     })
-    ;['ended', 'pause', 'waiting'].forEach(evt => {
+    // eslint-disable-next-line no-array-constructor
+    Array('ended', 'pause', 'waiting').forEach(evt => {
       video.addEventListener(evt, () => {
         postPlayState(evt)
         if (evt === 'ended') {
@@ -61,7 +60,7 @@ function __$hack() {
     }
     const reloadBtn = document.createElement('div')
     reloadBtn.id = 'download-button'
-    reloadBtn.innerHTML = '⇓'
+    reloadBtn.innerHTML = '&#8659;'
     reloadBtn.style.cssText = `
     width: 24px;
     height: 24px;
@@ -100,32 +99,56 @@ function __$hack() {
     clearInterval(timer4)
     clearInterval(timer5)
   }, 4000)
-  let startY
-  let endY
-  document.addEventListener('touchstart', function (e) {
-    startY = e.touches[0].clientY
+  const element = document.body
+  let startX = 0
+  let startY = 0
+  let distanceX = 0
+  let distanceY = 0
+  let direction = ''
+
+  element.addEventListener('touchstart', function (event) {
+    const touch = event.touches[0]
+    startX = touch.clientX
+    startY = touch.clientY
   })
 
-  document.addEventListener('touchmove', function (e) {
-    endY = e.touches[0].clientY
-    if (videoDom && videoDom.ended) {
-      return
+  element.addEventListener('touchmove', function (event) {
+    const touch = event.touches[0]
+    distanceX = touch.clientX - startX
+    distanceY = touch.clientY - startY
+  })
+
+  element.addEventListener('touchend', function () {
+    if (Math.abs(distanceX) > Math.abs(distanceY)) {
+      direction = distanceX < 0 ? 'left' : 'right'
+    } else {
+      direction = distanceY < 0 ? 'up' : 'down'
     }
-    if (endY - startY > 99) {
+    if (
+      (direction === 'down' || direction === 'up') &&
+      Math.abs(distanceY) > 99
+    ) {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
           action: 'change-video-height',
-          payload: 'down',
-        }),
-      )
-    } else if (endY - startY < -99) {
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          action: 'change-video-height',
-          payload: 'up',
+          payload: direction,
         }),
       )
     }
+    if (
+      (direction === 'left' || direction === 'right') &&
+      Math.abs(distanceX) > 70
+    ) {
+      const video = document.querySelector('video')
+      if (video) {
+        video.currentTime += direction === 'left' ? -5 : 5
+      }
+    }
+    startX = 0
+    startY = 0
+    distanceX = 0
+    distanceY = 0
+    direction = ''
   })
 }
 
