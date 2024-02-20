@@ -59,7 +59,11 @@ await spinner('Checking build env...', async () => {
     chalk.red('EAS cli not login.'),
   )
 
-  await $`git ls-remote --heads https://github.com/lovetingyuan/minibili.git`
+  await retry(
+    3,
+    () => $`git ls-remote --heads https://github.com/lovetingyuan/minibili.git`,
+  )
+  // await $`git ls-remote --heads https://github.com/lovetingyuan/minibili.git`
 
   const branch = await $`git rev-parse --abbrev-ref HEAD`
   assert.equal(
