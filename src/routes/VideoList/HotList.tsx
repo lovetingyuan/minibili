@@ -75,6 +75,7 @@ export default React.memo(function Hot({ navigation }: Props) {
   }
   const gotoPlay = (data: VideoItem) => {
     navigation.navigate('Play', {
+      aid: data.aid,
       bvid: data.bvid,
       title: data.title,
       desc: data.desc,
@@ -82,6 +83,8 @@ export default React.memo(function Hot({ navigation }: Props) {
       face: data.face,
       name: data.name,
       cover: data.cover,
+      date: data.date,
+      tag: data.tag,
       // video: data,
     })
   }

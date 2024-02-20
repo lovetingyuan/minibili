@@ -62,7 +62,7 @@ const HeaderTitle = React.memo(function HeaderTitle() {
             onPress={showMenu}
             className="flex-row items-center h-full">
             <Text
-              className={`text-lg font-semibold ${
+              className={`text-lg font-bold ${
                 currentVideosCate.rid === -1
                   ? colors.secondary.text
                   : colors.gray7.text
@@ -101,7 +101,7 @@ const HeaderTitle = React.memo(function HeaderTitle() {
         <Button
           type="clear"
           size="sm"
-          titleStyle={tw(`text-sm ${colors.secondary.text}`)}
+          titleStyle={tw(`text-sm ${colors.primary.text}`)}
           onPress={() => {
             Linking.openURL(newVersion.downloadLink)
           }}>

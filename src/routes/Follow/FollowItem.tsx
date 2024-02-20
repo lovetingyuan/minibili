@@ -156,7 +156,7 @@ export default React.memo(function FollowItem(props: {
       onLongPress={() => {
         setOverlayButtons(buttons)
       }}
-      className="items-center mb-4 flex-1 justify-between relative"
+      className="items-center mb-5 flex-1 justify-between relative"
       onPress={gotoDynamic}>
       <View>
         <Avatar
@@ -178,14 +178,14 @@ export default React.memo(function FollowItem(props: {
       </View>
       {livingUps[mid] ? (
         <Text
-          className={`font-bold shrink-0 text-sm p-3 flex-1 text-center ${colors.primary.text}`}
+          className={`font-bold shrink-0 text-sm py-2 flex-1 text-center ${colors.success.text}`}
           onPress={gotoLivePage}>
           直播中~
         </Text>
       ) : (
         <Text
-          className={`text-sm p-3 shrink-0 flex-1 text-center ${
-            pin ? 'font-bold' : ''
+          className={`text-sm py-2 shrink-0 flex-1 text-center ${
+            pin ? `font-bold ${colors.primary.text}` : ''
           } ${hasUpdate ? colors.secondary.text : ''}`}
           numberOfLines={2}
           ellipsizeMode="tail">

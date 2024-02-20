@@ -21,6 +21,7 @@ function CommentText(props: {
 }) {
   const { nodes, style, idStr } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
+  const textShadowRadius = 0.2
 
   return (
     <Text style={style} selectable>
@@ -32,8 +33,7 @@ function CommentText(props: {
               className={colors.primary.text}
               style={{
                 textShadowColor: tw(colors.primary.text).color,
-                textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 0.2, // 阴影模糊程度
+                textShadowRadius,
               }}
               onPress={() => {
                 navigation.push('Dynamic', {

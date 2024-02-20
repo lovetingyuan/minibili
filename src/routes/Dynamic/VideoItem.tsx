@@ -57,7 +57,7 @@ export default function VideoItem(props: {
           face,
           desc,
           cover,
-          // date,
+          date,
         })
       }}>
       <RichTexts idStr={props.item.id} nodes={nodes} topic={props.item.topic} />

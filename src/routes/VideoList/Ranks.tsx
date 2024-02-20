@@ -45,13 +45,16 @@ export default React.memo(function Ranks({ navigation }: Props) {
   }
   const gotoPlay = (data: VideoItem) => {
     navigation.navigate('Play', {
+      aid: data.aid,
       bvid: data.bvid,
       title: data.title,
       desc: data.desc,
       mid: data.mid,
+      cover: data.cover,
       face: data.face,
       name: data.name,
       date: data.date,
+      tag: data.tag,
     })
   }
   const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {

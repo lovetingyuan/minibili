@@ -3,7 +3,7 @@ import { RanksConfig } from '../constants'
 import { checkUpdate } from '../api/check-update'
 import { UpInfo } from '../types'
 import {
-  ProviderOnChangeType,
+  type ProviderOnChangeType,
   createAtomicContext,
   useAtomicContext,
   useAtomicContextMethods,

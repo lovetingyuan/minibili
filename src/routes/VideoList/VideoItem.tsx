@@ -1,13 +1,17 @@
 import React from 'react'
 import { View } from 'react-native'
-import { VideoItem } from '@/api/hot-videos'
+import { type VideoItem as VideoItemType } from '@/api/hot-videos'
 import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'
 import { Text, Icon } from '@rneui/themed'
 import { Image } from 'expo-image'
 import { useStore } from '@/store'
 import { colors } from '@/constants/colors.tw'
 
-export default React.memo(function HotItem({ video }: { video: VideoItem }) {
+export default React.memo(function VideoItem({
+  video,
+}: {
+  video: VideoItemType
+}) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
   const { isWiFi, _followedUpsMap } = useStore()
@@ -34,7 +38,7 @@ export default React.memo(function HotItem({ video }: { video: VideoItem }) {
         ) : null}
       </View>
       <Text
-        className={`mt-3 min-h-8 ${isFollowed ? 'font-bold' : ''}`}
+        className={`mt-3 min-h-8 ${isFollowed ? `font-bold ${colors.primary.text}` : ''}`}
         numberOfLines={2}>
         {video.title}
       </Text>

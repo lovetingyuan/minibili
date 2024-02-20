@@ -18,20 +18,24 @@ import { Icon } from '@rneui/themed'
 import { useStore } from '../../store'
 import { useAppState } from '../../hooks/useAppState'
 import useMounted from '../../hooks/useMounted'
+import { RouteProp, useRoute } from '@react-navigation/native'
+import { RootStackParamList } from '@/types'
 
-export default React.memo(function Player(props: {
-  bvid: string
-  page: number
-}) {
+export default React.memo(function Player(props: { currentPage: number }) {
   const { getIsWiFi } = useStore()
+  const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { width, height } = useWindowDimensions()
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
-  const { data: videoInfo, error } = useVideoInfo(props.bvid)
+  const { data, error } = useVideoInfo(route.params.bvid)
   const [loadPlayer, setLoadPlayer] = React.useState(getIsWiFi())
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
+  const videoInfo = {
+    ...data,
+    ...route.params,
+  }
   useAppState(currentAppState => {
     if (
       currentAppState === 'active' &&
@@ -63,10 +67,10 @@ export default React.memo(function Player(props: {
 
   const handleMessage = (evt: WebViewMessageEvent) => {
     try {
-      const data = JSON.parse(evt.nativeEvent.data) as any
-      if (data.action === 'playState') {
-        playStateRef.current = data.action
-        if (data.payload === 'play') {
+      const eventData = JSON.parse(evt.nativeEvent.data) as any
+      if (eventData.action === 'playState') {
+        playStateRef.current = eventData.action
+        if (eventData.payload === 'play') {
           KeepAwake.activateKeepAwakeAsync('PLAY')
           setExtraHeight(40)
           if (isVerticalVideo && !verticalScale) {
@@ -74,21 +78,21 @@ export default React.memo(function Player(props: {
           }
         } else {
           KeepAwake.deactivateKeepAwake('PLAY')
-          if (data.payload === 'ended') {
+          if (eventData.payload === 'ended') {
             setExtraHeight(0)
             setVerticalScale(0)
           }
         }
       }
-      if (data.action === 'change-video-height') {
-        setVerticalScale(data.payload === 'up' ? 0.4 : 0.7)
+      if (eventData.action === 'change-video-height') {
+        setVerticalScale(eventData.payload === 'up' ? 0.4 : 0.7)
       }
-      if (data.action === 'downloadVideo') {
-        Linking.openURL(data.payload)
+      if (eventData.action === 'downloadVideo') {
+        Linking.openURL(eventData.payload)
       }
-      if (data.action === 'console.log') {
+      if (eventData.action === 'console.log') {
         // eslint-disable-next-line no-console
-        __DEV__ && console.log('message', data.payload)
+        __DEV__ && console.log('message', eventData.payload)
       }
     } catch (e) {}
   }
@@ -122,12 +126,12 @@ export default React.memo(function Player(props: {
   const search = new URLSearchParams()
   const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
   Object.entries({
-    bvid: props.bvid,
+    bvid: route.params.bvid,
     autoplay: 0,
     highQuality: getIsWiFi() ? 1 : 0,
     quality: getIsWiFi() ? 100 : 16,
     portraitFullScreen: true,
-    page: props.page,
+    page: props.currentPage,
   }).forEach(([k, v]) => {
     search.append(k, v + '')
   })

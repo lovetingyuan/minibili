@@ -4,17 +4,22 @@ import { View } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
 import { ListItem, Text, Icon } from '@rneui/themed'
 import { colors } from '@/constants/colors.tw'
+import { type RouteProp, useRoute } from '@react-navigation/native'
+import { type RootStackParamList } from '@/types'
 
 export default React.memo(function VideoInfo(props: {
-  changePage: (p: number) => void
-  bvid: string
-  page: number
+  currentPage: number
+  setCurrentPage: (p: number) => void
 }) {
-  const { changePage } = props
-  const { data: videoInfo, isLoading } = useVideoInfo(props.bvid)
+  const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
+  const { data, isLoading } = useVideoInfo(route.params.bvid)
   const [expanded, setExpanded] = React.useState(false)
+  const videoInfo = {
+    ...data,
+    ...route.params,
+  }
 
-  const { title, desc } = videoInfo || {}
+  const { title, desc } = videoInfo
   let videoDesc = desc
   if (videoDesc === '-') {
     videoDesc = ''
@@ -23,19 +28,19 @@ export default React.memo(function VideoInfo(props: {
   }
   return (
     <>
-      <VideoHeader bvid={props.bvid} />
+      <VideoHeader />
       <View>
         <Text className="text-base mt-3">{title}</Text>
         {videoDesc ? <Text className="mt-3">{videoDesc}</Text> : null}
-        {(videoInfo?.pages?.length || 0) > 1 && props.page ? (
+        {(videoInfo?.pages?.length || 0) > 1 ? (
           <ListItem.Accordion
             icon={<Icon name={'chevron-down'} type="material-community" />}
             containerStyle={tw('py-1 px-3 mt-5')}
             content={
               <ListItem.Content>
                 <ListItem.Title>
-                  视频分集（{videoInfo?.pages?.length}） {props.page}:{' '}
-                  {videoInfo?.pages?.[props.page - 1].title}
+                  视频分集（{videoInfo?.pages?.length}） {props.currentPage}:{' '}
+                  {videoInfo?.pages?.[props.currentPage - 1].title}
                 </ListItem.Title>
               </ListItem.Content>
             }
@@ -44,12 +49,12 @@ export default React.memo(function VideoInfo(props: {
               setExpanded(!expanded)
             }}>
             {videoInfo?.pages?.map(v => {
-              const selected = v.page === props.page
+              const selected = v.page === props.currentPage
               return (
                 <ListItem
                   key={v.page}
                   onPress={() => {
-                    changePage(v.page)
+                    props.setCurrentPage(v.page)
                   }}
                   containerStyle={tw('py-3 px-5')}
                   bottomDivider

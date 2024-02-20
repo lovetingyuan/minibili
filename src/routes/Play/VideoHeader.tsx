@@ -1,9 +1,9 @@
-import { useNavigation } from '@react-navigation/native'
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { Avatar, Icon, Text } from '@rneui/themed'
 import React from 'react'
 import { View, Pressable } from 'react-native'
 import { useVideoInfo } from '../../api/video-info'
-import { NavigationProps } from '../../types'
+import { NavigationProps, RootStackParamList } from '../../types'
 import {
   handleShareVideo,
   imgUrl,
@@ -13,10 +13,15 @@ import {
 } from '../../utils'
 import { Image } from 'expo-image'
 
-export default React.memo(function VideoHeader(props: { bvid: string }) {
+export default React.memo(function VideoHeader() {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { data: videoInfo } = useVideoInfo(props.bvid)
-  const { name, face, mid, date, title } = videoInfo || {}
+  const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
+  const { data } = useVideoInfo(route.params.bvid)
+  const videoInfo = {
+    ...data,
+    ...route.params,
+  }
+  const { name, face, mid, date, title } = videoInfo
   return (
     <View className="flex-row items-center flex-wrap justify-between">
       <Pressable
@@ -33,19 +38,21 @@ export default React.memo(function VideoHeader(props: { bvid: string }) {
           navigation.push('Dynamic', { user })
         }}
         className="flex-row items-center mr-1 flex-1">
-        {face ? (
-          <Avatar
-            size={34}
-            rounded
-            source={{ uri: imgUrl(face, 80) }}
-            ImageComponent={Image}
-          />
-        ) : null}
+        <Avatar
+          size={34}
+          rounded
+          source={{
+            uri: face
+              ? imgUrl(face, 80)
+              : require('../../../assets/loading.png'),
+          }}
+          ImageComponent={Image}
+        />
         <Text
           numberOfLines={1}
           ellipsizeMode="tail"
           className="ml-3 mr-1 text-base grow shrink font-bold">
-          {name + ' '}
+          {name ? name + ' ' : ' '}
         </Text>
       </Pressable>
       <View className="flex-row shrink-0 items-center gap-3">
@@ -69,8 +76,8 @@ export default React.memo(function VideoHeader(props: { bvid: string }) {
         <Pressable
           className="flex-row items-center"
           onPress={() => {
-            if (name && title && props.bvid) {
-              handleShareVideo(name, title, props.bvid)
+            if (name && title && route.params.bvid) {
+              handleShareVideo(name, title, route.params.bvid)
             }
           }}>
           <Icon type="material-community" name="share" size={20} />

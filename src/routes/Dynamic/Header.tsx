@@ -39,6 +39,8 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const userName = dynamicUser?.name ? dynamicUser.name + level : ''
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
+  const { _followedUpsMap } = useStore()
+  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   return (
     <View className="flex-row items-center mr-28 left-[-12px] relative">
       {dynamicUser?.face ? (
@@ -73,7 +75,16 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           ) : null}
         </Text>
       </Pressable>
-      {sex ? <Text className="text-sm ml-3 opacity-80">{sex}</Text> : null}
+      {followed ? (
+        <Icon
+          size={15}
+          name="checkbox-marked-circle-outline"
+          type="material-community"
+          className="relative top-[1px] ml-2"
+          color={tw(colors.secondary.text).color}
+        />
+      ) : null}
+      {sex ? <Text className="text-sm ml-2   opacity-80">{sex}</Text> : null}
       {dynamicUser.mid && livingUrl ? (
         <Button
           size="sm"
@@ -103,11 +114,8 @@ function HeaderRight() {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
-  const { $followedUps, set$followedUps } = useStore()
-  const followed = $followedUps.find(
-    v => v.mid.toString() === dynamicUser?.mid.toString(),
-  )
-
+  const { get$followedUps, _followedUpsMap, set$followedUps } = useStore()
+  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   return (
     <View className="flex-row items-center gap-2">
       <Menu
@@ -135,7 +143,7 @@ function HeaderRight() {
                     face: dynamicUser.face,
                     sign: dynamicUser.sign,
                   },
-                  ...$followedUps,
+                  ...get$followedUps(),
                 ])
                 showToast('已关注')
               }

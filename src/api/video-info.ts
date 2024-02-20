@@ -11,20 +11,21 @@ const getVideoItem = (data: VideoInfoResponse) => {
     bvid: data.bvid,
     date: data.pubdate,
     desc: data.desc,
-    width: data.dimension.width,
-    height: data.dimension.height,
-    rotate: data.dimension.rotate,
-    duration: data.duration,
+    cover: data.pic,
     mid: data.owner.mid,
     name: data.owner.name,
     face: data.owner.face,
     title: data.title,
+    // --------------------
+    width: data.dimension.width,
+    height: data.dimension.height,
+    rotate: data.dimension.rotate,
+    duration: data.duration,
     likeNum: data.stat.like,
     replyNum: data.stat.reply,
     shareNum: data.stat.share,
     playNum: data.stat.view,
     danmuNum: data.stat.danmaku,
-    cover: data.pic,
     videos: data.videos, // 如果是分片视频或者互动视频，这个videos会是大于1的数字
     tag: data.tname,
     pages: data.pages.map(v => {
@@ -43,17 +44,13 @@ const getVideoItem = (data: VideoInfoResponse) => {
 
 export type VideoInfo = ReturnType<typeof getVideoItem>
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
-export function useVideoInfo(
-  bvid: string,
-  fallbackData?: { bvid: string } & Partial<VideoInfo>,
-) {
-  // const { getPlayingVideo } = useStore()
+export function useVideoInfo(bvid: string) {
   const { data, error, isLoading } = useSWR<VideoInfoResponse>(
     bvid ? '/x/web-interface/view?bvid=' + bvid : null,
     request,
   )
   return {
-    data: data ? getVideoItem(data) : fallbackData,
+    data: data ? getVideoItem(data) : null,
     error,
     isLoading,
   }

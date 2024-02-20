@@ -157,13 +157,8 @@ export default function ForwardItem(props: {
                 mid: payload.mid,
                 aid: video.aid,
                 cover: video.cover,
-                // date: payload.date,
-                // pubDate: payload.
                 title: video.title,
-                // aid: video.aid,
-                // cover: video.cover,
                 desc: video.desc,
-                // play: video.stat.play,
               })
             } else {
               navigation.navigate('WebPage', {
