@@ -74,11 +74,11 @@ await spinner('Checking build env...', async () => {
   await $`git push`
 })
 
-echo(chalk.green('environment is alright.'))
+echo(chalk.green('Environment is all right.\n'))
 
 let appVersion
 
-await spinner('checking current build list...', async () => {
+await spinner('Checking current build list...', async () => {
   const currentBuild =
     await $`npx -y eas-cli@latest build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
   appVersion = getBuildList(currentBuild)[0].appVersion
@@ -125,7 +125,7 @@ echo(
 let latestBuildList
 
 try {
-  await spinner('eas building...', async () => {
+  await spinner('EAS building...', async () => {
     await $`npx -y eas-cli@latest build --platform android --profile production --message ${changes} --json --non-interactive`
     return new Promise(r => setTimeout(r, 1000))
   })
@@ -133,7 +133,7 @@ try {
   echo(chalk.green('eas build done.'))
 
   try {
-    buildListStr = await spinner('checking eas build list...', () =>
+    buildListStr = await spinner('Checking EAS build list...', () =>
       retry(
         3,
         () =>
@@ -179,7 +179,7 @@ const apkUrl = latestBuildList[0].artifacts.buildUrl
 echo(chalk.blue('download apk file...'))
 
 try {
-  await spinner('downloading apk file...', async () => {
+  await spinner('Downloading APK file...', async () => {
     await $`npx rimraf apk`
     await $`mkdir apk`
     return retry(3, () => {
@@ -197,7 +197,7 @@ try {
 }
 
 try {
-  await spinner('publish to npm...', () =>
+  await spinner('Publish to npm...', () =>
     retry(
       3,
       () => $`npm publish --tag beta --registry=https://registry.npmjs.org/`,
