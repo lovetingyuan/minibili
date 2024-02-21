@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 
-import fetcher from './fetcher'
+import fetcher from './fetcher-test'
 import {
   UserBatchInfoResponseSchema,
   UserCardInfoResponseSchema,
