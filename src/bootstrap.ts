@@ -4,8 +4,18 @@ import * as SentryExpo from '@sentry/react-native'
 import Constants from 'expo-constants'
 import * as SplashScreen from 'expo-splash-screen'
 
+import getSetWbiImg from './api/get-set-user-nav'
+import { getUserNav } from './api/get-user-nav'
 import { showFatalError, showToast } from './utils'
 import { reportUserOpenApp, Tags } from './utils/report'
+
+const getWbiImg = () => {
+  return getUserNav().then(res => {
+    getSetWbiImg(res)
+  })
+}
+getWbiImg()
+setInterval(getWbiImg, 12 * 60 * 60 * 1000)
 
 SplashScreen.preventAutoHideAsync()
 

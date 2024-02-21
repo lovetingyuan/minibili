@@ -1,9 +1,7 @@
 import { UA } from '../constants'
 import encWbi from '../utils/wbi'
-// import { reportApiError } from '../utils/report'
 import { getCookie } from './get-cookie'
-import { getUserNav } from './get-user-nav'
-import type { UserNavType } from './get-user-nav.schema'
+import getSetWbiImg from './get-set-user-nav'
 
 type Res<D = any> = {
   code: number
@@ -23,20 +21,9 @@ export class ApiError extends Error {
 }
 let cookie = ''
 
-let wbiImg: UserNavType['wbi_img'] | null = null
-
 getCookie().then(c => {
   cookie = c
 })
-
-const getWbiImg = () => {
-  return getUserNav().then(res => {
-    wbiImg = res
-    return res
-  })
-}
-
-setInterval(getWbiImg, 12 * 60 * 60 * 1000)
 
 export default async function request<D extends any>(url: string) {
   let requestUrl = url.startsWith('http')
@@ -72,9 +59,7 @@ export default async function request<D extends any>(url: string) {
     options.credentials = 'omit'
   }
   if (url.includes('/wbi/')) {
-    if (!wbiImg) {
-      wbiImg = await getWbiImg()
-    }
+    const wbiImg = await getSetWbiImg()
     const [_url, _query] = requestUrl.split('?')
     const params = new URLSearchParams(_query)
     const queryParams: Record<string, string> = {}

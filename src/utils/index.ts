@@ -2,7 +2,7 @@ import * as Updates from 'expo-updates'
 import { Alert, Linking, Platform, Share, ToastAndroid } from 'react-native'
 import Toast from 'react-native-root-toast'
 
-import { getAppUpdateInfo } from '../store'
+import { checkUpdate } from '@/api/check-update'
 
 export const parseNumber = (num?: number | null) => {
   if (num == null) {
@@ -134,46 +134,46 @@ export function showToast(message: string, long = false) {
 
 let showedFatalError = false
 
-export function showFatalError(error: any) {
+export async function showFatalError(error: any) {
   if (showedFatalError) {
     return
   }
-  getAppUpdateInfo.then(info => {
-    showedFatalError = true
-    if (__DEV__) {
-      return
-    }
-    Alert.alert(
-      '抱歉，应用发生了错误😅',
-      '我们会处理这个错误\n' +
-        (error?.message || error) +
-        (info.hasUpdate
-          ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
-          : ''),
-      [
-        info.hasUpdate
-          ? {
-              text: '下载新版',
-              onPress: () => {
-                Linking.openURL(info.downloadLink)
-              },
-            }
-          : null,
-        {
-          text: '确定',
-          onPress() {
-            Updates.reloadAsync()
-          },
-        },
-      ].filter(Boolean),
+  const updateInfo = await checkUpdate().catch(() => null)
+  showedFatalError = true
+  if (__DEV__) {
+    return
+  }
+
+  Alert.alert(
+    '抱歉，应用发生了错误😅',
+    '我们会处理这个错误\n' +
+      (error?.message || error) +
+      (updateInfo?.hasUpdate
+        ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
+        : ''),
+    [
+      updateInfo?.hasUpdate
+        ? {
+            text: '下载新版',
+            onPress: () => {
+              Linking.openURL(updateInfo.downloadLink)
+            },
+          }
+        : null,
       {
-        cancelable: false,
-        onDismiss() {
-          showedFatalError = false
+        text: '确定',
+        onPress() {
+          Updates.reloadAsync()
         },
       },
-    )
-  })
+    ].filter(Boolean),
+    {
+      cancelable: false,
+      onDismiss() {
+        showedFatalError = false
+      },
+    },
+  )
 }
 
 export function imgUrl(url: string, size?: number, h = size) {
