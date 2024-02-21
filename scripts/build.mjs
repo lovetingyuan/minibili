@@ -246,5 +246,10 @@ echo(
 )
 const open = require('open')
 open(
-  `https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(changes.map(c => `- ${c}`).join('\n'))}`,
+  `https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
+    changes
+      .split('  ')
+      .map(c => `- ${c}`)
+      .join('\n'),
+  )}`,
 )
