@@ -6,6 +6,4 @@ const config = getSentryExpoConfig(__dirname)
 
 module.exports = config
 
-if (process.env.NODE_ENV === 'development') {
-  require('@tingyuan/react-native-tailwindcss/src/start-tailwind')(__dirname)
-}
+require('@tingyuan/react-native-tailwindcss/tailwind')(__dirname)
