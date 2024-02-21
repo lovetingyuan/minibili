@@ -1,6 +1,7 @@
-import fetcher from './fetcher-test'
 import { test } from 'vitest'
+
 import { DynamicListResponseSchema } from './dynamic-items.schema'
+import fetcher from './fetcher-test'
 
 test('dynamic-list', async () => {
   const { list } = (await fetcher(

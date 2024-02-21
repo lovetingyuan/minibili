@@ -1,6 +1,7 @@
-import { z } from 'zod'
+import type { z } from 'zod'
+
 import { configUrl } from '../constants'
-import { ConfigSchema } from './get-config.schema'
+import type { ConfigSchema } from './get-config.schema'
 
 type RemoteConfig = z.infer<typeof ConfigSchema>
 

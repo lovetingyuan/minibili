@@ -1,8 +1,10 @@
-import { ListItem, Text, Icon } from '@rneui/themed'
+import { Icon, ListItem, Text } from '@rneui/themed'
 import React from 'react'
 import { Linking } from 'react-native'
-import { githubLink } from '../../constants'
+
 import { colors } from '@/constants/colors.tw'
+
+import { githubLink } from '../../constants'
 
 export default React.memo(function Statement() {
   const [expandedStatement, setExpandedStatement] = React.useState(true)

@@ -1,7 +1,7 @@
 import encWbi from '../utils/wbi'
 import { getCookie } from './get-cookie'
 import { getUserNav } from './get-user-nav'
-import { UserNavType } from './get-user-nav.schema'
+import type { UserNavType } from './get-user-nav.schema'
 
 let cookie = ''
 

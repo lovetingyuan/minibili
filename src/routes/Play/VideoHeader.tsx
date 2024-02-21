@@ -1,9 +1,15 @@
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native'
 import { Avatar, Icon, Text } from '@rneui/themed'
+import { Image } from 'expo-image'
 import React from 'react'
-import { View, Pressable } from 'react-native'
+import { Pressable, View } from 'react-native'
+
 import { useVideoInfo } from '../../api/video-info'
-import { NavigationProps, RootStackParamList } from '../../types'
+import type { NavigationProps, RootStackParamList } from '../../types'
 import {
   handleShareVideo,
   imgUrl,
@@ -11,7 +17,6 @@ import {
   parseNumber,
   showToast,
 } from '../../utils'
-import { Image } from 'expo-image'
 
 export default React.memo(function VideoHeader() {
   const navigation = useNavigation<NavigationProps['navigation']>()

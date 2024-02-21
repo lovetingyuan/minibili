@@ -1,6 +1,7 @@
 import useSWR from 'swr'
-import { z } from 'zod'
-import { UserRelationResponseSchema } from './user-relation.schema'
+import type { z } from 'zod'
+
+import type { UserRelationResponseSchema } from './user-relation.schema'
 
 type UserRelationResponse = z.infer<typeof UserRelationResponseSchema>
 

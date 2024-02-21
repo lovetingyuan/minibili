@@ -1,6 +1,7 @@
+import { assert, test } from 'vitest'
+
 import encWbi from '../utils/wbi'
 import fetcher from './fetcher-test'
-import { test, assert } from 'vitest'
 
 const querys = [
   ['oid', '750721856'],

@@ -1,13 +1,15 @@
-import React from 'react'
-import { TouchableOpacity, Alert, View, Linking } from 'react-native'
-import { Avatar, Badge, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
-import { NavigationProps, UpInfo } from '../../types'
+import { Avatar, Badge, Text } from '@rneui/themed'
+import { Image } from 'expo-image'
+import React from 'react'
+import { Alert, Linking, TouchableOpacity, View } from 'react-native'
+
+import { colors } from '@/constants/colors.tw'
+
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { useStore } from '../../store'
-import { Image } from 'expo-image'
+import type { NavigationProps, UpInfo } from '../../types'
 import { imgUrl, parseUrl } from '../../utils'
-import { colors } from '@/constants/colors.tw'
 
 export default React.memo(function FollowItem(props: {
   item: UpInfo

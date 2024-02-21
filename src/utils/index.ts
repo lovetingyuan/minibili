@@ -1,7 +1,8 @@
-import { Share, Platform, ToastAndroid, Alert, Linking } from 'react-native'
-import Toast from 'react-native-root-toast'
-import { getAppUpdateInfo } from '../store'
 import * as Updates from 'expo-updates'
+import { Alert, Linking, Platform, Share, ToastAndroid } from 'react-native'
+import Toast from 'react-native-root-toast'
+
+import { getAppUpdateInfo } from '../store'
 
 export const parseNumber = (num?: number | null) => {
   if (num == null) {

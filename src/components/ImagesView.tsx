@@ -1,9 +1,10 @@
+import { useNetInfo } from '@react-native-community/netinfo'
+import { Overlay } from '@rneui/themed'
 import React from 'react'
 import { Linking } from 'react-native'
-import { Overlay } from '@rneui/themed'
-import { useNetInfo } from '@react-native-community/netinfo'
-import { useStore } from '../store'
 import WebView from 'react-native-webview'
+
+import { useStore } from '../store'
 
 function __$hack() {
   const gallery = document.createElement('div')

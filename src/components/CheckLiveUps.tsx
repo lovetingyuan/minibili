@@ -1,10 +1,11 @@
 import React from 'react'
-import { useStore } from '../store'
-import useSWR from 'swr'
-import { LiveInfoBatchItemSchema } from '../api/living-info.schema'
-import request from '../api/fetcher'
 import { Vibration } from 'react-native'
-import { z } from 'zod'
+import useSWR from 'swr'
+import type { z } from 'zod'
+
+import request from '../api/fetcher'
+import type { LiveInfoBatchItemSchema } from '../api/living-info.schema'
+import { useStore } from '../store'
 
 let prevLivingMap = {}
 

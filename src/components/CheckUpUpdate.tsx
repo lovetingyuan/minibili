@@ -1,8 +1,9 @@
-import React from 'react'
-import { useStore } from '../store'
 import PQueue from 'p-queue'
+import React from 'react'
+
 import { checkSingleUpUpdate } from '../api/dynamic-items'
 import useMounted from '../hooks/useMounted'
+import { useStore } from '../store'
 
 function useCheckUpdateUps() {
   const { get$followedUps, set$upUpdateMap, get$upUpdateMap } = useStore()

@@ -1,10 +1,11 @@
-import { View } from 'react-native'
-import { useStore } from '../../store'
+import { useNavigation } from '@react-navigation/native'
+import { Icon } from '@rneui/base'
 import { Button, Text } from '@rneui/themed'
 import React from 'react'
-import { Icon } from '@rneui/base'
-import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../../types'
+import { View } from 'react-native'
+
+import { useStore } from '../../store'
+import type { NavigationProps } from '../../types'
 
 function HeaderTitle() {
   const { $followedUps, _updatedCount } = useStore()

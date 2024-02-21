@@ -1,4 +1,5 @@
-import { test, assert } from 'vitest'
+import { assert, test } from 'vitest'
+
 import { getCookie } from './get-cookie'
 
 test('get-cookie', async () => {

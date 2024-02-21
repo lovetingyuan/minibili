@@ -1,7 +1,8 @@
-import { z } from 'zod'
-import request from './fetcher'
-import { LiveInfoBatchItemSchema } from './living-info.schema'
 import useSWR from 'swr'
+import type { z } from 'zod'
+
+import request from './fetcher'
+import type { LiveInfoBatchItemSchema } from './living-info.schema'
 
 // https://api.live.bilibili.com/live_user/v1/Master/info?uid=
 // https://api.live.bilibili.com/room/v1/Room/get_info?room_id=

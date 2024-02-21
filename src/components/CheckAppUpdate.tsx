@@ -1,5 +1,6 @@
 import React from 'react'
 import { Alert, Linking } from 'react-native'
+
 import { getAppUpdateInfo, useStore } from '../store'
 import { delay } from '../utils'
 

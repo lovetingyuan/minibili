@@ -1,15 +1,17 @@
+import { useRoute } from '@react-navigation/native'
 import React from 'react'
+import { Text, View } from 'react-native'
+
+import { colors } from '@/constants/colors.tw'
+
+import type { DynamicItemAllType } from '../../api/dynamic-items'
 import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
-import { View, Text } from 'react-native'
+import CommonItem from './CommonItem'
+import DefaultItem from './DefaultItem'
+import DynamicStat from './DynamicStat'
 import ForwardItem from './ForwardItem'
 import VideoItem from './VideoItem'
 import WordDrawItem from './WordDrawItem'
-import DefaultItem from './DefaultItem'
-import CommonItem from './CommonItem'
-import DynamicStat from './DynamicStat'
-import { useRoute } from '@react-navigation/native'
-import { DynamicItemAllType } from '../../api/dynamic-items'
-import { colors } from '@/constants/colors.tw'
 
 export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   let Item: React.FC<any> = DefaultItem

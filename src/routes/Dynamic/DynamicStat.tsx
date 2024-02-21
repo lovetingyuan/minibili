@@ -1,8 +1,10 @@
 import { Icon, Text } from '@rneui/themed'
 import React from 'react'
-import { View, Pressable } from 'react-native'
-import { handleShareVideo, parseNumber, showToast } from '../../utils'
+import { Pressable, View } from 'react-native'
+
 import { colors } from '@/constants/colors.tw'
+
+import { handleShareVideo, parseNumber, showToast } from '../../utils'
 
 export default function DynamicStat(props: {
   id: string | number

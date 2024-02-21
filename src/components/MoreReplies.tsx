@@ -1,10 +1,11 @@
 import { BottomSheet } from '@rneui/themed'
 import React from 'react'
-import { useStore } from '../store'
-import WebView from 'react-native-webview'
-import { showToast } from '../utils'
 import { View } from 'react-native'
+import WebView from 'react-native-webview'
+
 import useIsDark from '../hooks/useIsDark'
+import { useStore } from '../store'
+import { showToast } from '../utils'
 
 const injectCode = `
 const style = document.createElement('style');

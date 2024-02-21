@@ -1,10 +1,11 @@
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { TouchableOpacity } from 'react-native'
-import { DynamicItemType } from '../../api/dynamic-items'
-import { OtherDynamicTypeEnum } from '../../api/dynamic-items.type'
+
+import type { DynamicItemType } from '../../api/dynamic-items'
+import type { OtherDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
-import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../../types'
+import type { NavigationProps } from '../../types'
 
 export default function DefaultItem(props: {
   item: DynamicItemType<OtherDynamicTypeEnum>

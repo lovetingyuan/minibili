@@ -1,25 +1,27 @@
+import { type RouteProp, useRoute } from '@react-navigation/native'
+import { Icon } from '@rneui/themed'
 import * as KeepAwake from 'expo-keep-awake'
 import React from 'react'
 import {
-  useWindowDimensions,
-  View,
-  ImageBackground,
-  Pressable,
-  Text,
-  Linking,
   ActivityIndicator,
   Image,
+  ImageBackground,
+  Linking,
+  Pressable,
+  Text,
+  useWindowDimensions,
+  View,
 } from 'react-native'
-import WebView, { WebViewMessageEvent } from 'react-native-webview'
+import WebView, { type WebViewMessageEvent } from 'react-native-webview'
+
+import type { RootStackParamList } from '@/types'
+
 import { useVideoInfo } from '../../api/video-info'
-import { INJECTED_JAVASCRIPT } from './inject-play'
-import { imgUrl, parseDuration, showToast } from '../../utils'
-import { Icon } from '@rneui/themed'
-import { useStore } from '../../store'
 import { useAppState } from '../../hooks/useAppState'
 import useMounted from '../../hooks/useMounted'
-import { RouteProp, useRoute } from '@react-navigation/native'
-import { RootStackParamList } from '@/types'
+import { useStore } from '../../store'
+import { imgUrl, parseDuration, showToast } from '../../utils'
+import { INJECTED_JAVASCRIPT } from './inject-play'
 
 export default React.memo(function Player(props: { currentPage: number }) {
   const { getIsWiFi } = useStore()

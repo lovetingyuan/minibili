@@ -1,10 +1,12 @@
-import React from 'react'
-import { showFatalError } from '../utils'
-import { Button, Image, Linking, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
-import { site } from '../constants'
 import * as Updates from 'expo-updates'
+import React from 'react'
+import { Button, Image, Linking, Text, View } from 'react-native'
+
 import { colors } from '@/constants/colors.tw'
+
+import { site } from '../constants'
+import { showFatalError } from '../utils'
 
 export default function ErrorFallback(props: { message?: string }) {
   React.useEffect(() => {

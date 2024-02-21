@@ -1,9 +1,9 @@
+import { UA } from '../constants'
 import encWbi from '../utils/wbi'
 // import { reportApiError } from '../utils/report'
 import { getCookie } from './get-cookie'
 import { getUserNav } from './get-user-nav'
-import { UserNavType } from './get-user-nav.schema'
-import { UA } from '../constants'
+import type { UserNavType } from './get-user-nav.schema'
 
 type Res<D = any> = {
   code: number

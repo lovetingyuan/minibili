@@ -1,7 +1,8 @@
 import useSWR from 'swr'
-import { SearchResponse } from './search-up.schema'
+
 import { parseUrl } from '../utils'
 import request from './fetcher'
+import type { SearchResponse } from './search-up.schema'
 
 export const useSearchUps = (name: string) => {
   const { data, error, isValidating } = useSWR<SearchResponse>(

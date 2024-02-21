@@ -1,10 +1,15 @@
-import { View } from 'react-native'
-import { NavigationProps, RootStackParamList } from '../../types'
-import React from 'react'
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native'
-import { Icon, Avatar, Text } from '@rneui/themed'
-import { imgUrl } from '../../utils'
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native'
+import { Avatar, Icon, Text } from '@rneui/themed'
 import { Image } from 'expo-image'
+import React from 'react'
+import { View } from 'react-native'
+
+import type { NavigationProps, RootStackParamList } from '../../types'
+import { imgUrl } from '../../utils'
 
 function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()

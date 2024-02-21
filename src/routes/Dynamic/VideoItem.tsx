@@ -1,14 +1,16 @@
 import { useNavigation } from '@react-navigation/native'
+import { Icon, Text } from '@rneui/themed'
 import React from 'react'
 import { Image, Linking, TouchableOpacity, View } from 'react-native'
-import { NavigationProps } from '../../types'
-import { DynamicItemType } from '../../api/dynamic-items'
-import { Icon, Text } from '@rneui/themed'
-import { imgUrl, parseNumber, parseUrl } from '../../utils'
-import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+
+import { colors } from '@/constants/colors.tw'
+
+import type { DynamicItemType } from '../../api/dynamic-items'
+import type { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 import { useStore } from '../../store'
-import { colors } from '@/constants/colors.tw'
+import type { NavigationProps } from '../../types'
+import { imgUrl, parseNumber, parseUrl } from '../../utils'
 
 export default function VideoItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>

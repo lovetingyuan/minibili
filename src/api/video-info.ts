@@ -1,7 +1,8 @@
 import useSWR from 'swr'
-import { z } from 'zod'
-import { VideoInfoResponseSchema } from './video-info.schema'
+import type { z } from 'zod'
+
 import request from './fetcher'
+import type { VideoInfoResponseSchema } from './video-info.schema'
 
 type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>
 

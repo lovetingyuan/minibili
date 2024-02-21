@@ -1,15 +1,16 @@
-import React from 'react'
-import { View, TouchableOpacity, useWindowDimensions } from 'react-native'
-import { DynamicItemType } from '../../api/dynamic-items'
-import { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import RichTexts from '../../components/RichTexts'
-import { Image } from 'expo-image'
-import { Additional } from '../../components/Additional'
-import { NavigationProps } from '../../types'
-import { imgUrl } from '../../utils'
-import { useStore } from '../../store'
 import { Text } from '@rneui/themed'
+import { Image } from 'expo-image'
+import React from 'react'
+import { TouchableOpacity, useWindowDimensions, View } from 'react-native'
+
+import type { DynamicItemType } from '../../api/dynamic-items'
+import type { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
+import { Additional } from '../../components/Additional'
+import RichTexts from '../../components/RichTexts'
+import { useStore } from '../../store'
+import type { NavigationProps } from '../../types'
+import { imgUrl } from '../../utils'
 
 export default function WordDrawItem(props: {
   item: DynamicItemType<

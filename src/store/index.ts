@@ -1,16 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { RanksConfig } from '../constants'
-import { checkUpdate } from '../api/check-update'
-import { UpInfo } from '../types'
+import * as SplashScreen from 'expo-splash-screen'
+import React from 'react'
 import {
-  type ProviderOnChangeType,
   createAtomicContext,
+  type ProviderOnChangeType,
   useAtomicContext,
   useAtomicContextMethods,
 } from 'react-atomic-context'
-import React from 'react'
+
+import { checkUpdate } from '../api/check-update'
+import { RanksConfig } from '../constants'
 import useMounted from '../hooks/useMounted'
-import * as SplashScreen from 'expo-splash-screen'
+import type { UpInfo } from '../types'
 
 interface UpdateUpInfo {
   latestId: string

@@ -1,7 +1,8 @@
-import React from 'react'
-import { Alert, Appearance, Linking } from 'react-native'
 import Constants from 'expo-constants'
 import * as Updates from 'expo-updates'
+import React from 'react'
+import { Alert, Appearance, Linking } from 'react-native'
+
 import {
   checkUpdate as checkUpdateApi,
   currentVersion,

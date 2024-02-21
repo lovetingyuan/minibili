@@ -1,14 +1,15 @@
-import React from 'react'
-import { View, Pressable, ScrollView } from 'react-native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../types'
-import CommentList from '../../components/CommentList'
-import { Icon, Text } from '@rneui/themed'
-import { handleShareVideo, parseNumber, showToast } from '../../utils'
-import DynamicItem from '../Dynamic/DynamicItem'
 import { useFocusEffect } from '@react-navigation/native'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Icon, Text } from '@rneui/themed'
+import React from 'react'
+import { Pressable, ScrollView, View } from 'react-native'
+
+import CommentList from '../../components/CommentList'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
+import type { RootStackParamList } from '../../types'
+import { handleShareVideo, parseNumber, showToast } from '../../utils'
 import { setViewingDynamicId } from '../../utils/report'
+import DynamicItem from '../Dynamic/DynamicItem'
 
 export default React.memo(function DynamicDetail({
   route,

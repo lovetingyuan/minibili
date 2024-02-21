@@ -1,13 +1,15 @@
-import { View } from 'react-native'
-import { useStore } from '../../store'
+import { type RouteProp, useRoute } from '@react-navigation/native'
+import { Icon } from '@rneui/base'
 import { Text } from '@rneui/themed'
 import React from 'react'
-import { Icon } from '@rneui/base'
-import { parseNumber, showToast } from '@/utils'
-import { colors } from '@/constants/colors.tw'
+import { View } from 'react-native'
+
 import { useUserRelation } from '@/api/user-relation'
-import { RouteProp, useRoute } from '@react-navigation/native'
-import { RootStackParamList } from '@/types'
+import { colors } from '@/constants/colors.tw'
+import type { RootStackParamList } from '@/types'
+import { parseNumber, showToast } from '@/utils'
+
+import { useStore } from '../../store'
 
 export default function PlayHeader() {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()

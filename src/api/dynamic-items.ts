@@ -1,24 +1,25 @@
-import request from './fetcher'
+import useSWRInfinite from 'swr/infinite'
+
+import { parseUrl } from '../utils'
 import {
+  reportUnknownAdditional,
+  reportUnknownDynamicItem,
+} from '../utils/report'
+import type {
   DynamicItemBaseType,
   DynamicItemResponse,
   DynamicListResponse,
   RichTextItem,
 } from './dynamic-items.schema'
-import useSWRInfinite from 'swr/infinite'
 import {
-  reportUnknownAdditional,
-  reportUnknownDynamicItem,
-} from '../utils/report'
-import {
-  DynamicTypes,
+  type DynamicTypes,
   HandledAdditionalTypeEnum,
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
   MajorTypeEnum,
-  OtherForwardTypeEnum,
+  type OtherForwardTypeEnum,
 } from './dynamic-items.type'
-import { parseUrl } from '../utils'
+import request from './fetcher'
 
 type OmitUndef<T> = {
   [K in keyof T as T[K] extends undefined ? never : K]: T[K]

@@ -1,6 +1,7 @@
-import React from 'react'
-import { View, Linking, Pressable, Image } from 'react-native'
 import { Button, Icon, Text } from '@rneui/themed'
+import React from 'react'
+import { Image, Linking, Pressable, View } from 'react-native'
+
 import { githubLink } from '../../constants'
 
 export default React.memo(function Header() {

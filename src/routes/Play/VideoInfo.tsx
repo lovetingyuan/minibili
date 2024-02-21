@@ -1,11 +1,13 @@
-import React from 'react'
-import VideoHeader from './VideoHeader'
-import { View } from 'react-native'
-import { useVideoInfo } from '../../api/video-info'
-import { ListItem, Text, Icon } from '@rneui/themed'
-import { colors } from '@/constants/colors.tw'
 import { type RouteProp, useRoute } from '@react-navigation/native'
+import { Icon, ListItem, Text } from '@rneui/themed'
+import React from 'react'
+import { View } from 'react-native'
+
+import { colors } from '@/constants/colors.tw'
 import { type RootStackParamList } from '@/types'
+
+import { useVideoInfo } from '../../api/video-info'
+import VideoHeader from './VideoHeader'
 
 export default React.memo(function VideoInfo(props: {
   currentPage: number

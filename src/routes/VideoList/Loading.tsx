@@ -1,6 +1,6 @@
+import { Skeleton } from '@rneui/themed'
 import React from 'react'
 import { View } from 'react-native'
-import { Skeleton } from '@rneui/themed'
 
 const getWidth = () => Math.floor(Math.random() * (100 - 10 + 1)) + 10
 

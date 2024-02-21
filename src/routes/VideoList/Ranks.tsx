@@ -1,23 +1,24 @@
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Linking,
   Text,
   TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Linking,
-  Dimensions,
+  View,
 } from 'react-native'
-import HotItem from './VideoItem'
-import { RootStackParamList } from '../../types'
-import { FlashList } from '@shopify/flash-list'
-import { useStore } from '../../store'
-import { VideoItem } from '../../api/hot-videos'
-import { handleShareVideo, parseNumber, parseUrl } from '../../utils'
+
+import type { VideoItem } from '../../api/hot-videos'
 import { useRankList } from '../../api/rank-list'
-import Loading from './Loading'
+import { useStore } from '../../store'
+import type { RootStackParamList } from '../../types'
+import { handleShareVideo, parseNumber, parseUrl } from '../../utils'
 import { Action, reportUserAction } from '../../utils/report'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import Loading from './Loading'
+import HotItem from './VideoItem'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 

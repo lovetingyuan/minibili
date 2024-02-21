@@ -1,6 +1,6 @@
+import { Button, Text } from '@rneui/themed'
 import React from 'react'
 import { View } from 'react-native'
-import { Button, Text } from '@rneui/themed'
 
 export default React.memo(function TextAction(
   props: React.PropsWithChildren<{

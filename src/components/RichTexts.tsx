@@ -1,14 +1,22 @@
-import React from 'react'
-import { View, Linking, ViewStyle, TextProps, Image } from 'react-native'
-import { RichTextNode } from '../api/dynamic-items.schema'
-import { HandledRichTextType } from '../api/dynamic-items.type'
-import { reportUnknownRichTextItem } from '../utils/report'
-import { Icon, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../types'
-import { imgUrl, parseUrl } from '../utils'
-import { useStore } from '../store'
+import { Icon, Text } from '@rneui/themed'
+import React from 'react'
+import {
+  Image,
+  Linking,
+  type TextProps,
+  View,
+  type ViewStyle,
+} from 'react-native'
+
 import { colors } from '@/constants/colors.tw'
+
+import type { RichTextNode } from '../api/dynamic-items.schema'
+import { HandledRichTextType } from '../api/dynamic-items.type'
+import { useStore } from '../store'
+import type { NavigationProps } from '../types'
+import { imgUrl, parseUrl } from '../utils'
+import { reportUnknownRichTextItem } from '../utils/report'
 
 export default React.memo(
   function RichTexts(props: {

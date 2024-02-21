@@ -1,12 +1,13 @@
-import React from 'react'
-import { View, Pressable, Linking } from 'react-native'
-import { AdditionalType } from '../api/dynamic-items.schema'
-import { HandledAdditionalTypeEnum } from '../api/dynamic-items.type'
-import { Image } from 'expo-image'
-import { imgUrl, parseDate, parseNumber, parseUrl } from '../utils'
-import { Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../types'
+import { Text } from '@rneui/themed'
+import { Image } from 'expo-image'
+import React from 'react'
+import { Linking, Pressable, View } from 'react-native'
+
+import type { AdditionalType } from '../api/dynamic-items.schema'
+import { HandledAdditionalTypeEnum } from '../api/dynamic-items.type'
+import type { NavigationProps } from '../types'
+import { imgUrl, parseDate, parseNumber, parseUrl } from '../utils'
 
 export function Additional(props: { additional?: AdditionalType | null }) {
   const { additional } = props

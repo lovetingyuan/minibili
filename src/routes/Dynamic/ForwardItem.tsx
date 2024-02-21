@@ -1,19 +1,21 @@
+import { useNavigation } from '@react-navigation/native'
+import { Avatar, Text } from '@rneui/themed'
+import { Image } from 'expo-image'
 import React from 'react'
-import { View, Pressable, TouchableOpacity } from 'react-native'
-import { DynamicItemType } from '../../api/dynamic-items'
+import { Pressable, TouchableOpacity, View } from 'react-native'
+
+import { colors } from '@/constants/colors.tw'
+
+import type { DynamicItemType } from '../../api/dynamic-items'
 import {
-  HandledDynamicTypeEnum,
+  type HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
 } from '../../api/dynamic-items.type'
-import { Avatar, Text } from '@rneui/themed'
-import RichTexts from '../../components/RichTexts'
-import { NavigationProps } from '../../types'
-import { useNavigation } from '@react-navigation/native'
-import { Image } from 'expo-image'
-import { CommonContent } from './CommonItem'
 import { Additional } from '../../components/Additional'
+import RichTexts from '../../components/RichTexts'
+import type { NavigationProps } from '../../types'
 import { imgUrl } from '../../utils'
-import { colors } from '@/constants/colors.tw'
+import { CommonContent } from './CommonItem'
 
 export default function ForwardItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD>

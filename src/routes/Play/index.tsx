@@ -1,18 +1,19 @@
-import React from 'react'
-import { View, ScrollView, Pressable } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../types'
-import Player from './Player'
+import React from 'react'
+import { Pressable, ScrollView, View } from 'react-native'
+
 import { useVideoInfo } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
-import VideoInfo from './VideoInfo'
-import { showToast } from '../../utils'
-import { useFocusEffect } from '@react-navigation/native'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
+import type { RootStackParamList } from '../../types'
+import { showToast } from '../../utils'
 import { setViewingVideoId } from '../../utils/report'
 import PlayHeader from './Header'
+import Player from './Player'
+import VideoInfo from './VideoInfo'
 
 // https://www.bilibili.com/blackboard/html5mobileplayer.html?&bvid=BV1aX4y1B7n7&cid=1103612055&wmode=transparent&as_wide=1&crossDomain=1&lite=0&danmaku=0
 // https://www.bilibili.com/blackboard/newplayer.html?crossDomain=true&bvid=BV1cB4y1n7v8&as_wide=1&page=1&autoplay=0&poster=1

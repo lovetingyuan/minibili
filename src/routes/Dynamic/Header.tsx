@@ -1,18 +1,20 @@
-import { Avatar, Button, Icon, Text } from '@rneui/themed'
-import React from 'react'
-import { View, Pressable, Linking } from 'react-native'
-import { useStore } from '../../store'
-import { handleShareUp, imgUrl, parseNumber, showToast } from '../../utils'
-import { useUserRelation } from '../../api/user-relation'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { NavigationProps, RootStackParamList } from '../../types'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useUserInfo } from '../../api/user-info'
-import { useLivingInfo } from '../../api/living-info'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Avatar, Button, Icon, Text } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
+import React from 'react'
+import { Linking, Pressable, View } from 'react-native'
 import { Menu, MenuItem } from 'react-native-material-menu'
+
 import { colors } from '@/constants/colors.tw'
+
+import { useLivingInfo } from '../../api/living-info'
+import { useUserInfo } from '../../api/user-info'
+import { useUserRelation } from '../../api/user-relation'
+import { useStore } from '../../store'
+import type { NavigationProps, RootStackParamList } from '../../types'
+import { handleShareUp, imgUrl, parseNumber, showToast } from '../../utils'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 

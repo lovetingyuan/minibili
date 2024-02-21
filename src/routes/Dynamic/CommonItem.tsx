@@ -1,15 +1,16 @@
+import { useNavigation } from '@react-navigation/native'
+import { Text } from '@rneui/themed'
+import { Image } from 'expo-image'
 import React from 'react'
-import { View, Pressable, Linking, TouchableOpacity } from 'react-native'
-import { DynamicItemType } from '../../api/dynamic-items'
+import { Linking, Pressable, TouchableOpacity, View } from 'react-native'
+
+import type { DynamicItemType } from '../../api/dynamic-items'
 import {
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
 } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
-import { Text } from '@rneui/themed'
-import { Image } from 'expo-image'
-import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../../types'
+import type { NavigationProps } from '../../types'
 import { imgUrl } from '../../utils'
 
 type ItemType =

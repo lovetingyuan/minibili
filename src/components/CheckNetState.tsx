@@ -1,7 +1,8 @@
 import { NetInfoStateType, useNetInfo } from '@react-native-community/netinfo'
+import React from 'react'
+
 import { useStore } from '../store'
 import { showToast } from '../utils'
-import React from 'react'
 
 export default React.memo(function NetState() {
   const { setIsWiFi } = useStore()

@@ -1,5 +1,6 @@
-import { ListItem, Text, Icon } from '@rneui/themed'
+import { Icon, ListItem, Text } from '@rneui/themed'
 import React from 'react'
+
 import { useStore } from '../../store'
 
 export default React.memo(function BlackUps() {

@@ -1,33 +1,34 @@
-import React from 'react'
 import {
-  DefaultTheme,
   DarkTheme,
+  DefaultTheme,
   NavigationContainer,
-  RouteProp,
+  type RouteProp,
 } from '@react-navigation/native'
 import {
-  NativeStackNavigationOptions,
   createNativeStackNavigator,
+  type NativeStackNavigationOptions,
 } from '@react-navigation/native-stack'
-import Play from './Play'
+import React from 'react'
+
+import useIsDark from '../hooks/useIsDark'
+import { useStore } from '../store'
+import type { RootStackParamList } from '../types'
+import { setScreenTag } from '../utils/report'
 import About from './About'
-import WebPage from './WebPage'
-import { RootStackParamList } from '../types'
+import aboutHeaderRight from './About/headerRight'
 import Dynamic from './Dynamic'
 import DynamicDetail from './DynamicDetail'
-import aboutHeaderRight from './About/headerRight'
-import useIsDark from '../hooks/useIsDark'
-import { setScreenTag } from '../utils/report'
 import {
   dynamicDetailHeaderRight,
   dynamicDetailHeaderTitle,
 } from './DynamicDetail/Header'
 import Follow from './Follow'
+import { followHeaderRight, followHeaderTitle } from './Follow/Header'
+import Play from './Play'
 import VideoList from './VideoList'
 import { videoListHeaderRight, videoListHeaderTitle } from './VideoList/Header'
-import { followHeaderRight, followHeaderTitle } from './Follow/Header'
+import WebPage from './WebPage'
 import Welcome from './Welcome'
-import { useStore } from '../store'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 

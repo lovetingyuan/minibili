@@ -1,13 +1,15 @@
+import { type RouteProp, useRoute } from '@react-navigation/native'
 import { Icon } from '@rneui/themed'
-import React from 'react'
-import { View, Linking, Share } from 'react-native'
-import { useStore } from '../../store'
-import { Menu, MenuItem } from 'react-native-material-menu'
 import * as Clipboard from 'expo-clipboard'
-import { RouteProp, useRoute } from '@react-navigation/native'
-import { RootStackParamList } from '../../types'
-import { showToast } from '../../utils'
+import React from 'react'
+import { Linking, Share, View } from 'react-native'
+import { Menu, MenuItem } from 'react-native-material-menu'
+
 import { colors } from '@/constants/colors.tw'
+
+import { useStore } from '../../store'
+import type { RootStackParamList } from '../../types'
+import { showToast } from '../../utils'
 
 export default React.memo(function HeaderRight(props: { reload: () => void }) {
   const { webViewMode, setWebViewMode } = useStore()

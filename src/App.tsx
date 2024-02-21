@@ -1,30 +1,31 @@
-import React from 'react'
-import { StatusBar } from 'expo-status-bar'
-import { SWRConfig } from 'swr'
-import fetcher from './api/fetcher'
-import { AppState } from 'react-native'
-import { ThemeProvider, createTheme } from '@rneui/themed'
 import NetInfo from '@react-native-community/netinfo'
-import ButtonsOverlay from './components/ButtonsOverlay'
-import { RootSiblingParent } from 'react-native-root-siblings'
-import Route from './routes/Index'
+import { createTheme, ThemeProvider } from '@rneui/themed'
 import * as SentryExpo from '@sentry/react-native'
-import ThemeResponse from './components/ThemeResponse'
-import ImagesView from './components/ImagesView'
+import { StatusBar } from 'expo-status-bar'
+import React from 'react'
+import { AppState } from 'react-native'
+import { RootSiblingParent } from 'react-native-root-siblings'
+import { SWRConfig } from 'swr'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
-import ErrorFallback from './components/ErrorFallback'
-import useIsDark from './hooks/useIsDark'
+
+import fetcher from './api/fetcher'
+import ButtonsOverlay from './components/ButtonsOverlay'
+import CheckAppUpdate from './components/CheckAppUpdate'
 import CheckLiveUps from './components/CheckLiveUps'
+import CheckNetState from './components/CheckNetState'
+import CheckUpUpdate from './components/CheckUpUpdate'
+import ErrorFallback from './components/ErrorFallback'
+import ImagesView from './components/ImagesView'
+import ShowRemoteConfig from './components/ShowRemoteConfig'
+import ThemeResponse from './components/ThemeResponse'
+import useIsDark from './hooks/useIsDark'
+import Route from './routes/Index'
 import {
   AppContextProvider,
-  InitContextComp,
   getAppValue,
+  InitContextComp,
   onChange,
 } from './store'
-import CheckNetState from './components/CheckNetState'
-import CheckAppUpdate from './components/CheckAppUpdate'
-import CheckUpUpdate from './components/CheckUpUpdate'
-import ShowRemoteConfig from './components/ShowRemoteConfig'
 import { reportApiError } from './utils/report'
 
 let online = true

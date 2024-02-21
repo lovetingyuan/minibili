@@ -1,7 +1,8 @@
 import React from 'react'
 import useSWR from 'swr'
-import { z } from 'zod'
-import { ReplayItem, ReplyResponseSchema } from './comments.schema'
+import type { z } from 'zod'
+
+import type { ReplayItem, ReplyResponseSchema } from './comments.schema'
 import request from './fetcher'
 
 type ReplyResponse = z.infer<typeof ReplyResponseSchema>

@@ -1,9 +1,11 @@
 import './sentry'
+
 import * as SentryExpo from '@sentry/react-native'
-import { showFatalError, showToast } from './utils'
 import Constants from 'expo-constants'
-import { Tags, reportUserOpenApp } from './utils/report'
 import * as SplashScreen from 'expo-splash-screen'
+
+import { showFatalError, showToast } from './utils'
+import { reportUserOpenApp, Tags } from './utils/report'
 
 SplashScreen.preventAutoHideAsync()
 

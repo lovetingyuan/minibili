@@ -1,14 +1,15 @@
+import { Divider } from '@rneui/themed'
 import React from 'react'
 import { ScrollView, View } from 'react-native'
-import { Divider } from '@rneui/themed'
+
+import Backup from './Backup'
+import BlackTags from './BlackTags'
+import BlackUps from './BlackUps'
 import Feedback from './Feedback'
 import Header from './Header'
-import Version from './Version'
-import Statement from './Statement'
-import BlackUps from './BlackUps'
-import BlackTags from './BlackTags'
 import SortCate from './SortCate'
-import Backup from './Backup'
+import Statement from './Statement'
+import Version from './Version'
 
 export default React.memo(function About() {
   const content = (

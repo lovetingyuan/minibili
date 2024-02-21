@@ -1,18 +1,19 @@
+import { Text } from '@rneui/themed'
 import React from 'react'
 import {
-  View,
   FlatList,
-  useWindowDimensions,
   Image,
   ImageBackground,
+  useWindowDimensions,
+  View,
 } from 'react-native'
-import { Text } from '@rneui/themed'
-import FollowItem from './FollowItem'
-import { UpInfo } from '../../types'
-import { useStore } from '../../store'
-import AddFollow from './AddFollow'
-import useMounted from '../../hooks/useMounted'
+
 import useIsDark from '../../hooks/useIsDark'
+import useMounted from '../../hooks/useMounted'
+import { useStore } from '../../store'
+import type { UpInfo } from '../../types'
+import AddFollow from './AddFollow'
+import FollowItem from './FollowItem'
 
 const tvL = require('../../../assets/tv-l.png')
 const tvR = require('../../../assets/tv-r.png')

@@ -1,12 +1,14 @@
-import React from 'react'
-import { Linking, View, Image, TextStyle } from 'react-native'
-import { MessageContent, ReplyItem } from '../api/comments'
-import { Button, Text } from '@rneui/themed'
 import { useNavigation } from '@react-navigation/native'
-import { NavigationProps } from '../types'
-import { imgUrl } from '../utils'
-import { useStore } from '../store'
+import { Button, Text } from '@rneui/themed'
+import React from 'react'
+import { Image, Linking, type TextStyle, View } from 'react-native'
+
 import { colors } from '@/constants/colors.tw'
+
+import type { MessageContent, ReplyItem } from '../api/comments'
+import { useStore } from '../store'
+import type { NavigationProps } from '../types'
+import { imgUrl } from '../utils'
 
 interface Props {
   upName: string

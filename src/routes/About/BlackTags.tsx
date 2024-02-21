@@ -1,7 +1,8 @@
-import { Chip, ListItem, Text, Icon } from '@rneui/themed'
+import { Chip, Icon, ListItem, Text } from '@rneui/themed'
 import React from 'react'
-import { useStore } from '@/store'
+
 import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
 
 export default React.memo(function BlackTags() {
   const [expanded, setExpanded] = React.useState(false)

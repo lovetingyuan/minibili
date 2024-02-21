@@ -1,7 +1,7 @@
-import request from './fetcher'
-
 import useSWR from 'swr'
-import { HotVideoResponse, getVideo } from './hot-videos'
+
+import request from './fetcher'
+import { getVideo, type HotVideoResponse } from './hot-videos'
 
 const getUrl = (rid?: number) => {
   if (rid === undefined || rid === -1) {

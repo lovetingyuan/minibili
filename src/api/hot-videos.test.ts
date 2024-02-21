@@ -1,5 +1,6 @@
-import fetcher from './fetcher-test'
 import { test } from 'vitest'
+
+import fetcher from './fetcher-test'
 import { HotVideosDataResponseSchema } from './hot-videos.schema'
 
 test('hot-videos', async () => {

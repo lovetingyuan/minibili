@@ -1,5 +1,6 @@
-import fetcher from './fetcher-test'
 import { test } from 'vitest'
+
+import fetcher from './fetcher-test'
 import { UserRelationResponseSchema } from './user-relation.schema'
 
 test('user-relation', async () => {

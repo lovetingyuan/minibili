@@ -1,18 +1,23 @@
+import { useFocusEffect } from '@react-navigation/native'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Icon, Skeleton, Text } from '@rneui/themed'
+import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import { Image, View } from 'react-native'
-import { RootStackParamList } from '../../types'
-import { DynamicItemAllType, useDynamicItems } from '../../api/dynamic-items'
-import { HeaderLeft, headerRight } from './Header'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Icon, Text, Skeleton } from '@rneui/themed'
-import { FlashList } from '@shopify/flash-list'
-import DynamicItem from './DynamicItem'
-import { useUserInfo } from '../../api/user-info'
-import { useFocusEffect } from '@react-navigation/native'
-import useMemoizedFn from '../../hooks/useMemoizedFn'
-import { setViewingUpMid } from '../../utils/report'
-import useErrToast from '../../hooks/useErrToast'
+
 import { colors } from '@/constants/colors.tw'
+
+import {
+  type DynamicItemAllType,
+  useDynamicItems,
+} from '../../api/dynamic-items'
+import { useUserInfo } from '../../api/user-info'
+import useErrToast from '../../hooks/useErrToast'
+import useMemoizedFn from '../../hooks/useMemoizedFn'
+import type { RootStackParamList } from '../../types'
+import { setViewingUpMid } from '../../utils/report'
+import DynamicItem from './DynamicItem'
+import { HeaderLeft, headerRight } from './Header'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 

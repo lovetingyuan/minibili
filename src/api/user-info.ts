@@ -1,4 +1,7 @@
+import React from 'react'
 import useSWRImmutable from 'swr/immutable'
+
+import { useStore } from '../store'
 // import fetcher from './fetcher'
 // import { z } from 'zod'
 // import {
@@ -6,9 +9,7 @@ import useSWRImmutable from 'swr/immutable'
 //   UserCardInfoResponseSchema,
 //   UserInfoResponseSchema,
 // } from './user-info.schema'
-import { UpInfo } from '../types'
-import React from 'react'
-import { useStore } from '../store'
+import type { UpInfo } from '../types'
 
 // type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
 type UserInfo = UpInfo & {

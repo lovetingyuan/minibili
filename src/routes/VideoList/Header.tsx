@@ -1,12 +1,14 @@
-import { Icon, Text, Button, Badge } from '@rneui/themed'
-import { Linking, ScrollView, View, TouchableOpacity } from 'react-native'
-import { getAppUpdateInfo, useStore } from '../../store'
-import React from 'react'
-import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
-import { NavigationProps, PromiseResult } from '../../types'
 import { useNavigation } from '@react-navigation/native'
-import useMounted from '../../hooks/useMounted'
+import { Badge, Button, Icon, Text } from '@rneui/themed'
+import React from 'react'
+import { Linking, ScrollView, TouchableOpacity, View } from 'react-native'
+import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
+
 import { colors } from '@/constants/colors.tw'
+
+import useMounted from '../../hooks/useMounted'
+import { getAppUpdateInfo, useStore } from '../../store'
+import type { NavigationProps, PromiseResult } from '../../types'
 
 function splitArrayIntoChunks(arr: any[]) {
   const result = [[arr[0]]]

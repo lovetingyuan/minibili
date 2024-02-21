@@ -1,11 +1,13 @@
-import React from 'react'
-import { View, Share } from 'react-native'
 import { Dialog, Input } from '@rneui/themed'
-import { reportUserFeedback } from '../../utils/report'
-import { showToast } from '../../utils'
-import { site } from '../../constants'
-import TextAction from './TextAction'
+import React from 'react'
+import { Share, View } from 'react-native'
+
 import { colors } from '@/constants/colors.tw'
+
+import { site } from '../../constants'
+import { showToast } from '../../utils'
+import { reportUserFeedback } from '../../utils/report'
+import TextAction from './TextAction'
 
 export default React.memo(function Feedback() {
   const [feedBackVisible, setFeedbackVisible] = React.useState(false)

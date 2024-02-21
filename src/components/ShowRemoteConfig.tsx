@@ -1,6 +1,7 @@
-import useMounted from '../hooks/useMounted'
-import { getRemoteConfig } from '../api/get-config'
 import { Alert, Linking } from 'react-native'
+
+import { getRemoteConfig } from '../api/get-config'
+import useMounted from '../hooks/useMounted'
 import { delay } from '../utils'
 
 export default function ShowRemoteConfig() {

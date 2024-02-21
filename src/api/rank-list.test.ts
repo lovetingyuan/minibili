@@ -1,5 +1,6 @@
-import fetcher from './fetcher-test'
 import { describe, test } from 'vitest'
+
+import fetcher from './fetcher-test'
 import { RankVideosDataResponseSchema } from './rank-list.schema'
 
 describe('ranks-videos', () => {

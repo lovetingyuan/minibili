@@ -1,7 +1,8 @@
 import useSWRInfinite from 'swr/infinite'
-import { z } from 'zod'
+import type { z } from 'zod'
+
 import fetcher from './fetcher'
-import { VideoItemResponseSchema } from './hot-videos.schema'
+import type { VideoItemResponseSchema } from './hot-videos.schema'
 
 const fetcher2 = (url: string) => {
   // eslint-disable-next-line no-console

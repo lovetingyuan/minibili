@@ -1,11 +1,13 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import React from 'react'
-import { View, Image, Linking } from 'react-native'
-import { RootStackParamList } from '../types'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button, Text } from '@rneui/themed'
-import { useStore } from '../store'
-import { githubLink } from '../constants'
+import React from 'react'
+import { Image, Linking, View } from 'react-native'
+
 import { colors } from '@/constants/colors.tw'
+
+import { githubLink } from '../constants'
+import { useStore } from '../store'
+import type { RootStackParamList } from '../types'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>
 

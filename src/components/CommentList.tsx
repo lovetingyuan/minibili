@@ -1,10 +1,12 @@
-import { Icon, Text, Skeleton } from '@rneui/themed'
+import { Icon, Skeleton, Text } from '@rneui/themed'
 import React from 'react'
-import { View, Image } from 'react-native'
+import { Image, View } from 'react-native'
+
+import { colors } from '@/constants/colors.tw'
+
 import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
-import { colors } from '@/constants/colors.tw'
 
 const Loading = React.memo(function Loading() {
   return (

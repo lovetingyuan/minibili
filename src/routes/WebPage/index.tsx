@@ -1,20 +1,21 @@
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import {
-  View,
-  Image,
-  ScrollView,
   Dimensions,
+  Image,
   RefreshControl,
+  ScrollView,
+  View,
 } from 'react-native'
 import { WebView } from 'react-native-webview'
-import { INJECTED_JAVASCRIPT } from './inject-code'
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../types'
-import { useStore } from '../../store'
-import HeaderRight from './HeaderRight'
-import useIsDark from '../../hooks/useIsDark'
+
 import { UA } from '../../constants'
+import useIsDark from '../../hooks/useIsDark'
+import { useStore } from '../../store'
+import type { RootStackParamList } from '../../types'
 import { showToast } from '../../utils'
+import HeaderRight from './HeaderRight'
+import { INJECTED_JAVASCRIPT } from './inject-code'
 
 function Loading() {
   return (

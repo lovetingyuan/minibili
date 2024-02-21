@@ -1,11 +1,12 @@
+import { Icon, Text } from '@rneui/themed'
+import { Image } from 'expo-image'
 import React from 'react'
 import { View } from 'react-native'
+
 import { type VideoItem as VideoItemType } from '@/api/hot-videos'
-import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'
-import { Text, Icon } from '@rneui/themed'
-import { Image } from 'expo-image'
-import { useStore } from '@/store'
 import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
+import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'
 
 export default React.memo(function VideoItem({
   video,

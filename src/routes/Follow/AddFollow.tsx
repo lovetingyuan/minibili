@@ -7,13 +7,15 @@ import {
   SearchBar,
   Text,
 } from '@rneui/themed'
-import React from 'react'
-import { SearchedUpType, useSearchUps } from '../../api/search-up'
-import { FlatList, Linking, View } from 'react-native'
 import { Image } from 'expo-image'
-import { imgUrl, parseNumber, showToast } from '../../utils'
-import { useStore } from '../../store'
+import React from 'react'
+import { FlatList, Linking, View } from 'react-native'
+
 import { colors } from '@/constants/colors.tw'
+
+import { type SearchedUpType, useSearchUps } from '../../api/search-up'
+import { useStore } from '../../store'
+import { imgUrl, parseNumber, showToast } from '../../utils'
 
 function SearchedItem(props: { up: SearchedUpType }) {
   const up = props.up

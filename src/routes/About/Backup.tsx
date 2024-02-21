@@ -1,8 +1,9 @@
+import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Alert } from 'react-native'
-import { showToast } from '../../utils'
+
 import { useMethods } from '../../store'
-import * as Clipboard from 'expo-clipboard'
+import { showToast } from '../../utils'
 import TextAction from './TextAction'
 
 export default React.memo(function Backup() {

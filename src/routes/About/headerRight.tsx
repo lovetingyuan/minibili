@@ -1,7 +1,8 @@
+import { Button } from '@rneui/themed'
 import React from 'react'
 import { Linking } from 'react-native'
+
 import { site } from '../../constants'
-import { Button } from '@rneui/themed'
 // import { s } from '../../styles'
 
 export default () => (
