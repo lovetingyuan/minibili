@@ -5,7 +5,7 @@ export const colors = {
   },
   secondary: {
     text: 'text-pink-500 dark:text-pink-400',
-    bg: 'bg-pink-500',
+    bg: 'bg-pink-400',
   },
   black: {
     text: 'text-zinc-800 dark:text-neutral-200',

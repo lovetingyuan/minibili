@@ -62,7 +62,7 @@ function SearchedItem(props: { up: SearchedUpType }) {
         </Button>
       ) : (
         <Button size="sm" type="clear" onPress={handler}>
-          <Icon name="add" size={16} color={'#2b9af3'} />
+          <Icon name="add" size={16} color={tw(colors.primary.text).color} />
           关注
         </Button>
       )}

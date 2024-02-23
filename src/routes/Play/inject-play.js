@@ -106,7 +106,22 @@ function __$hack() {
   let distanceY = 0
   let direction = ''
 
+  let touchTimer
+  const isVideoPlaying = video =>
+    !!(
+      video.currentTime > 0 &&
+      !video.paused &&
+      !video.ended &&
+      video.readyState > 2
+    )
+
   element.addEventListener('touchstart', function (event) {
+    touchTimer = setTimeout(function () {
+      const video = document.querySelector('video')
+      if (video && isVideoPlaying(video)) {
+        video.playbackRate = 3
+      }
+    }, 1600)
     const touch = event.touches[0]
     startX = touch.clientX
     startY = touch.clientY
@@ -119,31 +134,91 @@ function __$hack() {
   })
 
   element.addEventListener('touchend', function () {
+    clearTimeout(touchTimer)
+    const video = document.querySelector('video')
+    if (video) {
+      video.playbackRate = 1
+    }
     if (Math.abs(distanceX) > Math.abs(distanceY)) {
       direction = distanceX < 0 ? 'left' : 'right'
     } else {
       direction = distanceY < 0 ? 'up' : 'down'
     }
-    if (
-      (direction === 'down' || direction === 'up') &&
-      Math.abs(distanceY) > 99
-    ) {
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          action: 'change-video-height',
-          payload: direction,
-        }),
-      )
-    }
-    if (
-      (direction === 'left' || direction === 'right') &&
-      Math.abs(distanceX) > 70
-    ) {
-      const video = document.querySelector('video')
-      if (video) {
-        video.currentTime += direction === 'left' ? -5 : 5
+    const time1 = document
+      .querySelector('.mplayer-time-current-text')
+      ?.getBoundingClientRect()
+    const time2 = document
+      .querySelector('.mplayer-time-total-text')
+      ?.getBoundingClientRect()
+    // window.ReactNativeWebView.postMessage(
+    //   JSON.stringify({
+    //     action: 'console.log',
+    //     payload: {
+    //       time1,
+    //       time2,
+    //       a: !!document.querySelector('.gsl-timeline-time'),
+    //       video: video.tagName,
+    //     },
+    //   }),
+    // )
+    if (time1 && time2 && video) {
+      const { x: x1, y: y1 } = time1
+      const { x: x2, y: y2 } = time2
+      if (Math.abs(x1 - x2) < 5 && Math.abs(distanceY) > 70) {
+        // fullscreen
+        if (y1 > y2) {
+          // up -> forward, down -> backward
+          video.currentTime += direction === 'down' ? -5 : 5
+        } else {
+          video.currentTime += direction === 'up' ? -5 : 5
+        }
+      }
+      if (Math.abs(y1 - y2) < 5) {
+        if (x1 < x2) {
+          if (
+            !document.fullscreenElement &&
+            (direction === 'down' || direction === 'up') &&
+            Math.abs(distanceY) > 99
+          ) {
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                action: 'change-video-height',
+                payload: direction,
+              }),
+            )
+          }
+          if (
+            (direction === 'left' || direction === 'right') &&
+            Math.abs(distanceX) > 70
+          ) {
+            video.currentTime += direction === 'left' ? -5 : 5
+          }
+        } else {
+          // TODO:
+        }
       }
     }
+    // if (!document.fullscreenElement) {
+    //   if (
+    //     (direction === 'down' || direction === 'up') &&
+    //     Math.abs(distanceY) > 99
+    //   ) {
+    //     window.ReactNativeWebView.postMessage(
+    //       JSON.stringify({
+    //         action: 'change-video-height',
+    //         payload: direction,
+    //       }),
+    //     )
+    //   }
+    //   if (
+    //     (direction === 'left' || direction === 'right') &&
+    //     Math.abs(distanceX) > 70
+    //   ) {
+    //     video.currentTime += direction === 'left' ? -5 : 5
+    //   }
+    // } else {
+    // }
+
     startX = 0
     startY = 0
     distanceX = 0

@@ -3,7 +3,7 @@ import { Image } from 'expo-image'
 import React from 'react'
 import { View } from 'react-native'
 
-import { type VideoItem as VideoItemType } from '@/api/hot-videos'
+import type { VideoItem as VideoItemType } from '@/api/hot-videos'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'

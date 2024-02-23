@@ -14,6 +14,7 @@ import {
 } from 'react-native'
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 
+import { colors } from '@/constants/colors.tw'
 import type { RootStackParamList } from '@/types'
 
 import { useVideoInfo } from '../../api/video-info'
@@ -119,7 +120,7 @@ export default React.memo(function Player(props: { currentPage: number }) {
       ) : null}
       <ActivityIndicator
         size={'large'}
-        color={'#ff746f'}
+        color={tw(colors.secondary.text).color}
         className="absolute top-[45%] scale-150"
       />
     </View>

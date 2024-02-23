@@ -4,7 +4,7 @@ import React from 'react'
 import { View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
-import { type RootStackParamList } from '@/types'
+import type { RootStackParamList } from '@/types'
 
 import { useVideoInfo } from '../../api/video-info'
 import VideoHeader from './VideoHeader'

@@ -85,9 +85,7 @@ type UserInfo = UpInfo & {
 export function useUserInfo(mid?: number | string) {
   const { data } = useSWRImmutable<UserInfo | undefined>(
     mid ? `/x/space/wbi/acc/info?mid=${mid}` : null,
-    // () => request(mid!),
   )
-  // console.log('userinfo', data)
   const { get$followedUps, set$followedUps } = useStore()
   React.useEffect(() => {
     if (!data) {

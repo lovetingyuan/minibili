@@ -39,7 +39,7 @@ export default React.memo(function VLoading() {
         .fill(null)
         .map((_, i) => {
           return (
-            <View className="p-3 gap-4 my-3 flex-row" key={i}>
+            <View className="px-2 py-1 gap-3 my-2 flex-row" key={i}>
               <VideoLoading />
               <VideoLoading />
             </View>

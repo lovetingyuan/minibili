@@ -58,14 +58,12 @@ export default React.memo(function Ranks({ navigation }: Props) {
       tag: data.tag,
     })
   }
-  const renderItem = ({ item, index }: { item: VideoItem; index: number }) => {
+  const renderItem = ({ item }: { item: VideoItem; index: number }) => {
     const key = item.bvid
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        className={`flex-1 flex-row justify-around ${
-          index % 2 ? 'pl-1 pr-2' : 'pl-2 pr-1'
-        }`}
+        className="flex-1 flex-row justify-around mx-1 my-2"
         key={key}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
@@ -153,7 +151,7 @@ export default React.memo(function Ranks({ navigation }: Props) {
             ) : null}
           </View>
         }
-        contentContainerStyle={tw('pt-4')}
+        contentContainerStyle={tw('px-1 pt-4')}
       />
     </View>
   )

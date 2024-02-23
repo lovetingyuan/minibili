@@ -6,8 +6,10 @@ export default React.memo(function ThemeResponse() {
   const { setMode, mode } = useThemeMode()
   const color = useColorScheme()
   React.useEffect(() => {
-    if (typeof color === 'string' && color !== mode) {
-      setMode(color)
+    if (color && color !== mode) {
+      setTimeout(() => {
+        setMode(color)
+      }, 200)
     }
   }, [color, mode, setMode])
 

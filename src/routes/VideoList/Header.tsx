@@ -1,7 +1,13 @@
 import { useNavigation } from '@react-navigation/native'
 import { Badge, Button, Icon, Text } from '@rneui/themed'
 import React from 'react'
-import { Linking, ScrollView, TouchableOpacity, View } from 'react-native'
+import {
+  Animated,
+  Linking,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 
 import { colors } from '@/constants/colors.tw'
@@ -9,6 +15,60 @@ import { colors } from '@/constants/colors.tw'
 import useMounted from '../../hooks/useMounted'
 import { getAppUpdateInfo, useStore } from '../../store'
 import type { NavigationProps, PromiseResult } from '../../types'
+
+function NewVersionTip() {
+  const [newVersion, setNewVersion] = React.useState<PromiseResult<
+    typeof getAppUpdateInfo
+  > | null>(null)
+  const opacityValue = React.useRef(new Animated.Value(0)).current
+
+  React.useEffect(() => {
+    const blinkAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacityValue, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityValue, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ]),
+    )
+
+    blinkAnimation.start()
+
+    return () => {
+      blinkAnimation.stop()
+    }
+  }, [opacityValue])
+
+  useMounted(() => {
+    getAppUpdateInfo.then(r => {
+      setNewVersion(r)
+    })
+  })
+  return newVersion?.hasUpdate ? (
+    <Button
+      type="clear"
+      size="sm"
+      titleStyle={tw(`text-sm ${colors.primary.text}`)}
+      onPress={() => {
+        Linking.openURL(newVersion.downloadLink)
+      }}>
+      有新版本
+      <Animated.View style={{ opacity: opacityValue }}>
+        <Icon
+          name="fiber-new"
+          color={tw(colors.secondary.text).color}
+          size={20}
+        />
+      </Animated.View>
+    </Button>
+  ) : null
+}
 
 function splitArrayIntoChunks(arr: any[]) {
   const result = [[arr[0]]]
@@ -22,14 +82,7 @@ function splitArrayIntoChunks(arr: any[]) {
 const HeaderTitle = React.memo(function HeaderTitle() {
   const { currentVideosCate, $videoCatesList, setCurrentVideosCate } =
     useStore()
-  const [newVersion, setNewVersion] = React.useState<PromiseResult<
-    typeof getAppUpdateInfo
-  > | null>(null)
-  useMounted(() => {
-    getAppUpdateInfo.then(r => {
-      setNewVersion(r)
-    })
-  })
+
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
@@ -99,22 +152,7 @@ const HeaderTitle = React.memo(function HeaderTitle() {
           })}
         </ScrollView>
       </Menu>
-      {newVersion?.hasUpdate ? (
-        <Button
-          type="clear"
-          size="sm"
-          titleStyle={tw(`text-sm ${colors.primary.text}`)}
-          onPress={() => {
-            Linking.openURL(newVersion.downloadLink)
-          }}>
-          有新版本
-          <Icon
-            name="fiber-new"
-            color={tw(colors.secondary.text).color}
-            size={20}
-          />
-        </Button>
-      ) : null}
+      <NewVersionTip />
     </View>
   )
 })

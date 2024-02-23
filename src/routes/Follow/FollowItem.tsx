@@ -158,7 +158,7 @@ export default React.memo(function FollowItem(props: {
       onLongPress={() => {
         setOverlayButtons(buttons)
       }}
-      className="items-center mb-5 flex-1 justify-between relative"
+      className="items-center mb-6 flex-1 justify-between relative"
       onPress={gotoDynamic}>
       <View>
         <Avatar

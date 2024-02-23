@@ -20,9 +20,6 @@ function HeaderTitle() {
             : ` (${count})`
           : ''}
       </Text>
-      {/* {checkingUpUpdate ? (
-        <ActivityIndicator size={'small'} color={'#F85A54'} />
-      ) : null} */}
     </View>
   )
 }

@@ -193,7 +193,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         onEndReachedThreshold={0.5}
         refreshing={isRefreshing}
         onRefresh={() => mutate()}
-        contentContainerStyle={tw('pt-4 px-1')}
+        contentContainerStyle={tw('px-1 pt-4')}
         estimatedFirstItemOffset={100}
       />
       <FAB
