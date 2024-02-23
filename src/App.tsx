@@ -37,6 +37,7 @@ const errorFallback: React.ComponentProps<
 }
 
 const theme = createTheme()
+
 const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
   fetcher,
   errorRetryCount: 4,
@@ -84,10 +85,8 @@ const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
 
 export default function App() {
   theme.mode = useColorScheme() || 'light'
+  const appValue = React.useMemo(() => getAppValue(), [])
 
-  const appValue = React.useMemo(() => {
-    return getAppValue()
-  }, [])
   return (
     <RootSiblingParent>
       <StatusBar style="auto" />

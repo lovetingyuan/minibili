@@ -25,7 +25,7 @@ export const colors = {
   },
   white: {
     text: 'text-zinc-50 dark:text-neutral-800',
-    bg: 'bg-white dark:bg-neutral-300',
+    bg: 'bg-white dark:bg-neutral-900',
   },
   gray0: {
     text: 'text-gray-50 dark:text-gray-950',

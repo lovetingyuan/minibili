@@ -9,6 +9,7 @@ import {
   type NativeStackNavigationOptions,
 } from '@react-navigation/native-stack'
 import React from 'react'
+import { View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 
@@ -92,63 +93,65 @@ export default React.memo(function Route() {
   const { $firstRun } = useStore()
   const isFirstRun = $firstRun === 0
   return (
-    <NavigationContainer theme={RouteTheme} key={$firstRun}>
-      <Stack.Navigator
-        initialRouteName={isFirstRun ? 'Welcome' : 'VideoList'}
-        screenOptions={screenOptions}
-        screenListeners={onRouteChange}>
-        <Stack.Screen
-          name="Welcome"
-          component={Welcome}
-          options={welcomeOptions}
-        />
-        <Stack.Screen
-          name="VideoList"
-          component={VideoList}
-          options={videosOptions}
-        />
-        <Stack.Screen
-          name="Follow"
-          component={Follow}
-          options={{
-            headerTitle: followHeaderTitle,
-            headerRight: followHeaderRight,
-          }}
-        />
-        <Stack.Screen
-          name="Dynamic"
-          component={Dynamic}
-          options={{
-            headerTitle: '动态',
-          }}
-        />
-        <Stack.Screen name="Play" component={Play} />
-        <Stack.Screen
-          name="DynamicDetail"
-          component={DynamicDetail}
-          options={{
-            headerTitle: dynamicDetailHeaderTitle,
-            headerRight: dynamicDetailHeaderRight,
-          }}
-        />
-        <Stack.Screen
-          name={'WebPage'}
-          component={WebPage}
-          options={props => {
-            return {
-              headerTitle: props.route.params.title || '-',
-            }
-          }}
-        />
-        <Stack.Screen
-          name="About"
-          component={About}
-          options={{
-            headerTitle: '关于',
-            headerRight: aboutHeaderRight,
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View className={`flex-1 ${colors.white.bg}`}>
+      <NavigationContainer theme={RouteTheme} key={$firstRun}>
+        <Stack.Navigator
+          initialRouteName={isFirstRun ? 'Welcome' : 'VideoList'}
+          screenOptions={screenOptions}
+          screenListeners={onRouteChange}>
+          <Stack.Screen
+            name="Welcome"
+            component={Welcome}
+            options={welcomeOptions}
+          />
+          <Stack.Screen
+            name="VideoList"
+            component={VideoList}
+            options={videosOptions}
+          />
+          <Stack.Screen
+            name="Follow"
+            component={Follow}
+            options={{
+              headerTitle: followHeaderTitle,
+              headerRight: followHeaderRight,
+            }}
+          />
+          <Stack.Screen
+            name="Dynamic"
+            component={Dynamic}
+            options={{
+              headerTitle: '动态',
+            }}
+          />
+          <Stack.Screen name="Play" component={Play} />
+          <Stack.Screen
+            name="DynamicDetail"
+            component={DynamicDetail}
+            options={{
+              headerTitle: dynamicDetailHeaderTitle,
+              headerRight: dynamicDetailHeaderRight,
+            }}
+          />
+          <Stack.Screen
+            name={'WebPage'}
+            component={WebPage}
+            options={props => {
+              return {
+                headerTitle: props.route.params.title || '-',
+              }
+            }}
+          />
+          <Stack.Screen
+            name="About"
+            component={About}
+            options={{
+              headerTitle: '关于',
+              headerRight: aboutHeaderRight,
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </View>
   )
 })
