@@ -1,9 +1,4 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-  type RouteProp,
-} from '@react-navigation/native'
+import { NavigationContainer, type RouteProp } from '@react-navigation/native'
 import {
   createNativeStackNavigator,
   type NativeStackNavigationOptions,
@@ -12,8 +7,7 @@ import React from 'react'
 import { View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
-import { useAppState } from '@/hooks/useAppState'
-import useIsDark from '@/hooks/useIsDark'
+import useRouteTheme from '@/hooks/useRouteTheme'
 
 import { useStore } from '../store'
 import type { RootStackParamList } from '../types'
@@ -37,29 +31,7 @@ import Welcome from './Welcome'
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 export default React.memo(function Route() {
-  const isDark = useIsDark()
-  const getRouteTheme = React.useCallback(() => {
-    return isDark
-      ? {
-          dark: true,
-          colors: {
-            ...DarkTheme.colors,
-            background: tw('bg-zinc-800').backgroundColor,
-          },
-        }
-      : {
-          ...DefaultTheme,
-        }
-  }, [isDark])
-  const [routeTheme, setRouteTheme] = React.useState(getRouteTheme)
-
-  useAppState(() => {
-    // console.log('change route color mode')
-    setRouteTheme(getRouteTheme())
-  })
-  React.useEffect(() => {
-    setRouteTheme(getRouteTheme())
-  }, [getRouteTheme])
+  const routeTheme = useRouteTheme()
 
   const onRouteChange = React.useCallback(
     ({ route }: { route: RouteProp<RootStackParamList> }) => {

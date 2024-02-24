@@ -1,5 +1,5 @@
 import NetInfo from '@react-native-community/netinfo'
-import { createTheme, ThemeProvider } from '@rneui/themed'
+import { ThemeProvider } from '@rneui/themed'
 import * as SentryExpo from '@sentry/react-native'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
@@ -18,8 +18,10 @@ import ErrorFallback from './components/ErrorFallback'
 import ImagesView from './components/ImagesView'
 import ShowRemoteConfig from './components/ShowRemoteConfig'
 // import ThemeResponse from './components/ThemeResponse'
-import { colors } from './constants/colors.tw'
-import useIsDark from './hooks/useIsDark'
+// import { colors } from './constants/colors.tw'
+// import { useAppState } from './hooks/useAppState'
+// import useIsDark from './hooks/useIsDark'
+import useRNETheme from './hooks/useRNETheme'
 import Route from './routes/Index'
 import {
   AppContextProvider,
@@ -84,28 +86,8 @@ const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
 }
 
 export default function App() {
-  const [primary, secondary] = [
-    tw(colors.primary.text).color,
-    tw(colors.secondary.text).color,
-  ]
-  const isDark = useIsDark()
-  const rneTheme = React.useMemo(() => {
-    // console.log('change ui theme')
-    return createTheme({
-      lightColors: {
-        primary,
-        secondary,
-      },
-      darkColors: {
-        primary,
-        secondary,
-      },
-      mode: isDark ? 'dark' : 'light',
-    })
-  }, [primary, secondary, isDark])
-
+  const rneTheme = useRNETheme()
   const appValue = React.useMemo(() => getAppValue(), [])
-
   return (
     <RootSiblingParent>
       <StatusBar style="auto" />

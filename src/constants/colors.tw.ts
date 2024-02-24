@@ -68,3 +68,5 @@ export const colors = {
     bg: 'bg-gray-900 dark:bg-gray-100',
   },
 } as const
+
+export const RouteBackgroundColor = 'bg-zinc-800'
