@@ -206,7 +206,7 @@ export default React.memo(function Comment(props: Props) {
           {comment.replies.map(reply => {
             return (
               <Text
-                key={reply.id + '#'}
+                key={`${reply.id}#`}
                 className="flex-row items-center flex-wrap text-sm my-[2px] leading-5">
                 <Text
                   className={

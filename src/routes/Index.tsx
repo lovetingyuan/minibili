@@ -12,8 +12,9 @@ import React from 'react'
 import { View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
+import { useAppState } from '@/hooks/useAppState'
+import useIsDark from '@/hooks/useIsDark'
 
-import useIsDark from '../hooks/useIsDark'
 import { useStore } from '../store'
 import type { RootStackParamList } from '../types'
 import { setScreenTag } from '../utils/report'
@@ -37,7 +38,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 
 export default React.memo(function Route() {
   const isDark = useIsDark()
-  const RouteTheme = React.useMemo(() => {
+  const getRouteTheme = React.useCallback(() => {
     return isDark
       ? {
           dark: true,
@@ -50,6 +51,15 @@ export default React.memo(function Route() {
           ...DefaultTheme,
         }
   }, [isDark])
+  const [routeTheme, setRouteTheme] = React.useState(getRouteTheme)
+
+  useAppState(() => {
+    // console.log('change route color mode')
+    setRouteTheme(getRouteTheme())
+  })
+  React.useEffect(() => {
+    setRouteTheme(getRouteTheme())
+  }, [getRouteTheme])
 
   const onRouteChange = React.useCallback(
     ({ route }: { route: RouteProp<RootStackParamList> }) => {
@@ -94,7 +104,7 @@ export default React.memo(function Route() {
   const isFirstRun = $firstRun === 0
   return (
     <View className={`flex-1 ${colors.white.bg}`}>
-      <NavigationContainer theme={RouteTheme} key={$firstRun}>
+      <NavigationContainer theme={routeTheme} key={$firstRun}>
         <Stack.Navigator
           initialRouteName={isFirstRun ? 'Welcome' : 'VideoList'}
           screenOptions={screenOptions}

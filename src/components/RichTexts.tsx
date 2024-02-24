@@ -37,7 +37,12 @@ export default React.memo(
     const fontSize = props.fontSize || 16
     const Topic = props.topic ? (
       <View className="flex-row items-center mb-3">
-        <Icon name="hashtag" type="fontisto" color="#178bcf" size={14} />
+        <Icon
+          name="hashtag"
+          type="fontisto"
+          color={tw(colors.primary.text).color}
+          size={14}
+        />
         <Text
           onPress={() => {
             if (props.topic?.jump_url) {

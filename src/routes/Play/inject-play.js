@@ -55,7 +55,7 @@ function __$hack() {
       return
     }
     clearInterval(timer4)
-    if (right.querySelector('#download-button')) {
+    if (right.getElementById('download-button')) {
       return
     }
     const reloadBtn = document.createElement('div')

@@ -4,6 +4,8 @@ import { Button, Text } from '@rneui/themed'
 import React from 'react'
 import { View } from 'react-native'
 
+import { colors } from '@/constants/colors.tw'
+
 import { useStore } from '../../store'
 import type { NavigationProps } from '../../types'
 
@@ -36,7 +38,12 @@ function HeaderRight() {
       onPress={() => {
         navigation.navigate('About')
       }}>
-      <Icon name="snow" type="ionicon" size={20} color="#00AEEC" />
+      <Icon
+        name="snow"
+        type="ionicon"
+        size={20}
+        color={tw(colors.primary.text).color}
+      />
     </Button>
   )
 }

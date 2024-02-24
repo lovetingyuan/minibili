@@ -2,7 +2,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import {
-  ActivityIndicator,
+  // ActivityIndicator,
   Alert,
   Dimensions,
   Linking,
@@ -141,14 +141,6 @@ export default React.memo(function Ranks({ navigation }: Props) {
             <Text className="text-center my-3 text-gray-500">
               {isLoading ? '加载中...' : '到底了~'}
             </Text>
-            {isLoading ? (
-              <ActivityIndicator
-                color="#00AEEC"
-                animating
-                size={'large'}
-                className="mt-8"
-              />
-            ) : null}
           </View>
         }
         contentContainerStyle={tw('px-1 pt-4')}

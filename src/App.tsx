@@ -3,7 +3,7 @@ import { createTheme, ThemeProvider } from '@rneui/themed'
 import * as SentryExpo from '@sentry/react-native'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
-import { AppState, useColorScheme } from 'react-native'
+import { AppState } from 'react-native'
 import { RootSiblingParent } from 'react-native-root-siblings'
 import { SWRConfig } from 'swr'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
@@ -17,7 +17,9 @@ import CheckUpUpdate from './components/CheckUpUpdate'
 import ErrorFallback from './components/ErrorFallback'
 import ImagesView from './components/ImagesView'
 import ShowRemoteConfig from './components/ShowRemoteConfig'
-import ThemeResponse from './components/ThemeResponse'
+// import ThemeResponse from './components/ThemeResponse'
+import { colors } from './constants/colors.tw'
+import useIsDark from './hooks/useIsDark'
 import Route from './routes/Index'
 import {
   AppContextProvider,
@@ -35,8 +37,6 @@ const errorFallback: React.ComponentProps<
 >['fallback'] = errorData => {
   return <ErrorFallback message={errorData.error.message} />
 }
-
-const theme = createTheme()
 
 const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
   fetcher,
@@ -84,7 +84,26 @@ const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
 }
 
 export default function App() {
-  theme.mode = useColorScheme() || 'light'
+  const [primary, secondary] = [
+    tw(colors.primary.text).color,
+    tw(colors.secondary.text).color,
+  ]
+  const isDark = useIsDark()
+  const rneTheme = React.useMemo(() => {
+    // console.log('change ui theme')
+    return createTheme({
+      lightColors: {
+        primary,
+        secondary,
+      },
+      darkColors: {
+        primary,
+        secondary,
+      },
+      mode: isDark ? 'dark' : 'light',
+    })
+  }, [primary, secondary, isDark])
+
   const appValue = React.useMemo(() => getAppValue(), [])
 
   return (
@@ -92,8 +111,8 @@ export default function App() {
       <StatusBar style="auto" />
       <SentryExpo.ErrorBoundary fallback={errorFallback}>
         <AppContextProvider value={appValue} onChange={onChange}>
-          <ThemeProvider theme={theme}>
-            <ThemeResponse />
+          <ThemeProvider theme={rneTheme}>
+            {/* <ThemeResponse /> */}
             <SWRConfig value={swrConfig}>
               <InitContextComp />
               <ShowRemoteConfig />

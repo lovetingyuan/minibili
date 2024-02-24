@@ -8,6 +8,8 @@ import { Image } from 'expo-image'
 import React from 'react'
 import { View } from 'react-native'
 
+import { colors } from '@/constants/colors.tw'
+
 import type { NavigationProps, RootStackParamList } from '../../types'
 import { imgUrl } from '../../utils'
 
@@ -18,7 +20,7 @@ function HeaderRight() {
   return (
     <Icon
       name="open-in-new"
-      color="#F85A54"
+      color={tw(colors.secondary.text).color}
       className="p-1"
       size={20}
       onPress={() => {

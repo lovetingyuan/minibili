@@ -63,7 +63,7 @@ function NewVersionTip() {
         <Icon
           name="fiber-new"
           color={tw(colors.secondary.text).color}
-          size={20}
+          size={24}
         />
       </Animated.View>
     </Button>
