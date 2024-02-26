@@ -1,6 +1,6 @@
 {
   "name": "minibili",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "minimum bilibili apk",
   "unpkg": "docs/version.json",
   "files": [
@@ -105,8 +105,8 @@
     ]
   },
   "config": {
-    "versionCode": 61,
-    "changelog": "支持视频进度微调  样式调整"
+    "versionCode": 62,
+    "changelog": "修复黑暗模式切换"
   },
-  "gitHead": "b3b082a"
+  "gitHead": "8536929"
 }
