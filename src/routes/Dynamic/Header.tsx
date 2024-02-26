@@ -4,7 +4,7 @@ import { Avatar, Button, Icon, Text } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Linking, Pressable, View } from 'react-native'
+import { Linking, View } from 'react-native'
 import { Menu, MenuItem } from 'react-native-material-menu'
 
 import { colors } from '@/constants/colors.tw'
@@ -46,37 +46,44 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   return (
     <View className="flex-row items-center mr-28 left-[-12px] relative">
       {dynamicUser?.face ? (
-        <Avatar
-          size={33}
-          rounded
-          onPress={gotoWebPage}
-          ImageComponent={Image}
-          source={{
-            uri: imgUrl(dynamicUser.face, 120),
-          }}
-        />
-      ) : null}
-      <Pressable
-        className="shrink ml-3"
-        onPress={() => {
-          props.scrollTop()
-        }}>
-        <Text
-          className="text-lg relative top-[2px] leading-5"
-          adjustsFontSizeToFit
-          numberOfLines={1}>
-          {userName + '   '}
-          {fans ? (
-            <Text
-              className="text-sm text-gray-500 dark:text-gray-400"
-              onPress={() => {
-                showToast(`粉丝：${fans.follower}`)
-              }}>
-              {parseNumber(fans.follower)}粉丝
+        <View className="relative">
+          <Avatar
+            size={33}
+            rounded
+            onPress={gotoWebPage}
+            ImageComponent={Image}
+            source={{
+              uri: imgUrl(dynamicUser.face, 120),
+            }}
+          />
+          {sex ? (
+            <Text className="text-xs opacity-80 absolute top-0 right-[-8px]">
+              {sex}
             </Text>
           ) : null}
+        </View>
+      ) : null}
+
+      <Text
+        className="ml-3 text-lg relative top-[2px] leading-5 align-middle"
+        adjustsFontSizeToFit
+        numberOfLines={2}>
+        <Text
+          onPress={() => {
+            props.scrollTop()
+          }}>
+          {userName + '   '}
         </Text>
-      </Pressable>
+        {fans ? (
+          <Text
+            className="text-sm text-gray-500 dark:text-gray-400"
+            onPress={() => {
+              showToast(`粉丝：${fans.follower}`)
+            }}>
+            {parseNumber(fans.follower)}粉丝
+          </Text>
+        ) : null}
+      </Text>
       {followed ? (
         <Icon
           size={15}
@@ -86,12 +93,12 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           color={tw(colors.secondary.text).color}
         />
       ) : null}
-      {sex ? <Text className="text-sm ml-2   opacity-80">{sex}</Text> : null}
       {dynamicUser.mid && livingUrl ? (
         <Button
           size="sm"
           type="clear"
-          buttonStyle={tw('ml-[10px]')}
+          buttonStyle={tw('ml-[10px] mr-[10px]')}
+          titleStyle={tw('text-sm')}
           onPress={() => {
             if (dynamicUser.mid) {
               navigation.navigate('WebPage', {

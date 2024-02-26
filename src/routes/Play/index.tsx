@@ -3,7 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
-import { Pressable, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
 import { useVideoInfo } from '../../api/video-info'
 import CommentList from '../../components/CommentList'
@@ -58,16 +58,15 @@ export default React.memo(function Play({ route, navigation }: Props) {
             commentType={1}
             dividerRight={
               <View className="flex-row items-center">
-                <Pressable
+                <Text
                   onPress={() => {
                     Clipboard.setStringAsync(bvid).then(() => {
                       showToast('已复制视频ID')
                     })
-                  }}>
-                  <Text className="text-xs text-gray-500 dark:text-gray-400">
-                    {bvid}
-                  </Text>
-                </Pressable>
+                  }}
+                  className="text-xs text-gray-500 dark:text-gray-400">
+                  {bvid}
+                </Text>
                 <Text className="text-base font-bold text-gray-500 dark:text-gray-400">
                   {' · '}
                 </Text>
