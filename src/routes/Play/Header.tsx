@@ -21,7 +21,7 @@ export default function PlayHeader() {
     <View className="flex-row items-center relative left-[-10px]">
       <Text className="text-lg font-semibold">{route.params?.name}</Text>
       <Text
-        className="ml-3 text-gray-500"
+        className="ml-3 text-gray-500 dark:text-gray-400"
         onPress={() => {
           showToast(`粉丝：${fans?.follower}`)
         }}>

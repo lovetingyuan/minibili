@@ -52,7 +52,7 @@ export default React.memo(function Version() {
   return (
     <TextAction
       text={`当前版本：${currentVersion}`}
-      onTextPress={() => {
+      onTextLongPress={() => {
         Alert.alert(
           '版本信息',
           [

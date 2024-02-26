@@ -6,12 +6,16 @@ export default React.memo(function TextAction(
   props: React.PropsWithChildren<{
     text: string
     onTextPress?: () => void
+    onTextLongPress?: () => void
     buttons: { text: string; loading?: boolean; onPress: () => void }[]
   }>,
 ) {
   return (
     <View className="flex-row items-center justify-between mb-2">
-      <Text className="text-base" onPress={props.onTextPress}>
+      <Text
+        className="text-base"
+        onPress={props.onTextPress}
+        onLongPress={props.onTextLongPress}>
         {props.text}
       </Text>
       <View className="flex-row">

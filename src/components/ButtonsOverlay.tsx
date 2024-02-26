@@ -20,8 +20,8 @@ export default React.memo(function ButtonsOverlay() {
           title={button.text}
           key={button.text}
           onPress={() => {
-            button.onPress()
             dismiss()
+            button.onPress()
           }}
         />
       )
