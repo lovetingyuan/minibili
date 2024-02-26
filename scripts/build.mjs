@@ -118,7 +118,7 @@ fs.outputJsonSync(pkgPath, pkg, {
 
 echo(
   chalk.cyan(
-    'eas building: https://expo.dev/accounts/tingyuan/projects/minibili/builds',
+    'EAS building: https://expo.dev/accounts/tingyuan/projects/minibili/builds',
   ),
 )
 
@@ -130,7 +130,7 @@ try {
     return new Promise(r => setTimeout(r, 1000))
   })
   let buildListStr = ''
-  echo(chalk.green('eas build done.'))
+  echo(chalk.green('EAS build done.'))
 
   try {
     buildListStr = await spinner('Checking EAS build list...', () =>
@@ -151,7 +151,7 @@ try {
       `EAS latest version ${latestBuildList[0].appVersion} is not same as updated version ${newVersion}`,
     )
   }
-  echo(chalk.green('eas build success.'))
+  echo(chalk.green('EAS build success.'))
 } catch (err) {
   await $`git checkout -- .`
   // await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
