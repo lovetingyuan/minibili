@@ -55,7 +55,8 @@ function __$hack() {
       return
     }
     clearInterval(timer4)
-    if (right.getElementById('download-button')) {
+
+    if (document.getElementById('download-button')) {
       return
     }
     const reloadBtn = document.createElement('div')
@@ -150,17 +151,7 @@ function __$hack() {
     const time2 = document
       .querySelector('.mplayer-time-total-text')
       ?.getBoundingClientRect()
-    // window.ReactNativeWebView.postMessage(
-    //   JSON.stringify({
-    //     action: 'console.log',
-    //     payload: {
-    //       time1,
-    //       time2,
-    //       a: !!document.querySelector('.gsl-timeline-time'),
-    //       video: video.tagName,
-    //     },
-    //   }),
-    // )
+
     if (time1 && time2 && video) {
       const { x: x1, y: y1 } = time1
       const { x: x2, y: y2 } = time2
