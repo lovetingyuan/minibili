@@ -74,7 +74,9 @@ const renderSearchItem = ({ item: up }: { item: SearchedUpType }) => {
   return <SearchedItem up={up} />
 }
 
-export default React.memo(function AddFollow() {
+export default React.memo(AddFollow)
+
+function AddFollow() {
   const [addUpVisible, setAddUpVisible] = React.useState(false)
   const [searchValue, setSearchValue] = React.useState('')
 
@@ -153,4 +155,4 @@ export default React.memo(function AddFollow() {
       </Dialog>
     </>
   )
-})
+}

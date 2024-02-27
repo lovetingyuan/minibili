@@ -36,7 +36,10 @@ function TvImg() {
     />
   )
 }
-export default React.memo(function Follow() {
+
+export default React.memo(Follow)
+
+function Follow() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
   const { $followedUps, $upUpdateMap, livingUps } = useStore()
@@ -146,4 +149,4 @@ export default React.memo(function Follow() {
       )}
     </View>
   )
-})
+}

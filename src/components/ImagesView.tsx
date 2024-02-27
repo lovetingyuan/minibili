@@ -106,7 +106,9 @@ const html = `
 </html>
 `
 
-export default React.memo(function ImagesView() {
+export default React.memo(ImagesView)
+
+function ImagesView() {
   const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } =
     useStore()
   const netinfo = useNetInfo()
@@ -146,4 +148,4 @@ export default React.memo(function ImagesView() {
       />
     </Overlay>
   )
-})
+}

@@ -6,7 +6,9 @@ import { colors } from '@/constants/colors.tw'
 
 import { useStore } from '../../store'
 
-export default React.memo(function SortCate() {
+export default React.memo(SortCate)
+
+function SortCate() {
   const [expandedCate, setExpandedCate] = React.useState(false)
   const { $videoCatesList, set$videoCatesList } = useStore()
   const [sortedRankList, setSortedRankList] = React.useState<
@@ -79,4 +81,4 @@ export default React.memo(function SortCate() {
       </ListItem>
     </ListItem.Accordion>
   )
-})
+}

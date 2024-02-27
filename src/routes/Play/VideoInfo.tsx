@@ -9,7 +9,9 @@ import type { RootStackParamList } from '@/types'
 import { useVideoInfo } from '../../api/video-info'
 import VideoHeader from './VideoHeader'
 
-export default React.memo(function VideoInfo(props: {
+export default React.memo(VideoInfo)
+
+function VideoInfo(props: {
   currentPage: number
   setCurrentPage: (p: number) => void
 }) {
@@ -85,4 +87,4 @@ export default React.memo(function VideoInfo(props: {
       </View>
     </>
   )
-})
+}

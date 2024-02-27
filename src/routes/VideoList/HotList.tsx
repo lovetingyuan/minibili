@@ -26,7 +26,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
 let refreshTime = Date.now()
 
-export default React.memo(function Hot({ navigation }: Props) {
+export default React.memo(Hot)
+
+function Hot({ navigation }: Props) {
   const hotListRef = React.useRef<any>(null)
   const {
     $blackUps,
@@ -163,10 +165,6 @@ export default React.memo(function Hot({ navigation }: Props) {
   }
   return (
     <View className="flex-1">
-      {/* <View><View className="bg-red-500 w-[50vw] h-3 border" /></View> */}
-      {/* <Text className="bg-red-300 h-[33vh] w-[50vw]">
-        sdf: {width} - {height}
-      </Text> */}
       <FlashList
         ref={v => {
           hotListRef.current = v
@@ -192,7 +190,7 @@ export default React.memo(function Hot({ navigation }: Props) {
         }}
         onEndReachedThreshold={0.5}
         refreshing={isRefreshing}
-        onRefresh={() => mutate()}
+        onRefresh={() => mutate([])}
         contentContainerStyle={tw('px-1 pt-4')}
         estimatedFirstItemOffset={100}
       />
@@ -212,4 +210,4 @@ export default React.memo(function Hot({ navigation }: Props) {
       />
     </View>
   )
-})
+}

@@ -30,10 +30,10 @@ export default function PlayHeader() {
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
         toggleAction="onLongPress"
-        closeOnlyOnBackdropPress={false}
-        backgroundColor="rgba(122,122,122,0.8)"
+        // closeOnlyOnBackdropPress={false}
+        backgroundColor="rgba(150,150,150,0.8)"
         pointerColor={'rgba(0,0,0,0)'}
-        containerStyle={tw('p-0 h-8')}
+        containerStyle={tw('p-0 h-8 rounded-sm')}
         withOverlay={false}
         popover={<Text className="text-white">粉丝：{fans?.follower}</Text>}>
         <Text className="ml-3 text-gray-500 dark:text-gray-400">

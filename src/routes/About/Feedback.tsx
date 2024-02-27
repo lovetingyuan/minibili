@@ -9,7 +9,9 @@ import { showToast } from '../../utils'
 import { reportUserFeedback } from '../../utils/report'
 import TextAction from './TextAction'
 
-export default React.memo(function Feedback() {
+export default React.memo(Feedback)
+
+function Feedback() {
   const [feedBackVisible, setFeedbackVisible] = React.useState(false)
   const hideFeedback = () => {
     setFeedbackVisible(false)
@@ -77,4 +79,4 @@ export default React.memo(function Feedback() {
       </Dialog>
     </TextAction>
   )
-})
+}

@@ -43,8 +43,9 @@ const style = document.createElement('style');
     document.body.appendChild(style);
   true;
 `
+export default React.memo(MoreReplies)
 
-export default React.memo(function MoreReplies() {
+function MoreReplies() {
   const { moreRepliesUrl, setMoreRepliesUrl } = useStore()
   const isDark = useIsDark()
   const webviewRef = React.useRef<WebView | null>(null)
@@ -96,4 +97,4 @@ export default React.memo(function MoreReplies() {
       ) : null}
     </BottomSheet>
   )
-})
+}

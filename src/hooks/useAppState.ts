@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { AppState, type AppStateStatus } from 'react-native'
+
+import useMounted from './useMounted'
 
 export function useAppState(callback?: (s: AppStateStatus) => void) {
   const currentState = AppState.currentState
@@ -7,7 +9,7 @@ export function useAppState(callback?: (s: AppStateStatus) => void) {
   const callbackRef = useRef(callback)
   callbackRef.current = callback
 
-  useEffect(() => {
+  useMounted(() => {
     function onChange(newState: AppStateStatus) {
       setAppState(newState)
       callbackRef.current?.(newState)
@@ -18,7 +20,7 @@ export function useAppState(callback?: (s: AppStateStatus) => void) {
     return () => {
       subscription.remove()
     }
-  }, [])
+  })
 
   return appState
 }

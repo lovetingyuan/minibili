@@ -11,7 +11,9 @@ import SortCate from './SortCate'
 import Statement from './Statement'
 import Version from './Version'
 
-export default React.memo(function About() {
+export default React.memo(About)
+
+function About() {
   const content = (
     <ScrollView className="p-5">
       <Header />
@@ -28,4 +30,4 @@ export default React.memo(function About() {
     </ScrollView>
   )
   return content
-})
+}

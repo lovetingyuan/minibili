@@ -11,7 +11,9 @@ import { useStore } from '../../store'
 import type { RootStackParamList } from '../../types'
 import { showToast } from '../../utils'
 
-export default React.memo(function HeaderRight(props: { reload: () => void }) {
+export default React.memo(HeaderRight)
+
+function HeaderRight(props: { reload: () => void }) {
   const { webViewMode, setWebViewMode } = useStore()
   const [visible, setVisible] = React.useState(false)
   const route = useRoute<RouteProp<RootStackParamList, 'WebPage'>>()
@@ -86,4 +88,4 @@ export default React.memo(function HeaderRight(props: { reload: () => void }) {
       </Menu>
     </View>
   )
-})
+}

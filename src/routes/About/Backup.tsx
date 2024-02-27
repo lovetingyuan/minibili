@@ -6,7 +6,9 @@ import { useMethods } from '../../store'
 import { showToast } from '../../utils'
 import TextAction from './TextAction'
 
-export default React.memo(function Backup() {
+export default React.memo(Backup)
+
+function Backup() {
   const {
     get$blackUps,
     get$followedUps,
@@ -77,4 +79,4 @@ export default React.memo(function Backup() {
       ]}
     />
   )
-})
+}

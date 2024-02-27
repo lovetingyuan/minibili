@@ -1,4 +1,3 @@
-import React from 'react'
 import useSWRImmutable from 'swr/immutable'
 
 import { useStore } from '../store'
@@ -83,36 +82,40 @@ type UserInfo = UpInfo & {
 // }
 
 export function useUserInfo(mid?: number | string) {
+  const { get$followedUps, set$followedUps } = useStore()
   const { data } = useSWRImmutable<UserInfo | undefined>(
     mid ? `/x/space/wbi/acc/info?mid=${mid}` : null,
-  )
-  const { get$followedUps, set$followedUps } = useStore()
-  React.useEffect(() => {
-    if (!data) {
-      return
-    }
-    const followedUps = get$followedUps()
-    const index = followedUps.findIndex(
-      u => u.mid.toString() === data.mid.toString(),
-    )
-    // 用户信息可能会变化
-    if (index >= 0) {
-      const followedUp = followedUps[index]
-      if (
-        followedUp.name !== data.name ||
-        followedUp.sign !== data.sign ||
-        followedUp.face !== data.face
-      ) {
-        followedUps[index] = {
-          ...followedUp,
-          name: data.name,
-          sign: data.sign,
-          face: data.face,
+    {
+      onSuccess(_data) {
+        if (!_data) {
+          return
         }
-        set$followedUps(followedUps.slice())
-      }
-    }
-  }, [data, get$followedUps, set$followedUps])
+        const followedUps = get$followedUps()
+        const index = followedUps.findIndex(
+          u => u.mid.toString() === _data.mid.toString(),
+        )
+        if (index === -1) {
+          return
+        }
+        // 用户信息可能会变化
+        const followedUp = followedUps[index]
+        if (
+          followedUp.name !== _data.name ||
+          followedUp.sign !== _data.sign ||
+          followedUp.face !== _data.face
+        ) {
+          followedUps[index] = {
+            ...followedUp,
+            name: _data.name,
+            sign: _data.sign,
+            face: _data.face,
+          }
+          set$followedUps(followedUps.slice())
+        }
+      },
+    },
+  )
+
   return {
     data,
   }

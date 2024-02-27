@@ -4,7 +4,9 @@ import { Image, Linking, View } from 'react-native'
 
 import { githubLink } from '../../constants'
 
-export default React.memo(function Header() {
+export default React.memo(Header)
+
+function Header() {
   return (
     <>
       <View className="mb-4 flex-1 items-center">
@@ -30,4 +32,4 @@ export default React.memo(function Header() {
       </View>
     </>
   )
-})
+}

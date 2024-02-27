@@ -10,19 +10,23 @@ import {
 } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 
+import { checkUpdate } from '@/api/check-update'
 import { colors } from '@/constants/colors.tw'
 
 import useMounted from '../../hooks/useMounted'
-import { getAppUpdateInfo, useStore } from '../../store'
+import { useStore } from '../../store'
 import type { NavigationProps, PromiseResult } from '../../types'
 
 function NewVersionTip() {
   const [newVersion, setNewVersion] = React.useState<PromiseResult<
-    typeof getAppUpdateInfo
+    ReturnType<typeof checkUpdate>
   > | null>(null)
   const opacityValue = React.useRef(new Animated.Value(0)).current
 
-  React.useEffect(() => {
+  useMounted(() => {
+    checkUpdate().then(r => {
+      setNewVersion(r)
+    })
     const blinkAnimation = Animated.loop(
       Animated.sequence([
         Animated.timing(opacityValue, {
@@ -43,13 +47,8 @@ function NewVersionTip() {
     return () => {
       blinkAnimation.stop()
     }
-  }, [opacityValue])
-
-  useMounted(() => {
-    getAppUpdateInfo.then(r => {
-      setNewVersion(r)
-    })
   })
+
   return newVersion?.hasUpdate ? (
     <Button
       type="clear"
@@ -79,7 +78,7 @@ function splitArrayIntoChunks(arr: any[]) {
   return result
 }
 
-const HeaderTitle = React.memo(function HeaderTitle() {
+function HeaderTitleComp() {
   const { currentVideosCate, $videoCatesList, setCurrentVideosCate } =
     useStore()
 
@@ -155,9 +154,13 @@ const HeaderTitle = React.memo(function HeaderTitle() {
       <NewVersionTip />
     </View>
   )
-})
+}
 
-const HeaderRight = React.memo(function HeaderRight() {
+const HeaderTitle = React.memo(HeaderTitleComp)
+
+const HeaderRight = React.memo(HeaderRightComp)
+
+function HeaderRightComp() {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { _updatedCount, livingUps } = useStore()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
@@ -183,7 +186,7 @@ const HeaderRight = React.memo(function HeaderRight() {
       </Button>
     </View>
   )
-})
+}
 
 export const videoListHeaderTitle = () => <HeaderTitle />
 export const videoListHeaderRight = () => <HeaderRight />

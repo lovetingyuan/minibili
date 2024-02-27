@@ -4,27 +4,29 @@ import React from 'react'
 import { useStore } from '../store'
 import { showToast } from '../utils'
 
-export default React.memo(function NetState() {
+export default React.memo(NetState)
+
+function NetState() {
   const { setIsWiFi } = useStore()
-  const toasted = React.useRef(false)
   const { type, isConnected } = useNetInfo()
+  const isWifi = type === NetInfoStateType.wifi
+
   React.useEffect(() => {
-    if (!isConnected) {
-      return
-    }
-    const wifi = type === NetInfoStateType.wifi
-    setIsWiFi(wifi)
-    if (!wifi && !toasted.current) {
-      toasted.current = true
-      showToast('请注意当前网络不是Wifi')
-    }
     const timer = setTimeout(() => {
-      toasted.current = false
-    }, 30 * 1000)
+      if (!isConnected) {
+        showToast('当前网络状况不佳')
+      } else if (!isWifi) {
+        setIsWiFi(false)
+        showToast('请注意当前网络不是 WiFi')
+      } else {
+        setIsWiFi(true)
+      }
+    }, 3000)
+    // setIsWiFi(isWifi)
     return () => {
       clearTimeout(timer)
     }
-  }, [type, isConnected, setIsWiFi])
+  }, [isWifi, isConnected, setIsWiFi])
 
   return null
-})
+}

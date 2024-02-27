@@ -18,7 +18,9 @@ import {
   showToast,
 } from '../../utils'
 
-export default React.memo(function VideoHeader() {
+export default React.memo(VideoHeader)
+
+function VideoHeader() {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data } = useVideoInfo(route.params.bvid)
@@ -91,4 +93,4 @@ export default React.memo(function VideoHeader() {
       </View>
     </View>
   )
-})
+}

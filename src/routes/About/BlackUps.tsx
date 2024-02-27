@@ -3,7 +3,9 @@ import React from 'react'
 
 import { useStore } from '../../store'
 
-export default React.memo(function BlackUps() {
+export default React.memo(BlackUps)
+
+function BlackUps() {
   const [expandedUp, setExpandedUp] = React.useState(false)
   const { $blackUps } = useStore()
   return (
@@ -34,4 +36,4 @@ export default React.memo(function BlackUps() {
       </ListItem>
     </ListItem.Accordion>
   )
-})
+}

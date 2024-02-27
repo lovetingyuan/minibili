@@ -17,10 +17,6 @@ import CheckUpUpdate from './components/CheckUpUpdate'
 import ErrorFallback from './components/ErrorFallback'
 import ImagesView from './components/ImagesView'
 import ShowRemoteConfig from './components/ShowRemoteConfig'
-// import ThemeResponse from './components/ThemeResponse'
-// import { colors } from './constants/colors.tw'
-// import { useAppState } from './hooks/useAppState'
-// import useIsDark from './hooks/useIsDark'
 import useRNETheme from './hooks/useRNETheme'
 import Route from './routes/Index'
 import {
@@ -94,7 +90,6 @@ export default function App() {
       <SentryExpo.ErrorBoundary fallback={errorFallback}>
         <AppContextProvider value={appValue} onChange={onChange}>
           <ThemeProvider theme={rneTheme}>
-            {/* <ThemeResponse /> */}
             <SWRConfig value={swrConfig}>
               <InitContextComp />
               <ShowRemoteConfig />

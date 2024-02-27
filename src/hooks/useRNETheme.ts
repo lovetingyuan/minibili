@@ -2,7 +2,7 @@ import { createTheme } from '@rneui/themed'
 import React from 'react'
 
 import { colors } from '@/constants/colors.tw'
-import useTWC from '@/hooks/useTWC'
+import { useTWC } from '@/hooks/useTWC'
 
 import { useAppState } from './useAppState'
 import useIsDark from './useIsDark'

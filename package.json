@@ -28,7 +28,8 @@
     "test": "npx vitest run",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src scripts",
     "aa": "npx metro get-dependencies index.js --platform android --output tmp/aa.txt",
-    "update-expo": "npm i -g eas-cli && npm install expo && npx expo install --fix && npm run doctor"
+    "update-expo": "npm i -g eas-cli && npm install expo && npx expo install --fix && npm run doctor",
+    "bundle-analyze": "npx react-native-bundle-visualizer --platform android --entry-file index.js --expo true"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.21.0",

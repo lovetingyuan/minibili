@@ -31,7 +31,9 @@ function Loading() {
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
-export default React.memo(function WebPage({ route, navigation }: Props) {
+export default React.memo(WebPage)
+
+function WebPage({ route, navigation }: Props) {
   const { url, title } = route.params
 
   const webviewRef = React.useRef<WebView | null>(null)
@@ -133,4 +135,4 @@ export default React.memo(function WebPage({ route, navigation }: Props) {
       />
     </ScrollView>
   )
-})
+}

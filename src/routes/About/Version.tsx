@@ -10,7 +10,9 @@ import {
 import { showToast } from '../../utils'
 import TextAction from './TextAction'
 
-export default React.memo(function Version() {
+export default React.memo(Version)
+
+function Version() {
   const updateTime: string = Updates.createdAt
     ? `${Updates.createdAt.toLocaleDateString()} ${Updates.createdAt.toLocaleTimeString()}`
     : Constants.expoConfig?.extra?.buildTime
@@ -76,4 +78,4 @@ export default React.memo(function Version() {
       ]}
     />
   )
-})
+}

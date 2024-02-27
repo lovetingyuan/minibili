@@ -21,7 +21,7 @@ import { HeaderLeft, headerRight } from './Header'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
 
-const Loading = React.memo(function Loading() {
+function LoadingComp() {
   return (
     <View>
       {Array(10)
@@ -64,9 +64,13 @@ const Loading = React.memo(function Loading() {
         })}
     </View>
   )
-})
+}
 
-export default React.memo(function Dynamic({ navigation, route }: Props) {
+const Loading = React.memo(LoadingComp)
+
+export default React.memo(Dynamic)
+
+function Dynamic({ navigation, route }: Props) {
   const upId = route.params?.user?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<any>(null)
   const { data: userInfo } = useUserInfo(upId)
@@ -179,4 +183,4 @@ export default React.memo(function Dynamic({ navigation, route }: Props) {
       />
     </View>
   )
-})
+}

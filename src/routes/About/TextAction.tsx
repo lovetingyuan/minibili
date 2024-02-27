@@ -2,7 +2,9 @@ import { Button, Text } from '@rneui/themed'
 import React from 'react'
 import { View } from 'react-native'
 
-export default React.memo(function TextAction(
+export default React.memo(TextAction)
+
+function TextAction(
   props: React.PropsWithChildren<{
     text: string
     onTextPress?: () => void
@@ -37,4 +39,4 @@ export default React.memo(function TextAction(
       {props.children}
     </View>
   )
-})
+}

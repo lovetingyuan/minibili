@@ -2,7 +2,7 @@ import { DarkTheme, DefaultTheme } from '@react-navigation/native'
 import React from 'react'
 
 import { RouteBackgroundColor } from '@/constants/colors.tw'
-import useTWC from '@/hooks/useTWC'
+import { useTWC } from '@/hooks/useTWC'
 
 import { useAppState } from './useAppState'
 import useIsDark from './useIsDark'

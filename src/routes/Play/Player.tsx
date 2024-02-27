@@ -24,7 +24,9 @@ import { useStore } from '../../store'
 import { imgUrl, parseDuration, showToast } from '../../utils'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 
-export default React.memo(function Player(props: { currentPage: number }) {
+export default React.memo(Player)
+
+function Player(props: { currentPage: number }) {
   const { getIsWiFi } = useStore()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { width, height } = useWindowDimensions()
@@ -205,4 +207,4 @@ export default React.memo(function Player(props: { currentPage: number }) {
       )}
     </View>
   )
-})
+}

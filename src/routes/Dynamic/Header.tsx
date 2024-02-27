@@ -37,7 +37,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
       })
     }
   }
-  const level = dynamicUser?.level ? 'ᴸ' + levelList[dynamicUser.level] : ''
+  const level = dynamicUser?.level ? 'ᴸⱽ' + levelList[dynamicUser.level] : ''
   const userName = dynamicUser?.name ? dynamicUser.name + level : ''
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
@@ -90,6 +90,9 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           name="checkbox-marked-circle-outline"
           type="material-community"
           className="relative top-[1px] ml-2"
+          onPress={() => {
+            showToast('已关注')
+          }}
           color={tw(colors.secondary.text).color}
         />
       ) : null}

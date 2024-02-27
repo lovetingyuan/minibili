@@ -23,7 +23,9 @@ import VideoInfo from './VideoInfo'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 
-export default React.memo(function Play({ route, navigation }: Props) {
+export default React.memo(Play)
+
+function Play({ route, navigation }: Props) {
   const { bvid } = route.params
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data } = useVideoInfo(bvid)
@@ -80,4 +82,4 @@ export default React.memo(function Play({ route, navigation }: Props) {
       </ScrollView>
     </View>
   )
-})
+}

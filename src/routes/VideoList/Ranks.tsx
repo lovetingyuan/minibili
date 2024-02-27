@@ -22,7 +22,9 @@ import HotItem from './VideoItem'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
 
-export default React.memo(function Ranks({ navigation }: Props) {
+export default React.memo(Ranks)
+
+function Ranks({ navigation }: Props) {
   const videoListRef = React.useRef<any>(null)
   const { currentVideosCate, $blackUps, set$blackUps, setOverlayButtons } =
     useStore()
@@ -147,4 +149,4 @@ export default React.memo(function Ranks({ navigation }: Props) {
       />
     </View>
   )
-})
+}

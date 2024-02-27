@@ -49,7 +49,9 @@ const useCheckLivingUps = (time?: number) => {
   )
 }
 
-export default React.memo(function CheckLiveUps() {
+export default React.memo(CheckLiveUps)
+
+function CheckLiveUps() {
   useCheckLivingUps()
   return null
-})
+}

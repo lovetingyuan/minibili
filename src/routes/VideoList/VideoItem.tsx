@@ -8,11 +8,9 @@ import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'
 
-export default React.memo(function VideoItem({
-  video,
-}: {
-  video: VideoItemType
-}) {
+export default React.memo(VideoItem)
+
+function VideoItem({ video }: { video: VideoItemType }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
   const { isWiFi, _followedUpsMap } = useStore()
@@ -81,4 +79,4 @@ export default React.memo(function VideoItem({
       </View>
     </View>
   )
-})
+}

@@ -32,7 +32,9 @@ function VideoLoading() {
   )
 }
 
-export default React.memo(function VLoading() {
+export default React.memo(VLoading)
+
+function VLoading() {
   return (
     <View>
       {Array(10)
@@ -47,4 +49,4 @@ export default React.memo(function VLoading() {
         })}
     </View>
   )
-})
+}

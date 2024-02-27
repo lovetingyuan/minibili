@@ -8,7 +8,7 @@ import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
 
-const Loading = React.memo(function Loading() {
+function LoadingComp() {
   return (
     <View>
       {Array(10)
@@ -30,7 +30,9 @@ const Loading = React.memo(function Loading() {
         })}
     </View>
   )
-})
+}
+
+const Loading = React.memo(LoadingComp)
 
 export default function CommentList(props: {
   commentId: string | number

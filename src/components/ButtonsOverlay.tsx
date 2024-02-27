@@ -3,7 +3,7 @@ import React from 'react'
 
 import { useStore } from '../store'
 
-export default React.memo(function ButtonsOverlay() {
+function ButtonsOverlay() {
   const { overlayButtons, setOverlayButtons } = useStore()
   const dismiss = () => {
     setOverlayButtons([])
@@ -39,4 +39,6 @@ export default React.memo(function ButtonsOverlay() {
       {Buttons}
     </Overlay>
   )
-})
+}
+
+export default React.memo(ButtonsOverlay)

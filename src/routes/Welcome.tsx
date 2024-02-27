@@ -11,7 +11,9 @@ import type { RootStackParamList } from '../types'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>
 
-export default React.memo(function Welcome({ navigation }: Props) {
+export default React.memo(Welcome)
+
+function Welcome({ navigation }: Props) {
   const { set$firstRun } = useStore()
   return (
     <View className="flex-1 h-full py-10">
@@ -52,4 +54,4 @@ export default React.memo(function Welcome({ navigation }: Props) {
       </Button>
     </View>
   )
-})
+}

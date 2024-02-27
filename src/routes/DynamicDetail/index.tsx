@@ -11,7 +11,9 @@ import { handleShareVideo, parseNumber, showToast } from '../../utils'
 import { setViewingDynamicId } from '../../utils/report'
 import DynamicItem from '../Dynamic/DynamicItem'
 
-export default React.memo(function DynamicDetail({
+export default React.memo(DynamicDetail)
+
+function DynamicDetail({
   route,
 }: NativeStackScreenProps<RootStackParamList, 'DynamicDetail'>) {
   const {
@@ -90,4 +92,4 @@ export default React.memo(function DynamicDetail({
       />
     </ScrollView>
   )
-})
+}

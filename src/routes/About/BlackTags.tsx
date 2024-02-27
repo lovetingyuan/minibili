@@ -4,7 +4,9 @@ import React from 'react'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 
-export default React.memo(function BlackTags() {
+export default React.memo(BlackTags)
+
+function BlackTags() {
   const [expanded, setExpanded] = React.useState(false)
   const { $blackTags, set$blackTags } = useStore()
   return (
@@ -52,4 +54,4 @@ export default React.memo(function BlackTags() {
       </ListItem>
     </ListItem.Accordion>
   )
-})
+}

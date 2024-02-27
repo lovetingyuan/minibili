@@ -6,7 +6,9 @@ import { colors } from '@/constants/colors.tw'
 
 import { githubLink } from '../../constants'
 
-export default React.memo(function Statement() {
+export default React.memo(Statement)
+
+function Statement() {
   const [expandedStatement, setExpandedStatement] = React.useState(true)
   return (
     <ListItem.Accordion
@@ -39,4 +41,4 @@ export default React.memo(function Statement() {
       </ListItem>
     </ListItem.Accordion>
   )
-})
+}

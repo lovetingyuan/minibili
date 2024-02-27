@@ -7,11 +7,13 @@ import HotList from './HotList'
 import Ranks from './Ranks'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
-// rounded font-bold
-export default React.memo(function (props: Props) {
+
+export default React.memo(VideoList)
+
+function VideoList(props: Props) {
   const { currentVideosCate } = useStore()
   if (currentVideosCate.rid === -1) {
     return <HotList {...props} />
   }
   return <Ranks {...props} />
-})
+}

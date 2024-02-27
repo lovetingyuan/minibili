@@ -59,7 +59,9 @@ function useCheckUpdateUps() {
   })
 }
 
-export default React.memo(function CheckUpUpdate() {
+export default React.memo(CheckUpUpdate)
+
+function CheckUpUpdate() {
   useCheckUpdateUps()
   return null
-})
+}

@@ -11,10 +11,9 @@ import { useStore } from '../../store'
 import type { NavigationProps, UpInfo } from '../../types'
 import { imgUrl, parseUrl } from '../../utils'
 
-export default React.memo(function FollowItem(props: {
-  item: UpInfo
-  index?: number
-}) {
+export default React.memo(FollowItem)
+
+function FollowItem(props: { item: UpInfo; index?: number }) {
   // __DEV__ && console.log('follow item', props.item.name)
   const {
     item: { face, name, sign, mid, pin },
@@ -196,4 +195,4 @@ export default React.memo(function FollowItem(props: {
       )}
     </TouchableOpacity>
   )
-})
+}

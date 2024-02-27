@@ -114,7 +114,9 @@ function CommentText(props: {
   )
 }
 
-export default React.memo(function Comment(props: Props) {
+export default React.memo(Comment)
+
+function Comment(props: Props) {
   const { comment, upName } = props
   const { setImagesList, setCurrentImageIndex, setMoreRepliesUrl } = useStore()
 
@@ -269,4 +271,4 @@ export default React.memo(function Comment(props: Props) {
       ) : null}
     </View>
   )
-})
+}

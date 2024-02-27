@@ -30,7 +30,7 @@ import Welcome from './Welcome'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-export default React.memo(function Route() {
+function Route() {
   const routeTheme = useRouteTheme()
 
   const onRouteChange = React.useCallback(
@@ -136,4 +136,6 @@ export default React.memo(function Route() {
       </NavigationContainer>
     </View>
   )
-})
+}
+
+export default React.memo(Route)
