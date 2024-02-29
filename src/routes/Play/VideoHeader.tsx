@@ -30,7 +30,7 @@ function VideoHeader() {
   }
   const { name, face, mid, date, title } = videoInfo
   return (
-    <View className="flex-row items-center flex-wrap justify-between">
+    <View className="items-center flex-wrap justify-between flex-1 shrink-0 gap-3">
       <Pressable
         onPress={() => {
           if (!mid || !face || !name) {
@@ -44,7 +44,7 @@ function VideoHeader() {
           }
           navigation.push('Dynamic', { user })
         }}
-        className="flex-row items-center mr-1 flex-1">
+        className="flex-row items-center justify-between mr-1 shrink-0">
         <Avatar
           size={34}
           rounded
@@ -58,18 +58,22 @@ function VideoHeader() {
         <Text
           numberOfLines={1}
           ellipsizeMode="tail"
-          className="ml-3 mr-1 text-base grow shrink font-bold">
+          className="ml-3 mr-1 text-base grow font-bold">
           {name ? name + ' ' : ' '}
         </Text>
       </Pressable>
-      <View className="flex-row shrink-0 items-center gap-3">
+      <View className="flex-row w-full justify-start gap-x-4 gap-y-1 flex-1 flex-wrap">
         <View className="flex-row items-center gap-1">
           <Icon name="date-range" size={15} />
-          <Text className="text-xs">{parseDate(date)}</Text>
+          <Text className="text-xs">{parseDate(date, true)}</Text>
         </View>
         <View className="flex-row items-center gap-1">
           <Icon name="play-circle-outline" size={15} />
           <Text className="text-xs">{parseNumber(videoInfo?.playNum)}</Text>
+        </View>
+        <View className="flex-row items-center gap-1">
+          <Icon name="chat-bubble-outline" size={14} />
+          <Text className="text-xs">{parseNumber(videoInfo?.danmuNum)}弹</Text>
         </View>
         <Pressable
           className="flex-row items-center gap-1"
@@ -79,7 +83,10 @@ function VideoHeader() {
           <Icon name="thumb-up-off-alt" size={15} />
           <Text className="text-xs">{parseNumber(videoInfo?.likeNum)}</Text>
         </Pressable>
-
+        <View className="flex-row items-center gap-1">
+          <Icon name="star" size={15} />
+          <Text className="text-xs">{parseNumber(videoInfo?.collectNum)}</Text>
+        </View>
         <Pressable
           className="flex-row items-center"
           onPress={() => {
@@ -87,7 +94,7 @@ function VideoHeader() {
               handleShareVideo(name, title, route.params.bvid)
             }
           }}>
-          <Icon type="material-community" name="share" size={20} />
+          <Icon type="material-community" name="share" size={18} />
           <Text className="text-xs">{parseNumber(videoInfo?.shareNum)}</Text>
         </Pressable>
       </View>

@@ -47,7 +47,7 @@ export default function CommentList(props: {
   } = useDynamicComments(props.commentId, props.commentType)
 
   return (
-    <View>
+    <View className="flex-1">
       <View className="my-5 border-b-[0.5px] border-gray-400 pb-1 flex-row justify-between">
         <View className="flex-row items-center mr-1">
           <Icon

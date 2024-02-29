@@ -10,8 +10,8 @@ export function useTWC(classes: string) {
 }
 
 // export function useTWC2() {
+//   const ele = <Tw className={'flex-1'} />
 //   return (classes: string) => {
-//     const ele = <Tw className={classes} />
-//     return ele.props.style
+//     const tw(classes)
 //   }
 // }

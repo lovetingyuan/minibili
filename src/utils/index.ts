@@ -14,7 +14,7 @@ export const parseNumber = (num?: number | null) => {
   return (num / 10000).toFixed(1) + '万'
 }
 
-export const parseDate = (time?: number | string) => {
+export const parseDate = (time?: number | string, more?: boolean) => {
   if (!time) {
     return ''
   }
@@ -36,7 +36,13 @@ export const parseDate = (time?: number | string) => {
   }
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
   const day = date.getDate().toString().padStart(2, '0')
-  return `${year ? year + '-' : ''}${month}-${day}`
+  const ret = `${year ? year + '-' : ''}${month}-${day}`
+  if (more) {
+    const hour = date.getHours().toString().padStart(2, '0')
+    const minute = date.getMinutes().toString().padStart(2, '0')
+    return ret + ` ${hour}:${minute}`
+  }
+  return ret
 }
 
 export const parseDuration = (seconds?: number | string) => {

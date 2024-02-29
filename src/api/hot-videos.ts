@@ -32,6 +32,7 @@ export const getVideo = (item: HotVideoResponse) => {
     shareNum: item.stat.share,
     likeNum: item.stat.like,
     commentNum: item.stat.reply,
+    danmuNum: item.stat.danmaku,
     tag: item.tname,
     videosNum: item.videos,
   }

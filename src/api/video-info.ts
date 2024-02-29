@@ -6,7 +6,7 @@ import type { VideoInfoResponseSchema } from './video-info.schema'
 
 type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>
 
-const getVideoItem = (data: VideoInfoResponse) => {
+const getVideoInfo = (data: VideoInfoResponse) => {
   return {
     aid: data.aid,
     bvid: data.bvid,
@@ -26,9 +26,11 @@ const getVideoItem = (data: VideoInfoResponse) => {
     replyNum: data.stat.reply,
     shareNum: data.stat.share,
     playNum: data.stat.view,
+    collectNum: data.stat.favorite,
     danmuNum: data.stat.danmaku,
     videos: data.videos, // 如果是分片视频或者互动视频，这个videos会是大于1的数字
     tag: data.tname,
+    location: data.pub_location,
     pages: data.pages.map(v => {
       // 如果是分片视频，那么length会是分片数量，否则是1
       return {
@@ -43,7 +45,7 @@ const getVideoItem = (data: VideoInfoResponse) => {
   }
 }
 
-export type VideoInfo = ReturnType<typeof getVideoItem>
+export type VideoInfo = ReturnType<typeof getVideoInfo>
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
 export function useVideoInfo(bvid: string) {
   const { data, error, isLoading } = useSWR<VideoInfoResponse>(
@@ -51,7 +53,7 @@ export function useVideoInfo(bvid: string) {
     request,
   )
   return {
-    data: data ? getVideoItem(data) : null,
+    data: data ? getVideoInfo(data) : null,
     error,
     isLoading,
   }

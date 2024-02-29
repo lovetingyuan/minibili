@@ -17,7 +17,6 @@ export interface UpInfo {
 
 export type RootStackParamList = {
   Welcome: undefined
-  Home: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
   Play: {
     bvid: string

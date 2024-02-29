@@ -30,6 +30,11 @@ function VideoItem({ video }: { video: VideoItemType }) {
         <View className="bottom-0 absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
           <Text className="text-white text-xs">{parseDate(video.date)}</Text>
         </View>
+        <View className="top-0 right-0 absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
+          <Text className="text-white text-xs">
+            {parseNumber(video.danmuNum)}弹
+          </Text>
+        </View>
         {video.tag ? (
           <View className="right-0 bottom-0 absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
             <Text className="text-white text-xs">{video.tag}</Text>

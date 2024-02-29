@@ -27,7 +27,6 @@
     "format": "npx prettier src scripts --write",
     "test": "npx vitest run",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src scripts",
-    "aa": "npx metro get-dependencies index.js --platform android --output tmp/aa.txt",
     "update-expo": "npm i -g eas-cli && npm install expo && npx expo install --fix && npm run doctor",
     "bundle-analyze": "npx react-native-bundle-visualizer --platform android --entry-file index.js --expo true"
   },
@@ -41,7 +40,7 @@
     "@sentry/react-native": "5.17.0",
     "@shopify/flash-list": "1.6.3",
     "@total-typescript/ts-reset": "^0.5.1",
-    "expo": "~50.0.7",
+    "expo": "~50.0.8",
     "expo-application": "~5.8.3",
     "expo-background-fetch": "~11.8.1",
     "expo-clipboard": "~5.0.1",

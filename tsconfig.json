@@ -1,4 +1,5 @@
 {
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -8,6 +9,5 @@
         "src/*"
       ]
     }
-  },
-  "extends": "expo/tsconfig.base"
+  }
 }

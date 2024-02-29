@@ -68,7 +68,7 @@ function CommentText(props: {
             <Image
               key={idStr + i}
               source={{ uri: imgUrl(node.url) }}
-              className="w-4 h-4"
+              className="w-[18px] h-[18px]"
             />
           )
         }
@@ -123,9 +123,9 @@ function Comment(props: Props) {
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (
-    <View>
-      <Text className="flex-row items-center mb-1">
-        <Text className="font-bold text-base align-middle">
+    <View className="flex-1 shrink-0">
+      <Text className="flex-row items-center mb-1 justify-center">
+        <Text className="font-bold text-base align-middle leading-7">
           <Text
             className={
               upName === comment.name
@@ -147,7 +147,7 @@ function Comment(props: Props) {
           <Text>
             {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}
           </Text>
-          {comment.location ? (
+          {/* {comment.location ? (
             <Text className="text-sm">
               (
               {comment.location.includes('：')
@@ -155,7 +155,7 @@ function Comment(props: Props) {
                 : comment.location}
               )
             </Text>
-          ) : null}
+          ) : null} */}
           ：
         </Text>
         {comment.top ? (
@@ -172,7 +172,7 @@ function Comment(props: Props) {
         ) : null}
         <CommentText
           nodes={comment.message}
-          className={`text-base ${
+          className={`text-base leading-7 ${
             comment.upLike ? colors.success.text : ''
           } ${comment.top ? colors.primary.text : ''}`}
           idStr={comment.id + '_'}
@@ -209,7 +209,7 @@ function Comment(props: Props) {
             return (
               <Text
                 key={`${reply.id}#`}
-                className="flex-row items-center flex-wrap text-sm my-[2px] leading-5">
+                className="flex-row items-center flex-wrap text-sm">
                 <Text
                   className={
                     upName === reply.name
@@ -231,21 +231,15 @@ function Comment(props: Props) {
                 <Text>
                   {reply.sex === '男' ? '♂' : reply.sex === '女' ? '♀' : ''}
                 </Text>
-                {reply.location ? (
-                  <Text className="text-sm">
-                    (
-                    {reply.location.includes('：')
-                      ? reply.location.split('：')[1]
-                      : reply.location}
-                    )
-                  </Text>
-                ) : null}
-                ：
-                <CommentText nodes={reply.message} idStr={reply.id + '_'} />
+                <Text>：</Text>
+                <CommentText
+                  nodes={reply.message}
+                  idStr={reply.id + '_'}
+                  className="leading-6 border"
+                />
                 {reply.like ? (
                   <Text className={`text-xs ${colors.secondary.text}`}>
-                    {' '}
-                    {reply.like}
+                    {' ' + reply.like}
                   </Text>
                 ) : null}
               </Text>
@@ -261,7 +255,7 @@ function Comment(props: Props) {
                   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
                 )
               }}
-              buttonStyle={tw('justify-start px-0')}>
+              buttonStyle={tw('justify-start p-0  ')}>
               <Text className={colors.primary.text}>
                 {comment.moreText + '...'}
               </Text>
