@@ -203,7 +203,7 @@ function VideoList(props: {
           size="small"
           onPress={() => {
             listRef.current?.scrollToOffset(0)
-            props.onRefresh && setTimeout(props.onRefresh, 50)
+            props.onRefresh?.()
           }}
         />
       )}
