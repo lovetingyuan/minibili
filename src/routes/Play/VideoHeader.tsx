@@ -31,71 +31,77 @@ function VideoHeader() {
   const { name, face, mid, date, title } = videoInfo
   return (
     <View className="items-center flex-wrap justify-between flex-1 shrink-0 gap-3">
-      <Pressable
-        onPress={() => {
-          if (!mid || !face || !name) {
-            return
-          }
-          const user = {
-            mid,
-            face,
-            name,
-            sign: '-',
-          }
-          navigation.push('Dynamic', { user })
-        }}
-        className="flex-row items-center justify-between mr-1 shrink-0">
-        <Avatar
-          size={34}
-          rounded
-          source={{
-            uri: face
-              ? imgUrl(face, 80)
-              : require('../../../assets/loading.png'),
+      <View className="flex-1 justify-between flex-row w-full ">
+        <Pressable
+          onPress={() => {
+            if (!mid || !face || !name) {
+              return
+            }
+            const user = {
+              mid,
+              face,
+              name,
+              sign: '-',
+            }
+            navigation.push('Dynamic', { user })
           }}
-          ImageComponent={Image}
-        />
-        <Text
-          numberOfLines={1}
-          ellipsizeMode="tail"
-          className="ml-3 mr-1 text-base grow font-bold">
-          {name ? name + ' ' : ' '}
-        </Text>
-      </Pressable>
-      <View className="flex-row w-full justify-start gap-x-4 gap-y-1 flex-1 flex-wrap">
+          className="flex-row items-center justify-between mr-1 shrink-0">
+          <Avatar
+            size={34}
+            rounded
+            source={{
+              uri: face
+                ? imgUrl(face, 80)
+                : require('../../../assets/loading.png'),
+            }}
+            ImageComponent={Image}
+          />
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            className="ml-3 mr-1 text-base grow font-bold">
+            {name ? name + ' ' : ' '}
+          </Text>
+        </Pressable>
+        <View className="flex-row items-center gap-1 mr-2">
+          <Icon name="date-range" size={16} />
+          <Text className="text-sm">{parseDate(date, true)} 发布</Text>
+        </View>
+      </View>
+      <View className="flex-row w-full shrink-0 my-1 justify-start gap-x-4 gap-y-2 flex-1 flex-wrap">
+        {/* <View className="flex-row items-center gap-1">
+          <Icon name="date-range" size={18} />
+          <Text className="text-sm">{parseDate(date, true)}</Text>
+        </View> */}
         <View className="flex-row items-center gap-1">
-          <Icon name="date-range" size={15} />
-          <Text className="text-xs">{parseDate(date, true)}</Text>
+          <Icon name="play-circle-outline" size={18} />
+          <Text className="text-sm">{parseNumber(videoInfo?.playNum)}</Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <Icon name="play-circle-outline" size={15} />
-          <Text className="text-xs">{parseNumber(videoInfo?.playNum)}</Text>
-        </View>
-        <View className="flex-row items-center gap-1">
-          <Icon name="chat-bubble-outline" size={14} />
-          <Text className="text-xs">{parseNumber(videoInfo?.danmuNum)}弹</Text>
+          <Icon name="chat-bubble-outline" size={16} />
+          <Text className="text-sm">{parseNumber(videoInfo?.danmuNum)}弹</Text>
         </View>
         <Pressable
           className="flex-row items-center gap-1"
           onPress={() => {
             showToast('不支持点赞')
           }}>
-          <Icon name="thumb-up-off-alt" size={15} />
-          <Text className="text-xs">{parseNumber(videoInfo?.likeNum)}</Text>
+          <Icon name="thumb-up-off-alt" size={18} />
+          <Text className="text-sm">{parseNumber(videoInfo?.likeNum)}</Text>
         </Pressable>
         <View className="flex-row items-center gap-1">
-          <Icon name="star" size={15} />
-          <Text className="text-xs">{parseNumber(videoInfo?.collectNum)}</Text>
+          <Icon name="star" size={18} />
+          <Text className="text-sm">{parseNumber(videoInfo?.collectNum)}</Text>
         </View>
         <Pressable
-          className="flex-row items-center"
+          className="flex-row items-center mr-2"
           onPress={() => {
             if (name && title && route.params.bvid) {
               handleShareVideo(name, title, route.params.bvid)
             }
           }}>
-          <Icon type="material-community" name="share" size={18} />
-          <Text className="text-xs">{parseNumber(videoInfo?.shareNum)}</Text>
+          <Icon type="material-community" name="share" size={22} />
+          <Text className="text-sm">{parseNumber(videoInfo?.shareNum)}</Text>
         </Pressable>
       </View>
     </View>
