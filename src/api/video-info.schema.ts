@@ -41,7 +41,7 @@ export const VideoInfoResponseSchema = z.object({
     .array(),
   pic: z.string(),
   pubdate: z.number(),
-  pub_location: z.string().nullable(),
+  // pub_location: z.string().nullable(),
   season_id: z.number(),
   stat: z.object({
     aid: z.number(),

@@ -1,5 +1,10 @@
 {
   "extends": "expo/tsconfig.base",
+  "include": [
+    "src/**/*.tsx",
+    "src/**/*.ts",
+    "*.d.ts"
+  ],
   "compilerOptions": {
     "strict": true,
     "forceConsistentCasingInFileNames": true,

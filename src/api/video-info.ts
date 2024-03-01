@@ -30,7 +30,7 @@ const getVideoInfo = (data: VideoInfoResponse) => {
     danmuNum: data.stat.danmaku,
     videos: data.videos, // 如果是分片视频或者互动视频，这个videos会是大于1的数字
     tag: data.tname,
-    location: data.pub_location,
+    // location: data.pub_location,
     pages: data.pages.map(v => {
       // 如果是分片视频，那么length会是分片数量，否则是1
       return {

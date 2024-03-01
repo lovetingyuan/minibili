@@ -19,7 +19,7 @@ const AuthorSchema = z.object({
   label: z.string(),
   mid: z.number(),
   name: z.string(),
-  pub_location_text: z.string().nullish(),
+  // pub_location_text: z.string().nullish(),
   pub_time: z.string(),
   pub_ts: z.number(),
 })
