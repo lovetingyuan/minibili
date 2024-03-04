@@ -10,10 +10,10 @@ import { useStore } from '../store'
 let prevLivingMap = {}
 
 const useCheckLivingUps = (time?: number) => {
-  const { $followedUps, setLivingUps } = useStore()
+  const { $followedUps, setLivingUps, checkLiveTimeStamp } = useStore()
   const uids = $followedUps.map(user => `uids[]=${user.mid}`).join('&')
   const url = uids
-    ? `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}`
+    ? `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}&_t=${checkLiveTimeStamp}`
     : null
   useSWR<Record<string, z.infer<typeof LiveInfoBatchItemSchema>>>(
     url,

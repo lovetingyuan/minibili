@@ -95,12 +95,11 @@ function VideoList(props: {
     })
   }
   const renderItem = ({ item }: { item: VideoItemType }) => {
-    const key = item.bvid
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        className="flex-1 flex-row justify-around mx-1 my-2"
-        key={key}
+        className="flex-1 flex-row justify-around mx-1 mb-6"
+        key={item.bvid}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item

@@ -1,3 +1,4 @@
+// import { useNavigation } from '@react-navigation/native'
 import {
   Avatar,
   Button,
@@ -13,6 +14,7 @@ import { FlatList, Linking, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 
+// import { NavigationProps } from '@/types'
 import { type SearchedUpType, useSearchUps } from '../../api/search-up'
 import { useStore } from '../../store'
 import { imgUrl, parseNumber, showToast } from '../../utils'
@@ -21,6 +23,8 @@ function SearchedItem(props: { up: SearchedUpType }) {
   const up = props.up
   const { _followedUpsMap, get$followedUps, set$followedUps } = useStore()
   const followed = up.mid in _followedUpsMap
+  // const navigation = useNavigation<NavigationProps['navigation']>()
+
   const user = {
     name: up.name,
     face: up.face,
@@ -31,6 +35,9 @@ function SearchedItem(props: { up: SearchedUpType }) {
     set$followedUps([user, ...get$followedUps()])
   }
   const goToDynamic = () => {
+    // navigation.push('Dynamic', {
+    //   user,
+    // })
     Linking.openURL(`https://m.bilibili.com/space/${up.mid}`)
   }
   return (
@@ -109,7 +116,7 @@ function AddFollow() {
       <Dialog
         isVisible={addUpVisible}
         onBackdropPress={handleAddUpVisible}
-        overlayStyle={tw('max-h-[60%] w-[85%]')}>
+        overlayStyle={tw('max-h-[70%] w-[85%]')}>
         <View className="flex-row justify-between items-center">
           <Text className="font-bold text-lg">新增关注</Text>
           <Icon name="close" size={24} onPress={() => handleAddUpVisible()} />

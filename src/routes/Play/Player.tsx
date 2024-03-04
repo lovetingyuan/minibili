@@ -33,7 +33,7 @@ function Player(props: { currentPage: number }) {
   const [verticalScale, setVerticalScale] = React.useState(0)
   const [extraHeight, setExtraHeight] = React.useState(0)
   const playStateRef = React.useRef('')
-  const { data, error } = useVideoInfo(route.params.bvid)
+  const { data } = useVideoInfo(route.params.bvid)
   const [loadPlayer, setLoadPlayer] = React.useState(getIsWiFi())
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
@@ -64,7 +64,7 @@ function Player(props: { currentPage: number }) {
 
   let videoWidth = 0
   let videoHeight = 0
-  if (!error && videoInfo?.bvid && videoInfo?.width && videoInfo?.height) {
+  if (videoInfo?.width && videoInfo?.height) {
     videoWidth = videoInfo.width
     videoHeight = videoInfo.height
   }
@@ -77,7 +77,7 @@ function Player(props: { currentPage: number }) {
         playStateRef.current = eventData.action
         if (eventData.payload === 'play') {
           KeepAwake.activateKeepAwakeAsync('PLAY')
-          setExtraHeight(40)
+          setExtraHeight(20)
           if (isVerticalVideo && !verticalScale) {
             setVerticalScale(0.4)
           }
@@ -102,14 +102,17 @@ function Player(props: { currentPage: number }) {
     } catch (e) {}
   }
 
-  let videoViewHeight = height * 0.4
+  let videoViewHeight = width * 0.5
   if (videoWidth && videoHeight) {
-    videoViewHeight =
-      (isVerticalVideo ? videoWidth / videoHeight : videoHeight / videoWidth) *
-        width +
-      extraHeight
     if (isVerticalVideo && verticalScale) {
       videoViewHeight = verticalScale * height
+    } else {
+      videoViewHeight =
+        (isVerticalVideo
+          ? videoWidth / videoHeight
+          : videoHeight / videoWidth) *
+          width +
+        extraHeight
     }
   }
   const renderLoading = () => (
@@ -178,7 +181,7 @@ function Player(props: { currentPage: number }) {
     <View
       renderToHardwareTextureAndroid
       className="w-full shrink-0"
-      style={{ height: videoViewHeight + extraHeight }}>
+      style={{ height: videoViewHeight }}>
       {loadPlayer ? (
         webview
       ) : (

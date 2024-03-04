@@ -26,6 +26,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
     setOverlayButtons,
     set$followedUps,
     get$followedUps,
+    setCheckLiveTimeStamp,
   } = useStore()
   let hasUpdate = false
   if ($upUpdateMap[mid]) {
@@ -46,120 +47,122 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
   const gotoLivePage = useMemoizedFn(() => {
     const liveUrl = livingUps[mid]
     if (liveUrl) {
+      setCheckLiveTimeStamp(Date.now())
       navigation.navigate('WebPage', {
         url: liveUrl,
         title: name + '的直播间',
       })
     }
   })
-  const buttons = [
-    hasUpdate
-      ? {
-          text: '标记为已读',
-          onPress: () => {
-            const update = $upUpdateMap[mid]
-            set$upUpdateMap({
-              ...$upUpdateMap,
-              [mid]: {
-                latestId: update.currentLatestId,
-                currentLatestId: update.currentLatestId,
-              },
-            })
-          },
-        }
-      : {
-          text: '标记为未读',
-          onPress: () => {
-            if (mid in $upUpdateMap) {
+  const buttons = () =>
+    [
+      hasUpdate
+        ? {
+            text: '标记为已读',
+            onPress: () => {
               const update = $upUpdateMap[mid]
               set$upUpdateMap({
                 ...$upUpdateMap,
                 [mid]: {
-                  latestId: Math.random().toString(),
+                  latestId: update.currentLatestId,
                   currentLatestId: update.currentLatestId,
                 },
               })
-            } else {
-              set$upUpdateMap({
-                ...$upUpdateMap,
-                [mid]: {
-                  latestId: Math.random().toString(),
-                  currentLatestId: Math.random().toString(),
-                },
-              })
-              // showToast('请稍候再操作')
-            }
-          },
-        },
-    {
-      text: '取消关注',
-      onPress: () => {
-        Alert.alert(`确定取消关注「${name}」吗？`, '', [
-          { text: '关闭' },
-          {
-            text: '确定',
-            onPress() {
-              set$followedUps(
-                get$followedUps().filter(
-                  u => u.mid.toString() !== mid.toString(),
-                ),
-              )
+            },
+          }
+        : {
+            text: '标记为未读',
+            onPress: () => {
+              if (mid in $upUpdateMap) {
+                const update = $upUpdateMap[mid]
+                set$upUpdateMap({
+                  ...$upUpdateMap,
+                  [mid]: {
+                    latestId: Math.random().toString(),
+                    currentLatestId: update.currentLatestId,
+                  },
+                })
+              } else {
+                set$upUpdateMap({
+                  ...$upUpdateMap,
+                  [mid]: {
+                    latestId: Math.random().toString(),
+                    currentLatestId: Math.random().toString(),
+                  },
+                })
+                // showToast('请稍候再操作')
+              }
             },
           },
-        ])
-      },
-    },
-    {
-      text: '查看头像',
-      onPress: () => {
-        Linking.openURL(parseUrl(face))
-      },
-    },
-    pin && index === 0
-      ? null
-      : {
-          text: '置顶UP',
-          onPress: () => {
-            const followedUps = get$followedUps()
-            const i = followedUps.findIndex(
-              u => u.mid.toString() === mid.toString(),
-            )
-            followedUps[i] = {
-              ...followedUps[i],
-              pin: Date.now(),
-            }
-            set$followedUps(followedUps.slice())
-          },
+      {
+        text: '取消关注',
+        onPress: () => {
+          Alert.alert(`确定取消关注「${name}」吗？`, '', [
+            { text: '关闭' },
+            {
+              text: '确定',
+              onPress() {
+                set$followedUps(
+                  get$followedUps().filter(
+                    u => u.mid.toString() !== mid.toString(),
+                  ),
+                )
+              },
+            },
+          ])
         },
-    pin && {
-      text: '取消置顶',
-      onPress: () => {
-        const followedUps = get$followedUps()
-        const i = followedUps.findIndex(
-          u => u.mid.toString() === mid.toString(),
-        )
-        followedUps[i] = {
-          ...followedUps[i],
-          pin: 0,
-        }
-        set$followedUps(followedUps.slice())
       },
-    },
-    __DEV__ && {
-      text: `${$upUpdateMap[mid]?.latestId} - ${$upUpdateMap[mid]?.currentLatestId}`,
-      onPress: () => {},
-    },
-  ].filter(Boolean)
+      {
+        text: '查看头像',
+        onPress: () => {
+          Linking.openURL(parseUrl(face))
+        },
+      },
+      pin && index === 0
+        ? null
+        : {
+            text: '置顶UP',
+            onPress: () => {
+              const followedUps = get$followedUps()
+              const i = followedUps.findIndex(
+                u => u.mid.toString() === mid.toString(),
+              )
+              followedUps[i] = {
+                ...followedUps[i],
+                pin: Date.now(),
+              }
+              set$followedUps(followedUps.slice())
+            },
+          },
+      pin && {
+        text: '取消置顶',
+        onPress: () => {
+          const followedUps = get$followedUps()
+          const i = followedUps.findIndex(
+            u => u.mid.toString() === mid.toString(),
+          )
+          followedUps[i] = {
+            ...followedUps[i],
+            pin: 0,
+          }
+          set$followedUps(followedUps.slice())
+        },
+      },
+      __DEV__ && {
+        text: `${$upUpdateMap[mid]?.latestId} - ${$upUpdateMap[mid]?.currentLatestId}`,
+        onPress: () => {},
+      },
+    ].filter(Boolean)
 
   return (
     <TouchableOpacity
       activeOpacity={0.6}
       onLongPress={() => {
-        setOverlayButtons(buttons)
+        setOverlayButtons(buttons())
       }}
-      className="items-center mb-6 flex-1 justify-between relative"
+      className="items-center mb-6 mx-1 flex-1"
       onPress={gotoDynamic}>
-      <View>
+      <View className="relative">
         <Avatar
           size={46}
           ImageComponent={Image}
@@ -179,13 +182,13 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       </View>
       {livingUps[mid] ? (
         <Text
-          className={`font-bold shrink-0 text-sm py-2 flex-1 text-center ${colors.success.text}`}
+          className={`font-bold flex-1 shrink-0 text-sm py-2 text-center ${colors.success.text}`}
           onPress={gotoLivePage}>
           直播中~
         </Text>
       ) : (
         <Text
-          className={`text-sm py-2 shrink-0 flex-1 text-center ${
+          className={`text-sm py-2 flex-1 shrink-0 text-center ${
             pin ? `font-bold ${colors.primary.text}` : ''
           } ${hasUpdate ? colors.secondary.text : ''}`}
           numberOfLines={2}

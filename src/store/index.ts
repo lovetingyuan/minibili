@@ -59,6 +59,7 @@ export const getAppValue = () => {
     _followedUpsMap: {} as Record<string, UpInfo>,
     _updatedCount: 0,
     moreRepliesUrl: '',
+    checkLiveTimeStamp: Date.now(),
   }
 }
 

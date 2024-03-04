@@ -41,7 +41,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const userName = dynamicUser?.name ? dynamicUser.name + level : ''
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
-  const { _followedUpsMap } = useStore()
+  const { _followedUpsMap, setCheckLiveTimeStamp } = useStore()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   return (
     <View className="flex-row items-center mr-28 left-[-12px] relative">
@@ -104,6 +104,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           titleStyle={tw('text-sm')}
           onPress={() => {
             if (dynamicUser.mid) {
+              setCheckLiveTimeStamp(Date.now())
               navigation.navigate('WebPage', {
                 title: dynamicUser.name + '的直播间',
                 url: livingUrl,
