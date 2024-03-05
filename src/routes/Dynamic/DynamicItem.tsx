@@ -43,12 +43,10 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   return (
     <View className="py-5 px-3 border-b-[0.5px] border-b-gray-400">
       {item.top ? (
-        <View className="border-[0.5px] w-9 rounded mb-3 px-1 border-rose-600">
-          <Text
-            className={`text-center font-thin text-sm ${colors.secondary.text}`}>
-            置顶
-          </Text>
-        </View>
+        <Text
+          className={`self-start px-2 text-left border mb-2 ${colors.secondary.border} rounded flex-1 font-thin text-sm ${colors.secondary.text}`}>
+          置顶
+        </Text>
       ) : null}
       <Item item={item} />
       {/* {__DEV__ && <Text>{item.type}</Text>} */}

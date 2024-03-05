@@ -37,4 +37,4 @@ if (typeof ErrorUtils === 'object') {
   })
 }
 
-registerRootComponent(SentryExpo.wrap(App))
+registerRootComponent(__DEV__ ? App : SentryExpo.wrap(App))

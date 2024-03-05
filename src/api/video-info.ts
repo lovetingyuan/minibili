@@ -9,6 +9,7 @@ type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>
 const getVideoInfo = (data: VideoInfoResponse) => {
   return {
     aid: data.aid,
+    cid: data.cid,
     bvid: data.bvid,
     date: data.pubdate,
     desc: data.desc,

@@ -32,7 +32,11 @@ function VideoInfo(props: {
   return (
     <View className="  ">
       <Text className="text-base mt-3">{title}</Text>
-      {videoDesc ? <Text className="mt-3">{videoDesc}</Text> : null}
+      {videoDesc ? (
+        <Text className="mt-3" selectable>
+          {videoDesc}
+        </Text>
+      ) : null}
       {(videoInfo?.pages?.length || 0) > 1 ? (
         <ListItem.Accordion
           icon={<Icon name={'chevron-down'} type="material-community" />}

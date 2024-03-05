@@ -8,6 +8,8 @@ import { Image } from 'expo-image'
 import React from 'react'
 import { Pressable, View } from 'react-native'
 
+import { useWatchingCount } from '@/api/watching-count'
+
 import { useVideoInfo } from '../../api/video-info'
 import type { NavigationProps, RootStackParamList } from '../../types'
 import {
@@ -29,6 +31,7 @@ function VideoHeader() {
     ...route.params,
   }
   const { name, face, mid, date, title } = videoInfo
+  const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid!)
   return (
     <View className="items-center flex-wrap justify-between flex-1 shrink-0 gap-3">
       <View className="flex-1 justify-between flex-row w-full ">
@@ -65,7 +68,13 @@ function VideoHeader() {
         </Pressable>
         <View className="flex-row items-center gap-1 mr-2">
           <Icon name="date-range" size={16} />
-          <Text className="text-sm">{parseDate(date, true)} 发布</Text>
+          <Text className="text-sm">{parseDate(date, true)}</Text>
+          {watchingCount ? (
+            <Text className="text-sm ml-1">
+              {watchingCount.total === '1' ? '你' : watchingCount.total + '人'}
+              在看
+            </Text>
+          ) : null}
         </View>
       </View>
       <View className="flex-row w-full shrink-0 my-1 justify-start gap-x-4 gap-y-2 flex-1 flex-wrap">
@@ -84,7 +93,7 @@ function VideoHeader() {
         <Pressable
           className="flex-row items-center gap-1"
           onPress={() => {
-            showToast('不支持点赞')
+            showToast(`${videoInfo?.likeNum} 点赞`)
           }}>
           <Icon name="thumb-up-off-alt" size={18} />
           <Text className="text-sm">{parseNumber(videoInfo?.likeNum)}</Text>

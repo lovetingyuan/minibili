@@ -159,16 +159,10 @@ function Comment(props: Props) {
           ：
         </Text>
         {comment.top ? (
-          <>
-            <Text> </Text>
-            <View className="border-[0.5px] w-7 rounded border-rose-600">
-              <Text
-                className={`text-center font-thin text-xs ${colors.secondary.text}`}>
-                置顶
-              </Text>
-            </View>
-            <Text> </Text>
-          </>
+          <Text
+            className={`border ${colors.secondary.border} rounded font-bold text-sm ${colors.secondary.text}`}>
+            置顶{' '}
+          </Text>
         ) : null}
         <CommentText
           nodes={comment.message}

@@ -22,7 +22,7 @@ function NetState() {
         setIsWiFi(true)
       }
     }, 3000)
-    // setIsWiFi(isWifi)
+    setIsWiFi(isWifi)
     return () => {
       clearTimeout(timer)
     }

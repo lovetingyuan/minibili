@@ -32,7 +32,7 @@ export default function DynamicStat(props: {
           <Text
             style={textStyle}
             onPress={() => {
-              showToast('不支持点赞')
+              showToast(`${props.like} 点赞`)
             }}>
             {parseNumber(props.like)}
           </Text>

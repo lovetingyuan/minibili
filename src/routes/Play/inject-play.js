@@ -153,9 +153,9 @@ function __$hack() {
   element.addEventListener('touchend', function () {
     clearTimeout(touchTimer)
     const video = document.querySelector('video')
-    if (video) {
-      video.playbackRate = 1
-    }
+    // if (video) {
+    //   video.playbackRate = 1
+    // }
     if (Math.abs(distanceX) > Math.abs(distanceY)) {
       direction = distanceX < 0 ? 'left' : 'right'
     } else {

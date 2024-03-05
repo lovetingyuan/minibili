@@ -2,10 +2,12 @@ export const colors = {
   primary: {
     text: 'text-sky-600 dark:text-sky-500',
     bg: 'bg-sky-500',
+    border: 'border-sky-500',
   },
   secondary: {
     text: 'text-pink-500 dark:text-pink-400',
     bg: 'bg-pink-400',
+    border: 'border-pink-500',
   },
   black: {
     text: 'text-zinc-800 dark:text-neutral-200',

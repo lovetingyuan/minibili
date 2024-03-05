@@ -57,7 +57,7 @@ function DynamicDetail({
             <Pressable
               className="flex-row gap-1 items-center"
               onPress={() => {
-                showToast('不支持点赞')
+                showToast(`${likeCount} 点赞`)
               }}>
               <Icon
                 name="thumb-up-off-alt"

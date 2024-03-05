@@ -56,7 +56,7 @@ export default function CommentList(props: {
             size={14}
             color={tw(colors.gray6.text).color}
           />
-          <Text className={`text-xs mr-3 px-2 ${colors.gray6.text}`}>
+          <Text className={`text-xs mr-3 px-1 ${colors.gray6.text}`}>
             {allCount ? allCount + '条评论' : '暂无评论'}
           </Text>
         </View>
