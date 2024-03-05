@@ -132,15 +132,15 @@ function Player(props: { currentPage: number }) {
   )
 
   const search = new URLSearchParams()
-  // const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
-  const playUrl = 'https://www.bilibili.com/blackboard/webplayer/mbplayer.html'
+  const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
+  // const playUrl = 'https://www.bilibili.com/blackboard/webplayer/mbplayer.html'
   Object.entries({
     bvid: route.params.bvid,
-    // autoplay: 0,
-    // highQuality: getIsWiFi() ? 1 : 0,
-    // quality: getIsWiFi() ? 64 : 32,
+    autoplay: getIsWiFi() ? 1 : 0,
+    highQuality: getIsWiFi() ? 1 : 0,
+    quality: getIsWiFi() ? 64 : 32,
     portraitFullScreen: true,
-    high_quality: 1,
+    high_quality: getIsWiFi() ? 1 : 0,
     page: props.currentPage,
   }).forEach(([k, v]) => {
     search.append(k, v + '')
