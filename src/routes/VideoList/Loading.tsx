@@ -7,16 +7,21 @@ const getWidth = () => Math.floor(Math.random() * (100 - 10 + 1)) + 10
 function VideoLoading() {
   return (
     <View className="flex-1 gap-3">
-      <Skeleton animation="pulse" width={'100%' as any} height={90} />
+      <Skeleton
+        animation="pulse"
+        // skeletonStyle={tw('bg-zinc-200')}
+        width={'100%' as any}
+        height={90}
+      />
       <View className="gap-2">
         <Skeleton
-          animation="pulse"
+          animation="wave"
           width={(getWidth() + '%') as any}
           height={15}
         />
         {Math.random() > 0.5 ? (
           <Skeleton
-            animation="pulse"
+            animation="wave"
             width={(getWidth() + '%') as any}
             height={15}
           />
@@ -25,8 +30,8 @@ function VideoLoading() {
         )}
       </View>
       <View className="flex-row justify-between">
-        <Skeleton animation="pulse" width={60} height={12} />
-        <Skeleton animation="pulse" width={50} height={12} />
+        <Skeleton animation="wave" width={60} height={12} />
+        <Skeleton animation="wave" width={50} height={12} />
       </View>
     </View>
   )

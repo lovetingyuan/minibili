@@ -9,6 +9,10 @@ export const colors = {
     bg: 'bg-pink-400',
     border: 'border-pink-500',
   },
+  white: {
+    text: 'text-zinc-50 dark:text-neutral-800',
+    bg: 'bg-white dark:bg-neutral-900',
+  },
   black: {
     text: 'text-zinc-800 dark:text-neutral-200',
     bg: 'bg-black dark:bg-neutral-300',
@@ -25,10 +29,7 @@ export const colors = {
     text: 'text-red-500',
     bg: 'bg-red-500',
   },
-  white: {
-    text: 'text-zinc-50 dark:text-neutral-800',
-    bg: 'bg-white dark:bg-neutral-900',
-  },
+
   gray0: {
     text: 'text-gray-50 dark:text-gray-950',
     bg: 'bg-gray-50 dark:bg-gray-950',

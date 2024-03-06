@@ -6,7 +6,6 @@ import {
 import React from 'react'
 import { View } from 'react-native'
 
-// import useSWR from 'swr'
 import { colors } from '@/constants/colors.tw'
 import useRouteTheme from '@/hooks/useRouteTheme'
 
@@ -31,18 +30,8 @@ import Welcome from './Welcome'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-// function useTest() {
-//   // https://api.bilibili.com/x/player/wbi/playurl
-//   const { data } = useSWR(
-//     '/x/player/wbi/playurl?bvid=BV1Av421r7Ur&cid=1454646853&type=mp4&qn=64&fnval=1&platform=html5&high_quality=1',
-//   )
-//   return data
-// }
-
 function Route() {
   const routeTheme = useRouteTheme()
-  // const ddd = useTest()
-  // console.log(333, JSON.stringify(ddd, null, 2))
   const onRouteChange = React.useCallback(
     ({ route }: { route: RouteProp<RootStackParamList> }) => {
       return {

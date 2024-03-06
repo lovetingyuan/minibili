@@ -14,6 +14,7 @@ function __$hack() {
       clearInterval(timer)
     }, 10000)
   }
+  const xx = 'x'
   waitForDom('.mplayer-display', dom => {
     dom.addEventListener('dblclick', evt => {
       if (evt.target.matches('.mplayer-right *')) {
@@ -84,7 +85,7 @@ function __$hack() {
     if (!document.getElementById('play-rate-button')) {
       const rateBtn = document.createElement('div')
       rateBtn.id = 'play-rate-button'
-      rateBtn.innerHTML = '1X'
+      rateBtn.innerHTML = '1' + xx
       rateBtn.dataset.rate = '1'
       rateBtn.style.cssText = `
         width: 24px;
@@ -109,7 +110,7 @@ function __$hack() {
           rate = 1
         }
         rateBtn.dataset.rate = rate
-        rateBtn.textContent = rate + 'X'
+        rateBtn.textContent = rate + xx
         video.playbackRate = rate
       })
       right.appendChild(rateBtn)
@@ -137,8 +138,9 @@ function __$hack() {
       const video = document.querySelector('video')
       if (video && isVideoPlaying(video)) {
         video.playbackRate = 3
+        video.dataset.longPress = 'true'
       }
-    }, 1600)
+    }, 1200)
     const touch = event.touches[0]
     startX = touch.clientX
     startY = touch.clientY
@@ -153,9 +155,15 @@ function __$hack() {
   element.addEventListener('touchend', function () {
     clearTimeout(touchTimer)
     const video = document.querySelector('video')
-    // if (video) {
-    //   video.playbackRate = 1
-    // }
+    if (video && video.dataset.longPress === 'true') {
+      video.playbackRate = 1
+      video.dataset.longPress = 'false'
+      const rateBtn = document.getElementById('play-rate-button')
+      if (rateBtn) {
+        rateBtn.dataset.rate = '1'
+        rateBtn.textContent = '1' + xx
+      }
+    }
     if (Math.abs(distanceX) > Math.abs(distanceY)) {
       direction = distanceX < 0 ? 'left' : 'right'
     } else {

@@ -7,7 +7,6 @@ import { RootStackParamList } from '@/types'
 import { useStore } from '../../store'
 import HotList from './HotList'
 import Ranks from './Ranks'
-
 export default React.memo(VideoList)
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
@@ -36,6 +35,7 @@ function VideoList({ navigation }: Props) {
   //     },
   //   }),
   // ).current
+
   return (
     <View className="flex-1">
       {currentVideosCate.rid === -1 ? <HotList /> : <Ranks />}

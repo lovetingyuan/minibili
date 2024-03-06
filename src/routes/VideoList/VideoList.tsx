@@ -187,7 +187,7 @@ function VideoList(props: {
             ? props.footer(videoList)
             : props.footer
         }
-        contentContainerStyle={tw('px-1 pt-4')}
+        contentContainerStyle={tw('px-1 pt-6')}
         estimatedFirstItemOffset={100}
         {...refreshProps}
         {...reachEndProps}

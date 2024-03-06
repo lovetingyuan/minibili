@@ -71,7 +71,7 @@ function VideoHeader() {
           <Text className="text-sm">{parseDate(date, true)}</Text>
           {watchingCount ? (
             <Text className="text-sm ml-1">
-              {watchingCount.total === '1' ? '你' : watchingCount.total + '人'}
+              {watchingCount.total === '1' ? '壹' : watchingCount.total + '人'}
               在看
             </Text>
           ) : null}

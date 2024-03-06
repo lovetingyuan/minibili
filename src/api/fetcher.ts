@@ -1,4 +1,7 @@
+import * as protobuf from 'protobufjs'
+
 import { UA } from '../constants'
+import dm from '../constants/dm'
 import encWbi from '../utils/wbi'
 import { getCookie } from './get-cookie'
 import getSetWbiImg from './get-set-user-nav'
@@ -24,6 +27,9 @@ let cookie = ''
 getCookie().then(c => {
   cookie = c
 })
+
+const root = protobuf.Root.fromJSON(dm as any)
+const lp = root.lookupType('DmSegMobileReply')
 
 export default async function request<D extends any>(url: string) {
   let requestUrl = url.startsWith('http')
@@ -69,6 +75,22 @@ export default async function request<D extends any>(url: string) {
     }
     const query = encWbi(queryParams, wbiImg.img_url, wbiImg.sub_url)
     requestUrl = _url + '?' + query
+  }
+  if (url.includes('/dm/web/seg.so')) {
+    const arrayBuffer = await fetch(requestUrl, options).then(r =>
+      r.arrayBuffer(),
+    )
+    const bytes = new Uint8Array(arrayBuffer)
+
+    const message = lp.decode(bytes)
+    const objects = lp.toObject(message, {
+      // bool: Boolean,
+      longs: Number,
+      enums: Number,
+      bytes: String,
+      // Object: String,
+    })
+    return objects.elems
   }
   let resText = await fetch(requestUrl, options).then(r => r.text())
 

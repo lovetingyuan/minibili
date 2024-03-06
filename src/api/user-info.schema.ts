@@ -57,9 +57,10 @@ export const UserBatchInfoResponseSchema = z
     face: z.string(),
     sign: z.string(),
     level: z.number(),
-    birthday: z.number(),
-    vip: z.object({
-      status: z.number(),
-    }),
+    silence: z.union([z.literal(0), z.literal(1)]),
+    // birthday: z.number(),
+    // vip: z.object({
+    //   status: z.number(),
+    // }),
   })
   .array()
