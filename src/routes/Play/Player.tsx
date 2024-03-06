@@ -14,6 +14,8 @@ import {
 } from 'react-native'
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 
+import { usePlayUrl } from '@/api/get-playurl'
+import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
 import type { RootStackParamList } from '@/types'
 
@@ -41,6 +43,30 @@ function Player(props: { currentPage: number }) {
     ...data,
     ...route.params,
   }
+  const isWifi = getIsWiFi()
+  const durl = usePlayUrl(videoInfo.bvid, videoInfo.cid)
+  // const durl = usePlayUrl('BV1SZ421y7Ae', '1460675026')
+  React.useEffect(() => {
+    if (!isWifi) {
+      return
+    }
+    const videoUrl = durl?.[0]?.backup_url?.[0] || durl?.[0]?.url
+    if (videoUrl) {
+      webviewRef.current?.injectJavaScript(`
+        ;(function() {
+          const video = document.querySelector('video')
+          if (video) {
+            video.pause();
+            video.src = "${videoUrl}";
+            video.load();
+            video.play(true);
+          }
+        })();
+        true;
+      `)
+    }
+  }, [durl, isWifi])
+
   useAppState(currentAppState => {
     if (
       currentAppState === 'active' &&
@@ -136,11 +162,9 @@ function Player(props: { currentPage: number }) {
   // const playUrl = 'https://www.bilibili.com/blackboard/webplayer/mbplayer.html'
   Object.entries({
     bvid: route.params.bvid,
-    autoplay: getIsWiFi() ? 1 : 0,
-    highQuality: getIsWiFi() ? 1 : 0,
-    quality: getIsWiFi() ? 64 : 32,
+    quality: isWifi ? 64 : 32,
     portraitFullScreen: true,
-    high_quality: getIsWiFi() ? 1 : 0,
+    high_quality: isWifi ? 1 : 0,
     page: props.currentPage,
   }).forEach(([k, v]) => {
     search.append(k, v + '')
@@ -156,8 +180,20 @@ function Player(props: { currentPage: number }) {
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback
       startInLoadingState
+      userAgent={UA}
+      key={videoInfo.bvid}
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
+      injectedJavaScriptBeforeContentLoaded={`
+       const rawPlay = HTMLMediaElement.prototype.play
+       HTMLMediaElement.prototype.play = function(v) {
+        if (v) {
+          return rawPlay.call(this)
+        }
+        return Promise.resolve()
+       }
+       true;
+      `}
       renderLoading={renderLoading}
       onMessage={handleMessage}
       onLoad={() => {

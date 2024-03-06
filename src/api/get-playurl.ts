@@ -7,12 +7,12 @@ type Res = z.infer<typeof PlayUrlResponseSchema>
 
 export function usePlayUrl(
   bvid: string,
-  cid: string | number,
+  cid?: string | number,
   highQuality = true,
 ) {
   const search = new URLSearchParams()
   // https://socialsisteryi.github.io/bilibili-API-collect/docs/video/videostream_url.html
-  if (bvid) {
+  if (bvid && cid) {
     const query = {
       bvid,
       cid,
@@ -27,6 +27,8 @@ export function usePlayUrl(
     })
   }
 
-  const { data } = useSWR<Res>(bvid ? `/x/player/wbi/playurl?${search}` : null)
+  const { data } = useSWR<Res>(
+    bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
+  )
   return data?.durl
 }
