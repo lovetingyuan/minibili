@@ -56,7 +56,7 @@ function __$hack() {
       })
     })
     postPlayState(video.paused ? 'pause' : 'play')
-    if (!video.muted && !document.getElementById('muted-toggle')) {
+    if (video.muted && !document.getElementById('muted-toggle')) {
       const div = document.createElement('div')
       div.id = 'muted-toggle'
       div.style.cssText = `

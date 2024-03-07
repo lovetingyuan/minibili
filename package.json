@@ -42,7 +42,6 @@
     "@total-typescript/ts-reset": "^0.5.1",
     "expo": "~50.0.8",
     "expo-application": "~5.8.3",
-    "expo-av": "~13.10.5",
     "expo-background-fetch": "~11.8.1",
     "expo-clipboard": "~5.0.1",
     "expo-constants": "~15.4.5",

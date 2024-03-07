@@ -1,4 +1,4 @@
-import { ResizeMode, Video } from 'expo-av'
+// import { ResizeMode, Video } from 'expo-av'
 import React from 'react'
 
 import { UA } from '@/constants'

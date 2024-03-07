@@ -80,13 +80,13 @@ module.exports = {
         organization: process.env.SENTRY_ORG,
       },
     ],
-    [
-      'expo-av',
-      {
-        microphonePermission:
-          'Allow $(PRODUCT_NAME) to access your microphone.',
-      },
-    ],
+    // [
+    //   'expo-av',
+    //   {
+    //     microphonePermission:
+    //       'Allow $(PRODUCT_NAME) to access your microphone.',
+    //   },
+    // ],
   ],
   extra: {
     eas: {
