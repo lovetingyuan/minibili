@@ -117,6 +117,9 @@ function __$hack() {
     #app .open-app-btn {
       display: none!important;
     }
+    #app #bili-danmaku-wrap {
+      bottom: 12px;
+    }
     `
     //https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=23716652
     const roomId = window.location.pathname.split('/').pop()

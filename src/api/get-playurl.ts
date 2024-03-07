@@ -32,3 +32,27 @@ export function usePlayUrl(
   )
   return data?.durl
 }
+
+export function useVideoDownloadUrl(bvid: string, cid?: string | number) {
+  const search = new URLSearchParams()
+  // https://socialsisteryi.github.io/bilibili-API-collect/docs/video/videostream_url.html
+  if (bvid && cid) {
+    const query = {
+      bvid,
+      cid,
+      type: 'mp4',
+      qn: 64,
+      fnval: 1,
+      platform: 'html5',
+      high_quality: 1,
+    }
+    Object.entries(query).forEach(([k, v]) => {
+      search.append(k, v + '')
+    })
+  }
+
+  const { data } = useSWR<Res>(
+    bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
+  )
+  return data?.durl?.[0]?.url
+}

@@ -56,6 +56,24 @@ function __$hack() {
       })
     })
     postPlayState(video.paused ? 'pause' : 'play')
+    if (!video.muted && !document.getElementById('muted-toggle')) {
+      const div = document.createElement('div')
+      div.id = 'muted-toggle'
+      div.style.cssText = `
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: #eee;
+      border-radius: 4px;
+      padding: 2px 10px;
+      border: 1px solid #555;
+      `
+      div.innerHTML = `
+      <span onclick="document.querySelector('video').muted=false;this.parentElement.style.display='none'" style="vertical-align: middle">取消静音</span>
+      <span onclick="this.parentElement.style.display='none'" style="font-size: 22px; vertical-align: middle"> ×</span>
+      `
+      document.body.appendChild(div)
+    }
   })
   waitForDom(['video', '.mplayer-right'], (video, right) => {
     if (!document.getElementById('download-button')) {
@@ -76,7 +94,7 @@ function __$hack() {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             action: 'downloadVideo',
-            payload: video.src,
+            payload: null,
           }),
         )
       })
@@ -115,6 +133,31 @@ function __$hack() {
       })
       right.appendChild(rateBtn)
     }
+    // if (!document.getElementById('reload-button')) {
+    //   const reloadBtn = document.createElement('div')
+    //   reloadBtn.id = 'reload-button'
+    //   reloadBtn.innerHTML = '↻'
+    //   reloadBtn.style.cssText = `
+    //     width: 24px;
+    //     height: 24px;
+    //     color: white;
+    //     font-size: 22px;
+    //     line-height: 24px;
+    //     text-align: center;
+    //     background: rgba(0,0,0,.2);
+    //     border-radius: 50%;
+    //     margin-top: 12px;
+    //   `
+    //   reloadBtn.addEventListener('click', () => {
+    //     window.ReactNativeWebView.postMessage(
+    //       JSON.stringify({
+    //         action: 'reload',
+    //         payload: null,
+    //       }),
+    //     )
+    //   })
+    //   right.appendChild(reloadBtn)
+    // }
   })
 
   const element = document.body
@@ -139,6 +182,12 @@ function __$hack() {
       if (video && isVideoPlaying(video)) {
         video.playbackRate = 3
         video.dataset.longPress = 'true'
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            action: 'showToast',
+            payload: '3倍速播放',
+          }),
+        )
       }
     }, 1200)
     const touch = event.touches[0]

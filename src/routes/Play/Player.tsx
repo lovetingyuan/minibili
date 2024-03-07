@@ -14,7 +14,7 @@ import {
 } from 'react-native'
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 
-import { usePlayUrl } from '@/api/get-playurl'
+import { usePlayUrl, useVideoDownloadUrl } from '@/api/get-playurl'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
 import type { RootStackParamList } from '@/types'
@@ -45,27 +45,46 @@ function Player(props: { currentPage: number }) {
   }
   const isWifi = getIsWiFi()
   const durl = usePlayUrl(videoInfo.bvid, videoInfo.cid)
+  // const [webviewKey, setWebViewKey] = React.useState(videoInfo.bvid)
+  const videoUrl = durl?.[0]?.backup_url?.[0] || durl?.[0]?.url
+  const downloadVideoUrl = useVideoDownloadUrl(videoInfo.bvid, videoInfo.cid)
+
   // const durl = usePlayUrl('BV1SZ421y7Ae', '1460675026')
   React.useEffect(() => {
     if (!isWifi) {
       return
     }
-    const videoUrl = durl?.[0]?.backup_url?.[0] || durl?.[0]?.url
     if (videoUrl) {
       webviewRef.current?.injectJavaScript(`
         ;(function() {
           const video = document.querySelector('video')
+          const videoUrl = "${videoUrl}"
           if (video) {
+            video.dataset.replaced = 'true'
             video.pause();
-            video.src = "${videoUrl}";
+             // alert(video.outerHTML)
+            video.dataset.originUrl = video.src
+           // video.src = video.src.replace('qn=32', 'qn=64')
+           video.src = videoUrl
             video.load();
-            video.play(true);
+            video.play();
+          }
+        })();
+        true;
+      `)
+    } else if (durl) {
+      webviewRef.current?.injectJavaScript(`
+        ;(function() {
+          const video = document.querySelector('video')
+          if (video) {
+            video.dataset.replaced = 'true'
+            video.play();
           }
         })();
         true;
       `)
     }
-  }, [durl, isWifi])
+  }, [durl, videoUrl, isWifi])
 
   useAppState(currentAppState => {
     if (
@@ -118,8 +137,14 @@ function Player(props: { currentPage: number }) {
       if (eventData.action === 'change-video-height') {
         setVerticalScale(eventData.payload === 'up' ? 0.4 : 0.7)
       }
-      if (eventData.action === 'downloadVideo') {
-        Linking.openURL(eventData.payload)
+      if (eventData.action === 'downloadVideo' && downloadVideoUrl) {
+        Linking.openURL(downloadVideoUrl)
+      }
+      if (eventData.action === 'reload') {
+        // TODO:
+      }
+      if (eventData.action === 'showToast') {
+        showToast(eventData.payload)
       }
       if (eventData.action === 'console.log') {
         // eslint-disable-next-line no-console
@@ -181,16 +206,16 @@ function Player(props: { currentPage: number }) {
       allowsInlineMediaPlayback
       startInLoadingState
       userAgent={UA}
-      key={videoInfo.bvid}
+      // key={videoInfo.bvid}
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
       injectedJavaScriptBeforeContentLoaded={`
-       const rawPlay = HTMLMediaElement.prototype.play
-       HTMLMediaElement.prototype.play = function(v) {
-        if (v) {
-          return rawPlay.call(this)
+       const __rawPlay = HTMLMediaElement.prototype.play
+       HTMLMediaElement.prototype.play = function play() {
+        if (!this.dataset.replaced) {
+          return Promise.resolve()
         }
-        return Promise.resolve()
+        return __rawPlay.call(this)
        }
        true;
       `}

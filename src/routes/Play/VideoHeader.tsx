@@ -34,7 +34,7 @@ function VideoHeader() {
   const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid!)
   return (
     <View className="items-center flex-wrap justify-between flex-1 shrink-0 gap-3">
-      <View className="flex-1 justify-between flex-row w-full ">
+      <View className="flex-1 justify-between flex-row w-full">
         <Pressable
           onPress={() => {
             if (!mid || !face || !name) {
@@ -48,7 +48,7 @@ function VideoHeader() {
             }
             navigation.push('Dynamic', { user })
           }}
-          className="flex-row items-center justify-between mr-1 shrink-0">
+          className="flex-row flex-1 items-center mr-2">
           <Avatar
             size={34}
             rounded
@@ -62,17 +62,17 @@ function VideoHeader() {
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"
-            className="ml-3 mr-1 text-base grow font-bold">
-            {name ? name + ' ' : ' '}
+            className="ml-3 grow text-base font-bold">
+            {name ? name + '  ' : ' '}
           </Text>
         </Pressable>
-        <View className="flex-row items-center gap-1 mr-2">
+        <View className="flex-row items-center gap-1 px-2 flex-none">
           <Icon name="date-range" size={16} />
           <Text className="text-sm">{parseDate(date, true)}</Text>
           {watchingCount ? (
             <Text className="text-sm ml-1">
-              {watchingCount.total === '1' ? '壹' : watchingCount.total + '人'}
-              在看
+              {watchingCount.total === '1' ? '壹' : watchingCount.total}
+              人在看
             </Text>
           ) : null}
         </View>
