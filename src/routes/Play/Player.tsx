@@ -46,7 +46,8 @@ function Player(props: { currentPage: number }) {
   const isWifi = getIsWiFi()
   const durl = usePlayUrl(videoInfo.bvid, videoInfo.cid)
   // const [webviewKey, setWebViewKey] = React.useState(videoInfo.bvid)
-  const videoUrl = durl?.[0]?.backup_url?.[0] || durl?.[0]?.url
+  const videoUrl = durl ? durl[0]?.backup_url?.[0] || durl[0]?.url || '' : null
+
   const downloadVideoUrl = useVideoDownloadUrl(videoInfo.bvid, videoInfo.cid)
 
   // const durl = usePlayUrl('BV1SZ421y7Ae', '1460675026')
@@ -54,37 +55,44 @@ function Player(props: { currentPage: number }) {
     if (!isWifi) {
       return
     }
+    if (videoUrl === null) {
+      return
+    }
+    // console.log(333, videoUrl)
     if (videoUrl) {
       webviewRef.current?.injectJavaScript(`
         ;(function() {
           const video = document.querySelector('video')
           const videoUrl = "${videoUrl}"
-          if (video) {
+          if (video && video.src !== videoUrl) {
             video.dataset.replaced = 'true'
             video.pause();
-             // alert(video.outerHTML)
+            // alert(video.outerHTML)
             video.dataset.originUrl = video.src
-           // video.src = video.src.replace('qn=32', 'qn=64')
-           video.src = videoUrl
+            // video.src = video.src.replace('qn=32', 'qn=64')
+            video.src = videoUrl
             video.load();
+            video.muted = false;
             video.play();
+            // alert(video.muted)
           }
         })();
         true;
       `)
-    } else if (durl) {
+    } else {
       webviewRef.current?.injectJavaScript(`
         ;(function() {
           const video = document.querySelector('video')
           if (video) {
             video.dataset.replaced = 'true'
+            video.muted = false;
             video.play();
           }
         })();
         true;
       `)
     }
-  }, [durl, videoUrl, isWifi])
+  }, [videoUrl, isWifi])
 
   useAppState(currentAppState => {
     if (

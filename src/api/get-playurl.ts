@@ -29,6 +29,9 @@ export function usePlayUrl(
 
   const { data } = useSWR<Res>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
+    {
+      dedupingInterval: 2 * 60 * 1000 * 1000 - 60 * 1000,
+    },
   )
   return data?.durl
 }
@@ -53,6 +56,9 @@ export function useVideoDownloadUrl(bvid: string, cid?: string | number) {
 
   const { data } = useSWR<Res>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
+    {
+      dedupingInterval: 2 * 60 * 1000 * 1000,
+    },
   )
   return data?.durl?.[0]?.url
 }

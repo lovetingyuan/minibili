@@ -3,13 +3,15 @@ function __$hack() {
     if (typeof selectors === 'string') {
       selectors = [selectors]
     }
-    const timer = setInterval(() => {
+    const fn = () => {
       const doms = selectors.map(s => document.querySelector(s)).filter(Boolean)
       if (doms.length === selectors.length) {
         clearInterval(timer)
         callback(...doms)
       }
-    }, 200)
+    }
+    const timer = setInterval(fn, 200)
+    fn()
     setTimeout(() => {
       clearInterval(timer)
     }, 10000)
@@ -56,6 +58,14 @@ function __$hack() {
       })
     })
     postPlayState(video.paused ? 'pause' : 'play')
+    // if (video.muted) {
+    //   alert('muted')
+    // }
+    // setTimeout(() => {
+    //   if (video.muted) {
+    //     alert('muted22')
+    //   }
+    // }, 2000)
     if (video.muted && !document.getElementById('muted-toggle')) {
       const div = document.createElement('div')
       div.id = 'muted-toggle'
