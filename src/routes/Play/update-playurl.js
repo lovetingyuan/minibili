@@ -1,20 +1,13 @@
 function __$hack() {
   let requestId
-  // const rawPlay = HTMLMediaElement.prototype.play
-  // window.aa = new Set()
-  // setTimeout(() => {
-  //   alert([...aa].length)
-  // }, 10000)
-  // HTMLMediaElement.prototype.play = function () {
-  //   // alert(this.src)
-  //   aa.add(this)
-
-  //   return rawPlay.call(this)
-  // }
   function executeMethod() {
     const video = document.querySelector('video')
     const videoUrl = window.__newVideoUrl
     if (video) {
+      video.addEventListener('loadedmetadata', function () {
+        video.muted = false
+        video.play()
+      })
       video.pause()
       video.autoplay = false
     }
@@ -29,10 +22,10 @@ function __$hack() {
       // video.src = video.src.replace('qn=32', 'qn=64')
       video.src = videoUrl
       video.load()
-      // setTimeout(() => {
-      video.muted = false
-      video.play()
-      // }, 100)
+      setTimeout(() => {
+        video.muted = false
+        video.play()
+      }, 10)
       return
     }
     requestId = requestAnimationFrame(executeMethod)

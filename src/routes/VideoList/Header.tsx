@@ -17,7 +17,7 @@ import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import type { NavigationProps, PromiseResult } from '../../types'
 
-function NewVersionTip() {
+function HeaderTitleComp() {
   const [newVersion, setNewVersion] = React.useState<PromiseResult<
     ReturnType<typeof checkUpdate>
   > | null>(null)
@@ -53,6 +53,7 @@ function NewVersionTip() {
     <Button
       type="clear"
       size="sm"
+      buttonStyle={tw('mx-2')}
       titleStyle={tw(`text-sm ${colors.primary.text}`)}
       onPress={() => {
         Linking.openURL(newVersion.downloadLink)
@@ -78,7 +79,7 @@ function splitArrayIntoChunks(arr: any[]) {
   return result
 }
 
-function HeaderTitleComp() {
+function HeaderLeftComp() {
   const { currentVideosCate, $videoCatesList, setCurrentVideosCate } =
     useStore()
 
@@ -151,13 +152,12 @@ function HeaderTitleComp() {
           })}
         </ScrollView>
       </Menu>
-      <NewVersionTip />
     </View>
   )
 }
 
+const HeaderLeft = React.memo(HeaderLeftComp)
 const HeaderTitle = React.memo(HeaderTitleComp)
-
 const HeaderRight = React.memo(HeaderRightComp)
 
 function HeaderRightComp() {
@@ -188,5 +188,6 @@ function HeaderRightComp() {
   )
 }
 
-export const videoListHeaderTitle = () => <HeaderTitle />
+export const videoListHeaderLeft = () => <HeaderLeft />
 export const videoListHeaderRight = () => <HeaderRight />
+export const videoListHeaderTitle = () => <HeaderTitle />

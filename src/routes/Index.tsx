@@ -24,7 +24,11 @@ import Follow from './Follow'
 import { followHeaderRight, followHeaderTitle } from './Follow/Header'
 import Play from './Play'
 import VideoList from './VideoList'
-import { videoListHeaderRight, videoListHeaderTitle } from './VideoList/Header'
+import {
+  videoListHeaderLeft,
+  videoListHeaderRight,
+  videoListHeaderTitle,
+} from './VideoList/Header'
 import WebPage from './WebPage'
 import Welcome from './Welcome'
 
@@ -42,10 +46,12 @@ function Route() {
     },
     [],
   )
+  const blackColor = tw(colors.black.text).color
   const videosOptions = React.useMemo<NativeStackNavigationOptions>(() => {
     return {
-      headerTitle: videoListHeaderTitle,
+      headerLeft: videoListHeaderLeft,
       headerTitleAlign: 'left',
+      headerTitle: videoListHeaderTitle,
       headerRight: videoListHeaderRight,
       headerShown: true,
       headerStyle: {
@@ -55,8 +61,23 @@ function Route() {
         shadowRadius: 2,
         elevation: 3, // 仅在 Android 平台上需要设置
       } as any,
+      headerSearchBarOptions: undefined && {
+        placeholder: '搜索视频',
+        headerIconColor: blackColor,
+        hintTextColor: blackColor,
+        textColor: blackColor,
+        tintColor: blackColor,
+        // barTintColor: blackColor,
+        shouldShowHintSearchIcon: false,
+        onSearchButtonPress: ({ nativeEvent: { text } }) => {
+          const keyword = text.trim()
+          if (!keyword) {
+            return
+          }
+        },
+      },
     }
-  }, [])
+  }, [blackColor])
   const welcomeOptions = React.useMemo(() => {
     return {
       headerTitle: '欢迎使用 MiniBili',

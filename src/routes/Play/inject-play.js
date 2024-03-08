@@ -78,11 +78,17 @@ function __$hack() {
       `
       document.body.appendChild(div)
     }
+    let timer = null
     video.addEventListener('volumechange', function () {
-      const mutedBtn = document.getElementById('muted-toggle')
-      if (video.muted) {
-        mutedBtn.style.display = 'block'
-      }
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        const mutedBtn = document.getElementById('muted-toggle')
+        if (video.muted) {
+          mutedBtn.style.display = 'block'
+        } else {
+          mutedBtn.style.display = 'none'
+        }
+      }, 500)
     })
   })
   waitForDom(['video', '.mplayer-right'], (video, right) => {

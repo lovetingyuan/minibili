@@ -50,7 +50,7 @@ function VideoHeader() {
           }}
           className="flex-row flex-1 items-center mr-2">
           <Avatar
-            size={34}
+            size={40}
             rounded
             source={{
               uri: face

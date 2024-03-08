@@ -38,17 +38,17 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
     }
   }
   const level = dynamicUser?.level ? 'ᴸⱽ' + levelList[dynamicUser.level] : ''
-  const userName = dynamicUser?.name ? dynamicUser.name + level : ''
+  const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   const { _followedUpsMap, setCheckLiveTimeStamp } = useStore()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   return (
-    <View className="flex-row items-center mr-28 left-[-12px] relative">
+    <View className="flex-row flex-none items-center mr-[110px] left-[-12px]">
       {dynamicUser?.face ? (
         <View className="relative">
           <Avatar
-            size={33}
+            size={38}
             rounded
             onPress={gotoWebPage}
             ImageComponent={Image}
@@ -57,7 +57,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             }}
           />
           {sex ? (
-            <Text className="text-xs opacity-80 absolute top-0 right-[-8px]">
+            <Text className="text-xs opacity-80 absolute top-1 right-[-8px]">
               {sex}
             </Text>
           ) : null}
@@ -65,37 +65,27 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
       ) : null}
 
       <Text
-        className="ml-3 text-lg relative top-[2px] leading-5 align-middle"
+        className="flex-1 ml-3 text-lg relative top-[2px] leading-5 align-middle"
         adjustsFontSizeToFit
         numberOfLines={2}>
         <Text
+          className={followed ? colors.secondary.text : ''}
           onPress={() => {
             props.scrollTop()
           }}>
-          {userName + '   '}
+          {userName}
         </Text>
+        <Text className="text-sm">{level}</Text>
         {fans ? (
           <Text
             className="text-sm text-gray-500 dark:text-gray-400"
             onPress={() => {
               showToast(`粉丝：${fans.follower}`)
             }}>
-            {parseNumber(fans.follower)}粉丝
+            {'  '} {parseNumber(fans.follower)}粉丝
           </Text>
         ) : null}
       </Text>
-      {followed ? (
-        <Icon
-          size={15}
-          name="checkbox-marked-circle-outline"
-          type="material-community"
-          className="relative top-[1px] ml-2"
-          onPress={() => {
-            showToast('已关注')
-          }}
-          color={tw(colors.secondary.text).color}
-        />
-      ) : null}
       {dynamicUser.mid && livingUrl ? (
         <Button
           size="sm"
