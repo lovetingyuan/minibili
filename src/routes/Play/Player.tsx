@@ -25,6 +25,7 @@ import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import { imgUrl, parseDuration, showToast } from '../../utils'
 import { INJECTED_JAVASCRIPT } from './inject-play'
+import { UPDATE_URL_CODE } from './update-playurl'
 
 export default React.memo(Player)
 
@@ -52,7 +53,7 @@ function Player(props: { currentPage: number }) {
 
   // const durl = usePlayUrl('BV1SZ421y7Ae', '1460675026')
   React.useEffect(() => {
-    if (!isWifi) {
+    if (!getIsWiFi()) {
       return
     }
     if (videoUrl === null) {
@@ -61,38 +62,24 @@ function Player(props: { currentPage: number }) {
     // console.log(333, videoUrl)
     if (videoUrl) {
       webviewRef.current?.injectJavaScript(`
-        ;(function() {
-          const video = document.querySelector('video')
-          const videoUrl = "${videoUrl}"
-          if (video && video.src !== videoUrl) {
-            video.dataset.replaced = 'true'
-            video.pause();
-            // alert(video.outerHTML)
-            video.dataset.originUrl = video.src
-            // video.src = video.src.replace('qn=32', 'qn=64')
-            video.src = videoUrl
-            video.load();
-            video.muted = false;
-            video.play();
-            // alert(video.muted)
-          }
-        })();
-        true;
-      `)
-    } else {
-      webviewRef.current?.injectJavaScript(`
-        ;(function() {
-          const video = document.querySelector('video')
-          if (video) {
-            video.dataset.replaced = 'true'
-            video.muted = false;
-            video.play();
-          }
-        })();
-        true;
+      window.__newVideoUrl = "${videoUrl}";
+      true;
       `)
     }
-  }, [videoUrl, isWifi])
+    // else {
+    //   webviewRef.current?.injectJavaScript(`
+    //     ;(function() {
+    //       const video = document.querySelector('video')
+    //       if (video) {
+    //         video.dataset.replaced = 'true'
+    //         video.muted = false;
+    //         video.play();
+    //       }
+    //     })();
+    //     true;
+    //   `)
+    // }
+  }, [videoUrl, getIsWiFi])
 
   useAppState(currentAppState => {
     if (
@@ -217,16 +204,7 @@ function Player(props: { currentPage: number }) {
       // key={videoInfo.bvid}
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
-      injectedJavaScriptBeforeContentLoaded={`
-       const __rawPlay = HTMLMediaElement.prototype.play
-       HTMLMediaElement.prototype.play = function play() {
-        if (!this.dataset.replaced) {
-          return Promise.resolve()
-        }
-        return __rawPlay.call(this)
-       }
-       true;
-      `}
+      injectedJavaScriptBeforeContentLoaded={UPDATE_URL_CODE}
       renderLoading={renderLoading}
       onMessage={handleMessage}
       onLoad={() => {

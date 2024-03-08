@@ -58,15 +58,8 @@ function __$hack() {
       })
     })
     postPlayState(video.paused ? 'pause' : 'play')
-    // if (video.muted) {
-    //   alert('muted')
-    // }
-    // setTimeout(() => {
-    //   if (video.muted) {
-    //     alert('muted22')
-    //   }
-    // }, 2000)
-    if (video.muted && !document.getElementById('muted-toggle')) {
+
+    if (!document.getElementById('muted-toggle')) {
       const div = document.createElement('div')
       div.id = 'muted-toggle'
       div.style.cssText = `
@@ -77,6 +70,7 @@ function __$hack() {
       border-radius: 4px;
       padding: 2px 10px;
       border: 1px solid #555;
+      display: none;
       `
       div.innerHTML = `
       <span onclick="document.querySelector('video').muted=false;this.parentElement.style.display='none'" style="vertical-align: middle">取消静音</span>
@@ -84,6 +78,12 @@ function __$hack() {
       `
       document.body.appendChild(div)
     }
+    video.addEventListener('volumechange', function () {
+      const mutedBtn = document.getElementById('muted-toggle')
+      if (video.muted) {
+        mutedBtn.style.display = 'block'
+      }
+    })
   })
   waitForDom(['video', '.mplayer-right'], (video, right) => {
     if (!document.getElementById('download-button')) {
@@ -94,7 +94,7 @@ function __$hack() {
         width: 24px;
         height: 24px;
         color: white;
-        font-size: 28px;
+        font-size: 26px;
         line-height: 24px;
         text-align: center;
         background: rgba(0,0,0,.2);
