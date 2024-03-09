@@ -204,7 +204,7 @@ function Player(props: { currentPage: number }) {
       // key={videoInfo.bvid}
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
-      injectedJavaScriptBeforeContentLoaded={UPDATE_URL_CODE}
+      injectedJavaScriptBeforeContentLoaded={isWifi ? UPDATE_URL_CODE : 'true;'}
       renderLoading={renderLoading}
       onMessage={handleMessage}
       onLoad={() => {
