@@ -1,4 +1,20 @@
 function __$hack() {
+  function waitForVideo(callback) {
+    const video = document.querySelector('video')
+    if (video) {
+      callback(video)
+    } else {
+      document.addEventListener(
+        'loadstart',
+        evt => {
+          if (evt.target && evt.target.tagName === 'VIDEO') {
+            callback(evt.target)
+          }
+        },
+        true,
+      )
+    }
+  }
   function waitForDom(selectors, callback) {
     if (typeof selectors === 'string') {
       selectors = [selectors]
@@ -16,34 +32,20 @@ function __$hack() {
       clearInterval(timer)
     }, 10000)
   }
-  const xx = 'x'
-  waitForDom('.mplayer-display', dom => {
-    dom.addEventListener('dblclick', evt => {
-      if (evt.target.matches('.mplayer-right *')) {
-        return
-      }
-      const video = document.querySelector('video')
-      if (video && !video.paused) {
-        video.pause()
-      }
-    })
-  })
-  waitForDom('video', video => {
-    const postPlayState = state => {
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          action: 'playState',
-          payload: state,
-        }),
-      )
+  waitForVideo(video => {
+    if (video.__handled) {
+      return
     }
-    video.addEventListener('play', () => {
-      postPlayState('play')
-    })
+    video.__handled = true
     // eslint-disable-next-line no-array-constructor
-    Array('ended', 'pause', 'waiting').forEach(evt => {
+    Array('play', 'ended', 'pause', 'waiting', 'playing').forEach(evt => {
       video.addEventListener(evt, () => {
-        postPlayState(evt)
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            action: 'playState',
+            payload: evt,
+          }),
+        )
         if (evt === 'ended') {
           if (document.exitFullscreen) {
             document.exitFullscreen()
@@ -57,8 +59,6 @@ function __$hack() {
         }
       })
     })
-    postPlayState(video.paused ? 'pause' : 'play')
-
     if (!document.getElementById('muted-toggle')) {
       const div = document.createElement('div')
       div.id = 'muted-toggle'
@@ -91,7 +91,26 @@ function __$hack() {
       }, 500)
     })
   })
-  waitForDom(['video', '.mplayer-right'], (video, right) => {
+
+  const xx = 'x'
+  waitForDom('.mplayer-display', container => {
+    container.addEventListener('dblclick', evt => {
+      if (evt.target.matches('.mplayer-right *')) {
+        return
+      }
+      const video = document.querySelector('video')
+      if (!video) {
+        return
+      }
+      const paused = video.paused
+      if (paused) {
+        video.play()
+      } else {
+        video.pause()
+      }
+    })
+  })
+  waitForDom('.mplayer-right', right => {
     if (!document.getElementById('download-button')) {
       const downloadBtn = document.createElement('div')
       downloadBtn.id = 'download-button'
@@ -133,6 +152,10 @@ function __$hack() {
         margin-top: 12px;
       `
       rateBtn.addEventListener('click', () => {
+        const video = document.querySelector('video')
+        if (!video) {
+          return
+        }
         let rate = rateBtn.dataset.rate - 0
         if (rate === 1) {
           rate = 2
@@ -205,7 +228,7 @@ function __$hack() {
           }),
         )
       }
-    }, 1200)
+    }, 1000)
     const touch = event.touches[0]
     startX = touch.clientX
     startY = touch.clientY

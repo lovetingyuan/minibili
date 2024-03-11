@@ -35,6 +35,8 @@ export const getVideo = (item: HotVideoResponse) => {
     danmuNum: item.stat.danmaku,
     tag: item.tname,
     videosNum: item.videos,
+    width: item.dimension.width,
+    height: item.dimension.height,
   }
 }
 

@@ -29,13 +29,17 @@ import { UPDATE_URL_CODE } from './update-playurl'
 
 export default React.memo(Player)
 
+// const VerticalInitScale = 0.3
+// const getIsWiFi = () => false
+
 function Player(props: { currentPage: number }) {
   const { getIsWiFi } = useStore()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { width, height } = useWindowDimensions()
-  const [verticalScale, setVerticalScale] = React.useState(0)
-  const [extraHeight, setExtraHeight] = React.useState(0)
-  const playStateRef = React.useRef('')
+  // const [verticalScale, setVerticalScale] = React.useState(VerticalInitScale)
+  // const [extraHeight, setExtraHeight] = React.useState(0)
+  const [verticalExpand, setVerticalExpand] = React.useState(false)
+  // const playStateRef = React.useRef('')
   const { data } = useVideoInfo(route.params.bvid)
   const [loadPlayer, setLoadPlayer] = React.useState(getIsWiFi())
   const loadingErrorRef = React.useRef(false)
@@ -45,9 +49,13 @@ function Player(props: { currentPage: number }) {
     ...route.params,
   }
   const isWifi = getIsWiFi()
-  const durl = usePlayUrl(videoInfo.bvid, videoInfo.cid)
+  const durl = usePlayUrl(
+    isWifi ? videoInfo.bvid : '',
+    isWifi ? videoInfo.cid : '',
+  )
   // const [webviewKey, setWebViewKey] = React.useState(videoInfo.bvid)
   const videoUrl = durl ? durl[0]?.backup_url?.[0] || durl[0]?.url || '' : null
+  const [playState, setPlayState] = React.useState('init')
 
   const downloadVideoUrl = useVideoDownloadUrl(videoInfo.bvid, videoInfo.cid)
 
@@ -62,7 +70,7 @@ function Player(props: { currentPage: number }) {
     // console.log(333, videoUrl)
     if (videoUrl) {
       webviewRef.current?.injectJavaScript(`
-      window.__newVideoUrl = "${videoUrl}";
+      window.setNewVideoUrl("${videoUrl}")
       true;
       `)
     }
@@ -101,6 +109,21 @@ function Player(props: { currentPage: number }) {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
+  React.useEffect(() => {
+    if (playState === 'ended' || playState === 'pause') {
+      KeepAwake.activateKeepAwakeAsync('PLAY')
+    } else {
+      KeepAwake.deactivateKeepAwake('PLAY')
+    }
+    // if (eventData.payload === 'ended') {
+    //   setExtraHeight(0)
+    //   setVerticalScale(VerticalInitScale)
+    // } else {
+    //   setExtraHeight(26)
+    // }
+    // if (eventData.payload === 'play' || eventData.payload === 'playing') {
+    // }
+  }, [playState])
 
   let videoWidth = 0
   let videoHeight = 0
@@ -109,28 +132,36 @@ function Player(props: { currentPage: number }) {
     videoHeight = videoInfo.height
   }
   const isVerticalVideo = videoWidth < videoHeight
-
+  let videoViewHeight = width * 0.6
+  if (!loadPlayer) {
+    videoViewHeight = width * 0.5
+  } else if (videoWidth && videoHeight) {
+    if (playState === 'ended') {
+      videoViewHeight = isVerticalVideo
+        ? (width * videoWidth) / videoHeight
+        : (videoHeight / videoWidth) * width
+    } else {
+      if (isVerticalVideo) {
+        videoViewHeight = verticalExpand ? height * 0.66 : height * 0.33
+      } else {
+        videoViewHeight = (videoHeight / videoWidth) * width + 26
+      }
+    }
+  }
   const handleMessage = (evt: WebViewMessageEvent) => {
     try {
       const eventData = JSON.parse(evt.nativeEvent.data) as any
       if (eventData.action === 'playState') {
-        playStateRef.current = eventData.action
-        if (eventData.payload === 'play') {
-          KeepAwake.activateKeepAwakeAsync('PLAY')
-          setExtraHeight(26)
-          if (isVerticalVideo && !verticalScale) {
-            setVerticalScale(0.4)
-          }
-        } else {
-          KeepAwake.deactivateKeepAwake('PLAY')
-          if (eventData.payload === 'ended') {
-            setExtraHeight(0)
-            setVerticalScale(0)
-          }
+        setPlayState(eventData.payload)
+        if (eventData.payload === 'ended') {
+          setVerticalExpand(false)
         }
+        // 'play', 'ended', 'pause', 'waiting', 'playing'
       }
       if (eventData.action === 'change-video-height') {
-        setVerticalScale(eventData.payload === 'up' ? 0.4 : 0.7)
+        if (playState !== 'ended') {
+          setVerticalExpand(eventData.payload === 'down')
+        }
       }
       if (eventData.action === 'downloadVideo' && downloadVideoUrl) {
         Linking.openURL(downloadVideoUrl)
@@ -146,20 +177,6 @@ function Player(props: { currentPage: number }) {
         __DEV__ && console.log('message', eventData.payload)
       }
     } catch (e) {}
-  }
-
-  let videoViewHeight = width * 0.5
-  if (videoWidth && videoHeight) {
-    if (isVerticalVideo && verticalScale) {
-      videoViewHeight = verticalScale * height
-    } else {
-      videoViewHeight =
-        (isVerticalVideo
-          ? videoWidth / videoHeight
-          : videoHeight / videoWidth) *
-          width +
-        extraHeight
-    }
   }
   const renderLoading = () => (
     <View className="absolute items-center w-full h-full">
@@ -186,6 +203,7 @@ function Player(props: { currentPage: number }) {
     portraitFullScreen: true,
     high_quality: isWifi ? 1 : 0,
     page: props.currentPage,
+    autoplay: isWifi ? '0' : '1',
   }).forEach(([k, v]) => {
     search.append(k, v + '')
   })
@@ -231,6 +249,7 @@ function Player(props: { currentPage: number }) {
       renderToHardwareTextureAndroid
       className="w-full shrink-0"
       style={{ height: videoViewHeight }}>
+      {/* <Text>playstate: {playState}</Text> */}
       {loadPlayer ? (
         webview
       ) : (
