@@ -305,11 +305,17 @@ function wuzhi(now: number, buvid3: string, uuid: string) {
   )
 }
 
+let cookie = ''
+
 export async function getCookie() {
+  if (cookie) {
+    return cookie
+  }
   const buvid3 = (await getbuvid3()) || getuuid(Date.now())
   const now = Date.now()
   const uuid = getuuid(now)
   const buvid4 = await getbuvid4(buvid3, uuid)
   await wuzhi(now, buvid3, uuid)
-  return `${buvid3}; _uuid=${uuid}; buvid4=${buvid4}`
+  cookie = `${buvid3}; _uuid=${uuid}; buvid4=${buvid4}`
+  return cookie
 }

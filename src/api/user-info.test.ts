@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 
-import fetcher from './fetcher-test'
+import fetcher from './fetcher'
 import {
   UserBatchInfoResponseSchema,
   UserCardInfoResponseSchema,
@@ -8,16 +8,12 @@ import {
 } from './user-info.schema'
 
 test('user-info', async () => {
-  const res = await fetcher(
-    'https://api.bilibili.com/x/space/wbi/acc/info?mid=1458143131',
-  )
+  const res = await fetcher('/x/space/wbi/acc/info?mid=3493117728656046')
   UserInfoResponseSchema.parse(res)
 })
 
 test('user-card-info', async () => {
-  const res = await fetcher(
-    'https://api.bilibili.com/x/web-interface/card?mid=1458143131',
-  )
+  const res = await fetcher('/x/web-interface/card?mid=1458143131')
   UserCardInfoResponseSchema.parse(res)
 })
 

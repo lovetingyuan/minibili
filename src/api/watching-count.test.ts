@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 
-import fetcher from './fetcher-test'
+import fetcher from './fetcher'
 import { WatchingCountResponseSchema } from './watching-count.schema'
 
 test('video-watching-count', async () => {

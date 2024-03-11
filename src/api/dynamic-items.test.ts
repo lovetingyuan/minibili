@@ -1,17 +1,15 @@
 import { test } from 'vitest'
 
 import { DynamicListResponseSchema } from './dynamic-items.schema'
-import fetcher from './fetcher-test'
+import fetcher from './fetcher'
 
 test('dynamic-list', async () => {
-  const { list } = (await fetcher(
-    'https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1',
-  )) as any
+  const { list } = (await fetcher('/x/web-interface/popular?ps=20&pn=1')) as any
   const mids = list.map((v: any) => v.owner.mid).concat([1458143131])
   const failedList: string[] = []
   const list352: string[] = []
   for (const mid of mids) {
-    const url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
+    const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
     const res = await fetcher<any>(url).catch(() => null)
     if (!res) {
       list352.push('null-' + mid)
@@ -24,7 +22,7 @@ test('dynamic-list', async () => {
       }
       if (res.has_more) {
         const res2 = await fetcher<any>(
-          `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=${res.offset}&host_mid=${mid}&timezone_offset=-480`,
+          `/x/polymer/web-dynamic/v1/feed/space?offset=${res.offset}&host_mid=${mid}&timezone_offset=-480`,
         ).catch(() => null)
         if (!res2) {
           list352.push('null2-' + mid)

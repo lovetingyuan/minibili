@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import fetcher from './fetcher-test'
+import fetcher from './fetcher'
 import { LiveInfoBatchItemSchema } from './living-info.schema'
 
 describe('living-info', () => {

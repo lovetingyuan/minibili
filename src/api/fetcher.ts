@@ -4,34 +4,36 @@ import { UA } from '../constants'
 import dm from '../constants/dm'
 import encWbi from '../utils/wbi'
 import { getCookie } from './get-cookie'
-import getSetWbiImg from './get-set-user-nav'
+import { getWBIInfo } from './get-user-nav'
 
-type Res<D = any> = {
+type ResponseType<D = any> = {
   code: number
   message: string
   data: D
 }
 
 export class ApiError extends Error {
-  response: Res
+  response: ResponseType
   url: string
-  constructor(message: string, url: string, res: Res) {
+  constructor(message: string, url: string, res: ResponseType) {
     super(message)
     this.name = 'API Error'
     this.response = res
     this.url = url
   }
 }
-let cookie = ''
-
-getCookie().then(c => {
-  cookie = c
-})
 
 const root = protobuf.Root.fromJSON(dm as any)
 const lp = root.lookupType('DmSegMobileReply')
 
-export default async function request<D extends any>(url: string) {
+if (typeof __DEV__ === 'undefined') {
+  try {
+    // @ts-ignore
+    globalThis.__DEV__ = false
+  } catch (e) {}
+}
+
+export default async function request<D extends any>(url: string): Promise<D> {
   let requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url
@@ -45,7 +47,7 @@ export default async function request<D extends any>(url: string) {
     // 'sec-fetch-mode': 'cors',
     // 'sec-fetch-site': 'same-site',
     // Cookie: '',
-    cookie,
+    cookie: await getCookie(),
     origin: 'https://www.bilibili.com',
     'user-agent': UA, // 'user-agent': 'Mozilla/5.0',
   }
@@ -64,8 +66,9 @@ export default async function request<D extends any>(url: string) {
     // @ts-ignore
     options.credentials = 'omit'
   }
+
   if (url.includes('/wbi/')) {
-    const wbiImg = await getSetWbiImg()
+    const wbiImg = await getWBIInfo()
     const [_url, _query] = requestUrl.split('?')
     const params = new URLSearchParams(_query)
     const queryParams: Record<string, string> = {}
@@ -73,7 +76,7 @@ export default async function request<D extends any>(url: string) {
     for (const [key, value] of params.entries()) {
       queryParams[key] = value
     }
-    const query = encWbi(queryParams, wbiImg.img_url, wbiImg.sub_url)
+    const query = encWbi(queryParams, wbiImg?.img_url, wbiImg?.sub_url)
     requestUrl = _url + '?' + query
   }
   if (url.includes('/dm/web/seg.so')) {
@@ -93,7 +96,6 @@ export default async function request<D extends any>(url: string) {
     return objects.elems
   }
   let resText = await fetch(requestUrl, options).then(r => r.text())
-
   const index = resText.indexOf('}{"code":')
   if (index > -1) {
     resText = resText.substring(index + 1)
@@ -102,7 +104,7 @@ export default async function request<D extends any>(url: string) {
     code: -1,
     message: '解析json失败:' + resText,
     data: resText,
-  } as Res<D>
+  } as ResponseType<D>
   try {
     if (url.includes('/x/v2/reply/wbi/main?')) {
       // oid这个属性是数字但是会溢出，所以这里处理成字符串
@@ -110,16 +112,16 @@ export default async function request<D extends any>(url: string) {
         return `"oid":"${num}","`
       })
     }
-    res = JSON.parse(resText) as Res<D>
+    res = JSON.parse(resText) as ResponseType<D>
   } catch (err) {}
-  if (url === '/x/web-interface/nav') {
-    return res.data
-  }
+  // if (url === '/x/web-interface/nav') {
+  //   return res.data
+  // }
   if (res.code) {
     // reportApiError(url, res)
 
     return Promise.reject(
-      new ApiError('未能获取当前数据' + (__DEV__ ? ' ' + url : ''), url, res),
+      new ApiError(res.code + ':' + res.message + url, url, res),
     )
   }
   return res.data

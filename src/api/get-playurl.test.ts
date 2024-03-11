@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 
-import request from './fetcher-test'
+import request from './fetcher'
 import { PlayUrlResponseSchema } from './get-playurl.schema'
 
 test('get-play-url', async () => {
@@ -14,7 +14,6 @@ test('get-play-url-2', async () => {
   const res = await request(
     '/x/player/wbi/playurl?bvid=BV1SZ421y7Ae&cid=1460675026&type=mp4&qn=64&platform=pc&high_quality=1',
   )
-  console.log(999, JSON.stringify(res, null, 2))
   PlayUrlResponseSchema.parse(res)
 })
 

@@ -1,23 +1,27 @@
 import useSWRImmutable from 'swr/immutable'
+import { z } from 'zod'
 
 import { useStore } from '../store'
-// import fetcher from './fetcher'
-// import { z } from 'zod'
 // import {
 //   UserBatchInfoResponseSchema,
 //   UserCardInfoResponseSchema,
 //   UserInfoResponseSchema,
 // } from './user-info.schema'
 import type { UpInfo } from '../types'
+import fetcher from './fetcher'
+import {
+  UserCardInfoResponseSchema,
+  UserInfoResponseSchema,
+} from './user-info.schema'
 
-// type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
+type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
 type UserInfo = UpInfo & {
   level: number
   sex: string
-  silence: 0 | 1
+  silence?: 0 | 1
 }
 
-// type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>
+type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>
 // type UserBatchInfoResponse = z.infer<typeof UserBatchInfoResponseSchema>
 
 // const getUserInfo1 = (mid: number | string): Promise<UserInfo> => {
@@ -85,6 +89,22 @@ export function useUserInfo(mid?: number | string) {
   const { get$followedUps, set$followedUps } = useStore()
   const { data } = useSWRImmutable<UserInfo | undefined>(
     mid ? `/x/space/wbi/acc/info?mid=${mid}` : null,
+    url => {
+      return fetcher<UserInfoResponse>(url).catch(() => {
+        return fetcher<UserCardInfoResponse>(
+          `/x/web-interface/card?mid=${mid}`,
+        ).then(userInfo => {
+          return {
+            face: userInfo.card.face,
+            name: userInfo.card.name,
+            sign: userInfo.card.sign,
+            mid: userInfo.card.mid.toString(),
+            level: userInfo.card.level_info.current_level,
+            sex: userInfo.card.sex,
+          }
+        })
+      })
+    },
     {
       onSuccess(_data) {
         if (!_data) {

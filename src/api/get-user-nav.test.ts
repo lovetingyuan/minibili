@@ -1,9 +1,9 @@
 import { test } from 'vitest'
 
-import request from './fetcher-test'
+import { getUserNav } from './get-user-nav'
 import ResSchema from './get-user-nav.schema'
 
 test('get-user-nav', async () => {
-  const res = await request('/x/web-interface/nav')
+  const res = await getUserNav()
   ResSchema.parse(res)
 })

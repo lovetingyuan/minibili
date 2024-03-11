@@ -1,7 +1,7 @@
 import { assert, test } from 'vitest'
 
 import encWbi from '../utils/wbi'
-import fetcher from './fetcher-test'
+import { simpleRequest } from './fetcher-lite'
 
 const querys = [
   ['oid', '750721856'],
@@ -16,9 +16,7 @@ const querys = [
 ]
 
 test('wbi-generate', async () => {
-  const data: any = await fetcher(
-    'https://api.bilibili.com/x/web-interface/nav',
-  )
+  const data: any = await simpleRequest('/x/web-interface/nav')
   const query = encWbi(
     querys.reduce((a, b) => {
       // @ts-ignore
