@@ -1,0 +1,62 @@
+import { z } from 'zod'
+
+export const SearchVideoItemSchema = z.object({
+  type: z.string(),
+  id: z.number(),
+  author: z.string(),
+  mid: z.number(),
+  typeid: z.string(),
+  typename: z.string(),
+  arcurl: z.string(),
+  aid: z.number(),
+  bvid: z.string(),
+  title: z.string(),
+  description: z.string(),
+  // arcrank: z.s
+  pic: z.string(),
+  play: z.number(),
+  video_review: z.number(),
+  favorites: z.number(),
+  tag: z.string(),
+  review: z.number(),
+  pubdate: z.number(),
+  senddate: z.number(),
+  duration: z.string(),
+  // badgepay: false,
+  // hit_columns: ['title'],
+  // view_type: '',
+  // is_pay: 0,
+  // is_union_video: 0,
+  // rec_tags: null,
+  // new_rec_tags: [],
+  // rank_score: 106065678,
+  like: z.number(),
+  upic: z.string(),
+  // corner: '',
+  cover: z.string(),
+  desc: z.string(),
+  url: z.string(),
+  // rec_reason: '',
+  danmaku: z.number(),
+  // biz_data: null,
+  // is_charge_video: 0,
+  // vt: 0,
+  // enable_vt: 0,
+  // vt_display: '',
+  subtitle: z.string(),
+  // episode_count_text: '',
+  // release_status: 0,
+  // is_intervene: 0,
+})
+
+export const SearchVideoResponseSchema = z.object({
+  // seid: z.string(),
+  page: z.number(),
+  pagesize: z.number(),
+  numResults: z.number(),
+  numPages: z.number(),
+  result: SearchVideoItemSchema.array().nullish(),
+})
+
+export type SearchVideoResponse = z.infer<typeof SearchVideoResponseSchema>
+export type SearchVideoItemType = z.infer<typeof SearchVideoItemSchema>

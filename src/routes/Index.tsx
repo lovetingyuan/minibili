@@ -22,8 +22,9 @@ import {
 } from './DynamicDetail/Header'
 import Follow from './Follow'
 import { followHeaderRight } from './Follow/Header'
-import SearchUps from './Follow/SearchUps'
 import Play from './Play'
+import SearchUps from './SearchUps'
+import SearchVideos from './SearchVideos'
 import VideoList from './VideoList'
 import {
   videoListHeaderLeft,
@@ -47,7 +48,7 @@ function Route() {
     },
     [],
   )
-  const blackColor = tw(colors.black.text).color
+  // const blackColor = tw(colors.black.text).color
   const videosOptions = React.useMemo<NativeStackNavigationOptions>(() => {
     return {
       headerLeft: videoListHeaderLeft,
@@ -62,23 +63,23 @@ function Route() {
         shadowRadius: 2,
         elevation: 3, // 仅在 Android 平台上需要设置
       } as any,
-      headerSearchBarOptions: undefined && {
-        placeholder: '搜索视频',
-        headerIconColor: blackColor,
-        hintTextColor: blackColor,
-        textColor: blackColor,
-        tintColor: blackColor,
-        // barTintColor: blackColor,
-        shouldShowHintSearchIcon: false,
-        onSearchButtonPress: ({ nativeEvent: { text } }) => {
-          const keyword = text.trim()
-          if (!keyword) {
-            return
-          }
-        },
-      },
+      // headerSearchBarOptions: undefined && {
+      //   placeholder: '搜索视频',
+      //   headerIconColor: blackColor,
+      //   hintTextColor: blackColor,
+      //   textColor: blackColor,
+      //   tintColor: blackColor,
+      //   // barTintColor: blackColor,
+      //   shouldShowHintSearchIcon: false,
+      //   onSearchButtonPress: ({ nativeEvent: { text } }) => {
+      //     const keyword = text.trim()
+      //     if (!keyword) {
+      //       return
+      //     }
+      //   },
+      // },
     }
-  }, [blackColor])
+  }, [])
   const welcomeOptions = React.useMemo(() => {
     return {
       headerTitle: '欢迎使用 MiniBili',
@@ -114,10 +115,16 @@ function Route() {
             options={videosOptions}
           />
           <Stack.Screen
+            name="SearchVideos"
+            component={SearchVideos}
+            options={{
+              headerTitle: '搜索视频',
+            }}
+          />
+          <Stack.Screen
             name="Follow"
             component={Follow}
             options={{
-              // headerTitle: followHeaderTitle,
               headerRight: followHeaderRight,
             }}
           />

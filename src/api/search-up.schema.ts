@@ -15,7 +15,7 @@ export const SearchUpItemSchema = z.object({
   room_id: z.number(),
 })
 
-export const SearchResponseSchema = z.object({
+export const SearchUpResponseSchema = z.object({
   // seid: z.string(),
   page: z.number(),
   pagesize: z.number(),
@@ -24,5 +24,5 @@ export const SearchResponseSchema = z.object({
   result: SearchUpItemSchema.array().nullish(),
 })
 
-export type SearchResponse = z.infer<typeof SearchResponseSchema>
+export type SearchResponse = z.infer<typeof SearchUpResponseSchema>
 export type SearchUpResType = z.infer<typeof SearchUpItemSchema>

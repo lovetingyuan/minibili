@@ -28,15 +28,12 @@ export const useSearchUps = (name: string) => {
   const isReachingEnd =
     !!data && (data[data.length - 1]?.result?.length ?? 0) < 50
   // const isRefreshing = isValidating && !!data && data.length === size
-  const list = data?.reduce(
-    (a, b) => {
-      if (b.result) {
-        return a.concat(b.result.map(getUpInfo))
-      }
-      return a
-    },
-    [] as ReturnType<typeof getUpInfo>[],
-  )
+  const list = data?.reduce((a, b) => {
+    if (b.result) {
+      return a.concat(b.result.map(getUpInfo))
+    }
+    return a
+  }, [] as SearchedUpType[])
   return {
     data: list,
     error,
@@ -52,7 +49,4 @@ export const useSearchUps = (name: string) => {
   }
 }
 
-export type SearchedUpType = Exclude<
-  ReturnType<typeof useSearchUps>['data'],
-  undefined
->[0]
+export type SearchedUpType = ReturnType<typeof getUpInfo>

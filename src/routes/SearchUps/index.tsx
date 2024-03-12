@@ -13,7 +13,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'SearchUps'>
 function SearchUps(props: Props) {
   const searchBarRef = React.useRef<SearchBarCommands | null>(null)
   const blackColor = tw(colors.black.text).color
-  const [searchingUpsKeyWord, setSearchingUpsKeyWord] = React.useState('')
+  const [searchKeyWord, setSearchKeyWord] = React.useState('')
 
   React.useEffect(() => {
     props.navigation.setOptions({
@@ -27,24 +27,24 @@ function SearchUps(props: Props) {
         disableBackButtonOverride: false,
         shouldShowHintSearchIcon: false,
         onClose: () => {
-          setSearchingUpsKeyWord('')
+          setSearchKeyWord('')
         },
         onSearchButtonPress: ({ nativeEvent: { text } }) => {
           const keyword = text.trim()
           if (!keyword) {
             return
           }
-          setSearchingUpsKeyWord(keyword)
+          setSearchKeyWord(keyword)
         },
       },
     })
 
     const unsubscribe = props.navigation.addListener('beforeRemove', () => {
-      setSearchingUpsKeyWord('')
+      setSearchKeyWord('')
     })
 
     return unsubscribe
-  }, [props.navigation, blackColor, setSearchingUpsKeyWord])
+  }, [props.navigation, blackColor, setSearchKeyWord])
 
   useMounted(() => {
     setTimeout(() => {
@@ -52,7 +52,7 @@ function SearchUps(props: Props) {
     }, 100)
   })
 
-  return <UpList keyword={searchingUpsKeyWord} />
+  return <UpList keyword={searchKeyWord} />
 }
 
 export default React.memo(SearchUps)

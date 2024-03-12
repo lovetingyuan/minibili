@@ -165,24 +165,36 @@ function HeaderRightComp() {
   const { _updatedCount, livingUps } = useStore()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
-    <View>
-      {_updatedCount ? (
-        <Badge
-          status="success"
-          value={_updatedCount}
-          badgeStyle={tw(
-            `h-4 absolute left-10 top-1 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`,
-          )}
-          textStyle={tw('text-[11px]')}
-        />
-      ) : null}
+    <View className="flex-row items-center gap-2">
+      <View className="relative">
+        {_updatedCount ? (
+          <Badge
+            status="success"
+            value={_updatedCount}
+            badgeStyle={tw(
+              `h-4 absolute left-10 top-1 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`,
+            )}
+            textStyle={tw('text-[11px]')}
+          />
+        ) : null}
+        <Button
+          type="clear"
+          size="sm"
+          titleStyle={tw('text-lg')}
+          onPress={() => {
+            navigation.navigate('Follow')
+          }}>
+          {' 关注 ' + (_updatedCount ? '  ' : '')}
+        </Button>
+      </View>
       <Button
+        radius={'sm'}
+        size="sm"
         type="clear"
-        titleStyle={tw('text-lg')}
         onPress={() => {
-          navigation.navigate('Follow')
+          navigation.navigate('SearchVideos')
         }}>
-        {' 关注 '}
+        <Icon name="search" color={tw(colors.gray7.text).color} size={24} />
       </Button>
     </View>
   )
