@@ -17,6 +17,7 @@ const assert = require('assert')
 const getBuildList = buildStr => {
   let buildListStr = buildStr.toString('utf8')
   buildListStr = buildListStr.substring(buildListStr.indexOf('['))
+  console.log(22, buildListStr)
   const list = JSON.parse(buildListStr)
   // BuildListSchema.parse(list)
   list.toString = () => buildListStr.trim()
