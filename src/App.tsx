@@ -17,6 +17,7 @@ import CheckUpUpdate from './components/CheckUpUpdate'
 import ErrorFallback from './components/ErrorFallback'
 import ImagesView from './components/ImagesView'
 import ShowRemoteConfig from './components/ShowRemoteConfig'
+import UserLocation from './components/UserLocation'
 import useRNETheme from './hooks/useRNETheme'
 import Route from './routes/Index'
 import {
@@ -99,6 +100,7 @@ export default function App() {
               <CheckLiveUps />
               <ButtonsOverlay />
               <ImagesView />
+              <UserLocation />
               <Route />
             </SWRConfig>
           </ThemeProvider>

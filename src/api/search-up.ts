@@ -5,7 +5,7 @@ import request from './fetcher'
 import type { SearchResponse } from './search-up.schema'
 
 export const useSearchUps = (name: string) => {
-  const { data, error, isValidating } = useSWR<SearchResponse>(
+  const { data, error, isValidating, isLoading } = useSWR<SearchResponse>(
     name
       ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=1&page_size=50&platform=pc&search_type=bili_user`
       : null,
@@ -25,6 +25,7 @@ export const useSearchUps = (name: string) => {
       }
     }),
     error,
+    isLoading,
     isValidating,
   }
 }

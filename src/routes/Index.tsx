@@ -22,6 +22,7 @@ import {
 } from './DynamicDetail/Header'
 import Follow from './Follow'
 import { followHeaderRight, followHeaderTitle } from './Follow/Header'
+import SearchUps from './Follow/SearchUps'
 import Play from './Play'
 import VideoList from './VideoList'
 import {
@@ -86,6 +87,7 @@ function Route() {
   const titleColor = tw(colors.gray8.text).color
   const screenOptions = React.useMemo<NativeStackNavigationOptions>(() => {
     return {
+      headerTransparent: false,
       headerTitleStyle: {
         fontSize: 18,
         color: titleColor,
@@ -117,6 +119,13 @@ function Route() {
             options={{
               headerTitle: followHeaderTitle,
               headerRight: followHeaderRight,
+            }}
+          />
+          <Stack.Screen
+            name="SearchUps"
+            component={SearchUps}
+            options={{
+              headerTitle: '搜索UP主',
             }}
           />
           <Stack.Screen

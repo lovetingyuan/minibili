@@ -1,6 +1,8 @@
 import * as SentryExpo from '@sentry/react-native'
 import Constants from 'expo-constants'
 
+import { Tags } from './utils/report'
+
 if (!__DEV__) {
   SentryExpo.init({
     dsn: Constants.expoConfig?.extra?.dsn,
@@ -19,4 +21,8 @@ if (!__DEV__) {
     //   }),
     // ],
   })
+  const gitHash = Constants.expoConfig?.extra?.gitHash
+  if (gitHash) {
+    SentryExpo.setTag(Tags.git_hash, gitHash)
+  }
 }

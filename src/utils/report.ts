@@ -2,7 +2,6 @@ import * as SentryExpo from '@sentry/react-native'
 
 import { HandledDynamicTypeEnum } from '../api/dynamic-items.type'
 import { ApiError } from '../api/fetcher'
-import getLocation from '../api/get-location'
 
 export enum Tags {
   user_name = 'user.name',
@@ -57,18 +56,6 @@ export function reportUserAction(action: Action, actionPayload: any = null) {
       action,
       actionPayload,
     },
-  })
-}
-
-export function reportUserOpenApp() {
-  if (__DEV__) {
-    return
-  }
-  getLocation().then(loc => {
-    const locationStr = [loc.country, loc.province, loc.city].join('/')
-    SentryExpo.setTag(Tags.user_location, locationStr)
-    SentryExpo.setContext('location', loc)
-    SentryExpo.captureMessage('Open app')
   })
 }
 

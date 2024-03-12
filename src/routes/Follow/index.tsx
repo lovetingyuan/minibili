@@ -12,7 +12,6 @@ import useIsDark from '../../hooks/useIsDark'
 import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import type { UpInfo } from '../../types'
-import AddFollow from './AddFollow'
 import FollowItem from './FollowItem'
 
 const tvL = require('../../../assets/tv-l.png')
@@ -37,9 +36,9 @@ function TvImg() {
   )
 }
 
-export default React.memo(Follow)
+export default React.memo(FollowList)
 
-function Follow() {
+function FollowList() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
   const { $followedUps, $upUpdateMap, livingUps } = useStore()
@@ -100,38 +99,35 @@ function Follow() {
     ]
 
     return (
-      <>
-        <View className="flex-1">
-          <FlatList
-            data={displayUps}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
-            onEndReachedThreshold={1}
-            persistentScrollbar
-            key={columns} // FlatList不支持直接更改columns
-            numColumns={columns}
-            ref={followListRef}
-            columnWrapperStyle={tw('px-3')}
-            contentContainerStyle={tw('pt-8')}
-            ListEmptyComponent={
-              <View>
-                <TvImg />
-                <Text className="text-center my-10 text-lg">
-                  暂无关注，请添加
-                </Text>
-              </View>
-            }
-            ListFooterComponent={
-              $followedUps.length ? (
-                <Text className="text-center pb-3 text-xs text-gray-500">
-                  到底了~
-                </Text>
-              ) : null
-            }
-          />
-        </View>
-        <AddFollow />
-      </>
+      <View className="flex-1">
+        <FlatList
+          data={displayUps}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
+          onEndReachedThreshold={1}
+          persistentScrollbar
+          key={columns} // FlatList不支持直接更改columns
+          numColumns={columns}
+          ref={followListRef}
+          columnWrapperStyle={tw('px-3')}
+          contentContainerStyle={tw('pt-8')}
+          ListEmptyComponent={
+            <View>
+              <TvImg />
+              <Text className="text-center my-10 text-lg">
+                暂无关注，请添加
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            $followedUps.length ? (
+              <Text className="text-center pb-3 text-xs text-gray-500">
+                到底了~
+              </Text>
+            ) : null
+          }
+        />
+      </View>
     )
   }, [$followedUps, $upUpdateMap, livingUps, columns, renderItem])
 

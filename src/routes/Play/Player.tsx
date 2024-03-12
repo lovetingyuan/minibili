@@ -201,9 +201,11 @@ function Player(props: { currentPage: number }) {
     bvid: route.params.bvid,
     quality: isWifi ? 64 : 32,
     portraitFullScreen: true,
-    high_quality: isWifi ? 1 : 0,
+    highQuality: isWifi ? 1 : 0,
     page: props.currentPage,
-    autoplay: isWifi ? '0' : '1',
+    autoplay: isWifi ? 0 : 1,
+    hasMuteButton: true,
+    // portraitFullScreen: 1,
   }).forEach(([k, v]) => {
     search.append(k, v + '')
   })

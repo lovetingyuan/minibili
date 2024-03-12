@@ -9,7 +9,7 @@ import { colors } from '@/constants/colors.tw'
 import { useStore } from '../../store'
 import type { NavigationProps } from '../../types'
 
-function HeaderTitle() {
+export function HeaderTitle() {
   const { $followedUps, _updatedCount } = useStore()
   const count = $followedUps.length
   return (
@@ -28,24 +28,35 @@ function HeaderTitle() {
 
 export const followHeaderTitle = () => <HeaderTitle />
 
-function HeaderRight() {
+export function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (
-    <Button
-      radius={'sm'}
-      type="clear"
-      onPress={() => {
-        navigation.navigate('About')
-      }}>
+    <View className="gap-4 flex-row items-center">
+      <Button
+        radius={'sm'}
+        type="clear"
+        onPress={() => {
+          navigation.navigate('About')
+        }}>
+        <Icon
+          name="snow"
+          type="ionicon"
+          size={20}
+          color={tw(colors.primary.text).color}
+        />
+      </Button>
       <Icon
-        name="snow"
-        type="ionicon"
-        size={20}
-        color={tw(colors.primary.text).color}
+        name="search"
+        size={24}
+        onPress={() => {
+          navigation.navigate('SearchUps')
+        }}
       />
-    </Button>
+    </View>
   )
 }
 
-export const followHeaderRight = () => <HeaderRight />
+export const followHeaderRight = () => {
+  return <HeaderRight />
+}
