@@ -1,3 +1,4 @@
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text } from '@rneui/themed'
 import React from 'react'
 import {
@@ -11,7 +12,7 @@ import {
 import useIsDark from '../../hooks/useIsDark'
 import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
-import type { UpInfo } from '../../types'
+import type { RootStackParamList, UpInfo } from '../../types'
 import FollowItem from './FollowItem'
 
 const tvL = require('../../../assets/tv-l.png')
@@ -38,15 +39,31 @@ function TvImg() {
 
 export default React.memo(FollowList)
 
-function FollowList() {
+type Props = NativeStackScreenProps<RootStackParamList, 'Follow'>
+
+function FollowList(props: Props) {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
-  const { $followedUps, $upUpdateMap, livingUps } = useStore()
+  const { $followedUps, _updatedCount, $upUpdateMap, livingUps } = useStore()
   const followListRef = React.useRef<FlatList | null>(null)
   const dark = useIsDark()
 
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
+  const count = $followedUps.length
+
+  React.useEffect(() => {
+    props.navigation.setOptions({
+      headerTitle:
+        '关注的UP' +
+        (count
+          ? _updatedCount
+            ? ` (${_updatedCount}/${count})`
+            : ` (${count})`
+          : ''),
+    })
+  }, [props.navigation, count, _updatedCount])
+
   const renderItem = React.useCallback(
     ({
       item,

@@ -10,7 +10,7 @@ import UpList from './UpList'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SearchUps'>
 
-export default function SearchUps(props: Props) {
+function SearchUps(props: Props) {
   const searchBarRef = React.useRef<SearchBarCommands | null>(null)
   const blackColor = tw(colors.black.text).color
   const [searchingUpsKeyWord, setSearchingUpsKeyWord] = React.useState('')
@@ -25,13 +25,8 @@ export default function SearchUps(props: Props) {
         textColor: blackColor,
         tintColor: blackColor,
         disableBackButtonOverride: false,
-        // barTintColor: blackColor,
         shouldShowHintSearchIcon: false,
-        onOpen: () => {
-          // setSearchingUps(true)
-        },
         onClose: () => {
-          // setSearchingUps(false)
           setSearchingUpsKeyWord('')
         },
         onSearchButtonPress: ({ nativeEvent: { text } }) => {
@@ -54,8 +49,10 @@ export default function SearchUps(props: Props) {
   useMounted(() => {
     setTimeout(() => {
       searchBarRef.current?.focus()
-    }, 200)
+    }, 100)
   })
 
   return <UpList keyword={searchingUpsKeyWord} />
 }
+
+export default React.memo(SearchUps)

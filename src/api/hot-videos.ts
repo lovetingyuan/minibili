@@ -1,17 +1,17 @@
 import useSWRInfinite from 'swr/infinite'
 import type { z } from 'zod'
 
-import fetcher from './fetcher'
+// import fetcher from './fetcher'
 import type { VideoItemResponseSchema } from './hot-videos.schema'
 
-const fetcher2 = (url: string) => {
-  // eslint-disable-next-line no-console
-  __DEV__ && console.log('fetch hot videos: ' + url)
+// const fetcher2 = (url: string) => {
+//   // eslint-disable-next-line no-console
+//   __DEV__ && console.log('fetch hot videos: ' + url)
 
-  return fetcher<{ list: HotVideoResponse[]; no_more: boolean }>(
-    url + '&_t=' + Date.now(),
-  )
-}
+//   return fetcher<{ list: HotVideoResponse[]; no_more: boolean }>(
+//     url + '&_t=' + Date.now(),
+//   )
+// }
 
 export type HotVideoResponse = z.infer<typeof VideoItemResponseSchema>
 
@@ -50,7 +50,7 @@ export function useHotVideos() {
       index => {
         return `/x/web-interface/popular?ps=30&pn=${index + 1}`
       },
-      fetcher2,
+      // fetcher2,
       {
         revalidateFirstPage: false,
         // revalidateAll: true,

@@ -91,16 +91,19 @@ function EmptyContent(props: { loading: boolean }) {
 }
 
 function UpList(props: { keyword: string }) {
-  // const { searchingUpsKeyWord } = useStore()
-  const { data: searchedUps, isLoading } = useSearchUps(props.keyword)
+  const {
+    data: searchedUps,
+    isLoading,
+    update,
+    isReachingEnd,
+    isValidating,
+  } = useSearchUps(props.keyword)
   const listRef = React.useRef<any>(null)
-  // const upList = []
   return (
     <FlashList
       ref={v => {
         listRef.current = v
       }}
-      // numColumns={2}
       data={searchedUps}
       keyExtractor={v => v.mid + ''}
       renderItem={({ item }: { item: SearchedUpType }) => {
@@ -109,11 +112,22 @@ function UpList(props: { keyword: string }) {
       persistentScrollbar
       estimatedItemSize={100}
       ListEmptyComponent={<EmptyContent loading={isLoading} />}
-      ListFooterComponent={null}
+      ListFooterComponent={
+        isValidating ? (
+          <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
+            加载中~
+          </Text>
+        ) : searchedUps?.length && isReachingEnd ? (
+          <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
+            暂无更多
+          </Text>
+        ) : null
+      }
       contentContainerStyle={tw('px-1 pt-6')}
       estimatedFirstItemOffset={80}
-      // {...refreshProps}
-      onEndReached={() => {}}
+      onEndReached={() => {
+        update()
+      }}
       onEndReachedThreshold={1}
     />
   )

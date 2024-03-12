@@ -25,3 +25,4 @@ export const SearchResponseSchema = z.object({
 })
 
 export type SearchResponse = z.infer<typeof SearchResponseSchema>
+export type SearchUpResType = z.infer<typeof SearchUpItemSchema>

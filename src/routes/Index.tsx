@@ -21,7 +21,7 @@ import {
   dynamicDetailHeaderTitle,
 } from './DynamicDetail/Header'
 import Follow from './Follow'
-import { followHeaderRight, followHeaderTitle } from './Follow/Header'
+import { followHeaderRight } from './Follow/Header'
 import SearchUps from './Follow/SearchUps'
 import Play from './Play'
 import VideoList from './VideoList'
@@ -117,7 +117,7 @@ function Route() {
             name="Follow"
             component={Follow}
             options={{
-              headerTitle: followHeaderTitle,
+              // headerTitle: followHeaderTitle,
               headerRight: followHeaderRight,
             }}
           />

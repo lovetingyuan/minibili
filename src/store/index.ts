@@ -60,8 +60,6 @@ export const getAppValue = () => {
     _updatedCount: 0,
     moreRepliesUrl: '',
     checkLiveTimeStamp: Date.now(),
-    searchingUps: false,
-    searchingUpsKeyWord: '',
   }
 }
 
