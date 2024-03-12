@@ -105,18 +105,18 @@ module.exports = {
     dsn: process.env.SENTRY_DSN,
     releaseName: release,
   },
-  hooks: {
-    postPublish: [
-      {
-        file: 'sentry-expo/upload-sourcemaps',
-        config: {
-          organization: process.env.SENTRY_ORG,
-          project: process.env.SENTRY_PROJECT,
-          // authToken: process.env.SENTRY_AUTH_TOKEN,
-        },
-      },
-    ],
-  },
+  // hooks: {
+  //   postPublish: [
+  //     {
+  //       file: 'sentry-expo/upload-sourcemaps',
+  //       config: {
+  //         organization: process.env.SENTRY_ORG,
+  //         project: process.env.SENTRY_PROJECT,
+  //         // authToken: process.env.SENTRY_AUTH_TOKEN,
+  //       },
+  //     },
+  //   ],
+  // },
   updates: {
     url: 'https://u.expo.dev/17ac07b9-df37-4b3a-9a31-50da2bb5d44c',
   },
