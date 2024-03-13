@@ -1,3 +1,4 @@
+import { useRefresh } from '@react-native-community/hooks'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import {
@@ -41,16 +42,15 @@ function WebPage({ route, navigation }: Props) {
   const isDark = useIsDark()
   const [height, setHeight] = React.useState(Dimensions.get('screen').height)
   const [isEnabled, setEnabled] = React.useState(true)
-  const [isRefreshing, setRefreshing] = React.useState(false)
-  const onRefresh = React.useCallback(() => {
-    if (webviewRef.current) {
-      setRefreshing(true)
-      webviewRef.current.reload()
-      setTimeout(() => {
-        setRefreshing(false)
-      }, 1000)
-    }
-  }, [])
+  const { isRefreshing, onRefresh } = useRefresh(
+    React.useCallback(() => {
+      return new Promise(r => {
+        webviewRef.current?.reload()
+        setTimeout(r, 1000)
+      })
+    }, []),
+  )
+
   React.useEffect(() => {
     const headerRight = () => {
       return <HeaderRight reload={onRefresh} />

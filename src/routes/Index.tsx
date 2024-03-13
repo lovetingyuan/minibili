@@ -13,7 +13,8 @@ import { useStore } from '../store'
 import type { RootStackParamList } from '../types'
 import { setScreenTag } from '../utils/report'
 import About from './About'
-import aboutHeaderRight from './About/headerRight'
+import { headerRight as aboutHeaderRight } from './About/Header'
+import Collect from './Collect'
 import Dynamic from './Dynamic'
 import DynamicDetail from './DynamicDetail'
 import {
@@ -48,7 +49,6 @@ function Route() {
     },
     [],
   )
-  // const blackColor = tw(colors.black.text).color
   const videosOptions = React.useMemo<NativeStackNavigationOptions>(() => {
     return {
       headerLeft: videoListHeaderLeft,
@@ -63,21 +63,6 @@ function Route() {
         shadowRadius: 2,
         elevation: 3, // 仅在 Android 平台上需要设置
       } as any,
-      // headerSearchBarOptions: undefined && {
-      //   placeholder: '搜索视频',
-      //   headerIconColor: blackColor,
-      //   hintTextColor: blackColor,
-      //   textColor: blackColor,
-      //   tintColor: blackColor,
-      //   // barTintColor: blackColor,
-      //   shouldShowHintSearchIcon: false,
-      //   onSearchButtonPress: ({ nativeEvent: { text } }) => {
-      //     const keyword = text.trim()
-      //     if (!keyword) {
-      //       return
-      //     }
-      //   },
-      // },
     }
   }, [])
   const welcomeOptions = React.useMemo(() => {
@@ -168,6 +153,7 @@ function Route() {
               headerRight: aboutHeaderRight,
             }}
           />
+          <Stack.Screen name="Collect" component={Collect} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

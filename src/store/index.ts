@@ -11,7 +11,7 @@ import {
 import { checkUpdate } from '../api/check-update'
 import { RanksConfig } from '../constants'
 import useMounted from '../hooks/useMounted'
-import type { UpInfo } from '../types'
+import type { CollectVideoInfo, UpInfo } from '../types'
 
 interface UpdateUpInfo {
   latestId: string
@@ -42,6 +42,7 @@ export const getAppValue = () => {
     $upUpdateMap: {} as Record<string, UpdateUpInfo>,
     $ignoredVersions: [] as string[],
     $videoCatesList: RanksConfig,
+    $collectedVideos: [] as CollectVideoInfo[],
     // -------------------------
     initialed: false,
     isWiFi: false,
@@ -58,6 +59,7 @@ export const getAppValue = () => {
     overlayButtons: [] as { text: string; onPress: () => void }[],
     _followedUpsMap: {} as Record<string, UpInfo>,
     _updatedCount: 0,
+    _collectedVideosMap: {} as Record<string, CollectVideoInfo>,
     moreRepliesUrl: '',
     checkLiveTimeStamp: Date.now(),
   }
@@ -98,6 +100,13 @@ export const onChange: ProviderOnChangeType<AppContextValueType> = (
       return item.latestId !== item.currentLatestId
     }).length
     ctx.set_updatedCount(count)
+  }
+  if (key === '$collectedVideos') {
+    const _map: Record<string, CollectVideoInfo> = {}
+    value.forEach(vi => {
+      _map[vi.bvid] = vi
+    })
+    ctx.set_collectedVideosMap(_map)
   }
   if (!ctx.getInitialed()) {
     return

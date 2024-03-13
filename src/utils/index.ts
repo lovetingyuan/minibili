@@ -192,3 +192,7 @@ export function imgUrl(url: string, size?: number, h = size) {
 export function openUrl(url: string) {
   Linking.openURL(url)
 }
+
+export function isDefined(v: any) {
+  return v !== null && v !== undefined
+}

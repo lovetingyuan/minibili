@@ -20,7 +20,7 @@ import { colors } from '@/constants/colors.tw'
 import type { RootStackParamList } from '@/types'
 
 import { useVideoInfo } from '../../api/video-info'
-import { useAppState } from '../../hooks/useAppState'
+import { useAppStateChange } from '../../hooks/useAppState'
 import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import { imgUrl, parseDuration, showToast } from '../../utils'
@@ -45,8 +45,8 @@ function Player(props: { currentPage: number }) {
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
   const videoInfo = {
-    ...data,
     ...route.params,
+    ...data,
   }
   const isWifi = getIsWiFi()
   const durl = usePlayUrl(
@@ -67,29 +67,15 @@ function Player(props: { currentPage: number }) {
     if (videoUrl === null) {
       return
     }
-    // console.log(333, videoUrl)
     if (videoUrl) {
       webviewRef.current?.injectJavaScript(`
-      window.setNewVideoUrl("${videoUrl}")
+      window.setNewVideoUrl("${videoUrl}");
       true;
       `)
     }
-    // else {
-    //   webviewRef.current?.injectJavaScript(`
-    //     ;(function() {
-    //       const video = document.querySelector('video')
-    //       if (video) {
-    //         video.dataset.replaced = 'true'
-    //         video.muted = false;
-    //         video.play();
-    //       }
-    //     })();
-    //     true;
-    //   `)
-    // }
   }, [videoUrl, getIsWiFi])
 
-  useAppState(currentAppState => {
+  useAppStateChange(currentAppState => {
     if (
       currentAppState === 'active' &&
       loadingErrorRef.current &&
@@ -115,14 +101,6 @@ function Player(props: { currentPage: number }) {
     } else {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
-    // if (eventData.payload === 'ended') {
-    //   setExtraHeight(0)
-    //   setVerticalScale(VerticalInitScale)
-    // } else {
-    //   setExtraHeight(26)
-    // }
-    // if (eventData.payload === 'play' || eventData.payload === 'playing') {
-    // }
   }, [playState])
 
   let videoWidth = 0

@@ -6,9 +6,11 @@ import {
 import { Avatar, Icon, Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Pressable, View } from 'react-native'
+import { Alert, Pressable, TouchableOpacity, View } from 'react-native'
 
 import { useWatchingCount } from '@/api/watching-count'
+import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
 
 import { useVideoInfo } from '../../api/video-info'
 import type { NavigationProps, RootStackParamList } from '../../types'
@@ -27,14 +29,51 @@ function VideoHeader() {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data } = useVideoInfo(route.params.bvid)
   const videoInfo = {
-    ...data,
     ...route.params,
+    ...data,
   }
   const { name, face, mid, date, title } = videoInfo
   const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid!)
+  const { _collectedVideosMap, set$collectedVideos, get$collectedVideos } =
+    useStore()
+  const isCollected = videoInfo.bvid && videoInfo.bvid in _collectedVideosMap
+  const collectVideo = () => {
+    if (typeof videoInfo?.collectNum !== 'number') {
+      return
+    }
+    if (isCollected) {
+      Alert.alert('是否取消收藏？', '', [
+        {
+          text: '否',
+        },
+        {
+          text: '是',
+          onPress: () => {
+            const list = get$collectedVideos()
+            set$collectedVideos(list.filter(vi => vi.bvid !== videoInfo.bvid))
+          },
+        },
+      ])
+    } else {
+      const list = get$collectedVideos()
+      set$collectedVideos([
+        {
+          bvid: videoInfo.bvid,
+          name: videoInfo.name!,
+          title: videoInfo.title,
+          cover: videoInfo.cover!,
+          date: videoInfo.date!,
+          duration: videoInfo.duration!,
+        },
+        ...list,
+      ])
+      showToast('已收藏')
+    }
+  }
+
   return (
     <View className="items-center flex-wrap justify-between flex-1 shrink-0 gap-3">
-      <View className="flex-1 justify-between flex-row w-full">
+      <View className="flex-1 justify-between flex-row">
         <Pressable
           onPress={() => {
             if (!mid || !face || !name) {
@@ -52,11 +91,13 @@ function VideoHeader() {
           <Avatar
             size={40}
             rounded
-            source={{
-              uri: face
-                ? imgUrl(face, 80)
-                : require('../../../assets/loading.png'),
-            }}
+            source={
+              face
+                ? {
+                    uri: imgUrl(face, 80),
+                  }
+                : require('../../../assets/loading.png')
+            }
             ImageComponent={Image}
           />
           <Text
@@ -77,33 +118,41 @@ function VideoHeader() {
           ) : null}
         </View>
       </View>
-      <View className="flex-row w-full shrink-0 my-1 justify-start gap-x-4 gap-y-2 flex-1 flex-wrap">
-        {/* <View className="flex-row items-center gap-1">
-          <Icon name="date-range" size={18} />
-          <Text className="text-sm">{parseDate(date, true)}</Text>
-        </View> */}
-        <View className="flex-row items-center gap-1">
+      <View className="flex-row w-full shrink-0 my-1 justify-start flex-1 flex-wrap">
+        <View className="flex-row items-center gap-1 pr-1 py-1">
           <Icon name="play-circle-outline" size={18} />
           <Text className="text-sm">{parseNumber(videoInfo?.playNum)}</Text>
         </View>
-        <View className="flex-row items-center gap-1">
+        <View className="flex-row items-center gap-1 px-2 py-1">
           <Icon name="chat-bubble-outline" size={16} />
           <Text className="text-sm">{parseNumber(videoInfo?.danmuNum)}弹</Text>
         </View>
         <Pressable
-          className="flex-row items-center gap-1"
+          className="flex-row items-center gap-1 px-2 py-1"
           onPress={() => {
             showToast(`${videoInfo?.likeNum} 点赞`)
           }}>
           <Icon name="thumb-up-off-alt" size={18} />
           <Text className="text-sm">{parseNumber(videoInfo?.likeNum)}</Text>
         </Pressable>
-        <View className="flex-row items-center gap-1">
-          <Icon name="star" size={18} />
-          <Text className="text-sm">{parseNumber(videoInfo?.collectNum)}</Text>
-        </View>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={collectVideo}
+          className="flex-row items-center gap-1 px-2 py-1">
+          <Icon
+            name="star"
+            size={18}
+            color={
+              tw(isCollected ? colors.warning.text : colors.gray8.text).color
+            }
+          />
+          <Text
+            className={`text-sm ${isCollected ? colors.warning.text : colors.gray8.text} ${isCollected ? 'font-bold' : ''}`}>
+            {parseNumber(videoInfo?.collectNum)}
+          </Text>
+        </TouchableOpacity>
         <Pressable
-          className="flex-row items-center mr-2"
+          className="flex-row items-center gap-1 pl-2 py-1"
           onPress={() => {
             if (name && title && route.params.bvid) {
               handleShareVideo(name, title, route.params.bvid)

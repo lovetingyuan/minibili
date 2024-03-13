@@ -165,7 +165,16 @@ function HeaderRightComp() {
   const { _updatedCount, livingUps } = useStore()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
-    <View className="flex-row items-center gap-2">
+    <View className="flex-row items-center gap-1">
+      <Button
+        radius={'sm'}
+        size="sm"
+        type="clear"
+        onPress={() => {
+          navigation.navigate('SearchVideos')
+        }}>
+        <Icon name="search" color={tw(colors.gray7.text).color} size={24} />
+      </Button>
       <View className="relative">
         {_updatedCount ? (
           <Badge
@@ -187,15 +196,6 @@ function HeaderRightComp() {
           {' 关注 ' + (_updatedCount ? '  ' : '')}
         </Button>
       </View>
-      <Button
-        radius={'sm'}
-        size="sm"
-        type="clear"
-        onPress={() => {
-          navigation.navigate('SearchVideos')
-        }}>
-        <Icon name="search" color={tw(colors.gray7.text).color} size={24} />
-      </Button>
     </View>
   )
 }

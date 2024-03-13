@@ -18,8 +18,8 @@ function VideoInfo(props: {
   const { data, isLoading } = useVideoInfo(route.params.bvid)
   const [expanded, setExpanded] = React.useState(false)
   const videoInfo = {
-    ...data,
     ...route.params,
+    ...data,
   }
 
   const { title, desc } = videoInfo

@@ -17,6 +17,14 @@ export function HeaderRight() {
         radius={'sm'}
         type="clear"
         onPress={() => {
+          navigation.navigate('SearchUps')
+        }}>
+        <Icon name="search" color={tw(colors.gray7.text).color} size={24} />
+      </Button>
+      <Button
+        radius={'sm'}
+        type="clear"
+        onPress={() => {
           navigation.navigate('About')
         }}>
         <Icon
@@ -25,14 +33,6 @@ export function HeaderRight() {
           size={20}
           color={tw(colors.primary.text).color}
         />
-      </Button>
-      <Button
-        radius={'sm'}
-        type="clear"
-        onPress={() => {
-          navigation.navigate('SearchUps')
-        }}>
-        <Icon name="search" color={tw(colors.gray7.text).color} size={24} />
       </Button>
     </View>
   )

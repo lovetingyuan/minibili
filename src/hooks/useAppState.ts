@@ -3,7 +3,7 @@ import { AppState, type AppStateStatus } from 'react-native'
 
 import useMounted from './useMounted'
 
-export function useAppState(callback?: (s: AppStateStatus) => void) {
+export function useAppStateChange(callback?: (s: AppStateStatus) => void) {
   const currentState = AppState.currentState
   const [appState, setAppState] = useState(currentState)
   const callbackRef = useRef(callback)

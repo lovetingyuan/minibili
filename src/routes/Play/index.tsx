@@ -30,8 +30,8 @@ function Play({ route, navigation }: Props) {
   const [currentPage, setCurrentPage] = React.useState(1)
   const { data } = useVideoInfo(bvid)
   const videoInfo = {
-    ...data,
     ...route.params,
+    ...data,
   }
   React.useEffect(() => {
     const headerTitle = () => <PlayHeader />

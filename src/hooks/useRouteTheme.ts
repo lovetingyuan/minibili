@@ -4,7 +4,7 @@ import React from 'react'
 import { RouteBackgroundColor } from '@/constants/colors.tw'
 import { useTWC } from '@/hooks/useTWC'
 
-import { useAppState } from './useAppState'
+import { useAppStateChange } from './useAppState'
 import useIsDark from './useIsDark'
 
 export default function useRouteTheme() {
@@ -25,7 +25,7 @@ export default function useRouteTheme() {
   }, [isDark, backgroundColor])
   const [routeTheme, setRouteTheme] = React.useState(getRouteTheme)
 
-  useAppState(() => {
+  useAppStateChange(() => {
     // console.log('change route color mode')
     setRouteTheme(getRouteTheme())
   })

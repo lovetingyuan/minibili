@@ -4,7 +4,7 @@ import React from 'react'
 import { colors } from '@/constants/colors.tw'
 import { useTWC } from '@/hooks/useTWC'
 
-import { useAppState } from './useAppState'
+import { useAppStateChange } from './useAppState'
 import useIsDark from './useIsDark'
 
 export default function useRNETheme() {
@@ -38,7 +38,7 @@ export default function useRNETheme() {
     setRNETheme(getRNETheme())
   }, [getRNETheme])
 
-  useAppState(() => {
+  useAppStateChange(() => {
     setRNETheme(getRNETheme())
   })
   return rneTheme

@@ -15,10 +15,29 @@ export interface UpInfo {
   pin?: number
 }
 
+export interface CollectVideoInfo {
+  bvid: string
+  name: string
+  title: string
+  cover: string
+  date: string | number
+  duration: string | number
+  // ---
+  desc?: string
+  tag?: string
+  face?: string
+  mid?: string | number
+  aid?: number
+  danmaku?: number
+  play?: number
+  like?: number
+}
+
 export type RootStackParamList = {
   Welcome: undefined
   SearchUps: undefined
   SearchVideos: undefined
+  Collect: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
   Play: {
     bvid: string
