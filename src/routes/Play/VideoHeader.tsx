@@ -72,8 +72,8 @@ function VideoHeader() {
   }
 
   return (
-    <View className="items-center flex-wrap justify-between flex-1 shrink-0 gap-3">
-      <View className="flex-1 justify-between flex-row">
+    <View className="items-center flex-wrap justify-between shrink-0 gap-3">
+      <View className="justify-between flex-row">
         <Pressable
           onPress={() => {
             if (!mid || !face || !name) {
@@ -118,7 +118,7 @@ function VideoHeader() {
           ) : null}
         </View>
       </View>
-      <View className="flex-row w-full shrink-0 my-1 justify-start flex-1 flex-wrap">
+      <View className="flex-row w-full my-1 justify-start flex-wrap">
         <View className="flex-row items-center gap-1 pr-1 py-1">
           <Icon name="play-circle-outline" size={18} />
           <Text className="text-sm">{parseNumber(videoInfo?.playNum)}</Text>

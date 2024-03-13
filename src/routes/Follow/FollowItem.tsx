@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Avatar, Badge, Text } from '@rneui/themed'
+import { Avatar, Badge, Button, Icon, Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 import React from 'react'
 import { Alert, Linking, TouchableOpacity, View } from 'react-native'
@@ -181,12 +181,25 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         ) : null}
       </View>
       {livingUps[mid] ? (
-        <Text
-          className={`font-bold flex-1 shrink-0 text-sm py-2 text-center ${colors.success.text}`}
-          onPress={gotoLivePage}>
+        <Button
+          size="sm"
+          type="clear"
+          onPress={gotoLivePage}
+          buttonStyle={tw('mt-1 rounded')}
+          titleStyle={tw(`${colors.success.text} text-base`)}>
+          <Icon
+            name="live-tv"
+            size={16}
+            color={tw(colors.success.text).color}
+          />
           直播中~
-        </Text>
+        </Button>
       ) : (
+        // <Text
+        //   className={`font-bold flex-1 shrink-0 text-sm py-2 text-center ${colors.success.text}`}
+        //   onPress={gotoLivePage}>
+        //   📺直播中~
+        // </Text>
         <Text
           className={`text-sm py-2 flex-1 shrink-0 text-center ${
             pin ? `font-bold ${colors.primary.text}` : ''
