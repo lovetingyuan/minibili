@@ -1,9 +1,8 @@
 import React from 'react'
 import type { z } from 'zod'
 
-import useMounted from '@/hooks/useMounted'
-
 import { configUrl } from '../constants'
+import useMounted from '../hooks/useMounted'
 import type { ConfigSchema } from './remote-config.schema'
 
 type RemoteConfig = z.infer<typeof ConfigSchema>
