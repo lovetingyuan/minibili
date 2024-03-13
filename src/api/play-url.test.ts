@@ -1,7 +1,7 @@
 import { test } from 'vitest'
 
 import request from './fetcher'
-import { PlayUrlResponseSchema } from './get-playurl.schema'
+import { PlayUrlResponseSchema } from './play-url.schema'
 
 test('get-play-url', async () => {
   const res = await request(

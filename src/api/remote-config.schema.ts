@@ -9,4 +9,5 @@ export const ConfigSchema = z.object({
     show: z.boolean(),
     url: z.string().nullish(),
   }),
+  userAgent: z.string(),
 })

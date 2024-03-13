@@ -1,6 +1,6 @@
 // import request from './fetcher'
 import { simpleRequest } from './fetcher-lite'
-import type { UserNavType } from './get-user-nav.schema'
+import type { UserNavType } from './user-nav.schema'
 
 export function getUserNav() {
   return simpleRequest<UserNavType>('/x/web-interface/nav')

@@ -4,7 +4,7 @@ import { UA } from '../constants'
 import dm from '../constants/dm'
 import encWbi from '../utils/wbi'
 import { getCookie } from './get-cookie'
-import { getWBIInfo } from './get-user-nav'
+import { getWBIInfo } from './user-nav'
 
 type ResponseType<D = any> = {
   code: number

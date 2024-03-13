@@ -16,7 +16,7 @@ import CheckNetState from './components/CheckNetState'
 import CheckUpUpdate from './components/CheckUpUpdate'
 import ErrorFallback from './components/ErrorFallback'
 import ImagesView from './components/ImagesView'
-import ShowRemoteConfig from './components/ShowRemoteConfig'
+import RemoteConfig from './components/RemoteConfig'
 import UserLocation from './components/UserLocation'
 import useRNETheme from './hooks/useRNETheme'
 import Route from './routes/Index'
@@ -93,7 +93,7 @@ export default function App() {
           <ThemeProvider theme={rneTheme}>
             <SWRConfig value={swrConfig}>
               <InitContextComp />
-              <ShowRemoteConfig />
+              <RemoteConfig />
               <CheckAppUpdate />
               <CheckUpUpdate />
               <CheckNetState />

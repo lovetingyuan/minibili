@@ -8,7 +8,6 @@ import {
   useAtomicContextMethods,
 } from 'react-atomic-context'
 
-import { checkUpdate } from '../api/check-update'
 import { RanksConfig } from '../constants'
 import useMounted from '../hooks/useMounted'
 import type { CollectVideoInfo, UpInfo } from '../types'
@@ -70,8 +69,6 @@ const AppContext = createAtomicContext(initValue)
 const storedKeys = Object.keys(initValue).filter(k =>
   k.startsWith('$'),
 ) as StoredKeys[]
-
-export const getAppUpdateInfo = checkUpdate()
 
 export function useStore() {
   return useAtomicContext(AppContext)

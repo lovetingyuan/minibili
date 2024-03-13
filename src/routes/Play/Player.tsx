@@ -14,7 +14,7 @@ import {
 } from 'react-native'
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 
-import { usePlayUrl, useVideoDownloadUrl } from '@/api/get-playurl'
+import { usePlayUrl, useVideoDownloadUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
 import type { RootStackParamList } from '@/types'

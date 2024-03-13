@@ -6,14 +6,14 @@ import { Button, Image, Linking, Text, View } from 'react-native'
 import { colors } from '@/constants/colors.tw'
 
 import { site } from '../constants'
-import { showFatalError } from '../utils'
+// import { showFatalError } from '../utils'
 
 export default function ErrorFallback(props: { message?: string }) {
-  React.useEffect(() => {
-    showFatalError(props)
-  }, [props])
+  // React.useEffect(() => {
+  //   showFatalError(props)
+  // }, [props])
 
-  if (__DEV__ && props.message) {
+  if (__DEV__) {
     // eslint-disable-next-line no-console
     console.error(props.message)
   }

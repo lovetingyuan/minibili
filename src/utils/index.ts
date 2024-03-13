@@ -146,9 +146,9 @@ export async function showFatalError(error: any) {
   }
   const updateInfo = await checkUpdate().catch(() => null)
   showedFatalError = true
-  if (__DEV__) {
-    return
-  }
+  // if (__DEV__) {
+  //   return
+  // }
 
   Alert.alert(
     '抱歉，应用发生了错误😅',

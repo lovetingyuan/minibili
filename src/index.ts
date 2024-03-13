@@ -13,7 +13,7 @@ if (typeof ErrorUtils === 'object') {
   ErrorUtils.setGlobalHandler((error, isFatal) => {
     SentryExpo.captureException(error)
     if (!isFatal) {
-      showToast('抱歉，发生了未知错误')
+      showToast('抱歉，发生了未知错误 😅')
       return
     }
     showFatalError(error)

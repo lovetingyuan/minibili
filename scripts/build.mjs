@@ -4,6 +4,50 @@
 // import { BuildListSchema } from '../src/api/check-update.schema.ts'
 // 1 检查环境 2 写入版本 3 eas构建 4 写入更新日志 5 下载apk 6 git推送
 
+const z = require('zod')
+
+const BuildListSchema = z
+  .object({
+    id: z.string(),
+    status: z.enum(['PENDING', 'FINISHED']),
+    platform: z.enum(['ANDROID', 'IOS', 'ALL']),
+    artifacts: z.object({
+      buildUrl: z.string(),
+      applicationArchiveUrl: z.string(),
+    }),
+    initiatingActor: z.object({
+      id: z.string(),
+      displayName: z.string(),
+    }),
+    project: z.object({
+      id: z.string(),
+      name: z.string(),
+      slug: z.string(),
+      ownerAccount: z.object({
+        id: z.string(),
+        name: z.string(),
+      }),
+    }),
+    channel: z.string().nullish(),
+    releaseChannel: z.string().nullish(),
+    distribution: z.enum(['STORE']),
+    buildProfile: z.string(),
+    sdkVersion: z.string(),
+    appVersion: z.string(),
+    appBuildVersion: z.string(),
+    gitCommitHash: z.string(),
+    gitCommitMessage: z.string(),
+    // priority: 'NORMAL'
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    completedAt: z.string(),
+    // resourceClass: 'ANDROID_MEDIUM'
+  })
+  .refine(data => {
+    return !!data.channel || !!data.releaseChannel
+  }, 'channel error')
+  .array()
+
 require('dotenv').config({
   path: path.resolve(__dirname, '../.env'),
 })
@@ -16,16 +60,22 @@ const assert = require('assert')
 
 const getBuildList = buildStr => {
   let buildListStr = buildStr.toString('utf8')
-  buildListStr = buildListStr.substring(buildListStr.lastIndexOf('['))
-  const list = JSON.parse(buildListStr)
-  // BuildListSchema.parse(list)
-  list.toString = () => buildListStr.trim()
+  let str = buildListStr
+  let list
+  while (str.includes('[')) {
+    try {
+      list = JSON.parse(str)
+      break
+    } catch (e) {
+      str = str.substring(str.indexOf('['))
+    }
+  }
+  list.toString = () => str.trim()
   return list
 }
 
 $.verbose = false
 
-// echo(chalk.blue('checking env...'))
 await spinner('Checking build env...', async () => {
   assert.equal(
     typeof process.env.SENTRY_AUTH_TOKEN,
@@ -81,7 +131,9 @@ let appVersion
 await spinner('Checking current build list...', async () => {
   const currentBuild =
     await $`npx -y eas-cli@latest build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`
-  appVersion = getBuildList(currentBuild)[0].appVersion
+  const buildList = getBuildList(currentBuild)
+  BuildListSchema.parse(buildList)
+  appVersion = buildList[0].appVersion
   if (appVersion !== version) {
     throw new Error(
       `Package version ${version} is not same as the latest build version ${appVersion}`,

@@ -1,4 +1,7 @@
 import * as Application from 'expo-application'
+import React from 'react'
+
+import useMounted from '@/hooks/useMounted'
 
 export const currentVersion = Application.nativeApplicationVersion!
 
@@ -24,4 +27,18 @@ export const checkUpdate = () => {
         }
       },
     )
+}
+type PT<V> = V extends Promise<infer T> ? T : never
+
+export const useAppUpdateInfo = () => {
+  const [appUpdateInfo, setAppUpdateInfo] = React.useState<PT<
+    ReturnType<typeof checkUpdate>
+  > | null>(null)
+  useMounted(() => {
+    if (appUpdateInfo) {
+      return
+    }
+    checkUpdate().then(setAppUpdateInfo)
+  })
+  return appUpdateInfo
 }

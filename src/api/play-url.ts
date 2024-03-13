@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 import { z } from 'zod'
 
-import { PlayUrlResponseSchema } from './get-playurl.schema'
+import { PlayUrlResponseSchema } from './play-url.schema'
 
 type Res = z.infer<typeof PlayUrlResponseSchema>
 

@@ -1,7 +1,7 @@
 import { test } from 'vitest'
 
-import { getRemoteConfig } from './get-config'
-import { ConfigSchema } from './get-config.schema'
+import { getRemoteConfig } from './remote-config'
+import { ConfigSchema } from './remote-config.schema'
 
 test.skip('get-remote-config', async () => {
   const res = await getRemoteConfig()

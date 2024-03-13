@@ -8,18 +8,17 @@ describe('app-version-update', () => {
       timeout: 30000,
     },
     async () => {
-      const BuildListSchema = z
-        .object({
-          version: z.string(),
-          changelog: z.string().array(),
-          date: z.string(),
-        })
-        .array()
       const res = await fetch(
         'https://unpkg.com/minibili/docs/version.json',
       ).then(r => r.json())
       expect(res.length > 0).toBe(true)
-      BuildListSchema.parse(res)
+      z.object({
+        version: z.string(),
+        changelog: z.string().array(),
+        date: z.string(),
+      })
+        .array()
+        .parse(res)
     },
   )
 
