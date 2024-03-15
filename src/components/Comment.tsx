@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Button, Text } from '@rneui/themed'
 import React from 'react'
-import { Image, Linking, type TextStyle, View } from 'react-native'
+import { Image, Linking, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 
@@ -17,22 +17,23 @@ interface Props {
 
 function CommentText(props: {
   nodes: MessageContent
-  className?: string
-  style?: TextStyle | TextStyle[]
   idStr: string
+  fontSize: string
 }) {
-  const { nodes, style, idStr } = props
+  const { nodes, idStr, fontSize } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
   const textShadowRadius = 0.2
 
   return (
-    <Text style={style} selectable>
+    // <Text style={style} selectable>
+    <>
       {nodes.map((node, i) => {
+        const key = idStr + i
         if (node.type === 'at') {
           return (
             <Text
-              key={idStr + i}
-              className={colors.primary.text}
+              key={key}
+              className={`${colors.primary.text} ${fontSize}`}
               style={{
                 textShadowColor: tw(colors.primary.text).color,
                 textShadowRadius,
@@ -54,8 +55,8 @@ function CommentText(props: {
         if (node.type === 'url') {
           return (
             <Text
-              key={idStr + i}
-              className={colors.primary.text}
+              key={key}
+              className={`${colors.primary.text} ${fontSize}`}
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
@@ -66,17 +67,17 @@ function CommentText(props: {
         if (node.type === 'emoji') {
           return (
             <Image
-              key={idStr + i}
+              key={key}
               source={{ uri: imgUrl(node.url) }}
-              className="w-[18px] h-[18px]"
+              className="w-[18px] h-[18px] mx-1"
             />
           )
         }
         if (node.type === 'vote') {
           return (
             <Text
-              key={idStr + i}
-              className={colors.primary.text}
+              key={key}
+              className={`${colors.primary.text} ${fontSize}`}
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
@@ -87,8 +88,8 @@ function CommentText(props: {
         if (node.type === 'av') {
           return (
             <Text
-              key={idStr + i}
-              className={colors.primary.text}
+              key={key}
+              className={`${colors.primary.text} ${fontSize}`}
               onPress={() => {
                 const bvid = node.url.split('/').pop()
                 if (bvid?.startsWith('BV')) {
@@ -105,138 +106,96 @@ function CommentText(props: {
           )
         }
         return (
-          <Text style={style} selectable key={idStr + i}>
+          <Text className={fontSize} selectable key={key}>
             {node.text}
           </Text>
         )
       })}
-    </Text>
+    </>
   )
 }
 
 export default React.memo(Comment)
 
-function Comment(props: Props) {
+function CommentItem(props: {
+  comment: ReplyItem | ReplyItem['replies'][0]
+  upName: string
+}) {
   const { comment, upName } = props
-  const { setImagesList, setCurrentImageIndex, setMoreRepliesUrl } = useStore()
-
+  const { setImagesList, setCurrentImageIndex } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
-
+  const fontSize = 'rcount' in comment ? 'text-base' : 'text-sm'
   return (
-    <View className="flex-1 shrink-0">
-      <Text className="flex-row items-center mb-1 justify-center">
-        <Text className="font-bold text-base align-middle leading-7">
-          <Text
-            className={
-              upName === comment.name
-                ? colors.secondary.text
-                : colors.primary.text
-            }
-            onPress={() => {
-              navigation.push('Dynamic', {
-                user: {
-                  face: comment.face,
-                  name: comment.name,
-                  mid: comment.mid,
-                  sign: comment.sign || '-',
-                },
-              })
-            }}>
-            {comment.name}
-          </Text>
-          <Text>
-            {comment.sex === '男' ? '♂' : comment.sex === '女' ? '♀' : ''}
-          </Text>
-          {/* {comment.location ? (
-            <Text className="text-sm">
-              (
-              {comment.location.includes('：')
-                ? comment.location.split('：')[1]
-                : comment.location}
-              )
-            </Text>
-          ) : null} */}
-          ：
-        </Text>
-        {comment.top ? (
-          <Text
-            className={`border ${colors.secondary.border} rounded font-bold text-sm ${colors.secondary.text}`}>
-            置顶{' '}
-          </Text>
-        ) : null}
+    <Text>
+      <Text
+        className={`${
+          upName === comment.name
+            ? colors.secondary.text + ' font-bold'
+            : colors.primary.text
+        } ${fontSize}`}
+        onPress={() => {
+          navigation.push('Dynamic', {
+            user: {
+              face: comment.face,
+              name: comment.name,
+              mid: comment.mid,
+              sign: comment.sign || '-',
+            },
+          })
+        }}>
+        {comment.name}
+      </Text>
+      <Text className={fontSize}>
+        {comment.sex === '男' ? '♂：' : comment.sex === '女' ? '♀：' : '：'}
+      </Text>
+      {'top' in comment && comment.top ? (
+        <Text className={fontSize}> 🔝 </Text>
+      ) : null}
+      {comment.message?.length ? (
         <CommentText
+          fontSize={fontSize}
           nodes={comment.message}
-          className={`text-base leading-7 ${
-            comment.upLike ? colors.success.text : ''
-          } ${comment.top ? colors.primary.text : ''}`}
           idStr={comment.id + '_'}
         />
-        {comment.like ? (
-          <Text className={`text-xs ${colors.secondary.text}`}>
-            {' '}
-            {comment.like}
-            <Text>{comment.upLike ? '  UP👍' : ''}</Text>
-          </Text>
-        ) : null}
-        {comment.images?.length ? (
-          <Text
-            className={colors.primary.text}
-            onPress={() => {
-              if (comment.images) {
-                setImagesList(
-                  comment.images.map(img => {
-                    img.src = imgUrl(img.src)
-                    return img
-                  }),
-                )
-                setCurrentImageIndex(0)
-              }
-            }}>
-            {'  '}查看图片
-            {comment.images.length > 1 ? `(${comment.images.length})` : ''}
-          </Text>
-        ) : null}
-      </Text>
+      ) : null}
+      {comment.like ? (
+        <Text className={`text-xs ${colors.secondary.text}`}>
+          {' ' + comment.like + (comment.upLike ? '+UP👍' : '')}
+        </Text>
+      ) : null}
+      {'images' in comment && comment.images?.length ? (
+        <Text
+          className={colors.primary.text}
+          onPress={() => {
+            if (comment.images) {
+              setImagesList(
+                comment.images.map(img => {
+                  img.src = imgUrl(img.src)
+                  return img
+                }),
+              )
+              setCurrentImageIndex(0)
+            }
+          }}>
+          {`  查看图片${comment.images.length > 1 ? `(${comment.images.length})` : ''}`}
+        </Text>
+      ) : null}
+    </Text>
+  )
+}
+
+function Comment(props: Props) {
+  const { comment, upName } = props
+  const { setMoreRepliesUrl } = useStore()
+
+  return (
+    <View className="flex-1 shrink-0 mb-7">
+      <CommentItem comment={comment} upName={upName} />
       {comment.replies?.length ? (
-        <View className="p-2 rounded mt-1 mb-4 gap-1 opacity-90 flex-1 shrink-0 border-gray-500 bg-neutral-200 dark:bg-neutral-900">
+        <View className="p-2 mt-1 rounded gap-1 opacity-90 flex-1 shrink-0 border-gray-500 bg-neutral-200 dark:bg-neutral-900">
           {comment.replies.map(reply => {
             return (
-              <Text
-                key={`${reply.id}#`}
-                className="flex-row items-center flex-wrap text-sm">
-                <Text
-                  className={
-                    upName === reply.name
-                      ? colors.secondary.text
-                      : colors.primary.text
-                  }
-                  onPress={() => {
-                    navigation.push('Dynamic', {
-                      user: {
-                        face: reply.face,
-                        name: reply.name,
-                        mid: reply.mid,
-                        sign: reply.sign || '-',
-                      },
-                    })
-                  }}>
-                  {reply.name}
-                </Text>
-                <Text>
-                  {reply.sex === '男' ? '♂' : reply.sex === '女' ? '♀' : ''}
-                </Text>
-                <Text>：</Text>
-                <CommentText
-                  nodes={reply.message}
-                  idStr={reply.id + '_'}
-                  className="leading-6 border"
-                />
-                {reply.like ? (
-                  <Text className={`text-xs ${colors.secondary.text}`}>
-                    {' ' + reply.like}
-                  </Text>
-                ) : null}
-              </Text>
+              <CommentItem key={reply.id} comment={reply} upName={upName} />
             )
           })}
           {comment.moreText ? (
@@ -249,7 +208,7 @@ function Comment(props: Props) {
                   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
                 )
               }}
-              buttonStyle={tw('justify-start p-0  ')}>
+              buttonStyle={tw('justify-start p-[1px]')}>
               <Text className={colors.primary.text}>
                 {comment.moreText + '...'}
               </Text>

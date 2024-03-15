@@ -1,4 +1,16 @@
 function __$hack() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const style = document.createElement('style')
+    style.textContent = `
+    body, #bilibiliPlayer, .mplayer {
+      background-color: black!important;
+    }
+    .b-danmaku {
+      opacity: 0.6!important;
+    }
+    `
+    document.head.appendChild(style)
+  })
   let videoUrl = ''
   const replacePlayUrl = () => {
     const video = document.querySelector('video')

@@ -8,7 +8,7 @@ import { useDynamicComments } from '../api/comments'
 import Comment from './Comment'
 import MoreReplies from './MoreReplies'
 
-function LoadingComp() {
+function Loading() {
   return (
     <View>
       {Array(10)
@@ -32,8 +32,6 @@ function LoadingComp() {
   )
 }
 
-const Loading = React.memo(LoadingComp)
-
 export default function CommentList(props: {
   commentId: string | number
   commentType: number
@@ -48,7 +46,7 @@ export default function CommentList(props: {
 
   return (
     <View className="flex-1">
-      <View className="my-5 border-b-[0.5px] border-gray-400 pb-1 flex-row justify-between">
+      <View className="my-5 border-b-[0.5px] border-gray-400 flex-row justify-between">
         <View className="flex-row items-center mr-1">
           <Icon
             name="comment-text-outline"
@@ -69,11 +67,13 @@ export default function CommentList(props: {
       ) : null}
       {commentLoading ? <Loading /> : null}
       {comments?.length ? (
-        comments.map((comment, i) => {
+        comments.map(comment => {
           return (
-            <View key={comment.id + '@' + i} className="mb-3">
-              <Comment upName={props.upName} comment={comment} />
-            </View>
+            <Comment
+              key={comment.id + '@' + comment.root}
+              upName={props.upName}
+              comment={comment}
+            />
           )
         })
       ) : comments?.length === 0 && !commentLoading ? (

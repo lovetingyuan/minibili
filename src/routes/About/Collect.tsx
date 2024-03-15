@@ -10,7 +10,7 @@ function Collect() {
 
   return (
     <TextAction
-      text="我的收藏"
+      text="⭐️ 我的收藏"
       buttons={[
         {
           text: '查看',

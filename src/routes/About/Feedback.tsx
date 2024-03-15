@@ -34,7 +34,7 @@ function Feedback() {
   }
   return (
     <TextAction
-      text="欢迎分享本应用 ❤"
+      text="💗 欢迎分享本应用"
       buttons={[
         {
           text: '分享',

@@ -22,7 +22,7 @@ function Backup() {
 
   return (
     <TextAction
-      text="导入或导出当前设置"
+      text="⚙️ 导入或导出当前设置"
       buttons={[
         {
           text: '导出',

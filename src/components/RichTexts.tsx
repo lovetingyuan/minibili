@@ -130,7 +130,14 @@ function RichTexts(props: {
         <Text
           numberOfLines={1}
           onPress={() => {
-            Linking.openURL(parseUrl(node.jump_url))
+            if (node.rid.startsWith('BV')) {
+              navigation.push('Play', {
+                bvid: node.rid,
+                title: node.text,
+              })
+            } else {
+              Linking.openURL(parseUrl(node.jump_url))
+            }
           }}
           key={key++}
           className={colors.primary.text}

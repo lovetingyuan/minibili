@@ -53,7 +53,7 @@ function Version() {
   }
   return (
     <TextAction
-      text={`当前版本：${currentVersion}`}
+      text={`💡 当前版本：${currentVersion}`}
       onTextLongPress={() => {
         Alert.alert(
           '版本信息',

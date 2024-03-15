@@ -1,7 +1,7 @@
 // 获取正确的cookie
 // https://github.com/SocialSisterYi/bilibili-API-collect/issues/686
 
-import { TracyId, UA } from '../constants'
+import { UA } from '../constants'
 
 function getuuid(time: number) {
   const randString8 = randomString(8),
@@ -48,7 +48,7 @@ function toHex(num: number) {
   return Math.ceil(num).toString(16).toUpperCase()
 }
 
-function getbuvid3(mid = TracyId) {
+function getbuvid3(mid = 5201314) {
   return fetch('https://space.bilibili.com/' + mid + '/dynamic', {
     headers: {
       accept:
@@ -98,7 +98,7 @@ function getPayload(now: number, uuid: string) {
   return {
     3064: 1,
     5062: now.toString(),
-    '03bf': 'https%3A%2F%2Fspace.bilibili.com%2F' + TracyId + '%2Fdynamic',
+    '03bf': 'https%3A%2F%2Fspace.bilibili.com%2F' + 5201314 + '%2Fdynamic',
     '39c8': '333.999.fp.risk',
     '34f1': '',
     d402: '',
