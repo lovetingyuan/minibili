@@ -7,7 +7,7 @@ import { RootStackParamList } from '@/types'
 import { useStore } from '../../store'
 import HotList from './HotList'
 import Ranks from './Ranks'
-// import { Test } from './Test'
+// import Test from './Test'
 export default React.memo(VideoList)
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VideoList'>
