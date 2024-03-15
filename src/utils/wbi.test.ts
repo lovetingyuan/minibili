@@ -1,7 +1,7 @@
 import { assert, test } from 'vitest'
 
-import encWbi from '../utils/wbi'
-import { simpleRequest } from './fetcher-lite'
+import { simpleRequest } from '../api/fetcher-lite'
+import encWbi from './wbi'
 
 const querys = [
   ['oid', '750721856'],
