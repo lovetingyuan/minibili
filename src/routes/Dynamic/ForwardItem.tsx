@@ -35,28 +35,37 @@ export default function ForwardItem(props: {
     />
   )
   if (payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
-    const { title, cover, stat } = payload.video
-    forwardContent = (
-      <View className="flex-col flex-1">
-        {forwardRichTextContent}
-        <View className="flex-row">
-          <Image
-            className="w-[45%] aspect-[8/5] h-auto mr-3 rounded"
-            source={{ uri: imgUrl(cover, 240, 150) }}
-          />
-          <View className="flex-1">
-            <Text numberOfLines={3} className="text-sm">
-              <Text className="font-bold">视频：</Text>
-              {title}
-            </Text>
-            <Text className="mt-3 text-xs text-gray-600 dark:text-gray-400">
-              {stat.play}播放{'   '}
-              {stat.danmaku}弹幕
-            </Text>
+    if (typeof payload.video === 'string') {
+      forwardContent = (
+        <View className="flex-col flex-1">
+          <Text className="font-bold">视频：</Text>
+          <Text>{payload.video}</Text>
+        </View>
+      )
+    } else {
+      const { title, cover, stat } = payload.video
+      forwardContent = (
+        <View className="flex-col flex-1">
+          {forwardRichTextContent}
+          <View className="flex-row">
+            <Image
+              className="w-[45%] aspect-[8/5] h-auto mr-3 rounded"
+              source={{ uri: imgUrl(cover, 240, 150) }}
+            />
+            <View className="flex-1">
+              <Text numberOfLines={3} className="text-sm">
+                <Text className="font-bold">视频：</Text>
+                {title}
+              </Text>
+              <Text className="mt-3 text-xs text-gray-600 dark:text-gray-400">
+                {stat.play}播放{'   '}
+                {stat.danmaku}弹幕
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-    )
+      )
+    }
   } else if (
     payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW ||
     payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_WORD
@@ -152,6 +161,10 @@ export default function ForwardItem(props: {
           onPress={() => {
             if (payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
               const { video } = payload
+              if (typeof video === 'string') {
+                // 一般是视频失效了
+                return
+              }
               navigation.push('Play', {
                 bvid: video.bvid,
                 name: payload.name,

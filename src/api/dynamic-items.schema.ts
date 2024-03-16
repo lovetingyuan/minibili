@@ -122,6 +122,12 @@ const RichTextSchema = z.discriminatedUnion('type', [
 ])
 
 const MajorSchemaMap = {
+  NONE: z.object({
+    type: z.enum([MajorTypeEnum.MAJOR_TYPE_NONE]),
+    none: z.object({
+      tips: z.string(),
+    }),
+  }),
   AV: z.object({
     type: z.enum([MajorTypeEnum.MAJOR_TYPE_ARCHIVE]),
     archive: z.object({
@@ -622,7 +628,10 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: MajorSchemaMap.AV,
+                  major: z.discriminatedUnion('type', [
+                    MajorSchemaMap.NONE,
+                    MajorSchemaMap.AV,
+                  ]),
                 }),
               ),
             }),

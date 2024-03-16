@@ -1,3 +1,5 @@
+import fs from 'node:fs'
+
 import { test } from 'vitest'
 
 import { DynamicListResponseSchema } from './dynamic-items.schema'
@@ -19,6 +21,7 @@ test('dynamic-list', async () => {
         failedList.push('zod-' + mid)
         console.log(mid + ' zod error')
         console.error(result.error)
+        fs.writeFileSync(`dynamic-list-${mid}.json`, JSON.stringify(res))
       }
       if (res.has_more) {
         const res2 = await fetcher<any>(

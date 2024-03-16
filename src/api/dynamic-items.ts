@@ -232,7 +232,10 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         payload: {
           ...getForwardCommon(),
           text: '',
-          video: forward.major.archive,
+          video:
+            forward.major.type === MajorTypeEnum.MAJOR_TYPE_NONE
+              ? forward.major.none.tips
+              : forward.major.archive,
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_AV as const,
         },
       }
