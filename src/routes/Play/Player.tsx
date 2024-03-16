@@ -1,4 +1,8 @@
-import { type RouteProp, useRoute } from '@react-navigation/native'
+import {
+  type RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native'
 import { Icon } from '@rneui/themed'
 import * as KeepAwake from 'expo-keep-awake'
 import React from 'react'
@@ -17,7 +21,7 @@ import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 import { usePlayUrl, useVideoDownloadUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
-import type { RootStackParamList } from '@/types'
+import type { NavigationProps, RootStackParamList } from '@/types'
 
 import { useVideoInfo } from '../../api/video-info'
 import { useAppStateChange } from '../../hooks/useAppState'
@@ -29,8 +33,8 @@ import { UPDATE_URL_CODE } from './update-playurl'
 
 export default React.memo(Player)
 
-function Player(props: { currentPage: number }) {
-  const { getIsWiFi } = useStore()
+function Player(props: { currentPage: number; currentCid?: number }) {
+  const { getIsWiFi, set$watchedVideos, get$watchedVideos } = useStore()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { width, height } = useWindowDimensions()
   const [verticalExpand, setVerticalExpand] = React.useState(false)
@@ -45,12 +49,15 @@ function Player(props: { currentPage: number }) {
   const isWifi = getIsWiFi()
   const durl = usePlayUrl(
     isWifi ? videoInfo.bvid : '',
-    isWifi ? videoInfo.cid : '',
+    isWifi ? props.currentCid || videoInfo.cid : '',
   )
   const videoUrl = durl ? durl[0]?.backup_url?.[0] || durl[0]?.url || '' : null
   const [playState, setPlayState] = React.useState('init')
 
-  const downloadVideoUrl = useVideoDownloadUrl(videoInfo.bvid, videoInfo.cid)
+  const downloadVideoUrl = useVideoDownloadUrl(
+    videoInfo.bvid,
+    props.currentCid || videoInfo.cid,
+  )
 
   // const durl = usePlayUrl('BV1SZ421y7Ae', '1460675026')
   React.useEffect(() => {
@@ -88,6 +95,22 @@ function Player(props: { currentPage: number }) {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
+  const navigation = useNavigation<NavigationProps['navigation']>()
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', e => {
+      e.preventDefault()
+      webviewRef.current?.injectJavaScript(`
+      window.reportPlayTime();
+      true;
+      `)
+      setTimeout(() => {
+        navigation.dispatch(e.data.action)
+      })
+      //
+    })
+    return unsubscribe
+  }, [navigation])
 
   let videoWidth = 0
   let videoHeight = 0
@@ -132,14 +155,58 @@ function Player(props: { currentPage: number }) {
           setVerticalExpand(eventData.payload === 'down')
         }
       }
-      if (eventData.action === 'downloadVideo' && downloadVideoUrl) {
-        Linking.openURL(downloadVideoUrl)
+      if (eventData.action === 'downloadVideo') {
+        const url = downloadVideoUrl?.[0]?.url
+        if (url) {
+          Linking.openURL(url)
+        } else {
+          showToast('抱歉，暂不支持下载')
+        }
       }
       if (eventData.action === 'reload') {
         // TODO:
       }
       if (eventData.action === 'showToast') {
         showToast(eventData.payload)
+      }
+      if (eventData.action === 'reportPlayTime') {
+        if (videoInfo.duration && eventData.payload) {
+          let playedMap = get$watchedVideos()
+          const playedInfo = playedMap[videoInfo.bvid]
+          const newProgress = eventData.payload
+          if (playedInfo) {
+            if (playedInfo.watchProgress < newProgress) {
+              set$watchedVideos({
+                ...playedMap,
+                [videoInfo.bvid]: {
+                  ...playedInfo,
+                  watchProgress: newProgress,
+                  watchTime: Date.now(),
+                  bvid: videoInfo.bvid,
+                },
+              })
+            }
+          } else {
+            const watchedVideos = Object.values(playedMap)
+            if (watchedVideos.length > 500) {
+              const values = watchedVideos
+                .sort((a, b) => b.watchTime - a.watchTime)
+                .slice(0, 400)
+              playedMap = {}
+              values.forEach(item => {
+                playedMap[item.bvid] = item
+              })
+            } else {
+              playedMap = { ...playedMap }
+            }
+            playedMap[videoInfo.bvid] = {
+              watchProgress: newProgress,
+              watchTime: Date.now(),
+              bvid: videoInfo.bvid,
+            }
+            set$watchedVideos(playedMap)
+          }
+        }
       }
       if (eventData.action === 'console.log') {
         // eslint-disable-next-line no-console
@@ -171,12 +238,14 @@ function Player(props: { currentPage: number }) {
     quality: isWifi ? 64 : 32,
     portraitFullScreen: true,
     highQuality: isWifi ? 1 : 0,
-    page: props.currentPage,
+    page: isWifi ? undefined : props.currentPage,
     autoplay: isWifi ? 0 : 1,
     hasMuteButton: true,
     // portraitFullScreen: 1,
   }).forEach(([k, v]) => {
-    search.append(k, v + '')
+    if (v !== undefined) {
+      search.append(k, v + '')
+    }
   })
   const webview = (
     <WebView

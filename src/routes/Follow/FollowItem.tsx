@@ -1,8 +1,8 @@
 import { useNavigation } from '@react-navigation/native'
-import { Avatar, Badge, Button, Icon, Text } from '@rneui/themed'
+import { Avatar, Badge, Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Alert, Linking, TouchableOpacity, View } from 'react-native'
+import { Alert, Linking, Pressable, TouchableOpacity, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 
@@ -164,13 +164,23 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       onPress={gotoDynamic}>
       <View className="relative">
         <Avatar
-          size={46}
+          size={48}
           ImageComponent={Image}
           rounded
           source={{
             uri: imgUrl(face, 120),
           }}
         />
+        {livingUps[mid] ? (
+          <Pressable
+            onPress={e => {
+              e.stopPropagation()
+              gotoLivePage()
+            }}
+            className="inset-0 absolute justify-center items-center w-12 h-12 rounded-full bg-neutral-900/50">
+            <Text className={'text-center text-teal-400'}>直播中</Text>
+          </Pressable>
+        ) : null}
         {hasUpdate ? (
           <Badge
             key={mid}
@@ -180,7 +190,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
           />
         ) : null}
       </View>
-      {livingUps[mid] ? (
+      {/* {livingUps[mid] ? (
         <Button
           size="sm"
           type="clear"
@@ -195,11 +205,6 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
           直播中~
         </Button>
       ) : (
-        // <Text
-        //   className={`font-bold flex-1 shrink-0 text-sm py-2 text-center ${colors.success.text}`}
-        //   onPress={gotoLivePage}>
-        //   📺直播中~
-        // </Text>
         <Text
           className={`text-sm py-2 flex-1 shrink-0 text-center ${
             pin ? `font-bold ${colors.primary.text}` : ''
@@ -208,7 +213,15 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
           ellipsizeMode="tail">
           {name}
         </Text>
-      )}
+      )} */}
+      <Text
+        className={`text-sm py-2 flex-1 shrink-0 text-center ${
+          pin ? `font-bold ${colors.primary.text}` : ''
+        } ${hasUpdate ? colors.secondary.text : ''}`}
+        numberOfLines={2}
+        ellipsizeMode="tail">
+        {name}
+      </Text>
     </TouchableOpacity>
   )
 }

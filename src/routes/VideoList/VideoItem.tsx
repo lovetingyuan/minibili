@@ -13,13 +13,14 @@ export default React.memo(VideoItem)
 function VideoItem({ video }: { video: VideoItemType }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
-  const { isWiFi, _followedUpsMap } = useStore()
+  const { isWiFi, _followedUpsMap, $watchedVideos } = useStore()
   const isFollowed = video.mid in _followedUpsMap
+  const watchedInfo = $watchedVideos[video.bvid]
   return (
     <View className="self-center w-full flex-1">
       <View className="flex-1">
         <Image
-          className="flex-1 w-full rounded aspect-[8/5]"
+          className={'flex-1 w-full rounded aspect-[8/5]'}
           source={imgUrl(video.cover, ...(isWiFi ? [480, 300] : [320, 200]))}
         />
         <View className=" absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
@@ -44,6 +45,14 @@ function VideoItem({ video }: { video: VideoItemType }) {
       <Text
         className={`mt-3 min-h-8 ${isFollowed ? `font-bold ${colors.primary.text}` : ''}`}
         numberOfLines={2}>
+        {watchedInfo ? (
+          <Text className={`${colors.success.text} font-bold`}>
+            👀
+            {watchedInfo.watchProgress > 99
+              ? '已看完 '
+              : `已观看${watchedInfo.watchProgress}% `}{' '}
+          </Text>
+        ) : null}
         {video.title}
       </Text>
       <View className="flex-row items-center mt-2 justify-between">

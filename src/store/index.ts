@@ -42,6 +42,10 @@ export const getAppValue = () => {
     $ignoredVersions: [] as string[],
     $videoCatesList: RanksConfig,
     $collectedVideos: [] as CollectVideoInfo[],
+    $watchedVideos: {} as Record<
+      string,
+      { watchProgress: number; watchTime: number; bvid: string }
+    >,
     // -------------------------
     initialed: false,
     isWiFi: false,
@@ -119,7 +123,7 @@ type StoredKeys<K = keyof AppContextValueType> = K extends `$${string}`
   ? K
   : never
 
-export const InitContextComp = React.memo(() => {
+export const InitStoreComp = React.memo(() => {
   const methods = useAtomicContextMethods(AppContext)
   useMounted(() => {
     Promise.all(

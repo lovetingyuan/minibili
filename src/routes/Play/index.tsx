@@ -33,6 +33,7 @@ function Play({ route, navigation }: Props) {
     ...route.params,
     ...data,
   }
+  const [currentCid, setCurrentCid] = React.useState(videoInfo.cid)
   React.useEffect(() => {
     const headerTitle = () => <PlayHeader />
     navigation.setOptions({
@@ -50,10 +51,14 @@ function Play({ route, navigation }: Props) {
 
   return (
     <View className="flex-1">
-      <Player currentPage={currentPage} />
+      <Player currentPage={currentPage} currentCid={currentCid} />
       <ScrollView className="py-4 px-3">
         <VideoHeader />
-        <VideoInfo currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        <VideoInfo
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          setCurrentCid={setCurrentCid}
+        />
         <CommentList
           upName={videoInfo?.name || ''}
           commentId={videoInfo?.aid || ''}

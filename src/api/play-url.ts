@@ -19,6 +19,7 @@ export function usePlayUrl(
       type: 'mp4',
       qn: highQuality ? 64 : 16,
       fnval: 1,
+      try_look: 1,
       platform: 'pc',
       high_quality: highQuality ? 1 : 0,
     }
@@ -45,9 +46,10 @@ export function useVideoDownloadUrl(bvid: string, cid?: string | number) {
       cid,
       type: 'mp4',
       qn: 64,
-      fnval: 1,
+      fnval: 4048,
       platform: 'html5',
       high_quality: 1,
+      try_look: 1,
     }
     Object.entries(query).forEach(([k, v]) => {
       search.append(k, v + '')
@@ -60,5 +62,5 @@ export function useVideoDownloadUrl(bvid: string, cid?: string | number) {
       dedupingInterval: 2 * 60 * 1000 * 1000,
     },
   )
-  return data?.durl?.[0]?.url
+  return data?.durl
 }

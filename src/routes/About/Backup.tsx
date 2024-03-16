@@ -14,10 +14,12 @@ function Backup() {
     get$followedUps,
     get$blackTags,
     get$videoCatesList,
+    get$collectedVideos,
     set$blackTags,
     set$followedUps,
     set$blackUps,
     set$videoCatesList,
+    set$collectedVideos,
   } = useMethods()
 
   return (
@@ -35,6 +37,7 @@ function Backup() {
                 $followedUps: get$followedUps(),
                 $blackTags: get$blackTags(),
                 $videoCatesList: get$videoCatesList(),
+                $collectedVideos: get$collectedVideos(),
               },
             })
             Clipboard.setStringAsync(settings).then(() => {
@@ -65,6 +68,7 @@ function Backup() {
                         set$followedUps(data.$followedUps)
                         set$blackUps(data.$blackUps)
                         set$videoCatesList(data.$videoCatesList)
+                        set$collectedVideos(data.$collectedVideos)
                         showToast('导入完成')
                       },
                     },

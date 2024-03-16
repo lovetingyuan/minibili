@@ -1,22 +1,36 @@
 function __$hack() {
-  document.addEventListener('DOMContentLoaded', () => {
-    const style = document.createElement('style')
-    style.textContent = `
-    body, #bilibiliPlayer, .mplayer {
-      background-color: black!important;
-    }
-    .b-danmaku {
-      opacity: 0.6!important;
-    }
-    `
-    document.head.appendChild(style)
-  })
   let videoUrl = ''
   const replacePlayUrl = () => {
     const video = document.querySelector('video')
+    // window.ReactNativeWebView.postMessage(
+    //   JSON.stringify({
+    //     action: 'console.log',
+    //     payload: `
+    //     ${video.src}
+    //     -----
+    //     ${videoUrl}
+    //     `,
+    //   }),
+    // )
     if (videoUrl && video.src !== videoUrl) {
+      video.currentTime = 0
+      video.pause()
       video.dataset.originUrl = video.src
       video.src = videoUrl
+      const style = document.createElement('style')
+      style.textContent = `
+      .mplayer-time-total-text {
+        font-weight: bold;
+      }
+      `
+      document.head.appendChild(style)
+      // alert(videoUrl)
+      // window.ReactNativeWebView.postMessage(
+      //   JSON.stringify({
+      //     action: 'console.log',
+      //     payload: 'current url: ' + videoUrl,
+      //   }),
+      // )
       video.load()
       setTimeout(() => {
         video.muted = false
@@ -33,8 +47,6 @@ function __$hack() {
     evt => {
       const video = evt.target
       if (video && video.tagName === 'VIDEO') {
-        video.currentTime = 0
-        video.pause()
         replacePlayUrl()
       }
     },

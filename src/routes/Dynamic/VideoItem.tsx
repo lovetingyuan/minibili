@@ -27,7 +27,7 @@ export default function VideoItem(props: {
       // forwardCount,
     },
   } = props
-  const { setOverlayButtons } = useStore()
+  const { setOverlayButtons, $watchedVideos } = useStore()
   const navigation = useNavigation<NavigationProps['navigation']>()
   const gray = tw(colors.gray6.text).color
   const textStyle = {
@@ -35,6 +35,7 @@ export default function VideoItem(props: {
     fontSize: 13,
   }
   const nodes = props.item.desc?.rich_text_nodes
+  const watchedInfo = $watchedVideos[bvid]
 
   return (
     <TouchableOpacity
@@ -87,6 +88,14 @@ export default function VideoItem(props: {
         </View>
         <View className="flex-1 justify-around">
           <Text className="flex-1 text-base mb-3" numberOfLines={3}>
+            {watchedInfo ? (
+              <Text className={`${colors.success.text} font-bold`}>
+                👀
+                {watchedInfo.watchProgress > 99
+                  ? '已看完 '
+                  : `已观看${watchedInfo.watchProgress}% `}
+              </Text>
+            ) : null}
             {title}
           </Text>
           <View className="flex-row shrink-0 min-w-20 items-center gap-x-3 flex-wrap">

@@ -5,6 +5,7 @@ import { View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 import type { RootStackParamList } from '@/types'
+import { parseDuration } from '@/utils'
 
 import { useVideoInfo } from '../../api/video-info'
 
@@ -13,6 +14,7 @@ export default React.memo(VideoInfo)
 function VideoInfo(props: {
   currentPage: number
   setCurrentPage: (p: number) => void
+  setCurrentCid: (c: number) => void
 }) {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data, isLoading } = useVideoInfo(route.params.bvid)
@@ -22,7 +24,7 @@ function VideoInfo(props: {
     ...data,
   }
 
-  const { title, desc } = videoInfo
+  const { title, desc, pages } = videoInfo
   let videoDesc = desc
   if (videoDesc === '-') {
     videoDesc = ''
@@ -37,7 +39,7 @@ function VideoInfo(props: {
           {videoDesc}
         </Text>
       ) : null}
-      {(videoInfo?.pages?.length || 0) > 1 ? (
+      {(pages?.length || 0) > 1 ? (
         <ListItem.Accordion
           icon={<Icon name={'chevron-down'} type="material-community" />}
           containerStyle={tw('py-1 px-3 mt-5')}
@@ -60,6 +62,7 @@ function VideoInfo(props: {
                 key={v.page}
                 onPress={() => {
                   props.setCurrentPage(v.page)
+                  props.setCurrentCid(v.cid)
                 }}
                 containerStyle={tw('py-3 px-5')}
                 bottomDivider
@@ -67,11 +70,9 @@ function VideoInfo(props: {
                 <ListItem.Content>
                   <ListItem.Title
                     className={
-                      selected
-                        ? `font-bold ${colors.success.text}`
-                        : 'text-gray-500'
+                      selected ? colors.success.text : 'text-gray-500'
                     }>
-                    {v.page}. {v.title}
+                    {v.page}. {v.title} ({parseDuration(v.duration)})
                   </ListItem.Title>
                 </ListItem.Content>
               </ListItem>

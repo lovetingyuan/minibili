@@ -66,6 +66,49 @@ function __$hack() {
       rateBtn.textContent = 1 + xx
       video.playbackRate = 1
     })
+    let watchedTime = 0
+    let lastTime = 0 // Last time update position
+
+    video.addEventListener('timeupdate', function () {
+      let currentTime = video.currentTime
+      // Add the time difference if it's a regular playback or a small skip (less than 2 seconds)
+      if (currentTime - lastTime < 2 && currentTime > lastTime) {
+        watchedTime += currentTime - lastTime
+      }
+      lastTime = currentTime
+    })
+
+    video.addEventListener('seeking', function () {
+      // Update lastTime to current time when user seeks
+      lastTime = video.currentTime
+    })
+
+    video.addEventListener('ended', function () {
+      window.reportPlayTime()
+    })
+    window.reportPlayTime = () => {
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          action: 'reportPlayTime',
+          payload: parseFloat(
+            ((watchedTime * 100) / video.duration).toFixed(1),
+          ),
+        }),
+      )
+    }
+    const style = document.createElement('style')
+    style.textContent = `
+    body, #bilibiliPlayer, .mplayer {
+      background-color: black!important;
+    }
+    .b-danmaku {
+      opacity: 0.66!important;
+    }
+    .mplayer-control-bar-top {
+      align-items: center;
+    }
+    `
+    document.head.appendChild(style)
   })
 
   const xx = 'x'

@@ -23,7 +23,7 @@ import Route from './routes/Index'
 import {
   AppContextProvider,
   getAppValue,
-  InitContextComp,
+  InitStoreComp,
   onChange,
 } from './store'
 import { reportApiError } from './utils/report'
@@ -92,7 +92,7 @@ export default function App() {
         <AppContextProvider value={appValue} onChange={onChange}>
           <ThemeProvider theme={rneTheme}>
             <SWRConfig value={swrConfig}>
-              <InitContextComp />
+              <InitStoreComp />
               <RemoteConfig />
               <CheckAppUpdate />
               <CheckUpUpdate />

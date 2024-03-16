@@ -41,6 +41,7 @@ const getVideoInfo = (data: VideoInfoResponse) => {
         cover: v.first_frame,
         title: v.part,
         page: v.page,
+        cid: v.cid,
       }
     }),
   }
