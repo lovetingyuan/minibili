@@ -6,7 +6,11 @@ import { TouchableOpacity, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
-import type { CollectVideoInfo, NavigationProps } from '@/types'
+import type {
+  CollectVideoInfo,
+  HistoryVideoInfo,
+  NavigationProps,
+} from '@/types'
 import {
   imgUrl,
   isDefined,
@@ -19,8 +23,8 @@ function VideoListItem({
   video,
   buttons,
 }: {
-  video: CollectVideoInfo
-  buttons?: (vi: CollectVideoInfo) => {
+  video: CollectVideoInfo | HistoryVideoInfo
+  buttons?: (vi: CollectVideoInfo | HistoryVideoInfo) => {
     text: string
     onPress: () => void
   }[]
@@ -77,6 +81,15 @@ function VideoListItem({
             </Text>
           </View>
         ) : null}
+        {'watchProgress' in video ? (
+          <View className="absolute px-1 py-[1px] bottom-0 right-0 m-1 rounded-sm bg-gray-900/70">
+            <Text className="text-xs text-white">
+              {video.watchProgress > 99
+                ? '已看完 '
+                : `已观看${video.watchProgress}% `}
+            </Text>
+          </View>
+        ) : null}
       </View>
       <View className="flex-[4] justify-between">
         <Text
@@ -88,6 +101,7 @@ function VideoListItem({
         <View className="gap-2">
           <Text
             className={`${isFollowed ? colors.secondary.text : colors.primary.text} ${isFollowed ? 'font-bold' : ''}`}>
+            <Text className={colors.gray7.text}>UP: </Text>
             {video.name}
           </Text>
           {isDefined(video.play) ? (

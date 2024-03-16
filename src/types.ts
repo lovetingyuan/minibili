@@ -33,11 +33,17 @@ export interface CollectVideoInfo {
   like?: number
 }
 
+export interface HistoryVideoInfo extends CollectVideoInfo {
+  watchProgress: number
+  watchTime: number
+}
+
 export type RootStackParamList = {
   Welcome: undefined
   SearchUps: undefined
   SearchVideos: undefined
   Collect: undefined
+  History: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
   Play: {
     bvid: string

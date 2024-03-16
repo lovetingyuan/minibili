@@ -23,6 +23,7 @@ import {
 } from './DynamicDetail/Header'
 import Follow from './Follow'
 import { followHeaderRight } from './Follow/Header'
+import History from './History'
 import Play from './Play'
 import SearchUps from './SearchUps'
 import SearchVideos from './SearchVideos'
@@ -154,6 +155,7 @@ function Route() {
             }}
           />
           <Stack.Screen name="Collect" component={Collect} />
+          <Stack.Screen name="History" component={History} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

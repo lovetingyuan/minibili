@@ -175,17 +175,15 @@ function Player(props: { currentPage: number; currentCid?: number }) {
           const playedInfo = playedMap[videoInfo.bvid]
           const newProgress = eventData.payload
           if (playedInfo) {
-            if (playedInfo.watchProgress < newProgress) {
-              set$watchedVideos({
-                ...playedMap,
-                [videoInfo.bvid]: {
-                  ...playedInfo,
-                  watchProgress: newProgress,
-                  watchTime: Date.now(),
-                  bvid: videoInfo.bvid,
-                },
-              })
-            }
+            set$watchedVideos({
+              ...playedMap,
+              [videoInfo.bvid]: {
+                ...playedInfo,
+                watchProgress: Math.max(playedInfo.watchProgress, newProgress),
+                watchTime: Date.now(),
+                bvid: videoInfo.bvid,
+              },
+            })
           } else {
             const watchedVideos = Object.values(playedMap)
             if (watchedVideos.length > 500) {
@@ -203,6 +201,11 @@ function Player(props: { currentPage: number; currentCid?: number }) {
               watchProgress: newProgress,
               watchTime: Date.now(),
               bvid: videoInfo.bvid,
+              name: videoInfo.name!,
+              title: videoInfo.title,
+              cover: videoInfo.cover!,
+              date: videoInfo.date!,
+              duration: videoInfo.duration,
             }
             set$watchedVideos(playedMap)
           }

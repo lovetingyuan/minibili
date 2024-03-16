@@ -10,12 +10,12 @@ function Collect() {
 
   return (
     <TextAction
-      text="⭐️ 我的收藏"
+      text="⏰ 观看历史"
       buttons={[
         {
-          text: '查看收藏',
+          text: '查看记录',
           onPress: () => {
-            navigation.navigate('Collect')
+            navigation.navigate('History')
           },
         },
       ]}

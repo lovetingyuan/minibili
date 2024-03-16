@@ -8,6 +8,7 @@ import BlackTags from './BlackTags'
 import BlackUps from './BlackUps'
 import Collect from './Collect'
 import Feedback from './Feedback'
+import History from './History'
 import SortCate from './SortCate'
 import Statement from './Statement'
 import Version from './Version'
@@ -23,6 +24,7 @@ function About() {
       <Feedback />
       <Backup />
       <Collect />
+      <History />
       <Statement />
       <Divider className="mb-4" />
       <BlackTags />

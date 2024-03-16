@@ -10,7 +10,7 @@ import {
 
 import { RanksConfig } from '../constants'
 import useMounted from '../hooks/useMounted'
-import type { CollectVideoInfo, UpInfo } from '../types'
+import type { CollectVideoInfo, HistoryVideoInfo, UpInfo } from '../types'
 
 interface UpdateUpInfo {
   latestId: string
@@ -42,10 +42,7 @@ export const getAppValue = () => {
     $ignoredVersions: [] as string[],
     $videoCatesList: RanksConfig,
     $collectedVideos: [] as CollectVideoInfo[],
-    $watchedVideos: {} as Record<
-      string,
-      { watchProgress: number; watchTime: number; bvid: string }
-    >,
+    $watchedVideos: {} as Record<string, HistoryVideoInfo>,
     // -------------------------
     initialed: false,
     isWiFi: false,
