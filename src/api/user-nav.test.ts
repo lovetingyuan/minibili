@@ -6,5 +6,8 @@ import ResSchema from './user-nav.schema'
 
 test('get-user-nav', async () => {
   const res = await getWBIInfo(request)
-  ResSchema.parse(res)
+  ResSchema.parse({
+    isLogin: false,
+    wbi_img: res,
+  })
 })

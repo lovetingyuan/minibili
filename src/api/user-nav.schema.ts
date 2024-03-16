@@ -7,6 +7,7 @@ const Schema = z.object({
     sub_url: z.string(),
   }),
 })
+
 export default Schema
 
 export type UserNavType = z.infer<typeof Schema>
