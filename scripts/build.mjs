@@ -60,17 +60,17 @@ const assert = require('assert')
 
 const getBuildList = buildStr => {
   let buildListStr = buildStr.toString('utf8')
-  let str = buildListStr
   let list
-  while (str.includes('[')) {
+  while (buildListStr.includes('[')) {
     try {
-      list = JSON.parse(str)
+      buildListStr = buildListStr.substring(buildListStr.indexOf('['))
+      list = JSON.parse(buildListStr)
       break
     } catch (e) {
-      str = str.substring(str.indexOf('['))
+      buildListStr = buildListStr.substring(1)
     }
   }
-  list.toString = () => str.trim()
+  list.toString = () => buildListStr.trim()
   return list
 }
 
