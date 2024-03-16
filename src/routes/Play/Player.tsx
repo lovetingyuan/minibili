@@ -29,17 +29,11 @@ import { UPDATE_URL_CODE } from './update-playurl'
 
 export default React.memo(Player)
 
-// const VerticalInitScale = 0.3
-// const getIsWiFi = () => false
-
 function Player(props: { currentPage: number }) {
   const { getIsWiFi } = useStore()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { width, height } = useWindowDimensions()
-  // const [verticalScale, setVerticalScale] = React.useState(VerticalInitScale)
-  // const [extraHeight, setExtraHeight] = React.useState(0)
   const [verticalExpand, setVerticalExpand] = React.useState(false)
-  // const playStateRef = React.useRef('')
   const { data } = useVideoInfo(route.params.bvid)
   const [loadPlayer, setLoadPlayer] = React.useState(getIsWiFi())
   const loadingErrorRef = React.useRef(false)
@@ -53,7 +47,6 @@ function Player(props: { currentPage: number }) {
     isWifi ? videoInfo.bvid : '',
     isWifi ? videoInfo.cid : '',
   )
-  // const [webviewKey, setWebViewKey] = React.useState(videoInfo.bvid)
   const videoUrl = durl ? durl[0]?.backup_url?.[0] || durl[0]?.url || '' : null
   const [playState, setPlayState] = React.useState('init')
 
@@ -95,13 +88,6 @@ function Player(props: { currentPage: number }) {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
-  React.useEffect(() => {
-    if (playState === 'ended' || playState === 'pause') {
-      KeepAwake.activateKeepAwakeAsync('PLAY')
-    } else {
-      KeepAwake.deactivateKeepAwake('PLAY')
-    }
-  }, [playState])
 
   let videoWidth = 0
   let videoHeight = 0
@@ -131,6 +117,11 @@ function Player(props: { currentPage: number }) {
       const eventData = JSON.parse(evt.nativeEvent.data) as any
       if (eventData.action === 'playState') {
         setPlayState(eventData.payload)
+        if (eventData.payload === 'ended' || eventData.payload === 'pause') {
+          KeepAwake.deactivateKeepAwake('PLAY')
+        } else {
+          KeepAwake.activateKeepAwakeAsync('PLAY')
+        }
         if (eventData.payload === 'ended') {
           setVerticalExpand(false)
         }

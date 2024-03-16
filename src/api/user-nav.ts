@@ -1,18 +1,15 @@
 // import request from './fetcher'
-import { simpleRequest } from './fetcher-lite'
+// import { simpleRequest } from './fetcher-lite'
 import type { UserNavType } from './user-nav.schema'
 
-export function getUserNav() {
-  return simpleRequest<UserNavType>('/x/web-interface/nav')
-}
-
+//https://api.bilibili.com/x/web-interface/nav
 let wbiImage: UserNavType['wbi_img'] | null = null
 
-export function getWBIInfo() {
+export function getWBIInfo(request: <T>(url: string) => Promise<T>) {
   if (wbiImage) {
-    return Promise.resolve(wbiImage)
+    return wbiImage
   }
-  return getUserNav().then(data => {
+  return request<UserNavType>('/x/web-interface/nav').then(data => {
     wbiImage = data.wbi_img
     return wbiImage
   })

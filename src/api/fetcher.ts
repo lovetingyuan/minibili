@@ -68,7 +68,7 @@ export default async function request<D extends any>(url: string): Promise<D> {
   }
 
   if (url.includes('/wbi/')) {
-    const wbiImg = await getWBIInfo()
+    const wbiImg = await getWBIInfo(request)
     const [_url, _query] = requestUrl.split('?')
     const params = new URLSearchParams(_query)
     const queryParams: Record<string, string> = {}
@@ -117,7 +117,7 @@ export default async function request<D extends any>(url: string): Promise<D> {
   // if (url === '/x/web-interface/nav') {
   //   return res.data
   // }
-  if (res.code) {
+  if (res.code && url !== '/x/web-interface/nav') {
     // reportApiError(url, res)
 
     return Promise.reject(

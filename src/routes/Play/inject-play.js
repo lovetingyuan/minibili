@@ -66,37 +66,6 @@ function __$hack() {
       rateBtn.textContent = 1 + xx
       video.playbackRate = 1
     })
-    // if (!document.getElementById('muted-toggle')) {
-    //   const div = document.createElement('div')
-    //   div.id = 'muted-toggle'
-    //   div.style.cssText = `
-    //   position: fixed;
-    //   top: 10px;
-    //   left: 10px;
-    //   background: #eee;
-    //   border-radius: 4px;
-    //   padding: 2px 10px;
-    //   border: 1px solid #555;
-    //   display: none;
-    //   `
-    //   div.innerHTML = `
-    //   <span onclick="document.querySelector('video').muted=false;this.parentElement.style.display='none'" style="vertical-align: middle">取消静音</span>
-    //   <span onclick="this.parentElement.style.display='none'" style="font-size: 22px; vertical-align: middle"> ×</span>
-    //   `
-    //   document.body.appendChild(div)
-    // }
-    // let timer = null
-    // video.addEventListener('volumechange', function () {
-    //   clearTimeout(timer)
-    //   timer = setTimeout(() => {
-    //     const mutedBtn = document.getElementById('muted-toggle')
-    //     if (video.muted) {
-    //       mutedBtn.style.display = 'block'
-    //     } else {
-    //       mutedBtn.style.display = 'none'
-    //     }
-    //   }, 500)
-    // })
   })
 
   const xx = 'x'

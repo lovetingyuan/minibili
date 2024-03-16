@@ -1,6 +1,7 @@
 import { assert, test } from 'vitest'
 
-import { simpleRequest } from '../api/fetcher-lite'
+import request from '../api/fetcher'
+import { getWBIInfo } from '../api/user-nav'
 import encWbi from './wbi'
 
 const querys = [
@@ -16,15 +17,15 @@ const querys = [
 ]
 
 test('wbi-generate', async () => {
-  const data: any = await simpleRequest('/x/web-interface/nav')
+  const data: any = await getWBIInfo(request)
   const query = encWbi(
     querys.reduce((a, b) => {
       // @ts-ignore
       a[b[0]] = b[1]
       return a
     }, {}),
-    data.wbi_img.img_url,
-    data.wbi_img.sub_url,
+    data.img_url,
+    data.sub_url,
   )
   assert.ok(/w_rid=[a-z0-9]{32}$/.test(query))
   // console.log(query)
