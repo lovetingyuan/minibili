@@ -1,152 +1,120 @@
 import { useNetInfo } from '@react-native-community/netinfo'
 import { Overlay } from '@rneui/themed'
+import { Image } from 'expo-image'
 import React from 'react'
-import { Linking } from 'react-native'
-import WebView from 'react-native-webview'
+import {
+  Linking,
+  Pressable,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native'
+import PagerView from 'react-native-pager-view'
 
 import { useStore } from '../store'
 
-function __$hack() {
-  const gallery = document.createElement('div')
-  document.body.appendChild(gallery)
-  const style = document.createElement('style')
-  style.textContent = `
-  body .pswp__counter { font-size: 18px; }
-  .picture {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  `
-  document.head.appendChild(style)
-  gallery.style.opacity = '0'
-  // @ts-ignore
-  gallery.innerHTML = window.images
-    // @ts-ignore
-    .map(img => {
-      return `
-    <a href="${img.src}" data-pswp-width="${img.width}" data-pswp-height="${img.height}">
-      <img src="${img.src}" class="picture" alt="" />
-    </a>
-    `
-    })
-    .join('')
-  // @ts-ignore
-  // eslint-disable-next-line no-undef
-  const lightbox = new PhotoSwipeLightbox({
-    gallery,
-    children: 'a',
-    // @ts-ignore
-    // eslint-disable-next-line no-undef
-    pswpModule: PhotoSwipe,
-    closeOnVerticalDrag: false,
-    clickToCloseNonZoomable: false,
-    pinchToClose: false,
-    loop: false,
-  })
-  lightbox.on('uiRegister', function () {
-    lightbox.pswp.ui.registerElement({
-      name: 'download-button',
-      order: 8,
-      isButton: true,
-      tagName: 'a',
-      html: {
-        isCustomSVG: true,
-        inner:
-          '<path d="M20.5 14.3 17.1 18V10h-2.2v7.9l-3.4-3.6L10 16l6 6.1 6-6.1ZM23 23H9v2h14Z" id="pswp__icn-download"/>',
-        outlineID: 'pswp__icn-download',
-      },
-      // @ts-ignore
-      onInit: (el, pswp) => {
-        el.setAttribute('download', '')
-        el.setAttribute('target', '_blank')
-        el.setAttribute('rel', 'noopener')
-        pswp.on('change', () => {
-          el.href = pswp.currSlide.data.src
-        })
-      },
-    })
-  })
-  lightbox.on('close', () => {
-    // @ts-ignore
-    window.ReactNativeWebView.postMessage(
-      JSON.stringify({
-        action: 'close',
-        payload: '',
-      }),
-    )
-  })
-  // lightbox.init()
-  // @ts-ignore
-  lightbox.loadAndOpen(window.currentImgIndex, {
-    gallery,
-  })
-}
-
-const a = inlineRequire('photoswipe/dist/umd/photoswipe-lightbox.umd.min.js')
-const b = inlineRequire('photoswipe/dist/umd/photoswipe.umd.min.js')
-const c = inlineRequire('photoswipe/dist/photoswipe.css')
-
-const html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>images</title>
-  <script> window.setImages = ${__$hack} </script>
-  <script>
-  ${a}
-  ${b}
-  </script>
-  <style> ${c} </style>
-</head>
-<body style="background-color: #222;"></body>
-</html>
-`
-
 export default React.memo(ImagesView)
 
+const textShadow = {
+  textShadowColor: 'black',
+  textShadowOffset: { width: 0, height: 0 },
+  textShadowRadius: 5,
+}
+
 function ImagesView() {
-  const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } =
-    useStore()
+  const {
+    imagesList,
+    currentImageIndex,
+    setOverlayButtons,
+    setImagesList,
+    setCurrentImageIndex,
+  } = useStore()
 
   const netinfo = useNetInfo()
-  const webviewRef = React.useRef<WebView | null>(null)
+  const { width, height } = useWindowDimensions()
+  const isWiFi = netinfo.type === 'wifi'
+  const images = imagesList.map(v => {
+    let url = v.src
+    if (!isWiFi) {
+      url += `@${width * 0.8}w_${(width * 0.8 * v.height) / v.width}h_1c.webp`
+    }
+    return {
+      url,
+      width: v.width,
+      height: v.height,
+    }
+  })
+  const [current, setCurrent] = React.useState(currentImageIndex)
+  const onClose = () => {
+    setImagesList([])
+    setCurrentImageIndex(0)
+  }
   return (
     <Overlay
-      isVisible={imagesList.length > 0}
+      isVisible={images.length > 0}
       fullScreen
       overlayStyle={tw('p-0 m-0')}
-      onBackdropPress={() => {
-        setImagesList([])
-        setCurrentImageIndex(0)
-      }}>
-      <WebView
-        originWhitelist={['*']}
-        ref={webviewRef}
-        source={{ html }}
-        onLoad={() => {
-          webviewRef.current?.injectJavaScript(`
-          window.images = ${JSON.stringify(imagesList)};
-          window.currentImgIndex = ${currentImageIndex};
-          window.isWifi = ${netinfo.type === 'wifi'};
-          window.setImages && window.setImages();
-          true;
-        `)
-        }}
-        onMessage={evt => {
-          const data = JSON.parse(evt.nativeEvent.data) as any
-          if (data.action === 'current-index') {
-            Linking.openURL(imagesList[data.payload].src)
-          }
-          if (data.action === 'close') {
-            setImagesList([])
-            setCurrentImageIndex(0)
-          }
-        }}
-      />
+      onBackdropPress={onClose}>
+      <View className="flex-1 relative">
+        <View className="w-full justify-center absolute top-5 z-10">
+          <Text className="text-center text-white text-lg" style={textShadow}>
+            {current + 1} / {images.length}
+          </Text>
+        </View>
+        <View className="w-full justify-center absolute top-5 z-10">
+          <Text
+            className="text-right text-white text-2xl mr-4"
+            onPress={onClose}
+            style={textShadow}>
+            ✕
+          </Text>
+        </View>
+        <PagerView
+          onPageSelected={e => {
+            setCurrent(e.nativeEvent.position)
+          }}
+          className="flex-1"
+          initialPage={currentImageIndex}>
+          {images.map(v => {
+            let imgWidth = Math.min(width, v.width)
+            let imgHeight = (imgWidth * v.height) / v.width
+            if (imgHeight > height) {
+              imgHeight = Math.min(height, v.height)
+              imgWidth = (v.width * imgHeight) / v.height
+            }
+            return (
+              <Pressable
+                onLongPress={() => {
+                  setOverlayButtons(
+                    [
+                      {
+                        text: '浏览器查看（下载）',
+                        onPress: () => {
+                          Linking.openURL(v.url)
+                        },
+                      },
+                      v.url.includes('@')
+                        ? {
+                            text: '查看清晰版本',
+                            onPress: () => {
+                              Linking.openURL(v.url.split('@')[0])
+                            },
+                          }
+                        : null,
+                    ].filter(Boolean),
+                  )
+                }}
+                key={v.url}
+                className="flex-1 bg-black justify-center items-center">
+                <Image
+                  source={{ uri: v.url }}
+                  style={{ width: imgWidth, height: imgHeight }}
+                />
+              </Pressable>
+            )
+          })}
+        </PagerView>
+      </View>
     </Overlay>
   )
 }
