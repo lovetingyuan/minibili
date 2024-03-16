@@ -228,7 +228,7 @@ function Player(props: { currentPage: number }) {
   return (
     <View
       renderToHardwareTextureAndroid
-      className="w-full shrink-0"
+      className="w-full shrink-0 bg-black"
       style={{ height: videoViewHeight }}>
       {/* <Text>playstate: {playState}</Text> */}
       {loadPlayer ? (
