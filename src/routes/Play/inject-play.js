@@ -59,6 +59,13 @@ function __$hack() {
         }
       })
     })
+
+    video.addEventListener('ended', () => {
+      const rateBtn = document.getElementById('play-rate-button')
+      rateBtn.dataset.rate = '1' + xx
+      rateBtn.textContent = 1 + xx
+      video.playbackRate = 1
+    })
     // if (!document.getElementById('muted-toggle')) {
     //   const div = document.createElement('div')
     //   div.id = 'muted-toggle'

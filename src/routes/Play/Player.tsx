@@ -194,6 +194,7 @@ function Player(props: { currentPage: number }) {
       }}
       ref={webviewRef}
       originWhitelist={['https://*', 'bilibili://*']}
+      containerStyle={tw('bg-white')}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback
