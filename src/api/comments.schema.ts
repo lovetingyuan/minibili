@@ -93,11 +93,11 @@ const BaseReplySchema = z.object({
   up_action: z.object({ like: z.boolean(), reply: z.boolean() }),
 })
 
-export type ReplayItem = z.infer<typeof BaseReplySchema> & {
-  replies: ReplayItem[] | null
+export type ReplyResItem = z.infer<typeof BaseReplySchema> & {
+  replies: ReplyResItem[] | null
 }
 
-const RepliesSchema: z.ZodType<ReplayItem> = BaseReplySchema.extend({
+const RepliesSchema: z.ZodType<ReplyResItem> = BaseReplySchema.extend({
   replies: z.lazy(() => RepliesSchema.array()).nullable(),
 })
 

@@ -3,7 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
-import { ScrollView, View } from 'react-native'
+import { View } from 'react-native'
 
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
@@ -57,7 +57,36 @@ function Play({ route }: Props) {
   return (
     <View className="flex-1">
       <Player currentPage={currentPage} currentCid={currentCid} />
-      <ScrollView className="py-4 px-3">
+      <CommentList
+        commentId={videoInfo?.aid || ''}
+        commentType={1}
+        dividerRight={
+          <View className="flex-row items-center">
+            <Text
+              onPress={() => {
+                Clipboard.setStringAsync(bvid).then(() => {
+                  showToast('已复制视频ID')
+                })
+              }}
+              className="text-xs text-gray-500 dark:text-gray-400">
+              {bvid}
+            </Text>
+            <Text className="text-base font-bold text-gray-500 dark:text-gray-400">
+              {' · '}
+            </Text>
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              {videoInfo?.tag}
+            </Text>
+          </View>
+        }>
+        <VideoHeader />
+        <VideoInfo
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          setCurrentCid={setCurrentCid}
+        />
+      </CommentList>
+      {/* <ScrollView className="py-4 px-3">
         <VideoHeader />
         <VideoInfo
           currentPage={currentPage}
@@ -87,7 +116,7 @@ function Play({ route }: Props) {
             </View>
           }
         />
-      </ScrollView>
+      </ScrollView> */}
     </View>
   )
 }

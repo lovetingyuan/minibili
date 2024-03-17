@@ -498,9 +498,8 @@ export function useDynamicItems(mid?: string | number) {
           // &features=itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote
           return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}`
         }
-        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response.offset}&host_mid=${mid}`
+        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response?.offset ?? ''}&host_mid=${mid}`
       },
-      request,
       {
         revalidateFirstPage: true,
         errorRetryCount: 3,

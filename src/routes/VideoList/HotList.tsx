@@ -47,6 +47,9 @@ function Hot() {
       videos={list || []}
       isRefreshing={isRefreshing}
       onReachEnd={() => {
+        if (isReachingEnd) {
+          return
+        }
         setSize(page + 1)
       }}
       onRefresh={fab => {

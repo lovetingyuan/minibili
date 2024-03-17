@@ -2,7 +2,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Icon, Text } from '@rneui/themed'
 import React from 'react'
-import { Pressable, ScrollView, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 
 import CommentList from '../../components/CommentList'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
@@ -36,8 +36,7 @@ function DynamicDetail({
   )
 
   return (
-    <ScrollView className="flex-1 px-3 pt-5">
-      <DynamicItem item={route.params.detail} />
+    <View className="flex-1">
       <CommentList
         commentId={commentId}
         commentType={commentType}
@@ -87,8 +86,9 @@ function DynamicDetail({
               ) : null}
             </Pressable>
           </View>
-        }
-      />
-    </ScrollView>
+        }>
+        <DynamicItem item={route.params.detail} />
+      </CommentList>
+    </View>
   )
 }

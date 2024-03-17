@@ -177,15 +177,17 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
               e.stopPropagation()
               gotoLivePage()
             }}
-            className="inset-0 absolute justify-center items-center w-12 h-12 rounded-full bg-neutral-900/50">
-            <Text className={'text-center text-teal-400'}>直播中</Text>
+            className="inset-0 absolute justify-center items-center w-12 h-12 rounded-full bg-neutral-950/60">
+            <Text className={'text-center text-teal-300 font-bold'}>
+              直播中
+            </Text>
           </Pressable>
         ) : null}
         {hasUpdate ? (
           <Badge
             key={mid}
             badgeStyle={tw(
-              `h-4 w-4 rounded-[16px] absolute top-[-40px] left-[38px] ${colors.secondary.bg}`,
+              `h-4 w-4 rounded-full absolute top-[-45px] left-[38px] ${colors.secondary.bg}`,
             )}
           />
         ) : null}

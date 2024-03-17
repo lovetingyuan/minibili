@@ -1,15 +1,16 @@
 import React from 'react'
 import useSWR from 'swr'
+import useSWRInfinite from 'swr/infinite'
 import type { z } from 'zod'
 
-import type { ReplayItem, ReplyResponseSchema } from './comments.schema'
+import type { ReplyResItem, ReplyResponseSchema } from './comments.schema'
 import request from './fetcher'
 
 type ReplyResponse = z.infer<typeof ReplyResponseSchema>
 
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/
 
-const parseMessage = (content: ReplayItem['content']) => {
+const parseMessage = (content: ReplyResItem['content']) => {
   let keys: string[] = []
   let message = content.message
   const emojiMap: Record<
@@ -217,7 +218,7 @@ const getReplies = (res1: ReplyResponse, type: number) => {
   return replies
 }
 
-export type ReplyItem = ReturnType<typeof getReplies>[0]
+export type ReplyItemType = ReturnType<typeof getReplies>[0]
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
@@ -226,7 +227,7 @@ export function useDynamicComments(oid: string | number, type: number) {
       ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=3&pn=1&ps=30`
       : null
   }, request)
-  const replies: ReplyItem[] = React.useMemo(() => {
+  const replies: ReplyItemType[] = React.useMemo(() => {
     if (!data) {
       return []
     }
@@ -238,6 +239,54 @@ export function useDynamicComments(oid: string | number, type: number) {
       replies,
     },
     isLoading,
+    error,
+  }
+}
+
+export function useComments(oid: string | number, type: number) {
+  const { data, error, size, setSize, isValidating, isLoading } =
+    useSWRInfinite<ReplyResponse>(
+      (index, previousPageData) => {
+        const next = previousPageData?.cursor.next ?? 1
+        return oid
+          ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=3&next=${next}&ps=20`
+          : null
+      },
+      {
+        revalidateFirstPage: false,
+      },
+    )
+  // const isLoadingMore =
+  //   isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')
+  // const isEmpty = data?.[0]?.replies.length === 0
+  // const isReachingEnd =
+  //   isEmpty || (data && data[data.length - 1]?.replies.length === 0)
+  // const isRefreshing = isValidating && data && data.length === size
+  const uniqueMap: Record<string, boolean> = {}
+  const list =
+    data?.reduce((a, b) => {
+      return a.concat(getReplies(b, type))
+    }, [] as ReplyItemType[]) || []
+  const replies: ReplyItemType[] = []
+  for (const r of list) {
+    if (!uniqueMap[r.id]) {
+      uniqueMap[r.id] = true
+      replies.push(r)
+    }
+  }
+  return {
+    data: {
+      allCount: data?.[0]?.cursor.all_count,
+      replies,
+    },
+    isLoading,
+    update: () => {
+      // if (isReachingEnd) {
+      //   return
+      // }
+      setSize(size + 1)
+    },
+    isValidating,
     error,
   }
 }

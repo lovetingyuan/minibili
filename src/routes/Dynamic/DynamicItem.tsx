@@ -41,7 +41,7 @@ export default function DynamicItem({ item }: { item: DynamicItemAllType }) {
   }
   // https://m.bilibili.com/dynamic/710533241871794180?spm_id_from=333.999.0.0
   return (
-    <View className="py-5 px-3 border-b-[0.5px] border-b-gray-400">
+    <View className="flex-1 py-5 px-3 border-b-[0.5px] border-b-gray-400">
       {item.top ? (
         <Text
           className={`self-start px-2 text-left border mb-2 ${colors.secondary.border} rounded flex-1 font-thin text-sm ${colors.secondary.text}`}>
