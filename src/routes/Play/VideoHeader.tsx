@@ -6,7 +6,7 @@ import {
 import { Avatar, Icon, Text } from '@rneui/themed'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Alert, Pressable, TouchableOpacity, View } from 'react-native'
+import { Alert, Linking, Pressable, TouchableOpacity, View } from 'react-native'
 
 import { useWatchingCount } from '@/api/watching-count'
 import { colors } from '@/constants/colors.tw'
@@ -73,6 +73,19 @@ function VideoHeader() {
 
   return (
     <View className="items-center flex-wrap justify-between shrink-0 gap-3">
+      {videoInfo?.argument ? (
+        <View className="p-2 self-start">
+          <Text
+            className={`${colors.warning.text}`}
+            onPress={() => {
+              if (videoInfo.argumentLink) {
+                Linking.openURL(videoInfo.argumentLink)
+              }
+            }}>
+            ⚠️ {videoInfo.argument}
+          </Text>
+        </View>
+      ) : null}
       <View className="justify-between flex-row">
         <Pressable
           onPress={() => {

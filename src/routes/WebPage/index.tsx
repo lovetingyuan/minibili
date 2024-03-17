@@ -10,6 +10,8 @@ import {
 } from 'react-native'
 import { WebView } from 'react-native-webview'
 
+import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
+
 import { UA } from '../../constants'
 import useIsDark from '../../hooks/useIsDark'
 import { useStore } from '../../store'
@@ -34,7 +36,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
 export default React.memo(WebPage)
 
-function WebPage({ route, navigation }: Props) {
+function WebPage({ route }: Props) {
   const { url, title } = route.params
 
   const webviewRef = React.useRef<WebView | null>(null)
@@ -42,6 +44,7 @@ function WebPage({ route, navigation }: Props) {
   const isDark = useIsDark()
   const [height, setHeight] = React.useState(Dimensions.get('screen').height)
   const [isEnabled, setEnabled] = React.useState(true)
+  const [pageTitle, setPageTitle] = React.useState(title)
   const { isRefreshing, onRefresh } = useRefresh(
     React.useCallback(() => {
       return new Promise(r => {
@@ -50,15 +53,17 @@ function WebPage({ route, navigation }: Props) {
       })
     }, []),
   )
-
-  React.useEffect(() => {
-    const headerRight = () => {
-      return <HeaderRight reload={onRefresh} />
-    }
-    navigation.setOptions({
-      headerRight,
-    })
-  }, [navigation, onRefresh])
+  useUpdateNavigationOptions(
+    React.useMemo(() => {
+      const headerRight = () => {
+        return <HeaderRight reload={onRefresh} />
+      }
+      return {
+        headerRight,
+        headerTitle: pageTitle,
+      }
+    }, [onRefresh, pageTitle]),
+  )
   return (
     <ScrollView
       onLayout={e => setHeight(e.nativeEvent.layout.height)}
@@ -92,9 +97,7 @@ function WebPage({ route, navigation }: Props) {
         onMessage={evt => {
           const data = JSON.parse(evt.nativeEvent.data) as any
           if (data.action === 'set-title' && !title) {
-            navigation.setOptions({
-              headerTitle: data.payload,
-            })
+            setPageTitle(data.payload)
           }
         }}
         onLoad={() => {

@@ -1,49 +1,48 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import { SearchBarCommands } from 'react-native-screens'
 
 import { colors } from '@/constants/colors.tw'
 import useMounted from '@/hooks/useMounted'
-import { RootStackParamList } from '@/types'
+import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
 import UpList from './UpList'
 
-type Props = NativeStackScreenProps<RootStackParamList, 'SearchUps'>
-
-function SearchUps(props: Props) {
+function SearchUps() {
   const searchBarRef = React.useRef<SearchBarCommands | null>(null)
   const blackColor = tw(colors.black.text).color
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
 
-  React.useEffect(() => {
-    props.navigation.setOptions({
-      headerSearchBarOptions: {
-        ref: searchBarRef,
-        placeholder: '搜索UP主',
-        headerIconColor: blackColor,
-        hintTextColor: blackColor,
-        textColor: blackColor,
-        tintColor: blackColor,
-        disableBackButtonOverride: false,
-        shouldShowHintSearchIcon: false,
-        onClose: () => {
-          setSearchKeyWord('')
+  useUpdateNavigationOptions(
+    React.useMemo(() => {
+      return {
+        headerSearchBarOptions: {
+          ref: searchBarRef,
+          placeholder: '搜索UP主',
+          headerIconColor: blackColor,
+          hintTextColor: blackColor,
+          textColor: blackColor,
+          tintColor: blackColor,
+          disableBackButtonOverride: false,
+          shouldShowHintSearchIcon: false,
+          onClose: () => {
+            setSearchKeyWord('')
+          },
+          onSearchButtonPress: ({ nativeEvent: { text } }) => {
+            const keyword = text.trim()
+            if (!keyword) {
+              return
+            }
+            setSearchKeyWord(keyword)
+          },
         },
-        onSearchButtonPress: ({ nativeEvent: { text } }) => {
-          const keyword = text.trim()
-          if (!keyword) {
-            return
-          }
-          setSearchKeyWord(keyword)
-        },
-      },
-    })
-  }, [props.navigation, blackColor, setSearchKeyWord])
+      }
+    }, [blackColor]),
+  )
 
   useMounted(() => {
     setTimeout(() => {
       searchBarRef.current?.focus()
-    }, 100)
+    }, 80)
   })
 
   return <UpList keyword={searchKeyWord} />

@@ -26,7 +26,6 @@ export default function useRouteTheme() {
   const [routeTheme, setRouteTheme] = React.useState(getRouteTheme)
 
   useAppStateChange(() => {
-    // console.log('change route color mode')
     setRouteTheme(getRouteTheme())
   })
   React.useEffect(() => {

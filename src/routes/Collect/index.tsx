@@ -1,4 +1,3 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
@@ -6,18 +5,21 @@ import { Alert, Linking } from 'react-native'
 
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
+import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { useStore } from '@/store'
-import { CollectVideoInfo, RootStackParamList } from '@/types'
+import { CollectVideoInfo } from '@/types'
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Collect'>
-
-function CollectList(props: Props) {
+function CollectList() {
   const { $collectedVideos, set$collectedVideos } = useStore()
-  React.useEffect(() => {
-    props.navigation.setOptions({
-      headerTitle: `我的收藏（${$collectedVideos.length}）`,
-    })
-  }, [props.navigation, $collectedVideos.length])
+  const headerTitle = `我的收藏（${$collectedVideos.length}）`
+  useUpdateNavigationOptions(
+    React.useMemo(() => {
+      return {
+        headerTitle,
+      }
+    }, [headerTitle]),
+  )
+
   const buttons = (video: CollectVideoInfo) => {
     return [
       {

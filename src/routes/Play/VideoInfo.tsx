@@ -32,7 +32,7 @@ function VideoInfo(props: {
     videoDesc = ''
   }
   return (
-    <View className="  ">
+    <View>
       <Text className="text-base mt-3">{title}</Text>
       {videoDesc ? (
         <Text className="mt-3" selectable>
@@ -79,11 +79,10 @@ function VideoInfo(props: {
             )
           })}
         </ListItem.Accordion>
-      ) : !isLoading &&
-        videoInfo?.videos &&
-        videoInfo?.videos !== videoInfo?.pages?.length ? (
+      ) : null}
+      {!isLoading && videoInfo?.interactive ? (
         <Text className="mt-3 italic text-orange-600">
-          该视频为交互视频，暂不支持
+          【该视频为交互视频，暂不支持】
         </Text>
       ) : null}
     </View>

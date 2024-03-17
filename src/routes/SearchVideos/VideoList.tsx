@@ -14,7 +14,7 @@ function EmptyContent(props: { loading: boolean }) {
         {Array.from({ length: 20 }).map((_, i) => {
           return (
             <View
-              className="flex-row items-center h-28 justify-between gap-4 mb-6 px-4"
+              className="flex-row items-center h-28 justify-between gap-4 mb-6 px-2"
               key={i}>
               <Skeleton
                 animation="pulse"

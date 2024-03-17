@@ -7,12 +7,7 @@ const getWidth = () => Math.floor(Math.random() * (100 - 10 + 1)) + 10
 function VideoLoading() {
   return (
     <View className="flex-1 gap-3">
-      <Skeleton
-        animation="pulse"
-        // skeletonStyle={tw('bg-zinc-200')}
-        width={'100%' as any}
-        height={90}
-      />
+      <Skeleton animation="pulse" width={'100%' as any} height={110} />
       <View className="gap-2">
         <Skeleton
           animation="wave"
@@ -46,7 +41,7 @@ function VLoading() {
         .fill(null)
         .map((_, i) => {
           return (
-            <View className="px-2 py-1 gap-3 my-2 flex-row" key={i}>
+            <View className="px-2 pb-2 gap-3 mb-4 flex-row" key={i}>
               <VideoLoading />
               <VideoLoading />
             </View>

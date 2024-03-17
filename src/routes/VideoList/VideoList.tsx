@@ -21,7 +21,7 @@ function VideoList(props: {
   type: 'Hot' | 'Rank' | 'Search'
   footer?: Footer | ((l: any[]) => Footer)
   onReachEnd?: () => void
-  onRefresh?: () => void
+  onRefresh?: (fab?: boolean) => void
   isRefreshing?: boolean
 }) {
   const {
@@ -98,7 +98,7 @@ function VideoList(props: {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        className="flex-1 flex-row justify-around mx-1 mb-6"
+        className="flex-1 flex-row justify-around mx-[5px] mb-6"
         key={item.bvid}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
@@ -187,7 +187,7 @@ function VideoList(props: {
             ? props.footer(videoList)
             : props.footer
         }
-        contentContainerStyle={tw('px-1 pt-6')}
+        contentContainerStyle={tw('px-[4px] pt-6')}
         estimatedFirstItemOffset={100}
         {...refreshProps}
         {...reachEndProps}
@@ -202,7 +202,7 @@ function VideoList(props: {
           size="small"
           onPress={() => {
             listRef.current?.scrollToOffset(0)
-            props.onRefresh?.()
+            props.onRefresh?.(true)
           }}
         />
       )}

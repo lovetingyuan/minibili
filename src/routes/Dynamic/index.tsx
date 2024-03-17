@@ -6,6 +6,7 @@ import React from 'react'
 import { Image, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
+import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
 import {
   type DynamicItemAllType,
@@ -76,7 +77,7 @@ const Loading = React.memo(LoadingComp)
 
 export default React.memo(Dynamic)
 
-function Dynamic({ navigation, route }: Props) {
+function Dynamic({ route }: Props) {
   const upId = route.params?.user?.mid // || specialUser?.mid
   const dynamicListRef = React.useRef<any>(null)
   const { data: userInfo } = useUserInfo(upId)
@@ -117,13 +118,15 @@ function Dynamic({ navigation, route }: Props) {
       />
     )
   }, [])
+  useUpdateNavigationOptions(
+    React.useMemo(() => {
+      return {
+        headerTitle,
+        headerRight,
+      }
+    }, [headerTitle]),
+  )
 
-  React.useEffect(() => {
-    navigation.setOptions({
-      headerTitle,
-      headerRight,
-    })
-  }, [navigation, headerTitle])
   const renderItem = ({ item }: { item: DynamicItemAllType }) => {
     return <DynamicItem item={item} />
   }

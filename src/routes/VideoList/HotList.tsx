@@ -10,6 +10,7 @@ let refreshTime = Date.now()
 export default React.memo(Hot)
 
 function Hot() {
+  const [reload, setReload] = React.useState(0)
   const {
     list,
     page,
@@ -19,7 +20,7 @@ function Hot() {
     mutate,
     isReachingEnd,
     error,
-  } = useHotVideos()
+  } = useHotVideos(reload)
   React.useEffect(() => {
     if (Date.now() - refreshTime > 5 * 60 * 1000) {
       mutate()
@@ -48,8 +49,13 @@ function Hot() {
       onReachEnd={() => {
         setSize(page + 1)
       }}
-      onRefresh={() => {
-        mutate()
+      onRefresh={fab => {
+        // mutate()
+        if (!fab) {
+          setReload(reload + 1)
+        } else {
+          mutate()
+        }
       }}
       footer={getFooter}
     />

@@ -14,7 +14,6 @@ export default function useRNETheme() {
     useTWC(colors.white.text).color,
     useTWC(colors.black.text).color,
   ]
-  // console.log(white, black)
   const isDark = useIsDark()
   const getRNETheme = React.useCallback(() => {
     return createTheme({

@@ -1,4 +1,3 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
@@ -6,19 +5,21 @@ import { Linking } from 'react-native'
 
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
+import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { useStore } from '@/store'
-import { CollectVideoInfo, HistoryVideoInfo, RootStackParamList } from '@/types'
+import { CollectVideoInfo, HistoryVideoInfo } from '@/types'
 
-type Props = NativeStackScreenProps<RootStackParamList, 'History'>
-
-function HistoryList(props: Props) {
+function HistoryList() {
   const { $watchedVideos } = useStore()
-  React.useEffect(() => {
-    const count = Object.keys($watchedVideos).length
-    props.navigation.setOptions({
-      headerTitle: `观看历史（${count}）`,
-    })
-  }, [props.navigation, $watchedVideos])
+  const headerTitle = `观看历史（${Object.keys($watchedVideos).length}）`
+  useUpdateNavigationOptions(
+    React.useMemo(() => {
+      return {
+        headerTitle,
+      }
+    }, [headerTitle]),
+  )
+
   const buttons = (video: CollectVideoInfo) => {
     return [
       {

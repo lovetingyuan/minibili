@@ -19,7 +19,7 @@ import {
 } from 'react-native'
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 
-import { usePlayUrl, useVideoDownloadUrl } from '@/api/play-url'
+import { getDownloadUrl, usePlayUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
 import type { NavigationProps, RootStackParamList } from '@/types'
@@ -50,20 +50,12 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     ...route.params,
     ...data,
   }
-  const durl = usePlayUrl(
+  const videoUrl = usePlayUrl(
     isWifi ? videoInfo.bvid : '',
-    isWifi ? props.currentCid || videoInfo.cid : '',
+    isWifi ? props.currentCid || videoInfo.cid : 0,
   )
-  const videoUrl = durl ? durl[0]?.backup_url?.[0] || durl[0]?.url || '' : null
-  // const [playState, setPlayState] = React.useState('init')
+
   const [isEnded, setIsEnded] = React.useState(true)
-
-  const downloadVideoUrl = useVideoDownloadUrl(
-    videoInfo.bvid,
-    props.currentCid || videoInfo.cid,
-  )
-
-  // const durl = usePlayUrl('BV1SZ421y7Ae', '1460675026')
   React.useEffect(() => {
     if (!getIsWiFi()) {
       return
@@ -123,7 +115,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     }
   })
   const navigation = useNavigation<NavigationProps['navigation']>()
-  // const isFocused = useIsFocused();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -143,7 +134,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       setTimeout(() => {
         navigation.dispatch(e.data.action)
       })
-      //
     })
     return unsubscribe
   }, [navigation])
@@ -159,9 +149,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
   if (loadPlayer && videoWidth && videoHeight) {
     if (isEnded) {
       videoViewHeight = width * 0.6
-      // videoViewHeight = isVerticalVideo
-      //   ? (width * videoWidth) / videoHeight
-      //   : (videoHeight / videoWidth) * width
     } else {
       if (isVerticalVideo) {
         videoViewHeight = verticalExpand ? height * 0.66 : height * 0.33
@@ -174,7 +161,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     try {
       const eventData = JSON.parse(evt.nativeEvent.data) as any
       if (eventData.action === 'playState') {
-        // setPlayState(eventData.payload)
         setIsEnded(eventData.payload === 'ended')
         if (eventData.payload === 'play') {
           KeepAwake.activateKeepAwakeAsync('PLAY')
@@ -195,12 +181,14 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         }
       }
       if (eventData.action === 'downloadVideo') {
-        const url = downloadVideoUrl?.[0]?.url
-        if (url) {
-          Linking.openURL(url)
-        } else {
-          showToast('抱歉，暂不支持下载')
-        }
+        showToast('请稍后在浏览器中下载')
+        getDownloadUrl(videoInfo.bvid, props.currentCid || videoInfo.cid)?.then(
+          url => {
+            if (url) {
+              Linking.openURL(url)
+            }
+          },
+        )
       }
       if (eventData.action === 'reload') {
         // TODO:
@@ -283,7 +271,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     page: isWifi ? undefined : props.currentPage,
     autoplay: isWifi ? 0 : 1,
     hasMuteButton: true,
-    // portraitFullScreen: 1,
   }).forEach(([k, v]) => {
     if (v !== undefined) {
       search.append(k, v + '')
