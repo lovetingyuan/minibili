@@ -3,14 +3,14 @@ import useSWR from 'swr'
 import useSWRInfinite from 'swr/infinite'
 import type { z } from 'zod'
 
-import type { ReplyResItem, ReplyResponseSchema } from './comments.schema'
+import type { CommentResItem, CommentResponseSchema } from './comments.schema'
 import request from './fetcher'
 
-type ReplyResponse = z.infer<typeof ReplyResponseSchema>
+type CommentResType = z.infer<typeof CommentResponseSchema>
 
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/
 
-const parseMessage = (content: ReplyResItem['content']) => {
+export const parseCommentMessage = (content: CommentResItem['content']) => {
   let keys: string[] = []
   let message = content.message
   const emojiMap: Record<
@@ -117,14 +117,14 @@ const parseMessage = (content: ReplyResItem['content']) => {
         }
   })
 }
-export type MessageContent = ReturnType<typeof parseMessage>
+export type CommentMessageContent = ReturnType<typeof parseCommentMessage>
 
-const getReplies = (res1: ReplyResponse, type: number) => {
+const getReplies = (res1: CommentResType, type: number) => {
   const replies = (res1.replies || [])
     .filter(v => !v.invisible)
     .map(item => {
       return {
-        message: parseMessage(item.content),
+        message: parseCommentMessage(item.content),
         images: item.content.pictures?.map(img => {
           return {
             src: img.img_src,
@@ -151,7 +151,7 @@ const getReplies = (res1: ReplyResponse, type: number) => {
         replies:
           item.replies?.map(v => {
             return {
-              message: parseMessage(v.content),
+              message: parseCommentMessage(v.content),
               name: v.member.uname,
               face: v.member.avatar,
               sex: v.member.sex,
@@ -171,7 +171,7 @@ const getReplies = (res1: ReplyResponse, type: number) => {
   if (res1?.top?.upper) {
     const item = res1.top.upper
     replies.unshift({
-      message: parseMessage(item.content),
+      message: parseCommentMessage(item.content),
       images: item.content.pictures?.map(img => {
         return {
           src: img.img_src,
@@ -198,7 +198,7 @@ const getReplies = (res1: ReplyResponse, type: number) => {
       replies:
         item.replies?.map(v => {
           return {
-            message: parseMessage(v.content),
+            message: parseCommentMessage(v.content),
             name: v.member.uname,
             face: v.member.avatar,
             id: v.rpid_str,
@@ -218,16 +218,16 @@ const getReplies = (res1: ReplyResponse, type: number) => {
   return replies
 }
 
-export type ReplyItemType = ReturnType<typeof getReplies>[0]
+export type CommentItemType = ReturnType<typeof getReplies>[0]
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 export function useDynamicComments(oid: string | number, type: number) {
-  const { data, error, isLoading } = useSWR<ReplyResponse>(() => {
+  const { data, error, isLoading } = useSWR<CommentResType>(() => {
     return oid
       ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=3&pn=1&ps=30`
       : null
   }, request)
-  const replies: ReplyItemType[] = React.useMemo(() => {
+  const replies: CommentItemType[] = React.useMemo(() => {
     if (!data) {
       return []
     }
@@ -245,7 +245,7 @@ export function useDynamicComments(oid: string | number, type: number) {
 
 export function useComments(oid: string | number, type: number) {
   const { data, error, size, setSize, isValidating, isLoading } =
-    useSWRInfinite<ReplyResponse>(
+    useSWRInfinite<CommentResType>(
       (index, previousPageData) => {
         const next = previousPageData?.cursor.next ?? 1
         return oid
@@ -266,8 +266,8 @@ export function useComments(oid: string | number, type: number) {
   const list =
     data?.reduce((a, b) => {
       return a.concat(getReplies(b, type))
-    }, [] as ReplyItemType[]) || []
-  const replies: ReplyItemType[] = []
+    }, [] as CommentItemType[]) || []
+  const replies: CommentItemType[] = []
   for (const r of list) {
     if (!uniqueMap[r.id]) {
       uniqueMap[r.id] = true

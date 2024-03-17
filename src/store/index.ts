@@ -61,6 +61,11 @@ export const getAppValue = () => {
     _updatedCount: 0,
     _collectedVideosMap: {} as Record<string, CollectVideoInfo>,
     moreRepliesUrl: '',
+    repliesInfo: null as {
+      oid: string | number
+      root: string | number
+      type: number
+    } | null,
     checkLiveTimeStamp: Date.now(),
   }
 }

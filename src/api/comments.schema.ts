@@ -65,7 +65,7 @@ const ContentSchema = z.object({
     .nullish(),
 })
 
-const BaseReplySchema = z.object({
+export const BaseCommentSchema = z.object({
   content: ContentSchema,
   count: z.number(),
   ctime: z.number(),
@@ -74,9 +74,11 @@ const BaseReplySchema = z.object({
   member: MemberSchema,
   mid: z.number(),
   oid: z.union([z.number(), z.string()]),
+  // oid_string: z.string().nullish(),
   parent: z.number(),
+  parent_str: z.string(),
   rcount: z.number(),
-  // replies: z.lazy(() => ReplySchema.array()).nullable(),
+  // replies: z.lazy(() => CommentSchema.array()).nullable(),
   reply_control: z.object({
     time_desc: z.string().nullish(),
     location: z.string().nullish(),
@@ -93,15 +95,15 @@ const BaseReplySchema = z.object({
   up_action: z.object({ like: z.boolean(), reply: z.boolean() }),
 })
 
-export type ReplyResItem = z.infer<typeof BaseReplySchema> & {
-  replies: ReplyResItem[] | null
+export type CommentResItem = z.infer<typeof BaseCommentSchema> & {
+  replies: CommentResItem[] | null
 }
 
-const RepliesSchema: z.ZodType<ReplyResItem> = BaseReplySchema.extend({
+const RepliesSchema: z.ZodType<CommentResItem> = BaseCommentSchema.extend({
   replies: z.lazy(() => RepliesSchema.array()).nullable(),
 })
 
-export const ReplyResponseSchema = z.object({
+export const CommentResponseSchema = z.object({
   assist: z.number(),
   blacklist: z.number(),
   note: z.number(),

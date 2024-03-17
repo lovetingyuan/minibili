@@ -282,8 +282,9 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         uri: `${playUrl}?${search}`,
       }}
       ref={webviewRef}
+      className="bg-black"
       originWhitelist={['https://*', 'bilibili://*']}
-      containerStyle={tw('bg-white')}
+      containerStyle={tw('bg-black')}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback

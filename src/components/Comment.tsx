@@ -6,33 +6,45 @@ import { Image, Linking, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 
-import type { MessageContent, ReplyItem } from '../api/comments'
+import type { CommentItemType, CommentMessageContent } from '../api/comments'
 import { useStore } from '../store'
 import type { NavigationProps, RootStackParamList } from '../types'
 import { imgUrl } from '../utils'
 
 function CommentText(props: {
-  nodes: MessageContent
+  nodes: CommentMessageContent
   idStr: string
   fontSize: string
 }) {
   const { nodes, idStr, fontSize } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
-
+  const route =
+    useRoute<
+      NativeStackScreenProps<
+        RootStackParamList,
+        'Play' | 'DynamicDetail'
+      >['route']
+    >()
+  const upName = route.params
+    ? 'detail' in route.params
+      ? route.params.detail.name
+      : route.params.name
+    : ''
   return (
     <>
       {nodes.map((node, i) => {
         const key = idStr + i
         if (node.type === 'at') {
+          const name = node.text.substring(1)
           return (
             <Text
               key={key}
-              className={`${colors.primary.text} ${fontSize}`}
+              className={` ${fontSize} ${upName === name ? colors.secondary.text : colors.primary.text}`}
               onPress={() => {
                 navigation.push('Dynamic', {
                   user: {
                     face: '',
-                    name: node.text.substring(1),
+                    name,
                     mid: node.mid,
                     sign: '-',
                   },
@@ -105,9 +117,9 @@ function CommentText(props: {
   )
 }
 
-export default React.memo(Comment)
-
-function CommentItem(props: { comment: ReplyItem | ReplyItem['replies'][0] }) {
+function CommentItem(props: {
+  comment: CommentItemType | CommentItemType['replies'][0]
+}) {
   const { comment } = props
   const { setImagesList, setCurrentImageIndex } = useStore()
   const route =
@@ -183,13 +195,20 @@ function CommentItem(props: { comment: ReplyItem | ReplyItem['replies'][0] }) {
   )
 }
 
-function Comment(props: { comment: ReplyItem }) {
+export default React.memo(Comment)
+
+function Comment(props: {
+  comment: CommentItemType
+  className?: string
+  style?: any
+}) {
   const { comment } = props
-  const { setMoreRepliesUrl } = useStore()
+  const { setRepliesInfo } = useStore()
 
   return (
     <View
-      className={`flex-1 shrink-0 ${comment.replies?.length ? 'mb-7' : 'mb-4'}`}>
+      className={`${comment.replies?.length ? 'mb-7' : 'mb-4'} ${props.className || ''}`}
+      style={props.style}>
       <CommentItem comment={comment} />
       {comment.replies?.length ? (
         <View className="p-2 mt-1 rounded gap-1 opacity-90 flex-1 shrink-0 border-gray-500 bg-neutral-200 dark:bg-neutral-900">
@@ -201,10 +220,14 @@ function Comment(props: { comment: ReplyItem }) {
               type="clear"
               size="sm"
               onPress={() => {
-                const root = comment.replies[0].root_str
-                setMoreRepliesUrl(
-                  `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
-                )
+                setRepliesInfo({
+                  oid: comment.oid,
+                  type: comment.type,
+                  root: comment.replies[0].root_str,
+                })
+                // setMoreRepliesUrl(
+                //   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
+                // )
               }}
               buttonStyle={tw('justify-start p-[1px]')}>
               <Text className={colors.primary.text}>

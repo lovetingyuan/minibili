@@ -5,9 +5,10 @@ import { View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 
-import { ReplyItemType, useComments } from '../api/comments'
+import { type CommentItemType, useComments } from '../api/comments'
 import Comment from './Comment'
-import MoreReplies from './MoreReplies'
+// import MoreReplies from './MoreReplies'
+import ReplyList from './ReplyList'
 
 function Loading() {
   return (
@@ -53,7 +54,7 @@ export default function CommentList(
       <FlashList
         data={comments}
         keyExtractor={v => v.id + '@' + v.root}
-        renderItem={({ item }: { item: ReplyItemType }) => {
+        renderItem={({ item }: { item: CommentItemType }) => {
           return <Comment comment={item} />
         }}
         // persistentScrollbar
@@ -93,13 +94,14 @@ export default function CommentList(
             </Text>
           ) : null
         }
-        contentContainerStyle={tw('p-3')}
+        contentContainerStyle={tw('p-3 pt-4')}
         onEndReached={() => {
           update()
         }}
         onEndReachedThreshold={1}
       />
-      <MoreReplies />
+      {/* <MoreReplies /> */}
+      <ReplyList />
     </View>
   )
 }

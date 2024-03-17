@@ -131,16 +131,18 @@ function __$hack() {
     if (!document.getElementById('download-button')) {
       const downloadBtn = document.createElement('div')
       downloadBtn.id = 'download-button'
-      downloadBtn.innerHTML = '&#8659;'
+      // downloadBtn.innerHTML = '&#8659;'
+      downloadBtn.innerHTML = '⇩'
       downloadBtn.style.cssText = `
         width: 24px;
         height: 24px;
         color: white;
-        font-size: 26px;
-        line-height: 24px;
+        font-size: 20px;
+        line-height: 28px;
         text-align: center;
         background: rgba(0,0,0,.2);
         border-radius: 50%;
+        font-weight: 500;
       `
       downloadBtn.addEventListener('click', () => {
         window.ReactNativeWebView.postMessage(
