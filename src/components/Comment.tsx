@@ -1,4 +1,5 @@
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button, Text } from '@rneui/themed'
 import React from 'react'
 import { Image, Linking, View } from 'react-native'
@@ -7,13 +8,8 @@ import { colors } from '@/constants/colors.tw'
 
 import type { MessageContent, ReplyItem } from '../api/comments'
 import { useStore } from '../store'
-import type { NavigationProps } from '../types'
+import type { NavigationProps, RootStackParamList } from '../types'
 import { imgUrl } from '../utils'
-
-interface Props {
-  upName: string
-  comment: ReplyItem
-}
 
 function CommentText(props: {
   nodes: MessageContent
@@ -22,10 +18,8 @@ function CommentText(props: {
 }) {
   const { nodes, idStr, fontSize } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const textShadowRadius = 0.2
 
   return (
-    // <Text style={style} selectable>
     <>
       {nodes.map((node, i) => {
         const key = idStr + i
@@ -34,10 +28,6 @@ function CommentText(props: {
             <Text
               key={key}
               className={`${colors.primary.text} ${fontSize}`}
-              style={{
-                textShadowColor: tw(colors.primary.text).color,
-                textShadowRadius,
-              }}
               onPress={() => {
                 navigation.push('Dynamic', {
                   user: {
@@ -117,16 +107,25 @@ function CommentText(props: {
 
 export default React.memo(Comment)
 
-function CommentItem(props: {
-  comment: ReplyItem | ReplyItem['replies'][0]
-  upName: string
-}) {
-  const { comment, upName } = props
+function CommentItem(props: { comment: ReplyItem | ReplyItem['replies'][0] }) {
+  const { comment } = props
   const { setImagesList, setCurrentImageIndex } = useStore()
+  const route =
+    useRoute<
+      NativeStackScreenProps<
+        RootStackParamList,
+        'Play' | 'DynamicDetail'
+      >['route']
+    >()
+  const upName = route.params
+    ? 'detail' in route.params
+      ? route.params.detail.name
+      : route.params.name
+    : ''
   const navigation = useNavigation<NavigationProps['navigation']>()
   const fontSize = 'rcount' in comment ? 'text-base' : 'text-sm'
   return (
-    <Text>
+    <Text className="py-[2px]">
       <Text
         className={`${
           upName === comment.name
@@ -184,19 +183,18 @@ function CommentItem(props: {
   )
 }
 
-function Comment(props: Props) {
-  const { comment, upName } = props
+function Comment(props: { comment: ReplyItem }) {
+  const { comment } = props
   const { setMoreRepliesUrl } = useStore()
 
   return (
-    <View className="flex-1 shrink-0 mb-7">
-      <CommentItem comment={comment} upName={upName} />
+    <View
+      className={`flex-1 shrink-0 ${comment.replies?.length ? 'mb-7' : 'mb-4'}`}>
+      <CommentItem comment={comment} />
       {comment.replies?.length ? (
         <View className="p-2 mt-1 rounded gap-1 opacity-90 flex-1 shrink-0 border-gray-500 bg-neutral-200 dark:bg-neutral-900">
           {comment.replies.map(reply => {
-            return (
-              <CommentItem key={reply.id} comment={reply} upName={upName} />
-            )
+            return <CommentItem key={reply.id} comment={reply} />
           })}
           {comment.moreText ? (
             <Button

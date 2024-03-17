@@ -35,7 +35,6 @@ function Loading() {
 export default function CommentList(props: {
   commentId: string | number
   commentType: number
-  upName: string
   dividerRight?: React.ReactNode
 }) {
   const {
@@ -46,7 +45,7 @@ export default function CommentList(props: {
 
   return (
     <View className="flex-1">
-      <View className="my-5 border-b-[0.5px] border-gray-400 flex-row justify-between">
+      <View className="my-5 pb-1 border-b-[0.5px] border-gray-400 flex-row justify-between">
         <View className="flex-row items-center mr-1">
           <Icon
             name="comment-text-outline"
@@ -69,11 +68,7 @@ export default function CommentList(props: {
       {comments?.length ? (
         comments.map(comment => {
           return (
-            <Comment
-              key={comment.id + '@' + comment.root}
-              upName={props.upName}
-              comment={comment}
-            />
+            <Comment key={comment.id + '@' + comment.root} comment={comment} />
           )
         })
       ) : comments?.length === 0 && !commentLoading ? (

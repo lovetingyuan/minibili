@@ -60,7 +60,6 @@ function Play({ route, navigation }: Props) {
           setCurrentCid={setCurrentCid}
         />
         <CommentList
-          upName={videoInfo?.name || ''}
           commentId={videoInfo?.aid || ''}
           commentType={1}
           dividerRight={

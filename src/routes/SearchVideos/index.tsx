@@ -38,12 +38,6 @@ function SearchVideos(props: Props) {
         },
       },
     })
-
-    const unsubscribe = props.navigation.addListener('beforeRemove', () => {
-      setSearchKeyWord('')
-    })
-
-    return unsubscribe
   }, [props.navigation, blackColor, searchKeyWord])
 
   useMounted(() => {

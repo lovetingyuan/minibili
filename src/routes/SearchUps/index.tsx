@@ -38,12 +38,6 @@ function SearchUps(props: Props) {
         },
       },
     })
-
-    const unsubscribe = props.navigation.addListener('beforeRemove', () => {
-      setSearchKeyWord('')
-    })
-
-    return unsubscribe
   }, [props.navigation, blackColor, setSearchKeyWord])
 
   useMounted(() => {

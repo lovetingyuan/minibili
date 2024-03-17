@@ -1,5 +1,6 @@
 import {
   type RouteProp,
+  useFocusEffect,
   useNavigation,
   useRoute,
 } from '@react-navigation/native'
@@ -34,25 +35,28 @@ import { UPDATE_URL_CODE } from './update-playurl'
 export default React.memo(Player)
 
 function Player(props: { currentPage: number; currentCid?: number }) {
-  const { getIsWiFi, set$watchedVideos, get$watchedVideos } = useStore()
+  const { getIsWiFi, set$watchedVideos, get$watchedVideos, imagesList } =
+    useStore()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { width, height } = useWindowDimensions()
   const [verticalExpand, setVerticalExpand] = React.useState(false)
   const { data } = useVideoInfo(route.params.bvid)
-  const [loadPlayer, setLoadPlayer] = React.useState(getIsWiFi())
+  const isWifi = getIsWiFi()
+
+  const [loadPlayer, setLoadPlayer] = React.useState(isWifi)
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
   const videoInfo = {
     ...route.params,
     ...data,
   }
-  const isWifi = getIsWiFi()
   const durl = usePlayUrl(
     isWifi ? videoInfo.bvid : '',
     isWifi ? props.currentCid || videoInfo.cid : '',
   )
   const videoUrl = durl ? durl[0]?.backup_url?.[0] || durl[0]?.url || '' : null
-  const [playState, setPlayState] = React.useState('init')
+  // const [playState, setPlayState] = React.useState('init')
+  const [isEnded, setIsEnded] = React.useState(true)
 
   const downloadVideoUrl = useVideoDownloadUrl(
     videoInfo.bvid,
@@ -74,6 +78,32 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       `)
     }
   }, [videoUrl, getIsWiFi])
+  /**
+   * hasimg  play -> imagepause
+   *         pause -> nothing
+   * noimg   imagepause -> play
+   */
+  React.useEffect(() => {
+    webviewRef.current?.injectJavaScript(`
+    ;(function() {
+      const video = document.querySelector('video');
+      if (video) {
+        if (${imagesList.length > 0}) {
+          if (!video.paused) {
+            video.pause();
+            video.dataset.imgPaused = 'true'
+          }
+        } else {
+          if (video.dataset.imgPaused === 'true') {
+            video.play();
+            video.dataset.imgPaused = ''
+          }
+        }
+      }
+    })();
+    true;
+    `)
+  }, [imagesList.length])
 
   useAppStateChange(currentAppState => {
     if (
@@ -88,14 +118,20 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     }
   })
   useMounted(() => {
-    if (!getIsWiFi()) {
+    if (!isWifi) {
       showToast('注意流量')
-    }
-    return () => {
-      KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
   const navigation = useNavigation<NavigationProps['navigation']>()
+  // const isFocused = useIsFocused();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        KeepAwake.deactivateKeepAwake('PLAY')
+      }
+    }, []),
+  )
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', e => {
@@ -120,13 +156,12 @@ function Player(props: { currentPage: number; currentCid?: number }) {
   }
   const isVerticalVideo = videoWidth < videoHeight
   let videoViewHeight = width * 0.6
-  if (!loadPlayer) {
-    videoViewHeight = width * 0.5
-  } else if (videoWidth && videoHeight) {
-    if (playState === 'ended') {
-      videoViewHeight = isVerticalVideo
-        ? (width * videoWidth) / videoHeight
-        : (videoHeight / videoWidth) * width
+  if (loadPlayer && videoWidth && videoHeight) {
+    if (isEnded) {
+      videoViewHeight = width * 0.6
+      // videoViewHeight = isVerticalVideo
+      //   ? (width * videoWidth) / videoHeight
+      //   : (videoHeight / videoWidth) * width
     } else {
       if (isVerticalVideo) {
         videoViewHeight = verticalExpand ? height * 0.66 : height * 0.33
@@ -139,11 +174,15 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     try {
       const eventData = JSON.parse(evt.nativeEvent.data) as any
       if (eventData.action === 'playState') {
-        setPlayState(eventData.payload)
-        if (eventData.payload === 'ended' || eventData.payload === 'pause') {
-          KeepAwake.deactivateKeepAwake('PLAY')
-        } else {
+        // setPlayState(eventData.payload)
+        setIsEnded(eventData.payload === 'ended')
+        if (eventData.payload === 'play') {
           KeepAwake.activateKeepAwakeAsync('PLAY')
+        } else if (
+          eventData.payload === 'ended' ||
+          eventData.payload === 'pause'
+        ) {
+          KeepAwake.deactivateKeepAwake('PLAY')
         }
         if (eventData.payload === 'ended') {
           setVerticalExpand(false)
@@ -151,7 +190,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         // 'play', 'ended', 'pause', 'waiting', 'playing'
       }
       if (eventData.action === 'change-video-height') {
-        if (playState !== 'ended') {
+        if (!isEnded) {
           setVerticalExpand(eventData.payload === 'down')
         }
       }
@@ -293,7 +332,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       renderToHardwareTextureAndroid
       className="w-full shrink-0 bg-black"
       style={{ height: videoViewHeight }}>
-      {/* <Text>playstate: {playState}</Text> */}
       {loadPlayer ? (
         webview
       ) : (

@@ -38,7 +38,7 @@ function __$hack() {
     }
     video.__handled = true
     // eslint-disable-next-line no-array-constructor
-    Array('play', 'ended', 'pause', 'waiting', 'playing').forEach(evt => {
+    Array('play', 'ended', 'pause').forEach(evt => {
       video.addEventListener(evt, () => {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
@@ -46,17 +46,6 @@ function __$hack() {
             payload: evt,
           }),
         )
-        if (evt === 'ended') {
-          if (document.exitFullscreen) {
-            document.exitFullscreen()
-          } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen() // Firefox
-          } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen() // Chrome, Safari & Opera
-          } else if (document.msExitFullscreen) {
-            document.msExitFullscreen() // IE/Edge
-          }
-        }
       })
     })
 
@@ -65,6 +54,15 @@ function __$hack() {
       rateBtn.dataset.rate = '1' + xx
       rateBtn.textContent = 1 + xx
       video.playbackRate = 1
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen() // Firefox
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen() // Chrome, Safari & Opera
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen() // IE/Edge
+      }
     })
     let watchedTime = 0
     let lastTime = 0 // Last time update position

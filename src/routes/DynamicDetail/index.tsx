@@ -39,7 +39,6 @@ function DynamicDetail({
     <ScrollView className="flex-1 px-3 pt-5">
       <DynamicItem item={route.params.detail} />
       <CommentList
-        upName={name}
         commentId={commentId}
         commentType={commentType}
         dividerRight={
