@@ -40,7 +40,7 @@ export default function ReplyList() {
       <View className="h-[68vh] bg-neutral-100 dark:bg-neutral-700">
         <View className="py-2 px-3 flex-row items-center border-gray-500 justify-between">
           <Text className="text-lg font-bold">
-            评论详情{typeof allCount === 'number' ? `（${allCount}）` : ''}
+            评论详情{typeof allCount === 'number' ? `（${allCount}条）` : ''}
           </Text>
           <Icon
             name="close"
@@ -56,10 +56,10 @@ export default function ReplyList() {
             renderItem={({ item }: { item: ReplyItemType }) => {
               return <Comment comment={item} className="pl-3 mb-2" />
             }}
-            estimatedItemSize={50}
+            estimatedItemSize={30}
             ListHeaderComponent={
               root ? (
-                <View className="border-b-[1px] border-b-neutral-300 dark:border-b-neutral-700 mb-4">
+                <View className="border-b-[4px] border-b-neutral-300 dark:border-b-neutral-700 mb-4">
                   <Comment comment={root} className="mb-2" />
                 </View>
               ) : null
@@ -80,7 +80,8 @@ export default function ReplyList() {
             }
             ListFooterComponent={
               replies?.length ? (
-                <Text className={`${colors.gray6.text} text-xs text-center`}>
+                <Text
+                  className={`${colors.gray6.text} text-xs text-center mt-1`}>
                   {isValidating ? '正在加载...' : '暂无更多'}
                 </Text>
               ) : null
