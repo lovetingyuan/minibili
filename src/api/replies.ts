@@ -48,9 +48,9 @@ export function useReplies() {
     )
   // const isLoadingMore =
   //   isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')
-  // const isEmpty = data?.[0]?.replies.length === 0
-  // const isReachingEnd =
-  //   isEmpty || (data && data[data.length - 1]?.replies.length === 0)
+  const isEmpty = data?.[0]?.replies.length === 0
+  const isReachingEnd =
+    isEmpty || (data && data[data.length - 1]?.replies.length === 0)
   // const isRefreshing = isValidating && data && data.length === size
   // const uniqueMap: Record<string, boolean> = {}
   const list =
@@ -72,9 +72,9 @@ export function useReplies() {
     },
     isLoading,
     update: () => {
-      // if (isReachingEnd) {
-      //   return
-      // }
+      if (isReachingEnd) {
+        return
+      }
       setSize(size + 1)
     },
     isValidating,

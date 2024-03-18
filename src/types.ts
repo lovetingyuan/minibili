@@ -27,7 +27,7 @@ export interface CollectVideoInfo {
   tag?: string
   face?: string
   mid?: string | number
-  aid?: number
+  aid?: number | string
   danmaku?: number
   play?: number
   like?: number

@@ -7,6 +7,7 @@ import { Alert, Dimensions, Linking, TouchableOpacity } from 'react-native'
 import type { VideoItem as VideoItemType } from '@/api/hot-videos'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
+import { useMarkVideoWatched } from '@/store/actions'
 import { NavigationProps } from '@/types'
 import { handleShareVideo, parseNumber, parseUrl } from '@/utils'
 import { Action, reportUserAction } from '@/utils/report'
@@ -57,27 +58,49 @@ function VideoList(props: {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const listRef = React.useRef<any>(null)
   const currentVideoRef = React.useRef<VideoItemType | null>(null)
-
+  const markVideoWatched = useMarkVideoWatched()
   const addBlackUp = () => {
     if (!currentVideoRef.current) {
       return
     }
-    const { mid, name } = currentVideoRef.current
-    set$blackUps({
-      ...$blackUps,
-      ['_' + mid]: name,
-    })
-    reportUserAction(Action.add_black_user, { mid, name })
+    Alert.alert(`不再看 ${currentVideoRef.current.name} 的视频？`, '', [
+      {
+        text: '取消',
+        style: 'cancel',
+      },
+      {
+        text: '确定',
+        onPress: () => {
+          const { mid, name } = currentVideoRef.current!
+          set$blackUps({
+            ...$blackUps,
+            ['_' + mid]: name,
+          })
+          reportUserAction(Action.add_black_user, { mid, name })
+        },
+      },
+    ])
   }
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
       return
     }
-    const { tag } = currentVideoRef.current
-    set$blackTags({
-      ...$blackTags,
-      [tag]: tag,
-    })
+    Alert.alert(`不再看 ${currentVideoRef.current.tag} 类型的视频？`, '', [
+      {
+        text: '取消',
+        style: 'cancel',
+      },
+      {
+        text: '确定',
+        onPress: () => {
+          const { tag } = currentVideoRef.current!
+          set$blackTags({
+            ...$blackTags,
+            [tag]: tag,
+          })
+        },
+      },
+    ])
   }
   const gotoPlay = (data: VideoItemType) => {
     navigation.navigate('Play', {
@@ -109,35 +132,22 @@ function VideoList(props: {
       </TouchableOpacity>
     )
   }
+  const markWatched = () => {
+    const videoInfo = currentVideoRef.current
+    if (!videoInfo) {
+      return
+    }
+    markVideoWatched(videoInfo, 100)
+  }
   const buttons = () =>
     [
       {
         text: `不再看「${currentVideoRef.current?.name}」的视频`,
-        onPress: () => {
-          Alert.alert(`不再看 ${currentVideoRef.current?.name} 的视频？`, '', [
-            {
-              text: '取消',
-              style: 'cancel',
-            },
-            { text: '确定', onPress: addBlackUp },
-          ])
-        },
+        onPress: addBlackUp,
       },
       props.type === 'Hot' && {
         text: `不再看「${currentVideoRef.current?.tag}」类型的视频`,
-        onPress: () => {
-          Alert.alert(
-            `不再看 ${currentVideoRef.current?.tag} 类型的视频？`,
-            '',
-            [
-              {
-                text: '取消',
-                style: 'cancel',
-              },
-              { text: '确定', onPress: addBlackTagName },
-            ],
-          )
-        },
+        onPress: addBlackTagName,
       },
       {
         text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
@@ -147,6 +157,10 @@ function VideoList(props: {
             handleShareVideo(name, title, bvid)
           }
         },
+      },
+      {
+        text: '标记观看完成',
+        onPress: markWatched,
       },
       {
         text: '查看封面',

@@ -22,6 +22,7 @@ import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 import { getDownloadUrl, usePlayUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
+import { useMarkVideoWatched } from '@/store/actions'
 import type { NavigationProps, RootStackParamList } from '@/types'
 
 import { useVideoInfo } from '../../api/video-info'
@@ -35,8 +36,7 @@ import { UPDATE_URL_CODE } from './update-playurl'
 export default React.memo(Player)
 
 function Player(props: { currentPage: number; currentCid?: number }) {
-  const { getIsWiFi, set$watchedVideos, get$watchedVideos, imagesList } =
-    useStore()
+  const { getIsWiFi, imagesList } = useStore()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { width, height } = useWindowDimensions()
   const [verticalExpand, setVerticalExpand] = React.useState(false)
@@ -54,6 +54,8 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     isWifi ? videoInfo.bvid : '',
     isWifi ? props.currentCid || videoInfo.cid : 0,
   )
+
+  const markVideoWatched = useMarkVideoWatched()
 
   const [isEnded, setIsEnded] = React.useState(true)
   React.useEffect(() => {
@@ -197,45 +199,9 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         showToast(eventData.payload)
       }
       if (eventData.action === 'reportPlayTime') {
-        if (videoInfo.duration && eventData.payload) {
-          let playedMap = get$watchedVideos()
-          const playedInfo = playedMap[videoInfo.bvid]
-          const newProgress = eventData.payload
-          if (playedInfo) {
-            set$watchedVideos({
-              ...playedMap,
-              [videoInfo.bvid]: {
-                ...playedInfo,
-                watchProgress: Math.max(playedInfo.watchProgress, newProgress),
-                watchTime: Date.now(),
-                bvid: videoInfo.bvid,
-              },
-            })
-          } else {
-            const watchedVideos = Object.values(playedMap)
-            if (watchedVideos.length > 500) {
-              const values = watchedVideos
-                .sort((a, b) => b.watchTime - a.watchTime)
-                .slice(0, 400)
-              playedMap = {}
-              values.forEach(item => {
-                playedMap[item.bvid] = item
-              })
-            } else {
-              playedMap = { ...playedMap }
-            }
-            playedMap[videoInfo.bvid] = {
-              watchProgress: newProgress,
-              watchTime: Date.now(),
-              bvid: videoInfo.bvid,
-              name: videoInfo.name!,
-              title: videoInfo.title,
-              cover: videoInfo.cover!,
-              date: videoInfo.date!,
-              duration: videoInfo.duration,
-            }
-            set$watchedVideos(playedMap)
-          }
+        if (videoInfo.name && videoInfo.duration && eventData.payload) {
+          // @ts-ignore
+          markVideoWatched(videoInfo, eventData.payload)
         }
       }
       if (eventData.action === 'console.log') {

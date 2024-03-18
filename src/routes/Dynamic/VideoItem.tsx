@@ -4,13 +4,14 @@ import React from 'react'
 import { Image, Linking, TouchableOpacity, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
+import { useMarkVideoWatched } from '@/store/actions'
 
 import type { DynamicItemType } from '../../api/dynamic-items'
 import type { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 import { useStore } from '../../store'
 import type { NavigationProps } from '../../types'
-import { imgUrl, parseNumber, parseUrl } from '../../utils'
+import { handleShareVideo, imgUrl, parseNumber, parseUrl } from '../../utils'
 
 export default function VideoItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>
@@ -36,12 +37,35 @@ export default function VideoItem(props: {
   }
   const nodes = props.item.desc?.rich_text_nodes
   const watchedInfo = $watchedVideos[bvid]
+  const markWatchVideo = useMarkVideoWatched()
 
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={() => {
         setOverlayButtons([
+          {
+            text: '分享',
+            onPress: () => {
+              handleShareVideo(name, title, bvid)
+            },
+          },
+          {
+            text: '标记观看完成',
+            onPress: () => {
+              markWatchVideo(
+                {
+                  bvid,
+                  name,
+                  title,
+                  cover,
+                  date,
+                  duration,
+                },
+                100,
+              )
+            },
+          },
           {
             text: '查看封面',
             onPress: () => {

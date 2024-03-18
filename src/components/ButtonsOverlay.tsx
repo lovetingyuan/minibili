@@ -1,6 +1,8 @@
 import { Button, Overlay } from '@rneui/themed'
 import React from 'react'
 
+import { colors } from '@/constants/colors.tw'
+
 import { useStore } from '../store'
 
 function ButtonsOverlay() {
@@ -34,7 +36,7 @@ function ButtonsOverlay() {
   return (
     <Overlay
       isVisible={overlayButtons.length > 0}
-      overlayStyle={tw('px-0 py-3 min-w-[70%]')}
+      overlayStyle={tw(`px-0 py-3 min-w-[70%] ${colors.gray2.bg}`)}
       onBackdropPress={dismiss}>
       {Buttons}
     </Overlay>

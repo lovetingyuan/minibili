@@ -59,6 +59,7 @@ const getCommon = (item: DynamicItemBaseType) => {
     commentCount: stat.comment.count,
     likeCount: stat.like.count,
     forwardCount: stat.forward.count,
+    shareCount: stat,
   }
 }
 
@@ -85,6 +86,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         duration: video.duration_text,
         desc: video.desc,
         danmu: video.stat.danmaku,
+        // name: video
       },
     }
   }

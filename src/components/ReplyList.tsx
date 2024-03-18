@@ -54,13 +54,13 @@ export default function ReplyList() {
             data={replies}
             keyExtractor={v => v.id + '@' + v.root}
             renderItem={({ item }: { item: ReplyItemType }) => {
-              return <Comment comment={item} className="pl-3 mb-2" />
+              return <Comment comment={item} className="pl-7 pr-3 mb-2" />
             }}
             estimatedItemSize={30}
             ListHeaderComponent={
               root ? (
-                <View className="border-b-[4px] border-b-neutral-300 dark:border-b-neutral-700 mb-4">
-                  <Comment comment={root} className="mb-2" />
+                <View className="border-b-[16px] px-4 border-b-neutral-300 dark:border-b-neutral-700 mb-4">
+                  <Comment comment={root} className="mb-3" />
                 </View>
               ) : null
             }
@@ -86,7 +86,7 @@ export default function ReplyList() {
                 </Text>
               ) : null
             }
-            contentContainerStyle={tw('px-3 py-5')}
+            contentContainerStyle={tw('py-5')}
             onEndReached={() => {
               update()
             }}

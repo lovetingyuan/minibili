@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SplashScreen from 'expo-splash-screen'
 import React from 'react'
 import {
+  type AtomicContextMethodsType,
   createAtomicContext,
   type ProviderOnChangeType,
   useAtomicContext,
@@ -85,6 +86,11 @@ export function useMethods() {
 export const AppContextProvider = AppContext.Provider
 
 export type AppContextValueType = ReturnType<typeof getAppValue>
+
+export type AppContextMethodsType =
+  AtomicContextMethodsType<AppContextValueType>
+
+export const useAppContextMethods = () => useAtomicContextMethods(AppContext)
 
 export const onChange: ProviderOnChangeType<AppContextValueType> = (
   { key, value },

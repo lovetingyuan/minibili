@@ -215,7 +215,7 @@ function Comment(props: {
           {comment.replies.map(reply => {
             return <CommentItem key={reply.id} comment={reply} />
           })}
-          {comment.moreText ? (
+          {comment.moreText && comment.rcount > comment.replies.length ? (
             <Button
               type="clear"
               size="sm"
