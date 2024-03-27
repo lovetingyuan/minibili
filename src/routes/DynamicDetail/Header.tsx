@@ -11,7 +11,7 @@ import { View } from 'react-native'
 import { colors } from '@/constants/colors.tw'
 
 import type { NavigationProps, RootStackParamList } from '../../types'
-import { imgUrl } from '../../utils'
+import { parseImgUrl } from '../../utils'
 
 function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -41,7 +41,7 @@ function HeaderTitle() {
       <Avatar
         size={33}
         rounded
-        source={{ uri: imgUrl(face, 80) }}
+        source={{ uri: parseImgUrl(face, 80) }}
         ImageComponent={Image}
       />
       <Text className="ml-1 text-lg">{name}的动态</Text>

@@ -9,7 +9,7 @@ import { colors } from '@/constants/colors.tw'
 import type { CommentItemType, CommentMessageContent } from '../api/comments'
 import { useStore } from '../store'
 import type { NavigationProps, RootStackParamList } from '../types'
-import { imgUrl } from '../utils'
+import { parseImgUrl } from '../utils'
 
 function CommentText(props: {
   nodes: CommentMessageContent
@@ -70,7 +70,7 @@ function CommentText(props: {
           return (
             <Image
               key={key}
-              source={{ uri: imgUrl(node.url) }}
+              source={{ uri: parseImgUrl(node.url) }}
               className="w-[18px] h-[18px] mx-1"
             />
           )
@@ -179,12 +179,7 @@ function CommentItem(props: {
           className={colors.primary.text}
           onPress={() => {
             if (comment.images) {
-              setImagesList(
-                comment.images.map(img => {
-                  img.src = imgUrl(img.src)
-                  return img
-                }),
-              )
+              setImagesList(comment.images)
               setCurrentImageIndex(0)
             }
           }}>

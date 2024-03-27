@@ -15,7 +15,7 @@ import type { RichTextNode } from '../api/dynamic-items.schema'
 import { HandledRichTextType } from '../api/dynamic-items.type'
 import { useStore } from '../store'
 import type { NavigationProps } from '../types'
-import { imgUrl, parseUrl } from '../utils'
+import { parseImgUrl, parseUrl } from '../utils'
 import { reportUnknownRichTextItem } from '../utils/report'
 
 function RichTexts(props: {
@@ -105,7 +105,7 @@ function RichTexts(props: {
       reactNodes.push(
         <Image
           key={key++}
-          source={{ uri: imgUrl(node.emoji.icon_url) }}
+          source={{ uri: parseImgUrl(node.emoji.icon_url) }}
           className="w-5 h-5"
         />,
       )

@@ -14,7 +14,7 @@ import {
 import { Additional } from '../../components/Additional'
 import RichTexts from '../../components/RichTexts'
 import type { NavigationProps } from '../../types'
-import { imgUrl } from '../../utils'
+import { parseImgUrl } from '../../utils'
 import { CommonContent } from './CommonItem'
 
 export default function ForwardItem(props: {
@@ -50,7 +50,7 @@ export default function ForwardItem(props: {
           <View className="flex-row">
             <Image
               className="w-[45%] aspect-[8/5] h-auto mr-3 rounded"
-              source={{ uri: imgUrl(cover, 240, 150) }}
+              source={{ uri: parseImgUrl(cover, 240, 150) }}
             />
             <View className="flex-1">
               <Text numberOfLines={3} className="text-sm">
@@ -80,7 +80,7 @@ export default function ForwardItem(props: {
                 className="h-24 w-auto mt-2 rounded"
                 style={{ aspectRatio: img.ratio }}
                 key={img.src + i}
-                source={{ uri: imgUrl(img.src, 240) }}
+                source={{ uri: parseImgUrl(img.src, 240) }}
               />
             )
           })}
@@ -145,7 +145,7 @@ export default function ForwardItem(props: {
             }}>
             {payload.face ? (
               <Avatar
-                source={{ uri: imgUrl(payload.face, 50) }}
+                source={{ uri: parseImgUrl(payload.face, 50) }}
                 size={22}
                 ImageComponent={Image}
                 rounded

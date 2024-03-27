@@ -12,10 +12,10 @@ import type {
   NavigationProps,
 } from '@/types'
 import {
-  imgUrl,
   isDefined,
   parseDate,
   parseDuration,
+  parseImgUrl,
   parseNumber,
 } from '@/utils'
 
@@ -61,7 +61,7 @@ function VideoListItem({
       <View className="flex-[3] mr-3 relative justify-center content-center">
         <Image
           className="w-full rounded flex-1  h-auto"
-          source={{ uri: imgUrl(video.cover, 480, 300) }}
+          source={{ uri: parseImgUrl(video.cover, 480, 300) }}
           placeholder={require('../../assets/video-loading.png')}
         />
         <View className="absolute px-1 py-[1px] bg-gray-900/70 bottom-0 left-0 rounded-sm m-1">

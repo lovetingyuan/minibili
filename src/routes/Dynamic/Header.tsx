@@ -14,7 +14,7 @@ import { useUserInfo } from '../../api/user-info'
 import { useUserRelation } from '../../api/user-relation'
 import { useStore } from '../../store'
 import type { NavigationProps, RootStackParamList } from '../../types'
-import { handleShareUp, imgUrl, parseNumber, showToast } from '../../utils'
+import { handleShareUp, parseImgUrl, parseNumber, showToast } from '../../utils'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
@@ -53,7 +53,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             onPress={gotoWebPage}
             ImageComponent={Image}
             source={{
-              uri: imgUrl(dynamicUser.face, 120),
+              uri: parseImgUrl(dynamicUser.face, 120),
             }}
           />
           {sex ? (

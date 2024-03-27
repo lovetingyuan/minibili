@@ -1,4 +1,4 @@
-import { useNetInfo } from '@react-native-community/netinfo'
+// import { useNetInfo } from '@react-native-community/netInfo'
 import { Overlay } from '@rneui/themed'
 import { Image } from 'expo-image'
 import React from 'react'
@@ -10,6 +10,8 @@ import {
   View,
 } from 'react-native'
 import PagerView from 'react-native-pager-view'
+
+import { parseImgUrl } from '@/utils'
 
 import { useStore } from '../store'
 
@@ -30,16 +32,16 @@ function ImagesView() {
     setCurrentImageIndex,
   } = useStore()
 
-  const netinfo = useNetInfo()
+  // const netInfo = useNetInfo()
   const { width, height } = useWindowDimensions()
-  const isWiFi = netinfo.type === 'wifi'
+  // const isWiFi = netInfo.type === 'wifi'
   const images = imagesList.map(v => {
-    let url = v.src
-    if (!isWiFi) {
-      url += `@${width * 0.8}w_${(width * 0.8 * v.height) / v.width}h_1c.webp`
-    }
+    // let url = v.src
+    // if (!isWiFi) {
+    //   url += `@${width * 0.8}w_${(width * 0.8 * v.height) / v.width}h_1c.webp`
+    // }
     return {
-      url,
+      url: parseImgUrl(v.src),
       width: v.width,
       height: v.height,
     }

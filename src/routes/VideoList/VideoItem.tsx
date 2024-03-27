@@ -6,7 +6,7 @@ import { View } from 'react-native'
 import type { VideoItem as VideoItemType } from '@/api/hot-videos'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
-import { imgUrl, parseDate, parseDuration, parseNumber } from '@/utils'
+import { parseDate, parseDuration, parseImgUrl, parseNumber } from '@/utils'
 
 export default React.memo(VideoItem)
 
@@ -21,7 +21,11 @@ function VideoItem({ video }: { video: VideoItemType }) {
       <View className="flex-1">
         <Image
           className={'flex-1 w-full rounded aspect-[8/5]'}
-          source={imgUrl(video.cover, ...(isWiFi ? [480, 300] : [320, 200]))}
+          source={
+            isWiFi
+              ? parseImgUrl(video.cover, 480, 300)
+              : parseImgUrl(video.cover, 320, 200)
+          }
         />
         <View className=" absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
           <Text className="text-white text-xs">

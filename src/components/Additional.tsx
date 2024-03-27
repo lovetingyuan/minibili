@@ -7,7 +7,7 @@ import { Linking, Pressable, View } from 'react-native'
 import type { AdditionalType } from '../api/dynamic-items.schema'
 import { HandledAdditionalTypeEnum } from '../api/dynamic-items.type'
 import type { NavigationProps } from '../types'
-import { imgUrl, parseDate, parseNumber, parseUrl } from '../utils'
+import { parseDate, parseImgUrl, parseNumber, parseUrl } from '../utils'
 
 export function Additional(props: { additional?: AdditionalType | null }) {
   const { additional } = props
@@ -49,7 +49,7 @@ export function Additional(props: { additional?: AdditionalType | null }) {
     additionalContent = (
       <View className="gap-2.5 flex-row pr-2.5">
         <Image
-          source={{ uri: imgUrl(additional.ugc.cover, 200, 100) }}
+          source={{ uri: parseImgUrl(additional.ugc.cover, 200, 100) }}
           className="w-24 min-h-12 rounded"
         />
         <View className="shrink flex-1 gap-1">
@@ -72,7 +72,7 @@ export function Additional(props: { additional?: AdditionalType | null }) {
     additionalContent = (
       <View className="gap-2.5 flex-row pr-2.5">
         <Image
-          source={{ uri: imgUrl(additional.common.cover, 200, 100) }}
+          source={{ uri: parseImgUrl(additional.common.cover, 200, 100) }}
           className="w-24 min-h-12 rounded"
         />
         <View className="shrink flex-1 gap-1">

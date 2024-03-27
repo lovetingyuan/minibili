@@ -11,7 +11,7 @@ import {
 } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 import type { NavigationProps } from '../../types'
-import { imgUrl } from '../../utils'
+import { parseImgUrl } from '../../utils'
 
 type ItemType =
   | HandledDynamicTypeEnum.DYNAMIC_TYPE_COMMON_SQUARE
@@ -83,7 +83,7 @@ export function CommonContent(props: {
     <View className="flex-row gap-3 rounded pr-3">
       {cover ? (
         <Image
-          source={{ uri: imgUrl(cover, 240, 150) }}
+          source={{ uri: parseImgUrl(cover, 240, 150) }}
           className="aspect-[8/5] rounded h-auto w-[45%]"
         />
       ) : null}

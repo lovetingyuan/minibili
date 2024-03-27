@@ -9,7 +9,7 @@ import { colors } from '@/constants/colors.tw'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import { useStore } from '../../store'
 import type { NavigationProps, UpInfo } from '../../types'
-import { imgUrl, parseUrl } from '../../utils'
+import { parseImgUrl, parseUrl } from '../../utils'
 
 export default React.memo(FollowItem)
 
@@ -168,7 +168,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
           ImageComponent={Image}
           rounded
           source={{
-            uri: imgUrl(face, 120),
+            uri: parseImgUrl(face, 120),
           }}
         />
         {livingUps[mid] ? (

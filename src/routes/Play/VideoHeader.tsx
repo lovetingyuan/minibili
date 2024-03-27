@@ -16,8 +16,8 @@ import { useVideoInfo } from '../../api/video-info'
 import type { NavigationProps, RootStackParamList } from '../../types'
 import {
   handleShareVideo,
-  imgUrl,
   parseDate,
+  parseImgUrl,
   parseNumber,
   showToast,
 } from '../../utils'
@@ -107,7 +107,7 @@ function VideoHeader() {
             source={
               face
                 ? {
-                    uri: imgUrl(face, 80),
+                    uri: parseImgUrl(face, 80),
                   }
                 : require('../../../assets/loading.png')
             }

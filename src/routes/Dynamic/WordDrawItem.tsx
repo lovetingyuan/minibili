@@ -10,7 +10,7 @@ import { Additional } from '../../components/Additional'
 import RichTexts from '../../components/RichTexts'
 import { useStore } from '../../store'
 import type { NavigationProps } from '../../types'
-import { imgUrl } from '../../utils'
+import { parseImgUrl } from '../../utils'
 
 export default function WordDrawItem(props: {
   item: DynamicItemType<
@@ -36,7 +36,7 @@ export default function WordDrawItem(props: {
             key={img.src + i}
             className="w-24 h-24 mr-1 rounded"
             source={{
-              uri: imgUrl(img.src, 240),
+              uri: parseImgUrl(img.src, 240),
             }}
           />
         )
@@ -72,7 +72,7 @@ export default function WordDrawItem(props: {
             className="aspect-square rounded"
             style={{ width: imageListWidth }}
             source={{
-              uri: imgUrl(img.src, 240),
+              uri: parseImgUrl(img.src, 240),
             }}
           />
         )

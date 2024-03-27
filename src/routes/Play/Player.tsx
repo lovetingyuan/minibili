@@ -29,7 +29,7 @@ import { useVideoInfo } from '../../api/video-info'
 import { useAppStateChange } from '../../hooks/useAppState'
 import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
-import { imgUrl, parseDuration, showToast } from '../../utils'
+import { parseDuration, parseImgUrl, showToast } from '../../utils'
 import { INJECTED_JAVASCRIPT } from './inject-play'
 import { UPDATE_URL_CODE } from './update-playurl'
 
@@ -214,7 +214,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     <View className="absolute items-center w-full h-full">
       {videoInfo?.cover ? (
         <Image
-          source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
+          source={{ uri: parseImgUrl(videoInfo.cover, 672, 420) }}
           className="flex-1 w-full"
         />
       ) : null}
@@ -296,7 +296,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
           className="flex-1">
           {videoInfo?.cover ? (
             <ImageBackground
-              source={{ uri: imgUrl(videoInfo.cover, 672, 420) }}
+              source={{ uri: parseImgUrl(videoInfo.cover, 672, 420) }}
               resizeMode="cover"
               className="flex-1 justify-center items-center">
               <Icon

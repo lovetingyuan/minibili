@@ -11,7 +11,12 @@ import type { HandledDynamicTypeEnum } from '../../api/dynamic-items.type'
 import RichTexts from '../../components/RichTexts'
 import { useStore } from '../../store'
 import type { NavigationProps } from '../../types'
-import { handleShareVideo, imgUrl, parseNumber, parseUrl } from '../../utils'
+import {
+  handleShareVideo,
+  parseImgUrl,
+  parseNumber,
+  parseUrl,
+} from '../../utils'
 
 export default function VideoItem(props: {
   item: DynamicItemType<HandledDynamicTypeEnum.DYNAMIC_TYPE_AV>
@@ -93,7 +98,7 @@ export default function VideoItem(props: {
         <View className="w-[52%] mr-3 justify-center content-center">
           <Image
             className="w-full rounded aspect-[8/5] h-auto"
-            source={{ uri: imgUrl(cover, 480, 300) }}
+            source={{ uri: parseImgUrl(cover, 480, 300) }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image
