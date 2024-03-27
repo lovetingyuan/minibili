@@ -18,12 +18,12 @@ function Loading() {
         .map((_, i) => {
           return (
             <View className="flex-1 gap-1 mb-5" key={i}>
-              <Skeleton animation="pulse" width={'100%' as any} height={16} />
+              <Skeleton animation="wave" width={'100%' as any} height={16} />
               {i % 2 ? (
-                <Skeleton animation="pulse" width={'100%' as any} height={16} />
+                <Skeleton animation="wave" width={'100%' as any} height={16} />
               ) : null}
               <Skeleton
-                animation="pulse"
+                animation="wave"
                 width={(Math.random() * 100 + '%') as any}
                 height={16}
               />

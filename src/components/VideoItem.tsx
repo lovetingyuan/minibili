@@ -19,6 +19,23 @@ import {
   parseNumber,
 } from '@/utils'
 
+function extractTextWithEmTags(text: string) {
+  const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g
+  const matches = text.matchAll(regex)
+  const result: (React.ReactElement | string)[] = []
+
+  for (const match of matches) {
+    const [, emContent, nonEmContent] = match
+    if (emContent) {
+      result.push(<Text style={{ color: 'orange' }}>{emContent}</Text>)
+    } else if (nonEmContent.trim() !== '') {
+      result.push(nonEmContent)
+    }
+  }
+
+  return result
+}
+
 function VideoListItem({
   video,
   buttons,
@@ -96,7 +113,7 @@ function VideoListItem({
           className="flex-1 text-base mb-3"
           numberOfLines={2}
           ellipsizeMode="tail">
-          {video.title}
+          {extractTextWithEmTags(video.title)}
         </Text>
         <View className="gap-2">
           <Text

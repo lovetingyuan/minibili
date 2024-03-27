@@ -9,9 +9,7 @@ import type {
 function getVideoInfo(video: SearchVideoItemType) {
   return {
     name: video.author,
-    title: video.title // 「${name}」
-      .replaceAll('<em class="keyword">', '「')
-      .replaceAll('</em>', '」'),
+    title: video.title,
     desc: video.description,
     cover: parseUrl(video.pic),
     tag: video.typename,

@@ -327,6 +327,11 @@ function __$hack() {
     distanceY = 0
     direction = ''
   })
+
+  document.addEventListener('copy', event => {
+    event.preventDefault()
+    event.clipboardData.setData('text/plain', '')
+  })
 }
 
 export const INJECTED_JAVASCRIPT = `(${__$hack})();\ntrue;`
