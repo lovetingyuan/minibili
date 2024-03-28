@@ -53,7 +53,7 @@ export const UserBatchInfoResponseSchema = z
   .object({
     mid: z.number(),
     name: z.string(),
-    sex: z.string(),
+    sex: z.string().nullish(),
     face: z.string(),
     sign: z.string(),
     level: z.number(),
