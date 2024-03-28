@@ -42,10 +42,19 @@ function SearchVideos() {
     setTimeout(() => {
       searchBarRef.current?.focus()
       searchBarRef.current?.setText('')
-    }, 80)
+    }, 200)
   })
 
-  return <VideoList keyword={searchKeyWord} />
+  return (
+    <VideoList
+      keyword={searchKeyWord}
+      onSearch={(keyword: string) => {
+        searchBarRef.current?.setText(keyword)
+        searchBarRef.current?.blur()
+        setSearchKeyWord(keyword)
+      }}
+    />
+  )
 }
 
 export default React.memo(SearchVideos)

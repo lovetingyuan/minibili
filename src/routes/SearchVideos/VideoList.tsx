@@ -1,20 +1,40 @@
 import { Skeleton, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
-import { View } from 'react-native'
+import { Image, ScrollView, TouchableOpacity, View } from 'react-native'
 
+import { useHotSearch } from '@/api/hot-search'
 import { SearchedVideoType, useSearchVideos } from '@/api/search-video'
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
+import useMounted from '@/hooks/useMounted'
+import { parseImgUrl } from '@/utils'
 
-function EmptyContent(props: { loading: boolean }) {
+function Img(props: { url: string }) {
+  const imageUrl = parseImgUrl(props.url)
+  const [width, setWidth] = React.useState(0)
+  useMounted(() => {
+    Image.getSize(imageUrl, (w, h) => {
+      setWidth((16 * w) / h)
+    })
+  })
+  return (
+    <Image source={{ uri: imageUrl }} className="h-4 mx-1" style={{ width }} />
+  )
+}
+
+function EmptyContent(props: {
+  loading: boolean
+  onSearch: (k: string) => void
+}) {
+  const hotSearchList = useHotSearch()
   if (props.loading) {
     return (
       <View>
         {Array.from({ length: 20 }).map((_, i) => {
           return (
             <View
-              className="flex-row items-center h-28 justify-between gap-4 mb-6 px-2"
+              className="flex-row items-center h-28 justify-between gap-4 mb-4 px-2"
               key={i}>
               <Skeleton
                 animation="pulse"
@@ -39,10 +59,32 @@ function EmptyContent(props: { loading: boolean }) {
       </View>
     )
   }
-  return <Text className="text-center my-10">暂无结果</Text>
+  return (
+    <ScrollView className="mb-4">
+      {hotSearchList ? (
+        hotSearchList.map(hot => {
+          return (
+            <TouchableOpacity
+              key={hot.hot_id}
+              activeOpacity={0.7}
+              onPress={() => {
+                props.onSearch(hot.keyword)
+              }}
+              className="flex-1 flex-row p-2 mx-2 my-1 items-center">
+              <Text className="text-base">{hot.position}. </Text>
+              <Text className="text-base">{hot.show_name}</Text>
+              {hot.icon ? <Img url={hot.icon} /> : null}
+            </TouchableOpacity>
+          )
+        })
+      ) : (
+        <Text className="text-center my-20 text-base">暂无结果</Text>
+      )}
+    </ScrollView>
+  )
 }
 
-function VideoList(props: { keyword: string }) {
+function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   const {
     data: searchedVideos,
     isLoading,
@@ -66,7 +108,9 @@ function VideoList(props: { keyword: string }) {
       }}
       persistentScrollbar
       estimatedItemSize={100}
-      ListEmptyComponent={<EmptyContent loading={isLoading} />}
+      ListEmptyComponent={
+        <EmptyContent loading={isLoading} onSearch={props.onSearch} />
+      }
       ListFooterComponent={
         isValidating ? (
           <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
@@ -78,7 +122,7 @@ function VideoList(props: { keyword: string }) {
           </Text>
         ) : null
       }
-      contentContainerStyle={tw('px-1 pt-6')}
+      contentContainerStyle={tw('px-1 pt-4')}
       estimatedFirstItemOffset={80}
       onEndReached={() => {
         update()

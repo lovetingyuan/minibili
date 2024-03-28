@@ -8,7 +8,7 @@ import { assert, test } from 'vitest'
 
 // const lp = root.lookupType('DmSegMobileReply')
 
-test('get-danmaku', async () => {
+test.skip('get-danmaku', async () => {
   assert.ok(true)
   //   const arrayBuffer = await fetch(
   //     'https://api.bilibili.com/x/v2/dm/web/seg.so?type=1&oid=1459734495&pid=1001385310&segment_index=1',

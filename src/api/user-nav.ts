@@ -1,5 +1,3 @@
-// import request from './fetcher'
-// import { simpleRequest } from './fetcher-lite'
 import type { UserNavType } from './user-nav.schema'
 
 //https://api.bilibili.com/x/web-interface/nav

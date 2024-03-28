@@ -60,7 +60,10 @@ export default async function request<D extends any>(url: string): Promise<D> {
     mode: 'cors',
     credentials: 'include',
   } satisfies Parameters<typeof fetch>[1]
-  if (url.includes('/reply/')) {
+  if (
+    url.includes('/reply/') ||
+    url.includes('/x/v2/search/trending/ranking')
+  ) {
     // @ts-ignore
     delete headers.cookie
     // @ts-ignore
