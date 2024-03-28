@@ -252,9 +252,13 @@ export function useComments(oid: string | number, type: number) {
           ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=3&next=${next}&ps=20`
           : null
       },
-      {
-        revalidateFirstPage: false,
-      },
+      // url => {
+      //   console.log(44, url)
+      //   return request(url)
+      // },
+      // {
+      //   // revalidateFirstPage: false,
+      // },
     )
   // const isLoadingMore =
   //   isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')

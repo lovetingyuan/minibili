@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
   Image,
   ImageBackground,
-  Linking,
   Pressable,
   Text,
   useWindowDimensions,
@@ -19,7 +18,7 @@ import {
 } from 'react-native'
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 
-import { getDownloadUrl, usePlayUrl } from '@/api/play-url'
+import { usePlayUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
 import { useMarkVideoWatched } from '@/store/actions'
@@ -50,10 +49,8 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     ...route.params,
     ...data,
   }
-  const videoUrl = usePlayUrl(
-    isWifi ? videoInfo.bvid : '',
-    isWifi ? props.currentCid || videoInfo.cid : 0,
-  )
+  const cid = props.currentCid || videoInfo.cid
+  const videoUrl = usePlayUrl(isWifi ? videoInfo.bvid : '', isWifi ? cid : 0)
 
   const markVideoWatched = useMarkVideoWatched()
 
@@ -109,6 +106,10 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     }
     if (currentAppState !== 'active') {
       KeepAwake.deactivateKeepAwake('PLAY')
+      webviewRef.current?.injectJavaScript(`
+      document.querySelector('video')?.play();
+      true;
+      `)
     }
   })
   useMounted(() => {
@@ -181,16 +182,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         if (!isEnded) {
           setVerticalExpand(eventData.payload === 'down')
         }
-      }
-      if (eventData.action === 'downloadVideo') {
-        showToast('请稍后在浏览器中下载')
-        getDownloadUrl(videoInfo.bvid, props.currentCid || videoInfo.cid)?.then(
-          url => {
-            if (url) {
-              Linking.openURL(url)
-            }
-          },
-        )
       }
       if (eventData.action === 'reload') {
         // TODO:

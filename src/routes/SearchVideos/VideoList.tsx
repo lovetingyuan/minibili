@@ -50,10 +50,17 @@ function VideoList(props: { keyword: string }) {
     isReachingEnd,
     isValidating,
   } = useSearchVideos(props.keyword)
+  const listRef = React.useRef<FlashList<any> | null>(null)
+  React.useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollToOffset({ offset: 0 })
+    }
+  }, [props.keyword])
   return (
     <FlashList
       data={searchedVideos}
-      keyExtractor={v => v.bvid + ''}
+      keyExtractor={v => v.bvid}
+      ref={listRef}
       renderItem={({ item }: { item: SearchedVideoType }) => {
         return <VideoListItem video={item} />
       }}

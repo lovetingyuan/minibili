@@ -66,6 +66,7 @@ export default function VideoItem(props: {
                   cover,
                   date,
                   duration,
+                  mid,
                 },
                 100,
               )
@@ -105,26 +106,27 @@ export default function VideoItem(props: {
             className="w-14 h-12 absolute self-center"
             source={require('../../../assets/tv.png')}
           />
-          <View className="absolute px-1 py-[1px] bg-gray-900/70 bottom-0 left-0 rounded-sm m-1">
+          {watchedInfo ? (
+            <View
+              className={`absolute bottom-0 left-0 h-[6px] ${colors.secondary.bg}`}
+              // @ts-expect-error in fact, react native supports use % as width unit
+              style={{ width: watchedInfo.watchProgress + '%' }}
+            />
+          ) : null}
+          <View
+            className={`absolute px-1 py-[1px] bg-gray-900/70 ${watchedInfo ? 'bottom-1' : 'bottom-0'} left-0 rounded-sm m-1`}>
             <Text className="text-xs font-thin text-white">{duration}</Text>
           </View>
           <View className="absolute px-1 py-[1px] top-0 rounded-sm m-1 bg-gray-900/70">
             <Text className="text-xs font-thin text-white">{date}</Text>
           </View>
-          <View className="absolute px-1 py-[1px] bottom-0 right-0 m-1 rounded-sm bg-gray-900/70">
+          <View
+            className={`absolute px-1 py-[1px] ${watchedInfo ? 'bottom-1' : 'bottom-0'} right-0 m-1 rounded-sm bg-gray-900/70`}>
             <Text className="text-xs font-thin text-white">{danmu}弹</Text>
           </View>
         </View>
         <View className="flex-1 justify-around">
           <Text className="flex-1 text-base mb-3" numberOfLines={3}>
-            {watchedInfo ? (
-              <Text className={`${colors.success.text} font-bold`}>
-                👀
-                {watchedInfo.watchProgress > 99
-                  ? '已看完 '
-                  : `已观看${watchedInfo.watchProgress}% `}
-              </Text>
-            ) : null}
             {title}
           </Text>
           <View className="flex-row shrink-0 min-w-20 items-center gap-x-3 flex-wrap">

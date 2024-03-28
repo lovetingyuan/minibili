@@ -1,8 +1,12 @@
 import { type RouteProp, useRoute } from '@react-navigation/native'
-import { Text } from '@rneui/themed'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Icon, Text } from '@rneui/themed'
+import * as Clipboard from 'expo-clipboard'
 import React from 'react'
-import { View } from 'react-native'
+import { Linking, View } from 'react-native'
+import { Menu, MenuItem } from 'react-native-material-menu'
 
+import { getDownloadUrl } from '@/api/play-url'
 import { useUserRelation } from '@/api/user-relation'
 import { useVideoInfo } from '@/api/video-info'
 import { colors } from '@/constants/colors.tw'
@@ -11,13 +15,12 @@ import { parseNumber, showToast } from '@/utils'
 
 import { useStore } from '../../store'
 
-export default function PlayHeader() {
+export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data: vi } = useVideoInfo(route.params.bvid)
   const { data: fans } = useUserRelation(route.params?.mid || vi?.mid)
   const { _followedUpsMap } = useStore()
   const followed = route.params?.mid && route.params?.mid in _followedUpsMap
-  // const [open, setOpen] = React.useState(false)
 
   return (
     <View className="flex-row items-center relative left-[-10px]">
@@ -32,21 +35,103 @@ export default function PlayHeader() {
         }}>
         {` ${fans?.follower ? parseNumber(fans.follower) : ''}粉丝`}
       </Text>
-      {/* <Tooltip
-        visible={open}
-        onOpen={() => setOpen(true)}
-        onClose={() => setOpen(false)}
-        toggleAction="onLongPress"
-        // closeOnlyOnBackdropPress={false}
-        backgroundColor="rgba(150,150,150,0.8)"
-        pointerColor={'rgba(0,0,0,0)'}
-        containerStyle={tw('p-0 h-8 rounded-sm')}
-        withOverlay={false}
-        popover={<Text className="text-white">粉丝：{fans?.follower}</Text>}>
-        <Text className="ml-3 text-gray-500 dark:text-gray-400">
-          {` ${fans?.follower ? parseNumber(fans.follower) : ''}粉丝`}
-        </Text>
-      </Tooltip> */}
+    </View>
+  )
+}
+
+export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
+  const [visible, setVisible] = React.useState(false)
+  const hideMenu = () => setVisible(false)
+  const showMenu = () => setVisible(true)
+  const route =
+    useRoute<NativeStackScreenProps<RootStackParamList, 'Play'>['route']>()
+  const videoInfo = route.params
+  return (
+    <View className="flex-row items-center gap-2">
+      <Menu
+        visible={visible}
+        // @ts-expect-error className will be handled
+        className="bg-white dark:bg-zinc-900"
+        anchor={
+          <Icon
+            name="dots-vertical"
+            type="material-community"
+            onPress={showMenu}
+          />
+        }
+        onRequestClose={hideMenu}>
+        <MenuItem
+          textStyle={tw('text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            if (props.cid) {
+              showToast('请稍后在浏览器中下载')
+              getDownloadUrl(videoInfo.bvid, props.cid)
+                ?.then(url => {
+                  if (url) {
+                    Linking.openURL(url)
+                  } else {
+                    return Promise.reject()
+                  }
+                })
+                .catch(() => {
+                  showToast('暂不支持下载')
+                })
+            } else {
+              showToast('稍后再试')
+            }
+            hideMenu()
+          }}>
+          下载视频
+        </MenuItem>
+        <MenuItem
+          textStyle={tw('text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            hideMenu()
+            Linking.openURL('https://www.bilibili.com/video/' + videoInfo.bvid)
+          }}>
+          浏览器打开
+        </MenuItem>
+        <MenuItem
+          textStyle={tw('text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            Clipboard.setStringAsync(
+              'https://www.bilibili.com/video/' + videoInfo.bvid,
+            ).then(() => {
+              showToast('已复制视频链接')
+              hideMenu()
+            })
+          }}>
+          复制链接
+        </MenuItem>
+        <MenuItem
+          textStyle={tw(' text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            // props.refresh()
+            showToast('暂未实现')
+          }}>
+          刷新
+        </MenuItem>
+        <MenuItem
+          textStyle={tw(' text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            showToast('暂未实现')
+          }}>
+          切换高清
+        </MenuItem>
+        {/* <MenuItem
+          textStyle={tw(' text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            showToast('暂未实现')
+          }}>
+          后台播放
+        </MenuItem> */}
+      </Menu>
     </View>
   )
 }

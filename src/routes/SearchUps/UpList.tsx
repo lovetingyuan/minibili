@@ -98,9 +98,16 @@ function UpList(props: { keyword: string }) {
     isReachingEnd,
     isValidating,
   } = useSearchUps(props.keyword)
+  const listRef = React.useRef<FlashList<any> | null>(null)
+  React.useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollToOffset({ offset: 0 })
+    }
+  }, [props.keyword])
   return (
     <FlashList
       data={searchedUps}
+      ref={listRef}
       keyExtractor={v => v.mid + ''}
       renderItem={({ item }: { item: SearchedUpType }) => {
         return <SearchUpItem up={item} />

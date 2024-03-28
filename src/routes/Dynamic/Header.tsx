@@ -64,28 +64,30 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
         </View>
       ) : null}
 
-      <Text
-        className="flex-1 ml-3 text-lg relative top-[2px] leading-5 align-middle"
-        adjustsFontSizeToFit
-        numberOfLines={2}>
+      <View className="flex-1 ml-3 items-center flex-wrap flex-row">
         <Text
-          className={followed ? colors.secondary.text : ''}
+          className={`${followed ? colors.secondary.text : ''} text-lg pt-1`}
+          adjustsFontSizeToFit
+          numberOfLines={1}
           onPress={() => {
             props.scrollTop()
           }}>
           {userName}
+          <Text className="text-sm">
+            {level}
+            {'    '}
+          </Text>
         </Text>
-        <Text className="text-sm">{level}</Text>
         {fans ? (
           <Text
             className="text-sm text-gray-500 dark:text-gray-400"
             onPress={() => {
               showToast(`粉丝：${fans.follower}`)
             }}>
-            {'  '} {parseNumber(fans.follower)}粉丝
+            {parseNumber(fans.follower)}粉丝
           </Text>
         ) : null}
-      </Text>
+      </View>
       {dynamicUser.mid && livingUrl ? (
         <Button
           size="sm"

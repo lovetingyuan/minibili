@@ -22,11 +22,11 @@ export interface CollectVideoInfo {
   cover: string
   date: string | number
   duration: string | number
+  mid: string | number
   // ---
   desc?: string
   tag?: string
   face?: string
-  mid?: string | number
   aid?: number | string
   danmaku?: number
   play?: number

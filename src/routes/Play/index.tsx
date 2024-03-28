@@ -13,7 +13,7 @@ import useMemoizedFn from '../../hooks/useMemoizedFn'
 import type { RootStackParamList } from '../../types'
 import { showToast } from '../../utils'
 import { setViewingVideoId } from '../../utils/report'
-import PlayHeader from './Header'
+import { PlayHeaderRight, PlayHeaderTitle } from './Header'
 import Player from './Player'
 import VideoHeader from './VideoHeader'
 import VideoInfo from './VideoInfo'
@@ -36,13 +36,29 @@ function Play({ route }: Props) {
     ...data,
   }
   const [currentCid, setCurrentCid] = React.useState(videoInfo.cid)
+  React.useEffect(() => {
+    if (videoInfo.cid && !currentCid) {
+      setCurrentCid(videoInfo.cid)
+    }
+  }, [videoInfo.cid, currentCid])
+  const [key, setKey] = React.useState(bvid)
+
   useUpdateNavigationOptions(
     React.useMemo(() => {
-      const headerTitle = () => <PlayHeader />
+      const headerTitle = () => <PlayHeaderTitle />
+      const headerRight = () => (
+        <PlayHeaderRight
+          cid={currentCid}
+          refresh={() => {
+            setKey(k => k + 1)
+          }}
+        />
+      )
       return {
         headerTitle,
+        headerRight,
       }
-    }, []),
+    }, [currentCid]),
   )
 
   useFocusEffect(
@@ -55,7 +71,7 @@ function Play({ route }: Props) {
   )
 
   return (
-    <View className="flex-1">
+    <View className="flex-1" key={key}>
       <Player currentPage={currentPage} currentCid={currentCid} />
       <CommentList
         commentId={videoInfo?.aid || ''}
@@ -86,37 +102,6 @@ function Play({ route }: Props) {
           setCurrentCid={setCurrentCid}
         />
       </CommentList>
-      {/* <ScrollView className="py-4 px-3">
-        <VideoHeader />
-        <VideoInfo
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          setCurrentCid={setCurrentCid}
-        />
-        <CommentList
-          commentId={videoInfo?.aid || ''}
-          commentType={1}
-          dividerRight={
-            <View className="flex-row items-center">
-              <Text
-                onPress={() => {
-                  Clipboard.setStringAsync(bvid).then(() => {
-                    showToast('已复制视频ID')
-                  })
-                }}
-                className="text-xs text-gray-500 dark:text-gray-400">
-                {bvid}
-              </Text>
-              <Text className="text-base font-bold text-gray-500 dark:text-gray-400">
-                {' · '}
-              </Text>
-              <Text className="text-xs text-gray-500 dark:text-gray-400">
-                {videoInfo?.tag}
-              </Text>
-            </View>
-          }
-        />
-      </ScrollView> */}
     </View>
   )
 }

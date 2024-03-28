@@ -12,9 +12,13 @@ export function useMarkVideoWatched() {
         ...playedMap,
         [videoInfo.bvid]: {
           ...playedInfo,
-          watchProgress: Math.max(newProgress, playedInfo.watchProgress),
+          watchProgress: Math.min(
+            Math.max(newProgress, playedInfo.watchProgress),
+            100,
+          ),
           watchTime: Date.now(),
           bvid: videoInfo.bvid,
+          mid: videoInfo.mid,
         },
       })
     } else {
@@ -31,10 +35,11 @@ export function useMarkVideoWatched() {
         playedMap = { ...playedMap }
       }
       playedMap[videoInfo.bvid] = {
-        watchProgress: newProgress,
+        watchProgress: Math.min(newProgress, 100),
         watchTime: Date.now(),
         bvid: videoInfo.bvid,
         name: videoInfo.name!,
+        mid: videoInfo.mid!,
         title: videoInfo.title,
         cover: videoInfo.cover!,
         date: videoInfo.date!,

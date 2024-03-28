@@ -20,7 +20,8 @@ function __$hack() {
       const style = document.createElement('style')
       style.textContent = `
       .mplayer-time-total-text {
-        font-weight: bold;
+        font-weight: bold!important;
+        font-size: 14px!important;
       }
       `
       document.head.appendChild(style)

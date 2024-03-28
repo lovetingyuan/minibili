@@ -44,6 +44,7 @@ export const getAppValue = () => {
     $videoCatesList: RanksConfig,
     $collectedVideos: [] as CollectVideoInfo[],
     $watchedVideos: {} as Record<string, HistoryVideoInfo>,
+    $showUsageStatement: true,
     // -------------------------
     initialed: false,
     isWiFi: false,
@@ -149,7 +150,8 @@ export const InitStoreComp = React.memo(() => {
               })
               methods.set$videoCatesList(list)
             } else {
-              methods[setKey](JSON.parse(data) as any)
+              // @ts-expect-error not clear
+              methods[setKey](JSON.parse(data))
             }
           }
         })

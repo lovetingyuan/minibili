@@ -36,7 +36,7 @@ export function usePlayUrl(bvid: string, cid?: number) {
     : null
 }
 
-export function getDownloadUrl(bvid: string, cid?: number) {
+export function getDownloadUrl(bvid: string, cid: number) {
   const search = new URLSearchParams()
   if (!bvid || !cid) {
     return

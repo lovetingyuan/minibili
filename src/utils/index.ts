@@ -182,14 +182,6 @@ export async function showFatalError(error: any) {
   )
 }
 
-// export function parseImgUrl(url: string, size?: number, h = size) {
-//   size = Math.round(size)
-//   h = Math.round(h)
-//   return (
-//     url.replace('http://', 'https://') +
-//     (typeof size === 'number' ? `@${size}w_${h}h_1c.webp` : '')
-//   )
-// }
 export function parseImgUrl(url: string): string
 export function parseImgUrl(url: string, size: number): string
 export function parseImgUrl(url: string, width: number, height: number): string
@@ -203,7 +195,7 @@ export function parseImgUrl(
     height = typeof height === 'number' ? height : width
     width = Math.round(width)
     height = Math.round(height)
-    return `${url}?@${width}w_${height}h_1c.webp`
+    return `${url}@${width}w_${height}h_1c.webp`
   }
   return url
 }

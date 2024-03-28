@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Icon, Text } from '@rneui/themed'
 import { Image } from 'expo-image'
+import he from 'he'
 import React from 'react'
 import { TouchableOpacity, View } from 'react-native'
 
@@ -19,17 +20,21 @@ import {
   parseNumber,
 } from '@/utils'
 
-function extractTextWithEmTags(text: string) {
+function extractTextWithEmTags(text: string, style: any) {
   const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g
   const matches = text.matchAll(regex)
   const result: (React.ReactElement | string)[] = []
-
+  let i = 0
   for (const match of matches) {
     const [, emContent, nonEmContent] = match
     if (emContent) {
-      result.push(<Text style={{ color: 'orange' }}>{emContent}</Text>)
+      result.push(
+        <Text style={style} key={i++}>
+          {he.decode(emContent)}
+        </Text>,
+      )
     } else if (nonEmContent.trim() !== '') {
-      result.push(nonEmContent)
+      result.push(he.decode(nonEmContent))
     }
   }
 
@@ -74,7 +79,7 @@ function VideoListItem({
           tag: video.tag,
         })
       }}
-      className="flex-row min-h-28 px-2 py-2 mb-4">
+      className="flex-row min-h-28 px-2 py-2 mb-1">
       <View className="flex-[3] mr-3 relative justify-center content-center">
         <Image
           className="w-full rounded flex-1  h-auto"
@@ -113,11 +118,11 @@ function VideoListItem({
           className="flex-1 text-base mb-3"
           numberOfLines={2}
           ellipsizeMode="tail">
-          {extractTextWithEmTags(video.title)}
+          {extractTextWithEmTags(video.title, tw(colors.secondary.text))}
         </Text>
         <View className="gap-2">
           <Text
-            className={`${isFollowed ? colors.secondary.text : colors.primary.text} ${isFollowed ? 'font-bold' : ''}`}>
+            className={`${isFollowed ? colors.secondary.text : colors.primary.text}`}>
             <Text className={colors.gray7.text}>UP: </Text>
             {video.name}
           </Text>

@@ -64,6 +64,7 @@ function VideoHeader() {
           cover: videoInfo.cover!,
           date: videoInfo.date!,
           duration: videoInfo.duration!,
+          mid: videoInfo.mid!,
         },
         ...list,
       ])

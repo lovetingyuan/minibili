@@ -1,5 +1,6 @@
 // import { useNetInfo } from '@react-native-community/netInfo'
 import { Overlay } from '@rneui/themed'
+import { Asset } from 'expo-asset'
 import { Image } from 'expo-image'
 import React from 'react'
 import {
@@ -27,7 +28,7 @@ function ImagesView() {
   const {
     imagesList,
     currentImageIndex,
-    setOverlayButtons,
+    // setOverlayButtons,
     setImagesList,
     setCurrentImageIndex,
   } = useStore()
@@ -51,6 +52,15 @@ function ImagesView() {
     setImagesList([])
     setCurrentImageIndex(0)
   }
+  const onOpen = () => {
+    const img = imagesList[current].src
+    Linking.openURL(img.split('@')[0])
+  }
+  const {
+    width: loadingWidth,
+    height: loadingHeight,
+    uri: loadingUri,
+  } = Asset.fromModule(require('../../assets/loading.png'))
   return (
     <Overlay
       isVisible={images.length > 0}
@@ -58,12 +68,18 @@ function ImagesView() {
       overlayStyle={tw('p-0 m-0')}
       onBackdropPress={onClose}>
       <View className="flex-1 relative">
-        <View className="w-full justify-center absolute top-5 z-10">
+        <View className="w-full justify-center absolute top-6 z-10">
           <Text className="text-center text-white text-lg" style={textShadow}>
             {current + 1} / {images.length}
           </Text>
         </View>
-        <View className="w-full justify-center absolute top-5 z-10">
+        <View className="w-full justify-end flex-row items-center absolute top-5 z-10">
+          <Text
+            className="text-right font-semibold text-white text-2xl mr-4"
+            onPress={onOpen}
+            style={textShadow}>
+            ⇩
+          </Text>
           <Text
             className="text-right text-white text-2xl mr-4"
             onPress={onClose}
@@ -86,31 +102,41 @@ function ImagesView() {
             }
             return (
               <Pressable
-                onLongPress={() => {
-                  setOverlayButtons(
-                    [
-                      {
-                        text: '浏览器查看（下载）',
-                        onPress: () => {
-                          Linking.openURL(v.url)
-                        },
-                      },
-                      v.url.includes('@')
-                        ? {
-                            text: '查看清晰版本',
-                            onPress: () => {
-                              Linking.openURL(v.url.split('@')[0])
-                            },
-                          }
-                        : null,
-                    ].filter(Boolean),
-                  )
-                }}
+                // onLongPress={() => {
+                //   setOverlayButtons(
+                //     [
+                //       {
+                //         text: '浏览器查看（下载）',
+                //         onPress: () => {
+                //           Linking.openURL(v.url)
+                //         },
+                //       },
+                //       v.url.includes('@')
+                //         ? {
+                //             text: '查看清晰版本',
+                //             onPress: () => {
+                //               Linking.openURL(v.url.split('@')[0])
+                //             },
+                //           }
+                //         : null,
+                //     ].filter(Boolean),
+                //   )
+                // }}
                 key={v.url}
                 className="flex-1 bg-black justify-center items-center">
                 <Image
                   source={{ uri: v.url }}
                   style={{ width: imgWidth, height: imgHeight }}
+                  placeholder={
+                    typeof loadingWidth === 'number' &&
+                    typeof loadingHeight === 'number'
+                      ? {
+                          width: loadingWidth,
+                          height: loadingHeight,
+                          uri: loadingUri,
+                        }
+                      : null
+                  }
                 />
               </Pressable>
             )
