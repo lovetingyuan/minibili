@@ -106,10 +106,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     }
     if (currentAppState !== 'active') {
       KeepAwake.deactivateKeepAwake('PLAY')
-      webviewRef.current?.injectJavaScript(`
-      document.querySelector('video')?.play();
-      true;
-      `)
     }
   })
   useMounted(() => {
