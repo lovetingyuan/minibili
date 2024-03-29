@@ -5,7 +5,12 @@ The minimum bilibili app.
 
 <img src="./docs/minibili.png" alt="minibili" width="200" >
 
-https://lovetingyuan.github.io/minibili/
+<img src="./docs/video-list.jpg" alt="video list" width="160" >
+<img src="./docs/player.jpg" alt="player" width="160" >
+<img src="./docs/up-list.jpg" alt="up list" width="160" >
+<img src="./docs/up-detail.jpg" alt="up detail" width="160" >
+
+Website: https://lovetingyuan.github.io/minibili/
 
 Developed with Expo, React-Native and TailwindCSS.
 
