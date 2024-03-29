@@ -6,9 +6,11 @@ The minimum bilibili app.
 
 <img src="./docs/minibili.png" alt="minibili" width="280" >
 
-<img src="./docs/video-list.jpg" alt="video list" width="320" > <img src="./docs/player.jpg" alt="player" width="320" >
+<img src="./docs/video-list.jpg" alt="video list" width="320" style="margin-right: 20px"> <img src="./docs/player.jpg" alt="player" width="320" style="margin-right: 20px">
 
-<img src="./docs/up-list.jpg" alt="up list" width="320" > <img src="./docs/up-detail.jpg" alt="up detail" width="320" >
+---
+
+<img src="./docs/up-list.jpg" alt="up list" width="320" style="margin-right: 20px"> <img src="./docs/up-detail.jpg" alt="up detail" width="320" style="margin-right: 20px">
 
 Website: https://lovetingyuan.github.io/minibili/
 
