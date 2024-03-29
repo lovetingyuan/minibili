@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '@rneui/themed'
+import clsx from 'clsx'
 import { Image } from 'expo-image'
 import React from 'react'
 import { Linking, Pressable, TouchableOpacity, View } from 'react-native'
@@ -90,12 +91,11 @@ export function CommonContent(props: {
       <Foo className="gap-2 flex-1" {...linkProp}>
         {title ? (
           <Text
-            className={[
-              props.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE
-                ? 'font-bold'
-                : '',
+            className={clsx([
+              props.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_ARTICLE &&
+                'font-bold',
               'text-[15px]',
-            ].join(' ')}
+            ])}
             numberOfLines={2}>
             {title}
           </Text>

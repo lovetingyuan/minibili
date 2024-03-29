@@ -8,7 +8,7 @@ import { ReplyItemType, useReplies } from '@/api/replies'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 
-import Comment from './Comment'
+import { CommentItem } from './Comment'
 
 export default function ReplyList() {
   const {
@@ -54,13 +54,17 @@ export default function ReplyList() {
             data={replies}
             keyExtractor={v => v.id + '@' + v.root}
             renderItem={({ item }: { item: ReplyItemType }) => {
-              return <Comment comment={item} className="pl-7 pr-3 mb-2" />
+              return (
+                <View className="px-5 mb-2">
+                  <CommentItem comment={item} smallFont />
+                </View>
+              )
             }}
             estimatedItemSize={30}
             ListHeaderComponent={
               root ? (
-                <View className="border-b-[16px] px-4 border-b-neutral-300 dark:border-b-neutral-700 mb-4">
-                  <Comment comment={root} className="mb-3" />
+                <View className="border-b-[18px] p-4 border-b-neutral-300 dark:border-b-neutral-700 mb-5">
+                  <CommentItem comment={root} />
                 </View>
               ) : null
             }
@@ -86,7 +90,7 @@ export default function ReplyList() {
                 </Text>
               ) : null
             }
-            contentContainerStyle={tw('py-5')}
+            contentContainerStyle={tw('pb-5')}
             onEndReached={() => {
               update()
             }}

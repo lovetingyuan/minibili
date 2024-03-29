@@ -41,8 +41,10 @@
     "@sentry/react-native": "5.19.1",
     "@shopify/flash-list": "1.6.3",
     "@total-typescript/ts-reset": "^0.5.1",
+    "clsx": "^2.1.0",
     "expo": "~50.0.8",
     "expo-application": "~5.8.3",
+    "expo-asset": "~9.0.2",
     "expo-background-fetch": "~11.8.1",
     "expo-clipboard": "~5.0.1",
     "expo-constants": "~15.4.5",
@@ -67,8 +69,8 @@
     "react-native-webview": "13.6.4",
     "spark-md5": "^3.0.2",
     "swr": "^2.2.4",
-    "zod": "^3.21.4",
-    "expo-asset": "~9.0.2"
+    "throttle-debounce": "^5.0.0",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -77,6 +79,7 @@
     "@types/he": "^1.2.3",
     "@types/react": "~18.2.14",
     "@types/spark-md5": "^3.0.4",
+    "@types/throttle-debounce": "^5.0.2",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "babel-plugin-transform-remove-console": "^6.9.4",

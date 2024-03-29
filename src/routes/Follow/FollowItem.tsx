@@ -192,30 +192,6 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
           />
         ) : null}
       </View>
-      {/* {livingUps[mid] ? (
-        <Button
-          size="sm"
-          type="clear"
-          onPress={gotoLivePage}
-          buttonStyle={tw('mt-1 rounded')}
-          titleStyle={tw(`${colors.success.text} text-base`)}>
-          <Icon
-            name="live-tv"
-            size={16}
-            color={tw(colors.success.text).color}
-          />
-          直播中~
-        </Button>
-      ) : (
-        <Text
-          className={`text-sm py-2 flex-1 shrink-0 text-center ${
-            pin ? `font-bold ${colors.primary.text}` : ''
-          } ${hasUpdate ? colors.secondary.text : ''}`}
-          numberOfLines={2}
-          ellipsizeMode="tail">
-          {name}
-        </Text>
-      )} */}
       <Text
         className={`text-sm py-2 flex-1 shrink-0 text-center ${
           pin ? `font-bold ${colors.primary.text}` : ''

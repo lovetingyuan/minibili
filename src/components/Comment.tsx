@@ -1,6 +1,8 @@
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Button, Text } from '@rneui/themed'
+import clsx from 'clsx'
+import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Image, Linking, View } from 'react-native'
 
@@ -9,7 +11,7 @@ import { colors } from '@/constants/colors.tw'
 import type { CommentItemType, CommentMessageContent } from '../api/comments'
 import { useStore } from '../store'
 import type { NavigationProps, RootStackParamList } from '../types'
-import { parseImgUrl } from '../utils'
+import { parseImgUrl, showToast } from '../utils'
 
 function CommentText(props: {
   nodes: CommentMessageContent
@@ -39,7 +41,10 @@ function CommentText(props: {
           return (
             <Text
               key={key}
-              className={` ${fontSize} ${upName === name ? colors.secondary.text : colors.primary.text}`}
+              className={clsx([
+                fontSize,
+                upName === name ? colors.secondary.text : colors.primary.text,
+              ])}
               onPress={() => {
                 navigation.push('Dynamic', {
                   user: {
@@ -59,10 +64,15 @@ function CommentText(props: {
             <Text
               key={key}
               className={`${colors.primary.text} ${fontSize}`}
+              onLongPress={() => {
+                Clipboard.setStringAsync(node.url).then(() => {
+                  showToast('已复制链接')
+                })
+              }}
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
-              {node.url}
+              {'🔗 链接 '}
             </Text>
           )
         }
@@ -108,7 +118,7 @@ function CommentText(props: {
           )
         }
         return (
-          <Text className={fontSize} selectable key={key}>
+          <Text className={fontSize} key={key}>
             {node.text}
           </Text>
         )
@@ -117,8 +127,9 @@ function CommentText(props: {
   )
 }
 
-function CommentItem(props: {
+export function CommentItem(props: {
   comment: CommentItemType | CommentItemType['replies'][0]
+  smallFont?: boolean
 }) {
   const { comment } = props
   const { setImagesList, setCurrentImageIndex } = useStore()
@@ -135,15 +146,15 @@ function CommentItem(props: {
       : route.params.name
     : ''
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const fontSize = 'rcount' in comment ? 'text-base' : 'text-sm'
+  const fontSize = props.smallFont ? 'text-sm' : 'text-base'
   return (
     <Text className="py-[2px]">
       <Text
-        className={`${
-          upName === comment.name
-            ? colors.secondary.text + ' font-bold'
-            : colors.primary.text
-        } ${fontSize}`}
+        className={clsx(
+          colors.primary.text,
+          upName === comment.name && [colors.secondary.text, 'font-bold'],
+          fontSize,
+        )}
         onPress={() => {
           navigation.push('Dynamic', {
             user: {
@@ -160,7 +171,9 @@ function CommentItem(props: {
         {comment.sex === '男' ? '♂：' : comment.sex === '女' ? '♀：' : '：'}
       </Text>
       {'top' in comment && comment.top ? (
-        <Text className={fontSize}> 🔝 </Text>
+        <Text className={`text-sm font-bold ${colors.secondary.text}`}>
+          {' 置顶 '}
+        </Text>
       ) : null}
       {comment.message?.length ? (
         <CommentText
@@ -190,9 +203,9 @@ function CommentItem(props: {
   )
 }
 
-export default React.memo(Comment)
+export const Comment = React.memo(CommentBlock)
 
-function Comment(props: {
+function CommentBlock(props: {
   comment: CommentItemType
   className?: string
   style?: any
@@ -202,13 +215,16 @@ function Comment(props: {
 
   return (
     <View
-      className={`${comment.replies?.length ? 'mb-7' : 'mb-4'} ${props.className || ''}`}
+      className={clsx([
+        comment.replies?.length ? 'mb-7' : 'mb-4',
+        props.className,
+      ])}
       style={props.style}>
       <CommentItem comment={comment} />
       {comment.replies?.length ? (
         <View className="p-2 mt-1 rounded gap-1 opacity-90 flex-1 shrink-0 border-gray-500 bg-neutral-200 dark:bg-neutral-900">
           {comment.replies.map(reply => {
-            return <CommentItem key={reply.id} comment={reply} />
+            return <CommentItem key={reply.id} comment={reply} smallFont />
           })}
           {comment.moreText && comment.rcount > comment.replies.length ? (
             <Button

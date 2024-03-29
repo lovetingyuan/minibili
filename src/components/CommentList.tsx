@@ -6,8 +6,7 @@ import { View } from 'react-native'
 import { colors } from '@/constants/colors.tw'
 
 import { type CommentItemType, useComments } from '../api/comments'
-import Comment from './Comment'
-// import MoreReplies from './MoreReplies'
+import { Comment } from './Comment'
 import ReplyList from './ReplyList'
 
 function Loading() {

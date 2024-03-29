@@ -50,7 +50,7 @@ function HistoryList() {
       ListFooterComponent={
         list.length ? (
           <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
-            暂无更多（只记录最近400条）
+            暂无更多（最近约400条）
           </Text>
         ) : null
       }

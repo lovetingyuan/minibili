@@ -1,4 +1,5 @@
 import { Icon, Text } from '@rneui/themed'
+import clsx from 'clsx'
 import { Image } from 'expo-image'
 import React from 'react'
 import { View } from 'react-native'
@@ -54,14 +55,20 @@ function VideoItem({ video }: { video: VideoItemType }) {
           <View
             className={`right-0 ${watchedInfo ? 'bottom-1' : 'bottom-0'} absolute px-1 items-center bg-gray-900/70 rounded-sm m-1`}>
             <Text
-              className={`text-white text-xs ${isBlackTag ? 'line-through opacity-60' : ''}`}>
+              className={clsx(
+                'text-white text-xs',
+                isBlackTag && 'line-through opacity-60',
+              )}>
               {video.tag}
             </Text>
           </View>
         ) : null}
       </View>
       <Text
-        className={`mt-3 min-h-8 ${isFollowed ? `font-bold ${colors.primary.text}` : ''}`}
+        className={clsx(
+          'mt-3',
+          isFollowed && ['font-bold', colors.primary.text],
+        )}
         numberOfLines={2}>
         {video.title}
       </Text>
@@ -83,11 +90,12 @@ function VideoItem({ video }: { video: VideoItemType }) {
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"
-            className={`ml-1 text-xs grow shrink ${
+            className={clsx(
+              'ml-1 text-xs grow shrink',
               isFollowed
-                ? `font-bold ${colors.secondary.text}`
-                : colors.primary.text
-            }`}>
+                ? ['font-bold', colors.secondary.text]
+                : colors.primary.text,
+            )}>
             {video.name}
           </Text>
         </View>

@@ -4,6 +4,7 @@ import {
   useRoute,
 } from '@react-navigation/native'
 import { Avatar, Icon, Text } from '@rneui/themed'
+import clsx from 'clsx'
 import { Image } from 'expo-image'
 import React from 'react'
 import { Alert, Linking, Pressable, TouchableOpacity, View } from 'react-native'
@@ -161,7 +162,12 @@ function VideoHeader() {
             }
           />
           <Text
-            className={`text-sm ${isCollected ? colors.warning.text : colors.gray8.text} ${isCollected ? 'font-bold' : ''}`}>
+            className={clsx(
+              'text-sm',
+              isCollected
+                ? [colors.warning.text, 'font-bold']
+                : colors.gray8.text,
+            )}>
             {parseNumber(videoInfo?.collectNum)}
           </Text>
         </TouchableOpacity>

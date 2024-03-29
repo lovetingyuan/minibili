@@ -1,10 +1,11 @@
 import { useNavigation, useRoute } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Avatar, Button, Icon, Text } from '@rneui/themed'
+import { Avatar, Icon, Text } from '@rneui/themed'
+import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Linking, View } from 'react-native'
+import { Linking, Pressable, View } from 'react-native'
 import { Menu, MenuItem } from 'react-native-material-menu'
 
 import { colors } from '@/constants/colors.tw'
@@ -48,7 +49,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
       {dynamicUser?.face ? (
         <View className="relative">
           <Avatar
-            size={38}
+            size={40}
             rounded
             onPress={gotoWebPage}
             ImageComponent={Image}
@@ -61,22 +62,39 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
               {sex}
             </Text>
           ) : null}
+          {dynamicUser.mid && livingUrl ? (
+            <Pressable
+              onPress={() => {
+                if (dynamicUser.mid) {
+                  setCheckLiveTimeStamp(Date.now())
+                  navigation.navigate('WebPage', {
+                    title: dynamicUser.name + '的直播间',
+                    url: livingUrl,
+                  })
+                }
+              }}
+              className="inset-0 absolute justify-center items-center w-10 h-10 rounded-full bg-neutral-950/60">
+              <Text className={'text-center text-xs text-teal-300 font-bold'}>
+                直播中
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       ) : null}
 
       <View className="flex-1 ml-3 items-center flex-wrap flex-row">
         <Text
-          className={`${followed ? colors.secondary.text : ''} text-lg pt-1`}
+          className={clsx(
+            followed && [colors.secondary.text, 'font-bold'],
+            'text-lg pt-1',
+          )}
           adjustsFontSizeToFit
           numberOfLines={1}
           onPress={() => {
             props.scrollTop()
           }}>
           {userName}
-          <Text className="text-sm">
-            {level}
-            {'    '}
-          </Text>
+          <Text className="text-sm">{level + '   '}</Text>
         </Text>
         {fans ? (
           <Text
@@ -88,24 +106,6 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           </Text>
         ) : null}
       </View>
-      {dynamicUser.mid && livingUrl ? (
-        <Button
-          size="sm"
-          type="clear"
-          buttonStyle={tw('ml-[10px] mr-[10px]')}
-          titleStyle={tw('text-sm')}
-          onPress={() => {
-            if (dynamicUser.mid) {
-              setCheckLiveTimeStamp(Date.now())
-              navigation.navigate('WebPage', {
-                title: dynamicUser.name + '的直播间',
-                url: livingUrl,
-              })
-            }
-          }}>
-          直播中
-        </Button>
-      ) : null}
     </View>
   )
 }

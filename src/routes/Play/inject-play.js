@@ -96,7 +96,7 @@ function __$hack() {
     }
     const style = document.createElement('style')
     style.textContent = `
-    body, #bilibiliPlayer, .mplayer {
+    html, body, #bilibiliPlayer, .mplayer {
       background-color: black!important;
     }
     .b-danmaku {
@@ -128,32 +128,6 @@ function __$hack() {
     })
   })
   waitForDom('.mplayer-right', right => {
-    // if (!document.getElementById('download-button')) {
-    //   const downloadBtn = document.createElement('div')
-    //   downloadBtn.id = 'download-button'
-    //   // downloadBtn.innerHTML = '&#8659;'
-    //   downloadBtn.innerHTML = '⇩'
-    //   downloadBtn.style.cssText = `
-    //     width: 24px;
-    //     height: 24px;
-    //     color: white;
-    //     font-size: 20px;
-    //     line-height: 28px;
-    //     text-align: center;
-    //     background: rgba(0,0,0,.2);
-    //     border-radius: 50%;
-    //     font-weight: 500;
-    //   `
-    //   downloadBtn.addEventListener('click', () => {
-    //     window.ReactNativeWebView.postMessage(
-    //       JSON.stringify({
-    //         action: 'downloadVideo',
-    //         payload: null,
-    //       }),
-    //     )
-    //   })
-    //   right.appendChild(downloadBtn)
-    // }
     if (!document.getElementById('play-rate-button')) {
       const rateBtn = document.createElement('div')
       rateBtn.id = 'play-rate-button'

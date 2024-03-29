@@ -122,7 +122,9 @@ function VideoListItem({
         </Text>
         <View className="gap-2">
           <Text
-            className={`${isFollowed ? colors.secondary.text : colors.primary.text}`}>
+            className={
+              isFollowed ? colors.secondary.text : colors.primary.text
+            }>
             <Text className={colors.gray7.text}>UP: </Text>
             {video.name}
           </Text>

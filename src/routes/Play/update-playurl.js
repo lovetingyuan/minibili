@@ -33,10 +33,10 @@ function __$hack() {
       //   }),
       // )
       video.load()
-      setTimeout(() => {
-        video.muted = false
-        video.play()
-      }, 10)
+      // setTimeout(() => {
+      video.muted = false
+      video.play()
+      // }, 10)
     }
   }
   window.setNewVideoUrl = function (url) {
@@ -48,6 +48,7 @@ function __$hack() {
     evt => {
       const video = evt.target
       if (video && video.tagName === 'VIDEO') {
+        video.pause()
         replacePlayUrl()
       }
     },

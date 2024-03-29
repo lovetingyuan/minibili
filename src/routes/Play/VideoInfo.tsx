@@ -81,7 +81,7 @@ function VideoInfo(props: {
         </ListItem.Accordion>
       ) : null}
       {!isLoading && videoInfo?.interactive ? (
-        <Text className="mt-3 italic text-orange-600">
+        <Text className={`mt-3 italic ${colors.warning.text}`}>
           【该视频为交互视频，暂不支持】
         </Text>
       ) : null}
