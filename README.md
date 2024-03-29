@@ -2,8 +2,9 @@
 
 The minimum bilibili app.
 (Android 6 or above)
+简单的B站浏览APP，欢迎下载使用
 
-<img src="./docs/minibili.png" alt="minibili" width="200" >
+<img src="./docs/minibili.png" alt="minibili" width="280" >
 
 <img src="./docs/video-list.jpg" alt="video list" width="320" > <img src="./docs/player.jpg" alt="player" width="320" >
 
