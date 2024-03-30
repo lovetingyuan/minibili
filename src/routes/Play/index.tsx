@@ -36,11 +36,14 @@ function Play({ route }: Props) {
     ...data,
   }
   const [currentCid, setCurrentCid] = React.useState(videoInfo.cid)
-  React.useEffect(() => {
-    if (videoInfo.cid && !currentCid) {
-      setCurrentCid(videoInfo.cid)
-    }
-  }, [videoInfo.cid, currentCid])
+  if (!currentCid && videoInfo.cid) {
+    setCurrentCid(videoInfo.cid)
+  }
+  // React.useEffect(() => {
+  //   if (videoInfo.cid && !currentCid) {
+  //     setCurrentCid(videoInfo.cid)
+  //   }
+  // }, [videoInfo.cid, currentCid])
   const [key, setKey] = React.useState(bvid)
 
   useUpdateNavigationOptions(

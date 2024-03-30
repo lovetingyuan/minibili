@@ -222,7 +222,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     portraitFullScreen: true,
     highQuality: isWifi ? 1 : 0,
     page: isWifi ? undefined : props.currentPage,
-    autoplay: isWifi ? 0 : 1,
+    autoplay: 0, // isWifi ? 0 : 1,
     hasMuteButton: true,
   }).forEach(([k, v]) => {
     if (v !== undefined) {
