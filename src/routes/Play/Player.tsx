@@ -229,7 +229,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       search.append(k, v + '')
     }
   })
-  const webview = (
+  const player = !loadPlayer ? (
     <WebView
       source={{
         uri: `${playUrl}?${search}`,
@@ -267,38 +267,41 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         return false
       }}
     />
+  ) : (
+    <Pressable
+      onPress={() => {
+        setLoadPlayer(true)
+      }}
+      className="flex-1">
+      {videoInfo?.cover ? (
+        <ImageBackground
+          source={{ uri: parseImgUrl(videoInfo.cover, 500, 312) }}
+          resizeMode="cover"
+          className="flex-1 justify-center items-center">
+          <Icon
+            name="television-play"
+            type="material-community"
+            size={60}
+            color={'white'}
+          />
+          <View className="absolute bottom-2 left-2 flex-row gap-2">
+            <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+              {parseDuration(videoInfo?.duration)}
+            </Text>
+            <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+              播放将消耗流量
+            </Text>
+          </View>
+        </ImageBackground>
+      ) : null}
+    </Pressable>
   )
   return (
     <View
       renderToHardwareTextureAndroid
       className="w-full shrink-0 bg-black"
       style={{ height: videoViewHeight }}>
-      {loadPlayer ? (
-        webview
-      ) : (
-        <Pressable
-          onPress={() => {
-            setLoadPlayer(true)
-          }}
-          className="flex-1">
-          {videoInfo?.cover ? (
-            <ImageBackground
-              source={{ uri: parseImgUrl(videoInfo.cover, 672, 420) }}
-              resizeMode="cover"
-              className="flex-1 justify-center items-center">
-              <Icon
-                name="television-play"
-                type="material-community"
-                size={60}
-                color={'white'}
-              />
-              <Text className="absolute bottom-0 m-3 rounded bg-gray-900/60 py-[2px] px-2 left-0 text-white font-bold">
-                {parseDuration(videoInfo?.duration)}
-              </Text>
-            </ImageBackground>
-          ) : null}
-        </Pressable>
-      )}
+      {player}
     </View>
   )
 }
