@@ -25,22 +25,11 @@ const textShadow = {
 }
 
 function ImagesView() {
-  const {
-    imagesList,
-    currentImageIndex,
-    // setOverlayButtons,
-    setImagesList,
-    setCurrentImageIndex,
-  } = useStore()
+  const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } =
+    useStore()
 
-  // const netInfo = useNetInfo()
   const { width, height } = useWindowDimensions()
-  // const isWiFi = netInfo.type === 'wifi'
   const images = imagesList.map(v => {
-    // let url = v.src
-    // if (!isWiFi) {
-    //   url += `@${width * 0.8}w_${(width * 0.8 * v.height) / v.width}h_1c.webp`
-    // }
     return {
       url: parseImgUrl(v.src),
       width: v.width,
@@ -102,26 +91,6 @@ function ImagesView() {
             }
             return (
               <Pressable
-                // onLongPress={() => {
-                //   setOverlayButtons(
-                //     [
-                //       {
-                //         text: '浏览器查看（下载）',
-                //         onPress: () => {
-                //           Linking.openURL(v.url)
-                //         },
-                //       },
-                //       v.url.includes('@')
-                //         ? {
-                //             text: '查看清晰版本',
-                //             onPress: () => {
-                //               Linking.openURL(v.url.split('@')[0])
-                //             },
-                //           }
-                //         : null,
-                //     ].filter(Boolean),
-                //   )
-                // }}
                 key={v.url}
                 className="flex-1 bg-black justify-center items-center">
                 <Image
