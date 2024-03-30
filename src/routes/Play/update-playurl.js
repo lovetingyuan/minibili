@@ -2,48 +2,38 @@ function __$hack() {
   const createElement = document.createElement
   const style = document.createElement('style')
   style.textContent = `
-  .mplayer-time-total-text {
+  body[data-replaced] .mplayer-time-total-text {
     font-weight: bold!important;
     font-size: 14px!important;
   }
   `
+  document.head.appendChild(style)
   document.createElement = function _createElement(name, options) {
     const ele = createElement.call(this, name, options)
     if (name === 'video') {
       Promise.resolve().then(() => {
         if (ele.src) {
-          ele.removeAttribute('src')
-          ele.setAttribute('autoplay', 'false')
-          ele.setAttribute('muted', 'false')
+          // ele.dataset.originSrc = ele.src
+          // ele.setAttribute('muted', 'false')
+          // ele.setAttribute('autoplay', 'false')
+          if (window.newVideoUrl && ele.src !== window.newVideoUrl) {
+            ele.setAttribute('src', window.newVideoUrl)
+            if (window.newVideoUrl.includes('_high_quality')) {
+              document.body.dataset.replaced = 'true'
+            }
+          }
         }
       })
     }
     return ele
   }
 
-  window.setNewVideoUrl = videoUrl => {
-    const video = document.querySelector('video')
-    // window.ReactNativeWebView.postMessage(
-    //   JSON.stringify({
-    //     action: 'console.log',
-    //     payload: `
-    //     ${video.src}
-    //     -----
-    //     ${videoUrl}
-    //     `,
-    //   }),
-    // )
-    if (videoUrl && video.src !== videoUrl) {
-      video.src = videoUrl
-      document.head.appendChild(style)
-      // alert(videoUrl)
-      video.load()
-      setTimeout(() => {
-        video.muted = false
-        video.play()
-      })
-    }
-  }
+  window.ReactNativeWebView.postMessage(
+    JSON.stringify({
+      action: 'updateUrlSettled',
+      payload: '',
+    }),
+  )
 }
 
 export const UPDATE_URL_CODE = `(${__$hack})();\ntrue;`

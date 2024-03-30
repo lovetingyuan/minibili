@@ -43,6 +43,8 @@ function Player(props: { currentPage: number; currentCid?: number }) {
   const isWifi = getIsWiFi()
 
   const [loadPlayer, setLoadPlayer] = React.useState(isWifi)
+  const [updateUrlReady, setUpdateUrlReady] = React.useState(false)
+
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
   const videoInfo = {
@@ -50,25 +52,31 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     ...data,
   }
   const cid = props.currentCid || videoInfo.cid
-  const videoUrl = usePlayUrl(isWifi ? videoInfo.bvid : '', isWifi ? cid : 0)
-
+  const { videoUrl } = usePlayUrl(videoInfo.bvid, cid, isWifi)
   const markVideoWatched = useMarkVideoWatched()
 
   const [isEnded, setIsEnded] = React.useState(true)
+  // video created, get new videourl, we are not sure which will happen first.
   React.useEffect(() => {
-    if (!getIsWiFi()) {
-      return
-    }
-    if (videoUrl === null) {
-      return
-    }
-    if (videoUrl) {
+    if (videoUrl && updateUrlReady) {
       webviewRef.current?.injectJavaScript(`
-      window.setNewVideoUrl("${videoUrl}");
+      window.newVideoUrl = "${videoUrl}";
+      ;(function() {
+        const video = document.querySelector('video[src]')
+        if (video) {
+          video.setAttribute('src', window.newVideoUrl)
+          if (window.newVideoUrl.includes('_high_quality')) {
+            document.body.dataset.replaced = 'true'
+          }
+          setTimeout(() => {
+            video.play()
+          })
+        }
+      })();
       true;
       `)
     }
-  }, [videoUrl, getIsWiFi])
+  }, [videoUrl, updateUrlReady])
   /**
    * hasimg  play -> imagepause
    *         pause -> nothing
@@ -191,6 +199,9 @@ function Player(props: { currentPage: number; currentCid?: number }) {
           markVideoWatched(videoInfo, eventData.payload)
         }
       }
+      if (eventData.action === 'updateUrlSettled') {
+        setUpdateUrlReady(true)
+      }
       if (eventData.action === 'console.log') {
         // eslint-disable-next-line no-console
         __DEV__ && console.log('message', eventData.payload)
@@ -218,18 +229,18 @@ function Player(props: { currentPage: number; currentCid?: number }) {
   // const playUrl = 'https://www.bilibili.com/blackboard/webplayer/mbplayer.html'
   Object.entries({
     bvid: route.params.bvid,
-    quality: isWifi ? 64 : 32,
+    // quality: isWifi ? 64 : 32,
     portraitFullScreen: true,
-    highQuality: isWifi ? 1 : 0,
-    page: isWifi ? undefined : props.currentPage,
-    autoplay: 0, // isWifi ? 0 : 1,
+    // highQuality: isWifi ? 1 : 0,
+    // page: isWifi ? undefined : props.currentPage,
+    // autoplay: 0, // isWifi ? 0 : 1,
     hasMuteButton: true,
   }).forEach(([k, v]) => {
     if (v !== undefined) {
       search.append(k, v + '')
     }
   })
-  const player = !loadPlayer ? (
+  const player = loadPlayer ? (
     <WebView
       source={{
         uri: `${playUrl}?${search}`,
@@ -246,7 +257,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       // key={videoInfo.bvid}
       mediaPlaybackRequiresUserAction={false}
       injectedJavaScript={INJECTED_JAVASCRIPT}
-      injectedJavaScriptBeforeContentLoaded={isWifi ? UPDATE_URL_CODE : 'true;'}
+      injectedJavaScriptBeforeContentLoaded={UPDATE_URL_CODE}
       renderLoading={renderLoading}
       onMessage={handleMessage}
       onLoad={() => {

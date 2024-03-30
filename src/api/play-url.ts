@@ -6,7 +6,7 @@ import { PlayUrlResponseSchema } from './play-url.schema'
 
 type Res = z.infer<typeof PlayUrlResponseSchema>
 
-export function usePlayUrl(bvid: string, cid?: number) {
+export function usePlayUrl(bvid: string, cid?: number, highQuality?: boolean) {
   const search = new URLSearchParams()
   // https://socialsisteryi.github.io/bilibili-API-collect/docs/video/videostream_url.html
   if (bvid && cid) {
@@ -14,29 +14,36 @@ export function usePlayUrl(bvid: string, cid?: number) {
       bvid,
       cid,
       type: 'mp4',
-      qn: 64,
+      qn: highQuality ? 64 : 32,
       fnval: 1,
       try_look: 1,
       platform: 'pc',
-      high_quality: 1,
+      high_quality: highQuality ? 1 : 0,
     }
     Object.entries(query).forEach(([k, v]) => {
       search.append(k, v + '')
     })
   }
 
-  const { data } = useSWR<Res>(
+  const { data, error } = useSWR<Res>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
     {
-      dedupingInterval: 0, // 2 * 60 * 1000 * 1000 - 60 * 1000,
+      dedupingInterval: 2 * 60 * 1000 * 1000 - 60 * 1000,
       shouldRetryOnError: true,
       errorRetryCount: 3,
       errorRetryInterval: 0,
     },
   )
-  return data?.durl
+  let url = data?.durl
     ? data.durl[0]?.backup_url?.[0] || data.durl[0]?.url || ''
     : null
+  if (highQuality && url) {
+    url += '&_high_quality=true'
+  }
+  return {
+    videoUrl: url,
+    error,
+  }
 }
 
 export function getDownloadUrl(bvid: string, cid: number) {

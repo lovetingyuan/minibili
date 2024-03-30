@@ -106,7 +106,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           }}>
           复制链接
         </MenuItem>
-        <MenuItem
+        {/* <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
@@ -114,7 +114,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
             showToast('暂未实现')
           }}>
           刷新
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={tw(colors.gray4.text).color}
