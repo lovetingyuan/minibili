@@ -1,6 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Avatar, Button, Skeleton, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
+import clsx from 'clsx'
 import React from 'react'
 import { TouchableOpacity, View } from 'react-native'
 
@@ -12,9 +13,10 @@ import { parseNumber } from '@/utils'
 
 function SearchUpItem(props: { up: SearchedUpType }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { _followedUpsMap, set$followedUps, get$followedUps } = useStore()
+  const { _followedUpsMap, $blackUps, set$followedUps, get$followedUps } =
+    useStore()
   const isFollowed = props.up.mid in _followedUpsMap
-
+  const isBlackUp = props.up.mid in $blackUps
   return (
     <View className="flex-1 flex-row items-center justify-between px-4 mb-5">
       <TouchableOpacity
@@ -34,7 +36,12 @@ function SearchUpItem(props: { up: SearchedUpType }) {
         <Avatar rounded source={{ uri: props.up.face }} size={40} />
         <Text
           numberOfLines={2}
-          className={`${colors.primary.text} ${isFollowed ? colors.secondary.text : ''} text-base flex-1`}
+          className={clsx(
+            colors.primary.text,
+            isBlackUp && 'line-through',
+            isFollowed && colors.secondary.text,
+            'text-base flex-1',
+          )}
           ellipsizeMode="tail">
           {props.up.name}
         </Text>

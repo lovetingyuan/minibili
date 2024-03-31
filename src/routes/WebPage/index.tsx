@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 import { WebView } from 'react-native-webview'
 
+import useMounted from '@/hooks/useMounted'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
 import { UA } from '../../constants'
@@ -40,7 +41,7 @@ function WebPage({ route }: Props) {
   const { url, title } = route.params
 
   const webviewRef = React.useRef<WebView | null>(null)
-  const { webViewMode } = useStore()
+  const { webViewMode, setCheckLiveTimeStamp } = useStore()
   const isDark = useIsDark()
   const [height, setHeight] = React.useState(Dimensions.get('screen').height)
   const [isEnabled, setEnabled] = React.useState(true)
@@ -53,6 +54,13 @@ function WebPage({ route }: Props) {
       })
     }, []),
   )
+  useMounted(() => {
+    return () => {
+      if (url.includes('live.bilibili.com')) {
+        setCheckLiveTimeStamp(Date.now())
+      }
+    }
+  })
   useUpdateNavigationOptions(
     React.useMemo(() => {
       const headerRight = () => {

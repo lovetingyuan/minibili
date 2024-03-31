@@ -1,6 +1,7 @@
 import { type RouteProp, useRoute } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Icon, Text } from '@rneui/themed'
+import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Linking, View } from 'react-native'
@@ -19,13 +20,17 @@ export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data: vi } = useVideoInfo(route.params.bvid)
   const { data: fans } = useUserRelation(route.params?.mid || vi?.mid)
-  const { _followedUpsMap } = useStore()
-  const followed = route.params?.mid && route.params?.mid in _followedUpsMap
-
+  const { _followedUpsMap, $blackUps } = useStore()
+  const followed = route.params?.mid && route.params.mid in _followedUpsMap
+  const isBlackUp = route.params?.mid && route.params.mid in $blackUps
   return (
     <View className="flex-row items-center relative left-[-10px]">
       <Text
-        className={`text-lg font-semibold ${followed ? colors.secondary.text : ''}`}>
+        className={clsx(
+          'text-lg font-semibold',
+          isBlackUp && 'line-through',
+          followed && colors.secondary.text,
+        )}>
         {route.params?.name || vi?.name}
       </Text>
       <Text

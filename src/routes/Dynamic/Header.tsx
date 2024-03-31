@@ -42,8 +42,9 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
-  const { _followedUpsMap, setCheckLiveTimeStamp } = useStore()
+  const { _followedUpsMap, setCheckLiveTimeStamp, $blackUps } = useStore()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
+  const isBlackUp = dynamicUser?.mid && dynamicUser.mid in $blackUps
   return (
     <View className="flex-row flex-none items-center mr-[110px] left-[-12px]">
       {dynamicUser?.face ? (
@@ -87,6 +88,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
           className={clsx(
             followed && [colors.secondary.text, 'font-bold'],
             'text-lg pt-1',
+            isBlackUp && 'line-through',
           )}
           adjustsFontSizeToFit
           numberOfLines={1}
