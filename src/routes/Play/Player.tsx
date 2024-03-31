@@ -70,7 +70,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
           }
           setTimeout(() => {
             video.play()
-          })
+          }, 20)
         }
       })();
       true;
