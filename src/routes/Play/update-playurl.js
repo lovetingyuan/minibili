@@ -21,6 +21,9 @@ function __$hack() {
             if (window.newVideoUrl.includes('_high_quality')) {
               document.body.dataset.replaced = 'true'
             }
+            setTimeout(() => {
+              ele.play()
+            })
           }
         }
       })
