@@ -18,10 +18,18 @@ function __$hack() {
           // ele.setAttribute('autoplay', 'false')
           if (window.newVideoUrl && ele.src !== window.newVideoUrl) {
             ele.setAttribute('src', window.newVideoUrl)
+            ele.dataset.replaced = 'true'
             if (window.newVideoUrl.includes('_high_quality')) {
               document.body.dataset.replaced = 'true'
             }
             ele.setAttribute('autoplay', 'true')
+            ele.addEventListener('canplaythrough', () => {
+              if (document.body.contains(ele)) {
+                requestAnimationFrame(() => {
+                  ele.play()
+                })
+              }
+            })
           }
         }
       })

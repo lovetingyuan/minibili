@@ -63,14 +63,12 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       window.newVideoUrl = "${videoUrl}";
       ;(function() {
         const video = document.querySelector('video[src]')
-        if (video) {
+        if (video && video.src !== window.newVideoUrl) {
           video.setAttribute('src', window.newVideoUrl)
+          video.dataset.replaced = 'true'
           if (window.newVideoUrl.includes('_high_quality')) {
             document.body.dataset.replaced = 'true'
           }
-          setTimeout(() => {
-            video.play()
-          }, 20)
         }
       })();
       true;
