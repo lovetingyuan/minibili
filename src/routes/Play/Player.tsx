@@ -71,7 +71,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
           }
           requestAnimationFrame(() => {
             const video = document.querySelector('video[src]')
-            if (video) {
+            if (video && document.body.contains(video)) {
               video.play()
             }
           })

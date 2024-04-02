@@ -23,13 +23,12 @@ function __$hack() {
               document.body.dataset.replaced = 'true'
             }
             ele.setAttribute('autoplay', 'true')
-            ele.addEventListener('canplay', () => {
-              requestAnimationFrame(() => {
-                if (document.body.contains(ele)) {
-                  ele.play()
-                }
-              })
-            })
+            setTimeout(() => {
+              const vi = document.querySelector('video[src]')
+              if (vi && document.body.contains(vi)) {
+                vi.play()
+              }
+            }, 500)
           }
         }
       })
