@@ -69,6 +69,12 @@ function Player(props: { currentPage: number; currentCid?: number }) {
           if (window.newVideoUrl.includes('_high_quality')) {
             document.body.dataset.replaced = 'true'
           }
+          requestAnimationFrame(() => {
+            const video = document.querySelector('video[src]')
+            if (video) {
+              video.play()
+            }
+          })
         }
       })();
       true;

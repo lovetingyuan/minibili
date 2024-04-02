@@ -23,12 +23,12 @@ function __$hack() {
               document.body.dataset.replaced = 'true'
             }
             ele.setAttribute('autoplay', 'true')
-            ele.addEventListener('canplaythrough', () => {
-              if (document.body.contains(ele)) {
-                requestAnimationFrame(() => {
+            ele.addEventListener('canplay', () => {
+              requestAnimationFrame(() => {
+                if (document.body.contains(ele)) {
                   ele.play()
-                })
-              }
+                }
+              })
             })
           }
         }
