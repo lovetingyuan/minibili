@@ -44,7 +44,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   const { _followedUpsMap, setCheckLiveTimeStamp, $blackUps } = useStore()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
-  const isBlackUp = dynamicUser?.mid && dynamicUser.mid in $blackUps
+  const isBlackUp = dynamicUser?.mid && '_' + dynamicUser.mid in $blackUps
   return (
     <View className="flex-row flex-none items-center mr-[110px] left-[-12px]">
       {dynamicUser?.face ? (
@@ -121,8 +121,11 @@ function HeaderRight() {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
-  const { get$followedUps, _followedUpsMap, set$followedUps } = useStore()
+  const { get$followedUps, _followedUpsMap, set$followedUps, $blackUps } =
+    useStore()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
+  const isBlackUp = dynamicUser?.mid && '_' + dynamicUser.mid in $blackUps
+
   return (
     <View className="flex-row items-center gap-2">
       <Menu
@@ -137,7 +140,7 @@ function HeaderRight() {
           />
         }
         onRequestClose={hideMenu}>
-        {!followed && (
+        {!followed && !isBlackUp && (
           <MenuItem
             textStyle={tw('text-black dark:text-gray-300')}
             pressColor={tw(colors.gray4.text).color}

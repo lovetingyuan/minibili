@@ -1,27 +1,13 @@
 import { Skeleton, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
-import { Image, ScrollView, TouchableOpacity, View } from 'react-native'
+import { ScrollView, TouchableOpacity, View } from 'react-native'
 
 import { useHotSearch } from '@/api/hot-search'
 import { SearchedVideoType, useSearchVideos } from '@/api/search-video'
+import Image2 from '@/components/Image2'
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
-import useMounted from '@/hooks/useMounted'
-import { parseImgUrl } from '@/utils'
-
-function Img(props: { url: string }) {
-  const imageUrl = parseImgUrl(props.url)
-  const [width, setWidth] = React.useState(0)
-  useMounted(() => {
-    Image.getSize(imageUrl, (w, h) => {
-      setWidth((16 * w) / h)
-    })
-  })
-  return (
-    <Image source={{ uri: imageUrl }} className="h-4 mx-1" style={{ width }} />
-  )
-}
 
 function EmptyContent(props: {
   loading: boolean
@@ -73,7 +59,9 @@ function EmptyContent(props: {
               className="flex-1 flex-row p-2 mx-2 my-1 items-center">
               <Text className="text-base">{hot.position}. </Text>
               <Text className="text-base">{hot.show_name}</Text>
-              {hot.icon ? <Img url={hot.icon} /> : null}
+              {hot.icon ? (
+                <Image2 source={{ uri: hot.icon }} className="ml-1 h-4" />
+              ) : null}
             </TouchableOpacity>
           )
         })

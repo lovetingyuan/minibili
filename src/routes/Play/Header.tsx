@@ -22,7 +22,7 @@ export function PlayHeaderTitle() {
   const { data: fans } = useUserRelation(route.params?.mid || vi?.mid)
   const { _followedUpsMap, $blackUps } = useStore()
   const followed = route.params?.mid && route.params.mid in _followedUpsMap
-  const isBlackUp = route.params?.mid && route.params.mid in $blackUps
+  const isBlackUp = route.params?.mid && '_' + route.params.mid in $blackUps
   return (
     <View className="flex-row items-center relative left-[-10px]">
       <Text

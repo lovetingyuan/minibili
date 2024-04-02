@@ -66,7 +66,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
       </View>
       <Text
         className={clsx(
-          'mt-3',
+          'mt-3 min-h-[2rem]',
           isFollowed && ['font-bold', colors.primary.text],
         )}
         numberOfLines={2}>

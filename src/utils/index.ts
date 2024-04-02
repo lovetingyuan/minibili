@@ -195,6 +195,11 @@ export function parseImgUrl(
   url: string,
   width?: number,
   height?: number,
+): string
+export function parseImgUrl(
+  url: string,
+  width?: number,
+  height?: number,
 ): string {
   url = parseUrl(url)
   if (typeof width === 'number') {
@@ -206,9 +211,9 @@ export function parseImgUrl(
   return url
 }
 
-export function openUrl(url: string) {
-  Linking.openURL(url)
-}
+// export function openUrl(url: string) {
+//   Linking.openURL(url)
+// }
 
 export function isDefined(v: any) {
   return v !== null && v !== undefined

@@ -1,20 +1,14 @@
 // import { useNetInfo } from '@react-native-community/netInfo'
 import { Overlay } from '@rneui/themed'
-import { Asset } from 'expo-asset'
 import { Image } from 'expo-image'
 import React from 'react'
-import {
-  Linking,
-  Pressable,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native'
+import { Linking, Text, useWindowDimensions, View } from 'react-native'
 import PagerView from 'react-native-pager-view'
 
 import { parseImgUrl } from '@/utils'
 
 import { useStore } from '../store'
+import Image2 from './Image2'
 
 export default React.memo(ImagesView)
 
@@ -45,11 +39,11 @@ function ImagesView() {
     const img = imagesList[current].src
     Linking.openURL(img.split('@')[0])
   }
-  const {
-    width: loadingWidth,
-    height: loadingHeight,
-    uri: loadingUri,
-  } = Asset.fromModule(require('../../assets/loading.png'))
+  // avoid view pager render all pages at same time.
+  const imageCompCache = React.useRef<
+    Record<string, React.ComponentElement<any, any>>
+  >({})
+
   return (
     <Overlay
       isVisible={images.length > 0}
@@ -80,34 +74,44 @@ function ImagesView() {
           onPageSelected={e => {
             setCurrent(e.nativeEvent.position)
           }}
+          offscreenPageLimit={1}
           className="flex-1"
           initialPage={currentImageIndex}>
-          {images.map(v => {
+          {images.map((v, i) => {
             let imgWidth = Math.min(width, v.width)
             let imgHeight = (imgWidth * v.height) / v.width
             if (imgHeight > height) {
               imgHeight = Math.min(height, v.height)
               imgWidth = (v.width * imgHeight) / v.height
             }
+            let imageView = null
+            if (imageCompCache.current[v.url]) {
+              imageView = imageCompCache.current[v.url]
+            } else if (current === i) {
+              imageCompCache.current[v.url] = (
+                <Image2
+                  source={{ uri: v.url }}
+                  initWidth={96}
+                  initHeight={96}
+                  style={{ width: imgWidth, height: imgHeight }}
+                  placeholder={require('../../assets/loading.png')}
+                />
+              )
+              imageView = imageCompCache.current[v.url]
+            } else {
+              imageView = (
+                <Image
+                  source={require('../../assets/loading.png')}
+                  className="w-24 h-24"
+                />
+              )
+            }
             return (
-              <Pressable
+              <View
                 key={v.url}
                 className="flex-1 bg-black justify-center items-center">
-                <Image
-                  source={{ uri: v.url }}
-                  style={{ width: imgWidth, height: imgHeight }}
-                  placeholder={
-                    typeof loadingWidth === 'number' &&
-                    typeof loadingHeight === 'number'
-                      ? {
-                          width: loadingWidth,
-                          height: loadingHeight,
-                          uri: loadingUri,
-                        }
-                      : null
-                  }
-                />
-              </Pressable>
+                {imageView}
+              </View>
             )
           })}
         </PagerView>

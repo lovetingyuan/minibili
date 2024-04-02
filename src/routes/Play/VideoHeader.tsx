@@ -35,9 +35,14 @@ function VideoHeader() {
   }
   const { name, face, mid, date, title } = videoInfo
   const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid!)
-  const { _collectedVideosMap, set$collectedVideos, get$collectedVideos } =
-    useStore()
+  const {
+    _collectedVideosMap,
+    set$collectedVideos,
+    get$collectedVideos,
+    $blackUps,
+  } = useStore()
   const isCollected = videoInfo.bvid && videoInfo.bvid in _collectedVideosMap
+  const isBlackUp = videoInfo.mid && '_' + videoInfo.mid in $blackUps
   const collectVideo = () => {
     if (typeof videoInfo?.collectNum !== 'number') {
       return
@@ -118,8 +123,11 @@ function VideoHeader() {
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"
-            className="ml-3 grow text-base font-bold">
-            {name ? name + '  ' : ' '}
+            className={clsx(
+              'ml-3 grow text-base font-bold',
+              isBlackUp && `line-through ${colors.gray4.text}`,
+            )}>
+            {(name || '') + '  '}
           </Text>
         </Pressable>
         <View className="flex-row items-center gap-1 px-2 flex-none">

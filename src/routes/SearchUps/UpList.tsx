@@ -3,7 +3,7 @@ import { Avatar, Button, Skeleton, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import clsx from 'clsx'
 import React from 'react'
-import { TouchableOpacity, View } from 'react-native'
+import { Alert, TouchableOpacity, View } from 'react-native'
 
 import { SearchedUpType, useSearchUps } from '@/api/search-up'
 import { colors } from '@/constants/colors.tw'
@@ -16,7 +16,7 @@ function SearchUpItem(props: { up: SearchedUpType }) {
   const { _followedUpsMap, $blackUps, set$followedUps, get$followedUps } =
     useStore()
   const isFollowed = props.up.mid in _followedUpsMap
-  const isBlackUp = props.up.mid in $blackUps
+  const isBlackUp = '_' + props.up.mid in $blackUps
   return (
     <View className="flex-1 flex-row items-center justify-between px-4 mb-5">
       <TouchableOpacity
@@ -38,7 +38,7 @@ function SearchUpItem(props: { up: SearchedUpType }) {
           numberOfLines={2}
           className={clsx(
             colors.primary.text,
-            isBlackUp && 'line-through',
+            isBlackUp && `line-through ${colors.gray4.text}`,
             isFollowed && colors.secondary.text,
             'text-base flex-1',
           )}
@@ -60,7 +60,21 @@ function SearchUpItem(props: { up: SearchedUpType }) {
             mid: props.up.mid,
             sign: props.up.sign,
           }
-          set$followedUps([user, ...get$followedUps()])
+          if (isBlackUp) {
+            Alert.alert('是否关注', '该UP在你的黑名单中', [
+              {
+                text: '否',
+              },
+              {
+                text: '是',
+                onPress: () => {
+                  set$followedUps([user, ...get$followedUps()])
+                },
+              },
+            ])
+          } else {
+            set$followedUps([user, ...get$followedUps()])
+          }
         }}
         title={isFollowed ? '已关注' : '关注'}
       />
