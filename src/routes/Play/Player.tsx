@@ -43,7 +43,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
   const isWifi = getIsWiFi()
 
   const [loadPlayer, setLoadPlayer] = React.useState(isWifi)
-  const [updateUrlReady, setUpdateUrlReady] = React.useState(false)
+  // const [updateUrlReady, setUpdateUrlReady] = React.useState(false)
 
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
@@ -57,30 +57,30 @@ function Player(props: { currentPage: number; currentCid?: number }) {
 
   const [isEnded, setIsEnded] = React.useState(true)
   // video created, get new videourl, we are not sure which will happen first.
-  React.useEffect(() => {
-    if (videoUrl && updateUrlReady) {
-      webviewRef.current?.injectJavaScript(`
-      window.newVideoUrl = "${videoUrl}";
-      ;(function() {
-        const video = document.querySelector('video[src]')
-        if (video && video.src !== window.newVideoUrl) {
-          video.setAttribute('src', window.newVideoUrl)
-          video.dataset.replaced = 'true'
-          if (window.newVideoUrl.includes('_high_quality')) {
-            document.body.dataset.replaced = 'true'
-          }
-          requestAnimationFrame(() => {
-            const video = document.querySelector('video[src]')
-            if (video && document.body.contains(video)) {
-              video.play()
-            }
-          })
-        }
-      })();
-      true;
-      `)
-    }
-  }, [videoUrl, updateUrlReady])
+  // React.useEffect(() => {
+  //   if (videoUrl && updateUrlReady) {
+  //     webviewRef.current?.injectJavaScript(`
+  //     window.newVideoUrl = "${videoUrl}";
+  //     ;(function() {
+  //       const video = document.querySelector('video[src]')
+  //       if (video && video.src !== window.newVideoUrl) {
+  //         video.setAttribute('src', window.newVideoUrl)
+  //         video.dataset.replaced = 'true'
+  //         if (window.newVideoUrl.includes('_high_quality')) {
+  //           document.body.dataset.replaced = 'true'
+  //         }
+  //         requestAnimationFrame(() => {
+  //           const video = document.querySelector('video[src]')
+  //           if (video && document.body.contains(video)) {
+  //             video.play()
+  //           }
+  //         })
+  //       }
+  //     })();
+  //     true;
+  //     `)
+  //   }
+  // }, [videoUrl, updateUrlReady])
   /**
    * hasimg  play -> imagepause
    *         pause -> nothing
@@ -203,9 +203,8 @@ function Player(props: { currentPage: number; currentCid?: number }) {
           markVideoWatched(videoInfo, eventData.payload)
         }
       }
-      if (eventData.action === 'updateUrlSettled') {
-        setUpdateUrlReady(true)
-      }
+      // if (eventData.action === 'updateUrlSettled') {
+      // }
       if (eventData.action === 'console.log') {
         // eslint-disable-next-line no-console
         __DEV__ && console.log('message', eventData.payload)
@@ -237,80 +236,84 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     portraitFullScreen: true,
     // highQuality: isWifi ? 1 : 0,
     // page: isWifi ? undefined : props.currentPage,
-    // autoplay: 0, // isWifi ? 0 : 1,
+    autoplay: 1, // isWifi ? 0 : 1,
     hasMuteButton: true,
   }).forEach(([k, v]) => {
     if (v !== undefined) {
       search.append(k, v + '')
     }
   })
-  const player = loadPlayer ? (
-    <WebView
-      source={{
-        uri: `${playUrl}?${search}`,
-      }}
-      ref={webviewRef}
-      className="bg-black"
-      originWhitelist={['https://*', 'bilibili://*']}
-      containerStyle={tw('bg-black')}
-      allowsFullscreenVideo
-      injectedJavaScriptForMainFrameOnly
-      allowsInlineMediaPlayback
-      startInLoadingState
-      userAgent={UA}
-      // key={videoInfo.bvid}
-      mediaPlaybackRequiresUserAction={false}
-      injectedJavaScript={INJECTED_JAVASCRIPT}
-      injectedJavaScriptBeforeContentLoaded={UPDATE_URL_CODE}
-      renderLoading={renderLoading}
-      onMessage={handleMessage}
-      onLoad={() => {
-        loadingErrorRef.current = false
-      }}
-      onError={() => {
-        showToast('当前视频加载失败/(ㄒoㄒ)/~~')
-        loadingErrorRef.current = true
-      }}
-      onShouldStartLoadWithRequest={request => {
-        // Only allow navigating within this website
-        if (request.url.endsWith('/log-reporter.js')) {
+  const player =
+    loadPlayer && videoUrl ? (
+      <WebView
+        source={{
+          uri: `${playUrl}?${search}`,
+        }}
+        ref={webviewRef}
+        className="bg-black"
+        originWhitelist={['https://*', 'bilibili://*']}
+        containerStyle={tw('bg-black')}
+        allowsFullscreenVideo
+        injectedJavaScriptForMainFrameOnly
+        allowsInlineMediaPlayback
+        startInLoadingState
+        userAgent={UA}
+        // key={videoInfo.bvid}
+        mediaPlaybackRequiresUserAction={false}
+        injectedJavaScript={INJECTED_JAVASCRIPT}
+        injectedJavaScriptBeforeContentLoaded={UPDATE_URL_CODE.replace(
+          'NewVideoUrl',
+          videoUrl,
+        )}
+        renderLoading={renderLoading}
+        onMessage={handleMessage}
+        onLoad={() => {
+          loadingErrorRef.current = false
+        }}
+        onError={() => {
+          showToast('当前视频加载失败/(ㄒoㄒ)/~~')
+          loadingErrorRef.current = true
+        }}
+        onShouldStartLoadWithRequest={request => {
+          // Only allow navigating within this website
+          if (request.url.endsWith('/log-reporter.js')) {
+            return false
+          }
+          if (request.url.startsWith('http') && !request.url.includes('.apk')) {
+            return true
+          }
           return false
-        }
-        if (request.url.startsWith('http') && !request.url.includes('.apk')) {
-          return true
-        }
-        return false
-      }}
-    />
-  ) : (
-    <Pressable
-      onPress={() => {
-        setLoadPlayer(true)
-      }}
-      className="flex-1">
-      {videoInfo?.cover ? (
-        <ImageBackground
-          source={{ uri: parseImgUrl(videoInfo.cover, 500, 312) }}
-          resizeMode="cover"
-          className="flex-1 justify-center items-center">
-          <Icon
-            name="television-play"
-            type="material-community"
-            size={60}
-            color={'white'}
-          />
-          <View className="absolute bottom-2 left-2 flex-row gap-2">
-            <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
-              {parseDuration(videoInfo?.duration)}
-            </Text>
-            <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
-              播放将消耗流量
-            </Text>
-          </View>
-        </ImageBackground>
-      ) : null}
-    </Pressable>
-  )
+        }}
+      />
+    ) : (
+      <Pressable
+        onPress={() => {
+          setLoadPlayer(true)
+        }}
+        className="flex-1">
+        {videoInfo?.cover ? (
+          <ImageBackground
+            source={{ uri: parseImgUrl(videoInfo.cover, 500, 312) }}
+            resizeMode="cover"
+            className="flex-1 justify-center items-center">
+            <Icon
+              name="television-play"
+              type="material-community"
+              size={60}
+              color={'white'}
+            />
+            <View className="absolute bottom-2 left-2 flex-row gap-2">
+              <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+                {parseDuration(videoInfo?.duration)}
+              </Text>
+              <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+                播放将消耗流量
+              </Text>
+            </View>
+          </ImageBackground>
+        ) : null}
+      </Pressable>
+    )
   return (
     <View
       renderToHardwareTextureAndroid

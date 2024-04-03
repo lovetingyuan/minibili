@@ -13,22 +13,13 @@ function __$hack() {
     if (name === 'video') {
       Promise.resolve().then(() => {
         if (ele.src) {
-          // ele.dataset.originSrc = ele.src
-          // ele.setAttribute('muted', 'false')
-          // ele.setAttribute('autoplay', 'false')
-          if (window.newVideoUrl && ele.src !== window.newVideoUrl) {
-            ele.setAttribute('src', window.newVideoUrl)
-            ele.dataset.replaced = 'true'
-            if (window.newVideoUrl.includes('_high_quality')) {
-              document.body.dataset.replaced = 'true'
-            }
-            ele.setAttribute('autoplay', 'true')
-            setTimeout(() => {
-              const vi = document.querySelector('video[src]')
-              if (vi && document.body.contains(vi)) {
-                vi.play()
-              }
-            }, 500)
+          ele.dataset.src = ele.src
+          const newVideoUrl = 'NewVideoUrl'
+          ele.setAttribute('autoplay', 'true')
+          ele.setAttribute('src', newVideoUrl)
+          ele.dataset.replaced = 'true'
+          if (newVideoUrl.includes('_high_quality')) {
+            document.body.dataset.replaced = 'true'
           }
         }
       })
@@ -36,12 +27,12 @@ function __$hack() {
     return ele
   }
 
-  window.ReactNativeWebView.postMessage(
-    JSON.stringify({
-      action: 'updateUrlSettled',
-      payload: '',
-    }),
-  )
+  // window.ReactNativeWebView.postMessage(
+  //   JSON.stringify({
+  //     action: 'updateUrlSettled',
+  //     payload: '',
+  //   }),
+  // )
 }
 
 export const UPDATE_URL_CODE = `(${__$hack})();\ntrue;`
