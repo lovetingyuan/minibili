@@ -39,7 +39,7 @@ export default function ReplyList() {
       isVisible={!!repliesInfo}>
       <View className="h-[68vh] bg-neutral-100 dark:bg-neutral-700">
         <View className="py-2 px-3 flex-row items-center border-gray-500 justify-between">
-          <Text className="text-lg font-bold">
+          <Text className="text-lg font-semibold">
             评论详情{typeof allCount === 'number' ? `（${allCount}条）` : ''}
           </Text>
           <Icon
