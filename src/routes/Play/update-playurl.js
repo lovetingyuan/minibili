@@ -12,13 +12,13 @@ function __$hack() {
     const ele = createElement.call(this, name, options)
     if (name === 'video') {
       Promise.resolve().then(() => {
-        if (ele.src) {
+        if (ele.src && document.body && document.body.contains(ele)) {
           ele.dataset.src = ele.src
           const newVideoUrl = 'NewVideoUrl'
           ele.setAttribute('autoplay', 'true')
           ele.setAttribute('src', newVideoUrl)
           ele.dataset.replaced = 'true'
-          if (newVideoUrl.includes('_high_quality')) {
+          if (newVideoUrl.includes('_high_quality') && document.body) {
             document.body.dataset.replaced = 'true'
           }
         }
@@ -26,13 +26,6 @@ function __$hack() {
     }
     return ele
   }
-
-  // window.ReactNativeWebView.postMessage(
-  //   JSON.stringify({
-  //     action: 'updateUrlSettled',
-  //     payload: '',
-  //   }),
-  // )
 }
 
 export const UPDATE_URL_CODE = `(${__$hack})();\ntrue;`

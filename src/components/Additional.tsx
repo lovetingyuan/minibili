@@ -4,6 +4,8 @@ import { Image } from 'expo-image'
 import React from 'react'
 import { Linking, Pressable, View } from 'react-native'
 
+import { colors } from '@/constants/colors.tw'
+
 import type { AdditionalType } from '../api/dynamic-items.schema'
 import { HandledAdditionalTypeEnum } from '../api/dynamic-items.type'
 import type { NavigationProps } from '../types'
@@ -166,7 +168,7 @@ export function Additional(props: { additional?: AdditionalType | null }) {
   return (
     <Foo
       {...linkProp}
-      className="border-l flex-1 border-zinc-200 pl-2 mt-5 py-1">
+      className={`border-l flex-1 pl-2 mt-5 py-1 ${colors.gray6.border}`}>
       {additionalContent}
     </Foo>
   )

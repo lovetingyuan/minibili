@@ -56,31 +56,6 @@ function Player(props: { currentPage: number; currentCid?: number }) {
   const markVideoWatched = useMarkVideoWatched()
 
   const [isEnded, setIsEnded] = React.useState(true)
-  // video created, get new videourl, we are not sure which will happen first.
-  // React.useEffect(() => {
-  //   if (videoUrl && updateUrlReady) {
-  //     webviewRef.current?.injectJavaScript(`
-  //     window.newVideoUrl = "${videoUrl}";
-  //     ;(function() {
-  //       const video = document.querySelector('video[src]')
-  //       if (video && video.src !== window.newVideoUrl) {
-  //         video.setAttribute('src', window.newVideoUrl)
-  //         video.dataset.replaced = 'true'
-  //         if (window.newVideoUrl.includes('_high_quality')) {
-  //           document.body.dataset.replaced = 'true'
-  //         }
-  //         requestAnimationFrame(() => {
-  //           const video = document.querySelector('video[src]')
-  //           if (video && document.body.contains(video)) {
-  //             video.play()
-  //           }
-  //         })
-  //       }
-  //     })();
-  //     true;
-  //     `)
-  //   }
-  // }, [videoUrl, updateUrlReady])
   /**
    * hasimg  play -> imagepause
    *         pause -> nothing
