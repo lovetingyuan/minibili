@@ -1,12 +1,13 @@
 import { type RouteProp, useRoute } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Icon, Text } from '@rneui/themed'
+import { Dialog, Icon, Text } from '@rneui/themed'
 import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
-import { Linking, View } from 'react-native'
+import { ActivityIndicator, Linking, View } from 'react-native'
 import { Menu, MenuItem } from 'react-native-material-menu'
 
+import { useAiConclusion } from '@/api/ai-conclusion'
 import { getDownloadUrl } from '@/api/play-url'
 import { useUserRelation } from '@/api/user-relation'
 import { useVideoInfo } from '@/api/video-info'
@@ -44,6 +45,49 @@ export function PlayHeaderTitle() {
   )
 }
 
+function AiConclusionModal(props: {
+  bvid: string
+  cid?: number
+  mid?: number | string
+  onClose: () => void
+}) {
+  const toggleDialog = () => {
+    props.onClose()
+  }
+  const { summary, isLoading, error } = useAiConclusion(
+    props.bvid,
+    props.cid,
+    props.mid,
+  )
+  return (
+    <Dialog
+      isVisible={true}
+      // overlayStyle={{ opacity: 0.8 }}
+      backdropStyle={tw('bg-neutral-900/90')}
+      onBackdropPress={toggleDialog}>
+      <Dialog.Title title={'视频总结'} />
+      {isLoading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator
+            size={'large'}
+            className="my-8"
+            color={tw(colors.secondary.text).color}
+          />
+        </View>
+      ) : error ? (
+        <Text className="mt-3">抱歉，出错了</Text>
+      ) : (
+        <Text className="leading-6 mt-3">
+          {summary ? '  ' + summary : '暂无总结'}
+        </Text>
+      )}
+      <Dialog.Actions>
+        <Dialog.Button title="OK" onPress={toggleDialog} />
+      </Dialog.Actions>
+    </Dialog>
+  )
+}
+
 export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
@@ -51,6 +95,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Play'>['route']>()
   const videoInfo = route.params
+  const [showAiConclusion, setShowAiConclusion] = React.useState(false)
   return (
     <View className="flex-row items-center gap-2">
       <Menu
@@ -111,15 +156,15 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           }}>
           复制链接
         </MenuItem>
-        {/* <MenuItem
+        <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
-            // props.refresh()
-            showToast('暂未实现')
+            hideMenu()
+            setShowAiConclusion(true)
           }}>
-          刷新
-        </MenuItem> */}
+          省流
+        </MenuItem>
         <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={tw(colors.gray4.text).color}
@@ -137,6 +182,16 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           后台播放
         </MenuItem> */}
       </Menu>
+      {showAiConclusion ? (
+        <AiConclusionModal
+          bvid={videoInfo.bvid}
+          cid={props.cid}
+          mid={videoInfo.mid}
+          onClose={() => {
+            setShowAiConclusion(false)
+          }}
+        />
+      ) : null}
     </View>
   )
 }

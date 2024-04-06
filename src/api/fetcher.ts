@@ -70,7 +70,7 @@ export default async function request<D extends any>(url: string): Promise<D> {
     options.credentials = 'omit'
   }
 
-  if (url.includes('/wbi/')) {
+  if (url.includes('/wbi/') || url.includes('/view/conclusion/get')) {
     const wbiImg = await getWBIInfo(request)
     const [_url, _query] = requestUrl.split('?')
     const params = new URLSearchParams(_query)
