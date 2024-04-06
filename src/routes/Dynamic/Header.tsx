@@ -38,7 +38,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
       })
     }
   }
-  const level = dynamicUser?.level ? 'ᴸⱽ' + levelList[dynamicUser.level] : ''
+  const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
   const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
@@ -96,7 +96,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             props.scrollTop()
           }}>
           {userName}
-          <Text className="text-sm">{level + '   '}</Text>
+          <Text className="text-lg">{level + '  '}</Text>
         </Text>
         {fans ? (
           <Text

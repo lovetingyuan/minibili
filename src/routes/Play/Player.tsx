@@ -4,7 +4,6 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native'
-import { Icon } from '@rneui/themed'
 import * as KeepAwake from 'expo-keep-awake'
 import React from 'react'
 import {
@@ -19,6 +18,7 @@ import {
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 
 import { usePlayUrl } from '@/api/play-url'
+import Image2 from '@/components/Image2'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
 import { useMarkVideoWatched } from '@/store/actions'
@@ -26,7 +26,6 @@ import type { NavigationProps, RootStackParamList } from '@/types'
 
 import { useVideoInfo } from '../../api/video-info'
 import { useAppStateChange } from '../../hooks/useAppState'
-import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import { parseDuration, parseImgUrl, showToast } from '../../utils'
 import { INJECTED_JAVASCRIPT } from './inject-play'
@@ -95,11 +94,11 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
-  useMounted(() => {
-    if (!isWifi) {
-      showToast('注意流量')
-    }
-  })
+  // useMounted(() => {
+  //   if (!isWifi) {
+  //     showToast('注意流量')
+  //   }
+  // })
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   useFocusEffect(
@@ -271,16 +270,16 @@ function Player(props: { currentPage: number; currentCid?: number }) {
             source={{ uri: parseImgUrl(videoInfo.cover, 500, 312) }}
             resizeMode="cover"
             className="flex-1 justify-center items-center">
-            <Icon
-              name="television-play"
-              type="material-community"
-              size={60}
-              color={'white'}
+            <Image2
+              source={require('../../../assets/play.png')}
+              className="w-20"
             />
             <View className="absolute bottom-2 left-2 flex-row gap-2">
-              <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
-                {parseDuration(videoInfo?.duration)}
-              </Text>
+              {videoInfo?.duration ? (
+                <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+                  {parseDuration(videoInfo?.duration)}
+                </Text>
+              ) : null}
               <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
                 播放将消耗流量
               </Text>

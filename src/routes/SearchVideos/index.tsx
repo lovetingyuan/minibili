@@ -1,3 +1,4 @@
+import { useBackHandler } from '@react-native-community/hooks'
 import React from 'react'
 import type { SearchBarCommands } from 'react-native-screens'
 
@@ -11,6 +12,15 @@ function SearchVideos() {
   const searchBarRef = React.useRef<SearchBarCommands | null>(null)
   const blackColor = tw(colors.black.text).color
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
+  useBackHandler(() => {
+    if (searchKeyWord) {
+      searchBarRef.current?.blur()
+      searchBarRef.current?.setText('')
+      setSearchKeyWord('')
+      return true
+    }
+    return false
+  })
   useUpdateNavigationOptions(
     React.useMemo(() => {
       return {

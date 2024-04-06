@@ -16,7 +16,7 @@ function Image2(
   >(null)
 
   let style: ImageProps['style'] = React.useMemo(() => {
-    const imgStyle = StyleSheet.flatten(props.style)
+    const imgStyle = StyleSheet.flatten(props.style) || {}
 
     if (sourceInfo) {
       const aspectRatio =
