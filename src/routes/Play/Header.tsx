@@ -67,10 +67,9 @@ function AiConclusionModal(props: {
       onBackdropPress={toggleDialog}>
       <Dialog.Title title={'视频总结'} />
       {isLoading ? (
-        <View className="flex-1 justify-center items-center">
+        <View className="flex-1 justify-center items-center py-8">
           <ActivityIndicator
             size={'large'}
-            className="my-8"
             color={tw(colors.secondary.text).color}
           />
         </View>
@@ -78,7 +77,7 @@ function AiConclusionModal(props: {
         <Text className="mt-3">抱歉，出错了</Text>
       ) : (
         <Text className="leading-6 mt-3">
-          {summary ? '  ' + summary : '暂无总结'}
+          {summary ? '    ' + summary : '暂无总结'}
         </Text>
       )}
       <Dialog.Actions>

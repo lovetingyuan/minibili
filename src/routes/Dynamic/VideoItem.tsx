@@ -104,7 +104,7 @@ export default function VideoItem(props: {
           />
           <Image
             className="w-14 h-12 absolute self-center"
-            source={require('../../../assets/tv.png')}
+            source={require('../../../assets/play.png')}
           />
           {watchedInfo ? (
             <View
