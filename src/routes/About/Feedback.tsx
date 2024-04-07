@@ -49,7 +49,10 @@ function Feedback() {
           onPress: showFeedback,
         },
       ]}>
-      <Dialog isVisible={feedBackVisible} onBackdropPress={hideFeedback}>
+      <Dialog
+        isVisible={feedBackVisible}
+        onBackdropPress={hideFeedback}
+        overlayStyle={tw(colors.gray2.bg)}>
         <Dialog.Title
           title="欢迎反馈意见 😊"
           titleStyle={tw(colors.black.text)}
@@ -62,13 +65,13 @@ function Feedback() {
             className="mt-5 h-20"
             maxLength={500}
             textAlignVertical="top"
-            placeholderTextColor={tw(colors.gray3.text).color}
+            placeholderTextColor={tw(colors.gray4.text).color}
             onChangeText={value => (feedbackRef.current = value)}
           />
           <Input
             placeholder="联系方式"
             maxLength={100}
-            placeholderTextColor={tw(colors.gray3.text).color}
+            placeholderTextColor={tw(colors.gray4.text).color}
             onChangeText={value => (feedbackContactRef.current = value)}
           />
         </View>

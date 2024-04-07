@@ -1,5 +1,6 @@
 import { useBackHandler } from '@react-native-community/hooks'
 import React from 'react'
+import { KeyboardAvoidingView, Platform } from 'react-native'
 import type { SearchBarCommands } from 'react-native-screens'
 
 import { colors } from '@/constants/colors.tw'
@@ -56,14 +57,18 @@ function SearchVideos() {
   })
 
   return (
-    <VideoList
-      keyword={searchKeyWord}
-      onSearch={(keyword: string) => {
-        searchBarRef.current?.setText(keyword)
-        searchBarRef.current?.blur()
-        setSearchKeyWord(keyword)
-      }}
-    />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1">
+      <VideoList
+        keyword={searchKeyWord}
+        onSearch={(keyword: string) => {
+          searchBarRef.current?.setText(keyword)
+          searchBarRef.current?.blur()
+          setSearchKeyWord(keyword)
+        }}
+      />
+    </KeyboardAvoidingView>
   )
 }
 

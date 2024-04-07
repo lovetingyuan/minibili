@@ -3,7 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text } from '@rneui/themed'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
 
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
@@ -30,11 +30,19 @@ export default React.memo(Play)
 function Play({ route }: Props) {
   const { bvid } = route.params
   const [currentPage, setCurrentPage] = React.useState(1)
-  const { data } = useVideoInfo(bvid)
+  const { data, error } = useVideoInfo(bvid)
   const videoInfo = {
     ...route.params,
     ...data,
   }
+  React.useEffect(() => {
+    if (error) {
+      Alert.alert(
+        '抱歉，出错了',
+        '\n获取当前视频信息失败，无法播放\n可能是由于UP删除、设置为私密或者涉及违规等',
+      )
+    }
+  }, [error])
   const [currentCid, setCurrentCid] = React.useState(videoInfo.cid)
   if (!currentCid && videoInfo.cid) {
     setCurrentCid(videoInfo.cid)

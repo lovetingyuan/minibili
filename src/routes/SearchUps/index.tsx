@@ -1,4 +1,5 @@
 import React from 'react'
+import { KeyboardAvoidingView, Platform } from 'react-native'
 import { SearchBarCommands } from 'react-native-screens'
 
 import { colors } from '@/constants/colors.tw'
@@ -44,8 +45,13 @@ function SearchUps() {
       searchBarRef.current?.focus()
     }, 80)
   })
-
-  return <UpList keyword={searchKeyWord} />
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1">
+      <UpList keyword={searchKeyWord} />
+    </KeyboardAvoidingView>
+  )
 }
 
 export default React.memo(SearchUps)

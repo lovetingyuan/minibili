@@ -87,7 +87,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
         <Text
           className={clsx(
             followed && [colors.secondary.text, 'font-bold'],
-            'text-lg pt-1',
+            'text-lg',
             isBlackUp && 'line-through',
           )}
           adjustsFontSizeToFit

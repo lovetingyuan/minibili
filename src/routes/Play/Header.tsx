@@ -62,10 +62,10 @@ function AiConclusionModal(props: {
   return (
     <Dialog
       isVisible={true}
-      // overlayStyle={{ opacity: 0.8 }}
+      overlayStyle={tw(colors.gray2.bg)}
       backdropStyle={tw('bg-neutral-900/90')}
       onBackdropPress={toggleDialog}>
-      <Dialog.Title title={'视频总结'} />
+      <Dialog.Title title={'视频总结💡'} titleStyle={tw(colors.black.text)} />
       {isLoading ? (
         <View className="flex-1 justify-center items-center py-8">
           <ActivityIndicator

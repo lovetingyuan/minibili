@@ -3,6 +3,7 @@ import React from 'react'
 import { Linking } from 'react-native'
 
 import { setUA } from '@/constants'
+import { colors } from '@/constants/colors.tw'
 
 import { useRemoteConfig } from '../api/remote-config'
 
@@ -22,12 +23,15 @@ export default function RemoteConfig() {
     return (
       <Dialog
         isVisible={visible}
-        // overlayStyle={{ opacity: 0.8 }}
+        overlayStyle={tw(colors.gray2.bg)}
         backdropStyle={tw('bg-neutral-900/90')}
         onBackdropPress={
           remoteConfig.statement.dismiss ? toggleDialog : undefined
         }>
-        <Dialog.Title title={remoteConfig.statement.title} />
+        <Dialog.Title
+          title={remoteConfig.statement.title}
+          titleStyle={tw(colors.black.text)}
+        />
         <Text>{remoteConfig.statement.content}</Text>
         <Dialog.Actions>
           {remoteConfig.statement.dismiss ? (
