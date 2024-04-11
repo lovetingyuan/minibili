@@ -8,6 +8,7 @@ import { SearchedVideoType, useSearchVideos } from '@/api/search-video'
 import Image2 from '@/components/Image2'
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
+import { parseImgUrl } from '@/utils'
 
 function EmptyContent(props: {
   loading: boolean
@@ -60,7 +61,10 @@ function EmptyContent(props: {
               <Text className="text-base">{hot.position}. </Text>
               <Text className="text-base">{hot.show_name}</Text>
               {hot.icon ? (
-                <Image2 source={{ uri: hot.icon }} className="ml-1 h-4" />
+                <Image2
+                  source={{ uri: parseImgUrl(hot.icon) }}
+                  className="ml-1 h-4"
+                />
               ) : null}
             </TouchableOpacity>
           )

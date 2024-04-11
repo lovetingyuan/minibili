@@ -29,7 +29,6 @@ import { useAppStateChange } from '../../hooks/useAppState'
 import { useStore } from '../../store'
 import { parseDuration, parseImgUrl, showToast } from '../../utils'
 import { INJECTED_JAVASCRIPT } from './inject-play'
-import { UPDATE_URL_CODE } from './update-playurl'
 
 export default React.memo(Player)
 
@@ -217,11 +216,12 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       search.append(k, v + '')
     }
   })
+  const uri = `${playUrl}?${search}`
   const player =
     loadPlayer && videoUrl ? (
       <WebView
         source={{
-          uri: `${playUrl}?${search}`,
+          uri,
         }}
         ref={webviewRef}
         className="bg-black"
@@ -234,9 +234,8 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         userAgent={UA}
         // key={videoInfo.bvid}
         mediaPlaybackRequiresUserAction={false}
-        injectedJavaScript={INJECTED_JAVASCRIPT}
-        injectedJavaScriptBeforeContentLoaded={UPDATE_URL_CODE.replace(
-          'NewVideoUrl',
+        injectedJavaScript={INJECTED_JAVASCRIPT.replace(
+          '@NewVideoUrl',
           videoUrl,
         )}
         renderLoading={renderLoading}
@@ -272,7 +271,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
             className="flex-1 justify-center items-center">
             <Image2
               source={require('../../../assets/play.png')}
-              className="w-20"
+              className="w-16 opacity-80"
             />
             <View className="absolute bottom-2 left-2 flex-row gap-2">
               {videoInfo?.duration ? (
@@ -280,9 +279,11 @@ function Player(props: { currentPage: number; currentCid?: number }) {
                   {parseDuration(videoInfo?.duration)}
                 </Text>
               ) : null}
-              <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
-                播放将消耗流量
-              </Text>
+              {isWifi ? null : (
+                <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+                  播放将消耗流量
+                </Text>
+              )}
             </View>
           </ImageBackground>
         ) : null}

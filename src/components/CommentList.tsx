@@ -40,13 +40,14 @@ export default function CommentList(
     dividerRight?: React.ReactNode
   }>,
 ) {
+  const [mode, setMode] = React.useState(3)
   const {
     data: { replies: comments, allCount },
     isLoading,
     isValidating,
     error,
     update,
-  } = useComments(props.commentId, props.commentType)
+  } = useComments(props.commentId, props.commentType, mode)
 
   return (
     <View className="flex-1">
@@ -73,7 +74,16 @@ export default function CommentList(
                   {allCount ? allCount + '条评论' : '暂无评论'}
                 </Text>
               </View>
-              <View className="ml-2 mr-1">{props.dividerRight}</View>
+              <View className="ml-2 mr-1 flex-row gap-2 items-center">
+                {props.dividerRight}
+                <Text
+                  className="text-sm"
+                  onPress={() => {
+                    setMode(mode === 3 ? 2 : 3)
+                  }}>
+                  {mode === 3 ? '按热度' : '按时间'}
+                </Text>
+              </View>
             </View>
           </View>
         }

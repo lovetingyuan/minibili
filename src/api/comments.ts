@@ -1,10 +1,7 @@
-import React from 'react'
-import useSWR from 'swr'
 import useSWRInfinite from 'swr/infinite'
 import type { z } from 'zod'
 
 import type { CommentResItem, CommentResponseSchema } from './comments.schema'
-import request from './fetcher'
 
 type CommentResType = z.infer<typeof CommentResponseSchema>
 
@@ -221,35 +218,14 @@ const getReplies = (res1: CommentResType, type: number) => {
 export type CommentItemType = ReturnType<typeof getReplies>[0]
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
-export function useDynamicComments(oid: string | number, type: number) {
-  const { data, error, isLoading } = useSWR<CommentResType>(() => {
-    return oid
-      ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=3&pn=1&ps=30`
-      : null
-  }, request)
-  const replies: CommentItemType[] = React.useMemo(() => {
-    if (!data) {
-      return []
-    }
-    return getReplies(data, type)
-  }, [data, type])
-  return {
-    data: {
-      allCount: data?.cursor.all_count,
-      replies,
-    },
-    isLoading,
-    error,
-  }
-}
 
-export function useComments(oid: string | number, type: number) {
+export function useComments(oid: string | number, type: number, mode = 3) {
   const { data, error, size, setSize, isValidating, isLoading } =
     useSWRInfinite<CommentResType>(
       (index, previousPageData) => {
         const next = previousPageData?.cursor.next ?? 1
         return oid
-          ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=3&next=${next}&ps=20`
+          ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&next=${next}&ps=20`
           : null
       },
       // url => {

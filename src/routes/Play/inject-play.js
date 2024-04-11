@@ -1,13 +1,21 @@
 function __$hack() {
+  const style = document.createElement('style')
+  style.textContent = `
+  body[data-replaced] .mplayer-time-total-text {
+    font-weight: bold!important;
+    font-size: 14px!important;
+  }
+  `
+  document.head.appendChild(style)
   function waitForVideo(callback) {
-    const video = document.querySelector('video')
+    const video = document.querySelector('video[src]')
     if (video) {
       callback(video)
     } else {
       document.addEventListener(
         'loadstart',
         evt => {
-          if (evt.target && evt.target.tagName === 'VIDEO') {
+          if (evt.target && evt.target.tagName === 'VIDEO' && evt.target.src) {
             callback(evt.target)
           }
         },
@@ -166,6 +174,20 @@ function __$hack() {
     }
   })
 
+  waitForVideo(() => {
+    const newVideoUrl = '@NewVideoUrl'
+    const vi = document.querySelector('video[src]')
+    if (vi && vi.src !== newVideoUrl) {
+      vi.dataset.src = vi.src
+      vi.setAttribute('autoplay', 'true')
+      vi.setAttribute('src', newVideoUrl)
+      vi.dataset.replaced = 'true'
+      if (newVideoUrl.includes('_high_quality') && document.body) {
+        document.body.dataset.replaced = 'true'
+      }
+    }
+  })
+
   const element = document.body
   let startX = 0
   let startY = 0
@@ -274,11 +296,6 @@ function __$hack() {
     distanceX = 0
     distanceY = 0
     direction = ''
-  })
-
-  document.addEventListener('copy', event => {
-    event.preventDefault()
-    event.clipboardData.setData('text/plain', '')
   })
 }
 

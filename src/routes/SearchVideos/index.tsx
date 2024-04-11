@@ -1,4 +1,5 @@
 import { useBackHandler } from '@react-native-community/hooks'
+import { useIsFocused } from '@react-navigation/native'
 import React from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import type { SearchBarCommands } from 'react-native-screens'
@@ -13,8 +14,9 @@ function SearchVideos() {
   const searchBarRef = React.useRef<SearchBarCommands | null>(null)
   const blackColor = tw(colors.black.text).color
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
+  const focused = useIsFocused()
   useBackHandler(() => {
-    if (searchKeyWord) {
+    if (searchKeyWord && focused) {
       searchBarRef.current?.blur()
       searchBarRef.current?.setText('')
       setSearchKeyWord('')
