@@ -49,6 +49,7 @@ export default async function request<D extends any>(url: string): Promise<D> {
     // Cookie: '',
     cookie: await getCookie(),
     origin: 'https://www.bilibili.com',
+    referer: 'https://www.bilibili.com',
     'user-agent': UA, // 'user-agent': 'Mozilla/5.0',
   }
   const options = {
