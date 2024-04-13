@@ -24,7 +24,7 @@ export default function Test() {
       return true
     }
   }
-  const [current, setCurrent] = React.useState(0)
+  const [_current, setCurrent] = React.useState(0)
 
   return (
     <PagerView

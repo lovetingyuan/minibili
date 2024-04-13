@@ -29,6 +29,8 @@ import { useAppStateChange } from '../../hooks/useAppState'
 import { useStore } from '../../store'
 import { parseDuration, parseImgUrl, showToast } from '../../utils'
 import { INJECTED_JAVASCRIPT } from './inject-play'
+import { CheckBox } from '@rneui/themed'
+const PlayUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
 
 export default React.memo(Player)
 
@@ -38,10 +40,10 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   const { width, height } = useWindowDimensions()
   const [verticalExpand, setVerticalExpand] = React.useState(false)
   const { data } = useVideoInfo(route.params.bvid)
-  const isWifi = getIsWiFi()
+  const isWifi = false //getIsWiFi()
 
   const [loadPlayer, setLoadPlayer] = React.useState(isWifi)
-  // const [updateUrlReady, setUpdateUrlReady] = React.useState(false)
+  const [highQuality, setHighQuality] = React.useState(isWifi)
 
   const loadingErrorRef = React.useRef(false)
   const webviewRef = React.useRef<WebView | null>(null)
@@ -50,7 +52,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     ...data,
   }
   const cid = videoInfo.pages ? videoInfo.pages[props.currentPage - 1].cid : 0
-  const { videoUrl } = usePlayUrl(videoInfo.bvid, cid, isWifi)
+  const { videoUrl } = usePlayUrl(videoInfo.bvid, cid, highQuality)
   const markVideoWatched = useMarkVideoWatched()
 
   const [isEnded, setIsEnded] = React.useState(true)
@@ -80,15 +82,6 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     true;
     `)
   }, [imagesList.length])
-
-  // React.useEffect(() => {
-  //   if (videoUrl && loadPlayer && webviewRef.current) {
-  //     webviewRef.current.injectJavaScript(
-  //       `window.newVideoUrl = "${videoUrl}";
-  //       window.replaceVideoUrl && replaceVideoUrl();true;`,
-  //     )
-  //   }
-  // }, [videoUrl, loadPlayer])
 
   useAppStateChange(currentAppState => {
     if (
@@ -206,93 +199,114 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     </View>
   )
 
-  const search = new URLSearchParams()
-  const playUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
-  // const playUrl = 'https://www.bilibili.com/blackboard/webplayer/mbplayer.html'
-  Object.entries({
-    bvid: route.params.bvid,
-    cid,
-    // quality: isWifi ? 64 : 32,
-    portraitFullScreen: true,
-    // highQuality: isWifi ? 1 : 0,
-    page: props.currentPage,
-    autoplay: 1, // isWifi ? 0 : 1,
-    hasMuteButton: true,
-  }).forEach(([k, v]) => {
-    if (v !== undefined) {
-      search.append(k, v + '')
+  const playPageUrl = React.useMemo(() => {
+    if (!videoUrl || !loadPlayer) {
+      return
     }
-  })
-  const uri = `${playUrl}?${search}#${encodeURIComponent(videoUrl ?? '')}`
-  const player =
-    loadPlayer && cid ? (
-      <WebView
-        source={{
-          uri,
-        }}
-        ref={webviewRef}
-        className="bg-black"
-        originWhitelist={['https://*', 'bilibili://*']}
-        containerStyle={tw('bg-black')}
-        allowsFullscreenVideo
-        injectedJavaScriptForMainFrameOnly
-        allowsInlineMediaPlayback
-        startInLoadingState
-        userAgent={UA}
-        // key={videoInfo.bvid}
-        mediaPlaybackRequiresUserAction={false}
-        injectedJavaScript={INJECTED_JAVASCRIPT}
-        renderLoading={renderLoading}
-        onMessage={handleMessage}
-        onLoad={() => {
-          loadingErrorRef.current = false
-        }}
-        onError={() => {
-          showToast('当前视频加载失败/(ㄒoㄒ)/~~')
-          loadingErrorRef.current = true
-        }}
-        onShouldStartLoadWithRequest={request => {
-          // Only allow navigating within this website
-          if (request.url.endsWith('/log-reporter.js')) {
-            return false
-          }
-          if (request.url.startsWith('http') && !request.url.includes('.apk')) {
-            return true
-          }
+    const search = new URLSearchParams()
+    Object.entries({
+      bvid: videoInfo.bvid,
+      cid,
+      // quality: isWifi ? 64 : 32,
+      portraitFullScreen: true,
+      // highQuality: isWifi ? 1 : 0,
+      page: props.currentPage,
+      autoplay: 1, // isWifi ? 0 : 1,
+      hasMuteButton: true,
+    }).forEach(([k, v]) => {
+      if (v !== undefined) {
+        search.append(k, v + '')
+      }
+    })
+    return `${PlayUrl}?${search}#${encodeURIComponent(videoUrl)}`
+  }, [videoUrl, loadPlayer, videoInfo.bvid, props.currentPage])
+
+  const player = playPageUrl ? (
+    <WebView
+      source={{
+        uri: playPageUrl,
+      }}
+      ref={webviewRef}
+      className="bg-black"
+      originWhitelist={['https://*', 'bilibili://*']}
+      containerStyle={tw('bg-black')}
+      allowsFullscreenVideo
+      injectedJavaScriptForMainFrameOnly
+      allowsInlineMediaPlayback
+      startInLoadingState
+      userAgent={UA}
+      // key={videoInfo.bvid}
+      mediaPlaybackRequiresUserAction={false}
+      injectedJavaScript={INJECTED_JAVASCRIPT}
+      renderLoading={renderLoading}
+      onMessage={handleMessage}
+      onLoad={() => {
+        loadingErrorRef.current = false
+      }}
+      onError={() => {
+        showToast('当前视频加载失败/(ㄒoㄒ)/~~')
+        loadingErrorRef.current = true
+      }}
+      onShouldStartLoadWithRequest={request => {
+        // Only allow navigating within this website
+        if (request.url.endsWith('/log-reporter.js')) {
           return false
-        }}
-      />
-    ) : (
-      <Pressable
-        onPress={() => {
-          setLoadPlayer(true)
-        }}
-        className="flex-1">
-        {videoInfo?.cover ? (
-          <ImageBackground
-            source={{ uri: parseImgUrl(videoInfo.cover, 500, 312) }}
-            resizeMode="cover"
-            className="flex-1 justify-center items-center">
-            <Image2
-              source={require('../../../assets/play.png')}
-              className="w-16 opacity-80"
-            />
-            <View className="absolute bottom-2 left-2 flex-row gap-2">
-              {videoInfo?.duration ? (
-                <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
-                  {parseDuration(videoInfo?.duration)}
-                </Text>
-              ) : null}
-              {isWifi ? null : (
-                <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
-                  播放将消耗流量
-                </Text>
+        }
+        if (request.url.startsWith('http') && !request.url.includes('.apk')) {
+          return true
+        }
+        return false
+      }}
+    />
+  ) : (
+    <Pressable
+      onPress={() => {
+        setLoadPlayer(true)
+      }}
+      className="flex-1">
+      {videoInfo?.cover ? (
+        <ImageBackground
+          source={{ uri: parseImgUrl(videoInfo.cover, 500, 312) }}
+          resizeMode="cover"
+          className="flex-1 justify-center items-center">
+          <Image2
+            source={require('../../../assets/play.png')}
+            className="w-16 opacity-80"
+          />
+          <View className="absolute bottom-2 left-2 flex-row gap-2">
+            {videoInfo?.duration ? (
+              <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+                {parseDuration(videoInfo?.duration)}
+              </Text>
+            ) : null}
+            {isWifi ? null : (
+              <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+                播放将消耗流量
+              </Text>
+            )}
+          </View>
+
+          <View className="absolute bottom-2 right-2 ">
+            <CheckBox
+              checked={highQuality}
+              title="高清"
+              textStyle={tw('text-white')}
+              wrapperStyle={tw(
+                'rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold',
               )}
-            </View>
-          </ImageBackground>
-        ) : null}
-      </Pressable>
-    )
+              checkedColor={tw(colors.secondary.text).color}
+              uncheckedColor={'white'}
+              size={18}
+              containerStyle={tw('bg-transparent p-0 m-0')}
+              onPress={() => {
+                setHighQuality(!highQuality)
+              }}
+            />
+          </View>
+        </ImageBackground>
+      ) : null}
+    </Pressable>
+  )
   return (
     <View
       renderToHardwareTextureAndroid

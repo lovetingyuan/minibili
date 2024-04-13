@@ -103,8 +103,8 @@ function __$hack() {
         }),
       )
     }
-    const style = document.createElement('style')
-    style.textContent = `
+    const fixStyle = document.createElement('style')
+    fixStyle.textContent = `
     html, body, #bilibiliPlayer, .mplayer {
       background-color: black!important;
     }
@@ -115,7 +115,7 @@ function __$hack() {
       align-items: center;
     }
     `
-    document.head.appendChild(style)
+    document.head.appendChild(fixStyle)
   })
 
   waitForVideo(vi => {
@@ -137,7 +137,7 @@ function __$hack() {
       if (evt.target.matches('.mplayer-right *')) {
         return
       }
-      const video = document.querySelector('video')
+      const video = document.querySelector('video[src]')
       if (!video) {
         return
       }

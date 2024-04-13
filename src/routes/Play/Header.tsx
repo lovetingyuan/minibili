@@ -31,10 +31,7 @@ export function PlayHeaderTitle() {
           'text-lg font-semibold',
           isBlackUp && 'line-through',
           followed && colors.secondary.text,
-        )}
-        onPress={() => {
-          //
-        }}>
+        )}>
         {route.params?.name || vi?.name}
       </Text>
       <Text
@@ -167,14 +164,14 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           }}>
           省流
         </MenuItem>
-        <MenuItem
+        {/* <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             showToast('暂未实现')
           }}>
           切换高清
-        </MenuItem>
+        </MenuItem> */}
         {/* <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}
           pressColor={tw(colors.gray4.text).color}

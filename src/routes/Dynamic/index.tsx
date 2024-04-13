@@ -105,26 +105,27 @@ function Dynamic({ route }: Props) {
     error,
   } = useDynamicItems(upId)
   useErrToast('请求动态失败', error)
-  const headerTitle = React.useCallback(() => {
-    return (
-      <HeaderLeft
-        scrollTop={() => {
-          try {
-            dynamicListRef.current?.scrollToOffset({
-              offset: 0,
-            })
-          } catch (err) {}
-        }}
-      />
-    )
-  }, [])
+
   useUpdateNavigationOptions(
     React.useMemo(() => {
+      const headerTitle = () => {
+        return (
+          <HeaderLeft
+            scrollTop={() => {
+              try {
+                dynamicListRef.current?.scrollToOffset({
+                  offset: 0,
+                })
+              } catch (err) {}
+            }}
+          />
+        )
+      }
       return {
         headerTitle,
         headerRight,
       }
-    }, [headerTitle]),
+    }, []),
   )
 
   const renderItem = ({ item }: { item: DynamicItemAllType }) => {

@@ -1,9 +1,11 @@
 import {
   type RouteProp,
-  useRoute,
   useNavigation,
+  useRoute,
 } from '@react-navigation/native'
 import { Avatar, Dialog, Icon, Text } from '@rneui/themed'
+import clsx from 'clsx'
+import { Image } from 'expo-image'
 import React from 'react'
 import {
   Alert,
@@ -14,7 +16,9 @@ import {
   View,
 } from 'react-native'
 
+import { useWatchingCount } from '@/api/watching-count'
 import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
 import type { NavigationProps, RootStackParamList } from '@/types'
 import {
   handleShareVideo,
@@ -26,10 +30,6 @@ import {
 } from '@/utils'
 
 import { useVideoInfo } from '../../api/video-info'
-import clsx from 'clsx'
-import { useStore } from '@/store'
-import { useWatchingCount } from '@/api/watching-count'
-import { Image } from 'expo-image'
 
 export default React.memo(VideoInfo)
 

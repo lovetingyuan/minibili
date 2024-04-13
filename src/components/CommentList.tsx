@@ -1,5 +1,6 @@
 import { Icon, Skeleton, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
+import clsx from 'clsx'
 import React from 'react'
 import { TouchableOpacity, View } from 'react-native'
 
@@ -8,7 +9,6 @@ import { colors } from '@/constants/colors.tw'
 import { type CommentItemType, useComments } from '../api/comments'
 import { Comment } from './Comment'
 import ReplyList from './ReplyList'
-import clsx from 'clsx'
 
 function Loading() {
   return (
@@ -72,7 +72,11 @@ export default function CommentList(
                   color={tw(colors.gray6.text).color}
                 />
                 <Text className={`text-xs mr-3 px-1 ${colors.gray6.text}`}>
-                  {allCount ? allCount + '条评论' : '暂无评论'}
+                  {allCount
+                    ? allCount + '条评论'
+                    : isLoading
+                      ? '加载中'
+                      : '暂无评论'}
                 </Text>
               </View>
               <View className="ml-2 mr-1 flex-row gap-2 items-center">

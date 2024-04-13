@@ -38,7 +38,7 @@ function HistoryList() {
           },
         },
       }
-    }, [headerTitle]),
+    }, [headerTitle, blackColor]),
   )
 
   const buttons = (video: CollectVideoInfo) => {

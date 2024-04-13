@@ -44,10 +44,12 @@ function Statement() {
           </Card.Title>
           <Card.Divider />
           <View>
-            <Text className="text-base">感谢你使用这款应用 ❤</Text>
+            <Text className="text-base">感谢你使用这款应用(MiniBili) ❤</Text>
             <Text />
             <Text className="text-base">
-              本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，仅供学习交流!
+              本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，
+              <Text className="font-bold">*仅供*</Text>
+              个人使用及学习交流!
             </Text>
             <Text className="text-base">
               有问题欢迎使用意见反馈或者在
@@ -61,7 +63,7 @@ function Statement() {
               中提出 😀
             </Text>
             <Text />
-            <Text>⚠️ 切勿频繁刷新数据！🙏</Text>
+            <Text className="text-base">⚠️ 切勿频繁刷新数据！🙏</Text>
             <View className="items-end my-3">
               <Button
                 size="sm"
