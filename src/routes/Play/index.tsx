@@ -15,7 +15,6 @@ import { showToast } from '../../utils'
 import { setViewingVideoId } from '../../utils/report'
 import { PlayHeaderRight, PlayHeaderTitle } from './Header'
 import Player from './Player'
-import VideoHeader from './VideoHeader'
 import VideoInfo from './VideoInfo'
 
 // https://www.bilibili.com/blackboard/webplayer/mbplayer.html?aid=1501398719&bvid=BV1HS421w7wG&cid=1458260037&p=1
@@ -29,12 +28,15 @@ export default React.memo(Play)
 
 function Play({ route }: Props) {
   const { bvid } = route.params
-  const [currentPage, setCurrentPage] = React.useState(1)
+
   const { data, error } = useVideoInfo(bvid)
   const videoInfo = {
     ...route.params,
     ...data,
   }
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const cid = videoInfo.pages ? videoInfo.pages[currentPage - 1].cid : 0
+
   const errorShowedRef = React.useRef(false)
 
   React.useEffect(() => {
@@ -46,10 +48,6 @@ function Play({ route }: Props) {
       )
     }
   }, [error])
-  const [currentCid, setCurrentCid] = React.useState(videoInfo.cid)
-  if (!currentCid && videoInfo.cid) {
-    setCurrentCid(videoInfo.cid)
-  }
 
   const [key, setKey] = React.useState(bvid)
 
@@ -58,7 +56,7 @@ function Play({ route }: Props) {
       const headerTitle = () => <PlayHeaderTitle />
       const headerRight = () => (
         <PlayHeaderRight
-          cid={currentCid}
+          cid={cid}
           refresh={() => {
             setKey(k => k + 1)
           }}
@@ -68,7 +66,7 @@ function Play({ route }: Props) {
         headerTitle,
         headerRight,
       }
-    }, [currentCid]),
+    }, [cid]),
   )
 
   useFocusEffect(
@@ -80,9 +78,15 @@ function Play({ route }: Props) {
     }),
   )
 
+  const handlePlayEnd = useMemoizedFn(() => {
+    if (videoInfo.pages && currentPage < videoInfo.pages.length) {
+      setCurrentPage(currentPage + 1)
+    }
+  })
+
   return (
     <View className="flex-1" key={key}>
-      <Player currentPage={currentPage} currentCid={currentCid} />
+      <Player currentPage={currentPage} onPlayEnded={handlePlayEnd} />
       <CommentList
         commentId={videoInfo?.aid || ''}
         commentType={1}
@@ -105,12 +109,7 @@ function Play({ route }: Props) {
             </Text>
           </View>
         }>
-        <VideoHeader />
-        <VideoInfo
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          setCurrentCid={setCurrentCid}
-        />
+        <VideoInfo currentPage={currentPage} setCurrentPage={setCurrentPage} />
       </CommentList>
     </View>
   )

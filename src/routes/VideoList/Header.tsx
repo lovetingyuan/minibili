@@ -114,7 +114,9 @@ function HeaderLeftComp() {
             <Text
               className={`text-lg font-bold ${
                 currentVideosCate.rid === -1
-                  ? colors.secondary.text
+                  ? __DEV__
+                    ? colors.success.text
+                    : colors.secondary.text
                   : colors.gray7.text
               }`}>
               {currentVideosCate.label +

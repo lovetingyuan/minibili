@@ -32,7 +32,7 @@ import { INJECTED_JAVASCRIPT } from './inject-play'
 
 export default React.memo(Player)
 
-function Player(props: { currentPage: number; currentCid?: number }) {
+function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   const { getIsWiFi, imagesList } = useStore()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { width, height } = useWindowDimensions()
@@ -49,7 +49,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     ...route.params,
     ...data,
   }
-  const cid = props.currentCid || videoInfo.cid
+  const cid = videoInfo.pages ? videoInfo.pages[props.currentPage - 1].cid : 0
   const { videoUrl } = usePlayUrl(videoInfo.bvid, cid, isWifi)
   const markVideoWatched = useMarkVideoWatched()
 
@@ -81,6 +81,15 @@ function Player(props: { currentPage: number; currentCid?: number }) {
     `)
   }, [imagesList.length])
 
+  // React.useEffect(() => {
+  //   if (videoUrl && loadPlayer && webviewRef.current) {
+  //     webviewRef.current.injectJavaScript(
+  //       `window.newVideoUrl = "${videoUrl}";
+  //       window.replaceVideoUrl && replaceVideoUrl();true;`,
+  //     )
+  //   }
+  // }, [videoUrl, loadPlayer])
+
   useAppStateChange(currentAppState => {
     if (
       currentAppState === 'active' &&
@@ -93,11 +102,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       KeepAwake.deactivateKeepAwake('PLAY')
     }
   })
-  // useMounted(() => {
-  //   if (!isWifi) {
-  //     showToast('注意流量')
-  //   }
-  // })
+
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   useFocusEffect(
@@ -156,6 +161,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         }
         if (eventData.payload === 'ended') {
           setVerticalExpand(false)
+          props.onPlayEnded()
         }
         // 'play', 'ended', 'pause', 'waiting', 'playing'
       }
@@ -205,10 +211,11 @@ function Player(props: { currentPage: number; currentCid?: number }) {
   // const playUrl = 'https://www.bilibili.com/blackboard/webplayer/mbplayer.html'
   Object.entries({
     bvid: route.params.bvid,
+    cid,
     // quality: isWifi ? 64 : 32,
     portraitFullScreen: true,
     // highQuality: isWifi ? 1 : 0,
-    // page: isWifi ? undefined : props.currentPage,
+    page: props.currentPage,
     autoplay: 1, // isWifi ? 0 : 1,
     hasMuteButton: true,
   }).forEach(([k, v]) => {
@@ -216,9 +223,9 @@ function Player(props: { currentPage: number; currentCid?: number }) {
       search.append(k, v + '')
     }
   })
-  const uri = `${playUrl}?${search}`
+  const uri = `${playUrl}?${search}#${encodeURIComponent(videoUrl ?? '')}`
   const player =
-    loadPlayer && videoUrl ? (
+    loadPlayer && cid ? (
       <WebView
         source={{
           uri,
@@ -234,10 +241,7 @@ function Player(props: { currentPage: number; currentCid?: number }) {
         userAgent={UA}
         // key={videoInfo.bvid}
         mediaPlaybackRequiresUserAction={false}
-        injectedJavaScript={INJECTED_JAVASCRIPT.replace(
-          '@NewVideoUrl',
-          videoUrl,
-        )}
+        injectedJavaScript={INJECTED_JAVASCRIPT}
         renderLoading={renderLoading}
         onMessage={handleMessage}
         onLoad={() => {

@@ -12,12 +12,33 @@ import { CollectVideoInfo } from '@/types'
 function CollectList() {
   const { $collectedVideos, set$collectedVideos } = useStore()
   const headerTitle = `我的收藏（${$collectedVideos.length}）`
+  const blackColor = tw(colors.black.text).color
+  const [searchKeyWord, setSearchKeyWord] = React.useState('')
   useUpdateNavigationOptions(
     React.useMemo(() => {
       return {
         headerTitle,
+        headerSearchBarOptions: {
+          placeholder: '搜索视频',
+          headerIconColor: blackColor,
+          hintTextColor: blackColor,
+          textColor: blackColor,
+          tintColor: blackColor,
+          disableBackButtonOverride: false,
+          shouldShowHintSearchIcon: false,
+          onClose: () => {
+            setSearchKeyWord('')
+          },
+          onSearchButtonPress: ({ nativeEvent: { text } }) => {
+            const keyword = text.trim()
+            if (!keyword) {
+              return
+            }
+            setSearchKeyWord(keyword)
+          },
+        },
       }
-    }, [headerTitle]),
+    }, [headerTitle, blackColor]),
   )
 
   const buttons = (video: CollectVideoInfo) => {
@@ -48,10 +69,18 @@ function CollectList() {
       },
     ]
   }
+  const collectVideos = React.useMemo(() => {
+    if (searchKeyWord) {
+      return $collectedVideos.filter(vi => {
+        return vi.title.includes(searchKeyWord)
+      })
+    }
+    return $collectedVideos
+  }, [searchKeyWord, $collectedVideos])
   return (
     <FlashList
-      data={$collectedVideos}
-      keyExtractor={v => v.bvid + ''}
+      data={collectVideos}
+      keyExtractor={v => v.bvid}
       renderItem={({ item }: { item: CollectVideoInfo }) => {
         return <VideoListItem video={item} buttons={buttons} />
       }}

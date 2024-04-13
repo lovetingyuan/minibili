@@ -1,13 +1,14 @@
 import { Icon, Skeleton, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
-import { View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 
 import { type CommentItemType, useComments } from '../api/comments'
 import { Comment } from './Comment'
 import ReplyList from './ReplyList'
+import clsx from 'clsx'
 
 function Loading() {
   return (
@@ -76,13 +77,15 @@ export default function CommentList(
               </View>
               <View className="ml-2 mr-1 flex-row gap-2 items-center">
                 {props.dividerRight}
-                <Text
-                  className="text-sm"
+                <TouchableOpacity
+                  activeOpacity={0.7}
                   onPress={() => {
                     setMode(mode === 3 ? 2 : 3)
                   }}>
-                  {mode === 3 ? '按热度' : '按时间'}
-                </Text>
+                  <Text className={clsx('text-sm', colors.primary.text)}>
+                    {mode === 3 ? '按热度' : '按时间'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>

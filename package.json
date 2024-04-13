@@ -31,6 +31,7 @@
     "bundle-analyze": "npx react-native-bundle-visualizer --platform android --entry-file index.js --expo true"
   },
   "dependencies": {
+    "@openspacelabs/react-native-zoomable-view": "^2.1.6",
     "@react-native-async-storage/async-storage": "1.21.0",
     "@react-native-community/hooks": "^3.0.0",
     "@react-native-community/netinfo": "11.1.0",
@@ -66,10 +67,13 @@
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
     "react-native-webview": "13.6.4",
+    "react-native-zoom-reanimated": "^1.4.5",
     "spark-md5": "^3.0.2",
     "swr": "^2.2.4",
     "throttle-debounce": "^5.0.0",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "react-native-reanimated": "~3.6.2",
+    "react-native-gesture-handler": "~2.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

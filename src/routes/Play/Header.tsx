@@ -31,7 +31,10 @@ export function PlayHeaderTitle() {
           'text-lg font-semibold',
           isBlackUp && 'line-through',
           followed && colors.secondary.text,
-        )}>
+        )}
+        onPress={() => {
+          //
+        }}>
         {route.params?.name || vi?.name}
       </Text>
       <Text

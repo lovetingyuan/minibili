@@ -1,4 +1,3 @@
-// import { useNetInfo } from '@react-native-community/netInfo'
 import { Overlay } from '@rneui/themed'
 import { Image } from 'expo-image'
 import React from 'react'
@@ -9,7 +8,6 @@ import { parseImgUrl } from '@/utils'
 
 import { useStore } from '../store'
 import Image2 from './Image2'
-
 export default React.memo(ImagesView)
 
 const textShadow = {
@@ -43,7 +41,6 @@ function ImagesView() {
   const imageCompCache = React.useRef<
     Record<string, React.ComponentElement<any, any>>
   >({})
-
   return (
     <Overlay
       isVisible={images.length > 0}

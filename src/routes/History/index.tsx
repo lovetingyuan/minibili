@@ -12,10 +12,31 @@ import { CollectVideoInfo, HistoryVideoInfo } from '@/types'
 function HistoryList() {
   const { $watchedVideos } = useStore()
   const headerTitle = `观看历史（${Object.keys($watchedVideos).length}）`
+  const blackColor = tw(colors.black.text).color
+  const [searchKeyWord, setSearchKeyWord] = React.useState('')
   useUpdateNavigationOptions(
     React.useMemo(() => {
       return {
         headerTitle,
+        headerSearchBarOptions: {
+          placeholder: '搜索视频',
+          headerIconColor: blackColor,
+          hintTextColor: blackColor,
+          textColor: blackColor,
+          tintColor: blackColor,
+          disableBackButtonOverride: false,
+          shouldShowHintSearchIcon: false,
+          onClose: () => {
+            setSearchKeyWord('')
+          },
+          onSearchButtonPress: ({ nativeEvent: { text } }) => {
+            const keyword = text.trim()
+            if (!keyword) {
+              return
+            }
+            setSearchKeyWord(keyword)
+          },
+        },
       }
     }, [headerTitle]),
   )
@@ -31,10 +52,17 @@ function HistoryList() {
     ]
   }
   const list = React.useMemo(() => {
-    return Object.values($watchedVideos).sort((a, b) => {
+    const _list = Object.values($watchedVideos).sort((a, b) => {
       return b.watchTime - a.watchTime
     })
-  }, [$watchedVideos])
+    if (searchKeyWord) {
+      return _list.filter(vi => {
+        return vi.title.includes(searchKeyWord)
+      })
+    }
+    return _list
+  }, [$watchedVideos, searchKeyWord])
+
   return (
     <FlashList
       data={list}
