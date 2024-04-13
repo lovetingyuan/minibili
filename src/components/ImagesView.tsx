@@ -91,14 +91,14 @@ function ImagesView() {
                   initWidth={96}
                   initHeight={96}
                   style={{ width: imgWidth, height: imgHeight }}
-                  placeholder={require('../../assets/loading.gif')}
+                  placeholder={require('../../assets/loading2.gif')}
                 />
               )
               imageView = imageCompCache.current[v.url]
             } else {
               imageView = (
                 <Image
-                  source={require('../../assets/loading.gif')}
+                  source={require('../../assets/loading2.gif')}
                   className="w-24 h-24"
                 />
               )

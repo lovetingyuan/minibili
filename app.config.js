@@ -75,7 +75,7 @@ module.exports = {
       '@sentry/react-native/expo',
       {
         url: 'https://sentry.io/',
-        authToken: process.env.SENTRY_AUTH_TOKEN,
+        // authToken: process.env.SENTRY_AUTH_TOKEN,
         project: process.env.SENTRY_PROJECT,
         organization: process.env.SENTRY_ORG,
       },
