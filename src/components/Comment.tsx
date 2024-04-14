@@ -183,7 +183,10 @@ export function CommentItem(props: {
         />
       ) : null}
       {'time' in comment && comment.time ? (
-        <Text className={`text-xs ${colors.gray6.text}`}> {comment.time} </Text>
+        <Text className={`text-xs ${colors.gray6.text}`}>
+          {' '}
+          {comment.time.replace('发布', '')}{' '}
+        </Text>
       ) : null}
       {comment.like ? (
         <Text className={`text-xs ${colors.secondary.text}`}>
