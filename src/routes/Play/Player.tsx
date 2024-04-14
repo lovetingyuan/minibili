@@ -40,7 +40,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   const { width, height } = useWindowDimensions()
   const [verticalExpand, setVerticalExpand] = React.useState(false)
   const { data } = useVideoInfo(route.params.bvid)
-  const isWifi = false //getIsWiFi()
+  const isWifi = getIsWiFi()
 
   const [loadPlayer, setLoadPlayer] = React.useState(isWifi)
   const [highQuality, setHighQuality] = React.useState(isWifi)
