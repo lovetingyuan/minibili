@@ -1,6 +1,6 @@
 {
   "name": "minibili",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "minimum bilibili apk",
   "unpkg": "docs/version.json",
   "files": [
@@ -117,8 +117,8 @@
     ]
   },
   "config": {
-    "versionCode": 65,
-    "changelog": "修复已知问题  优化界面"
+    "versionCode": 66,
+    "changelog": "支持评论显示时间"
   },
-  "gitHead": "af1f55a"
+  "gitHead": "3cde821"
 }
