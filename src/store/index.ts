@@ -12,11 +12,9 @@ import {
 import { RanksConfig } from '../constants'
 import useMounted from '../hooks/useMounted'
 import type { CollectVideoInfo, HistoryVideoInfo, UpInfo } from '../types'
+import { UpdateUpInfo } from './types'
 
-interface UpdateUpInfo {
-  latestId: string
-  currentLatestId: string
-}
+const StoragePrefix = 'Store:'
 
 export const getAppValue = () => {
   return {
@@ -40,6 +38,10 @@ export const getAppValue = () => {
      * 有更新的up主
      */
     $upUpdateMap: {} as Record<string, UpdateUpInfo>,
+    // get _ss() {
+    //   const { $upUpdateMap } = this
+    //   return false
+    // },
     $ignoredVersions: [] as string[],
     $videoCatesList: RanksConfig,
     $collectedVideos: [] as CollectVideoInfo[],
@@ -59,9 +61,6 @@ export const getAppValue = () => {
     }[],
     currentImageIndex: 0,
     overlayButtons: [] as { text: string; onPress: () => void }[],
-    _followedUpsMap: {} as Record<string, UpInfo>,
-    _updatedCount: 0,
-    _collectedVideosMap: {} as Record<string, CollectVideoInfo>,
     moreRepliesUrl: '',
     repliesInfo: null as {
       oid: string | number
@@ -91,33 +90,10 @@ export type AppContextValueType = ReturnType<typeof getAppValue>
 export type AppContextMethodsType =
   AtomicContextMethodsType<AppContextValueType>
 
-export const useAppContextMethods = () => useAtomicContextMethods(AppContext)
-
 export const onChange: ProviderOnChangeType<AppContextValueType> = (
   { key, value },
   ctx,
 ) => {
-  if (key === '$followedUps') {
-    const ups: Record<string, UpInfo> = {}
-    for (const up of value) {
-      ups[up.mid] = up
-    }
-    ctx.set_followedUpsMap(ups)
-  }
-  if (key === '$upUpdateMap') {
-    const aa = Object.values<UpdateUpInfo>(value)
-    const count = aa.filter(item => {
-      return item.latestId !== item.currentLatestId
-    }).length
-    ctx.set_updatedCount(count)
-  }
-  if (key === '$collectedVideos') {
-    const _map: Record<string, CollectVideoInfo> = {}
-    value.forEach(vi => {
-      _map[vi.bvid] = vi
-    })
-    ctx.set_collectedVideosMap(_map)
-  }
   if (!ctx.getInitialed()) {
     return
   }
@@ -125,8 +101,6 @@ export const onChange: ProviderOnChangeType<AppContextValueType> = (
     AsyncStorage.setItem(StoragePrefix + key, JSON.stringify(value))
   }
 }
-
-const StoragePrefix = 'Store:'
 
 type StoredKeys<K = keyof AppContextValueType> = K extends `$${string}`
   ? K
@@ -158,7 +132,9 @@ export const InitStoreComp = React.memo(() => {
       }),
     ).then(() => {
       methods.setInitialed(true)
-      SplashScreen.hideAsync()
+      setTimeout(() => {
+        SplashScreen.hideAsync()
+      }, 10)
     })
   })
   return null

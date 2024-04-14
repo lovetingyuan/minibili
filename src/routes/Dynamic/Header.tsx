@@ -16,6 +16,7 @@ import { useUserRelation } from '../../api/user-relation'
 import { useStore } from '../../store'
 import type { NavigationProps, RootStackParamList } from '../../types'
 import { handleShareUp, parseImgUrl, parseNumber, showToast } from '../../utils'
+import { useFollowedUpsMap } from '@/store/derives'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
@@ -42,7 +43,8 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
   const sex =
     dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
-  const { _followedUpsMap, setCheckLiveTimeStamp, $blackUps } = useStore()
+  const { setCheckLiveTimeStamp, $blackUps } = useStore()
+  const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   const isBlackUp = dynamicUser?.mid && '_' + dynamicUser.mid in $blackUps
   return (
@@ -121,8 +123,8 @@ function HeaderRight() {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
-  const { get$followedUps, _followedUpsMap, set$followedUps, $blackUps } =
-    useStore()
+  const { get$followedUps, set$followedUps, $blackUps } = useStore()
+  const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   const isBlackUp = dynamicUser?.mid && '_' + dynamicUser.mid in $blackUps
 

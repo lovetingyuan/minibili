@@ -15,6 +15,7 @@ import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import type { UpInfo } from '../../types'
 import FollowItem from './FollowItem'
+import { useUpUpdateCount } from '@/store/derives'
 
 const tvL = require('../../../assets/tv-l.png')
 const tvR = require('../../../assets/tv-r.png')
@@ -43,7 +44,8 @@ export default React.memo(FollowList)
 function FollowList() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
-  const { $followedUps, _updatedCount, $upUpdateMap, livingUps } = useStore()
+  const { $followedUps, $upUpdateMap, livingUps } = useStore()
+  const _updatedCount = useUpUpdateCount()
   const followListRef = React.useRef<FlatList | null>(null)
   const dark = useIsDark()
 

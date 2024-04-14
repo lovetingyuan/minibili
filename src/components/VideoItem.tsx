@@ -19,6 +19,7 @@ import {
   parseImgUrl,
   parseNumber,
 } from '@/utils'
+import { useFollowedUpsMap } from '@/store/derives'
 
 function extractTextWithEmTags(text: string, style: any) {
   const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g
@@ -52,8 +53,8 @@ function VideoListItem({
   }[]
 }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { _followedUpsMap, setOverlayButtons } = useStore()
-
+  const { setOverlayButtons } = useStore()
+  const _followedUpsMap = useFollowedUpsMap()
   const isFollowed = video.mid && video.mid in _followedUpsMap
   return (
     <TouchableOpacity

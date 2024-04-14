@@ -16,12 +16,14 @@ import type { RootStackParamList } from '@/types'
 import { parseNumber, showToast } from '@/utils'
 
 import { useStore } from '../../store'
+import { useFollowedUpsMap } from '@/store/derives'
 
 export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data: vi } = useVideoInfo(route.params.bvid)
   const { data: fans } = useUserRelation(route.params?.mid || vi?.mid)
-  const { _followedUpsMap, $blackUps } = useStore()
+  const { $blackUps } = useStore()
+  const _followedUpsMap = useFollowedUpsMap()
   const followed = route.params?.mid && route.params.mid in _followedUpsMap
   const isBlackUp = route.params?.mid && '_' + route.params.mid in $blackUps
   return (
@@ -163,6 +165,15 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
             setShowAiConclusion(true)
           }}>
           省流
+        </MenuItem>
+        <MenuItem
+          textStyle={tw(' text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            hideMenu()
+            // setShowAiConclusion(true)
+          }}>
+          添加到歌单
         </MenuItem>
         {/* <MenuItem
           textStyle={tw(' text-black dark:text-gray-300')}

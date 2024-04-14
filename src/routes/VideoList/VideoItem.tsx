@@ -8,13 +8,16 @@ import type { VideoItem as VideoItemType } from '@/api/hot-videos'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { parseDate, parseDuration, parseImgUrl, parseNumber } from '@/utils'
+import { useFollowedUpsMap } from '@/store/derives'
 
 export default React.memo(VideoItem)
 
 function VideoItem({ video }: { video: VideoItemType }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum)
-  const { isWiFi, _followedUpsMap, $watchedVideos, $blackTags } = useStore()
+  const { isWiFi, $watchedVideos, $blackTags } = useStore()
+  const _followedUpsMap = useFollowedUpsMap()
+
   const isFollowed = video.mid in _followedUpsMap
   const watchedInfo = $watchedVideos[video.bvid]
   const isBlackTag = video.tag in $blackTags

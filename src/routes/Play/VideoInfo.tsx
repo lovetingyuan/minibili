@@ -30,6 +30,7 @@ import {
 } from '@/utils'
 
 import { useVideoInfo } from '../../api/video-info'
+import { useCollectedVideosMap } from '@/store/derives'
 
 export default React.memo(VideoInfo)
 
@@ -61,11 +62,12 @@ function VideoInfo(props: {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid!)
   const {
-    _collectedVideosMap,
+    // _collectedVideosMap,
     set$collectedVideos,
     get$collectedVideos,
     $blackUps,
   } = useStore()
+  const _collectedVideosMap = useCollectedVideosMap()
   const isCollected = videoInfo.bvid && videoInfo.bvid in _collectedVideosMap
   const isBlackUp = videoInfo.mid && '_' + videoInfo.mid in $blackUps
   const collectVideo = () => {

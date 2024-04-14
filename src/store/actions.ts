@@ -1,9 +1,9 @@
 import { CollectVideoInfo } from '@/types'
 
-import { useAppContextMethods } from '.'
+import { useMethods } from '.'
 
 export function useMarkVideoWatched() {
-  const { get$watchedVideos, set$watchedVideos } = useAppContextMethods()
+  const { get$watchedVideos, set$watchedVideos } = useMethods()
   return (videoInfo: CollectVideoInfo, newProgress: number) => {
     let playedMap = get$watchedVideos()
     const playedInfo = playedMap[videoInfo.bvid]

@@ -16,6 +16,7 @@ import { colors } from '@/constants/colors.tw'
 import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import type { NavigationProps } from '../../types'
+import { useUpUpdateCount } from '@/store/derives'
 
 function HeaderTitleComp() {
   const opacityValue = React.useRef(new Animated.Value(0)).current
@@ -159,7 +160,8 @@ const HeaderRight = React.memo(HeaderRightComp)
 
 function HeaderRightComp() {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { _updatedCount, livingUps } = useStore()
+  const { livingUps } = useStore()
+  const _updatedCount = useUpUpdateCount()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
     <View className="flex-row items-center gap-1">

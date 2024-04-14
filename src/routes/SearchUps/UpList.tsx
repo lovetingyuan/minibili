@@ -10,11 +10,13 @@ import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { NavigationProps } from '@/types'
 import { parseNumber } from '@/utils'
+import { useFollowedUpsMap } from '@/store/derives'
 
 function SearchUpItem(props: { up: SearchedUpType }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const { _followedUpsMap, $blackUps, set$followedUps, get$followedUps } =
-    useStore()
+  const { $blackUps, set$followedUps, get$followedUps } = useStore()
+  const _followedUpsMap = useFollowedUpsMap()
+
   const isFollowed = props.up.mid in _followedUpsMap
   const isBlackUp = '_' + props.up.mid in $blackUps
   return (
