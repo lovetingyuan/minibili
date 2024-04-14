@@ -25,7 +25,7 @@ export const getAppValue = () => {
      */
     $firstRun: 0,
     /**
-     * 拉黑的up主
+     * 拉黑的up主，key是下划线加上up的mid
      */
     $blackUps: {} as Record<string, string>,
     /**

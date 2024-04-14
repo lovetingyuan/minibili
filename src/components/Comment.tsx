@@ -182,6 +182,9 @@ export function CommentItem(props: {
           idStr={comment.id + '_'}
         />
       ) : null}
+      {'time' in comment && comment.time ? (
+        <Text className={`text-xs ${colors.gray6.text}`}> {comment.time} </Text>
+      ) : null}
       {comment.like ? (
         <Text className={`text-xs ${colors.secondary.text}`}>
           {' ' + comment.like + (comment.upLike ? '+UP👍' : '')}

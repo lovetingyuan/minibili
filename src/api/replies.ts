@@ -22,6 +22,7 @@ const getReplyItem = (reply: ReplyResItem) => {
     upLike: reply.up_action.like,
     moreText: reply.reply_control.sub_reply_entry_text,
     location: reply.reply_control.location,
+    time: reply.reply_control.time_desc,
     like: reply.like,
     sex: reply.member.sex,
     type: reply.type,
