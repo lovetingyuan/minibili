@@ -35,6 +35,7 @@ import {
 } from './VideoList/Header'
 import WebPage from './WebPage'
 import Welcome from './Welcome'
+import Music from './Music'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
@@ -156,6 +157,7 @@ function Route() {
           />
           <Stack.Screen name="Collect" component={Collect} />
           <Stack.Screen name="History" component={History} />
+          <Stack.Screen name="Music" component={Music} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

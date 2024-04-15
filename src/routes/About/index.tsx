@@ -12,6 +12,7 @@ import History from './History'
 import SortCate from './SortCate'
 import Statement from './Statement'
 import Version from './Version'
+import Music from './Music'
 
 export default React.memo(About)
 
@@ -25,6 +26,7 @@ function About() {
       <Backup />
       <Collect />
       <History />
+      <Music />
       <Statement />
       <Divider className="mb-4" />
       <BlackTags />

@@ -12,7 +12,7 @@ import {
 import { RanksConfig } from '../constants'
 import useMounted from '../hooks/useMounted'
 import type { CollectVideoInfo, HistoryVideoInfo, UpInfo } from '../types'
-import { UpdateUpInfo } from './types'
+import { MusicSong, UpdateUpInfo } from './types'
 
 const StoragePrefix = 'Store:'
 
@@ -38,15 +38,20 @@ export const getAppValue = () => {
      * 有更新的up主
      */
     $upUpdateMap: {} as Record<string, UpdateUpInfo>,
-    // get _ss() {
-    //   const { $upUpdateMap } = this
-    //   return false
-    // },
     $ignoredVersions: [] as string[],
     $videoCatesList: RanksConfig,
     $collectedVideos: [] as CollectVideoInfo[],
     $watchedVideos: {} as Record<string, HistoryVideoInfo>,
     $showUsageStatement: true,
+    $musicList: [
+      {
+        name: '默认',
+        songs: [],
+      },
+    ] as {
+      name: string
+      songs: MusicSong[]
+    }[],
     // -------------------------
     initialed: false,
     isWiFi: false,
@@ -68,6 +73,7 @@ export const getAppValue = () => {
       type: number
     } | null,
     checkLiveTimeStamp: Date.now(),
+    playingSong: null as MusicSong | null,
   }
 }
 

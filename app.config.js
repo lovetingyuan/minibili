@@ -58,6 +58,7 @@ module.exports = {
       backgroundColor: '#FFFFFF',
     },
     package: appId,
+    permissions: ['WAKE_LOCK'],
     versionCode: Number(versionCode),
     splash: {
       image: './assets/splash.png',

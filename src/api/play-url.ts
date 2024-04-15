@@ -2,11 +2,17 @@ import useSWR from 'swr'
 import { z } from 'zod'
 
 import request from './fetcher'
-import { PlayUrlResponseSchema } from './play-url.schema'
+import { DashUrlResponseSchema, PlayUrlResponseSchema } from './play-url.schema'
 
 type Res = z.infer<typeof PlayUrlResponseSchema>
 
-export function usePlayUrl(bvid: string, cid?: number, highQuality?: boolean) {
+type DashRes = z.infer<typeof DashUrlResponseSchema>
+
+export function useVideoMp4Url(
+  bvid: string,
+  cid?: number,
+  highQuality?: boolean,
+) {
   const search = new URLSearchParams()
   // https://socialsisteryi.github.io/bilibili-API-collect/docs/video/videostream_url.html
   if (bvid && cid) {
@@ -71,36 +77,35 @@ export function getDownloadUrl(bvid: string, cid: number) {
   })
 }
 
-export function useVideoDownloadUrl(
-  bvid: string,
-  cid: string | number,
-  onSuccess: (d?: Res['durl']) => void,
-) {
+export function useAudioUrl(bvid: string, cid?: number | string) {
   const search = new URLSearchParams()
   // https://socialsisteryi.github.io/bilibili-API-collect/docs/video/videostream_url.html
   if (bvid && cid) {
     const query = {
       bvid,
       cid,
-      type: 'mp4',
+      // type: 'mp4',
       qn: 64,
-      fnval: 4048,
-      platform: 'html5',
-      high_quality: 1,
+      fnval: 16, // DASH格式才可以获取到音频
       try_look: 1,
+      platform: 'pc',
+      high_quality: 1,
     }
     Object.entries(query).forEach(([k, v]) => {
       search.append(k, v + '')
     })
   }
-  const { data } = useSWR<Res>(
+
+  const { data, error } = useSWR<DashRes>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
     {
-      dedupingInterval: 2 * 60 * 1000 * 1000,
-      onSuccess: d => {
-        onSuccess?.(d?.durl)
-      },
+      dedupingInterval: 2 * 60 * 1000 * 1000 - 60 * 1000,
     },
   )
-  return data?.durl
+  // console.log(data?.dash.audio)
+  return {
+    url: data?.dash.audio?.sort((a, b) => a.id - b.id).pop()?.baseUrl,
+    time: data?.timelength,
+    error,
+  }
 }

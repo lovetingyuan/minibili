@@ -17,7 +17,7 @@ import {
 } from 'react-native'
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
 
-import { usePlayUrl } from '@/api/play-url'
+import { useVideoMp4Url } from '@/api/play-url'
 import Image2 from '@/components/Image2'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
@@ -52,7 +52,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     ...data,
   }
   const cid = videoInfo.pages ? videoInfo.pages[props.currentPage - 1].cid : 0
-  const { videoUrl } = usePlayUrl(videoInfo.bvid, cid, highQuality)
+  const { videoUrl } = useVideoMp4Url(videoInfo.bvid, cid, highQuality)
   const markVideoWatched = useMarkVideoWatched()
 
   const [isEnded, setIsEnded] = React.useState(true)

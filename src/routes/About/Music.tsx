@@ -5,17 +5,17 @@ import { NavigationProps } from '@/types'
 
 import TextAction from './TextAction'
 
-function MyCollect() {
+function MyMusic() {
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (
     <TextAction
-      text="⭐️ 我的收藏"
+      text="🎵 我的歌单"
       buttons={[
         {
-          text: '查看收藏',
+          text: '查看歌单',
           onPress: () => {
-            navigation.navigate('Collect')
+            navigation.navigate('Music')
           },
         },
       ]}
@@ -23,4 +23,4 @@ function MyCollect() {
   )
 }
 
-export default React.memo(MyCollect)
+export default React.memo(MyMusic)

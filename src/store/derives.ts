@@ -1,7 +1,7 @@
 import React from 'react'
 import { useStore } from '.'
 import { CollectVideoInfo, UpInfo } from '@/types'
-import { UpdateUpInfo } from './types'
+import { MusicSong, UpdateUpInfo } from './types'
 
 export const useFollowedUpsMap = () => {
   const { $followedUps } = useStore()
@@ -34,4 +34,17 @@ export const useCollectedVideosMap = () => {
     })
     return _map
   }, [$collectedVideos])
+}
+
+export const useMusicSongsMap = () => {
+  const { $musicList } = useStore()
+  return React.useMemo(() => {
+    const map: Record<string, MusicSong> = {}
+    $musicList.forEach(music => {
+      music.songs.forEach(song => {
+        map[song.bvid + '_' + song.cid] = song
+      })
+    })
+    return map
+  }, [$musicList])
 }

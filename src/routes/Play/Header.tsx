@@ -16,7 +16,7 @@ import type { RootStackParamList } from '@/types'
 import { parseNumber, showToast } from '@/utils'
 
 import { useStore } from '../../store'
-import { useFollowedUpsMap } from '@/store/derives'
+import { useFollowedUpsMap, useMusicSongsMap } from '@/store/derives'
 
 export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
@@ -95,8 +95,14 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
   const showMenu = () => setVisible(true)
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Play'>['route']>()
-  const videoInfo = route.params
+  const { data } = useVideoInfo(route.params.bvid)
+  const videoInfo = {
+    ...route.params,
+    ...data,
+  }
   const [showAiConclusion, setShowAiConclusion] = React.useState(false)
+  const { set$musicList, get$musicList } = useStore()
+  const musicSongsMap = useMusicSongsMap()
   return (
     <View className="flex-row items-center gap-2">
       <Menu
@@ -171,7 +177,26 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             hideMenu()
-            // setShowAiConclusion(true)
+            if (!props.cid || !videoInfo.cover || !videoInfo.duration) {
+              showToast('请稍候再试')
+              return
+            }
+            const id = videoInfo.bvid + '_' + props.cid
+            if (id in musicSongsMap) {
+              showToast('当前视频已经在歌单当中')
+              return
+            }
+            const musicList = get$musicList()
+            musicList[0].songs.unshift({
+              name: videoInfo.title,
+              bvid: videoInfo.bvid,
+              cid: props.cid,
+              cover: videoInfo.cover,
+              duration: videoInfo.duration,
+              createTime: Date.now(),
+            })
+            set$musicList([...musicList])
+            showToast('添加成功')
           }}>
           添加到歌单
         </MenuItem>

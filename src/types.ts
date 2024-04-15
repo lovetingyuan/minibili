@@ -44,6 +44,7 @@ export type RootStackParamList = {
   SearchVideos: undefined
   Collect: undefined
   History: undefined
+  Music: undefined
   WebPage: { url: string; title?: string; type?: 'pc' | 'mobile' }
   Play: {
     bvid: string

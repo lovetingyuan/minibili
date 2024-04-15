@@ -73,7 +73,8 @@
     "throttle-debounce": "^5.0.0",
     "zod": "^3.21.4",
     "react-native-reanimated": "~3.6.2",
-    "react-native-gesture-handler": "~2.14.0"
+    "react-native-gesture-handler": "~2.14.0",
+    "expo-av": "~13.10.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
