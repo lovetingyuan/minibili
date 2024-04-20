@@ -5,7 +5,7 @@ describe('app-version-update', () => {
   test(
     'version.json',
     {
-      timeout: 30000,
+      timeout: 60000,
     },
     async () => {
       const res = await fetch(
@@ -25,7 +25,7 @@ describe('app-version-update', () => {
   test(
     'unpkg-check',
     {
-      timeout: 30000,
+      timeout: 60000,
     },
     async () => {
       await fetch('https://unpkg.com/minibili/package.json')
