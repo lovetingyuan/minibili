@@ -7,8 +7,8 @@ import { View } from 'react-native'
 import type { VideoItem as VideoItemType } from '@/api/hot-videos'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
-import { parseDate, parseDuration, parseImgUrl, parseNumber } from '@/utils'
 import { useFollowedUpsMap } from '@/store/derives'
+import { parseDate, parseDuration, parseImgUrl, parseNumber } from '@/utils'
 
 export default React.memo(VideoItem)
 

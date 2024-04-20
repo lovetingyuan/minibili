@@ -9,6 +9,7 @@ import { Linking, Pressable, View } from 'react-native'
 import { Menu, MenuItem } from 'react-native-material-menu'
 
 import { colors } from '@/constants/colors.tw'
+import { useFollowedUpsMap } from '@/store/derives'
 
 import { useLivingInfo } from '../../api/living-info'
 import { useUserInfo } from '../../api/user-info'
@@ -16,7 +17,6 @@ import { useUserRelation } from '../../api/user-relation'
 import { useStore } from '../../store'
 import type { NavigationProps, RootStackParamList } from '../../types'
 import { handleShareUp, parseImgUrl, parseNumber, showToast } from '../../utils'
-import { useFollowedUpsMap } from '@/store/derives'
 
 const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 

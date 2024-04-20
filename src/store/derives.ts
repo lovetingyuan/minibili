@@ -1,6 +1,8 @@
 import React from 'react'
-import { useStore } from '.'
+
 import { CollectVideoInfo, UpInfo } from '@/types'
+
+import { useStore } from '.'
 import { MusicSong, UpdateUpInfo } from './types'
 
 export const useFollowedUpsMap = () => {

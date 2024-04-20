@@ -12,11 +12,11 @@ import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 
 import { useAppUpdateInfo } from '@/api/check-update'
 import { colors } from '@/constants/colors.tw'
+import { useUpUpdateCount } from '@/store/derives'
 
 import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import type { NavigationProps } from '../../types'
-import { useUpUpdateCount } from '@/store/derives'
 
 function HeaderTitleComp() {
   const opacityValue = React.useRef(new Animated.Value(0)).current

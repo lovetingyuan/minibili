@@ -9,10 +9,10 @@ import BlackUps from './BlackUps'
 import Collect from './Collect'
 import Feedback from './Feedback'
 import History from './History'
+import Music from './Music'
 import SortCate from './SortCate'
 import Statement from './Statement'
 import Version from './Version'
-import Music from './Music'
 
 export default React.memo(About)
 

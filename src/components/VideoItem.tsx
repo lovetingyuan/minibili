@@ -7,6 +7,7 @@ import { TouchableOpacity, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
+import { useFollowedUpsMap } from '@/store/derives'
 import type {
   CollectVideoInfo,
   HistoryVideoInfo,
@@ -19,7 +20,6 @@ import {
   parseImgUrl,
   parseNumber,
 } from '@/utils'
-import { useFollowedUpsMap } from '@/store/derives'
 
 function extractTextWithEmTags(text: string, style: any) {
   const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g

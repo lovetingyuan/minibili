@@ -9,13 +9,13 @@ import {
 } from 'react-native'
 
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
+import { useUpUpdateCount } from '@/store/derives'
 
 import useIsDark from '../../hooks/useIsDark'
 import useMounted from '../../hooks/useMounted'
 import { useStore } from '../../store'
 import type { UpInfo } from '../../types'
 import FollowItem from './FollowItem'
-import { useUpUpdateCount } from '@/store/derives'
 
 const tvL = require('../../../assets/tv-l.png')
 const tvR = require('../../../assets/tv-r.png')

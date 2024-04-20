@@ -8,9 +8,9 @@ import { Alert, TouchableOpacity, View } from 'react-native'
 import { SearchedUpType, useSearchUps } from '@/api/search-up'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
+import { useFollowedUpsMap } from '@/store/derives'
 import { NavigationProps } from '@/types'
 import { parseNumber } from '@/utils'
-import { useFollowedUpsMap } from '@/store/derives'
 
 function SearchUpItem(props: { up: SearchedUpType }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
