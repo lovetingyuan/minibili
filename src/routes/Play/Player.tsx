@@ -4,6 +4,7 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native'
+import { CheckBox } from '@rneui/themed'
 import * as KeepAwake from 'expo-keep-awake'
 import React from 'react'
 import {
@@ -29,7 +30,6 @@ import { useAppStateChange } from '../../hooks/useAppState'
 import { useStore } from '../../store'
 import { parseDuration, parseImgUrl, showToast } from '../../utils'
 import { INJECTED_JAVASCRIPT } from './inject-play'
-import { CheckBox } from '@rneui/themed'
 const PlayUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
 
 export default React.memo(Player)
@@ -219,7 +219,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       }
     })
     return `${PlayUrl}?${search}#${encodeURIComponent(videoUrl)}`
-  }, [videoUrl, loadPlayer, videoInfo.bvid, props.currentPage])
+  }, [videoUrl, loadPlayer, cid, videoInfo.bvid, props.currentPage])
 
   const player = playPageUrl ? (
     <WebView

@@ -24,6 +24,7 @@ import {
 import Follow from './Follow'
 import { followHeaderRight } from './Follow/Header'
 import History from './History'
+import Music from './Music'
 import Play from './Play'
 import SearchUps from './SearchUps'
 import SearchVideos from './SearchVideos'
@@ -35,7 +36,6 @@ import {
 } from './VideoList/Header'
 import WebPage from './WebPage'
 import Welcome from './Welcome'
-import Music from './Music'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 

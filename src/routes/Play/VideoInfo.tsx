@@ -19,6 +19,7 @@ import {
 import { useWatchingCount } from '@/api/watching-count'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
+import { useCollectedVideosMap } from '@/store/derives'
 import type { NavigationProps, RootStackParamList } from '@/types'
 import {
   handleShareVideo,
@@ -30,7 +31,6 @@ import {
 } from '@/utils'
 
 import { useVideoInfo } from '../../api/video-info'
-import { useCollectedVideosMap } from '@/store/derives'
 
 export default React.memo(VideoInfo)
 
@@ -134,7 +134,7 @@ function VideoInfo(props: {
               }
               navigation.push('Dynamic', { user })
             }}
-            className="flex-row flex-1 items-center mr-2">
+            className="flex-row flex-1 items-center mr-1">
             <Avatar
               size={36}
               rounded
@@ -151,21 +151,21 @@ function VideoInfo(props: {
               numberOfLines={1}
               ellipsizeMode="tail"
               className={clsx(
-                'ml-3 grow text-base font-bold',
+                'ml-3 mr-1 grow text-base font-bold',
                 isBlackUp && `line-through ${colors.gray4.text}`,
               )}>
-              {(name || '') + '  '}
+              {name || ''}
             </Text>
           </Pressable>
-          <View className="flex-row items-center gap-1 px-2 flex-none">
+          <View className="flex-row items-center gap-1 px-2 flex-none ml-1">
             <Icon name="date-range" size={16} />
             <Text className="text-sm">{parseDate(date, true)}</Text>
-            {watchingCount ? (
-              <Text className="text-sm ml-1">
-                {watchingCount.total === '1' ? '壹' : watchingCount.total}
-                人在看
-              </Text>
-            ) : null}
+            <Text className="text-sm ml-1">
+              {watchingCount
+                ? (watchingCount.total === '1' ? '壹' : watchingCount.total) +
+                  '人在看'
+                : ' '}
+            </Text>
           </View>
         </View>
         <View className="flex-row w-full my-1 justify-start flex-wrap">

@@ -12,11 +12,11 @@ import { getDownloadUrl } from '@/api/play-url'
 import { useUserRelation } from '@/api/user-relation'
 import { useVideoInfo } from '@/api/video-info'
 import { colors } from '@/constants/colors.tw'
+import { useFollowedUpsMap, useMusicSongsMap } from '@/store/derives'
 import type { RootStackParamList } from '@/types'
 import { parseNumber, showToast } from '@/utils'
 
 import { useStore } from '../../store'
-import { useFollowedUpsMap, useMusicSongsMap } from '@/store/derives'
 
 export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
@@ -187,6 +187,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
               return
             }
             const musicList = get$musicList()
+            // console.log(videoInfo)
             musicList[0].songs.unshift({
               name: videoInfo.title,
               bvid: videoInfo.bvid,

@@ -46,6 +46,7 @@
     "expo": "~50.0.8",
     "expo-application": "~5.8.3",
     "expo-asset": "~9.0.2",
+    "expo-av": "~13.10.5",
     "expo-background-fetch": "~11.8.1",
     "expo-clipboard": "~5.0.1",
     "expo-constants": "~15.4.5",
@@ -61,8 +62,10 @@
     "react": "18.2.0",
     "react-atomic-context": "^2.0.3",
     "react-native": "0.73.6",
+    "react-native-gesture-handler": "~2.14.0",
     "react-native-material-menu": "^2.0.0",
     "react-native-pager-view": "6.2.3",
+    "react-native-reanimated": "~3.6.2",
     "react-native-root-toast": "^3.5.1",
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
@@ -71,10 +74,7 @@
     "spark-md5": "^3.0.2",
     "swr": "^2.2.4",
     "throttle-debounce": "^5.0.0",
-    "zod": "^3.21.4",
-    "react-native-reanimated": "~3.6.2",
-    "react-native-gesture-handler": "~2.14.0",
-    "expo-av": "~13.10.5"
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

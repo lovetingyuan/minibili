@@ -103,7 +103,7 @@ export default function VideoItem(props: {
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image
-            className="w-14 h-12 absolute self-center opacity-75"
+            className="w-14 h-12 absolute self-center opacity-80"
             source={require('../../../assets/play.png')}
           />
           {watchedInfo ? (
