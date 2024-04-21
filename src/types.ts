@@ -49,6 +49,7 @@ export type RootStackParamList = {
   Play: {
     bvid: string
     title: string
+    cid?: number
     aid?: string | number
     mid?: string | number
     name?: string

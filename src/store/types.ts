@@ -6,7 +6,7 @@ export interface UpdateUpInfo {
 export interface MusicSong {
   name: string
   bvid: string
-  cid: string | number
+  cid: number
   cover: string
   duration: number
   createTime: number

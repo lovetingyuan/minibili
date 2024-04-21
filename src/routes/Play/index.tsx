@@ -35,7 +35,7 @@ function Play({ route }: Props) {
     ...data,
   }
   const [currentPage, setCurrentPage] = React.useState(1)
-  const cid = videoInfo.pages ? videoInfo.pages[currentPage - 1].cid : 0
+  const cid2 = videoInfo.pages ? videoInfo.pages[currentPage - 1].cid : 0
 
   const errorShowedRef = React.useRef(false)
 
@@ -56,7 +56,7 @@ function Play({ route }: Props) {
       const headerTitle = () => <PlayHeaderTitle />
       const headerRight = () => (
         <PlayHeaderRight
-          cid={cid}
+          cid={cid2}
           refresh={() => {
             setKey(k => k + 1)
           }}
@@ -66,7 +66,7 @@ function Play({ route }: Props) {
         headerTitle,
         headerRight,
       }
-    }, [cid]),
+    }, [cid2]),
   )
 
   useFocusEffect(

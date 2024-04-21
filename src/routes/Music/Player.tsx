@@ -143,7 +143,7 @@ function PlayerBar(props: { url?: string; time?: number }) {
           <Icon
             name={isPlaying ? 'pause-circle-outline' : 'play-circle-outline'} // pause-circle-outline
             type="material-community"
-            size={40}
+            size={50}
             className="h-full justify-center items-center"
             onPress={() => {
               if (isPlaying) {

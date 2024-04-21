@@ -1,6 +1,6 @@
 import { type RouteProp, useRoute } from '@react-navigation/native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Dialog, Icon, Text } from '@rneui/themed'
+import { Dialog, Icon, Input, Text } from '@rneui/themed'
 import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
@@ -89,6 +89,98 @@ function AiConclusionModal(props: {
   )
 }
 
+function SongInfoModal(props: {
+  videoInfo: any
+  cid: number
+  onClose: () => void
+}) {
+  const [title, setTitle] = React.useState(props.videoInfo.title)
+  const [singer, setSinger] = React.useState('')
+  const [year, setYear] = React.useState(2000)
+  const { set$musicList, get$musicList } = useStore()
+
+  const handleSearchInternet = () => {
+    Linking.openURL(`https://www.baidu.com/s?wd=${encodeURIComponent(title)}`)
+  }
+  const handleAddSong = () => {
+    const musicList = get$musicList()
+    // console.log(videoInfo)
+    musicList[0].songs.unshift({
+      name: title,
+      bvid: props.videoInfo.bvid,
+      cid: props.cid,
+      cover: props.videoInfo.cover,
+      singer,
+      year,
+      duration: props.videoInfo.duration,
+      createTime: Date.now(),
+    })
+    set$musicList([...musicList])
+    showToast('添加成功')
+    props.onClose()
+  }
+  return (
+    <Dialog
+      isVisible={true}
+      overlayStyle={tw(colors.gray2.bg)}
+      backdropStyle={tw('bg-neutral-900/90')}
+      onBackdropPress={props.onClose}>
+      <Dialog.Title title={'添加到歌单'} titleStyle={tw(colors.black.text)} />
+      <View className="mt-3">
+        <Input
+          label="歌曲名称"
+          placeholder="歌曲名称"
+          autoFocus
+          // className="mt-5 h-20"
+          maxLength={100}
+          value={title}
+          placeholderTextColor={tw(colors.gray4.text).color}
+          onChangeText={value => {
+            setTitle(value)
+          }}
+        />
+        <Input
+          label="演唱者"
+          placeholder="演唱者名称"
+          // className="mt-5 h-20"
+          maxLength={60}
+          value={singer}
+          placeholderTextColor={tw(colors.gray4.text).color}
+          onChangeText={value => {
+            setSinger(value)
+          }}
+        />
+        <Input
+          label="年份"
+          placeholder="创作年份"
+          // className="mt-5 h-20"
+          maxLength={10}
+          value={year + ''}
+          placeholderTextColor={tw(colors.gray4.text).color}
+          onChangeText={value => {
+            if (!/^\d{4}$/.test(value)) {
+              showToast('请输入正确的年份')
+            } else {
+              setYear(Number(value))
+            }
+          }}
+        />
+      </View>
+      <Dialog.Actions>
+        <Dialog.Button title="网络搜索" onPress={handleSearchInternet} />
+        <Dialog.Button title="添加到歌单" onPress={handleAddSong} />
+        <Dialog.Button
+          titleStyle={tw(colors.gray6.text)}
+          title="取消"
+          onPress={() => {
+            props.onClose()
+          }}
+        />
+      </Dialog.Actions>
+    </Dialog>
+  )
+}
+
 export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
@@ -101,7 +193,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
     ...data,
   }
   const [showAiConclusion, setShowAiConclusion] = React.useState(false)
-  const { set$musicList, get$musicList } = useStore()
+  const [showAddSongInfoModal, setShowAddSongInfoModal] = React.useState(false)
   const musicSongsMap = useMusicSongsMap()
   return (
     <View className="flex-row items-center gap-2">
@@ -186,37 +278,10 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
               showToast('当前视频已经在歌单当中')
               return
             }
-            const musicList = get$musicList()
-            // console.log(videoInfo)
-            musicList[0].songs.unshift({
-              name: videoInfo.title,
-              bvid: videoInfo.bvid,
-              cid: props.cid,
-              cover: videoInfo.cover,
-              duration: videoInfo.duration,
-              createTime: Date.now(),
-            })
-            set$musicList([...musicList])
-            showToast('添加成功')
+            setShowAddSongInfoModal(true)
           }}>
           添加到歌单
         </MenuItem>
-        {/* <MenuItem
-          textStyle={tw(' text-black dark:text-gray-300')}
-          pressColor={tw(colors.gray4.text).color}
-          onPress={() => {
-            showToast('暂未实现')
-          }}>
-          切换高清
-        </MenuItem> */}
-        {/* <MenuItem
-          textStyle={tw(' text-black dark:text-gray-300')}
-          pressColor={tw(colors.gray4.text).color}
-          onPress={() => {
-            showToast('暂未实现')
-          }}>
-          后台播放
-        </MenuItem> */}
       </Menu>
       {showAiConclusion ? (
         <AiConclusionModal
@@ -225,6 +290,16 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           mid={videoInfo.mid}
           onClose={() => {
             setShowAiConclusion(false)
+          }}
+        />
+      ) : null}
+      {showAddSongInfoModal && props.cid ? (
+        <SongInfoModal
+          videoInfo={videoInfo}
+          cid={props.cid}
+          // mid={videoInfo.mid}
+          onClose={() => {
+            setShowAddSongInfoModal(false)
           }}
         />
       ) : null}
