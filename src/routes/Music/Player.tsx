@@ -1,4 +1,5 @@
 import { Icon, Slider, Text } from '@rneui/themed'
+import clsx from 'clsx'
 import {
   Audio,
   AVPlaybackStatus,
@@ -7,12 +8,13 @@ import {
 } from 'expo-av'
 // import { Image } from 'expo-image'
 import React from 'react'
-import { ImageBackground, View } from 'react-native'
+import { ImageBackground, TouchableOpacity, View } from 'react-native'
 import { throttle } from 'throttle-debounce'
 
 import { useAudioUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
+import useMemoizedFn from '@/hooks/useMemoizedFn'
 import { useStore } from '@/store'
 import { parseImgUrl, parseTime, showToast } from '@/utils'
 
@@ -25,28 +27,65 @@ Audio.setAudioModeAsync({
   // playThroughEarpieceAndroid: true,
 })
 
+const shadowStyle = {
+  shadowColor: 'black',
+  shadowOpacity: 0.8,
+  shadowOffset: { width: 0, height: -12 },
+  shadowRadius: 10,
+  elevation: 10, // 添加 Android 阴影效果
+}
+
 function PlayerBar(props: { url?: string; time?: number }) {
-  const { playingSong } = useStore()
+  const { playingSong, get$musicList, setPlayingSong } = useStore()
   const [isPlaying, setIsPlaying] = React.useState(false)
+  const [playFinished, setPlayFinished] = React.useState(false)
   const [playingTime, setPlayingTime] = React.useState(0)
   const soundRef = React.useRef<Audio.Sound | null>(null)
-  const updatePlayedTime = (currentTime: number) => {
-    soundRef.current?.setPositionAsync(currentTime)
-  }
-  const handlePlayStatusChange = React.useMemo(() => {
-    return throttle(200, (status: AVPlaybackStatus) => {
-      if (status.isLoaded) {
-        setIsPlaying(status.isPlaying)
-        setPlayingTime(status.positionMillis)
-        // console.log(status.positionMillis)
+  const [playMode, setPlayMode] = React.useState<'single' | 'order' | 'loop'>(
+    'single',
+  )
+
+  const { prevSong, nextSong } = React.useMemo(() => {
+    if (!playingSong) {
+      return {
+        prevSong: null,
+        nextSong: null,
       }
-    })
-  }, [])
-  // console.log(url?.substring(0, 30), time, playingSong?.name, error)
+    }
+    const [{ songs }] = get$musicList()
+    const index = songs.findIndex(
+      s => s.bvid === playingSong.bvid && s.cid === playingSong.cid,
+    )
+    return {
+      prevSong: songs[index - 1] ?? null,
+      nextSong: songs[index + 1] ?? null,
+    }
+  }, [playingSong, get$musicList])
+  const handlePlayStatusChange = useMemoizedFn(
+    React.useMemo(() => {
+      return throttle(200, (status: AVPlaybackStatus) => {
+        if (status.isLoaded) {
+          setIsPlaying(status.isPlaying)
+          setPlayFinished(status.didJustFinish)
+          setPlayingTime(status.positionMillis)
+          if (status.didJustFinish) {
+            if (playMode === 'loop') {
+              soundRef.current?.replayAsync()
+            } else if (playMode === 'order') {
+              if (nextSong) {
+                setPlayingSong(nextSong)
+              }
+            }
+          }
+        }
+      })
+    }, [playMode, nextSong, setPlayingSong]),
+  )
 
   React.useEffect(() => {
     setIsPlaying(false)
     setPlayingTime(0)
+    setPlayFinished(false)
     let promise: Promise<any> = Promise.resolve()
     if (soundRef.current) {
       promise = soundRef.current.unloadAsync()
@@ -66,9 +105,7 @@ function PlayerBar(props: { url?: string; time?: number }) {
             },
           },
           {},
-          status => {
-            handlePlayStatusChange(status)
-          },
+          handlePlayStatusChange,
         )
       })
       .then(res => {
@@ -84,21 +121,17 @@ function PlayerBar(props: { url?: string; time?: number }) {
       // console.log('Unloading Sound' + playingSong?.name)
       soundRef.current?.unloadAsync()
     }
-  }, [props.url, handlePlayStatusChange, playingSong?.name])
+  }, [props.url, handlePlayStatusChange])
+
   if (!playingSong) {
     return null
   }
+
   return (
     <View
       className={`flex-1 absolute bottom-0 z-10 left-0 right-0 px-4 py-6 ${colors.white.bg}`}
-      style={{
-        shadowColor: 'black',
-        shadowOpacity: 0.8,
-        shadowOffset: { width: 0, height: -12 },
-        shadowRadius: 10,
-        elevation: 10, // 添加 Android 阴影效果
-      }}>
-      <View className="flex-row gap-2">
+      style={shadowStyle}>
+      <View className="flex-row gap-3">
         <ImageBackground
           source={
             playingSong
@@ -106,15 +139,17 @@ function PlayerBar(props: { url?: string; time?: number }) {
               : require('../../../assets/loading.png')
           }
           resizeMode="cover"
-          className="w-16 h-16 rounded">
+          className="w-20 h-20 rounded">
           <Icon
             name={isPlaying ? 'pause-circle-outline' : 'play-circle-outline'} // pause-circle-outline
             type="material-community"
             size={40}
-            className="h-16 justify-center items-center"
+            className="h-full justify-center items-center"
             onPress={() => {
               if (isPlaying) {
                 soundRef.current?.pauseAsync()
+              } else if (playFinished) {
+                soundRef.current?.replayAsync()
               } else {
                 soundRef.current?.playAsync()
               }
@@ -122,30 +157,75 @@ function PlayerBar(props: { url?: string; time?: number }) {
             color={'white'}
           />
         </ImageBackground>
-        <View className="flex-1">
-          <Text
-            className="flex-1 text-base"
-            ellipsizeMode="tail"
-            numberOfLines={1}>
+        <View className="flex-1 justify-between">
+          <Text className="text-base" ellipsizeMode="tail" numberOfLines={1}>
             {playingSong?.name || '-'}
           </Text>
+          <View className="flex-row gap-6">
+            <TouchableOpacity
+              activeOpacity={0.6}
+              disabled={!prevSong}
+              onPress={() => {
+                setPlayingSong(prevSong)
+              }}>
+              <Text
+                className={clsx(prevSong ? colors.primary.text : 'opacity-60')}>
+                上一首
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              disabled={!nextSong}
+              onPress={() => {
+                setPlayingSong(nextSong)
+              }}>
+              <Text
+                className={clsx(nextSong ? colors.primary.text : 'opacity-60')}>
+                下一首
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => {
+                setPlayMode(
+                  playMode === 'single'
+                    ? 'order'
+                    : playMode === 'order'
+                      ? 'loop'
+                      : 'single',
+                )
+              }}>
+              <Text className={colors.primary.text}>
+                {playMode === 'single'
+                  ? '单曲播放'
+                  : playMode === 'order'
+                    ? '顺序播放'
+                    : '循环单曲'}
+              </Text>
+            </TouchableOpacity>
+          </View>
           <View className="flex-row gap-2 items-center">
             <Text className="text-xs" style={{ fontVariant: ['tabular-nums'] }}>
               {parseTime(playingTime)}
             </Text>
-            <Slider
-              // @ts-ignore
-              className="flex-1"
-              value={playingTime}
-              onValueChange={updatePlayedTime}
-              maximumValue={props.time}
-              minimumValue={0}
-              step={1}
-              allowTouchTrack
-              minimumTrackTintColor={tw(colors.secondary.text).color}
-              trackStyle={tw('h-1 rounded')}
-              thumbStyle={tw(`${colors.secondary.bg} w-3 h-3 rounded-full`)}
-            />
+
+            {props.url ? (
+              <Slider
+                // @ts-ignore
+                className="flex-1 h-2"
+                value={playingTime}
+                onValueChange={currentTime => {
+                  soundRef.current?.setPositionAsync(currentTime)
+                }}
+                maximumValue={props.time}
+                minimumValue={0}
+                step={1}
+                allowTouchTrack
+                minimumTrackTintColor={tw(colors.secondary.text).color}
+                trackStyle={tw('h-1 rounded')}
+                thumbStyle={tw(`${colors.secondary.bg} w-3 h-3 rounded-full`)}
+              />
+            ) : null}
             <Text className="text-xs">{parseTime(props.time || 0)}</Text>
           </View>
         </View>
@@ -153,7 +233,9 @@ function PlayerBar(props: { url?: string; time?: number }) {
     </View>
   )
 }
+
 const PlayerBarComp = React.memo(PlayerBar)
+
 function MusicPlayerBar() {
   const { playingSong, setPlayingSong } = useStore()
   const { url, time, error } = useAudioUrl(
