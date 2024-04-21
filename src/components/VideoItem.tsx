@@ -17,6 +17,7 @@ import {
   isDefined,
   parseDate,
   parseDuration,
+  parseDurationStr,
   parseImgUrl,
   parseNumber,
 } from '@/utils'
@@ -89,7 +90,9 @@ function VideoListItem({
         />
         <View className="absolute px-1 py-[1px] bg-gray-900/70 bottom-0 left-0 rounded-sm m-1">
           <Text className="text-xs font-thin text-white">
-            {parseDuration(video.duration)}
+            {typeof video.duration === 'string'
+              ? parseDurationStr(video.duration)
+              : parseDuration(video.duration)}
           </Text>
         </View>
         <View className="absolute px-1 py-[1px] top-0 rounded-sm m-1 bg-gray-900/70">

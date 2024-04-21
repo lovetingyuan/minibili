@@ -93,6 +93,18 @@ export function parseTime(milliseconds: number) {
   return timeString
 }
 
+export function parseDurationStr(duration: string) {
+  return duration
+    .split(':')
+    .map(t => {
+      if (t.length === 1) {
+        return '0' + t
+      }
+      return t
+    })
+    .join(':')
+}
+
 export async function handleShareVideo(
   name: string,
   title: string,
