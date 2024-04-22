@@ -11,7 +11,7 @@ export interface MusicSong {
   duration: number
   createTime: number
   singer?: string
-  year?: number
+  year?: number | string
   description?: string
   rate?: number
 }

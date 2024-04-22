@@ -96,7 +96,7 @@ function SongInfoModal(props: {
 }) {
   const [title, setTitle] = React.useState(props.videoInfo.title)
   const [singer, setSinger] = React.useState('')
-  const [year, setYear] = React.useState(2000)
+  const [year, setYear] = React.useState('')
   const { set$musicList, get$musicList } = useStore()
 
   const handleSearchInternet = () => {
@@ -158,17 +158,17 @@ function SongInfoModal(props: {
           value={year + ''}
           placeholderTextColor={tw(colors.gray4.text).color}
           onChangeText={value => {
-            if (!/^\d{4}$/.test(value)) {
-              showToast('请输入正确的年份')
-            } else {
-              setYear(Number(value))
-            }
+            setYear(value)
           }}
         />
       </View>
       <Dialog.Actions>
-        <Dialog.Button title="网络搜索" onPress={handleSearchInternet} />
         <Dialog.Button title="添加到歌单" onPress={handleAddSong} />
+        <Dialog.Button
+          title="网络搜索"
+          titleStyle={tw(colors.success.text)}
+          onPress={handleSearchInternet}
+        />
         <Dialog.Button
           titleStyle={tw(colors.gray6.text)}
           title="取消"
