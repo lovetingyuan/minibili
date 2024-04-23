@@ -158,9 +158,17 @@ function PlayerBar(props: { url?: string; time?: number }) {
           />
         </ImageBackground>
         <View className="flex-1 justify-between">
-          <Text className="text-base" ellipsizeMode="tail" numberOfLines={1}>
-            {playingSong?.name || '-'}
-          </Text>
+          <View className="flex-row justify-between items-center">
+            <Text
+              className="text-base flex-1"
+              ellipsizeMode="tail"
+              numberOfLines={1}>
+              {playingSong?.name || '-'}
+            </Text>
+            <Text className={colors.gray5.text}>
+              {playingSong?.singer ? playingSong.singer : ''}
+            </Text>
+          </View>
           <View className="flex-row gap-6">
             <TouchableOpacity
               activeOpacity={0.6}
@@ -169,7 +177,9 @@ function PlayerBar(props: { url?: string; time?: number }) {
                 setPlayingSong(prevSong)
               }}>
               <Text
-                className={clsx(prevSong ? colors.primary.text : 'opacity-60')}>
+                className={clsx(
+                  prevSong ? colors.primary.text : 'opacity-60 line-through',
+                )}>
                 上一首
               </Text>
             </TouchableOpacity>
@@ -180,7 +190,9 @@ function PlayerBar(props: { url?: string; time?: number }) {
                 setPlayingSong(nextSong)
               }}>
               <Text
-                className={clsx(nextSong ? colors.primary.text : 'opacity-60')}>
+                className={clsx(
+                  nextSong ? colors.primary.text : 'opacity-60 line-through',
+                )}>
                 下一首
               </Text>
             </TouchableOpacity>

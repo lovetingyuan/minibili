@@ -2,9 +2,10 @@ import { useBackHandler } from '@react-native-community/hooks'
 import { useIsFocused, useNavigation } from '@react-navigation/native'
 import { Icon, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
+import clsx from 'clsx'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Alert, View } from 'react-native'
+import { Alert, Linking, View } from 'react-native'
 import { SearchBarCommands } from 'react-native-screens'
 
 import { colors } from '@/constants/colors.tw'
@@ -73,6 +74,14 @@ function MusicItem(props: {
           })
         },
       },
+      {
+        text: '网络搜索',
+        onPress: () => {
+          Linking.openURL(
+            `https://www.baidu.com/s?wd=${encodeURIComponent(song.name + (song.singer ? ' ' + song.singer : ''))}`,
+          )
+        },
+      },
     ]
   }
   return (
@@ -105,10 +114,16 @@ function MusicItem(props: {
           {/* )} */}
         </View>
       </View>
-      <View className="justify-between flex-1">
+      <View className="gap-2 flex-1">
         <Text
-          className={`text-base flex-1 items-center ${isPlaying ? colors.primary.text : ''}`}
+          className={clsx(
+            'text-base items-center leading-5',
+            isPlaying && [colors.primary.text, 'font-bold'],
+          )}
           numberOfLines={2}
+          onPress={() => {
+            setPlayingSong(song)
+          }}
           onLongPress={() => {
             setOverlayButtons(buttons())
           }}
@@ -116,9 +131,13 @@ function MusicItem(props: {
           {song.name}
         </Text>
         <View className="flex-row gap-3">
-          <Text>👤{song.singer || '-'}</Text>
-          <Text>{parseTime(song.duration * 1000)}</Text>
-          <Text>{song.year ? song.year + '年' : ''}</Text>
+          <Text className={colors.gray5.text}>👤{song.singer || '佚名'}</Text>
+          <Text className={colors.gray5.text}>
+            {parseTime(song.duration * 1000)}
+          </Text>
+          <Text className={colors.gray5.text}>
+            {song.year ? song.year + '年' : ''}
+          </Text>
         </View>
       </View>
     </View>
@@ -199,7 +218,7 @@ function MusicList() {
         ListFooterComponent={
           songsList.length ? (
             <Text
-              className={`${colors.gray6.text} text-xs text-center my-2 ${playingSong ? 'mb-32' : ''}`}>
+              className={`${colors.gray6.text} text-xs text-center py-1 my-2 ${playingSong ? 'mb-32' : ''}`}>
               到底了
             </Text>
           ) : null
