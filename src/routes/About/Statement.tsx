@@ -40,7 +40,7 @@ function Statement() {
         isVisible={showStatement}>
         <Card containerStyle={tw('m-0')}>
           <Card.Title h4 className="text-left">
-            使用声明
+            📣使用声明
           </Card.Title>
           <Card.Divider />
           <View>

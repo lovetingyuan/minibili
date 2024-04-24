@@ -163,7 +163,7 @@ function MusicList() {
   useUpdateNavigationOptions(
     React.useMemo(() => {
       return {
-        headerTitle: `我的歌单（${list.length}）`,
+        headerTitle: `🎵 我的歌单（${list.length}）`,
         headerSearchBarOptions: {
           ref: searchBarRef,
           placeholder: '搜索歌曲',

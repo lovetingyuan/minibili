@@ -11,7 +11,7 @@ import { CollectVideoInfo } from '@/types'
 
 function CollectList() {
   const { $collectedVideos, set$collectedVideos } = useStore()
-  const headerTitle = `我的收藏（${$collectedVideos.length}）`
+  const headerTitle = `⭐️ 我的收藏（${$collectedVideos.length}）`
   const blackColor = tw(colors.black.text).color
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
   useUpdateNavigationOptions(

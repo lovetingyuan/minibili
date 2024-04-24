@@ -11,7 +11,7 @@ import { CollectVideoInfo, HistoryVideoInfo } from '@/types'
 
 function HistoryList() {
   const { $watchedVideos } = useStore()
-  const headerTitle = `观看历史（${Object.keys($watchedVideos).length}）`
+  const headerTitle = `⏰ 观看历史（${Object.keys($watchedVideos).length}）`
   const blackColor = tw(colors.black.text).color
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
   useUpdateNavigationOptions(

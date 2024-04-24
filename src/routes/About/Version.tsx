@@ -1,7 +1,7 @@
 import Constants from 'expo-constants'
 import * as Updates from 'expo-updates'
 import React from 'react'
-import { Alert, Appearance, Linking } from 'react-native'
+import { Alert, Linking } from 'react-native'
 
 import {
   checkUpdate as checkUpdateApi,
@@ -60,7 +60,7 @@ function Version() {
           [
             `当前版本：${currentVersion} (${
               Constants.expoConfig?.extra?.gitHash || '-'
-            }-${Appearance.getColorScheme() === 'dark' ? 1 : 0})`,
+            })`,
             `更新时间：${updateTime || '-'}`,
             `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
             Updates.updateId && `更新ID：${Updates.updateId}`,

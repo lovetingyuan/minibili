@@ -14,6 +14,8 @@ import { throttle } from 'throttle-debounce'
 import { useAudioUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
+import useBackgroundTask from '@/hooks/useBackgroundTask'
+import useIsDark from '@/hooks/useIsDark'
 import useMemoizedFn from '@/hooks/useMemoizedFn'
 import { useStore } from '@/store'
 import { parseImgUrl, parseTime, showToast } from '@/utils'
@@ -61,6 +63,19 @@ function PlayerBar(props: { url?: string; time?: number }) {
       nextSong: songs[index + 1] ?? null,
     }
   }, [playingSong, get$musicList])
+  useBackgroundTask(
+    'Check-Music-Play',
+    useMemoizedFn(() => {
+      // console.log(playMode, isPlaying)
+      if (isPlaying && playMode === 'loop' && props.time) {
+        if (playingTime < props.time - 900) {
+          soundRef.current?.playAsync()
+        } else {
+          soundRef.current?.replayAsync()
+        }
+      }
+    }),
+  )
   const handlePlayStatusChange = useMemoizedFn(
     React.useMemo(() => {
       return throttle(200, (status: AVPlaybackStatus) => {
@@ -81,7 +96,6 @@ function PlayerBar(props: { url?: string; time?: number }) {
       })
     }, [playMode, nextSong, setPlayingSong]),
   )
-
   React.useEffect(() => {
     setIsPlaying(false)
     setPlayingTime(0)
@@ -117,19 +131,28 @@ function PlayerBar(props: { url?: string; time?: number }) {
           showToast('出错了，播放失败')
         })
       })
+      .catch(() => {
+        showToast('出错了，创建失败')
+      })
     return () => {
       // console.log('Unloading Sound' + playingSong?.name)
       soundRef.current?.unloadAsync()
     }
   }, [props.url, handlePlayStatusChange])
-
+  const isDark = useIsDark()
   if (!playingSong) {
     return null
   }
 
   return (
-    <View
-      className={`flex-1 absolute bottom-0 z-10 left-0 right-0 px-4 py-6 ${colors.white.bg}`}
+    <ImageBackground
+      source={
+        isDark
+          ? require('../../../assets/bg-342.png')
+          : require('../../../assets/bg-111.webp')
+      }
+      resizeMode="stretch"
+      className={`flex-1 blur-md absolute bottom-0 z-10 left-0 right-0 px-4 py-6 ${colors.white.bg}`}
       style={shadowStyle}>
       <View className="flex-row gap-3">
         <ImageBackground
@@ -162,6 +185,9 @@ function PlayerBar(props: { url?: string; time?: number }) {
             <Text
               className="text-base flex-1"
               ellipsizeMode="tail"
+              onPress={() => {
+                soundRef.current?.playAsync()
+              }}
               numberOfLines={1}>
               {playingSong?.name || '-'}
             </Text>
@@ -242,7 +268,7 @@ function PlayerBar(props: { url?: string; time?: number }) {
           </View>
         </View>
       </View>
-    </View>
+    </ImageBackground>
   )
 }
 
