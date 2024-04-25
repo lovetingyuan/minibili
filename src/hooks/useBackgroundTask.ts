@@ -23,7 +23,7 @@ export default function useBackgroundTask(name: string, callback: () => void) {
       })
       .then(() => {
         BackgroundFetch.registerTaskAsync(name, {
-          minimumInterval: 60 * 10, // 15 minutes
+          minimumInterval: 60 * 5, // 15 minutes
           stopOnTerminate: false, // android only,
           startOnBoot: true, // android only
         })

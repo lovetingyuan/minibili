@@ -135,7 +135,7 @@ function FollowList() {
             <View>
               <TvImg />
               <Text className="text-center my-10 text-lg">
-                暂无关注，请添加
+                暂无关注，请搜索你感兴趣的UP主添加
               </Text>
             </View>
           }
