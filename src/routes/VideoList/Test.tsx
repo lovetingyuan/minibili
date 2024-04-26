@@ -1,50 +1,35 @@
-import {
-  ReactNativeZoomableView,
-  ZoomableViewEvent,
-} from '@openspacelabs/react-native-zoomable-view'
-import { Image } from 'expo-image'
+import { useAppState } from '@react-native-community/hooks'
+import { Text } from '@rneui/themed'
 import React from 'react'
-import { GestureResponderEvent, PanResponderGestureState } from 'react-native'
-import PagerView from 'react-native-pager-view'
-const images = [
-  require('../../../assets/tv-l.png'),
-  require('../../../assets/play.png'),
-  require('../../../assets/ss.png'),
-]
 
+import useBackgroundTask from '@/hooks/useBackgroundTask'
+import useMemoizedFn from '@/hooks/useMemoizedFn'
+import useMounted from '@/hooks/useMounted'
+const getTime = new Date().toLocaleTimeString()
 export default function Test() {
-  const onShouldBlockNativeResponderHandler = (
-    event: GestureResponderEvent,
-    gestureState: PanResponderGestureState,
-    zoomableViewEventObject: ZoomableViewEvent,
-  ): boolean => {
-    if (zoomableViewEventObject.zoomLevel === 1) {
-      return false
-    } else {
-      return true
-    }
-  }
-  const [_current, setCurrent] = React.useState(0)
-
+  const [count, setCount] = React.useState(0)
+  const [time, setTime] = React.useState(getTime)
+  const state = useAppState()
+  console.log(99, state)
+  // useBackgroundTask(
+  //   'test',
+  //   useMemoizedFn(() => {
+  //     console.log(99)
+  //     const time = setInterval(() => {
+  //       setTime(getTime())
+  //     }, 1000)
+  //   }),
+  // )
+  // useMounted(() => {
+  //   console.log(99)
+  //   const timer = setInterval(() => {
+  //     setCount(c => c + 1)
+  //   }, 1000)
+  //   return () => clearInterval(timer)
+  // })
   return (
-    <PagerView
-      onPageSelected={e => {
-        setCurrent(e.nativeEvent.position)
-      }}
-      offscreenPageLimit={1}
-      className="flex-1"
-      initialPage={0}>
-      {images.map(img => {
-        return (
-          <ReactNativeZoomableView
-            maxZoom={4}
-            key={img}
-            disablePanOnInitialZoom={true}
-            onShouldBlockNativeResponder={onShouldBlockNativeResponderHandler}>
-            <Image source={img} style={{ width: 100, height: 100 }} />
-          </ReactNativeZoomableView>
-        )
-      })}
-    </PagerView>
+    <Text className="text-lg text-center">
+      {time}: {count}
+    </Text>
   )
 }

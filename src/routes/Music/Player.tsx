@@ -15,6 +15,7 @@ import { useAudioUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
 import useBackgroundTask from '@/hooks/useBackgroundTask'
+import useDataChange from '@/hooks/useDataChange'
 import useIsDark from '@/hooks/useIsDark'
 import useMemoizedFn from '@/hooks/useMemoizedFn'
 import { useStore } from '@/store'
@@ -37,16 +38,18 @@ const shadowStyle = {
   elevation: 10, // 添加 Android 阴影效果
 }
 
-function PlayerBar(props: { url?: string; time?: number }) {
+function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   const { playingSong, get$musicList, setPlayingSong } = useStore()
   const [isPlaying, setIsPlaying] = React.useState(false)
   const [playFinished, setPlayFinished] = React.useState(false)
   const [playingTime, setPlayingTime] = React.useState(0)
-  const soundRef = React.useRef<Audio.Sound | null>(null)
+  const soundRef = React.useRef<Audio.Sound>(null as unknown as Audio.Sound)
+  if (!soundRef.current) {
+    soundRef.current = new Audio.Sound()
+  }
   const [playMode, setPlayMode] = React.useState<'single' | 'order' | 'loop'>(
     'single',
   )
-
   const { prevSong, nextSong } = React.useMemo(() => {
     if (!playingSong) {
       return {
@@ -64,16 +67,11 @@ function PlayerBar(props: { url?: string; time?: number }) {
     }
   }, [playingSong, get$musicList])
   useBackgroundTask(
-    'Check-Music-Play',
+    'KeepMusicPlay',
     useMemoizedFn(() => {
-      // console.log(playMode, isPlaying)
-      if (isPlaying && playMode === 'loop' && props.time) {
-        if (playingTime < props.time - 900) {
-          soundRef.current?.playAsync()
-        } else {
-          soundRef.current?.replayAsync()
-        }
-      }
+      soundRef.current.getStatusAsync().then(status => {
+        handlePlayStatusChange(status)
+      })
     }),
   )
   const handlePlayStatusChange = useMemoizedFn(
@@ -84,9 +82,7 @@ function PlayerBar(props: { url?: string; time?: number }) {
           setPlayFinished(status.didJustFinish)
           setPlayingTime(status.positionMillis)
           if (status.didJustFinish) {
-            if (playMode === 'loop') {
-              soundRef.current?.replayAsync()
-            } else if (playMode === 'order') {
+            if (playMode === 'order') {
               if (nextSong) {
                 setPlayingSong(nextSong)
               }
@@ -96,49 +92,45 @@ function PlayerBar(props: { url?: string; time?: number }) {
       })
     }, [playMode, nextSong, setPlayingSong]),
   )
-  React.useEffect(() => {
+  useDataChange(() => {
+    if (!props.url) {
+      return
+    }
     setIsPlaying(false)
     setPlayingTime(0)
     setPlayFinished(false)
-    let promise: Promise<any> = Promise.resolve()
-    if (soundRef.current) {
-      promise = soundRef.current.unloadAsync()
-      soundRef.current = null
-    }
-    promise
+
+    soundRef.current
+      .unloadAsync()
+      .catch(() => {})
       .then(() => {
         if (!props.url) {
           return null
         }
-        return Audio.Sound.createAsync(
-          {
-            uri: props.url,
-            headers: {
-              'user-agent': UA,
-              referer: 'https://www.bilibili.com',
+        soundRef.current.setOnPlaybackStatusUpdate(handlePlayStatusChange)
+        return soundRef.current
+          .loadAsync(
+            {
+              uri: props.url,
+              headers: {
+                'user-agent': UA,
+                referer: 'https://www.bilibili.com',
+              },
             },
-          },
-          {},
-          handlePlayStatusChange,
-        )
-      })
-      .then(res => {
-        if (!res) {
-          return
-        }
-        soundRef.current = res.sound
-        return res.sound.playAsync().catch(() => {
-          showToast('出错了，播放失败')
-        })
-      })
-      .catch(() => {
-        showToast('出错了，创建失败')
+            {
+              isLooping: playMode === 'loop',
+              shouldPlay: true,
+            },
+          )
+          .catch(() => {
+            showToast('出错了，播放失败')
+          })
       })
     return () => {
-      // console.log('Unloading Sound' + playingSong?.name)
-      soundRef.current?.unloadAsync()
+      soundRef.current.unloadAsync()
     }
-  }, [props.url, handlePlayStatusChange])
+  }, [props.url])
+
   const isDark = useIsDark()
   if (!playingSong) {
     return null
@@ -225,13 +217,14 @@ function PlayerBar(props: { url?: string; time?: number }) {
             <TouchableOpacity
               activeOpacity={0.6}
               onPress={() => {
-                setPlayMode(
+                const mode =
                   playMode === 'single'
                     ? 'order'
                     : playMode === 'order'
                       ? 'loop'
-                      : 'single',
-                )
+                      : 'single'
+                setPlayMode(mode)
+                soundRef.current?.setIsLoopingAsync(mode === 'loop')
               }}>
               <Text className={colors.primary.text}>
                 {playMode === 'single'
@@ -292,7 +285,7 @@ function MusicPlayerBar() {
       setPlayingSong(null)
     }
   }, [setPlayingSong])
-  return <PlayerBarComp url={url} time={time} />
+  return <PlayerBarComp url={url} time={time} error={!!error} />
 }
 
 export default React.memo(MusicPlayerBar)

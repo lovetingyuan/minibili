@@ -37,7 +37,7 @@ function Welcome({ navigation }: Props) {
             }}>
             {'github'}
           </Text>
-          )，所有数据均为B站官网公开，不会读取、存储、公开任何个人隐私数据，仅供学习交流!
+          )，所有数据均存放在手机本地，展示的所有数据均为B站官网公开，不会读取、存储、传播任何个人相关数据，仅供学习交流!
         </Text>
         <Text className="text-base mt-5 text-gray-600 dark:text-gray-400">
           如果遇到闪退或报错请及时更新最新版本。
@@ -50,7 +50,7 @@ function Welcome({ navigation }: Props) {
           set$firstRun(Date.now())
           navigation.replace('VideoList')
         }}>
-        同意并开始使用
+        知晓并开始使用
       </Button>
     </View>
   )

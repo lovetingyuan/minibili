@@ -3,6 +3,7 @@ import { useIsFocused, useNavigation } from '@react-navigation/native'
 import { Icon, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import clsx from 'clsx'
+import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import React from 'react'
 import { Alert, Linking, View } from 'react-native'
@@ -12,7 +13,7 @@ import { colors } from '@/constants/colors.tw'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { AppContextValueType, useStore } from '@/store'
 import { NavigationProps } from '@/types'
-import { parseImgUrl, parseTime } from '@/utils'
+import { parseImgUrl, parseTime, showToast } from '@/utils'
 
 import MusicPlayerBar from './Player'
 
@@ -80,6 +81,14 @@ function MusicItem(props: {
           Linking.openURL(
             `https://www.baidu.com/s?wd=${encodeURIComponent(song.name + (song.singer ? ' ' + song.singer : ''))}`,
           )
+        },
+      },
+      {
+        text: '复制歌曲名',
+        onPress: () => {
+          Clipboard.setStringAsync(song.name).then(() => {
+            showToast('已复制')
+          })
         },
       },
     ]
