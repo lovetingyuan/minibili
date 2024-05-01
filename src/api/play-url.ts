@@ -102,6 +102,9 @@ export function useAudioUrl(bvid: string, cid?: number | string) {
       dedupingInterval: 2 * 60 * 1000 * 1000 - 60 * 1000,
     },
   )
+  // if (error) {
+  //   console.log(error)
+  // }
 
   return {
     url: data?.dash.audio?.sort((a, b) => a.id - b.id).at(-1)?.baseUrl,

@@ -125,7 +125,7 @@ export default async function request<D extends any>(url: string): Promise<D> {
     // reportApiError(url, res)
 
     return Promise.reject(
-      new ApiError(res.code + ':' + res.message + url, url, res),
+      new ApiError(res.code + ':' + res.message + ' ' + url, url, res),
     )
   }
   return res.data

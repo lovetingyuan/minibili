@@ -51,6 +51,7 @@ const useCheckLivingUps = (time?: number) => {
           checkLivingUps(data)
         })
       }
+      return null
     }),
   )
   useSWR<LivingUpsData>(url, {

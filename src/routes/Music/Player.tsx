@@ -38,6 +38,8 @@ const shadowStyle = {
   elevation: 10, // 添加 Android 阴影效果
 }
 
+const audioCache = {}
+
 function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   const { playingSong, get$musicList, setPlayingSong } = useStore()
   const [isPlaying, setIsPlaying] = React.useState(false)
@@ -175,7 +177,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
         <View className="flex-1 justify-between">
           <View className="flex-row justify-between items-center">
             <Text
-              className="text-base flex-1"
+              className="text-lg flex-1"
               ellipsizeMode="tail"
               onPress={() => {
                 soundRef.current?.playAsync()
