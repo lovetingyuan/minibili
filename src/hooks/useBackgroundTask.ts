@@ -40,7 +40,7 @@ export default function useBackgroundTask<T extends keyof TaskMapType>(
       })
       .then(() => {
         BackgroundFetch.registerTaskAsync(name, {
-          minimumInterval: 60, // 15 minutes
+          minimumInterval: 5, // 15 minutes
           stopOnTerminate: false, // android only,
           startOnBoot: true, // android only
         })

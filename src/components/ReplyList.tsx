@@ -61,7 +61,7 @@ export default function ReplyList() {
             renderItem={({ item }: { item: ReplyItemType }) => {
               return (
                 <View className="px-5 mb-2">
-                  <CommentItem comment={item} smallFont />
+                  <CommentItem comment={item} smallFont={false} />
                 </View>
               )
             }}

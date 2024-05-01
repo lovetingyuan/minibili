@@ -16,9 +16,9 @@ import { parseImgUrl, showToast } from '../utils'
 function CommentText(props: {
   nodes: CommentMessageContent
   idStr: string
-  fontSize: string
+  textStyle?: any
 }) {
-  const { nodes, idStr, fontSize } = props
+  const { nodes, idStr, textStyle } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
   const route =
     useRoute<
@@ -41,10 +41,10 @@ function CommentText(props: {
           return (
             <Text
               key={key}
-              className={clsx([
-                fontSize,
+              style={textStyle}
+              className={clsx(
                 upName === name ? colors.secondary.text : colors.primary.text,
-              ])}
+              )}
               onPress={() => {
                 navigation.push('Dynamic', {
                   user: {
@@ -63,7 +63,8 @@ function CommentText(props: {
           return (
             <Text
               key={key}
-              className={`${colors.primary.text} ${fontSize}`}
+              style={textStyle}
+              className={`${colors.primary.text}`}
               onLongPress={() => {
                 Clipboard.setStringAsync(node.url).then(() => {
                   showToast('已复制链接')
@@ -89,7 +90,8 @@ function CommentText(props: {
           return (
             <Text
               key={key}
-              className={`${colors.primary.text} ${fontSize}`}
+              style={textStyle}
+              className={`${colors.primary.text}`}
               onPress={() => {
                 Linking.openURL(node.url)
               }}>
@@ -101,7 +103,8 @@ function CommentText(props: {
           return (
             <Text
               key={key}
-              className={`${colors.primary.text} ${fontSize}`}
+              style={textStyle}
+              className={`${colors.primary.text}`}
               onPress={() => {
                 const bvid = node.url.split('/').pop()
                 if (bvid?.startsWith('BV')) {
@@ -118,7 +121,7 @@ function CommentText(props: {
           )
         }
         return (
-          <Text className={fontSize} key={key}>
+          <Text style={textStyle} key={key}>
             {node.text}
           </Text>
         )
@@ -147,6 +150,7 @@ export function CommentItem(props: {
     : ''
   const navigation = useNavigation<NavigationProps['navigation']>()
   const fontSize = props.smallFont ? 'text-sm' : 'text-base'
+  // console.log(999, clsx(fontSize, comment.upLike && 'font-bold'))
   return (
     <Text className="py-[2px]">
       <Text
@@ -177,7 +181,7 @@ export function CommentItem(props: {
       ) : null}
       {comment.message?.length ? (
         <CommentText
-          fontSize={fontSize}
+          textStyle={tw(clsx(fontSize, comment.upLike && 'font-bold'))}
           nodes={comment.message}
           idStr={comment.id + '_'}
         />
@@ -189,7 +193,8 @@ export function CommentItem(props: {
         </Text>
       ) : null}
       {comment.like ? (
-        <Text className={`text-xs ${colors.secondary.text}`}>
+        <Text
+          className={`text-xs ${colors.secondary.text} ${comment.upLike ? 'font-bold' : ''}`}>
           {' ' + comment.like + (comment.upLike ? '+UP👍' : '')}
         </Text>
       ) : null}

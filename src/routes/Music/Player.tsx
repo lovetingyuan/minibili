@@ -38,17 +38,16 @@ const shadowStyle = {
   elevation: 10, // 添加 Android 阴影效果
 }
 
-const audioCache = {}
-
+// const audioSoundCache = {}
 function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   const { playingSong, get$musicList, setPlayingSong } = useStore()
   const [isPlaying, setIsPlaying] = React.useState(false)
   const [playFinished, setPlayFinished] = React.useState(false)
   const [playingTime, setPlayingTime] = React.useState(0)
-  const soundRef = React.useRef<Audio.Sound>(null as unknown as Audio.Sound)
-  if (!soundRef.current) {
-    soundRef.current = new Audio.Sound()
-  }
+  const soundRef = React.useRef<Audio.Sound | null>(null)
+  // if (!soundRef.current) {
+  //   soundRef.current = new Audio.Sound()
+  // }
   const [playMode, setPlayMode] = React.useState<'single' | 'order' | 'loop'>(
     'single',
   )
@@ -71,7 +70,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   useBackgroundTask(
     'KeepMusicPlay',
     useMemoizedFn(() => {
-      soundRef.current.getStatusAsync().then(status => {
+      soundRef.current?.getStatusAsync().then(status => {
         handlePlayStatusChange(status)
       })
     }),
@@ -101,35 +100,31 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
     setIsPlaying(false)
     setPlayingTime(0)
     setPlayFinished(false)
-
-    soundRef.current
-      .unloadAsync()
-      .catch(() => {})
+    Promise.resolve(soundRef.current?.unloadAsync().catch(() => {}))
       .then(() => {
-        if (!props.url) {
-          return null
-        }
-        soundRef.current.setOnPlaybackStatusUpdate(handlePlayStatusChange)
-        return soundRef.current
-          .loadAsync(
-            {
-              uri: props.url,
-              headers: {
-                'user-agent': UA,
-                referer: 'https://www.bilibili.com',
-              },
+        return Audio.Sound.createAsync(
+          {
+            uri: props.url!,
+            headers: {
+              'user-agent': UA,
+              referer: 'https://www.bilibili.com',
             },
-            {
-              isLooping: playMode === 'loop',
-              shouldPlay: true,
-            },
-          )
-          .catch(() => {
-            showToast('出错了，播放失败')
-          })
+          },
+          {
+            isLooping: playMode === 'loop',
+            shouldPlay: true,
+          },
+          handlePlayStatusChange,
+        )
+      })
+      .then(({ sound }) => {
+        soundRef.current = sound
+      })
+      .catch(() => {
+        showToast('抱歉，播放失败')
       })
     return () => {
-      soundRef.current.unloadAsync()
+      soundRef.current?.unloadAsync()
     }
   }, [props.url])
 
@@ -252,7 +247,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
                 }}
                 maximumValue={props.time}
                 minimumValue={0}
-                step={1}
+                step={1000}
                 allowTouchTrack
                 minimumTrackTintColor={tw(colors.secondary.text).color}
                 trackStyle={tw('h-1 rounded')}
