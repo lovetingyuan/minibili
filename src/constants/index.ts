@@ -1,6 +1,6 @@
 export const githubLink = 'https://github.com/lovetingyuan/minibili'
 export const site = 'https://lovetingyuan.github.io/minibili/'
-export const configUrl = site + 'config.json'
+export const configUrl = `${site}config.json`
 
 export let UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0'
@@ -11,7 +11,7 @@ export const setUA = (ua: string) => {
 export const RanksConfig = [
   {
     rid: -1,
-    label: '🔥 热门' + (typeof __DEV__ === 'boolean' && __DEV__ ? 'dev' : ''),
+    label: `🔥 热门${typeof __DEV__ === 'boolean' && __DEV__ ? 'dev' : ''}`,
   },
   {
     rid: 0,

@@ -52,13 +52,13 @@ function FollowList() {
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
   const count = $followedUps.length
-  const headerTitle =
-    '关注的UP' +
-    (count
+  const headerTitle = `关注的UP${
+    count
       ? _updatedCount
         ? ` (${_updatedCount}/${count})`
         : ` (${count})`
-      : '')
+      : ''
+  }`
   useUpdateNavigationOptions(
     React.useMemo(() => {
       return {
@@ -123,7 +123,7 @@ function FollowList() {
         <FlatList
           data={displayUps}
           renderItem={renderItem}
-          keyExtractor={(item, index) => (item ? item.mid + '' : index + '')}
+          keyExtractor={(item, index) => (item ? `${item.mid}` : `${index}`)}
           onEndReachedThreshold={1}
           persistentScrollbar
           key={columns} // FlatList不支持直接更改columns

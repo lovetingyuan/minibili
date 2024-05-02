@@ -35,7 +35,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
     if (dynamicUser) {
       navigation.navigate('WebPage', {
         url: `https://space.bilibili.com/${dynamicUser.mid}`,
-        title: dynamicUser.name + '的主页',
+        title: `${dynamicUser.name}的主页`,
       })
     }
   }
@@ -46,7 +46,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const { setCheckLiveTimeStamp, $blackUps } = useStore()
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
-  const isBlackUp = dynamicUser?.mid && '_' + dynamicUser.mid in $blackUps
+  const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps
   return (
     <View className="flex-row flex-none items-center mr-[110px] left-[-12px]">
       {dynamicUser?.face ? (
@@ -71,7 +71,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
                 if (dynamicUser.mid) {
                   setCheckLiveTimeStamp(Date.now())
                   navigation.navigate('WebPage', {
-                    title: dynamicUser.name + '的直播间',
+                    title: `${dynamicUser.name}的直播间`,
                     url: livingUrl,
                   })
                 }
@@ -98,7 +98,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             props.scrollTop()
           }}>
           {userName}
-          <Text className="text-lg">{level + '  '}</Text>
+          <Text className="text-lg">{`${level}  `}</Text>
         </Text>
         {fans ? (
           <Text
@@ -126,7 +126,7 @@ function HeaderRight() {
   const { get$followedUps, set$followedUps, $blackUps } = useStore()
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
-  const isBlackUp = dynamicUser?.mid && '_' + dynamicUser.mid in $blackUps
+  const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps
 
   return (
     <View className="flex-row items-center gap-2">
@@ -208,7 +208,7 @@ function HeaderRight() {
             if (!dynamicUser) {
               return
             }
-            Clipboard.setStringAsync(dynamicUser.mid + '').then(() => {
+            Clipboard.setStringAsync(`${dynamicUser.mid}`).then(() => {
               showToast('已复制用户ID')
               hideMenu()
             })

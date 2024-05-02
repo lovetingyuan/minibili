@@ -34,34 +34,34 @@ function LoadingComp() {
                 <View className="gap-2">
                   <Skeleton
                     animation="wave"
-                    width={(Math.floor(Math.random() * 81) + 10 + '%') as any}
+                    width={`${Math.floor(Math.random() * 81) + 10}%` as any}
                     height={15}
                   />
                   {Math.random() > 0.5 ? (
                     <Skeleton
                       animation="wave"
-                      width={(Math.floor(Math.random() * 81) + 10 + '%') as any}
+                      width={`${Math.floor(Math.random() * 81) + 10}%` as any}
                       height={15}
                     />
                   ) : null}
                   <Skeleton
-                    width={(Math.floor(Math.random() * 81) + 10 + '%') as any}
+                    width={`${Math.floor(Math.random() * 81) + 10}%` as any}
                     animation="wave"
                     height={15}
                   />
                 </View>
               ) : null}
               <View className="flex-row gap-3">
-                <Skeleton animation="pulse" width={'55%' as any} height={110} />
+                <Skeleton animation="pulse" width={'45%' as any} height={95} />
                 <View className="gap-3 justify-between flex-1">
                   <Skeleton
                     animation="wave"
-                    width={(Math.floor(Math.random() * 81) + 10 + '%') as any}
+                    width={`${Math.floor(Math.random() * 81) + 10}%` as any}
                     height={15}
                   />
                   <Skeleton
                     animation="wave"
-                    width={(Math.floor(Math.random() * 81) + 10 + '%') as any}
+                    width={`${Math.floor(Math.random() * 81) + 10}%` as any}
                     height={15}
                   />
                 </View>

@@ -119,7 +119,7 @@ export default function ForwardItem(props: {
       className="flex-1"
       onPress={() => {
         navigation.navigate('WebPage', {
-          title: item.name + '的动态',
+          title: `${item.name}的动态`,
           url: `https://m.bilibili.com/dynamic/${item.id}`,
         })
       }}>
@@ -177,7 +177,7 @@ export default function ForwardItem(props: {
               })
             } else {
               navigation.navigate('WebPage', {
-                title: payload.name + '的动态',
+                title: `${payload.name}的动态`,
                 url: `https://m.bilibili.com/dynamic/${payload.id}`,
               })
             }

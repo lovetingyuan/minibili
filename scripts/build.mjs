@@ -56,7 +56,7 @@ const pkgPath = require.resolve('../package.json')
 const pkg = require('../package.json')
 const version = pkg.version
 const semver = require('semver')
-const assert = require('assert')
+const assert = require('node:assert')
 
 const getBuildList = buildStr => {
   let buildListStr = buildStr.toString('utf8')

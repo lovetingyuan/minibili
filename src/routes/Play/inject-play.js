@@ -60,7 +60,7 @@ function __$hack() {
 
     video.addEventListener('ended', () => {
       const rateBtn = document.getElementById('play-rate-button')
-      rateBtn.dataset.rate = '1' + xx
+      rateBtn.dataset.rate = `1${xx}`
       rateBtn.textContent = 1 + xx
       video.playbackRate = 1
       if (document.exitFullscreen) {
@@ -153,7 +153,7 @@ function __$hack() {
     if (!document.getElementById('play-rate-button')) {
       const rateBtn = document.createElement('div')
       rateBtn.id = 'play-rate-button'
-      rateBtn.innerHTML = '1' + xx
+      rateBtn.innerHTML = `1${xx}`
       rateBtn.dataset.rate = '1'
       rateBtn.style.cssText = `
         width: 24px;
@@ -204,7 +204,7 @@ function __$hack() {
       video.readyState > 2
     )
 
-  element.addEventListener('touchstart', (event) => {
+  element.addEventListener('touchstart', event => {
     touchTimer = setTimeout(() => {
       const video = document.querySelector('video')
       if (video && isVideoPlaying(video)) {
@@ -223,7 +223,7 @@ function __$hack() {
     startY = touch.clientY
   })
 
-  element.addEventListener('touchmove', (event) => {
+  element.addEventListener('touchmove', event => {
     const touch = event.touches[0]
     distanceX = touch.clientX - startX
     distanceY = touch.clientY - startY
@@ -238,7 +238,7 @@ function __$hack() {
       const rateBtn = document.getElementById('play-rate-button')
       if (rateBtn) {
         rateBtn.dataset.rate = '1'
-        rateBtn.textContent = '1' + xx
+        rateBtn.textContent = `1${xx}`
       }
     }
     if (Math.abs(distanceX) > Math.abs(distanceY)) {

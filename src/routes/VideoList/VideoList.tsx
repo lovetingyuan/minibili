@@ -40,11 +40,11 @@ function VideoList(props: {
       if (
         needShow &&
         props.type === 'Hot' &&
-        ('_' + item.mid in $blackUps || item.tag in $blackTags)
+        (`_${item.mid}` in $blackUps || item.tag in $blackTags)
       ) {
         needShow = false
       }
-      if (needShow && props.type === 'Rank' && '_' + item.mid in $blackUps) {
+      if (needShow && props.type === 'Rank' && `_${item.mid}` in $blackUps) {
         needShow = false
       }
       if (needShow) {
@@ -74,7 +74,7 @@ function VideoList(props: {
           const { mid, name } = currentVideoRef.current!
           set$blackUps({
             ...$blackUps,
-            ['_' + mid]: name,
+            [`_${mid}`]: name,
           })
           reportUserAction(Action.add_black_user, { mid, name })
         },

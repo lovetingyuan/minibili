@@ -3,7 +3,7 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native'
-import { Avatar, Dialog, Icon, Text } from '@rneui/themed'
+import { Avatar, BottomSheet, Card, Icon, Text } from '@rneui/themed'
 import clsx from 'clsx'
 import { Image } from 'expo-image'
 import React from 'react'
@@ -37,7 +37,6 @@ export default React.memo(VideoInfo)
 function VideoInfo(props: {
   currentPage: number
   setCurrentPage: (p: number) => void
-  // setCurrentCid: (c: number) => void
 }) {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data, isLoading } = useVideoInfo(route.params.bvid)
@@ -53,23 +52,13 @@ function VideoInfo(props: {
     videoDesc = ''
   }
   const [showPagesModal, setShowPagesModal] = React.useState(false)
-  // const pages = Array.from({ length: 20 }).map(v => {
-  //   return {
-  //     ..._pages?.[0],
-  //     cid: Math.random(),
-  //   }
-  // })
+
   const navigation = useNavigation<NavigationProps['navigation']>()
   const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid!)
-  const {
-    // _collectedVideosMap,
-    set$collectedVideos,
-    get$collectedVideos,
-    $blackUps,
-  } = useStore()
+  const { set$collectedVideos, get$collectedVideos, $blackUps } = useStore()
   const _collectedVideosMap = useCollectedVideosMap()
   const isCollected = videoInfo.bvid && videoInfo.bvid in _collectedVideosMap
-  const isBlackUp = videoInfo.mid && '_' + videoInfo.mid in $blackUps
+  const isBlackUp = videoInfo.mid && `_${videoInfo.mid}` in $blackUps
   const collectVideo = () => {
     if (typeof videoInfo?.collectNum !== 'number') {
       return
@@ -162,13 +151,12 @@ function VideoInfo(props: {
             <Text className="text-sm">{parseDate(date, true)}</Text>
             <Text className="text-sm ml-1">
               {watchingCount
-                ? (watchingCount.total === '1' ? '壹' : watchingCount.total) +
-                  '人在看'
+                ? `${watchingCount.total === '1' ? '壹' : watchingCount.total}人在看`
                 : ' '}
             </Text>
           </View>
         </View>
-        <View className="flex-row w-full my-1 justify-start flex-wrap">
+        <View className="flex-row w-full my-1 justify-start flex-wrap opacity-80">
           <View className="flex-row items-center gap-1 pr-1 py-1">
             <Icon name="play-circle-outline" size={18} />
             <Text className="text-sm">{parseNumber(videoInfo?.playNum)}</Text>
@@ -230,61 +218,71 @@ function VideoInfo(props: {
         <View className="flex-row items-center mt-3">
           <TouchableOpacity
             activeOpacity={0.7}
+            className=" flex-1"
             onPress={() => {
               setShowPagesModal(true)
             }}>
             <Text
-              className="text-base flex-1 flex-wrap"
+              className="text-base flex-1 flex-wrap "
               numberOfLines={1}
               ellipsizeMode="tail">
               视频分集【{props.currentPage}/{videoInfo?.pages?.length}】：
               <Text
                 className={clsx(
                   colors.primary.text,
-                  'text-base align-middle flex-wrap',
+                  'text-base align-middle flex-wrap flex-1 border',
                 )}>
                 {pages[props.currentPage - 1].title}
               </Text>
             </Text>
           </TouchableOpacity>
-          <Dialog
-            isVisible={showPagesModal}
+          <BottomSheet
             onBackdropPress={() => {
               setShowPagesModal(false)
             }}
-            overlayStyle={tw(clsx(colors.gray2.bg, 'shrink-0'))}>
-            <Dialog.Title
-              title={`视频分集【${props.currentPage}/${pages.length}】`}
-              titleStyle={tw(colors.black.text)}
-            />
-            <View className="h-[50vh]">
-              <ScrollView className="flex-1">
-                {pages.map(item => {
-                  const selected = item.page === props.currentPage
-                  return (
-                    <TouchableOpacity
-                      key={item.cid}
-                      activeOpacity={0.8}
-                      onPress={() => {
-                        props.setCurrentPage(item.page)
-                        // props.setCurrentCid(item.cid)
-                        setShowPagesModal(false)
-                      }}
-                      className="py-2">
-                      <Text
-                        className={clsx(
-                          'text-base',
-                          selected && [colors.primary.text, 'font-bold'],
-                        )}>
-                        {item.page}. {item.title} (
-                        {parseDuration(item.duration)})
-                      </Text>
-                    </TouchableOpacity>
-                  )
-                })}
+            modalProps={{
+              onRequestClose: () => {
+                setShowPagesModal(false)
+              },
+            }}
+            isVisible={showPagesModal}>
+            <Card containerStyle={tw('m-0')}>
+              <Card.Title className="text-left text-lg">{`视频分集【${props.currentPage}/${pages.length}】`}</Card.Title>
+              <Card.Divider />
+              <ScrollView className="flex-1 max-h-[80vh]">
+                {pages
+                  .concat(pages)
+                  .concat(pages)
+                  .concat(pages)
+                  .concat(pages)
+                  .concat(pages)
+                  .concat(pages)
+                  .map(item => {
+                    const selected = item.page === props.currentPage
+                    return (
+                      <TouchableOpacity
+                        key={item.cid}
+                        activeOpacity={0.8}
+                        onPress={() => {
+                          props.setCurrentPage(item.page)
+                          // props.setCurrentCid(item.cid)
+                          setShowPagesModal(false)
+                        }}
+                        className="py-2">
+                        <Text
+                          className={clsx(
+                            'text-base',
+                            selected && [colors.primary.text, 'font-bold'],
+                          )}>
+                          {item.page}. {item.title} (
+                          {parseDuration(item.duration)})
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  })}
               </ScrollView>
-            </View>
-          </Dialog>
+            </Card>
+          </BottomSheet>
         </View>
       ) : null}
       {!isLoading && videoInfo?.interactive ? (

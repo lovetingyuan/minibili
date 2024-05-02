@@ -55,7 +55,7 @@ export type VideoInfo = ReturnType<typeof getVideoInfo>
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
 export function useVideoInfo(bvid: string) {
   const { data, error, isLoading } = useSWR<VideoInfoResponse>(
-    bvid ? '/x/web-interface/view?bvid=' + bvid : null,
+    bvid ? `/x/web-interface/view?bvid=${bvid}` : null,
     request,
   )
   return {

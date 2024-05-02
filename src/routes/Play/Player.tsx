@@ -123,8 +123,13 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   let videoWidth = 0
   let videoHeight = 0
   if (videoInfo?.width && videoInfo?.height) {
-    videoWidth = videoInfo.width
-    videoHeight = videoInfo.height
+    if (videoInfo.rotate) {
+      videoWidth = videoInfo.height
+      videoHeight = videoInfo.width
+    } else {
+      videoWidth = videoInfo.width
+      videoHeight = videoInfo.height
+    }
   }
   const isVerticalVideo = videoWidth < videoHeight
   let videoViewHeight = width * 0.6
@@ -215,7 +220,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       hasMuteButton: true,
     }).forEach(([k, v]) => {
       if (v !== undefined) {
-        search.append(k, v + '')
+        search.append(k, `${v}`)
       }
     })
     return `${PlayUrl}?${search}#${encodeURIComponent(videoUrl)}`

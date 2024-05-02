@@ -21,20 +21,20 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
   const atMap: Record<string, { mid: number; name: string }> = {}
   if (content.emote) {
     Object.keys(content.emote).forEach(emoji => {
-      const id = 'emoji' + Math.random().toString().substring(2)
-      emojiMap[id] = content.emote![emoji]
+      const id = `emoji${Math.random().toString().substring(2)}`
+      emojiMap[id] = content.emote?.[emoji]
       message = message.replaceAll(emoji, id)
       keys.push(id)
     })
   }
   if (content.at_name_to_mid) {
     Object.keys(content.at_name_to_mid).forEach(name => {
-      const id = '@' + Math.random().toString().substring(2)
+      const id = `@${Math.random().toString().substring(2)}`
       atMap[id] = {
-        mid: content.at_name_to_mid![name],
-        name: '@' + name,
+        mid: content.at_name_to_mid?.[name],
+        name: `@${name}`,
       }
-      message = message.replaceAll('@' + name, id)
+      message = message.replaceAll(`@${name}`, id)
       keys.push(id)
     })
   }
@@ -66,8 +66,8 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
           if (part.startsWith('{vote:') && part.endsWith('}')) {
             return {
               type: 'vote' as const,
-              text: content.vote!.title,
-              url: content.vote!.url,
+              text: content.vote?.title,
+              url: content.vote?.url,
             }
           }
           if (part.startsWith('emoji')) {
@@ -80,7 +80,7 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
             return {
               type: 'av' as const,
               text: content.jump_url[part].title,
-              url: 'https://b23.tv/' + part,
+              url: `https://b23.tv/${part}`,
             }
           }
         }

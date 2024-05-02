@@ -27,7 +27,7 @@ export function useVideoMp4Url(
       high_quality: highQuality ? 1 : 0,
     }
     Object.entries(query).forEach(([k, v]) => {
-      search.append(k, v + '')
+      search.append(k, `${v}`)
     })
   }
 
@@ -70,7 +70,7 @@ export function getDownloadUrl(bvid: string, cid: number) {
     try_look: 1,
   }
   Object.entries(query).forEach(([k, v]) => {
-    search.append(k, v + '')
+    search.append(k, `${v}`)
   })
   return request<Res>(`/x/player/wbi/playurl?${search}`).then(res => {
     return res.durl?.[0]?.url
@@ -92,7 +92,7 @@ export function useAudioUrl(bvid: string, cid?: number | string) {
       high_quality: 1,
     }
     Object.entries(query).forEach(([k, v]) => {
-      search.append(k, v + '')
+      search.append(k, `${v}`)
     })
   }
 

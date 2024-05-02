@@ -9,7 +9,7 @@ export const headerRight = () => (
     type="clear"
     size="sm"
     onPress={() => {
-      Linking.openURL(site + '?showchangelog=true')
+      Linking.openURL(`${site}?showchangelog=true`)
     }}>
     更新日志
   </Button>

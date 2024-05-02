@@ -124,8 +124,7 @@ function __$hack() {
     //https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=23716652
     const roomId = window.location.pathname.split('/').pop()
     fetch(
-      'https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=' +
-        roomId,
+      `https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=${roomId}`,
     )
       .then(res => res.json())
       .then(res => {
@@ -135,7 +134,7 @@ function __$hack() {
           const liveInfo = document.querySelector('.room-info')
           const liveTimeSpan = document.createElement('span')
           liveTimeSpan.textContent = `${liveTime.getHours()}:${
-            minute < 10 ? '0' + minute : minute
+            minute < 10 ? `0${minute}` : minute
           }开始`
           liveTimeSpan.style.cssText = `
             font-size: 12px;

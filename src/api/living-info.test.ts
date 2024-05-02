@@ -9,8 +9,7 @@ describe('living-info', () => {
       return `uids[]=${1458143131 + i}`
     })
     const res = await fetcher<any>(
-      'https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?' +
-        uids.join('&'),
+      `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids.join('&')}`,
     )
     expect('1458143131' in res).toBe(true)
     LiveInfoBatchItemSchema.parse(res['1458143131'])

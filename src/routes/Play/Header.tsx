@@ -25,7 +25,7 @@ export function PlayHeaderTitle() {
   const { $blackUps } = useStore()
   const _followedUpsMap = useFollowedUpsMap()
   const followed = route.params?.mid && route.params.mid in _followedUpsMap
-  const isBlackUp = route.params?.mid && '_' + route.params.mid in $blackUps
+  const isBlackUp = route.params?.mid && `_${route.params.mid}` in $blackUps
   return (
     <View className="flex-row items-center relative left-[-10px]">
       <Text
@@ -79,7 +79,7 @@ function AiConclusionModal(props: {
         <Text className="mt-3">抱歉，出错了</Text>
       ) : (
         <Text className="leading-6 mt-3">
-          {summary ? '    ' + summary : '暂无总结'}
+          {summary ? `    ${summary}` : '暂无总结'}
         </Text>
       )}
       <Dialog.Actions>
@@ -155,7 +155,7 @@ function SongInfoModal(props: {
           placeholder="创作年份"
           // className="mt-5 h-20"
           maxLength={10}
-          value={year + ''}
+          value={`${year}`}
           placeholderTextColor={tw(colors.gray4.text).color}
           onChangeText={value => {
             setYear(value)
@@ -238,7 +238,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             hideMenu()
-            Linking.openURL('https://www.bilibili.com/video/' + videoInfo.bvid)
+            Linking.openURL(`https://www.bilibili.com/video/${videoInfo.bvid}`)
           }}>
           浏览器打开
         </MenuItem>
@@ -247,7 +247,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             Clipboard.setStringAsync(
-              'https://www.bilibili.com/video/' + videoInfo.bvid,
+              `https://www.bilibili.com/video/${videoInfo.bvid}`,
             ).then(() => {
               showToast('已复制视频链接')
               hideMenu()
@@ -273,7 +273,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
               showToast('请稍候再试')
               return
             }
-            const id = videoInfo.bvid + '_' + props.cid
+            const id = `${videoInfo.bvid}_${props.cid}`
             if (id in musicSongsMap) {
               showToast('当前视频已经在歌单当中')
               return

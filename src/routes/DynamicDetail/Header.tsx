@@ -25,7 +25,7 @@ function HeaderRight() {
       size={20}
       onPress={() => {
         navigation.navigate('WebPage', {
-          title: name + '的动态',
+          title: `${name}的动态`,
           url: `https://m.bilibili.com/dynamic/${id}`,
         })
       }}

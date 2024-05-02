@@ -68,7 +68,7 @@ function HeaderRight(props: { reload: () => void }) {
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             Clipboard.setStringAsync(url).then(() => {
-              showToast('已复制链接：' + url)
+              showToast(`已复制链接：${url}`)
               hideMenu()
             })
           }}>

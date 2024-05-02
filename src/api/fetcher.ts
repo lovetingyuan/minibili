@@ -36,7 +36,7 @@ if (typeof __DEV__ === 'undefined') {
 export default async function request<D>(url: string): Promise<D> {
   let requestUrl = url.startsWith('http')
     ? url
-    : 'https://api.bilibili.com' + url
+    : `https://api.bilibili.com${url}`
 
   // __DEV__ && console.log('request url: ', url.slice(0, 150))
   const headers = {
@@ -66,7 +66,7 @@ export default async function request<D>(url: string): Promise<D> {
     url.includes('/x/v2/search/trending/ranking')
   ) {
     // @ts-ignore
-    delete headers.cookie
+    headers.cookie = undefined
     // @ts-ignore
     options.credentials = 'omit'
   }
@@ -81,7 +81,7 @@ export default async function request<D>(url: string): Promise<D> {
       queryParams[key] = value
     }
     const query = encWbi(queryParams, wbiImg?.img_url, wbiImg?.sub_url)
-    requestUrl = _url + '?' + query
+    requestUrl = `${_url}?${query}`
   }
   // if (url.includes('/dm/web/seg.so')) {
   //   const arrayBuffer = await fetch(requestUrl, options).then(r =>
@@ -106,7 +106,7 @@ export default async function request<D>(url: string): Promise<D> {
   }
   let res = {
     code: -1,
-    message: '解析json失败:' + resText,
+    message: `解析json失败:${resText}`,
     data: resText,
   } as ResponseType<D>
   try {
@@ -125,7 +125,7 @@ export default async function request<D>(url: string): Promise<D> {
     // reportApiError(url, res)
 
     return Promise.reject(
-      new ApiError(res.code + ':' + res.message + ' ' + url, url, res),
+      new ApiError(`${res.code}:${res.message} ${url}`, url, res),
     )
   }
   return res.data

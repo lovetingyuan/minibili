@@ -25,7 +25,7 @@ export const useLivingInfo = (mid?: string | number) => {
     const { live_status, room_id } = data?.[mid] || {}
     return {
       livingUrl:
-        live_status === 1 ? 'https://live.bilibili.com/h5/' + room_id : '',
+        live_status === 1 ? `https://live.bilibili.com/h5/${room_id}` : '',
     }
   }
   return {

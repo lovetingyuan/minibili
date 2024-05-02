@@ -30,7 +30,7 @@ export default function CommonItem(props: { item: DynamicItemType<ItemType> }) {
       activeOpacity={0.8}
       onPress={() => {
         navigation.navigate('WebPage', {
-          title: item.name + '的动态',
+          title: `${item.name}的动态`,
           url: `https://m.bilibili.com/dynamic/${item.id}`,
         })
       }}>

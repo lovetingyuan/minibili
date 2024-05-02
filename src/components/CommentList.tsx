@@ -24,7 +24,7 @@ function Loading() {
               ) : null}
               <Skeleton
                 animation="wave"
-                width={(Math.random() * 100 + '%') as any}
+                width={`${Math.random() * 100}%` as any}
                 height={16}
               />
             </View>
@@ -54,7 +54,7 @@ export default function CommentList(
     <View className="flex-1">
       <FlashList
         data={comments}
-        keyExtractor={v => v.id + '@' + v.root}
+        keyExtractor={v => `${v.id}@${v.root}`}
         renderItem={({ item }: { item: CommentItemType }) => {
           return <Comment comment={item} />
         }}
@@ -73,7 +73,7 @@ export default function CommentList(
                 />
                 <Text className={`text-xs mr-3 px-1 ${colors.gray6.text}`}>
                   {allCount
-                    ? allCount + '条评论'
+                    ? `${allCount}条评论`
                     : isLoading
                       ? '加载中'
                       : '暂无评论'}

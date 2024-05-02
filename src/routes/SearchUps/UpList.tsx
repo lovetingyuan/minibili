@@ -18,7 +18,7 @@ function SearchUpItem(props: { up: SearchedUpType }) {
   const _followedUpsMap = useFollowedUpsMap()
 
   const isFollowed = props.up.mid in _followedUpsMap
-  const isBlackUp = '_' + props.up.mid in $blackUps
+  const isBlackUp = `_${props.up.mid}` in $blackUps
   return (
     <View className="flex-1 flex-row items-center justify-between px-4 mb-5">
       <TouchableOpacity
@@ -131,7 +131,7 @@ function UpList(props: { keyword: string }) {
     <FlashList
       data={searchedUps}
       ref={listRef}
-      keyExtractor={v => v.mid + ''}
+      keyExtractor={v => `${v.mid}`}
       renderItem={({ item }: { item: SearchedUpType }) => {
         return <SearchUpItem up={item} />
       }}

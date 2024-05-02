@@ -36,8 +36,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
         {watchedInfo ? (
           <View
             className={`absolute bottom-0 left-0 h-[6px] ${colors.secondary.bg}`}
-            // @ts-expect-error in fact, react native supports use % as width unit
-            style={{ width: watchedInfo.watchProgress + '%' }}
+            style={{ width: `${watchedInfo.watchProgress}%` }}
           />
         ) : null}
         <View className="absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">

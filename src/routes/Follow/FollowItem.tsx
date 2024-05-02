@@ -50,7 +50,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       setCheckLiveTimeStamp(Date.now())
       navigation.navigate('WebPage', {
         url: liveUrl,
-        title: name + '的直播间',
+        title: `${name}的直播间`,
       })
     }
   })

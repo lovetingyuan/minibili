@@ -79,7 +79,7 @@ function MusicItem(props: {
         text: '网络搜索',
         onPress: () => {
           Linking.openURL(
-            `https://www.baidu.com/s?wd=${encodeURIComponent(song.name + (song.singer ? ' ' + song.singer : ''))}`,
+            `https://www.baidu.com/s?wd=${encodeURIComponent(song.name + (song.singer ? ` ${song.singer}` : ''))}`,
           )
         },
       },
@@ -145,7 +145,7 @@ function MusicItem(props: {
             {parseTime(song.duration * 1000)}
           </Text>
           <Text className={colors.gray5.text}>
-            {song.year ? song.year + '年' : ''}
+            {song.year ? `${song.year}年` : ''}
           </Text>
         </View>
       </View>
@@ -207,7 +207,7 @@ function MusicList() {
     <View className="flex-1 relative">
       <FlashList
         data={songsList}
-        keyExtractor={v => v.bvid + '_' + v.cid}
+        keyExtractor={v => `${v.bvid}_${v.cid}`}
         renderItem={({ item }) => {
           return <MusicItem song={item} />
         }}

@@ -40,7 +40,7 @@ function Feedback() {
           text: '分享',
           onPress: () => {
             Share.share({
-              message: 'MiniBili - 简单的B站浏览\n点击下载：' + site,
+              message: `MiniBili - 简单的B站浏览\n点击下载：${site}`,
             })
           },
         },

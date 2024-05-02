@@ -44,7 +44,7 @@ export const useMusicSongsMap = () => {
     const map: Record<string, MusicSong> = {}
     $musicList.forEach(music => {
       music.songs.forEach(song => {
-        map[song.bvid + '_' + song.cid] = song
+        map[`${song.bvid}_${song.cid}`] = song
       })
     })
     return map

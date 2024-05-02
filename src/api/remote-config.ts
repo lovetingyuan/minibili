@@ -8,7 +8,7 @@ import type { ConfigSchema } from './remote-config.schema'
 type RemoteConfig = z.infer<typeof ConfigSchema>
 
 export function getRemoteConfig() {
-  return fetch(configUrl + '?_t=' + Date.now())
+  return fetch(`${configUrl}?_t=${Date.now()}`)
     .then(r => r.json())
     .then((res: RemoteConfig) => {
       return res

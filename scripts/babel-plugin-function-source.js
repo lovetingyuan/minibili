@@ -1,8 +1,8 @@
 const { default: generate } = require('@babel/generator')
-const fs = require('fs')
-const nodePath = require('path')
+const fs = require('node:fs')
+const nodePath = require('node:path')
 
-module.exports = function (babel) {
+module.exports = babel => {
   const { types: t } = babel
 
   return {
@@ -37,7 +37,7 @@ module.exports = function (babel) {
           } else {
             absolutePath = nodePath.resolve(
               __dirname,
-              '../node_modules/' + filePath,
+              `../node_modules/${filePath}`,
             )
           }
           const fileContent = fs.readFileSync(absolutePath, 'utf8')

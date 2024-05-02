@@ -11,13 +11,13 @@ function VideoLoading() {
       <View className="gap-2">
         <Skeleton
           animation="wave"
-          width={(getWidth() + '%') as any}
+          width={`${getWidth()}%` as any}
           height={15}
         />
         {Math.random() > 0.5 ? (
           <Skeleton
             animation="wave"
-            width={(getWidth() + '%') as any}
+            width={`${getWidth()}%` as any}
             height={15}
           />
         ) : (

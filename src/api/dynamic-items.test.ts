@@ -14,12 +14,12 @@ test('dynamic-list', async () => {
     const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}&timezone_offset=-480`
     const res = await fetcher<any>(url).catch(() => null)
     if (!res) {
-      list352.push('null-' + mid)
+      list352.push(`null-${mid}`)
     } else {
       const result = DynamicListResponseSchema.safeParse(res)
       if (result.success === false) {
-        failedList.push('zod-' + mid)
-        console.log(mid + ' zod error')
+        failedList.push(`zod-${mid}`)
+        console.log(`${mid} zod error`)
         console.error(result.error)
         fs.writeFileSync(`dynamic-list-${mid}.json`, JSON.stringify(res))
       }
@@ -28,12 +28,12 @@ test('dynamic-list', async () => {
           `/x/polymer/web-dynamic/v1/feed/space?offset=${res.offset}&host_mid=${mid}&timezone_offset=-480`,
         ).catch(() => null)
         if (!res2) {
-          list352.push('null2-' + mid)
+          list352.push(`null2-${mid}`)
         } else {
           const ret = DynamicListResponseSchema.safeParse(res2)
           if (ret.success === false) {
-            failedList.push('zod2-' + mid)
-            console.log(mid + ' zod2 error')
+            failedList.push(`zod2-${mid}`)
+            console.log(`${mid} zod2 error`)
             console.error(ret.error)
           }
         }
@@ -41,7 +41,7 @@ test('dynamic-list', async () => {
     }
   }
   failedList.length && console.log('Failed mid list:', failedList)
-  list352.length && console.log('352 list: ' + list352.length, list352)
+  list352.length && console.log(`352 list: ${list352.length}`, list352)
   if (failedList.length) {
     throw new Error('dynamic list failed')
   }

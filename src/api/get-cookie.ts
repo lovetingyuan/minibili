@@ -4,25 +4,15 @@
 import { UA } from '../constants'
 
 function getuuid(time: number) {
-  const randString8 = randomString(8),
-    randString4_1 = randomString(4),
-    randString4_2 = randomString(4),
-    randString4_3 = randomString(4),
-    randString12 = randomString(12),
-    truncatedTime = time
+  const randString8 = randomString(8)
+  const randString4_1 = randomString(4)
+  const randString4_2 = randomString(4)
+  const randString4_3 = randomString(4)
+  const randString12 = randomString(12)
+  const truncatedTime = time
 
   return (
-    randString8 +
-    '-' +
-    randString4_1 +
-    '-' +
-    randString4_2 +
-    '-' +
-    randString4_3 +
-    '-' +
-    randString12 +
-    padLeft((truncatedTime % 1e5).toString(), 5) +
-    'infoc'
+    `${randString8}-${randString4_1}-${randString4_2}-${randString4_3}-${randString12}${padLeft((truncatedTime % 1e5).toString(), 5)}infoc`
   )
 }
 
@@ -49,7 +39,7 @@ function toHex(num: number) {
 }
 
 function getbuvid3(mid = 5201314) {
-  return fetch('https://space.bilibili.com/' + mid + '/dynamic', {
+  return fetch(`https://space.bilibili.com/${mid}/dynamic`, {
     headers: {
       accept:
         'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -98,7 +88,7 @@ function getPayload(now: number, uuid: string) {
   return {
     3064: 1,
     5062: now.toString(),
-    '03bf': 'https%3A%2F%2Fspace.bilibili.com%2F' + 5201314 + '%2Fdynamic',
+    '03bf': `https%3A%2F%2Fspace.bilibili.com%2F${5201314}%2Fdynamic`,
     '39c8': '333.999.fp.risk',
     '34f1': '',
     d402: '',

@@ -6,7 +6,7 @@ import useMounted from '@/hooks/useMounted'
 export const currentVersion = Application.nativeApplicationVersion!
 
 export const checkUpdate = () => {
-  return fetch('https://unpkg.com/minibili/package.json?_t=' + Date.now())
+  return fetch(`https://unpkg.com/minibili/package.json?_t=${Date.now()}`)
     .then(r => r.json())
     .then(
       (res: {

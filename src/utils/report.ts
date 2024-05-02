@@ -62,9 +62,9 @@ export function reportUserAction(action: Action, actionPayload: any = null) {
 export function reportUnknownDynamicItem(item: any) {
   let type = item.type
   if (type === HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD) {
-    type = 'FORWARD:' + item.orig?.type
+    type = `FORWARD:${item.orig?.type}`
   }
-  SentryExpo.captureMessage('unknown dynamic item:' + type, {
+  SentryExpo.captureMessage(`unknown dynamic item:${type}`, {
     extra: {
       dynamicItem: JSON.stringify(item, null, 2),
     },
@@ -73,7 +73,7 @@ export function reportUnknownDynamicItem(item: any) {
 
 export function reportUnknownRichTextItem(item: any) {
   const type = item.type
-  SentryExpo.captureMessage('unknown rich text item:' + type, {
+  SentryExpo.captureMessage(`unknown rich text item:${type}`, {
     extra: {
       dynamicItem: JSON.stringify(item, null, 2),
     },
@@ -82,10 +82,7 @@ export function reportUnknownRichTextItem(item: any) {
 
 export function reportUnknownAdditional(item: any) {
   SentryExpo.captureMessage(
-    'item additional:' +
-      item.type +
-      '@' +
-      item.modules.module_dynamic.additional.type,
+    `item additional:${item.type}@${item.modules.module_dynamic.additional.type}`,
     {
       extra: {
         dynamicItem: JSON.stringify(item, null, 2),

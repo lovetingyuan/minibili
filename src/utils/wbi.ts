@@ -30,9 +30,9 @@ export default function encWbi(
       sub_url.lastIndexOf('.'),
     ),
   }
-  const mixin_key = getMixinKey(img_key + sub_key),
-    curr_time = Math.round(Date.now() / 1000),
-    chr_filter = /[!'()*]/g
+  const mixin_key = getMixinKey(img_key + sub_key)
+  const curr_time = Math.round(Date.now() / 1000)
+  const chr_filter = /[!'()*]/g
 
   Object.assign(params, { wts: curr_time }) // 添加 wts 字段
   // 按照 key 重排参数
@@ -47,5 +47,5 @@ export default function encWbi(
 
   const wbi_sign = md5.hash(query + mixin_key) // 计算 w_rid
 
-  return query + '&w_rid=' + wbi_sign
+  return `${query}&w_rid=${wbi_sign}`
 }

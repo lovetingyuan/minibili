@@ -96,7 +96,7 @@ export default function VideoItem(props: {
       <RichTexts idStr={props.item.id} nodes={nodes} topic={props.item.topic} />
 
       <View className="flex-1 flex-row">
-        <View className="w-[52%] mr-3 justify-center content-center">
+        <View className="w-[45%] mr-3 justify-center content-center">
           <Image
             className="w-full rounded aspect-[8/5] h-auto"
             source={{ uri: parseImgUrl(cover, 480, 300) }}
@@ -109,17 +109,16 @@ export default function VideoItem(props: {
           {watchedInfo ? (
             <View
               className={`absolute bottom-0 left-0 h-[6px] ${colors.secondary.bg}`}
-              // @ts-expect-error in fact, react native supports use % as width unit
-              style={{ width: watchedInfo.watchProgress + '%' }}
+              style={{ width: `${watchedInfo.watchProgress}%` }}
             />
           ) : null}
           <View
             className={`absolute px-1 py-[1px] bg-gray-900/70 ${watchedInfo ? 'bottom-1' : 'bottom-0'} left-0 rounded-sm m-1`}>
             <Text className="text-xs font-thin text-white">{duration}</Text>
           </View>
-          <View className="absolute px-1 py-[1px] top-0 rounded-sm m-1 bg-gray-900/70">
+          {/* <View className="absolute px-1 py-[1px] top-0 rounded-sm m-1 bg-gray-900/70">
             <Text className="text-xs font-thin text-white">{date}</Text>
-          </View>
+          </View> */}
           <View
             className={`absolute px-1 py-[1px] ${watchedInfo ? 'bottom-1' : 'bottom-0'} right-0 m-1 rounded-sm bg-gray-900/70`}>
             <Text className="text-xs font-thin text-white">{danmu}弹</Text>
@@ -129,7 +128,7 @@ export default function VideoItem(props: {
           <Text className="flex-1 text-base mb-3" numberOfLines={3}>
             {title}
           </Text>
-          <View className="flex-row shrink-0 min-w-20 items-center gap-x-3 flex-wrap">
+          <View className="flex-row shrink-0 min-w-20 items-center gap-x-3 gap-y-1 flex-wrap">
             {play === undefined ? null : (
               <View className="flex-row items-center gap-1">
                 <Icon name="play-circle-outline" size={15} color={gray} />
@@ -139,6 +138,10 @@ export default function VideoItem(props: {
             <View className="flex-row gap-1 items-center">
               <Icon name="thumb-up-off-alt" size={15} color={gray} />
               <Text style={textStyle}>{parseNumber(likeCount)}</Text>
+            </View>
+            <View className="flex-row gap-1 items-center">
+              <Icon name="date-range" size={15} color={gray} />
+              <Text style={textStyle}>{date}</Text>
             </View>
           </View>
         </View>

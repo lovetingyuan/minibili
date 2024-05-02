@@ -46,7 +46,7 @@ function RichTexts(props: {
         onPress={() => {
           if (props.topic?.jump_url) {
             navigation.navigate('WebPage', {
-              title: '话题：' + props.topic?.name,
+              title: `话题：${props.topic?.name}`,
               url: parseUrl(props.topic?.jump_url),
             })
           }
@@ -79,7 +79,7 @@ function RichTexts(props: {
           key={key++}
           className={colors.primary.text}
           style={{ fontSize }}>
-          {'🔗' + node.text + ' '}
+          {`🔗${node.text} `}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AT) {
@@ -142,7 +142,7 @@ function RichTexts(props: {
           key={key++}
           className={colors.primary.text}
           style={{ fontSize }}>
-          {'📺 ' + node.text}
+          {`📺 ${node.text}`}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_GOODS) {
@@ -155,7 +155,7 @@ function RichTexts(props: {
           key={key++}
           className={colors.primary.text}
           style={{ fontSize }}>
-          {'🛒 ' + node.text}
+          {`🛒 ${node.text}`}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_MAIL) {
@@ -167,7 +167,7 @@ function RichTexts(props: {
           key={key++}
           className={colors.primary.text}
           style={{ fontSize }}>
-          {'📧 ' + node.text}
+          {`📧 ${node.text}`}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_VOTE) {
@@ -181,7 +181,7 @@ function RichTexts(props: {
           key={key++}
           className={colors.primary.text}
           style={{ fontSize }}>
-          {'🗳️ ' + node.text}
+          {`🗳️ ${node.text}`}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_LOTTERY) {
@@ -195,7 +195,7 @@ function RichTexts(props: {
               `https://t.bilibili.com/lottery/h5/index/#/result?business_type=1&business_id=${props.idStr}&isWeb=1`,
             )
           }}>
-          {'🎁 ' + node.text}
+          {`🎁 ${node.text}`}
         </Text>,
       )
     } else if (
@@ -210,7 +210,7 @@ function RichTexts(props: {
           key={key++}
           className={colors.primary.text}
           style={{ fontSize }}>
-          {'📹 ' + node.text}
+          {`📹 ${node.text}`}
         </Text>,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_CV) {
@@ -223,7 +223,7 @@ function RichTexts(props: {
           key={key++}
           className={colors.primary.text}
           style={{ fontSize }}>
-          {'📝 ' + node.text}
+          {`📝 ${node.text}`}
         </Text>,
       )
     } else if (
@@ -239,7 +239,7 @@ function RichTexts(props: {
           key={key++}
           className={colors.primary.text}
           style={{ fontSize }}>
-          {'📝 ' + node.text}
+          {`📝 ${node.text}`}
         </Text>,
       )
     } else {

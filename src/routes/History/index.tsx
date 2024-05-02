@@ -66,7 +66,7 @@ function HistoryList() {
   return (
     <FlashList
       data={list}
-      keyExtractor={v => v.bvid + ''}
+      keyExtractor={v => `${v.bvid}`}
       renderItem={({ item }: { item: HistoryVideoInfo }) => {
         return <VideoListItem video={item} buttons={buttons} />
       }}

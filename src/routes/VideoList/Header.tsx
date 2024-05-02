@@ -192,7 +192,7 @@ function HeaderRightComp() {
           onPress={() => {
             navigation.navigate('Follow')
           }}>
-          {' 关注 ' + (_updatedCount ? '  ' : '')}
+          {` 关注 ${_updatedCount ? '  ' : ''}`}
         </Button>
       </View>
     </View>

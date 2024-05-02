@@ -106,9 +106,7 @@ export function Additional(props: { additional?: AdditionalType | null }) {
   } else if (
     additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_VOTE
   ) {
-    url =
-      'https://t.bilibili.com/vote/h5/index/#/result?vote_id=' +
-      additional.vote.vote_id
+    url = `https://t.bilibili.com/vote/h5/index/#/result?vote_id=${additional.vote.vote_id}`
     additionalContent = (
       <View className="flex-1">
         <Text>投票：{additional.vote.desc}</Text>
@@ -129,7 +127,7 @@ export function Additional(props: { additional?: AdditionalType | null }) {
         <Text>赛事：{additional.match.head_text}</Text>
         <Text>
           {title} {left_team.name} VS {right_team.name}{' '}
-          {center_bottom + '-' + center_top.join('')}
+          {`${center_bottom}-${center_top.join('')}`}
         </Text>
       </View>
     )

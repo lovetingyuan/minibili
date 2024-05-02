@@ -10,9 +10,9 @@ export const parseNumber = (num?: number | null) => {
     return ''
   }
   if (num < 10000) {
-    return num + ''
+    return `${num}`
   }
-  return (num / 10000).toFixed(1) + '万'
+  return `${(num / 10000).toFixed(1)}万`
 }
 
 export const parseDate = (time?: number | string, more?: boolean) => {
@@ -37,11 +37,11 @@ export const parseDate = (time?: number | string, more?: boolean) => {
   }
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
   const day = date.getDate().toString().padStart(2, '0')
-  const ret = `${year ? year + '-' : ''}${month}-${day}`
+  const ret = `${year ? `${year}-` : ''}${month}-${day}`
   if (more) {
     const hour = date.getHours().toString().padStart(2, '0')
     const minute = date.getMinutes().toString().padStart(2, '0')
-    return ret + ` ${hour}:${minute}`
+    return `${ret} ${hour}:${minute}`
   }
   return ret
 }
@@ -57,15 +57,12 @@ export const parseDuration = (seconds?: number | string) => {
   const minute = Math.floor((seconds - hour * 3600) / 60)
   const second = seconds - hour * 3600 - minute * 60
 
-  const hourString = hour < 10 ? '0' + hour : hour
-  const minuteString = minute < 10 ? '0' + minute : minute
-  const secondString = second < 10 ? '0' + second : second
-  return (
-    (hourString === '00' ? '' : hourString + ':') +
-    minuteString +
-    ':' +
-    secondString
-  )
+  const hourString = hour < 10 ? `0${hour}` : hour
+  const minuteString = minute < 10 ? `0${minute}` : minute
+  const secondString = second < 10 ? `0${second}` : second
+  return `${
+    (hourString === '00' ? '' : `${hourString}:`) + minuteString
+  }:${secondString}`
 }
 
 export function parseTime(milliseconds: number) {
@@ -98,7 +95,7 @@ export function parseDurationStr(duration: string) {
     .split(':')
     .map(t => {
       if (t.length === 1) {
-        return '0' + t
+        return `0${t}`
       }
       return t
     })
@@ -111,13 +108,13 @@ export async function handleShareVideo(
   bvid: string | number,
 ) {
   try {
-    const message = title.length < 40 ? title : title.substring(0, 40) + '……'
+    const message = title.length < 40 ? title : `${title.substring(0, 40)}……`
     await Share.share({
       // title: 'MiniBili - ' + video.owner.name,
       message: [
-        'MiniBili - ' + name,
+        `MiniBili - ${name}`,
         message,
-        /^\d+$/.test(bvid + '')
+        /^\d+$/.test(`${bvid}`)
           ? `https://m.bilibili.com/dynamic/${bvid}`
           : `https://b23.tv/${bvid}`,
       ].join('\n'),
@@ -133,11 +130,11 @@ export async function handleShareUp(
   sign: string,
 ) {
   try {
-    const message = sign.length < 40 ? sign : sign.substring(0, 40) + '……'
+    const message = sign.length < 40 ? sign : `${sign.substring(0, 40)}……`
     await Share.share({
       // title: 'MiniBili - ' + video.owner.name,
       message: [
-        'MiniBili - ' + name,
+        `MiniBili - ${name}`,
         message,
         `https://m.bilibili.com/space/${mid}`,
       ].join('\n'),
@@ -148,7 +145,7 @@ export async function handleShareUp(
 }
 
 export const parseUrl = (url: string) => {
-  const u = url.startsWith('//') ? 'https:' + url : url
+  const u = url.startsWith('//') ? `https:${url}` : url
   return u.replace('http://', 'https://')
 }
 
@@ -195,11 +192,11 @@ export async function showFatalError(error: any) {
 
   Alert.alert(
     '抱歉，应用发生了错误😅',
-    '我们会处理这个错误\n' +
-      (error?.message || error) +
-      (updateInfo?.hasUpdate
+    `我们会处理这个错误\n${error?.message || error}${
+      updateInfo?.hasUpdate
         ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
-        : ''),
+        : ''
+    }`,
     [
       updateInfo?.hasUpdate
         ? {

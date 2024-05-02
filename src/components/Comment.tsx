@@ -93,9 +93,9 @@ function CommentText(props: {
               style={textStyle}
               className={`${colors.primary.text}`}
               onPress={() => {
-                Linking.openURL(node.url)
+                node.url && Linking.openURL(node.url)
               }}>
-              {'🗳️ ' + node.text}
+              {`🗳️ ${node.text}`}
             </Text>
           )
         }
@@ -116,7 +116,7 @@ function CommentText(props: {
                   Linking.openURL(node.url)
                 }
               }}>
-              {'📺 ' + node.text}
+              {`📺 ${node.text}`}
             </Text>
           )
         }
@@ -183,7 +183,7 @@ export function CommentItem(props: {
         <CommentText
           textStyle={tw(clsx(fontSize, comment.upLike && 'font-bold'))}
           nodes={comment.message}
-          idStr={comment.id + '_'}
+          idStr={`${comment.id}_`}
         />
       ) : null}
       {'time' in comment && comment.time ? (
@@ -195,7 +195,7 @@ export function CommentItem(props: {
       {comment.like ? (
         <Text
           className={`text-xs ${colors.secondary.text} ${comment.upLike ? 'font-bold' : ''}`}>
-          {' ' + comment.like + (comment.upLike ? '+UP👍' : '')}
+          {` ${comment.like}${comment.upLike ? '+UP👍' : ''}`}
         </Text>
       ) : null}
       {'images' in comment && comment.images?.length ? (
@@ -253,7 +253,7 @@ function CommentBlock(props: {
               }}
               buttonStyle={tw('justify-start p-[1px]')}>
               <Text className={colors.primary.text}>
-                {comment.moreText + '...'}
+                {`${comment.moreText}...`}
               </Text>
             </Button>
           ) : null}

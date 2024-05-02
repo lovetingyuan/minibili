@@ -29,7 +29,7 @@ const useCheckLivingUps = (time?: number) => {
       // https://live.bilibili.com/h5/24446464
       const { live_status, room_id } = data[mid]
       if (live_status === 1) {
-        livingMap[mid] = 'https://live.bilibili.com/h5/' + room_id
+        livingMap[mid] = `https://live.bilibili.com/h5/${room_id}`
       }
     })
     let notVibrate = true
