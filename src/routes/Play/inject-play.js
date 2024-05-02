@@ -76,8 +76,8 @@ function __$hack() {
     let watchedTime = 0
     let lastTime = 0 // Last time update position
 
-    video.addEventListener('timeupdate', function () {
-      let currentTime = video.currentTime
+    video.addEventListener('timeupdate', () => {
+      const currentTime = video.currentTime
       // Add the time difference if it's a regular playback or a small skip (less than 2 seconds)
       if (currentTime - lastTime < 2 && currentTime > lastTime) {
         watchedTime += currentTime - lastTime
@@ -85,19 +85,19 @@ function __$hack() {
       lastTime = currentTime
     })
 
-    video.addEventListener('seeking', function () {
+    video.addEventListener('seeking', () => {
       // Update lastTime to current time when user seeks
       lastTime = video.currentTime
     })
 
-    video.addEventListener('ended', function () {
+    video.addEventListener('ended', () => {
       window.reportPlayTime()
     })
     window.reportPlayTime = () => {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
           action: 'reportPlayTime',
-          payload: parseFloat(
+          payload: Number.parseFloat(
             ((watchedTime * 100) / video.duration).toFixed(1),
           ),
         }),
@@ -204,8 +204,8 @@ function __$hack() {
       video.readyState > 2
     )
 
-  element.addEventListener('touchstart', function (event) {
-    touchTimer = setTimeout(function () {
+  element.addEventListener('touchstart', (event) => {
+    touchTimer = setTimeout(() => {
       const video = document.querySelector('video')
       if (video && isVideoPlaying(video)) {
         video.playbackRate = 3
@@ -223,13 +223,13 @@ function __$hack() {
     startY = touch.clientY
   })
 
-  element.addEventListener('touchmove', function (event) {
+  element.addEventListener('touchmove', (event) => {
     const touch = event.touches[0]
     distanceX = touch.clientX - startX
     distanceY = touch.clientY - startY
   })
 
-  element.addEventListener('touchend', function () {
+  element.addEventListener('touchend', () => {
     clearTimeout(touchTimer)
     const video = document.querySelector('video')
     if (video && video.dataset.longPress === 'true') {

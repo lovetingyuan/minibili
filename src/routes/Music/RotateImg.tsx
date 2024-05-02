@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { Animated, Easing, ImageProps, View } from 'react-native'
+import { Animated, Easing, type ImageProps, View } from 'react-native'
 
 const RotateImage = (props: ImageProps) => {
   const rotation = useRef(new Animated.Value(0))

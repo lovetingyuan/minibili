@@ -20,7 +20,7 @@
 
 import useSWR from 'swr'
 
-import { WatchingCountResponseType } from './watching-count.schema'
+import type { WatchingCountResponseType } from './watching-count.schema'
 
 export function useWatchingCount(bvid: string, cid: string | number) {
   const { data } = useSWR<WatchingCountResponseType>(

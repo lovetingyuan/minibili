@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 
-import { NavigationProps } from '@/types'
+import type { NavigationProps } from '@/types'
 
 import TextAction from './TextAction'
 

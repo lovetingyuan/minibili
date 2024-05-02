@@ -1,8 +1,8 @@
 import useSWR from 'swr'
-import { z } from 'zod'
+import type { z } from 'zod'
 
 import request from './fetcher'
-import { DashUrlResponseSchema, PlayUrlResponseSchema } from './play-url.schema'
+import type { DashUrlResponseSchema, PlayUrlResponseSchema } from './play-url.schema'
 
 type Res = z.infer<typeof PlayUrlResponseSchema>
 

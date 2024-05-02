@@ -2,7 +2,7 @@ import { Icon, Slider, Text } from '@rneui/themed'
 import clsx from 'clsx'
 import {
   Audio,
-  AVPlaybackStatus,
+  type AVPlaybackStatus,
   // InterruptionModeAndroid,
   // InterruptionModeIOS,
 } from 'expo-av'

@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 
-import { AiConclusionResType } from './ai-conclusion.schema'
+import type { AiConclusionResType } from './ai-conclusion.schema'
 
 export function useAiConclusion(
   bvid: string,

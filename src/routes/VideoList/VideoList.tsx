@@ -8,7 +8,7 @@ import type { VideoItem as VideoItemType } from '@/api/hot-videos'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { useMarkVideoWatched } from '@/store/actions'
-import { NavigationProps } from '@/types'
+import type { NavigationProps } from '@/types'
 import { handleShareVideo, parseNumber, parseUrl } from '@/utils'
 import { Action, reportUserAction } from '@/utils/report'
 

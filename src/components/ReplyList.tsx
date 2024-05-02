@@ -4,7 +4,7 @@ import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import { ActivityIndicator, View } from 'react-native'
 
-import { ReplyItemType, useReplies } from '@/api/replies'
+import { type ReplyItemType, useReplies } from '@/api/replies'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 

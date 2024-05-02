@@ -29,7 +29,7 @@ import {
 import { reportApiError } from './utils/report'
 
 let online = true
-let focus = true
+const focus = true
 
 const errorFallback: React.ComponentProps<
   typeof SentryExpo.ErrorBoundary

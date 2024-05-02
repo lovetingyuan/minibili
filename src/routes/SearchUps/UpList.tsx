@@ -5,11 +5,11 @@ import clsx from 'clsx'
 import React from 'react'
 import { Alert, TouchableOpacity, View } from 'react-native'
 
-import { SearchedUpType, useSearchUps } from '@/api/search-up'
+import { type SearchedUpType, useSearchUps } from '@/api/search-up'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { useFollowedUpsMap } from '@/store/derives'
-import { NavigationProps } from '@/types'
+import type { NavigationProps } from '@/types'
 import { parseNumber } from '@/utils'
 
 function SearchUpItem(props: { up: SearchedUpType }) {

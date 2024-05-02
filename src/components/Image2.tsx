@@ -1,4 +1,4 @@
-import { Image as ExpoImage, ImageProps } from 'expo-image'
+import { Image as ExpoImage, type ImageProps } from 'expo-image'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 
@@ -15,7 +15,7 @@ function Image2(
     Parameters<NonNullable<ImageProps['onLoad']>>[0]['source'] | null
   >(null)
 
-  let style: ImageProps['style'] = React.useMemo(() => {
+  const style: ImageProps['style'] = React.useMemo(() => {
     const imgStyle = StyleSheet.flatten(props.style) || {}
 
     if (sourceInfo) {

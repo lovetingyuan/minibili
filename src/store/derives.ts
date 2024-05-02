@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { CollectVideoInfo, UpInfo } from '@/types'
+import type { CollectVideoInfo, UpInfo } from '@/types'
 
 import { useStore } from '.'
-import { MusicSong, UpdateUpInfo } from './types'
+import type { MusicSong, UpdateUpInfo } from './types'
 
 export const useFollowedUpsMap = () => {
   const { $followedUps } = useStore()

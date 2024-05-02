@@ -1,4 +1,4 @@
-import { CollectVideoInfo } from '@/types'
+import type { CollectVideoInfo } from '@/types'
 
 import { useMethods } from '.'
 

@@ -1,5 +1,5 @@
 import useSWRImmutable from 'swr/immutable'
-import { z } from 'zod'
+import type { z } from 'zod'
 
 import { useStore } from '../store'
 // import {
@@ -9,7 +9,7 @@ import { useStore } from '../store'
 // } from './user-info.schema'
 import type { UpInfo } from '../types'
 import fetcher from './fetcher'
-import {
+import type {
   UserCardInfoResponseSchema,
   UserInfoResponseSchema,
 } from './user-info.schema'

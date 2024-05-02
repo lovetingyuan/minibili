@@ -1,5 +1,5 @@
 import { type RouteProp, useRoute } from '@react-navigation/native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Dialog, Icon, Input, Text } from '@rneui/themed'
 import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'

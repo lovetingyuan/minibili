@@ -1,8 +1,8 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React from 'react'
 import { View } from 'react-native'
 
-import { RootStackParamList } from '@/types'
+import type { RootStackParamList } from '@/types'
 
 import { useStore } from '../../store'
 import HotList from './HotList'

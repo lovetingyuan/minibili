@@ -33,7 +33,7 @@ if (typeof __DEV__ === 'undefined') {
   } catch (e) {}
 }
 
-export default async function request<D extends any>(url: string): Promise<D> {
+export default async function request<D>(url: string): Promise<D> {
   let requestUrl = url.startsWith('http')
     ? url
     : 'https://api.bilibili.com' + url

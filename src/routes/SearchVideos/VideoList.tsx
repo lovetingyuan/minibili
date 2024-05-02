@@ -4,7 +4,7 @@ import React from 'react'
 import { ScrollView, TouchableOpacity, View } from 'react-native'
 
 import { useHotSearch } from '@/api/hot-search'
-import { SearchedVideoType, useSearchVideos } from '@/api/search-video'
+import { type SearchedVideoType, useSearchVideos } from '@/api/search-video'
 import Image2 from '@/components/Image2'
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'

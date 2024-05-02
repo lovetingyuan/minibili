@@ -1,7 +1,7 @@
 import useSWRImmutable from 'swr/immutable'
-import { z } from 'zod'
+import type { z } from 'zod'
 
-import getLocationSchema from './user-location.schema'
+import type getLocationSchema from './user-location.schema'
 
 type UserLocation = z.infer<typeof getLocationSchema>
 

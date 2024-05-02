@@ -7,7 +7,7 @@ import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { useStore } from '@/store'
-import { CollectVideoInfo, HistoryVideoInfo } from '@/types'
+import type { CollectVideoInfo, HistoryVideoInfo } from '@/types'
 
 function HistoryList() {
   const { $watchedVideos } = useStore()

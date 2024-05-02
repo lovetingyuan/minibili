@@ -7,7 +7,7 @@ import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { useStore } from '@/store'
-import { CollectVideoInfo } from '@/types'
+import type { CollectVideoInfo } from '@/types'
 
 function CollectList() {
   const { $collectedVideos, set$collectedVideos } = useStore()

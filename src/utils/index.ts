@@ -53,13 +53,13 @@ export const parseDuration = (seconds?: number | string) => {
   if (typeof seconds === 'string') {
     return seconds
   }
-  let hour = Math.floor(seconds / 3600)
-  let minute = Math.floor((seconds - hour * 3600) / 60)
-  let second = seconds - hour * 3600 - minute * 60
+  const hour = Math.floor(seconds / 3600)
+  const minute = Math.floor((seconds - hour * 3600) / 60)
+  const second = seconds - hour * 3600 - minute * 60
 
-  let hourString = hour < 10 ? '0' + hour : hour
-  let minuteString = minute < 10 ? '0' + minute : minute
-  let secondString = second < 10 ? '0' + second : second
+  const hourString = hour < 10 ? '0' + hour : hour
+  const minuteString = minute < 10 ? '0' + minute : minute
+  const secondString = second < 10 ? '0' + second : second
   return (
     (hourString === '00' ? '' : hourString + ':') +
     minuteString +

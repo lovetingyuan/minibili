@@ -1,7 +1,7 @@
 import useSWR from 'swr'
-import { z } from 'zod'
+import type { z } from 'zod'
 
-import { DanmakuSchema } from './get-danmaku.schema'
+import type { DanmakuSchema } from './get-danmaku.schema'
 
 type Res = z.infer<typeof DanmakuSchema>
 

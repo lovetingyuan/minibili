@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '@rneui/themed'
 import { Image } from 'expo-image'
-import React from 'react'
+import type React from 'react'
 import { Linking, Pressable, View } from 'react-native'
 
 import { colors } from '@/constants/colors.tw'

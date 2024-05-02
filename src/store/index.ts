@@ -12,7 +12,7 @@ import {
 import { RanksConfig } from '../constants'
 import useMounted from '../hooks/useMounted'
 import type { CollectVideoInfo, HistoryVideoInfo, UpInfo } from '../types'
-import { MusicSong, UpdateUpInfo } from './types'
+import type { MusicSong, UpdateUpInfo } from './types'
 
 const StoragePrefix = 'Store:'
 

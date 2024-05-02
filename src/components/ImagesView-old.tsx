@@ -45,7 +45,7 @@ function __$hack() {
     pinchToClose: false,
     loop: false,
   })
-  lightbox.on('uiRegister', function () {
+  lightbox.on('uiRegister', () => {
     lightbox.pswp.ui.registerElement({
       name: 'download-button',
       order: 8,

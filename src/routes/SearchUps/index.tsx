@@ -1,6 +1,6 @@
 import React from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
-import { SearchBarCommands } from 'react-native-screens'
+import type { SearchBarCommands } from 'react-native-screens'
 
 import { colors } from '@/constants/colors.tw'
 import useMounted from '@/hooks/useMounted'
