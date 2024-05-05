@@ -2,7 +2,10 @@ import useSWR from 'swr'
 import type { z } from 'zod'
 
 import request from './fetcher'
-import type { DashUrlResponseSchema, PlayUrlResponseSchema } from './play-url.schema'
+import type {
+  DashUrlResponseSchema,
+  PlayUrlResponseSchema,
+} from './play-url.schema'
 
 type Res = z.infer<typeof PlayUrlResponseSchema>
 
@@ -72,7 +75,7 @@ export function getDownloadUrl(bvid: string, cid: number) {
   Object.entries(query).forEach(([k, v]) => {
     search.append(k, `${v}`)
   })
-  return request<Res>(`/x/player/wbi/playurl?${search}`).then(res => {
+  return request<Res>(`/x/player/wbi/playurl?${search}`).then((res) => {
     return res.durl?.[0]?.url
   })
 }
@@ -99,7 +102,7 @@ export function useAudioUrl(bvid: string, cid?: number | string) {
   const { data, error } = useSWR<DashRes>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
     {
-      dedupingInterval: 2 * 60 * 1000 * 1000 - 60 * 1000,
+      dedupingInterval: 60 * 1000 * 1000,
     },
   )
   // if (error) {
