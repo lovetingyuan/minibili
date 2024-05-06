@@ -141,7 +141,7 @@ function Route() {
           <Stack.Screen
             name={'WebPage'}
             component={WebPage}
-            options={props => {
+            options={(props) => {
               return {
                 headerTitle: props.route.params.title || '-',
               }

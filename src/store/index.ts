@@ -79,7 +79,7 @@ export const getAppValue = () => {
 
 const initValue = getAppValue()
 const AppContext = createAtomicContext(initValue)
-const storedKeys = Object.keys(initValue).filter(k =>
+const storedKeys = Object.keys(initValue).filter((k) =>
   k.startsWith('$'),
 ) as StoredKeys[]
 
@@ -116,15 +116,15 @@ export const InitStoreComp = React.memo(() => {
   const methods = useAtomicContextMethods(AppContext)
   useMounted(() => {
     Promise.all(
-      storedKeys.map(k => {
+      storedKeys.map((k) => {
         const key = k as StoredKeys
         const setKey = `set${key}` as const
-        return AsyncStorage.getItem(StoragePrefix + key).then(data => {
+        return AsyncStorage.getItem(StoragePrefix + key).then((data) => {
           if (data) {
             if (key === '$videoCatesList') {
               const list = JSON.parse(data) as typeof RanksConfig
-              RanksConfig.forEach(r => {
-                if (!list.find(v => v.rid === r.rid)) {
+              RanksConfig.forEach((r) => {
+                if (!list.find((v) => v.rid === r.rid)) {
                   list.push({ ...r })
                 }
               })

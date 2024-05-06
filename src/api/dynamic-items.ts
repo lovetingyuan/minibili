@@ -98,7 +98,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     if (major?.type === MajorTypeEnum.MAJOR_TYPE_OPUS) {
       title = major.opus.title
       texts = major.opus.summary.rich_text_nodes
-      images = major.opus.pics.map(p => {
+      images = major.opus.pics.map((p) => {
         return { width: p.width, height: p.height, src: p.url }
       })
     }
@@ -123,7 +123,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         title: '',
         additional,
         images:
-          item.modules?.module_dynamic?.major?.draw?.items?.map(v => {
+          item.modules?.module_dynamic?.major?.draw?.items?.map((v) => {
             return {
               src: v.src,
               width: v.width,
@@ -264,7 +264,7 @@ const getDynamicItem = (item: DynamicItemResponse) => {
           type: HandledForwardTypeEnum.DYNAMIC_TYPE_DRAW as const,
           text: '',
           images:
-            draw?.items?.map(v => {
+            draw?.items?.map((v) => {
               return {
                 ratio: v.width / v.height,
                 src: v.src,
@@ -537,11 +537,11 @@ export function useDynamicItems(mid?: string | number) {
 export function checkSingleUpUpdate(mid: string | number) {
   const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}`
   return request<DynamicListResponse>(url)
-    .then(data => {
+    .then((data) => {
       let latestTime = 0
       let latestId = ''
       if (data?.items) {
-        data.items.forEach(item => {
+        data.items.forEach((item) => {
           if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
             return
           }

@@ -48,7 +48,7 @@ function Backup() {
         {
           text: '导入',
           onPress: () => {
-            Clipboard.getStringAsync().then(res => {
+            Clipboard.getStringAsync().then((res) => {
               try {
                 const { type, data } = JSON.parse(res) as any
                 if (type !== 'minibili-settings') {

@@ -262,7 +262,7 @@ function RichTexts(props: {
       <Text
         className="flex-row flex-wrap items-center flex-1"
         {...props.textProps}
-        onTextLayout={evt => {
+        onTextLayout={(evt) => {
           setLines(evt.nativeEvent.lines.length)
         }}>
         {reactNodes}

@@ -49,7 +49,7 @@ function EmptyContent(props: {
   return (
     <ScrollView className="mb-4">
       {hotSearchList ? (
-        hotSearchList.map(hot => {
+        hotSearchList.map((hot) => {
           return (
             <TouchableOpacity
               key={hot.hot_id}
@@ -93,7 +93,7 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   return (
     <FlashList
       data={searchedVideos}
-      keyExtractor={v => v.bvid}
+      keyExtractor={(v) => v.bvid}
       ref={listRef}
       renderItem={({ item }: { item: SearchedVideoType }) => {
         return <VideoListItem video={item} />

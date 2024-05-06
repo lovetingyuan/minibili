@@ -25,7 +25,7 @@ function BlackUps() {
       }}>
       <ListItem
         containerStyle={tw('flex-wrap p-0 flex-row px-1 mb-3 bg-transparent')}>
-        {Object.values($blackUps).map(name => {
+        {Object.values($blackUps).map((name) => {
           return (
             <Text key={name} className="text-gray-500 line-through">
               {name}

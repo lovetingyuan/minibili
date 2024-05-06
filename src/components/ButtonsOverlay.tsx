@@ -11,7 +11,7 @@ function ButtonsOverlay() {
     setOverlayButtons([])
   }
   const Buttons = overlayButtons
-    .map(button => {
+    .map((button) => {
       if (!button) {
         return null
       }

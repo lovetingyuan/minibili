@@ -24,7 +24,7 @@ function TvImg() {
   const [tvImg, setTvImg] = React.useState(false)
   useMounted(() => {
     const timer = window.setInterval(() => {
-      setTvImg(v => !v)
+      setTvImg((v) => !v)
     }, 700)
     return () => {
       timer && window.clearInterval(timer)

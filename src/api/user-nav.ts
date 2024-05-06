@@ -7,7 +7,7 @@ export function getWBIInfo(request: <T>(url: string) => Promise<T>) {
   if (wbiImage) {
     return wbiImage
   }
-  return request<UserNavType>('/x/web-interface/nav').then(data => {
+  return request<UserNavType>('/x/web-interface/nav').then((data) => {
     wbiImage = data.wbi_img
     return wbiImage
   })

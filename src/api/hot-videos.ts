@@ -37,7 +37,7 @@ export type VideoItem = ReturnType<typeof getVideo>
 export function useHotVideos(t: number) {
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite(
-      index => {
+      (index) => {
         return `/x/web-interface/popular?ps=30&pn=${index + 1}&_t=${t}`
       },
       {

@@ -131,7 +131,7 @@ function UpList(props: { keyword: string }) {
     <FlashList
       data={searchedUps}
       ref={listRef}
-      keyExtractor={v => `${v.mid}`}
+      keyExtractor={(v) => `${v.mid}`}
       renderItem={({ item }: { item: SearchedUpType }) => {
         return <SearchUpItem up={item} />
       }}

@@ -38,7 +38,7 @@ export function useReplies() {
   const { repliesInfo } = useStore()
   const { data, error, size, setSize, isValidating, isLoading } =
     useSWRInfinite<ReplyResponse>(
-      index => {
+      (index) => {
         return repliesInfo
           ? `/x/v2/reply/reply?oid=${repliesInfo.oid}&type=${repliesInfo.type}&root=${repliesInfo.root}&pn=${index + 1}&ps=20`
           : null

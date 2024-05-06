@@ -234,7 +234,7 @@ function CommentBlock(props: {
       <CommentItem comment={comment} />
       {comment.replies?.length ? (
         <View className="p-2 mt-1 rounded gap-1 opacity-90 flex-1 shrink-0 border-gray-500 bg-neutral-200 dark:bg-neutral-900">
-          {comment.replies.map(reply => {
+          {comment.replies.map((reply) => {
             return <CommentItem key={reply.id} comment={reply} smallFont />
           })}
           {comment.moreText && comment.rcount > comment.replies.length ? (

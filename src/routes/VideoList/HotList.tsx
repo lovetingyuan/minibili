@@ -52,7 +52,7 @@ function Hot() {
         }
         setSize(page + 1)
       }}
-      onRefresh={fab => {
+      onRefresh={(fab) => {
         // mutate()
         if (!fab) {
           setReload(reload + 1)

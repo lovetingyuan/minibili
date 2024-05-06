@@ -24,7 +24,7 @@ function Version() {
     }
     setCheckingUpdate(true)
     checkUpdateApi().then(
-      data => {
+      (data) => {
         setHasUpdate(data.hasUpdate)
         if (data.hasUpdate) {
           Alert.alert(

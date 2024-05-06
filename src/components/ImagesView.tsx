@@ -21,7 +21,7 @@ function ImagesView() {
     useStore()
 
   const { width, height } = useWindowDimensions()
-  const images = imagesList.map(v => {
+  const images = imagesList.map((v) => {
     return {
       url: parseImgUrl(v.src),
       width: v.width,
@@ -68,7 +68,7 @@ function ImagesView() {
           </Text>
         </View>
         <PagerView
-          onPageSelected={e => {
+          onPageSelected={(e) => {
             setCurrent(e.nativeEvent.position)
           }}
           offscreenPageLimit={1}

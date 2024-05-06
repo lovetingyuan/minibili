@@ -60,7 +60,7 @@ function CollectList() {
               text: '是',
               onPress: () => {
                 set$collectedVideos(
-                  $collectedVideos.filter(v => v.bvid !== video.bvid),
+                  $collectedVideos.filter((v) => v.bvid !== video.bvid),
                 )
               },
             },
@@ -71,7 +71,7 @@ function CollectList() {
   }
   const collectVideos = React.useMemo(() => {
     if (searchKeyWord) {
-      return $collectedVideos.filter(vi => {
+      return $collectedVideos.filter((vi) => {
         return vi.title.includes(searchKeyWord)
       })
     }
@@ -80,7 +80,7 @@ function CollectList() {
   return (
     <FlashList
       data={collectVideos}
-      keyExtractor={v => v.bvid}
+      keyExtractor={(v) => v.bvid}
       renderItem={({ item }: { item: CollectVideoInfo }) => {
         return <VideoListItem video={item} buttons={buttons} />
       }}

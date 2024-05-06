@@ -21,7 +21,7 @@ function ImagesView() {
   const netinfo = useNetInfo()
   const { width } = useWindowDimensions()
   const isWiFi = netinfo.type === 'wifi'
-  const images = imagesList.map(v => {
+  const images = imagesList.map((v) => {
     let url = v.src
     if (!isWiFi) {
       url += `@${width * 0.8}w_${(width * 0.8 * v.height) / v.width}h_1c.webp`
@@ -47,7 +47,7 @@ function ImagesView() {
         // onSave={url => {
         //   Linking.openURL(url)
         // }}
-        onLongPress={img => {
+        onLongPress={(img) => {
           if (!img) {
             return
           }

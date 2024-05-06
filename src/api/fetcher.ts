@@ -99,7 +99,7 @@ export default async function request<D>(url: string): Promise<D> {
   //   })
   //   return objects.elems
   // }
-  let resText = await fetch(requestUrl, options).then(r => r.text())
+  let resText = await fetch(requestUrl, options).then((r) => r.text())
   const index = resText.indexOf('}{"code":')
   if (index > -1) {
     resText = resText.substring(index + 1)

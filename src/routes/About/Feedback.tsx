@@ -66,13 +66,13 @@ function Feedback() {
             maxLength={500}
             textAlignVertical="top"
             placeholderTextColor={tw(colors.gray4.text).color}
-            onChangeText={value => (feedbackRef.current = value)}
+            onChangeText={(value) => (feedbackRef.current = value)}
           />
           <Input
             placeholder="联系方式"
             maxLength={100}
             placeholderTextColor={tw(colors.gray4.text).color}
-            onChangeText={value => (feedbackContactRef.current = value)}
+            onChangeText={(value) => (feedbackContactRef.current = value)}
           />
         </View>
         <Dialog.Actions>

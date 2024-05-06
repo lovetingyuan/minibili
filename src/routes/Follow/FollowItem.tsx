@@ -104,7 +104,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
               onPress() {
                 set$followedUps(
                   get$followedUps().filter(
-                    u => u.mid.toString() !== mid.toString(),
+                    (u) => u.mid.toString() !== mid.toString(),
                   ),
                 )
               },
@@ -125,7 +125,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
             onPress: () => {
               const followedUps = get$followedUps()
               const i = followedUps.findIndex(
-                u => u.mid.toString() === mid.toString(),
+                (u) => u.mid.toString() === mid.toString(),
               )
               followedUps[i] = {
                 ...followedUps[i],
@@ -139,7 +139,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         onPress: () => {
           const followedUps = get$followedUps()
           const i = followedUps.findIndex(
-            u => u.mid.toString() === mid.toString(),
+            (u) => u.mid.toString() === mid.toString(),
           )
           followedUps[i] = {
             ...followedUps[i],
@@ -173,7 +173,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         />
         {livingUps[mid] ? (
           <Pressable
-            onPress={e => {
+            onPress={(e) => {
               e.stopPropagation()
               gotoLivePage()
             }}

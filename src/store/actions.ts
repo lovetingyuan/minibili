@@ -28,7 +28,7 @@ export function useMarkVideoWatched() {
           .sort((a, b) => b.watchTime - a.watchTime)
           .slice(0, 400)
         playedMap = {}
-        values.forEach(item => {
+        values.forEach((item) => {
           playedMap[item.bvid] = item
         })
       } else {

@@ -16,7 +16,7 @@ describe('living-info', () => {
     expect('1458143263' in res).toBe(true)
     LiveInfoBatchItemSchema.parse(res['1458143263'])
     expect(
-      Object.keys(res).every(v => +v >= 1458143131 && +v < 1458143131 + 250),
+      Object.keys(res).every((v) => +v >= 1458143131 && +v < 1458143131 + 250),
     ).toBe(true)
   })
 })

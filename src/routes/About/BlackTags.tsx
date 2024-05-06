@@ -26,7 +26,7 @@ function BlackTags() {
       }}>
       <ListItem
         containerStyle={tw('flex-wrap p-0 flex-row px-1 bg-transparent')}>
-        {Object.values($blackTags).map(tag => {
+        {Object.values($blackTags).map((tag) => {
           return (
             <Chip
               title={tag}

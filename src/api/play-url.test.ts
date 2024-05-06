@@ -5,7 +5,7 @@ import { PlayUrlResponseSchema } from './play-url.schema'
 
 const sleep = () => {
   // @ts-ignore
-  return new Promise(r => setTimeout(r, 1000))
+  return new Promise((r) => setTimeout(r, 1000))
 }
 
 const testIt = async (url: string) => {

@@ -47,7 +47,7 @@ function Image2(
         : null),
     }
   }, [props.style, sourceInfo, props.initWidth, props.initHeight])
-  const handleLoad: typeof props.onLoad = data => {
+  const handleLoad: typeof props.onLoad = (data) => {
     props.onLoad?.(data)
     setSourceInfo(data.source)
   }

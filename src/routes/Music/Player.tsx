@@ -60,7 +60,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
     }
     const [{ songs }] = get$musicList()
     const index = songs.findIndex(
-      s => s.bvid === playingSong.bvid && s.cid === playingSong.cid,
+      (s) => s.bvid === playingSong.bvid && s.cid === playingSong.cid,
     )
     return {
       prevSong: songs[index - 1] ?? null,
@@ -70,7 +70,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   useBackgroundTask(
     'KeepMusicPlay',
     useMemoizedFn(() => {
-      soundRef.current?.getStatusAsync().then(status => {
+      soundRef.current?.getStatusAsync().then((status) => {
         handlePlayStatusChange(status)
       })
     }),
@@ -242,7 +242,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
                 // @ts-ignore
                 className="flex-1 h-2"
                 value={playingTime}
-                onValueChange={currentTime => {
+                onValueChange={(currentTime) => {
                   soundRef.current?.setPositionAsync(currentTime)
                 }}
                 maximumValue={props.time}

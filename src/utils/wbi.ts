@@ -10,7 +10,7 @@ const mixinKeyEncTab = [
 // 对 imgKey 和 subKey 进行字符顺序打乱编码
 const getMixinKey = (orig: string) =>
   mixinKeyEncTab
-    .map(n => orig[n])
+    .map((n) => orig[n])
     .join('')
     .slice(0, 32)
 
@@ -38,7 +38,7 @@ export default function encWbi(
   // 按照 key 重排参数
   const query = Object.keys(params)
     .sort()
-    .map(key => {
+    .map((key) => {
       // 过滤 value 中的 "!'()*" 字符
       const value = params[key].toString().replace(chr_filter, '')
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`

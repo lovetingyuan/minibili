@@ -21,7 +21,7 @@ function TextAction(
         {props.text}
       </Text>
       <View className="flex-row">
-        {props.buttons.map(button => {
+        {props.buttons.map((button) => {
           return (
             <Button
               type="clear"

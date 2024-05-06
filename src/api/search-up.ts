@@ -16,7 +16,7 @@ function getUpInfo(up: SearchUpResType) {
 export const useSearchUps = (name: string) => {
   const { data, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<SearchResponse>(
-      index => {
+      (index) => {
         return name
           ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=${index + 1}&page_size=50&platform=pc&search_type=bili_user`
           : null

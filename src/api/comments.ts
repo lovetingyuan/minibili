@@ -20,7 +20,7 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
   > = {}
   const atMap: Record<string, { mid: number; name: string }> = {}
   if (content.emote) {
-    Object.keys(content.emote).forEach(emoji => {
+    Object.keys(content.emote).forEach((emoji) => {
       const id = `emoji${Math.random().toString().substring(2)}`
       emojiMap[id] = content.emote?.[emoji]
       message = message.replaceAll(emoji, id)
@@ -28,7 +28,7 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
     })
   }
   if (content.at_name_to_mid) {
-    Object.keys(content.at_name_to_mid).forEach(name => {
+    Object.keys(content.at_name_to_mid).forEach((name) => {
       const id = `@${Math.random().toString().substring(2)}`
       atMap[id] = {
         mid: content.at_name_to_mid?.[name],
@@ -39,7 +39,7 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
     })
   }
   if (content.jump_url) {
-    Object.keys(content.jump_url).forEach(bvid => {
+    Object.keys(content.jump_url).forEach((bvid) => {
       if (bvid.startsWith('BV')) {
         keys.push(bvid)
       }
@@ -118,11 +118,11 @@ export type CommentMessageContent = ReturnType<typeof parseCommentMessage>
 
 const getReplies = (res1: CommentResType, type: number) => {
   const replies = (res1.replies || [])
-    .filter(v => !v.invisible)
-    .map(item => {
+    .filter((v) => !v.invisible)
+    .map((item) => {
       return {
         message: parseCommentMessage(item.content),
-        images: item.content.pictures?.map(img => {
+        images: item.content.pictures?.map((img) => {
           return {
             src: img.img_src,
             width: img.img_width,
@@ -147,7 +147,7 @@ const getReplies = (res1: CommentResType, type: number) => {
         sex: item.member.sex,
         type,
         replies:
-          item.replies?.map(v => {
+          item.replies?.map((v) => {
             return {
               message: parseCommentMessage(v.content),
               name: v.member.uname,
@@ -170,7 +170,7 @@ const getReplies = (res1: CommentResType, type: number) => {
     const item = res1.top.upper
     replies.unshift({
       message: parseCommentMessage(item.content),
-      images: item.content.pictures?.map(img => {
+      images: item.content.pictures?.map((img) => {
         return {
           src: img.img_src,
           width: img.img_width,
@@ -195,7 +195,7 @@ const getReplies = (res1: CommentResType, type: number) => {
       sex: item.member.sex,
       type,
       replies:
-        item.replies?.map(v => {
+        item.replies?.map((v) => {
           return {
             message: parseCommentMessage(v.content),
             name: v.member.uname,

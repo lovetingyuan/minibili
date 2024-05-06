@@ -135,7 +135,7 @@ function SongInfoModal(props: {
           maxLength={100}
           value={title}
           placeholderTextColor={tw(colors.gray4.text).color}
-          onChangeText={value => {
+          onChangeText={(value) => {
             setTitle(value)
           }}
         />
@@ -146,7 +146,7 @@ function SongInfoModal(props: {
           maxLength={60}
           value={singer}
           placeholderTextColor={tw(colors.gray4.text).color}
-          onChangeText={value => {
+          onChangeText={(value) => {
             setSinger(value)
           }}
         />
@@ -157,7 +157,7 @@ function SongInfoModal(props: {
           maxLength={10}
           value={`${year}`}
           placeholderTextColor={tw(colors.gray4.text).color}
-          onChangeText={value => {
+          onChangeText={(value) => {
             setYear(value)
           }}
         />
@@ -216,7 +216,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
             if (props.cid) {
               showToast('请稍后在浏览器中下载')
               getDownloadUrl(videoInfo.bvid, props.cid)
-                ?.then(url => {
+                ?.then((url) => {
                   if (url) {
                     Linking.openURL(url)
                   } else {

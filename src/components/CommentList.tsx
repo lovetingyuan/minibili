@@ -54,7 +54,7 @@ export default function CommentList(
     <View className="flex-1">
       <FlashList
         data={comments}
-        keyExtractor={v => `${v.id}@${v.root}`}
+        keyExtractor={(v) => `${v.id}@${v.root}`}
         renderItem={({ item }: { item: CommentItemType }) => {
           return <Comment comment={item} />
         }}

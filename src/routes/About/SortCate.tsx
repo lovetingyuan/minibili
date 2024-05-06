@@ -33,14 +33,14 @@ function SortCate() {
       <ListItem
         containerStyle={tw('flex-wrap p-0 flex-row px-1 bg-transparent')}>
         <View className="flex-row flex-wrap border-b-[0.5px] flex-1 w-full gap-x-3 border-b-gray-400	">
-          {sortedRankList.map(cate => {
+          {sortedRankList.map((cate) => {
             return (
               <Chip
                 title={cate.label}
                 key={cate.rid}
                 type="outline"
                 onPress={() => {
-                  const a = sortedRankList.filter(v => v.rid !== cate.rid)
+                  const a = sortedRankList.filter((v) => v.rid !== cate.rid)
                   const b = unsortedRankList.concat(cate)
                   setSortedRankList(a)
                   setUnSortedRankList(b)
@@ -59,7 +59,7 @@ function SortCate() {
           )}
         </View>
         <View className="flex-row flex-wrap gap-x-3 mt-5">
-          {unsortedRankList.map(cate => {
+          {unsortedRankList.map((cate) => {
             return (
               <Chip
                 title={cate.label}
@@ -67,7 +67,7 @@ function SortCate() {
                 type="outline"
                 onPress={() => {
                   const a = sortedRankList.concat(cate)
-                  const b = unsortedRankList.filter(v => v.rid !== cate.rid)
+                  const b = unsortedRankList.filter((v) => v.rid !== cate.rid)
                   setSortedRankList(a)
                   setUnSortedRankList(b)
                   set$videoCatesList([$videoCatesList[0], ...a, ...b])

@@ -57,7 +57,7 @@ export default function ReplyList() {
         <View className="flex-1 bg-neutral-200 dark:bg-neutral-900">
           <FlashList
             data={replies}
-            keyExtractor={v => `${v.id}@${v.root}`}
+            keyExtractor={(v) => `${v.id}@${v.root}`}
             renderItem={({ item }: { item: ReplyItemType }) => {
               return (
                 <View className="px-5 mb-2">

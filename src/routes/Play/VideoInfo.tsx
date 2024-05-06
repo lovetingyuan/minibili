@@ -72,7 +72,7 @@ function VideoInfo(props: {
           text: '是',
           onPress: () => {
             const list = get$collectedVideos()
-            set$collectedVideos(list.filter(vi => vi.bvid !== videoInfo.bvid))
+            set$collectedVideos(list.filter((vi) => vi.bvid !== videoInfo.bvid))
           },
         },
       ])
@@ -257,7 +257,7 @@ function VideoInfo(props: {
                   .concat(pages)
                   .concat(pages)
                   .concat(pages)
-                  .map(item => {
+                  .map((item) => {
                     const selected = item.page === props.currentPage
                     return (
                       <TouchableOpacity

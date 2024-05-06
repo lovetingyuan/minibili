@@ -29,7 +29,7 @@ function getVideoInfo(video: SearchVideoItemType) {
 export const useSearchVideos = (name: string) => {
   const { data, size, setSize, isValidating, isLoading, error } =
     useSWRInfinite<SearchVideoResponse>(
-      index => {
+      (index) => {
         return name
           ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=${index + 1}&page_size=50&platform=pc&search_type=video`
           : null
@@ -46,7 +46,7 @@ export const useSearchVideos = (name: string) => {
     if (b.result) {
       return a.concat(
         b.result
-          .filter(v => {
+          .filter((v) => {
             if (v.type !== 'video') {
               return false
             }

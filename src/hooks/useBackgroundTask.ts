@@ -10,7 +10,7 @@ const TaskMap = {
 
 type TaskMapType = typeof TaskMap
 
-Object.keys(TaskMap).forEach(n => {
+Object.keys(TaskMap).forEach((n) => {
   const name = n as keyof typeof TaskMap
   // 1. Define the task by providing a name and the function that should be executed
   // Note: This needs to be called in the global scope (e.g outside of your React components)

@@ -11,9 +11,7 @@ function getuuid(time: number) {
   const randString12 = randomString(12)
   const truncatedTime = time
 
-  return (
-    `${randString8}-${randString4_1}-${randString4_2}-${randString4_3}-${randString12}${padLeft((truncatedTime % 1e5).toString(), 5)}infoc`
-  )
+  return `${randString8}-${randString4_1}-${randString4_2}-${randString4_3}-${randString12}${padLeft((truncatedTime % 1e5).toString(), 5)}infoc`
 }
 
 function randomString(length: number) {
@@ -54,10 +52,10 @@ function getbuvid3(mid = 5201314) {
     body: null,
     method: 'GET',
     mode: 'cors',
-  }).then(response => {
+  }).then((response) => {
     const cookie = response.headers.get('Set-Cookie') || ''
     const cookies = cookie.split('; ')
-    return cookies.find(v => v.startsWith('buvid3='))
+    return cookies.find((v) => v.startsWith('buvid3='))
   })
 }
 
@@ -78,8 +76,8 @@ function getbuvid4(buvid3: string, uuid: string) {
     mode: 'cors',
     credentials: 'include',
   })
-    .then(res => res.json())
-    .then(res => {
+    .then((res) => res.json())
+    .then((res) => {
       return res.data.b_4.replaceAll('=', '%3D')
     })
 }

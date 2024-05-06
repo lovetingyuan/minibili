@@ -36,7 +36,7 @@ const getVideoInfo = (data: VideoInfoResponse) => {
     argument: data.argue_info.argue_msg,
     argumentLink: data.argue_info.argue_link,
     // location: data.pub_location,
-    pages: data.pages.map(v => {
+    pages: data.pages.map((v) => {
       // 如果是分片视频，那么length会是分片数量，否则是1
       return {
         width: v.dimension.width,

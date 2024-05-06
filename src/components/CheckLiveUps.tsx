@@ -16,7 +16,7 @@ type LivingUpsData = Record<string, z.infer<typeof LiveInfoBatchItemSchema>>
 
 const useCheckLivingUps = (time?: number) => {
   const { $followedUps, setLivingUps, checkLiveTimeStamp } = useStore()
-  const uids = $followedUps.map(user => `uids[]=${user.mid}`).join('&')
+  const uids = $followedUps.map((user) => `uids[]=${user.mid}`).join('&')
   const url = uids
     ? `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}&_t=${checkLiveTimeStamp}`
     : null
@@ -25,7 +25,7 @@ const useCheckLivingUps = (time?: number) => {
       return
     }
     const livingMap: Record<string, string> = {}
-    Object.keys(data).forEach(mid => {
+    Object.keys(data).forEach((mid) => {
       // https://live.bilibili.com/h5/24446464
       const { live_status, room_id } = data[mid]
       if (live_status === 1) {
@@ -47,7 +47,7 @@ const useCheckLivingUps = (time?: number) => {
     'CheckLivingUps',
     useMemoizedFn(() => {
       if (url) {
-        request<LivingUpsData>(url).then(data => {
+        request<LivingUpsData>(url).then((data) => {
           checkLivingUps(data)
         })
       }

@@ -93,7 +93,7 @@ export function parseTime(milliseconds: number) {
 export function parseDurationStr(duration: string) {
   return duration
     .split(':')
-    .map(t => {
+    .map((t) => {
       if (t.length === 1) {
         return `0${t}`
       }
@@ -150,7 +150,7 @@ export const parseUrl = (url: string) => {
 }
 
 export function delay(ms: number) {
-  return new Promise(r => {
+  return new Promise((r) => {
     setTimeout(r, ms)
   })
 }

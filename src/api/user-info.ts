@@ -89,11 +89,11 @@ export function useUserInfo(mid?: number | string) {
   const { get$followedUps, set$followedUps } = useStore()
   const { data } = useSWRImmutable<UserInfo | undefined>(
     mid ? `/x/space/wbi/acc/info?mid=${mid}` : null,
-    url => {
+    (url) => {
       return fetcher<UserInfoResponse>(url).catch(() => {
         return fetcher<UserCardInfoResponse>(
           `/x/web-interface/card?mid=${mid}`,
-        ).then(userInfo => {
+        ).then((userInfo) => {
           return {
             face: userInfo.card.face,
             name: userInfo.card.name,
@@ -112,7 +112,7 @@ export function useUserInfo(mid?: number | string) {
         }
         const followedUps = get$followedUps()
         const index = followedUps.findIndex(
-          u => u.mid.toString() === _data.mid.toString(),
+          (u) => u.mid.toString() === _data.mid.toString(),
         )
         if (index === -1) {
           return

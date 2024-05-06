@@ -58,7 +58,7 @@ function Play({ route }: Props) {
         <PlayHeaderRight
           cid={cid2}
           refresh={() => {
-            setKey(k => k + 1)
+            setKey((k) => k + 1)
           }}
         />
       )

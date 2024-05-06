@@ -187,7 +187,7 @@ function VideoList(props: {
   return (
     <>
       <FlashList
-        ref={v => {
+        ref={(v) => {
           listRef.current = v
         }}
         numColumns={2}

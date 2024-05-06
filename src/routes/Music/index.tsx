@@ -45,7 +45,7 @@ function MusicItem(props: {
               onPress: () => {
                 const list = get$musicList()
                 const songs = list[0].songs
-                list[0].songs = songs.filter(v => {
+                list[0].songs = songs.filter((v) => {
                   if (v.bvid !== song.bvid) {
                     return true
                   }
@@ -199,7 +199,7 @@ function MusicList() {
   const songsList = React.useMemo(() => {
     const keyword = searchKeyWord.trim()
     if (keyword) {
-      return list.filter(v => v.name.includes(keyword))
+      return list.filter((v) => v.name.includes(keyword))
     }
     return list
   }, [list, searchKeyWord])
@@ -207,7 +207,7 @@ function MusicList() {
     <View className="flex-1 relative">
       <FlashList
         data={songsList}
-        keyExtractor={v => `${v.bvid}_${v.cid}`}
+        keyExtractor={(v) => `${v.bvid}_${v.cid}`}
         renderItem={({ item }) => {
           return <MusicItem song={item} />
         }}

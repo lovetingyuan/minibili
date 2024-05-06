@@ -15,7 +15,7 @@ function __$hack() {
     } else {
       document.addEventListener(
         'loadstart',
-        evt => {
+        (evt) => {
           if (evt.target && evt.target.tagName === 'VIDEO' && evt.target.src) {
             callback(evt.target)
           }
@@ -29,7 +29,9 @@ function __$hack() {
       selectors = [selectors]
     }
     const fn = () => {
-      const doms = selectors.map(s => document.querySelector(s)).filter(Boolean)
+      const doms = selectors
+        .map((s) => document.querySelector(s))
+        .filter(Boolean)
       if (doms.length === selectors.length) {
         clearInterval(timer)
         callback(...doms)
@@ -41,13 +43,13 @@ function __$hack() {
       clearInterval(timer)
     }, 10000)
   }
-  waitForVideo(video => {
+  waitForVideo((video) => {
     if (video.__handled) {
       return
     }
     video.__handled = true
     // eslint-disable-next-line no-array-constructor
-    Array('play', 'ended', 'pause').forEach(evt => {
+    Array('play', 'ended', 'pause').forEach((evt) => {
       video.addEventListener(evt, () => {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
@@ -118,7 +120,7 @@ function __$hack() {
     document.head.appendChild(fixStyle)
   })
 
-  waitForVideo(vi => {
+  waitForVideo((vi) => {
     const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
     if (vi && newVideoUrl.startsWith('https') && vi.src !== newVideoUrl) {
       vi.dataset.src = vi.src
@@ -132,8 +134,8 @@ function __$hack() {
   })
 
   const xx = 'x'
-  waitForDom('.mplayer-display', container => {
-    container.addEventListener('dblclick', evt => {
+  waitForDom('.mplayer-display', (container) => {
+    container.addEventListener('dblclick', (evt) => {
       if (evt.target.matches('.mplayer-right *')) {
         return
       }
@@ -149,7 +151,7 @@ function __$hack() {
       }
     })
   })
-  waitForDom('.mplayer-right', right => {
+  waitForDom('.mplayer-right', (right) => {
     if (!document.getElementById('play-rate-button')) {
       const rateBtn = document.createElement('div')
       rateBtn.id = 'play-rate-button'
@@ -196,7 +198,7 @@ function __$hack() {
   let direction = ''
 
   let touchTimer
-  const isVideoPlaying = video =>
+  const isVideoPlaying = (video) =>
     !!(
       video.currentTime > 0 &&
       !video.paused &&
@@ -204,7 +206,7 @@ function __$hack() {
       video.readyState > 2
     )
 
-  element.addEventListener('touchstart', event => {
+  element.addEventListener('touchstart', (event) => {
     touchTimer = setTimeout(() => {
       const video = document.querySelector('video')
       if (video && isVideoPlaying(video)) {
@@ -223,7 +225,7 @@ function __$hack() {
     startY = touch.clientY
   })
 
-  element.addEventListener('touchmove', event => {
+  element.addEventListener('touchmove', (event) => {
     const touch = event.touches[0]
     distanceX = touch.clientX - startX
     distanceY = touch.clientY - startY

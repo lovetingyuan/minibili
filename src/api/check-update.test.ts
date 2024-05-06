@@ -10,7 +10,7 @@ describe('app-version-update', () => {
     async () => {
       const res = await fetch(
         'https://unpkg.com/minibili/docs/version.json',
-      ).then(r => r.json())
+      ).then((r) => r.json())
       expect(res.length > 0).toBe(true)
       z.object({
         version: z.string(),
@@ -29,8 +29,8 @@ describe('app-version-update', () => {
     },
     async () => {
       await fetch('https://unpkg.com/minibili/package.json')
-        .then(r => r.json())
-        .then(pkg => {
+        .then((r) => r.json())
+        .then((pkg) => {
           expect(typeof pkg.version).toBe('string')
           expect(typeof pkg.config.versionCode).toBe('number')
         })

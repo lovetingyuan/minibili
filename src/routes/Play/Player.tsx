@@ -83,7 +83,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     `)
   }, [imagesList.length])
 
-  useAppStateChange(currentAppState => {
+  useAppStateChange((currentAppState) => {
     if (
       currentAppState === 'active' &&
       loadingErrorRef.current &&
@@ -107,7 +107,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   )
 
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener('beforeRemove', e => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       e.preventDefault()
       webviewRef.current?.injectJavaScript(`
       window.reportPlayTime();
@@ -252,7 +252,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         showToast('当前视频加载失败/(ㄒoㄒ)/~~')
         loadingErrorRef.current = true
       }}
-      onShouldStartLoadWithRequest={request => {
+      onShouldStartLoadWithRequest={(request) => {
         // Only allow navigating within this website
         if (request.url.endsWith('/log-reporter.js')) {
           return false

@@ -56,7 +56,7 @@ function HistoryList() {
       return b.watchTime - a.watchTime
     })
     if (searchKeyWord) {
-      return _list.filter(vi => {
+      return _list.filter((vi) => {
         return vi.title.includes(searchKeyWord)
       })
     }
@@ -66,7 +66,7 @@ function HistoryList() {
   return (
     <FlashList
       data={list}
-      keyExtractor={v => `${v.bvid}`}
+      keyExtractor={(v) => `${v.bvid}`}
       renderItem={({ item }: { item: HistoryVideoInfo }) => {
         return <VideoListItem video={item} buttons={buttons} />
       }}

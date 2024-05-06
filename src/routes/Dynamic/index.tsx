@@ -164,7 +164,7 @@ function Dynamic({ route }: Props) {
       <FlashList
         data={list}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         onEndReachedThreshold={1}
         ref={dynamicListRef}
         estimatedItemSize={100}

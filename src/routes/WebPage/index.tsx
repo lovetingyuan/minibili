@@ -48,7 +48,7 @@ function WebPage({ route }: Props) {
   const [pageTitle, setPageTitle] = React.useState(title)
   const { isRefreshing, onRefresh } = useRefresh(
     React.useCallback(() => {
-      return new Promise(r => {
+      return new Promise((r) => {
         webviewRef.current?.reload()
         setTimeout(r, 1000)
       })
@@ -74,7 +74,7 @@ function WebPage({ route }: Props) {
   )
   return (
     <ScrollView
-      onLayout={e => setHeight(e.nativeEvent.layout.height)}
+      onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
       refreshControl={
         <RefreshControl
           onRefresh={onRefresh}
@@ -88,7 +88,7 @@ function WebPage({ route }: Props) {
         style={{ height }}
         source={{ uri: url }}
         key={webViewMode}
-        onScroll={e => setEnabled(e.nativeEvent.contentOffset.y === 0)}
+        onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
         originWhitelist={['http://*', 'https://*', 'bilibili://*']}
         allowsFullscreenVideo
         injectedJavaScriptForMainFrameOnly
@@ -102,7 +102,7 @@ function WebPage({ route }: Props) {
         renderLoading={() => <Loading />}
         userAgent={webViewMode === 'MOBILE' ? '' : UA}
         ref={webviewRef}
-        onMessage={evt => {
+        onMessage={(evt) => {
           const data = JSON.parse(evt.nativeEvent.data) as any
           if (data.action === 'set-title' && !title) {
             setPageTitle(data.payload)
@@ -131,7 +131,7 @@ function WebPage({ route }: Props) {
         onError={() => {
           showToast('加载失败')
         }}
-        onShouldStartLoadWithRequest={request => {
+        onShouldStartLoadWithRequest={(request) => {
           if (request.url.startsWith('bilibili://')) {
             // Linking.openURL(request.url).catch(err => {
             //   __DEV__ && console.error(err)

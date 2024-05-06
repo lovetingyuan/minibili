@@ -126,8 +126,8 @@ function __$hack() {
     fetch(
       `https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=${roomId}`,
     )
-      .then(res => res.json())
-      .then(res => {
+      .then((res) => res.json())
+      .then((res) => {
         if (res.code === 0) {
           const liveTime = new Date(res.data.room_info.live_start_time * 1000)
           const minute = liveTime.getMinutes()

@@ -24,7 +24,7 @@ function __$hack() {
   // @ts-ignore
   gallery.innerHTML = window.images
     // @ts-ignore
-    .map(img => {
+    .map((img) => {
       return `
     <a href="${img.src}" data-pswp-width="${img.width}" data-pswp-height="${img.height}">
       <img src="${img.src}" class="picture" alt="" />
@@ -136,7 +136,7 @@ function ImagesView() {
           true;
         `)
         }}
-        onMessage={evt => {
+        onMessage={(evt) => {
           const data = JSON.parse(evt.nativeEvent.data) as any
           if (data.action === 'current-index') {
             Linking.openURL(imagesList[data.payload].src)

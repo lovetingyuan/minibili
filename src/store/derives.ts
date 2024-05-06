@@ -20,7 +20,7 @@ export const useUpUpdateCount = () => {
   const { $upUpdateMap } = useStore()
   return React.useMemo(() => {
     const aa = Object.values<UpdateUpInfo>($upUpdateMap)
-    const count = aa.filter(item => {
+    const count = aa.filter((item) => {
       return item.latestId !== item.currentLatestId
     }).length
     return count
@@ -31,7 +31,7 @@ export const useCollectedVideosMap = () => {
   const { $collectedVideos } = useStore()
   return React.useMemo(() => {
     const _map: Record<string, CollectVideoInfo> = {}
-    $collectedVideos.forEach(vi => {
+    $collectedVideos.forEach((vi) => {
       _map[vi.bvid] = vi
     })
     return _map
@@ -42,8 +42,8 @@ export const useMusicSongsMap = () => {
   const { $musicList } = useStore()
   return React.useMemo(() => {
     const map: Record<string, MusicSong> = {}
-    $musicList.forEach(music => {
-      music.songs.forEach(song => {
+    $musicList.forEach((music) => {
+      music.songs.forEach((song) => {
         map[`${song.bvid}_${song.cid}`] = song
       })
     })

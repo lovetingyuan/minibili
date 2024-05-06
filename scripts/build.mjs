@@ -43,7 +43,7 @@ const BuildListSchema = z
     completedAt: z.string(),
     // resourceClass: 'ANDROID_MEDIUM'
   })
-  .refine(data => {
+  .refine((data) => {
     return !!data.channel || !!data.releaseChannel
   }, 'channel error')
   .array()
@@ -58,7 +58,7 @@ const version = pkg.version
 const semver = require('semver')
 const assert = require('node:assert')
 
-const getBuildList = buildStr => {
+const getBuildList = (buildStr) => {
   let buildListStr = buildStr.toString('utf8')
   let list
   while (buildListStr.includes('[')) {
@@ -91,8 +91,8 @@ await spinner('Checking build env...', async () => {
   )
 
   await fetch('https://api.expo.dev')
-    .then(res => res.text())
-    .then(d => {
+    .then((res) => res.text())
+    .then((d) => {
       assert.equal(d, 'OK', chalk.red('Can not access Expo Api'))
     })
 
@@ -179,7 +179,7 @@ let latestBuildList
 try {
   await spinner('EAS building...', async () => {
     await $`npx -y eas-cli@latest build --platform android --profile production --message ${changes} --json --non-interactive`
-    return new Promise(r => setTimeout(r, 1000))
+    return new Promise((r) => setTimeout(r, 1000))
   })
   let buildListStr = ''
   echo(chalk.green('EAS build done.'))
@@ -215,7 +215,7 @@ try {
 echo(chalk.blue('Update version file...'))
 await fs.outputJsonSync(
   path.resolve(__dirname, '../docs/version.json'),
-  latestBuildList.map(item => {
+  latestBuildList.map((item) => {
     return {
       version: item.appVersion,
       changelog: (item.message || item.gitCommitMessage).split('  '),
@@ -301,7 +301,7 @@ open(
   `https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
     changes
       .split('  ')
-      .map(c => `- ${c}`)
+      .map((c) => `- ${c}`)
       .join('\n'),
   )}`,
 )

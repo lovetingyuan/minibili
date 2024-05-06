@@ -33,7 +33,7 @@ const focus = true
 
 const errorFallback: React.ComponentProps<
   typeof SentryExpo.ErrorBoundary
->['fallback'] = errorData => {
+>['fallback'] = (errorData) => {
   return <ErrorFallback message={errorData.error.message} />
 }
 
@@ -51,7 +51,7 @@ const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
   initFocus(callback) {
     let appState = AppState.currentState
 
-    const subscription = AppState.addEventListener('change', nextAppState => {
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
       online = nextAppState === 'active'
       if (appState.match(/inactive|background/) && online) {
         callback()
@@ -64,7 +64,7 @@ const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
     }
   },
   initReconnect(callback) {
-    return NetInfo.addEventListener(state => {
+    return NetInfo.addEventListener((state) => {
       if (state.isConnected) {
         online = true
         callback()

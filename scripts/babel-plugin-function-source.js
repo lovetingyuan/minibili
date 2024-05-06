@@ -2,7 +2,7 @@ const { default: generate } = require('@babel/generator')
 const fs = require('node:fs')
 const nodePath = require('node:path')
 
-module.exports = babel => {
+module.exports = (babel) => {
   const { types: t } = babel
 
   return {

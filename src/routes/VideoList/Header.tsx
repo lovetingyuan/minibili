@@ -144,7 +144,7 @@ function HeaderLeftComp() {
             }
             return (
               <View key={i} className="flex-row flex-1">
-                {items.map(item => getItem(item))}
+                {items.map((item) => getItem(item))}
               </View>
             )
           })}
