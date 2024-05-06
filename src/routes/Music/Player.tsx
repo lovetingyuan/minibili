@@ -9,12 +9,12 @@ import {
 // import { Image } from 'expo-image'
 import React from 'react'
 import { ImageBackground, TouchableOpacity, View } from 'react-native'
-import { throttle } from 'throttle-debounce'
 
+// import { throttle } from 'throttle-debounce'
 import { useAudioUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
-import useBackgroundTask from '@/hooks/useBackgroundTask'
+// import useBackgroundTask from '@/hooks/useBackgroundTask'
 import useDataChange from '@/hooks/useDataChange'
 import useIsDark from '@/hooks/useIsDark'
 import useMemoizedFn from '@/hooks/useMemoizedFn'
@@ -67,30 +67,32 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
       nextSong: songs[index + 1] ?? null,
     }
   }, [playingSong, get$musicList])
-  useBackgroundTask(
-    'KeepMusicPlay',
-    useMemoizedFn(() => {
-      soundRef.current?.getStatusAsync().then((status) => {
-        handlePlayStatusChange(status)
-      })
-    }),
-  )
+  // useBackgroundTask(
+  //   'KeepMusicPlay',
+  //   useMemoizedFn(() => {
+  //     soundRef.current?.getStatusAsync().then((status) => {
+  //       handlePlayStatusChange(status)
+  //     })
+  //   }),
+  // )
   const handlePlayStatusChange = useMemoizedFn(
     React.useMemo(() => {
-      return throttle(200, (status: AVPlaybackStatus) => {
+      return (status: AVPlaybackStatus) => {
         if (status.isLoaded) {
           setIsPlaying(status.isPlaying)
           setPlayFinished(status.didJustFinish)
           setPlayingTime(status.positionMillis)
           if (status.didJustFinish) {
+            // console.log('play done')
             if (playMode === 'order') {
+              soundRef.current?.stopAsync()
               if (nextSong) {
                 setPlayingSong(nextSong)
               }
             }
           }
         }
-      })
+      }
     }, [playMode, nextSong, setPlayingSong]),
   )
   useDataChange(() => {
@@ -111,7 +113,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
             },
           },
           {
-            isLooping: playMode === 'loop',
+            isLooping: playMode === 'loop' || playMode === 'order',
             shouldPlay: true,
           },
           handlePlayStatusChange,
@@ -221,7 +223,9 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
                       ? 'loop'
                       : 'single'
                 setPlayMode(mode)
-                soundRef.current?.setIsLoopingAsync(mode === 'loop')
+                soundRef.current?.setIsLoopingAsync(
+                  mode === 'loop' || mode === 'order',
+                )
               }}>
               <Text className={colors.primary.text}>
                 {playMode === 'single'
