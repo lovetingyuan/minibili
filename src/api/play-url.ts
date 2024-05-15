@@ -37,7 +37,7 @@ export function useVideoMp4Url(
   const { data, error } = useSWR<Res>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
     {
-      dedupingInterval: 2 * 60 * 1000 * 1000 - 60 * 1000,
+      dedupingInterval: 60 * 1000 * 1000,
       shouldRetryOnError: true,
       errorRetryCount: 3,
       errorRetryInterval: 0,
@@ -102,7 +102,7 @@ export function useAudioUrl(bvid: string, cid?: number | string) {
   const { data, error } = useSWR<DashRes>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
     {
-      dedupingInterval: 60 * 1000 * 1000,
+      dedupingInterval: 30 * 1000 * 1000,
     },
   )
   // if (error) {
