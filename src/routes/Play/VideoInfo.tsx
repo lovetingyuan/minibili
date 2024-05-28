@@ -250,36 +250,29 @@ function VideoInfo(props: {
               <Card.Title className="text-left text-lg">{`视频分集【${props.currentPage}/${pages.length}】`}</Card.Title>
               <Card.Divider />
               <ScrollView className="flex-1 max-h-[80vh]">
-                {pages
-                  .concat(pages)
-                  .concat(pages)
-                  .concat(pages)
-                  .concat(pages)
-                  .concat(pages)
-                  .concat(pages)
-                  .map((item) => {
-                    const selected = item.page === props.currentPage
-                    return (
-                      <TouchableOpacity
-                        key={item.cid}
-                        activeOpacity={0.8}
-                        onPress={() => {
-                          props.setCurrentPage(item.page)
-                          // props.setCurrentCid(item.cid)
-                          setShowPagesModal(false)
-                        }}
-                        className="py-2">
-                        <Text
-                          className={clsx(
-                            'text-base',
-                            selected && [colors.primary.text, 'font-bold'],
-                          )}>
-                          {item.page}. {item.title} (
-                          {parseDuration(item.duration)})
-                        </Text>
-                      </TouchableOpacity>
-                    )
-                  })}
+                {pages.map((item) => {
+                  const selected = item.page === props.currentPage
+                  return (
+                    <TouchableOpacity
+                      key={item.cid}
+                      activeOpacity={0.8}
+                      onPress={() => {
+                        props.setCurrentPage(item.page)
+                        // props.setCurrentCid(item.cid)
+                        setShowPagesModal(false)
+                      }}
+                      className="py-2">
+                      <Text
+                        className={clsx(
+                          'text-base',
+                          selected && [colors.primary.text, 'font-bold'],
+                        )}>
+                        {item.page}. {item.title} (
+                        {parseDuration(item.duration)})
+                      </Text>
+                    </TouchableOpacity>
+                  )
+                })}
               </ScrollView>
             </Card>
           </BottomSheet>
