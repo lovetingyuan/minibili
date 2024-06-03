@@ -54,7 +54,7 @@ function VideoInfo(props: {
   const [showPagesModal, setShowPagesModal] = React.useState(false)
 
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid!)
+  const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid)
   const { set$collectedVideos, get$collectedVideos, $blackUps } = useStore()
   const _collectedVideosMap = useCollectedVideosMap()
   const isCollected = videoInfo.bvid && videoInfo.bvid in _collectedVideosMap

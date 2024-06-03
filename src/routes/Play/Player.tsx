@@ -245,6 +245,9 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       injectedJavaScript={INJECTED_JAVASCRIPT}
       renderLoading={renderLoading}
       onMessage={handleMessage}
+      onContentProcessDidTerminate={() => {
+        webviewRef.current?.reload()
+      }}
       onLoad={() => {
         loadingErrorRef.current = false
       }}

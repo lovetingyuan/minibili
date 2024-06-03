@@ -22,9 +22,9 @@ import useSWR from 'swr'
 
 import type { WatchingCountResponseType } from './watching-count.schema'
 
-export function useWatchingCount(bvid: string, cid: string | number) {
+export function useWatchingCount(bvid: string, cid?: string | number) {
   const { data } = useSWR<WatchingCountResponseType>(
-    bvid ? `/x/player/online/total?bvid=${bvid}&cid=${cid}` : null,
+    bvid && cid ? `/x/player/online/total?bvid=${bvid}&cid=${cid}` : null,
     {
       refreshInterval: 60 * 1000,
     },
