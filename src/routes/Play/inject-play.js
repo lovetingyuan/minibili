@@ -8,6 +8,18 @@ function __$hack() {
   `
   const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
   document.head.appendChild(style)
+
+  // eslint-disable-next-line no-undef
+  const seta = HTMLElement.prototype.setAttribute
+  // eslint-disable-next-line no-undef
+  HTMLElement.prototype.setAttribute = function (...args) {
+    if (this.tagName === 'VIDEO' && this.src !== newVideoUrl) {
+      Promise.resolve().then(() => {
+        this.src = newVideoUrl
+      })
+    }
+    return seta.apply(this, args)
+  }
   function waitForVideo(callback) {
     const video = document.querySelector('video[src]')
     if (video) {
@@ -120,23 +132,23 @@ function __$hack() {
     document.head.appendChild(fixStyle)
   })
 
-  waitForVideo((vi) => {
-    if (vi && newVideoUrl.startsWith('https') && vi.src !== newVideoUrl) {
-      vi.dataset.src = vi.src
-      vi.setAttribute('autoplay', 'true')
-      vi.setAttribute('src', newVideoUrl)
-      vi.dataset.replaced = 'true'
-      setTimeout(() => {
-        vi.play()
-      }, 500)
-      setTimeout(() => {
-        const _vi = document.querySelector('video[data-replaced]')
-        if (_vi && newVideoUrl.includes('_high_quality') && document.body) {
-          document.body.dataset.replaced = 'true'
-        }
-      }, 3000)
-    }
-  })
+  // waitForVideo((vi) => {
+  //   if (vi && newVideoUrl.startsWith('https') && vi.src !== newVideoUrl) {
+  //     vi.dataset.src = vi.src
+  //     vi.setAttribute('autoplay', 'true')
+  //     vi.setAttribute('src', newVideoUrl)
+  //     vi.dataset.replaced = 'true'
+  //     setTimeout(() => {
+  //       vi.play()
+  //     }, 500)
+  //     setTimeout(() => {
+  //       const _vi = document.querySelector('video[data-replaced]')
+  //       if (_vi && newVideoUrl.includes('_high_quality') && document.body) {
+  //         document.body.dataset.replaced = 'true'
+  //       }
+  //     }, 3000)
+  //   }
+  // })
 
   const xx = 'x'
   waitForDom('.mplayer-display', (container) => {
