@@ -40,7 +40,7 @@ export function useVideoMp4Url(
       return request<Res>(url + '&_t=' + Date.now())
     },
     {
-      dedupingInterval: 60 * 1000 * 1000,
+      // dedupingInterval: 60 * 1000 * 1000,
       shouldRetryOnError: true,
       errorRetryCount: 3,
       errorRetryInterval: 0,
@@ -104,12 +104,12 @@ export function useAudioUrl(bvid: string, cid?: number | string) {
 
   const { data, error } = useSWR<DashRes>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
-    (url) => {
+    (url: string) => {
       return request<DashRes>(url + '&_t=' + Date.now())
     },
-    {
-      dedupingInterval: 30 * 1000 * 1000,
-    },
+    // {
+    //   dedupingInterval: 30 * 1000 * 1000,
+    // },
   )
   // if (error) {
   //   console.log(error)
