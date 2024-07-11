@@ -6,8 +6,8 @@ function __$hack() {
     font-size: 14px!important;
   }
   `
+  const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
   document.head.appendChild(style)
-
   function waitForVideo(callback) {
     const video = document.querySelector('video[src]')
     if (video) {
@@ -121,15 +121,20 @@ function __$hack() {
   })
 
   waitForVideo((vi) => {
-    const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
     if (vi && newVideoUrl.startsWith('https') && vi.src !== newVideoUrl) {
       vi.dataset.src = vi.src
       vi.setAttribute('autoplay', 'true')
       vi.setAttribute('src', newVideoUrl)
       vi.dataset.replaced = 'true'
-      if (newVideoUrl.includes('_high_quality') && document.body) {
-        document.body.dataset.replaced = 'true'
-      }
+      setTimeout(() => {
+        vi.play()
+      }, 500)
+      setTimeout(() => {
+        const _vi = document.querySelector('video[data-replaced]')
+        if (_vi && newVideoUrl.includes('_high_quality') && document.body) {
+          document.body.dataset.replaced = 'true'
+        }
+      }, 3000)
     }
   })
 
