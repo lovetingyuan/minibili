@@ -12,7 +12,7 @@ The minimum bilibili app.
 
 <img src="./docs/up-list.jpg" alt="up list" width="320" style="margin-right: 20px"> <img src="./docs/up-detail.jpg" alt="up detail" width="320" style="margin-right: 20px">
 
-Website: https://lovetingyuan.github.io/minibili/
+下载: https://minibili.tingyuan.in/
 
 Developed with Expo, React-Native and TailwindCSS.
 

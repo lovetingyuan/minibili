@@ -1,0 +1,10 @@
+{
+  "brokenVersions": ["0.0.32"],
+  "statement": {
+    "title": "抱歉",
+    "content": "由于B站限制，现在无法获取关注列表",
+    "dismiss": true,
+    "show": false
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0"
+}

@@ -4,8 +4,8 @@ module.exports = {
     es2022: true,
   },
   extends: ['@react-native'],
+  ignorePatterns: ['docs/**'],
   plugins: ['sonarjs', 'simple-import-sort'],
-
   parserOptions: {
     ecmaVersion: 2022,
   },
