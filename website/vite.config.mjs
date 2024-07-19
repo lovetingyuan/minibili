@@ -10,6 +10,19 @@ export default defineConfig((env) => {
     build: {
       outDir: '../docs',
     },
+    define: {
+      __BUILD_TIME__: JSON.stringify(
+        new Intl.DateTimeFormat('zh', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'Asia/Shanghai',
+        }).format(new Date()),
+      ),
+    },
     plugins: [
       {
         name: 'critical-css',

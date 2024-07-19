@@ -121,7 +121,10 @@
               }">
               <template x-for="(pic, i) in imgs">
                 <div class="carousel-item w-full" :id="'screenshot-' + i">
-                  <img :src="pic" class="w-full" alt="app运行截图" />
+                  <img
+                    :src="pic"
+                    class="w-full min-w-[250px] min-h-[550px]"
+                    alt="app运行截图" />
                 </div>
               </template>
             </div>
@@ -131,6 +134,9 @@
           >❯</a
         >
       </div>
+      <footer class="text-right">
+        <span class="text-xs pr-1 text-gray-400" x-text="buildTime"></span>
+      </footer>
     </div>
   </body>
 </html>
