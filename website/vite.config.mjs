@@ -1,8 +1,10 @@
 import cp from 'child_process'
-import { generate } from 'critical'
-import fs from 'fs'
+// import { generate } from 'critical'
+// import fs from 'fs'
 import path from 'path'
 import { defineConfig } from 'vite'
+
+import htmPlugin from './viteHtmPlugin'
 
 export default defineConfig((env) => {
   return {
@@ -34,6 +36,7 @@ export default defineConfig((env) => {
           })
         },
       },
+      htmPlugin(),
     ],
   }
 })

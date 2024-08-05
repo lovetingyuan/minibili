@@ -1,0 +1,68 @@
+<section class="my-4 text-center">
+  <img
+    src="./minibili.png"
+    class="max-w-full w-[400px] mt-12 mb-8 inline-block"
+    alt="minibili logo" />
+  <p class="text-3xl mt-6 mb-12 tracking-wider">一款简洁的B站浏览应用</p>
+  <a
+    :href="latestApkUrl"
+    @click="displayDownloadToast"
+    :style="latestApkUrl ? '' : 'pointer-events: none'"
+    class="btn btn-primary btn-lg px-16 text-white hover:tracking-wide transition-all"
+    :download="'minibili-' + latestVersion + '.apk'">
+    下载APP
+    <template x-if="!latestVersion">
+      <span class="loading loading-spinner"></span>
+    </template>
+    <template x-if="latestVersion">
+      <span x-text="' (' + latestVersion + ')'"></span>
+    </template>
+  </a>
+  <div
+    class="toast toast-top toast-start"
+    style="display: none"
+    :style="showDownloadToast ? '' : 'display: none'">
+    <div class="alert alert-info">
+      <span> 下载已开始，请稍候...</span>
+      <button
+        class="btn btn-ghost btn-square btn-sm"
+        @click="showDownloadToast = false">
+        ✕
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { advancedRequest } from '../request'
+  function setup() {
+    return {
+      latestVersion: '',
+      latestApkUrl: '',
+      showDownloadToast: false,
+      displayDownloadToast() {
+        if (this.latestApkUrl) {
+          this.showDownloadToast = true
+        }
+      },
+      init() {
+        this.getLatestVersion()
+      },
+      getLatestVersion() {
+        if (this.latestVersion) {
+          return
+        }
+        advancedRequest(
+          'https://unpkg.com/minibili/package.json?_t=' + Date.now(),
+          20 * 1000,
+          5,
+        ).then((r) => {
+          const version = r.version.split('-')[0]
+          const apkUrl = `https://unpkg.com/minibili@${r.version}/apk/minibili-${version}.apk`
+          this.latestApkUrl = apkUrl
+          this.latestVersion = version
+        })
+      },
+    }
+  }
+</script>

@@ -1,0 +1,52 @@
+<section
+  class="text-center flex items-center sm:gap-4 justify-center my-12 gap-0">
+  <a :href="'#screenshot-' + leftIndex" class="btn btn-circle text-lg">❮</a>
+  <div class="mockup-phone flex-shrink-0" style="margin: 0">
+    <div class="camera" style="background: transparent"></div>
+    <div class="display">
+      <div class="carousel rounded-box w-64">
+        <template x-for="(pic, i) in imgs">
+          <div class="carousel-item w-full" :id="'screenshot-' + i">
+            <img
+              :src="pic"
+              class="w-full min-w-[250px] min-h-[550px]"
+              alt="app运行截图" />
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+  <a :href="'#screenshot-' + rightIndex" class="btn btn-circle text-lg">❯</a>
+</section>
+
+<script>
+  function setup() {
+    return {
+      leftIndex: 3,
+      rightIndex: 1,
+      screenShotCount: 4,
+      imgs: ['video-list.jpg', 'player.jpg', 'up-list.jpg', 'up-detail.jpg'],
+      handleHashChange() {
+        // 0 1 2 3
+        if (!window.location.hash) {
+          return
+        }
+        const index = window.location.hash.split('-').pop() - 0
+        this.leftIndex =
+          (index + this.screenShotCount - 1) % this.screenShotCount
+        this.rightIndex = (index + 1) % this.screenShotCount
+      },
+      init() {
+        // Register an event handler that references the component instance
+        this.handleHashChange = this.handleHashChange.bind(this)
+        window.addEventListener('hashchange', this.handleHashChange)
+        if (window.location.hash) {
+          this.handleHashChange()
+        }
+      },
+      destroy() {
+        window.removeEventListener('hashchange', this.handleHashChange)
+      },
+    }
+  }
+</script>

@@ -1,0 +1,22 @@
+<main>
+  <top-nav></top-nav>
+  <download-btn></download-btn>
+  <screen-shots></screen-shots>
+  <footer class="text-right">
+    <time
+      class="text-xs pr-1 pb-1 italic text-gray-400"
+      x-text="buildTime"></time>
+  </footer>
+</main>
+
+<script>
+  import './components/top-nav.htm'
+  import './components/download-btn.htm'
+  import './components/screen-shots.htm'
+  import { buildTime } from './constant'
+  function setup() {
+    return {
+      buildTime,
+    }
+  }
+</script>
