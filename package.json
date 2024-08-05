@@ -91,7 +91,6 @@
     "@typescript-eslint/parser": "^5.57.0",
     "@vue/compiler-sfc": "^3.4.35",
     "babel-plugin-transform-remove-console": "^6.9.4",
-    "critical": "^7.1.2",
     "cross-env": "^7.0.3",
     "cross-spawn": "^7.0.3",
     "daisyui": "^4.12.10",
@@ -111,6 +110,7 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5.1.3",
     "vite": "^5.3.4",
+    "vite-plugin-singlefile": "^2.0.2",
     "vitest": "^1.4.0",
     "wrangler": "^3.65.1",
     "zx": "^7.2.1"

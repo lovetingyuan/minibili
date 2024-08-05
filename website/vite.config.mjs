@@ -1,8 +1,9 @@
-import cp from 'child_process'
+// import cp from 'child_process'
 // import { generate } from 'critical'
 // import fs from 'fs'
-import path from 'path'
+// import path from 'path'
 import { defineConfig } from 'vite'
+import { viteSingleFile } from 'vite-plugin-singlefile'
 
 import htmPlugin from './viteHtmPlugin'
 
@@ -26,16 +27,17 @@ export default defineConfig((env) => {
       ),
     },
     plugins: [
-      {
-        name: 'critical-css',
-        enforce: 'post',
-        apply: 'build',
-        closeBundle() {
-          cp.execSync('npx critical index.html --inline --target index.html', {
-            cwd: path.resolve(__dirname, '../docs'),
-          })
-        },
-      },
+      viteSingleFile(),
+      // {
+      //   name: 'critical-css',
+      //   enforce: 'post',
+      //   apply: 'build',
+      //   closeBundle() {
+      //     cp.execSync('npx critical index.html --inline --target index.html', {
+      //       cwd: path.resolve(__dirname, '../docs'),
+      //     })
+      //   },
+      // },
       htmPlugin(),
     ],
   }
