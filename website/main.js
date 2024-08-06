@@ -1,6 +1,6 @@
 import './style.css'
 import './mini-bili.htm'
 
-import start from 'virtual:alpine'
+import Alpine from 'alpinejs'
 
-start()
+Alpine.start()

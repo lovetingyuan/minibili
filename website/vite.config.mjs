@@ -2,10 +2,9 @@
 // import { generate } from 'critical'
 // import fs from 'fs'
 // import path from 'path'
+import { vitePlugin as htmPlugin } from 'unplugin-alpinejs-component'
 import { defineConfig } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
-
-import htmPlugin from './viteHtmPlugin'
 
 export default defineConfig((env) => {
   return {
