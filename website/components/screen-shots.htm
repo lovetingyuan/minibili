@@ -1,6 +1,11 @@
 <section
   class="text-center flex items-center sm:gap-4 justify-center my-12 gap-0">
-  <a :href="'#screenshot-' + leftIndex" class="btn btn-circle text-lg">❮</a>
+  <a
+    :href="'#screenshot-' + leftIndex"
+    class="btn btn-circle text-lg"
+    title="上一张"
+    >❮</a
+  >
   <div class="mockup-phone flex-shrink-0" style="margin: 0">
     <div class="camera" style="background: transparent"></div>
     <div class="display">
@@ -16,7 +21,12 @@
       </div>
     </div>
   </div>
-  <a :href="'#screenshot-' + rightIndex" class="btn btn-circle text-lg">❯</a>
+  <a
+    :href="'#screenshot-' + rightIndex"
+    class="btn btn-circle text-lg"
+    title="下一张"
+    >❯</a
+  >
 </section>
 
 <script>

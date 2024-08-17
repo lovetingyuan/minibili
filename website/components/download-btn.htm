@@ -4,20 +4,25 @@
     class="max-w-full w-[400px] mt-12 mb-8 inline-block"
     alt="minibili logo" />
   <p class="text-3xl mt-6 mb-12 tracking-wider">一款简洁的B站浏览应用</p>
-  <a
-    :href="latestApkUrl"
-    @click="displayDownloadToast"
-    :style="latestApkUrl ? '' : 'pointer-events: none'"
-    class="btn btn-primary btn-lg px-16 text-white hover:tracking-wide transition-all"
-    :download="'minibili-' + latestVersion + '.apk'">
-    下载APP
-    <template x-if="!latestVersion">
-      <span class="loading loading-spinner"></span>
-    </template>
-    <template x-if="latestVersion">
-      <span x-text="' (' + latestVersion + ')'"></span>
-    </template>
-  </a>
+  <div
+    data-tip="正在获取最新版本，请稍候"
+    :class="latestApkUrl? '' : 'tooltip'">
+    <a
+      :href="latestApkUrl"
+      @click="displayDownloadToast"
+      :style="latestApkUrl ? '' : 'pointer-events: none'"
+      :disabled="!latestApkUrl"
+      class="btn btn-primary btn-lg px-16 text-white hover:tracking-wide transition-all"
+      :download="'minibili-' + latestVersion + '.apk'">
+      下载APP
+      <template x-if="!latestVersion">
+        <span class="loading loading-spinner"></span>
+      </template>
+      <template x-if="latestVersion">
+        <span x-text="' (' + latestVersion + ')'"></span>
+      </template>
+    </a>
+  </div>
   <div
     class="toast toast-top toast-start"
     style="display: none"
