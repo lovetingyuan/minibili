@@ -82,11 +82,11 @@ function Route() {
       },
     }
   }, [titleColor])
-  const { $firstRun } = useStore()
-  const isFirstRun = $firstRun === 0
+  const { $firstRun, initialed } = useStore()
+  const isFirstRun = initialed && $firstRun === -1
   return (
     <View className={`flex-1 ${colors.white.bg}`}>
-      <NavigationContainer theme={routeTheme} key={$firstRun}>
+      <NavigationContainer theme={routeTheme}>
         <Stack.Navigator
           initialRouteName={isFirstRun ? 'Welcome' : 'VideoList'}
           screenOptions={screenOptions}

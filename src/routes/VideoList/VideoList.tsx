@@ -31,6 +31,7 @@ function VideoList(props: {
     set$blackTags,
     set$blackUps,
     setOverlayButtons,
+    currentVideosCate,
   } = useStore()
   const videoList = React.useMemo(() => {
     const result: VideoItemType[] = []
@@ -59,6 +60,11 @@ function VideoList(props: {
   const listRef = React.useRef<any>(null)
   const currentVideoRef = React.useRef<VideoItemType | null>(null)
   const markVideoWatched = useMarkVideoWatched()
+  React.useEffect(() => {
+    setTimeout(() => {
+      listRef.current?.scrollToOffset(0)
+    })
+  }, [currentVideosCate])
   const addBlackUp = () => {
     if (!currentVideoRef.current) {
       return

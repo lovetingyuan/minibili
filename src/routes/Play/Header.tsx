@@ -14,7 +14,7 @@ import { useVideoInfo } from '@/api/video-info'
 import { colors } from '@/constants/colors.tw'
 import { useFollowedUpsMap, useMusicSongsMap } from '@/store/derives'
 import type { RootStackParamList } from '@/types'
-import { parseNumber, showToast } from '@/utils'
+import { parseImgUrl, parseNumber, showToast } from '@/utils'
 
 import { useStore } from '../../store'
 
@@ -232,6 +232,19 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
             hideMenu()
           }}>
           下载视频
+        </MenuItem>
+        <MenuItem
+          textStyle={tw('text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            hideMenu()
+            if (videoInfo.cover) {
+              Linking.openURL(parseImgUrl(videoInfo.cover))
+            } else {
+              showToast('暂时无法获取封面')
+            }
+          }}>
+          下载封面
         </MenuItem>
         <MenuItem
           textStyle={tw('text-black dark:text-gray-300')}

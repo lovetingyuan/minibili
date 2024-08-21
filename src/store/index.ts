@@ -21,7 +21,7 @@ export const getAppValue = () => {
     /**
      * 首次运行的时间
      */
-    $firstRun: 0,
+    $firstRun: -1,
     /**
      * 拉黑的up主，key是下划线加上up的mid
      */
@@ -140,7 +140,7 @@ export const InitStoreComp = React.memo(() => {
       methods.setInitialed(true)
       setTimeout(() => {
         SplashScreen.hideAsync()
-      }, 10)
+      }, 100)
     })
   })
   return null

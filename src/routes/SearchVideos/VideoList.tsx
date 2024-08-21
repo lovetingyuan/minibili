@@ -63,7 +63,8 @@ function EmptyContent(props: {
               {hot.icon ? (
                 <Image2
                   source={{ uri: parseImgUrl(hot.icon) }}
-                  className="ml-1 h-4"
+                  style={{ height: 16 }}
+                  className="ml-1"
                 />
               ) : null}
             </TouchableOpacity>

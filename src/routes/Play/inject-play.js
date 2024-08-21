@@ -5,21 +5,47 @@ function __$hack() {
     font-weight: bold!important;
     font-size: 14px!important;
   }
-  `
-  const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
-  document.head.appendChild(style)
 
-  // eslint-disable-next-line no-undef
-  const seta = HTMLElement.prototype.setAttribute
-  // eslint-disable-next-line no-undef
-  HTMLElement.prototype.setAttribute = function (...args) {
-    if (this.tagName === 'VIDEO' && this.src !== newVideoUrl) {
-      Promise.resolve().then(() => {
-        this.src = newVideoUrl
-      })
-    }
-    return seta.apply(this, args)
+  html, body, #bilibiliPlayer, .mplayer {
+    background-color: black!important;
   }
+  .b-danmaku {
+    opacity: 0.66!important;
+  }
+  .mplayer-control-bar-top {
+    align-items: center;
+  }
+  `
+  document.head.appendChild(style)
+  const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
+  if (window.MutationObserver) {
+    const observer = new window.MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        // 遍历 DOM 变更记录
+        mutation.addedNodes.forEach(function (node) {
+          // 检查是否是 video 元素
+          if (node.tagName === 'VIDEO') {
+            // 触发你的自定义事件
+            // const event = new CustomEvent('videoCreated', { detail: node })
+            // window.dispatchEvent(event)
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                action: 'console.log',
+                payload: 'video url change',
+              }),
+            )
+            Promise.resolve().then(() => {
+              node.src = newVideoUrl
+            })
+          }
+        })
+      })
+    })
+
+    // 开始监听 DOM 变更
+    observer.observe(document.body, { childList: true, subtree: true })
+  }
+
   function waitForVideo(callback) {
     const video = document.querySelector('video[src]')
     if (video) {
@@ -60,6 +86,7 @@ function __$hack() {
       return
     }
     video.__handled = true
+
     // eslint-disable-next-line no-array-constructor
     Array('play', 'ended', 'pause').forEach((evt) => {
       video.addEventListener(evt, () => {
@@ -117,19 +144,6 @@ function __$hack() {
         }),
       )
     }
-    const fixStyle = document.createElement('style')
-    fixStyle.textContent = `
-    html, body, #bilibiliPlayer, .mplayer {
-      background-color: black!important;
-    }
-    .b-danmaku {
-      opacity: 0.66!important;
-    }
-    .mplayer-control-bar-top {
-      align-items: center;
-    }
-    `
-    document.head.appendChild(fixStyle)
   })
 
   // waitForVideo((vi) => {
