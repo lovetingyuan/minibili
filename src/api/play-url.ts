@@ -47,7 +47,7 @@ export function useVideoMp4Url(
     },
   )
   let url = data?.durl
-    ? data.durl[0]?.backup_url?.[0] || data.durl[0]?.url || ''
+    ? data.durl[0]?.url || data.durl[0]?.backup_url?.[0] || ''
     : null
   if (highQuality && url) {
     url += '&_high_quality=true'

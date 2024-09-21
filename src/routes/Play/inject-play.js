@@ -17,6 +17,7 @@ function __$hack() {
   }
   `
   document.head.appendChild(style)
+  let originVideoUrl = ''
   const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
   if (window.MutationObserver) {
     const observer = new window.MutationObserver(function (mutations) {
@@ -34,8 +35,28 @@ function __$hack() {
                 payload: 'video url change',
               }),
             )
+            if (node.src && !originVideoUrl) {
+              originVideoUrl = node.src
+            }
+            node.addEventListener('error', () => {
+              if (node.src !== originVideoUrl && originVideoUrl) {
+                node.src = originVideoUrl
+              }
+              // eslint-disable-next-line no-alert
+              alert('视频加载失败')
+            })
+            node.src = newVideoUrl
             Promise.resolve().then(() => {
-              node.src = newVideoUrl
+              if (node.src !== newVideoUrl) {
+                node.src = newVideoUrl
+                node.play()
+              }
+              setTimeout(() => {
+                if (node.src !== newVideoUrl) {
+                  node.src = newVideoUrl
+                  node.play()
+                }
+              })
             })
           }
         })
@@ -147,21 +168,12 @@ function __$hack() {
   })
 
   // waitForVideo((vi) => {
-  //   if (vi && newVideoUrl.startsWith('https') && vi.src !== newVideoUrl) {
-  //     vi.dataset.src = vi.src
-  //     vi.setAttribute('autoplay', 'true')
-  //     vi.setAttribute('src', newVideoUrl)
-  //     vi.dataset.replaced = 'true'
-  //     setTimeout(() => {
-  //       vi.play()
-  //     }, 500)
-  //     setTimeout(() => {
-  //       const _vi = document.querySelector('video[data-replaced]')
-  //       if (_vi && newVideoUrl.includes('_high_quality') && document.body) {
-  //         document.body.dataset.replaced = 'true'
-  //       }
-  //     }, 3000)
+  //   if (newVideoUrl.startsWith('https') && vi.src !== newVideoUrl) {
+  //     vi.src = newVideoUrl
   //   }
+  //   setTimeout(() => {
+  //     vi.play()
+  //   }, 100)
   // })
 
   const xx = 'x'
