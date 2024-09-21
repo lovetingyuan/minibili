@@ -1,3 +1,4 @@
+import { useFocusEffect } from '@react-navigation/native'
 import { Icon, Slider, Text } from '@rneui/themed'
 import clsx from 'clsx'
 import {
@@ -67,14 +68,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
       nextSong: songs[index + 1] ?? null,
     }
   }, [playingSong, get$musicList])
-  // useBackgroundTask(
-  //   'KeepMusicPlay',
-  //   useMemoizedFn(() => {
-  //     soundRef.current?.getStatusAsync().then((status) => {
-  //       handlePlayStatusChange(status)
-  //     })
-  //   }),
-  // )
+
   const handlePlayStatusChange = useMemoizedFn(
     React.useMemo(() => {
       return (status: AVPlaybackStatus) => {
@@ -129,6 +123,14 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
       soundRef.current?.unloadAsync()
     }
   }, [props.url])
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        soundRef.current?.unloadAsync()
+      }
+    }, []),
+  )
 
   const isDark = useIsDark()
   if (!playingSong) {

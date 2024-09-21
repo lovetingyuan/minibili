@@ -6,6 +6,7 @@ const TaskMap = {
   KeepMusicPlay: () => {},
   test: () => null,
   CheckLivingUps: () => null,
+  KeepVideoPlay: () => null,
 }
 
 type TaskMapType = typeof TaskMap

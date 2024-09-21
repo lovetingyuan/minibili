@@ -30,6 +30,7 @@ import { useAppStateChange } from '../../hooks/useAppState'
 import { useStore } from '../../store'
 import { parseDuration, parseImgUrl, showToast } from '../../utils'
 import { INJECTED_JAVASCRIPT } from './inject-play'
+
 const PlayUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
 
 export default React.memo(Player)
@@ -93,28 +94,6 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     }
     if (currentAppState !== 'active') {
       KeepAwake.deactivateKeepAwake('PLAY')
-      webviewRef.current?.requestFocus()
-      webviewRef.current?.postMessage('dsfs')
-      setTimeout(() => {
-        webviewRef.current?.requestFocus()
-        webviewRef.current?.postMessage('dsfs')
-        webviewRef.current?.injectJavaScript(`
-          (function() {
-            const aa = document.getElementById('play-rate-button')
-            if (aa ) {
-              aa.style.backgroundColor = 'red';
-            }
-          })(); true;
-          `)
-      }, 1000)
-      webviewRef.current?.injectJavaScript(`
-          (function() {
-            const video = document.querySelector('video');
-            if (video) {
-              video.play()
-            }
-          })(); true;
-          `)
     }
   })
 
