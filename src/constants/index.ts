@@ -1,9 +1,10 @@
 export const githubLink = 'https://github.com/lovetingyuan/minibili'
-export const site = 'https://lovetingyuan.github.io/minibili/'
+export const site = 'https://minibili.tingyuan.in/'
 export const configUrl = `${site}config.json`
 
 export let UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 Edg/127.0.0.0'
+
 export const setUA = (ua: string) => {
   UA = ua
 }
