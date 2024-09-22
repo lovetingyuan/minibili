@@ -214,7 +214,7 @@ try {
 // ---------------------------------------------
 echo(chalk.blue('Update version file...'))
 await fs.outputJsonSync(
-  path.resolve(__dirname, '../docs/version.json'),
+  path.resolve(__dirname, '../website/public/version.json'),
   latestBuildList.map((item) => {
     return {
       version: item.appVersion,
