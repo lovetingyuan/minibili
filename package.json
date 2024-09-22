@@ -1,6 +1,6 @@
 {
   "name": "minibili",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "description": "minimum bilibili apk",
   "unpkg": "docs/version.json",
   "files": [
@@ -126,8 +126,8 @@
     ]
   },
   "config": {
-    "versionCode": 67,
-    "changelog": "支持添加视频到歌曲"
+    "versionCode": 68,
+    "changelog": "修复已知问题"
   },
-  "gitHead": "2591480"
+  "gitHead": "d611975"
 }
