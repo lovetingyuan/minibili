@@ -81,6 +81,7 @@ module.exports = {
         organization: process.env.SENTRY_ORG,
       },
     ],
+    'expo-asset',
     // [
     //   'expo-av',
     //   {

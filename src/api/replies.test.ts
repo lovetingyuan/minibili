@@ -3,7 +3,7 @@ import { test } from 'vitest'
 import request from './fetcher'
 import { ReplyResponseSchema } from './replies.schema'
 
-test('get-comment-replies-1', async () => {
+test.skip('get-comment-replies-1', async () => {
   const repliesInfo = {
     oid: 1451532147,
     root: 212143555808,

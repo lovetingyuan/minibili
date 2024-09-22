@@ -42,8 +42,11 @@ function __$hack() {
               if (node.src !== originVideoUrl && originVideoUrl) {
                 node.src = originVideoUrl
               }
-              // eslint-disable-next-line no-alert
-              alert('视频加载失败')
+              if (!window.__show_err_alert) {
+                window.__show_err_alert = true
+                // eslint-disable-next-line no-alert
+                alert('视频加载失败')
+              }
             })
             node.src = newVideoUrl
             Promise.resolve().then(() => {

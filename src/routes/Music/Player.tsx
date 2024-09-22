@@ -8,7 +8,7 @@ import {
   // InterruptionModeIOS,
 } from 'expo-av'
 // import { Image } from 'expo-image'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { ImageBackground, TouchableOpacity, View } from 'react-native'
 
 // import { throttle } from 'throttle-debounce'
@@ -46,9 +46,12 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   const [playFinished, setPlayFinished] = React.useState(false)
   const [playingTime, setPlayingTime] = React.useState(0)
   const soundRef = React.useRef<Audio.Sound | null>(null)
-  // if (!soundRef.current) {
-  //   soundRef.current = new Audio.Sound()
-  // }
+  const unmountRef = React.useRef(false)
+
+  const stop = () => {
+    return soundRef.current?.unloadAsync().catch(() => {})
+  }
+
   const [playMode, setPlayMode] = React.useState<'single' | 'order' | 'loop'>(
     'single',
   )
@@ -77,7 +80,6 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
           setPlayFinished(status.didJustFinish)
           setPlayingTime(status.positionMillis)
           if (status.didJustFinish) {
-            // console.log('play done')
             if (playMode === 'order') {
               soundRef.current?.stopAsync()
               if (nextSong) {
@@ -96,7 +98,10 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
     setIsPlaying(false)
     setPlayingTime(0)
     setPlayFinished(false)
-    Promise.resolve(soundRef.current?.unloadAsync().catch(() => {}))
+    if (unmountRef.current) {
+      return
+    }
+    Promise.resolve(stop())
       .then(() => {
         return Audio.Sound.createAsync(
           {
@@ -115,22 +120,34 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
       })
       .then(({ sound }) => {
         soundRef.current = sound
+        if (unmountRef.current) {
+          stop()
+          return
+        }
       })
       .catch(() => {
         showToast('抱歉，播放失败')
       })
     return () => {
-      soundRef.current?.unloadAsync()
+      stop()
     }
   }, [props.url])
 
   useFocusEffect(
     React.useCallback(() => {
       return () => {
-        soundRef.current?.unloadAsync()
+        unmountRef.current = true
+        stop()
       }
     }, []),
   )
+
+  useEffect(() => {
+    return () => {
+      unmountRef.current = true
+      stop()
+    }
+  }, [])
 
   const isDark = useIsDark()
   if (!playingSong) {
@@ -288,7 +305,7 @@ function MusicPlayerBar() {
       setPlayingSong(null)
     }
   }, [setPlayingSong])
-  return <PlayerBarComp url={url} time={time} error={!!error} />
+  return <PlayerBarComp key={url} url={url} time={time} error={!!error} />
 }
 
 export default React.memo(MusicPlayerBar)
