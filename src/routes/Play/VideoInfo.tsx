@@ -244,6 +244,7 @@ function VideoInfo(props: {
               onRequestClose: () => {
                 setShowPagesModal(false)
               },
+              statusBarTranslucent: true,
             }}
             isVisible={showPagesModal}>
             <Card containerStyle={tw('m-0')}>

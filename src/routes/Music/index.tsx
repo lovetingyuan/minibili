@@ -154,7 +154,7 @@ function MusicItem(props: {
 }
 
 function MusicList() {
-  const { $musicList, playingSong } = useStore()
+  const { $musicList } = useStore()
   const list = $musicList[0].songs
   const blackColor = tw(colors.black.text).color
   const searchBarRef = React.useRef<SearchBarCommands | null>(null)
@@ -204,38 +204,42 @@ function MusicList() {
     return list
   }, [list, searchKeyWord])
   return (
-    <View className="flex-1 relative">
-      <FlashList
-        data={songsList}
-        keyExtractor={(v) => `${v.bvid}_${v.cid}`}
-        renderItem={({ item }) => {
-          return <MusicItem song={item} />
-        }}
-        persistentScrollbar
-        estimatedItemSize={100}
-        // ListHeaderComponent={<MusicPlayerBar />}
-        ListEmptyComponent={
-          <View className="flex-1 gap-2 my-16">
-            <Text className="text-center text-base">暂无歌曲</Text>
-            {list.length === 0 ? (
-              <Text className="text-center text-base">
-                你可以在视频播放页面右上角添加
+    <View className="flex-1">
+      <View className="flex-grow shrink">
+        <FlashList
+          data={songsList}
+          keyExtractor={(v) => `${v.bvid}_${v.cid}`}
+          renderItem={({ item }) => {
+            return <MusicItem song={item} />
+          }}
+          persistentScrollbar
+          estimatedItemSize={100}
+          // ListHeaderComponent={<MusicPlayerBar />}
+          ListEmptyComponent={
+            <View className="flex-1 gap-2 my-16">
+              <Text className="text-center text-base">暂无歌曲</Text>
+              {list.length === 0 ? (
+                <Text className="text-center text-base">
+                  你可以在视频播放页面右上角添加
+                </Text>
+              ) : null}
+            </View>
+          }
+          ListFooterComponent={
+            songsList.length ? (
+              <Text
+                className={`${colors.gray6.text} text-xs text-center py-1 my-2`}>
+                到底了
               </Text>
-            ) : null}
-          </View>
-        }
-        ListFooterComponent={
-          songsList.length ? (
-            <Text
-              className={`${colors.gray6.text} text-xs text-center py-1 my-2 ${playingSong ? 'mb-32' : ''}`}>
-              到底了
-            </Text>
-          ) : null
-        }
-        contentContainerStyle={tw('px-4 pt-4')}
-        estimatedFirstItemOffset={80}
-      />
-      <MusicPlayerBar />
+            ) : null
+          }
+          contentContainerStyle={tw('px-4 pt-4')}
+          estimatedFirstItemOffset={80}
+        />
+      </View>
+      <View className="shrink-0">
+        <MusicPlayerBar />
+      </View>
     </View>
   )
 }

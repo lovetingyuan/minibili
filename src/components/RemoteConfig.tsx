@@ -6,6 +6,7 @@ import { setUA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
 
 import { useRemoteConfig } from '../api/remote-config'
+import Modal2 from './Modal2'
 
 export default function RemoteConfig() {
   const remoteConfig = useRemoteConfig()
@@ -24,6 +25,7 @@ export default function RemoteConfig() {
       <Dialog
         isVisible={visible}
         overlayStyle={tw(colors.gray2.bg)}
+        ModalComponent={Modal2}
         backdropStyle={tw('bg-neutral-900/90')}
         onBackdropPress={
           remoteConfig.statement.dismiss ? toggleDialog : undefined

@@ -35,6 +35,7 @@ export default function ReplyList() {
       onBackdropPress={handleClose}
       modalProps={{
         onRequestClose: handleClose,
+        statusBarTranslucent: true,
       }}
       isVisible={!!repliesInfo}>
       <View className="h-[68vh] bg-neutral-100 dark:bg-neutral-700">

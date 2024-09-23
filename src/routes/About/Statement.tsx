@@ -36,6 +36,7 @@ function Statement() {
           onRequestClose: () => {
             setShowStatement(false)
           },
+          statusBarTranslucent: true,
         }}
         isVisible={showStatement}>
         <Card containerStyle={tw('m-0')}>

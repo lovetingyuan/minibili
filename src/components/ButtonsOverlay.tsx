@@ -4,6 +4,7 @@ import React from 'react'
 import { colors } from '@/constants/colors.tw'
 
 import { useStore } from '../store'
+import Modal2 from './Modal2'
 
 function ButtonsOverlay() {
   const { overlayButtons, setOverlayButtons } = useStore()
@@ -36,6 +37,7 @@ function ButtonsOverlay() {
   return (
     <Overlay
       isVisible={overlayButtons.length > 0}
+      ModalComponent={Modal2}
       overlayStyle={tw(`px-0 py-3 min-w-[70%] ${colors.gray2.bg}`)}
       onBackdropPress={dismiss}>
       {Buttons}

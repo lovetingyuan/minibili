@@ -2,6 +2,7 @@ import { Dialog, Input } from '@rneui/themed'
 import React from 'react'
 import { Share, View } from 'react-native'
 
+import Modal2 from '@/components/Modal2'
 import { colors } from '@/constants/colors.tw'
 
 import { site } from '../../constants'
@@ -52,6 +53,7 @@ function Feedback() {
       <Dialog
         isVisible={feedBackVisible}
         onBackdropPress={hideFeedback}
+        ModalComponent={Modal2}
         overlayStyle={tw(colors.gray2.bg)}>
         <Dialog.Title
           title="欢迎反馈意见 😊"

@@ -162,7 +162,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
           : require('../../../assets/bg-111.webp')
       }
       resizeMode="stretch"
-      className={`flex-1 blur-md absolute bottom-0 z-10 left-0 right-0 px-4 py-6 ${colors.white.bg}`}
+      className={`px-4 py-6 ${colors.white.bg}`}
       style={shadowStyle}>
       <View className="flex-row gap-3">
         <ImageBackground

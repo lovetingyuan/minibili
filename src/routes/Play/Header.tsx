@@ -11,6 +11,7 @@ import { useAiConclusion } from '@/api/ai-conclusion'
 import { getDownloadUrl } from '@/api/play-url'
 import { useUserRelation } from '@/api/user-relation'
 import { useVideoInfo } from '@/api/video-info'
+import Modal2 from '@/components/Modal2'
 import { colors } from '@/constants/colors.tw'
 import { useFollowedUpsMap, useMusicSongsMap } from '@/store/derives'
 import type { RootStackParamList } from '@/types'
@@ -64,8 +65,9 @@ function AiConclusionModal(props: {
   return (
     <Dialog
       isVisible={true}
+      ModalComponent={Modal2}
       overlayStyle={tw(colors.gray2.bg)}
-      backdropStyle={tw('bg-neutral-900/90')}
+      backdropStyle={tw('bg-neutral-900/80')}
       onBackdropPress={toggleDialog}>
       <Dialog.Title title={'视频总结💡'} titleStyle={tw(colors.black.text)} />
       {isLoading ? (

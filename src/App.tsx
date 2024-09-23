@@ -3,8 +3,8 @@ import { ThemeProvider } from '@rneui/themed'
 import * as SentryExpo from '@sentry/react-native'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
-import { AppState } from 'react-native'
-import { RootSiblingParent } from 'react-native-root-siblings'
+import { AppState, SafeAreaView } from 'react-native'
+// import { RootSiblingParent } from 'react-native-root-siblings'
 import { SWRConfig } from 'swr'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
 
@@ -82,8 +82,8 @@ export default function App() {
   const rneTheme = useRNETheme()
   const appValue = React.useMemo(() => getAppValue(), [])
   return (
-    <RootSiblingParent>
-      <StatusBar style="auto" />
+    <SafeAreaView className="flex-1">
+      <StatusBar style="auto" translucent backgroundColor="transparent" />
       <SentryExpo.ErrorBoundary fallback={errorFallback}>
         <AppContextProvider value={appValue} onChange={onChange}>
           <ThemeProvider theme={rneTheme}>
@@ -102,6 +102,6 @@ export default function App() {
           </ThemeProvider>
         </AppContextProvider>
       </SentryExpo.ErrorBoundary>
-    </RootSiblingParent>
+    </SafeAreaView>
   )
 }

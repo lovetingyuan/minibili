@@ -1,6 +1,7 @@
 import * as Updates from 'expo-updates'
-import { Alert, Linking, Platform, Share, ToastAndroid } from 'react-native'
-import Toast from 'react-native-root-toast'
+import { Alert, Linking, Share } from 'react-native'
+// import Toast from 'react-native-root-toast'
+import Toast from 'react-native-simple-toast'
 import { throttle } from 'throttle-debounce'
 
 import { checkUpdate } from '@/api/check-update'
@@ -161,14 +162,15 @@ export function showToast(message: string, long = false) {
     toastFuncMap[message] = throttle(
       5000,
       () => {
-        Platform.OS === 'android'
-          ? ToastAndroid.show(
-              message,
-              long ? ToastAndroid.LONG : ToastAndroid.SHORT,
-            )
-          : Toast.show(message, {
-              duration: long ? Toast.durations.LONG : Toast.durations.SHORT,
-            })
+        Toast.show(message, long ? Toast.LONG : Toast.SHORT)
+        // Platform.OS === 'android'
+        //   ? ToastAndroid.show(
+        //       message,
+        //       long ? ToastAndroid.LONG : ToastAndroid.SHORT,
+        //     )
+        //   : Toast.show(message, {
+        //       duration: long ? Toast.durations.LONG : Toast.durations.SHORT,
+        //     })
       },
       {
         noLeading: false,
