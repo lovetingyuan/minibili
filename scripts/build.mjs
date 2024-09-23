@@ -249,6 +249,15 @@ try {
 }
 
 try {
+  await spinner('Building website...', async () => {
+    return $`npm run build:docs`
+  })
+  echo(chalk.blue('website build done'))
+} catch (err) {
+  echo(chalk.red('Failed to build website.'))
+}
+
+try {
   await spinner('Publish to npm...', () =>
     retry(
       3,
@@ -296,6 +305,9 @@ echo(
 echo(
   `npm dist-tag add ${pkg.name}@${newVersion} latest --registry=https://registry.npmjs.org/`,
 )
+
+echo('npm run deploy:docs')
+
 const open = require('open')
 open(
   `https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
