@@ -22,9 +22,9 @@ import useRNETheme from './hooks/useRNETheme'
 import Route from './routes/Index'
 import {
   AppContextProvider,
-  getAppValue,
   InitStoreComp,
   onChange,
+  useAppValue,
 } from './store'
 import { reportApiError } from './utils/report'
 
@@ -80,7 +80,7 @@ const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
 
 export default function App() {
   const rneTheme = useRNETheme()
-  const appValue = React.useMemo(() => getAppValue(), [])
+  const appValue = useAppValue()
   return (
     <SafeAreaView className="flex-1">
       <StatusBar style="auto" translucent backgroundColor="transparent" />

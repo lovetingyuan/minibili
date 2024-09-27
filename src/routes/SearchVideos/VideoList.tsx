@@ -1,13 +1,14 @@
 import { Skeleton, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
-import { ScrollView, TouchableOpacity, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 
 import { useHotSearch } from '@/api/hot-search'
 import { type SearchedVideoType, useSearchVideos } from '@/api/search-video'
 import Image2 from '@/components/Image2'
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
 import { parseImgUrl } from '@/utils'
 
 function EmptyContent(props: {
@@ -15,6 +16,7 @@ function EmptyContent(props: {
   onSearch: (k: string) => void
 }) {
   const hotSearchList = useHotSearch()
+  const { $watchedHotSearch } = useStore()
   if (props.loading) {
     return (
       <View>
@@ -47,7 +49,7 @@ function EmptyContent(props: {
     )
   }
   return (
-    <ScrollView className="mb-4">
+    <>
       {hotSearchList ? (
         hotSearchList.map((hot) => {
           return (
@@ -58,8 +60,14 @@ function EmptyContent(props: {
                 props.onSearch(hot.keyword)
               }}
               className="flex-1 flex-row p-2 mx-2 my-1 items-center">
-              <Text className="text-base">{hot.position}. </Text>
-              <Text className="text-base">{hot.show_name}</Text>
+              <Text
+                className={`text-base ${hot.keyword in $watchedHotSearch ? 'opacity-40' : ''}`}>
+                {hot.position}.{' '}
+              </Text>
+              <Text
+                className={`text-base ${hot.keyword in $watchedHotSearch ? 'opacity-40' : ''}`}>
+                {hot.show_name}
+              </Text>
               {hot.icon ? (
                 <Image2
                   source={{ uri: parseImgUrl(hot.icon) }}
@@ -73,7 +81,7 @@ function EmptyContent(props: {
       ) : (
         <Text className="text-center my-20 text-base">暂无结果</Text>
       )}
-    </ScrollView>
+    </>
   )
 }
 
@@ -86,11 +94,13 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
     isValidating,
   } = useSearchVideos(props.keyword)
   const listRef = React.useRef<FlashList<any> | null>(null)
+
   React.useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollToOffset({ offset: 0 })
     }
   }, [props.keyword])
+
   return (
     <FlashList
       data={searchedVideos}

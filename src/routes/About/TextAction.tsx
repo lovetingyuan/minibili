@@ -28,6 +28,7 @@ function TextAction(
               size="sm"
               key={button.text}
               loading={!!button.loading}
+              buttonStyle={button.loading ? { padding: 2.5 } : null}
               onPress={() => {
                 button.onPress()
               }}>

@@ -52,6 +52,7 @@ export const getAppValue = () => {
       name: string
       songs: MusicSong[]
     }[],
+    $watchedHotSearch: {} as Record<string, number>,
     // -------------------------
     initialed: false,
     isWiFi: false,
@@ -82,7 +83,9 @@ const AppContext = createAtomicContext(initValue)
 const storedKeys = Object.keys(initValue).filter((k) =>
   k.startsWith('$'),
 ) as StoredKeys[]
-
+export function useAppValue() {
+  return React.useMemo(() => getAppValue(), [])
+}
 export function useStore() {
   return useAtomicContext(AppContext)
 }

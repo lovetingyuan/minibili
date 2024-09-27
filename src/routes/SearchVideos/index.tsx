@@ -7,6 +7,7 @@ import type { SearchBarCommands } from 'react-native-screens'
 import { colors } from '@/constants/colors.tw'
 import useMounted from '@/hooks/useMounted'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
+import { useMarkHotSearchViewed } from '@/store/actions'
 
 import VideoList from './VideoList'
 
@@ -24,6 +25,7 @@ function SearchVideos() {
     }
     return false
   })
+  const markHotViewed = useMarkHotSearchViewed()
   useUpdateNavigationOptions(
     React.useMemo(() => {
       return {
@@ -56,6 +58,9 @@ function SearchVideos() {
       searchBarRef.current?.focus()
       searchBarRef.current?.setText('')
     }, 200)
+    return () => {
+      console.log('unmoutned')
+    }
   })
 
   return (
@@ -68,6 +73,7 @@ function SearchVideos() {
           searchBarRef.current?.setText(keyword)
           searchBarRef.current?.blur()
           setSearchKeyWord(keyword)
+          markHotViewed(keyword)
         }}
       />
     </KeyboardAvoidingView>

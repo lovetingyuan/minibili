@@ -1,4 +1,3 @@
-import { useFocusEffect } from '@react-navigation/native'
 import { Icon, Slider, Text } from '@rneui/themed'
 import clsx from 'clsx'
 import {
@@ -133,21 +132,21 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
     }
   }, [props.url])
 
-  useFocusEffect(
-    React.useCallback(() => {
-      return () => {
-        unmountRef.current = true
-        stop()
-      }
-    }, []),
-  )
-
   useEffect(() => {
     return () => {
       unmountRef.current = true
       stop()
     }
   }, [])
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     return () => {
+  //       unmountRef.current = true
+  //       stop()
+  //     }
+  //   }, []),
+  // )
 
   const isDark = useIsDark()
   if (!playingSong) {
