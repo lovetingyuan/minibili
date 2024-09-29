@@ -21,14 +21,16 @@ function About() {
     <ScrollView className="p-5">
       <Header />
       <Divider className="my-4" />
-      <Version />
-      <Feedback />
-      <Backup />
-      <Collect />
-      <History />
-      <Music />
-      <Statement />
-      <Divider className="mb-4" />
+      <View className="gap-2">
+        <Version />
+        <Feedback />
+        <Backup />
+        <Collect />
+        <History />
+        <Music />
+        <Statement />
+      </View>
+      <Divider className="my-4" />
       <BlackTags />
       <BlackUps />
       <SortCate />

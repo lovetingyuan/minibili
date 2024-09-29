@@ -13,7 +13,7 @@ function TextAction(
   }>,
 ) {
   return (
-    <View className="flex-row items-center justify-between mb-2">
+    <View className="flex-row items-center justify-between">
       <Text
         className="text-base"
         onPress={props.onTextPress}
@@ -28,7 +28,7 @@ function TextAction(
               size="sm"
               key={button.text}
               loading={!!button.loading}
-              buttonStyle={button.loading ? { padding: 2.5 } : null}
+              buttonStyle={tw('h-8')}
               onPress={() => {
                 button.onPress()
               }}>
