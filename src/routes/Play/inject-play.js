@@ -17,6 +17,27 @@ function __$hack() {
   }
   `
   document.head.appendChild(style)
+
+  document.addEventListener('visibilitychange', (e) => {
+    const bgPlayBtn = document.getElementById('play-background-button')
+    if (bgPlayBtn.dataset.bgPlay !== 'true') {
+      return
+    }
+    if (document.visibilityState === 'hidden') {
+      const video = document.querySelector('video')
+      setTimeout(() => {
+        if (video.paused) {
+          video.muted = true
+          video.play()
+          setTimeout(() => {
+            video.muted = false
+          })
+        }
+      })
+      bgPlayBtn.dataset.bgPlay = 'false'
+    }
+  })
+
   let originVideoUrl = ''
   const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
   if (window.MutationObserver) {
@@ -29,12 +50,12 @@ function __$hack() {
             // 触发你的自定义事件
             // const event = new CustomEvent('videoCreated', { detail: node })
             // window.dispatchEvent(event)
-            window.ReactNativeWebView.postMessage(
-              JSON.stringify({
-                action: 'console.log',
-                payload: 'video url change',
-              }),
-            )
+            // window.ReactNativeWebView.postMessage(
+            //   JSON.stringify({
+            //     action: 'console.log',
+            //     payload: 'video url change',
+            //   }),
+            // )
             if (node.src && !originVideoUrl) {
               originVideoUrl = node.src
             }
@@ -113,7 +134,19 @@ function __$hack() {
 
     // eslint-disable-next-line no-array-constructor
     Array('play', 'ended', 'pause').forEach((evt) => {
-      video.addEventListener(evt, () => {
+      video.addEventListener(evt, (event) => {
+        // window.ReactNativeWebView.postMessage(
+        //   JSON.stringify({
+        //     action: 'console.log',
+        //     payload: event.type + '99' + document.visibilityState,
+        //   }),
+        // )
+        // if (event.type === 'pause') {
+        //   setTimeout(() => {
+
+        //   })
+        //   event.target.play()
+        // }
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             action: 'playState',
@@ -189,12 +222,20 @@ function __$hack() {
       if (!video) {
         return
       }
-      const paused = video.paused
-      if (paused) {
-        video.play()
-      } else {
-        video.pause()
-      }
+      video.pause()
+      // const paused = video.paused
+      // window.ReactNativeWebView.postMessage(
+      //   JSON.stringify({
+      //     action: 'console.log',
+      //     payload: 'pp' + paused,
+      //   }),
+      // )
+
+      // if (paused) {
+      //   video.play()
+      // } else {
+      //   video.pause()
+      // }
     })
   })
   waitForDom('.mplayer-right', (right) => {
@@ -233,6 +274,37 @@ function __$hack() {
         video.playbackRate = rate
       })
       right.appendChild(rateBtn)
+    }
+    if (!document.getElementById('play-background-button')) {
+      const bgPlayBtn = document.createElement('div')
+      bgPlayBtn.id = 'play-background-button'
+      bgPlayBtn.innerHTML =
+        '后<style>#play-background-button[data-bg-play="true"] {color: #FF6699!important;font-weight: bold;}</style>'
+      bgPlayBtn.style.cssText = `
+        width: 24px;
+        height: 24px;
+        color: white;
+        font-size: 16px;
+        line-height: 28px;
+        text-align: center;
+        margin-top: 10px;
+        background: rgba(0,0,0,.2);
+        border-radius: 50%;
+      `
+      bgPlayBtn.addEventListener('click', () => {
+        if (bgPlayBtn.dataset.bgPlay === 'true') {
+          bgPlayBtn.dataset.bgPlay = 'false'
+        } else {
+          bgPlayBtn.dataset.bgPlay = 'true'
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              action: 'showToast',
+              payload: '后台播放已开启',
+            }),
+          )
+        }
+      })
+      right.appendChild(bgPlayBtn)
     }
   })
 
