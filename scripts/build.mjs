@@ -77,12 +77,6 @@ const getBuildList = (buildStr) => {
 $.verbose = false
 
 await spinner('Checking build env...', async () => {
-  // assert.equal(
-  //   typeof process.env.SENTRY_AUTH_TOKEN,
-  //   'string',
-  //   chalk.red('Missing process.env.SENTRY_AUTH_TOKEN'),
-  // )
-
   const gitStatus = await $`git status --porcelain`
   assert.equal(
     gitStatus.toString('utf8').trim(),

@@ -13,11 +13,10 @@ import { useUserRelation } from '@/api/user-relation'
 import { useVideoInfo } from '@/api/video-info'
 import Modal2 from '@/components/Modal2'
 import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
 import { useFollowedUpsMap, useMusicSongsMap } from '@/store/derives'
 import type { RootStackParamList } from '@/types'
 import { parseImgUrl, parseNumber, showToast } from '@/utils'
-
-import { useStore } from '../../store'
 
 export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
@@ -247,6 +246,15 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
             }
           }}>
           下载封面
+        </MenuItem>
+        <MenuItem
+          textStyle={tw('text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            hideMenu()
+            props.refresh()
+          }}>
+          刷新
         </MenuItem>
         <MenuItem
           textStyle={tw('text-black dark:text-gray-300')}

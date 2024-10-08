@@ -120,7 +120,33 @@ function __$hack() {
     #app #bili-danmaku-wrap {
       bottom: 12px;
     }
+  [data-background-play="true"] {
+    color: #FF6699!important;
+    font-weight: bold;
+  }
+    [data-background-play="true"]::after {
+    content: "开";
+    }
     `
+    document.addEventListener('visibilitychange', (e) => {
+      const bgPlayBtn = document.getElementById('live-background-button')
+      if (bgPlayBtn.dataset.backgroundPlay !== 'true') {
+        return
+      }
+      if (document.visibilityState === 'hidden') {
+        const video = document.querySelector('video')
+        setTimeout(() => {
+          bgPlayBtn.dataset.backgroundPlay = 'false'
+          if (video.paused) {
+            video.muted = true
+            video.play()
+            setTimeout(() => {
+              video.muted = false
+            })
+          }
+        }, 1000)
+      }
+    })
     //https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=23716652
     const roomId = window.location.pathname.split('/').pop()
     fetch(
@@ -129,6 +155,12 @@ function __$hack() {
       .then((res) => res.json())
       .then((res) => {
         if (res.code === 0) {
+          document
+            .querySelector('.web-player-danmaku')
+            ?.nextElementSibling?.click()
+          setTimeout(() => {
+            document.querySelector('video')?.removeAttribute('autoplay')
+          }, 1000)
           const liveTime = new Date(res.data.room_info.live_start_time * 1000)
           const minute = liveTime.getMinutes()
           const liveInfo = document.querySelector('.room-info')
@@ -143,6 +175,24 @@ function __$hack() {
             margin-right: 6px;
             `
           liveInfo.appendChild(liveTimeSpan)
+          const backplay = document.createElement('span')
+          backplay.textContent = '后台播放'
+          backplay.style.cssText = `
+            font-size: 12px;
+            color: white;
+            margin-left: 8px;
+            margin-right: 8px;
+          `
+          backplay.id = 'live-background-button'
+          backplay.addEventListener('click', (evt) => {
+            evt.stopPropagation()
+            if (backplay.dataset.backgroundPlay === 'true') {
+              backplay.dataset.backgroundPlay = 'false'
+            } else {
+              backplay.dataset.backgroundPlay = 'true'
+            }
+          })
+          // liveInfo.appendChild(backplay)
         }
       })
   } else if (window.location.pathname.startsWith('/topic-detail')) {

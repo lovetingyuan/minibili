@@ -58,9 +58,6 @@ function SearchVideos() {
       searchBarRef.current?.focus()
       searchBarRef.current?.setText('')
     }, 200)
-    return () => {
-      console.log('unmoutned')
-    }
   })
 
   return (

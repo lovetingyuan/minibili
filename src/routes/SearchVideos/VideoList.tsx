@@ -48,10 +48,10 @@ function EmptyContent(props: {
       </View>
     )
   }
-  return (
-    <>
-      {hotSearchList ? (
-        hotSearchList.map((hot) => {
+  if (hotSearchList?.length) {
+    return (
+      <>
+        {hotSearchList.map((hot) => {
           return (
             <TouchableOpacity
               key={hot.hot_id}
@@ -77,12 +77,12 @@ function EmptyContent(props: {
               ) : null}
             </TouchableOpacity>
           )
-        })
-      ) : (
-        <Text className="text-center my-20 text-base">暂无结果</Text>
-      )}
-    </>
-  )
+        })}
+        <Text className="my-2" />
+      </>
+    )
+  }
+  return <Text className="text-center my-20 text-base">暂无结果</Text>
 }
 
 function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {

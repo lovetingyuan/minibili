@@ -72,6 +72,73 @@ function WebPage({ route }: Props) {
       }
     }, [onRefresh, pageTitle]),
   )
+  const webview = (
+    <WebView
+      className="flex-1"
+      style={{ height }}
+      source={{ uri: url }}
+      key={webViewMode}
+      onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
+      originWhitelist={['http://*', 'https://*', 'bilibili://*']}
+      allowsFullscreenVideo
+      injectedJavaScriptForMainFrameOnly
+      allowsInlineMediaPlayback
+      startInLoadingState
+      pullToRefreshEnabled
+      applicationNameForUserAgent={'BILIBILI/8.0.0'}
+      // allowsBackForwardNavigationGestures
+      mediaPlaybackRequiresUserAction={false}
+      webviewDebuggingEnabled={__DEV__}
+      injectedJavaScript={INJECTED_JAVASCRIPT}
+      renderLoading={() => <Loading />}
+      userAgent={webViewMode === 'MOBILE' ? '' : UA}
+      ref={webviewRef}
+      onMessage={(evt) => {
+        const data = JSON.parse(evt.nativeEvent.data) as any
+        if (data.action === 'set-title' && !title) {
+          setPageTitle(data.payload)
+        }
+      }}
+      onLoad={() => {
+        isDark &&
+          webviewRef.current?.injectJavaScript(`
+        const style = document.createElement('style');
+        style.textContent = \`
+        body {background-color: #222; color: #ccc; }
+        .reply-item {
+            border-color: black;
+        }
+        .reply-item .info .content {
+          color: #ccc;
+        }
+        .reply-item .info .name .left .uname {
+            color: #ddd;
+        }
+        \`;
+        document.head.appendChild(style);
+      true;
+   `)
+      }}
+      onError={() => {
+        showToast('加载失败')
+      }}
+      onShouldStartLoadWithRequest={(request) => {
+        if (request.url.startsWith('bilibili://')) {
+          // Linking.openURL(request.url).catch(err => {
+          //   __DEV__ && console.error(err)
+          // })
+          return false
+        }
+        if (request.url.includes('.apk')) {
+          return false
+        }
+        return true
+      }}
+    />
+  )
+  if (url.includes('live.bilibili.com')) {
+    return webview
+  }
   return (
     <ScrollView
       onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
@@ -83,67 +150,7 @@ function WebPage({ route }: Props) {
         />
       }
       className="flex-1 h-full">
-      <WebView
-        className="flex-1"
-        style={{ height }}
-        source={{ uri: url }}
-        key={webViewMode}
-        onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
-        originWhitelist={['http://*', 'https://*', 'bilibili://*']}
-        allowsFullscreenVideo
-        injectedJavaScriptForMainFrameOnly
-        allowsInlineMediaPlayback
-        startInLoadingState
-        pullToRefreshEnabled
-        applicationNameForUserAgent={'BILIBILI/8.0.0'}
-        // allowsBackForwardNavigationGestures
-        mediaPlaybackRequiresUserAction={false}
-        injectedJavaScript={INJECTED_JAVASCRIPT}
-        renderLoading={() => <Loading />}
-        userAgent={webViewMode === 'MOBILE' ? '' : UA}
-        ref={webviewRef}
-        onMessage={(evt) => {
-          const data = JSON.parse(evt.nativeEvent.data) as any
-          if (data.action === 'set-title' && !title) {
-            setPageTitle(data.payload)
-          }
-        }}
-        onLoad={() => {
-          isDark &&
-            webviewRef.current?.injectJavaScript(`
-              const style = document.createElement('style');
-              style.textContent = \`
-              body {background-color: #222; color: #ccc; }
-              .reply-item {
-                  border-color: black;
-              }
-              .reply-item .info .content {
-                color: #ccc;
-              }
-              .reply-item .info .name .left .uname {
-                  color: #ddd;
-              }
-              \`;
-              document.head.appendChild(style);
-            true;
-         `)
-        }}
-        onError={() => {
-          showToast('加载失败')
-        }}
-        onShouldStartLoadWithRequest={(request) => {
-          if (request.url.startsWith('bilibili://')) {
-            // Linking.openURL(request.url).catch(err => {
-            //   __DEV__ && console.error(err)
-            // })
-            return false
-          }
-          if (request.url.includes('.apk')) {
-            return false
-          }
-          return true
-        }}
-      />
+      {webview}
     </ScrollView>
   )
 }
