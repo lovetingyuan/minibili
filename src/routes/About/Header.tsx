@@ -1,6 +1,6 @@
-import { Button } from '@rneui/themed'
+import { Button, Icon } from '@rneui/themed'
 import React from 'react'
-import { Linking } from 'react-native'
+import { Share } from 'react-native'
 
 import { site } from '@/constants'
 
@@ -9,8 +9,10 @@ export const headerRight = () => (
     type="clear"
     size="sm"
     onPress={() => {
-      Linking.openURL(site)
+      Share.share({
+        message: `MiniBili - 简单的B站浏览\n点击下载：${site}`,
+      })
     }}>
-    更新日志
+    <Icon name="share" type="material-community" />
   </Button>
 )

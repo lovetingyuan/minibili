@@ -1,6 +1,6 @@
 <nav class="flex gap-2 items-center absolute top-2 right-4">
   <button
-    @click=" changeLogModal.showModal(); getChangelogs()"
+    @click="showChangeLog"
     class="btn btn-ghost btn-sm btn-success font-normal text-neutral-600 hover:text-neutral-900">
     更新日志
   </button>
@@ -61,7 +61,13 @@
   function setup() {
     return {
       changeLogs: [],
-      getChangelogs() {
+      init() {
+        if (location.search.includes('showchangelog')) {
+          this.showChangeLog()
+        }
+      },
+      showChangeLog() {
+        changeLogModal.showModal()
         if (this.changeLogs.length) {
           return
         }

@@ -1,20 +1,24 @@
 import { Button, Icon, Text } from '@rneui/themed'
 import React from 'react'
-import { Image, Linking, View } from 'react-native'
+import { Image, Linking, Pressable, View } from 'react-native'
 
-import { githubLink } from '../../constants'
+import { githubLink, site } from '../../constants'
 
 export default React.memo(Header)
 
 function Header() {
   return (
     <>
-      <View className="mb-4 flex-1 items-center">
+      <Pressable
+        className="mb-5 mt-1 flex-1 items-center"
+        onPress={() => {
+          Linking.openURL(site)
+        }}>
         <Image
           source={require('../../../assets/minibili.png')}
           className="aspect-[33/10] h-auto w-[85%]"
         />
-      </View>
+      </Pressable>
       <View className="flex-row items-center justify-between mb-2">
         <Text className="text-2xl shrink" numberOfLines={2}>
           一款简单的B站浏览App

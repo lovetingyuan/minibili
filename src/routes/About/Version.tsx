@@ -3,6 +3,8 @@ import * as Updates from 'expo-updates'
 import React from 'react'
 import { Alert, Linking } from 'react-native'
 
+import { site } from '@/constants'
+
 import {
   checkUpdate as checkUpdateApi,
   currentVersion,
@@ -74,6 +76,12 @@ function Version() {
           text: hasUpdate === false ? '暂无更新' : '检查更新',
           loading: checkingUpdate,
           onPress: checkUpdate,
+        },
+        {
+          text: '更新日志',
+          onPress: () => {
+            Linking.openURL(site + '?showchangelog')
+          },
         },
       ]}
     />

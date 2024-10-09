@@ -1,11 +1,12 @@
-import { Dialog, Input } from '@rneui/themed'
+import { BottomSheet, Button, Card, Dialog, Input, Text } from '@rneui/themed'
 import React from 'react'
-import { Share, View } from 'react-native'
+import { Linking, View } from 'react-native'
 
 import Modal2 from '@/components/Modal2'
 import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
 
-import { site } from '../../constants'
+import { githubLink } from '../../constants'
 import { showToast } from '../../utils'
 import { reportUserFeedback } from '../../utils/report'
 import TextAction from './TextAction'
@@ -14,6 +15,10 @@ export default React.memo(Feedback)
 
 function Feedback() {
   const [feedBackVisible, setFeedbackVisible] = React.useState(false)
+  const { get$showUsageStatement, set$showUsageStatement } = useStore()
+  const [showStatement, setShowStatement] = React.useState(
+    get$showUsageStatement(),
+  )
   const hideFeedback = () => {
     setFeedbackVisible(false)
   }
@@ -35,14 +40,12 @@ function Feedback() {
   }
   return (
     <TextAction
-      text="💗 欢迎分享本应用"
+      text="💗 欢迎使用本应用"
       buttons={[
         {
-          text: '分享',
+          text: '使用声明',
           onPress: () => {
-            Share.share({
-              message: `MiniBili - 简单的B站浏览\n点击下载：${site}`,
-            })
+            setShowStatement(true)
           },
         },
         {
@@ -82,6 +85,57 @@ function Feedback() {
           <Dialog.Button title="取消" onPress={hideFeedback} />
         </Dialog.Actions>
       </Dialog>
+      <BottomSheet
+        onBackdropPress={() => {
+          setShowStatement(false)
+        }}
+        backdropStyle={tw('opacity-80 bg-gray-800')}
+        modalProps={{
+          onRequestClose: () => {
+            setShowStatement(false)
+          },
+          statusBarTranslucent: true,
+        }}
+        isVisible={showStatement}>
+        <Card containerStyle={tw('m-0')}>
+          <Card.Title h4 className="text-left">
+            📣使用声明
+          </Card.Title>
+          <Card.Divider />
+          <View>
+            <Text className="text-base">感谢你使用这款应用(MiniBili) ❤</Text>
+            <Text />
+            <Text className="text-base">
+              本应用完全开源并且所有数据均为B站官网公开，不涉及任何个人隐私数据，
+              <Text className="font-bold">*仅供*</Text>
+              个人使用及学习交流!
+            </Text>
+            <Text className="text-base">
+              有问题欢迎使用意见反馈或者在
+              <Text
+                className={colors.primary.text}
+                onPress={() => {
+                  Linking.openURL(githubLink)
+                }}>
+                {' Github '}
+              </Text>
+              中提出 😀
+            </Text>
+            <Text />
+            <Text className="text-base">⚠️ 切勿频繁刷新数据！🙏</Text>
+            <View className="items-end my-3">
+              <Button
+                size="sm"
+                onPress={() => {
+                  set$showUsageStatement(false)
+                  setShowStatement(false)
+                }}>
+                {' 我已知晓 '}
+              </Button>
+            </View>
+          </View>
+        </Card>
+      </BottomSheet>
     </TextAction>
   )
 }
