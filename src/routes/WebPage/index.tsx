@@ -1,5 +1,7 @@
 import { useRefresh } from '@react-native-community/hooks'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Button, Text } from '@rneui/themed'
+import { ResizeMode, Video } from 'expo-av'
 import React from 'react'
 import {
   Dimensions,
@@ -10,6 +12,7 @@ import {
 } from 'react-native'
 import { WebView } from 'react-native-webview'
 
+import useLiveUrl from '@/api/get-live-url'
 import useMounted from '@/hooks/useMounted'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
@@ -72,6 +75,47 @@ function WebPage({ route }: Props) {
       }
     }, [onRefresh, pageTitle]),
   )
+  const [enableBackgroundPlay, setEnableBackgroundPlay] = React.useState(false)
+  const roomId = url.startsWith('https://live.bilibili.com/h5/')
+    ? url.split('/')[4]
+    : ''
+  const liveUrls = useLiveUrl(enableBackgroundPlay ? roomId : '')
+  const videoRef = React.useRef<Video>(null)
+
+  if (enableBackgroundPlay && roomId && liveUrls?.length) {
+    return (
+      <View className="relative flex flex-1">
+        <Video
+          ref={videoRef}
+          className="h-full w-full"
+          source={{
+            uri: liveUrls[2],
+            headers: {
+              'user-agent': UA,
+              origin: 'https://live.bilibili.com',
+              referer: 'https://live.bilibili.com',
+            },
+          }}
+          // onError={(err) => {
+          //   // console.log(788, err)
+          // }}
+          useNativeControls
+          resizeMode={ResizeMode.CONTAIN}
+          shouldPlay
+        />
+        <View className="absolute top-2 left-2 flex-row items-center gap-4">
+          <Button
+            title={' 返回 '}
+            size="sm"
+            onPress={() => {
+              setEnableBackgroundPlay(false)
+            }}
+          />
+          <Text>当前支持后台播放</Text>
+        </View>
+      </View>
+    )
+  }
   const webview = (
     <WebView
       className="flex-1"
@@ -97,6 +141,9 @@ function WebPage({ route }: Props) {
         const data = JSON.parse(evt.nativeEvent.data) as any
         if (data.action === 'set-title' && !title) {
           setPageTitle(data.payload)
+        }
+        if (data.action === 'enable-background-play') {
+          setEnableBackgroundPlay(true)
         }
       }}
       onLoad={() => {

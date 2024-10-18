@@ -190,9 +190,15 @@ function __$hack() {
               backplay.dataset.backgroundPlay = 'false'
             } else {
               backplay.dataset.backgroundPlay = 'true'
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  action: 'enable-background-play',
+                  payload: null,
+                }),
+              )
             }
           })
-          // liveInfo.appendChild(backplay)
+          liveInfo.appendChild(backplay)
         }
       })
   } else if (window.location.pathname.startsWith('/topic-detail')) {
