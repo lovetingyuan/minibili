@@ -1,7 +1,7 @@
 import { Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
-import { Linking } from 'react-native'
+import { Linking, View } from 'react-native'
 
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
@@ -11,7 +11,8 @@ import type { CollectVideoInfo, HistoryVideoInfo } from '@/types'
 
 function HistoryList() {
   const { $watchedVideos } = useStore()
-  const headerTitle = `⏰ 观看历史（${Object.keys($watchedVideos).length}）`
+  const count = Object.keys($watchedVideos).length
+  const headerTitle = `⏰ 观看历史（${count}）`
   const blackColor = tw(colors.black.text).color
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
   useUpdateNavigationOptions(
@@ -73,12 +74,18 @@ function HistoryList() {
       persistentScrollbar
       estimatedItemSize={100}
       ListEmptyComponent={
-        <Text className="text-center text-base my-10">暂无记录</Text>
+        <View className="flex-1 gap-2 my-16">
+          {count === 0 ? (
+            <Text className="text-center text-base">暂无观看记录</Text>
+          ) : (
+            <Text className="text-center text-base">无搜索结果</Text>
+          )}
+        </View>
       }
       ListFooterComponent={
         list.length ? (
           <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
-            暂无更多（最近约400条）
+            暂无更多（保存最近约420条）
           </Text>
         ) : null
       }

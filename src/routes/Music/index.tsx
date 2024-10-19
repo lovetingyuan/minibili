@@ -217,12 +217,13 @@ function MusicList() {
           // ListHeaderComponent={<MusicPlayerBar />}
           ListEmptyComponent={
             <View className="flex-1 gap-2 my-16">
-              <Text className="text-center text-base">暂无歌曲</Text>
               {list.length === 0 ? (
                 <Text className="text-center text-base">
-                  你可以在视频播放页面右上角添加
+                  暂无歌曲{'\n\n'}在视频播放页面右上角菜单添加
                 </Text>
-              ) : null}
+              ) : (
+                <Text className="text-center text-base">无搜索结果</Text>
+              )}
             </View>
           }
           ListFooterComponent={

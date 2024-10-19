@@ -10,7 +10,6 @@ export default function Test() {
   const [count, setCount] = React.useState(0)
   const [time, setTime] = React.useState(getTime)
   const state = useAppState()
-  console.log(99, state)
   // useBackgroundTask(
   //   'test',
   //   useMemoizedFn(() => {

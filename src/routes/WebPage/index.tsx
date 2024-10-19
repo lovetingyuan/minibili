@@ -1,6 +1,6 @@
-import { useRefresh } from '@react-native-community/hooks'
+import { useBackHandler, useRefresh } from '@react-native-community/hooks'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Button, Text } from '@rneui/themed'
+import { Text } from '@rneui/themed'
 import { ResizeMode, Video } from 'expo-av'
 import React from 'react'
 import {
@@ -81,36 +81,52 @@ function WebPage({ route }: Props) {
     : ''
   const liveUrls = useLiveUrl(enableBackgroundPlay ? roomId : '')
   const videoRef = React.useRef<Video>(null)
+  const [validIndex, setValidIndex] = React.useState(1)
+  const backPlay = enableBackgroundPlay && roomId && liveUrls?.length
+  useBackHandler(() => {
+    if (backPlay) {
+      // handle it
+      setEnableBackgroundPlay(false)
+      return true
+    }
+    // let the default thing happen
+    return false
+  })
 
-  if (enableBackgroundPlay && roomId && liveUrls?.length) {
+  if (backPlay) {
+    const liveUrl = liveUrls[validIndex]
     return (
       <View className="relative flex flex-1">
         <Video
           ref={videoRef}
-          className="h-full w-full"
+          className="h-full w-full min-h-96"
+          key={liveUrl}
           source={{
-            uri: liveUrls[2],
+            uri: liveUrl,
             headers: {
               'user-agent': UA,
               origin: 'https://live.bilibili.com',
               referer: 'https://live.bilibili.com',
             },
           }}
-          // onError={(err) => {
-          //   // console.log(788, err)
-          // }}
+          onError={(err) => {
+            showToast('抱歉出错了' + err)
+            if (validIndex < liveUrls.length - 1) {
+              setValidIndex(validIndex + 1)
+            }
+          }}
           useNativeControls
           resizeMode={ResizeMode.CONTAIN}
           shouldPlay
         />
         <View className="absolute top-2 left-2 flex-row items-center gap-4">
-          <Button
+          {/* <Button
             title={' 返回 '}
             size="sm"
             onPress={() => {
               setEnableBackgroundPlay(false)
             }}
-          />
+          /> */}
           <Text>当前支持后台播放</Text>
         </View>
       </View>

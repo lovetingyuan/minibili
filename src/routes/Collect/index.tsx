@@ -1,7 +1,7 @@
 import { Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
-import { Alert, Linking } from 'react-native'
+import { Alert, Linking, View } from 'react-native'
 
 import VideoListItem from '@/components/VideoItem'
 import { colors } from '@/constants/colors.tw'
@@ -87,10 +87,18 @@ function CollectList() {
       persistentScrollbar
       estimatedItemSize={100}
       ListEmptyComponent={
-        <Text className="text-center text-base my-10">暂无收藏</Text>
+        <View className="flex-1 gap-2 my-16">
+          {$collectedVideos.length === 0 ? (
+            <Text className="text-center text-base">
+              暂无收藏{'\n\n'}在视频播放页点击⭐收藏按钮
+            </Text>
+          ) : (
+            <Text className="text-center text-base">无搜索结果</Text>
+          )}
+        </View>
       }
       ListFooterComponent={
-        $collectedVideos.length ? (
+        collectVideos.length ? (
           <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
             暂无更多
           </Text>

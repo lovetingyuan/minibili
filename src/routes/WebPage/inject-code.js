@@ -7,6 +7,15 @@ function __$hack() {
       payload: document.title,
     }),
   )
+  const waitDom = (selector, callback) => {
+    const timer = setInterval(() => {
+      const dom = document.querySelector(selector)
+      if (dom) {
+        clearInterval(timer)
+        callback(dom)
+      }
+    }, 200)
+  }
   if (window.location.pathname === '/read/mobile') {
     style.textContent = `
     #app bili-open-app {
@@ -155,50 +164,52 @@ function __$hack() {
       .then((res) => res.json())
       .then((res) => {
         if (res.code === 0) {
-          document
-            .querySelector('.web-player-danmaku')
-            ?.nextElementSibling?.click()
-          setTimeout(() => {
-            document.querySelector('video')?.removeAttribute('autoplay')
-          }, 1000)
+          waitDom('.web-player-danmaku', (dom) => {
+            dom.nextElementSibling?.click()
+            setTimeout(() => {
+              document.querySelector('video')?.removeAttribute('autoplay')
+            }, 1000)
+          })
           const liveTime = new Date(res.data.room_info.live_start_time * 1000)
           const minute = liveTime.getMinutes()
-          const liveInfo = document.querySelector('.room-info')
-          const liveTimeSpan = document.createElement('span')
-          liveTimeSpan.textContent = `${liveTime.getHours()}:${
-            minute < 10 ? `0${minute}` : minute
-          }开始`
-          liveTimeSpan.style.cssText = `
+          waitDom('.room-info', (liveInfo) => {
+            const liveTimeSpan = document.createElement('span')
+            liveTimeSpan.textContent = `${liveTime.getHours()}:${
+              minute < 10 ? `0${minute}` : minute
+            }开始`
+            liveTimeSpan.style.cssText = `
             font-size: 12px;
             color: white;
             margin-left: 10px;
             margin-right: 6px;
             `
-          liveInfo.appendChild(liveTimeSpan)
-          const backplay = document.createElement('span')
-          backplay.textContent = '后台播放'
-          backplay.style.cssText = `
+            liveInfo.appendChild(liveTimeSpan)
+
+            const backplay = document.createElement('span')
+            backplay.textContent = '后台播放'
+            backplay.style.cssText = `
             font-size: 12px;
             color: white;
             margin-left: 8px;
             margin-right: 8px;
           `
-          backplay.id = 'live-background-button'
-          backplay.addEventListener('click', (evt) => {
-            evt.stopPropagation()
-            if (backplay.dataset.backgroundPlay === 'true') {
-              backplay.dataset.backgroundPlay = 'false'
-            } else {
-              backplay.dataset.backgroundPlay = 'true'
-              window.ReactNativeWebView.postMessage(
-                JSON.stringify({
-                  action: 'enable-background-play',
-                  payload: null,
-                }),
-              )
-            }
+            backplay.id = 'live-background-button'
+            backplay.addEventListener('click', (evt) => {
+              evt.stopPropagation()
+              if (backplay.dataset.backgroundPlay === 'true') {
+                backplay.dataset.backgroundPlay = 'false'
+              } else {
+                backplay.dataset.backgroundPlay = 'true'
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    action: 'enable-background-play',
+                    payload: null,
+                  }),
+                )
+              }
+            })
+            liveInfo.appendChild(backplay)
           })
-          liveInfo.appendChild(backplay)
         }
       })
   } else if (window.location.pathname.startsWith('/topic-detail')) {

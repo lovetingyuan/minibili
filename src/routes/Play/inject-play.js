@@ -74,6 +74,9 @@ function __$hack() {
               if (node.src !== newVideoUrl) {
                 node.src = newVideoUrl
                 node.play()
+                setTimeout(() => {
+                  window.reportPlayTime()
+                }, 3000)
               }
               setTimeout(() => {
                 if (node.src !== newVideoUrl) {
@@ -157,6 +160,7 @@ function __$hack() {
     })
 
     video.addEventListener('ended', () => {
+      window.reportPlayTime()
       const rateBtn = document.getElementById('play-rate-button')
       rateBtn.dataset.rate = `1${xx}`
       rateBtn.textContent = 1 + xx
@@ -188,9 +192,6 @@ function __$hack() {
       lastTime = video.currentTime
     })
 
-    video.addEventListener('ended', () => {
-      window.reportPlayTime()
-    })
     window.reportPlayTime = () => {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
