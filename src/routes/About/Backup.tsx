@@ -27,7 +27,7 @@ function Backup() {
       text="⚙️ 导入或导出当前设置"
       buttons={[
         {
-          text: '导出',
+          text: '导出数据',
           onPress: () => {
             const settings = JSON.stringify({
               type: 'minibili-settings',
@@ -46,7 +46,7 @@ function Backup() {
           },
         },
         {
-          text: '导入',
+          text: '导入数据',
           onPress: () => {
             Clipboard.getStringAsync().then((res) => {
               try {
