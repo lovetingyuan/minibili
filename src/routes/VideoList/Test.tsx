@@ -27,7 +27,7 @@ export default function Test() {
   //   return () => clearInterval(timer)
   // })
   return (
-    <Text className="text-lg text-center">
+    <Text className="text-center text-lg">
       {time}: {count}
     </Text>
   )

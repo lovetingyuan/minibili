@@ -49,12 +49,12 @@ export function Additional(props: { additional?: AdditionalType | null }) {
       .join('  ')
     url = additional.ugc.jump_url
     additionalContent = (
-      <View className="gap-2.5 flex-row pr-2.5">
+      <View className="flex-row gap-2.5 pr-2.5">
         <Image
           source={{ uri: parseImgUrl(additional.ugc.cover, 200, 100) }}
-          className="w-24 min-h-12 rounded"
+          className="min-h-12 w-24 rounded"
         />
-        <View className="shrink flex-1 gap-1">
+        <View className="flex-1 shrink gap-1">
           <Text numberOfLines={1}>{additional.ugc.title}</Text>
           {text ? <Text numberOfLines={2}>{text}</Text> : null}
         </View>
@@ -72,12 +72,12 @@ export function Additional(props: { additional?: AdditionalType | null }) {
       .join('  ')
     url = additional.common.jump_url
     additionalContent = (
-      <View className="gap-2.5 flex-row pr-2.5">
+      <View className="flex-row gap-2.5 pr-2.5">
         <Image
           source={{ uri: parseImgUrl(additional.common.cover, 200, 100) }}
-          className="w-24 min-h-12 rounded"
+          className="min-h-12 w-24 rounded"
         />
-        <View className="shrink flex-1 gap-1">
+        <View className="flex-1 shrink gap-1">
           <Text numberOfLines={1}>{additional.common.title}</Text>
           {text ? (
             <Text numberOfLines={2} className="text-sm">
@@ -166,7 +166,7 @@ export function Additional(props: { additional?: AdditionalType | null }) {
   return (
     <Foo
       {...linkProp}
-      className={`border-l flex-1 pl-2 mt-5 py-1 ${colors.gray6.border}`}>
+      className={`mt-5 flex-1 border-l py-1 pl-2 ${colors.gray6.border}`}>
       {additionalContent}
     </Foo>
   )

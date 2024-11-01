@@ -16,16 +16,16 @@ export default React.memo(Welcome)
 function Welcome({ navigation }: Props) {
   const { set$firstRun } = useStore()
   return (
-    <View className="flex-1 h-full py-10">
+    <View className="h-full flex-1 py-10">
       <View className="flex-row justify-center">
         <Image
           source={require('../../assets/minibili.png')}
           className="aspect-[33/10] h-auto w-[80%]"
         />
       </View>
-      <View className="p-8 flex-1">
+      <View className="flex-1 p-8">
         <Text className="text-2xl">欢迎使用极简版B站 😊</Text>
-        <Text className="text-xl mt-5 mb-10 leading-8">
+        <Text className="mb-10 mt-5 text-xl leading-8">
           这里没有推荐、没有算法、没有广告、没有乱七八糟的功能，只有简单地浏览。
         </Text>
         <Text className="text-base">
@@ -39,7 +39,7 @@ function Welcome({ navigation }: Props) {
           </Text>
           )，所有数据均存放在手机本地，展示的所有数据均为B站官网公开，不会读取、存储、传播任何个人相关数据，仅供学习交流!
         </Text>
-        <Text className="text-base mt-5 text-gray-600 dark:text-gray-400">
+        <Text className="mt-5 text-base text-gray-600 dark:text-gray-400">
           如果遇到闪退或报错请及时更新最新版本。
         </Text>
       </View>

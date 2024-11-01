@@ -20,7 +20,7 @@ function SearchUpItem(props: { up: SearchedUpType }) {
   const isFollowed = props.up.mid in _followedUpsMap
   const isBlackUp = `_${props.up.mid}` in $blackUps
   return (
-    <View className="flex-1 flex-row items-center justify-between px-4 mb-5">
+    <View className="mb-5 flex-1 flex-row items-center justify-between px-4">
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => {
@@ -42,13 +42,13 @@ function SearchUpItem(props: { up: SearchedUpType }) {
             colors.primary.text,
             isBlackUp && `line-through ${colors.gray4.text}`,
             isFollowed && colors.secondary.text,
-            'text-base flex-1',
+            'flex-1 text-base',
           )}
           ellipsizeMode="tail">
           {props.up.name}
         </Text>
       </TouchableOpacity>
-      <Text className={`${colors.gray6.text} text-sm px-2`}>
+      <Text className={`${colors.gray6.text} px-2 text-sm`}>
         {parseNumber(props.up.fans)}粉丝
       </Text>
       <Button
@@ -91,7 +91,7 @@ function EmptyContent(props: { loading: boolean }) {
         {Array.from({ length: 20 }).map((_, i) => {
           return (
             <View
-              className="flex-row items-center justify-between gap-4 mb-6 px-4"
+              className="mb-6 flex-row items-center justify-between gap-4 px-4"
               key={i}>
               <View className="flex-row items-center gap-4">
                 <Skeleton
@@ -110,7 +110,7 @@ function EmptyContent(props: { loading: boolean }) {
       </View>
     )
   }
-  return <Text className="text-center my-10">暂无结果</Text>
+  return <Text className="my-10 text-center">暂无结果</Text>
 }
 
 function UpList(props: { keyword: string }) {
@@ -140,11 +140,11 @@ function UpList(props: { keyword: string }) {
       ListEmptyComponent={<EmptyContent loading={isLoading} />}
       ListFooterComponent={
         isValidating ? (
-          <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
+          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>
             加载中~
           </Text>
         ) : searchedUps?.length && isReachingEnd ? (
-          <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
+          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>
             暂无更多
           </Text>
         ) : null

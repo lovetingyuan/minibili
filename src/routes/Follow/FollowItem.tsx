@@ -160,7 +160,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       onLongPress={() => {
         setOverlayButtons(buttons())
       }}
-      className="items-center mb-6 mx-1 flex-1"
+      className="mx-1 mb-6 flex-1 items-center"
       onPress={gotoDynamic}>
       <View className="relative">
         <Avatar
@@ -177,8 +177,8 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
               e.stopPropagation()
               gotoLivePage()
             }}
-            className="inset-0 absolute justify-center items-center w-12 h-12 rounded-full bg-neutral-950/60">
-            <Text className={'text-center text-teal-300 font-bold'}>
+            className="absolute inset-0 h-12 w-12 items-center justify-center rounded-full bg-neutral-950/60">
+            <Text className={'text-center font-bold text-teal-300'}>
               直播中
             </Text>
           </Pressable>
@@ -193,7 +193,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         ) : null}
       </View>
       <Text
-        className={`text-sm py-2 flex-1 shrink-0 text-center ${
+        className={`flex-1 shrink-0 py-2 text-center text-sm ${
           pin ? `font-bold ${colors.primary.text}` : ''
         } ${hasUpdate ? colors.secondary.text : ''}`}
         numberOfLines={2}

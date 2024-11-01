@@ -87,7 +87,7 @@ function CollectList() {
       persistentScrollbar
       estimatedItemSize={100}
       ListEmptyComponent={
-        <View className="flex-1 gap-2 my-16">
+        <View className="my-16 flex-1 gap-2">
           {$collectedVideos.length === 0 ? (
             <Text className="text-center text-base">
               暂无收藏{'\n\n'}在视频播放页点击⭐收藏按钮
@@ -99,7 +99,7 @@ function CollectList() {
       }
       ListFooterComponent={
         collectVideos.length ? (
-          <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
+          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>
             暂无更多
           </Text>
         ) : null

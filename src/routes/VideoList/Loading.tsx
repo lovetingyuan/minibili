@@ -41,7 +41,7 @@ function VLoading() {
         .fill(null)
         .map((_, i) => {
           return (
-            <View className="px-2 pb-2 gap-3 mb-4 flex-row" key={i}>
+            <View className="mb-4 flex-row gap-3 px-2 pb-2" key={i}>
               <VideoLoading />
               <VideoLoading />
             </View>

@@ -23,13 +23,13 @@ function EmptyContent(props: {
         {Array.from({ length: 20 }).map((_, i) => {
           return (
             <View
-              className="flex-row items-center h-28 justify-between gap-4 mb-4 px-2"
+              className="mb-4 h-28 flex-row items-center justify-between gap-4 px-2"
               key={i}>
               <Skeleton
                 animation="pulse"
-                className="flex-[3] rounded h-[90%]  my-2"
+                className="my-2 h-[90%] flex-[3] rounded"
               />
-              <View className="py-2 flex-[4]">
+              <View className="flex-[4] py-2">
                 <View className="flex-1 gap-2">
                   <Skeleton animation="wave" width={150} height={16} />
                   <Skeleton animation="wave" width={50} height={16} />
@@ -59,7 +59,7 @@ function EmptyContent(props: {
               onPress={() => {
                 props.onSearch(hot.keyword)
               }}
-              className="flex-1 flex-row p-2 mx-2 my-1 items-center">
+              className="mx-2 my-1 flex-1 flex-row items-center p-2">
               <Text
                 className={`text-base ${hot.keyword in $watchedHotSearch ? 'opacity-40' : ''}`}>
                 {hot.position}.{' '}
@@ -82,7 +82,7 @@ function EmptyContent(props: {
       </>
     )
   }
-  return <Text className="text-center my-20 text-base">暂无结果</Text>
+  return <Text className="my-20 text-center text-base">暂无结果</Text>
 }
 
 function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
@@ -116,11 +116,11 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
       }
       ListFooterComponent={
         isValidating ? (
-          <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
+          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>
             加载中~
           </Text>
         ) : searchedVideos?.length && isReachingEnd ? (
-          <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
+          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>
             暂无更多
           </Text>
         ) : null

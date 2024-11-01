@@ -127,7 +127,7 @@ function VideoList(props: {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        className="flex-1 flex-row justify-around mx-[5px] mb-6"
+        className="mx-[5px] mb-6 flex-1 flex-row justify-around"
         key={item.bvid}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {

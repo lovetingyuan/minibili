@@ -23,10 +23,10 @@ function VideoItem({ video }: { video: VideoItemType }) {
   const isBlackTag = video.tag in $blackTags
   // console.log(parseImgUrl(video.cover, 480, 300))
   return (
-    <View className="self-center   flex-1">
+    <View className="flex-1 self-center">
       <View className="flex-1">
         <Image
-          className={'flex-1 w-full rounded aspect-[8/5]'}
+          className={'aspect-[8/5] w-full flex-1 rounded'}
           source={
             isWiFi
               ? parseImgUrl(video.cover, 480, 300)
@@ -39,26 +39,26 @@ function VideoItem({ video }: { video: VideoItemType }) {
             style={{ width: `${watchedInfo.watchProgress}%` }}
           />
         ) : null}
-        <View className="absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
-          <Text className="text-white text-xs">
+        <View className="absolute m-1 items-center rounded-sm bg-gray-900/70 px-1">
+          <Text className="text-xs text-white">
             {parseDuration(video.duration)}
           </Text>
         </View>
         <View
-          className={`${watchedInfo ? 'bottom-1' : 'bottom-0'} absolute px-1 items-center bg-gray-900/70 rounded-sm m-1`}>
-          <Text className="text-white text-xs">{parseDate(video.date)}</Text>
+          className={`${watchedInfo ? 'bottom-1' : 'bottom-0'} absolute m-1 items-center rounded-sm bg-gray-900/70 px-1`}>
+          <Text className="text-xs text-white">{parseDate(video.date)}</Text>
         </View>
-        <View className="top-0 right-0 absolute px-1 items-center bg-gray-900/70 rounded-sm m-1">
-          <Text className="text-white text-xs">
+        <View className="absolute right-0 top-0 m-1 items-center rounded-sm bg-gray-900/70 px-1">
+          <Text className="text-xs text-white">
             {parseNumber(video.danmuNum)}弹
           </Text>
         </View>
         {video.tag ? (
           <View
-            className={`right-0 ${watchedInfo ? 'bottom-1' : 'bottom-0'} absolute px-1 items-center bg-gray-900/70 rounded-sm m-1`}>
+            className={`right-0 ${watchedInfo ? 'bottom-1' : 'bottom-0'} absolute m-1 items-center rounded-sm bg-gray-900/70 px-1`}>
             <Text
               className={clsx(
-                'text-white text-xs',
+                'text-xs text-white',
                 isBlackTag && 'line-through opacity-60',
               )}>
               {video.tag}
@@ -74,8 +74,8 @@ function VideoItem({ video }: { video: VideoItemType }) {
         numberOfLines={2}>
         {video.title}
       </Text>
-      <View className="flex-row items-center mt-2 justify-between">
-        <View className="flex-row items-center shrink">
+      <View className="mt-2 flex-row items-center justify-between">
+        <View className="shrink flex-row items-center">
           {isFollowed ? (
             <Icon
               size={15}
@@ -85,7 +85,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
             />
           ) : (
             <Image
-              className="w-[13px] h-[11px]"
+              className="h-[11px] w-[13px]"
               source={require('../../../assets/up-mark.png')}
             />
           )}
@@ -93,7 +93,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
             numberOfLines={1}
             ellipsizeMode="tail"
             className={clsx(
-              'ml-1 text-xs grow shrink',
+              'ml-1 shrink grow text-xs',
               isFollowed
                 ? ['font-bold', colors.secondary.text]
                 : colors.primary.text,
@@ -101,9 +101,9 @@ function VideoItem({ video }: { video: VideoItemType }) {
             {video.name}
           </Text>
         </View>
-        <View className="flex-row items-center shrink-0">
+        <View className="shrink-0 flex-row items-center">
           <Image
-            className="w-[13px] h-[11px]"
+            className="h-[11px] w-[13px]"
             source={require('../../../assets/play-mark.png')}
           />
           <Text className="ml-1 text-xs text-gray-600 dark:text-gray-400">

@@ -47,21 +47,21 @@ function ImagesView() {
       fullScreen
       overlayStyle={tw('p-0 m-0')}
       onBackdropPress={onClose}>
-      <View className="flex-1 relative">
-        <View className="w-full justify-center absolute top-6 z-10">
-          <Text className="text-center text-white text-lg" style={textShadow}>
+      <View className="relative flex-1">
+        <View className="absolute top-6 z-10 w-full justify-center">
+          <Text className="text-center text-lg text-white" style={textShadow}>
             {current + 1} / {images.length}
           </Text>
         </View>
-        <View className="w-full justify-end flex-row items-center absolute top-5 z-10">
+        <View className="absolute top-5 z-10 w-full flex-row items-center justify-end">
           <Text
-            className="text-right font-semibold text-white text-2xl mr-4"
+            className="mr-4 text-right text-2xl font-semibold text-white"
             onPress={onOpen}
             style={textShadow}>
             ⇩
           </Text>
           <Text
-            className="text-right text-white text-2xl mr-4"
+            className="mr-4 text-right text-2xl text-white"
             onPress={onClose}
             style={textShadow}>
             ✕
@@ -99,14 +99,14 @@ function ImagesView() {
               imageView = (
                 <Image
                   source={require('../../assets/loading2.gif')}
-                  className="w-24 h-24"
+                  className="h-24 w-24"
                 />
               )
             }
             return (
               <View
                 key={v.url}
-                className="flex-1 bg-black justify-center items-center">
+                className="flex-1 items-center justify-center bg-black">
                 {imageView}
               </View>
             )

@@ -22,7 +22,7 @@ function Ranks() {
       type="Rank"
       footer={
         <View>
-          <Text className="text-center my-3 text-gray-500">
+          <Text className="my-3 text-center text-gray-500">
             {isLoading ? '加载中...' : '到底了~'}
           </Text>
         </View>

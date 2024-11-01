@@ -29,7 +29,7 @@ function LoadingComp() {
         .fill(null)
         .map((_, i) => {
           return (
-            <View className="p-3 gap-4 my-2" key={i}>
+            <View className="my-2 gap-4 p-3" key={i}>
               {i % 2 === 0 ? (
                 <View className="gap-2">
                   <Skeleton
@@ -53,7 +53,7 @@ function LoadingComp() {
               ) : null}
               <View className="flex-row gap-3">
                 <Skeleton animation="pulse" width={'45%' as any} height={95} />
-                <View className="gap-3 justify-between flex-1">
+                <View className="flex-1 justify-between gap-3">
                   <Skeleton
                     animation="wave"
                     width={`${Math.floor(Math.random() * 81) + 10}%` as any}
@@ -136,7 +136,7 @@ function Dynamic({ route }: Props) {
       return null
     }
     return (
-      <Text className="text-sm mt-3 mb-5 text-center text-gray-500">
+      <Text className="mb-5 mt-3 text-center text-sm text-gray-500">
         {isReachingEnd ? '到底了~' : isValidating ? '加载中...' : ''}
       </Text>
     )
@@ -146,7 +146,7 @@ function Dynamic({ route }: Props) {
       return <Loading />
     }
     if (error) {
-      return <Text className="m-12 text-base text-center">加载动态失败</Text>
+      return <Text className="m-12 text-center text-base">加载动态失败</Text>
     }
     return (
       <View className="items-center py-24">
@@ -154,7 +154,7 @@ function Dynamic({ route }: Props) {
           source={require('../../../assets/empty.png')}
           className="aspect-square h-auto w-[40%]"
         />
-        <Text className="m-10 text-lg text-center">暂无动态</Text>
+        <Text className="m-10 text-center text-lg">暂无动态</Text>
       </View>
     )
   }
@@ -170,14 +170,14 @@ function Dynamic({ route }: Props) {
         estimatedItemSize={100}
         ListHeaderComponent={
           dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
-            <View className="px-3 border-b-[0.5px] py-3 flex-row border-b-gray-400">
+            <View className="flex-row border-b-[0.5px] border-b-gray-400 px-3 py-3">
               <Icon
                 name="billboard"
                 type="material-community"
                 size={18}
                 color={tw(colors.gray6.text).color}
               />
-              <Text className="text-sm ml-2 shrink-0 flex-1 text-gray-600 dark:text-gray-400">
+              <Text className="ml-2 flex-1 shrink-0 text-sm text-gray-600 dark:text-gray-400">
                 {dynamicUser?.sign.trim()}
               </Text>
             </View>

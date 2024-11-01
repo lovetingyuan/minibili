@@ -33,7 +33,7 @@ const RotateImage = (props: ImageProps) => {
   })
 
   return (
-    <View className="justify-center items-center flex-1">
+    <View className="flex-1 items-center justify-center">
       <Animated.Image
         style={[props.style, { transform: [{ rotate: interpolatedRotation }] }]}
         {...props}

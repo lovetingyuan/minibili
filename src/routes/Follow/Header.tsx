@@ -11,7 +11,7 @@ export function HeaderRight() {
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   return (
-    <View className="gap-1 flex-row items-center">
+    <View className="flex-row items-center gap-1">
       <Button
         radius={'sm'}
         type="clear"

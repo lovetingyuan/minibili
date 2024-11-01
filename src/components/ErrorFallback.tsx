@@ -22,7 +22,7 @@ export default function ErrorFallback(props: { message?: string }) {
       <Text className="mx-7 text-base text-red-600">
         非常抱歉，应用发生了未知错误
         {'\n\n'}
-        <Text className="italic text-xs">{props.message || 'N/A'}</Text>
+        <Text className="text-xs italic">{props.message || 'N/A'}</Text>
         {'\n\n'}
         我们会处理这个错误，感谢您的理解和支持
         {'\n\n'}

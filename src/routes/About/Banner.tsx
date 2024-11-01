@@ -19,8 +19,8 @@ function Header() {
           className="aspect-[33/10] h-auto w-[85%]"
         />
       </Pressable>
-      <View className="flex-row items-center justify-between mb-2">
-        <Text className="text-2xl shrink" numberOfLines={2}>
+      <View className="mb-2 flex-row items-center justify-between">
+        <Text className="shrink text-2xl" numberOfLines={2}>
           一款简单的B站浏览App
         </Text>
         <Button

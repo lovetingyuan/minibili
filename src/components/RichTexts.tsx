@@ -35,7 +35,7 @@ function RichTexts(props: {
   let key = 0
   const fontSize = props.fontSize || 16
   const Topic = props.topic ? (
-    <View className="flex-row items-center mb-3">
+    <View className="mb-3 flex-row items-center">
       <Icon
         name="hashtag"
         type="fontisto"
@@ -106,7 +106,7 @@ function RichTexts(props: {
         <Image
           key={key++}
           source={{ uri: parseImgUrl(node.emoji.icon_url) }}
-          className="w-5 h-5"
+          className="h-5 w-5"
         />,
       )
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TOPIC) {
@@ -260,7 +260,7 @@ function RichTexts(props: {
       style={props.style}>
       {Topic}
       <Text
-        className="flex-row flex-wrap items-center flex-1"
+        className="flex-1 flex-row flex-wrap items-center"
         {...props.textProps}
         onTextLayout={(evt) => {
           setLines(evt.nativeEvent.lines.length)

@@ -6,7 +6,13 @@ import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Alert, Linking, View } from 'react-native'
+import {
+  Alert,
+  ImageBackground,
+  Linking,
+  useWindowDimensions,
+  View,
+} from 'react-native'
 import type { SearchBarCommands } from 'react-native-screens'
 
 import { colors } from '@/constants/colors.tw'
@@ -93,40 +99,48 @@ function MusicItem(props: {
       },
     ]
   }
+  const { width } = useWindowDimensions()
   return (
-    <View className="flex-row my-3 gap-3">
-      <View className="">
-        <Image
+    <View className="my-3 flex-row gap-3">
+      <View className="overflow-hidden rounded">
+        <ImageBackground
           source={{ uri: parseImgUrl(song.cover, 240, 160) }}
-          className="h-16 w-20 rounded"
-        />
-        <View className="absolute top-0 justify-center items-center">
-          {/* {isPlaying ? (
+          className="top-0 h-16 w-20 items-center justify-center">
+          {isPlaying ? (
             <Image
-              source={require('../../../assets/playing.gif')}
-              className="h-14 w-10 self-center align-middle"
+              source={require('../../../assets/ccc.webp')}
+              className="h-14 w-14"
             />
-          ) : ( */}
-          <Icon
-            name={'play-circle-outline'} // pause-circle-outline
-            type="material-community"
-            size={45}
-            className="h-16 w-20 justify-center items-center"
-            onPress={() => {
-              setPlayingSong(song)
-            }}
-            onLongPress={() => {
-              setOverlayButtons(buttons())
-            }}
-            color={'white'}
-          />
-          {/* )} */}
-        </View>
+          ) : (
+            <Icon
+              name={'play-circle-outline'} // pause-circle-outline
+              type="material-community"
+              size={45}
+              className={clsx(
+                'h-16 w-20 items-center justify-center',
+                isPlaying && colors.secondary.text,
+              )}
+              onPress={() => {
+                setPlayingSong(song)
+              }}
+              onLongPress={() => {
+                setOverlayButtons(buttons())
+              }}
+              color={isPlaying ? tw(colors.secondary.text).color : 'white'}
+            />
+          )}
+        </ImageBackground>
       </View>
-      <View className="gap-2 flex-1">
+      <ImageBackground
+        source={require('../../../assets/bbb.webp')}
+        imageStyle={{
+          width: 90,
+          left: width - 220,
+        }}
+        className="flex-1 gap-2">
         <Text
           className={clsx(
-            'text-base items-center leading-5',
+            'items-center text-base leading-5',
             isPlaying && [colors.primary.text, 'font-bold'],
           )}
           numberOfLines={2}
@@ -139,6 +153,7 @@ function MusicItem(props: {
           ellipsizeMode="tail">
           {song.name}
         </Text>
+
         <View className="flex-row gap-3">
           <Text className={colors.gray5.text}>👤{song.singer || '佚名'}</Text>
           <Text className={colors.gray5.text}>
@@ -148,7 +163,7 @@ function MusicItem(props: {
             {song.year ? `${song.year}年` : ''}
           </Text>
         </View>
-      </View>
+      </ImageBackground>
     </View>
   )
 }
@@ -205,7 +220,7 @@ function MusicList() {
   }, [list, searchKeyWord])
   return (
     <View className="flex-1">
-      <View className="flex-grow shrink">
+      <View className="shrink flex-grow">
         <FlashList
           data={songsList}
           keyExtractor={(v) => `${v.bvid}_${v.cid}`}
@@ -214,9 +229,8 @@ function MusicList() {
           }}
           persistentScrollbar
           estimatedItemSize={100}
-          // ListHeaderComponent={<MusicPlayerBar />}
           ListEmptyComponent={
-            <View className="flex-1 gap-2 my-16">
+            <View className="my-16 flex-1 gap-2">
               {list.length === 0 ? (
                 <Text className="text-center text-base">
                   暂无歌曲{'\n\n'}在视频播放页面右上角菜单添加
@@ -229,7 +243,7 @@ function MusicList() {
           ListFooterComponent={
             songsList.length ? (
               <Text
-                className={`${colors.gray6.text} text-xs text-center py-1 my-2`}>
+                className={`${colors.gray6.text} my-2 py-1 text-center text-xs`}>
                 到底了
               </Text>
             ) : null

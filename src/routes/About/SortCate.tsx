@@ -32,7 +32,7 @@ function SortCate() {
       }}>
       <ListItem
         containerStyle={tw('flex-wrap p-0 flex-row px-1 bg-transparent')}>
-        <View className="flex-row flex-wrap border-b-[0.5px] flex-1 w-full gap-x-3 border-b-gray-400	">
+        <View className="w-full flex-1 flex-row flex-wrap gap-x-3 border-b-[0.5px] border-b-gray-400">
           {sortedRankList.map((cate) => {
             return (
               <Chip
@@ -52,13 +52,13 @@ function SortCate() {
             )
           })}
           {sortedRankList.length === 0 && (
-            <Text className={`flex-1 mb-1 ${colors.gray6.text}`}>
+            <Text className={`mb-1 flex-1 ${colors.gray6.text}`}>
               {' '}
               点击名称调整顺序
             </Text>
           )}
         </View>
-        <View className="flex-row flex-wrap gap-x-3 mt-5">
+        <View className="mt-5 flex-row flex-wrap gap-x-3">
           {unsortedRankList.map((cate) => {
             return (
               <Chip

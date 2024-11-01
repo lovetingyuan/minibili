@@ -82,7 +82,7 @@ function CommentText(props: {
             <Image
               key={key}
               source={{ uri: parseImgUrl(node.url) }}
-              className="w-[18px] h-[18px] mx-1"
+              className="mx-1 h-[18px] w-[18px]"
             />
           )
         }
@@ -233,7 +233,7 @@ function CommentBlock(props: {
       style={props.style}>
       <CommentItem comment={comment} />
       {comment.replies?.length ? (
-        <View className="p-2 mt-1 rounded gap-1 opacity-90 flex-1 shrink-0 border-gray-500 bg-neutral-200 dark:bg-neutral-900">
+        <View className="mt-1 flex-1 shrink-0 gap-1 rounded border-gray-500 bg-neutral-200 p-2 opacity-90 dark:bg-neutral-900">
           {comment.replies.map((reply) => {
             return <CommentItem key={reply.id} comment={reply} smallFont />
           })}

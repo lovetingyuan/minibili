@@ -17,7 +17,7 @@ function Loading() {
         .fill(0)
         .map((_, i) => {
           return (
-            <View className="flex-1 gap-1 mb-5" key={i}>
+            <View className="mb-5 flex-1 gap-1" key={i}>
               <Skeleton animation="wave" width={'100%' as any} height={16} />
               {i % 2 ? (
                 <Skeleton animation="wave" width={'100%' as any} height={16} />
@@ -63,15 +63,15 @@ export default function CommentList(
         ListHeaderComponent={
           <View className="flex-1 shrink-0">
             {props.children}
-            <View className="my-5 pb-1 border-b-[0.5px] border-gray-400 flex-row justify-between">
-              <View className="flex-row items-center mr-1">
+            <View className="my-5 flex-row justify-between border-b-[0.5px] border-gray-400 pb-1">
+              <View className="mr-1 flex-row items-center">
                 <Icon
                   name="comment-text-outline"
                   type="material-community"
                   size={14}
                   color={tw(colors.gray6.text).color}
                 />
-                <Text className={`text-xs mr-3 px-1 ${colors.gray6.text}`}>
+                <Text className={`mr-3 px-1 text-xs ${colors.gray6.text}`}>
                   {allCount
                     ? `${allCount}条评论`
                     : isLoading
@@ -79,7 +79,7 @@ export default function CommentList(
                       : '暂无评论'}
                 </Text>
               </View>
-              <View className="ml-2 mr-1 flex-row gap-2 items-center">
+              <View className="ml-2 mr-1 flex-row items-center gap-2">
                 {props.dividerRight}
                 <TouchableOpacity
                   activeOpacity={0.7}
@@ -98,14 +98,14 @@ export default function CommentList(
           isLoading ? (
             <Loading />
           ) : (
-            <Text className="text-center text-base my-10">
+            <Text className="my-10 text-center text-base">
               {error ? '评论已关闭或加载失败' : '暂无评论'}
             </Text>
           )
         }
         ListFooterComponent={
           comments?.length ? (
-            <Text className={`${colors.gray6.text} text-xs text-center`}>
+            <Text className={`${colors.gray6.text} text-center text-xs`}>
               {isValidating ? '正在加载...' : '暂无更多'}
             </Text>
           ) : null

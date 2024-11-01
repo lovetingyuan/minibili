@@ -34,7 +34,7 @@ export default function WordDrawItem(props: {
         const ImageCmp = (
           <Image
             key={img.src + i}
-            className="w-24 h-24 mr-1 rounded"
+            className="mr-1 h-24 w-24 rounded"
             source={{
               uri: parseImgUrl(img.src, 240),
             }}
@@ -64,7 +64,7 @@ export default function WordDrawItem(props: {
         ? width / 2 - 16
         : width / 2
   const imageList = (
-    <View className="flex-wrap flex-row gap-2 mb-5">
+    <View className="mb-5 flex-row flex-wrap gap-2">
       {images.map((img, i) => {
         const ImageCmp = (
           <Image
@@ -101,7 +101,7 @@ export default function WordDrawItem(props: {
         topic={topic}
         textProps={isDetail ? {} : { numberOfLines: 4 }}
       />
-      {title ? <Text className="font-bold text-base">{title}</Text> : null}
+      {title ? <Text className="text-base font-bold">{title}</Text> : null}
       {texts.length ? (
         <RichTexts
           idStr={id}

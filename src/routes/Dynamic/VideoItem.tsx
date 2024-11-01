@@ -96,14 +96,14 @@ export default function VideoItem(props: {
       <RichTexts idStr={props.item.id} nodes={nodes} topic={props.item.topic} />
 
       <View className="flex-1 flex-row">
-        <View className="w-[45%] mr-3 justify-center content-center">
+        <View className="mr-3 w-[45%] content-center justify-center">
           <Image
-            className="w-full rounded aspect-[8/5] h-auto"
+            className="aspect-[8/5] h-auto w-full rounded"
             source={{ uri: parseImgUrl(cover, 480, 300) }}
             loadingIndicatorSource={require('../../../assets/video-loading.png')}
           />
           <Image
-            className="w-14 h-12 absolute self-center opacity-80"
+            className="absolute h-12 w-14 self-center opacity-80"
             source={require('../../../assets/play.png')}
           />
           {watchedInfo ? (
@@ -113,7 +113,7 @@ export default function VideoItem(props: {
             />
           ) : null}
           <View
-            className={`absolute px-1 py-[1px] bg-gray-900/70 ${watchedInfo ? 'bottom-1' : 'bottom-0'} left-0 rounded-sm m-1`}>
+            className={`absolute bg-gray-900/70 px-1 py-[1px] ${watchedInfo ? 'bottom-1' : 'bottom-0'} left-0 m-1 rounded-sm`}>
             <Text className="text-xs font-thin text-white">{duration}</Text>
           </View>
           {/* <View className="absolute px-1 py-[1px] top-0 rounded-sm m-1 bg-gray-900/70">
@@ -125,21 +125,21 @@ export default function VideoItem(props: {
           </View>
         </View>
         <View className="flex-1 justify-around">
-          <Text className="flex-1 text-base mb-3" numberOfLines={3}>
+          <Text className="mb-3 flex-1 text-base" numberOfLines={3}>
             {title}
           </Text>
-          <View className="flex-row shrink-0 min-w-20 items-center gap-x-3 gap-y-1 flex-wrap">
+          <View className="min-w-20 shrink-0 flex-row flex-wrap items-center gap-x-3 gap-y-1">
             {play === undefined ? null : (
               <View className="flex-row items-center gap-1">
                 <Icon name="play-circle-outline" size={15} color={gray} />
                 <Text style={textStyle}>{play}</Text>
               </View>
             )}
-            <View className="flex-row gap-1 items-center">
+            <View className="flex-row items-center gap-1">
               <Icon name="thumb-up-off-alt" size={15} color={gray} />
               <Text style={textStyle}>{parseNumber(likeCount)}</Text>
             </View>
-            <View className="flex-row gap-1 items-center">
+            <View className="flex-row items-center gap-1">
               <Icon name="date-range" size={15} color={gray} />
               <Text style={textStyle}>{date}</Text>
             </View>

@@ -27,7 +27,7 @@ export function PlayHeaderTitle() {
   const followed = route.params?.mid && route.params.mid in _followedUpsMap
   const isBlackUp = route.params?.mid && `_${route.params.mid}` in $blackUps
   return (
-    <View className="flex-row items-center relative left-[-10px]">
+    <View className="relative left-[-10px] flex-row items-center">
       <Text
         className={clsx(
           'text-lg font-semibold',
@@ -70,7 +70,7 @@ function AiConclusionModal(props: {
       onBackdropPress={toggleDialog}>
       <Dialog.Title title={'视频总结💡'} titleStyle={tw(colors.black.text)} />
       {isLoading ? (
-        <View className="flex-1 justify-center items-center py-8">
+        <View className="flex-1 items-center justify-center py-8">
           <ActivityIndicator
             size={'large'}
             color={tw(colors.secondary.text).color}
@@ -79,7 +79,7 @@ function AiConclusionModal(props: {
       ) : error ? (
         <Text className="mt-3">抱歉，出错了</Text>
       ) : (
-        <Text className="leading-6 mt-3">
+        <Text className="mt-3 leading-6">
           {summary ? `    ${summary}` : '暂无总结'}
         </Text>
       )}

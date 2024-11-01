@@ -37,7 +37,7 @@ function HeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, 'DynamicDetail'>>()
   const { face, name } = route.params.detail
   return (
-    <View className="flex-row items-center gap-3 relative left-[-20px]">
+    <View className="relative left-[-20px] flex-row items-center gap-3">
       <Avatar
         size={33}
         rounded

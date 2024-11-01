@@ -48,7 +48,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps
   return (
-    <View className="flex-row flex-none items-center mr-[110px] left-[-12px]">
+    <View className="left-[-12px] mr-[110px] flex-none flex-row items-center">
       {dynamicUser?.face ? (
         <View className="relative">
           <Avatar
@@ -61,7 +61,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             }}
           />
           {sex ? (
-            <Text className="text-xs opacity-80 absolute top-1 right-[-8px]">
+            <Text className="absolute right-[-8px] top-1 text-xs opacity-80">
               {sex}
             </Text>
           ) : null}
@@ -76,8 +76,8 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
                   })
                 }
               }}
-              className="inset-0 absolute justify-center items-center w-10 h-10 rounded-full bg-neutral-950/60">
-              <Text className={'text-center text-xs text-teal-300 font-bold'}>
+              className="absolute inset-0 h-10 w-10 items-center justify-center rounded-full bg-neutral-950/60">
+              <Text className={'text-center text-xs font-bold text-teal-300'}>
                 直播中
               </Text>
             </Pressable>
@@ -85,7 +85,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
         </View>
       ) : null}
 
-      <View className="flex-1 ml-3 items-center flex-wrap flex-row">
+      <View className="ml-3 flex-1 flex-row flex-wrap items-center">
         <Text
           className={clsx(
             followed && [colors.secondary.text, 'font-bold'],

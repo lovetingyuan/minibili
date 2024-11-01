@@ -171,12 +171,12 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
               : require('../../../assets/loading.png')
           }
           resizeMode="cover"
-          className="w-20 h-20 rounded">
+          className="h-20 w-20 rounded">
           <Icon
             name={isPlaying ? 'pause-circle-outline' : 'play-circle-outline'} // pause-circle-outline
             type="material-community"
             size={50}
-            className="h-full justify-center items-center"
+            className="h-full items-center justify-center"
             onPress={() => {
               if (isPlaying) {
                 soundRef.current?.pauseAsync()
@@ -190,9 +190,9 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
           />
         </ImageBackground>
         <View className="flex-1 justify-between">
-          <View className="flex-row justify-between items-center">
+          <View className="flex-row items-center justify-between">
             <Text
-              className="text-lg flex-1"
+              className="flex-1 text-lg"
               ellipsizeMode="tail"
               onPress={() => {
                 soundRef.current?.playAsync()
@@ -213,7 +213,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
               }}>
               <Text
                 className={clsx(
-                  prevSong ? colors.primary.text : 'opacity-60 line-through',
+                  prevSong ? colors.primary.text : 'line-through opacity-60',
                 )}>
                 上一首
               </Text>
@@ -226,7 +226,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
               }}>
               <Text
                 className={clsx(
-                  nextSong ? colors.primary.text : 'opacity-60 line-through',
+                  nextSong ? colors.primary.text : 'line-through opacity-60',
                 )}>
                 下一首
               </Text>
@@ -254,7 +254,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
               </Text>
             </TouchableOpacity>
           </View>
-          <View className="flex-row gap-2 items-center">
+          <View className="flex-row items-center gap-2">
             <Text className="text-xs" style={{ fontVariant: ['tabular-nums'] }}>
               {parseTime(playingTime)}
             </Text>
@@ -262,7 +262,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
             {props.url ? (
               <Slider
                 // @ts-ignore
-                className="flex-1 h-2"
+                className="h-2 flex-1"
                 value={playingTime}
                 onValueChange={(currentTime) => {
                   soundRef.current?.setPositionAsync(currentTime)

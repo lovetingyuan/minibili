@@ -81,34 +81,34 @@ function VideoListItem({
           tag: video.tag,
         })
       }}
-      className="flex-row min-h-28 px-2 py-2 mb-1">
-      <View className="flex-[3] mr-3 relative justify-center content-center">
+      className="mb-1 min-h-28 flex-row px-2 py-2">
+      <View className="relative mr-3 flex-[3] content-center justify-center">
         <Image
-          className="w-full rounded flex-1  h-auto"
+          className="h-auto w-full flex-1 rounded"
           source={{ uri: parseImgUrl(video.cover, 480, 300) }}
           placeholder={require('../../assets/video-loading.png')}
         />
-        <View className="absolute px-1 py-[1px] bg-gray-900/70 bottom-0 left-0 rounded-sm m-1">
+        <View className="absolute bottom-0 left-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
           <Text className="text-xs font-thin text-white">
             {typeof video.duration === 'string'
               ? parseDurationStr(video.duration)
               : parseDuration(video.duration)}
           </Text>
         </View>
-        <View className="absolute px-1 py-[1px] top-0 rounded-sm m-1 bg-gray-900/70">
+        <View className="absolute top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
           <Text className="text-xs font-thin text-white">
             {parseDate(video.date)}
           </Text>
         </View>
         {isDefined(video.danmaku) ? (
-          <View className="absolute px-1 py-[1px] bottom-0 right-0 m-1 rounded-sm bg-gray-900/70">
+          <View className="absolute bottom-0 right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
             <Text className="text-xs font-thin text-white">
               {parseNumber(video.danmaku)}弹
             </Text>
           </View>
         ) : null}
         {'watchProgress' in video ? (
-          <View className="absolute px-1 py-[1px] bottom-0 right-0 m-1 rounded-sm bg-gray-900/70">
+          <View className="absolute bottom-0 right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
             <Text className="text-xs text-white">
               {video.watchProgress > 99
                 ? '已看完 '
@@ -119,7 +119,7 @@ function VideoListItem({
       </View>
       <View className="flex-[4] justify-between">
         <Text
-          className="flex-1 text-base mb-3"
+          className="mb-3 flex-1 text-base"
           numberOfLines={2}
           ellipsizeMode="tail">
           {extractTextWithEmTags(video.title, tw(colors.secondary.text))}
@@ -133,7 +133,7 @@ function VideoListItem({
             {video.name}
           </Text>
           {isDefined(video.play) ? (
-            <View className="flex-row shrink-0 min-w-20 items-center gap-x-3 flex-wrap">
+            <View className="min-w-20 shrink-0 flex-row flex-wrap items-center gap-x-3">
               <View className="flex-row items-center gap-1">
                 <Icon
                   name="play-circle-outline"
@@ -144,7 +144,7 @@ function VideoListItem({
                   {parseNumber(video.play)}
                 </Text>
               </View>
-              <View className="flex-row gap-1 items-center">
+              <View className="flex-row items-center gap-1">
                 <Icon
                   name="thumb-up-off-alt"
                   color={tw(colors.gray6.text).color}

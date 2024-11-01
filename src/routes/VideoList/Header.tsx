@@ -111,7 +111,7 @@ function HeaderLeftComp() {
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={showMenu}
-            className="flex-row items-center h-full">
+            className="h-full flex-row items-center">
             <Text
               className={`text-lg font-bold ${
                 currentVideosCate.rid === -1
@@ -143,7 +143,7 @@ function HeaderLeftComp() {
               )
             }
             return (
-              <View key={i} className="flex-row flex-1">
+              <View key={i} className="flex-1 flex-row">
                 {items.map((item) => getItem(item))}
               </View>
             )

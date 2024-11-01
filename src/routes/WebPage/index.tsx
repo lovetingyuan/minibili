@@ -26,7 +26,7 @@ import { INJECTED_JAVASCRIPT } from './inject-code'
 
 function Loading() {
   return (
-    <View className="absolute w-full h-full justify-center items-center">
+    <View className="absolute h-full w-full items-center justify-center">
       <Image
         source={require('../../../assets/video-loading.png')}
         resizeMode="center"
@@ -99,7 +99,7 @@ function WebPage({ route }: Props) {
       <View className="relative flex flex-1">
         <Video
           ref={videoRef}
-          className="h-full w-full min-h-96"
+          className="h-full min-h-96 w-full"
           key={liveUrl}
           source={{
             uri: liveUrl,
@@ -119,7 +119,7 @@ function WebPage({ route }: Props) {
           resizeMode={ResizeMode.CONTAIN}
           shouldPlay
         />
-        <View className="absolute top-2 left-2 flex-row items-center gap-4">
+        <View className="absolute left-2 top-2 flex-row items-center gap-4">
           {/* <Button
             title={' 返回 '}
             size="sm"
@@ -212,7 +212,7 @@ function WebPage({ route }: Props) {
           enabled={isEnabled}
         />
       }
-      className="flex-1 h-full">
+      className="h-full flex-1">
       {webview}
     </ScrollView>
   )

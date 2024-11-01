@@ -39,7 +39,7 @@ export default function ReplyList() {
       }}
       isVisible={!!repliesInfo}>
       <View className="h-[68vh] bg-neutral-100 dark:bg-neutral-700">
-        <View className="py-2 px-3 flex-row items-center border-gray-500 justify-between">
+        <View className="flex-row items-center justify-between border-gray-500 px-3 py-2">
           <Text className="text-base font-semibold">
             评论详情
             {typeof allCount === 'number'
@@ -51,7 +51,7 @@ export default function ReplyList() {
           <Icon
             name="close"
             size={20}
-            className="p-1 rounded-sm"
+            className="rounded-sm p-1"
             onPress={handleClose}
           />
         </View>
@@ -61,7 +61,7 @@ export default function ReplyList() {
             keyExtractor={(v) => `${v.id}@${v.root}`}
             renderItem={({ item }: { item: ReplyItemType }) => {
               return (
-                <View className="px-5 mb-2">
+                <View className="mb-2 px-5">
                   <CommentItem comment={item} smallFont={false} />
                 </View>
               )
@@ -69,21 +69,21 @@ export default function ReplyList() {
             estimatedItemSize={30}
             ListHeaderComponent={
               root ? (
-                <View className="border-b-[18px] p-4 border-b-neutral-300 dark:border-b-neutral-700 mb-5">
+                <View className="mb-5 border-b-[18px] border-b-neutral-300 p-4 dark:border-b-neutral-700">
                   <CommentItem comment={root} />
                 </View>
               ) : null
             }
             ListEmptyComponent={
               isLoading ? (
-                <View className="flex-1 h-40 justify-center items-center">
+                <View className="h-40 flex-1 items-center justify-center">
                   <ActivityIndicator
                     size={50}
                     color={tw(colors.secondary.text).color}
                   />
                 </View>
               ) : (
-                <Text className="text-center text-base my-10">
+                <Text className="my-10 text-center text-base">
                   {error ? '评论已关闭或加载失败' : '暂无评论'}
                 </Text>
               )
@@ -91,7 +91,7 @@ export default function ReplyList() {
             ListFooterComponent={
               replies?.length ? (
                 <Text
-                  className={`${colors.gray6.text} text-xs text-center mt-1`}>
+                  className={`${colors.gray6.text} mt-1 text-center text-xs`}>
                   {isValidating ? '正在加载...' : '暂无更多'}
                 </Text>
               ) : null

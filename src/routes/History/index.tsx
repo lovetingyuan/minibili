@@ -74,7 +74,7 @@ function HistoryList() {
       persistentScrollbar
       estimatedItemSize={100}
       ListEmptyComponent={
-        <View className="flex-1 gap-2 my-16">
+        <View className="my-16 flex-1 gap-2">
           {count === 0 ? (
             <Text className="text-center text-base">暂无观看记录</Text>
           ) : (
@@ -84,7 +84,7 @@ function HistoryList() {
       }
       ListFooterComponent={
         list.length ? (
-          <Text className={`${colors.gray6.text} text-xs text-center my-2`}>
+          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>
             暂无更多（保存最近约420条）
           </Text>
         ) : null

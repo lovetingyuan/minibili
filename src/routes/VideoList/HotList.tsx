@@ -31,7 +31,7 @@ function Hot() {
 
   const getFooter = (_list: any[]) => {
     return (
-      <Text className="text-center my-3 text-gray-500">
+      <Text className="my-3 text-center text-gray-500">
         {loading
           ? `加载中(${_list.length})...`
           : isReachingEnd

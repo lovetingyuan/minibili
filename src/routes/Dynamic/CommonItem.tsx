@@ -85,10 +85,10 @@ export function CommonContent(props: {
       {cover ? (
         <Image
           source={{ uri: parseImgUrl(cover, 240, 150) }}
-          className="aspect-[8/5] rounded h-auto w-[45%]"
+          className="aspect-[8/5] h-auto w-[45%] rounded"
         />
       ) : null}
-      <Foo className="gap-2 flex-1" {...linkProp}>
+      <Foo className="flex-1 gap-2" {...linkProp}>
         {title ? (
           <Text
             className={clsx([

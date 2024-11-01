@@ -1,4 +1,6 @@
 import { BottomSheet, Button, Card, Dialog, Input, Text } from '@rneui/themed'
+import { UserFeedback } from '@sentry/react-native'
+import * as Sentry from '@sentry/react-native'
 import React from 'react'
 import { Linking, View } from 'react-native'
 
@@ -8,7 +10,7 @@ import { useStore } from '@/store'
 
 import { githubLink } from '../../constants'
 import { showToast } from '../../utils'
-import { reportUserFeedback } from '../../utils/report'
+// import { reportUserFeedback } from '../../utils/report'
 import TextAction from './TextAction'
 
 export default React.memo(Feedback)
@@ -34,7 +36,14 @@ function Feedback() {
       hideFeedback()
       return
     }
-    reportUserFeedback(message, feedbackContactRef.current)
+    const userFeedback: UserFeedback = {
+      event_id: '',
+      name: feedbackContactRef.current,
+      email: feedbackContactRef.current || 'N/A',
+      comments: message,
+    }
+    Sentry.captureUserFeedback(userFeedback)
+    // reportUserFeedback(message, feedbackContactRef.current)
     hideFeedback()
     showToast('感谢反馈 😊')
   }
@@ -123,7 +132,7 @@ function Feedback() {
             </Text>
             <Text />
             <Text className="text-base">⚠️ 切勿频繁刷新数据！🙏</Text>
-            <View className="items-end my-3">
+            <View className="my-3 items-end">
               <Button
                 size="sm"
                 onPress={() => {

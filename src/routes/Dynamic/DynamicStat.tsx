@@ -21,7 +21,7 @@ export default function DynamicStat(props: {
     fontSize: 13,
   }
   return (
-    <View className="flex-row shrink-0 min-w-20 items-center gap-5 mt-3">
+    <View className="mt-3 min-w-20 shrink-0 flex-row items-center gap-5">
       <View className="flex-row items-center gap-1">
         <Icon name="date-range" size={15} color={gray} />
         <Text style={textStyle}>{props.date}</Text>

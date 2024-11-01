@@ -190,11 +190,11 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     } catch (e) {}
   }
   const renderLoading = () => (
-    <View className="absolute items-center w-full h-full">
+    <View className="absolute h-full w-full items-center">
       {videoInfo?.cover ? (
         <Image
           source={{ uri: parseImgUrl(videoInfo.cover, 672, 420) }}
-          className="flex-1 w-full"
+          className="w-full flex-1"
         />
       ) : null}
       <ActivityIndicator
@@ -278,25 +278,25 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         <ImageBackground
           source={{ uri: parseImgUrl(videoInfo.cover, 500, 312) }}
           resizeMode="cover"
-          className="flex-1 justify-center items-center">
+          className="flex-1 items-center justify-center">
           <Image2
             source={require('../../../assets/play.png')}
             className="w-16 opacity-80"
           />
           <View className="absolute bottom-2 left-2 flex-row gap-2">
             {videoInfo?.duration ? (
-              <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+              <Text className="rounded bg-gray-900/60 px-2 py-[2px] font-bold text-white">
                 {parseDuration(videoInfo?.duration)}
               </Text>
             ) : null}
             {isWifi ? null : (
-              <Text className="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold">
+              <Text className="rounded bg-gray-900/60 px-2 py-[2px] font-bold text-white">
                 播放将消耗流量
               </Text>
             )}
           </View>
 
-          <View className="absolute bottom-2 right-2 ">
+          <View className="absolute bottom-2 right-2">
             <CheckBox
               checked={highQuality}
               title="高清"

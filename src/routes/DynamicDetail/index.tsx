@@ -41,8 +41,8 @@ function DynamicDetail({
         commentId={commentId}
         commentType={commentType}
         dividerRight={
-          <View className="flex-row shrink-0 min-w-20 gap-3 items-center text-gray-500">
-            <View className="flex-row gap-1 items-center">
+          <View className="min-w-20 shrink-0 flex-row items-center gap-3 text-gray-500">
+            <View className="flex-row items-center gap-1">
               <Icon
                 name="date-range"
                 size={15}
@@ -53,7 +53,7 @@ function DynamicDetail({
               </Text>
             </View>
             <Pressable
-              className="flex-row gap-1 items-center"
+              className="flex-row items-center gap-1"
               onPress={() => {
                 showToast(`${likeCount} 点赞`)
               }}>

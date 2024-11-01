@@ -34,7 +34,7 @@ function TvImg() {
   return (
     <Image
       source={tvImg ? tvL : tvR}
-      className="aspect-square h-auto mt-12 self-center w-[50%]"
+      className="mt-12 aspect-square h-auto w-[50%] self-center"
     />
   )
 }
@@ -134,14 +134,14 @@ function FollowList() {
           ListEmptyComponent={
             <View>
               <TvImg />
-              <Text className="text-center my-10 text-lg">
+              <Text className="my-10 text-center text-lg">
                 暂无关注，请搜索你感兴趣的UP主添加
               </Text>
             </View>
           }
           ListFooterComponent={
             $followedUps.length ? (
-              <Text className="text-center pb-3 text-xs text-gray-500">
+              <Text className="pb-3 text-center text-xs text-gray-500">
                 到底了~
               </Text>
             ) : null

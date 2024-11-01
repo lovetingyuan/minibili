@@ -37,7 +37,7 @@ export default function ForwardItem(props: {
   if (payload.type === HandledForwardTypeEnum.DYNAMIC_TYPE_AV) {
     if (typeof payload.video === 'string') {
       forwardContent = (
-        <View className="flex-col flex-1">
+        <View className="flex-1 flex-col">
           <Text className="font-bold">视频：</Text>
           <Text>{payload.video}</Text>
         </View>
@@ -45,11 +45,11 @@ export default function ForwardItem(props: {
     } else {
       const { title, cover, stat } = payload.video
       forwardContent = (
-        <View className="flex-col flex-1">
+        <View className="flex-1 flex-col">
           {forwardRichTextContent}
           <View className="flex-row">
             <Image
-              className="w-[45%] aspect-[8/5] h-auto mr-3 rounded"
+              className="mr-3 aspect-[8/5] h-auto w-[45%] rounded"
               source={{ uri: parseImgUrl(cover, 240, 150) }}
             />
             <View className="flex-1">
@@ -73,11 +73,11 @@ export default function ForwardItem(props: {
     forwardContent = (
       <View className="flex-1 flex-col">
         {forwardRichTextContent}
-        <View className="flex-row overflow-hidden gap-2">
+        <View className="flex-row gap-2 overflow-hidden">
           {payload.images.map((img, i) => {
             return (
               <Image
-                className="h-24 w-auto mt-2 rounded"
+                className="mt-2 h-24 w-auto rounded"
                 style={{ aspectRatio: img.ratio }}
                 key={img.src + i}
                 source={{ uri: parseImgUrl(img.src, 240) }}
@@ -129,10 +129,10 @@ export default function ForwardItem(props: {
         topic={item.topic}
         textProps={{ numberOfLines: 3 }}
       />
-      <View className="flex-1 mb-2 rounded p-3 overflow-hidden bg-stone-200 dark:bg-stone-900">
+      <View className="mb-2 flex-1 overflow-hidden rounded bg-stone-200 p-3 dark:bg-stone-900">
         {payload.name && payload.mid !== item.mid ? (
           <Pressable
-            className="flex-row items-center mb-2"
+            className="mb-2 flex-row items-center"
             onPress={() => {
               navigation.push('Dynamic', {
                 user: {
@@ -151,7 +151,7 @@ export default function ForwardItem(props: {
                 rounded
               />
             ) : null}
-            <Text className={`text-base ml-2 ${colors.primary.text}`}>
+            <Text className={`ml-2 text-base ${colors.primary.text}`}>
               {payload.name}
             </Text>
           </Pressable>

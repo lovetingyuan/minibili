@@ -65,7 +65,7 @@ function Statement() {
             </Text>
             <Text />
             <Text className="text-base">⚠️ 切勿频繁刷新数据！🙏</Text>
-            <View className="items-end my-3">
+            <View className="my-3 items-end">
               <Button
                 size="sm"
                 onPress={() => {
