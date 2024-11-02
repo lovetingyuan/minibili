@@ -133,7 +133,7 @@ function MusicItem(props: {
           className="top-0 h-16 w-20 items-center justify-center">
           {isPlaying ? (
             <Image
-              source={require('../../../assets/ccc.webp')}
+              source={require('../../../assets/bbb.webp')}
               className="h-14 w-14"
             />
           ) : (
@@ -156,13 +156,7 @@ function MusicItem(props: {
           )}
         </ImageBackground>
       </View>
-      <ImageBackground
-        source={require('../../../assets/bbb.webp')}
-        imageStyle={{
-          width: 90,
-          left: width - 220,
-        }}
-        className="flex-1 gap-2">
+      <View className="flex-1 gap-2">
         <Text
           className={clsx(
             'items-center text-base leading-5',
@@ -188,7 +182,7 @@ function MusicItem(props: {
             {song.year ? `${song.year}年` : ''}
           </Text>
         </View>
-      </ImageBackground>
+      </View>
     </View>
   )
 }
