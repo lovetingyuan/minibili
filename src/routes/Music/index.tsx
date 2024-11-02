@@ -1,6 +1,6 @@
 import { useBackHandler } from '@react-native-community/hooks'
 import { useIsFocused, useNavigation } from '@react-navigation/native'
-import { Icon, Text } from '@rneui/themed'
+import { Button, Icon, Text } from '@rneui/themed'
 import { FlashList } from '@shopify/flash-list'
 import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'
@@ -25,6 +25,7 @@ import MusicPlayerBar from './Player'
 
 function MusicItem(props: {
   song: AppContextValueType['$musicList'][0]['songs'][0]
+  type: 'normal' | 'brief'
 }) {
   const { song } = props
   const {
@@ -40,7 +41,7 @@ function MusicItem(props: {
   const buttons = () => {
     return [
       {
-        text: '移除',
+        text: `删除（${song.name}）`,
         onPress: () => {
           Alert.alert('确定要移除该歌曲吗？', '', [
             {
@@ -100,6 +101,30 @@ function MusicItem(props: {
     ]
   }
   const { width } = useWindowDimensions()
+  if (props.type === 'brief') {
+    return (
+      <View className="my-2 flex-row gap-2">
+        <Text
+          className={clsx(
+            'shrink items-center text-base leading-5',
+            isPlaying && [colors.primary.text, 'font-bold'],
+          )}
+          numberOfLines={1}
+          onPress={() => {
+            setPlayingSong(song)
+          }}
+          onLongPress={() => {
+            setOverlayButtons(buttons())
+          }}
+          ellipsizeMode="tail">
+          {song.name}bjkkjljljl福建高考会考立刻就垃圾垃圾
+        </Text>
+        {song.singer ? (
+          <Text className="shrink-0 italic">👤{song.singer}</Text>
+        ) : null}
+      </View>
+    )
+  }
   return (
     <View className="my-3 flex-row gap-3">
       <View className="overflow-hidden rounded">
@@ -218,17 +243,35 @@ function MusicList() {
     }
     return list
   }, [list, searchKeyWord])
+  const [displayType, setDisplayType] = React.useState<'normal' | 'brief'>(
+    'normal',
+  )
   return (
     <View className="flex-1">
       <View className="shrink flex-grow">
         <FlashList
           data={songsList}
           keyExtractor={(v) => `${v.bvid}_${v.cid}`}
+          key={displayType}
           renderItem={({ item }) => {
-            return <MusicItem song={item} />
+            return <MusicItem song={item} type={displayType} />
           }}
           persistentScrollbar
           estimatedItemSize={100}
+          ListHeaderComponent={
+            <View>
+              <Button
+                type="clear"
+                title={displayType === 'normal' ? '紧凑' : '常规'}
+                size="sm"
+                titleStyle={{ fontSize: 15 }}
+                buttonStyle={{ width: 40, padding: 0, marginLeft: 'auto' }}
+                onPress={() => {
+                  setDisplayType(displayType === 'normal' ? 'brief' : 'normal')
+                }}
+              />
+            </View>
+          }
           ListEmptyComponent={
             <View className="my-16 flex-1 gap-2">
               {list.length === 0 ? (
