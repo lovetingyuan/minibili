@@ -36,8 +36,10 @@ function Feedback() {
       hideFeedback()
       return
     }
+    const sentryId = Sentry.captureMessage('user feedback')
+
     const userFeedback: UserFeedback = {
-      event_id: '',
+      event_id: sentryId,
       name: feedbackContactRef.current,
       email: feedbackContactRef.current || 'N/A',
       comments: message,
