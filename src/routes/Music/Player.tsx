@@ -1,21 +1,12 @@
 import { Icon, Slider, Text } from '@rneui/themed'
 import clsx from 'clsx'
-import {
-  Audio,
-  type AVPlaybackStatus,
-  // InterruptionModeAndroid,
-  // InterruptionModeIOS,
-} from 'expo-av'
-// import { Image } from 'expo-image'
+import { Audio, type AVPlaybackStatus } from 'expo-av'
 import React, { useEffect } from 'react'
 import { ImageBackground, TouchableOpacity, View } from 'react-native'
 
-// import { throttle } from 'throttle-debounce'
 import { useAudioUrl } from '@/api/play-url'
 import { UA } from '@/constants'
 import { colors } from '@/constants/colors.tw'
-// import useBackgroundTask from '@/hooks/useBackgroundTask'
-import useDataChange from '@/hooks/useDataChange'
 import useIsDark from '@/hooks/useIsDark'
 import useMemoizedFn from '@/hooks/useMemoizedFn'
 import { useStore } from '@/store'
@@ -90,7 +81,10 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
       }
     }, [playMode, nextSong, setPlayingSong]),
   )
-  useDataChange(() => {
+  const getPlayMode = useMemoizedFn(() => {
+    return playMode
+  })
+  React.useEffect(() => {
     if (!props.url) {
       return
     }
@@ -111,7 +105,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
             },
           },
           {
-            isLooping: playMode === 'loop' || playMode === 'order',
+            isLooping: getPlayMode() === 'loop' || getPlayMode() === 'order',
             shouldPlay: true,
           },
           handlePlayStatusChange,
@@ -130,7 +124,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
     return () => {
       stop()
     }
-  }, [props.url])
+  }, [props.url, handlePlayStatusChange, getPlayMode])
 
   useEffect(() => {
     return () => {

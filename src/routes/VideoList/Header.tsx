@@ -19,7 +19,7 @@ import { useStore } from '../../store'
 import type { NavigationProps } from '../../types'
 
 function HeaderTitleComp() {
-  const opacityValue = React.useRef(new Animated.Value(0)).current
+  const { current: opacityValue } = React.useRef(new Animated.Value(0))
   const appUpdateInfo = useAppUpdateInfo()
 
   useMounted(() => {
@@ -54,8 +54,12 @@ function HeaderTitleComp() {
       onPress={() => {
         Linking.openURL(appUpdateInfo.downloadLink!)
       }}>
-      有新版本
-      <Animated.View style={{ opacity: opacityValue }}>
+      {'有新版本'}
+      <Animated.View
+        style={
+          /* eslint-disable-next-line react-compiler/react-compiler */
+          { opacity: opacityValue }
+        }>
         <Icon
           name="fiber-new"
           color={tw(colors.secondary.text).color}

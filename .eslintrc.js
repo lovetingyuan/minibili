@@ -5,7 +5,7 @@ module.exports = {
   },
   extends: ['@react-native'],
   ignorePatterns: ['docs/**'],
-  plugins: ['sonarjs', 'simple-import-sort'],
+  plugins: ['sonarjs', 'simple-import-sort', 'eslint-plugin-react-compiler'],
   parserOptions: {
     ecmaVersion: 2022,
   },
@@ -19,6 +19,7 @@ module.exports = {
     '@typescript-eslint/no-import-type-side-effects': 'error',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    'react-compiler/react-compiler': 'error',
   },
   overrides: [
     {

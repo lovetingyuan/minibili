@@ -1,13 +1,13 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { AppState, type AppStateStatus } from 'react-native'
 
+import useLatest from './useLatest'
 import useMounted from './useMounted'
 
 export function useAppStateChange(callback?: (s: AppStateStatus) => void) {
   const currentState = AppState.currentState
   const [appState, setAppState] = useState(currentState)
-  const callbackRef = useRef(callback)
-  callbackRef.current = callback
+  const callbackRef = useLatest(callback)
 
   useMounted(() => {
     function onChange(newState: AppStateStatus) {

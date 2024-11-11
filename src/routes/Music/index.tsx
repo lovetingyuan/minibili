@@ -6,13 +6,7 @@ import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import React from 'react'
-import {
-  Alert,
-  ImageBackground,
-  Linking,
-  useWindowDimensions,
-  View,
-} from 'react-native'
+import { Alert, ImageBackground, Linking, View } from 'react-native'
 import type { SearchBarCommands } from 'react-native-screens'
 
 import { colors } from '@/constants/colors.tw'
@@ -100,7 +94,6 @@ function MusicItem(props: {
       },
     ]
   }
-  const { width } = useWindowDimensions()
   if (props.type === 'brief') {
     return (
       <View className="my-2 flex-row gap-2">
@@ -117,7 +110,7 @@ function MusicItem(props: {
             setOverlayButtons(buttons())
           }}
           ellipsizeMode="tail">
-          {song.name}bjkkjljljl福建高考会考立刻就垃圾垃圾
+          {song.name}
         </Text>
         {song.singer ? (
           <Text className="shrink-0 italic">👤{song.singer}</Text>

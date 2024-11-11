@@ -1,9 +1,16 @@
 import { Overlay } from '@rneui/themed'
 import { Image } from 'expo-image'
 import React from 'react'
-import { Linking, Text, useWindowDimensions, View } from 'react-native'
+import {
+  Linking,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native'
 import PagerView from 'react-native-pager-view'
 
+import useLatest from '@/hooks/useLatest'
 import { parseImgUrl } from '@/utils'
 
 import { useStore } from '../store'
@@ -38,9 +45,76 @@ function ImagesView() {
     Linking.openURL(img.split('@')[0])
   }
   // avoid view pager render all pages at same time.
-  const imageCompCache = React.useRef<
+  const imageCompCache = useLatest<
     Record<string, React.ComponentElement<any, any>>
   >({})
+  // const imageCompCache = React.useRef<
+  //   Record<string, React.ComponentElement<any, any>>
+  // >({})
+  const imageNodes = React.useMemo(() => {
+    return images.map((v, i) => {
+      let imgWidth = Math.min(width, v.width)
+      let imgHeight = (imgWidth * v.height) / v.width
+      let overflow = false
+      if (imgHeight > height) {
+        imgWidth = width
+        imgHeight = (width * v.height) / v.width
+        overflow = true
+        // imgHeight = Math.min(height, v.height)
+        // imgWidth = (v.width * imgHeight) / v.height
+      }
+      let imageView = null
+      if (imageCompCache.current[v.url]) {
+        imageView = imageCompCache.current[v.url]
+      } else if (current === i) {
+        Object.assign(imageCompCache.current, {
+          [v.url]: (
+            <Image2
+              source={{ uri: v.url }}
+              // initWidth={96}
+              // initHeight={96}
+              style={{ width: imgWidth, height: imgHeight }}
+              placeholder={require('../../assets/loading2.gif')}
+            />
+          ),
+        })
+        imageView = imageCompCache.current[v.url]
+      } else {
+        imageView = (
+          <Image
+            source={require('../../assets/loading2.gif')}
+            className="h-24 w-24"
+          />
+        )
+      }
+      // if (overflow) {
+      //   return (
+      //     <ScrollView
+      //       key={v.url}
+      //       contentContainerStyle={tw('justify-center items-center')}
+      //       className="flex-1 bg-white">
+      //       {imageView}
+      //     </ScrollView>
+      //   )
+      // }
+      return (
+        <View
+          key={v.url}
+          className="flex-1 items-center justify-center bg-black">
+          {overflow ? (
+            <ScrollView
+              key={v.url}
+              contentContainerStyle={tw('justify-center items-center')}
+              className="flex-1 bg-black">
+              {imageView}
+            </ScrollView>
+          ) : (
+            imageView
+          )}
+        </View>
+      )
+    })
+  }, [images, width, height, imageCompCache, current])
   return (
     <Overlay
       isVisible={images.length > 0}
@@ -74,43 +148,7 @@ function ImagesView() {
           offscreenPageLimit={1}
           className="flex-1"
           initialPage={currentImageIndex}>
-          {images.map((v, i) => {
-            let imgWidth = Math.min(width, v.width)
-            let imgHeight = (imgWidth * v.height) / v.width
-            if (imgHeight > height) {
-              imgHeight = Math.min(height, v.height)
-              imgWidth = (v.width * imgHeight) / v.height
-            }
-            let imageView = null
-            if (imageCompCache.current[v.url]) {
-              imageView = imageCompCache.current[v.url]
-            } else if (current === i) {
-              imageCompCache.current[v.url] = (
-                <Image2
-                  source={{ uri: v.url }}
-                  initWidth={96}
-                  initHeight={96}
-                  style={{ width: imgWidth, height: imgHeight }}
-                  placeholder={require('../../assets/loading2.gif')}
-                />
-              )
-              imageView = imageCompCache.current[v.url]
-            } else {
-              imageView = (
-                <Image
-                  source={require('../../assets/loading2.gif')}
-                  className="h-24 w-24"
-                />
-              )
-            }
-            return (
-              <View
-                key={v.url}
-                className="flex-1 items-center justify-center bg-black">
-                {imageView}
-              </View>
-            )
-          })}
+          {imageNodes}
         </PagerView>
       </View>
     </Overlay>

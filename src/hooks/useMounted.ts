@@ -6,6 +6,7 @@ export default function useMounted(callback: () => void) {
     if (typeof clean === 'function') {
       return clean
     }
+    // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 }

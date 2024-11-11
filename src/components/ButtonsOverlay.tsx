@@ -38,7 +38,7 @@ function ButtonsOverlay() {
     <Overlay
       isVisible={overlayButtons.length > 0}
       ModalComponent={Modal2}
-      overlayStyle={tw(`px-0 py-3 min-w-[70%] ${colors.gray2.bg}`)}
+      overlayStyle={tw(`px-0 py-3 min-w-[70%] max-w-[90%] ${colors.gray2.bg}`)}
       onBackdropPress={dismiss}>
       {Buttons}
     </Overlay>
