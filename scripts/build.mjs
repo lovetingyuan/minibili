@@ -290,17 +290,13 @@ try {
   throw err
 }
 
-echo(
-  chalk.green(
-    'Build done, please test your app and set npm tag to latest to publish new version finally!',
-  ),
-)
+echo(chalk.green('Build done!'))
 
-echo(
-  `npm dist-tag add ${pkg.name}@${newVersion} latest --registry=https://registry.npmjs.org/`,
-)
+// echo(
+//   `npm dist-tag add ${pkg.name}@${newVersion} latest --registry=https://registry.npmjs.org/`,
+// )
 
-echo('npm run deploy:docs')
+// echo('npm run deploy:docs')
 
 const open = require('open')
 open(
