@@ -53,6 +53,7 @@ export const getAppValue = () => {
       songs: MusicSong[]
     }[],
     $watchedHotSearch: {} as Record<string, number>,
+    $checkAppUpdateTime: 0,
     // -------------------------
     initialed: false,
     isWiFi: false,
@@ -75,6 +76,11 @@ export const getAppValue = () => {
     } | null,
     checkLiveTimeStamp: Date.now(),
     playingSong: null as MusicSong | null,
+    releaseList: [] as {
+      version: string
+      changelog: string
+      apkLink: string
+    }[],
   }
 }
 

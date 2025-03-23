@@ -25,6 +25,7 @@ module.exports = {
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
+  newArchEnabled: true,
   androidStatusBar: {
     backgroundColor: '#94E0D8',
     barStyle: 'light-content',

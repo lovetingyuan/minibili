@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 
-import { useAppUpdateInfo } from '@/api/check-update'
+import useAppUpdateInfo from '@/api/check-update'
 import { colors } from '@/constants/colors.tw'
 import { useUpUpdateCount } from '@/store/derives'
 
@@ -21,7 +21,6 @@ import type { NavigationProps } from '../../types'
 function HeaderTitleComp() {
   const { current: opacityValue } = React.useRef(new Animated.Value(0))
   const appUpdateInfo = useAppUpdateInfo()
-
   useMounted(() => {
     const blinkAnimation = Animated.loop(
       Animated.sequence([
@@ -45,14 +44,17 @@ function HeaderTitleComp() {
     }
   })
 
-  return appUpdateInfo?.hasUpdate ? (
+  return appUpdateInfo.hasUpdate ? (
     <Button
       type="clear"
       size="sm"
       buttonStyle={tw('mx-2')}
       titleStyle={tw(`text-sm ${colors.primary.text}`)}
       onPress={() => {
-        Linking.openURL(appUpdateInfo.downloadLink!)
+        const downloadLink = appUpdateInfo.downloadLink
+        if (downloadLink) {
+          Linking.openURL(downloadLink)
+        }
       }}>
       {'有新版本'}
       <Animated.View

@@ -3,13 +3,9 @@ import * as Updates from 'expo-updates'
 import React from 'react'
 import { Alert, Linking } from 'react-native'
 
+import useAppUpdateInfo from '@/api/check-update'
 import { site } from '@/constants'
 
-import {
-  checkUpdate as checkUpdateApi,
-  currentVersion,
-} from '../../api/check-update'
-import { showToast } from '../../utils'
 import TextAction from './TextAction'
 
 export default React.memo(Version)
@@ -18,40 +14,41 @@ function Version() {
   const updateTime: string = Updates.createdAt
     ? `${Updates.createdAt.toLocaleDateString()} ${Updates.createdAt.toLocaleTimeString()}`
     : Constants.expoConfig?.extra?.buildTime
-  const [checkingUpdate, setCheckingUpdate] = React.useState(false)
-  const [hasUpdate, setHasUpdate] = React.useState<boolean | null>(null)
-  const checkUpdate = () => {
+  const {
+    currentVersion,
+    checkUpdate,
+    latestVersion,
+    changelog,
+    downloadLink,
+    loading: checkingUpdate,
+    hasUpdate,
+  } = useAppUpdateInfo()
+  const handleCheckUpdate = () => {
     if (checkingUpdate) {
       return
     }
-    setCheckingUpdate(true)
-    checkUpdateApi().then(
-      (data) => {
-        setHasUpdate(data.hasUpdate)
-        if (data.hasUpdate) {
-          Alert.alert(
-            '有新版本',
-            `${data.currentVersion}  ⟶  ${data.latestVersion}\n\n${data.changelog}`,
-            [
-              {
-                text: '取消',
-              },
-              {
-                text: '下载更新',
-                onPress: () => {
-                  Linking.openURL(data.downloadLink!)
-                },
-              },
-            ],
-          )
-        }
-        setCheckingUpdate(false)
-      },
-      () => {
-        showToast('检查更新失败')
-        setCheckingUpdate(false)
-      },
-    )
+
+    if (hasUpdate) {
+      Alert.alert(
+        '有新版本',
+        `${currentVersion}  ➔  ${latestVersion}\n\n${changelog}`,
+        [
+          {
+            text: '取消',
+          },
+          {
+            text: '下载更新',
+            onPress: () => {
+              if (downloadLink) {
+                Linking.openURL(downloadLink)
+              }
+            },
+          },
+        ],
+      )
+    } else {
+      checkUpdate()
+    }
   }
   return (
     <TextAction
@@ -73,9 +70,9 @@ function Version() {
       }}
       buttons={[
         {
-          text: hasUpdate === false ? '暂无更新' : '检查更新',
+          text: hasUpdate ? 'APP有更新🎉' : '检查更新',
           loading: checkingUpdate,
-          onPress: checkUpdate,
+          onPress: handleCheckUpdate,
         },
         {
           text: '更新日志',

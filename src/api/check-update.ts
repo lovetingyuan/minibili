@@ -1,44 +1,45 @@
 import * as Application from 'expo-application'
-import React from 'react'
+import useSWR from 'swr'
 
-import useMounted from '@/hooks/useMounted'
+import { GhProxy, githubLink } from '@/constants'
+import { useStore } from '@/store'
 
-export const currentVersion = Application.nativeApplicationVersion!
-
-export const checkUpdate = () => {
-  return fetch(`https://unpkg.com/minibili/package.json?_t=${Date.now()}`)
-    .then((r) => r.json())
-    .then(
-      (res: {
-        name: string
-        version: string
-        config: { changelog: string; versionCode: number }
-      }) => {
-        const latestVersion = res.version
-        // const latestVersion = res[0].appVersion
-        const hasUpdate = latestVersion !== currentVersion
-        const downloadLink = `https://unpkg.com/minibili@${res.version}/apk/minibili-${latestVersion}.apk`
-        return {
-          hasUpdate,
-          latestVersion,
-          downloadLink,
-          currentVersion,
-          changelog: res.config.changelog,
-        }
-      },
+export default function useAppUpdateInfo() {
+  const { set$checkAppUpdateTime } = useStore()
+  const currentVersion = Application.nativeApplicationVersion!
+  const {
+    data: list,
+    isLoading,
+    isValidating,
+    error,
+    mutate,
+  } = useSWR('$check-app-update', () => {
+    set$checkAppUpdateTime(Date.now())
+    return fetch(
+      'https://tingyuan.in/api/github/releases?user=lovetingyuan&repo=minibili',
     )
-}
-type PT<V> = V extends Promise<infer T> ? T : never
-
-export const useAppUpdateInfo = () => {
-  const [appUpdateInfo, setAppUpdateInfo] = React.useState<PT<
-    ReturnType<typeof checkUpdate>
-  > | null>(null)
-  useMounted(() => {
-    if (appUpdateInfo) {
-      return
-    }
-    checkUpdate().then(setAppUpdateInfo)
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.code !== 0) {
+          throw new Error(r.code + ':' + r.message)
+        }
+        return r.data as { version: string; changelog: string }[]
+      })
   })
-  return appUpdateInfo
+
+  const latest = list?.[0]
+  const latestVersion = latest?.version.split('-')[1]
+  return {
+    currentVersion,
+    hasUpdate: latestVersion ? latestVersion !== currentVersion : false,
+    downloadLink: latestVersion
+      ? `${GhProxy}/${githubLink}/releases/download/v${latestVersion}/${latest.version}.apk`
+      : undefined,
+    latestVersion,
+    changelog: latest?.changelog,
+    changeList: list,
+    loading: isLoading || isValidating,
+    error,
+    checkUpdate: mutate,
+  }
 }

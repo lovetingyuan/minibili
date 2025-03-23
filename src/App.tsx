@@ -34,6 +34,7 @@ const focus = true
 const errorFallback: React.ComponentProps<
   typeof SentryExpo.ErrorBoundary
 >['fallback'] = (errorData) => {
+  // @ts-ignore
   return <ErrorFallback message={errorData.error.message} />
 }
 

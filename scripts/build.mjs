@@ -90,12 +90,12 @@ await spinner('Checking build env...', async () => {
       assert.equal(d, 'OK', chalk.red('Can not access Expo Api'))
     })
 
-  await $`npm ping`
-  const npmuser = await $`npm whoami --registry=https://registry.npmjs.org/`
-  assert.ok(
-    npmuser && npmuser.toString('utf8').trim().length > 0,
-    chalk.red('npm user not login.'),
-  )
+  // await $`npm ping`
+  // const npmuser = await $`npm whoami --registry=https://registry.npmjs.org/`
+  // assert.ok(
+  //   npmuser && npmuser.toString('utf8').trim().length > 0,
+  //   chalk.red('npm user not login.'),
+  // )
 
   const easuser = await $`npx --yes eas-cli@latest whoami`
   assert.ok(
@@ -251,19 +251,19 @@ try {
   echo(chalk.red('Failed to build website.'))
 }
 
-try {
-  await spinner('Publish to npm...', () =>
-    retry(
-      3,
-      () => $`npm publish --tag beta --registry=https://registry.npmjs.org/`,
-    ),
-  )
-  echo(chalk.blue('published as beta tag to npm success.'))
-} catch (err) {
-  echo(chalk.red('Failed to publish to npm.'))
-  echo('npm publish --tag beta --registry=https://registry.npmjs.org/')
-  throw err
-}
+// try {
+//   await spinner('Publish to npm...', () =>
+//     retry(
+//       3,
+//       () => $`npm publish --tag beta --registry=https://registry.npmjs.org/`,
+//     ),
+//   )
+//   echo(chalk.blue('published as beta tag to npm success.'))
+// } catch (err) {
+//   echo(chalk.red('Failed to publish to npm.'))
+//   echo('npm publish --tag beta --registry=https://registry.npmjs.org/')
+//   throw err
+// }
 
 try {
   const message = `release(v${newVersion}): ${changes}`
