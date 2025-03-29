@@ -11,10 +11,10 @@ import type { UpInfo } from '../types'
 import fetcher from './fetcher'
 import type {
   UserCardInfoResponseSchema,
-  UserInfoResponseSchema,
+  // UserInfoResponseSchema,
 } from './user-info.schema'
 
-type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
+// type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
 type UserInfo = UpInfo & {
   level: number
   sex: string
@@ -88,22 +88,33 @@ type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>
 export function useUserInfo(mid?: number | string) {
   const { get$followedUps, set$followedUps } = useStore()
   const { data } = useSWRImmutable<UserInfo | undefined>(
-    mid ? `/x/space/wbi/acc/info?mid=${mid}` : null,
+    mid ? `/x/web-interface/card?mid=${mid}` : null,
+    // null,
     (url) => {
-      return fetcher<UserInfoResponse>(url).catch(() => {
-        return fetcher<UserCardInfoResponse>(
-          `/x/web-interface/card?mid=${mid}`,
-        ).then((userInfo) => {
-          return {
-            face: userInfo.card.face,
-            name: userInfo.card.name,
-            sign: userInfo.card.sign,
-            mid: userInfo.card.mid.toString(),
-            level: userInfo.card.level_info.current_level,
-            sex: userInfo.card.sex,
-          }
-        })
+      return fetcher<UserCardInfoResponse>(url).then((userInfo) => {
+        return {
+          face: userInfo.card.face,
+          name: userInfo.card.name,
+          sign: userInfo.card.sign,
+          mid: userInfo.card.mid.toString(),
+          level: userInfo.card.level_info.current_level,
+          sex: userInfo.card.sex,
+        }
       })
+      // return fetcher<UserInfoResponse>(url).catch(() => {
+      //   return fetcher<UserCardInfoResponse>(
+      //     `/x/web-interface/card?mid=${mid}`,
+      //   ).then((userInfo) => {
+      //     return {
+      //       face: userInfo.card.face,
+      //       name: userInfo.card.name,
+      //       sign: userInfo.card.sign,
+      //       mid: userInfo.card.mid.toString(),
+      //       level: userInfo.card.level_info.current_level,
+      //       sex: userInfo.card.sex,
+      //     }
+      //   })
+      // })
     },
     {
       onSuccess(_data) {

@@ -1,16 +1,10 @@
 import { useNavigation } from '@react-navigation/native'
 import { Badge, Button, Icon, Text } from '@rneui/themed'
 import React from 'react'
-import {
-  Animated,
-  Linking,
-  ScrollView,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Animated, ScrollView, TouchableOpacity, View } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
 
-import useAppUpdateInfo from '@/api/check-update'
+import { useAppUpdateInfo } from '@/api/check-update'
 import { colors } from '@/constants/colors.tw'
 import { useUpUpdateCount } from '@/store/derives'
 
@@ -51,10 +45,7 @@ function HeaderTitleComp() {
       buttonStyle={tw('mx-2')}
       titleStyle={tw(`text-sm ${colors.primary.text}`)}
       onPress={() => {
-        const downloadLink = appUpdateInfo.downloadLink
-        if (downloadLink) {
-          Linking.openURL(downloadLink)
-        }
+        appUpdateInfo.showAlert()
       }}>
       {'有新版本'}
       <Animated.View

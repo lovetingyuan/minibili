@@ -6,7 +6,13 @@ import useMounted from '../hooks/useMounted'
 import { useStore } from '../store'
 
 function useCheckUpdateUps() {
-  const { get$followedUps, set$upUpdateMap, get$upUpdateMap } = useStore()
+  const {
+    get$followedUps,
+    set$upUpdateMap,
+    get$upUpdateMap,
+    getRequestDynamicFailed,
+    setRequestDynamicFailed,
+  } = useStore()
   const checkUpdateUpsTimerRef = React.useRef(0)
   useMounted(() => {
     const upUpdateQueue = new PQueue({
@@ -20,10 +26,15 @@ function useCheckUpdateUps() {
       if (upUpdateQueue.size || upUpdateQueue.pending) {
         return
       }
+      if (Date.now() - getRequestDynamicFailed() < 60 * 60 * 1000) {
+        return
+      }
       const followedUps = get$followedUps()
       for (const up of followedUps) {
         upUpdateQueue.add(async () => {
-          const id = await checkSingleUpUpdate(up.mid)
+          const id = await checkSingleUpUpdate(up.mid).catch(() => {
+            setRequestDynamicFailed(Date.now())
+          })
           if (id) {
             upUpdateIdMap[up.mid] = id
           }

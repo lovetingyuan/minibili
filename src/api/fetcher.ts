@@ -15,11 +15,13 @@ type ResponseType<D = any> = {
 export class ApiError extends Error {
   response: ResponseType
   url: string
+  code: number
   constructor(message: string, url: string, res: ResponseType) {
     super(message)
     this.name = 'API Error'
     this.response = res
     this.url = url
+    this.code = res.code
   }
 }
 

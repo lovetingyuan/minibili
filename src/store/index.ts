@@ -81,6 +81,7 @@ export const getAppValue = () => {
       changelog: string
       apkLink: string
     }[],
+    requestDynamicFailed: 0,
   }
 }
 

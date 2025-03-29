@@ -536,25 +536,21 @@ export function useDynamicItems(mid?: string | number) {
 
 export function checkSingleUpUpdate(mid: string | number) {
   const url = `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}`
-  return request<DynamicListResponse>(url)
-    .then((data) => {
-      let latestTime = 0
-      let latestId = ''
-      if (data?.items) {
-        data.items.forEach((item) => {
-          if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
-            return
-          }
-          const pubTime = item.modules?.module_author?.pub_ts
-          if (pubTime > latestTime) {
-            latestTime = pubTime
-            latestId = item.id_str
-          }
-        })
-      }
-      return latestId
-    })
-    .catch(() => {
-      return '' // 忽略失败
-    })
+  return request<DynamicListResponse>(url).then((data) => {
+    let latestTime = 0
+    let latestId = ''
+    if (data?.items) {
+      data.items.forEach((item) => {
+        if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_LIVE_RCMD) {
+          return
+        }
+        const pubTime = item.modules?.module_author?.pub_ts
+        if (pubTime > latestTime) {
+          latestTime = pubTime
+          latestId = item.id_str
+        }
+      })
+    }
+    return latestId
+  })
 }

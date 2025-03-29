@@ -44,7 +44,8 @@ export default React.memo(FollowList)
 function FollowList() {
   // eslint-disable-next-line no-console
   __DEV__ && console.log('Follow page')
-  const { $followedUps, $upUpdateMap, livingUps } = useStore()
+  const { $followedUps, $upUpdateMap, livingUps, requestDynamicFailed } =
+    useStore()
   const _updatedCount = useUpUpdateCount()
   const followListRef = React.useRef<FlatList | null>(null)
   const dark = useIsDark()
@@ -52,11 +53,12 @@ function FollowList() {
   const { width } = useWindowDimensions()
   const columns = Math.floor(width / 90)
   const count = $followedUps.length
+  const failed = Date.now() - requestDynamicFailed < 60 * 60 * 1000
   const headerTitle = `关注的UP${
     count
       ? _updatedCount
-        ? ` (${_updatedCount}/${count})`
-        : ` (${count})`
+        ? ` (${_updatedCount}/${count}${failed ? '！' : ''})`
+        : ` (${count}${failed ? '！' : ''})`
       : ''
   }`
   useUpdateNavigationOptions(

@@ -49,10 +49,12 @@ function WebPage({ route }: Props) {
   const [height, setHeight] = React.useState(Dimensions.get('screen').height)
   const [isEnabled, setEnabled] = React.useState(true)
   const [pageTitle, setPageTitle] = React.useState(title)
+  const [webviewKey, setWebViewKey] = React.useState(0)
   const { isRefreshing, onRefresh } = useRefresh(
     React.useCallback(() => {
       return new Promise((r) => {
-        webviewRef.current?.reload()
+        // webviewRef.current?.reload()
+        setWebViewKey((k) => k + 1)
         setTimeout(r, 1000)
       })
     }, []),
@@ -137,7 +139,7 @@ function WebPage({ route }: Props) {
       className="flex-1"
       style={{ height }}
       source={{ uri: url }}
-      key={webViewMode}
+      key={webViewMode + '-' + webviewKey}
       onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
       originWhitelist={['http://*', 'https://*', 'bilibili://*']}
       allowsFullscreenVideo
@@ -160,6 +162,25 @@ function WebPage({ route }: Props) {
         }
         if (data.action === 'enable-background-play') {
           setEnableBackgroundPlay(true)
+        }
+        if (data.action === 'update-live-info') {
+          const { url, callback } = JSON.parse(data.payload) as {
+            url: string
+            callback: string
+          }
+          fetch(url, {
+            headers: { 'user-agent': UA },
+          })
+            .then((r) => r.text())
+            .then((html) => {
+              const index = html.indexOf('__NEPTUNE_IS_MY_WAIFU__=')
+              const html2 = html.substring(index)
+              const index2 = html2.indexOf('</script>')
+              const html3 = html2.substring(0, index2)
+              webviewRef.current?.injectJavaScript(
+                `window.${callback}(${html3});`,
+              )
+            })
         }
       }}
       onLoad={() => {
