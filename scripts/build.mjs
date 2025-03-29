@@ -1,5 +1,5 @@
 #!/usr/bin/env zx
-/* globals $, question, echo, chalk, fs, path, retry, spinner */
+/* globals $, question, echo, chalk, fs,  retry, spinner */
 
 // import { BuildListSchema } from '../src/api/check-update.schema.ts'
 // 1 检查环境 2 写入版本 3 eas构建 4 写入更新日志 5 下载apk 6 git推送
@@ -48,9 +48,9 @@ const BuildListSchema = z
   }, 'channel error')
   .array()
 
-require('dotenv').config({
-  path: path.resolve(__dirname, '../.env'),
-})
+// require('dotenv').config({
+//   path: path.resolve(__dirname, '../.env'),
+// })
 
 const pkgPath = require.resolve('../package.json')
 const pkg = require('../package.json')
@@ -107,7 +107,6 @@ await spinner('Checking build env...', async () => {
     3,
     () => $`git ls-remote --heads https://github.com/lovetingyuan/minibili.git`,
   )
-  // await $`git ls-remote --heads https://github.com/lovetingyuan/minibili.git`
 
   const branch = await $`git rev-parse --abbrev-ref HEAD`
   assert.equal(
@@ -206,20 +205,20 @@ try {
 }
 
 // ---------------------------------------------
-echo(chalk.blue('Update version file...'))
-await fs.outputJsonSync(
-  path.resolve(__dirname, '../website/public/version.json'),
-  latestBuildList.map((item) => {
-    return {
-      version: item.appVersion,
-      changelog: (item.message || item.gitCommitMessage).split('  '),
-      date: item.createdAt,
-    }
-  }),
-  {
-    spaces: 2,
-  },
-)
+// echo(chalk.blue('Update version file...'))
+// await fs.outputJsonSync(
+//   path.resolve(__dirname, '../website/public/version.json'),
+//   latestBuildList.map((item) => {
+//     return {
+//       version: item.appVersion,
+//       changelog: (item.message || item.gitCommitMessage).split('  '),
+//       date: item.createdAt,
+//     }
+//   }),
+//   {
+//     spaces: 2,
+//   },
+// )
 
 const apkUrl = latestBuildList[0].artifacts.buildUrl
 echo(chalk.blue('download apk file...'))
@@ -233,23 +232,20 @@ try {
     })
   })
   echo(chalk.blue(`Saved apk to ./apk/minibili-${newVersion}.apk`))
-  try {
-    await $`du -h apk/minibili-${newVersion}.apk`
-  } catch (e) {}
 } catch (err) {
   echo(chalk.red('Failed to download latest apk.'))
   echo(`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`)
   throw err
 }
 
-try {
-  await spinner('Building website...', async () => {
-    return $`npm run build:docs`
-  })
-  echo(chalk.blue('website build done'))
-} catch (err) {
-  echo(chalk.red('Failed to build website.'))
-}
+// try {
+//   await spinner('Building website...', async () => {
+//     return $`npm run build:docs`
+//   })
+//   echo(chalk.blue('website build done'))
+// } catch (err) {
+//   echo(chalk.red('Failed to build website.'))
+// }
 
 // try {
 //   await spinner('Publish to npm...', () =>
@@ -290,7 +286,7 @@ try {
   throw err
 }
 
-echo(chalk.green('Build done!'))
+echo(chalk.green('Build done, please test your app and publish to github.'))
 
 // echo(
 //   `npm dist-tag add ${pkg.name}@${newVersion} latest --registry=https://registry.npmjs.org/`,

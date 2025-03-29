@@ -1,10 +1,12 @@
+import * as Application from 'expo-application'
 import * as Updates from 'expo-updates'
 import { Alert, Linking, Share } from 'react-native'
 // import Toast from 'react-native-root-toast'
 import Toast from 'react-native-simple-toast'
 import { throttle } from 'throttle-debounce'
 
-import { checkUpdate } from '@/api/check-update'
+import { fetchVersion } from '@/api/check-update'
+import { site } from '@/constants'
 
 export const parseNumber = (num?: number | null) => {
   if (num == null) {
@@ -186,25 +188,25 @@ export async function showFatalError(error: any) {
   if (showedFatalError) {
     return
   }
-  const updateInfo = await checkUpdate().catch(() => null)
+  const updateInfo = await fetchVersion().catch(() => null)
   showedFatalError = true
   // if (__DEV__) {
   //   return
   // }
-
+  const hasUpdate =
+    updateInfo?.[0] &&
+    updateInfo[0].version !== Application.nativeApplicationVersion
   Alert.alert(
     '抱歉，应用发生了错误😅',
     `我们会处理这个错误\n${error?.message || error}${
-      updateInfo?.hasUpdate
-        ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误'
-        : ''
+      hasUpdate ? '\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误' : ''
     }`,
     [
-      updateInfo?.hasUpdate
+      hasUpdate
         ? {
             text: '下载新版',
             onPress: () => {
-              Linking.openURL(updateInfo.downloadLink)
+              Linking.openURL(site)
             },
           }
         : null,

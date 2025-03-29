@@ -6,7 +6,7 @@ import useSWR from 'swr'
 import { GhProxy, githubLink } from '@/constants'
 import { useStore } from '@/store'
 
-const fetchVersion = () => {
+export const fetchVersion = () => {
   return fetch(
     'https://tingyuan.in/api/github/releases?user=lovetingyuan&repo=minibili&_t=' +
       Date.now(),
