@@ -6,7 +6,7 @@ import { DynamicListResponseSchema } from './dynamic-items.schema'
 import fetcher from './fetcher'
 
 test('dynamic-list', async () => {
-  const { list } = (await fetcher('/x/web-interface/popular?ps=20&pn=1')) as any
+  const { list } = (await fetcher('/x/web-interface/popular?ps=10&pn=1')) as any
   const mids = list.map((v: any) => v.owner.mid).concat([1458143131])
   const failedList: string[] = []
   const list352: string[] = []

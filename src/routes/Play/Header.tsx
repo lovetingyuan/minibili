@@ -4,14 +4,12 @@ import { Dialog, Icon, Input, Text } from '@rneui/themed'
 import clsx from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
-import { ActivityIndicator, Linking, View } from 'react-native'
+import { Linking, View } from 'react-native'
 import { Menu, MenuItem } from 'react-native-material-menu'
 
-import { useAiConclusion } from '@/api/ai-conclusion'
 import { getDownloadUrl } from '@/api/play-url'
 import { useUserRelation } from '@/api/user-relation'
 import { useVideoInfo } from '@/api/video-info'
-import Modal2 from '@/components/Modal2'
 import { colors } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { useFollowedUpsMap, useMusicSongsMap } from '@/store/derives'
@@ -44,49 +42,6 @@ export function PlayHeaderTitle() {
         {` ${fans?.follower ? parseNumber(fans.follower) : ''}粉丝`}
       </Text>
     </View>
-  )
-}
-
-function AiConclusionModal(props: {
-  bvid: string
-  cid?: number
-  mid?: number | string
-  onClose: () => void
-}) {
-  const toggleDialog = () => {
-    props.onClose()
-  }
-  const { summary, isLoading, error } = useAiConclusion(
-    props.bvid,
-    props.cid,
-    props.mid,
-  )
-  return (
-    <Dialog
-      isVisible={true}
-      ModalComponent={Modal2}
-      overlayStyle={tw(colors.gray2.bg)}
-      backdropStyle={tw('bg-neutral-900/80')}
-      onBackdropPress={toggleDialog}>
-      <Dialog.Title title={'视频总结💡'} titleStyle={tw(colors.black.text)} />
-      {isLoading ? (
-        <View className="flex-1 items-center justify-center py-8">
-          <ActivityIndicator
-            size={'large'}
-            color={tw(colors.secondary.text).color}
-          />
-        </View>
-      ) : error ? (
-        <Text className="mt-3">抱歉，出错了</Text>
-      ) : (
-        <Text className="mt-3 leading-6">
-          {summary ? `    ${summary}` : '暂无总结'}
-        </Text>
-      )}
-      <Dialog.Actions>
-        <Dialog.Button title="OK" onPress={toggleDialog} />
-      </Dialog.Actions>
-    </Dialog>
   )
 }
 
@@ -193,7 +148,6 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
     ...route.params,
     ...data,
   }
-  const [showAiConclusion, setShowAiConclusion] = React.useState(false)
   const [showAddSongInfoModal, setShowAddSongInfoModal] = React.useState(false)
   const musicSongsMap = useMusicSongsMap()
   return (
@@ -283,15 +237,6 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             hideMenu()
-            setShowAiConclusion(true)
-          }}>
-          省流
-        </MenuItem>
-        <MenuItem
-          textStyle={tw(' text-black dark:text-gray-300')}
-          pressColor={tw(colors.gray4.text).color}
-          onPress={() => {
-            hideMenu()
             if (!props.cid || !videoInfo.cover || !videoInfo.duration) {
               showToast('请稍候再试')
               return
@@ -306,16 +251,6 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           添加到歌单
         </MenuItem>
       </Menu>
-      {showAiConclusion ? (
-        <AiConclusionModal
-          bvid={videoInfo.bvid}
-          cid={props.cid}
-          mid={videoInfo.mid}
-          onClose={() => {
-            setShowAiConclusion(false)
-          }}
-        />
-      ) : null}
       {showAddSongInfoModal && props.cid ? (
         <SongInfoModal
           videoInfo={videoInfo}
