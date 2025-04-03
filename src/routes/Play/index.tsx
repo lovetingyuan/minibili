@@ -44,7 +44,7 @@ function Play({ route }: Props) {
       errorShowedRef.current = true
       Alert.alert(
         '抱歉，出错了',
-        '\n获取当前视频信息失败，无法播放\n可能是由于UP删除、设置为私密或者涉及违规等',
+        '\n获取当前视频信息失败，无法播放\n可能是由于UP删除、设为私密或者涉及违规等',
       )
     }
   }, [error])

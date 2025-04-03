@@ -1,5 +1,7 @@
 // import * as protobuf from 'protobufjs'
 
+import { reportApiError } from '@/utils/report'
+
 import { UA } from '../constants'
 // import dm from '../constants/dm'
 import encWbi from '../utils/wbi'
@@ -51,7 +53,7 @@ export default async function request<D>(url: string): Promise<D> {
     // Cookie: '',
     cookie: await getCookie(),
     origin: 'https://www.bilibili.com',
-    referer: 'https://www.bilibili.com',
+    referer: 'https://space.bilibili.com',
     'user-agent': UA, // 'user-agent': 'Mozilla/5.0',
   }
   const options = {
@@ -73,7 +75,7 @@ export default async function request<D>(url: string): Promise<D> {
     options.credentials = 'omit'
   }
 
-  if (url.includes('/wbi/') || url.includes('/view/conclusion/get')) {
+  if (url.includes('/wbi/')) {
     const wbiImg = await getWBIInfo(request)
     const [_url, _query] = requestUrl.split('?')
     const params = new URLSearchParams(_query)
@@ -104,6 +106,7 @@ export default async function request<D>(url: string): Promise<D> {
   let resText = await fetch(requestUrl, options).then((r) => r.text())
   const index = resText.indexOf('}{"code":')
   if (index > -1) {
+    reportApiError(requestUrl, { code: 0, message: resText, data: null })
     resText = resText.substring(index + 1)
   }
   let res = {

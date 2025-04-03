@@ -227,6 +227,12 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     return `${PlayUrl}?${search}#${encodeURIComponent(videoUrl)}`
   }, [videoUrl, loadPlayer, cid, videoInfo.bvid, props.currentPage])
 
+  // React.useEffect(() => {
+  //   if (playPageUrl && webviewRef.current) {
+  //     webviewRef.current.injectJavaScript(`location.href="${playPageUrl}"`)
+  //   }
+  // }, [playPageUrl])
+
   const player = playPageUrl ? (
     <WebView
       source={{

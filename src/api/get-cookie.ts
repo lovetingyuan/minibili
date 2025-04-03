@@ -1,6 +1,9 @@
 // 获取正确的cookie
 // https://github.com/SocialSisterYi/bilibili-API-collect/issues/686
 
+import encHex from 'crypto-js/enc-hex'
+import hmacSHA256 from 'crypto-js/hmac-sha256'
+
 import { UA } from '../constants'
 
 function getuuid(time: number) {
@@ -299,11 +302,66 @@ export async function getCookie() {
   if (cookie) {
     return cookie
   }
-  const buvid3 = (await getbuvid3()) || getuuid(Date.now())
   const now = Date.now()
   const uuid = getuuid(now)
+  const buvid3 = (await getbuvid3()) || uuid
   const buvid4 = await getbuvid4(buvid3, uuid)
   await wuzhi(now, buvid3, uuid)
+  const ticket = await getBiliTicket('')
   cookie = `${buvid3}; _uuid=${uuid}; buvid4=${buvid4}`
+  if (ticket) {
+    cookie += '; bili_ticket=' + ticket
+  }
+  // console.log('cookie', cookie)
   return cookie
+}
+
+setInterval(
+  () => {
+    cookie = ''
+  },
+  60 * 60 * 1000,
+)
+
+/**
+ * Get Bilibili web ticket
+ * @param {string} csrf    CSRF token, can be empty or null
+ * @returns {Promise<any>} Promise of the ticket response in JSON format
+ */
+async function getBiliTicket(csrf: string) {
+  const ts = Math.floor(Date.now() / 1000).toString()
+  const hexSign = hmacSHA256(`ts${ts}`, 'XgwSnGZ1p').toString(encHex)
+
+  const url =
+    'https://api.bilibili.com/bapis/bilibili.api.ticket.v1.Ticket/GenWebTicket'
+  const params = new URLSearchParams({
+    key_id: 'ec02',
+    hexsign: hexSign,
+    'context[ts]': ts,
+    csrf: csrf || '',
+  })
+  try {
+    const response = await fetch(`${url}?${params.toString()}`, {
+      method: 'POST',
+      headers: {
+        'User-Agent': UA,
+      },
+    })
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data: {
+      code: number
+      data: {
+        nav: { img: string; sub: string }
+        ticket: string
+        ttl: number
+      }
+    } = await response.json()
+    if (data.code === 0) {
+      return data.data.ticket
+    }
+  } catch (error) {
+    throw error
+  }
 }
