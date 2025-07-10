@@ -78,8 +78,8 @@ module.exports = {
       {
         url: 'https://sentry.io/',
         // authToken: process.env.SENTRY_AUTH_TOKEN,
-        project: process.env.SENTRY_PROJECT,
-        organization: process.env.SENTRY_ORG,
+        project: 'minibili',
+        organization: 'tingyuan123',
       },
     ],
     'expo-asset',

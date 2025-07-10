@@ -75,7 +75,7 @@ export default async function request<D>(url: string): Promise<D> {
     options.credentials = 'omit'
   }
 
-  if (url.includes('/wbi/')) {
+  if (url.includes('/wbi/') || url.includes('v1/feed/space')) {
     const wbiImg = await getWBIInfo(request)
     const [_url, _query] = requestUrl.split('?')
     const params = new URLSearchParams(_query)

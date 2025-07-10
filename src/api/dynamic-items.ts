@@ -498,15 +498,16 @@ export function useDynamicItems(mid?: string | number) {
         // https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1458143131&timezone_offset=-480&features=itemOpusStyle
         if (!offset) {
           // &features=itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote
-          return `/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=${mid}`
+          return `/x/polymer/web-dynamic/v1/feed/space?dm_img_switch=0&offset=&host_mid=${mid}`
         }
-        return `/x/polymer/web-dynamic/v1/feed/space?offset=${response?.offset ?? ''}&host_mid=${mid}`
+        return `/x/polymer/web-dynamic/v1/feed/space?dm_img_switch=0&offset=${response?.offset ?? ''}&host_mid=${mid}`
       },
       {
         revalidateFirstPage: true,
-        errorRetryCount: 3,
-        errorRetryInterval: 600,
-        dedupingInterval: 60 * 1000,
+        shouldRetryOnError: false,
+        // errorRetryCount: 3,
+        // errorRetryInterval: 600,
+        dedupingInterval: 5 * 60 * 1000,
       },
     )
   // console.log(4444, data)

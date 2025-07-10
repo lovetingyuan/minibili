@@ -13,12 +13,12 @@ import { useFollowedUpsMap } from '@/store/derives'
 
 import { useLivingInfo } from '../../api/living-info'
 import { useUserInfo } from '../../api/user-info'
-import { useUserRelation } from '../../api/user-relation'
+// import { useUserRelation } from '../../api/user-relation'
 import { useStore } from '../../store'
 import type { NavigationProps, RootStackParamList } from '../../types'
-import { handleShareUp, parseImgUrl, parseNumber, showToast } from '../../utils'
+import { handleShareUp, parseImgUrl, showToast } from '../../utils'
 
-const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
+// const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
 
 export function HeaderLeft(props: { scrollTop: () => void }) {
   const route =
@@ -29,7 +29,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
     ...route.params?.user,
     ...userInfo,
   }
-  const { data: fans } = useUserRelation(dynamicUser?.mid)
+  // const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
   const gotoWebPage = () => {
     if (dynamicUser) {
@@ -39,10 +39,10 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
       })
     }
   }
-  const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
+  // const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
   const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
-  const sex =
-    dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
+  // const sex =
+  //   dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   const { setCheckLiveTimeStamp, $blackUps } = useStore()
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
@@ -60,11 +60,11 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
               uri: parseImgUrl(dynamicUser.face, 120),
             }}
           />
-          {sex ? (
+          {/* {sex ? (
             <Text className="absolute right-[-8px] top-1 text-xs opacity-80">
               {sex}
             </Text>
-          ) : null}
+          ) : null} */}
           {dynamicUser.mid && livingUrl ? (
             <Pressable
               onPress={() => {
@@ -98,9 +98,9 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             props.scrollTop()
           }}>
           {userName}
-          <Text className="text-lg">{`${level}  `}</Text>
+          {/* <Text className="text-lg">{`${level}  `}</Text> */}
         </Text>
-        {fans ? (
+        {/* {fans ? (
           <Text
             className="text-sm text-gray-500 dark:text-gray-400"
             onPress={() => {
@@ -108,7 +108,7 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             }}>
             {parseNumber(fans.follower)}粉丝
           </Text>
-        ) : null}
+        ) : null} */}
       </View>
     </View>
   )
@@ -123,7 +123,8 @@ function HeaderRight() {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
-  const { get$followedUps, set$followedUps, $blackUps } = useStore()
+  const { get$followedUps, set$followedUps, $blackUps, setReloadUerProfile } =
+    useStore()
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps
@@ -226,6 +227,15 @@ function HeaderRight() {
             hideMenu()
           }}>
           浏览器打开
+        </MenuItem>
+        <MenuItem
+          textStyle={tw(' text-black dark:text-gray-300')}
+          pressColor={tw(colors.gray4.text).color}
+          onPress={() => {
+            hideMenu()
+            setReloadUerProfile(Date.now())
+          }}>
+          刷新
         </MenuItem>
       </Menu>
     </View>

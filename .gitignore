@@ -15,6 +15,7 @@ web-build/
 
 *.log
 .env
+.env.*
 tmp
 apk
 .tmp

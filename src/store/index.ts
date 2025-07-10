@@ -82,6 +82,7 @@ export const getAppValue = () => {
       apkLink: string
     }[],
     requestDynamicFailed: 0,
+    reloadUerProfile: 0
   }
 }
 

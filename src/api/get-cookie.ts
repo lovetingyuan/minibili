@@ -296,7 +296,8 @@ function wuzhi(now: number, buvid3: string, uuid: string) {
   )
 }
 
-let cookie = ''
+let cookie =
+  'buvid3=97AE230D-638B-987F-10B6-2D37DD88ED0295018infoc; b_nut=100; __at_once=16271026527651463413; buvid4=820B2446-603E-95E0-5BFB-FF867F6DF46196291-025061421-hIwtdYxfUK3WabhnSG7Y1w%3D%3D; __at_sign=ff6cc37560f83896a076c751f77f2473; b_lsid=BA29B864_1976EB035C8; _uuid=A32B1A77-3657-9782-F736-FEB13688CA7A31340infoc; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTAxNjc5MTksImlhdCI6MTc0OTkwODY1OSwicGx0IjotMX0.I3i7MdmMN-4LeeOz8ug-iBVe6V2mh8mcDXKhDpx0oVg; bili_ticket_expires=1750167859; buvid_fp=ae0da91d4e07dcbc664fd0cddbd96411; x-bili-gaia-vtoken=3f0a1b91f33f43f2bf9a7c2859845381'
 
 export async function getCookie() {
   if (cookie) {
