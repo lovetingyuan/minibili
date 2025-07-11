@@ -60,16 +60,16 @@ function __$hack() {
           if (node.src && !originVideoUrl) {
             originVideoUrl = node.src
           }
-          node.addEventListener('error', () => {
-            if (node.src !== originVideoUrl && originVideoUrl) {
-              node.src = originVideoUrl
-            }
-            if (!window.__show_err_alert) {
-              window.__show_err_alert = true
-              // eslint-disable-next-line no-alert
-              alert('视频加载失败')
-            }
-          })
+          // node.addEventListener('error', () => {
+          //   if (node.src !== originVideoUrl && originVideoUrl) {
+          //     node.src = originVideoUrl
+          //   }
+          //   if (!window.__show_err_alert) {
+          //     window.__show_err_alert = true
+          //     // eslint-disable-next-line no-alert
+          //     alert('视频加载失败')
+          //   }
+          // })
           node.src = newVideoUrl
           node.dataset.handled = 'true'
 
@@ -100,8 +100,6 @@ function __$hack() {
                   document.mozCancelFullScreen() // Firefox
                 } else if (document.webkitExitFullscreen) {
                   document.webkitExitFullscreen() // Chrome, Safari & Opera
-                } else if (document.msExitFullscreen) {
-                  document.msExitFullscreen() // IE/Edge
                 }
               }
             })
@@ -113,19 +111,6 @@ function __$hack() {
               }
             })
           })
-
-          // Promise.resolve().then(() => {
-          //   if (node.src !== newVideoUrl) {
-          //     node.src = newVideoUrl
-          //     node.play()
-          //   }
-          //   setTimeout(() => {
-          //     if (node.src !== newVideoUrl) {
-          //       node.src = newVideoUrl
-          //       node.play()
-          //     }
-          //   })
-          // })
         })
       })
     })
@@ -241,7 +226,7 @@ function __$hack() {
     }
   })
 
-  waitForDom('body', (element) => {
+  const aa = (element) => {
     let startX = 0
     let startY = 0
     let distanceX = 0
@@ -350,7 +335,14 @@ function __$hack() {
       distanceY = 0
       direction = ''
     })
-  })
+  }
+  if (document.body) {
+    aa(document.body)
+  } else {
+    window.addEventListener('DOMContentLoaded', () => {
+      aa(document.body)
+    })
+  }
 }
 
 export const INJECTED_JAVASCRIPT = `(${__$hack})();\ntrue;`

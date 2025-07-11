@@ -123,8 +123,13 @@ function HeaderRight() {
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
-  const { get$followedUps, set$followedUps, $blackUps, setReloadUerProfile } =
-    useStore()
+  const {
+    get$followedUps,
+    set$followedUps,
+    $blackUps,
+    setReloadUerProfile,
+    setDynamicOpenUrl,
+  } = useStore()
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps
@@ -223,7 +228,8 @@ function HeaderRight() {
             if (!dynamicUser) {
               return
             }
-            Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`)
+            // Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`)
+            setDynamicOpenUrl(Date.now())
             hideMenu()
           }}>
           浏览器打开

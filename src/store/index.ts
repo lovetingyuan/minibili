@@ -82,7 +82,9 @@ export const getAppValue = () => {
       apkLink: string
     }[],
     requestDynamicFailed: 0,
-    reloadUerProfile: 0
+    reloadUerProfile: 0,
+    dynamicWebviewLink: '',
+    dynamicOpenUrl: 0,
   }
 }
 

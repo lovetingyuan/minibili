@@ -3,7 +3,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Skeleton } from '@rneui/themed'
 // import { FlashList } from '@shopify/flash-list'
 import React, { useCallback, useEffect, useRef } from 'react'
-import { BackHandler, Platform, Share, View } from 'react-native'
+import { BackHandler, Linking, Platform, Share, View } from 'react-native'
 import WebView from 'react-native-webview'
 
 // import { colors } from '@/constants/colors.tw'
@@ -90,7 +90,7 @@ function Dynamic({ route }: Props) {
   //   ...route.params?.user,
   //   ...userInfo,
   // }
-  const { reloadUerProfile } = useStore()
+  const { reloadUerProfile, dynamicOpenUrl, setDynamicOpenUrl } = useStore()
   const webviewRef = useRef<WebView>(null)
   const navigation = useNavigation<NavigationProps['navigation']>()
 
@@ -168,6 +168,21 @@ function Dynamic({ route }: Props) {
       }
     }, []),
   )
+  useEffect(() => {
+    if (dynamicOpenUrl) {
+      setDynamicOpenUrl(0)
+      webviewRef.current?.injectJavaScript(`
+        window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          action: 'open-url',
+          payload: {
+            url: location.href
+          },
+        }),
+      )
+        `)
+    }
+  }, [dynamicOpenUrl, setDynamicOpenUrl])
   // const renderItem = ({ item }: { item: DynamicItemAllType }) => {
   //   return <DynamicItem item={item} />
   // }
@@ -199,6 +214,7 @@ function Dynamic({ route }: Props) {
   //   )
   // }
   useEffect(() => {
+    // const a = webviewRef.current?
     if (reloadUerProfile) {
       // webviewRef.current?.reload()
       webviewRef.current?.injectJavaScript(`
@@ -318,6 +334,9 @@ function Dynamic({ route }: Props) {
               // title: texts,
               // url: link,
             })
+          } else if (data.action === 'open-url') {
+            const { url } = data.payload
+            Linking.openURL(url)
           }
         }}
         onLoad={() => {}}
