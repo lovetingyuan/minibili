@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { FAB } from '@rneui/themed'
+import { FAB } from '@rn-vui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import { Alert, Dimensions, Linking, TouchableOpacity } from 'react-native'
@@ -10,7 +10,6 @@ import { useStore } from '@/store'
 import { useMarkVideoWatched } from '@/store/actions'
 import type { NavigationProps } from '@/types'
 import { handleShareVideo, parseNumber, parseUrl } from '@/utils'
-import { Action, reportUserAction } from '@/utils/report'
 
 import Loading from './Loading'
 import VideoItem from './VideoItem'
@@ -82,7 +81,6 @@ function VideoList(props: {
             ...$blackUps,
             [`_${mid}`]: name,
           })
-          reportUserAction(Action.add_black_user, { mid, name })
         },
       },
     ])
@@ -177,7 +175,7 @@ function VideoList(props: {
           Linking.openURL(parseUrl(currentVideoRef.current.cover))
         },
       },
-    ].filter(Boolean)
+    ].filter((v) => v && typeof v === 'object')
   const refreshProps = props.onRefresh
     ? {
         onRefresh: props.onRefresh,

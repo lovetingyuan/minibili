@@ -1,4 +1,4 @@
-import { Skeleton, Text } from '@rneui/themed'
+import { Skeleton, Text } from '@rn-vui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import { TouchableOpacity, View } from 'react-native'

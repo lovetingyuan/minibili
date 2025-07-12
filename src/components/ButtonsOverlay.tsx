@@ -1,4 +1,4 @@
-import { Button, Overlay } from '@rneui/themed'
+import { Button, Overlay } from '@rn-vui/themed'
 import React from 'react'
 
 import { colors } from '@/constants/colors.tw'
@@ -37,7 +37,7 @@ function ButtonsOverlay() {
   return (
     <Overlay
       isVisible={overlayButtons.length > 0}
-      ModalComponent={Modal2}
+      ModalComponent={Modal2 as unknown as typeof React.Component}
       overlayStyle={tw(`px-0 py-3 min-w-[70%] max-w-[90%] ${colors.gray2.bg}`)}
       onBackdropPress={dismiss}>
       {Buttons}

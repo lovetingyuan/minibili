@@ -1,7 +1,5 @@
 // import * as protobuf from 'protobufjs'
 
-import { reportApiError } from '@/utils/report'
-
 import { UA } from '../constants'
 // import dm from '../constants/dm'
 import encWbi from '../utils/wbi'
@@ -34,15 +32,15 @@ if (typeof __DEV__ === 'undefined') {
   try {
     // @ts-ignore
     globalThis.__DEV__ = false
-  } catch (e) {}
+  } catch {}
 }
 
 export default async function request<D>(url: string): Promise<D> {
   let requestUrl = url.startsWith('http')
     ? url
     : `https://api.bilibili.com${url}`
-
-  // __DEV__ && console.log('request url: ', url.slice(0, 150))
+  // eslint-disable-next-line no-console
+  __DEV__ && console.log('request url: ', url.slice(0, 150))
   const headers = {
     accept: 'application/json, text/plain, */*',
     'accept-language': 'zh-CN,zh;q=0.9',
@@ -106,7 +104,6 @@ export default async function request<D>(url: string): Promise<D> {
   let resText = await fetch(requestUrl, options).then((r) => r.text())
   const index = resText.indexOf('}{"code":')
   if (index > -1) {
-    reportApiError(requestUrl, { code: 0, message: resText, data: null })
     resText = resText.substring(index + 1)
   }
   let res = {
@@ -122,7 +119,9 @@ export default async function request<D>(url: string): Promise<D> {
       })
     }
     res = JSON.parse(resText) as ResponseType<D>
-  } catch (err) {}
+  } catch {
+    // ignore
+  }
   // if (url === '/x/web-interface/nav') {
   //   return res.data
   // }

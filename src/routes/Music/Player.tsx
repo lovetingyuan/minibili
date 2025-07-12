@@ -1,5 +1,5 @@
-import { Icon, Slider, Text } from '@rneui/themed'
-import clsx from 'clsx'
+import { Icon, Slider, Text } from '@rn-vui/themed'
+import { clsx } from 'clsx'
 import { Audio, type AVPlaybackStatus } from 'expo-av'
 import React, { useEffect } from 'react'
 import { ImageBackground, TouchableOpacity, View } from 'react-native'

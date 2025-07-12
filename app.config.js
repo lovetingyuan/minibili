@@ -1,4 +1,4 @@
-require('dotenv').config()
+// require('dotenv').config()
 
 const pkg = require('./package.json')
 const version = pkg.version
@@ -26,12 +26,12 @@ module.exports = {
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
-  androidStatusBar: {
-    backgroundColor: '#94E0D8',
-    barStyle: 'light-content',
-    translucent: true,
-    hidden: true,
-  },
+  // androidStatusBar: {
+  //   backgroundColor: '#94E0D8',
+  //   barStyle: 'light-content',
+  //   translucent: true,
+  //   hidden: true,
+  // },
   splash: {
     image: './assets/splash.png',
     resizeMode: 'cover',
@@ -73,23 +73,15 @@ module.exports = {
     },
   },
   plugins: [
+    'expo-asset',
     [
-      '@sentry/react-native/expo',
+      'expo-splash-screen',
       {
-        url: 'https://sentry.io/',
-        // authToken: process.env.SENTRY_AUTH_TOKEN,
-        project: 'minibili',
-        organization: 'tingyuan123',
+        backgroundColor: '#ffffff',
+        image: './assets/splash.png',
       },
     ],
-    'expo-asset',
-    // [
-    //   'expo-av',
-    //   {
-    //     microphonePermission:
-    //       'Allow $(PRODUCT_NAME) to access your microphone.',
-    //   },
-    // ],
+    'react-native-edge-to-edge',
   ],
   extra: {
     eas: {
@@ -105,7 +97,7 @@ module.exports = {
       timeZone: 'Asia/Shanghai',
     }).format(new Date()),
     gitHash,
-    dsn: process.env.SENTRY_DSN,
+    // dsn: process.env.SENTRY_DSN,
     releaseName: release,
   },
   // hooks: {

@@ -2,7 +2,8 @@ import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Alert } from 'react-native'
 
-import { useMethods } from '../../store'
+import { useStore } from '@/store'
+
 import { showToast } from '../../utils'
 import TextAction from './TextAction'
 
@@ -20,7 +21,7 @@ function Backup() {
     set$blackUps,
     set$videoCatesList,
     set$collectedVideos,
-  } = useMethods()
+  } = useStore()
 
   return (
     <TextAction
@@ -74,7 +75,7 @@ function Backup() {
                     },
                   ],
                 )
-              } catch (e) {
+              } catch {
                 showToast('导入失败，数据错误')
               }
             })

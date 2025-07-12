@@ -1,10 +1,7 @@
 import useSWRInfinite from 'swr/infinite'
 
 import { parseUrl } from '../utils'
-import {
-  reportUnknownAdditional,
-  reportUnknownDynamicItem,
-} from '../utils/report'
+
 import type {
   DynamicItemBaseType,
   DynamicItemResponse,
@@ -64,14 +61,6 @@ const getCommon = (item: DynamicItemBaseType) => {
 }
 
 const getDynamicItem = (item: DynamicItemResponse) => {
-  if (
-    item.modules.module_dynamic.additional?.type &&
-    !Object.keys(HandledAdditionalTypeEnum).includes(
-      item.modules.module_dynamic.additional.type,
-    )
-  ) {
-    reportUnknownAdditional(item)
-  }
   if (item.type === HandledDynamicTypeEnum.DYNAMIC_TYPE_AV) {
     const video = item.modules.module_dynamic.major.archive
     return {
@@ -462,7 +451,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
         },
       }
     }
-    reportUnknownDynamicItem(item)
     return {
       ...getCommon(item),
       type: HandledDynamicTypeEnum.DYNAMIC_TYPE_FORWARD as const,
@@ -474,7 +462,6 @@ const getDynamicItem = (item: DynamicItemResponse) => {
     }
   }
 
-  reportUnknownDynamicItem(item)
   return {
     ...getCommon(item),
     type: item.type,

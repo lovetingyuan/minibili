@@ -1,6 +1,5 @@
-import { useFocusEffect } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Text } from '@rneui/themed'
+import { Text } from '@rn-vui/themed'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Alert, View } from 'react-native'
@@ -12,7 +11,6 @@ import CommentList from '../../components/CommentList'
 import useMemoizedFn from '../../hooks/useMemoizedFn'
 import type { RootStackParamList } from '../../types'
 import { showToast } from '../../utils'
-import { setViewingVideoId } from '../../utils/report'
 import { PlayHeaderRight, PlayHeaderTitle } from './Header'
 import Player from './Player'
 import VideoInfo from './VideoInfo'
@@ -67,15 +65,6 @@ function Play({ route }: Props) {
         headerRight,
       }
     }, [cid2]),
-  )
-
-  useFocusEffect(
-    useMemoizedFn(() => {
-      setViewingVideoId(bvid)
-      return () => {
-        setViewingVideoId(null)
-      }
-    }),
   )
 
   const handlePlayEnd = useMemoizedFn(() => {

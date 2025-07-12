@@ -3,11 +3,13 @@
   "include": [
     "src/**/*.tsx",
     "src/**/*.ts",
-    "*.d.ts"
+    "*.d.ts",
+    ".expo/types/**/*.ts",
   ],
   "compilerOptions": {
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
     "baseUrl": "./",
     "paths": {
       "@/*": [

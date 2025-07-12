@@ -1,5 +1,5 @@
 import { type RouteProp, useRoute } from '@react-navigation/native'
-import { Icon } from '@rneui/themed'
+import { Icon } from '@rn-vui/themed'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Linking, Share } from 'react-native'

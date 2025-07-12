@@ -1,9 +1,9 @@
 import type { CollectVideoInfo } from '@/types'
 
-import { useMethods } from '.'
+import { useStore } from '.'
 
 export function useMarkVideoWatched() {
-  const { get$watchedVideos, set$watchedVideos } = useMethods()
+  const { get$watchedVideos, set$watchedVideos } = useStore()
   return (videoInfo: CollectVideoInfo, newProgress: number) => {
     let playedMap = get$watchedVideos()
     const playedInfo = playedMap[videoInfo.bvid]
@@ -51,7 +51,7 @@ export function useMarkVideoWatched() {
 }
 
 export function useMarkHotSearchViewed() {
-  const { set$watchedHotSearch, get$watchedHotSearch } = useMethods()
+  const { set$watchedHotSearch, get$watchedHotSearch } = useStore()
   return (name: string) => {
     const viewed = { ...get$watchedHotSearch() }
     viewed[name] = Date.now()

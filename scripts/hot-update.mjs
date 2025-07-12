@@ -15,7 +15,6 @@ const buildTime = new Intl.DateTimeFormat('zh', {
 }).format(new Date())
 // const updateOutput =
 await $`npx -y eas-cli@latest update --branch main --json --non-interactive --platform android --message "update: ${buildTime}"`
-await $`npx -y sentry-expo-upload-sourcemaps dist`
 // const output = updateOutput.toString('utf8')
 // const updateInfo = JSON.parse(output.substring(output.lastIndexOf('[')))[0]
 

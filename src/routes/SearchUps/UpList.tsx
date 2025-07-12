@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
-import { Avatar, Button, Skeleton, Text } from '@rneui/themed'
+import { Avatar, Button, Skeleton, Text } from '@rn-vui/themed'
 import { FlashList } from '@shopify/flash-list'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import React from 'react'
 import { Alert, TouchableOpacity, View } from 'react-native'
 

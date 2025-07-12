@@ -11,56 +11,65 @@ function __$inject() {
       }, 50)
     }
   }
-  const style = document.createElement('style')
-  style.textContent = `
-          m-open-app:has(.m-fixed-openapp, .bm-link-card-goods, .easy-follow-btn),
-           .m-navbar, .m-space-info .banner, .archive-list, .tabs, .info-main,
-           .reply-input, .bili-dyn-item-header__following, .dyn-orig-author__right,
-            .openapp-dialog, .dyn-header__right, .m-footer, .dyn-goods, .opus-read-more,
-            .reply:has(.iconfont) {
-            display: none!important;
-          }
 
-          .dynamic-list {
-            display: block!important;
-          }
+  // 添加样式
+  waitFor(
+    () => document.head,
+    () => {
+      const style = document.createElement('style')
+      style.textContent = `
+    m-open-app:has(.m-fixed-openapp, .bm-link-card-goods, .easy-follow-btn),
+      .m-navbar, .m-space-info .banner, .archive-list, .tabs, .info-main,
+      .reply-input, .bili-dyn-item-header__following, .dyn-orig-author__right,
+      .openapp-dialog, .dyn-header__right, .m-footer, .dyn-goods, .opus-read-more,
+      .reply:has(.iconfont) {
+      display: none!important;
+    }
 
-          .m-space-info {
-            margin-top: 0!important;
-            padding-top: 12px!important;
-            border-bottom: 1px solid #e5e5e5;
-          }
-            .bili-dyn-item {
-            border-bottom: 1px solid #e5e5e5;
-            }
-          .bili-dyn-item-archive__card {
-            display: flex;
-            gap: 15px;
-          }
-          .bili-dyn-item-archive__main {
-            width: 50vw!important;
-            flex-shrink: 0;
-            border-radius: 10px;
-            overflow: hidden;
-          }
-          .bili-dyn-item-archive__cover {
-              height: 100px!important;
-          }
-          .bili-dyn-item-archive__title {
-            line-height: 1.6!important;
-            white-space: normal!important;
-            padding-top: 0!important;
-            font-size: 16px!important;
-          }
-            .bili-dyn-item-archive__meta {
-            font-size: 13px;
-            font-weight: bold;
-                background: rgba(0, 0, 0, .5);
-            }
-                .m-opus {
-                padding-top: 0!important;
-                }
-  `
+    .dynamic-list {
+      display: block!important;
+    }
+
+    .m-space-info {
+      margin-top: 0!important;
+      padding-top: 12px!important;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .bili-dyn-item {
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .bili-dyn-item-archive__card {
+      display: flex;
+      gap: 15px;
+    }
+    .bili-dyn-item-archive__main {
+      width: 50vw!important;
+      flex-shrink: 0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .bili-dyn-item-archive__cover {
+      height: 100px!important;
+    }
+    .bili-dyn-item-archive__title {
+      line-height: 1.6!important;
+      white-space: normal!important;
+      padding-top: 0!important;
+      font-size: 16px!important;
+    }
+    .bili-dyn-item-archive__meta {
+      font-size: 13px;
+      font-weight: bold;
+      background: rgba(0, 0, 0, .5);
+    }
+    .m-opus {
+      padding-top: 0!important;
+    }
+    `
+      document.head.appendChild(style)
+    },
+  )
+
   window.addEventListener('load', () => {
     const commentContainer = window.document.createElement('div')
     commentContainer.innerHTML = `
@@ -187,12 +196,7 @@ function __$inject() {
     }
     return open(url, target, features)
   }
-  waitFor(
-    () => document.head,
-    () => {
-      document.head.appendChild(style)
-    },
-  )
+
   if (window.location.pathname.startsWith('/space/')) {
     window.addEventListener('load', () => {
       const scrollY = window.localStorage.getItem('__scroll__')
@@ -202,6 +206,7 @@ function __$inject() {
       }
     })
   }
+  // 去掉阅读更多按钮
   if (/^\/opus\/\d+$/.test(window.location.pathname)) {
     const timer = setInterval(() => {
       const content = document.querySelector('.opus-module-content')
@@ -222,7 +227,6 @@ function __$inject() {
         'click',
         (e) => {
           if (e.target.matches('.bili-dyn-item-footer__button.forward')) {
-            // alert(true)
             e.preventDefault()
             e.stopPropagation()
             e.stopImmediatePropagation()
@@ -238,7 +242,6 @@ function __$inject() {
             return
           }
           const item = e.target.closest('m-open-app')
-          // alert(typeof item)
           if (item) {
             e.preventDefault()
             e.stopPropagation()
@@ -267,7 +270,6 @@ function __$inject() {
               )
             } else if (schema.startsWith('bilibili://opus/detail/')) {
               const link = item.getAttribute('universallink')
-              // alert(window.scrollY)
               window.localStorage.setItem('__scroll__', window.scrollY)
               window.location.href = link
             }
@@ -277,21 +279,21 @@ function __$inject() {
       )
     },
   )
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-  window.addEventListener('load', async (e) => {
-    await delay(1000)
-    const fans = document.querySelector('.relation .count .fans')
-    const base = document.querySelector('.info-detail .base')
-    // const fansNum = Number(fans?.querySelector('.num')?.textContent)
-    if (fans && base) {
-      const fansCount = fans.textContent.replace(/\s/g, '')
-      const span = document.createElement('span')
-      span.style.fontSize = '14px'
-      span.style.marginLeft = '10px'
-      span.style.opacity = '0.8'
-      span.textContent = fansCount
-      base.appendChild(span)
-    }
+  // 添加粉丝数
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const fans = document.querySelector('.relation .count .fans')
+      const base = document.querySelector('.info-detail .base')
+      if (fans && base) {
+        const fansCount = fans.textContent.replace(/\s/g, '')
+        const span = document.createElement('span')
+        span.style.fontSize = '14px'
+        span.style.marginLeft = '10px'
+        span.style.opacity = '0.8'
+        span.textContent = fansCount
+        base.appendChild(span)
+      }
+    }, 100)
   })
 }
 

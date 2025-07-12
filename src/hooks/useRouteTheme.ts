@@ -13,15 +13,14 @@ export default function useRouteTheme() {
   const getRouteTheme = React.useCallback(() => {
     return isDark
       ? {
-          dark: true,
+          // dark: true,
+          ...DarkTheme,
           colors: {
             ...DarkTheme.colors,
             background: backgroundColor,
           },
         }
-      : {
-          ...DefaultTheme,
-        }
+      : DefaultTheme
   }, [isDark, backgroundColor])
   const [routeTheme, setRouteTheme] = React.useState(getRouteTheme)
 

@@ -1,4 +1,4 @@
-import { Chip, Icon, ListItem, Text } from '@rneui/themed'
+import { Chip, Icon, ListItem, Text } from '@rn-vui/themed'
 import React from 'react'
 import { View } from 'react-native'
 

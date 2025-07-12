@@ -8,8 +8,17 @@ import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
 import UpList from './UpList'
 
+const defaultSearchBarCommands: SearchBarCommands = {
+  blur: () => {},
+  setText: () => {},
+  focus: () => {},
+  clearText: () => {},
+  toggleCancelButton: () => {},
+  cancelSearch: () => {},
+}
+
 function SearchUps() {
-  const searchBarRef = React.useRef<SearchBarCommands | null>(null)
+  const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands)
   const blackColor = tw(colors.black.text).color
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
 

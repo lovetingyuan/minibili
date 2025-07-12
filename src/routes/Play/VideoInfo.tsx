@@ -3,8 +3,8 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native'
-import { Avatar, BottomSheet, Card, Icon, Text } from '@rneui/themed'
-import clsx from 'clsx'
+import { Avatar, BottomSheet, Card, Icon, Text } from '@rn-vui/themed'
+import { clsx } from 'clsx'
 import { Image } from 'expo-image'
 import React from 'react'
 import {

@@ -1,4 +1,4 @@
-import { Dialog, Text } from '@rneui/themed'
+import { Dialog, Text } from '@rn-vui/themed'
 import React from 'react'
 import { Linking } from 'react-native'
 
@@ -25,7 +25,7 @@ export default function RemoteConfig() {
       <Dialog
         isVisible={visible}
         overlayStyle={tw(colors.gray2.bg)}
-        ModalComponent={Modal2}
+        ModalComponent={Modal2 as unknown as typeof React.Component}
         backdropStyle={tw('bg-neutral-900/90')}
         onBackdropPress={
           remoteConfig.statement.dismiss ? toggleDialog : undefined

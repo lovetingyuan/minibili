@@ -51,6 +51,7 @@ function Version() {
           text: hasUpdate ? 'APP有更新🎉' : '检查更新',
           loading: hasUpdate ? false : checkingUpdate,
           onPress: handleCheckUpdate,
+          color: hasUpdate ? '#FF6699' : undefined,
         },
         {
           text: '更新日志',

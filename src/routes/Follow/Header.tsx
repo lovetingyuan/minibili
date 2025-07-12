@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Button, Icon } from '@rneui/themed'
+import { Button, Icon } from '@rn-vui/themed'
 import React from 'react'
 import { View } from 'react-native'
 

@@ -1,4 +1,4 @@
-import { createTheme } from '@rneui/themed'
+import { createTheme } from '@rn-vui/themed'
 import React from 'react'
 
 import { colors } from '@/constants/colors.tw'

@@ -5,6 +5,7 @@ import type {
   SearchVideoItemType,
   SearchVideoResponse,
 } from './search-video.schema'
+import fetcher from './fetcher'
 
 function getVideoInfo(video: SearchVideoItemType) {
   return {
@@ -34,6 +35,7 @@ export const useSearchVideos = (name: string) => {
           ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=${index + 1}&page_size=50&platform=pc&search_type=video`
           : null
       },
+      fetcher,
       {
         revalidateFirstPage: false,
       },

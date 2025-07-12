@@ -1,4 +1,4 @@
-import { Icon, ListItem, Text } from '@rneui/themed'
+import { Icon, ListItem, Text } from '@rn-vui/themed'
 import React from 'react'
 
 import { useStore } from '../../store'
@@ -32,7 +32,7 @@ function BlackUps() {
             </Text>
           )
         })}
-        {Object.values($blackUps).length === 0 ? <Text>无</Text> : null}
+        {Object.values($blackUps).length === 0 ? <Text>🈚</Text> : null}
       </ListItem>
     </ListItem.Accordion>
   )

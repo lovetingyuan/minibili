@@ -18,7 +18,7 @@ function __$hack() {
   `
   document.head.appendChild(style)
 
-  document.addEventListener('visibilitychange', (e) => {
+  document.addEventListener('visibilitychange', () => {
     const bgPlayBtn = document.getElementById('play-background-button')
     if (bgPlayBtn.dataset.bgPlay !== 'true') {
       return
@@ -105,7 +105,7 @@ function __$hack() {
             })
           })
           ;['timeupdate', 'seeking'].forEach((evt) => {
-            video.addEventListener(evt, (e) => {
+            video.addEventListener(evt, () => {
               if (evt === 'seeking') {
                 reportPlayTime(video.currentTime, video.duration)
               }

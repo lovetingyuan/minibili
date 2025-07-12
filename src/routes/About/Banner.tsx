@@ -1,4 +1,4 @@
-import { Button, Icon, Text } from '@rneui/themed'
+import { Button, Icon, Text } from '@rn-vui/themed'
 import React from 'react'
 import { Image, Linking, Pressable, View } from 'react-native'
 

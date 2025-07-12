@@ -30,6 +30,3 @@ export function bv2av(bvid: string) {
   )
   return Number((tmp & MASK_CODE) ^ XOR_CODE)
 }
-
-// console.log(av2bv(111298867365120))
-// console.log(bv2av('BV1L9Uoa9EUx'))

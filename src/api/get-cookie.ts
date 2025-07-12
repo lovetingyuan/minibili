@@ -341,28 +341,25 @@ async function getBiliTicket(csrf: string) {
     'context[ts]': ts,
     csrf: csrf || '',
   })
-  try {
-    const response = await fetch(`${url}?${params.toString()}`, {
-      method: 'POST',
-      headers: {
-        'User-Agent': UA,
-      },
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+
+  const response = await fetch(`${url}?${params.toString()}`, {
+    method: 'POST',
+    headers: {
+      'User-Agent': UA,
+    },
+  })
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+  const data: {
+    code: number
+    data: {
+      nav: { img: string; sub: string }
+      ticket: string
+      ttl: number
     }
-    const data: {
-      code: number
-      data: {
-        nav: { img: string; sub: string }
-        ticket: string
-        ttl: number
-      }
-    } = await response.json()
-    if (data.code === 0) {
-      return data.data.ticket
-    }
-  } catch (error) {
-    throw error
+  } = await response.json()
+  if (data.code === 0) {
+    return data.data.ticket
   }
 }

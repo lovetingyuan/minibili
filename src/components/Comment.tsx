@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Button, Text } from '@rneui/themed'
-import clsx from 'clsx'
+import { Button, Text } from '@rn-vui/themed'
+import { clsx } from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Image, Linking, View } from 'react-native'
@@ -106,11 +106,11 @@ function CommentText(props: {
               style={textStyle}
               className={`${colors.primary.text}`}
               onPress={() => {
-                const bvid = node.url.split('/').pop()
+                const bvid = node.url?.split('/').pop()
                 if (bvid?.startsWith('BV')) {
                   navigation.push('Play', {
                     bvid,
-                    title: node.text,
+                    title: node.text ?? '',
                   })
                 } else {
                   Linking.openURL(node.url)

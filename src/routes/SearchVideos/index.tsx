@@ -11,8 +11,17 @@ import { useMarkHotSearchViewed } from '@/store/actions'
 
 import VideoList from './VideoList'
 
+const defaultSearchBarCommands: SearchBarCommands = {
+  blur: () => {},
+  setText: () => {},
+  focus: () => {},
+  clearText: () => {},
+  toggleCancelButton: () => {},
+  cancelSearch: () => {},
+}
+
 function SearchVideos() {
-  const searchBarRef = React.useRef<SearchBarCommands | null>(null)
+  const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands)
   const blackColor = tw(colors.black.text).color
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
   const focused = useIsFocused()

@@ -5,6 +5,7 @@ import { useStore } from '@/store'
 
 import { parseCommentMessage } from './comments'
 import type { ReplyResItem, ReplyResponseSchema } from './replies.schema'
+import fetcher from './fetcher'
 
 type ReplyResponse = z.infer<typeof ReplyResponseSchema>
 
@@ -43,6 +44,7 @@ export function useReplies() {
           ? `/x/v2/reply/reply?oid=${repliesInfo.oid}&type=${repliesInfo.type}&root=${repliesInfo.root}&pn=${index + 1}&ps=20`
           : null
       },
+      fetcher,
       {
         revalidateFirstPage: false,
       },

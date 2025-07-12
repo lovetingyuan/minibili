@@ -1,4 +1,4 @@
-import { Divider } from '@rneui/themed'
+import { Divider } from '@rn-vui/themed'
 import React from 'react'
 import { ScrollView, View } from 'react-native'
 
@@ -12,10 +12,16 @@ import History from './History'
 import Music from './Music'
 import SortCate from './SortCate'
 import Version from './Version'
+import { headerRight } from './Header'
+import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
 export default React.memo(About)
 
 function About() {
+  useUpdateNavigationOptions({
+    headerRight: headerRight,
+  })
+
   const content = (
     <ScrollView className="p-5">
       <Header />

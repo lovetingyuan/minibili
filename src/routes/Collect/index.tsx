@@ -1,4 +1,4 @@
-import { Text } from '@rneui/themed'
+import { Text } from '@rn-vui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import { Alert, Linking, View } from 'react-native'

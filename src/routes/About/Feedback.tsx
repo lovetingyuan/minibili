@@ -1,6 +1,4 @@
-import { BottomSheet, Button, Card, Dialog, Input, Text } from '@rneui/themed'
-import { UserFeedback } from '@sentry/react-native'
-import * as Sentry from '@sentry/react-native'
+import { BottomSheet, Button, Card, Dialog, Input, Text } from '@rn-vui/themed'
 import React from 'react'
 import { Linking, View } from 'react-native'
 
@@ -10,7 +8,6 @@ import { useStore } from '@/store'
 
 import { githubLink } from '../../constants'
 import { showToast } from '../../utils'
-// import { reportUserFeedback } from '../../utils/report'
 import TextAction from './TextAction'
 
 export default React.memo(Feedback)
@@ -36,19 +33,12 @@ function Feedback() {
       hideFeedback()
       return
     }
-    const sentryId = Sentry.captureMessage('user feedback')
-
-    const userFeedback: UserFeedback = {
-      event_id: sentryId,
-      name: feedbackContactRef.current,
-      email: feedbackContactRef.current || 'N/A',
-      comments: message,
-    }
-    Sentry.captureUserFeedback(userFeedback)
+    // TODO: feedback
     // reportUserFeedback(message, feedbackContactRef.current)
     hideFeedback()
     showToast('感谢反馈 😊')
   }
+
   return (
     <TextAction
       text="💗 欢迎使用本应用"
@@ -67,7 +57,7 @@ function Feedback() {
       <Dialog
         isVisible={feedBackVisible}
         onBackdropPress={hideFeedback}
-        ModalComponent={Modal2}
+        ModalComponent={Modal2 as unknown as typeof React.Component}
         overlayStyle={tw(colors.gray2.bg)}>
         <Dialog.Title
           title="欢迎反馈意见 😊"

@@ -1,8 +1,8 @@
 import { useBackHandler } from '@react-native-community/hooks'
 import { useIsFocused, useNavigation } from '@react-navigation/native'
-import { Button, Icon, Text } from '@rneui/themed'
+import { Button, Icon, Text } from '@rn-vui/themed'
 import { FlashList } from '@shopify/flash-list'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import React from 'react'
@@ -180,11 +180,20 @@ function MusicItem(props: {
   )
 }
 
+const defaultSearchBarCommands: SearchBarCommands = {
+  blur: () => {},
+  setText: () => {},
+  focus: () => {},
+  clearText: () => {},
+  toggleCancelButton: () => {},
+  cancelSearch: () => {},
+}
+
 function MusicList() {
   const { $musicList } = useStore()
   const list = $musicList[0].songs
   const blackColor = tw(colors.black.text).color
-  const searchBarRef = React.useRef<SearchBarCommands | null>(null)
+  const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands)
   const [searchKeyWord, setSearchKeyWord] = React.useState('')
   const focused = useIsFocused()
   useBackHandler(() => {

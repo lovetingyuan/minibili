@@ -62,7 +62,7 @@ const getBuildList = (buildStr) => {
       buildListStr = buildListStr.substring(buildListStr.indexOf('['))
       list = JSON.parse(buildListStr)
       break
-    } catch (e) {
+    } catch {
       buildListStr = buildListStr.substring(1)
     }
   }

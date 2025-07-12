@@ -7,10 +7,13 @@ import { colors } from '@/constants/colors.tw'
 
 import { site } from '../constants'
 
-export default function ErrorFallback(props: { message?: string }) {
+export default function ErrorFallback(props: {
+  error: Error
+  resetError: Function
+}) {
   if (__DEV__) {
     // eslint-disable-next-line no-console
-    console.error(props.message)
+    console.error(props.error)
   }
   return (
     <View className="flex-1 dark:bg-neutral-900">
@@ -22,7 +25,7 @@ export default function ErrorFallback(props: { message?: string }) {
       <Text className="mx-7 text-base text-red-600">
         非常抱歉，应用发生了未知错误
         {'\n\n'}
-        <Text className="text-xs italic">{props.message || 'N/A'}</Text>
+        <Text className="text-xs italic">{props.error.message || '😔'}</Text>
         {'\n\n'}
         我们会处理这个错误，感谢您的理解和支持
         {'\n\n'}

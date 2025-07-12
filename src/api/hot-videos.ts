@@ -2,6 +2,7 @@ import useSWRInfinite from 'swr/infinite'
 import type { z } from 'zod'
 
 import type { VideoItemResponseSchema } from './hot-videos.schema'
+import fetcher from './fetcher'
 
 export type HotVideoResponse = z.infer<typeof VideoItemResponseSchema>
 
@@ -36,10 +37,11 @@ export type VideoItem = ReturnType<typeof getVideo>
 
 export function useHotVideos(t: number) {
   const { data, mutate, size, setSize, isValidating, isLoading, error } =
-    useSWRInfinite(
+    useSWRInfinite<{ list: HotVideoResponse[]; no_more: boolean }>(
       (index) => {
         return `/x/web-interface/popular?ps=30&pn=${index + 1}&_t=${t}`
       },
+      fetcher,
       {
         revalidateFirstPage: false,
         // revalidateAll: true,

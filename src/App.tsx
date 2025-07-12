@@ -1,9 +1,8 @@
 import NetInfo from '@react-native-community/netinfo'
-import { ThemeProvider } from '@rneui/themed'
-import * as SentryExpo from '@sentry/react-native'
+import { ThemeProvider } from '@rn-vui/themed'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
-import { AppState, SafeAreaView } from 'react-native'
+import { AppState } from 'react-native'
 // import { RootSiblingParent } from 'react-native-root-siblings'
 import { SWRConfig } from 'swr'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
@@ -14,7 +13,6 @@ import CheckAppUpdate from './components/CheckAppUpdate'
 import CheckLiveUps from './components/CheckLiveUps'
 import CheckNetState from './components/CheckNetState'
 import CheckUpUpdate from './components/CheckUpUpdate'
-import ErrorFallback from './components/ErrorFallback'
 import ImagesView from './components/ImagesView'
 import RemoteConfig from './components/RemoteConfig'
 import UserLocation from './components/UserLocation'
@@ -26,23 +24,18 @@ import {
   onChange,
   useAppValue,
 } from './store'
-import { reportApiError } from './utils/report'
+import ErrorBoundary from 'react-native-error-boundary'
+import ErrorFallback from './components/ErrorFallback'
+// import { SafeAreaView } from 'react-native-safe-area-context'
 
 let online = true
 const focus = true
 
-const errorFallback: React.ComponentProps<
-  typeof SentryExpo.ErrorBoundary
->['fallback'] = (errorData) => {
-  // @ts-ignore
-  return <ErrorFallback message={errorData.error.message} />
-}
-
-const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
+const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
   fetcher,
-  errorRetryCount: 4,
-  errorRetryInterval: 2000,
-  dedupingInterval: 3000,
+  errorRetryCount: 2,
+  errorRetryInterval: 1000,
+  dedupingInterval: 5000,
   isVisible() {
     return focus
   },
@@ -74,35 +67,31 @@ const swrConfig: SWRConfiguration & Partial<ProviderConfiguration> = {
       }
     })
   },
-  onError(err, key) {
-    reportApiError(key, err)
-  },
 }
 
 export default function App() {
   const rneTheme = useRNETheme()
   const appValue = useAppValue()
   return (
-    <SafeAreaView className="flex-1">
-      <StatusBar style="auto" translucent backgroundColor="transparent" />
-      <SentryExpo.ErrorBoundary fallback={errorFallback}>
-        <AppContextProvider value={appValue} onChange={onChange}>
-          <ThemeProvider theme={rneTheme}>
-            <SWRConfig value={swrConfig}>
-              <InitStoreComp />
-              <RemoteConfig />
-              <CheckAppUpdate />
-              <CheckUpUpdate />
-              <CheckNetState />
-              <CheckLiveUps />
-              <ButtonsOverlay />
-              <ImagesView />
-              <UserLocation />
-              <Route />
-            </SWRConfig>
-          </ThemeProvider>
-        </AppContextProvider>
-      </SentryExpo.ErrorBoundary>
-    </SafeAreaView>
+    // <SafeAreaView className="flex-1 shrink-0">
+    <SWRConfig value={SWRConfigValue}>
+      <AppContextProvider value={appValue} onChange={onChange}>
+        <ThemeProvider theme={rneTheme}>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <InitStoreComp />
+            <RemoteConfig />
+            <CheckAppUpdate />
+            <CheckUpUpdate />
+            <CheckNetState />
+            <CheckLiveUps />
+            <ButtonsOverlay />
+            <ImagesView />
+            <UserLocation />
+            <Route />
+          </ErrorBoundary>
+        </ThemeProvider>
+      </AppContextProvider>
+      <StatusBar style="auto" translucent />
+    </SWRConfig>
   )
 }

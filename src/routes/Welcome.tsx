@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Button, Text } from '@rneui/themed'
+import { Button, Text } from '@rn-vui/themed'
 import React from 'react'
 import { Image, Linking, View } from 'react-native'
 
@@ -26,7 +26,7 @@ function Welcome({ navigation }: Props) {
       <View className="flex-1 p-8">
         <Text className="text-2xl">欢迎使用极简版B站 😊</Text>
         <Text className="mb-10 mt-5 text-xl leading-8">
-          这里没有推荐、没有算法、没有广告、没有乱七八糟的功能，只有简单地浏览。
+          这里没有推荐、没有算法、没有广告、没有多余的功能，只有简单地浏览。
         </Text>
         <Text className="text-base">
           🔈本应用为个人兴趣作品并完全开源(

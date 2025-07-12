@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Avatar, Badge, Text } from '@rneui/themed'
+import { Avatar, Badge, Text } from '@rn-vui/themed'
 import { Image } from 'expo-image'
 import React from 'react'
 import { Alert, Linking, Pressable, TouchableOpacity, View } from 'react-native'
@@ -152,7 +152,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         text: `${$upUpdateMap[mid]?.latestId} - ${$upUpdateMap[mid]?.currentLatestId}`,
         onPress: () => {},
       },
-    ].filter(Boolean)
+    ].filter((v) => !!v && typeof v === 'object')
 
   return (
     <TouchableOpacity

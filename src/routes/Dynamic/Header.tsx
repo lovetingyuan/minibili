@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Avatar, Icon, Text } from '@rneui/themed'
-import clsx from 'clsx'
+import { Avatar, Icon, Text } from '@rn-vui/themed'
+import { clsx } from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import React from 'react'
@@ -13,14 +13,11 @@ import { useFollowedUpsMap } from '@/store/derives'
 
 import { useLivingInfo } from '../../api/living-info'
 import { useUserInfo } from '../../api/user-info'
-// import { useUserRelation } from '../../api/user-relation'
 import { useStore } from '../../store'
 import type { NavigationProps, RootStackParamList } from '../../types'
 import { handleShareUp, parseImgUrl, showToast } from '../../utils'
 
-// const levelList = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹']
-
-export function HeaderLeft(props: { scrollTop: () => void }) {
+export function HeaderLeft() {
   const route =
     useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const { data: userInfo } = useUserInfo(route.params?.user.mid)
@@ -60,11 +57,6 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
               uri: parseImgUrl(dynamicUser.face, 120),
             }}
           />
-          {/* {sex ? (
-            <Text className="absolute right-[-8px] top-1 text-xs opacity-80">
-              {sex}
-            </Text>
-          ) : null} */}
           {dynamicUser.mid && livingUrl ? (
             <Pressable
               onPress={() => {
@@ -93,12 +85,8 @@ export function HeaderLeft(props: { scrollTop: () => void }) {
             isBlackUp && 'line-through',
           )}
           adjustsFontSizeToFit
-          numberOfLines={1}
-          onPress={() => {
-            props.scrollTop()
-          }}>
+          numberOfLines={1}>
           {userName}
-          {/* <Text className="text-lg">{`${level}  `}</Text> */}
         </Text>
         {/* {fans ? (
           <Text

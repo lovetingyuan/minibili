@@ -1,4 +1,4 @@
-import { Chip, Icon, ListItem, Text } from '@rneui/themed'
+import { Chip, Icon, ListItem, Text } from '@rn-vui/themed'
 import React from 'react'
 
 import { colors } from '@/constants/colors.tw'
@@ -50,7 +50,7 @@ function BlackTags() {
             />
           )
         })}
-        {Object.values($blackTags).length === 0 ? <Text>无</Text> : null}
+        {Object.values($blackTags).length === 0 ? <Text>🈚</Text> : null}
       </ListItem>
     </ListItem.Accordion>
   )

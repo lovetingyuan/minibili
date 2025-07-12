@@ -1,4 +1,4 @@
-import { Text } from '@rneui/themed'
+import { Text } from '@rn-vui/themed'
 import React from 'react'
 import {
   FlatList,

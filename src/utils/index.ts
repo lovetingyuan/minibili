@@ -1,7 +1,6 @@
 import * as Application from 'expo-application'
 import * as Updates from 'expo-updates'
 import { Alert, Linking, Share } from 'react-native'
-// import Toast from 'react-native-root-toast'
 import Toast from 'react-native-simple-toast'
 import { throttle } from 'throttle-debounce'
 
@@ -122,7 +121,7 @@ export async function handleShareVideo(
           : `https://b23.tv/${bvid}`,
       ].join('\n'),
     })
-  } catch (error) {
+  } catch {
     showToast('分享失败')
   }
 }
@@ -142,7 +141,7 @@ export async function handleShareUp(
         `https://m.bilibili.com/space/${mid}`,
       ].join('\n'),
     })
-  } catch (error) {
+  } catch {
     showToast('分享失败')
   }
 }
@@ -216,7 +215,7 @@ export async function showFatalError(error: any) {
           Updates.reloadAsync()
         },
       },
-    ].filter(Boolean),
+    ].filter((v) => v !== null),
     {
       cancelable: false,
       onDismiss() {

@@ -16,9 +16,9 @@ function useCheckUpdateUps() {
   const checkUpdateUpsTimerRef = React.useRef(0)
   useMounted(() => {
     const upUpdateQueue = new PQueue({
-      concurrency: 20,
-      intervalCap: 8,
-      interval: 1000,
+      concurrency: 5,
+      intervalCap: 5,
+      interval: 10000,
     })
 
     const upUpdateIdMap: Record<string, string> = {}

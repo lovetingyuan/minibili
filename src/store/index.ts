@@ -3,10 +3,9 @@ import * as SplashScreen from 'expo-splash-screen'
 import React from 'react'
 import {
   type AtomicContextMethodsType,
+  type ContextOnChangeType,
   createAtomicContext,
-  type ProviderOnChangeType,
   useAtomicContext,
-  useAtomicContextMethods,
 } from 'react-atomic-context'
 
 import { RanksConfig } from '../constants'
@@ -99,9 +98,7 @@ export function useAppValue() {
 export function useStore() {
   return useAtomicContext(AppContext)
 }
-export function useMethods() {
-  return useAtomicContextMethods(AppContext)
-}
+
 export const AppContextProvider = AppContext.Provider
 
 export type AppContextValueType = ReturnType<typeof getAppValue>
@@ -109,7 +106,7 @@ export type AppContextValueType = ReturnType<typeof getAppValue>
 export type AppContextMethodsType =
   AtomicContextMethodsType<AppContextValueType>
 
-export const onChange: ProviderOnChangeType<AppContextValueType> = (
+export const onChange: ContextOnChangeType<AppContextValueType> = (
   { key, value },
   ctx,
 ) => {
@@ -125,8 +122,8 @@ type StoredKeys<K = keyof AppContextValueType> = K extends `$${string}`
   ? K
   : never
 
-export const InitStoreComp = React.memo(() => {
-  const methods = useAtomicContextMethods(AppContext)
+export const InitStoreComp = React.memo(function InitStoreComp() {
+  const methods = useAtomicContext(AppContext)
   useMounted(() => {
     Promise.all(
       storedKeys.map((k) => {
@@ -143,7 +140,6 @@ export const InitStoreComp = React.memo(() => {
               })
               methods.set$videoCatesList(list)
             } else {
-              // @ts-expect-error not clear
               methods[setKey](JSON.parse(data))
             }
           }

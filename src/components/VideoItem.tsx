@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Icon, Text } from '@rneui/themed'
+import { Icon, Text } from '@rn-vui/themed'
 import { Image } from 'expo-image'
 import he from 'he'
 import React from 'react'

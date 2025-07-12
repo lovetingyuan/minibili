@@ -137,7 +137,7 @@ function __$hack() {
       content: "开";
     }
     `
-    document.addEventListener('visibilitychange', (e) => {
+    document.addEventListener('visibilitychange', () => {
       const bgPlayBtn = document.getElementById('live-background-button')
       if (bgPlayBtn.dataset.backgroundPlay !== 'true') {
         return

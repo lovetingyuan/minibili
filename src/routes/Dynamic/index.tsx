@@ -1,27 +1,16 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Skeleton } from '@rneui/themed'
-// import { FlashList } from '@shopify/flash-list'
+import { Skeleton } from '@rn-vui/themed'
 import React, { useCallback, useEffect, useRef } from 'react'
 import { BackHandler, Linking, Platform, Share, View } from 'react-native'
 import WebView from 'react-native-webview'
 
-// import { colors } from '@/constants/colors.tw'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { useStore } from '@/store'
 import { showToast } from '@/utils'
 
-// import {
-//   type DynamicItemAllType,
-//   useDynamicItems,
-// } from '../../api/dynamic-items'
-// import { useUserInfo } from '../../api/user-info'
-// import useErrToast from '../../hooks/useErrToast'
-import useMemoizedFn from '../../hooks/useMemoizedFn'
 import type { NavigationProps, RootStackParamList } from '../../types'
-import { setViewingUpMid } from '../../utils/report'
 import { av2bv } from './avbv'
-// import DynamicItem from './DynamicItem'
 import { HeaderLeft, headerRight } from './Header'
 import injectCode from './inject'
 
@@ -84,49 +73,26 @@ export default React.memo(Dynamic)
 
 function Dynamic({ route }: Props) {
   const upId = route.params?.user?.mid // || specialUser?.mid
-  const dynamicListRef = React.useRef<any>(null)
-  // const { data: userInfo } = useUserInfo(upId)
-  // const dynamicUser = {
-  //   ...route.params?.user,
-  //   ...userInfo,
-  // }
+  // const dynamicListRef = React.useRef<any>(null)
+
   const { reloadUerProfile, dynamicOpenUrl, setDynamicOpenUrl } = useStore()
   const webviewRef = useRef<WebView>(null)
   const navigation = useNavigation<NavigationProps['navigation']>()
-
-  useFocusEffect(
-    useMemoizedFn(() => {
-      upId && setViewingUpMid(upId)
-      return () => {
-        setViewingUpMid(null)
-      }
-    }),
-  )
-  // const {
-  //   list,
-  //   page,
-  //   setSize,
-  //   isRefreshing,
-  //   isLoading,
-  //   isValidating,
-  //   refresh,
-  //   isReachingEnd,
-  //   error,
-  // } = useDynamicItems(upId)
-  // useErrToast('请求动态失败', error)
 
   useUpdateNavigationOptions(
     React.useMemo(() => {
       const headerTitle = () => {
         return (
           <HeaderLeft
-            scrollTop={() => {
-              try {
-                dynamicListRef.current?.scrollToOffset({
-                  offset: 0,
-                })
-              } catch (err) {}
-            }}
+          // scrollTop={() => {
+          //   try {
+          //     dynamicListRef.current?.scrollToOffset({
+          //       offset: 0,
+          //     })
+          //   } catch {
+          //     //
+          //   }
+          // }}
           />
         )
       }
@@ -157,13 +123,13 @@ function Dynamic({ route }: Props) {
         return false
       }
       if (Platform.OS === 'android') {
-        BackHandler.addEventListener('hardwareBackPress', onAndroidBackPress)
+        const handler = BackHandler.addEventListener(
+          'hardwareBackPress',
+          onAndroidBackPress,
+        )
 
         return () => {
-          BackHandler.removeEventListener(
-            'hardwareBackPress',
-            onAndroidBackPress,
-          )
+          handler.remove()
         }
       }
     }, []),
@@ -183,96 +149,20 @@ function Dynamic({ route }: Props) {
         `)
     }
   }, [dynamicOpenUrl, setDynamicOpenUrl])
-  // const renderItem = ({ item }: { item: DynamicItemAllType }) => {
-  //   return <DynamicItem item={item} />
-  // }
-  // const footerContent = () => {
-  //   if (!list.length) {
-  //     return null
-  //   }
-  //   return (
-  //     <Text className="mb-5 mt-3 text-center text-sm text-gray-500">
-  //       {isReachingEnd ? '到底了~' : isValidating ? '加载中...' : ''}
-  //     </Text>
-  //   )
-  // }
-  // const emptyContent = () => {
-  //   if (isLoading) {
-  //     return <Loading />
-  //   }
-  //   if (error) {
-  //     return <Text className="m-12 text-center text-base">加载动态失败</Text>
-  //   }
-  //   return (
-  //     <View className="items-center py-24">
-  //       <Image
-  //         source={require('../../../assets/empty.png')}
-  //         className="aspect-square h-auto w-[40%]"
-  //       />
-  //       <Text className="m-10 text-center text-lg">暂无动态</Text>
-  //     </View>
-  //   )
-  // }
+
   useEffect(() => {
-    // const a = webviewRef.current?
     if (reloadUerProfile) {
-      // webviewRef.current?.reload()
       webviewRef.current?.injectJavaScript(`
-        window.location.reload()
+        window.location.reload();
       `)
     }
   }, [reloadUerProfile])
 
   return (
     <View className="flex-1">
-      {/* <FlashList
-        data={list}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        onEndReachedThreshold={1}
-        ref={dynamicListRef}
-        estimatedItemSize={100}
-        ListHeaderComponent={
-          dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
-            <View className="flex-row border-b-[0.5px] border-b-gray-400 px-3 py-3">
-              <Icon
-                name="billboard"
-                type="material-community"
-                size={18}
-                color={tw(colors.gray6.text).color}
-              />
-              <Text className="ml-2 flex-1 shrink-0 text-sm text-gray-600 dark:text-gray-400">
-                {dynamicUser?.sign.trim()}
-              </Text>
-            </View>
-          ) : null
-        }
-        onEndReached={() => {
-          setSize(page + 1)
-        }}
-        refreshing={isRefreshing}
-        onRefresh={refresh}
-        ListEmptyComponent={emptyContent()}
-        ListFooterComponent={footerContent()}
-      /> */}
-      {/* {dynamicUser?.sign && dynamicUser?.sign !== '-' ? (
-        <View className="flex-row border-b-[0.5px] border-b-gray-400 px-3 py-3">
-          <Icon
-            name="billboard"
-            type="material-community"
-            size={18}
-            color={tw(colors.gray6.text).color}
-          />
-          <Text className="ml-2 flex-1 shrink-0 text-sm text-gray-600 dark:text-gray-400">
-            {dynamicUser?.sign.trim()}
-          </Text>
-        </View>
-      ) : null} */}
       <WebView
         className="flex-1"
         source={{ uri: `https://m.bilibili.com/space/${upId}` }}
-        // key={webViewMode + '-' + webviewKey}
-        // onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
         originWhitelist={['http://*', 'https://*', 'bilibili://*']}
         allowsFullscreenVideo
         injectedJavaScriptForMainFrameOnly
@@ -292,10 +182,8 @@ function Dynamic({ route }: Props) {
             title: navState.title,
             url: navState.url,
           }
-          // setFabKey(fabKey + 1)
         }}
         userAgent="Mozilla/5.0 (Linux; Android 13; M2012K11AC Build/TKQ1.220829.002) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.7151.115 Mobile Safari/537.36"
-        // userAgent={webViewMode === 'MOBILE' ? '' : UA}
         ref={webviewRef}
         onMessage={(evt) => {
           const data = JSON.parse(evt.nativeEvent.data) as any

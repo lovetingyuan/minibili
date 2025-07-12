@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Icon, Text } from '@rneui/themed'
+import { Icon, Text } from '@rn-vui/themed'
 import React from 'react'
 import {
   Image,
@@ -16,7 +16,6 @@ import { HandledRichTextType } from '../api/dynamic-items.type'
 import { useStore } from '../store'
 import type { NavigationProps } from '../types'
 import { parseImgUrl, parseUrl } from '../utils'
-import { reportUnknownRichTextItem } from '../utils/report'
 
 function RichTexts(props: {
   idStr: string | number | null
@@ -243,7 +242,6 @@ function RichTexts(props: {
         </Text>,
       )
     } else {
-      reportUnknownRichTextItem(node)
       reactNodes.push(
         <Text style={{ fontSize, lineHeight: fontSize * 1.6 }} key={key++}>
           {node.text}

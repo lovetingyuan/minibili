@@ -2,6 +2,7 @@ import useSWRInfinite from 'swr/infinite'
 import type { z } from 'zod'
 
 import type { CommentResItem, CommentResponseSchema } from './comments.schema'
+import fetcher from './fetcher'
 
 type CommentResType = z.infer<typeof CommentResponseSchema>
 
@@ -22,7 +23,7 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
   if (content.emote) {
     Object.keys(content.emote).forEach((emoji) => {
       const id = `emoji${Math.random().toString().substring(2)}`
-      emojiMap[id] = content.emote?.[emoji]
+      emojiMap[id] = content.emote![emoji]
       message = message.replaceAll(emoji, id)
       keys.push(id)
     })
@@ -31,7 +32,7 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
     Object.keys(content.at_name_to_mid).forEach((name) => {
       const id = `@${Math.random().toString().substring(2)}`
       atMap[id] = {
-        mid: content.at_name_to_mid?.[name],
+        mid: content.at_name_to_mid![name],
         name: `@${name}`,
       }
       message = message.replaceAll(`@${name}`, id)
@@ -99,7 +100,7 @@ export const parseCommentMessage = (content: CommentResItem['content']) => {
               }
         })
       })
-      .filter(Boolean)
+      .filter((v) => !!v && typeof v === 'object')
       .flat()
   }
   return content.message.split(urlReg).map((part2, j) => {
@@ -223,21 +224,12 @@ export type CommentItemType = ReturnType<typeof getReplies>[0]
 
 export function useComments(oid: string | number, type: number, mode = 3) {
   const { data, error, size, setSize, isValidating, isLoading } =
-    useSWRInfinite<CommentResType>(
-      (index, previousPageData) => {
-        const next = previousPageData?.cursor.next ?? 1
-        return oid
-          ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&next=${next}&ps=20`
-          : null
-      },
-      // url => {
-      //   console.log(44, url)
-      //   return request(url)
-      // },
-      // {
-      //   // revalidateFirstPage: false,
-      // },
-    )
+    useSWRInfinite<CommentResType>((index, previousPageData) => {
+      const next = previousPageData?.cursor.next ?? 1
+      return oid
+        ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&next=${next}&ps=20`
+        : null
+    }, fetcher)
   // const isLoadingMore =
   //   isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')
   // const isEmpty = data?.[0]?.replies.length === 0

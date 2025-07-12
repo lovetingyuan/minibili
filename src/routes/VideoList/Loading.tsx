@@ -1,4 +1,4 @@
-import { Skeleton } from '@rneui/themed'
+import { Skeleton } from '@rn-vui/themed'
 import React from 'react'
 import { View } from 'react-native'
 

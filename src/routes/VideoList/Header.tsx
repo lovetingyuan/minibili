@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Badge, Button, Icon, Text } from '@rneui/themed'
+import { Badge, Button, Icon, Text } from '@rn-vui/themed'
 import React from 'react'
 import { Animated, ScrollView, TouchableOpacity, View } from 'react-native'
 import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
@@ -42,17 +42,13 @@ function HeaderTitleComp() {
     <Button
       type="clear"
       size="sm"
-      buttonStyle={tw('mx-2')}
+      buttonStyle={tw('mx-2 w-24')}
       titleStyle={tw(`text-sm ${colors.primary.text}`)}
       onPress={() => {
         appUpdateInfo.showAlert()
       }}>
       {'有新版本'}
-      <Animated.View
-        style={
-          /* eslint-disable-next-line react-compiler/react-compiler */
-          { opacity: opacityValue }
-        }>
+      <Animated.View style={{ opacity: opacityValue }}>
         <Icon
           name="fiber-new"
           color={tw(colors.secondary.text).color}
@@ -161,7 +157,7 @@ function HeaderRightComp() {
   const _updatedCount = useUpUpdateCount()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
-    <View className="flex-row items-center gap-1">
+    <View className="mr-4 flex-row items-center gap-1">
       <Button
         radius={'sm'}
         size="sm"

@@ -4,7 +4,7 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native'
-import { CheckBox } from '@rneui/themed'
+import { CheckBox } from '@rn-vui/themed'
 import * as KeepAwake from 'expo-keep-awake'
 import React from 'react'
 import {
@@ -187,7 +187,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         // eslint-disable-next-line no-console
         __DEV__ && console.log('message', eventData.payload)
       }
-    } catch (e) {}
+    } catch {}
   }
   const renderLoading = () => (
     <View className="absolute h-full w-full items-center">

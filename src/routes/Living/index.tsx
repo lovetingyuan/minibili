@@ -1,6 +1,6 @@
 import { useBackHandler, useRefresh } from '@react-native-community/hooks'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Text } from '@rneui/themed'
+import { Text } from '@rn-vui/themed'
 import { ResizeMode, Video } from 'expo-av'
 import React from 'react'
 import {

@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native'
-import { BottomSheet, Icon, Text } from '@rneui/themed'
+import { BottomSheet, Icon, Text } from '@rn-vui/themed'
 import { FlashList } from '@shopify/flash-list'
 import React from 'react'
 import { ActivityIndicator, View } from 'react-native'

@@ -36,6 +36,7 @@ module.exports = (babel) => {
             absolutePath = filePath
           } else {
             absolutePath = nodePath.resolve(
+              // eslint-disable-next-line no-undef
               __dirname,
               `../node_modules/${filePath}`,
             )

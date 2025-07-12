@@ -2,6 +2,7 @@ import useSWRInfinite from 'swr/infinite'
 
 import { parseUrl } from '../utils'
 import type { SearchResponse, SearchUpResType } from './search-up.schema'
+import fetcher from './fetcher'
 
 function getUpInfo(up: SearchUpResType) {
   return {
@@ -21,6 +22,7 @@ export const useSearchUps = (name: string) => {
           ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=${index + 1}&page_size=50&platform=pc&search_type=bili_user`
           : null
       },
+      fetcher,
       {
         revalidateFirstPage: false,
       },
