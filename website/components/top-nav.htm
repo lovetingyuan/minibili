@@ -24,7 +24,7 @@
             <template x-for="log of changeLogs">
               <li>
                 <b x-text="log.version"></b>
-                <!-- <time class="ml-2 text-sm" x-text="log.date"></time> -->
+                <time class="ml-2 text-sm" x-text="log.date"></time>
                 <ul class="mt-2 list-inside list-disc">
                   <template x-for="change of log.changelogs">
                     <li x-text="change" class="ml-4 text-sm"></li>
@@ -79,9 +79,9 @@
         ).then((r) => {
           this.changeLogs = r.data.map((change) => {
             const changelogs = change.changelog.split('\n')
-            // const buildDate = change.date.split('T')[0]
-            const version = change.version
-            return { version, changelogs }
+            const buildDate = change.date.split('T')[0]
+            const version = change.version.split('-')[1]
+            return { version, changelogs, date: buildDate }
           })
         })
       },

@@ -1,12 +1,12 @@
 <section
-  class="text-center flex items-center sm:gap-4 justify-center my-12 gap-0">
+  class="my-12 flex items-center justify-center gap-0 text-center sm:gap-4">
   <a
     :href="'#screenshot-' + leftIndex"
-    class="btn btn-circle text-lg"
+    class="btn btn-sm btn-circle text-lg"
     title="上一张"
     >❮</a
   >
-  <div class="mockup-phone flex-shrink-0" style="margin: 0">
+  <div class="mockup-phone flex-shrink-0" style="margin: 0 10px">
     <div class="camera" style="background: transparent"></div>
     <div class="display">
       <div class="carousel rounded-box w-64">
@@ -14,7 +14,7 @@
           <div class="carousel-item w-full" :id="'screenshot-' + i">
             <img
               :src="pic"
-              class="w-full min-w-[250px] min-h-[550px]"
+              class="min-h-[550px] w-full min-w-[250px]"
               alt="app运行截图" />
           </div>
         </template>
@@ -23,7 +23,7 @@
   </div>
   <a
     :href="'#screenshot-' + rightIndex"
-    class="btn btn-circle text-lg"
+    class="btn btn-sm btn-circle text-lg"
     title="下一张"
     >❯</a
   >
