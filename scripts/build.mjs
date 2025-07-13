@@ -5,6 +5,10 @@
 // 1 检查环境 2 写入版本 3 eas构建 4 写入更新日志 5 下载apk 6 git推送
 
 const z = require('zod')
+const { usePowerShell } = require('zx')
+
+// eslint-disable-next-line react-hooks/rules-of-hooks
+usePowerShell()
 
 const BuildListSchema = z
   .object({
