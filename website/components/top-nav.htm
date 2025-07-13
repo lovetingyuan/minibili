@@ -1,4 +1,4 @@
-<nav class="flex gap-2 items-center absolute top-2 right-4">
+<nav class="absolute right-4 top-2 flex items-center gap-2">
   <button
     @click="showChangeLog"
     class="btn btn-ghost btn-sm btn-success font-normal text-neutral-600 hover:text-neutral-900">
@@ -12,20 +12,20 @@
           ✕
         </button>
       </form>
-      <h3 class="text-lg font-bold text-left">更新日志</h3>
+      <h3 class="text-left text-lg font-bold">更新日志</h3>
       <div class="mt-5 p-2">
         <template x-if="changeLogs.length === 0">
-          <div class="text-center my-6">
+          <div class="my-6 text-center">
             <div class="loading loading-dots loading-lg"></div>
           </div>
         </template>
         <template x-if="changeLogs.length > 0">
-          <ul class="flex gap-4 flex-col">
+          <ul class="flex flex-col gap-4">
             <template x-for="log of changeLogs">
               <li>
                 <b x-text="log.version"></b>
-                <time class="text-sm ml-2" x-text="log.date"></time>
-                <ul class="list-disc list-inside mt-2">
+                <!-- <time class="ml-2 text-sm" x-text="log.date"></time> -->
+                <ul class="mt-2 list-inside list-disc">
                   <template x-for="change of log.changelogs">
                     <li x-text="change" class="ml-4 text-sm"></li>
                   </template>
@@ -42,7 +42,7 @@
     href="https://github.com/lovetingyuan/minibili"
     rel="noopener"
     target="_blank"
-    class="btn btn-sm btn-square text-lg btn-ghost">
+    class="btn btn-sm btn-square btn-ghost text-lg">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="1em"
@@ -71,16 +71,19 @@
         if (this.changeLogs.length) {
           return
         }
-        advancedRequest('https://www.unpkg.com/minibili', 30 * 1000, 3).then(
-          (list) => {
-            this.changeLogs = list.map((change) => {
-              const changelogs = change.changelog
-              const buildDate = change.date.split('T')[0]
-              const version = change.version
-              return { version, changelogs, date: buildDate }
-            })
-          },
-        )
+        advancedRequest(
+          'https://tingyuan.in/api/github/releases?user=lovetingyuan&repo=minibili&_t=' +
+            Date.now(),
+          20 * 1000,
+          5,
+        ).then((r) => {
+          this.changeLogs = r.data.map((change) => {
+            const changelogs = change.changelog.split('\n')
+            // const buildDate = change.date.split('T')[0]
+            const version = change.version
+            return { version, changelogs }
+          })
+        })
       },
     }
   }

@@ -1,9 +1,9 @@
 <section class="my-4 text-center">
   <img
     src="./minibili.png"
-    class="max-w-full w-[400px] mt-12 mb-8 inline-block"
+    class="mb-8 mt-12 inline-block w-[400px] max-w-full"
     alt="minibili logo" />
-  <p class="text-3xl mt-6 mb-12 tracking-wider">一款简洁的B站浏览应用</p>
+  <p class="mb-12 mt-6 text-3xl tracking-wider">一款简洁的B站浏览应用</p>
   <div
     data-tip="正在获取最新版本，请稍候"
     :class="latestApkUrl? '' : 'tooltip'">
@@ -12,7 +12,7 @@
       @click="displayDownloadToast"
       :style="latestApkUrl ? '' : 'pointer-events: none'"
       :disabled="!latestApkUrl"
-      class="btn btn-primary btn-lg px-16 text-white hover:tracking-wide transition-all"
+      class="btn btn-primary btn-lg px-16 text-white transition-all hover:tracking-wide"
       :download="'minibili-' + latestVersion + '.apk'">
       下载APP
       <template x-if="!latestVersion">
@@ -57,16 +57,39 @@
         if (this.latestVersion) {
           return
         }
+        //       fetch(
+        //   'https://tingyuan.in/api/github/releases?user=lovetingyuan&repo=minibili&_t=' +
+        //     Date.now(),
+        // )
+        //   .then((r) => r.json())
+        //   .then((r) => {
+        //     if (r.code !== 0) {
+        //       throw new Error(r.code + ':' + r.message)
+        //     }
+        //     return r.data as { version: string; changelog: string }[]
+        //   })
         advancedRequest(
-          'https://unpkg.com/minibili/package.json?_t=' + Date.now(),
+          'https://tingyuan.in/api/github/releases?user=lovetingyuan&repo=minibili&_t=' +
+            Date.now(),
           20 * 1000,
           5,
-        ).then((r) => {
-          const version = r.version.split('-')[0]
-          const apkUrl = `https://unpkg.com/minibili@${r.version}/apk/minibili-${version}.apk`
-          this.latestApkUrl = apkUrl
-          this.latestVersion = version
-        })
+        )
+          .then((r) => {
+            if (r.code !== 0) {
+              throw new Error(r.code + ':' + r.message)
+            }
+            return r.data[0]
+          })
+          .then((r) => {
+            const GhProxy = 'https://ghfast.top'
+            const githubLink = 'https://github.com/lovetingyuan/minibili'
+
+            const version = r.version.split('-')[1]
+            const downloadLink = `${GhProxy}/${githubLink}/releases/download/v${version}/${r.version}.apk`
+            // const apkUrl = `https://unpkg.com/minibili@${r.version}/apk/minibili-${version}.apk`
+            this.latestApkUrl = downloadLink
+            this.latestVersion = version
+          })
       },
     }
   }
