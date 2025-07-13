@@ -1,6 +1,6 @@
 {
   "name": "minibili",
-  "version": "0.6.4",
+  "version": "0.7.0",
   "description": "minimum bilibili apk",
   "files": [
     "apk",
@@ -115,8 +115,8 @@
     ]
   },
   "config": {
-    "versionCode": 72,
-    "changelog": "修复已知问题  添加直播人数和贡献榜"
+    "versionCode": 73,
+    "changelog": "update expo  动态页面改版"
   },
-  "gitHead": "092af80"
+  "gitHead": "7fea38d"
 }
