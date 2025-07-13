@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { View } from 'react-native'
 
 import { useStore } from '../../store'
@@ -15,12 +15,16 @@ export default React.memo(VideoList)
 
 function VideoList() {
   const { currentVideosCate } = useStore()
-  useUpdateNavigationOptions({
-    headerLeft: videoListHeaderLeft,
-    headerTitleAlign: 'left',
-    headerTitle: videoListHeaderTitle,
-    headerRight: videoListHeaderRight,
-  })
+  useUpdateNavigationOptions(
+    useMemo(() => {
+      return {
+        headerLeft: videoListHeaderLeft,
+        headerTitleAlign: 'left',
+        headerTitle: videoListHeaderTitle,
+        headerRight: videoListHeaderRight,
+      }
+    }, []),
+  )
 
   return (
     <View className="flex-1">

@@ -103,6 +103,7 @@ export function HeaderLeft() {
 }
 
 export const headerRight = () => <HeaderRight />
+export const headerTitle = () => <HeaderLeft />
 
 function HeaderRight() {
   const route =

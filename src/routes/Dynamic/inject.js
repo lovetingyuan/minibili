@@ -29,6 +29,12 @@ function __$inject() {
     .dynamic-list {
       display: block!important;
     }
+    .opus-modules {
+      padding-top: 0px!important;
+    }
+    .opus-module-title {
+      margin-top: 18px!important;
+    }
 
     .m-space-info {
       margin-top: 0!important;
@@ -295,6 +301,62 @@ function __$inject() {
       }
     }, 100)
   })
+  window.addEventListener('load', (e) => {
+    const imgs = document.querySelector('.opus-module-top__album')
+    if (imgs) {
+      const div = document.createElement('div')
+      div.textContent = '下载'
+      div.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        padding: 5px 10px;
+        border-radius: 5px;
+        user-select: none;
+      `
+      imgs.appendChild(div)
+      div.addEventListener('click', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        const item = [...imgs.querySelectorAll('.v-swipe__item')].find((v) => {
+          return v.style.transform.includes('translateX(0px)')
+        })
+        if (item) {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              action: 'open-image',
+              payload: {
+                url: item.querySelector('img').src.split('@')[0],
+              },
+            }),
+          )
+        }
+      })
+    }
+  })
+  document.addEventListener(
+    'click',
+    (e) => {
+      const pic = e.target.closest('.bm-pics-block__item')
+      if (pic) {
+        e.preventDefault()
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        const url = pic.querySelector('img').src.split('@')[0]
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            action: 'open-image',
+            payload: { url },
+          }),
+        )
+      }
+    },
+    true,
+  )
 }
 
 export default `(${__$inject})();`

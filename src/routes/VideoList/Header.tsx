@@ -157,7 +157,7 @@ function HeaderRightComp() {
   const _updatedCount = useUpUpdateCount()
   const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
-    <View className="mr-4 flex-row items-center gap-1">
+    <View className="mr-1 flex-row items-center gap-1">
       <Button
         radius={'sm'}
         size="sm"

@@ -1,5 +1,5 @@
 import { Divider } from '@rn-vui/themed'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { ScrollView, View } from 'react-native'
 
 import Backup from './Backup'
@@ -18,9 +18,14 @@ import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 export default React.memo(About)
 
 function About() {
-  useUpdateNavigationOptions({
-    headerRight: headerRight,
-  })
+  useUpdateNavigationOptions(
+    useMemo(
+      () => ({
+        headerRight,
+      }),
+      [],
+    ),
+  )
 
   const content = (
     <ScrollView className="p-5">

@@ -1,7 +1,7 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Skeleton } from '@rn-vui/themed'
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { BackHandler, Linking, Platform, Share, View } from 'react-native'
 import WebView from 'react-native-webview'
 
@@ -11,7 +11,7 @@ import { showToast } from '@/utils'
 
 import type { NavigationProps, RootStackParamList } from '../../types'
 import { av2bv } from './avbv'
-import { HeaderLeft, headerRight } from './Header'
+import { headerTitle, headerRight } from './Header'
 import injectCode from './inject'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Dynamic'>
@@ -80,27 +80,13 @@ function Dynamic({ route }: Props) {
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   useUpdateNavigationOptions(
-    React.useMemo(() => {
-      const headerTitle = () => {
-        return (
-          <HeaderLeft
-          // scrollTop={() => {
-          //   try {
-          //     dynamicListRef.current?.scrollToOffset({
-          //       offset: 0,
-          //     })
-          //   } catch {
-          //     //
-          //   }
-          // }}
-          />
-        )
-      }
-      return {
+    useMemo(
+      () => ({
         headerTitle,
         headerRight,
-      }
-    }, []),
+      }),
+      [],
+    ),
   )
   const currentNavigationStateRef = React.useRef<{
     canGoBack: boolean
@@ -223,6 +209,9 @@ function Dynamic({ route }: Props) {
               // url: link,
             })
           } else if (data.action === 'open-url') {
+            const { url } = data.payload
+            Linking.openURL(url)
+          } else if (data.action === 'open-image') {
             const { url } = data.payload
             Linking.openURL(url)
           }
