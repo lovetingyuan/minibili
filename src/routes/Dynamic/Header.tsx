@@ -6,7 +6,7 @@ import * as Clipboard from 'expo-clipboard'
 import { Image } from 'expo-image'
 import React from 'react'
 import { Linking, Pressable, View } from 'react-native'
-import { Menu, MenuItem } from 'react-native-material-menu'
+import { Menu, MenuItem } from '@/components/Menu'
 
 import { colors } from '@/constants/colors.tw'
 import { useFollowedUpsMap } from '@/store/derives'
@@ -28,14 +28,14 @@ export function HeaderLeft() {
   }
   // const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const gotoWebPage = () => {
-    if (dynamicUser) {
-      navigation.navigate('WebPage', {
-        url: `https://space.bilibili.com/${dynamicUser.mid}`,
-        title: `${dynamicUser.name}的主页`,
-      })
-    }
-  }
+  // const gotoWebPage = () => {
+  //   if (dynamicUser) {
+  //     navigation.navigate('WebPage', {
+  //       url: `https://space.bilibili.com/${dynamicUser.mid}`,
+  //       title: `${dynamicUser.name}的主页`,
+  //     })
+  //   }
+  // }
   // const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
   const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
   // const sex =
@@ -45,13 +45,13 @@ export function HeaderLeft() {
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps
   return (
-    <View className="left-[-12px] mr-[110px] flex-none flex-row items-center">
+    <View className="left-[-12px] mr-4 flex-none flex-row items-center">
       {dynamicUser?.face ? (
         <View className="relative">
           <Avatar
             size={40}
             rounded
-            onPress={gotoWebPage}
+            // onPress={gotoWebPage}
             ImageComponent={Image}
             source={{
               uri: parseImgUrl(dynamicUser.face, 120),
@@ -62,7 +62,7 @@ export function HeaderLeft() {
               onPress={() => {
                 if (dynamicUser.mid) {
                   setCheckLiveTimeStamp(Date.now())
-                  navigation.navigate('WebPage', {
+                  navigation.navigate('Living', {
                     title: `${dynamicUser.name}的直播间`,
                     url: livingUrl,
                   })
@@ -84,7 +84,7 @@ export function HeaderLeft() {
             'text-lg',
             isBlackUp && 'line-through',
           )}
-          adjustsFontSizeToFit
+          // adjustsFontSizeToFit
           numberOfLines={1}>
           {userName}
         </Text>
@@ -117,7 +117,7 @@ function HeaderRight() {
     set$followedUps,
     $blackUps,
     setReloadUerProfile,
-    setDynamicOpenUrl,
+    // setDynamicOpenUrl,
   } = useStore()
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
@@ -217,8 +217,8 @@ function HeaderRight() {
             if (!dynamicUser) {
               return
             }
-            // Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`)
-            setDynamicOpenUrl(Date.now())
+            Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`)
+            // setDynamicOpenUrl(Date.now())
             hideMenu()
           }}>
           浏览器打开

@@ -25,6 +25,10 @@ function __$inject() {
       .reply:has(.iconfont) {
       display: none!important;
     }
+    .dyn-draw__picture {
+      max-height: 200px!important;
+      border-radius: 10px;
+    }
 
     .dynamic-list {
       display: block!important;
@@ -55,7 +59,10 @@ function __$inject() {
       overflow: hidden;
     }
     .bili-dyn-item-archive__cover {
-      height: 100px!important;
+      height: 120px!important;
+    }
+    .bili-dyn-item-archive__cushion {
+      flex-wrap: wrap;
     }
     .bili-dyn-item-archive__title {
       line-height: 1.6!important;
@@ -67,165 +74,18 @@ function __$inject() {
       font-size: 13px;
       font-weight: bold;
       background: rgba(0, 0, 0, .5);
+      min-height: max-content;
     }
     .m-opus {
       padding-top: 0!important;
     }
+
     `
       document.head.appendChild(style)
     },
   )
 
-  window.addEventListener('load', () => {
-    const commentContainer = window.document.createElement('div')
-    commentContainer.innerHTML = `
-    <style>
-      .comments-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: none;
-        z-index: 1000;
-      }
-      .comments-popup {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 70%;
-        background-color: white;
-        border-radius: 20px 20px 0 0;
-        transform: translateY(100%);
-        transition: transform 0.2s ease-out;
-        z-index: 1001;
-      }
-      .comment-popup-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        user-select: none;
-        background-color: white;
-        position: sticky;
-        top: 0;
-        padding: 10px 0 10px 0;
-      }
-      .comments-popup-content {
-        font-size: 16px;
-        padding: 0 20px 10px 20px;
-        overflow-y: auto;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-      }
-      .show-comments-popup {
-        display: block;
-      }
-      .slide-up-comments-popup {
-        transform: translateY(0);
-      }
-      #comment-popup-title {
-        font-size: 18px;
-      }
-      #comment-popup-close {
-        padding: 10px;
-      }
-      #comment-popup-body {
-        flex-grow: 1;
-      }
-    </style>
-    <div class="comments-overlay" id="comments-overlay">
-      <div class="comments-popup" id="comments-popup">
-        <div class="comments-popup-content">
-          <div class="comment-popup-header">
-            <h2 id="comment-popup-title">更多回复</h2>
-            <div id="comment-popup-close">✕</div>
-          </div>
-          <div id="comment-popup-body">
-
-          </div>
-        </div>
-      </div>
-    </div>
-    `
-    window.document.body.appendChild(commentContainer)
-    const overlay = window.document.getElementById('comments-overlay')
-    const popup = window.document.getElementById('comments-popup')
-    const close = window.document.getElementById('comment-popup-close')
-    window._openPopup = () => {
-      window.history.pushState({ popup: 'open' }, 'open popup')
-      overlay.classList.add('show-comments-popup')
-      window.setTimeout(() => {
-        popup.classList.add('slide-up-comments-popup')
-      }, 10)
-    }
-
-    window.addEventListener('popstate', (evt) => {
-      if (evt.state.popup === 'open' || typeof evt.state.idx === 'number') {
-        closePopup(true)
-      }
-    })
-
-    const closePopup = (state) => {
-      if (!state) {
-        window.history.back()
-      }
-      popup.classList.remove('slide-up-comments-popup')
-      window.setTimeout(() => {
-        overlay.classList.remove('show-comments-popup')
-      }, 300)
-    }
-
-    overlay.addEventListener('click', (event) => {
-      if (event.target === overlay) {
-        closePopup()
-      }
-    })
-    close.addEventListener('click', () => {
-      closePopup()
-    })
-  })
-  const open = window.open
-  window.open = (url, target, features) => {
-    if (url.startsWith('https://www.bilibili.com/h5/comment/sub?')) {
-      const iframe = window.document.createElement('iframe')
-      iframe.src = url
-      iframe.id = 'sub-comment-iframe'
-      iframe.style.width = '100%'
-      iframe.style.height = '100%'
-      iframe.style.border = 'none'
-      document.getElementById('comment-popup-body').appendChild(iframe)
-      window._openPopup()
-      return
-    }
-    return open(url, target, features)
-  }
-
-  if (window.location.pathname.startsWith('/space/')) {
-    window.addEventListener('load', () => {
-      const scrollY = window.localStorage.getItem('__scroll__')
-      if (scrollY) {
-        window.scrollTo(0, scrollY)
-        window.localStorage.removeItem('__scroll__')
-      }
-    })
-  }
-  // 去掉阅读更多按钮
-  if (/^\/opus\/\d+$/.test(window.location.pathname)) {
-    const timer = setInterval(() => {
-      const content = document.querySelector('.opus-module-content')
-      if (content && content.classList.contains('limit')) {
-        content.classList.remove('limit')
-        clearInterval(timer)
-      }
-    }, 100)
-    setTimeout(() => {
-      clearInterval(timer)
-    }, 5000)
-  }
-
+  // 分享、打开视频、打开动态
   waitFor(
     () => document.body,
     () => {
@@ -253,9 +113,9 @@ function __$inject() {
             e.stopPropagation()
             e.stopImmediatePropagation()
             const schema = item.getAttribute('schema')
+            const state = window.__INITIAL_STATE__
             if (schema.startsWith('bilibili://video/')) {
               const av = item.getAttribute('schema').split('/').pop()
-              const state = window.__INITIAL_STATE__
               const payload = {
                 av,
                 title:
@@ -276,8 +136,16 @@ function __$inject() {
               )
             } else if (schema.startsWith('bilibili://opus/detail/')) {
               const link = item.getAttribute('universallink')
-              window.localStorage.setItem('__scroll__', window.scrollY)
-              window.location.href = link
+              // window.localStorage.setItem('__scroll__', window.scrollY)
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  action: 'open-dynamic-detail',
+                  payload: {
+                    url: link,
+                    title: `${state?.space?.info?.name}的动态`,
+                  },
+                }),
+              )
             }
           }
         },
@@ -301,62 +169,6 @@ function __$inject() {
       }
     }, 100)
   })
-  window.addEventListener('load', (e) => {
-    const imgs = document.querySelector('.opus-module-top__album')
-    if (imgs) {
-      const div = document.createElement('div')
-      div.textContent = '下载'
-      div.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        color: white;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        padding: 5px 10px;
-        border-radius: 5px;
-        user-select: none;
-      `
-      imgs.appendChild(div)
-      div.addEventListener('click', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        e.stopImmediatePropagation()
-        const item = [...imgs.querySelectorAll('.v-swipe__item')].find((v) => {
-          return v.style.transform.includes('translateX(0px)')
-        })
-        if (item) {
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              action: 'open-image',
-              payload: {
-                url: item.querySelector('img').src.split('@')[0],
-              },
-            }),
-          )
-        }
-      })
-    }
-  })
-  document.addEventListener(
-    'click',
-    (e) => {
-      const pic = e.target.closest('.bm-pics-block__item')
-      if (pic) {
-        e.preventDefault()
-        e.stopPropagation()
-        e.stopImmediatePropagation()
-        const url = pic.querySelector('img').src.split('@')[0]
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            action: 'open-image',
-            payload: { url },
-          }),
-        )
-      }
-    },
-    true,
-  )
 }
 
 export default `(${__$inject})();`

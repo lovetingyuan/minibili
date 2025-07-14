@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native'
 import { Badge, Button, Icon, Text } from '@rn-vui/themed'
 import React from 'react'
 import { Animated, ScrollView, TouchableOpacity, View } from 'react-native'
-import { Menu, MenuDivider, MenuItem } from 'react-native-material-menu'
+import { Menu, MenuDivider, MenuItem } from '@/components/Menu'
 
 import { useAppUpdateInfo } from '@/api/check-update'
 import { colors } from '@/constants/colors.tw'

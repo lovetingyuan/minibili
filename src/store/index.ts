@@ -82,8 +82,8 @@ export const getAppValue = () => {
     }[],
     requestDynamicFailed: 0,
     reloadUerProfile: 0,
-    dynamicWebviewLink: '',
-    dynamicOpenUrl: 0,
+    // dynamicWebviewLink: '',
+    // dynamicOpenUrl: 0,
   }
 }
 

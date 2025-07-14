@@ -48,7 +48,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
     const liveUrl = livingUps[mid]
     if (liveUrl) {
       setCheckLiveTimeStamp(Date.now())
-      navigation.navigate('WebPage', {
+      navigation.navigate('Living', {
         url: liveUrl,
         title: `${name}的直播间`,
       })

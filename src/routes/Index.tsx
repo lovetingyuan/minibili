@@ -24,6 +24,8 @@ import WebPage from './WebPage'
 import Welcome from './Welcome'
 
 import { Assets as NavigationAssets } from '@react-navigation/elements'
+import Living from './Living'
+import DynamicDetail from './DynamicDetail'
 
 Asset.loadAsync([
   ...NavigationAssets,
@@ -97,14 +99,14 @@ function Route() {
           }}
         />
         <Stack.Screen name="Play" component={Play} />
-        {/* <Stack.Screen
-            name="DynamicDetail"
-            component={DynamicDetail}
-            options={{
-              headerTitle: dynamicDetailHeaderTitle,
-              headerRight: dynamicDetailHeaderRight,
-            }}
-          /> */}
+        <Stack.Screen name="Living" component={Living} />
+        <Stack.Screen
+          name="DynamicDetail"
+          component={DynamicDetail}
+          options={{
+            headerTitle: '动态详情',
+          }}
+        />
         <Stack.Screen
           name={'WebPage'}
           component={WebPage}

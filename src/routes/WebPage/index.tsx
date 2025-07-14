@@ -1,7 +1,7 @@
-import { useBackHandler, useRefresh } from '@react-native-community/hooks'
+import { useRefresh } from '@react-native-community/hooks'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Text } from '@rn-vui/themed'
-import { ResizeMode, Video } from 'expo-av'
+// import { Text } from '@rn-vui/themed'
+// import { ResizeMode, Video } from 'expo-av'
 import React from 'react'
 import {
   Dimensions,
@@ -12,8 +12,8 @@ import {
 } from 'react-native'
 import { WebView } from 'react-native-webview'
 
-import useLiveUrl from '@/api/get-live-url'
-import useMounted from '@/hooks/useMounted'
+// import useLiveUrl from '@/api/get-live-url'
+// import useMounted from '@/hooks/useMounted'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
 import { UA } from '../../constants'
@@ -44,7 +44,7 @@ function WebPage({ route }: Props) {
   const { url, title } = route.params
 
   const webviewRef = React.useRef<WebView | null>(null)
-  const { webViewMode, setCheckLiveTimeStamp } = useStore()
+  const { webViewMode } = useStore()
   const isDark = useIsDark()
   const [height, setHeight] = React.useState(Dimensions.get('screen').height)
   const [isEnabled, setEnabled] = React.useState(true)
@@ -59,13 +59,7 @@ function WebPage({ route }: Props) {
       })
     }, []),
   )
-  useMounted(() => {
-    return () => {
-      if (url.includes('live.bilibili.com')) {
-        setCheckLiveTimeStamp(Date.now())
-      }
-    }
-  })
+
   useUpdateNavigationOptions(
     React.useMemo(() => {
       const headerRight = () => {
@@ -77,63 +71,7 @@ function WebPage({ route }: Props) {
       }
     }, [onRefresh, pageTitle]),
   )
-  const [enableBackgroundPlay, setEnableBackgroundPlay] = React.useState(false)
-  const roomId = url.startsWith('https://live.bilibili.com/h5/')
-    ? url.split('/')[4]
-    : ''
-  const liveUrls = useLiveUrl(enableBackgroundPlay ? roomId : '')
-  const videoRef = React.useRef<Video>(null)
-  const [validIndex, setValidIndex] = React.useState(1)
-  const backPlay = enableBackgroundPlay && roomId && liveUrls?.length
-  useBackHandler(() => {
-    if (backPlay) {
-      // handle it
-      setEnableBackgroundPlay(false)
-      return true
-    }
-    // let the default thing happen
-    return false
-  })
 
-  if (backPlay) {
-    const liveUrl = liveUrls[validIndex]
-    return (
-      <View className="relative flex flex-1">
-        <Video
-          ref={videoRef}
-          className="h-full min-h-96 w-full"
-          key={liveUrl}
-          source={{
-            uri: liveUrl,
-            headers: {
-              'user-agent': UA,
-              origin: 'https://live.bilibili.com',
-              referer: 'https://live.bilibili.com',
-            },
-          }}
-          onError={(err) => {
-            showToast('抱歉出错了' + err)
-            if (validIndex < liveUrls.length - 1) {
-              setValidIndex(validIndex + 1)
-            }
-          }}
-          useNativeControls
-          resizeMode={ResizeMode.CONTAIN}
-          shouldPlay
-        />
-        <View className="absolute left-2 top-2 flex-row items-center gap-4">
-          {/* <Button
-            title={' 返回 '}
-            size="sm"
-            onPress={() => {
-              setEnableBackgroundPlay(false)
-            }}
-          /> */}
-          <Text>当前支持后台播放</Text>
-        </View>
-      </View>
-    )
-  }
   const webview = (
     <WebView
       className="flex-1"
@@ -159,28 +97,6 @@ function WebPage({ route }: Props) {
         const data = JSON.parse(evt.nativeEvent.data) as any
         if (data.action === 'set-title' && !title) {
           setPageTitle(data.payload)
-        }
-        if (data.action === 'enable-background-play') {
-          setEnableBackgroundPlay(true)
-        }
-        if (data.action === 'update-live-info') {
-          const { url, callback } = JSON.parse(data.payload) as {
-            url: string
-            callback: string
-          }
-          fetch(url, {
-            headers: { 'user-agent': UA },
-          })
-            .then((r) => r.text())
-            .then((html) => {
-              const index = html.indexOf('__NEPTUNE_IS_MY_WAIFU__=')
-              const html2 = html.substring(index)
-              const index2 = html2.indexOf('</script>')
-              const html3 = html2.substring(0, index2)
-              webviewRef.current?.injectJavaScript(
-                `window.${callback}(${html3});`,
-              )
-            })
         }
       }}
       onLoad={() => {
@@ -220,9 +136,6 @@ function WebPage({ route }: Props) {
       }}
     />
   )
-  if (url.includes('live.bilibili.com')) {
-    return webview
-  }
   return (
     <ScrollView
       onLayout={(e) => setHeight(e.nativeEvent.layout.height)}

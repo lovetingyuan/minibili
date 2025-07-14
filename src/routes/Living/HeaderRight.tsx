@@ -3,7 +3,7 @@ import { Icon } from '@rn-vui/themed'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Linking, Share } from 'react-native'
-import { Menu, MenuItem } from 'react-native-material-menu'
+import { Menu, MenuItem } from '@/components/Menu'
 
 import { colors } from '@/constants/colors.tw'
 
@@ -16,7 +16,7 @@ export default React.memo(HeaderRight)
 function HeaderRight(props: { reload: () => void }) {
   const { webViewMode, setWebViewMode } = useStore()
   const [visible, setVisible] = React.useState(false)
-  const route = useRoute<RouteProp<RootStackParamList, 'WebPage'>>()
+  const route = useRoute<RouteProp<RootStackParamList, 'Living'>>()
   const { url, title } = route.params
   const hideMenu = () => setVisible(false)
 

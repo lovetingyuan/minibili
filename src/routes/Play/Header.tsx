@@ -5,7 +5,7 @@ import { clsx } from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { Linking, View } from 'react-native'
-import { Menu, MenuItem } from 'react-native-material-menu'
+import { Menu, MenuItem } from '@/components/Menu'
 
 import { getDownloadUrl } from '@/api/play-url'
 import { useUserRelation } from '@/api/user-relation'

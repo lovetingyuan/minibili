@@ -75,7 +75,7 @@ function Dynamic({ route }: Props) {
   const upId = route.params?.user?.mid // || specialUser?.mid
   // const dynamicListRef = React.useRef<any>(null)
 
-  const { reloadUerProfile, dynamicOpenUrl, setDynamicOpenUrl } = useStore()
+  const { reloadUerProfile } = useStore()
   const webviewRef = useRef<WebView>(null)
   const navigation = useNavigation<NavigationProps['navigation']>()
 
@@ -120,21 +120,21 @@ function Dynamic({ route }: Props) {
       }
     }, []),
   )
-  useEffect(() => {
-    if (dynamicOpenUrl) {
-      setDynamicOpenUrl(0)
-      webviewRef.current?.injectJavaScript(`
-        window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          action: 'open-url',
-          payload: {
-            url: location.href
-          },
-        }),
-      )
-        `)
-    }
-  }, [dynamicOpenUrl, setDynamicOpenUrl])
+  // useEffect(() => {
+  //   if (dynamicOpenUrl) {
+  //     setDynamicOpenUrl(0)
+  //     webviewRef.current?.injectJavaScript(`
+  //       window.ReactNativeWebView.postMessage(
+  //       JSON.stringify({
+  //         action: 'open-url',
+  //         payload: {
+  //           url: location.href
+  //         },
+  //       }),
+  //     )
+  //       `)
+  //   }
+  // }, [dynamicOpenUrl, setDynamicOpenUrl])
 
   useEffect(() => {
     if (reloadUerProfile) {
@@ -194,31 +194,22 @@ function Dynamic({ route }: Props) {
               // tag: data.tag,
               // video: data,
             })
-            // navigation.navigate('Video', {
-            //   av,
-            // })
           } else if (data.action === 'share-content') {
             const { link, texts } = data.payload
-            // console.log(99, link, texts)
             Share.share({
               message:
                 (texts.length > 100 ? texts.slice(0, 100) + '...' : texts) +
                 '\n' +
                 link,
-              // title: texts,
-              // url: link,
             })
-          } else if (data.action === 'open-url') {
-            const { url } = data.payload
-            Linking.openURL(url)
-          } else if (data.action === 'open-image') {
-            const { url } = data.payload
-            Linking.openURL(url)
+          } else if (data.action === 'open-dynamic-detail') {
+            const { url, title } = data.payload
+            navigation.navigate('DynamicDetail', { url, title })
           }
         }}
         onLoad={() => {}}
         onError={() => {
-          showToast('加载失败')
+          showToast('UP动态加载失败')
         }}
         onShouldStartLoadWithRequest={(request) => {
           if (!request.url.startsWith('http')) {

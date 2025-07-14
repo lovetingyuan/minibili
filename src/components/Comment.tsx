@@ -20,18 +20,13 @@ function CommentText(props: {
 }) {
   const { nodes, idStr, textStyle } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const route =
-    useRoute<
-      NativeStackScreenProps<
-        RootStackParamList,
-        'Play' | 'DynamicDetail'
-      >['route']
-    >()
-  const upName = route.params
-    ? 'detail' in route.params
-      ? route.params.detail.name
-      : route.params.name
-    : ''
+  const route = useRoute<
+    NativeStackScreenProps<
+      RootStackParamList,
+      'Play' // | 'DynamicDetail'
+    >['route']
+  >()
+  const upName = route.params ? route.params.name : ''
   return (
     <>
       {nodes.map((node, i) => {
@@ -136,18 +131,13 @@ export function CommentItem(props: {
 }) {
   const { comment } = props
   const { setImagesList, setCurrentImageIndex } = useStore()
-  const route =
-    useRoute<
-      NativeStackScreenProps<
-        RootStackParamList,
-        'Play' | 'DynamicDetail'
-      >['route']
-    >()
-  const upName = route.params
-    ? 'detail' in route.params
-      ? route.params.detail.name
-      : route.params.name
-    : ''
+  const route = useRoute<
+    NativeStackScreenProps<
+      RootStackParamList,
+      'Play' // | 'DynamicDetail'
+    >['route']
+  >()
+  const upName = route.params ? route.params.name : ''
   const navigation = useNavigation<NavigationProps['navigation']>()
   const fontSize = props.smallFont ? 'text-sm' : 'text-base'
   // console.log(999, clsx(fontSize, comment.upLike && 'font-bold'))

@@ -64,11 +64,14 @@ export type RootStackParamList = {
     user: UpInfo
   }
   DynamicDetail: {
-    detail: DynamicItemAllType
+    // detail: DynamicItemAllType
+    title: string
+    url: string
   }
   VideoList: undefined
   Follow: undefined
   About: undefined
+  Living: { url: string; title: string }
 }
 
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>
