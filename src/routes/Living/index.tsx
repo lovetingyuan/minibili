@@ -48,22 +48,13 @@ function LiveWebPage({ route }: Props) {
   useUpdateNavigationOptions(
     React.useMemo(() => {
       return {
-        // headerRight: () => (
-        //   <View
-        //     style={{
-        //       borderWidth: 1,
-        //       borderColor: 'red',
-        //       width: 100,
-        //       height: 20,
-        //     }}>
-        //     <Text>dsfdsf</Text>
-        //   </View>
-        //   // <HeaderRight
-        //   //   reload={() => {
-        //   //     webviewRef.current?.reload()
-        //   //   }}
-        //   // />
-        // ),
+        headerRight: () => (
+          <HeaderRight
+            reload={() => {
+              webviewRef.current?.injectJavaScript('location.reload()')
+            }}
+          />
+        ),
         headerTitle: pageTitle,
       }
     }, [pageTitle]),

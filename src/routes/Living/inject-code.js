@@ -127,23 +127,6 @@ function __$hack() {
   }
   updateLiveInfo()
   setInterval(updateLiveInfo, 5 * 60 * 1000)
-  const refresh = document.createElement('div')
-  refresh.textContent = '刷新'
-  refresh.style.cssText = `
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 9999;
-  background-color: #FF669980;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  `
-  document.body.appendChild(refresh)
-  refresh.addEventListener('click', () => {
-    window.location.reload()
-  })
 }
 
 function __$injectBefore() {

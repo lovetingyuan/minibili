@@ -18,6 +18,107 @@ function __$inject() {
     () => {
       const style = document.createElement('style')
       style.textContent = `
+      .m-space .list {
+            width: 100%;
+            min-height: 80vh;
+           background:
+                /* 第一张卡片 */
+                linear-gradient(#e2e2e2, #e2e2e2),           /* 图片 */
+                linear-gradient(#e2e2e2 14px, transparent 14px), /* 标题 */
+                linear-gradient(#e2e2e2 10px, transparent 10px),   /* 描述1 */
+                linear-gradient(#e2e2e2 10px, transparent 10px),   /* 描述2 */
+                linear-gradient(#e2e2e2 8px, transparent 8px),   /* 标签/价格 */
+
+                /* 第二张卡片 */
+                linear-gradient(#e2e2e2, #e2e2e2),           /* 图片 */
+                linear-gradient(#e2e2e2 14px, transparent 14px), /* 标题 */
+                linear-gradient(#e2e2e2 10px, transparent 10px),   /* 描述1 */
+                linear-gradient(#e2e2e2 10px, transparent 10px),   /* 描述2 */
+                linear-gradient(#e2e2e2 8px, transparent 8px),   /* 标签/价格 */
+
+                /* 第三张卡片 */
+                linear-gradient(#e2e2e2, #e2e2e2),           /* 图片 */
+                linear-gradient(#e2e2e2 14px, transparent 14px), /* 标题 */
+                linear-gradient(#e2e2e2 10px, transparent 10px),   /* 描述1 */
+                linear-gradient(#e2e2e2 10px, transparent 10px),   /* 描述2 */
+                linear-gradient(#e2e2e2 8px, transparent 8px),   /* 标签/价格 */
+
+                /* 第四张卡片 */
+                linear-gradient(#e2e2e2, #e2e2e2),           /* 图片 */
+                linear-gradient(#e2e2e2 14px, transparent 14px), /* 标题 */
+                linear-gradient(#e2e2e2 10px, transparent 10px),   /* 描述1 */
+                linear-gradient(#e2e2e2 10px, transparent 10px),   /* 描述2 */
+                linear-gradient(#e2e2e2 8px, transparent 8px),   /* 标签/价格 */
+
+                /* 整体背景 */
+                linear-gradient(#ffffff, #ffffff);
+
+            background-position:
+                /* 第一张卡片 - 左右各留40px空白 */
+                20px 20px,        /* 图片 */
+                20px 140px,       /* 标题 */
+                20px 160px,       /* 描述1 */
+                20px 175px,       /* 描述2 */
+                20px 195px,       /* 标签/价格 */
+
+                /* 第二张卡片 */
+                20px 220px,       /* 图片 */
+                20px 340px,       /* 标题 */
+                20px 360px,       /* 描述1 */
+                20px 375px,       /* 描述2 */
+                20px 395px,       /* 标签/价格 */
+
+                /* 第三张卡片 */
+                20px 420px,       /* 图片 */
+                20px 540px,       /* 标题 */
+                20px 560px,       /* 描述1 */
+                20px 575px,       /* 描述2 */
+                20px 595px,       /* 标签/价格 */
+
+                /* 第四张卡片 */
+                20px 620px,       /* 图片 */
+                20px 740px,       /* 标题 */
+                20px 760px,       /* 描述1 */
+                20px 775px,       /* 描述2 */
+                20px 795px,       /* 标签/价格 */
+
+                0 0;              /* 整体背景 */
+
+            background-size:
+                /* 第一张卡片尺寸 - 左右各留40px，总宽度80% */
+                80% 110px,      /* 图片 */
+                200px 14px,       /* 标题 */
+                350px 10px,       /* 描述1 */
+                300px 10px,       /* 描述2 */
+                80px 8px,         /* 标签/价格 */
+
+                /* 第二张卡片尺寸 (变化长度) */
+                80% 110px,
+                180px 14px,
+                320px 10px,
+                280px 10px,
+                90px 8px,
+
+                /* 第三张卡片尺寸 */
+                80% 110px,
+                220px 14px,
+                380px 10px,
+                330px 10px,
+                70px 8px,
+
+                /* 第四张卡片尺寸 */
+                80% 110px,
+                160px 14px,
+                290px 10px,
+                250px 10px,
+                100px 8px,
+
+                100% 100%;        /* 整体背景 */
+
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+      }
     m-open-app:has(.m-fixed-openapp, .bm-link-card-goods, .easy-follow-btn),
       .m-navbar, .m-space-info .banner, .archive-list, .tabs, .info-main,
       .reply-input, .bili-dyn-item-header__following, .dyn-orig-author__right,

@@ -129,7 +129,7 @@ export default async function request<D>(url: string): Promise<D> {
     // reportApiError(url, res)
     if (__DEV__) {
       // eslint-disable-next-line no-console
-      console.error(res)
+      console.error(url, res)
     }
     return Promise.reject(
       new ApiError(`${res.code}:${res.message} ${url}`, url, res),
