@@ -80,9 +80,7 @@ function HeaderLeftComp() {
     const selected = currentVideosCate.rid === item.rid
     return (
       <MenuItem
-        key={item.rid}
-        className={item.rid === -1 ? 'max-w-32' : 'max-w-24'}
-        pressColor={tw(colors.gray5.text).color}
+        pressColor={tw(colors.gray3.text).color}
         textStyle={tw(
           `text-base ${selected ? 'font-bold' : ''} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`,
         )}
@@ -99,7 +97,7 @@ function HeaderLeftComp() {
       <Menu
         visible={visible}
         // @ts-expect-error className will be handled
-        className="relative top-14 w-48 bg-white dark:bg-zinc-900"
+        className="relative left-4 top-12 h-96 w-48 bg-white dark:bg-zinc-900"
         anchor={
           <TouchableOpacity
             activeOpacity={0.5}
@@ -125,19 +123,22 @@ function HeaderLeftComp() {
           </TouchableOpacity>
         }
         onRequestClose={hideMenu}>
-        <ScrollView className="max-h-96 w-48">
+        <ScrollView>
           {list.map((items, i) => {
             if (i === 0) {
               return (
-                <View key={i} className="flex-1">
-                  {getItem(items[0])}
+                <View key={i} className="w-48 flex-1">
+                  <View>{getItem(items[0])}</View>
                   <MenuDivider color={tw(colors.gray3.text).color} />
                 </View>
               )
             }
             return (
-              <View key={i} className="flex-1 flex-row">
-                {items.map((item) => getItem(item))}
+              <View key={i} className="w-48 flex-row">
+                <View className="w-[50%]">{getItem(items[0])}</View>
+                {items[1] ? (
+                  <View className="w-[50%]">{getItem(items[1])}</View>
+                ) : null}
               </View>
             )
           })}

@@ -17,6 +17,7 @@ function __$inject() {
     () => document.head,
     () => {
       const style = document.createElement('style')
+
       style.textContent = `
       .m-space .list {
             width: 100%;
@@ -182,7 +183,33 @@ function __$inject() {
     }
 
     `
+      if (location.pathname === '/topic-detail') {
+        style.textContent = `
+        .m-navbar,  .fixed-openapp, .m-topic-float-openapp  {
+         display: none!important;
+        }
+         .topic-detail-container {
+         top: 0!important;
+         }
+        `
+      }
       document.head.appendChild(style)
+    },
+  )
+
+  waitFor(
+    () => {
+      const noMore = document.querySelector('.no-more')
+      if (noMore) {
+        return true
+      }
+      const list = document.querySelector('.m-space .list')
+      const list2 = document.querySelector('.list-scroll-content-wrap')
+      return list && list2?.childElementCount > 0
+    },
+    () => {
+      const list = document.querySelector('.m-space .list')
+      list.style.background = 'none'
     },
   )
 
@@ -193,6 +220,19 @@ function __$inject() {
       document.body.addEventListener(
         'click',
         (e) => {
+          if (e.target.closest('.bili-dyn-topic[data-url]')) {
+            const target = e.target.closest('.bili-dyn-topic[data-url]')
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                action: 'open-topic',
+                payload: {
+                  url: target.dataset.url,
+                  title: target.textContent,
+                },
+              }),
+            )
+            return
+          }
           if (e.target.matches('.bili-dyn-item-footer__button.forward')) {
             e.preventDefault()
             e.stopPropagation()
@@ -216,7 +256,8 @@ function __$inject() {
             const schema = item.getAttribute('schema')
             const state = window.__INITIAL_STATE__
             if (schema.startsWith('bilibili://video/')) {
-              const av = item.getAttribute('schema').split('/').pop()
+              const { pathname } = new URL(schema)
+              const av = pathname.split('/').pop()
               const payload = {
                 av,
                 title:

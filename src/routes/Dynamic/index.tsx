@@ -205,6 +205,9 @@ function Dynamic({ route }: Props) {
           } else if (data.action === 'open-dynamic-detail') {
             const { url, title } = data.payload
             navigation.navigate('DynamicDetail', { url, title })
+          } else if (data.action === 'open-topic') {
+            const { url, title } = data.payload
+            navigation.navigate('WebPage', { url, title })
           }
         }}
         onLoad={() => {}}
