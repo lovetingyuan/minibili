@@ -5,6 +5,7 @@ import type { z } from 'zod'
 
 import type { LiveInfoBatchItemSchema } from '../api/living-info.schema'
 import { useStore } from '../store'
+import { showToast } from '@/utils'
 
 type LivingUpsData = Record<string, z.infer<typeof LiveInfoBatchItemSchema>>
 
@@ -33,15 +34,19 @@ const useCheckLivingUps = (time?: number) => {
         }
       })
       let notVibrate = true
+      const livingUps: string[] = []
       for (const id in livingMap) {
         if (!(id in prevLivingMapRef.current) && notVibrate) {
           Vibration.vibrate(900)
+          livingUps.push(data[id].uname)
           notVibrate = false
-          break
         }
       }
       prevLivingMapRef.current = livingMap
       setLivingUps(livingMap)
+      if (livingUps.length) {
+        showToast(livingUps + ' 正在直播')
+      }
     },
   })
 }
