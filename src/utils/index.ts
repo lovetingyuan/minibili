@@ -195,7 +195,7 @@ export async function showFatalError(error: any) {
   const hasUpdate =
     updateInfo?.[0] &&
     updateInfo[0].version !== Application.nativeApplicationVersion
-  console.log(99999, 3434, error.stack)
+
   Alert.alert(
     '抱歉，应用发生了错误😅',
     `我们会处理这个错误\n${error?.message || error}${

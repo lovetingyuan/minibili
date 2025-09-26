@@ -1,7 +1,10 @@
 #!/usr/bin/env zx
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
 require('dotenv').config()
+const { usePowerShell } = require('zx')
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
+usePowerShell()
 await $`npx react-native-tailwindcss-build`
 
 const buildTime = new Intl.DateTimeFormat('zh', {
