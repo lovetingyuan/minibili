@@ -1,17 +1,18 @@
 {
   "name": "@minibili/app",
   "version": "0.7.0",
+  "gitHead": "7fea38d",
   "description": "minimum bilibili apk",
-  "main": "index.js",
+  "homepage": "https://lovetingyuan.github.io/minibili/",
+  "repository": "github:lovetingyuan/minibili",
   "files": [
     "apk",
     "docs"
   ],
+  "main": "index.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "repository": "github:lovetingyuan/minibili",
-  "homepage": "https://lovetingyuan.github.io/minibili/",
   "scripts": {
     "start": "expo start",
     "android": "adb devices -l && npx expo start --android",
@@ -23,7 +24,6 @@
     "build:android:preview": "cross-env APP_VARIANT=preview eas build --platform android --profile preview --non-interactive",
     "update": "zx scripts/hot-update.mjs",
     "doctor": "npx -y expo-doctor@latest",
-    "format": "npx prettier src scripts --write",
     "test": "npx vitest run",
     "lint": "expo lint",
     "update-expo": "npm i -g eas-cli && npm install expo && npx expo install --fix && npm run doctor",
@@ -70,9 +70,6 @@
     "throttle-debounce": "^5.0.2",
     "zod": "^3.24.2"
   },
-  "overrides": {
-    "react-test-renderer": "19.1.0"
-  },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@tingyuan/react-native-tailwindcss": "^0.0.18",
@@ -83,18 +80,19 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "cross-env": "^7.0.3",
     "download-cli": "^1.1.1",
-    "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "open": "8.4.2",
-    "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.8",
     "rimraf": "^5.0.5",
     "semver": "^7.5.1",
-    "tailwindcss": "^3.4.1",
-    "typescript": "~5.9.2",
-    "vitest": "^3.0.9",
     "wrangler": "^4.6.0",
     "zx": "^8.4.1"
+  },
+  "overrides": {
+    "react-test-renderer": "19.1.0"
+  },
+  "config": {
+    "changelog": "update expo  动态页面改版",
+    "versionCode": 73
   },
   "knip": {
     "$schema": "https://unpkg.com/knip/schema.json",
@@ -106,10 +104,5 @@
       "src/**",
       "scripts/**"
     ]
-  },
-  "config": {
-    "versionCode": 73,
-    "changelog": "update expo  动态页面改版"
-  },
-  "gitHead": "7fea38d"
+  }
 }

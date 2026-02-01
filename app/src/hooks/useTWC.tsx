@@ -1,12 +1,12 @@
-import React from 'react'
+import React from "react";
 
 function Tw(props: { className: string }) {
-  return props.className
+  return props.className;
 }
 
 export function useTWC(classes: string) {
-  const ele = <Tw className={classes} />
-  return ele.props.style
+  const ele = <Tw className={classes} />;
+  return ele.props.style;
 }
 
 // export function useTWC2() {

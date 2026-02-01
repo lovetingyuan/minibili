@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const VideoItemResponseSchema = z.object({
   aid: z.union([z.string(), z.number()]),
@@ -41,9 +41,9 @@ export const VideoItemResponseSchema = z.object({
   title: z.string(),
   tname: z.string(),
   videos: z.number(),
-})
+});
 
 export const HotVideosDataResponseSchema = z.object({
   list: VideoItemResponseSchema.array(),
   no_more: z.boolean(),
-})
+});

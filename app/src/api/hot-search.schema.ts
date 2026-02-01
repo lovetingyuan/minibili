@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const HotSearchSchema = z.object({
   trackid: z.string(),
@@ -6,16 +6,16 @@ export const HotSearchSchema = z.object({
     .object({
       hot_id: z.number(),
       icon: z.string().nullish(),
-      is_commercial: z.union([z.literal('0'), z.literal('1')]),
+      is_commercial: z.union([z.literal("0"), z.literal("1")]),
       keyword: z.string(),
       position: z.number(),
       show_name: z.string(),
       word_type: z.number(),
     })
     .array(),
-})
+});
 
-export type HotSearchResType = z.infer<typeof HotSearchSchema>
+export type HotSearchResType = z.infer<typeof HotSearchSchema>;
 
 export const HotSearchWebSchema = z.object({
   trending: z.object({
@@ -32,6 +32,6 @@ export const HotSearchWebSchema = z.object({
       })
       .array(),
   }),
-})
+});
 
-export type HotSearchWebResType = z.infer<typeof HotSearchWebSchema>
+export type HotSearchWebResType = z.infer<typeof HotSearchWebSchema>;

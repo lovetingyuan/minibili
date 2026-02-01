@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const UserInfoResponseSchema = z.object({
   birthday: z.string(),
@@ -23,7 +23,7 @@ export const UserInfoResponseSchema = z.object({
       roundStatus: z.number(),
     })
     .nullable(),
-})
+});
 
 export const UserCardInfoResponseSchema = z.object({
   card: z.object({
@@ -47,7 +47,7 @@ export const UserCardInfoResponseSchema = z.object({
   }),
   following: z.boolean(),
   follower: z.number(),
-})
+});
 
 export const UserBatchInfoResponseSchema = z
   .object({
@@ -63,4 +63,4 @@ export const UserBatchInfoResponseSchema = z
     //   status: z.number(),
     // }),
   })
-  .array()
+  .array();

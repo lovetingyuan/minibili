@@ -1,33 +1,32 @@
-import { useNavigation, useRoute } from '@react-navigation/native'
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Avatar, Icon, Text } from '@rneui/themed'
-import { clsx } from 'clsx'
-import * as Clipboard from 'expo-clipboard'
-import { Image } from 'expo-image'
-import React from 'react'
-import { Linking, Pressable, View } from 'react-native'
-import { Menu, MenuItem } from '@/components/Menu'
+import { useNavigation, useRoute } from "@react-navigation/native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Avatar, Icon, Text } from "@rneui/themed";
+import { clsx } from "clsx";
+import * as Clipboard from "expo-clipboard";
+import { Image } from "expo-image";
+import React from "react";
+import { Linking, Pressable, View } from "react-native";
+import { Menu, MenuItem } from "@/components/Menu";
 
-import { colors } from '@/constants/colors.tw'
-import { useFollowedUpsMap } from '@/store/derives'
+import { colors } from "@/constants/colors.tw";
+import { useFollowedUpsMap } from "@/store/derives";
 
-import { useLivingInfo } from '../../api/living-info'
-import { useUserInfo } from '../../api/user-info'
-import { useStore } from '../../store'
-import type { NavigationProps, RootStackParamList } from '../../types'
-import { handleShareUp, parseImgUrl, showToast } from '../../utils'
+import { useLivingInfo } from "../../api/living-info";
+import { useUserInfo } from "../../api/user-info";
+import { useStore } from "../../store";
+import type { NavigationProps, RootStackParamList } from "../../types";
+import { handleShareUp, parseImgUrl, showToast } from "../../utils";
 
 export function HeaderLeft() {
-  const route =
-    useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
-  const { data: userInfo } = useUserInfo(route.params?.user.mid)
-  const { livingUrl } = useLivingInfo(route.params?.user.mid)
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
+  const { data: userInfo } = useUserInfo(route.params?.user.mid);
+  const { livingUrl } = useLivingInfo(route.params?.user.mid);
   const dynamicUser = {
     ...route.params?.user,
     ...userInfo,
-  }
+  };
   // const { data: fans } = useUserRelation(dynamicUser?.mid)
-  const navigation = useNavigation<NavigationProps['navigation']>()
+  const navigation = useNavigation<NavigationProps["navigation"]>();
   // const gotoWebPage = () => {
   //   if (dynamicUser) {
   //     navigation.navigate('WebPage', {
@@ -37,13 +36,13 @@ export function HeaderLeft() {
   //   }
   // }
   // const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
-  const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
+  const userName = dynamicUser?.name || ""; // ? dynamicUser.name + level : ''
   // const sex =
   //   dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
-  const { setCheckLiveTimeStamp, $blackUps } = useStore()
-  const _followedUpsMap = useFollowedUpsMap()
-  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
-  const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps
+  const { setCheckLiveTimeStamp, $blackUps } = useStore();
+  const _followedUpsMap = useFollowedUpsMap();
+  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
+  const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps;
   return (
     <View className="left-[-12px] mr-4 flex-none flex-row items-center">
       {dynamicUser?.face ? (
@@ -61,17 +60,16 @@ export function HeaderLeft() {
             <Pressable
               onPress={() => {
                 if (dynamicUser.mid) {
-                  setCheckLiveTimeStamp(Date.now())
-                  navigation.navigate('Living', {
+                  setCheckLiveTimeStamp(Date.now());
+                  navigation.navigate("Living", {
                     title: `${dynamicUser.name}的直播间`,
                     url: livingUrl,
-                  })
+                  });
                 }
               }}
-              className="absolute inset-0 h-10 w-10 items-center justify-center rounded-full bg-neutral-950/60">
-              <Text className={'text-center text-xs font-bold text-teal-300'}>
-                直播中
-              </Text>
+              className="absolute inset-0 h-10 w-10 items-center justify-center rounded-full bg-neutral-950/60"
+            >
+              <Text className={"text-center text-xs font-bold text-teal-300"}>直播中</Text>
             </Pressable>
           ) : null}
         </View>
@@ -80,12 +78,13 @@ export function HeaderLeft() {
       <View className="ml-3 flex-1 flex-row flex-wrap items-center">
         <Text
           className={clsx(
-            followed && [colors.secondary.text, 'font-bold'],
-            'text-lg',
-            isBlackUp && 'line-through',
+            followed && [colors.secondary.text, "font-bold"],
+            "text-lg",
+            isBlackUp && "line-through",
           )}
           // adjustsFontSizeToFit
-          numberOfLines={1}>
+          numberOfLines={1}
+        >
           {userName}
         </Text>
         {/* {fans ? (
@@ -99,29 +98,28 @@ export function HeaderLeft() {
         ) : null} */}
       </View>
     </View>
-  )
+  );
 }
 
-export const headerRight = () => <HeaderRight />
-export const headerTitle = () => <HeaderLeft />
+export const headerRight = () => <HeaderRight />;
+export const headerTitle = () => <HeaderLeft />;
 
 function HeaderRight() {
-  const route =
-    useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
-  const dynamicUser = route.params?.user
-  const [visible, setVisible] = React.useState(false)
-  const hideMenu = () => setVisible(false)
-  const showMenu = () => setVisible(true)
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
+  const dynamicUser = route.params?.user;
+  const [visible, setVisible] = React.useState(false);
+  const hideMenu = () => setVisible(false);
+  const showMenu = () => setVisible(true);
   const {
     get$followedUps,
     set$followedUps,
     $blackUps,
     setReloadUerProfile,
     // setDynamicOpenUrl,
-  } = useStore()
-  const _followedUpsMap = useFollowedUpsMap()
-  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
-  const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps
+  } = useStore();
+  const _followedUpsMap = useFollowedUpsMap();
+  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
+  const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps;
 
   return (
     <View className="flex-row items-center gap-2">
@@ -129,17 +127,12 @@ function HeaderRight() {
         visible={visible}
         // @ts-expect-error className will be handled
         className="bg-white dark:bg-zinc-900"
-        anchor={
-          <Icon
-            name="dots-vertical"
-            type="material-community"
-            onPress={showMenu}
-          />
-        }
-        onRequestClose={hideMenu}>
+        anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
+        onRequestClose={hideMenu}
+      >
         {!followed && !isBlackUp && (
           <MenuItem
-            textStyle={tw('text-black dark:text-gray-300')}
+            textStyle={tw("text-black dark:text-gray-300")}
             pressColor={tw(colors.gray4.text).color}
             onPress={() => {
               if (dynamicUser) {
@@ -151,88 +144,95 @@ function HeaderRight() {
                     sign: dynamicUser.sign,
                   },
                   ...get$followedUps(),
-                ])
-                showToast('已关注')
+                ]);
+                showToast("已关注");
               }
-              hideMenu()
-            }}>
+              hideMenu();
+            }}
+          >
             关注UP
           </MenuItem>
         )}
         <MenuItem
-          textStyle={tw('text-black dark:text-gray-300')}
+          textStyle={tw("text-black dark:text-gray-300")}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (dynamicUser) {
-              const { name, mid, sign } = dynamicUser
-              handleShareUp(name, mid, sign)
+              const { name, mid, sign } = dynamicUser;
+              handleShareUp(name, mid, sign);
             }
-            hideMenu()
-          }}>
+            hideMenu();
+          }}
+        >
           分享UP
         </MenuItem>
         <MenuItem
-          textStyle={tw(' text-black dark:text-gray-300')}
+          textStyle={tw(" text-black dark:text-gray-300")}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (dynamicUser?.face) {
-              Linking.openURL(dynamicUser.face)
+              Linking.openURL(dynamicUser.face);
             }
-            hideMenu()
-          }}>
+            hideMenu();
+          }}
+        >
           查看头像
         </MenuItem>
         <MenuItem
-          textStyle={tw(' text-black dark:text-gray-300')}
+          textStyle={tw(" text-black dark:text-gray-300")}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (!dynamicUser) {
-              return
+              return;
             }
             Clipboard.setStringAsync(dynamicUser.name).then(() => {
-              showToast('已复制用户名')
-              hideMenu()
-            })
-          }}>
+              showToast("已复制用户名");
+              hideMenu();
+            });
+          }}
+        >
           复制用户名
         </MenuItem>
         <MenuItem
-          textStyle={tw(' text-black dark:text-gray-300')}
+          textStyle={tw(" text-black dark:text-gray-300")}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (!dynamicUser) {
-              return
+              return;
             }
             Clipboard.setStringAsync(`${dynamicUser.mid}`).then(() => {
-              showToast('已复制用户ID')
-              hideMenu()
-            })
-          }}>
+              showToast("已复制用户ID");
+              hideMenu();
+            });
+          }}
+        >
           复制用户ID
         </MenuItem>
         <MenuItem
-          textStyle={tw(' text-black dark:text-gray-300')}
+          textStyle={tw(" text-black dark:text-gray-300")}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
             if (!dynamicUser) {
-              return
+              return;
             }
-            Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`)
+            Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`);
             // setDynamicOpenUrl(Date.now())
-            hideMenu()
-          }}>
+            hideMenu();
+          }}
+        >
           浏览器打开
         </MenuItem>
         <MenuItem
-          textStyle={tw(' text-black dark:text-gray-300')}
+          textStyle={tw(" text-black dark:text-gray-300")}
           pressColor={tw(colors.gray4.text).color}
           onPress={() => {
-            hideMenu()
-            setReloadUerProfile(Date.now())
-          }}>
+            hideMenu();
+            setReloadUerProfile(Date.now());
+          }}
+        >
           刷新
         </MenuItem>
       </Menu>
     </View>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const PlayUrlResponseSchema = z.object({
   from: z.string(),
@@ -39,7 +39,7 @@ export const PlayUrlResponseSchema = z.object({
   last_play_time: z.number(),
   last_play_cid: z.number(),
   // view_info: null,
-})
+});
 
 export const DashUrlResponseSchema = z.object({
   from: z.string(),
@@ -132,4 +132,4 @@ export const DashUrlResponseSchema = z.object({
   last_play_time: z.number(),
   last_play_cid: z.number(),
   // view_info: null,
-})
+});

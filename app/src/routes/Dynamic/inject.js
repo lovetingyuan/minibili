@@ -1,22 +1,22 @@
 function __$inject() {
   const waitFor = (value, callback) => {
     if (value()) {
-      callback()
+      callback();
     } else {
       const timer = setInterval(() => {
         if (value()) {
-          callback()
-          clearInterval(timer)
+          callback();
+          clearInterval(timer);
         }
-      }, 50)
+      }, 50);
     }
-  }
+  };
 
   // 添加样式
   waitFor(
     () => document.head,
     () => {
-      const style = document.createElement('style')
+      const style = document.createElement("style");
 
       style.textContent = `
       .m-space .list {
@@ -182,8 +182,8 @@ function __$inject() {
       padding-top: 0!important;
     }
 
-    `
-      if (location.pathname === '/topic-detail') {
+    `;
+      if (location.pathname === "/topic-detail") {
         style.textContent = `
         .m-navbar,  .fixed-openapp, .m-topic-float-openapp  {
          display: none!important;
@@ -191,126 +191,125 @@ function __$inject() {
          .topic-detail-container {
          top: 0!important;
          }
-        `
+        `;
       }
-      document.head.appendChild(style)
+      document.head.appendChild(style);
     },
-  )
+  );
 
   waitFor(
     () => {
-      const noMore = document.querySelector('.no-more')
+      const noMore = document.querySelector(".no-more");
       if (noMore) {
-        return true
+        return true;
       }
-      const list = document.querySelector('.m-space .list')
-      const list2 = document.querySelector('.list-scroll-content-wrap')
-      return list && list2?.childElementCount > 0
+      const list = document.querySelector(".m-space .list");
+      const list2 = document.querySelector(".list-scroll-content-wrap");
+      return list && list2?.childElementCount > 0;
     },
     () => {
-      const list = document.querySelector('.m-space .list')
-      list.style.background = 'none'
+      const list = document.querySelector(".m-space .list");
+      list.style.background = "none";
     },
-  )
+  );
 
   // 分享、打开视频、打开动态
   waitFor(
     () => document.body,
     () => {
       document.body.addEventListener(
-        'click',
+        "click",
         (e) => {
-          if (e.target.closest('.bili-dyn-topic[data-url]')) {
-            const target = e.target.closest('.bili-dyn-topic[data-url]')
+          if (e.target.closest(".bili-dyn-topic[data-url]")) {
+            const target = e.target.closest(".bili-dyn-topic[data-url]");
             window.ReactNativeWebView.postMessage(
               JSON.stringify({
-                action: 'open-topic',
+                action: "open-topic",
                 payload: {
                   url: target.dataset.url,
                   title: target.textContent,
                 },
               }),
-            )
-            return
+            );
+            return;
           }
-          if (e.target.matches('.bili-dyn-item-footer__button.forward')) {
-            e.preventDefault()
-            e.stopPropagation()
-            e.stopImmediatePropagation()
-            const item = e.target.closest('m-open-app')
-            const link = item.getAttribute('universallink')
-            const texts = item.innerText
+          if (e.target.matches(".bili-dyn-item-footer__button.forward")) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            const item = e.target.closest("m-open-app");
+            const link = item.getAttribute("universallink");
+            const texts = item.innerText;
             window.ReactNativeWebView.postMessage(
               JSON.stringify({
-                action: 'share-content',
+                action: "share-content",
                 payload: { link, texts },
               }),
-            )
-            return
+            );
+            return;
           }
-          const item = e.target.closest('m-open-app')
+          const item = e.target.closest("m-open-app");
           if (item) {
-            e.preventDefault()
-            e.stopPropagation()
-            e.stopImmediatePropagation()
-            const schema = item.getAttribute('schema')
-            const state = window.__INITIAL_STATE__
-            if (schema.startsWith('bilibili://video/')) {
-              const { pathname } = new URL(schema)
-              const av = pathname.split('/').pop()
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            const schema = item.getAttribute("schema");
+            const state = window.__INITIAL_STATE__;
+            if (schema.startsWith("bilibili://video/")) {
+              const { pathname } = new URL(schema);
+              const av = pathname.split("/").pop();
               const payload = {
                 av,
                 title:
-                  item.querySelector('.bili-dyn-item-archive__title')
-                    ?.textContent ||
-                  item.querySelector('.up-archive__item__title')?.textContent,
-              }
+                  item.querySelector(".bili-dyn-item-archive__title")?.textContent ||
+                  item.querySelector(".up-archive__item__title")?.textContent,
+              };
               if (state) {
-                payload.mid = state.space.mid
-                payload.face = state.space.info.face
-                payload.name = state.space.info.name
+                payload.mid = state.space.mid;
+                payload.face = state.space.info.face;
+                payload.name = state.space.info.name;
               }
               window.ReactNativeWebView.postMessage(
                 JSON.stringify({
-                  action: 'open-video',
+                  action: "open-video",
                   payload,
                 }),
-              )
-            } else if (schema.startsWith('bilibili://opus/detail/')) {
-              const link = item.getAttribute('universallink')
+              );
+            } else if (schema.startsWith("bilibili://opus/detail/")) {
+              const link = item.getAttribute("universallink");
               // window.localStorage.setItem('__scroll__', window.scrollY)
               window.ReactNativeWebView.postMessage(
                 JSON.stringify({
-                  action: 'open-dynamic-detail',
+                  action: "open-dynamic-detail",
                   payload: {
                     url: link,
                     title: `${state?.space?.info?.name}的动态`,
                   },
                 }),
-              )
+              );
             }
           }
         },
         true,
-      )
+      );
     },
-  )
+  );
   // 添加粉丝数
-  window.addEventListener('load', () => {
+  window.addEventListener("load", () => {
     setTimeout(() => {
-      const fans = document.querySelector('.relation .count .fans')
-      const base = document.querySelector('.info-detail .base')
+      const fans = document.querySelector(".relation .count .fans");
+      const base = document.querySelector(".info-detail .base");
       if (fans && base) {
-        const fansCount = fans.textContent.replace(/\s/g, '')
-        const span = document.createElement('span')
-        span.style.fontSize = '14px'
-        span.style.marginLeft = '10px'
-        span.style.opacity = '0.8'
-        span.textContent = fansCount
-        base.appendChild(span)
+        const fansCount = fans.textContent.replace(/\s/g, "");
+        const span = document.createElement("span");
+        span.style.fontSize = "14px";
+        span.style.marginLeft = "10px";
+        span.style.opacity = "0.8";
+        span.textContent = fansCount;
+        base.appendChild(span);
       }
-    }, 100)
-  })
+    }, 100);
+  });
 }
 
-export default `(${__$inject})();`
+export default `(${__$inject})();`;

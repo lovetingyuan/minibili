@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export default z.object({
   addr: z.string(),
@@ -10,4 +10,4 @@ export default z.object({
   longitude: z.number(),
   zone_id: z.number(),
   country_code: z.number(),
-})
+});

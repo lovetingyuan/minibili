@@ -1,13 +1,14 @@
-import useSWR from 'swr'
-import type { z } from 'zod'
+import useSWR from "swr";
+import type { z } from "zod";
 
-import type { UserRelationResponseSchema } from './user-relation.schema'
+import type { UserRelationResponseSchema } from "./user-relation.schema";
 
-type UserRelationResponse = z.infer<typeof UserRelationResponseSchema>
+type UserRelationResponse = z.infer<typeof UserRelationResponseSchema>;
 
 export function useUserRelation(mid?: number | string) {
-  const { data, mutate, error, isValidating, isLoading } =
-    useSWR<UserRelationResponse>(mid ? `/x/relation/stat?vmid=${mid}` : null)
+  const { data, mutate, error, isValidating, isLoading } = useSWR<UserRelationResponse>(
+    mid ? `/x/relation/stat?vmid=${mid}` : null,
+  );
 
   return {
     data,
@@ -15,5 +16,5 @@ export function useUserRelation(mid?: number | string) {
     error,
     isValidating,
     isLoading,
-  }
+  };
 }

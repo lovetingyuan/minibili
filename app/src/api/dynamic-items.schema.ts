@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 import {
   HandledAdditionalTypeEnum,
@@ -10,7 +10,7 @@ import {
   OtherDynamicTypeEnum,
   OtherForwardTypeEnum,
   OtherRichTextType,
-} from './dynamic-items.type'
+} from "./dynamic-items.type";
 
 const AuthorSchema = z.object({
   face: z.string(),
@@ -22,9 +22,9 @@ const AuthorSchema = z.object({
   // pub_location_text: z.string().nullish(),
   pub_time: z.string(),
   pub_ts: z.number(),
-})
+});
 
-const RichTextSchema = z.discriminatedUnion('type', [
+const RichTextSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.enum([HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT]),
     // orig_text: z.string(),
@@ -111,15 +111,13 @@ const RichTextSchema = z.discriminatedUnion('type', [
     rid: z.string(),
     jump_url: z.string(),
     text: z.string(),
-    pics: z
-      .object({ height: z.number(), width: z.number(), src: z.string() })
-      .array(),
+    pics: z.object({ height: z.number(), width: z.number(), src: z.string() }).array(),
   }),
   z.object({
     type: z.nativeEnum(OtherRichTextType),
     text: z.string(),
   }),
-])
+]);
 
 const MajorSchemaMap = {
   NONE: z.object({
@@ -293,7 +291,7 @@ const MajorSchemaMap = {
       title: z.string(),
     }),
   }),
-}
+};
 
 const DynamicModulesBaseSchema = z.object({
   module_author: AuthorSchema,
@@ -313,9 +311,9 @@ const DynamicModulesBaseSchema = z.object({
       status: z.boolean(),
     }),
   }),
-})
+});
 
-const AdditionalSchema = z.discriminatedUnion('type', [
+const AdditionalSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.enum([HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UGC]),
     ugc: z.object({
@@ -428,19 +426,17 @@ const AdditionalSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.nativeEnum(OtherAdditionalTypeEnum),
   }),
-])
+]);
 
 const ModuleDynamicBaseSchema = z.object({
-  desc: z
-    .object({ text: z.string(), rich_text_nodes: RichTextSchema.array() })
-    .nullable(),
+  desc: z.object({ text: z.string(), rich_text_nodes: RichTextSchema.array() }).nullable(),
   topic: z.object({ name: z.string(), jump_url: z.string() }).nullable(),
   additional: AdditionalSchema.nullish(),
-})
+});
 
-export type RichTextNode = z.infer<typeof RichTextSchema>
+export type RichTextNode = z.infer<typeof RichTextSchema>;
 
-export type AdditionalType = z.infer<typeof AdditionalSchema>
+export type AdditionalType = z.infer<typeof AdditionalSchema>;
 
 const DynamicItemBaseSchema = z.object({
   id_str: z.string(),
@@ -455,9 +451,9 @@ const DynamicItemBaseSchema = z.object({
       module_dynamic: ModuleDynamicBaseSchema,
     }),
   ),
-})
+});
 
-export type DynamicItemBaseType = z.infer<typeof DynamicItemBaseSchema>
+export type DynamicItemBaseType = z.infer<typeof DynamicItemBaseSchema>;
 
 const BaseOrigSchema = z.object({
   id_str: z.union([z.string().nullable(), z.number().nullable()]), // MajorNoneSchema
@@ -471,9 +467,9 @@ const BaseOrigSchema = z.object({
       desc: z.object({ text: z.string() }).nullable(),
     }),
   }),
-})
+});
 
-const DynamicItemResponseSchema = z.discriminatedUnion('type', [
+const DynamicItemResponseSchema = z.discriminatedUnion("type", [
   DynamicItemBaseSchema.merge(
     z.object({
       type: z.enum([HandledDynamicTypeEnum.DYNAMIC_TYPE_AV]),
@@ -496,10 +492,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
               major: z
-                .discriminatedUnion('type', [
-                  MajorSchemaMap.Word,
-                  MajorSchemaMap.Opus,
-                ])
+                .discriminatedUnion("type", [MajorSchemaMap.Word, MajorSchemaMap.Opus])
                 .nullable(),
             }),
           ),
@@ -528,10 +521,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
         z.object({
           module_dynamic: ModuleDynamicBaseSchema.merge(
             z.object({
-              major: z.discriminatedUnion('type', [
-                MajorSchemaMap.Article,
-                MajorSchemaMap.Opus,
-              ]),
+              major: z.discriminatedUnion("type", [MajorSchemaMap.Article, MajorSchemaMap.Opus]),
             }),
           ),
         }),
@@ -607,7 +597,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
           ),
         }),
       ),
-      orig: z.discriminatedUnion('type', [
+      orig: z.discriminatedUnion("type", [
         BaseOrigSchema.merge(
           z.object({
             type: z.enum([HandledForwardTypeEnum.DYNAMIC_TYPE_WORD]),
@@ -628,10 +618,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: z.discriminatedUnion('type', [
-                    MajorSchemaMap.NONE,
-                    MajorSchemaMap.AV,
-                  ]),
+                  major: z.discriminatedUnion("type", [MajorSchemaMap.NONE, MajorSchemaMap.AV]),
                 }),
               ),
             }),
@@ -657,7 +644,7 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
               module_author: AuthorSchema,
               module_dynamic: ModuleDynamicBaseSchema.merge(
                 z.object({
-                  major: z.discriminatedUnion('type', [
+                  major: z.discriminatedUnion("type", [
                     MajorSchemaMap.Article,
                     MajorSchemaMap.Opus,
                   ]),
@@ -804,9 +791,9 @@ const DynamicItemResponseSchema = z.discriminatedUnion('type', [
       type: z.nativeEnum(OtherDynamicTypeEnum),
     }),
   ),
-])
+]);
 
-export type DynamicItemResponse = z.infer<typeof DynamicItemResponseSchema>
+export type DynamicItemResponse = z.infer<typeof DynamicItemResponseSchema>;
 
 export const DynamicListResponseSchema = z.object({
   has_more: z.boolean(),
@@ -814,8 +801,8 @@ export const DynamicListResponseSchema = z.object({
   update_baseline: z.string(),
   update_num: z.number(),
   items: z.array(DynamicItemResponseSchema),
-})
+});
 
-export type DynamicListResponse = z.infer<typeof DynamicListResponseSchema>
+export type DynamicListResponse = z.infer<typeof DynamicListResponseSchema>;
 
-export type RichTextItem = z.infer<typeof RichTextSchema>
+export type RichTextItem = z.infer<typeof RichTextSchema>;

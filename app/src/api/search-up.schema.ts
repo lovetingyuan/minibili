@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const SearchUpItemSchema = z.object({
   type: z.string(),
@@ -13,7 +13,7 @@ export const SearchUpItemSchema = z.object({
   is_upuser: z.union([z.literal(0), z.literal(1)]),
   is_live: z.union([z.literal(0), z.literal(1)]),
   room_id: z.number(),
-})
+});
 
 export const SearchUpResponseSchema = z.object({
   // seid: z.string(),
@@ -22,7 +22,7 @@ export const SearchUpResponseSchema = z.object({
   numResults: z.number(),
   numPages: z.number(),
   result: SearchUpItemSchema.array().nullish(),
-})
+});
 
-export type SearchResponse = z.infer<typeof SearchUpResponseSchema>
-export type SearchUpResType = z.infer<typeof SearchUpItemSchema>
+export type SearchResponse = z.infer<typeof SearchUpResponseSchema>;
+export type SearchUpResType = z.infer<typeof SearchUpItemSchema>;

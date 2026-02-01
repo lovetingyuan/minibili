@@ -1,15 +1,15 @@
-import { DarkTheme, DefaultTheme } from '@react-navigation/native'
-import React from 'react'
+import { DarkTheme, DefaultTheme } from "@react-navigation/native";
+import React from "react";
 
-import { RouteBackgroundColor } from '@/constants/colors.tw'
-import { useTWC } from '@/hooks/useTWC'
+import { RouteBackgroundColor } from "@/constants/colors.tw";
+import { useTWC } from "@/hooks/useTWC";
 
-import { useAppStateChange } from './useAppState'
-import useIsDark from './useIsDark'
+import { useAppStateChange } from "./useAppState";
+import useIsDark from "./useIsDark";
 
 export default function useRouteTheme() {
-  const isDark = useIsDark()
-  const { backgroundColor } = useTWC(RouteBackgroundColor)
+  const isDark = useIsDark();
+  const { backgroundColor } = useTWC(RouteBackgroundColor);
   const getRouteTheme = React.useCallback(() => {
     return isDark
       ? {
@@ -20,15 +20,15 @@ export default function useRouteTheme() {
             background: backgroundColor,
           },
         }
-      : DefaultTheme
-  }, [isDark, backgroundColor])
-  const [routeTheme, setRouteTheme] = React.useState(getRouteTheme)
+      : DefaultTheme;
+  }, [isDark, backgroundColor]);
+  const [routeTheme, setRouteTheme] = React.useState(getRouteTheme);
 
   useAppStateChange(() => {
-    setRouteTheme(getRouteTheme())
-  })
+    setRouteTheme(getRouteTheme());
+  });
   React.useEffect(() => {
-    setRouteTheme(getRouteTheme())
-  }, [getRouteTheme])
-  return routeTheme
+    setRouteTheme(getRouteTheme());
+  }, [getRouteTheme]);
+  return routeTheme;
 }

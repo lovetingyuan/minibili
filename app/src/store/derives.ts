@@ -1,52 +1,52 @@
-import React from 'react'
+import React from "react";
 
-import type { CollectVideoInfo, UpInfo } from '@/types'
+import type { CollectVideoInfo, UpInfo } from "@/types";
 
-import { useStore } from '.'
-import type { MusicSong, UpdateUpInfo } from './types'
+import { useStore } from ".";
+import type { MusicSong, UpdateUpInfo } from "./types";
 
 export const useFollowedUpsMap = () => {
-  const { $followedUps } = useStore()
+  const { $followedUps } = useStore();
   return React.useMemo(() => {
-    const ups: Record<string, UpInfo> = {}
+    const ups: Record<string, UpInfo> = {};
     for (const up of $followedUps) {
-      ups[up.mid] = up
+      ups[up.mid] = up;
     }
-    return ups
-  }, [$followedUps])
-}
+    return ups;
+  }, [$followedUps]);
+};
 
 export const useUpUpdateCount = () => {
-  const { $upUpdateMap } = useStore()
+  const { $upUpdateMap } = useStore();
   return React.useMemo(() => {
-    const aa = Object.values<UpdateUpInfo>($upUpdateMap)
+    const aa = Object.values<UpdateUpInfo>($upUpdateMap);
     const count = aa.filter((item) => {
-      return item.latestId !== item.currentLatestId
-    }).length
-    return count
-  }, [$upUpdateMap])
-}
+      return item.latestId !== item.currentLatestId;
+    }).length;
+    return count;
+  }, [$upUpdateMap]);
+};
 
 export const useCollectedVideosMap = () => {
-  const { $collectedVideos } = useStore()
+  const { $collectedVideos } = useStore();
   return React.useMemo(() => {
-    const _map: Record<string, CollectVideoInfo> = {}
+    const _map: Record<string, CollectVideoInfo> = {};
     $collectedVideos.forEach((vi) => {
-      _map[vi.bvid] = vi
-    })
-    return _map
-  }, [$collectedVideos])
-}
+      _map[vi.bvid] = vi;
+    });
+    return _map;
+  }, [$collectedVideos]);
+};
 
 export const useMusicSongsMap = () => {
-  const { $musicList } = useStore()
+  const { $musicList } = useStore();
   return React.useMemo(() => {
-    const map: Record<string, MusicSong> = {}
+    const map: Record<string, MusicSong> = {};
     $musicList.forEach((music) => {
       music.songs.forEach((song) => {
-        map[`${song.bvid}_${song.cid}`] = song
-      })
-    })
-    return map
-  }, [$musicList])
-}
+        map[`${song.bvid}_${song.cid}`] = song;
+      });
+    });
+    return map;
+  }, [$musicList]);
+};

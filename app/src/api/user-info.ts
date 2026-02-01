@@ -1,27 +1,27 @@
-import useSWRImmutable from 'swr/immutable'
-import type { z } from 'zod'
+import useSWRImmutable from "swr/immutable";
+import type { z } from "zod";
 
-import { useStore } from '../store'
+import { useStore } from "../store";
 // import {
 //   UserBatchInfoResponseSchema,
 //   UserCardInfoResponseSchema,
 //   UserInfoResponseSchema,
 // } from './user-info.schema'
-import type { UpInfo } from '../types'
-import fetcher from './fetcher'
+import type { UpInfo } from "../types";
+import fetcher from "./fetcher";
 import type {
   UserCardInfoResponseSchema,
   // UserInfoResponseSchema,
-} from './user-info.schema'
+} from "./user-info.schema";
 
 // type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
 type UserInfo = UpInfo & {
-  level: number
-  sex: string
-  silence?: 0 | 1
-}
+  level: number;
+  sex: string;
+  silence?: 0 | 1;
+};
 
-type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>
+type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>;
 // type UserBatchInfoResponse = z.infer<typeof UserBatchInfoResponseSchema>
 
 // const getUserInfo1 = (mid: number | string): Promise<UserInfo> => {
@@ -86,7 +86,7 @@ type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>
 // }
 
 export function useUserInfo(mid?: number | string) {
-  const { get$followedUps, set$followedUps } = useStore()
+  const { get$followedUps, set$followedUps } = useStore();
   const { data } = useSWRImmutable<UserInfo | undefined>(
     mid ? `/x/web-interface/card?mid=${mid}` : null,
     // null,
@@ -99,8 +99,8 @@ export function useUserInfo(mid?: number | string) {
           mid: userInfo.card.mid.toString(),
           level: userInfo.card.level_info.current_level,
           sex: userInfo.card.sex,
-        }
-      })
+        };
+      });
       // return fetcher<UserInfoResponse>(url).catch(() => {
       //   return fetcher<UserCardInfoResponse>(
       //     `/x/web-interface/card?mid=${mid}`,
@@ -119,17 +119,15 @@ export function useUserInfo(mid?: number | string) {
     {
       onSuccess(_data) {
         if (!_data) {
-          return
+          return;
         }
-        const followedUps = get$followedUps()
-        const index = followedUps.findIndex(
-          (u) => u.mid.toString() === _data.mid.toString(),
-        )
+        const followedUps = get$followedUps();
+        const index = followedUps.findIndex((u) => u.mid.toString() === _data.mid.toString());
         if (index === -1) {
-          return
+          return;
         }
         // 用户信息可能会变化
-        const followedUp = followedUps[index]
+        const followedUp = followedUps[index];
         if (
           followedUp.name !== _data.name ||
           followedUp.sign !== _data.sign ||
@@ -140,14 +138,14 @@ export function useUserInfo(mid?: number | string) {
             name: _data.name,
             sign: _data.sign,
             face: _data.face,
-          }
-          set$followedUps(followedUps.slice())
+          };
+          set$followedUps(followedUps.slice());
         }
       },
     },
-  )
+  );
 
   return {
     data,
-  }
+  };
 }

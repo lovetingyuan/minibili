@@ -1,13 +1,13 @@
-import useSWRInfinite from 'swr/infinite'
-import type { z } from 'zod'
+import useSWRInfinite from "swr/infinite";
+import type { z } from "zod";
 
-import { useStore } from '@/store'
+import { useStore } from "@/store";
 
-import { parseCommentMessage } from './comments'
-import type { ReplyResItem, ReplyResponseSchema } from './replies.schema'
-import fetcher from './fetcher'
+import { parseCommentMessage } from "./comments";
+import type { ReplyResItem, ReplyResponseSchema } from "./replies.schema";
+import fetcher from "./fetcher";
 
-type ReplyResponse = z.infer<typeof ReplyResponseSchema>
+type ReplyResponse = z.infer<typeof ReplyResponseSchema>;
 
 const getReplyItem = (reply: ReplyResItem) => {
   return {
@@ -30,36 +30,34 @@ const getReplyItem = (reply: ReplyResItem) => {
     replies: [],
     top: false,
     images: [],
-  }
-}
+  };
+};
 
-export type ReplyItemType = ReturnType<typeof getReplyItem>
+export type ReplyItemType = ReturnType<typeof getReplyItem>;
 
 export function useReplies() {
-  const { repliesInfo } = useStore()
-  const { data, error, size, setSize, isValidating, isLoading } =
-    useSWRInfinite<ReplyResponse>(
-      (index) => {
-        return repliesInfo
-          ? `/x/v2/reply/reply?oid=${repliesInfo.oid}&type=${repliesInfo.type}&root=${repliesInfo.root}&pn=${index + 1}&ps=20`
-          : null
-      },
-      fetcher,
-      {
-        revalidateFirstPage: false,
-      },
-    )
+  const { repliesInfo } = useStore();
+  const { data, error, size, setSize, isValidating, isLoading } = useSWRInfinite<ReplyResponse>(
+    (index) => {
+      return repliesInfo
+        ? `/x/v2/reply/reply?oid=${repliesInfo.oid}&type=${repliesInfo.type}&root=${repliesInfo.root}&pn=${index + 1}&ps=20`
+        : null;
+    },
+    fetcher,
+    {
+      revalidateFirstPage: false,
+    },
+  );
   // const isLoadingMore =
   //   isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')
-  const isEmpty = !data?.[0]?.replies?.length
-  const isReachingEnd =
-    isEmpty || (data && !data[data.length - 1]?.replies?.length)
+  const isEmpty = !data?.[0]?.replies?.length;
+  const isReachingEnd = isEmpty || (data && !data[data.length - 1]?.replies?.length);
   // const isRefreshing = isValidating && data && data.length === size
   // const uniqueMap: Record<string, boolean> = {}
   const list =
     data?.reduce((a, b) => {
-      return a.concat(b.replies?.map(getReplyItem) || [])
-    }, [] as ReplyItemType[]) || []
+      return a.concat(b.replies?.map(getReplyItem) || []);
+    }, [] as ReplyItemType[]) || [];
   // const replies: ReplyItemType[] = []
   // for (const r of list) {
   //   if (!uniqueMap[r.id]) {
@@ -76,11 +74,11 @@ export function useReplies() {
     isLoading,
     update: () => {
       if (isReachingEnd) {
-        return
+        return;
       }
-      setSize(size + 1)
+      setSize(size + 1);
     },
     isValidating,
     error,
-  }
+  };
 }

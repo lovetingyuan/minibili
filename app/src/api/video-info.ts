@@ -1,10 +1,10 @@
-import useSWR from 'swr'
-import type { z } from 'zod'
+import useSWR from "swr";
+import type { z } from "zod";
 
-import request from './fetcher'
-import type { VideoInfoResponseSchema } from './video-info.schema'
+import request from "./fetcher";
+import type { VideoInfoResponseSchema } from "./video-info.schema";
 
-type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>
+type VideoInfoResponse = z.infer<typeof VideoInfoResponseSchema>;
 
 const getVideoInfo = (data: VideoInfoResponse) => {
   return {
@@ -46,21 +46,21 @@ const getVideoInfo = (data: VideoInfoResponse) => {
         title: v.part,
         page: v.page,
         cid: v.cid,
-      }
+      };
     }),
-  }
-}
+  };
+};
 
-export type VideoInfo = ReturnType<typeof getVideoInfo>
+export type VideoInfo = ReturnType<typeof getVideoInfo>;
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
 export function useVideoInfo(bvid: string) {
   const { data, error, isLoading } = useSWR<VideoInfoResponse>(
     bvid ? `/x/web-interface/view?bvid=${bvid}` : null,
     request,
-  )
+  );
   return {
     data: data ? getVideoInfo(data) : null,
     error,
     isLoading,
-  }
+  };
 }

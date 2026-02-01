@@ -6,12 +6,21 @@
     "website",
     "tailwind"
   ],
+  "scripts": {
+    "format": "oxfmt .",
+    "android": "npm run android -w=@minibili/app",
+    "build:android": "npm run build:android -w=@minibili/app"
+  },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.18",
     "tailwindcss": "^4.1.18"
   },
-  "scripts": {
-    "android": "npm run android -w=@minibili/app",
-    "build:android": "npm run build:android -w=@minibili/app"
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "eslint": "^9.25.0",
+    "oxfmt": "latest",
+    "typescript": "~5.9.2",
+    "vite": "^6.2.3",
+    "vitest": "^3.0.9"
   }
 }

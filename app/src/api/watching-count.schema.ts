@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const WatchingCountResponseSchema = z.object({
   total: z.string(),
@@ -10,8 +10,6 @@ export const WatchingCountResponseSchema = z.object({
   // abtest: {
   //   group: 'b',
   // },
-})
+});
 
-export type WatchingCountResponseType = z.infer<
-  typeof WatchingCountResponseSchema
->
+export type WatchingCountResponseType = z.infer<typeof WatchingCountResponseSchema>;

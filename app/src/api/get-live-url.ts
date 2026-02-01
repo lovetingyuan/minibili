@@ -1,5 +1,5 @@
-import useSWR from 'swr'
-import { z } from 'zod'
+import useSWR from "swr";
+import { z } from "zod";
 
 const ResponseDataSchema = z.object({
   accept_quality: z.string().array(),
@@ -18,13 +18,11 @@ const ResponseDataSchema = z.object({
       qn: z.number(),
     })
     .array(),
-})
+});
 
 export default function useLiveUrl(roomId: string) {
   const { data } = useSWR<z.infer<typeof ResponseDataSchema>>(
-    roomId
-      ? 'https://api.live.bilibili.com/room/v1/Room/playUrl?cid=' + roomId
-      : null,
-  )
-  return data?.durl.map((v) => v.url)
+    roomId ? "https://api.live.bilibili.com/room/v1/Room/playUrl?cid=" + roomId : null,
+  );
+  return data?.durl.map((v) => v.url);
 }

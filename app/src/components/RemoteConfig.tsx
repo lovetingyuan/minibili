@@ -1,22 +1,22 @@
-import { Dialog, Text } from '@rneui/themed'
-import React from 'react'
-import { Linking } from 'react-native'
+import { Dialog, Text } from "@rneui/themed";
+import React from "react";
+import { Linking } from "react-native";
 
-import { setUA } from '@/constants'
-import { colors } from '@/constants/colors.tw'
+import { setUA } from "@/constants";
+import { colors } from "@/constants/colors.tw";
 
-import { useRemoteConfig } from '../api/remote-config'
-import Modal2 from './Modal2'
+import { useRemoteConfig } from "../api/remote-config";
+import Modal2 from "./Modal2";
 
 export default function RemoteConfig() {
-  const remoteConfig = useRemoteConfig()
-  const [visible, setVisible] = React.useState(true)
+  const remoteConfig = useRemoteConfig();
+  const [visible, setVisible] = React.useState(true);
   const toggleDialog = () => {
-    setVisible(!visible)
-  }
+    setVisible(!visible);
+  };
   // const { setUserAgent } = useStore()
   if (!remoteConfig) {
-    return null
+    return null;
   }
   // remoteConfig.statement.show = true
   // remoteConfig.statement.dismiss = false
@@ -26,14 +26,10 @@ export default function RemoteConfig() {
         isVisible={visible}
         overlayStyle={tw(colors.gray2.bg)}
         ModalComponent={Modal2 as unknown as typeof React.Component}
-        backdropStyle={tw('bg-neutral-900/90')}
-        onBackdropPress={
-          remoteConfig.statement.dismiss ? toggleDialog : undefined
-        }>
-        <Dialog.Title
-          title={remoteConfig.statement.title}
-          titleStyle={tw(colors.black.text)}
-        />
+        backdropStyle={tw("bg-neutral-900/90")}
+        onBackdropPress={remoteConfig.statement.dismiss ? toggleDialog : undefined}
+      >
+        <Dialog.Title title={remoteConfig.statement.title} titleStyle={tw(colors.black.text)} />
         <Text>{remoteConfig.statement.content}</Text>
         <Dialog.Actions>
           {remoteConfig.statement.dismiss ? (
@@ -43,16 +39,16 @@ export default function RemoteConfig() {
             <Dialog.Button
               title="详情"
               onPress={() => {
-                Linking.openURL(remoteConfig.statement.url!)
+                Linking.openURL(remoteConfig.statement.url!);
               }}
             />
           ) : null}
         </Dialog.Actions>
       </Dialog>
-    )
+    );
   }
   if (remoteConfig.userAgent) {
-    setUA(remoteConfig.userAgent)
+    setUA(remoteConfig.userAgent);
   }
-  return null
+  return null;
 }

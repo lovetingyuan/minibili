@@ -1,68 +1,65 @@
-import { BottomSheet, Button, Card, Dialog, Input, Text } from '@rneui/themed'
-import React from 'react'
-import { Linking, View } from 'react-native'
+import { BottomSheet, Button, Card, Dialog, Input, Text } from "@rneui/themed";
+import React from "react";
+import { Linking, View } from "react-native";
 
-import Modal2 from '@/components/Modal2'
-import { colors } from '@/constants/colors.tw'
-import { useStore } from '@/store'
+import Modal2 from "@/components/Modal2";
+import { colors } from "@/constants/colors.tw";
+import { useStore } from "@/store";
 
-import { githubLink } from '../../constants'
-import { showToast } from '../../utils'
-import TextAction from './TextAction'
+import { githubLink } from "../../constants";
+import { showToast } from "../../utils";
+import TextAction from "./TextAction";
 
-export default React.memo(Feedback)
+export default React.memo(Feedback);
 
 function Feedback() {
-  const [feedBackVisible, setFeedbackVisible] = React.useState(false)
-  const { get$showUsageStatement, set$showUsageStatement } = useStore()
-  const [showStatement, setShowStatement] = React.useState(
-    get$showUsageStatement(),
-  )
+  const [feedBackVisible, setFeedbackVisible] = React.useState(false);
+  const { get$showUsageStatement, set$showUsageStatement } = useStore();
+  const [showStatement, setShowStatement] = React.useState(get$showUsageStatement());
   const hideFeedback = () => {
-    setFeedbackVisible(false)
-  }
+    setFeedbackVisible(false);
+  };
   const showFeedback = () => {
-    setFeedbackVisible(true)
-  }
+    setFeedbackVisible(true);
+  };
 
-  const feedbackRef = React.useRef('')
-  const feedbackContactRef = React.useRef('')
+  const feedbackRef = React.useRef("");
+  const feedbackContactRef = React.useRef("");
   const submitFeedback = () => {
-    const message = feedbackRef.current.trim()
+    const message = feedbackRef.current.trim();
     if (message.length === 0) {
-      hideFeedback()
-      return
+      hideFeedback();
+      return;
     }
     // TODO: feedback
     // reportUserFeedback(message, feedbackContactRef.current)
-    hideFeedback()
-    showToast('感谢反馈 😊')
-  }
+    hideFeedback();
+    showToast("感谢反馈 😊");
+  };
 
   return (
     <TextAction
       text="💗 欢迎使用本应用"
       buttons={[
         {
-          text: '使用声明',
+          text: "使用声明",
           onPress: () => {
-            setShowStatement(true)
+            setShowStatement(true);
           },
         },
         {
-          text: '使用反馈',
+          text: "使用反馈",
           onPress: showFeedback,
         },
-      ]}>
+      ]}
+    >
       <Dialog
         isVisible={feedBackVisible}
         onBackdropPress={hideFeedback}
         ModalComponent={Modal2 as unknown as typeof React.Component}
-        overlayStyle={tw(colors.gray2.bg)}>
-        <Dialog.Title
-          title="欢迎反馈意见 😊"
-          titleStyle={tw(colors.black.text)}
-        />
+        overlayStyle={tw(colors.gray2.bg)}
+      >
+        <Dialog.Title title="欢迎反馈意见 😊" titleStyle={tw(colors.black.text)} />
         <View>
           <Input
             placeholder="填写意见"
@@ -88,17 +85,18 @@ function Feedback() {
       </Dialog>
       <BottomSheet
         onBackdropPress={() => {
-          setShowStatement(false)
+          setShowStatement(false);
         }}
-        backdropStyle={tw('opacity-80 bg-gray-800')}
+        backdropStyle={tw("opacity-80 bg-gray-800")}
         modalProps={{
           onRequestClose: () => {
-            setShowStatement(false)
+            setShowStatement(false);
           },
           statusBarTranslucent: true,
         }}
-        isVisible={showStatement}>
-        <Card containerStyle={tw('m-0')}>
+        isVisible={showStatement}
+      >
+        <Card containerStyle={tw("m-0")}>
           <Card.Title h4 className="text-left">
             📣使用声明
           </Card.Title>
@@ -116,9 +114,10 @@ function Feedback() {
               <Text
                 className={colors.primary.text}
                 onPress={() => {
-                  Linking.openURL(githubLink)
-                }}>
-                {' Github '}
+                  Linking.openURL(githubLink);
+                }}
+              >
+                {" Github "}
               </Text>
               中提出 😀
             </Text>
@@ -128,15 +127,16 @@ function Feedback() {
               <Button
                 size="sm"
                 onPress={() => {
-                  set$showUsageStatement(false)
-                  setShowStatement(false)
-                }}>
-                {' 我已知晓 '}
+                  set$showUsageStatement(false);
+                  setShowStatement(false);
+                }}
+              >
+                {" 我已知晓 "}
               </Button>
             </View>
           </View>
         </Card>
       </BottomSheet>
     </TextAction>
-  )
+  );
 }

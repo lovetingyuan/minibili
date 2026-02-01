@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const DanmakuSchema = z.object({
   color: z.number(),
@@ -11,4 +11,4 @@ export const DanmakuSchema = z.object({
   mode: z.number(),
   progress: z.number(),
   weight: z.number(),
-})
+});

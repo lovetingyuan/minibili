@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const LiveInfoBatchItemSchema = z.object({
   title: z.string(),
@@ -17,4 +17,4 @@ export const LiveInfoBatchItemSchema = z.object({
   cover_from_user: z.string(),
   keyframe: z.string(),
   broadcast_type: z.number(),
-})
+});

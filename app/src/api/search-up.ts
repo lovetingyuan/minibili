@@ -1,8 +1,8 @@
-import useSWRInfinite from 'swr/infinite'
+import useSWRInfinite from "swr/infinite";
 
-import { parseUrl } from '../utils'
-import type { SearchResponse, SearchUpResType } from './search-up.schema'
-import fetcher from './fetcher'
+import { parseUrl } from "../utils";
+import type { SearchResponse, SearchUpResType } from "./search-up.schema";
+import fetcher from "./fetcher";
 
 function getUpInfo(up: SearchUpResType) {
   return {
@@ -11,31 +11,29 @@ function getUpInfo(up: SearchUpResType) {
     sign: up.usign,
     mid: up.mid,
     fans: up.fans,
-  }
+  };
 }
 
 export const useSearchUps = (name: string) => {
-  const { data, size, setSize, isValidating, isLoading, error } =
-    useSWRInfinite<SearchResponse>(
-      (index) => {
-        return name
-          ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=${index + 1}&page_size=50&platform=pc&search_type=bili_user`
-          : null
-      },
-      fetcher,
-      {
-        revalidateFirstPage: false,
-      },
-    )
-  const isReachingEnd =
-    !!data && (data[data.length - 1]?.result?.length ?? 0) < 50
+  const { data, size, setSize, isValidating, isLoading, error } = useSWRInfinite<SearchResponse>(
+    (index) => {
+      return name
+        ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=${index + 1}&page_size=50&platform=pc&search_type=bili_user`
+        : null;
+    },
+    fetcher,
+    {
+      revalidateFirstPage: false,
+    },
+  );
+  const isReachingEnd = !!data && (data[data.length - 1]?.result?.length ?? 0) < 50;
   // const isRefreshing = isValidating && !!data && data.length === size
   const list = data?.reduce((a, b) => {
     if (b.result) {
-      return a.concat(b.result.map(getUpInfo))
+      return a.concat(b.result.map(getUpInfo));
     }
-    return a
-  }, [] as SearchedUpType[])
+    return a;
+  }, [] as SearchedUpType[]);
   return {
     data: list,
     error,
@@ -44,11 +42,11 @@ export const useSearchUps = (name: string) => {
     isReachingEnd,
     update: () => {
       if (isReachingEnd) {
-        return
+        return;
       }
-      setSize(size + 1)
+      setSize(size + 1);
     },
-  }
-}
+  };
+};
 
-export type SearchedUpType = ReturnType<typeof getUpInfo>
+export type SearchedUpType = ReturnType<typeof getUpInfo>;

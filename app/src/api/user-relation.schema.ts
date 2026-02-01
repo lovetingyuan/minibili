@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const UserRelationResponseSchema = z.object({
   mid: z.number(),
@@ -6,4 +6,4 @@ export const UserRelationResponseSchema = z.object({
   whisper: z.number(),
   black: z.number(),
   follower: z.number(),
-})
+});

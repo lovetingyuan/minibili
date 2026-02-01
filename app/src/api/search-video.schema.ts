@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const SearchVideoItemSchema = z.object({
   type: z.string(),
@@ -47,7 +47,7 @@ export const SearchVideoItemSchema = z.object({
   // episode_count_text: '',
   // release_status: 0,
   // is_intervene: 0,
-})
+});
 
 export const SearchVideoResponseSchema = z.object({
   // seid: z.string(),
@@ -56,7 +56,7 @@ export const SearchVideoResponseSchema = z.object({
   numResults: z.number(),
   numPages: z.number(),
   result: SearchVideoItemSchema.array().nullish(),
-})
+});
 
-export type SearchVideoResponse = z.infer<typeof SearchVideoResponseSchema>
-export type SearchVideoItemType = z.infer<typeof SearchVideoItemSchema>
+export type SearchVideoResponse = z.infer<typeof SearchVideoResponseSchema>;
+export type SearchVideoItemType = z.infer<typeof SearchVideoItemSchema>;

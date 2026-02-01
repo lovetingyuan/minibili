@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 const MemberSchema = z.object({
   avatar: z.string(),
@@ -14,7 +14,7 @@ const MemberSchema = z.object({
   sex: z.string(),
   sign: z.string(),
   uname: z.string(),
-})
+});
 
 const ContentSchema = z.object({
   message: z.string(),
@@ -63,7 +63,7 @@ const ContentSchema = z.object({
       url: z.string(),
     })
     .nullish(),
-})
+});
 
 export const BaseCommentSchema = z.object({
   content: ContentSchema,
@@ -93,15 +93,15 @@ export const BaseCommentSchema = z.object({
   state: z.number(),
   type: z.number(),
   up_action: z.object({ like: z.boolean(), reply: z.boolean() }),
-})
+});
 
 export type CommentResItem = z.infer<typeof BaseCommentSchema> & {
-  replies: CommentResItem[] | null
-}
+  replies: CommentResItem[] | null;
+};
 
 const RepliesSchema: z.ZodType<CommentResItem> = BaseCommentSchema.extend({
   replies: z.lazy(() => RepliesSchema.array()).nullable(),
-})
+});
 
 export const CommentResponseSchema = z.object({
   assist: z.number(),
@@ -126,4 +126,4 @@ export const CommentResponseSchema = z.object({
   // up_selection: {pending_count: 0, ignore_count: 0}
   upper: z.object({ mid: z.number() }),
   // vote: 0
-})
+});

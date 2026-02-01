@@ -1,25 +1,25 @@
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Button, Text } from '@rneui/themed'
-import React from 'react'
-import { Image, Linking, View } from 'react-native'
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Button, Text } from "@rneui/themed";
+import React from "react";
+import { Image, Linking, View } from "react-native";
 
-import { colors } from '@/constants/colors.tw'
+import { colors } from "@/constants/colors.tw";
 
-import { githubLink } from '../constants'
-import { useStore } from '../store'
-import type { RootStackParamList } from '../types'
+import { githubLink } from "../constants";
+import { useStore } from "../store";
+import type { RootStackParamList } from "../types";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>
+type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
-export default React.memo(Welcome)
+export default React.memo(Welcome);
 
 function Welcome({ navigation }: Props) {
-  const { set$firstRun } = useStore()
+  const { set$firstRun } = useStore();
   return (
     <View className="h-full flex-1 py-10">
       <View className="flex-row justify-center">
         <Image
-          source={require('../../assets/minibili.png')}
+          source={require("../../assets/minibili.png")}
           className="aspect-[33/10] h-auto w-[80%]"
         />
       </View>
@@ -33,9 +33,10 @@ function Welcome({ navigation }: Props) {
           <Text
             className={colors.primary.text}
             onPress={() => {
-              Linking.openURL(githubLink)
-            }}>
-            {'github'}
+              Linking.openURL(githubLink);
+            }}
+          >
+            {"github"}
           </Text>
           )，所有数据均存放在手机本地，展示的所有数据均为B站官网公开，不会读取、存储、传播任何个人相关数据，仅供学习交流!
         </Text>
@@ -45,13 +46,14 @@ function Welcome({ navigation }: Props) {
       </View>
       <Button
         size="lg"
-        containerStyle={tw('mx-5 rounded-lg')}
+        containerStyle={tw("mx-5 rounded-lg")}
         onPress={() => {
-          set$firstRun(Date.now())
-          navigation.replace('VideoList')
-        }}>
+          set$firstRun(Date.now());
+          navigation.replace("VideoList");
+        }}
+      >
         知晓并开始使用
       </Button>
     </View>
-  )
+  );
 }

@@ -1,39 +1,37 @@
 function __$hack() {
-  const style = document.createElement('style')
-  document.head.appendChild(style)
+  const style = document.createElement("style");
+  document.head.appendChild(style);
   const waitForDom = (selector, cb, timeout = 10000) => {
     const callback =
-      typeof selector === 'string'
-        ? () => document.querySelector(selector)
-        : selector
-    const ret = callback()
+      typeof selector === "string" ? () => document.querySelector(selector) : selector;
+    const ret = callback();
     if (ret) {
-      cb(ret)
-      return
+      cb(ret);
+      return;
     }
     const timer = setInterval(() => {
-      const ret = callback()
+      const ret = callback();
       if (ret) {
-        cb(ret)
-        clearInterval(timer)
+        cb(ret);
+        clearInterval(timer);
       }
-    }, 100)
+    }, 100);
     setTimeout(() => {
-      clearInterval(timer)
-      cb(new Error('timeout'))
-    }, timeout)
-  }
-  if (location.pathname.startsWith('/opus/')) {
+      clearInterval(timer);
+      cb(new Error("timeout"));
+    }, timeout);
+  };
+  if (location.pathname.startsWith("/opus/")) {
     // opus动态详情
   }
-  waitForDom('.opus-module-content', (content) => {
-    if (content.classList.contains('limit')) {
-      content.classList.remove('limit')
+  waitForDom(".opus-module-content", (content) => {
+    if (content.classList.contains("limit")) {
+      content.classList.remove("limit");
     }
-  })
+  });
   // 去掉阅读更多按钮
-  window.addEventListener('load', () => {
-    const commentContainer = window.document.createElement('div')
+  window.addEventListener("load", () => {
+    const commentContainer = window.document.createElement("div");
     commentContainer.innerHTML = `
     <style>
       .comments-overlay {
@@ -105,60 +103,60 @@ function __$hack() {
         </div>
       </div>
     </div>
-    `
-    window.document.body.appendChild(commentContainer)
-    const overlay = window.document.getElementById('comments-overlay')
-    const popup = window.document.getElementById('comments-popup')
-    const close = window.document.getElementById('comment-popup-close')
+    `;
+    window.document.body.appendChild(commentContainer);
+    const overlay = window.document.getElementById("comments-overlay");
+    const popup = window.document.getElementById("comments-popup");
+    const close = window.document.getElementById("comment-popup-close");
     window._openPopup = () => {
-      window.history.pushState({ popup: 'open' }, 'open popup')
-      overlay.classList.add('show-comments-popup')
+      window.history.pushState({ popup: "open" }, "open popup");
+      overlay.classList.add("show-comments-popup");
       window.setTimeout(() => {
-        popup.classList.add('slide-up-comments-popup')
-      }, 10)
-    }
+        popup.classList.add("slide-up-comments-popup");
+      }, 10);
+    };
 
-    window.addEventListener('popstate', (evt) => {
-      if (evt.state.popup === 'open' || typeof evt.state.idx === 'number') {
-        closePopup(true)
+    window.addEventListener("popstate", (evt) => {
+      if (evt.state.popup === "open" || typeof evt.state.idx === "number") {
+        closePopup(true);
       }
-    })
+    });
 
     const closePopup = (state) => {
       if (!state) {
-        window.history.back()
+        window.history.back();
       }
-      popup.classList.remove('slide-up-comments-popup')
+      popup.classList.remove("slide-up-comments-popup");
       window.setTimeout(() => {
-        overlay.classList.remove('show-comments-popup')
-      }, 300)
-    }
+        overlay.classList.remove("show-comments-popup");
+      }, 300);
+    };
 
-    overlay.addEventListener('click', (event) => {
+    overlay.addEventListener("click", (event) => {
       if (event.target === overlay) {
-        closePopup()
+        closePopup();
       }
-    })
-    close.addEventListener('click', () => {
-      closePopup()
-    })
-  })
-  const open = window.open
+    });
+    close.addEventListener("click", () => {
+      closePopup();
+    });
+  });
+  const open = window.open;
   window.open = (url, target, features) => {
-    if (url.startsWith('https://www.bilibili.com/h5/comment/sub?')) {
-      const iframe = document.querySelector('#sub-comment-iframe')
-      iframe.src = url
-      window._openPopup()
-      return
+    if (url.startsWith("https://www.bilibili.com/h5/comment/sub?")) {
+      const iframe = document.querySelector("#sub-comment-iframe");
+      iframe.src = url;
+      window._openPopup();
+      return;
     }
-    return open(url, target, features)
-  }
+    return open(url, target, features);
+  };
 
-  window.addEventListener('load', (e) => {
-    const imgs = document.querySelector('.opus-module-top__album')
+  window.addEventListener("load", (e) => {
+    const imgs = document.querySelector(".opus-module-top__album");
     if (imgs) {
-      const div = document.createElement('div')
-      div.textContent = '下载'
+      const div = document.createElement("div");
+      div.textContent = "下载";
       div.style.cssText = `
         position: absolute;
         top: 10px;
@@ -169,67 +167,67 @@ function __$hack() {
         padding: 5px 10px;
         border-radius: 5px;
         user-select: none;
-      `
-      imgs.appendChild(div)
-      div.addEventListener('click', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        e.stopImmediatePropagation()
-        const item = [...imgs.querySelectorAll('.v-swipe__item')].find((v) => {
-          return v.style.transform.includes('translateX(0px)')
-        })
+      `;
+      imgs.appendChild(div);
+      div.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        const item = [...imgs.querySelectorAll(".v-swipe__item")].find((v) => {
+          return v.style.transform.includes("translateX(0px)");
+        });
         if (item) {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
-              action: 'open-image',
+              action: "open-image",
               payload: {
-                url: item.querySelector('img').src.split('@')[0],
+                url: item.querySelector("img").src.split("@")[0],
               },
             }),
-          )
+          );
         }
-      })
+      });
     }
-  })
+  });
   document.addEventListener(
-    'click',
+    "click",
     (e) => {
-      const pic = e.target.closest('.bm-pics-block__item')
+      const pic = e.target.closest(".bm-pics-block__item");
       if (pic) {
-        e.preventDefault()
-        e.stopPropagation()
-        e.stopImmediatePropagation()
-        const url = pic.querySelector('img').src.split('@')[0]
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        const url = pic.querySelector("img").src.split("@")[0];
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
-            action: 'open-image',
+            action: "open-image",
             payload: { url },
           }),
-        )
+        );
       }
     },
     true,
-  )
+  );
 }
 
 function __$injectBefore() {
   // alert(document.title)
   const waitFor = (value, callback) => {
     if (value()) {
-      callback()
+      callback();
     } else {
       const timer = setInterval(() => {
         if (value()) {
-          callback()
-          clearInterval(timer)
+          callback();
+          clearInterval(timer);
         }
-      }, 50)
+      }, 50);
     }
-  }
+  };
   waitFor(
     () => document.head,
     () => {
-      const style = document.createElement('style')
+      const style = document.createElement("style");
       style.textContent = `
     m-open-app:has(.m-fixed-openapp, .bm-link-card-goods, .easy-follow-btn),
      m-open-app.m-open-app, .tab__pairs,
@@ -294,11 +292,11 @@ function __$injectBefore() {
       padding-top: 0!important;
     }
 
-    `
-      document.head.appendChild(style)
+    `;
+      document.head.appendChild(style);
     },
-  )
+  );
 }
 
-export const INJECTED_JAVASCRIPT = `(${__$hack})(${__DEV__});true;`
-export const INJECTED_JAVASCRIPT_BEFORE = `(${__$injectBefore})(${__DEV__});true;`
+export const INJECTED_JAVASCRIPT = `(${__$hack})(${__DEV__});true;`;
+export const INJECTED_JAVASCRIPT_BEFORE = `(${__$injectBefore})(${__DEV__});true;`;

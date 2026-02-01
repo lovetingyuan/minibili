@@ -1,15 +1,15 @@
-import { useBackHandler } from '@react-native-community/hooks'
-import { useIsFocused } from '@react-navigation/native'
-import React from 'react'
-import { KeyboardAvoidingView, Platform } from 'react-native'
-import type { SearchBarCommands } from 'react-native-screens'
+import { useBackHandler } from "@react-native-community/hooks";
+import { useIsFocused } from "@react-navigation/native";
+import React from "react";
+import { KeyboardAvoidingView, Platform } from "react-native";
+import type { SearchBarCommands } from "react-native-screens";
 
-import { colors } from '@/constants/colors.tw'
-import useMounted from '@/hooks/useMounted'
-import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
-import { useMarkHotSearchViewed } from '@/store/actions'
+import { colors } from "@/constants/colors.tw";
+import useMounted from "@/hooks/useMounted";
+import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
+import { useMarkHotSearchViewed } from "@/store/actions";
 
-import VideoList from './VideoList'
+import VideoList from "./VideoList";
 
 const defaultSearchBarCommands: SearchBarCommands = {
   blur: () => {},
@@ -18,29 +18,29 @@ const defaultSearchBarCommands: SearchBarCommands = {
   clearText: () => {},
   toggleCancelButton: () => {},
   cancelSearch: () => {},
-}
+};
 
 function SearchVideos() {
-  const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands)
-  const blackColor = tw(colors.black.text).color
-  const [searchKeyWord, setSearchKeyWord] = React.useState('')
-  const focused = useIsFocused()
+  const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands);
+  const blackColor = tw(colors.black.text).color;
+  const [searchKeyWord, setSearchKeyWord] = React.useState("");
+  const focused = useIsFocused();
   useBackHandler(() => {
     if (searchKeyWord && focused) {
-      searchBarRef.current?.blur()
-      searchBarRef.current?.setText('')
-      setSearchKeyWord('')
-      return true
+      searchBarRef.current?.blur();
+      searchBarRef.current?.setText("");
+      setSearchKeyWord("");
+      return true;
     }
-    return false
-  })
-  const markHotViewed = useMarkHotSearchViewed()
+    return false;
+  });
+  const markHotViewed = useMarkHotSearchViewed();
   useUpdateNavigationOptions(
     React.useMemo(() => {
       return {
         headerSearchBarOptions: {
           ref: searchBarRef,
-          placeholder: '搜索视频',
+          placeholder: "搜索视频",
           headerIconColor: blackColor,
           hintTextColor: blackColor,
           textColor: blackColor,
@@ -48,42 +48,43 @@ function SearchVideos() {
           disableBackButtonOverride: false,
           shouldShowHintSearchIcon: false,
           onClose: () => {
-            setSearchKeyWord('')
+            setSearchKeyWord("");
           },
           onSearchButtonPress: ({ nativeEvent: { text } }) => {
-            const keyword = text.trim()
+            const keyword = text.trim();
             if (!keyword) {
-              return
+              return;
             }
-            setSearchKeyWord(keyword)
+            setSearchKeyWord(keyword);
           },
         },
-      }
+      };
     }, [blackColor]),
-  )
+  );
 
   useMounted(() => {
     setTimeout(() => {
-      searchBarRef.current?.focus()
-      searchBarRef.current?.setText('')
-    }, 200)
-  })
+      searchBarRef.current?.focus();
+      searchBarRef.current?.setText("");
+    }, 200);
+  });
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1">
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1"
+    >
       <VideoList
         keyword={searchKeyWord}
         onSearch={(keyword: string) => {
-          searchBarRef.current?.setText(keyword)
-          searchBarRef.current?.blur()
-          setSearchKeyWord(keyword)
-          markHotViewed(keyword)
+          searchBarRef.current?.setText(keyword);
+          searchBarRef.current?.blur();
+          setSearchKeyWord(keyword);
+          markHotViewed(keyword);
         }}
       />
     </KeyboardAvoidingView>
-  )
+  );
 }
 
-export default React.memo(SearchVideos)
+export default React.memo(SearchVideos);

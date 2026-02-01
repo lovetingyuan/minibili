@@ -1,20 +1,20 @@
-import { useNavigation } from '@react-navigation/native'
-import { Badge, Button, Icon, Text } from '@rneui/themed'
-import React from 'react'
-import { Animated, ScrollView, TouchableOpacity, View } from 'react-native'
-import { Menu, MenuDivider, MenuItem } from '@/components/Menu'
+import { useNavigation } from "@react-navigation/native";
+import { Badge, Button, Icon, Text } from "@rneui/themed";
+import React from "react";
+import { Animated, ScrollView, TouchableOpacity, View } from "react-native";
+import { Menu, MenuDivider, MenuItem } from "@/components/Menu";
 
-import { useAppUpdateInfo } from '@/api/check-update'
-import { colors } from '@/constants/colors.tw'
-import { useUpUpdateCount } from '@/store/derives'
+import { useAppUpdateInfo } from "@/api/check-update";
+import { colors } from "@/constants/colors.tw";
+import { useUpUpdateCount } from "@/store/derives";
 
-import useMounted from '../../hooks/useMounted'
-import { useStore } from '../../store'
-import type { NavigationProps } from '../../types'
+import useMounted from "../../hooks/useMounted";
+import { useStore } from "../../store";
+import type { NavigationProps } from "../../types";
 
 function HeaderTitleComp() {
-  const { current: opacityValue } = React.useRef(new Animated.Value(0))
-  const appUpdateInfo = useAppUpdateInfo()
+  const { current: opacityValue } = React.useRef(new Animated.Value(0));
+  const appUpdateInfo = useAppUpdateInfo();
   useMounted(() => {
     const blinkAnimation = Animated.loop(
       Animated.sequence([
@@ -29,69 +29,66 @@ function HeaderTitleComp() {
           useNativeDriver: true,
         }),
       ]),
-    )
+    );
 
-    blinkAnimation.start()
+    blinkAnimation.start();
 
     return () => {
-      blinkAnimation.stop()
-    }
-  })
+      blinkAnimation.stop();
+    };
+  });
 
   return appUpdateInfo.hasUpdate ? (
     <Button
       type="clear"
       size="sm"
-      buttonStyle={tw('mx-2 w-24')}
+      buttonStyle={tw("mx-2 w-24")}
       titleStyle={tw(`text-sm ${colors.primary.text}`)}
       onPress={() => {
-        appUpdateInfo.showAlert()
-      }}>
-      {'有新版本'}
+        appUpdateInfo.showAlert();
+      }}
+    >
+      {"有新版本"}
       <Animated.View style={{ opacity: opacityValue }}>
-        <Icon
-          name="fiber-new"
-          color={tw(colors.secondary.text).color}
-          size={24}
-        />
+        <Icon name="fiber-new" color={tw(colors.secondary.text).color} size={24} />
       </Animated.View>
     </Button>
-  ) : null
+  ) : null;
 }
 
 function splitArrayIntoChunks(arr: any[]) {
-  const result = [[arr[0]]]
+  const result = [[arr[0]]];
   for (let i = 1; i < arr.length; i += 2) {
-    result.push(arr.slice(i, i + 2))
+    result.push(arr.slice(i, i + 2));
   }
 
-  return result
+  return result;
 }
 
 function HeaderLeftComp() {
-  const { currentVideosCate, $videoCatesList, setCurrentVideosCate } =
-    useStore()
+  const { currentVideosCate, $videoCatesList, setCurrentVideosCate } = useStore();
 
-  const [visible, setVisible] = React.useState(false)
-  const hideMenu = () => setVisible(false)
-  const showMenu = () => setVisible(true)
-  const list = splitArrayIntoChunks($videoCatesList)
+  const [visible, setVisible] = React.useState(false);
+  const hideMenu = () => setVisible(false);
+  const showMenu = () => setVisible(true);
+  const list = splitArrayIntoChunks($videoCatesList);
   const getItem = (item: any) => {
-    const selected = currentVideosCate.rid === item.rid
+    const selected = currentVideosCate.rid === item.rid;
     return (
       <MenuItem
         pressColor={tw(colors.gray3.text).color}
         textStyle={tw(
-          `text-base ${selected ? 'font-bold' : ''} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`,
+          `text-base ${selected ? "font-bold" : ""} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`,
         )}
         onPress={() => {
-          setCurrentVideosCate(item)
-          hideMenu()
-        }}>
+          setCurrentVideosCate(item);
+          hideMenu();
+        }}
+      >
         {item.label}
       </MenuItem>
-    )
-  }
+    );
+  };
   return (
     <View className="flex-row items-center gap-4">
       <Menu
@@ -102,7 +99,8 @@ function HeaderLeftComp() {
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={showMenu}
-            className="h-full flex-row items-center">
+            className="h-full flex-row items-center"
+          >
             <Text
               className={`text-lg font-bold ${
                 currentVideosCate.rid === -1
@@ -110,9 +108,9 @@ function HeaderLeftComp() {
                     ? colors.success.text
                     : colors.secondary.text
                   : colors.gray7.text
-              }`}>
-              {currentVideosCate.label +
-                (currentVideosCate.rid === -1 ? '' : '排行')}{' '}
+              }`}
+            >
+              {currentVideosCate.label + (currentVideosCate.rid === -1 ? "" : "排行")}{" "}
             </Text>
             <Icon
               name="triangle-down"
@@ -122,7 +120,8 @@ function HeaderLeftComp() {
             />
           </TouchableOpacity>
         }
-        onRequestClose={hideMenu}>
+        onRequestClose={hideMenu}
+      >
         <ScrollView>
           {list.map((items, i) => {
             if (i === 0) {
@@ -131,41 +130,40 @@ function HeaderLeftComp() {
                   <View>{getItem(items[0])}</View>
                   <MenuDivider color={tw(colors.gray3.text).color} />
                 </View>
-              )
+              );
             }
             return (
               <View key={i} className="w-48 flex-row">
                 <View className="w-[50%]">{getItem(items[0])}</View>
-                {items[1] ? (
-                  <View className="w-[50%]">{getItem(items[1])}</View>
-                ) : null}
+                {items[1] ? <View className="w-[50%]">{getItem(items[1])}</View> : null}
               </View>
-            )
+            );
           })}
         </ScrollView>
       </Menu>
     </View>
-  )
+  );
 }
 
-const HeaderLeft = React.memo(HeaderLeftComp)
-const HeaderTitle = React.memo(HeaderTitleComp)
-const HeaderRight = React.memo(HeaderRightComp)
+const HeaderLeft = React.memo(HeaderLeftComp);
+const HeaderTitle = React.memo(HeaderTitleComp);
+const HeaderRight = React.memo(HeaderRightComp);
 
 function HeaderRightComp() {
-  const navigation = useNavigation<NavigationProps['navigation']>()
-  const { livingUps } = useStore()
-  const _updatedCount = useUpUpdateCount()
-  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
+  const navigation = useNavigation<NavigationProps["navigation"]>();
+  const { livingUps } = useStore();
+  const _updatedCount = useUpUpdateCount();
+  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0;
   return (
     <View className="mr-2 flex-row items-center gap-1">
       <Button
-        radius={'sm'}
+        radius={"sm"}
         size="sm"
         type="clear"
         onPress={() => {
-          navigation.navigate('SearchVideos')
-        }}>
+          navigation.navigate("SearchVideos");
+        }}
+      >
         <Icon name="search" color={tw(colors.gray7.text).color} size={24} />
       </Button>
       <View className="relative">
@@ -176,23 +174,24 @@ function HeaderRightComp() {
             badgeStyle={tw(
               `h-4 absolute left-10 top-1 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`,
             )}
-            textStyle={tw('text-[11px]')}
+            textStyle={tw("text-[11px]")}
           />
         ) : null}
         <Button
           type="clear"
           size="sm"
-          titleStyle={tw('text-lg')}
+          titleStyle={tw("text-lg")}
           onPress={() => {
-            navigation.navigate('Follow')
-          }}>
-          {` 关注 ${_updatedCount ? '  ' : ''}`}
+            navigation.navigate("Follow");
+          }}
+        >
+          {` 关注 ${_updatedCount ? "  " : ""}`}
         </Button>
       </View>
     </View>
-  )
+  );
 }
 
-export const videoListHeaderLeft = () => <HeaderLeft />
-export const videoListHeaderRight = () => <HeaderRight />
-export const videoListHeaderTitle = () => <HeaderTitle />
+export const videoListHeaderLeft = () => <HeaderLeft />;
+export const videoListHeaderRight = () => <HeaderRight />;
+export const videoListHeaderTitle = () => <HeaderTitle />;

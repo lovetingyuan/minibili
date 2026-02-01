@@ -1,10 +1,10 @@
-import { Button, Icon, Text } from '@rneui/themed'
-import React from 'react'
-import { Image, Linking, Pressable, View } from 'react-native'
+import { Button, Icon, Text } from "@rneui/themed";
+import React from "react";
+import { Image, Linking, Pressable, View } from "react-native";
 
-import { githubLink, site } from '../../constants'
+import { githubLink, site } from "../../constants";
 
-export default React.memo(Header)
+export default React.memo(Header);
 
 function Header() {
   return (
@@ -12,10 +12,11 @@ function Header() {
       <Pressable
         className="mb-5 mt-1 flex-1 items-center"
         onPress={() => {
-          Linking.openURL(site)
-        }}>
+          Linking.openURL(site);
+        }}
+      >
         <Image
-          source={require('../../../assets/minibili.png')}
+          source={require("../../../assets/minibili.png")}
           className="aspect-[33/10] h-auto w-[85%]"
         />
       </Pressable>
@@ -24,16 +25,17 @@ function Header() {
           一款简单的B站浏览App
         </Text>
         <Button
-          radius={'sm'}
+          radius={"sm"}
           type="clear"
           size="sm"
-          containerStyle={tw('self-start')}
+          containerStyle={tw("self-start")}
           onPress={() => {
-            Linking.openURL(githubLink)
-          }}>
+            Linking.openURL(githubLink);
+          }}
+        >
           <Icon name="github" type="material-community" size={20} />
         </Button>
       </View>
     </>
-  )
+  );
 }

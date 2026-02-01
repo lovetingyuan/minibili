@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -18,11 +16,13 @@
 }
 
 html {
-  background: linear-gradient(315deg,
-      rgb(255, 216, 252) 3%,
-      rgb(211, 234, 255) 38%,
-      rgb(213, 255, 252) 68%,
-      rgb(255, 250, 213) 98%);
+  background: linear-gradient(
+    315deg,
+    rgb(255, 216, 252) 3%,
+    rgb(211, 234, 255) 38%,
+    rgb(213, 255, 252) 68%,
+    rgb(255, 250, 213) 98%
+  );
   animation: gradient 15s ease infinite;
   background-size: 400% 400%;
   background-attachment: fixed;

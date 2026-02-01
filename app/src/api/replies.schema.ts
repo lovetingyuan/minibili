@@ -1,10 +1,10 @@
-import { z } from 'zod'
+import { z } from "zod";
 
-import { BaseCommentSchema } from './comments.schema'
+import { BaseCommentSchema } from "./comments.schema";
 
-export type ReplyResItem = z.infer<typeof BaseCommentSchema>
+export type ReplyResItem = z.infer<typeof BaseCommentSchema>;
 
-const RepliesSchema: z.ZodType<ReplyResItem> = BaseCommentSchema
+const RepliesSchema: z.ZodType<ReplyResItem> = BaseCommentSchema;
 
 export const ReplyResponseSchema = z.object({
   page: z.object({
@@ -15,4 +15,4 @@ export const ReplyResponseSchema = z.object({
   replies: z.union([RepliesSchema.array(), z.null()]),
   root: RepliesSchema,
   upper: z.object({ mid: z.number() }),
-})
+});

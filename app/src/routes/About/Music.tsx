@@ -1,26 +1,26 @@
-import { useNavigation } from '@react-navigation/native'
-import React from 'react'
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
 
-import type { NavigationProps } from '@/types'
+import type { NavigationProps } from "@/types";
 
-import TextAction from './TextAction'
+import TextAction from "./TextAction";
 
 function MyMusic() {
-  const navigation = useNavigation<NavigationProps['navigation']>()
+  const navigation = useNavigation<NavigationProps["navigation"]>();
 
   return (
     <TextAction
       text="🎵 我的歌单"
       buttons={[
         {
-          text: '查看歌单',
+          text: "查看歌单",
           onPress: () => {
-            navigation.navigate('Music')
+            navigation.navigate("Music");
           },
         },
       ]}
     />
-  )
+  );
 }
 
-export default React.memo(MyMusic)
+export default React.memo(MyMusic);

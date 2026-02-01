@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const ConfigSchema = z.object({
   brokenVersions: z.array(z.string()),
@@ -10,4 +10,4 @@ export const ConfigSchema = z.object({
     url: z.string().nullish(),
   }),
   userAgent: z.string(),
-})
+});

@@ -1,14 +1,14 @@
 function __$hack() {
-  const style = document.createElement('style')
-  document.head.appendChild(style)
+  const style = document.createElement("style");
+  document.head.appendChild(style);
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
-      action: 'set-title',
+      action: "set-title",
       payload: document.title,
     }),
-  )
+  );
 
-  if (window.location.pathname === '/read/mobile') {
+  if (window.location.pathname === "/read/mobile") {
     style.textContent = `
     #app bili-open-app {
       display: none!important;
@@ -25,10 +25,10 @@ function __$hack() {
     #app .read-article-box.show-later {
       max-height: none!important;
     }
-    `
+    `;
   } else if (
-    window.location.pathname.startsWith('/dynamic') ||
-    window.location.pathname.startsWith('/opus')
+    window.location.pathname.startsWith("/dynamic") ||
+    window.location.pathname.startsWith("/opus")
   ) {
     style.textContent = `
     #app .dyn-header__right, .m-open-app.fixed-openapp {
@@ -91,8 +91,8 @@ function __$hack() {
  #app .opus-module-content.limit {
   max-height: none!important;
  }
-    `
-  } else if (window.location.pathname.startsWith('/space/')) {
+    `;
+  } else if (window.location.pathname.startsWith("/space/")) {
     style.textContent = `
     #app .m-navbar {
       display: none!important;
@@ -109,8 +109,8 @@ function __$hack() {
     #app .card-content .top-right {
       display: none!important;
     }
-    `
-  } else if (window.location.pathname.startsWith('/topic-detail')) {
+    `;
+  } else if (window.location.pathname.startsWith("/topic-detail")) {
     style.textContent = `
     .topic-detail .m-navbar {
       display: none!important;
@@ -124,7 +124,7 @@ function __$hack() {
     .bili-dyn-item-header__following {
       display: none!important;
     }
-    `
+    `;
   } else {
     style.textContent = `
     #app .m-navbar {
@@ -156,8 +156,8 @@ function __$hack() {
       display: none!important;
     }
 
-    `
+    `;
   }
 }
 
-export const INJECTED_JAVASCRIPT = `(${__$hack})(${__DEV__});true;`
+export const INJECTED_JAVASCRIPT = `(${__$hack})(${__DEV__});true;`;

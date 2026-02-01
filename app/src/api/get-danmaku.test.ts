@@ -1,5 +1,5 @@
 // import * as protobuf from 'protobufjs'
-import { assert, test } from 'vitest'
+import { assert, test } from "vitest";
 
 // import dm from '../constants/dm'
 // import { DanmakuSchema } from './get-danmaku.schema'
@@ -8,8 +8,8 @@ import { assert, test } from 'vitest'
 
 // const lp = root.lookupType('DmSegMobileReply')
 
-test.skip('get-danmaku', async () => {
-  assert.ok(true)
+test.skip("get-danmaku", async () => {
+  assert.ok(true);
   //   const arrayBuffer = await fetch(
   //     'https://api.bilibili.com/x/v2/dm/web/seg.so?type=1&oid=1459734495&pid=1001385310&segment_index=1',
   //   ).then(res => {
@@ -27,4 +27,4 @@ test.skip('get-danmaku', async () => {
   //   assert.ok(Array.isArray(objects.elems))
   //   DanmakuSchema.parse(objects.elems[0])
   //   DanmakuSchema.parse(objects.elems[10])
-})
+});

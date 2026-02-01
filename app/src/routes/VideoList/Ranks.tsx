@@ -1,19 +1,15 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import React from "react";
+import { Text, View } from "react-native";
 
-import { useRankList } from '../../api/rank-list'
-import { useStore } from '../../store'
-import VideoList from './VideoList'
+import { useRankList } from "../../api/rank-list";
+import { useStore } from "../../store";
+import VideoList from "./VideoList";
 
-export default React.memo(Ranks)
+export default React.memo(Ranks);
 
 function Ranks() {
-  const { currentVideosCate } = useStore()
-  const {
-    data: list = [],
-    isLoading,
-    mutate,
-  } = useRankList(currentVideosCate?.rid)
+  const { currentVideosCate } = useStore();
+  const { data: list = [], isLoading, mutate } = useRankList(currentVideosCate?.rid);
   return (
     <VideoList
       videos={list}
@@ -23,10 +19,10 @@ function Ranks() {
       footer={
         <View>
           <Text className="my-3 text-center text-gray-500">
-            {isLoading ? '加载中...' : '到底了~'}
+            {isLoading ? "加载中..." : "到底了~"}
           </Text>
         </View>
       }
     />
-  )
+  );
 }
