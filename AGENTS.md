@@ -1,0 +1,32 @@
+# AGENTS.md
+
+## 项目简介
+
+minibili - 使用 Expo + React Native + TailwindCSS 开发的精简版B站APP。
+
+## 代码规范
+
+### TypeScript
+
+- 遵守严格模式
+- 路径别名 `@/*` 映射到 `src/*`
+- **[CRITICAL]**使用 `type` 关键字导入类型（如 `import type { Foo } from './types'`）
+- **[CRITICAL]**严禁使用 `as any`，严格遵守第三方库的类型定义，严禁杜撰API用法。
+
+### 组件规范
+
+- 使用函数组件，使用function和大驼峰声明。
+- 不要使用 `useMemo` `useCallback` `memo`，而是使用 react-compiler。
+- 单个组件最好不要超过 300 行。
+- 类型定义在单独的 `.ts` 文件中，Zod schema 在 `.schema.ts` 文件
+- API 请求使用 `swr` 封装成 hook
+
+### 样式
+
+- 使用 TailwindCSS + `tw()` 辅助函数
+- 颜色定义在 `src/constants/colors.tw.ts`
+
+### Git
+
+- **[CRITICAL]**严禁自动提交
+- **[CRITICAL]**每次任务完毕后必须输出一条遵循 Conventional Commits 规范的commit信息。

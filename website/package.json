@@ -1,0 +1,21 @@
+{
+  "name": "@minibili/website",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --emptyOutDir",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "alpinejs": "^3.14.1"
+  },
+  "devDependencies": {
+    "daisyui": "^4.12.10",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.1",
+    "unplugin-alpinejs-component": "^0.0.10",
+    "vite": "^6.2.3",
+    "vite-plugin-singlefile": "^2.2.0"
+  }
+}

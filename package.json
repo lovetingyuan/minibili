@@ -1,121 +1,17 @@
 {
-  "name": "minibili",
-  "version": "0.7.0",
-  "description": "minimum bilibili apk",
-  "files": [
-    "apk",
-    "docs"
+  "name": "minibili-monorepo",
+  "private": true,
+  "workspaces": [
+    "app",
+    "website",
+    "tailwind"
   ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
-  "repository": "github:lovetingyuan/minibili",
-  "homepage": "https://lovetingyuan.github.io/minibili/",
-  "scripts": {
-    "start": "expo start",
-    "android": "adb devices -l && npx expo start --android",
-    "tw": "npx react-native-tailwindcss-start",
-    "tw:dev": "npx yalc update && npm run tw -- --write=styles.tw.css",
-    "ios": "adb devices -l && npx expo start --ios",
-    "web": "expo start --web",
-    "build:android": "zx scripts/build.mjs",
-    "build:android:preview": "cross-env APP_VARIANT=preview eas build --platform android --profile preview --non-interactive",
-    "update": "zx scripts/hot-update.mjs",
-    "doctor": "npx -y expo-doctor@latest",
-    "docs": "cd website && npx vite",
-    "build:docs": "cd website && npx vite build --emptyOutDir",
-    "deploy:docs": "npm run build:docs && wrangler pages deploy ./docs",
-    "format": "npx prettier src scripts --write",
-    "test": "npx vitest run",
-    "lint": "expo lint",
-    "update-expo": "npm i -g eas-cli && npm install expo && npx expo install --fix && npm run doctor",
-    "bundle-analyze": "npx react-native-bundle-visualizer --platform android --entry-file index.js --expo true"
-  },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "2.1.2",
-    "@react-native-community/hooks": "^100.1.0",
-    "@react-native-community/netinfo": "11.4.1",
-    "@react-navigation/elements": "^2.5.2",
-    "@react-navigation/native": "^7.1.14",
-    "@react-navigation/native-stack": "^7.3.21",
-    "@rn-vui/base": "^5.1.8",
-    "@rn-vui/themed": "^5.1.8",
-    "@shopify/flash-list": "1.7.6",
-    "@total-typescript/ts-reset": "^0.5.1",
-    "alpinejs": "^3.14.1",
-    "clsx": "^2.1.0",
-    "crypto-js": "^4.2.0",
-    "expo": "~53.0.19",
-    "expo-application": "~6.1.5",
-    "expo-asset": "~11.1.4",
-    "expo-av": "~15.1.7",
-    "expo-clipboard": "~7.1.5",
-    "expo-constants": "~17.1.7",
-    "expo-image": "~2.3.2",
-    "expo-keep-awake": "~14.1.4",
-    "expo-splash-screen": "~0.30.7",
-    "expo-status-bar": "~2.2.3",
-    "expo-system-ui": "~5.0.6",
-    "expo-updates": "~0.28.17",
-    "he": "^1.2.0",
-    "p-queue": "6.6.2",
-    "react": "19.0.0",
-    "react-atomic-context": "^3.0.0-0",
-    "react-native": "0.79.5",
-    "react-native-edge-to-edge": "^1.1.3",
-    "react-native-error-boundary": "^2.0.0",
-    "react-native-gesture-handler": "~2.24.0",
-    "react-native-pager-view": "6.7.1",
-    "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "~4.11.1",
-    "react-native-simple-toast": "^3.3.2",
-    "react-native-webview": "13.13.5",
-    "swr": "^2.3.4",
-    "throttle-debounce": "^5.0.2",
-    "zod": "^3.24.2"
+    "@tailwindcss/cli": "^4.1.18",
+    "tailwindcss": "^4.1.18"
   },
-  "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@tingyuan/react-native-tailwindcss": "^0.0.18",
-    "@types/crypto-js": "^4.2.2",
-    "@types/he": "^1.2.3",
-    "@types/react": "~19.0.10",
-    "@types/throttle-debounce": "^5.0.2",
-    "babel-plugin-transform-remove-console": "^6.9.4",
-    "cross-env": "^7.0.3",
-    "daisyui": "^4.12.10",
-    "download-cli": "^1.1.1",
-    "eslint": "^9.25.0",
-    "eslint-config-expo": "~9.2.0",
-    "open": "8.4.2",
-    "postcss": "^8.4.38",
-    "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.8",
-    "rimraf": "^5.0.5",
-    "semver": "^7.5.1",
-    "tailwindcss": "^3.4.1",
-    "typescript": "~5.8.3",
-    "unplugin-alpinejs-component": "^0.0.10",
-    "vite": "^6.2.3",
-    "vite-plugin-singlefile": "^2.2.0",
-    "vitest": "^3.0.9",
-    "wrangler": "^4.6.0",
-    "zx": "^8.4.1"
-  },
-  "knip": {
-    "$schema": "https://unpkg.com/knip/schema.json",
-    "entry": [
-      "./index.js",
-      "./website/main.js"
-    ],
-    "project": [
-      "src/**",
-      "scripts/**"
-    ]
-  },
-  "config": {
-    "versionCode": 73,
-    "changelog": "update expo  动态页面改版"
-  },
-  "gitHead": "7fea38d"
+  "scripts": {
+    "android": "npm run android -w=@minibili/app",
+    "build:android": "npm run build:android -w=@minibili/app"
+  }
 }
