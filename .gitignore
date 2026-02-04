@@ -24,3 +24,5 @@ apk
 yalc.lock
 %ProgramData%
 .VSCodeCounter
+
+app/tailwind-output/
