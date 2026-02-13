@@ -1,38 +1,39 @@
-import { Button, Overlay } from "@rneui/themed";
-import React from "react";
+import { Button, Overlay } from '@rneui/themed'
+import React from 'react'
 
-import { colors } from "@/constants/colors.tw";
+import { colors } from '@/constants/colors.tw'
 
-import { useStore } from "../store";
-import Modal2 from "./Modal2";
+import { useStore } from '../store'
+import Modal2 from './Modal2'
 
 function ButtonsOverlay() {
-  const { overlayButtons, setOverlayButtons } = useStore();
+  const { overlayButtons, setOverlayButtons } = useStore()
   const dismiss = () => {
-    setOverlayButtons([]);
-  };
+    setOverlayButtons([])
+  }
+  const style = tw('w-full justify-start py-2.5 px-5')
   const Buttons = overlayButtons
-    .map((button) => {
+    .map(button => {
       if (!button) {
-        return null;
+        return null
       }
       return (
         <Button
           type="clear"
-          buttonStyle={tw("w-full justify-start py-2.5 px-5")}
+          buttonStyle={style}
           title={button.text}
           key={button.text}
           onPress={() => {
-            dismiss();
-            button.onPress();
+            dismiss()
+            button.onPress()
           }}
         />
-      );
+      )
     })
-    .filter(Boolean);
+    .filter(Boolean)
 
   if (!Buttons.length) {
-    return null;
+    return null
   }
   return (
     <Overlay
@@ -43,7 +44,7 @@ function ButtonsOverlay() {
     >
       {Buttons}
     </Overlay>
-  );
+  )
 }
 
-export default React.memo(ButtonsOverlay);
+export default React.memo(ButtonsOverlay)
