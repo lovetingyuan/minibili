@@ -4,6 +4,7 @@ import type { SearchBarCommands } from "react-native-screens";
 
 import { colors } from "@/constants/colors.tw";
 import useMounted from "@/hooks/useMounted";
+import useResolvedColor from "@/hooks/useResolvedColor";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import UpList from "./UpList";
@@ -19,7 +20,7 @@ const defaultSearchBarCommands: SearchBarCommands = {
 
 function SearchUps() {
   const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands);
-  const blackColor = tw(colors.black.text).color;
+  const blackColor = useResolvedColor(colors.black.text);
   const [searchKeyWord, setSearchKeyWord] = React.useState("");
 
   useUpdateNavigationOptions(

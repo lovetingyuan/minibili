@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { BottomSheet, Icon, Text } from "@rneui/themed";
-import { FlashList } from "@shopify/flash-list";
+import { BottomSheet, Icon, Text } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
@@ -46,7 +46,7 @@ export default function ReplyList() {
         <View className="flex-1 bg-neutral-200 dark:bg-neutral-900">
           <FlashList
             data={replies}
-            keyExtractor={(v) => `${v.id}@${v.root}`}
+            keyExtractor={(v: ReplyItemType) => `${v.id}@${v.root}`}
             renderItem={({ item }: { item: ReplyItemType }) => {
               return (
                 <View className="mb-2 px-5">
@@ -65,7 +65,7 @@ export default function ReplyList() {
             ListEmptyComponent={
               isLoading ? (
                 <View className="h-40 flex-1 items-center justify-center">
-                  <ActivityIndicator size={50} color={tw(colors.secondary.text).color} />
+                  <ActivityIndicator size={50} colorClassName={colors.secondary.accent} />
                 </View>
               ) : (
                 <Text className="my-10 text-center text-base">
@@ -80,7 +80,7 @@ export default function ReplyList() {
                 </Text>
               ) : null
             }
-            contentContainerStyle={tw("pb-5")}
+            contentContainerClassName="pb-5"
             onEndReached={() => {
               update();
             }}

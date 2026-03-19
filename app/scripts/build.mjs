@@ -7,7 +7,7 @@
 const z = require("zod");
 const { usePowerShell } = require("zx");
 
-// eslint-disable-next-line react-hooks/rules-of-hooks
+// oxlint-disable-next-line react-hooks/rules-of-hooks
 usePowerShell();
 
 const BuildListSchema = z

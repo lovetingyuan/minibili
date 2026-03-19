@@ -1,4 +1,4 @@
-import { Chip, Icon, ListItem, Text } from "@rneui/themed";
+import { Chip, Icon, ListItem, Text } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
 
@@ -17,7 +17,7 @@ function SortCate() {
   return (
     <ListItem.Accordion
       icon={<Icon name={"chevron-down"} type="material-community" />}
-      containerStyle={tw("p-0 mt-1 mb-3 bg-transparent")}
+      containerClassName="p-0 mt-1 mb-3 bg-transparent"
       content={
         <ListItem.Content>
           <ListItem.Title>调整分区顺序</ListItem.Title>
@@ -28,7 +28,7 @@ function SortCate() {
         setExpandedCate(!expandedCate);
       }}
     >
-      <ListItem containerStyle={tw("flex-wrap p-0 flex-row px-1 bg-transparent")}>
+      <ListItem containerClassName="flex-wrap p-0 flex-row px-1 bg-transparent">
         <View className="w-full flex-1 flex-row flex-wrap gap-x-3 border-b-[0.5px] border-b-gray-400">
           {sortedRankList.map((cate) => {
             return (
@@ -43,8 +43,8 @@ function SortCate() {
                   setUnSortedRankList(b);
                   set$videoCatesList([$videoCatesList[0], ...a, ...b]);
                 }}
-                containerStyle={tw("mb-2")}
-                buttonStyle={tw("px-[6px] py-[2px]")}
+                containerClassName="mb-2"
+                buttonClassName="px-[6px] py-[2px]"
               />
             );
           })}
@@ -66,8 +66,8 @@ function SortCate() {
                   setUnSortedRankList(b);
                   set$videoCatesList([$videoCatesList[0], ...a, ...b]);
                 }}
-                containerStyle={tw("mb-2")}
-                buttonStyle={tw("px-2 py-[2px]")}
+                containerClassName="mb-2"
+                buttonClassName="px-2 py-[2px]"
               />
             );
           })}

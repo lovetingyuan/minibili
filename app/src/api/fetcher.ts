@@ -37,8 +37,10 @@ if (typeof __DEV__ === "undefined") {
 
 export default async function request<D>(url: string): Promise<D> {
   let requestUrl = url.startsWith("http") ? url : `https://api.bilibili.com${url}`;
-  // eslint-disable-next-line no-console
-  __DEV__ && console.log("request url: ", url.slice(0, 150));
+  if (__DEV__) {
+    // oxlint-disable-next-line no-console
+    console.log("request url: ", url.slice(0, 150));
+  }
   const headers = {
     accept: "application/json, text/plain, */*",
     "accept-language": "zh-CN,zh;q=0.9",
@@ -123,7 +125,7 @@ export default async function request<D>(url: string): Promise<D> {
   if (res.code && url !== "/x/web-interface/nav") {
     // reportApiError(url, res)
     if (__DEV__) {
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       console.error(url, res);
     }
     return Promise.reject(new ApiError(`${res.code}:${res.message} ${url}`, url, res));

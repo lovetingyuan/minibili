@@ -1,6 +1,6 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Skeleton } from "@rneui/themed";
+import { Skeleton } from "@/components/styled/rneui";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { BackHandler, Platform, Share, View } from "react-native";
 import WebView from "react-native-webview";

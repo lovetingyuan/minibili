@@ -1,15 +1,16 @@
 import { useBackHandler } from "@react-native-community/hooks";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { Button, Icon, Text } from "@rneui/themed";
-import { FlashList } from "@shopify/flash-list";
+import { Button, Icon, Text } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
-import { Image } from "expo-image";
+import { Image } from "@/components/styled/expo";
 import React from "react";
 import { Alert, ImageBackground, Linking, View } from "react-native";
 import type { SearchBarCommands } from "react-native-screens";
 
 import { colors } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import { type AppContextValueType, useStore } from "@/store";
 import type { NavigationProps } from "@/types";
@@ -135,7 +136,7 @@ function MusicItem(props: {
               onLongPress={() => {
                 setOverlayButtons(buttons());
               }}
-              color={isPlaying ? tw(colors.secondary.text).color : "white"}
+              colorClassName={isPlaying ? colors.secondary.accent : "accent-white"}
             />
           )}
         </ImageBackground>
@@ -180,7 +181,7 @@ const defaultSearchBarCommands: SearchBarCommands = {
 function MusicList() {
   const { $musicList } = useStore();
   const list = $musicList[0].songs;
-  const blackColor = tw(colors.black.text).color;
+  const blackColor = useResolvedColor(colors.black.text);
   const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands);
   const [searchKeyWord, setSearchKeyWord] = React.useState("");
   const focused = useIsFocused();
@@ -270,7 +271,7 @@ function MusicList() {
               <Text className={`${colors.gray6.text} my-2 py-1 text-center text-xs`}>到底了</Text>
             ) : null
           }
-          contentContainerStyle={tw("px-4 pt-4")}
+          contentContainerClassName="px-4 pt-4"
           estimatedFirstItemOffset={80}
         />
       </View>

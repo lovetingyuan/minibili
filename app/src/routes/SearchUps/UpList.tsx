@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { Avatar, Button, Skeleton, Text } from "@rneui/themed";
-import { FlashList } from "@shopify/flash-list";
+import { Avatar, Button, Skeleton, Text } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import React from "react";
 import { Alert, TouchableOpacity, View } from "react-native";
@@ -11,6 +11,7 @@ import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
 import type { NavigationProps } from "@/types";
 import { parseNumber } from "@/utils";
+import type { FlashListRef } from "@/components/styled/rneui";
 
 function SearchUpItem(props: { up: SearchedUpType }) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
@@ -114,7 +115,7 @@ function UpList(props: { keyword: string }) {
     isReachingEnd,
     isValidating,
   } = useSearchUps(props.keyword);
-  const listRef = React.useRef<FlashList<any> | null>(null);
+  const listRef = React.useRef<FlashListRef<SearchedUpType> | null>(null);
   React.useEffect(() => {
     if (listRef.current) {
       listRef.current.scrollToOffset({ offset: 0 });
@@ -124,7 +125,7 @@ function UpList(props: { keyword: string }) {
     <FlashList
       data={searchedUps}
       ref={listRef}
-      keyExtractor={(v) => `${v.mid}`}
+      keyExtractor={(v: SearchedUpType) => `${v.mid}`}
       renderItem={({ item }: { item: SearchedUpType }) => {
         return <SearchUpItem up={item} />;
       }}
@@ -138,7 +139,7 @@ function UpList(props: { keyword: string }) {
           <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>暂无更多</Text>
         ) : null
       }
-      contentContainerStyle={tw("px-1 pt-6")}
+      contentContainerClassName="px-1 pt-6"
       estimatedFirstItemOffset={80}
       onEndReached={() => {
         update();

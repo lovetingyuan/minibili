@@ -1,4 +1,4 @@
-import { Button, Text } from "@rneui/themed";
+import { Button, Text } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
 
@@ -30,7 +30,7 @@ function TextAction(
               size="sm"
               key={button.text}
               loading={!!button.loading}
-              buttonStyle={tw("h-8")}
+              buttonClassName="h-8"
               titleStyle={button.color ? { color: button.color } : undefined}
               onPress={() => {
                 button.onPress();

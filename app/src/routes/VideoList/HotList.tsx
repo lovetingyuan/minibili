@@ -11,7 +11,7 @@ export default React.memo(Hot);
 
 function Hot() {
   const [reload, setReload] = React.useState(0);
-  const { list, page, setSize, isRefreshing, loading, mutate, isReachingEnd, error } =
+  const { list, update, isRefreshing, loading, mutate, isReachingEnd, error } =
     useHotVideos(reload);
   React.useEffect(() => {
     if (Date.now() - refreshTime > 5 * 60 * 1000) {
@@ -34,16 +34,11 @@ function Hot() {
       type="Hot"
       videos={list || []}
       isRefreshing={isRefreshing}
-      onReachEnd={() => {
-        if (isReachingEnd) {
-          return;
-        }
-        setSize(page + 1);
-      }}
+      onReachEnd={update}
       onRefresh={(fab) => {
         // mutate()
         if (!fab) {
-          setReload(reload + 1);
+          setReload((current) => current + 1);
         } else {
           mutate();
         }

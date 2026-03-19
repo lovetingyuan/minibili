@@ -1,4 +1,4 @@
-import { Dialog, Text } from "@rneui/themed";
+import { Dialog, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Linking } from "react-native";
 
@@ -11,6 +11,7 @@ import Modal2 from "./Modal2";
 export default function RemoteConfig() {
   const remoteConfig = useRemoteConfig();
   const [visible, setVisible] = React.useState(true);
+  const modalComponent = Modal2 as unknown as typeof React.Component;
   const toggleDialog = () => {
     setVisible(!visible);
   };
@@ -24,12 +25,12 @@ export default function RemoteConfig() {
     return (
       <Dialog
         isVisible={visible}
-        overlayStyle={tw(colors.gray2.bg)}
-        ModalComponent={Modal2 as unknown as typeof React.Component}
-        backdropStyle={tw("bg-neutral-900/90")}
+        overlayClassName={colors.gray2.bg}
+        ModalComponent={modalComponent}
+        backdropClassName="bg-neutral-900/90"
         onBackdropPress={remoteConfig.statement.dismiss ? toggleDialog : undefined}
       >
-        <Dialog.Title title={remoteConfig.statement.title} titleStyle={tw(colors.black.text)} />
+        <Dialog.Title title={remoteConfig.statement.title} titleClassName={colors.black.text} />
         <Text>{remoteConfig.statement.content}</Text>
         <Dialog.Actions>
           {remoteConfig.statement.dismiss ? (

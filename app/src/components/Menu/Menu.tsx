@@ -31,18 +31,6 @@ enum States {
   Shown,
 }
 
-interface State {
-  buttonHeight: number;
-  buttonWidth: number;
-  left: number;
-  menuHeight: number;
-  menuSizeAnimation: Animated.ValueXY;
-  menuState: States;
-  menuWidth: number;
-  opacityAnimation: Animated.Value;
-  top: number;
-}
-
 const EASING = Easing.bezier(0.4, 0, 0.2, 1);
 const SCREEN_INDENT = 8;
 
@@ -107,7 +95,7 @@ export function Menu(props: MenuProps) {
     } else {
       hide();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
   // 菜单布局回调

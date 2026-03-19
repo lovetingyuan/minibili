@@ -1,6 +1,6 @@
 import { type RouteProp, useRoute } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Dialog, Icon, Input, Text } from "@rneui/themed";
+import { Dialog, Icon, Input, Text } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
@@ -38,7 +38,9 @@ export function PlayHeaderTitle() {
       <Text
         className="ml-3 text-gray-500 dark:text-gray-400"
         onPress={() => {
-          fans && showToast(`粉丝：${fans.follower}`);
+          if (fans) {
+            showToast(`粉丝：${fans.follower}`);
+          }
         }}
       >
         {` ${fans?.follower ? parseNumber(fans.follower) : ""}粉丝`}
@@ -76,11 +78,11 @@ function SongInfoModal(props: { videoInfo: any; cid: number; onClose: () => void
   return (
     <Dialog
       isVisible={true}
-      overlayStyle={tw(colors.gray2.bg)}
-      backdropStyle={tw("bg-neutral-900/90")}
+      overlayClassName={colors.gray2.bg}
+      backdropClassName="bg-neutral-900/90"
       onBackdropPress={props.onClose}
     >
-      <Dialog.Title title={"添加到歌单"} titleStyle={tw(colors.black.text)} />
+      <Dialog.Title title={"添加到歌单"} titleClassName={colors.black.text} />
       <View className="mt-3">
         <Input
           label="歌曲名称"
@@ -89,7 +91,7 @@ function SongInfoModal(props: { videoInfo: any; cid: number; onClose: () => void
           // className="mt-5 h-20"
           maxLength={100}
           value={title}
-          placeholderTextColor={tw(colors.gray4.text).color}
+          placeholderTextColorClassName={colors.gray4.accent}
           onChangeText={(value) => {
             setTitle(value);
           }}
@@ -100,7 +102,7 @@ function SongInfoModal(props: { videoInfo: any; cid: number; onClose: () => void
           // className="mt-5 h-20"
           maxLength={60}
           value={singer}
-          placeholderTextColor={tw(colors.gray4.text).color}
+          placeholderTextColorClassName={colors.gray4.accent}
           onChangeText={(value) => {
             setSinger(value);
           }}
@@ -111,7 +113,7 @@ function SongInfoModal(props: { videoInfo: any; cid: number; onClose: () => void
           // className="mt-5 h-20"
           maxLength={10}
           value={`${year}`}
-          placeholderTextColor={tw(colors.gray4.text).color}
+          placeholderTextColorClassName={colors.gray4.accent}
           onChangeText={(value) => {
             setYear(value);
           }}
@@ -121,11 +123,11 @@ function SongInfoModal(props: { videoInfo: any; cid: number; onClose: () => void
         <Dialog.Button title="添加到歌单" onPress={handleAddSong} />
         <Dialog.Button
           title="网络搜索"
-          titleStyle={tw(colors.success.text)}
+          titleClassName={colors.success.text}
           onPress={handleSearchInternet}
         />
         <Dialog.Button
-          titleStyle={tw(colors.gray6.text)}
+          titleClassName={colors.gray6.text}
           title="取消"
           onPress={() => {
             props.onClose();
@@ -150,16 +152,15 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
   const musicSongsMap = useMusicSongsMap();
   return (
     <View className="flex-row items-center gap-2">
-      <Menu
-        visible={visible}
-        // @ts-expect-error className will be handled
-        className="bg-white dark:bg-zinc-900"
-        anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
-        onRequestClose={hideMenu}
+        <Menu
+          visible={visible}
+          className="bg-white dark:bg-zinc-900"
+          anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
+          onRequestClose={hideMenu}
       >
         <MenuItem
-          textStyle={tw("text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName="text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             if (props.cid) {
               showToast("请稍后在浏览器中下载");
@@ -183,8 +184,8 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           下载视频
         </MenuItem>
         <MenuItem
-          textStyle={tw("text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName="text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             hideMenu();
             if (videoInfo.cover) {
@@ -197,8 +198,8 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           下载封面
         </MenuItem>
         <MenuItem
-          textStyle={tw("text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName="text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             hideMenu();
             props.refresh();
@@ -207,8 +208,8 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           刷新
         </MenuItem>
         <MenuItem
-          textStyle={tw("text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName="text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             hideMenu();
             Linking.openURL(`https://www.bilibili.com/video/${videoInfo.bvid}`);
@@ -217,8 +218,8 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           浏览器打开
         </MenuItem>
         <MenuItem
-          textStyle={tw("text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName="text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             Clipboard.setStringAsync(`https://www.bilibili.com/video/${videoInfo.bvid}`).then(
               () => {
@@ -231,8 +232,8 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           复制链接
         </MenuItem>
         <MenuItem
-          textStyle={tw(" text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName=" text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             hideMenu();
             if (!props.cid || !videoInfo.cover || !videoInfo.duration) {

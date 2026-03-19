@@ -1,5 +1,7 @@
+import '../global.css'
+
 import NetInfo from '@react-native-community/netinfo'
-import { ThemeProvider } from '@rneui/themed'
+import { ThemeProvider } from '@/components/styled/rneui'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 import { AppState } from 'react-native'
@@ -18,13 +20,9 @@ import RemoteConfig from './components/RemoteConfig'
 import UserLocation from './components/UserLocation'
 import useRNETheme from './hooks/useRNETheme'
 import Route from './routes/Index'
-import { AppContextProvider, InitStoreComp, onChange, useAppValue } from './store'
 import ErrorBoundary from 'react-native-error-boundary'
 import ErrorFallback from './components/ErrorFallback'
-// import { SafeAreaView } from 'react-native-safe-area-context'
-import { TailwindProvider } from '@tingyuan/react-native-tailwindcss'
-import { styleSheets, breakPoints } from '../tailwind-output/styles'
-console.log(99999, styleSheets)
+import { InitStoreComp } from './store'
 
 let online = true
 const focus = true
@@ -69,29 +67,23 @@ const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
 
 export default function App() {
   const rneTheme = useRNETheme()
-  const appValue = useAppValue()
   return (
-    // <SafeAreaView className="flex-1 shrink-0">
-    <TailwindProvider utilities={styleSheets} breakPoints={breakPoints}>
-      <SWRConfig value={SWRConfigValue}>
-        <AppContextProvider value={appValue} onChange={onChange}>
-          <ThemeProvider theme={rneTheme}>
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-              <InitStoreComp />
-              <RemoteConfig />
-              <CheckAppUpdate />
-              <CheckUpUpdate />
-              <CheckNetState />
-              <CheckLiveUps />
-              <ButtonsOverlay />
-              <ImagesView />
-              <UserLocation />
-              <Route />
-            </ErrorBoundary>
-          </ThemeProvider>
-        </AppContextProvider>
-        <StatusBar style="auto" translucent />
-      </SWRConfig>
-    </TailwindProvider>
+    <SWRConfig value={SWRConfigValue}>
+      <ThemeProvider theme={rneTheme}>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <InitStoreComp />
+          <RemoteConfig />
+          <CheckAppUpdate />
+          <CheckUpUpdate />
+          <CheckNetState />
+          <CheckLiveUps />
+          <ButtonsOverlay />
+          <ImagesView />
+          <UserLocation />
+          <Route />
+        </ErrorBoundary>
+      </ThemeProvider>
+      <StatusBar style="auto" translucent />
+    </SWRConfig>
   )
 }

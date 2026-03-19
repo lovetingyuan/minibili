@@ -1,5 +1,5 @@
 import { type RouteProp, useRoute } from "@react-navigation/native";
-import { Icon } from "@rneui/themed";
+import { Icon } from "@/components/styled/rneui";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, Share } from "react-native";
@@ -26,14 +26,13 @@ function HeaderRight(props: { reload: () => void }) {
     // <View className="flex-row items-center gap-3">
     <Menu
       visible={visible}
-      // @ts-expect-error className will be handled
       className="bg-white dark:bg-zinc-900"
       anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
       onRequestClose={hideMenu}
     >
       <MenuItem
-        textStyle={tw("text-black dark:text-gray-300")}
-        pressColor={tw(colors.gray4.text).color}
+        textClassName="text-black dark:text-gray-300"
+        pressColorClassName={colors.gray4.accent}
         onPress={() => {
           setWebViewMode(webViewMode === "MOBILE" ? "PC" : "MOBILE");
           hideMenu();
@@ -42,8 +41,8 @@ function HeaderRight(props: { reload: () => void }) {
         {webViewMode === "MOBILE" ? "电脑模式" : "手机模式"}
       </MenuItem>
       <MenuItem
-        textStyle={tw("text-black dark:text-gray-300")}
-        pressColor={tw(colors.gray4.text).color}
+        textClassName="text-black dark:text-gray-300"
+        pressColorClassName={colors.gray4.accent}
         onPress={() => {
           hideMenu();
           Linking.openURL(url);
@@ -52,8 +51,8 @@ function HeaderRight(props: { reload: () => void }) {
         浏览器打开
       </MenuItem>
       <MenuItem
-        textStyle={tw("text-black dark:text-gray-300")}
-        pressColor={tw(colors.gray4.text).color}
+        textClassName="text-black dark:text-gray-300"
+        pressColorClassName={colors.gray4.accent}
         onPress={() => {
           hideMenu();
           props.reload();
@@ -62,8 +61,8 @@ function HeaderRight(props: { reload: () => void }) {
         刷新页面
       </MenuItem>
       <MenuItem
-        textStyle={tw("text-black dark:text-gray-300")}
-        pressColor={tw(colors.gray4.text).color}
+        textClassName="text-black dark:text-gray-300"
+        pressColorClassName={colors.gray4.accent}
         onPress={() => {
           Clipboard.setStringAsync(url).then(() => {
             showToast(`已复制链接：${url}`);
@@ -74,8 +73,8 @@ function HeaderRight(props: { reload: () => void }) {
         复制链接
       </MenuItem>
       <MenuItem
-        textStyle={tw("text-black dark:text-gray-300")}
-        pressColor={tw(colors.gray4.text).color}
+        textClassName="text-black dark:text-gray-300"
+        pressColorClassName={colors.gray4.accent}
         onPress={() => {
           hideMenu();
           Share.share({

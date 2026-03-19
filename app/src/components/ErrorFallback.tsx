@@ -9,7 +9,7 @@ import { site } from '../constants'
 
 export default function ErrorFallback(props: { error: Error; resetError: Function }) {
   if (__DEV__) {
-    // eslint-disable-next-line no-console
+    // oxlint-disable-next-line no-console
     console.error(props.error)
   }
   return (

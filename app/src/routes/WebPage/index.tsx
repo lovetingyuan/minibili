@@ -1,6 +1,6 @@
 import { useRefresh } from "@react-native-community/hooks";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-// import { Text } from '@rneui/themed'
+// import { Text } from '@/components/styled/rneui'
 // import { ResizeMode, Video } from 'expo-av'
 import React from "react";
 import { Dimensions, Image, RefreshControl, ScrollView, View } from "react-native";
@@ -94,7 +94,7 @@ function WebPage({ route }: Props) {
         }
       }}
       onLoad={() => {
-        isDark &&
+        if (isDark) {
           webviewRef.current?.injectJavaScript(`
         const style = document.createElement('style');
         style.textContent = \`
@@ -112,6 +112,7 @@ function WebPage({ route }: Props) {
         document.head.appendChild(style);
       true;
    `);
+        }
       }}
       onError={() => {
         showToast("加载失败");

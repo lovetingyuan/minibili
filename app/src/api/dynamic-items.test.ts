@@ -19,8 +19,8 @@ test("dynamic-list", async () => {
       const result = DynamicListResponseSchema.safeParse(res);
       if (result.success === false) {
         failedList.push(`zod-${mid}`);
-        console.log(`${mid} zod error`);
-        console.error(result.error);
+        
+        
         fs.writeFileSync(`dynamic-list-${mid}.json`, JSON.stringify(res));
       }
       if (res.has_more) {
@@ -33,15 +33,13 @@ test("dynamic-list", async () => {
           const ret = DynamicListResponseSchema.safeParse(res2);
           if (ret.success === false) {
             failedList.push(`zod2-${mid}`);
-            console.log(`${mid} zod2 error`);
-            console.error(ret.error);
+            
+            
           }
         }
       }
     }
   }
-  failedList.length && console.log("Failed mid list:", failedList);
-  list352.length && console.log(`352 list: ${list352.length}`, list352);
   if (failedList.length) {
     throw new Error("dynamic list failed");
   }

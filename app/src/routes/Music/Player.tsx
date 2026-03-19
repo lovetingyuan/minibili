@@ -1,24 +1,20 @@
-import { Icon, Slider, Text } from "@rneui/themed";
+import { Icon, Slider, Text } from "@/components/styled/rneui";
 import { clsx } from "clsx";
-import { Audio, type AVPlaybackStatus } from "expo-av";
-import React, { useEffect } from "react";
+import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import React from "react";
 import { ImageBackground, TouchableOpacity, View } from "react-native";
 
 import { useAudioUrl } from "@/api/play-url";
 import { UA } from "@/constants";
 import { colors } from "@/constants/colors.tw";
 import useIsDark from "@/hooks/useIsDark";
-import useMemoizedFn from "@/hooks/useMemoizedFn";
 import { useStore } from "@/store";
 import { parseImgUrl, parseTime, showToast } from "@/utils";
 
-Audio.setAudioModeAsync({
-  staysActiveInBackground: true,
-  playsInSilentModeIOS: true,
-  // interruptionModeIOS: InterruptionModeIOS.DuckOthers,
-  // interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
-  // shouldDuckAndroid: true,
-  // playThroughEarpieceAndroid: true,
+void setAudioModeAsync({
+  shouldPlayInBackground: true,
+  playsInSilentMode: true,
+  interruptionMode: "doNotMix",
 });
 
 const shadowStyle = {
@@ -32,16 +28,6 @@ const shadowStyle = {
 // const audioSoundCache = {}
 function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   const { playingSong, get$musicList, setPlayingSong } = useStore();
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [playFinished, setPlayFinished] = React.useState(false);
-  const [playingTime, setPlayingTime] = React.useState(0);
-  const soundRef = React.useRef<Audio.Sound | null>(null);
-  const unmountRef = React.useRef(false);
-
-  const stop = () => {
-    return soundRef.current?.unloadAsync().catch(() => {});
-  };
-
   const [playMode, setPlayMode] = React.useState<"single" | "order" | "loop">("single");
   const { prevSong, nextSong } = React.useMemo(() => {
     if (!playingSong) {
@@ -57,86 +43,61 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
       nextSong: songs[index + 1] ?? null,
     };
   }, [playingSong, get$musicList]);
-
-  const handlePlayStatusChange = useMemoizedFn(
-    React.useMemo(() => {
-      return (status: AVPlaybackStatus) => {
-        if (status.isLoaded) {
-          setIsPlaying(status.isPlaying);
-          setPlayFinished(status.didJustFinish);
-          setPlayingTime(status.positionMillis);
-          if (status.didJustFinish) {
-            if (playMode === "order") {
-              soundRef.current?.stopAsync();
-              if (nextSong) {
-                setPlayingSong(nextSong);
-              }
-            }
-          }
+  const player = useAudioPlayer(
+    props.url
+      ? {
+          uri: props.url,
+          headers: {
+            "user-agent": UA,
+            referer: "https://www.bilibili.com",
+          },
+          name: playingSong?.name,
         }
-      };
-    }, [playMode, nextSong, setPlayingSong]),
+      : null,
+    {
+      updateInterval: 1000,
+    },
   );
-  const getPlayMode = useMemoizedFn(() => {
-    return playMode;
-  });
+  const status = useAudioPlayerStatus(player);
+  const isPlaying = status.playing;
+  const playFinished = status.didJustFinish;
+  const playingTime = Math.floor(status.currentTime * 1000);
+
   React.useEffect(() => {
     if (!props.url) {
       return;
     }
-    setIsPlaying(false);
-    setPlayingTime(0);
-    setPlayFinished(false);
-    if (unmountRef.current) {
+
+    player.play();
+  }, [player, props.url]);
+
+  React.useEffect(() => {
+    player.loop = playMode === "loop";
+  }, [playMode, player]);
+
+  React.useEffect(() => {
+    if (!status.didJustFinish || playMode !== "order" || !nextSong) {
       return;
     }
-    Promise.resolve(stop())
-      .then(() => {
-        return Audio.Sound.createAsync(
-          {
-            uri: props.url!,
-            headers: {
-              "user-agent": UA,
-              referer: "https://www.bilibili.com",
-            },
-          },
-          {
-            isLooping: getPlayMode() === "loop" || getPlayMode() === "order",
-            shouldPlay: true,
-          },
-          handlePlayStatusChange,
-        );
-      })
-      .then(({ sound }) => {
-        soundRef.current = sound;
-        if (unmountRef.current) {
-          stop();
-          return;
-        }
-      })
-      .catch(() => {
-        showToast("抱歉，播放失败");
-      });
-    return () => {
-      stop();
-    };
-  }, [props.url, handlePlayStatusChange, getPlayMode]);
 
-  useEffect(() => {
-    return () => {
-      unmountRef.current = true;
-      stop();
-    };
-  }, []);
+    setPlayingSong(nextSong);
+  }, [nextSong, playMode, setPlayingSong, status.didJustFinish]);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     return () => {
-  //       unmountRef.current = true
-  //       stop()
-  //     }
-  //   }, []),
-  // )
+  React.useEffect(() => {
+    if (!playingSong || !props.url) {
+      return;
+    }
+
+    player.setActiveForLockScreen(true, {
+      title: playingSong.name,
+      artist: playingSong.singer,
+      artworkUrl: parseImgUrl(playingSong.cover, 240, 240),
+    });
+
+    return () => {
+      player.setActiveForLockScreen(false);
+    };
+  }, [player, playingSong, props.url]);
 
   const isDark = useIsDark();
   if (!playingSong) {
@@ -169,11 +130,16 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
             className="h-full items-center justify-center"
             onPress={() => {
               if (isPlaying) {
-                soundRef.current?.pauseAsync();
+                player.pause();
               } else if (playFinished) {
-                soundRef.current?.replayAsync();
+                player
+                  .seekTo(0)
+                  .then(() => {
+                    player.play();
+                  })
+                  .catch(() => {});
               } else {
-                soundRef.current?.playAsync();
+                player.play();
               }
             }}
             color={"white"}
@@ -185,7 +151,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
               className="flex-1 text-lg"
               ellipsizeMode="tail"
               onPress={() => {
-                soundRef.current?.playAsync();
+                player.play();
               }}
               numberOfLines={1}
             >
@@ -224,7 +190,6 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
                 const mode =
                   playMode === "single" ? "order" : playMode === "order" ? "loop" : "single";
                 setPlayMode(mode);
-                soundRef.current?.setIsLoopingAsync(mode === "loop" || mode === "order");
               }}
             >
               <Text className={colors.primary.text}>
@@ -243,19 +208,18 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
 
             {props.url ? (
               <Slider
-                // @ts-ignore
                 className="h-2 flex-1"
                 value={playingTime}
                 onValueChange={(currentTime) => {
-                  soundRef.current?.setPositionAsync(currentTime);
+                  player.seekTo(currentTime / 1000).catch(() => {});
                 }}
                 maximumValue={props.time}
                 minimumValue={0}
                 step={1000}
                 allowTouchTrack
-                minimumTrackTintColor={tw(colors.secondary.text).color}
-                trackStyle={tw("h-1 rounded")}
-                thumbStyle={tw(`${colors.secondary.bg} w-3 h-3 rounded-full`)}
+                minimumTrackTintColorClassName={colors.secondary.accent}
+                trackClassName="h-1 rounded"
+                thumbClassName={clsx(colors.secondary.bg, "h-3 w-3 rounded-full")}
               />
             ) : null}
             <Text className="text-xs">{parseTime(props.time || 0)}</Text>

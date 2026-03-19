@@ -17,7 +17,7 @@ web-build/
 .env
 .env.*
 tmp
-apk
+apk/
 .tmp
 
 .yalc

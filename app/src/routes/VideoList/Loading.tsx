@@ -1,4 +1,4 @@
-import { Skeleton } from "@rneui/themed";
+import { Skeleton } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
 

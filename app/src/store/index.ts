@@ -1,12 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
-import React from "react";
 import {
-  type AtomicContextMethodsType,
-  type ContextOnChangeType,
-  createAtomicContext,
-  useAtomicContext,
-} from "react-atomic-context";
+  createStore,
+  type AtomicStoreMethodsType,
+} from "react-atomic-store";
 
 import { RanksConfig } from "../constants";
 import useMounted from "../hooks/useMounted";
@@ -88,61 +85,72 @@ export const getAppValue = () => {
 };
 
 const initValue = getAppValue();
-const AppContext = createAtomicContext(initValue);
-const storedKeys = Object.keys(initValue).filter((k) => k.startsWith("$")) as StoredKeys[];
-export function useAppValue() {
-  return React.useMemo(() => getAppValue(), []);
-}
-export function useStore() {
-  return useAtomicContext(AppContext);
-}
-
-export const AppContextProvider = AppContext.Provider;
+const appStore = createStore("AppStore", initValue);
+const storedKeys = Object.keys(initValue).filter((key): key is StoredKeys => key.startsWith("$"));
+export const useStore = appStore.useStore;
 
 export type AppContextValueType = ReturnType<typeof getAppValue>;
 
-export type AppContextMethodsType = AtomicContextMethodsType<AppContextValueType>;
+export type AppContextMethodsType = AtomicStoreMethodsType<AppContextValueType>;
 
-export const onChange: ContextOnChangeType<AppContextValueType> = ({ key, value }, ctx) => {
-  if (!ctx.getInitialed()) {
+type StoredKeys<K extends keyof AppContextValueType = keyof AppContextValueType> = K extends `$${string}`
+  ? K
+  : never;
+type StoreSetterKey<K extends string> = `set${K}`;
+type StoreSetterValue<K extends StoredKeys> =
+  | AppContextValueType[K]
+  | ((value: AppContextValueType[K]) => AppContextValueType[K]);
+
+async function hydrateStoredValue<K extends StoredKeys>(
+  methods: AppContextMethodsType,
+  key: K,
+) {
+  const data = await AsyncStorage.getItem(StoragePrefix + key);
+  if (!data) {
     return;
   }
-  if (key.startsWith("$")) {
-    AsyncStorage.setItem(StoragePrefix + key, JSON.stringify(value));
+  if (key === "$videoCatesList") {
+    const list = JSON.parse(data) as typeof RanksConfig;
+    RanksConfig.forEach((r) => {
+      if (!list.find((v) => v.rid === r.rid)) {
+        list.push({ ...r });
+      }
+    });
+    methods.set$videoCatesList(list);
+    return;
   }
-};
+  const setKey = `set${key}` as StoreSetterKey<K>;
+  const setValue = methods[setKey] as (value: StoreSetterValue<K>) => void;
+  setValue(JSON.parse(data) as AppContextValueType[K]);
+}
 
-type StoredKeys<K = keyof AppContextValueType> = K extends `$${string}` ? K : never;
-
-export const InitStoreComp = React.memo(function InitStoreComp() {
-  const methods = useAtomicContext(AppContext);
+export function InitStoreComp() {
   useMounted(() => {
+    const methods = appStore.getStoreMethods();
+    let unsubscribe: (() => void) | undefined;
+    let canceled = false;
+
     Promise.all(
-      storedKeys.map((k) => {
-        const key = k as StoredKeys;
-        const setKey = `set${key}` as const;
-        return AsyncStorage.getItem(StoragePrefix + key).then((data) => {
-          if (data) {
-            if (key === "$videoCatesList") {
-              const list = JSON.parse(data) as typeof RanksConfig;
-              RanksConfig.forEach((r) => {
-                if (!list.find((v) => v.rid === r.rid)) {
-                  list.push({ ...r });
-                }
-              });
-              methods.set$videoCatesList(list);
-            } else {
-              methods[setKey](JSON.parse(data));
-            }
-          }
-        });
-      }),
+      storedKeys.map((key) => hydrateStoredValue(methods, key)),
     ).then(() => {
+      if (canceled) {
+        return;
+      }
       methods.setInitialed(true);
+      unsubscribe = appStore.subscribeStore(({ key, value }) => {
+        if (key.startsWith("$")) {
+          void AsyncStorage.setItem(StoragePrefix + key, JSON.stringify(value));
+        }
+      });
       setTimeout(() => {
-        SplashScreen.hideAsync();
+        void SplashScreen.hideAsync();
       }, 100);
     });
+
+    return () => {
+      canceled = true;
+      unsubscribe?.();
+    };
   });
   return null;
-});
+}

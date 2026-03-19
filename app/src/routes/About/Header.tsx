@@ -1,4 +1,4 @@
-import { Button, Icon } from "@rneui/themed";
+import { Button, Icon } from "@/components/styled/rneui";
 import React from "react";
 import { Share } from "react-native";
 

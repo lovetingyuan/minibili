@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { Avatar, Badge, Text } from "@rneui/themed";
-import { Image } from "expo-image";
+import { Avatar, Badge, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Alert, Linking, Pressable, TouchableOpacity, View } from "react-native";
 
@@ -160,7 +159,6 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       <View className="relative">
         <Avatar
           size={48}
-          ImageComponent={Image}
           rounded
           source={{
             uri: parseImgUrl(face, 120),
@@ -180,16 +178,16 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         {hasUpdate ? (
           <Badge
             key={mid}
-            badgeStyle={tw(
-              `h-4 w-4 rounded-full absolute top-[-45px] left-[38px] ${colors.secondary.bg}`,
-            )}
+            badgeClassName={`absolute left-[38px] top-[-45px] h-4 w-4 rounded-full ${colors.secondary.bg}`}
           />
         ) : null}
       </View>
       <Text
-        className={`flex-1 shrink-0 py-2 text-center text-sm ${
-          pin ? `font-bold ${colors.primary.text}` : ""
-        } ${hasUpdate ? colors.secondary.text : ""}`}
+        className={`
+          flex-1 shrink-0 py-2 text-center text-sm
+          ${pin ? `font-bold ${colors.primary.text}` : ""}
+          ${hasUpdate ? colors.secondary.text : ""}
+        `}
         numberOfLines={2}
         ellipsizeMode="tail"
       >

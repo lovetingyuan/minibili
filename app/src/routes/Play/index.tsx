@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Text } from "@rneui/themed";
+import { Text } from "@/components/styled/rneui";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Alert, View } from "react-native";

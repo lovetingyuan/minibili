@@ -1,5 +1,5 @@
-import { Overlay } from "@rneui/themed";
-import { Image } from "expo-image";
+import { Overlay } from "@/components/styled/rneui";
+import { Image } from "@/components/styled/expo";
 import React from "react";
 import { Linking, ScrollView, Text, useWindowDimensions, View } from "react-native";
 import PagerView from "react-native-pager-view";
@@ -8,7 +8,6 @@ import useLatest from "@/hooks/useLatest";
 import { parseImgUrl } from "@/utils";
 
 import { useStore } from "../store";
-import Image2 from "./Image2";
 export default React.memo(ImagesView);
 
 const textShadow = {
@@ -60,10 +59,8 @@ function ImagesView() {
       } else if (current === i) {
         Object.assign(imageCompCache.current, {
           [v.url]: (
-            <Image2
+            <Image
               source={{ uri: v.url }}
-              // initWidth={96}
-              // initHeight={96}
               style={{ width: imgWidth, height: imgHeight }}
               placeholder={require("../../assets/loading2.gif")}
             />
@@ -77,7 +74,7 @@ function ImagesView() {
       //   return (
       //     <ScrollView
       //       key={v.url}
-      //       contentContainerStyle={tw('justify-center items-center')}
+      //       contentContainerClassName={'justify-center items-center')}
       //       className="flex-1 bg-white">
       //       {imageView}
       //     </ScrollView>
@@ -88,7 +85,7 @@ function ImagesView() {
           {overflow ? (
             <ScrollView
               key={v.url}
-              contentContainerStyle={tw("justify-center items-center")}
+              contentContainerClassName="justify-center items-center"
               className="flex-1 bg-black"
             >
               {imageView}
@@ -104,7 +101,7 @@ function ImagesView() {
     <Overlay
       isVisible={images.length > 0}
       fullScreen
-      overlayStyle={tw("p-0 m-0")}
+      overlayClassName="p-0 m-0"
       onBackdropPress={onClose}
     >
       <View className="relative flex-1">

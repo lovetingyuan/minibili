@@ -3,8 +3,7 @@
   "private": true,
   "workspaces": [
     "app",
-    "website",
-    "tailwind"
+    "website"
   ],
   "scripts": {
     "format": "oxfmt .",
@@ -19,7 +18,6 @@
   "devDependencies": {
     "@babel/preset-typescript": "^7.28.5",
     "@tailwindcss/vite": "^4.1.18",
-    "eslint": "^9.25.0",
     "oxfmt": "latest",
     "typescript": "~5.9.2",
     "vite": "^6.2.3",

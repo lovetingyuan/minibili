@@ -1,35 +1,25 @@
 import { DarkTheme, DefaultTheme } from '@react-navigation/native'
 import React from 'react'
+import { useResolveClassNames } from 'uniwind'
 
 import { RouteBackgroundColor } from '@/constants/colors.tw'
-import { useTWC } from '@/hooks/useTWC'
-
-import { useAppStateChange } from './useAppState'
 import useIsDark from './useIsDark'
 
 export default function useRouteTheme() {
   const isDark = useIsDark()
-  // const { backgroundColor } = useTWC(RouteBackgroundColor);
-  const backgroundColor = 'white'
-  const getRouteTheme = React.useCallback(() => {
+  const { backgroundColor } = useResolveClassNames(RouteBackgroundColor)
+  const resolvedBackgroundColor =
+    typeof backgroundColor === "string" ? backgroundColor : DefaultTheme.colors.background
+
+  return React.useMemo(() => {
     return isDark
       ? {
-          // dark: true,
           ...DarkTheme,
           colors: {
             ...DarkTheme.colors,
-            background: backgroundColor,
+            background: resolvedBackgroundColor,
           },
         }
       : DefaultTheme
-  }, [isDark, backgroundColor])
-  const [routeTheme, setRouteTheme] = React.useState(getRouteTheme)
-
-  useAppStateChange(() => {
-    setRouteTheme(getRouteTheme())
-  })
-  React.useEffect(() => {
-    setRouteTheme(getRouteTheme())
-  }, [getRouteTheme])
-  return routeTheme
+  }, [isDark, resolvedBackgroundColor])
 }

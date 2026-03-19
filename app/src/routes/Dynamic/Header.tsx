@@ -1,9 +1,8 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Avatar, Icon, Text } from "@rneui/themed";
+import { Avatar, Icon, Text } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
-import { Image } from "expo-image";
 import React from "react";
 import { Linking, Pressable, View } from "react-native";
 import { Menu, MenuItem } from "@/components/Menu";
@@ -51,7 +50,6 @@ export function HeaderLeft() {
             size={40}
             rounded
             // onPress={gotoWebPage}
-            ImageComponent={Image}
             source={{
               uri: parseImgUrl(dynamicUser.face, 120),
             }}
@@ -125,15 +123,14 @@ function HeaderRight() {
     <View className="flex-row items-center gap-2">
       <Menu
         visible={visible}
-        // @ts-expect-error className will be handled
         className="bg-white dark:bg-zinc-900"
         anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
         onRequestClose={hideMenu}
       >
         {!followed && !isBlackUp && (
           <MenuItem
-            textStyle={tw("text-black dark:text-gray-300")}
-            pressColor={tw(colors.gray4.text).color}
+            textClassName="text-black dark:text-gray-300"
+            pressColorClassName={colors.gray4.accent}
             onPress={() => {
               if (dynamicUser) {
                 set$followedUps([
@@ -154,8 +151,8 @@ function HeaderRight() {
           </MenuItem>
         )}
         <MenuItem
-          textStyle={tw("text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName="text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             if (dynamicUser) {
               const { name, mid, sign } = dynamicUser;
@@ -167,8 +164,8 @@ function HeaderRight() {
           分享UP
         </MenuItem>
         <MenuItem
-          textStyle={tw(" text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName=" text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             if (dynamicUser?.face) {
               Linking.openURL(dynamicUser.face);
@@ -179,8 +176,8 @@ function HeaderRight() {
           查看头像
         </MenuItem>
         <MenuItem
-          textStyle={tw(" text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName=" text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             if (!dynamicUser) {
               return;
@@ -194,8 +191,8 @@ function HeaderRight() {
           复制用户名
         </MenuItem>
         <MenuItem
-          textStyle={tw(" text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName=" text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             if (!dynamicUser) {
               return;
@@ -209,8 +206,8 @@ function HeaderRight() {
           复制用户ID
         </MenuItem>
         <MenuItem
-          textStyle={tw(" text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName=" text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             if (!dynamicUser) {
               return;
@@ -223,8 +220,8 @@ function HeaderRight() {
           浏览器打开
         </MenuItem>
         <MenuItem
-          textStyle={tw(" text-black dark:text-gray-300")}
-          pressColor={tw(colors.gray4.text).color}
+          textClassName=" text-black dark:text-gray-300"
+          pressColorClassName={colors.gray4.accent}
           onPress={() => {
             hideMenu();
             setReloadUerProfile(Date.now());

@@ -1,15 +1,38 @@
-import { Skeleton, Text } from "@rneui/themed";
-import { FlashList } from "@shopify/flash-list";
+import { Image } from "@/components/styled/expo";
+import { Skeleton, Text } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
+import type { ImageLoadEventData } from "expo-image";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
 import { useHotSearch } from "@/api/hot-search";
 import { type SearchedVideoType, useSearchVideos } from "@/api/search-video";
-import Image2 from "@/components/Image2";
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import { parseImgUrl } from "@/utils";
+import type { FlashListRef } from "@/components/styled/rneui";
+
+function HotSearchIcon(props: { icon: string }) {
+  const [aspectRatio, setAspectRatio] = React.useState<number | null>(null);
+  const source = { uri: parseImgUrl(props.icon) };
+
+  function handleLoad(event: ImageLoadEventData) {
+    if (event.source.width > 0 && event.source.height > 0) {
+      setAspectRatio(event.source.width / event.source.height);
+    }
+  }
+
+  return (
+    <Image
+      source={source}
+      style={aspectRatio ? { height: 16, aspectRatio, flexShrink: 0 } : { width: 16, height: 16, flexShrink: 0 }}
+      onLoad={handleLoad}
+      contentFit="contain"
+      className="ml-1"
+    />
+  );
+}
 
 function EmptyContent(props: { loading: boolean; onSearch: (k: string) => void }) {
   const hotSearchList = useHotSearch();
@@ -59,13 +82,7 @@ function EmptyContent(props: { loading: boolean; onSearch: (k: string) => void }
               <Text className={`text-base ${hot.keyword in $watchedHotSearch ? "opacity-40" : ""}`}>
                 {hot.show_name}
               </Text>
-              {hot.icon ? (
-                <Image2
-                  source={{ uri: parseImgUrl(hot.icon) }}
-                  style={{ height: 16 }}
-                  className="ml-1"
-                />
-              ) : null}
+              {hot.icon ? <HotSearchIcon icon={hot.icon} /> : null}
             </TouchableOpacity>
           );
         })}
@@ -84,7 +101,7 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
     isReachingEnd,
     isValidating,
   } = useSearchVideos(props.keyword);
-  const listRef = React.useRef<FlashList<any> | null>(null);
+  const listRef = React.useRef<FlashListRef<SearchedVideoType> | null>(null);
 
   React.useEffect(() => {
     if (listRef.current) {
@@ -95,7 +112,7 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   return (
     <FlashList
       data={searchedVideos}
-      keyExtractor={(v) => v.bvid}
+      keyExtractor={(v: SearchedVideoType) => v.bvid}
       ref={listRef}
       renderItem={({ item }: { item: SearchedVideoType }) => {
         return <VideoListItem video={item} />;
@@ -110,7 +127,7 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
           <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>暂无更多</Text>
         ) : null
       }
-      contentContainerStyle={tw("px-1 pt-4")}
+      contentContainerClassName="px-1 pt-4"
       estimatedFirstItemOffset={80}
       onEndReached={() => {
         update();

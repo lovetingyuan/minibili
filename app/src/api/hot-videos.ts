@@ -64,12 +64,16 @@ export function useHotVideos(t: number) {
 
   return {
     list,
-    page: size,
-    setSize,
     isRefreshing,
     isReachingEnd,
     loading: isLoadingMore,
     mutate,
+    update: () => {
+      if (isLoadingMore || isReachingEnd) {
+        return;
+      }
+      setSize((current) => current + 1);
+    },
     refresh: () => {
       mutate();
     },

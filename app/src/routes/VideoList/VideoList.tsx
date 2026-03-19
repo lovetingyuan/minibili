@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { FAB } from "@rneui/themed";
-import { FlashList } from "@shopify/flash-list";
+import { FAB, FlashList, Icon } from "@/components/styled/rneui";
 import React from "react";
 import { Alert, Dimensions, Linking, TouchableOpacity } from "react-native";
 
@@ -10,6 +9,7 @@ import { useStore } from "@/store";
 import { useMarkVideoWatched } from "@/store/actions";
 import type { NavigationProps } from "@/types";
 import { handleShareVideo, parseNumber, parseUrl } from "@/utils";
+import type { FlashListRef } from "@/components/styled/rneui";
 
 import Loading from "./Loading";
 import VideoItem from "./VideoItem";
@@ -19,7 +19,7 @@ type Footer = React.ReactElement | null | undefined;
 function VideoList(props: {
   videos: VideoItemType[];
   type: "Hot" | "Rank" | "Search";
-  footer?: Footer | ((l: any[]) => Footer);
+  footer?: Footer | ((l: VideoItemType[]) => Footer);
   onReachEnd?: () => void;
   onRefresh?: (fab?: boolean) => void;
   isRefreshing?: boolean;
@@ -56,12 +56,12 @@ function VideoList(props: {
   }, [props.videos, props.type, $blackTags, $blackUps]);
 
   const navigation = useNavigation<NavigationProps["navigation"]>();
-  const listRef = React.useRef<any>(null);
+  const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null);
   const currentVideoRef = React.useRef<VideoItemType | null>(null);
   const markVideoWatched = useMarkVideoWatched();
   React.useEffect(() => {
     setTimeout(() => {
-      listRef.current?.scrollToOffset(0);
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
     });
   }, [currentVideosCate]);
   const addBlackUp = () => {
@@ -125,7 +125,7 @@ function VideoList(props: {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        className="mx-[5px] mb-6 flex-1 flex-row justify-around"
+        className="mx-[5px] mb-6 flex-1"
         key={item.bvid}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
@@ -204,7 +204,7 @@ function VideoList(props: {
         ListFooterComponent={
           typeof props.footer === "function" ? props.footer(videoList) : props.footer
         }
-        contentContainerStyle={tw("px-[4px] pt-6")}
+        contentContainerClassName="px-[4px] pt-6"
         estimatedFirstItemOffset={100}
         {...refreshProps}
         {...reachEndProps}
@@ -212,13 +212,13 @@ function VideoList(props: {
       {props.type === "Hot" && (
         <FAB
           visible
-          color={tw(colors.secondary.text).color}
+          colorClassName={colors.secondary.accent}
           placement="right"
-          icon={{ name: "refresh", color: "white" }}
+          icon={<Icon name="refresh" color="white" />}
           className="bottom-3 opacity-90"
           size="small"
           onPress={() => {
-            listRef.current?.scrollToOffset(0);
+            listRef.current?.scrollToOffset({ offset: 0, animated: true });
             props.onRefresh?.(true);
           }}
         />

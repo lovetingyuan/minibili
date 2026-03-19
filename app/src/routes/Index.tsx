@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 
 import { colors } from '@/constants/colors.tw'
+import useResolvedColor from '@/hooks/useResolvedColor'
 import useRouteTheme from '@/hooks/useRouteTheme'
 
 import { useStore } from '../store'
@@ -26,7 +27,6 @@ import Welcome from './Welcome'
 import { Assets as NavigationAssets } from '@react-navigation/elements'
 import Living from './Living'
 import DynamicDetail from './DynamicDetail'
-import { useTw } from '@tingyuan/react-native-tailwindcss'
 
 Asset.loadAsync([
   ...NavigationAssets,
@@ -41,7 +41,7 @@ function AppRoute() {
 
   const { $firstRun, initialed } = useStore()
   const isFirstRun = initialed && $firstRun === -1
-  const tw = useTw()
+  const headerTitleColor = useResolvedColor(colors.gray8.text)
 
   return (
     <NavigationContainer theme={routeTheme}>
@@ -51,7 +51,7 @@ function AppRoute() {
           headerTransparent: false,
           headerTitleStyle: {
             fontSize: 18,
-            color: tw(colors.gray8.text).color,
+            color: headerTitleColor,
           },
         }}
         // screenListeners={undefined}

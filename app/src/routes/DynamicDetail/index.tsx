@@ -1,6 +1,6 @@
 import { useRefresh } from "@react-native-community/hooks";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-// import { Text } from '@rneui/themed'
+// import { Text } from '@/components/styled/rneui'
 // import { ResizeMode, Video } from 'expo-av'
 import React, { useCallback } from "react";
 import {

@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { Text } from "@rneui/themed";
-import { Image } from "expo-image";
+import { Text } from "@/components/styled/rneui";
+import { Image } from "@/components/styled/expo";
 import type React from "react";
 import { Linking, Pressable, View } from "react-native";
 

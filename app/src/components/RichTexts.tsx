@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@rneui/themed";
+import { Icon, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Image, Linking, type TextProps, View, type ViewStyle } from "react-native";
 
@@ -29,7 +29,7 @@ function RichTexts(props: {
   const fontSize = props.fontSize || 16;
   const Topic = props.topic ? (
     <View className="mb-3 flex-row items-center">
-      <Icon name="hashtag" type="fontisto" color={tw(colors.primary.text).color} size={14} />
+      <Icon name="hashtag" type="fontisto" colorClassName={colors.primary.accent} size={14} />
       <Text
         onPress={() => {
           if (props.topic?.jump_url) {

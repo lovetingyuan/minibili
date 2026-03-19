@@ -1,7 +1,6 @@
 import { type RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Avatar, BottomSheet, Card, Icon, Text } from "@rneui/themed";
+import { Avatar, BottomSheet, Card, Icon, Text } from "@/components/styled/rneui";
 import { clsx } from "clsx";
-import { Image } from "expo-image";
 import React from "react";
 import { Alert, Linking, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 
@@ -122,7 +121,6 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
                     }
                   : require("../../../assets/loading.png")
               }
-              ImageComponent={Image}
             />
             <Text
               numberOfLines={1}
@@ -168,11 +166,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             onPress={collectVideo}
             className="flex-row items-center gap-1 px-2 py-1"
           >
-            <Icon
-              name="star"
-              size={18}
-              color={tw(isCollected ? colors.warning.text : colors.gray8.text).color}
-            />
+            <Icon name="star" size={18} colorClassName={isCollected ? colors.warning.accent : colors.gray8.accent} />
             <Text
               className={clsx(
                 "text-sm",
@@ -234,7 +228,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             }}
             isVisible={showPagesModal}
           >
-            <Card containerStyle={tw("m-0")}>
+            <Card containerClassName="m-0">
               <Card.Title className="text-left text-lg">{`视频分集【${props.currentPage}/${pages.length}】`}</Card.Title>
               <Card.Divider />
               <ScrollView className="max-h-[80vh] flex-1">

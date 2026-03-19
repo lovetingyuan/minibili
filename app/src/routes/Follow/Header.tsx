@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { Button, Icon } from "@rneui/themed";
+import { Button, Icon } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
 
@@ -19,7 +19,7 @@ export function HeaderRight() {
           navigation.navigate("SearchUps");
         }}
       >
-        <Icon name="search" color={tw(colors.gray7.text).color} size={24} />
+        <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
       </Button>
       <Button
         radius={"sm"}
@@ -28,7 +28,7 @@ export function HeaderRight() {
           navigation.navigate("About");
         }}
       >
-        <Icon name="snow" type="ionicon" size={20} color={tw(colors.primary.text).color} />
+        <Icon name="snow" type="ionicon" size={20} colorClassName={colors.primary.accent} />
       </Button>
     </View>
   );

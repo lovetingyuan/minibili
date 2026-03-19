@@ -6,6 +6,7 @@ import type { SearchBarCommands } from "react-native-screens";
 
 import { colors } from "@/constants/colors.tw";
 import useMounted from "@/hooks/useMounted";
+import useResolvedColor from "@/hooks/useResolvedColor";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import { useMarkHotSearchViewed } from "@/store/actions";
 
@@ -22,7 +23,7 @@ const defaultSearchBarCommands: SearchBarCommands = {
 
 function SearchVideos() {
   const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands);
-  const blackColor = tw(colors.black.text).color;
+  const blackColor = useResolvedColor(colors.black.text);
   const [searchKeyWord, setSearchKeyWord] = React.useState("");
   const focused = useIsFocused();
   useBackHandler(() => {

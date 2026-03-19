@@ -1,4 +1,4 @@
-import { Button, Icon, Text } from "@rneui/themed";
+import { Button, Icon, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Image, Linking, Pressable, View } from "react-native";
 
@@ -28,7 +28,7 @@ function Header() {
           radius={"sm"}
           type="clear"
           size="sm"
-          containerStyle={tw("self-start")}
+          containerClassName="self-start"
           onPress={() => {
             Linking.openURL(githubLink);
           }}

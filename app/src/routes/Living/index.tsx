@@ -1,7 +1,7 @@
 import { useBackHandler } from "@react-native-community/hooks";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Text } from "@rneui/themed";
-import { ResizeMode, Video } from "expo-av";
+import { Text } from "@/components/styled/rneui";
+import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
 import { Image, View } from "react-native";
 import { WebView } from "react-native-webview";
@@ -62,9 +62,46 @@ function LiveWebPage({ route }: Props) {
   const [enableBackgroundPlay, setEnableBackgroundPlay] = React.useState(false);
   const roomId = url.startsWith("https://live.bilibili.com/h5/") ? url.split("/")[4] : "";
   const liveUrls = useLiveUrl(enableBackgroundPlay ? roomId : "");
-  const videoRef = React.useRef<Video>(null);
+  const resolvedLiveUrls = liveUrls ?? [];
   const [validIndex, setValidIndex] = React.useState(1);
   const backPlay = enableBackgroundPlay && roomId && liveUrls?.length;
+  const liveUrl = backPlay ? resolvedLiveUrls[validIndex] : "";
+  const player = useVideoPlayer(
+    liveUrl
+      ? {
+          uri: liveUrl,
+          headers: {
+            "user-agent": UA,
+            origin: "https://live.bilibili.com",
+            referer: "https://live.bilibili.com",
+          },
+        }
+      : null,
+    (currentPlayer) => {
+      currentPlayer.audioMixingMode = "doNotMix";
+      currentPlayer.staysActiveInBackground = true;
+      currentPlayer.showNowPlayingNotification = true;
+      currentPlayer.play();
+    },
+  );
+
+  React.useEffect(() => {
+    const subscription = player.addListener("statusChange", ({ error, status }) => {
+      if (status !== "error" || !liveUrl) {
+        return;
+      }
+
+      showToast(`抱歉出错了${error?.message ?? ""}`);
+      if (validIndex < resolvedLiveUrls.length - 1) {
+        setValidIndex((index) => index + 1);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [liveUrl, player, resolvedLiveUrls.length, validIndex]);
+
   useBackHandler(() => {
     if (backPlay) {
       // handle it
@@ -76,30 +113,13 @@ function LiveWebPage({ route }: Props) {
   });
 
   if (backPlay) {
-    const liveUrl = liveUrls[validIndex];
     return (
       <View className="relative flex flex-1">
-        <Video
-          ref={videoRef}
-          className="h-full min-h-96 w-full"
-          key={liveUrl}
-          source={{
-            uri: liveUrl,
-            headers: {
-              "user-agent": UA,
-              origin: "https://live.bilibili.com",
-              referer: "https://live.bilibili.com",
-            },
-          }}
-          onError={(err) => {
-            showToast("抱歉出错了" + err);
-            if (validIndex < liveUrls.length - 1) {
-              setValidIndex(validIndex + 1);
-            }
-          }}
-          useNativeControls
-          resizeMode={ResizeMode.CONTAIN}
-          shouldPlay
+        <VideoView
+          player={player}
+          nativeControls
+          contentFit="contain"
+          style={{ width: "100%", height: "100%", minHeight: 384 }}
         />
         <View className="absolute left-2 top-2 flex-row items-center gap-4">
           {/* <Button

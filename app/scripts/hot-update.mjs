@@ -3,7 +3,7 @@
 require("dotenv").config();
 const { usePowerShell } = require("zx");
 
-// eslint-disable-next-line react-hooks/rules-of-hooks
+// oxlint-disable-next-line react-hooks/rules-of-hooks
 usePowerShell();
 await $`npx react-native-tailwindcss-build`;
 

@@ -1,10 +1,11 @@
-import { Text } from "@rneui/themed";
-import { FlashList } from "@shopify/flash-list";
+import { Text } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
 import React from "react";
 import { Linking, View } from "react-native";
 
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import { useStore } from "@/store";
 import type { CollectVideoInfo, HistoryVideoInfo } from "@/types";
@@ -13,7 +14,7 @@ function HistoryList() {
   const { $watchedVideos } = useStore();
   const count = Object.keys($watchedVideos).length;
   const headerTitle = `⏰ 观看历史（${count}）`;
-  const blackColor = tw(colors.black.text).color;
+  const blackColor = useResolvedColor(colors.black.text);
   const [searchKeyWord, setSearchKeyWord] = React.useState("");
   useUpdateNavigationOptions(
     React.useMemo(() => {
@@ -89,7 +90,7 @@ function HistoryList() {
           </Text>
         ) : null
       }
-      contentContainerStyle={tw("px-1 pt-6")}
+      contentContainerClassName="px-1 pt-6"
       estimatedFirstItemOffset={80}
     />
   );

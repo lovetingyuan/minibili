@@ -1,7 +1,8 @@
-import { type RouteProp, useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
-import { CheckBox } from "@rneui/themed";
-import * as KeepAwake from "expo-keep-awake";
-import React from "react";
+import { type RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
+import { Image as ExpoImage } from '@/components/styled/expo'
+import { CheckBox } from '@/components/styled/rneui'
+import * as KeepAwake from 'expo-keep-awake'
+import React from 'react'
 import {
   ActivityIndicator,
   Image,
@@ -10,48 +11,54 @@ import {
   Text,
   useWindowDimensions,
   View,
-} from "react-native";
-import WebView, { type WebViewMessageEvent } from "react-native-webview";
+} from 'react-native'
+import WebView, { type WebViewMessageEvent } from 'react-native-webview'
+import { useResolveClassNames } from 'uniwind'
 
-import { useVideoMp4Url } from "@/api/play-url";
-import Image2 from "@/components/Image2";
-import { UA } from "@/constants";
-import { colors } from "@/constants/colors.tw";
-import { useMarkVideoWatched } from "@/store/actions";
-import type { NavigationProps, RootStackParamList } from "@/types";
+import { useVideoMp4Url } from '@/api/play-url'
+import { UA } from '@/constants'
+import { colors } from '@/constants/colors.tw'
+import { useMarkVideoWatched } from '@/store/actions'
+import type { NavigationProps, RootStackParamList } from '@/types'
 
-import { useVideoInfo } from "../../api/video-info";
-import { useAppStateChange } from "../../hooks/useAppState";
-import { useStore } from "../../store";
-import { parseDuration, parseImgUrl, showToast } from "../../utils";
-import { INJECTED_JAVASCRIPT } from "./inject-play";
+import { useVideoInfo } from '../../api/video-info'
+import { useAppStateChange } from '../../hooks/useAppState'
+import { useStore } from '../../store'
+import { parseDuration, parseImgUrl, showToast } from '../../utils'
+import { INJECTED_JAVASCRIPT } from './inject-play'
 
-const PlayUrl = "https://www.bilibili.com/blackboard/html5mobileplayer.html";
+const PlayUrl = 'https://www.bilibili.com/blackboard/html5mobileplayer.html'
 
-export default React.memo(Player);
+type PlayerMessage = {
+  action?: string
+  payload?: unknown
+}
+
+export default React.memo(Player)
 
 function Player(props: { currentPage: number; onPlayEnded: () => void }) {
-  const { getIsWiFi, imagesList } = useStore();
-  const route = useRoute<RouteProp<RootStackParamList, "Play">>();
-  const { width, height } = useWindowDimensions();
-  const [verticalExpand, setVerticalExpand] = React.useState(false);
-  const { data } = useVideoInfo(route.params.bvid);
-  const isWifi = getIsWiFi();
+  const { getIsWiFi, imagesList } = useStore()
+  const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
+  const { width, height } = useWindowDimensions()
+  const [verticalExpand, setVerticalExpand] = React.useState(false)
+  const { data } = useVideoInfo(route.params.bvid)
+  const webViewBackgroundStyle = useResolveClassNames('bg-black')
+  const isWifi = getIsWiFi()
 
-  const [loadPlayer, setLoadPlayer] = React.useState(isWifi);
-  const [highQuality, setHighQuality] = React.useState(isWifi);
+  const [loadPlayer, setLoadPlayer] = React.useState(isWifi)
+  const [highQuality, setHighQuality] = React.useState(isWifi)
 
-  const loadingErrorRef = React.useRef(false);
-  const webviewRef = React.useRef<WebView | null>(null);
+  const loadingErrorRef = React.useRef(false)
+  const webviewRef = React.useRef<WebView | null>(null)
   const videoInfo = {
     ...route.params,
     ...data,
-  };
-  const cid = videoInfo.pages ? videoInfo.pages[props.currentPage - 1].cid : 0;
-  const { videoUrl } = useVideoMp4Url(videoInfo.bvid, cid, highQuality);
-  const markVideoWatched = useMarkVideoWatched();
+  }
+  const cid = videoInfo.pages ? videoInfo.pages[props.currentPage - 1].cid : 0
+  const { videoUrl } = useVideoMp4Url(videoInfo.bvid, cid, highQuality)
+  const markVideoWatched = useMarkVideoWatched()
 
-  const [isEnded, setIsEnded] = React.useState(true);
+  const [isEnded, setIsEnded] = React.useState(true)
   /**
    * hasimg  play -> imagepause
    *         pause -> nothing
@@ -76,125 +83,146 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       }
     })();
     true;
-    `);
-  }, [imagesList.length]);
+    `)
+  }, [imagesList.length])
 
-  useAppStateChange((currentAppState) => {
-    if (currentAppState === "active" && loadingErrorRef.current && webviewRef.current) {
-      webviewRef.current.reload();
+  useAppStateChange(currentAppState => {
+    if (currentAppState === 'active' && loadingErrorRef.current && webviewRef.current) {
+      webviewRef.current.reload()
     }
-    if (currentAppState !== "active") {
-      KeepAwake.deactivateKeepAwake("PLAY");
+    if (currentAppState !== 'active') {
+      KeepAwake.deactivateKeepAwake('PLAY')
     }
-  });
+  })
 
-  const navigation = useNavigation<NavigationProps["navigation"]>();
+  const navigation = useNavigation<NavigationProps['navigation']>()
 
   useFocusEffect(
     React.useCallback(() => {
       return () => {
-        KeepAwake.deactivateKeepAwake("PLAY");
-      };
+        KeepAwake.deactivateKeepAwake('PLAY')
+      }
     }, []),
-  );
+  )
 
   React.useEffect(() => {
-    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
-      e.preventDefault();
+    const unsubscribe = navigation.addListener('beforeRemove', e => {
+      e.preventDefault()
       webviewRef.current?.injectJavaScript(`
       window.reportPlayTime();
       true;
-      `);
+      `)
       setTimeout(() => {
-        navigation.dispatch(e.data.action);
-      });
-    });
-    return unsubscribe;
-  }, [navigation]);
+        navigation.dispatch(e.data.action)
+      })
+    })
+    return unsubscribe
+  }, [navigation])
 
-  let videoWidth = 0;
-  let videoHeight = 0;
+  let videoWidth = 0
+  let videoHeight = 0
   if (videoInfo?.width && videoInfo?.height) {
     if (videoInfo.rotate) {
-      videoWidth = videoInfo.height;
-      videoHeight = videoInfo.width;
+      videoWidth = videoInfo.height
+      videoHeight = videoInfo.width
     } else {
-      videoWidth = videoInfo.width;
-      videoHeight = videoInfo.height;
+      videoWidth = videoInfo.width
+      videoHeight = videoInfo.height
     }
   }
-  const isVerticalVideo = videoWidth < videoHeight;
-  let videoViewHeight = width * 0.6;
+  const isVerticalVideo = videoWidth < videoHeight
+  let videoViewHeight = width * 0.6
   if (loadPlayer && videoWidth && videoHeight) {
     if (isEnded) {
-      videoViewHeight = width * 0.6;
+      videoViewHeight = width * 0.6
     } else {
       if (isVerticalVideo) {
-        videoViewHeight = verticalExpand ? height * 0.66 : height * 0.33;
+        videoViewHeight = verticalExpand ? height * 0.66 : height * 0.33
       } else {
-        videoViewHeight = (videoHeight / videoWidth) * width + 26;
+        videoViewHeight = (videoHeight / videoWidth) * width + 26
       }
     }
   }
   const handleMessage = (evt: WebViewMessageEvent) => {
     try {
-      const eventData = JSON.parse(evt.nativeEvent.data) as any;
-      if (eventData.action === "playState") {
-        setIsEnded(eventData.payload === "ended");
-        if (eventData.payload === "play") {
-          KeepAwake.activateKeepAwakeAsync("PLAY");
-        } else if (eventData.payload === "ended" || eventData.payload === "pause") {
-          KeepAwake.deactivateKeepAwake("PLAY");
+      const eventData = JSON.parse(evt.nativeEvent.data) as PlayerMessage
+      if (eventData.action === 'playState') {
+        setIsEnded(eventData.payload === 'ended')
+        if (eventData.payload === 'play') {
+          KeepAwake.activateKeepAwakeAsync('PLAY')
+        } else if (eventData.payload === 'ended' || eventData.payload === 'pause') {
+          KeepAwake.deactivateKeepAwake('PLAY')
         }
-        if (eventData.payload === "ended") {
-          setVerticalExpand(false);
-          props.onPlayEnded();
+        if (eventData.payload === 'ended') {
+          setVerticalExpand(false)
+          props.onPlayEnded()
         }
         // 'play', 'ended', 'pause', 'waiting', 'playing'
       }
-      if (eventData.action === "change-video-height") {
+      if (eventData.action === 'change-video-height') {
         if (!isEnded) {
-          setVerticalExpand(eventData.payload === "down");
+          setVerticalExpand(eventData.payload === 'down')
         }
       }
-      if (eventData.action === "reload") {
+      if (eventData.action === 'reload') {
         // TODO:
       }
-      if (eventData.action === "showToast") {
-        showToast(eventData.payload);
+      if (eventData.action === 'showToast') {
+        if (typeof eventData.payload === 'string') {
+          showToast(eventData.payload)
+        }
       }
-      if (eventData.action === "reportPlayTime") {
-        if (videoInfo.name && videoInfo.duration && eventData.payload) {
-          // @ts-ignore
-          markVideoWatched(videoInfo, eventData.payload);
+      if (eventData.action === 'reportPlayTime') {
+        if (
+          videoInfo.name &&
+          videoInfo.cover &&
+          videoInfo.date &&
+          videoInfo.duration &&
+          videoInfo.mid &&
+          typeof eventData.payload === 'number'
+        ) {
+          markVideoWatched(
+            {
+              bvid: videoInfo.bvid,
+              cover: videoInfo.cover,
+              date: videoInfo.date,
+              duration: videoInfo.duration,
+              mid: videoInfo.mid,
+              name: videoInfo.name,
+              title: videoInfo.title,
+            },
+            eventData.payload,
+          )
         }
       }
       // if (eventData.action === 'updateUrlSettled') {
       // }
-      if (eventData.action === "console.log") {
-        // eslint-disable-next-line no-console
-        __DEV__ && console.log("message", eventData.payload);
+      if (eventData.action === 'console.log') {
+        if (__DEV__) {
+          // oxlint-disable-next-line no-console
+          console.log('message', eventData.payload)
+        }
       }
     } catch {}
-  };
+  }
   const renderLoading = () => (
     <View className="absolute h-full w-full items-center">
       {videoInfo?.cover ? (
         <Image source={{ uri: parseImgUrl(videoInfo.cover, 672, 420) }} className="w-full flex-1" />
       ) : null}
       <ActivityIndicator
-        size={"large"}
-        color={tw(colors.secondary.text).color}
+        size={'large'}
+        colorClassName={colors.secondary.accent}
         className="absolute top-[45%] scale-150"
       />
     </View>
-  );
+  )
 
   const playPageUrl = React.useMemo(() => {
     if (!videoUrl || !loadPlayer) {
-      return;
+      return
     }
-    const search = new URLSearchParams();
+    const search = new URLSearchParams()
     Object.entries({
       bvid: videoInfo.bvid,
       cid,
@@ -206,11 +234,11 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       hasMuteButton: true,
     }).forEach(([k, v]) => {
       if (v !== undefined) {
-        search.append(k, `${v}`);
+        search.append(k, `${v}`)
       }
-    });
-    return `${PlayUrl}?${search}#${encodeURIComponent(videoUrl)}`;
-  }, [videoUrl, loadPlayer, cid, videoInfo.bvid, props.currentPage]);
+    })
+    return `${PlayUrl}?${search}#${encodeURIComponent(videoUrl)}`
+  }, [videoUrl, loadPlayer, cid, videoInfo.bvid, props.currentPage])
 
   // React.useEffect(() => {
   //   if (playPageUrl && webviewRef.current) {
@@ -224,9 +252,9 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         uri: playPageUrl,
       }}
       ref={webviewRef}
-      className="bg-black"
-      originWhitelist={["https://*", "bilibili://*"]}
-      containerStyle={tw("bg-black")}
+      style={webViewBackgroundStyle}
+      originWhitelist={['https://*', 'bilibili://*']}
+      containerStyle={webViewBackgroundStyle}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback
@@ -239,30 +267,30 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       onMessage={handleMessage}
       webviewDebuggingEnabled={__DEV__}
       onContentProcessDidTerminate={() => {
-        webviewRef.current?.reload();
+        webviewRef.current?.reload()
       }}
       onLoad={() => {
-        loadingErrorRef.current = false;
+        loadingErrorRef.current = false
       }}
       onError={() => {
-        showToast("当前视频加载失败/(ㄒoㄒ)/~~");
-        loadingErrorRef.current = true;
+        showToast('当前视频加载失败/(ㄒoㄒ)/~~')
+        loadingErrorRef.current = true
       }}
-      onShouldStartLoadWithRequest={(request) => {
+      onShouldStartLoadWithRequest={request => {
         // Only allow navigating within this website
-        if (request.url.endsWith("/log-reporter.js")) {
-          return false;
+        if (request.url.endsWith('/log-reporter.js')) {
+          return false
         }
-        if (request.url.startsWith("http") && !request.url.includes(".apk")) {
-          return true;
+        if (request.url.startsWith('http') && !request.url.includes('.apk')) {
+          return true
         }
-        return false;
+        return false
       }}
     />
   ) : (
     <Pressable
       onPress={() => {
-        setLoadPlayer(true);
+        setLoadPlayer(true)
       }}
       className="flex-1"
     >
@@ -272,10 +300,10 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
-          <Image2 source={require("../../../assets/play.png")} className="w-16 opacity-80" />
+          <ExpoImage source={require('../../../assets/play.png')} className="h-16 w-16 opacity-80" />
           <View className="absolute bottom-2 left-2 flex-row gap-2">
             {videoInfo?.duration ? (
-              <Text className="rounded bg-gray-900/60 px-2 py-[2px] font-bold text-white">
+              <Text className="rounded bg-gray-900/60 px-2 py-0.5 font-bold text-white">
                 {parseDuration(videoInfo?.duration)}
               </Text>
             ) : null}
@@ -290,21 +318,21 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
             <CheckBox
               checked={highQuality}
               title="高清"
-              textStyle={tw("text-white")}
-              wrapperStyle={tw("rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold")}
-              checkedColor={tw(colors.secondary.text).color}
-              uncheckedColor={"white"}
+              textClassName="text-white"
+              wrapperClassName="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold"
+              checkedColorClassName={colors.secondary.accent}
+              uncheckedColor={'white'}
               size={18}
-              containerStyle={tw("bg-transparent p-0 m-0")}
+              containerClassName="bg-transparent p-0 m-0"
               onPress={() => {
-                setHighQuality(!highQuality);
+                setHighQuality(!highQuality)
               }}
             />
           </View>
         </ImageBackground>
       ) : null}
     </Pressable>
-  );
+  )
   return (
     <View
       renderToHardwareTextureAndroid
@@ -313,5 +341,5 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     >
       {player}
     </View>
-  );
+  )
 }

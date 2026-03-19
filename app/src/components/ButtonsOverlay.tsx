@@ -1,4 +1,4 @@
-import { Button, Overlay } from '@rneui/themed'
+import { Button, Overlay } from '@/components/styled/rneui'
 import React from 'react'
 
 import { colors } from '@/constants/colors.tw'
@@ -11,7 +11,6 @@ function ButtonsOverlay() {
   const dismiss = () => {
     setOverlayButtons([])
   }
-  const style = tw('w-full justify-start py-2.5 px-5')
   const Buttons = overlayButtons
     .map(button => {
       if (!button) {
@@ -20,7 +19,7 @@ function ButtonsOverlay() {
       return (
         <Button
           type="clear"
-          buttonStyle={style}
+          buttonClassName="w-full justify-start px-5 py-2.5"
           title={button.text}
           key={button.text}
           onPress={() => {
@@ -39,7 +38,7 @@ function ButtonsOverlay() {
     <Overlay
       isVisible={overlayButtons.length > 0}
       ModalComponent={Modal2 as unknown as typeof React.Component}
-      overlayStyle={tw(`px-0 py-3 min-w-[70%] max-w-[90%] ${colors.gray2.bg}`)}
+      overlayClassName={`min-w-[70%] max-w-[90%] px-0 py-3 ${colors.gray2.bg}`}
       onBackdropPress={dismiss}
     >
       {Buttons}

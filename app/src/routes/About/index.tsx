@@ -1,4 +1,4 @@
-import { Divider } from "@rneui/themed";
+import { Divider } from "@/components/styled/rneui";
 import React, { useMemo } from "react";
 import { ScrollView, View } from "react-native";
 

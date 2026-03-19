@@ -1,0 +1,9 @@
+{
+  "ignorePatterns": [
+    ".expo/**",
+    "dist/**"
+  ],
+  "rules": {
+    "no-console": "error"
+  }
+}

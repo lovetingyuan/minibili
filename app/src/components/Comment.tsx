@@ -1,10 +1,11 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Button, Text } from "@rneui/themed";
+import { Button, Text } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Image, Linking, View } from "react-native";
+import { useResolveClassNames } from "uniwind";
 
 import { colors } from "@/constants/colors.tw";
 
@@ -13,8 +14,9 @@ import { useStore } from "../store";
 import type { NavigationProps, RootStackParamList } from "../types";
 import { parseImgUrl, showToast } from "../utils";
 
-function CommentText(props: { nodes: CommentMessageContent; idStr: string; textStyle?: any }) {
-  const { nodes, idStr, textStyle } = props;
+function CommentText(props: { nodes: CommentMessageContent; idStr: string; textClassName?: string }) {
+  const { nodes, idStr, textClassName } = props;
+  const textStyle = useResolveClassNames(textClassName ?? "");
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const route = useRoute<
     NativeStackScreenProps<
@@ -170,7 +172,7 @@ export function CommentItem(props: {
       ) : null}
       {comment.message?.length ? (
         <CommentText
-          textStyle={tw(clsx(fontSize, comment.upLike && "font-bold"))}
+          textClassName={clsx(fontSize, comment.upLike && "font-bold")}
           nodes={comment.message}
           idStr={`${comment.id}_`}
         />
@@ -231,7 +233,7 @@ function CommentBlock(props: { comment: CommentItemType; className?: string; sty
                 //   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
                 // )
               }}
-              buttonStyle={tw("justify-start p-[1px]")}
+              buttonClassName="justify-start p-[1px]"
             >
               <Text className={colors.primary.text}>{`${comment.moreText}...`}</Text>
             </Button>

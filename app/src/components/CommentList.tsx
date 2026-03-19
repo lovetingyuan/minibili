@@ -1,5 +1,5 @@
-import { Icon, Skeleton, Text } from "@rneui/themed";
-import { FlashList } from "@shopify/flash-list";
+import { Icon, Skeleton, Text } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -18,9 +18,9 @@ function Loading() {
         .map((_, i) => {
           return (
             <View className="mb-5 flex-1 gap-1" key={i}>
-              <Skeleton animation="wave" width={"100%" as any} height={16} />
-              {i % 2 ? <Skeleton animation="wave" width={"100%" as any} height={16} /> : null}
-              <Skeleton animation="wave" width={`${Math.random() * 100}%` as any} height={16} />
+              <Skeleton animation="wave" width="100%" height={16} />
+              {i % 2 ? <Skeleton animation="wave" width="100%" height={16} /> : null}
+              <Skeleton animation="wave" width={`${Math.random() * 100}%`} height={16} />
             </View>
           );
         })}
@@ -48,7 +48,7 @@ export default function CommentList(
     <View className="flex-1">
       <FlashList
         data={comments}
-        keyExtractor={(v) => `${v.id}@${v.root}`}
+        keyExtractor={(v: CommentItemType) => `${v.id}@${v.root}`}
         renderItem={({ item }: { item: CommentItemType }) => {
           return <Comment comment={item} />;
         }}
@@ -63,7 +63,7 @@ export default function CommentList(
                   name="comment-text-outline"
                   type="material-community"
                   size={14}
-                  color={tw(colors.gray6.text).color}
+                  colorClassName={colors.gray6.accent}
                 />
                 <Text className={`mr-3 px-1 text-xs ${colors.gray6.text}`}>
                   {allCount ? `${allCount}条评论` : isLoading ? "加载中" : "暂无评论"}
@@ -101,7 +101,7 @@ export default function CommentList(
             </Text>
           ) : null
         }
-        contentContainerStyle={tw("p-3 pt-4")}
+        contentContainerClassName="p-3 pt-4"
         onEndReached={() => {
           update();
         }}

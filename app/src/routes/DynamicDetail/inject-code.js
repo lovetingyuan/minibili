@@ -152,7 +152,7 @@ function __$hack() {
     return open(url, target, features);
   };
 
-  window.addEventListener("load", (e) => {
+  window.addEventListener("load", () => {
     const imgs = document.querySelector(".opus-module-top__album");
     if (imgs) {
       const div = document.createElement("div");

@@ -66,7 +66,7 @@ function __$hack() {
           //   }
           //   if (!window.__show_err_alert) {
           //     window.__show_err_alert = true
-          //     // eslint-disable-next-line no-alert
+  //     // oxlint-disable-next-line no-alert
           //     alert('视频加载失败')
           //   }
           // })

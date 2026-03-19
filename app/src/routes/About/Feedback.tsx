@@ -1,4 +1,4 @@
-import { BottomSheet, Button, Card, Dialog, Input, Text } from "@rneui/themed";
+import { BottomSheet, Button, Card, Dialog, Input, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Linking, View } from "react-native";
 
@@ -16,6 +16,7 @@ function Feedback() {
   const [feedBackVisible, setFeedbackVisible] = React.useState(false);
   const { get$showUsageStatement, set$showUsageStatement } = useStore();
   const [showStatement, setShowStatement] = React.useState(get$showUsageStatement());
+  const modalComponent = Modal2 as unknown as typeof React.Component;
   const hideFeedback = () => {
     setFeedbackVisible(false);
   };
@@ -56,10 +57,10 @@ function Feedback() {
       <Dialog
         isVisible={feedBackVisible}
         onBackdropPress={hideFeedback}
-        ModalComponent={Modal2 as unknown as typeof React.Component}
-        overlayStyle={tw(colors.gray2.bg)}
+        ModalComponent={modalComponent}
+        overlayClassName={colors.gray2.bg}
       >
-        <Dialog.Title title="欢迎反馈意见 😊" titleStyle={tw(colors.black.text)} />
+        <Dialog.Title title="欢迎反馈意见 😊" titleClassName={colors.black.text} />
         <View>
           <Input
             placeholder="填写意见"
@@ -68,13 +69,13 @@ function Feedback() {
             className="mt-5 h-20"
             maxLength={500}
             textAlignVertical="top"
-            placeholderTextColor={tw(colors.gray4.text).color}
+            placeholderTextColorClassName={colors.gray4.accent}
             onChangeText={(value) => (feedbackRef.current = value)}
           />
           <Input
             placeholder="联系方式"
             maxLength={100}
-            placeholderTextColor={tw(colors.gray4.text).color}
+            placeholderTextColorClassName={colors.gray4.accent}
             onChangeText={(value) => (feedbackContactRef.current = value)}
           />
         </View>
@@ -87,7 +88,7 @@ function Feedback() {
         onBackdropPress={() => {
           setShowStatement(false);
         }}
-        backdropStyle={tw("opacity-80 bg-gray-800")}
+        backdropClassName="opacity-80 bg-gray-800"
         modalProps={{
           onRequestClose: () => {
             setShowStatement(false);
@@ -96,7 +97,7 @@ function Feedback() {
         }}
         isVisible={showStatement}
       >
-        <Card containerStyle={tw("m-0")}>
+        <Card containerClassName="m-0">
           <Card.Title h4 className="text-left">
             📣使用声明
           </Card.Title>

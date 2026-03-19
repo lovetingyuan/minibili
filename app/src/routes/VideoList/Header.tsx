@@ -1,11 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
-import { Badge, Button, Icon, Text } from "@rneui/themed";
+import { Badge, Button, Icon, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Animated, ScrollView, TouchableOpacity, View } from "react-native";
 import { Menu, MenuDivider, MenuItem } from "@/components/Menu";
 
 import { useAppUpdateInfo } from "@/api/check-update";
 import { colors } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
 import { useUpUpdateCount } from "@/store/derives";
 
 import useMounted from "../../hooks/useMounted";
@@ -42,15 +43,15 @@ function HeaderTitleComp() {
     <Button
       type="clear"
       size="sm"
-      buttonStyle={tw("mx-2 w-24")}
-      titleStyle={tw(`text-sm ${colors.primary.text}`)}
+      buttonClassName="mx-2 w-24"
+      titleClassName={`text-sm ${colors.primary.text}`}
       onPress={() => {
         appUpdateInfo.showAlert();
       }}
     >
       {"有新版本"}
       <Animated.View style={{ opacity: opacityValue }}>
-        <Icon name="fiber-new" color={tw(colors.secondary.text).color} size={24} />
+        <Icon name="fiber-new" colorClassName={colors.secondary.accent} size={24} />
       </Animated.View>
     </Button>
   ) : null;
@@ -67,6 +68,7 @@ function splitArrayIntoChunks(arr: any[]) {
 
 function HeaderLeftComp() {
   const { currentVideosCate, $videoCatesList, setCurrentVideosCate } = useStore();
+  const dividerColor = useResolvedColor(colors.gray3.text);
 
   const [visible, setVisible] = React.useState(false);
   const hideMenu = () => setVisible(false);
@@ -76,10 +78,8 @@ function HeaderLeftComp() {
     const selected = currentVideosCate.rid === item.rid;
     return (
       <MenuItem
-        pressColor={tw(colors.gray3.text).color}
-        textStyle={tw(
-          `text-base ${selected ? "font-bold" : ""} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`,
-        )}
+        pressColorClassName={colors.gray3.accent}
+        textClassName={`text-base ${selected ? "font-bold" : ""} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`}
         onPress={() => {
           setCurrentVideosCate(item);
           hideMenu();
@@ -93,7 +93,6 @@ function HeaderLeftComp() {
     <View className="flex-row items-center gap-4">
       <Menu
         visible={visible}
-        // @ts-expect-error className will be handled
         className="relative left-4 top-12 h-96 w-48 bg-white dark:bg-zinc-900"
         anchor={
           <TouchableOpacity
@@ -116,7 +115,7 @@ function HeaderLeftComp() {
               name="triangle-down"
               type="octicon"
               size={28}
-              color={tw(colors.gray6.text).color}
+              colorClassName={colors.gray6.accent}
             />
           </TouchableOpacity>
         }
@@ -128,7 +127,7 @@ function HeaderLeftComp() {
               return (
                 <View key={i} className="w-48 flex-1">
                   <View>{getItem(items[0])}</View>
-                  <MenuDivider color={tw(colors.gray3.text).color} />
+                  <MenuDivider color={dividerColor} />
                 </View>
               );
             }
@@ -164,23 +163,21 @@ function HeaderRightComp() {
           navigation.navigate("SearchVideos");
         }}
       >
-        <Icon name="search" color={tw(colors.gray7.text).color} size={24} />
+        <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
       </Button>
       <View className="relative">
         {_updatedCount ? (
           <Badge
             status="success"
             value={_updatedCount}
-            badgeStyle={tw(
-              `h-4 absolute left-10 top-1 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`,
-            )}
-            textStyle={tw("text-[11px]")}
+            badgeClassName={`absolute left-10 top-1 h-4 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`}
+            textClassName="text-[11px]"
           />
         ) : null}
         <Button
           type="clear"
           size="sm"
-          titleStyle={tw("text-lg")}
+          titleClassName="text-lg"
           onPress={() => {
             navigation.navigate("Follow");
           }}

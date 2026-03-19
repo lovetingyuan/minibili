@@ -10,7 +10,6 @@ import type {
 } from "./dynamic-items.schema";
 import {
   type DynamicTypes,
-  HandledAdditionalTypeEnum,
   HandledDynamicTypeEnum,
   HandledForwardTypeEnum,
   MajorTypeEnum,

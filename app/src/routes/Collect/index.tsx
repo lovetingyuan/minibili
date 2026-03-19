@@ -1,10 +1,11 @@
-import { Text } from "@rneui/themed";
-import { FlashList } from "@shopify/flash-list";
+import { Text } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
 import React from "react";
 import { Alert, Linking, View } from "react-native";
 
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import { useStore } from "@/store";
 import type { CollectVideoInfo } from "@/types";
@@ -12,7 +13,7 @@ import type { CollectVideoInfo } from "@/types";
 function CollectList() {
   const { $collectedVideos, set$collectedVideos } = useStore();
   const headerTitle = `⭐️ 我的收藏（${$collectedVideos.length}）`;
-  const blackColor = tw(colors.black.text).color;
+  const blackColor = useResolvedColor(colors.black.text);
   const [searchKeyWord, setSearchKeyWord] = React.useState("");
   useUpdateNavigationOptions(
     React.useMemo(() => {
@@ -78,7 +79,7 @@ function CollectList() {
   return (
     <FlashList
       data={collectVideos}
-      keyExtractor={(v) => v.bvid}
+      keyExtractor={(v: CollectVideoInfo) => v.bvid}
       renderItem={({ item }: { item: CollectVideoInfo }) => {
         return <VideoListItem video={item} buttons={buttons} />;
       }}
@@ -100,7 +101,7 @@ function CollectList() {
           <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>暂无更多</Text>
         ) : null
       }
-      contentContainerStyle={tw("px-1 pt-6")}
+      contentContainerClassName="px-1 pt-6"
       estimatedFirstItemOffset={80}
     />
   );

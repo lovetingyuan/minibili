@@ -1,6 +1,5 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import type { DynamicItemAllType } from "./api/dynamic-items";
 // import { VideoInfo } from './api/video-info'
 // import { getInitVideoInfoValue } from './store/play'
 

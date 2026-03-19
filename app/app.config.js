@@ -18,13 +18,13 @@ const name = process.env.APP_VARIANT === 'preview' ? 'MiniBili-pre' : 'MiniBili'
 module.exports = {
   name,
   slug: 'minibili',
+  platforms: ['ios', 'android'],
   scheme: 'minibili',
   version,
   githubUrl: 'https://github.com/lovetingyuan/minibili',
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
-  newArchEnabled: true,
   ios: {
     supportsTablet: true,
     bundleIdentifier: appId,
@@ -35,17 +35,17 @@ module.exports = {
       foregroundImage: './assets/icon.png',
       backgroundColor: '#FFFFFF',
     },
-    edgeToEdgeEnabled: true,
     package: appId,
     permissions: ['WAKE_LOCK'],
     versionCode: Number(versionCode),
   },
   web: {
-    output: 'static',
+    output: 'single',
     favicon: './assets/icon.png',
   },
   plugins: [
     'expo-asset',
+    'expo-image',
     [
       'expo-splash-screen',
       {
@@ -60,9 +60,15 @@ module.exports = {
       },
     ],
     [
-      '@tingyuan/react-native-tailwindcss',
+      'expo-audio',
       {
-        cssOutputFile: './output.css',
+        enableBackgroundPlayback: true,
+      },
+    ],
+    [
+      'expo-video',
+      {
+        supportsBackgroundPlayback: true,
       },
     ],
   ],

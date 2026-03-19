@@ -1,4 +1,4 @@
-import { Text } from "@rneui/themed";
+import { Text } from "@/components/styled/rneui";
 import React from "react";
 import { FlatList, Image, ImageBackground, useWindowDimensions, View } from "react-native";
 
@@ -21,7 +21,9 @@ function TvImg() {
       setTvImg((v) => !v);
     }, 700);
     return () => {
-      timer && window.clearInterval(timer);
+      if (timer) {
+        window.clearInterval(timer);
+      }
     };
   });
 
@@ -33,8 +35,10 @@ function TvImg() {
 export default React.memo(FollowList);
 
 function FollowList() {
-  // eslint-disable-next-line no-console
-  __DEV__ && console.log("Follow page");
+  if (__DEV__) {
+    // oxlint-disable-next-line no-console
+    console.log("Follow page");
+  }
   const { $followedUps, $upUpdateMap, livingUps, requestDynamicFailed } = useStore();
   const _updatedCount = useUpUpdateCount();
   const followListRef = React.useRef<FlatList | null>(null);
@@ -121,8 +125,8 @@ function FollowList() {
           key={columns} // FlatList不支持直接更改columns
           numColumns={columns}
           ref={followListRef}
-          columnWrapperStyle={tw("px-3")}
-          contentContainerStyle={tw("pt-8")}
+          columnWrapperClassName="px-3"
+          contentContainerClassName="pt-8"
           ListEmptyComponent={
             <View>
               <TvImg />

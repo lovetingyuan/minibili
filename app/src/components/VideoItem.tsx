@@ -1,9 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@rneui/themed";
-import { Image } from "expo-image";
+import { Icon, Text } from "@/components/styled/rneui";
+import { Image } from "@/components/styled/expo";
 import he from "he";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
+import type { StyleProp, TextStyle } from "react-native";
+import { useResolveClassNames } from "uniwind";
 
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
@@ -18,7 +20,7 @@ import {
   parseNumber,
 } from "@/utils";
 
-function extractTextWithEmTags(text: string, style: any) {
+function extractTextWithEmTags(text: string, style: StyleProp<TextStyle>) {
   const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g;
   const matches = text.matchAll(regex);
   const result: (React.ReactElement | string)[] = [];
@@ -53,6 +55,7 @@ function VideoListItem({
   const { setOverlayButtons } = useStore();
   const _followedUpsMap = useFollowedUpsMap();
   const isFollowed = video.mid && video.mid in _followedUpsMap;
+  const secondaryTextStyle = useResolveClassNames(colors.secondary.text);
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -110,7 +113,7 @@ function VideoListItem({
       </View>
       <View className="flex-[4] justify-between">
         <Text className="mb-3 flex-1 text-base" numberOfLines={2} ellipsizeMode="tail">
-          {extractTextWithEmTags(video.title, tw(colors.secondary.text))}
+          {extractTextWithEmTags(video.title, secondaryTextStyle)}
         </Text>
         <View className="gap-2">
           <Text className={isFollowed ? colors.secondary.text : colors.primary.text}>
@@ -120,11 +123,11 @@ function VideoListItem({
           {isDefined(video.play) ? (
             <View className="min-w-20 shrink-0 flex-row flex-wrap items-center gap-x-3">
               <View className="flex-row items-center gap-1">
-                <Icon name="play-circle-outline" size={15} color={tw(colors.gray6.text).color} />
+                <Icon name="play-circle-outline" size={15} colorClassName={colors.gray6.accent} />
                 <Text className={colors.gray6.text}>{parseNumber(video.play)}</Text>
               </View>
               <View className="flex-row items-center gap-1">
-                <Icon name="thumb-up-off-alt" color={tw(colors.gray6.text).color} size={15} />
+                <Icon name="thumb-up-off-alt" colorClassName={colors.gray6.accent} size={15} />
                 <Text className={colors.gray6.text}>{parseNumber(video.like)}</Text>
               </View>
             </View>

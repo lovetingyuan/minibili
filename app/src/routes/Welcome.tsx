@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Button, Text } from "@rneui/themed";
+import { Button, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Image, Linking, View } from "react-native";
 
@@ -46,7 +46,7 @@ function Welcome({ navigation }: Props) {
       </View>
       <Button
         size="lg"
-        containerStyle={tw("mx-5 rounded-lg")}
+        containerClassName="mx-5 rounded-lg"
         onPress={() => {
           set$firstRun(Date.now());
           navigation.replace("VideoList");
