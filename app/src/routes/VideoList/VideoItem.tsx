@@ -10,7 +10,7 @@ import { useStore } from '@/store'
 import { useFollowedUpsMap } from '@/store/derives'
 import { parseDate, parseDuration, parseImgUrl, parseNumber } from '@/utils'
 
-export default React.memo(VideoItem)
+export default VideoItem
 
 function VideoItem({ video }: { video: VideoItemType }) {
   // __DEV__ && console.log('hot video', video.title);

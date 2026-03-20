@@ -34,8 +34,6 @@ type PlayerMessage = {
   payload?: unknown
 }
 
-export default React.memo(Player)
-
 function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   const { getIsWiFi, imagesList } = useStore()
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
@@ -218,18 +216,17 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     </View>
   )
 
-  const playPageUrl = React.useMemo(() => {
-    if (!videoUrl || !loadPlayer) {
-      return
-    }
+  let playPageUrl: string | undefined
+  if (videoUrl && loadPlayer) {
     const search = new URLSearchParams()
     Object.entries({
       bvid: videoInfo.bvid,
       cid,
+      isOutside: true,
       // quality: isWifi ? 64 : 32,
-      portraitFullScreen: true,
+      // portraitFullScreen: true,
       // highQuality: isWifi ? 1 : 0,
-      page: props.currentPage,
+      p: props.currentPage,
       autoplay: 1, // isWifi ? 0 : 1,
       hasMuteButton: true,
     }).forEach(([k, v]) => {
@@ -237,8 +234,8 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         search.append(k, `${v}`)
       }
     })
-    return `${PlayUrl}?${search}#${encodeURIComponent(videoUrl)}`
-  }, [videoUrl, loadPlayer, cid, videoInfo.bvid, props.currentPage])
+    playPageUrl = `${PlayUrl}?${search}#${encodeURIComponent(videoUrl)}`
+  }
 
   // React.useEffect(() => {
   //   if (playPageUrl && webviewRef.current) {
@@ -249,6 +246,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   const player = playPageUrl ? (
     <WebView
       source={{
+        // uri: 'player.bilibili.com/player.html?isOutside=true&aid=116255201697323&bvid=BV1NLw1zoECS&cid=36813670314&p=1', // playPageUrl,
         uri: playPageUrl,
       }}
       ref={webviewRef}
@@ -300,7 +298,10 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
-          <ExpoImage source={require('../../../assets/play.png')} className="h-16 w-16 opacity-80" />
+          <ExpoImage
+            source={require('../../../assets/play.png')}
+            className="h-16 w-16 opacity-80"
+          />
           <View className="absolute bottom-2 left-2 flex-row gap-2">
             {videoInfo?.duration ? (
               <Text className="rounded bg-gray-900/60 px-2 py-0.5 font-bold text-white">
@@ -343,3 +344,5 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     </View>
   )
 }
+
+export default Player

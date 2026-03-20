@@ -46,4 +46,4 @@ function ButtonsOverlay() {
   )
 }
 
-export default React.memo(ButtonsOverlay)
+export default ButtonsOverlay

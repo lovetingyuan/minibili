@@ -9,14 +9,13 @@ import { colors } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import { useUpUpdateCount } from "@/store/derives";
 
-import useMounted from "../../hooks/useMounted";
 import { useStore } from "../../store";
 import type { NavigationProps } from "../../types";
 
 function HeaderTitleComp() {
   const { current: opacityValue } = React.useRef(new Animated.Value(0));
   const appUpdateInfo = useAppUpdateInfo();
-  useMounted(() => {
+  React.useEffect(() => {
     const blinkAnimation = Animated.loop(
       Animated.sequence([
         Animated.timing(opacityValue, {
@@ -37,7 +36,7 @@ function HeaderTitleComp() {
     return () => {
       blinkAnimation.stop();
     };
-  });
+  }, [opacityValue]);
 
   return appUpdateInfo.hasUpdate ? (
     <Button
@@ -144,10 +143,6 @@ function HeaderLeftComp() {
   );
 }
 
-const HeaderLeft = React.memo(HeaderLeftComp);
-const HeaderTitle = React.memo(HeaderTitleComp);
-const HeaderRight = React.memo(HeaderRightComp);
-
 function HeaderRightComp() {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const { livingUps } = useStore();
@@ -189,6 +184,6 @@ function HeaderRightComp() {
   );
 }
 
-export const videoListHeaderLeft = () => <HeaderLeft />;
-export const videoListHeaderRight = () => <HeaderRight />;
-export const videoListHeaderTitle = () => <HeaderTitle />;
+export const videoListHeaderLeft = () => <HeaderLeftComp />;
+export const videoListHeaderRight = () => <HeaderRightComp />;
+export const videoListHeaderTitle = () => <HeaderTitleComp />;

@@ -11,7 +11,7 @@ import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 
-export default React.memo(HeaderRight);
+export default HeaderRight;
 
 function HeaderRight(props: { reload: () => void }) {
   const { webViewMode, setWebViewMode } = useStore();

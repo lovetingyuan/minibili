@@ -23,4 +23,4 @@ function MyMusic() {
   );
 }
 
-export default React.memo(MyMusic);
+export default MyMusic;

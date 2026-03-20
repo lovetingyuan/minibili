@@ -5,7 +5,7 @@ import { colors } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import { useStore } from "@/store";
 
-export default React.memo(BlackTags);
+export default BlackTags;
 
 function BlackTags() {
   const [expanded, setExpanded] = React.useState(false);

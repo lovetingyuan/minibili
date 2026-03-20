@@ -7,7 +7,7 @@ import VideoList from "./VideoList";
 
 let refreshTime = Date.now();
 
-export default React.memo(Hot);
+export default Hot;
 
 function Hot() {
   const [reload, setReload] = React.useState(0);

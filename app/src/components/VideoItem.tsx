@@ -138,4 +138,4 @@ function VideoListItem({
   );
 }
 
-export default React.memo(VideoListItem);
+export default VideoListItem;

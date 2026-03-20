@@ -2,7 +2,7 @@ import { Button, Text } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
 
-export default React.memo(TextAction);
+export default TextAction;
 
 function TextAction(
   props: React.PropsWithChildren<{

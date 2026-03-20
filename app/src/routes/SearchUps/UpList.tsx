@@ -149,4 +149,4 @@ function UpList(props: { keyword: string }) {
   );
 }
 
-export default React.memo(UpList);
+export default UpList;

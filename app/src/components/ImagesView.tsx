@@ -8,7 +8,6 @@ import useLatest from "@/hooks/useLatest";
 import { parseImgUrl } from "@/utils";
 
 import { useStore } from "../store";
-export default React.memo(ImagesView);
 
 const textShadow = {
   textShadowColor: "black",
@@ -41,62 +40,60 @@ function ImagesView() {
   // const imageCompCache = React.useRef<
   //   Record<string, React.ComponentElement<any, any>>
   // >({})
-  const imageNodes = React.useMemo(() => {
-    return images.map((v, i) => {
-      let imgWidth = Math.min(width, v.width);
-      let imgHeight = (imgWidth * v.height) / v.width;
-      let overflow = false;
-      if (imgHeight > height) {
-        imgWidth = width;
-        imgHeight = (width * v.height) / v.width;
-        overflow = true;
-        // imgHeight = Math.min(height, v.height)
-        // imgWidth = (v.width * imgHeight) / v.height
-      }
-      let imageView = null;
-      if (imageCompCache.current[v.url]) {
-        imageView = imageCompCache.current[v.url];
-      } else if (current === i) {
-        Object.assign(imageCompCache.current, {
-          [v.url]: (
-            <Image
-              source={{ uri: v.url }}
-              style={{ width: imgWidth, height: imgHeight }}
-              placeholder={require("../../assets/loading2.gif")}
-            />
-          ),
-        });
-        imageView = imageCompCache.current[v.url];
-      } else {
-        imageView = <Image source={require("../../assets/loading2.gif")} className="h-24 w-24" />;
-      }
-      // if (overflow) {
-      //   return (
-      //     <ScrollView
-      //       key={v.url}
-      //       contentContainerClassName={'justify-center items-center')}
-      //       className="flex-1 bg-white">
-      //       {imageView}
-      //     </ScrollView>
-      //   )
-      // }
-      return (
-        <View key={v.url} className="flex-1 items-center justify-center bg-black">
-          {overflow ? (
-            <ScrollView
-              key={v.url}
-              contentContainerClassName="justify-center items-center"
-              className="flex-1 bg-black"
-            >
-              {imageView}
-            </ScrollView>
-          ) : (
-            imageView
-          )}
-        </View>
-      );
-    });
-  }, [images, width, height, imageCompCache, current]);
+  const imageNodes = images.map((v, i) => {
+    let imgWidth = Math.min(width, v.width);
+    let imgHeight = (imgWidth * v.height) / v.width;
+    let overflow = false;
+    if (imgHeight > height) {
+      imgWidth = width;
+      imgHeight = (width * v.height) / v.width;
+      overflow = true;
+      // imgHeight = Math.min(height, v.height)
+      // imgWidth = (v.width * imgHeight) / v.height
+    }
+    let imageView = null;
+    if (imageCompCache.current[v.url]) {
+      imageView = imageCompCache.current[v.url];
+    } else if (current === i) {
+      Object.assign(imageCompCache.current, {
+        [v.url]: (
+          <Image
+            source={{ uri: v.url }}
+            style={{ width: imgWidth, height: imgHeight }}
+            placeholder={require("../../assets/loading2.gif")}
+          />
+        ),
+      });
+      imageView = imageCompCache.current[v.url];
+    } else {
+      imageView = <Image source={require("../../assets/loading2.gif")} className="h-24 w-24" />;
+    }
+    // if (overflow) {
+    //   return (
+    //     <ScrollView
+    //       key={v.url}
+    //       contentContainerClassName={'justify-center items-center')}
+    //       className="flex-1 bg-white">
+    //       {imageView}
+    //     </ScrollView>
+    //   )
+    // }
+    return (
+      <View key={v.url} className="flex-1 items-center justify-center bg-black">
+        {overflow ? (
+          <ScrollView
+            key={v.url}
+            contentContainerClassName="justify-center items-center"
+            className="flex-1 bg-black"
+          >
+            {imageView}
+          </ScrollView>
+        ) : (
+          imageView
+        )}
+      </View>
+    );
+  });
   return (
     <Overlay
       isVisible={images.length > 0}
@@ -140,3 +137,5 @@ function ImagesView() {
     </Overlay>
   );
 }
+
+export default ImagesView;

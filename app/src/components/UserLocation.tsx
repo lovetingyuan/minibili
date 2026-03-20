@@ -14,4 +14,4 @@ function UserLocation() {
   return null;
 }
 
-export default React.memo(UserLocation);
+export default UserLocation;

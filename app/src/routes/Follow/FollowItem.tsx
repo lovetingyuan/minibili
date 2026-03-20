@@ -5,12 +5,9 @@ import { Alert, Linking, Pressable, TouchableOpacity, View } from "react-native"
 
 import { colors } from "@/constants/colors.tw";
 
-import useMemoizedFn from "../../hooks/useMemoizedFn";
 import { useStore } from "../../store";
 import type { NavigationProps, UpInfo } from "../../types";
 import { parseImgUrl, parseUrl } from "../../utils";
-
-export default React.memo(FollowItem);
 
 function FollowItem(props: { item: UpInfo; index?: number }) {
   // __DEV__ && console.log('follow item', props.item.name)
@@ -33,7 +30,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
     hasUpdate = latestId !== currentLatestId;
   }
   const navigation = useNavigation<NavigationProps["navigation"]>();
-  const gotoDynamic = useMemoizedFn(() => {
+  const gotoDynamic = () => {
     navigation.navigate("Dynamic", {
       user: {
         mid,
@@ -42,8 +39,8 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         sign,
       },
     });
-  });
-  const gotoLivePage = useMemoizedFn(() => {
+  };
+  const gotoLivePage = () => {
     const liveUrl = livingUps[mid];
     if (liveUrl) {
       setCheckLiveTimeStamp(Date.now());
@@ -52,7 +49,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         title: `${name}的直播间`,
       });
     }
-  });
+  };
   const buttons = () =>
     [
       hasUpdate
@@ -196,3 +193,5 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
     </TouchableOpacity>
   );
 }
+
+export default FollowItem;

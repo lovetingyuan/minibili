@@ -23,4 +23,4 @@ function Collect() {
   );
 }
 
-export default React.memo(Collect);
+export default Collect;

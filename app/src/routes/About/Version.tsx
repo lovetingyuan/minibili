@@ -8,7 +8,7 @@ import { site } from "@/constants";
 
 import TextAction from "./TextAction";
 
-export default React.memo(Version);
+export default Version;
 
 function Version() {
   const updateTime: string = Updates.createdAt

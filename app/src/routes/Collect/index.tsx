@@ -15,32 +15,28 @@ function CollectList() {
   const headerTitle = `⭐️ 我的收藏（${$collectedVideos.length}）`;
   const blackColor = useResolvedColor(colors.black.text);
   const [searchKeyWord, setSearchKeyWord] = React.useState("");
-  useUpdateNavigationOptions(
-    React.useMemo(() => {
-      return {
-        headerTitle,
-        headerSearchBarOptions: {
-          placeholder: "搜索视频",
-          headerIconColor: blackColor,
-          hintTextColor: blackColor,
-          textColor: blackColor,
-          tintColor: blackColor,
-          disableBackButtonOverride: false,
-          shouldShowHintSearchIcon: false,
-          onClose: () => {
-            setSearchKeyWord("");
-          },
-          onSearchButtonPress: ({ nativeEvent: { text } }) => {
-            const keyword = text.trim();
-            if (!keyword) {
-              return;
-            }
-            setSearchKeyWord(keyword);
-          },
-        },
-      };
-    }, [headerTitle, blackColor]),
-  );
+  useUpdateNavigationOptions({
+    headerTitle,
+    headerSearchBarOptions: {
+      placeholder: "搜索视频",
+      headerIconColor: blackColor,
+      hintTextColor: blackColor,
+      textColor: blackColor,
+      tintColor: blackColor,
+      disableBackButtonOverride: false,
+      shouldShowHintSearchIcon: false,
+      onClose: () => {
+        setSearchKeyWord("");
+      },
+      onSearchButtonPress: ({ nativeEvent: { text } }) => {
+        const keyword = text.trim();
+        if (!keyword) {
+          return;
+        }
+        setSearchKeyWord(keyword);
+      },
+    },
+  });
 
   const buttons = (video: CollectVideoInfo) => {
     return [
@@ -68,14 +64,11 @@ function CollectList() {
       },
     ];
   };
-  const collectVideos = React.useMemo(() => {
-    if (searchKeyWord) {
-      return $collectedVideos.filter((vi) => {
+  const collectVideos = searchKeyWord
+    ? $collectedVideos.filter((vi) => {
         return vi.title.includes(searchKeyWord);
-      });
-    }
-    return $collectedVideos;
-  }, [searchKeyWord, $collectedVideos]);
+      })
+    : $collectedVideos;
   return (
     <FlashList
       data={collectVideos}
@@ -107,4 +100,4 @@ function CollectList() {
   );
 }
 
-export default React.memo(CollectList);
+export default CollectList;

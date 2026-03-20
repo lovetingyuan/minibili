@@ -11,7 +11,7 @@ import type { RootStackParamList } from "../types";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
-export default React.memo(Welcome);
+export default Welcome;
 
 function Welcome({ navigation }: Props) {
   const { set$firstRun } = useStore();

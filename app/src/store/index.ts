@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
+import React from "react";
 import {
   createStore,
   type AtomicStoreMethodsType,
 } from "react-atomic-store";
 
 import { RanksConfig } from "../constants";
-import useMounted from "../hooks/useMounted";
 import type { CollectVideoInfo, HistoryVideoInfo, UpInfo } from "../types";
 import type { MusicSong, UpdateUpInfo } from "./types";
 
@@ -125,7 +125,7 @@ async function hydrateStoredValue<K extends StoredKeys>(
 }
 
 export function InitStoreComp() {
-  useMounted(() => {
+  React.useEffect(() => {
     const methods = appStore.getStoreMethods();
     let unsubscribe: (() => void) | undefined;
     let canceled = false;
@@ -151,6 +151,6 @@ export function InitStoreComp() {
       canceled = true;
       unsubscribe?.();
     };
-  });
+  }, []);
   return null;
 }

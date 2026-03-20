@@ -194,40 +194,33 @@ function MusicList() {
     }
     return false;
   });
-  useUpdateNavigationOptions(
-    React.useMemo(() => {
-      return {
-        headerTitle: `🎵 我的歌单（${list.length}）`,
-        headerSearchBarOptions: {
-          ref: searchBarRef,
-          placeholder: "搜索歌曲",
-          headerIconColor: blackColor,
-          hintTextColor: blackColor,
-          textColor: blackColor,
-          tintColor: blackColor,
-          disableBackButtonOverride: false,
-          shouldShowHintSearchIcon: false,
-          onClose: () => {
-            setSearchKeyWord("");
-          },
-          onSearchButtonPress: ({ nativeEvent: { text } }) => {
-            const keyword = text.trim();
-            if (!keyword) {
-              return;
-            }
-            setSearchKeyWord(keyword);
-          },
-        },
-      };
-    }, [list, blackColor]),
-  );
-  const songsList = React.useMemo(() => {
-    const keyword = searchKeyWord.trim();
-    if (keyword) {
-      return list.filter((v) => v.name.includes(keyword));
-    }
-    return list;
-  }, [list, searchKeyWord]);
+  useUpdateNavigationOptions({
+    headerTitle: `🎵 我的歌单（${list.length}）`,
+    headerSearchBarOptions: {
+      ref: searchBarRef,
+      placeholder: "搜索歌曲",
+      headerIconColor: blackColor,
+      hintTextColor: blackColor,
+      textColor: blackColor,
+      tintColor: blackColor,
+      disableBackButtonOverride: false,
+      shouldShowHintSearchIcon: false,
+      onClose: () => {
+        setSearchKeyWord("");
+      },
+      onSearchButtonPress: ({ nativeEvent: { text } }) => {
+        const keyword = text.trim();
+        if (!keyword) {
+          return;
+        }
+        setSearchKeyWord(keyword);
+      },
+    },
+  });
+  const keyword = searchKeyWord.trim();
+  const songsList = keyword
+    ? list.filter((v) => v.name.includes(keyword))
+    : list;
   const [displayType, setDisplayType] = React.useState<"normal" | "brief">("normal");
   return (
     <View className="flex-1">
@@ -282,4 +275,4 @@ function MusicList() {
   );
 }
 
-export default React.memo(MusicList);
+export default MusicList;

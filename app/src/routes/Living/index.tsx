@@ -7,7 +7,6 @@ import { Image, View } from "react-native";
 import { WebView } from "react-native-webview";
 
 import useLiveUrl from "@/api/get-live-url";
-import useMounted from "@/hooks/useMounted";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import { UA } from "../../constants";
@@ -31,8 +30,6 @@ function Loading() {
 
 type Props = NativeStackScreenProps<RootStackParamList, "Living">;
 
-export default React.memo(LiveWebPage);
-
 function LiveWebPage({ route }: Props) {
   const { url, title: pageTitle } = route.params;
 
@@ -40,25 +37,22 @@ function LiveWebPage({ route }: Props) {
   const { webViewMode, setCheckLiveTimeStamp } = useStore();
   // const [pageTitle, setPageTitle] = React.useState(title)
 
-  useMounted(() => {
+  React.useEffect(() => {
     return () => {
       setCheckLiveTimeStamp(Date.now());
     };
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useUpdateNavigationOptions({
+    headerRight: () => (
+      <HeaderRight
+        reload={() => {
+          webviewRef.current?.injectJavaScript("location.reload()");
+        }}
+      />
+    ),
+    headerTitle: pageTitle,
   });
-  useUpdateNavigationOptions(
-    React.useMemo(() => {
-      return {
-        headerRight: () => (
-          <HeaderRight
-            reload={() => {
-              webviewRef.current?.injectJavaScript("location.reload()");
-            }}
-          />
-        ),
-        headerTitle: pageTitle,
-      };
-    }, [pageTitle]),
-  );
   const [enableBackgroundPlay, setEnableBackgroundPlay] = React.useState(false);
   const roomId = url.startsWith("https://live.bilibili.com/h5/") ? url.split("/")[4] : "";
   const liveUrls = useLiveUrl(enableBackgroundPlay ? roomId : "");
@@ -198,3 +192,5 @@ function LiveWebPage({ route }: Props) {
     />
   );
 }
+
+export default LiveWebPage;

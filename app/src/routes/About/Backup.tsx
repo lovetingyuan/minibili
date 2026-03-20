@@ -7,7 +7,7 @@ import { useStore } from "@/store";
 import { showToast } from "../../utils";
 import TextAction from "./TextAction";
 
-export default React.memo(Backup);
+export default Backup;
 
 function Backup() {
   const {

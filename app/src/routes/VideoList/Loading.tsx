@@ -24,7 +24,7 @@ function VideoLoading() {
   );
 }
 
-export default React.memo(VLoading);
+export default VLoading;
 
 function VLoading() {
   return (

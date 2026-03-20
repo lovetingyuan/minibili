@@ -5,7 +5,7 @@ import { useRankList } from "../../api/rank-list";
 import { useStore } from "../../store";
 import VideoList from "./VideoList";
 
-export default React.memo(Ranks);
+export default Ranks;
 
 function Ranks() {
   const { currentVideosCate } = useStore();

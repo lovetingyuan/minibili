@@ -2,7 +2,6 @@ import PQueue from "p-queue";
 import React from "react";
 
 import { checkSingleUpUpdate } from "../api/dynamic-items";
-import useMounted from "../hooks/useMounted";
 import { useStore } from "../store";
 
 function useCheckUpdateUps() {
@@ -14,7 +13,7 @@ function useCheckUpdateUps() {
     setRequestDynamicFailed,
   } = useStore();
   const checkUpdateUpsTimerRef = React.useRef(0);
-  useMounted(() => {
+  React.useEffect(() => {
     const upUpdateQueue = new PQueue({
       concurrency: 5,
       intervalCap: 5,
@@ -64,10 +63,11 @@ function useCheckUpdateUps() {
       upUpdateQueue.clear();
       window.clearInterval(checkUpdateUpsTimerRef.current);
     };
-  });
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 }
 
-export default React.memo(CheckUpUpdate);
+export default CheckUpUpdate;
 
 function CheckUpUpdate() {
   useCheckUpdateUps();

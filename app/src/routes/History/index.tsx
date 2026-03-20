@@ -16,32 +16,28 @@ function HistoryList() {
   const headerTitle = `⏰ 观看历史（${count}）`;
   const blackColor = useResolvedColor(colors.black.text);
   const [searchKeyWord, setSearchKeyWord] = React.useState("");
-  useUpdateNavigationOptions(
-    React.useMemo(() => {
-      return {
-        headerTitle,
-        headerSearchBarOptions: {
-          placeholder: "搜索视频",
-          headerIconColor: blackColor,
-          hintTextColor: blackColor,
-          textColor: blackColor,
-          tintColor: blackColor,
-          disableBackButtonOverride: false,
-          shouldShowHintSearchIcon: false,
-          onClose: () => {
-            setSearchKeyWord("");
-          },
-          onSearchButtonPress: ({ nativeEvent: { text } }) => {
-            const keyword = text.trim();
-            if (!keyword) {
-              return;
-            }
-            setSearchKeyWord(keyword);
-          },
-        },
-      };
-    }, [headerTitle, blackColor]),
-  );
+  useUpdateNavigationOptions({
+    headerTitle,
+    headerSearchBarOptions: {
+      placeholder: "搜索视频",
+      headerIconColor: blackColor,
+      hintTextColor: blackColor,
+      textColor: blackColor,
+      tintColor: blackColor,
+      disableBackButtonOverride: false,
+      shouldShowHintSearchIcon: false,
+      onClose: () => {
+        setSearchKeyWord("");
+      },
+      onSearchButtonPress: ({ nativeEvent: { text } }) => {
+        const keyword = text.trim();
+        if (!keyword) {
+          return;
+        }
+        setSearchKeyWord(keyword);
+      },
+    },
+  });
 
   const buttons = (video: CollectVideoInfo) => {
     return [
@@ -53,17 +49,13 @@ function HistoryList() {
       },
     ];
   };
-  const list = React.useMemo(() => {
-    const _list = Object.values($watchedVideos).sort((a, b) => {
+  const list = Object.values($watchedVideos)
+    .sort((a, b) => {
       return b.watchTime - a.watchTime;
+    })
+    .filter((vi) => {
+      return !searchKeyWord || vi.title.includes(searchKeyWord);
     });
-    if (searchKeyWord) {
-      return _list.filter((vi) => {
-        return vi.title.includes(searchKeyWord);
-      });
-    }
-    return _list;
-  }, [$watchedVideos, searchKeyWord]);
 
   return (
     <FlashList
@@ -96,4 +88,4 @@ function HistoryList() {
   );
 }
 
-export default React.memo(HistoryList);
+export default HistoryList;

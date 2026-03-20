@@ -8,7 +8,6 @@ import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import { useVideoInfo } from "../../api/video-info";
 import CommentList from "../../components/CommentList";
-import useMemoizedFn from "../../hooks/useMemoizedFn";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 import { PlayHeaderRight, PlayHeaderTitle } from "./Header";
@@ -21,8 +20,6 @@ import VideoInfo from "./VideoInfo";
 // https://player.bilibili.com/player.html?aid=899458592&bvid=BV1BN4y1G7tx&cid=802365081&page=1
 
 type Props = NativeStackScreenProps<RootStackParamList, "Play">;
-
-export default React.memo(Play);
 
 function Play({ route }: Props) {
   const { bvid } = route.params;
@@ -49,29 +46,23 @@ function Play({ route }: Props) {
 
   const [key, setKey] = React.useState(bvid);
 
-  useUpdateNavigationOptions(
-    React.useMemo(() => {
-      const headerTitle = () => <PlayHeaderTitle />;
-      const headerRight = () => (
-        <PlayHeaderRight
-          cid={cid2}
-          refresh={() => {
-            setKey((k) => k + 1);
-          }}
-        />
-      );
-      return {
-        headerTitle,
-        headerRight,
-      };
-    }, [cid2]),
-  );
+  useUpdateNavigationOptions({
+    headerTitle: () => <PlayHeaderTitle />,
+    headerRight: () => (
+      <PlayHeaderRight
+        cid={cid2}
+        refresh={() => {
+          setKey((k) => k + 1);
+        }}
+      />
+    ),
+  });
 
-  const handlePlayEnd = useMemoizedFn(() => {
+  const handlePlayEnd = () => {
     if (videoInfo.pages && currentPage < videoInfo.pages.length) {
       setCurrentPage(currentPage + 1);
     }
-  });
+  };
 
   return (
     <View className="flex-1" key={key}>
@@ -101,3 +92,5 @@ function Play({ route }: Props) {
     </View>
   );
 }
+
+export default Play;

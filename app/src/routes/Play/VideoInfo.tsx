@@ -20,7 +20,7 @@ import {
 
 import { useVideoInfo } from "../../api/video-info";
 
-export default React.memo(VideoInfo);
+export default VideoInfo;
 
 function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => void }) {
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();

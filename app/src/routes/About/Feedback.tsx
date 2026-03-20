@@ -10,7 +10,7 @@ import { githubLink } from "../../constants";
 import { showToast } from "../../utils";
 import TextAction from "./TextAction";
 
-export default React.memo(Feedback);
+export default Feedback;
 
 function Feedback() {
   const [feedBackVisible, setFeedbackVisible] = React.useState(false);

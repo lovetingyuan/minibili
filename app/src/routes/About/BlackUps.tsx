@@ -3,7 +3,7 @@ import React from "react";
 
 import { useStore } from "../../store";
 
-export default React.memo(BlackUps);
+export default BlackUps;
 
 function BlackUps() {
   const [expandedUp, setExpandedUp] = React.useState(false);

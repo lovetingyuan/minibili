@@ -4,7 +4,7 @@ import React from "react";
 import { useStore } from "../store";
 import { showToast } from "../utils";
 
-export default React.memo(NetState);
+export default NetState;
 
 function NetState() {
   const { setIsWiFi } = useStore();

@@ -3,15 +3,13 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 // import { Text } from '@/components/styled/rneui'
 // import { ResizeMode, Video } from 'expo-av'
 import React from "react";
-import { Dimensions, Image, RefreshControl, ScrollView, View } from "react-native";
+import { Dimensions, Image, RefreshControl, ScrollView, useColorScheme, View } from "react-native";
 import { WebView } from "react-native-webview";
 
 // import useLiveUrl from '@/api/get-live-url'
-// import useMounted from '@/hooks/useMounted'
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import { UA } from "../../constants";
-import useIsDark from "../../hooks/useIsDark";
 import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
@@ -32,39 +30,30 @@ function Loading() {
 
 type Props = NativeStackScreenProps<RootStackParamList, "WebPage">;
 
-export default React.memo(WebPage);
-
 function WebPage({ route }: Props) {
   const { url, title } = route.params;
 
   const webviewRef = React.useRef<WebView | null>(null);
   const { webViewMode } = useStore();
-  const isDark = useIsDark();
+  const isDark = useColorScheme() === "dark";
   const [height, setHeight] = React.useState(Dimensions.get("screen").height);
   const [isEnabled, setEnabled] = React.useState(true);
   const [pageTitle, setPageTitle] = React.useState(title);
   const [webviewKey, setWebViewKey] = React.useState(0);
-  const { isRefreshing, onRefresh } = useRefresh(
-    React.useCallback(() => {
-      return new Promise((r) => {
-        // webviewRef.current?.reload()
-        setWebViewKey((k) => k + 1);
-        setTimeout(r, 1000);
-      });
-    }, []),
-  );
+  const { isRefreshing, onRefresh } = useRefresh(() => {
+    return new Promise((r) => {
+      // webviewRef.current?.reload()
+      setWebViewKey((k) => k + 1);
+      setTimeout(r, 1000);
+    });
+  });
 
-  useUpdateNavigationOptions(
-    React.useMemo(() => {
-      const headerRight = () => {
-        return <HeaderRight reload={onRefresh} />;
-      };
-      return {
-        headerRight,
-        headerTitle: pageTitle,
-      };
-    }, [onRefresh, pageTitle]),
-  );
+  useUpdateNavigationOptions({
+    headerRight: () => {
+      return <HeaderRight reload={onRefresh} />;
+    },
+    headerTitle: pageTitle,
+  });
 
   const webview = (
     <WebView
@@ -143,3 +132,5 @@ function WebPage({ route }: Props) {
     </ScrollView>
   );
 }
+
+export default WebPage;

@@ -1,7 +1,7 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Skeleton } from "@/components/styled/rneui";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { BackHandler, Platform, Share, View } from "react-native";
 import WebView from "react-native-webview";
 
@@ -67,10 +67,6 @@ function LoadingComp() {
   );
 }
 
-const Loading = React.memo(LoadingComp);
-
-export default React.memo(Dynamic);
-
 function Dynamic({ route }: Props) {
   const upId = route.params?.user?.mid; // || specialUser?.mid
   // const dynamicListRef = React.useRef<any>(null)
@@ -79,15 +75,10 @@ function Dynamic({ route }: Props) {
   const webviewRef = useRef<WebView>(null);
   const navigation = useNavigation<NavigationProps["navigation"]>();
 
-  useUpdateNavigationOptions(
-    useMemo(
-      () => ({
-        headerTitle,
-        headerRight,
-      }),
-      [],
-    ),
-  );
+  useUpdateNavigationOptions({
+    headerTitle,
+    headerRight,
+  });
   const currentNavigationStateRef = React.useRef<{
     canGoBack: boolean;
     title: string;
@@ -158,7 +149,7 @@ function Dynamic({ route }: Props) {
         webviewDebuggingEnabled={__DEV__}
         injectedJavaScript={""}
         injectedJavaScriptBeforeContentLoaded={injectCode}
-        renderLoading={() => <Loading />}
+        renderLoading={() => <LoadingComp />}
         onNavigationStateChange={(navState) => {
           currentNavigationStateRef.current = {
             canGoBack: navState.canGoBack,
@@ -232,3 +223,5 @@ function Dynamic({ route }: Props) {
     </View>
   );
 }
+
+export default Dynamic;

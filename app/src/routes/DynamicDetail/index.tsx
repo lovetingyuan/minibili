@@ -2,7 +2,7 @@ import { useRefresh } from "@react-native-community/hooks";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 // import { Text } from '@/components/styled/rneui'
 // import { ResizeMode, Video } from 'expo-av'
-import React, { useCallback } from "react";
+import React from "react";
 import {
   BackHandler,
   Dimensions,
@@ -16,7 +16,6 @@ import {
 import { WebView } from "react-native-webview";
 
 // import useLiveUrl from '@/api/get-live-url'
-// import useMounted from '@/hooks/useMounted'
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import { UA } from "../../constants";
@@ -41,8 +40,6 @@ function Loading() {
 
 type Props = NativeStackScreenProps<RootStackParamList, "DynamicDetail">;
 
-export default React.memo(DynamicDetailPage);
-
 function DynamicDetailPage({ route }: Props) {
   const { title, url } = route.params;
 
@@ -52,27 +49,20 @@ function DynamicDetailPage({ route }: Props) {
   const [isEnabled, setEnabled] = React.useState(true);
   // const [pageTitle, setPageTitle] = React.useState(`${name}的动态`)
   const [webviewKey, setWebViewKey] = React.useState(0);
-  const { isRefreshing, onRefresh } = useRefresh(
-    React.useCallback(() => {
-      return new Promise((r) => {
-        // webviewRef.current?.reload()
-        setWebViewKey((k) => k + 1);
-        setTimeout(r, 1000);
-      });
-    }, []),
-  );
+  const { isRefreshing, onRefresh } = useRefresh(() => {
+    return new Promise((r) => {
+      // webviewRef.current?.reload()
+      setWebViewKey((k) => k + 1);
+      setTimeout(r, 1000);
+    });
+  });
 
-  useUpdateNavigationOptions(
-    React.useMemo(() => {
-      const headerRight = () => {
-        return <HeaderRight reload={onRefresh} />;
-      };
-      return {
-        headerRight,
-        headerTitle: title,
-      };
-    }, [onRefresh, title]),
-  );
+  useUpdateNavigationOptions({
+    headerRight: () => {
+      return <HeaderRight reload={onRefresh} />;
+    },
+    headerTitle: title,
+  });
 
   const currentNavigationStateRef = React.useRef<{
     canGoBack: boolean;
@@ -86,7 +76,7 @@ function DynamicDetailPage({ route }: Props) {
     init: true,
   });
   useFocusEffect(
-    useCallback(() => {
+    React.useCallback(() => {
       const onAndroidBackPress = () => {
         if (currentNavigationStateRef.current.canGoBack && webviewRef.current) {
           webviewRef.current.goBack();
@@ -173,3 +163,5 @@ function DynamicDetailPage({ route }: Props) {
     </ScrollView>
   );
 }
+
+export default DynamicDetailPage;

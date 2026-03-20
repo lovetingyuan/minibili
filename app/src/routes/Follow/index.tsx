@@ -1,12 +1,10 @@
 import { Text } from "@/components/styled/rneui";
 import React from "react";
-import { FlatList, Image, ImageBackground, useWindowDimensions, View } from "react-native";
+import { FlatList, Image, ImageBackground, useColorScheme, useWindowDimensions, View } from "react-native";
 
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import { useUpUpdateCount } from "@/store/derives";
 
-import useIsDark from "../../hooks/useIsDark";
-import useMounted from "../../hooks/useMounted";
 import { useStore } from "../../store";
 import type { UpInfo } from "../../types";
 import FollowItem from "./FollowItem";
@@ -16,7 +14,7 @@ const tvR = require("../../../assets/tv-r.png");
 
 function TvImg() {
   const [tvImg, setTvImg] = React.useState(false);
-  useMounted(() => {
+  React.useEffect(() => {
     const timer = window.setInterval(() => {
       setTvImg((v) => !v);
     }, 700);
@@ -25,15 +23,12 @@ function TvImg() {
         window.clearInterval(timer);
       }
     };
-  });
+  }, []);
 
   return (
     <Image source={tvImg ? tvL : tvR} className="mt-12 aspect-square h-auto w-[50%] self-center" />
   );
 }
-
-export default React.memo(FollowList);
-
 function FollowList() {
   if (__DEV__) {
     // oxlint-disable-next-line no-console
@@ -42,7 +37,7 @@ function FollowList() {
   const { $followedUps, $upUpdateMap, livingUps, requestDynamicFailed } = useStore();
   const _updatedCount = useUpUpdateCount();
   const followListRef = React.useRef<FlatList | null>(null);
-  const dark = useIsDark();
+  const dark = useColorScheme() === "dark";
 
   const { width } = useWindowDimensions();
   const columns = Math.floor(width / 90);
@@ -55,93 +50,76 @@ function FollowList() {
         : ` (${count}${failed ? "！" : ""})`
       : ""
   }`;
-  useUpdateNavigationOptions(
-    React.useMemo(() => {
-      return {
-        headerTitle,
-      };
-    }, [headerTitle]),
-  );
+  useUpdateNavigationOptions({
+    headerTitle,
+  });
 
-  const renderItem = React.useCallback(
-    ({
-      item,
-      index,
-    }: // index,
-    {
-      item: UpInfo | null;
-      index: number;
-    }) => {
-      if (item) {
-        return <FollowItem item={item} index={index} />;
-      }
-      return <View className="flex-1" />;
-    },
-    [],
-  );
-
-  const content = React.useMemo(() => {
-    const followedUpListLen = $followedUps.length;
-    const rest = followedUpListLen
-      ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
-      : 0;
-    const pinUps: UpInfo[] = [];
-    const liveUps: UpInfo[] = [];
-    const updateUps: UpInfo[] = [];
-    const otherUps: UpInfo[] = [];
-
-    for (const up of $followedUps) {
-      if (up.pin) {
-        pinUps.push({ ...up });
-      } else if (livingUps[up.mid]) {
-        liveUps.push({ ...up });
-      } else {
-        if (
-          up.mid in $upUpdateMap &&
-          $upUpdateMap[up.mid].latestId !== $upUpdateMap[up.mid].currentLatestId
-        ) {
-          updateUps.push({ ...up });
-        } else {
-          otherUps.push({ ...up });
-        }
-      }
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: UpInfo | null;
+    index: number;
+  }) => {
+    if (item) {
+      return <FollowItem item={item} index={index} />;
     }
-    const displayUps = [
-      ...pinUps.sort((a, b) => b.pin! - a.pin!),
-      ...liveUps,
-      ...updateUps,
-      ...otherUps,
-      ...(rest ? Array.from({ length: rest }).map(() => null) : []),
-    ];
+    return <View className="flex-1" />;
+  };
 
-    return (
-      <View className="flex-1">
-        <FlatList
-          data={displayUps}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => (item ? `${item.mid}` : `${index}`)}
-          onEndReachedThreshold={1}
-          persistentScrollbar
-          key={columns} // FlatList不支持直接更改columns
-          numColumns={columns}
-          ref={followListRef}
-          columnWrapperClassName="px-3"
-          contentContainerClassName="pt-8"
-          ListEmptyComponent={
-            <View>
-              <TvImg />
-              <Text className="my-10 text-center text-lg">暂无关注，请搜索你感兴趣的UP主添加</Text>
-            </View>
-          }
-          ListFooterComponent={
-            $followedUps.length ? (
-              <Text className="pb-3 text-center text-xs text-gray-500">到底了~</Text>
-            ) : null
-          }
-        />
-      </View>
-    );
-  }, [$followedUps, $upUpdateMap, livingUps, columns, renderItem]);
+  const followedUpListLen = $followedUps.length;
+  const rest = followedUpListLen ? columns - (followedUpListLen ? followedUpListLen % columns : 0) : 0;
+  const pinUps: UpInfo[] = [];
+  const liveUps: UpInfo[] = [];
+  const updateUps: UpInfo[] = [];
+  const otherUps: UpInfo[] = [];
+
+  for (const up of $followedUps) {
+    if (up.pin) {
+      pinUps.push({ ...up });
+    } else if (livingUps[up.mid]) {
+      liveUps.push({ ...up });
+    } else if (
+      up.mid in $upUpdateMap &&
+      $upUpdateMap[up.mid].latestId !== $upUpdateMap[up.mid].currentLatestId
+    ) {
+      updateUps.push({ ...up });
+    } else {
+      otherUps.push({ ...up });
+    }
+  }
+
+  const content = (
+    <View className="flex-1">
+      <FlatList
+        data={[
+          ...pinUps.sort((a, b) => b.pin! - a.pin!),
+          ...liveUps,
+          ...updateUps,
+          ...otherUps,
+          ...(rest ? Array.from({ length: rest }).map(() => null) : []),
+        ]}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => (item ? `${item.mid}` : `${index}`)}
+        onEndReachedThreshold={1}
+        persistentScrollbar
+        key={columns} // FlatList不支持直接更改columns
+        numColumns={columns}
+        ref={followListRef}
+        columnWrapperClassName="px-3"
+        contentContainerClassName="pt-8"
+        ListEmptyComponent={
+          <View>
+            <TvImg />
+            <Text className="my-10 text-center text-lg">暂无关注，请搜索你感兴趣的UP主添加</Text>
+          </View>
+        }
+        ListFooterComponent={
+          $followedUps.length ? <Text className="pb-3 text-center text-xs text-gray-500">到底了~</Text> : null
+        }
+      />
+    </View>
+  );
 
   return (
     <View className="flex-1 flex-col">
@@ -159,3 +137,5 @@ function FollowList() {
     </View>
   );
 }
+
+export default FollowList;

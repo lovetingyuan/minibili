@@ -1,5 +1,3 @@
-import React from "react";
-
 import type { CollectVideoInfo, UpInfo } from "@/types";
 
 import { useStore } from ".";
@@ -7,46 +5,37 @@ import type { MusicSong, UpdateUpInfo } from "./types";
 
 export const useFollowedUpsMap = () => {
   const { $followedUps } = useStore();
-  return React.useMemo(() => {
-    const ups: Record<string, UpInfo> = {};
-    for (const up of $followedUps) {
-      ups[up.mid] = up;
-    }
-    return ups;
-  }, [$followedUps]);
+  const ups: Record<string, UpInfo> = {};
+  for (const up of $followedUps) {
+    ups[up.mid] = up;
+  }
+  return ups;
 };
 
 export const useUpUpdateCount = () => {
   const { $upUpdateMap } = useStore();
-  return React.useMemo(() => {
-    const aa = Object.values<UpdateUpInfo>($upUpdateMap);
-    const count = aa.filter((item) => {
-      return item.latestId !== item.currentLatestId;
-    }).length;
-    return count;
-  }, [$upUpdateMap]);
+  const aa = Object.values<UpdateUpInfo>($upUpdateMap);
+  return aa.filter((item) => {
+    return item.latestId !== item.currentLatestId;
+  }).length;
 };
 
 export const useCollectedVideosMap = () => {
   const { $collectedVideos } = useStore();
-  return React.useMemo(() => {
-    const _map: Record<string, CollectVideoInfo> = {};
-    $collectedVideos.forEach((vi) => {
-      _map[vi.bvid] = vi;
-    });
-    return _map;
-  }, [$collectedVideos]);
+  const map: Record<string, CollectVideoInfo> = {};
+  $collectedVideos.forEach((vi) => {
+    map[vi.bvid] = vi;
+  });
+  return map;
 };
 
 export const useMusicSongsMap = () => {
   const { $musicList } = useStore();
-  return React.useMemo(() => {
-    const map: Record<string, MusicSong> = {};
-    $musicList.forEach((music) => {
-      music.songs.forEach((song) => {
-        map[`${song.bvid}_${song.cid}`] = song;
-      });
+  const map: Record<string, MusicSong> = {};
+  $musicList.forEach((music) => {
+    music.songs.forEach((song) => {
+      map[`${song.bvid}_${song.cid}`] = song;
     });
-    return map;
-  }, [$musicList]);
+  });
+  return map;
 };

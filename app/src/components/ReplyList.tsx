@@ -6,7 +6,6 @@ import { ActivityIndicator, View } from "react-native";
 
 import { type ReplyItemType, useReplies } from "@/api/replies";
 import { colors } from "@/constants/colors.tw";
-import useMemoizedFn from "@/hooks/useMemoizedFn";
 import { useStore } from "@/store";
 
 import { CommentItem } from "./Comment";
@@ -20,11 +19,16 @@ export default function ReplyList() {
     update,
   } = useReplies();
   const { setRepliesInfo, repliesInfo } = useStore();
-  const handleClose = useMemoizedFn(() => {
-    setRepliesInfo(null);
-  });
 
-  useFocusEffect(handleClose);
+  function handleClose() {
+    setRepliesInfo(null);
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setRepliesInfo(null);
+    }, [setRepliesInfo]),
+  );
 
   return (
     <BottomSheet

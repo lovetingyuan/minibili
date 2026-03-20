@@ -32,28 +32,21 @@ function VideoList(props: {
     setOverlayButtons,
     currentVideosCate,
   } = useStore();
-  const videoList = React.useMemo(() => {
-    const result: VideoItemType[] = [];
-    const uniqVideosMap: Record<string, boolean> = {};
-    for (const item of props.videos) {
-      let needShow = !(item.bvid in uniqVideosMap);
-      if (
-        needShow &&
-        props.type === "Hot" &&
-        (`_${item.mid}` in $blackUps || item.tag in $blackTags)
-      ) {
-        needShow = false;
-      }
-      if (needShow && props.type === "Rank" && `_${item.mid}` in $blackUps) {
-        needShow = false;
-      }
-      if (needShow) {
-        uniqVideosMap[item.bvid] = true;
-        result.push(item);
-      }
+  const videoList: VideoItemType[] = [];
+  const uniqVideosMap: Record<string, boolean> = {};
+  for (const item of props.videos) {
+    let needShow = !(item.bvid in uniqVideosMap);
+    if (needShow && props.type === "Hot" && (`_${item.mid}` in $blackUps || item.tag in $blackTags)) {
+      needShow = false;
     }
-    return result;
-  }, [props.videos, props.type, $blackTags, $blackUps]);
+    if (needShow && props.type === "Rank" && `_${item.mid}` in $blackUps) {
+      needShow = false;
+    }
+    if (needShow) {
+      uniqVideosMap[item.bvid] = true;
+      videoList.push(item);
+    }
+  }
 
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null);

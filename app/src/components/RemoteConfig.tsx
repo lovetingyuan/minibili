@@ -1,23 +1,23 @@
-import { Dialog, Text } from "@/components/styled/rneui";
-import React from "react";
-import { Linking } from "react-native";
+import { Dialog, Text } from '@/components/styled/rneui'
+import React from 'react'
+import { Linking } from 'react-native'
 
-import { setUA } from "@/constants";
-import { colors } from "@/constants/colors.tw";
+import { setUA } from '@/constants'
+import { colors } from '@/constants/colors.tw'
 
-import { useRemoteConfig } from "../api/remote-config";
-import Modal2 from "./Modal2";
+import { useRemoteConfig } from '../api/remote-config'
+import Modal2 from './Modal2'
 
 export default function RemoteConfig() {
-  const remoteConfig = useRemoteConfig();
-  const [visible, setVisible] = React.useState(true);
-  const modalComponent = Modal2 as unknown as typeof React.Component;
+  const remoteConfig = useRemoteConfig()
+  const [visible, setVisible] = React.useState(true)
+  const modalComponent = Modal2 as unknown as typeof React.Component
   const toggleDialog = () => {
-    setVisible(!visible);
-  };
+    setVisible(!visible)
+  }
   // const { setUserAgent } = useStore()
   if (!remoteConfig) {
-    return null;
+    return null
   }
   // remoteConfig.statement.show = true
   // remoteConfig.statement.dismiss = false
@@ -40,16 +40,16 @@ export default function RemoteConfig() {
             <Dialog.Button
               title="详情"
               onPress={() => {
-                Linking.openURL(remoteConfig.statement.url!);
+                Linking.openURL(remoteConfig.statement.url!)
               }}
             />
           ) : null}
         </Dialog.Actions>
       </Dialog>
-    );
+    )
   }
   if (remoteConfig.userAgent) {
-    setUA(remoteConfig.userAgent);
+    // setUA(remoteConfig.userAgent);
   }
-  return null;
+  return null
 }

@@ -4,7 +4,7 @@ import { Image, Linking, Pressable, View } from "react-native";
 
 import { githubLink, site } from "../../constants";
 
-export default React.memo(Header);
+export default Header;
 
 function Header() {
   return (

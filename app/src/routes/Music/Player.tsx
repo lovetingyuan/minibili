@@ -2,12 +2,11 @@ import { Icon, Slider, Text } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import React from "react";
-import { ImageBackground, TouchableOpacity, View } from "react-native";
+import { ImageBackground, TouchableOpacity, useColorScheme, View } from "react-native";
 
 import { useAudioUrl } from "@/api/play-url";
 import { UA } from "@/constants";
 import { colors } from "@/constants/colors.tw";
-import useIsDark from "@/hooks/useIsDark";
 import { useStore } from "@/store";
 import { parseImgUrl, parseTime, showToast } from "@/utils";
 
@@ -29,20 +28,14 @@ const shadowStyle = {
 function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   const { playingSong, get$musicList, setPlayingSong } = useStore();
   const [playMode, setPlayMode] = React.useState<"single" | "order" | "loop">("single");
-  const { prevSong, nextSong } = React.useMemo(() => {
-    if (!playingSong) {
-      return {
-        prevSong: null,
-        nextSong: null,
-      };
-    }
+  let prevSong = null;
+  let nextSong = null;
+  if (playingSong) {
     const [{ songs }] = get$musicList();
     const index = songs.findIndex((s) => s.bvid === playingSong.bvid && s.cid === playingSong.cid);
-    return {
-      prevSong: songs[index - 1] ?? null,
-      nextSong: songs[index + 1] ?? null,
-    };
-  }, [playingSong, get$musicList]);
+    prevSong = songs[index - 1] ?? null;
+    nextSong = songs[index + 1] ?? null;
+  }
   const player = useAudioPlayer(
     props.url
       ? {
@@ -99,7 +92,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
     };
   }, [player, playingSong, props.url]);
 
-  const isDark = useIsDark();
+  const isDark = useColorScheme() === "dark";
   if (!playingSong) {
     return null;
   }
@@ -230,8 +223,6 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   );
 }
 
-const PlayerBarComp = React.memo(PlayerBar);
-
 function MusicPlayerBar() {
   const { playingSong, setPlayingSong } = useStore();
   const { url, time, error } = useAudioUrl(playingSong?.bvid || "", playingSong?.cid);
@@ -247,7 +238,7 @@ function MusicPlayerBar() {
       setPlayingSong(null);
     };
   }, [setPlayingSong]);
-  return <PlayerBarComp key={url} url={url} time={time} error={!!error} />;
+  return <PlayerBar key={url} url={url} time={time} error={!!error} />;
 }
 
-export default React.memo(MusicPlayerBar);
+export default MusicPlayerBar;

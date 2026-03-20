@@ -137,4 +137,4 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   );
 }
 
-export default React.memo(VideoList);
+export default VideoList;

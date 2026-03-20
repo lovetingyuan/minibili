@@ -6,7 +6,7 @@ import { colors } from "@/constants/colors.tw";
 
 import { useStore } from "../../store";
 
-export default React.memo(SortCate);
+export default SortCate;
 
 function SortCate() {
   const [expandedCate, setExpandedCate] = React.useState(false);

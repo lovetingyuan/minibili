@@ -202,7 +202,7 @@ export function CommentItem(props: {
   );
 }
 
-export const Comment = React.memo(CommentBlock);
+export const Comment = CommentBlock;
 
 function CommentBlock(props: { comment: CommentItemType; className?: string; style?: any }) {
   const { comment } = props;

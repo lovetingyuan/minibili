@@ -64,7 +64,7 @@ export function Menu(props: MenuProps) {
   const [opacityAnimation, setOpacityAnimation] = React.useState(() => new Animated.Value(0));
 
   // 处理显示
-  const show = React.useCallback(() => {
+  const show = () => {
     containerRef.current?.measureInWindow((left, top, buttonWidth, buttonHeight) => {
       setButtonHeight(buttonHeight);
       setButtonWidth(buttonWidth);
@@ -72,10 +72,10 @@ export function Menu(props: MenuProps) {
       setTop(top);
       setMenuState(States.Shown);
     });
-  }, []);
+  };
 
   // 处理隐藏
-  const hide = React.useCallback(() => {
+  const hide = () => {
     Animated.timing(opacityAnimation, {
       toValue: 0,
       duration: animationDuration,
@@ -86,7 +86,7 @@ export function Menu(props: MenuProps) {
       setMenuSizeAnimation(new Animated.ValueXY({ x: 0, y: 0 }));
       setOpacityAnimation(new Animated.Value(0));
     });
-  }, [animationDuration, opacityAnimation]);
+  };
 
   // 监听visible变化
   React.useEffect(() => {
@@ -99,38 +99,35 @@ export function Menu(props: MenuProps) {
   }, [visible]);
 
   // 菜单布局回调
-  const onMenuLayout = React.useCallback(
-    (e: LayoutChangeEvent) => {
-      if (menuState === States.Animating) {
-        return;
-      }
-      const { width, height } = e.nativeEvent.layout;
-      setMenuState(States.Animating);
-      setMenuWidth(width);
-      setMenuHeight(height);
+  const onMenuLayout = (e: LayoutChangeEvent) => {
+    if (menuState === States.Animating) {
+      return;
+    }
+    const { width, height } = e.nativeEvent.layout;
+    setMenuState(States.Animating);
+    setMenuWidth(width);
+    setMenuHeight(height);
 
-      Animated.parallel([
-        Animated.timing(menuSizeAnimation, {
-          toValue: { x: width, y: height },
-          duration: animationDuration,
-          easing: EASING,
-          useNativeDriver: false,
-        }),
-        Animated.timing(opacityAnimation, {
-          toValue: 1,
-          duration: animationDuration,
-          easing: EASING,
-          useNativeDriver: false,
-        }),
-      ]).start();
-    },
-    [menuState, menuSizeAnimation, opacityAnimation, animationDuration],
-  );
+    Animated.parallel([
+      Animated.timing(menuSizeAnimation, {
+        toValue: { x: width, y: height },
+        duration: animationDuration,
+        easing: EASING,
+        useNativeDriver: false,
+      }),
+      Animated.timing(opacityAnimation, {
+        toValue: 1,
+        duration: animationDuration,
+        easing: EASING,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
 
   // 关闭请求
-  const handleRequestClose = React.useCallback(() => {
+  const handleRequestClose = () => {
     onRequestClose?.();
-  }, [onRequestClose]);
+  };
 
   const { isRTL } = I18nManager;
   const dimensions = Dimensions.get("window");

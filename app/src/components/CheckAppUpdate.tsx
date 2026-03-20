@@ -17,4 +17,4 @@ function CheckAppUpdate() {
   return null;
 }
 
-export default React.memo(CheckAppUpdate);
+export default CheckAppUpdate;

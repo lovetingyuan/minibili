@@ -263,6 +263,4 @@ function RichTexts(props: {
   );
 }
 
-export default React.memo(RichTexts, (a, b) => {
-  return a.idStr === b.idStr;
-});
+export default RichTexts;
