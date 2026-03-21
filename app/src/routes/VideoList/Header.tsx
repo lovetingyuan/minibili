@@ -6,7 +6,6 @@ import { Menu, MenuDivider, MenuItem } from '@/components/Menu'
 
 import { useAppUpdateInfo } from '@/api/check-update'
 import { colors } from '@/constants/colors.tw'
-import useResolvedColor from '@/hooks/useResolvedColor'
 import { useUpUpdateCount } from '@/store/derives'
 
 import { useStore } from '../../store'
@@ -67,7 +66,6 @@ function splitArrayIntoChunks(arr: any[]) {
 
 function HeaderLeftComp() {
   const { currentVideosCate, $videoCatesList, setCurrentVideosCate } = useStore()
-  const dividerColor = useResolvedColor(colors.gray3.text)
 
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
@@ -126,7 +124,7 @@ function HeaderLeftComp() {
               return (
                 <View key={i} className="w-48 flex-1">
                   <View>{getItem(items[0])}</View>
-                  <MenuDivider color={dividerColor} />
+                  <MenuDivider colorClassName={colors.gray3.border} />
                 </View>
               )
             }

@@ -13,7 +13,6 @@ import {
   View,
 } from 'react-native'
 import WebView, { type WebViewMessageEvent } from 'react-native-webview'
-import { useResolveClassNames } from 'uniwind'
 
 import { useVideoMp4Url } from '@/api/play-url'
 import { UA } from '@/constants'
@@ -40,7 +39,6 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   const { width, height } = useWindowDimensions()
   const [verticalExpand, setVerticalExpand] = React.useState(false)
   const { data } = useVideoInfo(route.params.bvid)
-  const webViewBackgroundStyle = useResolveClassNames('bg-black')
   const isWifi = getIsWiFi()
 
   const [loadPlayer, setLoadPlayer] = React.useState(isWifi)
@@ -250,9 +248,8 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         uri: playPageUrl,
       }}
       ref={webviewRef}
-      style={webViewBackgroundStyle}
+      className="flex-1 bg-black"
       originWhitelist={['https://*', 'bilibili://*']}
-      containerStyle={webViewBackgroundStyle}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback

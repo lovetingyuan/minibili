@@ -1,7 +1,8 @@
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Text } from "@/components/styled/rneui";
+import { clsx } from "clsx";
 import React from "react";
-import { Image, Linking, type TextProps, View, type ViewStyle } from "react-native";
+import { Image, Linking, type TextProps, View } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
 
@@ -18,7 +19,7 @@ function RichTexts(props: {
     name: string;
     jump_url: string;
   } | null;
-  style?: ViewStyle;
+  className?: string;
   textProps?: TextProps;
   fontSize?: number;
 }) {
@@ -27,6 +28,14 @@ function RichTexts(props: {
   const { setImagesList } = useStore();
   let key = 0;
   const fontSize = props.fontSize || 16;
+  const textSizeClassName =
+    fontSize <= 14 ? "text-sm" : fontSize >= 18 ? "text-lg" : "text-base";
+  const textLineClassName =
+    fontSize <= 14
+      ? "text-sm leading-[22.4px]"
+      : fontSize >= 18
+        ? "text-lg leading-[28.8px]"
+        : "text-base leading-[25.6px]";
   const Topic = props.topic ? (
     <View className="mb-3 flex-row items-center">
       <Icon name="hashtag" type="fontisto" colorClassName={colors.primary.accent} size={14} />
@@ -39,8 +48,7 @@ function RichTexts(props: {
             });
           }
         }}
-        className={colors.primary.text}
-        style={{ fontSize }}
+        className={clsx(colors.primary.text, textSizeClassName)}
       >
         {" "}
         {props.topic.name}
@@ -55,7 +63,7 @@ function RichTexts(props: {
   for (const node of props.nodes) {
     if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT) {
       reactNodes.push(
-        <Text style={{ fontSize, lineHeight: fontSize * 1.6 }} key={key++}>
+        <Text className={textLineClassName} key={key++}>
           {node.text}
         </Text>,
       );
@@ -66,8 +74,7 @@ function RichTexts(props: {
             Linking.openURL(node.jump_url);
           }}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {`🔗${node.text} `}
         </Text>,
@@ -86,8 +93,7 @@ function RichTexts(props: {
               },
             });
           }}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {node.text}
         </Text>,
@@ -107,8 +113,7 @@ function RichTexts(props: {
             Linking.openURL(parseUrl(node.jump_url));
           }}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {node.text}
         </Text>,
@@ -132,8 +137,7 @@ function RichTexts(props: {
             }
           }}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {`📺 ${node.text}`}
         </Text>,
@@ -146,8 +150,7 @@ function RichTexts(props: {
             Linking.openURL(node.jump_url);
           }}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {`🛒 ${node.text}`}
         </Text>,
@@ -159,8 +162,7 @@ function RichTexts(props: {
             Linking.openURL(`mailto:${node.text}`);
           }}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {`📧 ${node.text}`}
         </Text>,
@@ -172,8 +174,7 @@ function RichTexts(props: {
             Linking.openURL(`https://t.bilibili.com/vote/h5/index/#/result?vote_id=${node.rid}`);
           }}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {`🗳️ ${node.text}`}
         </Text>,
@@ -182,8 +183,7 @@ function RichTexts(props: {
       reactNodes.push(
         <Text
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
           onPress={() => {
             Linking.openURL(
               `https://t.bilibili.com/lottery/h5/index/#/result?business_type=1&business_id=${props.idStr}&isWeb=1`,
@@ -201,8 +201,7 @@ function RichTexts(props: {
           }}
           numberOfLines={1}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {`📹 ${node.text}`}
         </Text>,
@@ -215,8 +214,7 @@ function RichTexts(props: {
             Linking.openURL(parseUrl(node.jump_url));
           }}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {`📝 ${node.text}`}
         </Text>,
@@ -230,15 +228,14 @@ function RichTexts(props: {
             setImagesList(node.pics);
           }}
           key={key++}
-          className={colors.primary.text}
-          style={{ fontSize }}
+          className={clsx(colors.primary.text, textSizeClassName)}
         >
           {`📝 ${node.text}`}
         </Text>,
       );
     } else {
       reactNodes.push(
-        <Text style={{ fontSize, lineHeight: fontSize * 1.6 }} key={key++}>
+        <Text className={textLineClassName} key={key++}>
           {node.text}
         </Text>,
       );
@@ -247,7 +244,7 @@ function RichTexts(props: {
   const textOverflow =
     typeof props.textProps?.numberOfLines === "number" && lines - 1 > props.textProps.numberOfLines;
   return (
-    <View className={`flex-1 ${textOverflow ? "mb-4" : "mb-3"}`} style={props.style}>
+    <View className={clsx("flex-1", textOverflow ? "mb-4" : "mb-3", props.className)}>
       {Topic}
       <Text
         className="flex-1 flex-row flex-wrap items-center"

@@ -669,6 +669,7 @@ type SkeletonProps = BaseSkeletonProps & {
 export function Skeleton({
   className,
   skeletonClassName,
+  style,
   skeletonStyle,
   ...props
 }: SkeletonProps) {
@@ -678,7 +679,8 @@ export function Skeleton({
   return (
     <BaseSkeleton
       {...props}
-      skeletonStyle={[skeletonStyle, resolvedClassStyle, resolvedSkeletonStyle]}
+      style={[style, resolvedClassStyle]}
+      skeletonStyle={[skeletonStyle, resolvedSkeletonStyle]}
     />
   );
 }

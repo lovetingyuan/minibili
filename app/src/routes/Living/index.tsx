@@ -5,6 +5,7 @@ import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
 import { Image, View } from "react-native";
 import { WebView } from "react-native-webview";
+import { withUniwind } from "uniwind";
 
 import useLiveUrl from "@/api/get-live-url";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
@@ -29,6 +30,9 @@ function Loading() {
 }
 
 type Props = NativeStackScreenProps<RootStackParamList, "Living">;
+const StyledVideoView = withUniwind(VideoView) as unknown as React.ComponentType<
+  React.ComponentProps<typeof VideoView> & { className?: string }
+>;
 
 function LiveWebPage({ route }: Props) {
   const { url, title: pageTitle } = route.params;
@@ -109,11 +113,11 @@ function LiveWebPage({ route }: Props) {
   if (backPlay) {
     return (
       <View className="relative flex flex-1">
-        <VideoView
+        <StyledVideoView
           player={player}
           nativeControls
           contentFit="contain"
-          style={{ width: "100%", height: "100%", minHeight: 384 }}
+          className="min-h-96 h-full w-full"
         />
         <View className="absolute left-2 top-2 flex-row items-center gap-4">
           {/* <Button

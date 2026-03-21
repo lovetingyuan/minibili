@@ -22,14 +22,7 @@ function HeaderRight(props: { reload: () => void }) {
 
   const showMenu = () => setVisible(true);
   return (
-    <View
-      style={{
-        height: 32,
-        width: 32,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
+    <View className="h-8 w-8 justify-center">
       <Menu
         visible={visible}
         className="bg-white dark:bg-zinc-900"

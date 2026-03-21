@@ -12,26 +12,17 @@ type StyledMenuProps = MenuProps & {
   className?: string;
 };
 
-export function Menu({ className, style, ...props }: StyledMenuProps) {
-  const resolvedStyle = useResolveClassNames(className ?? "");
-
-  return <BaseMenu {...props} style={Object.assign({}, style, resolvedStyle)} />;
+export function Menu({ className, ...props }: StyledMenuProps) {
+  return <BaseMenu {...props} className={className} />;
 }
 
 type StyledMenuDividerProps = MenuDividerProps & {
+  className?: string;
   colorClassName?: string;
 };
 
-export function MenuDivider({ color, colorClassName }: StyledMenuDividerProps) {
-  const resolvedStyle = useResolveClassNames(colorClassName ?? "");
-  const resolvedColor =
-    typeof resolvedStyle.accentColor === "string"
-      ? resolvedStyle.accentColor
-      : typeof resolvedStyle.color === "string"
-        ? resolvedStyle.color
-        : undefined;
-
-  return <BaseMenuDivider color={resolvedColor ?? color} />;
+export function MenuDivider({ className, colorClassName }: StyledMenuDividerProps) {
+  return <BaseMenuDivider className={[className, colorClassName].filter(Boolean).join(" ")} />;
 }
 
 type StyledMenuItemProps = MenuItemProps & {
@@ -44,13 +35,9 @@ export function MenuItem({
   className,
   pressColor,
   pressColorClassName,
-  style,
   textClassName,
-  textStyle,
   ...props
 }: StyledMenuItemProps) {
-  const resolvedStyle = useResolveClassNames(className ?? "");
-  const resolvedTextStyle = useResolveClassNames(textClassName ?? "");
   const resolvedPressColorStyle = useResolveClassNames(pressColorClassName ?? "");
   const resolvedPressColor =
     typeof resolvedPressColorStyle.accentColor === "string"
@@ -62,9 +49,9 @@ export function MenuItem({
   return (
     <BaseMenuItem
       {...props}
+      className={className}
       pressColor={resolvedPressColor ?? pressColor}
-      style={Object.assign({}, style, resolvedStyle)}
-      textStyle={Object.assign({}, textStyle, resolvedTextStyle)}
+      textClassName={textClassName}
     />
   );
 }

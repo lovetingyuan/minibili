@@ -4,8 +4,6 @@ import { Image } from "@/components/styled/expo";
 import he from "he";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
-import type { StyleProp, TextStyle } from "react-native";
-import { useResolveClassNames } from "uniwind";
 
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
@@ -20,7 +18,7 @@ import {
   parseNumber,
 } from "@/utils";
 
-function extractTextWithEmTags(text: string, style: StyleProp<TextStyle>) {
+function extractTextWithEmTags(text: string, className?: string) {
   const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g;
   const matches = text.matchAll(regex);
   const result: (React.ReactElement | string)[] = [];
@@ -29,7 +27,7 @@ function extractTextWithEmTags(text: string, style: StyleProp<TextStyle>) {
     const [, emContent, nonEmContent] = match;
     if (emContent) {
       result.push(
-        <Text style={style} key={i++}>
+        <Text className={className} key={i++}>
           {he.decode(emContent)}
         </Text>,
       );
@@ -55,7 +53,6 @@ function VideoListItem({
   const { setOverlayButtons } = useStore();
   const _followedUpsMap = useFollowedUpsMap();
   const isFollowed = video.mid && video.mid in _followedUpsMap;
-  const secondaryTextStyle = useResolveClassNames(colors.secondary.text);
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -113,7 +110,7 @@ function VideoListItem({
       </View>
       <View className="flex-[4] justify-between">
         <Text className="mb-3 flex-1 text-base" numberOfLines={2} ellipsizeMode="tail">
-          {extractTextWithEmTags(video.title, secondaryTextStyle)}
+          {extractTextWithEmTags(video.title, colors.secondary.text)}
         </Text>
         <View className="gap-2">
           <Text className={isFollowed ? colors.secondary.text : colors.primary.text}>

@@ -4,6 +4,13 @@
 
 minibili - 使用 Expo + React Native + TailwindCSS 开发的精简版B站APP。
 
+## 项目结构
+
+本仓库是一个monorepo仓库，基于npm的workspace。
+
+- app，expo主项目，主要采用的框架和库有 expo + typescript + uniwind + swr + rneui组件库 + react-navigation
+- server，app项目的服务端，采用 cloudflare + hono 开发。
+
 ## 代码规范
 
 ### TypeScript
@@ -23,8 +30,9 @@ minibili - 使用 Expo + React Native + TailwindCSS 开发的精简版B站APP。
 
 ### 样式
 
-- 使用 TailwindCSS + `tw()` 辅助函数
+- 使用 TailwindCSS 语法 + `tw()` 辅助函数，基于 uniwind
 - 颜色定义在 `src/constants/colors.tw.ts`
+- 尽量不要使用 `style`属性，而是采用 tailwindcss 语法。
 
 ### Git
 
@@ -32,4 +40,5 @@ minibili - 使用 Expo + React Native + TailwindCSS 开发的精简版B站APP。
 - **[CRITICAL]**每次任务完毕后必须输出一条遵循 Conventional Commits 规范的commit信息。
 
 ### 其他规范
+
 - **[CRITICAL]**你在执行任务的过程中产生的临时文件都只能放在`tmp`文件夹下

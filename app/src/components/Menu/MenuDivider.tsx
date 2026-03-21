@@ -1,18 +1,12 @@
 import React from "react";
+import { clsx } from "clsx";
 
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
 export interface MenuDividerProps {
-  color?: string;
+  className?: string;
 }
 
-export function MenuDivider({ color = "rgba(0,0,0,0.12)" }: MenuDividerProps) {
-  return <View style={[styles.divider, { borderBottomColor: color }]} />;
+export function MenuDivider({ className }: MenuDividerProps) {
+  return <View className={clsx("flex-1 border-b-[0.5px] border-black/10", className)} />;
 }
-
-const styles = StyleSheet.create({
-  divider: {
-    flex: 1,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-});

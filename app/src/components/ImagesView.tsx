@@ -1,141 +1,178 @@
-import { Overlay } from "@/components/styled/rneui";
-import { Image } from "@/components/styled/expo";
-import React from "react";
-import { Linking, ScrollView, Text, useWindowDimensions, View } from "react-native";
-import PagerView from "react-native-pager-view";
+import { Image } from '@/components/styled/expo'
+import { Icon, Text } from '@/components/styled/rneui'
+import React from 'react'
+import {
+  FlatList,
+  Linking,
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native'
+import { GestureViewer, useGestureViewerState } from 'react-native-gesture-image-viewer'
 
-import useLatest from "@/hooks/useLatest";
-import { parseImgUrl } from "@/utils";
+import { parseImgUrl } from '@/utils'
 
-import { useStore } from "../store";
+import { useStore } from '../store'
+import type { ViewerImage } from './ImagesView.type'
 
-const textShadow = {
-  textShadowColor: "black",
-  textShadowOffset: { width: 0, height: 0 },
-  textShadowRadius: 5,
-};
+const ViewerId = 'images-viewer'
+const LoadingPlaceholder = require('../../assets/loading2.gif')
 
-function ImagesView() {
-  const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } = useStore();
-
-  const { width, height } = useWindowDimensions();
-  const images = imagesList.map((v) => {
+function normalizeImages(
+  imagesList: {
+    src: string
+    width: number
+    height: number
+    ratio?: number
+  }[],
+) {
+  return imagesList.map<ViewerImage>((image) => {
     return {
-      url: parseImgUrl(v.src),
-      width: v.width,
-      height: v.height,
-    };
-  });
-  const [current, setCurrent] = React.useState(currentImageIndex);
-  const onClose = () => {
-    setImagesList([]);
-    setCurrentImageIndex(0);
-  };
-  const onOpen = () => {
-    const img = imagesList[current].src;
-    Linking.openURL(img.split("@")[0]);
-  };
-  // avoid view pager render all pages at same time.
-  const imageCompCache = useLatest<Record<string, React.ComponentElement<any, any>>>({});
-  // const imageCompCache = React.useRef<
-  //   Record<string, React.ComponentElement<any, any>>
-  // >({})
-  const imageNodes = images.map((v, i) => {
-    let imgWidth = Math.min(width, v.width);
-    let imgHeight = (imgWidth * v.height) / v.width;
-    let overflow = false;
-    if (imgHeight > height) {
-      imgWidth = width;
-      imgHeight = (width * v.height) / v.width;
-      overflow = true;
-      // imgHeight = Math.min(height, v.height)
-      // imgWidth = (v.width * imgHeight) / v.height
+      uri: parseImgUrl(image.src),
+      originalUri: image.src.split('@')[0],
+      width: image.width,
+      height: image.height,
     }
-    let imageView = null;
-    if (imageCompCache.current[v.url]) {
-      imageView = imageCompCache.current[v.url];
-    } else if (current === i) {
-      Object.assign(imageCompCache.current, {
-        [v.url]: (
-          <Image
-            source={{ uri: v.url }}
-            style={{ width: imgWidth, height: imgHeight }}
-            placeholder={require("../../assets/loading2.gif")}
-          />
-        ),
-      });
-      imageView = imageCompCache.current[v.url];
-    } else {
-      imageView = <Image source={require("../../assets/loading2.gif")} className="h-24 w-24" />;
-    }
-    // if (overflow) {
-    //   return (
-    //     <ScrollView
-    //       key={v.url}
-    //       contentContainerClassName={'justify-center items-center')}
-    //       className="flex-1 bg-white">
-    //       {imageView}
-    //     </ScrollView>
-    //   )
-    // }
-    return (
-      <View key={v.url} className="flex-1 items-center justify-center bg-black">
-        {overflow ? (
-          <ScrollView
-            key={v.url}
-            contentContainerClassName="justify-center items-center"
-            className="flex-1 bg-black"
-          >
-            {imageView}
-          </ScrollView>
-        ) : (
-          imageView
-        )}
-      </View>
-    );
-  });
-  return (
-    <Overlay
-      isVisible={images.length > 0}
-      fullScreen
-      overlayClassName="p-0 m-0"
-      onBackdropPress={onClose}
-    >
-      <View className="relative flex-1">
-        <View className="absolute top-6 z-10 w-full justify-center">
-          <Text className="text-center text-lg text-white" style={textShadow}>
-            {current + 1} / {images.length}
-          </Text>
-        </View>
-        <View className="absolute top-5 z-10 w-full flex-row items-center justify-end">
-          <Text
-            className="mr-4 text-right text-2xl font-semibold text-white"
-            onPress={onOpen}
-            style={textShadow}
-          >
-            ⇩
-          </Text>
-          <Text
-            className="mr-4 text-right text-2xl text-white"
-            onPress={onClose}
-            style={textShadow}
-          >
-            ✕
-          </Text>
-        </View>
-        <PagerView
-          onPageSelected={(e) => {
-            setCurrent(e.nativeEvent.position);
-          }}
-          offscreenPageLimit={1}
-          className="flex-1"
-          initialPage={currentImageIndex}
-        >
-          {imageNodes}
-        </PagerView>
-      </View>
-    </Overlay>
-  );
+  })
 }
 
-export default ImagesView;
+function ImagesView() {
+  const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } = useStore()
+  const { currentIndex, totalCount } = useGestureViewerState(ViewerId)
+
+  const images = normalizeImages(imagesList)
+  const visible = images.length > 0
+  const activeIndex = totalCount > 0 ? currentIndex : currentImageIndex
+  const safeActiveIndex =
+    images.length > 0 ? Math.min(Math.max(activeIndex, 0), images.length - 1) : 0
+  const activeTotal = totalCount || images.length
+  const viewerKey = `${currentImageIndex}:${images.map(image => image.uri).join('|')}`
+
+  const closeViewer = () => {
+    setImagesList([])
+    setCurrentImageIndex(0)
+  }
+
+  const openOriginalImage = () => {
+    const image = images[safeActiveIndex] ?? images[0]
+
+    if (!image) {
+      return
+    }
+
+    void Linking.openURL(image.originalUri)
+  }
+
+  const renderContainer = (
+    children: React.ReactElement,
+    _helpers: { dismiss: () => void },
+  ) => {
+    return (
+      <View style={styles.container}>
+        {children}
+        <View pointerEvents="box-none" style={styles.overlay}>
+          <View pointerEvents="box-none" style={styles.bottomBarWrap}>
+            <View style={styles.bottomBar}>
+              <Pressable hitSlop={12} onPress={openOriginalImage}>
+                <Icon
+                  color="#fff"
+                  name="download"
+                  size={20}
+                  type="fontisto"
+                />
+              </Pressable>
+              <Text style={styles.counterText}>{`${safeActiveIndex + 1} / ${activeTotal}`}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
+  return (
+    <Modal
+      animationType="fade"
+      onRequestClose={closeViewer}
+      presentationStyle="overFullScreen"
+      statusBarTranslucent
+      transparent
+      visible={visible}
+    >
+      {visible ? (
+        <GestureViewer
+          backdropStyle={styles.backdrop}
+          key={viewerKey}
+          data={images}
+          dismiss={{ enabled: true }}
+          id={ViewerId}
+          initialIndex={currentImageIndex}
+          ListComponent={FlatList}
+          maxZoomScale={4}
+          onDismiss={closeViewer}
+          renderContainer={renderContainer}
+          renderItem={(item) => {
+            return (
+              <Image
+                contentFit="contain"
+                placeholder={LoadingPlaceholder}
+                recyclingKey={item.uri}
+                source={{ uri: item.uri }}
+                style={styles.image}
+              />
+            )
+          }}
+        />
+      ) : null}
+    </Modal>
+  )
+}
+
+const styles = StyleSheet.create({
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.88)',
+  },
+  bottomBar: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    borderRadius: 18,
+    flexDirection: 'row',
+    gap: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  bottomBarWrap: {
+    alignItems: 'center',
+    bottom: 28,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+  },
+  container: {
+    flex: 1,
+  },
+  counterText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+    textShadowColor: '#000',
+    textShadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    textShadowRadius: 5,
+  },
+  image: {
+    height: '100%',
+    width: '100%',
+  },
+  overlay: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+})
+
+export default ImagesView

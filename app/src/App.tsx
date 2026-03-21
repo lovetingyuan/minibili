@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/styled/rneui'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 import { AppState } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 // import { RootSiblingParent } from 'react-native-root-siblings'
 import { SWRConfig } from 'swr'
 import type { ProviderConfiguration, SWRConfiguration } from 'swr/_internal'
@@ -69,21 +70,23 @@ export default function App() {
   const rneTheme = useRNETheme()
   return (
     <SWRConfig value={SWRConfigValue}>
-      <ThemeProvider theme={rneTheme}>
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <InitStoreComp />
-          <RemoteConfig />
-          <CheckAppUpdate />
-          <CheckUpUpdate />
-          <CheckNetState />
-          <CheckLiveUps />
-          <ButtonsOverlay />
-          <ImagesView />
-          <UserLocation />
-          <Route />
-        </ErrorBoundary>
-      </ThemeProvider>
-      <StatusBar style="auto" translucent />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ThemeProvider theme={rneTheme}>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <InitStoreComp />
+            <RemoteConfig />
+            <CheckAppUpdate />
+            <CheckUpUpdate />
+            <CheckNetState />
+            <CheckLiveUps />
+            <ButtonsOverlay />
+            <ImagesView />
+            <UserLocation />
+            <Route />
+          </ErrorBoundary>
+        </ThemeProvider>
+        <StatusBar style="auto" translucent />
+      </GestureHandlerRootView>
     </SWRConfig>
   )
 }

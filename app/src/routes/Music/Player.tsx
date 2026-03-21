@@ -16,14 +16,6 @@ void setAudioModeAsync({
   interruptionMode: "doNotMix",
 });
 
-const shadowStyle = {
-  shadowColor: "black",
-  shadowOpacity: 0.8,
-  shadowOffset: { width: 0, height: -12 },
-  shadowRadius: 10,
-  elevation: 10, // 添加 Android 阴影效果
-};
-
 // const audioSoundCache = {}
 function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
   const { playingSong, get$musicList, setPlayingSong } = useStore();
@@ -103,8 +95,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
         isDark ? require("../../../assets/bg-342.png") : require("../../../assets/bg-111.webp")
       }
       resizeMode="stretch"
-      className={`px-4 py-6 ${colors.white.bg}`}
-      style={shadowStyle}
+      className={`px-4 py-6 shadow-2xl shadow-black ${colors.white.bg}`}
     >
       <View className="flex-row gap-3">
         <ImageBackground
@@ -195,7 +186,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
             </TouchableOpacity>
           </View>
           <View className="flex-row items-center gap-2">
-            <Text className="text-xs" style={{ fontVariant: ["tabular-nums"] }}>
+            <Text className="text-xs tabular-nums">
               {parseTime(playingTime)}
             </Text>
 

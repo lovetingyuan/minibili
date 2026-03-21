@@ -1,4 +1,5 @@
 import React from "react";
+import { clsx } from "clsx";
 
 import {
   Animated,
@@ -7,9 +8,7 @@ import {
   I18nManager,
   LayoutChangeEvent,
   Modal,
-  Platform,
   StatusBar,
-  StyleSheet,
   TouchableWithoutFeedback,
   View,
   ViewStyle,
@@ -18,6 +17,7 @@ import {
 export interface MenuProps {
   children?: React.ReactNode;
   anchor?: React.ReactNode;
+  className?: string;
   style?: ViewStyle;
   onRequestClose?(): void;
   animationDuration?: number;
@@ -39,6 +39,7 @@ export function Menu(props: MenuProps) {
     animationDuration = 300,
     testID,
     anchor,
+    className,
     style,
     children,
     visible,
@@ -196,12 +197,13 @@ export function Menu(props: MenuProps) {
         transparent
       >
         <TouchableWithoutFeedback onPress={handleRequestClose} accessible={false}>
-          <View style={StyleSheet.absoluteFill}>
+          <View className="absolute bottom-0 left-0 right-0 top-0">
             <Animated.View
               onLayout={onMenuLayout}
-              style={[styles.shadowMenuContainer, shadowMenuContainerStyle, style]}
+              className={clsx("absolute rounded bg-white shadow-lg shadow-black", className)}
+              style={[shadowMenuContainerStyle, style]}
             >
-              <Animated.View style={[styles.menuContainer, animationStarted && menuSize]}>
+              <Animated.View className="overflow-hidden" style={animationStarted && menuSize}>
                 {children}
               </Animated.View>
             </Animated.View>
@@ -211,28 +213,3 @@ export function Menu(props: MenuProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  shadowMenuContainer: {
-    position: "absolute",
-    backgroundColor: "white",
-    borderRadius: 4,
-    opacity: 0,
-
-    // Shadow
-    ...Platform.select({
-      ios: {
-        shadowColor: "black",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.14,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  menuContainer: {
-    overflow: "hidden",
-  },
-});
