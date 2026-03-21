@@ -3,21 +3,23 @@
   "private": true,
   "workspaces": [
     "app",
-    "website"
+    "server"
   ],
   "scripts": {
     "format": "oxfmt .",
+    "knip:app": "knip --workspace @minibili/app",
     "android": "npm run android -w=@minibili/app",
+    "server": "npm run dev -w=@minibili/server",
     "build:android": "npm run build:android -w=@minibili/app"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.18",
-    "@tingyuan/react-native-tailwindcss": "^0.0.18",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.28.5",
     "@tailwindcss/vite": "^4.1.18",
+    "knip": "^6.0.1",
     "oxfmt": "latest",
     "typescript": "~5.9.2",
     "vite": "^6.2.3",

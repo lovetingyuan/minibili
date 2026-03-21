@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    "app": {
+      "entry": ["metro.config.js"],
+      "ignoreBinaries": ["adb", "react-native-tailwindcss-build"],
+      "ignoreUnresolved": [".apk"]
+    }
+  }
+}

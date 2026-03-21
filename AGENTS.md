@@ -30,3 +30,6 @@ minibili - 使用 Expo + React Native + TailwindCSS 开发的精简版B站APP。
 
 - **[CRITICAL]**严禁自动提交
 - **[CRITICAL]**每次任务完毕后必须输出一条遵循 Conventional Commits 规范的commit信息。
+
+### 其他规范
+- **[CRITICAL]**你在执行任务的过程中产生的临时文件都只能放在`tmp`文件夹下

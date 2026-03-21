@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MiniBili</title>
+    <meta name="description" content="一款简洁的B站浏览应用" />
+    <link rel="icon" href="/minibili.png" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <nav class="top-actions" aria-label="页面操作">
+        <button id="open-changelog" class="ghost-button" type="button">更新日志</button>
+        <a
+          class="icon-link"
+          href="https://github.com/lovetingyuan/minibili"
+          rel="noreferrer noopener"
+          target="_blank"
+          aria-label="访问代码 github"
+          title="访问代码 github"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"
+            />
+          </svg>
+        </a>
+      </nav>
+
+      <section class="hero-block">
+        <img class="brand-mark" src="/minibili.png" alt="MiniBili logo" />
+        <p class="hero-copy">一款简洁的B站浏览应用</p>
+        <div class="download-wrap">
+          <a
+            id="download-link"
+            class="download-button is-loading"
+            href="/"
+            aria-disabled="true"
+            tabindex="-1"
+          >
+            <span>下载 APP</span>
+            <span id="download-meta" class="download-meta">获取版本中</span>
+          </a>
+          <p id="download-status" class="helper-text">正在获取最新版本，请稍候</p>
+        </div>
+      </section>
+
+      <section class="showcase" aria-label="应用截图">
+        <button id="carousel-prev" class="carousel-button" type="button" aria-label="上一张">
+          ❮
+        </button>
+        <div class="phone-frame">
+          <div class="phone-notch" aria-hidden="true"></div>
+          <div class="screen-shell">
+            <img
+              id="carousel-image"
+              class="screen-image"
+              src="/video-list.jpg"
+              alt="MiniBili 应用截图"
+            />
+          </div>
+        </div>
+        <button id="carousel-next" class="carousel-button" type="button" aria-label="下一张">
+          ❯
+        </button>
+      </section>
+
+      <footer class="page-footer">
+        <time id="build-time" datetime="">静态首页</time>
+      </footer>
+    </main>
+
+    <dialog id="changelog-dialog" class="changelog-dialog">
+      <div class="dialog-header">
+        <h2>更新日志</h2>
+        <form method="dialog" class="dialog-close-row">
+          <button class="close-button" type="submit" aria-label="关闭">✕</button>
+        </form>
+      </div>
+      <div id="changelog-body" class="dialog-content">
+        <p class="dialog-state">点击后加载更新日志。</p>
+      </div>
+    </dialog>
+  </body>
+</html>

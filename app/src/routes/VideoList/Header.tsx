@@ -1,20 +1,20 @@
-import { useNavigation } from "@react-navigation/native";
-import { Badge, Button, Icon, Text } from "@/components/styled/rneui";
-import React from "react";
-import { Animated, ScrollView, TouchableOpacity, View } from "react-native";
-import { Menu, MenuDivider, MenuItem } from "@/components/Menu";
+import { useNavigation } from '@react-navigation/native'
+import { Badge, Button, Icon, Text } from '@/components/styled/rneui'
+import React from 'react'
+import { Animated, ScrollView, TouchableOpacity, View } from 'react-native'
+import { Menu, MenuDivider, MenuItem } from '@/components/Menu'
 
-import { useAppUpdateInfo } from "@/api/check-update";
-import { colors } from "@/constants/colors.tw";
-import useResolvedColor from "@/hooks/useResolvedColor";
-import { useUpUpdateCount } from "@/store/derives";
+import { useAppUpdateInfo } from '@/api/check-update'
+import { colors } from '@/constants/colors.tw'
+import useResolvedColor from '@/hooks/useResolvedColor'
+import { useUpUpdateCount } from '@/store/derives'
 
-import { useStore } from "../../store";
-import type { NavigationProps } from "../../types";
+import { useStore } from '../../store'
+import type { NavigationProps } from '../../types'
 
 function HeaderTitleComp() {
-  const { current: opacityValue } = React.useRef(new Animated.Value(0));
-  const appUpdateInfo = useAppUpdateInfo();
+  const { current: opacityValue } = React.useRef(new Animated.Value(0))
+  const appUpdateInfo = useAppUpdateInfo()
   React.useEffect(() => {
     const blinkAnimation = Animated.loop(
       Animated.sequence([
@@ -29,14 +29,14 @@ function HeaderTitleComp() {
           useNativeDriver: true,
         }),
       ]),
-    );
+    )
 
-    blinkAnimation.start();
+    blinkAnimation.start()
 
     return () => {
-      blinkAnimation.stop();
-    };
-  }, [opacityValue]);
+      blinkAnimation.stop()
+    }
+  }, [opacityValue])
 
   return appUpdateInfo.hasUpdate ? (
     <Button
@@ -45,49 +45,49 @@ function HeaderTitleComp() {
       buttonClassName="mx-2 w-24"
       titleClassName={`text-sm ${colors.primary.text}`}
       onPress={() => {
-        appUpdateInfo.showAlert();
+        appUpdateInfo.showAlert()
       }}
     >
-      {"有新版本"}
+      {'有新版本'}
       <Animated.View style={{ opacity: opacityValue }}>
         <Icon name="fiber-new" colorClassName={colors.secondary.accent} size={24} />
       </Animated.View>
     </Button>
-  ) : null;
+  ) : null
 }
 
 function splitArrayIntoChunks(arr: any[]) {
-  const result = [[arr[0]]];
+  const result = [[arr[0]]]
   for (let i = 1; i < arr.length; i += 2) {
-    result.push(arr.slice(i, i + 2));
+    result.push(arr.slice(i, i + 2))
   }
 
-  return result;
+  return result
 }
 
 function HeaderLeftComp() {
-  const { currentVideosCate, $videoCatesList, setCurrentVideosCate } = useStore();
-  const dividerColor = useResolvedColor(colors.gray3.text);
+  const { currentVideosCate, $videoCatesList, setCurrentVideosCate } = useStore()
+  const dividerColor = useResolvedColor(colors.gray3.text)
 
-  const [visible, setVisible] = React.useState(false);
-  const hideMenu = () => setVisible(false);
-  const showMenu = () => setVisible(true);
-  const list = splitArrayIntoChunks($videoCatesList);
+  const [visible, setVisible] = React.useState(false)
+  const hideMenu = () => setVisible(false)
+  const showMenu = () => setVisible(true)
+  const list = splitArrayIntoChunks($videoCatesList)
   const getItem = (item: any) => {
-    const selected = currentVideosCate.rid === item.rid;
+    const selected = currentVideosCate.rid === item.rid
     return (
       <MenuItem
         pressColorClassName={colors.gray3.accent}
-        textClassName={`text-base ${selected ? "font-bold" : ""} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`}
+        textClassName={`text-base ${selected ? 'font-bold' : ''} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`}
         onPress={() => {
-          setCurrentVideosCate(item);
-          hideMenu();
+          setCurrentVideosCate(item)
+          hideMenu()
         }}
       >
         {item.label}
       </MenuItem>
-    );
-  };
+    )
+  }
   return (
     <View className="flex-row items-center gap-4">
       <Menu
@@ -108,7 +108,7 @@ function HeaderLeftComp() {
                   : colors.gray7.text
               }`}
             >
-              {currentVideosCate.label + (currentVideosCate.rid === -1 ? "" : "排行")}{" "}
+              {currentVideosCate.label + (currentVideosCate.rid === -1 ? '' : '排行')}{' '}
             </Text>
             <Icon
               name="triangle-down"
@@ -128,34 +128,34 @@ function HeaderLeftComp() {
                   <View>{getItem(items[0])}</View>
                   <MenuDivider color={dividerColor} />
                 </View>
-              );
+              )
             }
             return (
               <View key={i} className="w-48 flex-row">
                 <View className="w-[50%]">{getItem(items[0])}</View>
                 {items[1] ? <View className="w-[50%]">{getItem(items[1])}</View> : null}
               </View>
-            );
+            )
           })}
         </ScrollView>
       </Menu>
     </View>
-  );
+  )
 }
 
 function HeaderRightComp() {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  const { livingUps } = useStore();
-  const _updatedCount = useUpUpdateCount();
-  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0;
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const { livingUps } = useStore()
+  const _updatedCount = useUpUpdateCount()
+  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0
   return (
     <View className="mr-2 flex-row items-center gap-1">
       <Button
-        radius={"sm"}
+        radius={'sm'}
         size="sm"
         type="clear"
         onPress={() => {
-          navigation.navigate("SearchVideos");
+          navigation.navigate('SearchVideos')
         }}
       >
         <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
@@ -165,8 +165,8 @@ function HeaderRightComp() {
           <Badge
             status="success"
             value={_updatedCount}
-            badgeClassName={`absolute left-10 top-1 h-4 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`}
-            textClassName="text-[11px]"
+            badgeClassName={`absolute left-12 top-1 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`}
+            textClassName="text-[10px]"
           />
         ) : null}
         <Button
@@ -174,16 +174,16 @@ function HeaderRightComp() {
           size="sm"
           titleClassName="text-lg"
           onPress={() => {
-            navigation.navigate("Follow");
+            navigation.navigate('Follow')
           }}
         >
-          {` 关注 ${_updatedCount ? "  " : ""}`}
+          {` 关注 ${_updatedCount ? '  ' : ''}`}
         </Button>
       </View>
     </View>
-  );
+  )
 }
 
-export const videoListHeaderLeft = () => <HeaderLeftComp />;
-export const videoListHeaderRight = () => <HeaderRightComp />;
-export const videoListHeaderTitle = () => <HeaderTitleComp />;
+export const videoListHeaderLeft = () => <HeaderLeftComp />
+export const videoListHeaderRight = () => <HeaderRightComp />
+export const videoListHeaderTitle = () => <HeaderTitleComp />

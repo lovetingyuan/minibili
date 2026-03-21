@@ -19,13 +19,13 @@
     "ios": "adb devices -l && npx expo start --ios",
     "web": "expo start --web",
     "build:android": "zx scripts/build.mjs",
-    "build:android:preview": "cross-env APP_VARIANT=preview eas build --platform android --profile preview --non-interactive",
+    "build:android:preview": "cross-env APP_VARIANT=preview npx --yes eas-cli@latest build --platform android --profile preview --non-interactive",
     "update": "zx scripts/hot-update.mjs",
     "doctor": "npx -y expo-doctor@latest",
     "test": "npx vitest run",
     "lint": "oxlint . --react-plugin --fix --fix-suggestions",
     "update-expo": "npm i -g eas-cli && npm install expo && npx expo install --fix && npm run doctor",
-    "bundle-analyze": "npx react-native-bundle-visualizer --platform android --entry-file index.js --expo true"
+    "bundle-analyze": "npx --yes react-native-bundle-visualizer --platform android --entry-file index.js --expo true"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -42,7 +42,7 @@
     "@rneui/base": "^5.0.0",
     "@rneui/themed": "^5.0.0",
     "@shopify/flash-list": "2.0.2",
-    "babel-plugin-react-compiler": "^19.0.0-beta-af1b7da-20250417",
+    "babel-plugin-react-compiler": "^1.0.0",
     "clsx": "^2.1.0",
     "crypto-js": "^4.2.0",
     "expo": "^55.0.0",
@@ -60,11 +60,11 @@
     "expo-updates": "~55.0.15",
     "expo-video": "~55.0.11",
     "he": "^1.2.0",
-    "p-queue": "6.6.2",
+    "p-queue": "^9.1.0",
     "react": "19.2.0",
     "react-atomic-store": "^0.0.8",
     "react-native": "0.83.2",
-    "react-native-error-boundary": "^2.0.0",
+    "react-native-error-boundary": "^3.1.0",
     "react-native-gesture-handler": "~2.30.0",
     "react-native-pager-view": "8.0.0",
     "react-native-safe-area-context": "~5.6.0",
@@ -74,9 +74,10 @@
     "swr": "^2.3.4",
     "throttle-debounce": "^5.0.2",
     "uniwind": "^1.5.0",
-    "zod": "^3.24.2"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@babel/generator": "^7.29.1",
     "@babel/core": "^7.25.2",
     "@types/crypto-js": "^4.2.2",
     "@types/he": "^1.2.3",
@@ -85,12 +86,12 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "~55.0.8",
     "cross-env": "^7.0.3",
+    "dotenv": "^17.2.3",
     "download-cli": "^1.1.1",
     "open": "8.4.2",
     "oxlint": "^1.56.0",
     "rimraf": "^5.0.5",
     "semver": "^7.5.1",
-    "wrangler": "^4.6.0",
     "zx": "^8.4.1"
   },
   "overrides": {
@@ -99,16 +100,5 @@
   "config": {
     "changelog": "update expo  动态页面改版",
     "versionCode": 73
-  },
-  "knip": {
-    "$schema": "https://unpkg.com/knip/schema.json",
-    "entry": [
-      "./index.js",
-      "./website/main.js"
-    ],
-    "project": [
-      "src/**",
-      "scripts/**"
-    ]
   }
 }

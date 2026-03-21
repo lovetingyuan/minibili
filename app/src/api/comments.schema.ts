@@ -20,6 +20,7 @@ const ContentSchema = z.object({
   message: z.string(),
   emote: z
     .record(
+      z.string(),
       z.object({
         text: z.string(),
         url: z.string(),
@@ -34,9 +35,10 @@ const ContentSchema = z.object({
     })
     .array()
     .nullish(),
-  at_name_to_mid: z.record(z.number()).nullish(),
+  at_name_to_mid: z.record(z.string(), z.number()).nullish(),
   jump_url: z
     .record(
+      z.string(),
       z.object({
         title: z.string(),
       }),
