@@ -15,19 +15,13 @@
     "deploy": "npm run deploy -w=@minibili/server",
     "build": "npm run build:android -w=@minibili/app"
   },
-  "dependencies": {
-    "@tailwindcss/cli": "^4.1.18",
-    "tailwindcss": "^4.1.18"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@babel/preset-typescript": "^7.28.5",
-    "@tailwindcss/vite": "^4.1.18",
     "knip": "^6.0.1",
     "oxfmt": "latest",
     "oxlint": "^1.56.0",
     "typescript": "~5.9.2",
-    "vite": "^6.2.3",
-    "vitest": "^3.0.9"
+    "vitest": "^4.1.0"
   },
   "overrides": {
     "react-native-reanimated": "4.2.1",

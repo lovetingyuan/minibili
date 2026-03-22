@@ -81,6 +81,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/generator": "^7.29.1",
+    "@tailwindcss/cli": "^4.1.18",
     "@types/crypto-js": "^4.2.2",
     "@types/he": "^1.2.3",
     "@types/react": "~19.2.10",
@@ -91,6 +92,7 @@
     "open": "8.4.2",
     "rimraf": "^5.0.5",
     "semver": "^7.5.1",
+    "tailwindcss": "^4.1.18",
     "zx": "^8.4.1"
   },
   "overrides": {
