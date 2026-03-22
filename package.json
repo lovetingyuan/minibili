@@ -7,9 +7,10 @@
   ],
   "scripts": {
     "format": "oxfmt .",
-    "lint": "npm run lint -w=@minibili/app && npm run lint -w=@minibili/server",
+    "lint": "npm run lint --workspaces --if-present",
     "knip:app": "knip --workspace @minibili/app",
     "android": "npm run android -w=@minibili/app",
+    "update": "npm run update -w=@minibili/app",
     "server": "npm run dev -w=@minibili/server",
     "deploy": "npm run deploy -w=@minibili/server",
     "build": "npm run build:android -w=@minibili/app"

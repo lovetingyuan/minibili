@@ -17,3 +17,21 @@ The minimum bilibili app.
 Developed with Expo, React-Native and TailwindCSS.
 
 Thanks https://socialsisteryi.github.io/bilibili-API-collect/
+
+## Hot Update
+
+Use EAS Update directly from the `app` workspace.
+
+In `app`:
+
+```bash
+npm run update -- --message "your update message"
+```
+
+From the repo root:
+
+```bash
+npm run update -w=@minibili/app -- --message "your update message"
+```
+
+This publishes to the `production` channel for `android` with the `production` EAS environment.

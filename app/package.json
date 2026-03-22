@@ -20,7 +20,7 @@
     "web": "expo start --web",
     "build:android": "zx scripts/build.mjs",
     "build:android:preview": "cross-env APP_VARIANT=preview npx --yes eas-cli@latest build --platform android --profile preview --non-interactive",
-    "update": "zx scripts/hot-update.mjs",
+    "update": "npx --yes eas-cli@latest update --channel production --platform android --environment production",
     "doctor": "npx -y expo-doctor@latest",
     "test": "npx vitest run",
     "lint": "oxlint . --react-plugin --fix --fix-suggestions",
