@@ -1,23 +1,22 @@
 #!/usr/bin/env zx
 /* globals $, question, echo, chalk, fs, path, retry, spinner */
-require("dotenv").config();
-const { usePowerShell } = require("zx");
+const { usePowerShell } = require('zx')
 
 // oxlint-disable-next-line react-hooks/rules-of-hooks
-usePowerShell();
-await $`npx react-native-tailwindcss-build`;
+usePowerShell()
+await $`npx react-native-tailwindcss-build`
 
-const buildTime = new Intl.DateTimeFormat("zh", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-  hour: "2-digit",
-  minute: "2-digit",
+const buildTime = new Intl.DateTimeFormat('zh', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
   hour12: false,
-  timeZone: "Asia/Shanghai",
-}).format(new Date());
+  timeZone: 'Asia/Shanghai',
+}).format(new Date())
 // const updateOutput =
-await $`npx -y eas-cli@latest update --branch main --json --non-interactive --platform android --message "update: ${buildTime}"`;
+await $`npx -y eas-cli@latest update --branch main --json --non-interactive --platform android --message "update: ${buildTime}"`
 // const output = updateOutput.toString('utf8')
 // const updateInfo = JSON.parse(output.substring(output.lastIndexOf('[')))[0]
 
@@ -55,4 +54,4 @@ await $`npx -y eas-cli@latest update --branch main --json --non-interactive --pl
 // }
 // `
 
-echo("Hot update uploaded done");
+echo('Hot update uploaded done')
