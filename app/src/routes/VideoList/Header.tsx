@@ -41,13 +41,13 @@ function HeaderTitleComp() {
     <Button
       type="clear"
       size="sm"
-      buttonClassName="mx-2 w-24"
+      buttonClassName="mx-2"
       titleClassName={`text-sm ${colors.primary.text}`}
       onPress={() => {
         appUpdateInfo.showAlert()
       }}
     >
-      {'有新版本'}
+      有新版本
       <Animated.View style={{ opacity: opacityValue }}>
         <Icon name="fiber-new" colorClassName={colors.secondary.accent} size={24} />
       </Animated.View>
