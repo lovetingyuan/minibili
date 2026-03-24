@@ -40,8 +40,12 @@ function AppRoute() {
   const routeTheme = useRouteTheme()
 
   const { $firstRun, initialed } = useStore()
-  const isFirstRun = initialed && $firstRun === -1
+  const isFirstRun = $firstRun === -1
   const headerTitleColor = useResolvedColor(colors.gray8.text)
+
+  if (!initialed) {
+    return null
+  }
 
   return (
     <NavigationContainer theme={routeTheme}>

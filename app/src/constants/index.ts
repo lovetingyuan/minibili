@@ -2,6 +2,10 @@ export const githubLink = 'https://github.com/lovetingyuan/minibili'
 export const site = 'https://minibili.tingyuan.in/'
 export const configUrl = `${site}config.json`
 
+export const serverUrl = __DEV__
+  ? `http://${process.env.EXPO_PUBLIC_IPV4}:8787`
+  : 'https://minibili.tingyuan.workers.dev'
+
 export let UA =
   'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36'
 

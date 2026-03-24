@@ -6,11 +6,15 @@ import {
   Dimensions,
   Easing,
   I18nManager,
-  LayoutChangeEvent,
   Modal,
+  Pressable,
   StatusBar,
-  TouchableWithoutFeedback,
   View,
+} from "react-native";
+import type {
+  LayoutChangeEvent,
+  StyleProp,
+  TransformsStyle,
   ViewStyle,
 } from "react-native";
 
@@ -18,7 +22,7 @@ export interface MenuProps {
   children?: React.ReactNode;
   anchor?: React.ReactNode;
   className?: string;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   onRequestClose?(): void;
   animationDuration?: number;
   testID?: string;
@@ -33,6 +37,10 @@ enum States {
 
 const EASING = Easing.bezier(0.4, 0, 0.2, 1);
 const SCREEN_INDENT = 8;
+type AnimatedTransform = Extract<
+  Animated.WithAnimatedValue<TransformsStyle>["transform"],
+  readonly unknown[]
+>[number];
 
 export function Menu(props: MenuProps) {
   const {
@@ -59,10 +67,8 @@ export function Menu(props: MenuProps) {
   const [buttonWidth, setButtonWidth] = React.useState(0);
   const [buttonHeight, setButtonHeight] = React.useState(0);
 
-  const [menuSizeAnimation, setMenuSizeAnimation] = React.useState(
-    () => new Animated.ValueXY({ x: 0, y: 0 }),
-  );
-  const [opacityAnimation, setOpacityAnimation] = React.useState(() => new Animated.Value(0));
+  const menuSizeAnimation = React.useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const opacityAnimation = React.useRef(new Animated.Value(0)).current;
 
   // 处理显示
   const show = () => {
@@ -84,8 +90,8 @@ export function Menu(props: MenuProps) {
       useNativeDriver: false,
     }).start(() => {
       setMenuState(States.Hidden);
-      setMenuSizeAnimation(new Animated.ValueXY({ x: 0, y: 0 }));
-      setOpacityAnimation(new Animated.Value(0));
+      menuSizeAnimation.setValue({ x: 0, y: 0 });
+      opacityAnimation.setValue(0);
     });
   };
 
@@ -143,7 +149,7 @@ export function Menu(props: MenuProps) {
   // 计算菜单位置
   let computedLeft = left;
   let computedTop = top;
-  const transforms: any[] = [];
+  const transforms: AnimatedTransform[] = [];
 
   if (
     (isRTL && computedLeft + buttonWidth - menuWidth > SCREEN_INDENT) ||
@@ -196,19 +202,25 @@ export function Menu(props: MenuProps) {
         ]}
         transparent
       >
-        <TouchableWithoutFeedback onPress={handleRequestClose} accessible={false}>
-          <View className="absolute bottom-0 left-0 right-0 top-0">
-            <Animated.View
-              onLayout={onMenuLayout}
-              className={clsx("absolute rounded bg-white shadow-lg shadow-black", className)}
-              style={[shadowMenuContainerStyle, style]}
-            >
-              <Animated.View className="overflow-hidden" style={animationStarted && menuSize}>
-                {children}
-              </Animated.View>
+        <View className="absolute bottom-0 left-0 right-0 top-0">
+          <Pressable
+            className="absolute bottom-0 left-0 right-0 top-0"
+            onPress={handleRequestClose}
+            accessible={false}
+          />
+          <Animated.View
+            onLayout={onMenuLayout}
+            className={clsx(
+              "absolute rounded border border-black/5 bg-white shadow-md shadow-black/15 dark:border-white/10 dark:bg-zinc-900",
+              className,
+            )}
+            style={[shadowMenuContainerStyle, style]}
+          >
+            <Animated.View className="overflow-hidden" style={animationStarted && menuSize}>
+              {children}
             </Animated.View>
-          </View>
-        </TouchableWithoutFeedback>
+          </Animated.View>
+        </View>
       </Modal>
     </View>
   );

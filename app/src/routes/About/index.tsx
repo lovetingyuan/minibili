@@ -2,7 +2,6 @@ import { Divider } from "@/components/styled/rneui";
 import React from "react";
 import { ScrollView, View } from "react-native";
 
-import Backup from "./Backup";
 import Header from "./Banner";
 import BlackTags from "./BlackTags";
 import BlackUps from "./BlackUps";
@@ -27,7 +26,6 @@ function About() {
       <View className="gap-2">
         <Version />
         <Feedback />
-        <Backup />
         <Collect />
         <History />
         <Music />

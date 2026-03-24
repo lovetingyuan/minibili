@@ -14,10 +14,11 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "start": "expo start",
-    "android": "adb devices -l && npx expo start --android",
-    "ios": "adb devices -l && npx expo start --ios",
-    "web": "expo start --web",
+    "prepare-android": "node scripts/prepare-android.js",
+    "start": "npm run prepare-android && expo start",
+    "android": "npm run prepare-android && npx expo start --android",
+    "ios": "npm run prepare-android && npx expo start --ios",
+    "web": "npm run prepare-android && expo start --web",
     "build:android": "zx scripts/build.mjs",
     "build:android:preview": "cross-env APP_VARIANT=preview npx --yes eas-cli@latest build --platform android --profile preview --non-interactive",
     "update": "npx --yes eas-cli@latest update --channel production --platform android --environment production",
@@ -54,6 +55,7 @@
     "expo-font": "~55.0.4",
     "expo-image": "~55.0.6",
     "expo-keep-awake": "~55.0.4",
+    "expo-secure-store": "~55.0.9",
     "expo-splash-screen": "~55.0.12",
     "expo-status-bar": "~55.0.4",
     "expo-system-ui": "~55.0.10",

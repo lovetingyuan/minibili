@@ -582,7 +582,7 @@ export function Input({
   const resolvedSelectionColor = useResolvedColor(selectionColorClassName);
 
   return (
-    <BaseInput
+    <InputPrimitive
       {...props}
       containerStyle={[containerStyle, resolvedContainerStyle]}
       disabledInputStyle={[disabledInputStyle, resolvedDisabledInputStyle]}
@@ -747,6 +747,7 @@ const ChipPrimitive = BaseChip as unknown as React.ComponentType<ChipProps>;
 const DialogButtonPrimitive = BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
 const FABPrimitive = BaseFAB as unknown as React.ComponentType<FABProps>;
 const IconPrimitive = BaseIcon as unknown as React.ComponentType<IconProps>;
+const InputPrimitive = BaseInput as unknown as React.ComponentType<BaseInputProps>;
 const ListItemAccordionPrimitive =
   BaseListItem.Accordion as unknown as React.ComponentType<ListItemAccordionProps>;
 const OverlayPrimitive = BaseOverlay as unknown as React.ComponentType<OverlayProps>;

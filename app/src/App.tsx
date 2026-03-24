@@ -18,6 +18,7 @@ import CheckNetState from './components/CheckNetState'
 import CheckUpUpdate from './components/CheckUpUpdate'
 import ImagesView from './components/ImagesView'
 import RemoteConfig from './components/RemoteConfig'
+import UserSyncManager from './components/UserSyncManager'
 import UserLocation from './components/UserLocation'
 import useRNETheme from './hooks/useRNETheme'
 import Route from './routes/Index'
@@ -75,6 +76,7 @@ export default function App() {
           <ErrorBoundary FallbackComponent={ErrorFallback}>
             <InitStoreComp />
             <RemoteConfig />
+            <UserSyncManager />
             <CheckAppUpdate />
             <CheckUpUpdate />
             <CheckNetState />

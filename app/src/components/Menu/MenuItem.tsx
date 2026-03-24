@@ -4,10 +4,10 @@ import { clsx } from "clsx";
 import {
   Platform,
   Pressable,
-  PressableProps,
   Text,
   View,
 } from "react-native";
+import type { PressableProps } from "react-native";
 
 export type MenuItemProps = {
   children: React.ReactNode;
@@ -29,25 +29,29 @@ export function MenuItem({
   return (
     <Pressable
       disabled={disabled}
-      style={({ pressed }) => ({
-        backgroundColor: Platform.OS !== "android" && pressed ? pressColor : undefined,
-      })}
       android_ripple={{ color: pressColor }}
       onPress={onPress}
       {...props}
     >
-      <View className={clsx("h-12 min-w-[124px] max-w-[248px] justify-center", className)}>
-        <Text
-          numberOfLines={1}
-          className={clsx(
-            "px-4 text-left text-sm font-normal",
-            disabled && "text-[#bdbdbd]",
-            textClassName,
-          )}
+      {({ pressed }) => (
+        <View
+          className={clsx("h-12 min-w-[124px] max-w-[248px] justify-center", className)}
+          style={{
+            backgroundColor: Platform.OS !== "android" && pressed ? pressColor : undefined,
+          }}
         >
-          {children}
-        </Text>
-      </View>
+          <Text
+            numberOfLines={1}
+            className={clsx(
+              "px-4 text-left text-sm font-normal",
+              disabled && "text-gray-400 dark:text-gray-500",
+              textClassName,
+            )}
+          >
+            {children}
+          </Text>
+        </View>
+      )}
     </Pressable>
   );
 }

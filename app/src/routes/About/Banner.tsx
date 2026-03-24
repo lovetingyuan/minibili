@@ -1,12 +1,16 @@
 import { Button, Icon, Text } from "@/components/styled/rneui";
 import React from "react";
-import { Image, Linking, Pressable, View } from "react-native";
+import { ActivityIndicator, Alert, Image, Linking, Pressable, View } from "react-native";
 
+import { logoutUser, openAuthModal } from "@/features/user-sync/session";
+import { useStore } from "@/store";
 import { githubLink, site } from "../../constants";
 
 export default Header;
 
 function Header() {
+  const { authEmail, authFailureReason, authReady, isAuthenticated } = useStore();
+
   return (
     <>
       <Pressable
@@ -35,6 +39,56 @@ function Header() {
         >
           <Icon name="github" type="material-community" size={20} />
         </Button>
+      </View>
+      <View className="items-end gap-1">
+        {authReady ? (
+          <>
+            {!isAuthenticated && authEmail && authFailureReason ? (
+              <Text className="text-xs text-amber-600">
+                {authFailureReason === "expired"
+                  ? "登录已过期，请重新验证"
+                  : authFailureReason === "invalid"
+                    ? "登录认证失败，请重新验证"
+                    : "暂时无法连接服务器"}
+              </Text>
+            ) : null}
+            {isAuthenticated && authEmail ? (
+              <Button
+                buttonClassName="rounded-xl px-0"
+                onPress={() => {
+                  Alert.alert("退出登录", `确认退出 ${authEmail}？`, [
+                    {
+                      text: "取消",
+                      style: "cancel",
+                    },
+                    {
+                      text: "退出",
+                      onPress() {
+                        void logoutUser();
+                      },
+                    },
+                  ]);
+                }}
+                size="sm"
+                title={authEmail}
+                type="clear"
+              />
+            ) : (
+              <Button
+                buttonClassName="rounded-xl px-4"
+                onPress={() => {
+                  openAuthModal(authEmail ? "reauth" : "login", authFailureReason);
+                }}
+                radius={"sm"}
+                size="sm"
+                title={authEmail ? "重新验证" : "登录"}
+                type={authEmail ? "outline" : "solid"}
+              />
+            )}
+          </>
+        ) : (
+          <ActivityIndicator size="small" />
+        )}
       </View>
     </>
   );

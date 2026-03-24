@@ -46,6 +46,7 @@ module.exports = {
   plugins: [
     'expo-asset',
     'expo-image',
+    'expo-secure-store',
     [
       'expo-splash-screen',
       {

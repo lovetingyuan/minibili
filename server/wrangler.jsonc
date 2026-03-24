@@ -4,19 +4,37 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "server",
+	"name": "minibili-server",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-03-17",
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "USER_STORAGE",
+				"class_name": "UserStorage"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["UserStorage"]
+		}
+	],
 	"assets": {
 		"binding": "ASSETS",
-		"directory": "./public"
+		"directory": "./public",
+		"run_worker_first": true
 	},
 	"observability": {
 		"enabled": true
 	},
+	"dev": {
+		"ip": "0.0.0.0"
+	},
 	"compatibility_flags": [
 		"nodejs_compat"
-	]
+	],
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
@@ -34,7 +52,9 @@
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-	// "vars": {  "MY_VARIABLE": "production_value" }
+	"vars": {
+		"RESEND_FROM_EMAIL": "minibili@tingyuan.in"
+	},
 	/**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

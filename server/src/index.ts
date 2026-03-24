@@ -1,28 +1,28 @@
-import { Hono } from "hono";
+import { Hono } from 'hono'
 
-const app = new Hono<{ Bindings: CloudflareBindings }>();
-const releasesUrl =
-  "https://tingyuan.in/api/github/releases?user=lovetingyuan&repo=minibili&_t=";
+import type { ServerBindings } from './types'
+import { registerRoutes } from './routes'
 
-app.get("/message", (c) => {
-  return c.text("Hello Hono!");
-});
+function createApp() {
+  const app = new Hono<{ Bindings: ServerBindings }>()
 
-app.get("/api/releases", async (c) => {
-  const response = await fetch(`${releasesUrl}${Date.now()}`);
+  registerRoutes(app)
+  app.notFound(c => {
+    const { method, path } = c.req
+    const canServeAsset = (method === 'GET' || method === 'HEAD') && !path.startsWith('/api/') && path !== '/health'
 
-  if (!response.ok) {
-    return c.json(
-      {
-        code: response.status,
-        message: "Failed to fetch releases",
-      },
-      response.status,
-    );
-  }
+    if (canServeAsset) {
+      return c.env.ASSETS.fetch(c.req.raw)
+    }
 
-  const payload = await response.json();
-  return c.json(payload);
-});
+    return c.text('Not Found', 404)
+  })
 
-export default app;
+  return app
+}
+
+const app = createApp()
+
+export default app
+export { createApp }
+export { UserStorage } from './UserStorage'
