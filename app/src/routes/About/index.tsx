@@ -6,7 +6,6 @@ import Header from "./Banner";
 import BlackTags from "./BlackTags";
 import BlackUps from "./BlackUps";
 import Collect from "./Collect";
-import Feedback from "./Feedback";
 import History from "./History";
 import Music from "./Music";
 import SortCate from "./SortCate";
@@ -25,7 +24,6 @@ function About() {
       <Divider className="my-4" />
       <View className="gap-2">
         <Version />
-        <Feedback />
         <Collect />
         <History />
         <Music />

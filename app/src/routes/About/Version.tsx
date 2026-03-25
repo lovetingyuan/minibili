@@ -1,10 +1,9 @@
 import Constants from "expo-constants";
 import * as Updates from "expo-updates";
 import React from "react";
-import { Alert, Linking } from "react-native";
+import { Alert } from "react-native";
 
 import { useAppUpdateInfo } from "@/api/check-update";
-import { site } from "@/constants";
 
 import TextAction from "./TextAction";
 
@@ -50,12 +49,6 @@ function Version() {
           loading: hasUpdate ? false : checkingUpdate,
           onPress: handleCheckUpdate,
           color: hasUpdate ? "#FF6699" : undefined,
-        },
-        {
-          text: "更新日志",
-          onPress: () => {
-            Linking.openURL(site + "?showchangelog");
-          },
         },
       ]}
     />

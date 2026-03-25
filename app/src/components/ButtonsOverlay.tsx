@@ -20,6 +20,7 @@ function ButtonsOverlay() {
         <Button
           type="clear"
           buttonClassName="w-full justify-start px-5 py-2.5"
+          titleClassName="w-full text-left"
           title={button.text}
           key={button.text}
           onPress={() => {
@@ -38,7 +39,7 @@ function ButtonsOverlay() {
     <Overlay
       isVisible={overlayButtons.length > 0}
       ModalComponent={Modal2 as unknown as typeof React.Component}
-      overlayClassName={`min-w-[70%] max-w-[90%] px-0 py-3 ${colors.gray2.bg}`}
+      overlayClassName={`w-[80%] max-w-[500px] px-0 py-3 ${colors.gray2.bg}`}
       onBackdropPress={dismiss}
     >
       {Buttons}

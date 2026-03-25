@@ -39,12 +39,12 @@ function extractTextWithEmTags(text: string, className?: string) {
   return result;
 }
 
-function VideoListItem({
+function VideoListItem<T extends CollectVideoInfo | HistoryVideoInfo>({
   video,
   buttons,
 }: {
-  video: CollectVideoInfo | HistoryVideoInfo;
-  buttons?: (vi: CollectVideoInfo | HistoryVideoInfo) => {
+  video: T;
+  buttons?: (vi: T) => {
     text: string;
     onPress: () => void;
   }[];
@@ -53,6 +53,8 @@ function VideoListItem({
   const { setOverlayButtons } = useStore();
   const _followedUpsMap = useFollowedUpsMap();
   const isFollowed = video.mid && video.mid in _followedUpsMap;
+  const watchProgress =
+    "watchProgress" in video ? Math.min(Math.max(video.watchProgress, 0), 100) : null;
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -79,34 +81,36 @@ function VideoListItem({
       }}
       className="mb-1 min-h-28 flex-row px-2 py-2"
     >
-      <View className="relative mr-3 flex-[3] content-center justify-center">
-        <Image
-          className="h-auto w-full flex-1 rounded"
-          source={{ uri: parseImgUrl(video.cover, 480, 300) }}
-          placeholder={require("../../assets/video-loading.png")}
-        />
-        <View className="absolute bottom-0 left-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
-          <Text className="text-xs font-thin text-white">
-            {typeof video.duration === "string"
-              ? parseDurationStr(video.duration)
-              : parseDuration(video.duration)}
-          </Text>
-        </View>
-        <View className="absolute top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
-          <Text className="text-xs font-thin text-white">{parseDate(video.date)}</Text>
-        </View>
-        {isDefined(video.danmaku) ? (
-          <View className="absolute bottom-0 right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
-            <Text className="text-xs font-thin text-white">{parseNumber(video.danmaku)}弹</Text>
-          </View>
-        ) : null}
-        {"watchProgress" in video ? (
-          <View className="absolute bottom-0 right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
-            <Text className="text-xs text-white">
-              {video.watchProgress > 99 ? "已看完 " : `已观看${video.watchProgress}% `}
+      <View className="mr-3 flex-[3]">
+        <View className="relative aspect-8/5 w-full content-center justify-center">
+          <Image
+            className="h-full w-full rounded"
+            source={{ uri: parseImgUrl(video.cover, 480, 300) }}
+            placeholder={require("../../assets/video-loading.png")}
+          />
+          {watchProgress !== null ? (
+            <View className="absolute bottom-0 left-0 h-[5px] w-full overflow-hidden rounded-b bg-gray-300/80">
+              <View className={`${colors.secondary.bg} h-full`} style={{ width: `${watchProgress}%` }} />
+            </View>
+          ) : null}
+          <View className="absolute right-0 top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
+            <Text className="text-xs font-thin text-white">
+              {typeof video.duration === "string"
+                ? parseDurationStr(video.duration)
+                : parseDuration(video.duration)}
             </Text>
           </View>
-        ) : null}
+          <View className="absolute top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
+            <Text className="text-xs font-thin text-white">{parseDate(video.date)}</Text>
+          </View>
+          {isDefined(video.danmaku) ? (
+            <View
+              className={`${watchProgress !== null ? "bottom-[5px]" : "bottom-0"} absolute right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]`}
+            >
+              <Text className="text-xs font-thin text-white">{parseNumber(video.danmaku)}弹</Text>
+            </View>
+          ) : null}
+        </View>
       </View>
       <View className="flex-[4] justify-between">
         <Text className="mb-3 flex-1 text-base" numberOfLines={2} ellipsizeMode="tail">

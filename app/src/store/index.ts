@@ -49,7 +49,6 @@ const getAppValue = () => {
     $videoCatesList: RanksConfig,
     $collectedVideos: [] as CollectVideoInfo[],
     $watchedVideos: {} as Record<string, HistoryVideoInfo>,
-    $showUsageStatement: true,
     $musicList: [
       {
         name: '默认',

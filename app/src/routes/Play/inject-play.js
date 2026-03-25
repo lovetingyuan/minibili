@@ -15,6 +15,16 @@ function __$hack() {
   .mplayer-control-bar-top {
     align-items: center;
   }
+    @keyframes videoDetected {
+  from { opacity: 0.99; }
+  to { opacity: 1; }
+}
+
+video {
+  /* 只要 video 元素出现在 DOM 中，就会触发这个微小的动画 */
+  animation-duration: 0.001s;
+  animation-name: videoDetected;
+}
   `
   document.head.appendChild(style)
 
@@ -38,7 +48,7 @@ function __$hack() {
     }
   })
 
-  let originVideoUrl = ''
+  // let originVideoUrl = ''
   const newVideoUrl = decodeURIComponent(window.location.hash.slice(1))
   const reportPlayTime = (lastTime, duration) => {
     window.ReactNativeWebView.postMessage(
@@ -48,29 +58,44 @@ function __$hack() {
       }),
     )
   }
-
+  document.addEventListener(
+    'animationstart',
+    function (event) {
+      if (event.animationName === 'videoDetected') {
+        const video = event.target
+        window._aa = window._aa || []
+        _aa.push(video.outerHTML, video.src)
+        // video.src = newVideoUrl
+        // video.setAttribute('src', newVideoUrl)
+        // console.log('检测到 video 元素注入:', video);
+        // 处理逻辑...
+      }
+    },
+    true,
+  )
   const observer = new window.MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
       // 遍历 DOM 变更记录
       mutation.addedNodes.forEach(function (node) {
+        if (node.tagName === 'VIDEO') {
+          window._aa = window._aa || []
+          _aa.push(node.outerHTML)
+          // console.log(999, 33, node.outerHTML)
+        }
         // 检查是否是 video 元素
         if (node.tagName !== 'VIDEO' || node.dataset.handled) {
           return
         }
-        if (node.src && !originVideoUrl) {
-          originVideoUrl = node.src
+        if (!node.src) {
+          return
         }
-        // node.addEventListener('error', () => {
-        //   if (node.src !== originVideoUrl && originVideoUrl) {
-        //     node.src = originVideoUrl
-        //   }
-        //   if (!window.__show_err_alert) {
-        //     window.__show_err_alert = true
-        //     // oxlint-disable-next-line no-alert
-        //     alert('视频加载失败')
-        //   }
-        // })
-        node.src = newVideoUrl
+        // if (node.src) {
+        //   node.src = newVideoUrl
+        // }
+        // if (node.src && !originVideoUrl) {
+        //   originVideoUrl = node.src
+        // }
+        // node.src = newVideoUrl
         node.dataset.handled = 'true'
 
         const video = node
@@ -116,7 +141,7 @@ function __$hack() {
   })
 
   // 开始监听 DOM 变更
-  observer.observe(document.body, { childList: true, subtree: true })
+  // observer.observe(document.body, { childList: true, subtree: true })
 
   function waitForDom(selectors, callback) {
     if (typeof selectors === 'string') {
