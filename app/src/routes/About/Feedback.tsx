@@ -1,45 +1,45 @@
-import { Dialog, Input } from '@/components/styled/rneui'
-import React from 'react'
-import { View } from 'react-native'
+import { Dialog, Input } from "@/components/styled/rneui";
+import React from "react";
+import { View } from "react-native";
 
-import Modal2 from '@/components/Modal2'
-import { colors } from '@/constants/colors.tw'
+import Modal2 from "@/components/Modal2";
+import { colors } from "@/constants/colors.tw";
 
-import { showToast } from '../../utils'
-import TextAction from './TextAction'
+import { showToast } from "../../utils";
+import TextAction from "./TextAction";
 
-export default Feedback
+export default Feedback;
 
 function Feedback() {
-  const [feedBackVisible, setFeedbackVisible] = React.useState(false)
-  const modalComponent = Modal2 as unknown as typeof React.Component
+  const [feedBackVisible, setFeedbackVisible] = React.useState(false);
+  const modalComponent = Modal2 as unknown as typeof React.Component;
   const hideFeedback = () => {
-    setFeedbackVisible(false)
-  }
+    setFeedbackVisible(false);
+  };
   const showFeedback = () => {
-    setFeedbackVisible(true)
-  }
+    setFeedbackVisible(true);
+  };
 
-  const feedbackRef = React.useRef('')
-  const feedbackContactRef = React.useRef('')
+  const feedbackRef = React.useRef("");
+  const feedbackContactRef = React.useRef("");
   const submitFeedback = () => {
-    const message = feedbackRef.current.trim()
+    const message = feedbackRef.current.trim();
     if (message.length === 0) {
-      hideFeedback()
-      return
+      hideFeedback();
+      return;
     }
     // TODO: feedback
     // reportUserFeedback(message, feedbackContactRef.current)
-    hideFeedback()
-    showToast('感谢反馈 😊')
-  }
+    hideFeedback();
+    showToast("感谢反馈 😊");
+  };
 
   return (
     <TextAction
       text="💗 欢迎使用本应用"
       buttons={[
         {
-          text: '使用反馈',
+          text: "使用反馈",
           onPress: showFeedback,
         },
       ]}
@@ -60,13 +60,13 @@ function Feedback() {
             maxLength={500}
             textAlignVertical="top"
             placeholderTextColorClassName={colors.gray4.accent}
-            onChangeText={value => (feedbackRef.current = value)}
+            onChangeText={(value) => (feedbackRef.current = value)}
           />
           <Input
             placeholder="联系方式"
             maxLength={100}
             placeholderTextColorClassName={colors.gray4.accent}
-            onChangeText={value => (feedbackContactRef.current = value)}
+            onChangeText={(value) => (feedbackContactRef.current = value)}
           />
         </View>
         <Dialog.Actions>
@@ -75,5 +75,5 @@ function Feedback() {
         </Dialog.Actions>
       </Dialog>
     </TextAction>
-  )
+  );
 }

@@ -218,9 +218,7 @@ function MusicList() {
     },
   });
   const keyword = searchKeyWord.trim();
-  const songsList = keyword
-    ? list.filter((v) => v.name.includes(keyword))
-    : list;
+  const songsList = keyword ? list.filter((v) => v.name.includes(keyword)) : list;
   const [displayType, setDisplayType] = React.useState<"normal" | "brief">("normal");
   return (
     <View className="flex-1">

@@ -1,8 +1,8 @@
-const RESEND_API_URL = 'https://api.resend.com/emails'
+const RESEND_API_URL = "https://api.resend.com/emails";
 
 interface SendEmailResult {
-  error?: string
-  success: boolean
+  error?: string;
+  success: boolean;
 }
 
 export async function sendOtpEmail(
@@ -13,10 +13,10 @@ export async function sendOtpEmail(
 ): Promise<SendEmailResult> {
   try {
     const response = await fetch(RESEND_API_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         from: fromEmail,
@@ -31,24 +31,24 @@ export async function sendOtpEmail(
             <p style="color: #999; margin-top: 24px;">如果不是你本人操作，请忽略这封邮件。</p>
           </div>
         `,
-        subject: 'MiniBili 登录验证码',
+        subject: "MiniBili 登录验证码",
         to: toEmail,
       }),
-    })
+    });
 
     if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as { message?: string } | null
+      const payload = (await response.json().catch(() => null)) as { message?: string } | null;
       return {
-        error: payload?.message ?? 'Failed to send email',
+        error: payload?.message ?? "Failed to send email",
         success: false,
-      }
+      };
     }
 
-    return { success: true }
+    return { success: true };
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : 'Unknown email error',
+      error: error instanceof Error ? error.message : "Unknown email error",
       success: false,
-    }
+    };
   }
 }

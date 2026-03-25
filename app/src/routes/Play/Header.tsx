@@ -152,11 +152,11 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
   const musicSongsMap = useMusicSongsMap();
   return (
     <View className="flex-row items-center gap-2">
-        <Menu
-          visible={visible}
-          className="bg-white dark:bg-zinc-900"
-          anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
-          onRequestClose={hideMenu}
+      <Menu
+        visible={visible}
+        className="bg-white dark:bg-zinc-900"
+        anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
+        onRequestClose={hideMenu}
       >
         <MenuItem
           textClassName="text-black dark:text-gray-300"

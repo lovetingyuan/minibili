@@ -5,6 +5,7 @@ import he from "he";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
+import WatchProgressBar from "@/components/WatchProgressBar";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
@@ -88,11 +89,7 @@ function VideoListItem<T extends CollectVideoInfo | HistoryVideoInfo>({
             source={{ uri: parseImgUrl(video.cover, 480, 300) }}
             placeholder={require("../../assets/video-loading.png")}
           />
-          {watchProgress !== null ? (
-            <View className="absolute bottom-0 left-0 h-[5px] w-full overflow-hidden rounded-b bg-gray-300/80">
-              <View className={`${colors.secondary.bg} h-full`} style={{ width: `${watchProgress}%` }} />
-            </View>
-          ) : null}
+          {watchProgress !== null ? <WatchProgressBar progress={watchProgress} /> : null}
           <View className="absolute right-0 top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
             <Text className="text-xs font-thin text-white">
               {typeof video.duration === "string"
@@ -105,7 +102,7 @@ function VideoListItem<T extends CollectVideoInfo | HistoryVideoInfo>({
           </View>
           {isDefined(video.danmaku) ? (
             <View
-              className={`${watchProgress !== null ? "bottom-[5px]" : "bottom-0"} absolute right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]`}
+              className={`${watchProgress !== null ? "bottom-1.5" : "bottom-0"} absolute right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]`}
             >
               <Text className="text-xs font-thin text-white">{parseNumber(video.danmaku)}弹</Text>
             </View>

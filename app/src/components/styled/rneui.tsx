@@ -454,10 +454,11 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
   {
     className,
     contentContainerClassName,
-    columnWrapperClassName: _columnWrapperClassName,
+    columnWrapperClassName,
     ListFooterComponentClassName,
     ListHeaderComponentClassName,
     style,
+    columnWrapperStyle,
     contentContainerStyle,
     ListFooterComponentStyle,
     ListHeaderComponentStyle,
@@ -466,6 +467,7 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
   ref: React.ForwardedRef<FlashListRef<T>>,
 ) {
   const resolvedStyle = useResolvedStyle(className);
+  const resolvedColumnWrapperStyle = useResolvedStyle(columnWrapperClassName);
   const resolvedContentContainerStyle = useResolvedStyle(contentContainerClassName);
   const resolvedFooterStyle = useResolvedStyle(ListFooterComponentClassName);
   const resolvedHeaderStyle = useResolvedStyle(ListHeaderComponentClassName);
@@ -475,6 +477,7 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
       {...props}
       ref={ref}
       style={{ ...style, ...resolvedStyle }}
+      columnWrapperStyle={[columnWrapperStyle, resolvedColumnWrapperStyle]}
       contentContainerStyle={[contentContainerStyle, resolvedContentContainerStyle]}
       ListFooterComponentStyle={[ListFooterComponentStyle, resolvedFooterStyle]}
       ListHeaderComponentStyle={[ListHeaderComponentStyle, resolvedHeaderStyle]}
@@ -744,7 +747,8 @@ const ButtonPrimitive = BaseButton as unknown as React.ComponentType<ButtonProps
 const CardPrimitive = BaseCard as unknown as React.ComponentType<CardProps>;
 const CheckBoxPrimitive = BaseCheckBox as unknown as React.ComponentType<CheckBoxProps>;
 const ChipPrimitive = BaseChip as unknown as React.ComponentType<ChipProps>;
-const DialogButtonPrimitive = BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
+const DialogButtonPrimitive =
+  BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
 const FABPrimitive = BaseFAB as unknown as React.ComponentType<FABProps>;
 const IconPrimitive = BaseIcon as unknown as React.ComponentType<IconProps>;
 const InputPrimitive = BaseInput as unknown as React.ComponentType<BaseInputProps>;

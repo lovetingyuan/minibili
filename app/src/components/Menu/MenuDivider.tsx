@@ -9,6 +9,8 @@ export interface MenuDividerProps {
 
 export function MenuDivider({ className }: MenuDividerProps) {
   return (
-    <View className={clsx("flex-1 border-b-[0.5px] border-black/10 dark:border-white/10", className)} />
+    <View
+      className={clsx("flex-1 border-b-[0.5px] border-black/10 dark:border-white/10", className)}
+    />
   );
 }

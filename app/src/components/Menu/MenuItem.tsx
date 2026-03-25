@@ -1,12 +1,7 @@
 import React from "react";
 import { clsx } from "clsx";
 
-import {
-  Platform,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 import type { PressableProps } from "react-native";
 
 export type MenuItemProps = {

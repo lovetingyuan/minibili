@@ -28,8 +28,7 @@ function RichTexts(props: {
   const { setImagesList } = useStore();
   let key = 0;
   const fontSize = props.fontSize || 16;
-  const textSizeClassName =
-    fontSize <= 14 ? "text-sm" : fontSize >= 18 ? "text-lg" : "text-base";
+  const textSizeClassName = fontSize <= 14 ? "text-sm" : fontSize >= 18 ? "text-lg" : "text-base";
   const textLineClassName =
     fontSize <= 14
       ? "text-sm leading-[22.4px]"

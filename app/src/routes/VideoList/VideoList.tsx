@@ -36,7 +36,11 @@ function VideoList(props: {
   const uniqVideosMap: Record<string, boolean> = {};
   for (const item of props.videos) {
     let needShow = !(item.bvid in uniqVideosMap);
-    if (needShow && props.type === "Hot" && (`_${item.mid}` in $blackUps || item.tag in $blackTags)) {
+    if (
+      needShow &&
+      props.type === "Hot" &&
+      (`_${item.mid}` in $blackUps || item.tag in $blackTags)
+    ) {
       needShow = false;
     }
     if (needShow && props.type === "Rank" && `_${item.mid}` in $blackUps) {
@@ -118,7 +122,7 @@ function VideoList(props: {
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        className="mx-[5px] mb-6 flex-1"
+        className="mx-[5px] mb-6 flex-1 self-stretch"
         key={item.bvid}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
@@ -197,6 +201,7 @@ function VideoList(props: {
         ListFooterComponent={
           typeof props.footer === "function" ? props.footer(videoList) : props.footer
         }
+        columnWrapperClassName="items-stretch"
         contentContainerClassName="px-[4px] pt-6"
         estimatedFirstItemOffset={100}
         {...refreshProps}

@@ -1,56 +1,56 @@
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React from 'react'
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
 
-import { colors } from '@/constants/colors.tw'
-import useResolvedColor from '@/hooks/useResolvedColor'
-import useRouteTheme from '@/hooks/useRouteTheme'
+import { colors } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
+import useRouteTheme from "@/hooks/useRouteTheme";
 
-import { useStore } from '../store'
-import type { RootStackParamList } from '../types'
-import About from './About'
-import Collect from './Collect'
-import Dynamic from './Dynamic'
-import { Asset } from 'expo-asset'
-import Follow from './Follow'
-import { followHeaderRight } from './Follow/Header'
-import History from './History'
-import Music from './Music'
-import Play from './Play'
-import SearchUps from './SearchUps'
-import SearchVideos from './SearchVideos'
-import VideoList from './VideoList'
+import { useStore } from "../store";
+import type { RootStackParamList } from "../types";
+import About from "./About";
+import Collect from "./Collect";
+import Dynamic from "./Dynamic";
+import { Asset } from "expo-asset";
+import Follow from "./Follow";
+import { followHeaderRight } from "./Follow/Header";
+import History from "./History";
+import Music from "./Music";
+import Play from "./Play";
+import SearchUps from "./SearchUps";
+import SearchVideos from "./SearchVideos";
+import VideoList from "./VideoList";
 
-import WebPage from './WebPage'
-import Welcome from './Welcome'
+import WebPage from "./WebPage";
+import Welcome from "./Welcome";
 
-import { Assets as NavigationAssets } from '@react-navigation/elements'
-import Living from './Living'
-import DynamicDetail from './DynamicDetail'
+import { Assets as NavigationAssets } from "@react-navigation/elements";
+import Living from "./Living";
+import DynamicDetail from "./DynamicDetail";
 
 Asset.loadAsync([
   ...NavigationAssets,
   // require('./assets/newspaper.png'),
   // require('./assets/bell.png'),
-])
+]);
 
-const Stack = createNativeStackNavigator<RootStackParamList>()
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function AppRoute() {
-  const routeTheme = useRouteTheme()
+  const routeTheme = useRouteTheme();
 
-  const { $firstRun, initialed } = useStore()
-  const isFirstRun = $firstRun === -1
-  const headerTitleColor = useResolvedColor(colors.gray8.text)
+  const { $firstRun, initialed } = useStore();
+  const isFirstRun = $firstRun === -1;
+  const headerTitleColor = useResolvedColor(colors.gray8.text);
 
   if (!initialed) {
-    return null
+    return null;
   }
 
   return (
     <NavigationContainer theme={routeTheme}>
       <Stack.Navigator
-        initialRouteName={isFirstRun ? 'Welcome' : 'VideoList'}
+        initialRouteName={isFirstRun ? "Welcome" : "VideoList"}
         screenOptions={{
           headerTransparent: false,
           headerTitleStyle: {
@@ -64,7 +64,7 @@ function AppRoute() {
           name="Welcome"
           component={Welcome}
           options={{
-            headerTitle: '欢迎使用 MiniBili',
+            headerTitle: "欢迎使用 MiniBili",
             // headerStyle: { backgroundColor: 'tomato' },
             // headerRight: () => <Text>fsk jkljkl jkljkl</Text>,
           }}
@@ -80,7 +80,7 @@ function AppRoute() {
           name="SearchVideos"
           component={SearchVideos}
           options={{
-            headerTitle: '搜索视频',
+            headerTitle: "搜索视频",
           }}
         />
         <Stack.Screen
@@ -94,14 +94,14 @@ function AppRoute() {
           name="SearchUps"
           component={SearchUps}
           options={{
-            headerTitle: '搜索UP主',
+            headerTitle: "搜索UP主",
           }}
         />
         <Stack.Screen
           name="Dynamic"
           component={Dynamic}
           options={{
-            headerTitle: '动态',
+            headerTitle: "动态",
           }}
         />
         <Stack.Screen name="Play" component={Play} />
@@ -110,23 +110,23 @@ function AppRoute() {
           name="DynamicDetail"
           component={DynamicDetail}
           options={{
-            headerTitle: '动态详情',
+            headerTitle: "动态详情",
           }}
         />
         <Stack.Screen
-          name={'WebPage'}
+          name={"WebPage"}
           component={WebPage}
-          options={props => {
+          options={(props) => {
             return {
-              headerTitle: props.route.params.title || '-',
-            }
+              headerTitle: props.route.params.title || "-",
+            };
           }}
         />
         <Stack.Screen
           name="About"
           component={About}
           options={{
-            headerTitle: '关于',
+            headerTitle: "关于",
           }}
         />
         <Stack.Screen name="Collect" component={Collect} />
@@ -134,7 +134,7 @@ function AppRoute() {
         <Stack.Screen name="Music" component={Music} />
       </Stack.Navigator>
     </NavigationContainer>
-  )
+  );
 }
 
-export default AppRoute
+export default AppRoute;

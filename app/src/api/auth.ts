@@ -1,87 +1,87 @@
-import { serverUrl } from '@/constants'
+import { serverUrl } from "@/constants";
 
-import type { AuthFailureReason } from '../features/user-sync/types'
-import { normalizeAuthEmail, normalizeOtpInput } from '../features/user-sync/helpers'
+import type { AuthFailureReason } from "../features/user-sync/types";
+import { normalizeAuthEmail, normalizeOtpInput } from "../features/user-sync/helpers";
 
 interface ErrorPayload {
-  error?: string
-  reason?: AuthFailureReason
-  success?: boolean
-  waitSeconds?: number
+  error?: string;
+  reason?: AuthFailureReason;
+  success?: boolean;
+  waitSeconds?: number;
 }
 
 interface CheckAuthStatusValidPayload {
-  expiresAt: number
-  success: true
-  token: string
-  valid: true
+  expiresAt: number;
+  success: true;
+  token: string;
+  valid: true;
 }
 
 interface CheckAuthStatusInvalidPayload {
-  reason: AuthFailureReason
-  success: true
-  valid: false
+  reason: AuthFailureReason;
+  success: true;
+  valid: false;
 }
 
 interface SendOtpSuccessPayload {
-  expiresInSeconds: number
-  resendAfterSeconds: number
-  retryLimit: number
-  success: true
+  expiresInSeconds: number;
+  resendAfterSeconds: number;
+  retryLimit: number;
+  success: true;
 }
 
 interface VerifyOtpSuccessPayload {
-  expiresAt: number
-  success: true
-  token: string
+  expiresAt: number;
+  success: true;
+  token: string;
 }
 
 export interface SendOtpResult {
-  error?: string
-  expiresInSeconds?: number
-  resendAfterSeconds?: number
-  retryLimit?: number
-  success: boolean
-  waitSeconds?: number
+  error?: string;
+  expiresInSeconds?: number;
+  resendAfterSeconds?: number;
+  retryLimit?: number;
+  success: boolean;
+  waitSeconds?: number;
 }
 
 export interface VerifyOtpResult {
-  error?: string
-  expiresAt?: number
-  success: boolean
-  token?: string
+  error?: string;
+  expiresAt?: number;
+  success: boolean;
+  token?: string;
 }
 
 export interface CheckAuthStatusResult {
-  expiresAt?: number
-  reason?: AuthFailureReason
-  success: boolean
-  token?: string
-  valid: boolean
+  expiresAt?: number;
+  reason?: AuthFailureReason;
+  success: boolean;
+  token?: string;
+  valid: boolean;
 }
 
 async function parsePayload<T>(response: Response): Promise<T | null> {
-  return response.json().catch(() => null)
+  return response.json().catch(() => null);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function getPayloadError(payload: unknown, fallback: string) {
-  if (isRecord(payload) && typeof payload.error === 'string') {
-    return payload.error
+  if (isRecord(payload) && typeof payload.error === "string") {
+    return payload.error;
   }
 
-  return fallback
+  return fallback;
 }
 
 function getPayloadWaitSeconds(payload: unknown) {
-  if (isRecord(payload) && typeof payload.waitSeconds === 'number') {
-    return payload.waitSeconds
+  if (isRecord(payload) && typeof payload.waitSeconds === "number") {
+    return payload.waitSeconds;
   }
 
-  return undefined
+  return undefined;
 }
 
 function isCheckAuthStatusValidPayload(payload: unknown): payload is CheckAuthStatusValidPayload {
@@ -89,9 +89,9 @@ function isCheckAuthStatusValidPayload(payload: unknown): payload is CheckAuthSt
     isRecord(payload) &&
     payload.success === true &&
     payload.valid === true &&
-    typeof payload.token === 'string' &&
-    typeof payload.expiresAt === 'number'
-  )
+    typeof payload.token === "string" &&
+    typeof payload.expiresAt === "number"
+  );
 }
 
 function isCheckAuthStatusInvalidPayload(
@@ -101,27 +101,27 @@ function isCheckAuthStatusInvalidPayload(
     isRecord(payload) &&
     payload.success === true &&
     payload.valid === false &&
-    (payload.reason === 'expired' || payload.reason === 'invalid' || payload.reason === 'network')
-  )
+    (payload.reason === "expired" || payload.reason === "invalid" || payload.reason === "network")
+  );
 }
 
 function isSendOtpSuccessPayload(payload: unknown): payload is SendOtpSuccessPayload {
   return (
     isRecord(payload) &&
     payload.success === true &&
-    typeof payload.expiresInSeconds === 'number' &&
-    typeof payload.resendAfterSeconds === 'number' &&
-    typeof payload.retryLimit === 'number'
-  )
+    typeof payload.expiresInSeconds === "number" &&
+    typeof payload.resendAfterSeconds === "number" &&
+    typeof payload.retryLimit === "number"
+  );
 }
 
 function isVerifyOtpSuccessPayload(payload: unknown): payload is VerifyOtpSuccessPayload {
   return (
     isRecord(payload) &&
     payload.success === true &&
-    typeof payload.token === 'string' &&
-    typeof payload.expiresAt === 'number'
-  )
+    typeof payload.token === "string" &&
+    typeof payload.expiresAt === "number"
+  );
 }
 
 export async function checkAuthStatus(
@@ -135,21 +135,21 @@ export async function checkAuthStatus(
         token,
       }),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      method: 'POST',
-    })
+      method: "POST",
+    });
 
     const payload = await parsePayload<
       CheckAuthStatusValidPayload | CheckAuthStatusInvalidPayload | ErrorPayload
-    >(response)
+    >(response);
 
     if (!response.ok || !payload) {
       return {
-        reason: 'network',
+        reason: "network",
         success: false,
         valid: false,
-      }
+      };
     }
 
     if (isCheckAuthStatusValidPayload(payload)) {
@@ -158,7 +158,7 @@ export async function checkAuthStatus(
         success: true,
         token: payload.token,
         valid: true,
-      }
+      };
     }
 
     if (isCheckAuthStatusInvalidPayload(payload)) {
@@ -166,20 +166,20 @@ export async function checkAuthStatus(
         reason: payload.reason,
         success: true,
         valid: false,
-      }
+      };
     }
 
     return {
-      reason: 'network',
+      reason: "network",
       success: false,
       valid: false,
-    }
+    };
   } catch {
     return {
-      reason: 'network',
+      reason: "network",
       success: false,
       valid: false,
-    }
+    };
   }
 }
 
@@ -191,19 +191,19 @@ export async function logout(email: string, token: string) {
         token,
       }),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      method: 'POST',
-    })
+      method: "POST",
+    });
 
     if (!response.ok) {
-      return false
+      return false;
     }
 
-    const payload = await parsePayload<{ success?: boolean }>(response)
-    return payload?.success === true
+    const payload = await parsePayload<{ success?: boolean }>(response);
+    return payload?.success === true;
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -214,26 +214,26 @@ export async function sendOtp(email: string): Promise<SendOtpResult> {
         email: normalizeAuthEmail(email),
       }),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      method: 'POST',
-    })
+      method: "POST",
+    });
 
-    const payload = await parsePayload<SendOtpSuccessPayload | ErrorPayload>(response)
+    const payload = await parsePayload<SendOtpSuccessPayload | ErrorPayload>(response);
 
     if (response.status === 429) {
       return {
-        error: getPayloadError(payload, '请求过于频繁'),
+        error: getPayloadError(payload, "请求过于频繁"),
         success: false,
         waitSeconds: getPayloadWaitSeconds(payload),
-      }
+      };
     }
 
     if (!response.ok || !isSendOtpSuccessPayload(payload)) {
       return {
-        error: getPayloadError(payload, '发送验证码失败'),
+        error: getPayloadError(payload, "发送验证码失败"),
         success: false,
-      }
+      };
     }
 
     return {
@@ -241,12 +241,12 @@ export async function sendOtp(email: string): Promise<SendOtpResult> {
       resendAfterSeconds: payload.resendAfterSeconds,
       retryLimit: payload.retryLimit,
       success: true,
-    }
+    };
   } catch {
     return {
-      error: '网络错误，请稍后重试',
+      error: "网络错误，请稍后重试",
       success: false,
-    }
+    };
   }
 }
 
@@ -258,29 +258,29 @@ export async function verifyOtp(email: string, otp: string): Promise<VerifyOtpRe
         otp: normalizeOtpInput(otp),
       }),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      method: 'POST',
-    })
+      method: "POST",
+    });
 
-    const payload = await parsePayload<VerifyOtpSuccessPayload | ErrorPayload>(response)
+    const payload = await parsePayload<VerifyOtpSuccessPayload | ErrorPayload>(response);
 
     if (!response.ok || !isVerifyOtpSuccessPayload(payload)) {
       return {
-        error: getPayloadError(payload, '验证码错误'),
+        error: getPayloadError(payload, "验证码错误"),
         success: false,
-      }
+      };
     }
 
     return {
       expiresAt: payload.expiresAt,
       success: true,
       token: payload.token,
-    }
+    };
   } catch {
     return {
-      error: '网络错误，请稍后重试',
+      error: "网络错误，请稍后重试",
       success: false,
-    }
+    };
   }
 }

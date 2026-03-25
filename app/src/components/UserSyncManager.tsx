@@ -1,7 +1,7 @@
-import React from 'react'
+import React from "react";
 
-import * as authApi from '@/api/auth'
-import { syncUserData } from '@/api/user-sync'
+import * as authApi from "@/api/auth";
+import { syncUserData } from "@/api/user-sync";
 import {
   applySyncToServerSnapshot,
   getDefaultSyncToServerSnapshot,
@@ -14,24 +14,24 @@ import {
   type SyncToServerKey,
   type SyncToServerSnapshot,
   useStore,
-} from '@/store'
-import { getAuthData } from '@/utils/secure-store'
-import { showToast } from '@/utils'
+} from "@/store";
+import { getAuthData } from "@/utils/secure-store";
+import { showToast } from "@/utils";
 
-import AuthModal from './AuthModal'
-import { resolveInitialSync } from '@/features/user-sync/helpers'
+import AuthModal from "./AuthModal";
+import { resolveInitialSync } from "@/features/user-sync/helpers";
 import {
   closeAuthModal,
   setAnonymousAuthState,
   setAuthenticatedAuthState,
   setNetworkUnavailableAuthState,
   setReauthenticationRequiredState,
-} from '@/features/user-sync/session'
+} from "@/features/user-sync/session";
 
 function forEachSyncToServerKey(callback: <K extends SyncToServerKey>(key: K) => void) {
-  SyncToServerKeys.forEach(key => {
-    callback(key)
-  })
+  SyncToServerKeys.forEach((key) => {
+    callback(key);
+  });
 }
 
 function setSyncSnapshotValue<K extends SyncToServerKey>(
@@ -39,34 +39,40 @@ function setSyncSnapshotValue<K extends SyncToServerKey>(
   key: K,
   value: SyncToServerSnapshot[K],
 ) {
-  snapshot[key] = value
+  snapshot[key] = value;
 }
 
 export default function UserSyncManager() {
-  const { authEmail, authFailureReason, authModalMode, authModalVisible, initialed, isAuthenticated } =
-    useStore()
+  const {
+    authEmail,
+    authFailureReason,
+    authModalMode,
+    authModalVisible,
+    initialed,
+    isAuthenticated,
+  } = useStore();
 
-  const bootstrapStartedRef = React.useRef(false)
-  const initialSyncCompletedRef = React.useRef(false)
-  const isApplyingRemoteRef = React.useRef(false)
-  const pendingKeysRef = React.useRef(new Set<SyncToServerKey>())
-  const syncTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-  const isAuthenticatedRef = React.useRef(isAuthenticated)
+  const bootstrapStartedRef = React.useRef(false);
+  const initialSyncCompletedRef = React.useRef(false);
+  const isApplyingRemoteRef = React.useRef(false);
+  const pendingKeysRef = React.useRef(new Set<SyncToServerKey>());
+  const syncTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isAuthenticatedRef = React.useRef(isAuthenticated);
 
-  isAuthenticatedRef.current = isAuthenticated
+  isAuthenticatedRef.current = isAuthenticated;
 
   React.useEffect(() => {
     if (!initialed || bootstrapStartedRef.current) {
-      return
+      return;
     }
 
-    bootstrapStartedRef.current = true
-    void bootstrapAuth()
-  }, [initialed])
+    bootstrapStartedRef.current = true;
+    void bootstrapAuth();
+  }, [initialed]);
 
   React.useEffect(() => {
     if (!initialed) {
-      return
+      return;
     }
 
     const unsubscribe = subscribeStore(({ key }) => {
@@ -76,193 +82,197 @@ export default function UserSyncManager() {
         isApplyingRemoteRef.current ||
         !isSyncToServerKey(key)
       ) {
-        return
+        return;
       }
 
-      pendingKeysRef.current.add(key)
-      queueSync()
-    })
+      pendingKeysRef.current.add(key);
+      queueSync();
+    });
 
     return () => {
-      unsubscribe()
+      unsubscribe();
       if (syncTimerRef.current) {
-        clearTimeout(syncTimerRef.current)
-        syncTimerRef.current = null
+        clearTimeout(syncTimerRef.current);
+        syncTimerRef.current = null;
       }
-    }
-  }, [initialed])
+    };
+  }, [initialed]);
 
   React.useEffect(() => {
     if (!isAuthenticated || !authEmail) {
-      initialSyncCompletedRef.current = false
-      pendingKeysRef.current.clear()
+      initialSyncCompletedRef.current = false;
+      pendingKeysRef.current.clear();
       if (syncTimerRef.current) {
-        clearTimeout(syncTimerRef.current)
-        syncTimerRef.current = null
+        clearTimeout(syncTimerRef.current);
+        syncTimerRef.current = null;
       }
-      return
+      return;
     }
 
     if (initialSyncCompletedRef.current) {
-      return
+      return;
     }
 
-    void performInitialSync(authEmail)
-  }, [authEmail, isAuthenticated])
+    void performInitialSync(authEmail);
+  }, [authEmail, isAuthenticated]);
 
   async function bootstrapAuth() {
-    const methods = getStoreMethods()
-    methods.setAuthReady(false)
+    const methods = getStoreMethods();
+    methods.setAuthReady(false);
 
-    const { email, token } = await getAuthData()
+    const { email, token } = await getAuthData();
     if (!email) {
-      setAnonymousAuthState()
-      return
+      setAnonymousAuthState();
+      return;
     }
 
     if (!token) {
-      await setReauthenticationRequiredState(email, 'invalid', true)
-      return
+      await setReauthenticationRequiredState(email, "invalid", true);
+      return;
     }
 
-    const statusResult = await authApi.checkAuthStatus(email, token)
+    const statusResult = await authApi.checkAuthStatus(email, token);
     if (statusResult.success && statusResult.valid && statusResult.token) {
-      await setAuthenticatedAuthState(email, statusResult.token)
-      return
+      await setAuthenticatedAuthState(email, statusResult.token);
+      return;
     }
 
-    if (statusResult.reason === 'network') {
-      showToast('无法连接服务器检查登录状态')
-      setNetworkUnavailableAuthState(email)
-      return
+    if (statusResult.reason === "network") {
+      showToast("无法连接服务器检查登录状态");
+      setNetworkUnavailableAuthState(email);
+      return;
     }
 
-    await setReauthenticationRequiredState(email, statusResult.reason ?? 'invalid', true)
+    await setReauthenticationRequiredState(email, statusResult.reason ?? "invalid", true);
   }
 
   async function performInitialSync(email: string) {
-    const { token } = await getAuthData()
+    const { token } = await getAuthData();
     if (!token) {
-      return
+      return;
     }
 
-    const remoteResult = await syncUserData<Partial<Record<SyncToServerKey, unknown>>>(email, token, {
-      get: [...SyncToServerKeys],
-    })
+    const remoteResult = await syncUserData<Partial<Record<SyncToServerKey, unknown>>>(
+      email,
+      token,
+      {
+        get: [...SyncToServerKeys],
+      },
+    );
 
     if (!remoteResult.success) {
-      if (remoteResult.code === 'unauthorized') {
-        await setReauthenticationRequiredState(email, 'invalid', true)
-        return
+      if (remoteResult.code === "unauthorized") {
+        await setReauthenticationRequiredState(email, "invalid", true);
+        return;
       }
 
-      showToast(remoteResult.error)
-      initialSyncCompletedRef.current = true
-      return
+      showToast(remoteResult.error);
+      initialSyncCompletedRef.current = true;
+      return;
     }
 
-    const localSnapshot = getSyncToServerSnapshot()
-    const defaultSnapshot = getDefaultSyncToServerSnapshot()
-    const remoteSnapshot: Partial<SyncToServerSnapshot> = {}
+    const localSnapshot = getSyncToServerSnapshot();
+    const defaultSnapshot = getDefaultSyncToServerSnapshot();
+    const remoteSnapshot: Partial<SyncToServerSnapshot> = {};
 
-    forEachSyncToServerKey(key => {
+    forEachSyncToServerKey((key) => {
       if (Object.prototype.hasOwnProperty.call(remoteResult.result, key)) {
         setSyncSnapshotValue(
           remoteSnapshot,
           key,
           normalizeSyncToServerValue(key, remoteResult.result[key]),
-        )
+        );
       }
-    })
+    });
 
     const resolution = resolveInitialSync(
       SyncToServerKeys,
       localSnapshot,
       remoteSnapshot,
       defaultSnapshot,
-    )
+    );
 
     if (resolution.hasRemoteData) {
-      isApplyingRemoteRef.current = true
-      applySyncToServerSnapshot(resolution.nextLocal)
-      isApplyingRemoteRef.current = false
+      isApplyingRemoteRef.current = true;
+      applySyncToServerSnapshot(resolution.nextLocal);
+      isApplyingRemoteRef.current = false;
 
       if (resolution.nextRemoteSet) {
         const backfillResult = await syncUserData(email, token, {
           set: resolution.nextRemoteSet,
-        })
+        });
         if (!backfillResult.success) {
-          if (backfillResult.code === 'unauthorized') {
-            await setReauthenticationRequiredState(email, 'invalid', true)
-            return
+          if (backfillResult.code === "unauthorized") {
+            await setReauthenticationRequiredState(email, "invalid", true);
+            return;
           }
-          showToast(backfillResult.error)
+          showToast(backfillResult.error);
         }
       }
     } else {
       const pushLocalResult = await syncUserData(email, token, {
         set: resolution.nextRemoteSet ?? localSnapshot,
-      })
+      });
       if (!pushLocalResult.success) {
-        if (pushLocalResult.code === 'unauthorized') {
-          await setReauthenticationRequiredState(email, 'invalid', true)
-          return
+        if (pushLocalResult.code === "unauthorized") {
+          await setReauthenticationRequiredState(email, "invalid", true);
+          return;
         }
-        showToast(pushLocalResult.error)
+        showToast(pushLocalResult.error);
       }
     }
 
-    initialSyncCompletedRef.current = true
+    initialSyncCompletedRef.current = true;
   }
 
   function queueSync() {
     if (syncTimerRef.current) {
-      clearTimeout(syncTimerRef.current)
+      clearTimeout(syncTimerRef.current);
     }
 
     syncTimerRef.current = setTimeout(() => {
-      void flushPendingKeys()
-    }, 2000)
+      void flushPendingKeys();
+    }, 2000);
   }
 
   async function flushPendingKeys() {
     if (!isAuthenticatedRef.current || pendingKeysRef.current.size === 0) {
-      return
+      return;
     }
 
-    const { email, token } = await getAuthData()
+    const { email, token } = await getAuthData();
     if (!email || !token) {
-      return
+      return;
     }
 
-    const snapshot = getSyncToServerSnapshot()
-    const nextSet: Partial<Record<SyncToServerKey, unknown>> = {}
-    pendingKeysRef.current.forEach(key => {
-      nextSet[key] = snapshot[key]
-    })
+    const snapshot = getSyncToServerSnapshot();
+    const nextSet: Partial<Record<SyncToServerKey, unknown>> = {};
+    pendingKeysRef.current.forEach((key) => {
+      nextSet[key] = snapshot[key];
+    });
 
-    const result = await syncUserData(email, token, { set: nextSet })
+    const result = await syncUserData(email, token, { set: nextSet });
     if (!result.success) {
-      if (result.code === 'unauthorized') {
-        await setReauthenticationRequiredState(email, 'invalid', true)
-        return
+      if (result.code === "unauthorized") {
+        await setReauthenticationRequiredState(email, "invalid", true);
+        return;
       }
-      showToast(result.error)
-      return
+      showToast(result.error);
+      return;
     }
 
-    pendingKeysRef.current.clear()
+    pendingKeysRef.current.clear();
   }
 
   async function handleVerifyOtp(email: string, otp: string) {
-    const result = await authApi.verifyOtp(email, otp)
+    const result = await authApi.verifyOtp(email, otp);
     if (!result.success || !result.token) {
-      return result
+      return result;
     }
 
-    await setAuthenticatedAuthState(email, result.token)
-    initialSyncCompletedRef.current = false
-    return result
+    await setAuthenticatedAuthState(email, result.token);
+    initialSyncCompletedRef.current = false;
+    return result;
   }
 
   return (
@@ -275,5 +285,5 @@ export default function UserSyncManager() {
       onVerifyOtp={handleVerifyOtp}
       visible={authModalVisible}
     />
-  )
+  );
 }

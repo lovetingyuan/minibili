@@ -1,25 +1,25 @@
-import { Text } from '@/components/styled/rneui'
-import { FlashList } from '@/components/styled/rneui'
-import React from 'react'
-import { Alert, Linking, View } from 'react-native'
+import { Text } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
+import React from "react";
+import { Alert, Linking, View } from "react-native";
 
-import VideoListItem from '@/components/VideoItem'
-import { colors } from '@/constants/colors.tw'
-import useResolvedColor from '@/hooks/useResolvedColor'
-import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
-import { useStore } from '@/store'
-import type { HistoryVideoInfo } from '@/types'
+import VideoListItem from "@/components/VideoItem";
+import { colors } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
+import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
+import { useStore } from "@/store";
+import type { HistoryVideoInfo } from "@/types";
 
 function HistoryList() {
-  const { $watchedVideos, get$watchedVideos, set$watchedVideos } = useStore()
-  const count = Object.keys($watchedVideos).length
-  const headerTitle = `⏰ 观看历史（${count}）`
-  const blackColor = useResolvedColor(colors.black.text)
-  const [searchKeyWord, setSearchKeyWord] = React.useState('')
+  const { $watchedVideos, get$watchedVideos, set$watchedVideos } = useStore();
+  const count = Object.keys($watchedVideos).length;
+  const headerTitle = `⏰ 观看历史（${count}）`;
+  const blackColor = useResolvedColor(colors.black.text);
+  const [searchKeyWord, setSearchKeyWord] = React.useState("");
   useUpdateNavigationOptions({
     headerTitle,
     headerSearchBarOptions: {
-      placeholder: '搜索视频',
+      placeholder: "搜索视频",
       headerIconColor: blackColor,
       hintTextColor: blackColor,
       textColor: blackColor,
@@ -27,60 +27,60 @@ function HistoryList() {
       disableBackButtonOverride: false,
       shouldShowHintSearchIcon: false,
       onClose: () => {
-        setSearchKeyWord('')
+        setSearchKeyWord("");
       },
       onSearchButtonPress: ({ nativeEvent: { text } }) => {
-        const keyword = text.trim()
+        const keyword = text.trim();
         if (!keyword) {
-          return
+          return;
         }
-        setSearchKeyWord(keyword)
+        setSearchKeyWord(keyword);
       },
     },
-  })
+  });
 
   const buttons = (video: HistoryVideoInfo) => {
     return [
       {
-        text: '查看封面',
+        text: "查看封面",
         onPress: () => {
-          Linking.openURL(video.cover)
+          Linking.openURL(video.cover);
         },
       },
       {
-        text: '删除记录',
+        text: "删除记录",
         onPress: () => {
-          Alert.alert('确定要删除这条观看记录吗？', '', [
+          Alert.alert("确定要删除这条观看记录吗？", "", [
             {
-              text: '取消',
+              text: "取消",
             },
             {
-              text: '确定',
+              text: "确定",
               onPress: () => {
-                const nextWatchedVideos = { ...get$watchedVideos() }
-                delete nextWatchedVideos[video.bvid]
-                set$watchedVideos(nextWatchedVideos)
+                const nextWatchedVideos = { ...get$watchedVideos() };
+                delete nextWatchedVideos[video.bvid];
+                set$watchedVideos(nextWatchedVideos);
               },
             },
-          ])
+          ]);
         },
       },
-    ]
-  }
+    ];
+  };
   const list = Object.values($watchedVideos)
     .sort((a, b) => {
-      return b.watchTime - a.watchTime
+      return b.watchTime - a.watchTime;
     })
-    .filter(vi => {
-      return !searchKeyWord || vi.title.includes(searchKeyWord)
-    })
+    .filter((vi) => {
+      return !searchKeyWord || vi.title.includes(searchKeyWord);
+    });
 
   return (
     <FlashList
       data={list}
-      keyExtractor={v => `${v.bvid}`}
+      keyExtractor={(v) => `${v.bvid}`}
       renderItem={({ item }: { item: HistoryVideoInfo }) => {
-        return <VideoListItem video={item} buttons={buttons} />
+        return <VideoListItem video={item} buttons={buttons} />;
       }}
       persistentScrollbar
       estimatedItemSize={100}
@@ -103,7 +103,7 @@ function HistoryList() {
       contentContainerClassName="px-1 pt-6"
       estimatedFirstItemOffset={80}
     />
-  )
+  );
 }
 
-export default HistoryList
+export default HistoryList;

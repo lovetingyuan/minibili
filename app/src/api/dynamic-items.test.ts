@@ -19,8 +19,7 @@ test("dynamic-list", async () => {
       const result = DynamicListResponseSchema.safeParse(res);
       if (result.success === false) {
         failedList.push(`zod-${mid}`);
-        
-        
+
         fs.writeFileSync(`dynamic-list-${mid}.json`, JSON.stringify(res));
       }
       if (res.has_more) {
@@ -33,8 +32,6 @@ test("dynamic-list", async () => {
           const ret = DynamicListResponseSchema.safeParse(res2);
           if (ret.success === false) {
             failedList.push(`zod2-${mid}`);
-            
-            
           }
         }
       }

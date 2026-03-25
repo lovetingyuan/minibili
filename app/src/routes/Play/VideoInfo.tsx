@@ -166,7 +166,11 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             onPress={collectVideo}
             className="flex-row items-center gap-1 px-2 py-1"
           >
-            <Icon name="star" size={18} colorClassName={isCollected ? colors.warning.accent : colors.gray8.accent} />
+            <Icon
+              name="star"
+              size={18}
+              colorClassName={isCollected ? colors.warning.accent : colors.gray8.accent}
+            />
             <Text
               className={clsx(
                 "text-sm",

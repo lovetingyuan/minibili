@@ -1,14 +1,14 @@
-import { DarkTheme, DefaultTheme } from '@react-navigation/native'
-import { useColorScheme } from 'react-native'
-import { useResolveClassNames } from 'uniwind'
+import { DarkTheme, DefaultTheme } from "@react-navigation/native";
+import { useColorScheme } from "react-native";
+import { useResolveClassNames } from "uniwind";
 
-import { RouteBackgroundColor } from '@/constants/colors.tw'
+import { RouteBackgroundColor } from "@/constants/colors.tw";
 
 export default function useRouteTheme() {
-  const isDark = useColorScheme() === 'dark'
-  const { backgroundColor } = useResolveClassNames(RouteBackgroundColor)
+  const isDark = useColorScheme() === "dark";
+  const { backgroundColor } = useResolveClassNames(RouteBackgroundColor);
   const resolvedBackgroundColor =
-    typeof backgroundColor === "string" ? backgroundColor : DefaultTheme.colors.background
+    typeof backgroundColor === "string" ? backgroundColor : DefaultTheme.colors.background;
 
   return isDark
     ? {
@@ -18,5 +18,5 @@ export default function useRouteTheme() {
           background: resolvedBackgroundColor,
         },
       }
-    : DefaultTheme
+    : DefaultTheme;
 }

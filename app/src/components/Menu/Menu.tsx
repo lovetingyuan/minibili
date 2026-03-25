@@ -11,12 +11,7 @@ import {
   StatusBar,
   View,
 } from "react-native";
-import type {
-  LayoutChangeEvent,
-  StyleProp,
-  TransformsStyle,
-  ViewStyle,
-} from "react-native";
+import type { LayoutChangeEvent, StyleProp, TransformsStyle, ViewStyle } from "react-native";
 
 export interface MenuProps {
   children?: React.ReactNode;

@@ -186,9 +186,7 @@ function PlayerBar(props: { url?: string; time?: number; error?: boolean }) {
             </TouchableOpacity>
           </View>
           <View className="flex-row items-center gap-2">
-            <Text className="text-xs tabular-nums">
-              {parseTime(playingTime)}
-            </Text>
+            <Text className="text-xs tabular-nums">{parseTime(playingTime)}</Text>
 
             {props.url ? (
               <Slider

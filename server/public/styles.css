@@ -213,8 +213,7 @@ button {
   border: 1px solid rgba(32, 44, 66, 0.12);
   border-radius: 42px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(241, 244, 249, 0.96)),
-    #f5f7fa;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(241, 244, 249, 0.96)), #f5f7fa;
   box-shadow:
     0 32px 64px rgba(130, 146, 166, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
