@@ -90,7 +90,7 @@ function HeaderLeftComp() {
     <View className="flex-row items-center gap-4">
       <Menu
         visible={visible}
-        className="relative left-4 top-12 h-96 w-48 bg-white dark:bg-zinc-900"
+        className="relative left-4 top-12 max-h-[70vh] w-48 bg-white dark:bg-zinc-900"
         anchor={
           <TouchableOpacity
             activeOpacity={0.5}
@@ -118,7 +118,7 @@ function HeaderLeftComp() {
         }
         onRequestClose={hideMenu}
       >
-        <ScrollView>
+        <ScrollView className="max-h-[70vh]">
           {list.map((items, i) => {
             if (i === 0) {
               return (

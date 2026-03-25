@@ -87,7 +87,12 @@ function VideoItem({ video }: { video: VideoItemType }) {
           </Text>
         </View>
         <View className="shrink-0 flex-row items-center">
-          <Image className="h-[11px] w-[13px]" source={require('../../../assets/play-mark.png')} />
+          <Icon
+            size={14}
+            name="play-circle-outline"
+            type="material-community"
+            colorClassName="accent-gray-600 dark:accent-gray-400"
+          />
           <Text className="ml-1 text-xs text-gray-600 dark:text-gray-400">{playNum}</Text>
         </View>
       </View>
