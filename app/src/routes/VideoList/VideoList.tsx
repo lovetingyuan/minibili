@@ -1,28 +1,28 @@
-import { useNavigation } from "@react-navigation/native";
-import { FAB, FlashList, Icon } from "@/components/styled/rneui";
-import React from "react";
-import { Alert, Dimensions, Linking, TouchableOpacity } from "react-native";
+import { useNavigation } from '@react-navigation/native'
+import { FAB, FlashList, Icon } from '@/components/styled/rneui'
+import React from 'react'
+import { Alert, Dimensions, Linking, TouchableOpacity } from 'react-native'
 
-import type { VideoItem as VideoItemType } from "@/api/hot-videos";
-import { colors } from "@/constants/colors.tw";
-import { useStore } from "@/store";
-import { useMarkVideoWatched } from "@/store/actions";
-import type { NavigationProps } from "@/types";
-import { handleShareVideo, parseNumber, parseUrl } from "@/utils";
-import type { FlashListRef } from "@/components/styled/rneui";
+import type { VideoItem as VideoItemType } from '@/api/hot-videos'
+import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
+import { useMarkVideoWatched } from '@/store/actions'
+import type { NavigationProps } from '@/types'
+import { handleShareVideo, parseNumber, parseUrl } from '@/utils'
+import type { FlashListRef } from '@/components/styled/rneui'
 
-import Loading from "./Loading";
-import VideoItem from "./VideoItem";
+import Loading from './Loading'
+import VideoItem from './VideoItem'
 
-type Footer = React.ReactElement | null | undefined;
+type Footer = React.ReactElement | null | undefined
 
 function VideoList(props: {
-  videos: VideoItemType[];
-  type: "Hot" | "Rank" | "Search";
-  footer?: Footer | ((l: VideoItemType[]) => Footer);
-  onReachEnd?: () => void;
-  onRefresh?: (fab?: boolean) => void;
-  isRefreshing?: boolean;
+  videos: VideoItemType[]
+  type: 'Hot' | 'Rank' | 'Search'
+  footer?: Footer | ((l: VideoItemType[]) => Footer)
+  onReachEnd?: () => void
+  onRefresh?: (fab?: boolean) => void
+  isRefreshing?: boolean
 }) {
   const {
     $blackUps,
@@ -31,80 +31,80 @@ function VideoList(props: {
     set$blackUps,
     setOverlayButtons,
     currentVideosCate,
-  } = useStore();
-  const videoList: VideoItemType[] = [];
-  const uniqVideosMap: Record<string, boolean> = {};
+  } = useStore()
+  const videoList: VideoItemType[] = []
+  const uniqVideosMap: Record<string, boolean> = {}
   for (const item of props.videos) {
-    let needShow = !(item.bvid in uniqVideosMap);
+    let needShow = !(item.bvid in uniqVideosMap)
     if (
       needShow &&
-      props.type === "Hot" &&
+      props.type === 'Hot' &&
       (`_${item.mid}` in $blackUps || item.tag in $blackTags)
     ) {
-      needShow = false;
+      needShow = false
     }
-    if (needShow && props.type === "Rank" && `_${item.mid}` in $blackUps) {
-      needShow = false;
+    if (needShow && props.type === 'Rank' && `_${item.mid}` in $blackUps) {
+      needShow = false
     }
     if (needShow) {
-      uniqVideosMap[item.bvid] = true;
-      videoList.push(item);
+      uniqVideosMap[item.bvid] = true
+      videoList.push(item)
     }
   }
 
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null);
-  const currentVideoRef = React.useRef<VideoItemType | null>(null);
-  const markVideoWatched = useMarkVideoWatched();
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null)
+  const currentVideoRef = React.useRef<VideoItemType | null>(null)
+  const markVideoWatched = useMarkVideoWatched()
   React.useEffect(() => {
     setTimeout(() => {
-      listRef.current?.scrollToOffset({ offset: 0, animated: false });
-    });
-  }, [currentVideosCate]);
+      listRef.current?.scrollToOffset({ offset: 0, animated: false })
+    })
+  }, [currentVideosCate])
   const addBlackUp = () => {
     if (!currentVideoRef.current) {
-      return;
+      return
     }
-    Alert.alert(`不再看 ${currentVideoRef.current.name} 的视频？`, "", [
+    Alert.alert(`不再看 ${currentVideoRef.current.name} 的视频？`, '', [
       {
-        text: "取消",
-        style: "cancel",
+        text: '取消',
+        style: 'cancel',
       },
       {
-        text: "确定",
+        text: '确定',
         onPress: () => {
-          const { mid, name } = currentVideoRef.current!;
+          const { mid, name } = currentVideoRef.current!
           set$blackUps({
             ...$blackUps,
             [`_${mid}`]: name,
-          });
+          })
         },
       },
-    ]);
-  };
+    ])
+  }
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
-      return;
+      return
     }
-    Alert.alert(`不再看 ${currentVideoRef.current.tag} 类型的视频？`, "", [
+    Alert.alert(`不再看 ${currentVideoRef.current.tag} 类型的视频？`, '', [
       {
-        text: "取消",
-        style: "cancel",
+        text: '取消',
+        style: 'cancel',
       },
       {
-        text: "确定",
+        text: '确定',
         onPress: () => {
-          const { tag } = currentVideoRef.current!;
+          const { tag } = currentVideoRef.current!
           set$blackTags({
             ...$blackTags,
             [tag]: tag,
-          });
+          })
         },
       },
-    ]);
-  };
+    ])
+  }
   const gotoPlay = (data: VideoItemType) => {
-    navigation.navigate("Play", {
+    navigation.navigate('Play', {
       aid: data.aid,
       bvid: data.bvid,
       title: data.title,
@@ -116,38 +116,40 @@ function VideoList(props: {
       date: data.date,
       tag: data.tag,
       // video: data,
-    });
-  };
-  const renderItem = ({ item }: { item: VideoItemType }) => {
+    })
+  }
+  const renderItem = (props: { index: number; item: VideoItemType }) => {
+    const { item, index } = props
+    const blank = index % 2 ? 'ml-1.5 mr-2' : 'ml-2 mr-1.5'
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        className="mx-[5px] mb-6 flex-1 self-stretch"
+        className={`mb-6 flex-1 self-stretch ${blank}`}
         key={item.bvid}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
-          currentVideoRef.current = item;
-          setOverlayButtons(buttons());
+          currentVideoRef.current = item
+          setOverlayButtons(buttons())
         }}
       >
         <VideoItem video={item} />
       </TouchableOpacity>
-    );
-  };
+    )
+  }
   const markWatched = () => {
-    const videoInfo = currentVideoRef.current;
+    const videoInfo = currentVideoRef.current
     if (!videoInfo) {
-      return;
+      return
     }
-    markVideoWatched(videoInfo, 100);
-  };
+    markVideoWatched(videoInfo, 100)
+  }
   const buttons = () =>
     [
       {
         text: `不再看「${currentVideoRef.current?.name}」的视频`,
         onPress: addBlackUp,
       },
-      props.type === "Hot" && {
+      props.type === 'Hot' && {
         text: `不再看「${currentVideoRef.current?.tag}」类型的视频`,
         onPress: addBlackTagName,
       },
@@ -155,59 +157,59 @@ function VideoList(props: {
         text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
         onPress: () => {
           if (currentVideoRef.current) {
-            const { name, title, bvid } = currentVideoRef.current;
-            handleShareVideo(name, title, bvid);
+            const { name, title, bvid } = currentVideoRef.current
+            handleShareVideo(name, title, bvid)
           }
         },
       },
       {
-        text: "标记观看完成",
+        text: '标记观看完成',
         onPress: markWatched,
       },
       {
-        text: "查看封面",
+        text: '查看封面',
         onPress: () => {
           if (!currentVideoRef.current) {
-            return;
+            return
           }
-          Linking.openURL(parseUrl(currentVideoRef.current.cover));
+          Linking.openURL(parseUrl(currentVideoRef.current.cover))
         },
       },
-    ].filter((v) => v && typeof v === "object");
+    ].filter(v => v && typeof v === 'object')
   const refreshProps = props.onRefresh
     ? {
         onRefresh: props.onRefresh,
         refreshing: props.isRefreshing,
       }
-    : null;
+    : null
   const reachEndProps = props.onReachEnd
     ? {
         onEndReached: props.onReachEnd,
         onEndReachedThreshold: 0.5,
       }
-    : null;
+    : null
   return (
     <>
       <FlashList
-        ref={(v) => {
-          listRef.current = v;
+        ref={v => {
+          listRef.current = v
         }}
         numColumns={2}
         data={videoList}
         renderItem={renderItem}
         persistentScrollbar
-        estimatedItemSize={Dimensions.get("window").width / 2}
+        estimatedItemSize={Dimensions.get('window').width / 2 - 10}
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
-          typeof props.footer === "function" ? props.footer(videoList) : props.footer
+          typeof props.footer === 'function' ? props.footer(videoList) : props.footer
         }
         columnWrapperClassName="items-stretch"
-        contentContainerClassName="px-[4px] pt-6"
+        contentContainerClassName="px-1 pt-6"
         estimatedFirstItemOffset={100}
         {...refreshProps}
         {...reachEndProps}
       />
-      {props.type === "Hot" && (
+      {props.type === 'Hot' && (
         <FAB
           visible
           colorClassName={colors.secondary.accent}
@@ -216,13 +218,13 @@ function VideoList(props: {
           className="bottom-3 opacity-90"
           size="small"
           onPress={() => {
-            listRef.current?.scrollToOffset({ offset: 0, animated: true });
-            props.onRefresh?.(true);
+            listRef.current?.scrollToOffset({ offset: 0, animated: true })
+            props.onRefresh?.(true)
           }}
         />
       )}
     </>
-  );
+  )
 }
 
-export default VideoList;
+export default VideoList
