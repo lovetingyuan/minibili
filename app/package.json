@@ -1,7 +1,7 @@
 {
   "name": "@minibili/app",
-  "version": "0.7.0",
-  "gitHead": "7fea38d",
+  "version": "0.7.1",
+  "gitHead": "11a7ca2",
   "description": "minimum bilibili apk",
   "homepage": "https://lovetingyuan.github.io/minibili/",
   "repository": "github:lovetingyuan/minibili",
@@ -101,7 +101,7 @@
     "react-test-renderer": "19.2.0"
   },
   "config": {
-    "changelog": "update expo  动态页面改版",
-    "versionCode": 73
+    "changelog": "修复已知问题",
+    "versionCode": 74
   }
 }
