@@ -5,7 +5,6 @@ import * as KeepAwake from "expo-keep-awake";
 import React from "react";
 import {
   ActivityIndicator,
-  Image,
   ImageBackground,
   Pressable,
   Text,
@@ -33,6 +32,8 @@ type PlayerMessage = {
   payload?: unknown;
 };
 
+type PlayerErrorType = "play-url" | "webview";
+
 function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   const { getIsWiFi, imagesList } = useStore();
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
@@ -43,6 +44,9 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
 
   const [loadPlayer, setLoadPlayer] = React.useState(isWifi);
   const [highQuality, setHighQuality] = React.useState(isWifi);
+  const [playerErrorType, setPlayerErrorType] = React.useState<PlayerErrorType | null>(null);
+  const [isRetrying, setIsRetrying] = React.useState(false);
+  const [webViewKey, setWebViewKey] = React.useState(0);
 
   const loadingErrorRef = React.useRef(false);
   const webviewRef = React.useRef<WebView | null>(null);
@@ -51,10 +55,34 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     ...data,
   };
   const cid = videoInfo.pages ? videoInfo.pages[props.currentPage - 1].cid : 0;
-  const { videoUrl } = useVideoMp4Url(videoInfo.bvid, cid, highQuality);
+  const { videoUrl, error: playUrlError, retry: retryVideoUrl } = useVideoMp4Url(
+    videoInfo.bvid,
+    cid,
+    highQuality,
+  );
   const markVideoWatched = useMarkVideoWatched();
 
   const [isEnded, setIsEnded] = React.useState(true);
+  const handleRetry = async () => {
+    if (isRetrying) {
+      return;
+    }
+
+    setPlayerErrorType(null);
+    setIsRetrying(true);
+    loadingErrorRef.current = false;
+
+    try {
+      await retryVideoUrl();
+    } catch {}
+
+    if (webviewRef.current && videoUrl) {
+      webviewRef.current.reload();
+    }
+    setWebViewKey((key) => key + 1);
+    setIsRetrying(false);
+  };
+
   /**
    * hasimg  play -> imagepause
    *         pause -> nothing
@@ -82,9 +110,29 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     `);
   }, [imagesList.length]);
 
+  React.useEffect(() => {
+    if (!loadPlayer) {
+      return;
+    }
+
+    setPlayerErrorType(null);
+    setIsRetrying(false);
+    loadingErrorRef.current = false;
+  }, [cid, highQuality, loadPlayer]);
+
+  React.useEffect(() => {
+    if (!loadPlayer || !playUrlError) {
+      return;
+    }
+
+    setPlayerErrorType("play-url");
+    setIsRetrying(false);
+    loadingErrorRef.current = true;
+  }, [loadPlayer, playUrlError]);
+
   useAppStateChange((currentAppState) => {
-    if (currentAppState === "active" && loadingErrorRef.current && webviewRef.current) {
-      webviewRef.current.reload();
+    if (currentAppState === "active" && loadingErrorRef.current) {
+      void handleRetry();
     }
     if (currentAppState !== "active") {
       KeepAwake.deactivateKeepAwake("PLAY");
@@ -161,7 +209,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         }
       }
       if (eventData.action === "reload") {
-        // TODO:
+        void handleRetry();
       }
       if (eventData.action === "showToast") {
         if (typeof eventData.payload === "string") {
@@ -201,16 +249,33 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       }
     } catch {}
   };
+  const renderPlayerBackground = (children?: React.ReactNode) => {
+    if (videoInfo?.cover) {
+      return (
+        <ImageBackground
+          source={{ uri: parseImgUrl(videoInfo.cover, 672, 420) }}
+          resizeMode="cover"
+          className="flex-1 items-center justify-center"
+        >
+          <View className="absolute inset-0 bg-black/30" />
+          {children}
+        </ImageBackground>
+      );
+    }
+
+    return <View className="flex-1 items-center justify-center bg-black">{children}</View>;
+  };
   const renderLoading = () => (
-    <View className="absolute h-full w-full items-center">
-      {videoInfo?.cover ? (
-        <Image source={{ uri: parseImgUrl(videoInfo.cover, 672, 420) }} className="w-full flex-1" />
-      ) : null}
-      <ActivityIndicator
-        size={"large"}
-        colorClassName={colors.secondary.accent}
-        className="absolute top-[45%] scale-150"
-      />
+    <View className="absolute h-full w-full">
+      {renderPlayerBackground(
+        playerErrorType ? null : (
+          <ActivityIndicator
+            size={"large"}
+            colorClassName={colors.secondary.accent}
+            className="scale-150"
+          />
+        ),
+      )}
     </View>
   );
 
@@ -241,48 +306,17 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   //   }
   // }, [playPageUrl])
 
-  const player = playPageUrl ? (
-    <WebView
-      source={{
-        // uri: 'player.bilibili.com/player.html?isOutside=true&aid=116255201697323&bvid=BV1NLw1zoECS&cid=36813670314&p=1', // playPageUrl,
-        uri: playPageUrl,
-      }}
-      ref={webviewRef}
-      className="flex-1 bg-black"
-      originWhitelist={["https://*", "bilibili://*"]}
-      allowsFullscreenVideo
-      injectedJavaScriptForMainFrameOnly
-      allowsInlineMediaPlayback
-      startInLoadingState
-      userAgent={UA}
-      // key={videoInfo.bvid}
-      mediaPlaybackRequiresUserAction={false}
-      injectedJavaScript={INJECTED_JAVASCRIPT}
-      renderLoading={renderLoading}
-      onMessage={handleMessage}
-      webviewDebuggingEnabled={__DEV__}
-      onContentProcessDidTerminate={() => {
-        webviewRef.current?.reload();
-      }}
-      onLoad={() => {
-        loadingErrorRef.current = false;
-      }}
-      onError={() => {
-        showToast("当前视频加载失败/(ㄒoㄒ)/~~");
-        loadingErrorRef.current = true;
-      }}
-      onShouldStartLoadWithRequest={(request) => {
-        // Only allow navigating within this website
-        if (request.url.endsWith("/log-reporter.js")) {
-          return false;
+  const errorInfo =
+    playerErrorType === "play-url"
+      ? {
+          title: "视频加载失败",
+          description: "播放地址获取失败，请稍后重试",
         }
-        if (request.url.startsWith("http") && !request.url.includes(".apk")) {
-          return true;
-        }
-        return false;
-      }}
-    />
-  ) : (
+      : {
+          title: "播放器加载失败",
+          description: "播放器初始化失败，请点击重试",
+        };
+  const player = !loadPlayer ? (
     <Pressable
       onPress={() => {
         setLoadPlayer(true);
@@ -330,14 +364,104 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         </ImageBackground>
       ) : null}
     </Pressable>
+  ) : playPageUrl ? (
+    <WebView
+      source={{
+        // uri: 'player.bilibili.com/player.html?isOutside=true&aid=116255201697323&bvid=BV1NLw1zoECS&cid=36813670314&p=1', // playPageUrl,
+        uri: playPageUrl,
+      }}
+      key={`${cid}-${highQuality ? "hq" : "sq"}-${webViewKey}`}
+      ref={webviewRef}
+      className="flex-1 bg-black"
+      originWhitelist={["https://*", "bilibili://*"]}
+      allowsFullscreenVideo
+      injectedJavaScriptForMainFrameOnly
+      allowsInlineMediaPlayback
+      startInLoadingState
+      userAgent={UA}
+      mediaPlaybackRequiresUserAction={false}
+      injectedJavaScript={INJECTED_JAVASCRIPT}
+      renderLoading={renderLoading}
+      onMessage={handleMessage}
+      webviewDebuggingEnabled={__DEV__}
+      onContentProcessDidTerminate={() => {
+        webviewRef.current?.reload();
+      }}
+      onLoad={() => {
+        loadingErrorRef.current = false;
+        setPlayerErrorType(null);
+        setIsRetrying(false);
+      }}
+      onError={() => {
+        if (!loadingErrorRef.current) {
+          showToast("当前视频加载失败/(ㄒoㄒ)/~~");
+        }
+        loadingErrorRef.current = true;
+        setPlayerErrorType("webview");
+        setIsRetrying(false);
+      }}
+      onHttpError={() => {
+        if (!loadingErrorRef.current) {
+          showToast("当前视频加载失败/(ㄒoㄒ)/~~");
+        }
+        loadingErrorRef.current = true;
+        setPlayerErrorType("webview");
+        setIsRetrying(false);
+      }}
+      onShouldStartLoadWithRequest={(request) => {
+        // Only allow navigating within this website
+        if (request.url.endsWith("/log-reporter.js")) {
+          return false;
+        }
+        if (request.url.startsWith("http") && !request.url.includes(".apk")) {
+          return true;
+        }
+        return false;
+      }}
+    />
+  ) : (
+    renderPlayerBackground(
+      playerErrorType ? null : (
+        <ActivityIndicator
+          size={"large"}
+          colorClassName={colors.secondary.accent}
+          className="scale-150"
+        />
+      ),
+    )
   );
   return (
     <View
       renderToHardwareTextureAndroid
-      className="w-full shrink-0 bg-black"
+      className="relative w-full shrink-0 overflow-hidden bg-black"
       style={{ height: videoViewHeight }}
     >
       {player}
+      {loadPlayer && playerErrorType ? (
+        <View className="absolute inset-0">
+          {renderPlayerBackground(
+            <View className="items-center gap-3 px-8">
+              <Text className="text-xl font-bold text-white">{errorInfo.title}</Text>
+              <Text className="text-center text-sm leading-6 text-white/80">
+                {errorInfo.description}
+              </Text>
+              <Pressable
+                className={
+                  isRetrying
+                    ? "mt-2 rounded-full bg-sky-400/60 px-6 py-3"
+                    : "mt-2 rounded-full bg-sky-500 px-6 py-3"
+                }
+                disabled={isRetrying}
+                onPress={() => {
+                  void handleRetry();
+                }}
+              >
+                <Text className="font-bold text-white">{isRetrying ? "重试中..." : "重试"}</Text>
+              </Pressable>
+            </View>,
+          )}
+        </View>
+      ) : null}
     </View>
   );
 }

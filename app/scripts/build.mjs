@@ -1,268 +1,389 @@
 #!/usr/bin/env zx
-/* globals $, question, echo, chalk, fs, retry, spinner */
 
-// import { BuildListSchema } from '../src/api/check-update.schema.ts'
-// 1 检查环境 2 写入版本 3 eas构建 4 写入更新日志 5 下载apk 6 git推送
+import { createWriteStream, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { pipeline } from "node:stream/promises";
+import { Readable } from "node:stream";
+import { fileURLToPath } from "node:url";
 
-const z = require("zod");
-const { usePowerShell } = require("zx");
+import open from "open";
+import semver from "semver";
+import { $, chalk, question, spinner, usePowerShell } from "zx";
 
 // oxlint-disable-next-line react-hooks/rules-of-hooks
 usePowerShell();
 
-const BuildListSchema = z
-  .object({
-    id: z.string(),
-    status: z.enum(["PENDING", "FINISHED"]),
-    platform: z.enum(["ANDROID", "IOS", "ALL"]),
-    artifacts: z.object({
-      buildUrl: z.string(),
-      applicationArchiveUrl: z.string(),
-    }),
-    initiatingActor: z.object({
-      id: z.string(),
-      displayName: z.string(),
-    }),
-    project: z.object({
-      id: z.string(),
-      name: z.string(),
-      slug: z.string(),
-      ownerAccount: z.object({
-        id: z.string(),
-        name: z.string(),
-      }),
-    }),
-    channel: z.string().nullish(),
-    releaseChannel: z.string().nullish(),
-    distribution: z.enum(["STORE"]),
-    buildProfile: z.string(),
-    sdkVersion: z.string(),
-    appVersion: z.string(),
-    appBuildVersion: z.string(),
-    gitCommitHash: z.string(),
-    gitCommitMessage: z.string(),
-    // priority: 'NORMAL'
-    createdAt: z.string(),
-    updatedAt: z.string(),
-    completedAt: z.string(),
-    // resourceClass: 'ANDROID_MEDIUM'
-  })
-  .refine((data) => {
-    return !!data.channel || !!data.releaseChannel;
-  }, "channel error")
-  .array();
-
-const pkgPath = require.resolve("../package.json");
-const pkg = require("../package.json");
-const version = pkg.version;
-const semver = require("semver");
-const assert = require("node:assert");
-
-const getBuildList = (buildStr) => {
-  let buildListStr = buildStr.toString("utf8");
-  let list;
-  while (buildListStr.includes("[")) {
-    try {
-      buildListStr = buildListStr.substring(buildListStr.indexOf("["));
-      list = JSON.parse(buildListStr);
-      break;
-    } catch {
-      buildListStr = buildListStr.substring(1);
-    }
-  }
-  list.toString = () => buildListStr.trim();
-  return list;
-};
-
 $.verbose = false;
 
-await spinner("Checking build env...", async () => {
-  const gitStatus = await $`git status --porcelain`;
-  assert.equal(
-    gitStatus.toString("utf8").trim(),
-    "",
-    chalk.red("Current git workspace is not clean"),
-  );
+const APP_DIR = fileURLToPath(new URL("../", import.meta.url));
+const PACKAGE_JSON_PATH = fileURLToPath(new URL("../package.json", import.meta.url));
+const APK_DIR = fileURLToPath(new URL("../apk", import.meta.url));
+const MAIN_BRANCH = "main";
+const REPO_URL = "https://github.com/lovetingyuan/minibili";
 
-  await fetch("https://api.expo.dev")
-    .then((res) => res.text())
-    .then((d) => {
-      assert.equal(d, "OK", chalk.red("Can not access Expo Api"));
-    });
+process.chdir(APP_DIR);
 
-  const easuser = await $`npx --yes eas-cli@latest whoami`;
-  assert.ok(easuser && easuser.toString("utf8").trim().length > 0, chalk.red("EAS cli not login."));
+const log = {
+  info(message) {
+    console.log(chalk.blue("[INFO]"), message);
+  },
+  success(message) {
+    console.log(chalk.green("[OK]"), message);
+  },
+  warn(message) {
+    console.log(chalk.yellow("[WARN]"), message);
+  },
+  error(message) {
+    console.log(chalk.red("[ERR]"), message);
+  },
+};
 
-  await retry(3, () => $`git ls-remote --heads https://github.com/lovetingyuan/minibili.git`);
+function readPackageJson() {
+  return JSON.parse(readFileSync(PACKAGE_JSON_PATH, "utf8"));
+}
 
-  const branch = await $`git rev-parse --abbrev-ref HEAD`;
-  assert.equal(branch.toString("utf8").trim(), "main", chalk.red("Current branch is not main"));
-  await $`git push`;
-});
+function writePackageJson(data) {
+  writeFileSync(PACKAGE_JSON_PATH, `${JSON.stringify(data, null, 2)}\n`);
+}
 
-echo(chalk.green("Environment is all right.\n"));
+function getReleaseNotes(changelog) {
+  return changelog
+    .split("  ")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => `- ${item}`)
+    .join("\n");
+}
 
-let appVersion;
+async function withRetry(attempts, task, label) {
+  let lastError;
 
-await spinner("Checking current build list...", async () => {
-  const currentBuild =
-    await $`npx -y eas-cli@latest build:list --platform android --limit 1 --json --non-interactive --status finished --channel production`;
-  const buildList = getBuildList(currentBuild);
-  BuildListSchema.parse(buildList);
-  appVersion = buildList[0].appVersion;
-  if (appVersion !== version) {
-    throw new Error(
-      `Package version ${version} is not same as the latest build version ${appVersion}`,
-    );
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await task();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) {
+        log.warn(`${label} failed (${attempt}/${attempts}), retrying...`);
+        await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+      }
+    }
   }
-});
 
-await $`npx react-native-tailwindcss-build`;
-
-// -------------------------------------------
-
-const newVersion = await question(`更新版本（${appVersion} -> ?）`);
-
-if (!semver.valid(newVersion) || semver.lt(newVersion, appVersion)) {
-  throw new Error("版本号输入错误");
+  throw lastError;
 }
 
-const changes = await question("更新日志（使用双空格分开）");
-if (!changes.trim()) {
-  throw new Error("更新日志不能为空");
+async function assertReachable(url, label) {
+  await withRetry(
+    3,
+    async () => {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`${label} responded with ${response.status}`);
+      }
+    },
+    `${label} check`,
+  );
 }
 
-if (newVersion !== pkg.version) {
-  pkg.config.versionCode++;
-  pkg.version = newVersion;
+function extractJsonSegment(text, openChar, closeChar) {
+  let searchPos = text.length - 1;
+
+  while (searchPos >= 0) {
+    const start = text.lastIndexOf(openChar, searchPos);
+    if (start === -1) {
+      return null;
+    }
+
+    let depth = 0;
+    let end = -1;
+    let inString = false;
+    let escaped = false;
+
+    for (let index = start; index < text.length; index += 1) {
+      const char = text[index];
+
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+        } else if (char === "\\") {
+          escaped = true;
+        } else if (char === "\"") {
+          inString = false;
+        }
+        continue;
+      }
+
+      if (char === "\"") {
+        inString = true;
+        continue;
+      }
+
+      if (char === openChar) {
+        depth += 1;
+      } else if (char === closeChar) {
+        depth -= 1;
+      }
+
+      if (depth === 0) {
+        end = index;
+        break;
+      }
+    }
+
+    if (end !== -1) {
+      return text.slice(start, end + 1);
+    }
+
+    searchPos = start - 1;
+  }
+
+  return null;
 }
-pkg.config.changelog = changes;
-const commitHash = (await $`git rev-parse --short HEAD`).toString("utf8").trim();
-pkg.gitHead = commitHash;
 
-fs.outputJsonSync(pkgPath, pkg, {
-  spaces: 2,
-});
+function parseBuildResult(stdout, stderr) {
+  const combined = `${stdout ?? ""}\n${stderr ?? ""}`.trim();
+  if (!combined) {
+    throw new Error("EAS build output is empty");
+  }
 
-echo(chalk.cyan("EAS building: https://expo.dev/accounts/tingyuan/projects/minibili/builds"));
+  const candidates = [
+    extractJsonSegment(combined, "[", "]"),
+    extractJsonSegment(combined, "{", "}"),
+  ].filter(Boolean);
 
-let latestBuildList;
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate);
+      const build = Array.isArray(parsed) ? parsed[0] : parsed;
+      if (build && typeof build === "object" && typeof build.status === "string") {
+        return build;
+      }
+    } catch {
+      continue;
+    }
+  }
 
-try {
-  await spinner("EAS building...", async () => {
-    await $`npx -y eas-cli@latest build --platform android --profile production --message ${changes} --json --non-interactive`;
-    return new Promise((r) => setTimeout(r, 1000));
+  throw new Error("Unable to parse EAS build JSON output");
+}
+
+async function checkEnvironment() {
+  await spinner("Checking environment...", async () => {
+    const gitStatus = await $`git status --porcelain`;
+    if (gitStatus.stdout.trim() !== "") {
+      throw new Error("Git workspace is not clean");
+    }
+
+    const branch = await $`git rev-parse --abbrev-ref HEAD`;
+    if (branch.stdout.trim() !== MAIN_BRANCH) {
+      throw new Error(`Current branch is ${branch.stdout.trim()}, expected ${MAIN_BRANCH}`);
+    }
+
+    await $`git fetch origin`;
+    const summary = await $`git status --short --branch`;
+    const branchSummary = summary.stdout.split("\n")[0]?.trim() ?? "";
+
+    if (!branchSummary.includes("...")) {
+      throw new Error("Current branch does not track a remote branch");
+    }
+
+    if (branchSummary.includes("behind")) {
+      throw new Error("Current branch is behind origin/main, please pull first");
+    }
+
+    await assertReachable("https://github.com", "GitHub");
+    await assertReachable("https://api.expo.dev", "Expo API");
+
+    await withRetry(2, () => $`npx --yes eas-cli@latest --version`, "EAS CLI version");
+    const easUser = await withRetry(2, () => $`npx --yes eas-cli@latest whoami`, "EAS login");
+    if (!easUser.stdout.trim()) {
+      throw new Error("EAS CLI is not logged in");
+    }
   });
-  let buildListStr = "";
-  echo(chalk.green("EAS build done."));
+
+  log.success("Environment check passed");
+}
+
+async function promptReleaseInfo(currentVersion) {
+  const newVersion = (await question(`版本号（${currentVersion} -> ?）`)).trim();
+  if (!semver.valid(newVersion) || !semver.gt(newVersion, currentVersion)) {
+    throw new Error("版本号必须是大于当前版本的合法 semver");
+  }
+
+  const changelog = (await question("更新日志（双空格分隔）")).trim();
+  if (!changelog) {
+    throw new Error("更新日志不能为空");
+  }
+
+  return {
+    changelog,
+    newVersion,
+  };
+}
+
+async function updatePackageJson(newVersion, changelog) {
+  const originalText = readFileSync(PACKAGE_JSON_PATH, "utf8");
+  const pkg = JSON.parse(originalText);
+  const commitHash = (await $`git rev-parse --short HEAD`).stdout.trim();
+
+  pkg.version = newVersion;
+  pkg.gitHead = commitHash;
+  pkg.config = {
+    ...pkg.config,
+    changelog,
+    versionCode: Number(pkg.config?.versionCode ?? 0) + 1,
+  };
+
+  writePackageJson(pkg);
+
+  return {
+    originalText,
+    packageJson: pkg,
+  };
+}
+
+async function restorePackageJson(originalText) {
+  writeFileSync(PACKAGE_JSON_PATH, originalText);
+  log.warn("Restored app/package.json");
+}
+
+async function runEasBuild(newVersion, changelog) {
+  log.info("Starting EAS Android production build");
+
+  const result = await spinner("Running EAS build...", async () => {
+    return $`npx --yes eas-cli@latest build --platform android --profile production --message ${changelog} --json --non-interactive --wait`;
+  });
+
+  const build = parseBuildResult(result.stdout, result.stderr);
+
+  if (build.status !== "FINISHED") {
+    throw new Error(`Unexpected EAS build status: ${build.status}`);
+  }
+
+  if (build.appVersion && build.appVersion !== newVersion) {
+    throw new Error(`Built version ${build.appVersion} does not match ${newVersion}`);
+  }
+
+  if (build.platform && build.platform !== "ANDROID") {
+    throw new Error(`Unexpected build platform: ${build.platform}`);
+  }
+
+  log.success("EAS build finished");
+  return build;
+}
+
+async function downloadApk(newVersion, build) {
+  const apkUrl = build?.artifacts?.buildUrl;
+  if (!apkUrl) {
+    throw new Error("EAS build result does not contain artifacts.buildUrl");
+  }
+
+  const apkPath = `${APK_DIR}\\minibili-${newVersion}.apk`;
+  log.info(`Downloading APK from ${apkUrl}`);
+
+  await spinner("Downloading APK...", async () => {
+    rmSync(APK_DIR, { force: true, recursive: true });
+    mkdirSync(APK_DIR, { recursive: true });
+
+    const response = await withRetry(
+      3,
+      async () => {
+        const res = await fetch(apkUrl);
+        if (!res.ok || !res.body) {
+          throw new Error(`Download failed with status ${res.status}`);
+        }
+        return res;
+      },
+      "APK download",
+    );
+
+    await pipeline(Readable.fromWeb(response.body), createWriteStream(apkPath));
+  });
+
+  log.success(`APK saved to ${apkPath}`);
+  return apkPath;
+}
+
+async function commitAndPushRelease(newVersion, onCommitted) {
+  const commitMessage = `chore(release): v${newVersion}`;
+
+  await spinner("Committing release changes...", async () => {
+    await $`git add package.json`;
+    await $`git commit -m ${commitMessage}`;
+  });
+  onCommitted();
+
+  await spinner("Pushing release commit...", async () => {
+    await withRetry(3, () => $`git push origin ${MAIN_BRANCH}`, "git push");
+  });
+
+  log.success(`Release commit pushed: ${commitMessage}`);
+  return commitMessage;
+}
+
+async function createAndPushTag(newVersion, changelog) {
+  const tagName = `v${newVersion}`;
+
+  await spinner("Creating release tag...", async () => {
+    await $`git tag -a ${tagName} -m ${changelog}`;
+  });
+
+  await spinner("Pushing release tag...", async () => {
+    await withRetry(3, () => $`git push origin ${tagName}`, "git push tag");
+  });
+
+  log.success(`Release tag pushed: ${tagName}`);
+  return tagName;
+}
+
+async function openGitHubRelease(newVersion, changelog) {
+  const releaseUrl = new URL(`${REPO_URL}/releases/new`);
+  releaseUrl.searchParams.set("tag", `v${newVersion}`);
+  releaseUrl.searchParams.set("title", `minibili-${newVersion}`);
+  releaseUrl.searchParams.set("body", getReleaseNotes(changelog));
+
+  await open(releaseUrl.toString());
+  log.success("Opened GitHub release page");
+}
+
+async function main() {
+  let originalPackageText = null;
+  let releaseCommitted = false;
 
   try {
-    buildListStr = await spinner("Checking EAS build list...", () =>
-      retry(
-        3,
-        () =>
-          $`npx -y eas-cli@latest build:list --platform android --limit 5 --json --non-interactive --status finished --channel production`,
-      ),
-    );
-  } catch (err) {
-    echo(chalk.red("Failed to get build list."));
-    throw err;
-  }
+    await checkEnvironment();
 
-  latestBuildList = getBuildList(buildListStr);
-  if (latestBuildList[0].appVersion !== newVersion) {
-    throw new Error(
-      `EAS latest version ${latestBuildList[0].appVersion} is not same as updated version ${newVersion}`,
-    );
-  }
-  echo(chalk.green("EAS build success."));
-} catch (err) {
-  await $`git checkout -- .`;
-  // await $`npm version ${version} -m "failed to publish ${newVersion}" --allow-same-version`
-  echo(chalk.red("Failed to build new apk on EAS."));
-  throw err;
-}
+    const currentPackage = readPackageJson();
+    const currentVersion = currentPackage.version;
+    if (!currentVersion) {
+      throw new Error("app/package.json is missing version");
+    }
 
-const apkUrl = latestBuildList[0].artifacts.buildUrl;
-echo(chalk.blue("Download apk file: " + apkUrl));
+    log.info(`Current version: ${currentVersion}`);
 
-try {
-  await spinner("Downloading APK file...", async () => {
-    await $`npx rimraf apk`;
-    await $`mkdir apk`;
-    return retry(3, () => {
-      return $`npx download --out apk ${apkUrl} --filename minibili-${newVersion}.apk`;
+    const { newVersion, changelog } = await promptReleaseInfo(currentVersion);
+    const updated = await updatePackageJson(newVersion, changelog);
+    originalPackageText = updated.originalText;
+    log.success(`Updated app/package.json to ${newVersion}`);
+
+    const build = await runEasBuild(newVersion, changelog);
+    await downloadApk(newVersion, build);
+
+    await commitAndPushRelease(newVersion, () => {
+      releaseCommitted = true;
     });
-  });
-  echo(chalk.blue(`Saved apk to ./apk/minibili-${newVersion}.apk`));
-} catch (err) {
-  echo(chalk.red("Failed to download latest apk."));
-  echo(`wget ${apkUrl} -q -O ./apk/minibili-${newVersion}.apk`);
-  throw err;
+
+    await createAndPushTag(newVersion, changelog);
+    await openGitHubRelease(newVersion, changelog);
+
+    log.success("Release flow completed");
+  } catch (error) {
+    if (originalPackageText !== null && !releaseCommitted) {
+      await restorePackageJson(originalPackageText);
+    }
+
+    log.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  }
 }
 
-// try {
-//   await spinner('Building website...', async () => {
-//     return $`npm run build:docs`
-//   })
-//   echo(chalk.blue('website build done'))
-// } catch (err) {
-//   echo(chalk.red('Failed to build website.'))
-// }
-
-// try {
-//   await spinner('Publish to npm...', () =>
-//     retry(
-//       3,
-//       () => $`npm publish --tag beta --registry=https://registry.npmjs.org/`,
-//     ),
-//   )
-//   echo(chalk.blue('published as beta tag to npm success.'))
-// } catch (err) {
-//   echo(chalk.red('Failed to publish to npm.'))
-//   echo('npm publish --tag beta --registry=https://registry.npmjs.org/')
-//   throw err
-// }
-
-try {
-  const message = `release(v${newVersion}): ${changes}`;
-  await spinner("git push change...", async () => {
-    await $`git commit -am ${message}`;
-    return retry(5, () => $`git push`);
-  });
-  echo(chalk.green("git push commit done."));
-} catch (err) {
-  echo(chalk.red("Failed to publish to github."));
-  echo("git push");
-  throw err;
-}
-
-try {
-  await spinner("git push tag...", async () => {
-    await $`git tag -a v${newVersion} -m ${changes}`;
-    return retry(5, () => $`git push origin v${newVersion}`);
-  });
-  echo(chalk.green("git push tags done."));
-} catch (err) {
-  echo(chalk.red("Failed to push tags to git."));
-  echo(`git push origin v${newVersion}`);
-  throw err;
-}
-
-echo(chalk.green("Build done, please test your app and publish to github."));
-
-// echo(
-//   `npm dist-tag add ${pkg.name}@${newVersion} latest --registry=https://registry.npmjs.org/`,
-// )
-
-// echo('npm run deploy:docs')
-
-const open = require("open");
-open(
-  `https://github.com/lovetingyuan/minibili/releases/new?tag=v${newVersion}&title=minibili-${newVersion}&body=${encodeURIComponent(
-    changes
-      .split("  ")
-      .map((c) => `- ${c}`)
-      .join("\n"),
-  )}`,
-);
+await main();

@@ -10,7 +10,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "knip:app": "knip --workspace @minibili/app",
     "android": "npm run android -w=@minibili/app",
-    "android:preview": "npm run build:android:preview -w=@minibili/app",
+    "build:preview": "npm run build:android:preview -w=@minibili/app",
     "update": "npm run update -w=@minibili/app",
     "server": "npm run dev -w=@minibili/server",
     "deploy": "npm run deploy -w=@minibili/server",

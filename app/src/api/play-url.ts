@@ -27,7 +27,7 @@ export function useVideoMp4Url(bvid: string, cid?: number, highQuality?: boolean
     });
   }
 
-  const { data, error } = useSWR<Res>(
+  const { data, error, mutate } = useSWR<Res>(
     bvid && cid ? `/x/player/wbi/playurl?${search}` : null,
     (url) => {
       return request<Res>(url + "&_t=" + Date.now());
@@ -46,6 +46,7 @@ export function useVideoMp4Url(bvid: string, cid?: number, highQuality?: boolean
   return {
     videoUrl: url,
     error,
+    retry: () => mutate(),
   };
 }
 

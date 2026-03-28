@@ -23,7 +23,7 @@ module.exports = {
   version,
   githubUrl: "https://github.com/lovetingyuan/minibili",
   orientation: "portrait",
-  icon: "./assets/icon.png",
+  icon: "./assets/icon/icon.png",
   userInterfaceStyle: "automatic",
   ios: {
     supportsTablet: true,
@@ -31,9 +31,11 @@ module.exports = {
     buildNumber: version,
   },
   android: {
+    icon: "./assets/icon/icon.png",
     adaptiveIcon: {
-      foregroundImage: "./assets/icon.png",
-      backgroundColor: "#FFFFFF",
+      foregroundImage: "./assets/icon/android-icon-foreground.png",
+      backgroundImage: "./assets/icon/android-icon-background.png",
+      monochromeImage: "./assets/icon/android-icon-monochrome.png",
     },
     package: appId,
     permissions: ["WAKE_LOCK"],
@@ -41,7 +43,7 @@ module.exports = {
   },
   web: {
     output: "single",
-    favicon: "./assets/icon.png",
+    favicon: "./assets/icon/favicon.png",
   },
   plugins: [
     "expo-asset",
@@ -51,10 +53,10 @@ module.exports = {
       "expo-splash-screen",
       {
         backgroundColor: "#ffffff",
-        image: "./assets/splash.png",
+        image: "./assets/icon/splash-icon.png",
         resizeMode: "cover",
         dark: {
-          image: "./assets/splash-dark.png",
+          image: "./assets/icon/splash-icon.png",
           resizeMode: "cover",
           backgroundColor: "#000000",
         },
