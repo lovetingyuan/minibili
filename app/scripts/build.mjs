@@ -85,13 +85,18 @@ async function assertReachable(url, label) {
   );
 }
 
-function extractJsonSegment(text, openChar, closeChar) {
+function stripAnsi(text) {
+  return text.replaceAll(/\u001B\[[0-9;?]*[ -/]*[@-~]/g, "");
+}
+
+function extractJsonSegments(text, openChar, closeChar) {
+  const segments = [];
   let searchPos = text.length - 1;
 
   while (searchPos >= 0) {
     const start = text.lastIndexOf(openChar, searchPos);
     if (start === -1) {
-      return null;
+      break;
     }
 
     let depth = 0;
@@ -131,25 +136,25 @@ function extractJsonSegment(text, openChar, closeChar) {
     }
 
     if (end !== -1) {
-      return text.slice(start, end + 1);
+      segments.push(text.slice(start, end + 1));
     }
 
     searchPos = start - 1;
   }
 
-  return null;
+  return segments;
 }
 
 function parseBuildResult(stdout, stderr) {
-  const combined = `${stdout ?? ""}\n${stderr ?? ""}`.trim();
+  const combined = stripAnsi(`${stdout ?? ""}\n${stderr ?? ""}`.trim());
   if (!combined) {
     throw new Error("EAS build output is empty");
   }
 
   const candidates = [
-    extractJsonSegment(combined, "[", "]"),
-    extractJsonSegment(combined, "{", "}"),
-  ].filter(Boolean);
+    ...extractJsonSegments(combined, "[", "]"),
+    ...extractJsonSegments(combined, "{", "}"),
+  ];
 
   for (const candidate of candidates) {
     try {
