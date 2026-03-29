@@ -30,7 +30,7 @@ video {
 
   document.addEventListener("visibilitychange", () => {
     const bgPlayBtn = document.getElementById("play-background-button");
-    if (bgPlayBtn.dataset.bgPlay !== "true") {
+    if (!bgPlayBtn || bgPlayBtn.dataset.bgPlay !== "true") {
       return;
     }
     if (document.visibilityState === "hidden") {
@@ -48,100 +48,130 @@ video {
     }
   });
 
-  // let originVideoUrl = ''
-  const newVideoUrl = decodeURIComponent(window.location.hash.slice(1));
-  const reportPlayTime = (lastTime, duration) => {
+  const postMessage = (action, payload) => {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
-        action: "reportPlayTime",
-        payload: Number.parseFloat(((lastTime * 100) / duration).toFixed(1)),
+        action,
+        payload,
       }),
     );
   };
+
+  const reportPlayTime = (lastTime, duration) => {
+    if (!Number.isFinite(lastTime) || !Number.isFinite(duration) || duration <= 0) {
+      return;
+    }
+    postMessage(
+      "reportPlayTime",
+      Number.parseFloat(((lastTime * 100) / duration).toFixed(1)),
+    );
+  };
+
+  window.reportPlayTime = () => {
+    const video = document.querySelector("video");
+    if (!video) {
+      return;
+    }
+    reportPlayTime(video.currentTime, video.duration);
+  };
+
+  const setupVideo = (video) => {
+    if (!video || video.tagName !== "VIDEO" || video.dataset.handled === "true") {
+      return;
+    }
+
+    video.dataset.handled = "true";
+
+    const syncPlayTime = () => {
+      reportPlayTime(video.currentTime, video.duration);
+    };
+
+    ["play", "ended", "pause"].forEach((evt) => {
+      video.addEventListener(evt, () => {
+        postMessage("playState", evt);
+        if (evt === "play") {
+          setTimeout(syncPlayTime, 3000);
+        } else {
+          syncPlayTime();
+        }
+        if (evt === "ended") {
+          const rateBtn = document.getElementById("play-rate-button");
+          if (rateBtn) {
+            rateBtn.dataset.rate = `1${xx}`;
+            rateBtn.textContent = `1${xx}`;
+          }
+          video.playbackRate = 1;
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        }
+      });
+    });
+
+    ["timeupdate", "seeking"].forEach((evt) => {
+      video.addEventListener(evt, () => {
+        if (evt === "seeking") {
+          syncPlayTime();
+        }
+      });
+    });
+  };
+
+  const scanVideos = (node) => {
+    if (!node) {
+      return;
+    }
+    if (node.tagName === "VIDEO") {
+      setupVideo(node);
+      return;
+    }
+    if (typeof node.querySelectorAll === "function") {
+      node.querySelectorAll("video").forEach(setupVideo);
+    }
+  };
+
   document.addEventListener(
     "animationstart",
     function (event) {
-      if (event.animationName === "videoDetected") {
-        const video = event.target;
-        window._aa = window._aa || [];
-        _aa.push(video.outerHTML, video.src);
-        // video.src = newVideoUrl
-        // video.setAttribute('src', newVideoUrl)
-        // console.log('检测到 video 元素注入:', video);
-        // 处理逻辑...
+      if (event.animationName === "videoDetected" && event.target?.tagName === "VIDEO") {
+        setupVideo(event.target);
       }
     },
     true,
   );
-  const observer = new window.MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      // 遍历 DOM 变更记录
-      mutation.addedNodes.forEach(function (node) {
-        if (node.tagName === "VIDEO") {
-          window._aa = window._aa || [];
-          _aa.push(node.outerHTML);
-          // console.log(999, 33, node.outerHTML)
-        }
-        // 检查是否是 video 元素
-        if (node.tagName !== "VIDEO" || node.dataset.handled) {
-          return;
-        }
-        if (!node.src) {
-          return;
-        }
-        // if (node.src) {
-        //   node.src = newVideoUrl
-        // }
-        // if (node.src && !originVideoUrl) {
-        //   originVideoUrl = node.src
-        // }
-        // node.src = newVideoUrl
-        node.dataset.handled = "true";
 
-        const video = node;
-        ["play", "ended", "pause"].forEach((evt) => {
-          video.addEventListener(evt, () => {
-            window.ReactNativeWebView.postMessage(
-              JSON.stringify({
-                action: "playState",
-                payload: evt,
-              }),
-            );
-            if (evt === "play") {
-              setTimeout(() => {
-                reportPlayTime(video.currentTime, video.duration);
-              }, 3000);
-            } else {
-              reportPlayTime(video.currentTime, video.duration);
-            }
-            if (evt === "ended") {
-              const rateBtn = document.getElementById("play-rate-button");
-              rateBtn.dataset.rate = `1${xx}`;
-              rateBtn.textContent = 1 + xx;
-              video.playbackRate = 1;
-              if (document.exitFullscreen) {
-                document.exitFullscreen();
-              } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen(); // Firefox
-              } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen(); // Chrome, Safari & Opera
-              }
-            }
-          });
-        });
-        ["timeupdate", "seeking"].forEach((evt) => {
-          video.addEventListener(evt, () => {
-            if (evt === "seeking") {
-              reportPlayTime(video.currentTime, video.duration);
-            }
-          });
+  const startVideoObserver = () => {
+    const root = document.body || document.documentElement;
+    if (!root) {
+      return;
+    }
+
+    scanVideos(root);
+
+    if (!window.MutationObserver) {
+      return;
+    }
+
+    const observer = new window.MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        mutation.addedNodes.forEach(function (node) {
+          scanVideos(node);
         });
       });
     });
-  });
 
-  // 开始监听 DOM 变更
-  // observer.observe(document.body, { childList: true, subtree: true })
+    observer.observe(root, { childList: true, subtree: true });
+  };
+
+  if (document.body || document.documentElement) {
+    startVideoObserver();
+  } else {
+    window.addEventListener("DOMContentLoaded", startVideoObserver, { once: true });
+  }
 
   function waitForDom(selectors, callback) {
     if (typeof selectors === "string") {
@@ -161,10 +191,35 @@ video {
     }, 10000);
   }
 
+  const queryFirst = (selectors) => {
+    for (const selector of selectors) {
+      const dom = document.querySelector(selector);
+      if (dom) {
+        return dom;
+      }
+    }
+    return null;
+  };
+
+  const getTimelineDoms = () => {
+    return {
+      current: queryFirst([".mplayer-time-current-text", ".gsl-timeline-time"]),
+      total: queryFirst([".mplayer-time-total-text", ".gsl-timeline-duration"]),
+    };
+  };
+
+  const isFullscreen = () =>
+    !!(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement
+    );
+
   const xx = "x";
-  waitForDom(".mplayer-display", (container) => {
+  waitForDom(".mplayer-display, .gsl-inner", (container) => {
     container.addEventListener("dblclick", (evt) => {
-      if (evt.target.matches(".mplayer-right *")) {
+      if (evt.target.matches(".mplayer-right *, .gsl-control-right *")) {
         return;
       }
       const video = document.querySelector("video[src]");
@@ -175,7 +230,7 @@ video {
     });
   });
 
-  waitForDom(".mplayer-right", (right) => {
+  waitForDom(".mplayer-right, .gsl-control-right", (right) => {
     if (!document.getElementById("play-rate-button")) {
       const rateBtn = document.createElement("div");
       rateBtn.id = "play-rate-button";
@@ -236,12 +291,7 @@ video {
           bgPlayBtn.dataset.bgPlay = "false";
         } else {
           bgPlayBtn.dataset.bgPlay = "true";
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              action: "showToast",
-              payload: "后台播放已开启",
-            }),
-          );
+          postMessage("showToast", "后台播放已开启");
         }
       });
       right.appendChild(bgPlayBtn);
@@ -254,39 +304,14 @@ video {
     let distanceX = 0;
     let distanceY = 0;
     let direction = "";
+    let gestureHandled = false;
 
     let touchTimer;
     const isVideoPlaying = (video) =>
       !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
+    const touchEventOptions = { capture: true, passive: true };
 
-    element.addEventListener("touchstart", (event) => {
-      touchTimer = setTimeout(() => {
-        const video = document.querySelector("video");
-        if (video && isVideoPlaying(video)) {
-          video.playbackRate = 3;
-          video.dataset.longPress = "true";
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              action: "showToast",
-              payload: "3倍速播放",
-            }),
-          );
-        }
-      }, 1000);
-      const touch = event.touches[0];
-      startX = touch.clientX;
-      startY = touch.clientY;
-    });
-
-    element.addEventListener("touchmove", (event) => {
-      const touch = event.touches[0];
-      distanceX = touch.clientX - startX;
-      distanceY = touch.clientY - startY;
-    });
-
-    element.addEventListener("touchend", () => {
-      clearTimeout(touchTimer);
-      const video = document.querySelector("video");
+    const resetRate = (video) => {
       if (video && video.dataset.longPress === "true") {
         video.playbackRate = 1;
         video.dataset.longPress = "false";
@@ -296,13 +321,34 @@ video {
           rateBtn.textContent = `1${xx}`;
         }
       }
+    };
+
+    const clearGesture = () => {
+      startX = 0;
+      startY = 0;
+      distanceX = 0;
+      distanceY = 0;
+      direction = "";
+      gestureHandled = false;
+    };
+
+    const finalizeGesture = () => {
+      clearTimeout(touchTimer);
+      const video = document.querySelector("video");
+      resetRate(video);
+      if (gestureHandled) {
+        clearGesture();
+        return;
+      }
       if (Math.abs(distanceX) > Math.abs(distanceY)) {
         direction = distanceX < 0 ? "left" : "right";
       } else {
         direction = distanceY < 0 ? "up" : "down";
       }
-      const time1 = document.querySelector(".mplayer-time-current-text")?.getBoundingClientRect();
-      const time2 = document.querySelector(".mplayer-time-total-text")?.getBoundingClientRect();
+
+      const { current, total } = getTimelineDoms();
+      const time1 = current?.getBoundingClientRect();
+      const time2 = total?.getBoundingClientRect();
 
       if (time1 && time2 && video) {
         const { x: x1, y: y1 } = time1;
@@ -318,18 +364,6 @@ video {
         }
         if (Math.abs(y1 - y2) < 5) {
           if (x1 < x2) {
-            if (
-              !document.fullscreenElement &&
-              (direction === "down" || direction === "up") &&
-              Math.abs(distanceY) > 99
-            ) {
-              window.ReactNativeWebView.postMessage(
-                JSON.stringify({
-                  action: "change-video-height",
-                  payload: direction,
-                }),
-              );
-            }
             if ((direction === "left" || direction === "right") && Math.abs(distanceX) > 70) {
               video.currentTime += direction === "left" ? -5 : 5;
             }
@@ -339,20 +373,66 @@ video {
         }
       }
 
-      startX = 0;
-      startY = 0;
-      distanceX = 0;
-      distanceY = 0;
-      direction = "";
-    });
+      clearGesture();
+    };
+
+    element.addEventListener(
+      "touchstart",
+      (event) => {
+        gestureHandled = false;
+        touchTimer = setTimeout(() => {
+          const video = document.querySelector("video");
+          if (video && isVideoPlaying(video)) {
+            video.playbackRate = 3;
+            video.dataset.longPress = "true";
+            postMessage("showToast", "3倍速播放");
+          }
+        }, 1000);
+        const touch = event.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+      },
+      touchEventOptions,
+    );
+
+    element.addEventListener(
+      "touchmove",
+      (event) => {
+        const touch = event.touches[0];
+        distanceX = touch.clientX - startX;
+        distanceY = touch.clientY - startY;
+
+        if (
+          !gestureHandled &&
+          !isFullscreen() &&
+          Math.abs(distanceY) > 96 &&
+          Math.abs(distanceY) > Math.abs(distanceX) + 24
+        ) {
+          gestureHandled = true;
+          clearTimeout(touchTimer);
+          postMessage("change-video-height", distanceY < 0 ? "up" : "down");
+        }
+      },
+      touchEventOptions,
+    );
+
+    element.addEventListener(
+      "touchend",
+      finalizeGesture,
+      true,
+    );
+
+    element.addEventListener(
+      "touchcancel",
+      () => {
+        clearTimeout(touchTimer);
+        resetRate(document.querySelector("video"));
+        clearGesture();
+      },
+      true,
+    );
   };
-  if (document.body) {
-    aa(document.body);
-  } else {
-    window.addEventListener("DOMContentLoaded", () => {
-      aa(document.body);
-    });
-  }
+  aa(document);
 }
 
 export const INJECTED_JAVASCRIPT = `(${__$hack})();\ntrue;`;

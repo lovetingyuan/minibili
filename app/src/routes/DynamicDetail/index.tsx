@@ -18,8 +18,6 @@ import { WebView } from "react-native-webview";
 // import useLiveUrl from '@/api/get-live-url'
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
-import { UA } from "../../constants";
-import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 import HeaderRight from "./HeaderRight";
@@ -40,11 +38,13 @@ function Loading() {
 
 type Props = NativeStackScreenProps<RootStackParamList, "DynamicDetail">;
 
+const BILIBILI_MOBILE_UA =
+  "Mozilla/5.0 (Linux; Android 13; M2012K11AC Build/TKQ1.220829.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/137.0.7151.115 Mobile Safari/537.36 BiliApp/8.0.0";
+
 function DynamicDetailPage({ route }: Props) {
   const { title, url } = route.params;
 
   const webviewRef = React.useRef<WebView | null>(null);
-  const { webViewMode } = useStore();
   const [height, setHeight] = React.useState(Dimensions.get("screen").height);
   const [isEnabled, setEnabled] = React.useState(true);
   // const [pageTitle, setPageTitle] = React.useState(`${name}的动态`)
@@ -99,7 +99,7 @@ function DynamicDetailPage({ route }: Props) {
       className="flex-1"
       style={{ height }}
       source={{ uri: url }}
-      key={webViewMode + "-" + webviewKey}
+      key={webviewKey}
       onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
       originWhitelist={["http://*", "https://*", "bilibili://*"]}
       allowsFullscreenVideo
@@ -107,14 +107,13 @@ function DynamicDetailPage({ route }: Props) {
       allowsInlineMediaPlayback
       startInLoadingState
       pullToRefreshEnabled
-      applicationNameForUserAgent={"BILIBILI/8.0.0"}
       // allowsBackForwardNavigationGestures
       mediaPlaybackRequiresUserAction={false}
       webviewDebuggingEnabled={__DEV__}
       injectedJavaScript={INJECTED_JAVASCRIPT}
       injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT_BEFORE}
       renderLoading={() => <Loading />}
-      userAgent={webViewMode === "MOBILE" ? "" : UA}
+      userAgent={BILIBILI_MOBILE_UA}
       ref={webviewRef}
       onNavigationStateChange={(navState) => {
         currentNavigationStateRef.current = {

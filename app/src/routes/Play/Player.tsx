@@ -163,9 +163,13 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     return unsubscribe;
   }, [navigation]);
 
+  const currentPageInfo = videoInfo.pages ? videoInfo.pages[props.currentPage - 1] : undefined;
   let videoWidth = 0;
   let videoHeight = 0;
-  if (videoInfo?.width && videoInfo?.height) {
+  if (currentPageInfo?.width && currentPageInfo.height) {
+    videoWidth = currentPageInfo.width;
+    videoHeight = currentPageInfo.height;
+  } else if (videoInfo?.width && videoInfo?.height) {
     if (videoInfo.rotate) {
       videoWidth = videoInfo.height;
       videoHeight = videoInfo.width;
@@ -181,7 +185,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       videoViewHeight = width * 0.6;
     } else {
       if (isVerticalVideo) {
-        videoViewHeight = verticalExpand ? height * 0.66 : height * 0.33;
+        videoViewHeight = verticalExpand ? height * 0.7 : height * 0.33;
       } else {
         videoViewHeight = (videoHeight / videoWidth) * width + 26;
       }

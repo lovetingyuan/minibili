@@ -3,6 +3,21 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
+function hasConnectedAdbDevice() {
+  try {
+    const output = execSync("adb devices", { encoding: "utf8" });
+    const deviceLines = output
+      .split(/\r?\n/)
+      .slice(1)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    return deviceLines.some((line) => /\tdevice\b/.test(line));
+  } catch {
+    return false;
+  }
+}
+
 function getBestIP() {
   const interfaces = os.networkInterfaces();
   const candidates = [];
@@ -37,6 +52,11 @@ function getBestIP() {
   return candidates.length > 0 ? candidates[0].address : "127.0.0.1";
 }
 
+if (!hasConnectedAdbDevice()) {
+  console.error("No adb device detected, aborting Android preparation.");
+  process.exit(1);
+}
+
 const ip = getBestIP();
 const envLocalPath = path.resolve(__dirname, "../.env.local");
 
@@ -52,9 +72,3 @@ const newLines = lines.filter(
 newLines.push(`EXPO_PUBLIC_IPV4=${ip}`);
 
 fs.writeFileSync(envLocalPath, `${newLines.join("\n").trim()}\n`);
-
-try {
-  execSync("adb devices -l", { stdio: "inherit" });
-} catch {
-  // Ignore missing adb or device detection failures.
-}
