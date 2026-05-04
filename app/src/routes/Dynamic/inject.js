@@ -1,4 +1,68 @@
-function __$inject() {
+const EMPTY_DYNAMIC_FEED_RETRY_KEY = "__minibili_empty_dynamic_feed_retry";
+const EMPTY_DYNAMIC_FEED_RETRY_LIMIT = 5;
+const EMPTY_DYNAMIC_FEED_RETRY_WINDOW_MS = 60 * 1000;
+const EMPTY_DYNAMIC_FEED_RELOAD_DELAY_MS = 800;
+
+export function isSpaceDynamicFeedUrl(url) {
+  if (typeof url !== "string") {
+    return false;
+  }
+
+  try {
+    const parsed = new URL(url, "https://m.bilibili.com");
+    return (
+      parsed.hostname === "api.bilibili.com" &&
+      parsed.pathname === "/x/polymer/web-dynamic/v1/feed/space"
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function shouldReloadEmptyDynamicFeedPayload(payload) {
+  if (typeof payload !== "object" || payload === null) {
+    return false;
+  }
+
+  const data = payload.data;
+  if (typeof data !== "object" || data === null) {
+    return false;
+  }
+
+  return Array.isArray(data.items) && data.items.length === 0;
+}
+
+export function canRetryEmptyDynamicFeed(
+  retryTimestamps,
+  now,
+  retryLimit = EMPTY_DYNAMIC_FEED_RETRY_LIMIT,
+  retryWindowMs = EMPTY_DYNAMIC_FEED_RETRY_WINDOW_MS,
+) {
+  if (!Array.isArray(retryTimestamps)) {
+    return true;
+  }
+
+  const recentRetryCount = retryTimestamps.filter((timestamp) => {
+    return (
+      typeof timestamp === "number" &&
+      Number.isFinite(timestamp) &&
+      timestamp <= now &&
+      now - timestamp < retryWindowMs
+    );
+  }).length;
+
+  return recentRetryCount < retryLimit;
+}
+
+function __$inject(
+  isSpaceDynamicFeedUrl,
+  shouldReloadEmptyDynamicFeedPayload,
+  canRetryEmptyDynamicFeed,
+  retryKeyPrefix,
+  retryLimit,
+  retryWindowMs,
+  reloadDelayMs,
+) {
   const waitFor = (value, callback) => {
     if (value()) {
       callback();
@@ -12,13 +76,173 @@ function __$inject() {
     }
   };
 
+  const installEmptyDynamicFeedAutoReload = () => {
+    if (window.__minibiliEmptyDynamicFeedAutoReloadInstalled || typeof window.fetch !== "function") {
+      return;
+    }
+
+    window.__minibiliEmptyDynamicFeedAutoReloadInstalled = true;
+
+    const retryKey = `${retryKeyPrefix}:${location.pathname}`;
+    let pendingReload = false;
+    let memoryRetryTimestamps = [];
+
+    const getFetchUrl = (input) => {
+      if (typeof input === "string") {
+        return input;
+      }
+      if (input && typeof input.url === "string") {
+        return input.url;
+      }
+      if (input && typeof input.href === "string") {
+        return input.href;
+      }
+      return undefined;
+    };
+
+    const readRetryTimestamps = () => {
+      try {
+        const value = window.sessionStorage.getItem(retryKey);
+        const parsed = value ? JSON.parse(value) : [];
+        if (Array.isArray(parsed)) {
+          memoryRetryTimestamps = parsed.filter((timestamp) => {
+            return typeof timestamp === "number" && Number.isFinite(timestamp);
+          });
+        }
+      } catch {}
+
+      return memoryRetryTimestamps;
+    };
+
+    const writeRetryTimestamps = (retryTimestamps) => {
+      memoryRetryTimestamps = retryTimestamps;
+      try {
+        window.sessionStorage.setItem(retryKey, JSON.stringify(retryTimestamps));
+      } catch {}
+    };
+
+    const clearRetryTimestamps = () => {
+      memoryRetryTimestamps = [];
+      try {
+        window.sessionStorage.removeItem(retryKey);
+      } catch {}
+    };
+
+    const getRecentRetryTimestamps = (now) => {
+      return readRetryTimestamps().filter((timestamp) => {
+        return timestamp <= now && now - timestamp < retryWindowMs;
+      });
+    };
+
+    const reloadWithRetryLimit = () => {
+      if (pendingReload) {
+        return;
+      }
+
+      const now = Date.now();
+      const recentRetryTimestamps = getRecentRetryTimestamps(now);
+      if (!canRetryEmptyDynamicFeed(recentRetryTimestamps, now, retryLimit, retryWindowMs)) {
+        return;
+      }
+
+      pendingReload = true;
+      writeRetryTimestamps([...recentRetryTimestamps, now]);
+      window.setTimeout(() => {
+        window.location.reload();
+      }, reloadDelayMs);
+    };
+
+    const rawFetch = window.fetch.bind(window);
+    window.fetch = (...args) => {
+      const requestUrl = getFetchUrl(args[0]);
+
+      return rawFetch(...args).then((response) => {
+        if (!isSpaceDynamicFeedUrl(requestUrl) || typeof response.clone !== "function") {
+          return response;
+        }
+
+        response
+          .clone()
+          .json()
+          .then((payload) => {
+            if (shouldReloadEmptyDynamicFeedPayload(payload)) {
+              reloadWithRetryLimit();
+              return;
+            }
+
+            const items = payload?.data?.items;
+            if (Array.isArray(items) && items.length > 0) {
+              clearRetryTimestamps();
+            }
+          })
+          .catch(() => {});
+
+        return response;
+      });
+    };
+  };
+
+  installEmptyDynamicFeedAutoReload();
+
+  const installDynamicRefreshButton = () => {
+    const buttonId = "minibili-dynamic-refresh-button";
+    if (document.getElementById(buttonId)) {
+      return;
+    }
+
+    const button = document.createElement("button");
+    button.id = buttonId;
+    button.className = "minibili-dynamic-refresh-button";
+    button.type = "button";
+    button.setAttribute("aria-label", "刷新");
+    button.innerHTML = `
+      <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24">
+        <path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.45 5.08 1 1 0 1 0-1.86.74A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L14 10h6V4l-2.35 2.35Z" fill="currentColor"/>
+      </svg>
+    `;
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      window.location.reload();
+    });
+
+    document.body.appendChild(button);
+  };
+
   // 添加样式
   waitFor(
     () => document.head,
     () => {
       const style = document.createElement("style");
+      const refreshButtonStyle = `
+      .minibili-dynamic-refresh-button {
+        position: fixed;
+        right: 18px;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+        z-index: 2147483647;
+        width: 52px;
+        height: 52px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        color: #ffffff;
+        background: #fb7299;
+        box-shadow: 0 8px 24px rgba(251, 114, 153, 0.36);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .minibili-dynamic-refresh-button:active {
+        transform: scale(0.94);
+      }
+      .minibili-dynamic-refresh-button svg {
+        display: block;
+        pointer-events: none;
+      }
+    `;
 
       style.textContent = `
+      ${refreshButtonStyle}
       .m-space .list {
             width: 100%;
             min-height: 80vh;
@@ -185,6 +409,7 @@ function __$inject() {
     `;
       if (location.pathname === "/topic-detail") {
         style.textContent = `
+        ${refreshButtonStyle}
         .m-navbar,  .fixed-openapp, .m-topic-float-openapp  {
          display: none!important;
         }
@@ -196,6 +421,8 @@ function __$inject() {
       document.head.appendChild(style);
     },
   );
+
+  waitFor(() => document.body, installDynamicRefreshButton);
 
   waitFor(
     () => {
@@ -312,4 +539,6 @@ function __$inject() {
   });
 }
 
-export default `(${__$inject})();`;
+export default `(${__$inject})(${isSpaceDynamicFeedUrl},${shouldReloadEmptyDynamicFeedPayload},${canRetryEmptyDynamicFeed},${JSON.stringify(
+  EMPTY_DYNAMIC_FEED_RETRY_KEY,
+)},${EMPTY_DYNAMIC_FEED_RETRY_LIMIT},${EMPTY_DYNAMIC_FEED_RETRY_WINDOW_MS},${EMPTY_DYNAMIC_FEED_RELOAD_DELAY_MS});true;`;
