@@ -1,7 +1,5 @@
-const EMPTY_DYNAMIC_FEED_RETRY_KEY = "__minibili_empty_dynamic_feed_retry";
 const EMPTY_DYNAMIC_FEED_RETRY_LIMIT = 5;
 const EMPTY_DYNAMIC_FEED_RETRY_WINDOW_MS = 60 * 1000;
-const EMPTY_DYNAMIC_FEED_RELOAD_DELAY_MS = 800;
 
 export function isSpaceDynamicFeedUrl(url) {
   if (typeof url !== "string") {
@@ -9,10 +7,11 @@ export function isSpaceDynamicFeedUrl(url) {
   }
 
   try {
-    const parsed = new URL(url, "https://m.bilibili.com");
+    const isAbsoluteUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(url) || url.startsWith("//");
+    const parsed = new URL(url, "https://api.bilibili.com");
     return (
-      parsed.hostname === "api.bilibili.com" &&
-      parsed.pathname === "/x/polymer/web-dynamic/v1/feed/space"
+      parsed.pathname === "/x/polymer/web-dynamic/v1/feed/space" &&
+      (!isAbsoluteUrl || parsed.hostname === "api.bilibili.com")
     );
   } catch {
     return false;
@@ -54,15 +53,59 @@ export function canRetryEmptyDynamicFeed(
   return recentRetryCount < retryLimit;
 }
 
-function __$inject(
-  isSpaceDynamicFeedUrl,
-  shouldReloadEmptyDynamicFeedPayload,
-  canRetryEmptyDynamicFeed,
-  retryKeyPrefix,
-  retryLimit,
-  retryWindowMs,
-  reloadDelayMs,
-) {
+function __$inject() {
+  const retryKeyPrefix = "__minibili_empty_dynamic_feed_retry";
+  const retryLimit = 5;
+  const retryWindowMs = 60 * 1000;
+  const reloadDelayMs = 800;
+
+  const isSpaceDynamicFeedUrl = (url) => {
+    if (typeof url !== "string") {
+      return false;
+    }
+
+    try {
+      const isAbsoluteUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(url) || url.startsWith("//");
+      const parsed = new URL(url, "https://api.bilibili.com");
+      return (
+        parsed.pathname === "/x/polymer/web-dynamic/v1/feed/space" &&
+        (!isAbsoluteUrl || parsed.hostname === "api.bilibili.com")
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  const shouldReloadEmptyDynamicFeedPayload = (payload) => {
+    if (typeof payload !== "object" || payload === null) {
+      return false;
+    }
+
+    const data = payload.data;
+    if (typeof data !== "object" || data === null) {
+      return false;
+    }
+
+    return Array.isArray(data.items) && data.items.length === 0;
+  };
+
+  const canRetryEmptyDynamicFeed = (retryTimestamps, now) => {
+    if (!Array.isArray(retryTimestamps)) {
+      return true;
+    }
+
+    const recentRetryCount = retryTimestamps.filter((timestamp) => {
+      return (
+        typeof timestamp === "number" &&
+        Number.isFinite(timestamp) &&
+        timestamp <= now &&
+        now - timestamp < retryWindowMs
+      );
+    }).length;
+
+    return recentRetryCount < retryLimit;
+  };
+
   const waitFor = (value, callback) => {
     if (value()) {
       callback();
@@ -73,6 +116,24 @@ function __$inject(
           clearInterval(timer);
         }
       }, 50);
+    }
+  };
+
+  const reloadCurrentPage = () => {
+    let didPostReloadMessage = false;
+    try {
+      if (window.ReactNativeWebView?.postMessage) {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            action: "reload-dynamic-page",
+          }),
+        );
+        didPostReloadMessage = true;
+      }
+    } catch {}
+
+    if (!didPostReloadMessage) {
+      window.location.reload();
     }
   };
 
@@ -135,7 +196,7 @@ function __$inject(
     };
 
     const reloadWithRetryLimit = () => {
-      if (pendingReload) {
+      if (pendingReload || window.__minibiliEmptyDynamicFeedReloadPending) {
         return;
       }
 
@@ -146,9 +207,10 @@ function __$inject(
       }
 
       pendingReload = true;
+      window.__minibiliEmptyDynamicFeedReloadPending = true;
       writeRetryTimestamps([...recentRetryTimestamps, now]);
       window.setTimeout(() => {
-        window.location.reload();
+        reloadCurrentPage();
       }, reloadDelayMs);
     };
 
@@ -203,7 +265,7 @@ function __$inject(
     button.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      window.location.reload();
+      reloadCurrentPage();
     });
 
     document.body.appendChild(button);
@@ -539,6 +601,4 @@ function __$inject(
   });
 }
 
-export default `(${__$inject})(${isSpaceDynamicFeedUrl},${shouldReloadEmptyDynamicFeedPayload},${canRetryEmptyDynamicFeed},${JSON.stringify(
-  EMPTY_DYNAMIC_FEED_RETRY_KEY,
-)},${EMPTY_DYNAMIC_FEED_RETRY_LIMIT},${EMPTY_DYNAMIC_FEED_RETRY_WINDOW_MS},${EMPTY_DYNAMIC_FEED_RELOAD_DELAY_MS});true;`;
+export default `(${__$inject})();true;`;

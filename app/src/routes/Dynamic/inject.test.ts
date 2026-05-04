@@ -26,6 +26,11 @@ describe("Dynamic injected script helpers", () => {
         "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795",
       ),
     ).toBe(true);
+    expect(
+      injectCode.isSpaceDynamicFeedUrl(
+        "/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795",
+      ),
+    ).toBe(true);
     expect(injectCode.isSpaceDynamicFeedUrl("https://api.bilibili.com/x/space/upstat")).toBe(
       false,
     );
@@ -79,6 +84,298 @@ describe("Dynamic injected script helpers", () => {
         oneMinute,
       ),
     ).toBe(true);
+  });
+
+  test("default injected script executes __$inject without external function arguments", () => {
+    expect(injectCode.default).toContain("function __$inject()");
+    expect(injectCode.default).toContain(")();true;");
+    expect(injectCode.default).not.toContain("function isSpaceDynamicFeedUrl");
+    expect(injectCode.default).not.toContain("function shouldReloadEmptyDynamicFeedPayload");
+    expect(injectCode.default).not.toContain("function canRetryEmptyDynamicFeed");
+  });
+
+  test("does not reload from empty page dom without an empty feed response", () => {
+    type FakeElement = {
+      childElementCount: number;
+      children: FakeElement[];
+      className: string;
+      id: string;
+      innerHTML: string;
+      listeners: Record<string, (event: Event) => void>;
+      parentNode?: FakeElement;
+      setAttribute: (name: string, value: string) => void;
+      addEventListener: (type: string, handler: (event: Event) => void) => void;
+      appendChild: (child: FakeElement) => FakeElement;
+      dispatchEvent: (event: Event) => void;
+      style: Record<string, string>;
+      tagName: string;
+      textContent: string;
+    };
+
+    const elementsById = new Map<string, FakeElement>();
+
+    function createFakeElement(tagName: string): FakeElement {
+      const element: FakeElement = {
+        childElementCount: 0,
+        children: [],
+        className: "",
+        id: "",
+        innerHTML: "",
+        listeners: {},
+        setAttribute(name, value) {
+          if (name === "id") {
+            this.id = value;
+          }
+        },
+        addEventListener(type, handler) {
+          this.listeners[type] = handler;
+        },
+        appendChild(child) {
+          child.parentNode = this;
+          this.children.push(child);
+          this.childElementCount = this.children.length;
+          if (child.id) {
+            elementsById.set(child.id, child);
+          }
+          return child;
+        },
+        dispatchEvent(event) {
+          this.listeners[event.type]?.(event);
+        },
+        style: {},
+        tagName,
+        textContent: "",
+      };
+
+      return element;
+    }
+
+    const head = createFakeElement("head");
+    const body = createFakeElement("body");
+    const dynamicList = createFakeElement("div");
+    const listWrap = createFakeElement("div");
+    const noMore = createFakeElement("div");
+    const reload = vi.fn();
+    const document = {
+      body,
+      createElement: createFakeElement,
+      getElementById(id: string) {
+        return elementsById.get(id) ?? null;
+      },
+      head,
+      querySelector(selector: string) {
+        if (selector === ".no-more") {
+          return noMore;
+        }
+        if (selector === ".m-space .list") {
+          return dynamicList;
+        }
+        if (selector === ".list-scroll-content-wrap") {
+          return listWrap;
+        }
+        return null;
+      },
+      querySelectorAll(selector: string) {
+        if (selector === ".bili-dyn-item") {
+          return [];
+        }
+        return [];
+      },
+    };
+    const location = {
+      pathname: "/space/1625060795",
+      reload,
+    };
+    const sessionStorage = {
+      getItem: vi.fn(() => null),
+      removeItem: vi.fn(),
+      setItem: vi.fn(),
+    };
+    const window = {
+      addEventListener: vi.fn(),
+      document,
+      fetch: undefined,
+      location,
+      sessionStorage,
+      setTimeout: (handler: () => void) => {
+        handler();
+        return 1;
+      },
+    };
+
+    vi.stubGlobal("document", document);
+    vi.stubGlobal("location", location);
+    vi.stubGlobal("setInterval", vi.fn());
+    vi.stubGlobal("window", window);
+
+    Function(injectCode.default)();
+
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  test("default injected script reloads after fetch returns empty feed items", async () => {
+    const reload = vi.fn();
+    const elementsById = new Map<string, { id: string }>();
+    const head = {
+      appendChild: vi.fn(),
+    };
+    const body = {
+      addEventListener: vi.fn(),
+      appendChild: vi.fn((child: { id: string }) => {
+        elementsById.set(child.id, child);
+        return child;
+      }),
+    };
+    const document = {
+      body,
+      createElement(tagName: string) {
+        return {
+          addEventListener: vi.fn(),
+          className: "",
+          id: "",
+          innerHTML: "",
+          setAttribute: vi.fn(),
+          style: {},
+          tagName,
+          textContent: "",
+        };
+      },
+      getElementById(id: string) {
+        return elementsById.get(id) ?? null;
+      },
+      head,
+      querySelector: vi.fn(() => null),
+      querySelectorAll: vi.fn(() => []),
+    };
+    const location = {
+      pathname: "/space/1625060795",
+      reload,
+    };
+    const sessionStorage = {
+      getItem: vi.fn(() => null),
+      removeItem: vi.fn(),
+      setItem: vi.fn(),
+    };
+    const response = {
+      clone() {
+        return {
+          json() {
+            return Promise.resolve({
+              code: 0,
+              data: {
+                items: [],
+              },
+            });
+          },
+        };
+      },
+    };
+    const rawFetch = vi.fn(() => Promise.resolve(response));
+    const fakeWindow = {
+      addEventListener: vi.fn(),
+      document,
+      fetch: rawFetch,
+      location,
+      sessionStorage,
+      setTimeout: (handler: () => void) => {
+        handler();
+        return 1;
+      },
+    };
+
+    vi.stubGlobal("document", document);
+    vi.stubGlobal("location", location);
+    vi.stubGlobal("setInterval", vi.fn());
+    vi.stubGlobal("window", fakeWindow);
+
+    Function(injectCode.default)();
+
+    await fakeWindow.fetch("/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(rawFetch).toHaveBeenCalledTimes(1);
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  test("asks React Native WebView to reload when available", async () => {
+    const reload = vi.fn();
+    const postMessage = vi.fn();
+    const document = {
+      body: {
+        addEventListener: vi.fn(),
+        appendChild: vi.fn(),
+      },
+      createElement(tagName: string) {
+        return {
+          addEventListener: vi.fn(),
+          className: "",
+          id: "",
+          innerHTML: "",
+          setAttribute: vi.fn(),
+          style: {},
+          tagName,
+          textContent: "",
+        };
+      },
+      getElementById: vi.fn(() => null),
+      head: {
+        appendChild: vi.fn(),
+      },
+      querySelector: vi.fn(() => null),
+      querySelectorAll: vi.fn(() => []),
+    };
+    const location = {
+      pathname: "/space/1625060795",
+      reload,
+    };
+    const response = {
+      clone() {
+        return {
+          json() {
+            return Promise.resolve({
+              code: 0,
+              data: {
+                items: [],
+              },
+            });
+          },
+        };
+      },
+    };
+    const rawFetch = vi.fn(() => Promise.resolve(response));
+    const fakeWindow = {
+      ReactNativeWebView: {
+        postMessage,
+      },
+      addEventListener: vi.fn(),
+      document,
+      fetch: rawFetch,
+      location,
+      sessionStorage: {
+        getItem: vi.fn(() => null),
+        removeItem: vi.fn(),
+        setItem: vi.fn(),
+      },
+      setTimeout: (handler: () => void) => {
+        handler();
+        return 1;
+      },
+    };
+
+    vi.stubGlobal("document", document);
+    vi.stubGlobal("location", location);
+    vi.stubGlobal("setInterval", vi.fn());
+    vi.stubGlobal("window", fakeWindow);
+
+    Function(injectCode.default)();
+
+    await fakeWindow.fetch("/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(postMessage).toHaveBeenCalledWith(JSON.stringify({ action: "reload-dynamic-page" }));
+    expect(reload).not.toHaveBeenCalled();
   });
 
   test("injects a circular refresh button that reloads the page", () => {

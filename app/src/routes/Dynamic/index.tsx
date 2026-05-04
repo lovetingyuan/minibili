@@ -161,7 +161,9 @@ function Dynamic({ route }: Props) {
         ref={webviewRef}
         onMessage={evt => {
           const data = JSON.parse(evt.nativeEvent.data) as any
-          if (data.action === 'open-video') {
+          if (data.action === 'reload-dynamic-page') {
+            webviewRef.current?.reload()
+          } else if (data.action === 'open-video') {
             const { av, title, mid, name, face } = data.payload
             const bvid = av2bv(av)
 
