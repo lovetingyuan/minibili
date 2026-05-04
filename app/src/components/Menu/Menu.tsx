@@ -8,7 +8,6 @@ import {
   I18nManager,
   Modal,
   Pressable,
-  StatusBar,
   View,
 } from "react-native";
 import type { LayoutChangeEvent, StyleProp, TransformsStyle, ViewStyle } from "react-native";
@@ -134,7 +133,7 @@ export function Menu(props: MenuProps) {
   const { isRTL } = I18nManager;
   const dimensions = Dimensions.get("window");
   const { width: windowWidth } = dimensions;
-  const windowHeight = dimensions.height - (StatusBar.currentHeight || 0);
+  const windowHeight = dimensions.height;
 
   const menuSize = {
     width: menuSizeAnimation.x,
@@ -195,6 +194,7 @@ export function Menu(props: MenuProps) {
           "landscape-left",
           "landscape-right",
         ]}
+        statusBarTranslucent
         transparent
       >
         <View className="absolute bottom-0 left-0 right-0 top-0">
