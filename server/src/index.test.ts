@@ -23,13 +23,21 @@ import { MemoryStorageAdapter, UserRecordStore } from "./user-record-store";
 type UserStorageLike = {
   canSendOtp: () => Promise<{ canSend: boolean; waitSeconds: number }>;
   clearAuthState: () => Promise<void>;
+  clearTokenState: () => Promise<void>;
   clearOtpState: () => Promise<void>;
+  consumeRateLimit: (
+    key: string,
+    limit: number,
+    windowMs: number,
+  ) => Promise<{ allowed: boolean; waitSeconds: number }>;
   issueToken: () => Promise<{ expiresAt: number; token: string }>;
   rotateToken: () => Promise<{ expiresAt: number; token: string }>;
   saveOtp: (otp: string) => Promise<void>;
   syncData: (operations: SyncOperations) => Promise<Partial<Record<string, unknown>>>;
   verifyOtp: (otp: string) => Promise<{ reason?: string; valid: boolean }>;
-  verifyToken: (token: string) => Promise<{ reason?: "expired" | "invalid"; valid: boolean }>;
+  verifyToken: (
+    token: string,
+  ) => Promise<{ expiresAt?: number; needRefresh?: boolean; reason?: "expired" | "invalid"; valid: boolean }>;
 };
 
 function createStorageNamespace() {
@@ -42,7 +50,10 @@ function createStorageNamespace() {
         stores.set(email, {
           canSendOtp: () => recordStore.canSendOtp(),
           clearAuthState: () => recordStore.clearAuthState(),
+          clearTokenState: () => recordStore.clearTokenState(),
           clearOtpState: () => recordStore.clearOtpState(),
+          consumeRateLimit: (key, limit, windowMs) =>
+            recordStore.consumeRateLimit(key, limit, windowMs),
           issueToken: () => recordStore.issueToken(),
           rotateToken: () => recordStore.rotateToken(),
           saveOtp: (otp) => recordStore.saveOtp(otp),
@@ -149,6 +160,27 @@ describe("server routes", () => {
     expect(response.status).toBe(401);
   });
 
+  test("sync rejects authorization header without bearer scheme", async () => {
+    const app = createApp();
+    const env = createEnv();
+    const email = "user@example.com";
+    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
+
+    const response = await app.fetch(
+      new Request(`https://example.com/api/users/${encodeURIComponent(email)}/sync`, {
+        body: JSON.stringify({ get: ["$followedUps"] }),
+        headers: {
+          Authorization: issuedToken.token,
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      }),
+      env as ServerBindings,
+    );
+
+    expect(response.status).toBe(401);
+  });
+
   test("sync rejects unsupported keys", async () => {
     const app = createApp();
     const env = createEnv();
@@ -199,7 +231,31 @@ describe("server routes", () => {
     vi.useRealTimers();
   });
 
-  test("status rotates token and preserves synced data", async () => {
+  test("status rejects invalid token without clearing valid session", async () => {
+    const app = createApp();
+    const env = createEnv();
+    const email = "user@example.com";
+    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
+    const invalidToken = "00000000-0000-4000-8000-000000000000";
+
+    const response = await app.fetch(
+      new Request("https://example.com/api/auth/status", {
+        body: JSON.stringify({ email, token: invalidToken }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      }),
+      env as ServerBindings,
+    );
+
+    expect(response.status).toBe(200);
+    await expect(env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token)).resolves.toMatchObject({
+      valid: true,
+    });
+  });
+
+  test("status preserves token before refresh threshold and preserves synced data", async () => {
     const app = createApp();
     const env = createEnv();
     const email = "user@example.com";
@@ -231,12 +287,11 @@ describe("server routes", () => {
 
     expect(response.status).toBe(200);
     expect(payload.valid).toBe(true);
-    expect(payload.token).not.toBe(issuedToken.token);
-    await expect(env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token)).resolves.toEqual({
-      reason: "invalid",
-      valid: false,
+    expect(payload.token).toBe(issuedToken.token);
+    await expect(env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token)).resolves.toMatchObject({
+      valid: true,
     });
-    await expect(env.USER_STORAGE.getStore(email).verifyToken(payload.token)).resolves.toEqual({
+    await expect(env.USER_STORAGE.getStore(email).verifyToken(payload.token)).resolves.toMatchObject({
       valid: true,
     });
     await expect(
@@ -246,6 +301,34 @@ describe("server routes", () => {
     ).resolves.toEqual({
       $followedUps: [{ face: "", mid: "1", name: "up-1" }],
     });
+  });
+
+  test("otp send enforces global rate limit across target emails", async () => {
+    const app = createApp();
+    const env = createEnv();
+    const emailFetch = vi.fn(() => Promise.resolve(new Response("{}", { status: 200 })));
+    vi.stubGlobal("fetch", emailFetch);
+
+    try {
+      let lastResponse = new Response(null);
+      for (let index = 0; index < 121; index += 1) {
+        lastResponse = await app.fetch(
+          new Request("https://example.com/api/auth/otp", {
+            body: JSON.stringify({ email: `user-${index}@example.com` }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            method: "POST",
+          }),
+          env as ServerBindings,
+        );
+      }
+
+      expect(lastResponse.status).toBe(429);
+      expect(emailFetch).toHaveBeenCalledTimes(120);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   test("logout clears auth state", async () => {

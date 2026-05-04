@@ -1,3 +1,36 @@
+const DYNAMIC_FEED_RETRY_KEY = "__minibili_dynamic_feed_retry";
+const DYNAMIC_FEED_RETRY_LIMIT = 2;
+const IS_DEV = typeof __DEV__ === "undefined" ? false : __DEV__;
+
+export function isDynamicFeedUrl(url) {
+  return typeof url === "string" && url.includes("/x/polymer/web-dynamic/v1/feed/space");
+}
+
+export function shouldRetryDynamicFeedPayload(
+  payload,
+  retryCount,
+  retryLimit = DYNAMIC_FEED_RETRY_LIMIT,
+) {
+  return (
+    typeof payload === "object" &&
+    payload !== null &&
+    payload.code === -352 &&
+    retryCount < retryLimit
+  );
+}
+
+export function shouldReloadEmptySpaceDynamicList({
+  dynamicItemCount,
+  hasNoMore,
+  pathname,
+  retryCount,
+  retryLimit = DYNAMIC_FEED_RETRY_LIMIT,
+}) {
+  return (
+    pathname.startsWith("/space/") && dynamicItemCount === 0 && hasNoMore && retryCount < retryLimit
+  );
+}
+
 function __$hack() {
   const style = document.createElement("style");
   document.head.appendChild(style);
@@ -210,7 +243,13 @@ function __$hack() {
   );
 }
 
-function __$injectBefore() {
+function __$injectBefore(
+  isDynamicFeedUrl,
+  shouldRetryDynamicFeedPayload,
+  shouldReloadEmptySpaceDynamicList,
+  dynamicFeedRetryKey,
+  dynamicFeedRetryLimit,
+) {
   // alert(document.title)
   const waitFor = (value, callback) => {
     if (value()) {
@@ -230,11 +269,11 @@ function __$injectBefore() {
       const style = document.createElement("style");
       style.textContent = `
     m-open-app:has(.m-fixed-openapp, .bm-link-card-goods, .easy-follow-btn),
-     m-open-app.m-open-app, .tab__pairs,
+     .tab__pairs,
       .m-navbar, .m-space-info .banner, .archive-list, .tabs, .info-main,
       .reply-input, .bili-dyn-item-header__following, .dyn-orig-author__right,
       .openapp-dialog, .dyn-header__right, .m-footer, .dyn-goods, .opus-read-more,
-      .reply:has(.iconfont), .reply-item .toolbar .right, .opus__bottom-placeholder {
+      .reply:has(.iconfont), .reply-item .toolbar .right {
       display: none!important;
     }
     .dyn-draw__picture {
@@ -296,7 +335,76 @@ function __$injectBefore() {
       document.head.appendChild(style);
     },
   );
+
+  const retryKey = `${dynamicFeedRetryKey}:${location.pathname}`;
+  const getRetryCount = () => {
+    const retryCount = Number(window.sessionStorage.getItem(retryKey) || 0);
+    return Number.isFinite(retryCount) ? retryCount : 0;
+  };
+  const clearRetryCount = () => {
+    window.sessionStorage.removeItem(retryKey);
+  };
+  const reloadOnce = () => {
+    const retryCount = getRetryCount();
+    if (retryCount >= dynamicFeedRetryLimit) {
+      return;
+    }
+    window.sessionStorage.setItem(retryKey, `${retryCount + 1}`);
+    window.setTimeout(() => {
+      window.location.reload();
+    }, 800);
+  };
+
+  if (typeof window.fetch === "function") {
+    const rawFetch = window.fetch.bind(window);
+    window.fetch = (...args) => {
+      const requestUrl = typeof args[0] === "string" ? args[0] : args[0]?.url;
+      return rawFetch(...args).then((response) => {
+        if (isDynamicFeedUrl(requestUrl) && typeof response.clone === "function") {
+          response
+            .clone()
+            .json()
+            .then((payload) => {
+              if (shouldRetryDynamicFeedPayload(payload, getRetryCount(), dynamicFeedRetryLimit)) {
+                reloadOnce();
+              }
+            })
+            .catch(() => {});
+        }
+        return response;
+      });
+    };
+  }
+
+  const checkSpaceDynamicList = () => {
+    const dynamicItemCount = document.querySelectorAll(".bili-dyn-item").length;
+    if (dynamicItemCount > 0) {
+      clearRetryCount();
+      return;
+    }
+
+    if (
+      shouldReloadEmptySpaceDynamicList({
+        dynamicItemCount,
+        hasNoMore: Boolean(document.querySelector(".no-more")),
+        pathname: location.pathname,
+        retryCount: getRetryCount(),
+        retryLimit: dynamicFeedRetryLimit,
+      })
+    ) {
+      reloadOnce();
+    }
+  };
+
+  waitFor(
+    () => document.querySelector(".bili-dyn-item") || document.querySelector(".no-more"),
+    checkSpaceDynamicList,
+  );
+  window.setTimeout(checkSpaceDynamicList, 4000);
+  window.setTimeout(checkSpaceDynamicList, 8000);
 }
 
-export const INJECTED_JAVASCRIPT = `(${__$hack})(${__DEV__});true;`;
-export const INJECTED_JAVASCRIPT_BEFORE = `(${__$injectBefore})(${__DEV__});true;`;
+export const INJECTED_JAVASCRIPT = `(${__$hack})(${IS_DEV});true;`;
+export const INJECTED_JAVASCRIPT_BEFORE = `(${__$injectBefore})(${isDynamicFeedUrl},${shouldRetryDynamicFeedPayload},${shouldReloadEmptySpaceDynamicList},${JSON.stringify(
+  DYNAMIC_FEED_RETRY_KEY,
+)},${DYNAMIC_FEED_RETRY_LIMIT});true;`;

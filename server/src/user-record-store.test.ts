@@ -71,7 +71,7 @@ describe("UserRecordStore", () => {
     const store = new UserRecordStore(new MemoryStorageAdapter());
 
     const issued = await store.issueToken();
-    await expect(store.verifyToken(issued.token)).resolves.toEqual({ valid: true });
+    await expect(store.verifyToken(issued.token)).resolves.toMatchObject({ valid: true });
 
     vi.useFakeTimers();
     vi.setSystemTime(Date.now() + TOKEN_EXPIRY_MS + 1);

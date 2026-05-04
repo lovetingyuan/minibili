@@ -12,6 +12,7 @@
     "android": "npm run android -w=@minibili/app",
     "build:preview": "npm run build:android:preview -w=@minibili/app",
     "update": "npm run update -w=@minibili/app",
+    "upgrade": "npm run update-expo -w=@minibili/app",
     "server": "npm run dev -w=@minibili/server",
     "deploy": "npm run deploy -w=@minibili/server",
     "build": "npm run build:android -w=@minibili/app"

@@ -29,13 +29,21 @@ export interface AssetsBinding {
 export interface UserStorageStub {
   canSendOtp(): Promise<{ canSend: boolean; waitSeconds: number }>;
   clearAuthState(): Promise<void>;
+  clearTokenState(): Promise<void>;
   clearOtpState(): Promise<void>;
+  consumeRateLimit(
+    key: string,
+    limit: number,
+    windowMs: number,
+  ): Promise<{ allowed: boolean; waitSeconds: number }>;
   issueToken(): Promise<{ expiresAt: number; token: string }>;
   rotateToken(): Promise<{ expiresAt: number; token: string }>;
   saveOtp(otp: string): Promise<void>;
   syncData(operations: SyncOperations): Promise<Partial<Record<SyncToServerKey, unknown>>>;
   verifyOtp(otp: string): Promise<{ reason?: "exhausted" | "expired" | "invalid"; valid: boolean }>;
-  verifyToken(token: string): Promise<{ reason?: AuthFailureReason; valid: boolean }>;
+  verifyToken(
+    token: string,
+  ): Promise<{ expiresAt?: number; needRefresh?: boolean; reason?: AuthFailureReason; valid: boolean }>;
 }
 
 export interface UserStorageNamespace {

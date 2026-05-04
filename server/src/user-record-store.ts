@@ -6,9 +6,11 @@ export const OTP_LENGTH = 6;
 export const OTP_RESEND_COOLDOWN_MS = 60 * 1000;
 export const OTP_RETRY_LIMIT = 5;
 export const TOKEN_EXPIRY_MS = 30 * 24 * 60 * 60 * 1000;
+export const TOKEN_REFRESH_THRESHOLD_MS = 24 * 60 * 60 * 1000;
 
 const AUTH_TOKEN_KEY = "auth_token";
 const AUTH_TOKEN_EXPIRES_AT_KEY = "auth_token_expires_at";
+const AUTH_TOKEN_ISSUED_AT_KEY = "auth_token_issued_at";
 const AUTH_OTP_KEY = "auth_otp";
 const AUTH_OTP_ATTEMPTS_KEY = "auth_otp_attempts";
 const AUTH_OTP_EXPIRES_AT_KEY = "auth_otp_expires_at";
@@ -18,6 +20,7 @@ const OTP_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 const AUTH_STATE_KEYS = [
   AUTH_TOKEN_KEY,
   AUTH_TOKEN_EXPIRES_AT_KEY,
+  AUTH_TOKEN_ISSUED_AT_KEY,
   AUTH_OTP_KEY,
   AUTH_OTP_ATTEMPTS_KEY,
   AUTH_OTP_EXPIRES_AT_KEY,
@@ -39,6 +42,11 @@ export interface CanSendOtpResult {
   waitSeconds: number;
 }
 
+export interface RateLimitResult {
+  allowed: boolean;
+  waitSeconds: number;
+}
+
 export interface IssuedToken {
   expiresAt: number;
   token: string;
@@ -50,6 +58,8 @@ export interface OtpVerificationResult {
 }
 
 export interface TokenVerificationResult {
+  expiresAt?: number;
+  needRefresh?: boolean;
   reason?: AuthFailureReason;
   valid: boolean;
 }
@@ -159,6 +169,10 @@ export class UserRecordStore {
     await this.storage.delete([...AUTH_STATE_KEYS]);
   }
 
+  async clearTokenState() {
+    await this.storage.delete([AUTH_TOKEN_EXPIRES_AT_KEY, AUTH_TOKEN_ISSUED_AT_KEY, AUTH_TOKEN_KEY]);
+  }
+
   async clearOtpState() {
     await this.storage.delete([
       AUTH_OTP_ATTEMPTS_KEY,
@@ -170,11 +184,13 @@ export class UserRecordStore {
 
   // token 与过期时间一起写入，后续状态检查和轮换都依赖这两个字段。
   async issueToken(): Promise<IssuedToken> {
-    const expiresAt = Date.now() + TOKEN_EXPIRY_MS;
+    const issuedAt = Date.now();
+    const expiresAt = issuedAt + TOKEN_EXPIRY_MS;
     const token = crypto.randomUUID();
 
     await this.storage.putMany({
       [AUTH_TOKEN_EXPIRES_AT_KEY]: expiresAt,
+      [AUTH_TOKEN_ISSUED_AT_KEY]: issuedAt,
       [AUTH_TOKEN_KEY]: token,
     });
 
@@ -183,6 +199,34 @@ export class UserRecordStore {
 
   async rotateToken(): Promise<IssuedToken> {
     return this.issueToken();
+  }
+
+  async consumeRateLimit(key: string, limit: number, windowMs: number): Promise<RateLimitResult> {
+    const countKey = `rate_limit_${key}_count`;
+    const startedAtKey = `rate_limit_${key}_started_at`;
+    const now = Date.now();
+    const [count, windowStartedAt] = await Promise.all([
+      this.storage.get<number>(countKey),
+      this.storage.get<number>(startedAtKey),
+    ]);
+
+    if (!windowStartedAt || now - windowStartedAt >= windowMs) {
+      await this.storage.putMany({
+        [countKey]: 1,
+        [startedAtKey]: now,
+      });
+      return { allowed: true, waitSeconds: 0 };
+    }
+
+    if ((count ?? 0) >= limit) {
+      return {
+        allowed: false,
+        waitSeconds: Math.ceil((windowMs - (now - windowStartedAt)) / 1000),
+      };
+    }
+
+    await this.storage.put(countKey, (count ?? 0) + 1);
+    return { allowed: true, waitSeconds: 0 };
   }
 
   // 每次发送新验证码都会重置过期时间和错误次数。
@@ -256,9 +300,10 @@ export class UserRecordStore {
   }
 
   async verifyToken(token: string): Promise<TokenVerificationResult> {
-    const [storedToken, expiresAt] = await Promise.all([
+    const [storedToken, expiresAt, issuedAt] = await Promise.all([
       this.storage.get<string>(AUTH_TOKEN_KEY),
       this.storage.get<number>(AUTH_TOKEN_EXPIRES_AT_KEY),
+      this.storage.get<number>(AUTH_TOKEN_ISSUED_AT_KEY),
     ]);
 
     if (!storedToken || storedToken !== token) {
@@ -270,6 +315,11 @@ export class UserRecordStore {
       return { reason: "expired", valid: false };
     }
 
-    return { valid: true };
+    const tokenIssuedAt = issuedAt ?? expiresAt - TOKEN_EXPIRY_MS;
+    return {
+      expiresAt,
+      needRefresh: Date.now() - tokenIssuedAt > TOKEN_REFRESH_THRESHOLD_MS,
+      valid: true,
+    };
   }
 }

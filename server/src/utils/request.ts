@@ -11,7 +11,12 @@ function getBearerToken(authorization: string | undefined) {
     return null;
   }
 
-  const token = authorization.replace(/^Bearer\s+/i, "").trim();
+  const match = authorization.match(/^Bearer\s+([^\s]+)$/i);
+  if (!match) {
+    return null;
+  }
+
+  const token = match[1];
   if (!TOKEN_PATTERN.test(token)) {
     return null;
   }

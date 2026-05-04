@@ -20,8 +20,16 @@ export class UserStorage extends DurableObject<ServerBindings> {
     return this.store.clearAuthState();
   }
 
+  clearTokenState() {
+    return this.store.clearTokenState();
+  }
+
   clearOtpState() {
     return this.store.clearOtpState();
+  }
+
+  consumeRateLimit(key: string, limit: number, windowMs: number) {
+    return this.store.consumeRateLimit(key, limit, windowMs);
   }
 
   issueToken() {

@@ -1,18 +1,9 @@
-import { useRefresh } from "@react-native-community/hooks";
+import { useFocusEffect } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 // import { Text } from '@/components/styled/rneui'
 // import { ResizeMode, Video } from 'expo-av'
 import React from "react";
-import {
-  BackHandler,
-  Dimensions,
-  Image,
-  Linking,
-  Platform,
-  RefreshControl,
-  ScrollView,
-  View,
-} from "react-native";
+import { BackHandler, Image, Linking, Platform, View } from "react-native";
 import { WebView } from "react-native-webview";
 
 // import useLiveUrl from '@/api/get-live-url'
@@ -22,7 +13,6 @@ import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 import HeaderRight from "./HeaderRight";
 import { INJECTED_JAVASCRIPT, INJECTED_JAVASCRIPT_BEFORE } from "./inject-code";
-import { useFocusEffect } from "@react-navigation/native";
 
 function Loading() {
   return (
@@ -38,24 +28,47 @@ function Loading() {
 
 type Props = NativeStackScreenProps<RootStackParamList, "DynamicDetail">;
 
-const BILIBILI_MOBILE_UA =
-  "Mozilla/5.0 (Linux; Android 13; M2012K11AC Build/TKQ1.220829.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/137.0.7151.115 Mobile Safari/537.36 BiliApp/8.0.0";
+const MOBILE_CHROME_UA =
+  "Mozilla/5.0 (Linux; Android 13; M2012K11AC Build/TKQ1.220829.002) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.7151.115 Mobile Safari/537.36";
+
+type DynamicDetailOpenImageMessage = {
+  action: "open-image";
+  payload: {
+    url: string;
+  };
+};
+
+function isOpenImageMessage(data: unknown): data is DynamicDetailOpenImageMessage {
+  if (typeof data !== "object" || data === null || !("action" in data)) {
+    return false;
+  }
+
+  if (data.action !== "open-image" || !("payload" in data)) {
+    return false;
+  }
+
+  const { payload } = data;
+  return (
+    typeof payload === "object" &&
+    payload !== null &&
+    "url" in payload &&
+    typeof payload.url === "string"
+  );
+}
 
 function DynamicDetailPage({ route }: Props) {
   const { title, url } = route.params;
 
   const webviewRef = React.useRef<WebView | null>(null);
-  const [height, setHeight] = React.useState(Dimensions.get("screen").height);
-  const [isEnabled, setEnabled] = React.useState(true);
   // const [pageTitle, setPageTitle] = React.useState(`${name}的动态`)
   const [webviewKey, setWebViewKey] = React.useState(0);
-  const { isRefreshing, onRefresh } = useRefresh(() => {
+  const onRefresh = React.useCallback(() => {
     return new Promise((r) => {
       // webviewRef.current?.reload()
       setWebViewKey((k) => k + 1);
       setTimeout(r, 1000);
     });
-  });
+  }, []);
 
   useUpdateNavigationOptions({
     headerRight: () => {
@@ -94,26 +107,23 @@ function DynamicDetailPage({ route }: Props) {
     }, []),
   );
 
-  const webview = (
+  return (
     <WebView
       className="flex-1"
-      style={{ height }}
       source={{ uri: url }}
       key={webviewKey}
-      onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
       originWhitelist={["http://*", "https://*", "bilibili://*"]}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback
       startInLoadingState
-      pullToRefreshEnabled
       // allowsBackForwardNavigationGestures
       mediaPlaybackRequiresUserAction={false}
       webviewDebuggingEnabled={__DEV__}
       injectedJavaScript={INJECTED_JAVASCRIPT}
       injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT_BEFORE}
       renderLoading={() => <Loading />}
-      userAgent={BILIBILI_MOBILE_UA}
+      userAgent={MOBILE_CHROME_UA}
       ref={webviewRef}
       onNavigationStateChange={(navState) => {
         currentNavigationStateRef.current = {
@@ -126,8 +136,8 @@ function DynamicDetailPage({ route }: Props) {
         webviewRef.current?.reload();
       }}
       onMessage={(evt) => {
-        const data = JSON.parse(evt.nativeEvent.data) as any;
-        if (data.action === "open-image") {
+        const data = JSON.parse(evt.nativeEvent.data) as unknown;
+        if (isOpenImageMessage(data)) {
           const { url } = data.payload;
           Linking.openURL(url);
         }
@@ -149,17 +159,6 @@ function DynamicDetailPage({ route }: Props) {
         return true;
       }}
     />
-  );
-  return (
-    <ScrollView
-      onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
-      refreshControl={
-        <RefreshControl onRefresh={onRefresh} refreshing={isRefreshing} enabled={isEnabled} />
-      }
-      className="h-full flex-1"
-    >
-      {webview}
-    </ScrollView>
   );
 }
 

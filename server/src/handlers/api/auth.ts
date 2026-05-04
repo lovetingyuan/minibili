@@ -10,6 +10,9 @@ import {
 
 const OTP_PATTERN = /^[A-Z0-9]{6}$/;
 const TOKEN_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const GLOBAL_OTP_RATE_LIMIT_ID = "auth_otp_global";
+const OTP_GLOBAL_LIMIT = 120;
+const OTP_GLOBAL_WINDOW_MS = 60 * 1000;
 
 // 发送验证码前会先检查冷却时间，避免同一邮箱被短时间内重复触发。
 async function handleSendOtp(c: AppContext) {
@@ -20,6 +23,23 @@ async function handleSendOtp(c: AppContext) {
   }
 
   const store = getUserStorage(c, email);
+  const globalRateLimitStore = getUserStorage(c, GLOBAL_OTP_RATE_LIMIT_ID);
+  const globalRateLimit = await globalRateLimitStore.consumeRateLimit(
+    "otp_global",
+    OTP_GLOBAL_LIMIT,
+    OTP_GLOBAL_WINDOW_MS,
+  );
+  if (!globalRateLimit.allowed) {
+    return c.json(
+      {
+        error: `请求过于频繁，请等待 ${globalRateLimit.waitSeconds} 秒后再试`,
+        success: false,
+        waitSeconds: globalRateLimit.waitSeconds,
+      },
+      429,
+    );
+  }
+
   const canSendOtpResult = await store.canSendOtp();
   if (!canSendOtpResult.canSend) {
     return c.json(
@@ -93,7 +113,7 @@ async function handleVerifyOtp(c: AppContext) {
   });
 }
 
-// 状态检查在 token 无效时会顺便清理认证状态，避免客户端反复携带脏 token。
+// 状态检查只清理已过期且匹配的 token，避免无效 token 影响现有会话。
 async function handleAuthStatus(c: AppContext) {
   const body = await readJsonBody(c);
   const email = typeof body?.email === "string" ? normalizeEmail(body.email) : null;
@@ -106,11 +126,23 @@ async function handleAuthStatus(c: AppContext) {
   const store = getUserStorage(c, email);
   const verifyResult = await store.verifyToken(token);
   if (!verifyResult.valid) {
-    await store.clearAuthState();
+    if (verifyResult.reason === "expired") {
+      await store.clearTokenState();
+    }
+
     return c.json({
       reason: verifyResult.reason ?? "invalid",
       success: true,
       valid: false,
+    });
+  }
+
+  if (!verifyResult.needRefresh) {
+    return c.json({
+      expiresAt: verifyResult.expiresAt,
+      success: true,
+      token,
+      valid: true,
     });
   }
 
