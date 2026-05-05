@@ -43,7 +43,12 @@ export interface UserStorageStub {
   verifyOtp(otp: string): Promise<{ reason?: "exhausted" | "expired" | "invalid"; valid: boolean }>;
   verifyToken(
     token: string,
-  ): Promise<{ expiresAt?: number; needRefresh?: boolean; reason?: AuthFailureReason; valid: boolean }>;
+  ): Promise<{
+    expiresAt?: number;
+    needRefresh?: boolean;
+    reason?: AuthFailureReason;
+    valid: boolean;
+  }>;
 }
 
 export interface UserStorageNamespace {

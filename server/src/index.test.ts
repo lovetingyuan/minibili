@@ -37,7 +37,12 @@ type UserStorageLike = {
   verifyOtp: (otp: string) => Promise<{ reason?: string; valid: boolean }>;
   verifyToken: (
     token: string,
-  ) => Promise<{ expiresAt?: number; needRefresh?: boolean; reason?: "expired" | "invalid"; valid: boolean }>;
+  ) => Promise<{
+    expiresAt?: number;
+    needRefresh?: boolean;
+    reason?: "expired" | "invalid";
+    valid: boolean;
+  }>;
 };
 
 function createStorageNamespace() {
@@ -250,7 +255,9 @@ describe("server routes", () => {
     );
 
     expect(response.status).toBe(200);
-    await expect(env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token)).resolves.toMatchObject({
+    await expect(
+      env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token),
+    ).resolves.toMatchObject({
       valid: true,
     });
   });
@@ -288,10 +295,14 @@ describe("server routes", () => {
     expect(response.status).toBe(200);
     expect(payload.valid).toBe(true);
     expect(payload.token).toBe(issuedToken.token);
-    await expect(env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token)).resolves.toMatchObject({
+    await expect(
+      env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token),
+    ).resolves.toMatchObject({
       valid: true,
     });
-    await expect(env.USER_STORAGE.getStore(email).verifyToken(payload.token)).resolves.toMatchObject({
+    await expect(
+      env.USER_STORAGE.getStore(email).verifyToken(payload.token),
+    ).resolves.toMatchObject({
       valid: true,
     });
     await expect(

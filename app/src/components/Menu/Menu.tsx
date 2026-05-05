@@ -1,16 +1,10 @@
 import React from "react";
 import { clsx } from "clsx";
 
-import {
-  Animated,
-  Dimensions,
-  Easing,
-  I18nManager,
-  Modal,
-  Pressable,
-  View,
-} from "react-native";
+import { Animated, Dimensions, Easing, I18nManager, Modal, Pressable, View } from "react-native";
 import type { LayoutChangeEvent, StyleProp, TransformsStyle, ViewStyle } from "react-native";
+
+import { getMenuAnchorPosition } from "./Menu.helpers";
 
 export interface MenuProps {
   children?: React.ReactNode;
@@ -49,8 +43,10 @@ export function Menu(props: MenuProps) {
   } = props;
 
   const containerRef = React.useRef<View | null>(null);
+  const modalRef = React.useRef<View | null>(null);
 
   const [menuState, setMenuState] = React.useState<States>(States.Hidden);
+  const [modalOrigin, setModalOrigin] = React.useState<{ left: number; top: number } | null>(null);
 
   const [top, setTop] = React.useState(0);
   const [left, setLeft] = React.useState(0);
@@ -66,6 +62,7 @@ export function Menu(props: MenuProps) {
 
   // 处理显示
   const show = () => {
+    setModalOrigin(null);
     containerRef.current?.measureInWindow((left, top, buttonWidth, buttonHeight) => {
       setButtonHeight(buttonHeight);
       setButtonWidth(buttonWidth);
@@ -84,6 +81,7 @@ export function Menu(props: MenuProps) {
       useNativeDriver: false,
     }).start(() => {
       setMenuState(States.Hidden);
+      setModalOrigin(null);
       menuSizeAnimation.setValue({ x: 0, y: 0 });
       opacityAnimation.setValue(0);
     });
@@ -130,6 +128,21 @@ export function Menu(props: MenuProps) {
     onRequestClose?.();
   };
 
+  const measureModalOrigin = () => {
+    modalRef.current?.measureInWindow((modalLeft, modalTop) => {
+      setModalOrigin((current) => {
+        if (current?.left === modalLeft && current.top === modalTop) {
+          return current;
+        }
+
+        return {
+          left: modalLeft,
+          top: modalTop,
+        };
+      });
+    });
+  };
+
   const { isRTL } = I18nManager;
   const dimensions = Dimensions.get("window");
   const { width: windowWidth } = dimensions;
@@ -141,8 +154,14 @@ export function Menu(props: MenuProps) {
   };
 
   // 计算菜单位置
-  let computedLeft = left;
-  let computedTop = top;
+  const menuAnchorPosition = getMenuAnchorPosition({
+    measuredLeft: left,
+    measuredTop: top,
+    modalLeft: modalOrigin?.left ?? 0,
+    modalTop: modalOrigin?.top ?? 0,
+  });
+  let computedLeft = menuAnchorPosition.left;
+  let computedTop = menuAnchorPosition.top;
   const transforms: AnimatedTransform[] = [];
 
   if (
@@ -179,6 +198,7 @@ export function Menu(props: MenuProps) {
 
   const animationStarted = menuState === States.Animating;
   const modalVisible = menuState === States.Shown || animationStarted;
+  const modalReady = modalOrigin !== null;
 
   return (
     <View ref={containerRef} collapsable={false} testID={testID}>
@@ -194,27 +214,35 @@ export function Menu(props: MenuProps) {
           "landscape-left",
           "landscape-right",
         ]}
+        onShow={measureModalOrigin}
         statusBarTranslucent
         transparent
       >
-        <View className="absolute bottom-0 left-0 right-0 top-0">
+        <View
+          ref={modalRef}
+          collapsable={false}
+          onLayout={measureModalOrigin}
+          className="absolute bottom-0 left-0 right-0 top-0"
+        >
           <Pressable
             className="absolute bottom-0 left-0 right-0 top-0"
             onPress={handleRequestClose}
             accessible={false}
           />
-          <Animated.View
-            onLayout={onMenuLayout}
-            className={clsx(
-              "absolute rounded border border-black/5 bg-white shadow-md shadow-black/15 dark:border-white/10 dark:bg-zinc-900",
-              className,
-            )}
-            style={[shadowMenuContainerStyle, style]}
-          >
-            <Animated.View className="overflow-hidden" style={animationStarted && menuSize}>
-              {children}
+          {modalReady ? (
+            <Animated.View
+              onLayout={onMenuLayout}
+              className={clsx(
+                "absolute rounded border border-black/5 bg-white shadow-md shadow-black/15 dark:border-white/10 dark:bg-zinc-900",
+                className,
+              )}
+              style={[shadowMenuContainerStyle, style]}
+            >
+              <Animated.View className="overflow-hidden" style={animationStarted && menuSize}>
+                {children}
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
+          ) : null}
         </View>
       </Modal>
     </View>

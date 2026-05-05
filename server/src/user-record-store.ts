@@ -170,7 +170,11 @@ export class UserRecordStore {
   }
 
   async clearTokenState() {
-    await this.storage.delete([AUTH_TOKEN_EXPIRES_AT_KEY, AUTH_TOKEN_ISSUED_AT_KEY, AUTH_TOKEN_KEY]);
+    await this.storage.delete([
+      AUTH_TOKEN_EXPIRES_AT_KEY,
+      AUTH_TOKEN_ISSUED_AT_KEY,
+      AUTH_TOKEN_KEY,
+    ]);
   }
 
   async clearOtpState() {

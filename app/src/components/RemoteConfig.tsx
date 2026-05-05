@@ -2,7 +2,7 @@ import { Dialog, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Linking } from "react-native";
 
-import { setUA } from "@/constants";
+// import { setUA } from "@/constants";
 import { colors } from "@/constants/colors.tw";
 
 import { useRemoteConfig } from "../api/remote-config";

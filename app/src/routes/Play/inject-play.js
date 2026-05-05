@@ -61,10 +61,7 @@ video {
     if (!Number.isFinite(lastTime) || !Number.isFinite(duration) || duration <= 0) {
       return;
     }
-    postMessage(
-      "reportPlayTime",
-      Number.parseFloat(((lastTime * 100) / duration).toFixed(1)),
-    );
+    postMessage("reportPlayTime", Number.parseFloat(((lastTime * 100) / duration).toFixed(1)));
   };
 
   window.reportPlayTime = () => {
@@ -416,11 +413,7 @@ video {
       touchEventOptions,
     );
 
-    element.addEventListener(
-      "touchend",
-      finalizeGesture,
-      true,
-    );
+    element.addEventListener("touchend", finalizeGesture, true);
 
     element.addEventListener(
       "touchcancel",

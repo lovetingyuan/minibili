@@ -55,11 +55,11 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     ...data,
   };
   const cid = videoInfo.pages ? videoInfo.pages[props.currentPage - 1].cid : 0;
-  const { videoUrl, error: playUrlError, retry: retryVideoUrl } = useVideoMp4Url(
-    videoInfo.bvid,
-    cid,
-    highQuality,
-  );
+  const {
+    videoUrl,
+    error: playUrlError,
+    retry: retryVideoUrl,
+  } = useVideoMp4Url(videoInfo.bvid, cid, highQuality);
   const markVideoWatched = useMarkVideoWatched();
 
   const [isEnded, setIsEnded] = React.useState(true);

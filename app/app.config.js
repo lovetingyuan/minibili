@@ -1,77 +1,77 @@
 // require('dotenv').config()
 
-const pkg = require('./package.json')
-const version = pkg.version
-const versionCode = pkg.config.versionCode
+const pkg = require("./package.json");
+const version = pkg.version;
+const versionCode = pkg.config.versionCode;
 // const [version, versionCode] = pkg.version.split('-')
 
-const dev = process.argv.includes('start')
-const gitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || '-'
+const dev = process.argv.includes("start");
+const gitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || "-";
 
 const appId =
-  process.env.APP_VARIANT === 'preview' ? 'com.tingyuan.minibili.preview' : 'com.tingyuan.minibili'
+  process.env.APP_VARIANT === "preview" ? "com.tingyuan.minibili.preview" : "com.tingyuan.minibili";
 
-const release = `${appId}@${version}+${versionCode}`
+const release = `${appId}@${version}+${versionCode}`;
 
-const name = process.env.APP_VARIANT === 'preview' ? 'MiniBili-pre' : 'MiniBili'
+const name = process.env.APP_VARIANT === "preview" ? "MiniBili-pre" : "MiniBili";
 
 module.exports = {
   name,
-  slug: 'minibili',
-  platforms: ['ios', 'android'],
-  scheme: 'minibili',
+  slug: "minibili",
+  platforms: ["ios", "android"],
+  scheme: "minibili",
   version,
-  githubUrl: 'https://github.com/lovetingyuan/minibili',
-  orientation: 'portrait',
-  icon: './assets/icon/icon.png',
-  userInterfaceStyle: 'automatic',
+  githubUrl: "https://github.com/lovetingyuan/minibili",
+  orientation: "portrait",
+  icon: "./assets/icon/icon.png",
+  userInterfaceStyle: "automatic",
   ios: {
     supportsTablet: true,
     bundleIdentifier: appId,
     buildNumber: version,
   },
   android: {
-    icon: './assets/icon/icon.png',
+    icon: "./assets/icon/icon.png",
     adaptiveIcon: {
-      backgroundColor: '#ffffff',
-      foregroundImage: './assets/icon/android-icon-foreground.png',
-      backgroundImage: './assets/icon/android-icon-background.png',
-      monochromeImage: './assets/icon/android-icon-monochrome.png',
+      backgroundColor: "#ffffff",
+      foregroundImage: "./assets/icon/android-icon-foreground.png",
+      backgroundImage: "./assets/icon/android-icon-background.png",
+      monochromeImage: "./assets/icon/android-icon-monochrome.png",
     },
     package: appId,
-    permissions: ['WAKE_LOCK'],
+    permissions: ["WAKE_LOCK"],
     versionCode: Number(versionCode),
   },
   web: {
-    output: 'single',
-    favicon: './assets/icon/favicon.png',
+    output: "single",
+    favicon: "./assets/icon/favicon.png",
   },
   plugins: [
-    'expo-asset',
-    'expo-image',
-    'expo-secure-store',
-    'expo-font',
+    "expo-asset",
+    "expo-image",
+    "expo-secure-store",
+    "expo-font",
     [
-      'expo-splash-screen',
+      "expo-splash-screen",
       {
-        backgroundColor: '#ffffff',
-        image: './assets/icon/splash-icon.png',
+        backgroundColor: "#ffffff",
+        image: "./assets/icon/splash-icon.png",
         imageWidth: 180,
-        resizeMode: 'contain',
+        resizeMode: "contain",
         dark: {
-          image: './assets/icon/splash-icon-dark.png',
-          backgroundColor: '#1c1c1c',
+          image: "./assets/icon/splash-icon-dark.png",
+          backgroundColor: "#1c1c1c",
         },
       },
     ],
     [
-      'expo-audio',
+      "expo-audio",
       {
         enableBackgroundPlayback: true,
       },
     ],
     [
-      'expo-video',
+      "expo-video",
       {
         supportsBackgroundPlayback: true,
       },
@@ -82,16 +82,16 @@ module.exports = {
   },
   extra: {
     eas: {
-      projectId: '17ac07b9-df37-4b3a-9a31-50da2bb5d44c',
+      projectId: "17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
     },
-    buildTime: new Intl.DateTimeFormat('zh', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
+    buildTime: new Intl.DateTimeFormat("zh", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
       hour12: false,
-      timeZone: 'Asia/Shanghai',
+      timeZone: "Asia/Shanghai",
     }).format(new Date()),
     gitHash,
     // dsn: process.env.SENTRY_DSN,
@@ -110,15 +110,15 @@ module.exports = {
   //   ],
   // },
   updates: {
-    url: 'https://u.expo.dev/17ac07b9-df37-4b3a-9a31-50da2bb5d44c',
+    url: "https://u.expo.dev/17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
   },
   runtimeVersion: {
-    policy: 'appVersion',
+    policy: "appVersion",
   },
-  owner: 'tingyuan',
-}
+  owner: "tingyuan",
+};
 
 if (dev) {
-  delete module.exports.updates
-  delete module.exports.runtimeVersion
+  delete module.exports.updates;
+  delete module.exports.runtimeVersion;
 }

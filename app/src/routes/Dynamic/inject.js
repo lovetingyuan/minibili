@@ -138,7 +138,10 @@ function __$inject() {
   };
 
   const installEmptyDynamicFeedAutoReload = () => {
-    if (window.__minibiliEmptyDynamicFeedAutoReloadInstalled || typeof window.fetch !== "function") {
+    if (
+      window.__minibiliEmptyDynamicFeedAutoReloadInstalled ||
+      typeof window.fetch !== "function"
+    ) {
       return;
     }
 

@@ -1,18 +1,12 @@
 {
   "extends": "expo/tsconfig.base",
-  "include": [
-    "**/*.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
+  "include": ["**/*.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   }
 }

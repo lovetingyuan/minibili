@@ -27,13 +27,9 @@ describe("Dynamic injected script helpers", () => {
       ),
     ).toBe(true);
     expect(
-      injectCode.isSpaceDynamicFeedUrl(
-        "/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795",
-      ),
+      injectCode.isSpaceDynamicFeedUrl("/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795"),
     ).toBe(true);
-    expect(injectCode.isSpaceDynamicFeedUrl("https://api.bilibili.com/x/space/upstat")).toBe(
-      false,
-    );
+    expect(injectCode.isSpaceDynamicFeedUrl("https://api.bilibili.com/x/space/upstat")).toBe(false);
   });
 
   test("reloads only when dynamic feed items are empty", () => {

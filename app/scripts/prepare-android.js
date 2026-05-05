@@ -53,7 +53,6 @@ function getBestIP() {
 }
 
 if (!hasConnectedAdbDevice()) {
-  console.error("No adb device detected, aborting Android preparation.");
   process.exit(1);
 }
 
