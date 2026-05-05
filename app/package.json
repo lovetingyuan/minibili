@@ -46,7 +46,7 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "clsx": "^2.1.0",
     "crypto-js": "^4.2.0",
-    "expo": "^55.0.19",
+    "expo": "~55.0.20",
     "expo-application": "~55.0.14",
     "expo-asset": "~55.0.16",
     "expo-audio": "~55.0.14",
