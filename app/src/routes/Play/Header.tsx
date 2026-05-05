@@ -5,7 +5,12 @@ import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, View } from "react-native";
-import { Menu, MenuItem } from "@/components/Menu";
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuTrigger,
+} from "@/components/Menu";
 
 import { getDownloadUrl } from "@/api/play-url";
 import { useUserRelation } from "@/api/user-relation";
@@ -152,104 +157,86 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
   const musicSongsMap = useMusicSongsMap();
   return (
     <View className="flex-row items-center gap-2">
-      <Menu
-        visible={visible}
-        className="bg-white dark:bg-zinc-900"
-        anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
-        onRequestClose={hideMenu}
-      >
-        <MenuItem
-          textClassName="text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            if (props.cid) {
-              showToast("请稍后在浏览器中下载");
-              getDownloadUrl(videoInfo.bvid, props.cid)
-                ?.then((url) => {
-                  if (url) {
-                    Linking.openURL(url);
-                  } else {
-                    return Promise.reject();
-                  }
-                })
-                .catch(() => {
-                  showToast("暂不支持下载");
-                });
-            } else {
-              showToast("稍后再试");
-            }
-            hideMenu();
-          }}
-        >
-          下载视频
-        </MenuItem>
-        <MenuItem
-          textClassName="text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            hideMenu();
-            if (videoInfo.cover) {
-              Linking.openURL(parseImgUrl(videoInfo.cover));
-            } else {
-              showToast("暂时无法获取封面");
-            }
-          }}
-        >
-          下载封面
-        </MenuItem>
-        <MenuItem
-          textClassName="text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            hideMenu();
-            props.refresh();
-          }}
-        >
-          刷新
-        </MenuItem>
-        <MenuItem
-          textClassName="text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            hideMenu();
-            Linking.openURL(`https://www.bilibili.com/video/${videoInfo.bvid}`);
-          }}
-        >
-          浏览器打开
-        </MenuItem>
-        <MenuItem
-          textClassName="text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            Clipboard.setStringAsync(`https://www.bilibili.com/video/${videoInfo.bvid}`).then(
-              () => {
-                showToast("已复制视频链接");
-                hideMenu();
-              },
-            );
-          }}
-        >
-          复制链接
-        </MenuItem>
-        <MenuItem
-          textClassName=" text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            hideMenu();
-            if (!props.cid || !videoInfo.cover || !videoInfo.duration) {
-              showToast("请稍候再试");
-              return;
-            }
-            const id = `${videoInfo.bvid}_${props.cid}`;
-            if (id in musicSongsMap) {
-              showToast("当前视频已经在歌单当中");
-              return;
-            }
-            setShowAddSongInfoModal(true);
-          }}
-        >
-          添加到歌单
-        </MenuItem>
+      <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
+        <MenuTrigger onPress={showMenu}>
+          <Icon name="dots-vertical" type="material-community" />
+        </MenuTrigger>
+        <MenuOptions>
+          <MenuOption
+            text="下载视频"
+            onSelect={() => {
+              if (props.cid) {
+                showToast("请稍后在浏览器中下载");
+                getDownloadUrl(videoInfo.bvid, props.cid)
+                  ?.then((url) => {
+                    if (url) {
+                      Linking.openURL(url);
+                    } else {
+                      return Promise.reject();
+                    }
+                  })
+                  .catch(() => {
+                    showToast("暂不支持下载");
+                  });
+              } else {
+                showToast("稍后再试");
+              }
+              hideMenu();
+            }}
+          />
+          <MenuOption
+            text="下载封面"
+            onSelect={() => {
+              hideMenu();
+              if (videoInfo.cover) {
+                Linking.openURL(parseImgUrl(videoInfo.cover));
+              } else {
+                showToast("暂时无法获取封面");
+              }
+            }}
+          />
+          <MenuOption
+            text="刷新"
+            onSelect={() => {
+              hideMenu();
+              props.refresh();
+            }}
+          />
+          <MenuOption
+            text="浏览器打开"
+            onSelect={() => {
+              hideMenu();
+              Linking.openURL(`https://www.bilibili.com/video/${videoInfo.bvid}`);
+            }}
+          />
+          <MenuOption
+            text="复制链接"
+            onSelect={() => {
+              Clipboard.setStringAsync(`https://www.bilibili.com/video/${videoInfo.bvid}`).then(
+                () => {
+                  showToast("已复制视频链接");
+                  hideMenu();
+                },
+              );
+            }}
+          />
+          <MenuOption
+            text="添加到歌单"
+            onSelect={() => {
+              hideMenu();
+              if (!props.cid || !videoInfo.cover || !videoInfo.duration) {
+                showToast("请稍候再试");
+                return;
+              }
+              const id = `${videoInfo.bvid}_${props.cid}`;
+              if (id in musicSongsMap) {
+                showToast("当前视频已经在歌单当中");
+                return;
+              }
+              setShowAddSongInfoModal(true);
+            }}
+          />
+        </MenuOptions>
       </Menu>
       {showAddSongInfoModal && props.cid ? (
         <SongInfoModal

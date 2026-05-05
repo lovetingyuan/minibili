@@ -1,13 +1,13 @@
 import React from "react";
-import { KeyboardAvoidingView, View } from "react-native";
+import { KeyboardAvoidingView, Modal, View } from "react-native";
 
-import type { AuthModalProps } from "./AuthModal.types";
-import Modal2 from "./Modal2";
 import { Button, Input, Text } from "./styled/rneui";
+import type { SendOtpResult, VerifyOtpResult } from "@/api/auth";
 import { normalizeAuthEmail, normalizeOtpInput } from "@/features/user-sync/helpers";
+import type { AuthFailureReason, AuthModalMode } from "@/features/user-sync/types";
 import { showToast } from "@/utils";
 
-function getFailureReasonText(reason: AuthModalProps["failureReason"]) {
+function getFailureReasonText(reason: AuthFailureReason | null) {
   if (reason === "expired") {
     return "登录已过期，请重新发送验证码。";
   }
@@ -28,7 +28,15 @@ export default function AuthModal({
   onSendOtp,
   onVerifyOtp,
   visible,
-}: AuthModalProps) {
+}: {
+  email: string | null;
+  failureReason: AuthFailureReason | null;
+  mode: AuthModalMode;
+  onClose: () => void;
+  onSendOtp: (email: string) => Promise<SendOtpResult>;
+  onVerifyOtp: (email: string, otp: string) => Promise<VerifyOtpResult>;
+  visible: boolean;
+}) {
   const [countdown, setCountdown] = React.useState(0);
   const [email, setEmail] = React.useState(initialEmail ?? "");
   const [error, setError] = React.useState("");
@@ -112,7 +120,13 @@ export default function AuthModal({
   };
 
   return (
-    <Modal2 animationType="fade" onRequestClose={onClose} transparent visible={visible}>
+    <Modal
+      animationType="fade"
+      onRequestClose={onClose}
+      statusBarTranslucent
+      transparent
+      visible={visible}
+    >
       <KeyboardAvoidingView behavior="padding" className="flex-1 justify-center bg-black/45 px-5">
         <View className="rounded-3xl bg-white px-5 py-6 dark:bg-neutral-950">
           <View className="mb-5 gap-2">
@@ -218,6 +232,6 @@ export default function AuthModal({
           </View>
         </View>
       </KeyboardAvoidingView>
-    </Modal2>
+    </Modal>
   );
 }

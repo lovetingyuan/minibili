@@ -1,59 +1,74 @@
 import React from "react";
-import { useResolveClassNames } from "uniwind";
+import { BackHandler } from "react-native";
+import type { ComponentProps } from "react";
+import {
+  Menu as PopupMenu,
+  MenuOption as PopupMenuOption,
+  MenuOptions as PopupMenuOptions,
+  MenuProvider,
+  MenuTrigger,
+  renderers,
+} from "react-native-popup-menu";
 
-import { Menu as BaseMenu } from "./Menu";
-import { MenuDivider as BaseMenuDivider } from "./MenuDivider";
-import { MenuItem as BaseMenuItem } from "./MenuItem";
-import type { MenuDividerProps } from "./MenuDivider";
-import type { MenuItemProps } from "./MenuItem";
-import type { MenuProps } from "./Menu";
+import {
+  enhanceMenuChildren,
+  handleControlledMenuBackPress,
+} from "./Menu.helpers";
+import {
+  menuOptionClassName,
+  menuOptionTextClassName,
+  menuOptionWrapperStyle,
+  menuProviderCustomStyles,
+} from "./Menu.styles";
 
-type StyledMenuProps = MenuProps & {
-  className?: string;
+type PopupMenuProps = ComponentProps<typeof PopupMenu>;
+type PopupMenuOptionProps = ComponentProps<typeof PopupMenuOption>;
+
+export { MenuProvider, PopupMenuOptions as MenuOptions, MenuTrigger, renderers };
+export {
+  menuOptionClassName,
+  menuOptionTextClassName,
+  menuOptionWrapperStyle,
+  menuProviderCustomStyles,
 };
 
-export function Menu({ className, ...props }: StyledMenuProps) {
-  return <BaseMenu {...props} className={className} />;
-}
+export function Menu({ children, opened, onClose, ...props }: PopupMenuProps) {
+  React.useEffect(() => {
+    if (!opened) {
+      return;
+    }
 
-type StyledMenuDividerProps = MenuDividerProps & {
-  className?: string;
-  colorClassName?: string;
-};
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () =>
+      handleControlledMenuBackPress({ opened, onClose }),
+    );
 
-export function MenuDivider({ className, colorClassName }: StyledMenuDividerProps) {
-  return <BaseMenuDivider className={[className, colorClassName].filter(Boolean).join(" ")} />;
-}
-
-type StyledMenuItemProps = MenuItemProps & {
-  className?: string;
-  pressColorClassName?: string;
-  textClassName?: string;
-};
-
-export function MenuItem({
-  className,
-  pressColor,
-  pressColorClassName,
-  textClassName,
-  ...props
-}: StyledMenuItemProps) {
-  const resolvedPressColorStyle = useResolveClassNames(pressColorClassName ?? "");
-  const resolvedPressColor =
-    typeof resolvedPressColorStyle.accentColor === "string"
-      ? resolvedPressColorStyle.accentColor
-      : typeof resolvedPressColorStyle.color === "string"
-        ? resolvedPressColorStyle.color
-        : undefined;
+    return () => {
+      subscription.remove();
+    };
+  }, [opened, onClose]);
 
   return (
-    <BaseMenuItem
-      {...props}
-      className={className}
-      pressColor={resolvedPressColor ?? pressColor}
-      textClassName={textClassName}
-    />
+    <PopupMenu {...props} opened={opened} onClose={onClose}>
+      {enhanceMenuChildren(children, PopupMenuOptions)}
+    </PopupMenu>
   );
 }
 
-export type { MenuDividerProps, MenuItemProps, MenuProps };
+export function MenuOption({
+  children,
+  disabled,
+  text,
+  ...props
+}: PopupMenuOptionProps) {
+  if (text === undefined) {
+    return (
+      <PopupMenuOption {...props} disabled={disabled}>
+        {children}
+      </PopupMenuOption>
+    );
+  }
+
+  return (
+    <PopupMenuOption {...props} disabled={disabled} text={text} />
+  );
+}

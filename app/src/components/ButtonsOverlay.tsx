@@ -1,10 +1,10 @@
 import { Button, Overlay } from "@/components/styled/rneui";
 import React from "react";
+import { Modal } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
 
 import { useStore } from "../store";
-import Modal2 from "./Modal2";
 
 function ButtonsOverlay() {
   const { overlayButtons, setOverlayButtons } = useStore();
@@ -38,9 +38,10 @@ function ButtonsOverlay() {
   return (
     <Overlay
       isVisible={overlayButtons.length > 0}
-      ModalComponent={Modal2 as unknown as typeof React.Component}
+      ModalComponent={Modal as unknown as typeof React.Component}
       overlayClassName={`w-[80%] max-w-[500px] px-0 py-3 ${colors.gray2.bg}`}
       onBackdropPress={dismiss}
+      statusBarTranslucent
     >
       {Buttons}
     </Overlay>

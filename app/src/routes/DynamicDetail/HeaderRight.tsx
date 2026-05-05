@@ -3,9 +3,12 @@ import { Icon } from "@/components/styled/rneui";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, Share } from "react-native";
-import { Menu, MenuItem } from "@/components/Menu";
-
-import { colors } from "@/constants/colors.tw";
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuTrigger,
+} from "@/components/Menu";
 
 import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
@@ -21,69 +24,53 @@ function HeaderRight(props: { reload: () => void }) {
   const hideMenu = () => setVisible(false);
 
   const showMenu = () => setVisible(true);
-
   return (
     // <View className="flex-row items-center gap-3">
-    <Menu
-      visible={visible}
-      className="bg-white dark:bg-zinc-900"
-      anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
-      onRequestClose={hideMenu}
-    >
-      <MenuItem
-        textClassName="text-black dark:text-gray-300"
-        pressColorClassName={colors.gray4.accent}
-        onPress={() => {
-          setWebViewMode(webViewMode === "MOBILE" ? "PC" : "MOBILE");
-          hideMenu();
-        }}
-      >
-        {webViewMode === "MOBILE" ? "电脑模式" : "手机模式"}
-      </MenuItem>
-      <MenuItem
-        textClassName="text-black dark:text-gray-300"
-        pressColorClassName={colors.gray4.accent}
-        onPress={() => {
-          hideMenu();
-          Linking.openURL(url);
-        }}
-      >
-        浏览器打开
-      </MenuItem>
-      <MenuItem
-        textClassName="text-black dark:text-gray-300"
-        pressColorClassName={colors.gray4.accent}
-        onPress={() => {
-          hideMenu();
-          props.reload();
-        }}
-      >
-        刷新页面
-      </MenuItem>
-      <MenuItem
-        textClassName="text-black dark:text-gray-300"
-        pressColorClassName={colors.gray4.accent}
-        onPress={() => {
-          Clipboard.setStringAsync(url).then(() => {
-            showToast(`已复制链接：${url}`);
+    <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
+      <MenuTrigger onPress={showMenu}>
+        <Icon name="dots-vertical" type="material-community" />
+      </MenuTrigger>
+      <MenuOptions>
+        <MenuOption
+          text={webViewMode === "MOBILE" ? "电脑模式" : "手机模式"}
+          onSelect={() => {
+            setWebViewMode(webViewMode === "MOBILE" ? "PC" : "MOBILE");
             hideMenu();
-          });
-        }}
-      >
-        复制链接
-      </MenuItem>
-      <MenuItem
-        textClassName="text-black dark:text-gray-300"
-        pressColorClassName={colors.gray4.accent}
-        onPress={() => {
-          hideMenu();
-          Share.share({
-            message: [title, url].filter(Boolean).join("\n"),
-          });
-        }}
-      >
-        分享页面
-      </MenuItem>
+          }}
+        />
+        <MenuOption
+          text="浏览器打开"
+          onSelect={() => {
+            hideMenu();
+            Linking.openURL(url);
+          }}
+        />
+        <MenuOption
+          text="刷新页面"
+          onSelect={() => {
+            hideMenu();
+            props.reload();
+          }}
+        />
+        <MenuOption
+          text="复制链接"
+          onSelect={() => {
+            Clipboard.setStringAsync(url).then(() => {
+              showToast(`已复制链接：${url}`);
+              hideMenu();
+            });
+          }}
+        />
+        <MenuOption
+          text="分享页面"
+          onSelect={() => {
+            hideMenu();
+            Share.share({
+              message: [title, url].filter(Boolean).join("\n"),
+            });
+          }}
+        />
+      </MenuOptions>
     </Menu>
     // </View>
   );

@@ -1,8 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import { Badge, Button, Icon, Text } from "@/components/styled/rneui";
 import React from "react";
-import { Animated, ScrollView, TouchableOpacity, View } from "react-native";
-import { Menu, MenuDivider, MenuItem } from "@/components/Menu";
+import { Animated, ScrollView, View } from "react-native";
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuTrigger,
+  menuOptionClassName,
+} from "@/components/Menu";
 
 import { useAppUpdateInfo } from "@/api/check-update";
 import { colors } from "@/constants/colors.tw";
@@ -74,29 +80,28 @@ function HeaderLeftComp() {
   const getItem = (item: any) => {
     const selected = currentVideosCate.rid === item.rid;
     return (
-      <MenuItem
-        pressColorClassName={colors.gray3.accent}
-        textClassName={`text-base ${selected ? "font-bold" : ""} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`}
-        onPress={() => {
+      <MenuOption
+        onSelect={() => {
           setCurrentVideosCate(item);
           hideMenu();
         }}
       >
-        {item.label}
-      </MenuItem>
+        <View className={menuOptionClassName}>
+          <Text
+            numberOfLines={1}
+            className={`px-4 text-left text-base ${selected ? "font-bold" : ""} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`}
+          >
+            {item.label}
+          </Text>
+        </View>
+      </MenuOption>
     );
   };
   return (
     <View className="flex-row items-center gap-4">
-      <Menu
-        visible={visible}
-        className="relative left-4 top-12 max-h-[70vh] w-48 bg-white dark:bg-zinc-900"
-        anchor={
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={showMenu}
-            className="h-full flex-row items-center"
-          >
+      <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
+        <MenuTrigger onPress={showMenu}>
+          <View className="h-full flex-row items-center">
             <Text
               className={`text-lg font-bold ${
                 currentVideosCate.rid === -1
@@ -114,28 +119,28 @@ function HeaderLeftComp() {
               size={28}
               colorClassName={colors.gray6.accent}
             />
-          </TouchableOpacity>
-        }
-        onRequestClose={hideMenu}
-      >
-        <ScrollView className="max-h-[70vh]">
-          {list.map((items, i) => {
-            if (i === 0) {
+          </View>
+        </MenuTrigger>
+        <MenuOptions>
+          <ScrollView className="max-h-[70vh]">
+            {list.map((items, i) => {
+              if (i === 0) {
+                return (
+                  <View key={i} className="w-48 flex-1">
+                    <View>{getItem(items[0])}</View>
+                    <View className={`flex-1 border-b-[0.5px] ${colors.gray3.border}`} />
+                  </View>
+                );
+              }
               return (
-                <View key={i} className="w-48 flex-1">
-                  <View>{getItem(items[0])}</View>
-                  <MenuDivider colorClassName={colors.gray3.border} />
+                <View key={i} className="w-48 flex-row">
+                  <View className="w-[50%]">{getItem(items[0])}</View>
+                  {items[1] ? <View className="w-[50%]">{getItem(items[1])}</View> : null}
                 </View>
               );
-            }
-            return (
-              <View key={i} className="w-48 flex-row">
-                <View className="w-[50%]">{getItem(items[0])}</View>
-                {items[1] ? <View className="w-[50%]">{getItem(items[1])}</View> : null}
-              </View>
-            );
-          })}
-        </ScrollView>
+            })}
+          </ScrollView>
+        </MenuOptions>
       </Menu>
     </View>
   );

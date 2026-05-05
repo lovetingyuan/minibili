@@ -20,15 +20,25 @@ beforeAll(async () => {
 });
 
 describe("Dynamic injected script helpers", () => {
-  test("detects the Bilibili space dynamic feed api", () => {
+  test("detects only the first page of the Bilibili space dynamic feed api", () => {
     expect(
       injectCode.isSpaceDynamicFeedUrl(
-        "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795",
+        "https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1625060795",
       ),
     ).toBe(true);
     expect(
-      injectCode.isSpaceDynamicFeedUrl("/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795"),
+      injectCode.isSpaceDynamicFeedUrl(
+        "/x/polymer/web-dynamic/v1/feed/space?offset&host_mid=1625060795",
+      ),
     ).toBe(true);
+    expect(
+      injectCode.isSpaceDynamicFeedUrl(
+        "/x/polymer/web-dynamic/v1/feed/space?offset=1102755599446179875&host_mid=1625060795",
+      ),
+    ).toBe(false);
+    expect(
+      injectCode.isSpaceDynamicFeedUrl("/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795"),
+    ).toBe(false);
     expect(injectCode.isSpaceDynamicFeedUrl("https://api.bilibili.com/x/space/upstat")).toBe(false);
   });
 
@@ -286,7 +296,7 @@ describe("Dynamic injected script helpers", () => {
 
     Function(injectCode.default)();
 
-    await fakeWindow.fetch("/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795");
+    await fakeWindow.fetch("/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1625060795");
     await Promise.resolve();
     await Promise.resolve();
 
@@ -366,7 +376,7 @@ describe("Dynamic injected script helpers", () => {
 
     Function(injectCode.default)();
 
-    await fakeWindow.fetch("/x/polymer/web-dynamic/v1/feed/space?host_mid=1625060795");
+    await fakeWindow.fetch("/x/polymer/web-dynamic/v1/feed/space?offset=&host_mid=1625060795");
     await Promise.resolve();
     await Promise.resolve();
 

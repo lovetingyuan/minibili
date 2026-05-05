@@ -1,8 +1,7 @@
 import { Dialog, Input } from "@/components/styled/rneui";
 import React from "react";
-import { View } from "react-native";
+import { Modal, View } from "react-native";
 
-import Modal2 from "@/components/Modal2";
 import { colors } from "@/constants/colors.tw";
 
 import { showToast } from "../../utils";
@@ -12,7 +11,7 @@ export default Feedback;
 
 function Feedback() {
   const [feedBackVisible, setFeedbackVisible] = React.useState(false);
-  const modalComponent = Modal2 as unknown as typeof React.Component;
+  const modalComponent = Modal as unknown as typeof React.Component;
   const hideFeedback = () => {
     setFeedbackVisible(false);
   };
@@ -49,6 +48,7 @@ function Feedback() {
         onBackdropPress={hideFeedback}
         ModalComponent={modalComponent}
         overlayClassName={colors.gray2.bg}
+        statusBarTranslucent
       >
         <Dialog.Title title="欢迎反馈意见 😊" titleClassName={colors.black.text} />
         <View>

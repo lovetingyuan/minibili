@@ -17,6 +17,7 @@ import CheckLiveUps from "./components/CheckLiveUps";
 import CheckNetState from "./components/CheckNetState";
 import CheckUpUpdate from "./components/CheckUpUpdate";
 import ImagesView from "./components/ImagesView";
+import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
 import RemoteConfig from "./components/RemoteConfig";
 import UserSyncManager from "./components/UserSyncManager";
 import UserLocation from "./components/UserLocation";
@@ -73,19 +74,21 @@ export default function App() {
     <SWRConfig value={SWRConfigValue}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ThemeProvider theme={rneTheme}>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <InitStoreComp />
-            <RemoteConfig />
-            <UserSyncManager />
-            <CheckAppUpdate />
-            <CheckUpUpdate />
-            <CheckNetState />
-            <CheckLiveUps />
-            <ButtonsOverlay />
-            <ImagesView />
-            <UserLocation />
-            <Route />
-          </ErrorBoundary>
+          <MenuProvider backHandler customStyles={menuProviderCustomStyles}>
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <InitStoreComp />
+              <RemoteConfig />
+              <UserSyncManager />
+              <CheckAppUpdate />
+              <CheckUpUpdate />
+              <CheckNetState />
+              <CheckLiveUps />
+              <ButtonsOverlay />
+              <ImagesView />
+              <UserLocation />
+              <Route />
+            </ErrorBoundary>
+          </MenuProvider>
         </ThemeProvider>
         <StatusBar style="auto" translucent />
       </GestureHandlerRootView>

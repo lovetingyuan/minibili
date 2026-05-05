@@ -5,7 +5,12 @@ import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, Pressable, View } from "react-native";
-import { Menu, MenuItem } from "@/components/Menu";
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuTrigger,
+} from "@/components/Menu";
 
 import { colors } from "@/constants/colors.tw";
 import { useFollowedUpsMap } from "@/store/derives";
@@ -118,117 +123,95 @@ function HeaderRight() {
   const _followedUpsMap = useFollowedUpsMap();
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
   const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps;
-
   return (
     <View className="flex-row items-center gap-2">
-      <Menu
-        visible={visible}
-        className="bg-white dark:bg-zinc-900"
-        anchor={<Icon name="dots-vertical" type="material-community" onPress={showMenu} />}
-        onRequestClose={hideMenu}
-      >
-        {!followed && !isBlackUp && (
-          <MenuItem
-            textClassName="text-black dark:text-gray-300"
-            pressColorClassName={colors.gray4.accent}
-            onPress={() => {
+      <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
+        <MenuTrigger onPress={showMenu}>
+          <Icon name="dots-vertical" type="material-community" />
+        </MenuTrigger>
+        <MenuOptions>
+          {!followed && !isBlackUp && (
+            <MenuOption
+              text="关注UP"
+              onSelect={() => {
+                if (dynamicUser) {
+                  set$followedUps([
+                    {
+                      name: dynamicUser.name,
+                      mid: dynamicUser.mid,
+                      face: dynamicUser.face,
+                      sign: dynamicUser.sign,
+                    },
+                    ...get$followedUps(),
+                  ]);
+                  showToast("已关注");
+                }
+                hideMenu();
+              }}
+            />
+          )}
+          <MenuOption
+            text="分享UP"
+            onSelect={() => {
               if (dynamicUser) {
-                set$followedUps([
-                  {
-                    name: dynamicUser.name,
-                    mid: dynamicUser.mid,
-                    face: dynamicUser.face,
-                    sign: dynamicUser.sign,
-                  },
-                  ...get$followedUps(),
-                ]);
-                showToast("已关注");
+                const { name, mid, sign } = dynamicUser;
+                handleShareUp(name, mid, sign);
               }
               hideMenu();
             }}
-          >
-            关注UP
-          </MenuItem>
-        )}
-        <MenuItem
-          textClassName="text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            if (dynamicUser) {
-              const { name, mid, sign } = dynamicUser;
-              handleShareUp(name, mid, sign);
-            }
-            hideMenu();
-          }}
-        >
-          分享UP
-        </MenuItem>
-        <MenuItem
-          textClassName=" text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            if (dynamicUser?.face) {
-              Linking.openURL(dynamicUser.face);
-            }
-            hideMenu();
-          }}
-        >
-          查看头像
-        </MenuItem>
-        <MenuItem
-          textClassName=" text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            if (!dynamicUser) {
-              return;
-            }
-            Clipboard.setStringAsync(dynamicUser.name).then(() => {
-              showToast("已复制用户名");
+          />
+          <MenuOption
+            text="查看头像"
+            onSelect={() => {
+              if (dynamicUser?.face) {
+                Linking.openURL(dynamicUser.face);
+              }
               hideMenu();
-            });
-          }}
-        >
-          复制用户名
-        </MenuItem>
-        <MenuItem
-          textClassName=" text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            if (!dynamicUser) {
-              return;
-            }
-            Clipboard.setStringAsync(`${dynamicUser.mid}`).then(() => {
-              showToast("已复制用户ID");
+            }}
+          />
+          <MenuOption
+            text="复制用户名"
+            onSelect={() => {
+              if (!dynamicUser) {
+                return;
+              }
+              Clipboard.setStringAsync(dynamicUser.name).then(() => {
+                showToast("已复制用户名");
+                hideMenu();
+              });
+            }}
+          />
+          <MenuOption
+            text="复制用户ID"
+            onSelect={() => {
+              if (!dynamicUser) {
+                return;
+              }
+              Clipboard.setStringAsync(`${dynamicUser.mid}`).then(() => {
+                showToast("已复制用户ID");
+                hideMenu();
+              });
+            }}
+          />
+          <MenuOption
+            text="浏览器打开"
+            onSelect={() => {
+              if (!dynamicUser) {
+                return;
+              }
+              Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`);
+              // setDynamicOpenUrl(Date.now())
               hideMenu();
-            });
-          }}
-        >
-          复制用户ID
-        </MenuItem>
-        <MenuItem
-          textClassName=" text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            if (!dynamicUser) {
-              return;
-            }
-            Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`);
-            // setDynamicOpenUrl(Date.now())
-            hideMenu();
-          }}
-        >
-          浏览器打开
-        </MenuItem>
-        <MenuItem
-          textClassName=" text-black dark:text-gray-300"
-          pressColorClassName={colors.gray4.accent}
-          onPress={() => {
-            hideMenu();
-            setReloadUerProfile(Date.now());
-          }}
-        >
-          刷新
-        </MenuItem>
+            }}
+          />
+          <MenuOption
+            text="刷新"
+            onSelect={() => {
+              hideMenu();
+              setReloadUerProfile(Date.now());
+            }}
+          />
+        </MenuOptions>
       </Menu>
     </View>
   );

@@ -7,7 +7,6 @@ import { GestureViewer, useGestureViewerState } from "react-native-gesture-image
 import { parseImgUrl } from "@/utils";
 
 import { useStore } from "../store";
-import type { ViewerImage } from "./ImagesView.type";
 
 const ViewerId = "images-viewer";
 const LoadingPlaceholder = require("../../assets/loading2.gif");
@@ -20,7 +19,7 @@ function normalizeImages(
     ratio?: number;
   }[],
 ) {
-  return imagesList.map<ViewerImage>((image) => {
+  return imagesList.map((image) => {
     return {
       uri: parseImgUrl(image.src),
       originalUri: image.src.split("@")[0],

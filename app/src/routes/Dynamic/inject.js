@@ -11,6 +11,7 @@ export function isSpaceDynamicFeedUrl(url) {
     const parsed = new URL(url, "https://api.bilibili.com");
     return (
       parsed.pathname === "/x/polymer/web-dynamic/v1/feed/space" &&
+      parsed.searchParams.get("offset") === "" &&
       (!isAbsoluteUrl || parsed.hostname === "api.bilibili.com")
     );
   } catch {
@@ -69,6 +70,7 @@ function __$inject() {
       const parsed = new URL(url, "https://api.bilibili.com");
       return (
         parsed.pathname === "/x/polymer/web-dynamic/v1/feed/space" &&
+        parsed.searchParams.get("offset") === "" &&
         (!isAbsoluteUrl || parsed.hostname === "api.bilibili.com")
       );
     } catch {
