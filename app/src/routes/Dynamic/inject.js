@@ -1,294 +1,226 @@
-const EMPTY_DYNAMIC_FEED_RETRY_LIMIT = 5;
-const EMPTY_DYNAMIC_FEED_RETRY_WINDOW_MS = 60 * 1000;
-
-export function isSpaceDynamicFeedUrl(url) {
-  if (typeof url !== "string") {
-    return false;
-  }
-
-  try {
-    const isAbsoluteUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(url) || url.startsWith("//");
-    const parsed = new URL(url, "https://api.bilibili.com");
-    return (
-      parsed.pathname === "/x/polymer/web-dynamic/v1/feed/space" &&
-      parsed.searchParams.get("offset") === "" &&
-      (!isAbsoluteUrl || parsed.hostname === "api.bilibili.com")
-    );
-  } catch {
-    return false;
-  }
-}
-
-export function shouldReloadEmptyDynamicFeedPayload(payload) {
-  if (typeof payload !== "object" || payload === null) {
-    return false;
-  }
-
-  const data = payload.data;
-  if (typeof data !== "object" || data === null) {
-    return false;
-  }
-
-  return Array.isArray(data.items) && data.items.length === 0;
-}
-
-export function canRetryEmptyDynamicFeed(
-  retryTimestamps,
-  now,
-  retryLimit = EMPTY_DYNAMIC_FEED_RETRY_LIMIT,
-  retryWindowMs = EMPTY_DYNAMIC_FEED_RETRY_WINDOW_MS,
-) {
-  if (!Array.isArray(retryTimestamps)) {
-    return true;
-  }
-
-  const recentRetryCount = retryTimestamps.filter((timestamp) => {
-    return (
-      typeof timestamp === "number" &&
-      Number.isFinite(timestamp) &&
-      timestamp <= now &&
-      now - timestamp < retryWindowMs
-    );
-  }).length;
-
-  return recentRetryCount < retryLimit;
-}
-
 function __$inject() {
-  const retryKeyPrefix = "__minibili_empty_dynamic_feed_retry";
-  const retryLimit = 5;
-  const retryWindowMs = 60 * 1000;
-  const reloadDelayMs = 800;
+  const retryLimit = 5
+  const retryDelayMs = 800
 
-  const isSpaceDynamicFeedUrl = (url) => {
-    if (typeof url !== "string") {
-      return false;
+  const isSpaceDynamicFeedUrl = url => {
+    if (typeof url !== 'string') {
+      return false
     }
 
     try {
-      const isAbsoluteUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(url) || url.startsWith("//");
-      const parsed = new URL(url, "https://api.bilibili.com");
+      const isAbsoluteUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(url) || url.startsWith('//')
+      const parsed = new URL(url, 'https://api.bilibili.com')
       return (
-        parsed.pathname === "/x/polymer/web-dynamic/v1/feed/space" &&
-        parsed.searchParams.get("offset") === "" &&
-        (!isAbsoluteUrl || parsed.hostname === "api.bilibili.com")
-      );
+        parsed.pathname === '/x/polymer/web-dynamic/v1/feed/space' &&
+        parsed.searchParams.get('offset') === '' &&
+        (!isAbsoluteUrl || parsed.hostname === 'api.bilibili.com')
+      )
     } catch {
-      return false;
+      return false
     }
-  };
+  }
 
-  const shouldReloadEmptyDynamicFeedPayload = (payload) => {
-    if (typeof payload !== "object" || payload === null) {
-      return false;
-    }
-
-    const data = payload.data;
-    if (typeof data !== "object" || data === null) {
-      return false;
+  const isSpaceArcSearchUrl = url => {
+    if (typeof url !== 'string') {
+      return false
     }
 
-    return Array.isArray(data.items) && data.items.length === 0;
-  };
-
-  const canRetryEmptyDynamicFeed = (retryTimestamps, now) => {
-    if (!Array.isArray(retryTimestamps)) {
-      return true;
-    }
-
-    const recentRetryCount = retryTimestamps.filter((timestamp) => {
+    try {
+      const isAbsoluteUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(url) || url.startsWith('//')
+      const parsed = new URL(url, 'https://api.bilibili.com')
       return (
-        typeof timestamp === "number" &&
-        Number.isFinite(timestamp) &&
-        timestamp <= now &&
-        now - timestamp < retryWindowMs
-      );
-    }).length;
+        parsed.pathname === '/x/space/wbi/arc/search' &&
+        (!isAbsoluteUrl || parsed.hostname === 'api.bilibili.com')
+      )
+    } catch {
+      return false
+    }
+  }
 
-    return recentRetryCount < retryLimit;
-  };
+  const shouldRetryEmptyDynamicFeedPayload = payload => {
+    if (typeof payload !== 'object' || payload === null) {
+      return false
+    }
+
+    const data = payload.data
+    if (typeof data !== 'object' || data === null) {
+      return false
+    }
+
+    return data.has_more === true && Array.isArray(data.items) && data.items.length === 0
+  }
 
   const waitFor = (value, callback) => {
     if (value()) {
-      callback();
+      callback()
     } else {
       const timer = setInterval(() => {
         if (value()) {
-          callback();
-          clearInterval(timer);
+          callback()
+          clearInterval(timer)
         }
-      }, 50);
+      }, 50)
     }
-  };
+  }
 
   const reloadCurrentPage = () => {
-    let didPostReloadMessage = false;
+    let didPostReloadMessage = false
     try {
       if (window.ReactNativeWebView?.postMessage) {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
-            action: "reload-dynamic-page",
+            action: 'reload-dynamic-page',
           }),
-        );
-        didPostReloadMessage = true;
+        )
+        didPostReloadMessage = true
       }
     } catch {}
 
     if (!didPostReloadMessage) {
-      window.location.reload();
+      window.location.reload()
     }
-  };
+  }
 
   const installEmptyDynamicFeedAutoReload = () => {
     if (
       window.__minibiliEmptyDynamicFeedAutoReloadInstalled ||
-      typeof window.fetch !== "function"
+      typeof window.fetch !== 'function'
     ) {
-      return;
+      return
     }
 
-    window.__minibiliEmptyDynamicFeedAutoReloadInstalled = true;
+    window.__minibiliEmptyDynamicFeedAutoReloadInstalled = true
 
-    const retryKey = `${retryKeyPrefix}:${location.pathname}`;
-    let pendingReload = false;
-    let memoryRetryTimestamps = [];
+    const getFetchUrl = input => {
+      if (typeof input === 'string') {
+        return input
+      }
+      if (input && typeof input.url === 'string') {
+        return input.url
+      }
+      if (input && typeof input.href === 'string') {
+        return input.href
+      }
+      return undefined
+    }
 
-    const getFetchUrl = (input) => {
-      if (typeof input === "string") {
-        return input;
-      }
-      if (input && typeof input.url === "string") {
-        return input.url;
-      }
-      if (input && typeof input.href === "string") {
-        return input.href;
-      }
-      return undefined;
-    };
+    const rawFetch = window.fetch.bind(window)
 
-    const readRetryTimestamps = () => {
-      try {
-        const value = window.sessionStorage.getItem(retryKey);
-        const parsed = value ? JSON.parse(value) : [];
-        if (Array.isArray(parsed)) {
-          memoryRetryTimestamps = parsed.filter((timestamp) => {
-            return typeof timestamp === "number" && Number.isFinite(timestamp);
-          });
+    const waitForRetryDelay = () => {
+      return new Promise(resolve => {
+        window.setTimeout(resolve, retryDelayMs)
+      })
+    }
+
+    const readResponsePayload = response => {
+      if (typeof response.clone !== 'function') {
+        return Promise.resolve(undefined)
+      }
+
+      return response
+        .clone()
+        .json()
+        .catch(() => undefined)
+    }
+
+    const retryEmptyDynamicFeedResponse = async (response, args) => {
+      let currentResponse = response
+
+      for (let retryCount = 0; retryCount < retryLimit; retryCount += 1) {
+        const payload = await readResponsePayload(currentResponse)
+        if (!shouldRetryEmptyDynamicFeedPayload(payload)) {
+          return currentResponse
         }
-      } catch {}
 
-      return memoryRetryTimestamps;
-    };
+        await waitForRetryDelay()
 
-    const writeRetryTimestamps = (retryTimestamps) => {
-      memoryRetryTimestamps = retryTimestamps;
-      try {
-        window.sessionStorage.setItem(retryKey, JSON.stringify(retryTimestamps));
-      } catch {}
-    };
-
-    const clearRetryTimestamps = () => {
-      memoryRetryTimestamps = [];
-      try {
-        window.sessionStorage.removeItem(retryKey);
-      } catch {}
-    };
-
-    const getRecentRetryTimestamps = (now) => {
-      return readRetryTimestamps().filter((timestamp) => {
-        return timestamp <= now && now - timestamp < retryWindowMs;
-      });
-    };
-
-    const reloadWithRetryLimit = () => {
-      if (pendingReload || window.__minibiliEmptyDynamicFeedReloadPending) {
-        return;
+        try {
+          currentResponse = await rawFetch(...args)
+        } catch {
+          return currentResponse
+        }
       }
 
-      const now = Date.now();
-      const recentRetryTimestamps = getRecentRetryTimestamps(now);
-      if (!canRetryEmptyDynamicFeed(recentRetryTimestamps, now, retryLimit, retryWindowMs)) {
-        return;
+      return currentResponse
+    }
+
+    const retryNonOkResponse = async (response, args) => {
+      let currentResponse = response
+
+      for (let retryCount = 0; retryCount < retryLimit; retryCount += 1) {
+        if (currentResponse.status === 200) {
+          return currentResponse
+        }
+
+        await waitForRetryDelay()
+
+        try {
+          currentResponse = await rawFetch(...args)
+        } catch {
+          return currentResponse
+        }
       }
 
-      pendingReload = true;
-      window.__minibiliEmptyDynamicFeedReloadPending = true;
-      writeRetryTimestamps([...recentRetryTimestamps, now]);
-      window.setTimeout(() => {
-        reloadCurrentPage();
-      }, reloadDelayMs);
-    };
+      return currentResponse
+    }
 
-    const rawFetch = window.fetch.bind(window);
     window.fetch = (...args) => {
-      const requestUrl = getFetchUrl(args[0]);
+      const requestUrl = getFetchUrl(args[0])
 
-      return rawFetch(...args).then((response) => {
-        if (!isSpaceDynamicFeedUrl(requestUrl) || typeof response.clone !== "function") {
-          return response;
+      return rawFetch(...args).then(response => {
+        if (isSpaceArcSearchUrl(requestUrl)) {
+          return retryNonOkResponse(response, args)
         }
 
-        response
-          .clone()
-          .json()
-          .then((payload) => {
-            if (shouldReloadEmptyDynamicFeedPayload(payload)) {
-              reloadWithRetryLimit();
-              return;
-            }
+        if (!isSpaceDynamicFeedUrl(requestUrl) || typeof response.clone !== 'function') {
+          return response
+        }
 
-            const items = payload?.data?.items;
-            if (Array.isArray(items) && items.length > 0) {
-              clearRetryTimestamps();
-            }
-          })
-          .catch(() => {});
+        return retryEmptyDynamicFeedResponse(response, args)
+      })
+    }
+  }
 
-        return response;
-      });
-    };
-  };
-
-  installEmptyDynamicFeedAutoReload();
+  installEmptyDynamicFeedAutoReload()
 
   const installDynamicRefreshButton = () => {
-    const buttonId = "minibili-dynamic-refresh-button";
+    const buttonId = 'minibili-dynamic-refresh-button'
     if (document.getElementById(buttonId)) {
-      return;
+      return
     }
 
-    const button = document.createElement("button");
-    button.id = buttonId;
-    button.className = "minibili-dynamic-refresh-button";
-    button.type = "button";
-    button.setAttribute("aria-label", "刷新");
+    const button = document.createElement('button')
+    button.id = buttonId
+    button.className = 'minibili-dynamic-refresh-button'
+    button.type = 'button'
+    button.setAttribute('aria-label', '刷新')
     button.innerHTML = `
       <svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24">
         <path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.45 5.08 1 1 0 1 0-1.86.74A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L14 10h6V4l-2.35 2.35Z" fill="currentColor"/>
       </svg>
-    `;
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      reloadCurrentPage();
-    });
+    `
+    button.addEventListener('click', event => {
+      event.preventDefault()
+      event.stopPropagation()
+      reloadCurrentPage()
+    })
 
-    document.body.appendChild(button);
-  };
+    document.body.appendChild(button)
+  }
 
   // 添加样式
   waitFor(
     () => document.head,
     () => {
-      const style = document.createElement("style");
+      const style = document.createElement('style')
       const refreshButtonStyle = `
       .minibili-dynamic-refresh-button {
         position: fixed;
         right: 18px;
-        bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
         z-index: 2147483647;
-        width: 52px;
-        height: 52px;
+        width: 45px;
+        height: 45px;
         padding: 0;
         border: 0;
         border-radius: 50%;
@@ -306,7 +238,7 @@ function __$inject() {
         display: block;
         pointer-events: none;
       }
-    `;
+    `
 
       style.textContent = `
       ${refreshButtonStyle}
@@ -472,9 +404,23 @@ function __$inject() {
     .m-opus {
       padding-top: 0!important;
     }
+      .play-page-gotop {
+        right: calc(50% - 29px)!important;
+      }
+        .feed-list .list-scroll-content-wrap:empty {
+          min-height: calc(100vh - 200px);
+          background-color: #e1e1e1;
+        }
+        .list-scroll-content-wrap:empty::before {
+            content: 'TA还没有动态 O(∩_∩)O';
+            display: block;
+            align-items: center;
+            text-align: center;
+            padding-top: 200px;
 
-    `;
-      if (location.pathname === "/topic-detail") {
+        }
+    `
+      if (location.pathname === '/topic-detail') {
         style.textContent = `
         ${refreshButtonStyle}
         .m-navbar,  .fixed-openapp, .m-topic-float-openapp  {
@@ -483,127 +429,127 @@ function __$inject() {
          .topic-detail-container {
          top: 0!important;
          }
-        `;
+        `
       }
-      document.head.appendChild(style);
+      document.head.appendChild(style)
     },
-  );
+  )
 
-  waitFor(() => document.body, installDynamicRefreshButton);
+  waitFor(() => document.body, installDynamicRefreshButton)
 
   waitFor(
     () => {
-      const noMore = document.querySelector(".no-more");
+      const noMore = document.querySelector('.no-more')
       if (noMore) {
-        return true;
+        return true
       }
-      const list = document.querySelector(".m-space .list");
-      const list2 = document.querySelector(".list-scroll-content-wrap");
-      return list && list2?.childElementCount > 0;
+      const list = document.querySelector('.m-space .list')
+      const list2 = document.querySelector('.list-scroll-content-wrap')
+      return list && list2?.childElementCount > 0
     },
     () => {
-      const list = document.querySelector(".m-space .list");
-      list.style.background = "none";
+      const list = document.querySelector('.m-space .list')
+      list.style.background = 'none'
     },
-  );
+  )
 
   // 分享、打开视频、打开动态
   waitFor(
     () => document.body,
     () => {
       document.body.addEventListener(
-        "click",
-        (e) => {
-          if (e.target.closest(".bili-dyn-topic[data-url]")) {
-            const target = e.target.closest(".bili-dyn-topic[data-url]");
+        'click',
+        e => {
+          if (e.target.closest('.bili-dyn-topic[data-url]')) {
+            const target = e.target.closest('.bili-dyn-topic[data-url]')
             window.ReactNativeWebView.postMessage(
               JSON.stringify({
-                action: "open-topic",
+                action: 'open-topic',
                 payload: {
                   url: target.dataset.url,
                   title: target.textContent,
                 },
               }),
-            );
-            return;
+            )
+            return
           }
-          if (e.target.matches(".bili-dyn-item-footer__button.forward")) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            const item = e.target.closest("m-open-app");
-            const link = item.getAttribute("universallink");
-            const texts = item.innerText;
+          if (e.target.matches('.bili-dyn-item-footer__button.forward')) {
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+            const item = e.target.closest('m-open-app')
+            const link = item.getAttribute('universallink')
+            const texts = item.innerText
             window.ReactNativeWebView.postMessage(
               JSON.stringify({
-                action: "share-content",
+                action: 'share-content',
                 payload: { link, texts },
               }),
-            );
-            return;
+            )
+            return
           }
-          const item = e.target.closest("m-open-app");
+          const item = e.target.closest('m-open-app')
           if (item) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            const schema = item.getAttribute("schema");
-            const state = window.__INITIAL_STATE__;
-            if (schema.startsWith("bilibili://video/")) {
-              const { pathname } = new URL(schema);
-              const av = pathname.split("/").pop();
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+            const schema = item.getAttribute('schema')
+            const state = window.__INITIAL_STATE__
+            if (schema.startsWith('bilibili://video/')) {
+              const { pathname } = new URL(schema)
+              const av = pathname.split('/').pop()
               const payload = {
                 av,
                 title:
-                  item.querySelector(".bili-dyn-item-archive__title")?.textContent ||
-                  item.querySelector(".up-archive__item__title")?.textContent,
-              };
+                  item.querySelector('.bili-dyn-item-archive__title')?.textContent ||
+                  item.querySelector('.up-archive__item__title')?.textContent,
+              }
               if (state) {
-                payload.mid = state.space.mid;
-                payload.face = state.space.info.face;
-                payload.name = state.space.info.name;
+                payload.mid = state.space.mid
+                payload.face = state.space.info.face
+                payload.name = state.space.info.name
               }
               window.ReactNativeWebView.postMessage(
                 JSON.stringify({
-                  action: "open-video",
+                  action: 'open-video',
                   payload,
                 }),
-              );
-            } else if (schema.startsWith("bilibili://opus/detail/")) {
-              const link = item.getAttribute("universallink");
+              )
+            } else if (schema.startsWith('bilibili://opus/detail/')) {
+              const link = item.getAttribute('universallink')
               // window.localStorage.setItem('__scroll__', window.scrollY)
               window.ReactNativeWebView.postMessage(
                 JSON.stringify({
-                  action: "open-dynamic-detail",
+                  action: 'open-dynamic-detail',
                   payload: {
                     url: link,
                     title: `${state?.space?.info?.name}的动态`,
                   },
                 }),
-              );
+              )
             }
           }
         },
         true,
-      );
+      )
     },
-  );
+  )
   // 添加粉丝数
-  window.addEventListener("load", () => {
+  window.addEventListener('load', () => {
     setTimeout(() => {
-      const fans = document.querySelector(".relation .count .fans");
-      const base = document.querySelector(".info-detail .base");
+      const fans = document.querySelector('.relation .count .fans')
+      const base = document.querySelector('.info-detail .base')
       if (fans && base) {
-        const fansCount = fans.textContent.replace(/\s/g, "");
-        const span = document.createElement("span");
-        span.style.fontSize = "14px";
-        span.style.marginLeft = "10px";
-        span.style.opacity = "0.8";
-        span.textContent = fansCount;
-        base.appendChild(span);
+        const fansCount = fans.textContent.replace(/\s/g, '')
+        const span = document.createElement('span')
+        span.style.fontSize = '14px'
+        span.style.marginLeft = '10px'
+        span.style.opacity = '0.8'
+        span.textContent = fansCount
+        base.appendChild(span)
       }
-    }, 100);
-  });
+    }, 100)
+  })
 }
 
-export default `(${__$inject})();true;`;
+export default `(${__$inject})();true;`

@@ -1,11 +1,17 @@
 import { describe, expect, test, vi } from "vitest";
 import React from "react";
 
+vi.mock("react-native", () => ({
+  TouchableHighlight: "TouchableHighlight",
+}));
+
 import {
   createMenuOptionsCustomStyles,
   enhanceMenuChildren,
   handleControlledMenuBackPress,
+  MenuOptionTouchableComponent,
   menuOptionTextStyle,
+  menuOptionTouchableProps,
   menuOptionWrapperStyle,
   menuSurfaceStyle,
 } from "./Menu.helpers";
@@ -32,6 +38,8 @@ describe("handleControlledMenuBackPress", () => {
 describe("createMenuOptionsCustomStyles", () => {
   test("injects shared menu surface and option styles by default", () => {
     expect(createMenuOptionsCustomStyles({})).toMatchObject({
+      OptionTouchableComponent: MenuOptionTouchableComponent,
+      optionTouchable: menuOptionTouchableProps,
       optionsWrapper: menuSurfaceStyle,
       optionWrapper: menuOptionWrapperStyle,
       optionText: menuOptionTextStyle,
@@ -73,8 +81,10 @@ describe("enhanceMenuChildren", () => {
       optionsContainerStyle: [menuOptionsContainerStyle, undefined],
       customStyles: {
         optionText: menuOptionTextStyle,
+        optionTouchable: menuOptionTouchableProps,
         optionWrapper: menuOptionWrapperStyle,
         optionsWrapper: { borderRadius: 8 },
+        OptionTouchableComponent: MenuOptionTouchableComponent,
       },
     });
   });

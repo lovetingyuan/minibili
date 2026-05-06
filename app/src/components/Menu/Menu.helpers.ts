@@ -3,7 +3,9 @@ import type { ComponentProps, ElementType, ReactNode } from "react";
 import type { MenuOptions as PopupMenuOptions } from "react-native-popup-menu";
 
 import {
+  MenuOptionTouchableComponent,
   menuOptionTextStyle,
+  menuOptionTouchableProps,
   menuOptionWrapperStyle,
   menuOptionsContainerStyle,
   menuSurfaceStyle,
@@ -19,6 +21,7 @@ export type MenuOptionsCustomStyles = NonNullable<
 >;
 
 export { menuOptionTextStyle, menuOptionWrapperStyle, menuSurfaceStyle };
+export { MenuOptionTouchableComponent, menuOptionTouchableProps };
 
 export function handleControlledMenuBackPress({
   opened,
@@ -36,6 +39,8 @@ export function createMenuOptionsCustomStyles(
   customStyles: MenuOptionsCustomStyles,
 ): MenuOptionsCustomStyles {
   return {
+    OptionTouchableComponent: MenuOptionTouchableComponent,
+    optionTouchable: menuOptionTouchableProps,
     optionsWrapper: menuSurfaceStyle,
     optionWrapper: menuOptionWrapperStyle,
     optionText: menuOptionTextStyle,

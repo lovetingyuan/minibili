@@ -1,70 +1,37 @@
-const DYNAMIC_FEED_RETRY_KEY = "__minibili_dynamic_feed_retry";
-const DYNAMIC_FEED_RETRY_LIMIT = 2;
-const IS_DEV = typeof __DEV__ === "undefined" ? false : __DEV__;
-
-export function isDynamicFeedUrl(url) {
-  return typeof url === "string" && url.includes("/x/polymer/web-dynamic/v1/feed/space");
-}
-
-export function shouldRetryDynamicFeedPayload(
-  payload,
-  retryCount,
-  retryLimit = DYNAMIC_FEED_RETRY_LIMIT,
-) {
-  return (
-    typeof payload === "object" &&
-    payload !== null &&
-    payload.code === -352 &&
-    retryCount < retryLimit
-  );
-}
-
-export function shouldReloadEmptySpaceDynamicList({
-  dynamicItemCount,
-  hasNoMore,
-  pathname,
-  retryCount,
-  retryLimit = DYNAMIC_FEED_RETRY_LIMIT,
-}) {
-  return (
-    pathname.startsWith("/space/") && dynamicItemCount === 0 && hasNoMore && retryCount < retryLimit
-  );
-}
-
 function __$hack() {
-  const style = document.createElement("style");
-  document.head.appendChild(style);
+  const style = document.createElement('style')
+  document.head.appendChild(style)
   const waitForDom = (selector, cb, timeout = 10000) => {
     const callback =
-      typeof selector === "string" ? () => document.querySelector(selector) : selector;
-    const ret = callback();
+      typeof selector === 'string' ? () => document.querySelector(selector) : selector
+    const ret = callback()
     if (ret) {
-      cb(ret);
-      return;
+      cb(ret)
+      return
     }
     const timer = setInterval(() => {
-      const ret = callback();
+      const ret = callback()
       if (ret) {
-        cb(ret);
-        clearInterval(timer);
+        cb(ret)
+        clearInterval(timer)
       }
-    }, 100);
+    }, 100)
     setTimeout(() => {
-      clearInterval(timer);
-      cb(new Error("timeout"));
-    }, timeout);
-  };
-  if (location.pathname.startsWith("/opus/")) {
+      clearInterval(timer)
+      cb(new Error('timeout'))
+    }, timeout)
+  }
+  if (location.pathname.startsWith('/opus/')) {
     // opus动态详情
   }
-  waitForDom(".opus-module-content", (content) => {
-    if (content.classList.contains("limit")) {
-      content.classList.remove("limit");
+  waitForDom('.opus-module-content', content => {
+    if (content.classList.contains('limit')) {
+      content.classList.remove('limit')
     }
-  });
+  })
   // 去掉阅读更多按钮
-  window.addEventListener("load", () => {
-    const commentContainer = window.document.createElement("div");
+  window.addEventListener('load', () => {
+    const commentContainer = window.document.createElement('div')
     commentContainer.innerHTML = `
     <style>
       .comments-overlay {
@@ -136,60 +103,60 @@ function __$hack() {
         </div>
       </div>
     </div>
-    `;
-    window.document.body.appendChild(commentContainer);
-    const overlay = window.document.getElementById("comments-overlay");
-    const popup = window.document.getElementById("comments-popup");
-    const close = window.document.getElementById("comment-popup-close");
+    `
+    window.document.body.appendChild(commentContainer)
+    const overlay = window.document.getElementById('comments-overlay')
+    const popup = window.document.getElementById('comments-popup')
+    const close = window.document.getElementById('comment-popup-close')
     window._openPopup = () => {
-      window.history.pushState({ popup: "open" }, "open popup");
-      overlay.classList.add("show-comments-popup");
+      window.history.pushState({ popup: 'open' }, 'open popup')
+      overlay.classList.add('show-comments-popup')
       window.setTimeout(() => {
-        popup.classList.add("slide-up-comments-popup");
-      }, 10);
-    };
-
-    window.addEventListener("popstate", (evt) => {
-      if (evt.state.popup === "open" || typeof evt.state.idx === "number") {
-        closePopup(true);
-      }
-    });
-
-    const closePopup = (state) => {
-      if (!state) {
-        window.history.back();
-      }
-      popup.classList.remove("slide-up-comments-popup");
-      window.setTimeout(() => {
-        overlay.classList.remove("show-comments-popup");
-      }, 300);
-    };
-
-    overlay.addEventListener("click", (event) => {
-      if (event.target === overlay) {
-        closePopup();
-      }
-    });
-    close.addEventListener("click", () => {
-      closePopup();
-    });
-  });
-  const open = window.open;
-  window.open = (url, target, features) => {
-    if (url.startsWith("https://www.bilibili.com/h5/comment/sub?")) {
-      const iframe = document.querySelector("#sub-comment-iframe");
-      iframe.src = url;
-      window._openPopup();
-      return;
+        popup.classList.add('slide-up-comments-popup')
+      }, 10)
     }
-    return open(url, target, features);
-  };
 
-  window.addEventListener("load", () => {
-    const imgs = document.querySelector(".opus-module-top__album");
+    window.addEventListener('popstate', evt => {
+      if (evt.state.popup === 'open' || typeof evt.state.idx === 'number') {
+        closePopup(true)
+      }
+    })
+
+    const closePopup = state => {
+      if (!state) {
+        window.history.back()
+      }
+      popup.classList.remove('slide-up-comments-popup')
+      window.setTimeout(() => {
+        overlay.classList.remove('show-comments-popup')
+      }, 300)
+    }
+
+    overlay.addEventListener('click', event => {
+      if (event.target === overlay) {
+        closePopup()
+      }
+    })
+    close.addEventListener('click', () => {
+      closePopup()
+    })
+  })
+  const open = window.open
+  window.open = (url, target, features) => {
+    if (url.startsWith('https://www.bilibili.com/h5/comment/sub?')) {
+      const iframe = document.querySelector('#sub-comment-iframe')
+      iframe.src = url
+      window._openPopup()
+      return
+    }
+    return open(url, target, features)
+  }
+
+  window.addEventListener('load', () => {
+    const imgs = document.querySelector('.opus-module-top__album')
     if (imgs) {
-      const div = document.createElement("div");
-      div.textContent = "下载";
+      const div = document.createElement('div')
+      div.textContent = '下载'
       div.style.cssText = `
         position: absolute;
         top: 10px;
@@ -200,73 +167,67 @@ function __$hack() {
         padding: 5px 10px;
         border-radius: 5px;
         user-select: none;
-      `;
-      imgs.appendChild(div);
-      div.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        const item = [...imgs.querySelectorAll(".v-swipe__item")].find((v) => {
-          return v.style.transform.includes("translateX(0px)");
-        });
+      `
+      imgs.appendChild(div)
+      div.addEventListener('click', e => {
+        e.preventDefault()
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        const item = [...imgs.querySelectorAll('.v-swipe__item')].find(v => {
+          return v.style.transform.includes('translateX(0px)')
+        })
         if (item) {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
-              action: "open-image",
+              action: 'open-image',
               payload: {
-                url: item.querySelector("img").src.split("@")[0],
+                url: item.querySelector('img').src.split('@')[0],
               },
             }),
-          );
+          )
         }
-      });
+      })
     }
-  });
+  })
   document.addEventListener(
-    "click",
-    (e) => {
-      const pic = e.target.closest(".bm-pics-block__item");
+    'click',
+    e => {
+      const pic = e.target.closest('.bm-pics-block__item')
       if (pic) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        const url = pic.querySelector("img").src.split("@")[0];
+        e.preventDefault()
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        const url = pic.querySelector('img').src.split('@')[0]
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
-            action: "open-image",
+            action: 'open-image',
             payload: { url },
           }),
-        );
+        )
       }
     },
     true,
-  );
+  )
 }
 
-function __$injectBefore(
-  isDynamicFeedUrl,
-  shouldRetryDynamicFeedPayload,
-  shouldReloadEmptySpaceDynamicList,
-  dynamicFeedRetryKey,
-  dynamicFeedRetryLimit,
-) {
+function __$injectBefore() {
   // alert(document.title)
   const waitFor = (value, callback) => {
     if (value()) {
-      callback();
+      callback()
     } else {
       const timer = setInterval(() => {
         if (value()) {
-          callback();
-          clearInterval(timer);
+          callback()
+          clearInterval(timer)
         }
-      }, 50);
+      }, 50)
     }
-  };
+  }
   waitFor(
     () => document.head,
     () => {
-      const style = document.createElement("style");
+      const style = document.createElement('style')
       style.textContent = `
     m-open-app:has(.m-fixed-openapp, .bm-link-card-goods, .easy-follow-btn),
      .tab__pairs,
@@ -331,80 +292,11 @@ function __$injectBefore(
       padding-top: 0!important;
     }
 
-    `;
-      document.head.appendChild(style);
+    `
+      document.head.appendChild(style)
     },
-  );
-
-  const retryKey = `${dynamicFeedRetryKey}:${location.pathname}`;
-  const getRetryCount = () => {
-    const retryCount = Number(window.sessionStorage.getItem(retryKey) || 0);
-    return Number.isFinite(retryCount) ? retryCount : 0;
-  };
-  const clearRetryCount = () => {
-    window.sessionStorage.removeItem(retryKey);
-  };
-  const reloadOnce = () => {
-    const retryCount = getRetryCount();
-    if (retryCount >= dynamicFeedRetryLimit) {
-      return;
-    }
-    window.sessionStorage.setItem(retryKey, `${retryCount + 1}`);
-    window.setTimeout(() => {
-      window.location.reload();
-    }, 800);
-  };
-
-  if (typeof window.fetch === "function") {
-    const rawFetch = window.fetch.bind(window);
-    window.fetch = (...args) => {
-      const requestUrl = typeof args[0] === "string" ? args[0] : args[0]?.url;
-      return rawFetch(...args).then((response) => {
-        if (isDynamicFeedUrl(requestUrl) && typeof response.clone === "function") {
-          response
-            .clone()
-            .json()
-            .then((payload) => {
-              if (shouldRetryDynamicFeedPayload(payload, getRetryCount(), dynamicFeedRetryLimit)) {
-                reloadOnce();
-              }
-            })
-            .catch(() => {});
-        }
-        return response;
-      });
-    };
-  }
-
-  const checkSpaceDynamicList = () => {
-    const dynamicItemCount = document.querySelectorAll(".bili-dyn-item").length;
-    if (dynamicItemCount > 0) {
-      clearRetryCount();
-      return;
-    }
-
-    if (
-      shouldReloadEmptySpaceDynamicList({
-        dynamicItemCount,
-        hasNoMore: Boolean(document.querySelector(".no-more")),
-        pathname: location.pathname,
-        retryCount: getRetryCount(),
-        retryLimit: dynamicFeedRetryLimit,
-      })
-    ) {
-      reloadOnce();
-    }
-  };
-
-  waitFor(
-    () => document.querySelector(".bili-dyn-item") || document.querySelector(".no-more"),
-    checkSpaceDynamicList,
-  );
-  window.setTimeout(checkSpaceDynamicList, 4000);
-  window.setTimeout(checkSpaceDynamicList, 8000);
+  )
 }
 
-export const INJECTED_JAVASCRIPT = `(${__$hack})(${IS_DEV});true;`;
-export const INJECTED_JAVASCRIPT_BEFORE = `(${__$injectBefore})(${isDynamicFeedUrl},${shouldRetryDynamicFeedPayload},${shouldReloadEmptySpaceDynamicList},${JSON.stringify(
-  DYNAMIC_FEED_RETRY_KEY,
-)},${DYNAMIC_FEED_RETRY_LIMIT});true;`;
+export const INJECTED_JAVASCRIPT = `(${__$hack})();true;`
+export const INJECTED_JAVASCRIPT_BEFORE = `(${__$injectBefore})();true;`

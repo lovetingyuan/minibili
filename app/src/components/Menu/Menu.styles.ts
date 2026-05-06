@@ -1,3 +1,6 @@
+import React from "react";
+import { TouchableHighlight } from "react-native";
+import type { ComponentProps } from "react";
 import type { TextStyle, ViewStyle } from "react-native";
 
 const SCREEN_INDENT = 8;
@@ -32,6 +35,20 @@ export const menuOptionWrapperStyle: ViewStyle = {
   minWidth: 124,
   padding: 0,
 };
+
+export const menuOptionTouchableProps: Pick<
+  ComponentProps<typeof TouchableHighlight>,
+  "activeOpacity" | "underlayColor"
+> = {
+  activeOpacity: 1,
+  underlayColor: "rgba(127, 127, 127, 0.16)",
+};
+
+export function MenuOptionTouchableComponent(
+  props: ComponentProps<typeof TouchableHighlight>,
+) {
+  return React.createElement(TouchableHighlight, props);
+}
 
 export const menuSurfaceStyle: ViewStyle = {
   backgroundColor: "#fff",
