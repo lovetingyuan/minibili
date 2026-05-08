@@ -1,6 +1,5 @@
 export const githubLink = 'https://github.com/lovetingyuan/minibili'
 export const site = 'https://minibili.tingyuan.in/'
-export const configUrl = `${site}config.json`
 
 export const serverUrl = __DEV__
   ? `http://${process.env.EXPO_PUBLIC_IPV4}:8787`

@@ -18,7 +18,6 @@ import CheckNetState from "./components/CheckNetState";
 import CheckUpUpdate from "./components/CheckUpUpdate";
 import ImagesView from "./components/ImagesView";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
-import RemoteConfig from "./components/RemoteConfig";
 import UserSyncManager from "./components/UserSyncManager";
 import UserLocation from "./components/UserLocation";
 import useRNETheme from "./hooks/useRNETheme";
@@ -77,7 +76,6 @@ export default function App() {
           <MenuProvider backHandler customStyles={menuProviderCustomStyles}>
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               <InitStoreComp />
-              <RemoteConfig />
               <UserSyncManager />
               <CheckAppUpdate />
               <CheckUpUpdate />

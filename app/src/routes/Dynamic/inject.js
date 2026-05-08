@@ -1,22 +1,23 @@
 function __$inject() {
   const retryLimit = 5
   const retryDelayMs = 800
+  const spaceDynamicFeedPath = '/x/polymer/web-dynamic/v1/feed/space'
 
-  const isSpaceDynamicFeedUrl = url => {
+  const getSpaceDynamicFeedUrlKey = url => {
     if (typeof url !== 'string') {
-      return false
+      return undefined
     }
 
     try {
-      const isAbsoluteUrl = /^[a-z][a-z\d+.-]*:\/\//i.test(url) || url.startsWith('//')
       const parsed = new URL(url, 'https://api.bilibili.com')
-      return (
-        parsed.pathname === '/x/polymer/web-dynamic/v1/feed/space' &&
-        parsed.searchParams.get('offset') === '' &&
-        (!isAbsoluteUrl || parsed.hostname === 'api.bilibili.com')
-      )
+      if (parsed.hostname !== 'api.bilibili.com' || parsed.pathname !== spaceDynamicFeedPath) {
+        return undefined
+      }
+      parsed.searchParams.delete('w_rid')
+      parsed.searchParams.delete('wts')
+      return parsed.toString()
     } catch {
-      return false
+      return undefined
     }
   }
 
@@ -47,7 +48,7 @@ function __$inject() {
       return false
     }
 
-    return data.has_more === true && Array.isArray(data.items) && data.items.length === 0
+    return Array.isArray(data.items) && data.items.length === 0
   }
 
   const waitFor = (value, callback) => {
@@ -105,6 +106,7 @@ function __$inject() {
     }
 
     const rawFetch = window.fetch.bind(window)
+    const dynamicFeedRetryStates = new Map()
 
     const waitForRetryDelay = () => {
       return new Promise(resolve => {
@@ -123,25 +125,50 @@ function __$inject() {
         .catch(() => undefined)
     }
 
-    const retryEmptyDynamicFeedResponse = async (response, args) => {
-      let currentResponse = response
+    const retryEmptyDynamicFeedResponse = async (response, args, retryKey) => {
+      const retryState = dynamicFeedRetryStates.get(retryKey) ?? {
+        retryCount: 0,
+        retryPromise: undefined,
+      }
+      dynamicFeedRetryStates.set(retryKey, retryState)
 
-      for (let retryCount = 0; retryCount < retryLimit; retryCount += 1) {
-        const payload = await readResponsePayload(currentResponse)
-        if (!shouldRetryEmptyDynamicFeedPayload(payload)) {
-          return currentResponse
-        }
-
-        await waitForRetryDelay()
-
-        try {
-          currentResponse = await rawFetch(...args)
-        } catch {
-          return currentResponse
-        }
+      if (retryState.retryPromise) {
+        return retryState.retryPromise
       }
 
-      return currentResponse
+      retryState.retryPromise = (async () => {
+        let currentResponse = response
+
+        while (true) {
+          const payload = await readResponsePayload(currentResponse)
+          if (!shouldRetryEmptyDynamicFeedPayload(payload)) {
+            dynamicFeedRetryStates.delete(retryKey)
+            return currentResponse
+          }
+
+          if (retryState.retryCount >= retryLimit) {
+            return currentResponse
+          }
+
+          retryState.retryCount += 1
+          await waitForRetryDelay()
+
+          try {
+            currentResponse = await rawFetch(...args)
+          } catch {
+            return currentResponse
+          }
+        }
+      })()
+
+      try {
+        return await retryState.retryPromise
+      } finally {
+        const currentRetryState = dynamicFeedRetryStates.get(retryKey)
+        if (currentRetryState === retryState) {
+          retryState.retryPromise = undefined
+        }
+      }
     }
 
     const retryNonOkResponse = async (response, args) => {
@@ -166,17 +193,18 @@ function __$inject() {
 
     window.fetch = (...args) => {
       const requestUrl = getFetchUrl(args[0])
+      const dynamicFeedRetryKey = getSpaceDynamicFeedUrlKey(requestUrl)
 
       return rawFetch(...args).then(response => {
         if (isSpaceArcSearchUrl(requestUrl)) {
           return retryNonOkResponse(response, args)
         }
 
-        if (!isSpaceDynamicFeedUrl(requestUrl) || typeof response.clone !== 'function') {
+        if (!dynamicFeedRetryKey || typeof response.clone !== 'function') {
           return response
         }
 
-        return retryEmptyDynamicFeedResponse(response, args)
+        return retryEmptyDynamicFeedResponse(response, args, dynamicFeedRetryKey)
       })
     }
   }
@@ -230,6 +258,7 @@ function __$inject() {
         display: flex;
         align-items: center;
         justify-content: center;
+        opacity: 0.8;
       }
       .minibili-dynamic-refresh-button:active {
         transform: scale(0.94);
