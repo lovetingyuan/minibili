@@ -1,20 +1,27 @@
 const os = require("os");
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
+const { execFileSync } = require("child_process");
 
-function hasConnectedAdbDevice() {
+function getConnectedAdbDevices() {
   try {
-    const output = execSync("adb devices", { encoding: "utf8" });
-    const deviceLines = output
+    const output = execFileSync("adb", ["devices"], { encoding: "utf8" });
+    return output
       .split(/\r?\n/)
       .slice(1)
       .map((line) => line.trim())
-      .filter(Boolean);
-
-    return deviceLines.some((line) => /\tdevice\b/.test(line));
+      .filter((line) => /\tdevice\b/.test(line))
+      .map((line) => line.split("\t", 1)[0]);
   } catch {
-    return false;
+    return [];
+  }
+}
+
+function reverseMetroPort(devices, port) {
+  for (const device of devices) {
+    execFileSync("adb", ["-s", device, "reverse", `tcp:${port}`, `tcp:${port}`], {
+      stdio: "inherit",
+    });
   }
 }
 
@@ -52,9 +59,13 @@ function getBestIP() {
   return candidates.length > 0 ? candidates[0].address : "127.0.0.1";
 }
 
-if (!hasConnectedAdbDevice()) {
+const devices = getConnectedAdbDevices();
+
+if (devices.length === 0) {
   process.exit(1);
 }
+
+reverseMetroPort(devices, 8081);
 
 const ip = getBestIP();
 const envLocalPath = path.resolve(__dirname, "../.env.local");

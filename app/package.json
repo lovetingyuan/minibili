@@ -16,7 +16,7 @@
   "scripts": {
     "prepare-android": "node scripts/prepare-android.js",
     "start": "npm run prepare-android && expo start",
-    "android": "npm run prepare-android && npx expo start --android",
+    "android": "npm run prepare-android && npx expo start --android --localhost",
     "ios": "npm run prepare-android && npx expo start --ios",
     "web": "npm run prepare-android && expo start --web",
     "build:android": "zx scripts/build.mjs",

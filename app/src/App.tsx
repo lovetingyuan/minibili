@@ -16,6 +16,7 @@ import CheckAppUpdate from "./components/CheckAppUpdate";
 import CheckLiveUps from "./components/CheckLiveUps";
 import CheckNetState from "./components/CheckNetState";
 import CheckUpUpdate from "./components/CheckUpUpdate";
+import DevServerRecovery from "./components/DevServerRecovery";
 import ImagesView from "./components/ImagesView";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
 import UserSyncManager from "./components/UserSyncManager";
@@ -75,6 +76,7 @@ export default function App() {
         <ThemeProvider theme={rneTheme}>
           <MenuProvider backHandler customStyles={menuProviderCustomStyles}>
             <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <DevServerRecovery />
               <InitStoreComp />
               <UserSyncManager />
               <CheckAppUpdate />
