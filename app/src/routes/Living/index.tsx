@@ -8,6 +8,7 @@ import { WebView } from "react-native-webview";
 import { withUniwind } from "uniwind";
 
 import useLiveUrl from "@/api/get-live-url";
+import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import { UA } from "../../constants";
@@ -34,10 +35,88 @@ const StyledVideoView = withUniwind(VideoView) as unknown as React.ComponentType
   React.ComponentProps<typeof VideoView> & { className?: string }
 >;
 
+type LiveWebViewMessage =
+  | {
+      action: "enable-background-play";
+    }
+  | {
+      action: "update-live-info";
+      payload: {
+        url: string;
+        callback: string;
+      };
+    };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function parseUpdateLiveInfoPayload(data: string) {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(data);
+  } catch {
+    return null;
+  }
+
+  if (
+    isRecord(parsed) &&
+    typeof parsed.url === "string" &&
+    typeof parsed.callback === "string"
+  ) {
+    return {
+      url: parsed.url,
+      callback: parsed.callback,
+    };
+  }
+
+  return null;
+}
+
+function parseLiveWebViewMessage(data: string): LiveWebViewMessage | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(data);
+  } catch {
+    return null;
+  }
+
+  if (!isRecord(parsed) || typeof parsed.action !== "string") {
+    return null;
+  }
+
+  if (parsed.action === "enable-background-play") {
+    return {
+      action: parsed.action,
+    };
+  }
+
+  if (parsed.action === "update-live-info" && typeof parsed.payload === "string") {
+    const payload = parseUpdateLiveInfoPayload(parsed.payload);
+    if (!payload) {
+      return null;
+    }
+
+    return {
+      action: parsed.action,
+      payload,
+    };
+  }
+
+  return null;
+}
+
 function LiveWebPage({ route }: Props) {
   const { url, title: pageTitle } = route.params;
 
-  const webviewRef = React.useRef<WebView | null>(null);
+  const {
+    webViewRef,
+    webViewKey,
+    remountWebView,
+    handleWebViewMessage,
+    handleRenderProcessGone,
+    handleContentProcessDidTerminate,
+  } = useRecoverableWebView();
   const { webViewMode, setCheckLiveTimeStamp } = useStore();
   // const [pageTitle, setPageTitle] = React.useState(title)
 
@@ -51,7 +130,7 @@ function LiveWebPage({ route }: Props) {
     headerRight: () => (
       <HeaderRight
         reload={() => {
-          webviewRef.current?.injectJavaScript("location.reload()");
+          remountWebView();
         }}
       />
     ),
@@ -137,7 +216,7 @@ function LiveWebPage({ route }: Props) {
       className="flex-1"
       // style={{ height }}
       source={{ uri: url }}
-      key={webViewMode + "-webview"}
+      key={webViewMode + "-" + webViewKey}
       // onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
       originWhitelist={["http://*", "https://*", "bilibili://*"]}
       allowsFullscreenVideo
@@ -153,18 +232,23 @@ function LiveWebPage({ route }: Props) {
       injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT_BEFORE}
       renderLoading={() => <Loading />}
       userAgent={webViewMode === "MOBILE" ? "" : UA}
-      ref={webviewRef}
+      ref={webViewRef}
       onMessage={(evt) => {
-        const data = JSON.parse(evt.nativeEvent.data) as any;
+        if (handleWebViewMessage(evt.nativeEvent.data)) {
+          return;
+        }
+
+        const data = parseLiveWebViewMessage(evt.nativeEvent.data);
+        if (!data) {
+          return;
+        }
+
         if (data.action === "enable-background-play") {
           setEnableBackgroundPlay(true);
         }
 
         if (data.action === "update-live-info") {
-          const { url, callback } = JSON.parse(data.payload) as {
-            url: string;
-            callback: string;
-          };
+          const { url, callback } = data.payload;
           fetch(url, {
             headers: { "user-agent": UA },
           })
@@ -174,7 +258,7 @@ function LiveWebPage({ route }: Props) {
               const html2 = html.substring(index);
               const index2 = html2.indexOf("</script>");
               const html3 = html2.substring(0, index2);
-              webviewRef.current?.injectJavaScript(`window.${callback}(${html3});`);
+              webViewRef.current?.injectJavaScript(`window.${callback}(${html3});`);
             });
         }
       }}
@@ -193,6 +277,8 @@ function LiveWebPage({ route }: Props) {
         }
         return true;
       }}
+      onRenderProcessGone={handleRenderProcessGone}
+      onContentProcessDidTerminate={handleContentProcessDidTerminate}
     />
   );
 }

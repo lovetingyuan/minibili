@@ -7,6 +7,7 @@ import { Dimensions, Image, RefreshControl, ScrollView, useColorScheme, View } f
 import { WebView } from "react-native-webview";
 
 // import useLiveUrl from '@/api/get-live-url'
+import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import { UA } from "../../constants";
@@ -30,20 +31,56 @@ function Loading() {
 
 type Props = NativeStackScreenProps<RootStackParamList, "WebPage">;
 
+type WebPageMessage = {
+  action: "set-title";
+  payload: string;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function parseWebPageMessage(data: string): WebPageMessage | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(data);
+  } catch {
+    return null;
+  }
+
+  if (
+    isRecord(parsed) &&
+    parsed.action === "set-title" &&
+    typeof parsed.payload === "string"
+  ) {
+    return {
+      action: parsed.action,
+      payload: parsed.payload,
+    };
+  }
+
+  return null;
+}
+
 function WebPage({ route }: Props) {
   const { url, title } = route.params;
 
-  const webviewRef = React.useRef<WebView | null>(null);
+  const {
+    webViewRef,
+    webViewKey,
+    remountWebView,
+    handleWebViewMessage,
+    handleRenderProcessGone,
+    handleContentProcessDidTerminate,
+  } = useRecoverableWebView();
   const { webViewMode } = useStore();
   const isDark = useColorScheme() === "dark";
   const [height, setHeight] = React.useState(Dimensions.get("screen").height);
   const [isEnabled, setEnabled] = React.useState(true);
   const [pageTitle, setPageTitle] = React.useState(title);
-  const [webviewKey, setWebViewKey] = React.useState(0);
   const { isRefreshing, onRefresh } = useRefresh(() => {
-    return new Promise((r) => {
-      // webviewRef.current?.reload()
-      setWebViewKey((k) => k + 1);
+    return new Promise<void>((r) => {
+      remountWebView();
       setTimeout(r, 1000);
     });
   });
@@ -60,7 +97,7 @@ function WebPage({ route }: Props) {
       className="flex-1"
       style={{ height }}
       source={{ uri: url }}
-      key={webViewMode + "-" + webviewKey}
+      key={webViewMode + "-" + webViewKey}
       onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
       originWhitelist={["http://*", "https://*", "bilibili://*"]}
       allowsFullscreenVideo
@@ -75,16 +112,24 @@ function WebPage({ route }: Props) {
       injectedJavaScript={INJECTED_JAVASCRIPT}
       renderLoading={() => <Loading />}
       userAgent={webViewMode === "MOBILE" ? "" : UA}
-      ref={webviewRef}
+      ref={webViewRef}
       onMessage={(evt) => {
-        const data = JSON.parse(evt.nativeEvent.data) as any;
+        if (handleWebViewMessage(evt.nativeEvent.data)) {
+          return;
+        }
+
+        const data = parseWebPageMessage(evt.nativeEvent.data);
+        if (!data) {
+          return;
+        }
+
         if (data.action === "set-title" && !title) {
           setPageTitle(data.payload);
         }
       }}
       onLoad={() => {
         if (isDark) {
-          webviewRef.current?.injectJavaScript(`
+          webViewRef.current?.injectJavaScript(`
         const style = document.createElement('style');
         style.textContent = \`
         body {background-color: #222; color: #ccc; }
@@ -118,6 +163,8 @@ function WebPage({ route }: Props) {
         }
         return true;
       }}
+      onRenderProcessGone={handleRenderProcessGone}
+      onContentProcessDidTerminate={handleContentProcessDidTerminate}
     />
   );
   return (

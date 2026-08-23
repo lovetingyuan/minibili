@@ -16,6 +16,7 @@ import WebView, { type WebViewMessageEvent } from "react-native-webview";
 import { useVideoMp4Url } from "@/api/play-url";
 import { UA } from "@/constants";
 import { colors } from "@/constants/colors.tw";
+import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import { useMarkVideoWatched } from "@/store/actions";
 import type { NavigationProps, RootStackParamList } from "@/types";
 
@@ -47,9 +48,16 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   const [playerErrorType, setPlayerErrorType] = React.useState<PlayerErrorType | null>(null);
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [webViewKey, setWebViewKey] = React.useState(0);
+  const {
+    webViewRef,
+    webViewKey: recoverableWebViewKey,
+    handleRenderProcessGone,
+    handleContentProcessDidTerminate,
+  } = useRecoverableWebView({
+    recoverOnAppActive: false,
+  });
 
   const loadingErrorRef = React.useRef(false);
-  const webviewRef = React.useRef<WebView | null>(null);
   const videoInfo = {
     ...route.params,
     ...data,
@@ -76,8 +84,8 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       await retryVideoUrl();
     } catch {}
 
-    if (webviewRef.current && videoUrl) {
-      webviewRef.current.reload();
+    if (webViewRef.current && videoUrl) {
+      webViewRef.current.reload();
     }
     setWebViewKey((key) => key + 1);
     setIsRetrying(false);
@@ -89,7 +97,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
    * noimg   imagepause -> play
    */
   React.useEffect(() => {
-    webviewRef.current?.injectJavaScript(`
+    webViewRef.current?.injectJavaScript(`
     ;(function() {
       const video = document.querySelector('video');
       if (video) {
@@ -152,7 +160,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("beforeRemove", (e) => {
       e.preventDefault();
-      webviewRef.current?.injectJavaScript(`
+      webViewRef.current?.injectJavaScript(`
       window.reportPlayTime();
       true;
       `);
@@ -374,8 +382,8 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         // uri: 'player.bilibili.com/player.html?isOutside=true&aid=116255201697323&bvid=BV1NLw1zoECS&cid=36813670314&p=1', // playPageUrl,
         uri: playPageUrl,
       }}
-      key={`${cid}-${highQuality ? "hq" : "sq"}-${webViewKey}`}
-      ref={webviewRef}
+      key={`${cid}-${highQuality ? "hq" : "sq"}-${webViewKey}-${recoverableWebViewKey}`}
+      ref={webViewRef}
       className="flex-1 bg-black"
       originWhitelist={["https://*", "bilibili://*"]}
       allowsFullscreenVideo
@@ -388,9 +396,8 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       renderLoading={renderLoading}
       onMessage={handleMessage}
       webviewDebuggingEnabled={__DEV__}
-      onContentProcessDidTerminate={() => {
-        webviewRef.current?.reload();
-      }}
+      onRenderProcessGone={handleRenderProcessGone}
+      onContentProcessDidTerminate={handleContentProcessDidTerminate}
       onLoad={() => {
         loadingErrorRef.current = false;
         setPlayerErrorType(null);

@@ -7,6 +7,7 @@ import { BackHandler, Image, Linking, Platform, View } from "react-native";
 import { WebView } from "react-native-webview";
 
 // import useLiveUrl from '@/api/get-live-url'
+import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import type { RootStackParamList } from "../../types";
@@ -59,16 +60,21 @@ function isOpenImageMessage(data: unknown): data is DynamicDetailOpenImageMessag
 function DynamicDetailPage({ route }: Props) {
   const { title, url } = route.params;
 
-  const webviewRef = React.useRef<WebView | null>(null);
+  const {
+    webViewRef,
+    webViewKey,
+    remountWebView,
+    handleWebViewMessage,
+    handleRenderProcessGone,
+    handleContentProcessDidTerminate,
+  } = useRecoverableWebView();
   // const [pageTitle, setPageTitle] = React.useState(`${name}的动态`)
-  const [webviewKey, setWebViewKey] = React.useState(0);
-  const onRefresh = React.useCallback(() => {
-    return new Promise((r) => {
-      // webviewRef.current?.reload()
-      setWebViewKey((k) => k + 1);
+  function onRefresh() {
+    return new Promise<void>((r) => {
+      remountWebView();
       setTimeout(r, 1000);
     });
-  }, []);
+  }
 
   useUpdateNavigationOptions({
     headerRight: () => {
@@ -91,8 +97,8 @@ function DynamicDetailPage({ route }: Props) {
   useFocusEffect(
     React.useCallback(() => {
       const onAndroidBackPress = () => {
-        if (currentNavigationStateRef.current.canGoBack && webviewRef.current) {
-          webviewRef.current.goBack();
+        if (currentNavigationStateRef.current.canGoBack && webViewRef.current) {
+          webViewRef.current.goBack();
           return true;
         }
         return false;
@@ -111,7 +117,7 @@ function DynamicDetailPage({ route }: Props) {
     <WebView
       className="flex-1"
       source={{ uri: url }}
-      key={webviewKey}
+      key={webViewKey}
       originWhitelist={["http://*", "https://*", "bilibili://*"]}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
@@ -124,7 +130,7 @@ function DynamicDetailPage({ route }: Props) {
       injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT_BEFORE}
       renderLoading={() => <Loading />}
       userAgent={MOBILE_CHROME_UA}
-      ref={webviewRef}
+      ref={webViewRef}
       onNavigationStateChange={(navState) => {
         currentNavigationStateRef.current = {
           canGoBack: navState.canGoBack,
@@ -132,10 +138,13 @@ function DynamicDetailPage({ route }: Props) {
           url: navState.url,
         };
       }}
-      onContentProcessDidTerminate={() => {
-        webviewRef.current?.reload();
-      }}
+      onRenderProcessGone={handleRenderProcessGone}
+      onContentProcessDidTerminate={handleContentProcessDidTerminate}
       onMessage={(evt) => {
+        if (handleWebViewMessage(evt.nativeEvent.data)) {
+          return;
+        }
+
         const data = JSON.parse(evt.nativeEvent.data) as unknown;
         if (isOpenImageMessage(data)) {
           const { url } = data.payload;

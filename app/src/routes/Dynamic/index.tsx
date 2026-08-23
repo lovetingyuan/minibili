@@ -1,10 +1,11 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Skeleton } from "@/components/styled/rneui";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect } from "react";
 import { BackHandler, Platform, Share, View } from "react-native";
 import WebView from "react-native-webview";
 
+import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import { useStore } from "@/store";
 import { showToast } from "@/utils";
@@ -15,6 +16,139 @@ import { headerTitle, headerRight } from "./Header";
 import injectCode from "./inject";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Dynamic">;
+
+type DynamicOpenVideoPayload = {
+  av: number;
+  title: string;
+  mid?: string | number;
+  name?: string;
+  face?: string;
+};
+
+type DynamicWebViewMessage =
+  | {
+      action: "reload-dynamic-page";
+    }
+  | {
+      action: "open-video";
+      payload: DynamicOpenVideoPayload;
+    }
+  | {
+      action: "share-content";
+      payload: {
+        link: string;
+        texts: string;
+      };
+    }
+  | {
+      action: "open-dynamic-detail" | "open-topic";
+      payload: {
+        url: string;
+        title: string;
+      };
+    };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function toNumber(value: unknown) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
+
+function getString(value: unknown) {
+  return typeof value === "string" ? value : undefined;
+}
+
+function getStringOrNumber(value: unknown) {
+  return typeof value === "string" || typeof value === "number" ? value : undefined;
+}
+
+function parseDynamicWebViewMessage(data: string): DynamicWebViewMessage | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(data);
+  } catch {
+    return null;
+  }
+
+  if (!isRecord(parsed) || typeof parsed.action !== "string") {
+    return null;
+  }
+
+  if (parsed.action === "reload-dynamic-page") {
+    return {
+      action: parsed.action,
+    };
+  }
+
+  if (!isRecord(parsed.payload)) {
+    return null;
+  }
+
+  if (parsed.action === "open-video") {
+    const av = toNumber(parsed.payload.av);
+    if (av === null) {
+      return null;
+    }
+
+    return {
+      action: parsed.action,
+      payload: {
+        av,
+        title: getString(parsed.payload.title) ?? "",
+        mid: getStringOrNumber(parsed.payload.mid),
+        name: getString(parsed.payload.name),
+        face: getString(parsed.payload.face),
+      },
+    };
+  }
+
+  if (parsed.action === "share-content") {
+    const link = getString(parsed.payload.link);
+    const texts = getString(parsed.payload.texts);
+    if (!link || texts === undefined) {
+      return null;
+    }
+
+    return {
+      action: parsed.action,
+      payload: {
+        link,
+        texts,
+      },
+    };
+  }
+
+  if (parsed.action === "open-dynamic-detail" || parsed.action === "open-topic") {
+    const url = getString(parsed.payload.url);
+    const title = getString(parsed.payload.title);
+    if (!url || title === undefined) {
+      return null;
+    }
+
+    return {
+      action: parsed.action,
+      payload: {
+        url,
+        title,
+      },
+    };
+  }
+
+  return null;
+}
 
 function LoadingComp() {
   return (
@@ -72,7 +206,13 @@ function Dynamic({ route }: Props) {
   // const dynamicListRef = React.useRef<any>(null)
 
   const { reloadUerProfile } = useStore();
-  const webviewRef = useRef<WebView>(null);
+  const {
+    webViewRef,
+    webViewKey,
+    handleWebViewMessage,
+    handleRenderProcessGone,
+    handleContentProcessDidTerminate,
+  } = useRecoverableWebView();
   const navigation = useNavigation<NavigationProps["navigation"]>();
 
   useUpdateNavigationOptions({
@@ -93,8 +233,8 @@ function Dynamic({ route }: Props) {
   useFocusEffect(
     useCallback(() => {
       const onAndroidBackPress = () => {
-        if (currentNavigationStateRef.current.canGoBack && webviewRef.current) {
-          webviewRef.current.goBack();
+        if (currentNavigationStateRef.current.canGoBack && webViewRef.current) {
+          webViewRef.current.goBack();
           return true;
         }
         return false;
@@ -126,16 +266,17 @@ function Dynamic({ route }: Props) {
 
   useEffect(() => {
     if (reloadUerProfile) {
-      webviewRef.current?.injectJavaScript(`
+      webViewRef.current?.injectJavaScript(`
         window.location.reload();
       `);
     }
-  }, [reloadUerProfile]);
+  }, [reloadUerProfile, webViewRef]);
 
   return (
     <View className="flex-1">
       <WebView
         className="flex-1"
+        key={webViewKey}
         source={{ uri: `https://m.bilibili.com/space/${upId}` }}
         originWhitelist={["http://*", "https://*", "bilibili://*"]}
         allowsFullscreenVideo
@@ -158,11 +299,19 @@ function Dynamic({ route }: Props) {
           };
         }}
         userAgent="Mozilla/5.0 (Linux; Android 13; M2012K11AC Build/TKQ1.220829.002) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.7151.115 Mobile Safari/537.36"
-        ref={webviewRef}
+        ref={webViewRef}
         onMessage={(evt) => {
-          const data = JSON.parse(evt.nativeEvent.data) as any;
+          if (handleWebViewMessage(evt.nativeEvent.data)) {
+            return;
+          }
+
+          const data = parseDynamicWebViewMessage(evt.nativeEvent.data);
+          if (!data) {
+            return;
+          }
+
           if (data.action === "reload-dynamic-page") {
-            webviewRef.current?.reload();
+            webViewRef.current?.reload();
           } else if (data.action === "open-video") {
             const { av, title, mid, name, face } = data.payload;
             const bvid = av2bv(av);
@@ -218,9 +367,8 @@ function Dynamic({ route }: Props) {
           }
           return true;
         }}
-        onContentProcessDidTerminate={() => {
-          webviewRef.current?.reload();
-        }}
+        onRenderProcessGone={handleRenderProcessGone}
+        onContentProcessDidTerminate={handleContentProcessDidTerminate}
       />
     </View>
   );
