@@ -1,7 +1,37 @@
-import { test } from "vitest";
+import { expect, test } from "vitest";
 
 import request from "./fetcher";
+import { isReplyPageEnd, mergeReplyItems, shouldShowReplySection } from "./replies.helpers";
 import { ReplyResponseSchema } from "./replies.schema";
+
+test("merges preview and fetched replies without duplicates", () => {
+  const preview = [
+    { id: "1", source: "preview" },
+    { id: "2", source: "preview" },
+  ];
+  const fetched = [
+    { id: "1", source: "fetched" },
+    { id: "3", source: "fetched" },
+  ];
+
+  expect(mergeReplyItems(preview, fetched)).toEqual([
+    { id: "1", source: "fetched" },
+    { id: "2", source: "preview" },
+    { id: "3", source: "fetched" },
+  ]);
+});
+
+test("treats a short anonymous page as the end", () => {
+  expect(isReplyPageEnd(20, 18, 3, 3)).toBe(true);
+  expect(isReplyPageEnd(20, 40, 20, 20)).toBe(false);
+  expect(isReplyPageEnd(20, 20, 20, 20)).toBe(true);
+});
+
+test("shows the reply entry without embedded previews", () => {
+  expect(shouldShowReplySection(3, 0)).toBe(true);
+  expect(shouldShowReplySection(0, 1)).toBe(true);
+  expect(shouldShowReplySection(0, 0)).toBe(false);
+});
 
 test.skip("get-comment-replies-1", async () => {
   const repliesInfo = {

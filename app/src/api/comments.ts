@@ -1,10 +1,12 @@
 import useSWRInfinite from "swr/infinite";
-import type { z } from "zod";
 
-import type { CommentResItem, CommentResponseSchema } from "./comments.schema";
+import type {
+  BaseCommentResItem,
+  CommentCursor,
+  CommentResItem,
+  CommentResponse,
+} from "./comments.schema";
 import fetcher from "./fetcher";
-
-type CommentResType = z.infer<typeof CommentResponseSchema>;
 
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/;
 
@@ -117,118 +119,92 @@ export const parseCommentMessage = (content: CommentResItem["content"]) => {
 };
 export type CommentMessageContent = ReturnType<typeof parseCommentMessage>;
 
-const getReplies = (res1: CommentResType, type: number) => {
-  const replies = (res1.replies || [])
-    .filter((v) => !v.invisible)
-    .map((item) => {
-      return {
-        message: parseCommentMessage(item.content),
-        images: item.content.pictures?.map((img) => {
-          return {
-            src: img.img_src,
-            width: img.img_width,
-            height: img.img_height,
-            ratio: img.img_width / img.img_height,
-          };
-        }),
-        name: item.member.uname,
-        mid: item.member.mid,
-        face: item.member.avatar,
-        sign: item.member.sign,
-        id: item.rpid_str,
-        oid: item.oid,
-        root: item.root,
-        rcount: item.rcount,
-        upLike: item.up_action.like,
-        moreText: item.reply_control.sub_reply_entry_text,
-        location: item.reply_control.location,
-        time: item.reply_control.time_desc,
-        top: false,
-        like: item.like,
-        sex: item.member.sex,
-        type,
-        replies:
-          item.replies?.map((v) => {
-            return {
-              message: parseCommentMessage(v.content),
-              name: v.member.uname,
-              face: v.member.avatar,
-              sex: v.member.sex,
-              sign: v.member.sign,
-              id: v.rpid_str,
-              mid: v.mid,
-              oid: v.oid,
-              location: v.reply_control.location,
-              root: v.root,
-              root_str: v.root_str,
-              upLike: v.up_action.like,
-              like: v.like,
-            };
-          }) || [],
-      };
-    });
-  if (res1?.top?.upper) {
-    const item = res1.top.upper;
-    replies.unshift({
-      message: parseCommentMessage(item.content),
-      images: item.content.pictures?.map((img) => {
+export const getReplyItem = (item: BaseCommentResItem, type = item.type) => {
+  return {
+    message: parseCommentMessage(item.content),
+    images:
+      item.content.pictures?.map((img) => {
         return {
           src: img.img_src,
           width: img.img_width,
           height: img.img_height,
           ratio: img.img_width / img.img_height,
         };
-      }),
-      name: item.member.uname,
-      face: item.member.avatar,
-      id: item.rpid_str,
-      sign: item.member.sign,
-      oid: item.oid,
-      root: item.root,
-      rcount: item.rcount,
-      moreText: item.reply_control.sub_reply_entry_text,
-      location: item.reply_control.location,
-      time: item.reply_control.time_desc,
-      mid: item.member.mid,
-      upLike: item.up_action.like,
-      like: item.like,
-      top: true,
-      sex: item.member.sex,
-      type,
-      replies:
-        item.replies?.map((v) => {
-          return {
-            message: parseCommentMessage(v.content),
-            name: v.member.uname,
-            face: v.member.avatar,
-            id: v.rpid_str,
-            sign: v.member.sign,
-            sex: v.member.sex,
-            oid: v.oid,
-            location: v.reply_control.location,
-            root: v.root,
-            root_str: v.root_str,
-            mid: v.mid,
-            upLike: v.up_action.like,
-            like: v.like,
-          };
-        }) || [],
-    });
+      }) || [],
+    name: item.member.uname,
+    mid: item.member.mid,
+    face: item.member.avatar,
+    sign: item.member.sign,
+    id: item.rpid_str,
+    oid: item.oid,
+    root: item.root,
+    root_str: item.root_str,
+    rcount: item.rcount,
+    upLike: item.up_action.like,
+    moreText: item.reply_control.sub_reply_entry_text,
+    location: item.reply_control.location,
+    time: item.reply_control.time_desc,
+    top: false,
+    like: item.like,
+    sex: item.member.sex,
+    type,
+    replies: [],
+  };
+};
+
+export type ReplyItemType = ReturnType<typeof getReplyItem>;
+
+const getCommentItem = (item: CommentResItem, type: number, top: boolean) => {
+  return {
+    ...getReplyItem(item, type),
+    top,
+    replies: item.replies?.map((reply) => getReplyItem(reply, type)) || [],
+  };
+};
+
+export const getComments = (response: CommentResponse, type: number) => {
+  const replies = (response.replies || [])
+    .filter((item) => !item.invisible)
+    .map((item) => getCommentItem(item, type, false));
+  if (response.top?.upper) {
+    replies.unshift(getCommentItem(response.top.upper, type, true));
   }
   return replies;
 };
 
-export type CommentItemType = ReturnType<typeof getReplies>[0];
+export type CommentItemType = ReturnType<typeof getComments>[0];
+
+export function getCommentsPageUrl(
+  oid: string | number,
+  type: number,
+  mode: number,
+  previousCursor?: Pick<CommentCursor, "is_end" | "pagination_reply">,
+) {
+  if (!oid || previousCursor?.is_end) {
+    return null;
+  }
+  const offset = previousCursor?.pagination_reply?.next_offset;
+  if (previousCursor && !offset) {
+    return null;
+  }
+  const pagination = encodeURIComponent(JSON.stringify({ offset: offset || "" }));
+  return `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&pagination_str=${pagination}&plat=1&seek_rpid=&web_location=1315875`;
+}
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 
 export function useComments(oid: string | number, type: number, mode = 3) {
-  const { data, error, size, setSize, isValidating, isLoading } = useSWRInfinite<CommentResType>(
+  const { data, error, size, setSize, isValidating, isLoading } = useSWRInfinite<CommentResponse>(
     (index, previousPageData) => {
-      const next = previousPageData?.cursor.next ?? 1;
-      return oid
-        ? `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&next=${next}&ps=20`
-        : null;
+      if (index > 0 && !previousPageData) {
+        return null;
+      }
+      return getCommentsPageUrl(
+        oid,
+        type,
+        mode,
+        index === 0 ? undefined : previousPageData?.cursor,
+      );
     },
     fetcher,
   );
@@ -241,7 +217,7 @@ export function useComments(oid: string | number, type: number, mode = 3) {
   const uniqueMap: Record<string, boolean> = {};
   const list =
     data?.reduce((a, b) => {
-      return a.concat(getReplies(b, type));
+      return a.concat(getComments(b, type));
     }, [] as CommentItemType[]) || [];
   const replies: CommentItemType[] = [];
   for (const r of list) {
@@ -250,19 +226,27 @@ export function useComments(oid: string | number, type: number, mode = 3) {
       replies.push(r);
     }
   }
+  const lastPage = data?.[data.length - 1];
+  const isPageEnd =
+    !!lastPage && (lastPage.cursor.is_end || !lastPage.cursor.pagination_reply?.next_offset);
+  const isReachingEnd = !!error || isPageEnd;
+  const allCount = data?.[0]?.cursor.all_count;
+  const isLimited = typeof allCount === "number" && allCount > replies.length && isReachingEnd;
   return {
     data: {
-      allCount: data?.[0]?.cursor.all_count,
+      allCount,
       replies,
     },
     isLoading,
     update: () => {
-      // if (isReachingEnd) {
-      //   return
-      // }
+      if (isLoading || isValidating || isReachingEnd || error) {
+        return;
+      }
       setSize(size + 1);
     },
     isValidating,
+    isLimited,
+    isReachingEnd,
     error,
   };
 }

@@ -12,7 +12,7 @@ export const ReplyResponseSchema = z.object({
     size: z.number(),
     count: z.number(),
   }),
-  replies: z.union([RepliesSchema.array(), z.null()]),
-  root: RepliesSchema,
-  upper: z.object({ mid: z.number() }),
+  replies: RepliesSchema.array().nullable(),
+  root: RepliesSchema.nullable(),
+  upper: z.object({ mid: z.number() }).nullable(),
 });

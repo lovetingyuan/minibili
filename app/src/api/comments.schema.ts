@@ -97,7 +97,9 @@ export const BaseCommentSchema = z.object({
   up_action: z.object({ like: z.boolean(), reply: z.boolean() }),
 });
 
-export type CommentResItem = z.infer<typeof BaseCommentSchema> & {
+export type BaseCommentResItem = z.infer<typeof BaseCommentSchema>;
+
+export type CommentResItem = BaseCommentResItem & {
   replies: CommentResItem[] | null;
 };
 
@@ -105,27 +107,41 @@ const RepliesSchema: z.ZodType<CommentResItem> = BaseCommentSchema.extend({
   replies: z.lazy(() => RepliesSchema.array()).nullable(),
 });
 
+export const CommentCursorSchema = z.object({
+  is_begin: z.boolean(),
+  prev: z.number(),
+  next: z.number(),
+  is_end: z.boolean(),
+  all_count: z.number(),
+  mode: z.number(),
+  name: z.string(),
+  pagination_reply: z
+    .object({
+      next_offset: z.string(),
+    })
+    .nullish(),
+  session_id: z.string().optional(),
+});
+
+export type CommentCursor = z.infer<typeof CommentCursorSchema>;
+
 export const CommentResponseSchema = z.object({
   assist: z.number(),
   blacklist: z.number(),
   note: z.number(),
-  cursor: z.object({
-    is_begin: z.boolean(),
-    prev: z.number(),
-    next: z.number(),
-    is_end: z.boolean(),
-    all_count: z.number(),
-    mode: z.number(),
-    name: z.string(),
-  }),
-  replies: RepliesSchema.array(),
-  top: z.object({
-    // admin: null
-    upper: RepliesSchema.nullable(),
-    // vote: null
-  }),
+  cursor: CommentCursorSchema,
+  replies: RepliesSchema.array().nullable(),
+  top: z
+    .object({
+      // admin: null
+      upper: RepliesSchema.nullable(),
+      // vote: null
+    })
+    .nullable(),
   top_replies: RepliesSchema.array().nullable(),
   // up_selection: {pending_count: 0, ignore_count: 0}
   upper: z.object({ mid: z.number() }),
   // vote: 0
 });
+
+export type CommentResponse = z.infer<typeof CommentResponseSchema>;

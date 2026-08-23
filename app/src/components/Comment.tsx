@@ -9,6 +9,7 @@ import { Image, Linking, View } from "react-native";
 import { colors } from "@/constants/colors.tw";
 
 import type { CommentItemType, CommentMessageContent } from "../api/comments";
+import { shouldShowReplySection } from "../api/replies.helpers";
 import { useStore } from "../store";
 import type { NavigationProps, RootStackParamList } from "../types";
 import { parseImgUrl, showToast } from "../utils";
@@ -208,16 +209,17 @@ export const Comment = CommentBlock;
 function CommentBlock(props: { comment: CommentItemType; className?: string }) {
   const { comment } = props;
   const { setRepliesInfo } = useStore();
+  const hasReplies = shouldShowReplySection(comment.rcount, comment.replies.length);
 
   return (
-    <View className={clsx([comment.replies?.length ? "mb-7" : "mb-4", props.className])}>
+    <View className={clsx([hasReplies ? "mb-7" : "mb-4", props.className])}>
       <CommentItem comment={comment} />
-      {comment.replies?.length ? (
+      {hasReplies ? (
         <View className="mt-1 flex-1 shrink-0 gap-1 rounded border-gray-500 bg-neutral-200 p-2 opacity-90 dark:bg-neutral-900">
           {comment.replies.map((reply) => {
             return <CommentItem key={reply.id} comment={reply} smallFont />;
           })}
-          {comment.moreText && comment.rcount > comment.replies.length ? (
+          {comment.rcount > 0 ? (
             <Button
               type="clear"
               size="sm"
@@ -225,7 +227,10 @@ function CommentBlock(props: { comment: CommentItemType; className?: string }) {
                 setRepliesInfo({
                   oid: comment.oid,
                   type: comment.type,
-                  root: comment.replies[0].root_str,
+                  root: comment.id,
+                  allCount: comment.rcount,
+                  rootComment: comment,
+                  previewReplies: comment.replies,
                 });
                 // setMoreRepliesUrl(
                 //   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
@@ -233,7 +238,9 @@ function CommentBlock(props: { comment: CommentItemType; className?: string }) {
               }}
               buttonClassName="justify-start p-[1px]"
             >
-              <Text className={colors.primary.text}>{`${comment.moreText}...`}</Text>
+              <Text className={colors.primary.text}>
+                {`${comment.moreText || `共${comment.rcount}条回复`}...`}
+              </Text>
             </Button>
           ) : null}
         </View>

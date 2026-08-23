@@ -7,6 +7,7 @@ import Toast from "react-native-simple-toast";
 import { RanksConfig } from "../constants";
 import type { AuthFailureReason, AuthModalMode } from "../features/user-sync/types";
 import type { CollectVideoInfo, HistoryVideoInfo, UpInfo } from "../types";
+import type { RepliesInfo } from "./replies-info.type";
 import type { MusicSong, UpdateUpInfo } from "./types";
 
 const StoragePrefix = "Store:";
@@ -81,11 +82,7 @@ const getAppValue = () => {
     currentImageIndex: 0,
     overlayButtons: [] as { text: string; onPress: () => void }[],
     moreRepliesUrl: "",
-    repliesInfo: null as {
-      oid: string | number;
-      root: string | number;
-      type: number;
-    } | null,
+    repliesInfo: null as RepliesInfo | null,
     checkLiveTimeStamp: Date.now(),
     playingSong: null as MusicSong | null,
     releaseList: [] as {

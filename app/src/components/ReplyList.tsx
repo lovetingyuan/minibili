@@ -15,6 +15,8 @@ export default function ReplyList() {
     data: { replies, allCount, root },
     isLoading,
     isValidating,
+    isLimited,
+    isReachingEnd,
     error,
     update,
   } = useReplies();
@@ -79,7 +81,13 @@ export default function ReplyList() {
             ListFooterComponent={
               replies?.length ? (
                 <Text className={`${colors.gray6.text} mt-1 text-center text-xs`}>
-                  {isValidating ? "正在加载..." : "暂无更多"}
+                  {isValidating
+                    ? "正在加载..."
+                    : isLimited
+                      ? "匿名状态仅展示部分回复"
+                      : isReachingEnd
+                        ? "暂无更多"
+                        : "上拉加载更多"}
                 </Text>
               ) : null
             }

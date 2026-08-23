@@ -40,6 +40,8 @@ export default function CommentList(
     data: { replies: comments, allCount },
     isLoading,
     isValidating,
+    isLimited,
+    isReachingEnd,
     error,
     update,
   } = useComments(props.commentId, props.commentType, mode);
@@ -96,7 +98,13 @@ export default function CommentList(
         ListFooterComponent={
           comments?.length ? (
             <Text className={`${colors.gray6.text} text-center text-xs`}>
-              {isValidating ? "正在加载..." : "暂无更多"}
+              {isValidating
+                ? "正在加载..."
+                : isLimited
+                  ? "匿名状态仅展示部分评论"
+                  : isReachingEnd
+                    ? "暂无更多"
+                    : "上拉加载更多"}
             </Text>
           ) : null
         }
