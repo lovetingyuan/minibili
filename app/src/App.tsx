@@ -88,7 +88,7 @@ export default function App() {
             </ErrorBoundary>
           </MenuProvider>
         </ThemeProvider>
-        <StatusBar style="auto" translucent />
+        <StatusBar style="auto" />
       </GestureHandlerRootView>
     </SWRConfig>
   );

@@ -1,10 +1,6 @@
 {
   "name": "minibili-monorepo",
   "private": true,
-  "packageManager": "npm@10.9.8",
-  "engines": {
-    "npm": ">=10 <11"
-  },
   "workspaces": [
     "app",
     "server"
@@ -25,7 +21,11 @@
     "knip": "^6.0.1",
     "oxfmt": "latest",
     "oxlint": "^1.56.0",
-    "typescript": "~5.9.2",
+    "typescript": "~6.0.3",
     "vitest": "^4.1.0"
-  }
+  },
+  "engines": {
+    "npm": ">=10"
+  },
+  "packageManager": "npm@11.6.2"
 }

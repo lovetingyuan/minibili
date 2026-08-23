@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { FAB, FlashList, Icon } from "@/components/styled/rneui";
 import React from "react";
-import { Alert, Dimensions, Linking, TouchableOpacity } from "react-native";
+import { Alert, Linking, TouchableOpacity } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { colors } from "@/constants/colors.tw";
@@ -198,14 +198,11 @@ function VideoList(props: {
         data={videoList}
         renderItem={renderItem}
         persistentScrollbar
-        estimatedItemSize={Dimensions.get("window").width / 2 - 10}
         ListEmptyComponent={<Loading />}
         ListFooterComponent={
           typeof props.footer === "function" ? props.footer(videoList) : props.footer
         }
-        columnWrapperClassName="items-stretch"
         contentContainerClassName="px-1 pt-6"
-        estimatedFirstItemOffset={100}
         {...refreshProps}
         {...reachEndProps}
       />

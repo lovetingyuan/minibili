@@ -158,7 +158,6 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
         return <VideoListItem video={item} />;
       }}
       persistentScrollbar
-      estimatedItemSize={100}
       keyboardShouldPersistTaps="handled"
       automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
       ListEmptyComponent={<EmptyContent loading={isLoading} onSearch={props.onSearch} />}
@@ -173,7 +172,6 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
         paddingBottom: EMPTY_LIST_BOTTOM_SPACING + (Platform.OS === "android" ? keyboardInset : 0),
       }}
       contentContainerClassName="px-1 pt-4"
-      estimatedFirstItemOffset={80}
       onEndReached={() => {
         update();
       }}

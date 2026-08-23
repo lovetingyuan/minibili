@@ -83,7 +83,7 @@ function getChildren(element: ReactElement<ElementProps>) {
 }
 
 describe("VideoItem", () => {
-  test("keeps the title in a two-line bottom-aligned slot", () => {
+  test("keeps the title in a two-line top-aligned slot", () => {
     const video: React.ComponentProps<typeof VideoItem>["video"] = {
       aid: 1,
       bvid: "BV1",
@@ -112,7 +112,7 @@ describe("VideoItem", () => {
     const [titleSlot] = getChildren(content);
     const [title] = getChildren(titleSlot);
 
-    expect(titleSlot.props.className).toBe("h-10 justify-end");
+    expect(titleSlot.props.className).toBe("h-10 justify-start");
     expect(title.props.className).toContain("leading-5");
     expect(title.props.numberOfLines).toBe(2);
   });

@@ -5,6 +5,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "bundler",
+    "types": ["node"],
     "paths": {
       "@/*": ["./src/*"]
     }

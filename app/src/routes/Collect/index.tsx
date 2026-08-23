@@ -98,7 +98,6 @@ function CollectList() {
         return <VideoListItem video={item} buttons={buttons} />;
       }}
       persistentScrollbar
-      estimatedItemSize={100}
       ListEmptyComponent={
         isEmptyCollect ? (
           <EmptyCollectContent />
@@ -114,7 +113,6 @@ function CollectList() {
         ) : null
       }
       contentContainerClassName={collectVideos.length ? "px-1 pt-6" : "flex-1 px-4 pt-6"}
-      estimatedFirstItemOffset={80}
     />
   );
 }

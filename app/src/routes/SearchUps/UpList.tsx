@@ -130,7 +130,6 @@ function UpList(props: { keyword: string }) {
         return <SearchUpItem up={item} />;
       }}
       persistentScrollbar
-      estimatedItemSize={100}
       ListEmptyComponent={<EmptyContent loading={isLoading} />}
       ListFooterComponent={
         isValidating ? (
@@ -140,7 +139,6 @@ function UpList(props: { keyword: string }) {
         ) : null
       }
       contentContainerClassName="px-1 pt-6"
-      estimatedFirstItemOffset={80}
       onEndReached={() => {
         update();
       }}

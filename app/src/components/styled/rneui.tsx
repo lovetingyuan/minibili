@@ -439,11 +439,8 @@ export function FAB({
 type StyledFlashListProps<T> = FlashListProps<T> & {
   className?: string;
   contentContainerClassName?: string;
-  columnWrapperClassName?: string;
   ListFooterComponentClassName?: string;
   ListHeaderComponentClassName?: string;
-  estimatedFirstItemOffset?: number;
-  estimatedItemSize?: number;
 };
 
 type FlashListComponent = <T>(
@@ -454,11 +451,9 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
   {
     className,
     contentContainerClassName,
-    columnWrapperClassName,
     ListFooterComponentClassName,
     ListHeaderComponentClassName,
     style,
-    columnWrapperStyle,
     contentContainerStyle,
     ListFooterComponentStyle,
     ListHeaderComponentStyle,
@@ -467,7 +462,6 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
   ref: React.ForwardedRef<FlashListRef<T>>,
 ) {
   const resolvedStyle = useResolvedStyle(className);
-  const resolvedColumnWrapperStyle = useResolvedStyle(columnWrapperClassName);
   const resolvedContentContainerStyle = useResolvedStyle(contentContainerClassName);
   const resolvedFooterStyle = useResolvedStyle(ListFooterComponentClassName);
   const resolvedHeaderStyle = useResolvedStyle(ListHeaderComponentClassName);
@@ -477,7 +471,6 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
       {...props}
       ref={ref}
       style={{ ...style, ...resolvedStyle }}
-      columnWrapperStyle={[columnWrapperStyle, resolvedColumnWrapperStyle]}
       contentContainerStyle={[contentContainerStyle, resolvedContentContainerStyle]}
       ListFooterComponentStyle={[ListFooterComponentStyle, resolvedFooterStyle]}
       ListHeaderComponentStyle={[ListHeaderComponentStyle, resolvedHeaderStyle]}

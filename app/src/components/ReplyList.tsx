@@ -58,7 +58,6 @@ export default function ReplyList() {
                 </View>
               );
             }}
-            estimatedItemSize={30}
             ListHeaderComponent={
               root ? (
                 <View className="mb-5 border-b-[18px] border-b-neutral-300 p-4 dark:border-b-neutral-700">

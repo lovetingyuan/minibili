@@ -53,7 +53,6 @@ export default function CommentList(
           return <Comment comment={item} />;
         }}
         // persistentScrollbar
-        estimatedItemSize={50}
         ListHeaderComponent={
           <View className="flex-1 shrink-0">
             {props.children}

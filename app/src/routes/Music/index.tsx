@@ -231,7 +231,6 @@ function MusicList() {
             return <MusicItem song={item} type={displayType} />;
           }}
           persistentScrollbar
-          estimatedItemSize={100}
           ListHeaderComponent={
             <View>
               <Button
@@ -263,7 +262,6 @@ function MusicList() {
             ) : null
           }
           contentContainerClassName="px-4 pt-4"
-          estimatedFirstItemOffset={80}
         />
       </View>
       <View className="shrink-0">

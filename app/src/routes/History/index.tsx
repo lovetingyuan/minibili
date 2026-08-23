@@ -83,7 +83,6 @@ function HistoryList() {
         return <VideoListItem video={item} buttons={buttons} />;
       }}
       persistentScrollbar
-      estimatedItemSize={100}
       ListEmptyComponent={
         <View className="my-16 flex-1 gap-2">
           {count === 0 ? (
@@ -101,7 +100,6 @@ function HistoryList() {
         ) : null
       }
       contentContainerClassName="px-1 pt-6"
-      estimatedFirstItemOffset={80}
     />
   );
 }

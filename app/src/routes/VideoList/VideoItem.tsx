@@ -54,7 +54,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
         ) : null}
       </View>
       <View className="mt-3 flex-1 justify-between">
-        <View className="h-10 justify-end">
+        <View className="h-10 justify-start">
           <Text
             className={clsx("leading-5", isFollowed && ["font-bold", colors.primary.text])}
             numberOfLines={2}
