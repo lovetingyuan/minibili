@@ -1,10 +1,11 @@
 import type { CollectVideoInfo, UpInfo } from "@/types";
 
 import { useStore } from ".";
+import { useActiveFollowedUps } from "./followings";
 import type { MusicSong, UpdateUpInfo } from "./types";
 
 export const useFollowedUpsMap = () => {
-  const { $followedUps } = useStore();
+  const $followedUps = useActiveFollowedUps();
   const ups: Record<string, UpInfo> = {};
   for (const up of $followedUps) {
     ups[up.mid] = up;
@@ -14,7 +15,10 @@ export const useFollowedUpsMap = () => {
 
 export const useUpUpdateCount = () => {
   const { $upUpdateMap } = useStore();
-  const aa = Object.values<UpdateUpInfo>($upUpdateMap);
+  const ups = useActiveFollowedUps();
+  const aa = ups
+    .map((up) => $upUpdateMap[up.mid])
+    .filter((info): info is UpdateUpInfo => Boolean(info));
   return aa.filter((item) => {
     return item.latestId !== item.currentLatestId;
   }).length;

@@ -5,14 +5,10 @@ import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, Pressable, View } from "react-native";
-import {
-  Menu,
-  MenuOption,
-  MenuOptions,
-  MenuTrigger,
-} from "@/components/Menu";
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 
 import { colors } from "@/constants/colors.tw";
+import { useFollowActions } from "@/hooks/useFollowActions";
 import { useFollowedUpsMap } from "@/store/derives";
 
 import { useLivingInfo } from "../../api/living-info";
@@ -114,12 +110,11 @@ function HeaderRight() {
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
   const {
-    get$followedUps,
-    set$followedUps,
     $blackUps,
     setReloadUerProfile,
     // setDynamicOpenUrl,
   } = useStore();
+  const actions = useFollowActions();
   const _followedUpsMap = useFollowedUpsMap();
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
   const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps;
@@ -132,19 +127,17 @@ function HeaderRight() {
         <MenuOptions>
           {!followed && !isBlackUp && (
             <MenuOption
-              text="关注UP"
+              text={
+                actions.isPreparing
+                  ? "同步关注列表中"
+                  : actions.pendingMid
+                    ? "关注处理中"
+                    : "关注UP"
+              }
+              disabled={actions.disabled}
               onSelect={() => {
                 if (dynamicUser) {
-                  set$followedUps([
-                    {
-                      name: dynamicUser.name,
-                      mid: dynamicUser.mid,
-                      face: dynamicUser.face,
-                      sign: dynamicUser.sign,
-                    },
-                    ...get$followedUps(),
-                  ]);
-                  showToast("已关注");
+                  void actions.follow(dynamicUser);
                 }
                 hideMenu();
               }}

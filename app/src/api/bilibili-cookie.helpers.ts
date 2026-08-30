@@ -2,6 +2,16 @@ const REQUIRED_LOGIN_COOKIE_NAMES = ["SESSDATA", "DedeUserID"] as const;
 
 export const BILIBILI_API_COOKIE_URL = "https://api.bilibili.com/";
 
+export function getBilibiliCsrf(cookieHeader: string) {
+  for (const part of cookieHeader.split(";")) {
+    const separator = part.indexOf("=");
+    if (separator > 0 && part.slice(0, separator).trim() === "bili_jct") {
+      return part.slice(separator + 1).trim() || null;
+    }
+  }
+  return null;
+}
+
 export function isBilibiliUrl(url: string) {
   try {
     const parsedUrl = new URL(url);

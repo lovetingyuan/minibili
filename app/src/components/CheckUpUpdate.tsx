@@ -3,16 +3,12 @@ import React from "react";
 
 import { checkSingleUpUpdate } from "../api/dynamic-items";
 import { useStore } from "../store";
+import { getActiveFollowedUps, useActiveFollowedUps } from "../store/followings";
 
 function useCheckUpdateUps() {
-  const {
-    $followedUps,
-    get$followedUps,
-    set$upUpdateMap,
-    get$upUpdateMap,
-    getRequestDynamicFailed,
-    setRequestDynamicFailed,
-  } = useStore();
+  const { set$upUpdateMap, get$upUpdateMap, getRequestDynamicFailed, setRequestDynamicFailed } =
+    useStore();
+  const $followedUps = useActiveFollowedUps();
   const followedUpsKey = $followedUps
     .map((up) => up.mid.toString())
     .sort()
@@ -34,7 +30,7 @@ function useCheckUpdateUps() {
       if (Date.now() - getRequestDynamicFailed() < 60 * 60 * 1000) {
         return;
       }
-      const followedUps = get$followedUps();
+      const followedUps = getActiveFollowedUps();
       for (const up of followedUps) {
         upUpdateQueue.add(async () => {
           const id = await checkSingleUpUpdate(up.mid).catch(() => {

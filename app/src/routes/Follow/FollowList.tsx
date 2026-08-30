@@ -11,7 +11,9 @@ import {
 } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
+import { useFollowingsState } from "@/features/bilibili-followings/useFollowingsState";
 import { useUpUpdateCount } from "@/store/derives";
+import { useActiveFollowedUps } from "@/store/followings";
 
 import { useStore } from "../../store";
 import type { NavigationProps, UpInfo } from "../../types";
@@ -43,7 +45,9 @@ function FollowList() {
     console.log("Follow page");
   }
   const navigation = useNavigation<NavigationProps["navigation"]>();
-  const { $followedUps, $upUpdateMap, livingUps, requestDynamicFailed } = useStore();
+  const { $upUpdateMap, livingUps, requestDynamicFailed } = useStore();
+  const $followedUps = useActiveFollowedUps();
+  const { isValidating, mutate } = useFollowingsState();
   const _updatedCount = useUpUpdateCount();
   const followListRef = React.useRef<FlatList | null>(null);
   const dark = useColorScheme() === "dark";
@@ -109,6 +113,10 @@ function FollowList() {
         </Button>
       </View>
       <FlatList
+        refreshing={isValidating}
+        onRefresh={() => {
+          void mutate().catch(() => {});
+        }}
         data={[
           ...pinUps.sort((a, b) => b.pin! - a.pin!),
           ...liveUps,

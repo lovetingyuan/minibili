@@ -4,6 +4,7 @@ import React from "react";
 import { Alert, Linking, Pressable, TouchableOpacity, View } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
+import { useFollowActions } from "@/hooks/useFollowActions";
 
 import { useStore } from "../../store";
 import type { NavigationProps, UpInfo } from "../../types";
@@ -24,6 +25,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
     get$followedUps,
     setCheckLiveTimeStamp,
   } = useStore();
+  const actions = useFollowActions();
   let hasUpdate = false;
   if ($upUpdateMap[mid]) {
     const { latestId, currentLatestId } = $upUpdateMap[mid];
@@ -90,7 +92,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
               }
             },
           },
-      {
+      !actions.disabled && {
         text: "取消关注",
         onPress: () => {
           Alert.alert(`确定取消关注「${name}」吗？`, "", [
@@ -98,9 +100,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
             {
               text: "确定",
               onPress() {
-                set$followedUps(
-                  get$followedUps().filter((u) => u.mid.toString() !== mid.toString()),
-                );
+                void actions.unfollow(props.item);
               },
             },
           ]);
@@ -119,6 +119,9 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
             onPress: () => {
               const followedUps = get$followedUps();
               const i = followedUps.findIndex((u) => u.mid.toString() === mid.toString());
+              if (i < 0) {
+                return;
+              }
               followedUps[i] = {
                 ...followedUps[i],
                 pin: Date.now(),
@@ -131,6 +134,9 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         onPress: () => {
           const followedUps = get$followedUps();
           const i = followedUps.findIndex((u) => u.mid.toString() === mid.toString());
+          if (i < 0) {
+            return;
+          }
           followedUps[i] = {
             ...followedUps[i],
             pin: 0,

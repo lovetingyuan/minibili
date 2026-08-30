@@ -127,7 +127,7 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
         listeners.delete(listener);
       };
     },
-    isCurrentAccount(account: BilibiliAccount) {
+    isCurrentAccount(account: Pick<BilibiliAccount, "mid" | "generation">) {
       return control.phase === "ready" && account.generation === control.generation;
     },
   };

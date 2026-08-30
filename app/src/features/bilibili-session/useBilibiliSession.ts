@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 
 import { BilibiliSessionChangedError } from "./controller";
 import { bilibiliSession } from "./session";
@@ -7,7 +7,34 @@ import type { BilibiliAccount } from "./types";
 
 const SESSION_KEY = "bilibili-session";
 
+export function useBilibiliSessionActions() {
+  const { mutate } = useSWRConfig();
+  async function logout() {
+    await mutate<BilibiliAccount | null>(
+      SESSION_KEY,
+      async () => {
+        await bilibiliSession.logout();
+        return null;
+      },
+      { revalidate: false },
+    );
+  }
+  return { logout };
+}
+
+// 列表项只订阅会话；校验由全局管理器和登录入口负责，避免滚动时重复请求。
+export function useBilibiliSessionState() {
+  const control = useSyncExternalStore(bilibiliSession.subscribe, bilibiliSession.getSnapshot);
+  const { data, error } = useSWR<BilibiliAccount | null, Error>(SESSION_KEY, null, {
+    revalidateOnMount: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+  return { account: data, control, error };
+}
+
 export function useBilibiliSession() {
+  const { logout } = useBilibiliSessionActions();
   const control = useSyncExternalStore(bilibiliSession.subscribe, bilibiliSession.getSnapshot);
   const { data, error, isValidating, mutate } = useSWR<BilibiliAccount | null, Error>(
     SESSION_KEY,
@@ -32,16 +59,6 @@ export function useBilibiliSession() {
       { revalidate: false },
     );
     return accepted;
-  }
-
-  async function logout() {
-    await mutate(
-      async () => {
-        await bilibiliSession.logout();
-        return null;
-      },
-      { revalidate: false },
-    );
   }
 
   return {

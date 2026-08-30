@@ -7,6 +7,7 @@ import { Alert, TouchableOpacity, View } from "react-native";
 
 import { type SearchedUpType, useSearchUps } from "@/api/search-up";
 import { colors } from "@/constants/colors.tw";
+import { useFollowActions } from "@/hooks/useFollowActions";
 import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
 import type { NavigationProps } from "@/types";
@@ -15,7 +16,8 @@ import type { FlashListRef } from "@/components/styled/rneui";
 
 function SearchUpItem(props: { up: SearchedUpType }) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
-  const { $blackUps, set$followedUps, get$followedUps } = useStore();
+  const { $blackUps } = useStore();
+  const actions = useFollowActions();
   const _followedUpsMap = useFollowedUpsMap();
 
   const isFollowed = props.up.mid in _followedUpsMap;
@@ -55,7 +57,8 @@ function SearchUpItem(props: { up: SearchedUpType }) {
       <Button
         size="sm"
         type="clear"
-        disabled={isFollowed}
+        disabled={isFollowed || actions.disabled}
+        loading={actions.pendingMid === props.up.mid.toString()}
         onPress={() => {
           const user = {
             name: props.up.name,
@@ -71,15 +74,15 @@ function SearchUpItem(props: { up: SearchedUpType }) {
               {
                 text: "是",
                 onPress: () => {
-                  set$followedUps([user, ...get$followedUps()]);
+                  void actions.follow(user);
                 },
               },
             ]);
           } else {
-            set$followedUps([user, ...get$followedUps()]);
+            void actions.follow(user);
           }
         }}
-        title={isFollowed ? "已关注" : "关注"}
+        title={isFollowed ? "已关注" : actions.isPreparing ? "同步中" : "关注"}
       />
     </View>
   );

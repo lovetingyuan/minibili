@@ -5,12 +5,14 @@ import type { z } from "zod";
 
 import type { LiveInfoBatchItemSchema } from "../api/living-info.schema";
 import { useStore } from "../store";
+import { getActiveFollowedUps, useActiveFollowedUps } from "../store/followings";
 import { showToast } from "@/utils";
 
 type LivingUpsData = Record<string, z.infer<typeof LiveInfoBatchItemSchema>>;
 
 const useCheckLivingUps = (time?: number) => {
-  const { $followedUps, setLivingUps, checkLiveTimeStamp } = useStore();
+  const { setLivingUps, checkLiveTimeStamp } = useStore();
+  const $followedUps = useActiveFollowedUps();
   const uids = $followedUps.map((user) => `uids[]=${user.mid}`).join("&");
   const url = uids
     ? `https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids?${uids}&_t=${checkLiveTimeStamp}`
@@ -26,7 +28,11 @@ const useCheckLivingUps = (time?: number) => {
         return;
       }
       const livingMap: Record<string, string> = {};
+      const activeMids = new Set(getActiveFollowedUps().map((up) => up.mid.toString()));
       Object.keys(data).forEach((mid) => {
+        if (!activeMids.has(mid)) {
+          return;
+        }
         // https://live.bilibili.com/h5/24446464
         const { live_status, room_id } = data[mid];
         if (live_status === 1) {

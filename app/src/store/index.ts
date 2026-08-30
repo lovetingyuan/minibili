@@ -50,6 +50,8 @@ const getAppValue = () => {
     $checkAppUpdateTime: 0,
     // -------------------------
     initialed: false,
+    // 仅当前运行会话的完整 B站同步才激活磁盘缓存。
+    followingsGeneration: -1,
     isWiFi: false,
     webViewMode: "MOBILE" as "PC" | "MOBILE",
     livingUps: {} as Record<string, string>,

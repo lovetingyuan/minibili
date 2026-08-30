@@ -29,9 +29,13 @@ function BilibiliFollowingsManager() {
     if (mergedUps !== currentUps) {
       methods.set$followedUps(mergedUps);
     }
+    methods.setFollowingsGeneration(account.generation);
   }, [account, data, enabled]);
 
   React.useEffect(() => {
+    if (!error) {
+      notifiedErrorKeyRef.current = "";
+    }
     if (!enabled || !account || !error || !bilibiliSession.isCurrentAccount(account)) {
       return;
     }
@@ -39,7 +43,7 @@ function BilibiliFollowingsManager() {
     const errorKey = `${account.mid}:${account.generation}`;
     if (notifiedErrorKeyRef.current !== errorKey) {
       notifiedErrorKeyRef.current = errorKey;
-      showToast("B站关注列表获取失败，已保留本地关注");
+      showToast("B站关注列表同步失败，请在关注页重试；未覆盖上次数据");
     }
   }, [account, enabled, error]);
 

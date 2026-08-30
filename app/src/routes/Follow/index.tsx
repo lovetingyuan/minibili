@@ -3,13 +3,20 @@ import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { Button, Text } from "@/components/styled/rneui";
+import { useBilibiliFollowings } from "@/api/followings";
+import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import BilibiliLoginWebView from "./BilibiliLoginWebView";
-import FollowList from "./FollowList";
+import FollowingsContent from "./FollowingsContent";
 
 // 每次页面重新获得焦点时挂载，由 SWR 与其他入口的校验请求去重。
 function RevalidateSessionOnFocus() {
-  useBilibiliSession();
+  const { account } = useBilibiliSession();
+  useBilibiliFollowings(
+    account && bilibiliSession.isCurrentAccount(account) ? account.mid : undefined,
+    account?.generation,
+    () => Boolean(account && bilibiliSession.isCurrentAccount(account)),
+  );
   return null;
 }
 
@@ -63,7 +70,7 @@ export default function Follow() {
             />
           </View>
         ) : null}
-        {account ? <FollowList /> : focused ? <BilibiliLoginWebView /> : null}
+        {account ? <FollowingsContent /> : focused ? <BilibiliLoginWebView /> : null}
       </>
     );
   }
