@@ -91,7 +91,7 @@ export default function FavoritesContent() {
             keyExtractor={(item) => item.key}
             renderItem={({ item }) =>
               item.video ? (
-                <VideoListItem video={item.video} />
+                <VideoListItem video={item.video} playCountOnCover />
               ) : (
                 <View className={`mx-3 my-2 gap-2 rounded-lg p-4 ${colors.gray1.bg}`}>
                   <Text className={colors.gray7.text} numberOfLines={2}>

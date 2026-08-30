@@ -45,7 +45,6 @@ vi.mock("@/store", () => ({
     currentVideosCate: {},
   }),
 }));
-vi.mock("@/store/actions", () => ({ useMarkVideoWatched: () => vi.fn() }));
 vi.mock("@/utils", () => ({ handleShareVideo: vi.fn(), parseNumber: String, parseUrl: String }));
 vi.mock("./Loading", () => ({ default: () => null }));
 vi.mock("./VideoItem", () => ({ default: () => null }));
@@ -106,6 +105,7 @@ describe("video list after replacing local UP blocking", () => {
     }
     longPress(video, 0);
     const buttons = mocks.setOverlayButtons.mock.calls[0][0];
+    expect(buttons.some((button) => button.text === "标记观看完成")).toBe(false);
     expect(buttons[0].text).toBe("拉黑 UP 主「UP」");
     expect(buttons[1].text).toBe("不再看「音乐」类型的视频");
     longPress(other, 1);

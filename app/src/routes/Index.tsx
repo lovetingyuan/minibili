@@ -13,7 +13,6 @@ import Dynamic from "./Dynamic";
 import { Asset } from "expo-asset";
 import Follow from "./Follow";
 import { followHeaderRight, followHeaderTitle } from "./Follow/Header";
-import History from "./History";
 import Music from "./Music";
 import Play from "./Play";
 import SearchUps from "./SearchUps";
@@ -130,7 +129,6 @@ function AppRoute() {
             headerTitle: "关于",
           }}
         />
-        <Stack.Screen name="History" component={History} />
         <Stack.Screen name="Music" component={Music} />
       </Stack.Navigator>
     </NavigationContainer>

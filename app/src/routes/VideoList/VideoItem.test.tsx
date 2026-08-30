@@ -24,12 +24,6 @@ vi.mock("@/components/styled/expo", () => ({
   },
 }));
 
-vi.mock("@/components/WatchProgressBar", () => ({
-  default: function WatchProgressBar() {
-    return null;
-  },
-}));
-
 vi.mock("@/constants/colors.tw", () => ({
   colors: {
     primary: {
@@ -46,7 +40,6 @@ vi.mock("@/constants/colors.tw", () => ({
 vi.mock("@/store", () => ({
   useStore: () => ({
     $blackTags: {},
-    $watchedVideos: {},
     isWiFi: true,
   }),
 }));

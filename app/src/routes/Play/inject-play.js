@@ -57,21 +57,6 @@ video {
     );
   };
 
-  const reportPlayTime = (lastTime, duration) => {
-    if (!Number.isFinite(lastTime) || !Number.isFinite(duration) || duration <= 0) {
-      return;
-    }
-    postMessage("reportPlayTime", Number.parseFloat(((lastTime * 100) / duration).toFixed(1)));
-  };
-
-  window.reportPlayTime = () => {
-    const video = document.querySelector("video");
-    if (!video) {
-      return;
-    }
-    reportPlayTime(video.currentTime, video.duration);
-  };
-
   const setupVideo = (video) => {
     if (!video || video.tagName !== "VIDEO" || video.dataset.handled === "true") {
       return;
@@ -79,18 +64,9 @@ video {
 
     video.dataset.handled = "true";
 
-    const syncPlayTime = () => {
-      reportPlayTime(video.currentTime, video.duration);
-    };
-
     ["play", "ended", "pause"].forEach((evt) => {
       video.addEventListener(evt, () => {
         postMessage("playState", evt);
-        if (evt === "play") {
-          setTimeout(syncPlayTime, 3000);
-        } else {
-          syncPlayTime();
-        }
         if (evt === "ended") {
           const rateBtn = document.getElementById("play-rate-button");
           if (rateBtn) {
@@ -105,14 +81,6 @@ video {
           } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
           }
-        }
-      });
-    });
-
-    ["timeupdate", "seeking"].forEach((evt) => {
-      video.addEventListener(evt, () => {
-        if (evt === "seeking") {
-          syncPlayTime();
         }
       });
     });

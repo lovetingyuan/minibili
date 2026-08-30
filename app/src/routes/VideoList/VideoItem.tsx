@@ -5,7 +5,6 @@ import React from "react";
 import { View } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
-import WatchProgressBar from "@/components/WatchProgressBar";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
@@ -16,11 +15,10 @@ export default VideoItem;
 function VideoItem({ video }: { video: VideoItemType }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum);
-  const { isWiFi, $watchedVideos, $blackTags } = useStore();
+  const { isWiFi, $blackTags } = useStore();
   const _followedUpsMap = useFollowedUpsMap();
 
   const isFollowed = video.mid in _followedUpsMap;
-  const watchedInfo = $watchedVideos[video.bvid];
   const isBlackTag = video.tag in $blackTags;
   // console.log(parseImgUrl(video.cover, 480, 300))
   return (
@@ -31,22 +29,17 @@ function VideoItem({ video }: { video: VideoItemType }) {
           contentFit="cover"
           source={isWiFi ? parseImgUrl(video.cover, 480, 300) : parseImgUrl(video.cover, 320, 200)}
         />
-        {watchedInfo ? <WatchProgressBar progress={watchedInfo.watchProgress} /> : null}
         <View className="absolute m-1 items-center rounded-sm bg-gray-900/70 px-1  py-0.5">
           <Text className="text-xs text-white">{parseDuration(video.duration)}</Text>
         </View>
-        <View
-          className={`${watchedInfo ? "bottom-1.5" : "bottom-0"} absolute m-1 items-center rounded-sm bg-gray-900/70 px-1  py-0.5`}
-        >
+        <View className="absolute bottom-0 m-1 items-center rounded-sm bg-gray-900/70 px-1 py-0.5">
           <Text className="text-xs text-white">{parseDate(video.date)}</Text>
         </View>
         <View className="absolute right-0 top-0 m-1 items-center rounded-sm bg-gray-900/70 px-1  py-0.5">
           <Text className="text-xs text-white">{parseNumber(video.danmuNum)}弹</Text>
         </View>
         {video.tag ? (
-          <View
-            className={`right-0 ${watchedInfo ? "bottom-1.5" : "bottom-0"} absolute m-1 items-center rounded-sm bg-gray-900/70 px-1 py-0.5`}
-          >
+          <View className="absolute bottom-0 right-0 m-1 items-center rounded-sm bg-gray-900/70 px-1 py-0.5">
             <Text className={clsx("text-xs text-white", isBlackTag && "line-through opacity-60")}>
               {video.tag}
             </Text>

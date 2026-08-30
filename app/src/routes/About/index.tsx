@@ -5,7 +5,6 @@ import { ScrollView, View } from "react-native";
 import Header from "./Banner";
 import BilibiliAccount from "./BilibiliAccount";
 import BlackTags from "./BlackTags";
-import History from "./History";
 import Music from "./Music";
 import SortCate from "./SortCate";
 import Version from "./Version";
@@ -24,7 +23,6 @@ function About() {
       <View className="gap-2">
         <Version />
         <BilibiliAccount />
-        <History />
         <Music />
       </View>
       <Divider className="my-4" />

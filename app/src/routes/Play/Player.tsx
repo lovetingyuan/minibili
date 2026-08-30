@@ -1,4 +1,4 @@
-import { type RouteProp, useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import { type RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
 import { Image as ExpoImage } from "@/components/styled/expo";
 import { CheckBox } from "@/components/styled/rneui";
 import * as KeepAwake from "expo-keep-awake";
@@ -18,8 +18,7 @@ import { useVideoMp4Url } from "@/api/play-url";
 import { UA } from "@/constants";
 import { colors } from "@/constants/colors.tw";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
-import { useMarkVideoWatched } from "@/store/actions";
-import type { NavigationProps, RootStackParamList } from "@/types";
+import type { RootStackParamList } from "@/types";
 
 import { useVideoInfo } from "../../api/video-info";
 import { useAppStateChange } from "../../hooks/useAppState";
@@ -69,7 +68,6 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     error: playUrlError,
     retry: retryVideoUrl,
   } = useVideoMp4Url(videoInfo.bvid, cid, highQuality);
-  const markVideoWatched = useMarkVideoWatched();
 
   const [isEnded, setIsEnded] = React.useState(true);
   const handleRetry = async () => {
@@ -148,8 +146,6 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     }
   });
 
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-
   useFocusEffect(
     React.useCallback(() => {
       return () => {
@@ -157,20 +153,6 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       };
     }, []),
   );
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
-      e.preventDefault();
-      webViewRef.current?.injectJavaScript(`
-      window.reportPlayTime();
-      true;
-      `);
-      setTimeout(() => {
-        navigation.dispatch(e.data.action);
-      });
-    });
-    return unsubscribe;
-  }, [navigation]);
 
   const currentPageInfo = videoInfo.pages ? videoInfo.pages[props.currentPage - 1] : undefined;
   let videoWidth = 0;
@@ -227,29 +209,6 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       if (eventData.action === "showToast") {
         if (typeof eventData.payload === "string") {
           showToast(eventData.payload);
-        }
-      }
-      if (eventData.action === "reportPlayTime") {
-        if (
-          videoInfo.name &&
-          videoInfo.cover &&
-          videoInfo.date &&
-          videoInfo.duration &&
-          videoInfo.mid &&
-          typeof eventData.payload === "number"
-        ) {
-          markVideoWatched(
-            {
-              bvid: videoInfo.bvid,
-              cover: videoInfo.cover,
-              date: videoInfo.date,
-              duration: videoInfo.duration,
-              mid: videoInfo.mid,
-              name: videoInfo.name,
-              title: videoInfo.title,
-            },
-            eventData.payload,
-          );
         }
       }
       // if (eventData.action === 'updateUrlSettled') {

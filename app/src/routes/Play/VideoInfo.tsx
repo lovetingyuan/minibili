@@ -50,7 +50,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             </Text>
           </View>
         ) : null}
-        <View className="flex-row justify-between">
+        <View className="w-full flex-row justify-between">
           <Pressable
             onPress={() => {
               if (!mid || !face || !name) {
@@ -64,10 +64,11 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
               };
               navigation.push("Dynamic", { user });
             }}
-            className="mr-1 flex-1 flex-row items-center"
+            className="mr-1 min-w-0 flex-1 flex-row items-center"
           >
             <Avatar
               size={36}
+              containerClassName="shrink-0"
               rounded
               source={
                 face
@@ -80,7 +81,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
-              className="ml-3 mr-1 grow text-base font-bold"
+              className="ml-3 mr-1 min-w-0 flex-1 text-base font-bold"
             >
               {name || ""}
             </Text>

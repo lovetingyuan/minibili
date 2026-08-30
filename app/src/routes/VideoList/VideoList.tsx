@@ -7,7 +7,6 @@ import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { colors } from "@/constants/colors.tw";
 import { useBlockUpActions } from "@/hooks/useBlockUpActions";
 import { useStore } from "@/store";
-import { useMarkVideoWatched } from "@/store/actions";
 import type { NavigationProps } from "@/types";
 import { handleShareVideo, parseNumber, parseUrl } from "@/utils";
 import type { FlashListRef } from "@/components/styled/rneui";
@@ -43,7 +42,6 @@ function VideoList(props: {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null);
   const currentVideoRef = React.useRef<VideoItemType | null>(null);
-  const markVideoWatched = useMarkVideoWatched();
   React.useEffect(() => {
     setTimeout(() => {
       listRef.current?.scrollToOffset({ offset: 0, animated: false });
@@ -103,13 +101,6 @@ function VideoList(props: {
       </TouchableOpacity>
     );
   };
-  const markWatched = () => {
-    const videoInfo = currentVideoRef.current;
-    if (!videoInfo) {
-      return;
-    }
-    markVideoWatched(videoInfo, 100);
-  };
   const buttons = (video: VideoItemType) =>
     [
       {
@@ -128,10 +119,6 @@ function VideoList(props: {
             handleShareVideo(name, title, bvid);
           }
         },
-      },
-      {
-        text: "标记观看完成",
-        onPress: markWatched,
       },
       {
         text: "查看封面",

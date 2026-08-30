@@ -5,11 +5,12 @@ import he from "he";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
-import WatchProgressBar from "@/components/WatchProgressBar";
+import type { VideoListItemProps } from "./VideoItem.types";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
-import type { VideoListItemInfo, HistoryVideoInfo, NavigationProps } from "@/types";
+import type { VideoListItemInfo, NavigationProps } from "@/types";
+import { formatWatchTime } from "@/utils/watch-time";
 import {
   isDefined,
   parseDate,
@@ -40,22 +41,16 @@ function extractTextWithEmTags(text: string, className?: string) {
   return result;
 }
 
-function VideoListItem<T extends VideoListItemInfo | HistoryVideoInfo>({
+function VideoListItem<T extends VideoListItemInfo>({
   video,
   buttons,
-}: {
-  video: T;
-  buttons?: (vi: T) => {
-    text: string;
-    onPress: () => void;
-  }[];
-}) {
+  playCountOnCover = false,
+  watchedAt,
+}: VideoListItemProps<T>) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const { setOverlayButtons } = useStore();
   const _followedUpsMap = useFollowedUpsMap();
   const isFollowed = video.mid && video.mid in _followedUpsMap;
-  const watchProgress =
-    "watchProgress" in video ? Math.min(Math.max(video.watchProgress, 0), 100) : null;
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -89,7 +84,6 @@ function VideoListItem<T extends VideoListItemInfo | HistoryVideoInfo>({
             source={{ uri: parseImgUrl(video.cover, 480, 300) }}
             placeholder={require("../../assets/video-loading.png")}
           />
-          {watchProgress !== null ? <WatchProgressBar progress={watchProgress} /> : null}
           <View className="absolute right-0 top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
             <Text className="text-xs font-thin text-white">
               {typeof video.duration === "string"
@@ -97,13 +91,27 @@ function VideoListItem<T extends VideoListItemInfo | HistoryVideoInfo>({
                 : parseDuration(video.duration)}
             </Text>
           </View>
-          <View className="absolute top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
-            <Text className="text-xs font-thin text-white">{parseDate(video.date)}</Text>
-          </View>
-          {isDefined(video.danmaku) ? (
+          {video.date ? (
+            <View className="absolute top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
+              <Text className="text-xs font-thin text-white">{parseDate(video.date)}</Text>
+            </View>
+          ) : null}
+          {playCountOnCover && isDefined(video.play) ? (
             <View
-              className={`${watchProgress !== null ? "bottom-1.5" : "bottom-0"} absolute right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]`}
+              className={`absolute bottom-0 left-0 m-1 flex-row items-center gap-1 rounded-sm px-1 py-[1px] ${colors.coverBadge.bg}`}
             >
+              <Icon
+                name="play-circle-outline"
+                size={12}
+                colorClassName={colors.coverBadge.accent}
+              />
+              <Text className={`text-xs font-thin ${colors.coverBadge.text}`}>
+                {parseNumber(video.play)}
+              </Text>
+            </View>
+          ) : null}
+          {isDefined(video.danmaku) ? (
+            <View className="absolute bottom-0 right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
               <Text className="text-xs font-thin text-white">{parseNumber(video.danmaku)}弹</Text>
             </View>
           ) : null}
@@ -118,12 +126,17 @@ function VideoListItem<T extends VideoListItemInfo | HistoryVideoInfo>({
             <Text className={colors.gray7.text}>UP: </Text>
             {video.name}
           </Text>
-          {isDefined(video.play) ? (
+          {watchedAt !== undefined ? (
+            <Text className={`text-xs ${colors.gray6.text}`}>{formatWatchTime(watchedAt)}</Text>
+          ) : null}
+          {isDefined(video.play) && (!playCountOnCover || isDefined(video.like)) ? (
             <View className="min-w-20 shrink-0 flex-row flex-wrap items-center gap-x-3">
-              <View className="flex-row items-center gap-1">
-                <Icon name="play-circle-outline" size={15} colorClassName={colors.gray6.accent} />
-                <Text className={colors.gray6.text}>{parseNumber(video.play)}</Text>
-              </View>
+              {!playCountOnCover ? (
+                <View className="flex-row items-center gap-1">
+                  <Icon name="play-circle-outline" size={15} colorClassName={colors.gray6.accent} />
+                  <Text className={colors.gray6.text}>{parseNumber(video.play)}</Text>
+                </View>
+              ) : null}
               {isDefined(video.like) ? (
                 <View className="flex-row items-center gap-1">
                   <Icon name="thumb-up-off-alt" colorClassName={colors.gray6.accent} size={15} />

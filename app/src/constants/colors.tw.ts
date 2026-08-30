@@ -1,4 +1,9 @@
 export const colors = {
+  coverBadge: {
+    text: "text-white",
+    accent: "accent-white",
+    bg: "bg-gray-900/70",
+  },
   primary: {
     text: "text-sky-600 dark:text-sky-500",
     accent: "accent-sky-600 dark:accent-sky-500",

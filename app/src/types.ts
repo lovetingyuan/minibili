@@ -18,7 +18,7 @@ export interface VideoListItemInfo {
   name: string;
   title: string;
   cover: string;
-  date: string | number;
+  date?: string | number;
   duration: string | number;
   mid: string | number;
   // ---
@@ -31,16 +31,10 @@ export interface VideoListItemInfo {
   like?: number;
 }
 
-export interface HistoryVideoInfo extends VideoListItemInfo {
-  watchProgress: number;
-  watchTime: number;
-}
-
 export type RootStackParamList = {
   Welcome: undefined;
   SearchUps: undefined;
   SearchVideos: undefined;
-  History: undefined;
   Music: undefined;
   WebPage: { url: string; title?: string; type?: "pc" | "mobile" };
   Play: {

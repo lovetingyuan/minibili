@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
   currentPage: { current: 0 },
   stateIndex: 0,
   refIndex: 0,
-  values: [0, false, 360] as unknown[],
+  values: [0, false, false, 360] as unknown[],
   effects: [] as (() => void)[],
 }));
 
@@ -52,6 +52,7 @@ vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("./FollowingsContent", () => ({ default: "FollowingsContent" }));
 vi.mock("./FavoritesContent", () => ({ default: "FavoritesContent" }));
+vi.mock("./HistoryContent", () => ({ default: "HistoryContent" }));
 
 import FollowPages from "./FollowPages";
 
@@ -82,16 +83,58 @@ beforeEach(() => {
   mocks.hasViewManagerConfig.mockImplementation(() => mocks.nativeAvailable);
   mocks.nativeAvailable = false;
   mocks.currentPage.current = 0;
-  mocks.values = [0, false, 360];
+  mocks.values = [0, false, false, 360];
   mocks.effects = [];
 });
 
 describe("Follow pager native compatibility", () => {
+  test.each([false, true])("history tab is lazy and remains mounted (native=%s)", (native) => {
+    mocks.nativeAvailable = native;
+    const tabs = elements(render()).filter((element) => element.type === "Pressable");
+    expect(
+      tabs.map((tab) => {
+        if (!React.isValidElement<{ accessibilityLabel: string }>(tab))
+          throw new Error("Missing tab");
+        return tab.props.accessibilityLabel;
+      }),
+    ).toEqual(["UP主", "我的收藏", "观看历史"]);
+    if (!React.isValidElement<{ onPress: () => void }>(tabs[2]))
+      throw new Error("Missing history tab");
+    tabs[2].props.onPress();
+    if (native) expect(mocks.nativeRef.current.setPage).toHaveBeenCalledWith(2);
+    else expect(mocks.scrollRef.current.scrollTo).toHaveBeenCalledWith({ x: 720, animated: true });
+    const visited = render();
+    expect(elements(visited).some((element) => element.type === "HistoryContent")).toBe(true);
+    expect(elements(visited).some((element) => element.type === "FavoritesContent")).toBe(false);
+    find<{ onPress: () => void }>(visited, "Pressable").props.onPress();
+    expect(elements(render()).some((element) => element.type === "HistoryContent")).toBe(true);
+  });
+
+  test.each([false, true])(
+    "swiping to history mounts it and updates selection (native=%s)",
+    (native) => {
+      mocks.nativeAvailable = native;
+      const root = render();
+      if (native) {
+        find<ComponentProps<typeof PagerView>>(root, "PagerView").props.onPageSelected?.({
+          nativeEvent: { position: 2 },
+        } as Parameters<NonNullable<ComponentProps<typeof PagerView>["onPageSelected"]>>[0]);
+      } else {
+        find<ScrollViewProps>(root, "ScrollView").props.onMomentumScrollEnd?.({
+          nativeEvent: { contentOffset: { x: 720 }, layoutMeasurement: { width: 360 } },
+        } as Parameters<NonNullable<ScrollViewProps["onMomentumScrollEnd"]>>[0]);
+      }
+      expect(mocks.values.slice(0, 3)).toEqual([2, false, true]);
+      expect(elements(render()).some((element) => element.type === "HistoryContent")).toBe(true);
+    },
+  );
+
   test("never mounts the missing native manager and retains lazy favorites", () => {
     const root = render();
     expect(mocks.hasViewManagerConfig).toHaveBeenCalledWith("RNCViewPager");
     expect(elements(root).some((element) => element.type === "PagerView")).toBe(false);
     expect(elements(root).some((element) => element.type === "FavoritesContent")).toBe(false);
+    expect(elements(root).some((element) => element.type === "HistoryContent")).toBe(false);
     const scroll = find<ScrollViewProps>(root, "ScrollView");
     expect(scroll.props.horizontal).toBe(true);
     expect(scroll.props.pagingEnabled).toBe(true);

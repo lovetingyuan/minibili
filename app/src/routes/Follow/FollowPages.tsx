@@ -14,8 +14,9 @@ import { Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import FavoritesContent from "./FavoritesContent";
 import FollowingsContent from "./FollowingsContent";
+import HistoryContent from "./HistoryContent";
 
-const titles = ["UP主", "我的收藏"];
+const titles = ["UP主", "我的收藏", "观看历史"];
 
 export default function FollowPages() {
   // 旧开发包/OTA 安装包可能尚未编入新增的原生依赖，不能挂载缺失的 ViewManager。
@@ -25,6 +26,7 @@ export default function FollowPages() {
   const currentPage = React.useRef(0);
   const [page, setPage] = React.useState(0);
   const [favoritesVisited, setFavoritesVisited] = React.useState(false);
+  const [historyVisited, setHistoryVisited] = React.useState(false);
   const { width } = useWindowDimensions();
   const [pageWidth, setPageWidth] = React.useState(width);
   const pagerStyle = useResolveClassNames("flex-1");
@@ -41,6 +43,9 @@ export default function FollowPages() {
     setPage(index);
     if (index === 1) {
       setFavoritesVisited(true);
+    }
+    if (index === 2) {
+      setHistoryVisited(true);
     }
   }
 
@@ -69,6 +74,14 @@ export default function FollowPages() {
       style={nativePagerAvailable ? undefined : { width: pageWidth }}
     >
       {favoritesVisited ? <FavoritesContent /> : null}
+    </View>,
+    <View
+      key="history"
+      collapsable={false}
+      className="h-full w-full"
+      style={nativePagerAvailable ? undefined : { width: pageWidth }}
+    >
+      {historyVisited ? <HistoryContent /> : null}
     </View>,
   ];
 

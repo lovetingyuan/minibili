@@ -5,7 +5,7 @@ import { createStore, type AtomicStoreMethodsType } from "react-atomic-store";
 import Toast from "react-native-simple-toast";
 
 import { RanksConfig } from "../constants";
-import type { HistoryVideoInfo, UpInfo } from "../types";
+import type { UpInfo } from "../types";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { RepliesInfo } from "./replies-info.type";
 import type { MusicSong, UpdateUpInfo } from "./types";
@@ -32,7 +32,6 @@ const getAppValue = () => {
     $upUpdateMap: {} as Record<string, UpdateUpInfo>,
     // $ignoredVersions: [] as string[],
     $videoCatesList: RanksConfig,
-    $watchedVideos: {} as Record<string, HistoryVideoInfo>,
     $musicList: [
       {
         name: "默认",
@@ -207,7 +206,7 @@ export function InitStoreComp() {
         const notices = [
           hydration.status === "rejected" ? "应用数据恢复失败，已使用默认配置启动" : "",
           hasResetValues ? "部分本地数据异常，已重置默认值" : "",
-          clearedCollections ? "" : "旧收藏数据清理失败，将在下次启动重试",
+          clearedCollections ? "" : "旧收藏或观看历史数据清理失败，将在下次启动重试",
         ].filter(Boolean);
         finishHydration(notices.join("；") || undefined);
       })
