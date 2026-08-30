@@ -1,10 +1,10 @@
-import type { CollectVideoInfo } from "@/types";
+import type { VideoListItemInfo } from "@/types";
 
 import { useStore } from ".";
 
 export function useMarkVideoWatched() {
   const { get$watchedVideos, set$watchedVideos } = useStore();
-  return (videoInfo: CollectVideoInfo, newProgress: number) => {
+  return (videoInfo: VideoListItemInfo, newProgress: number) => {
     let playedMap = get$watchedVideos();
     const playedInfo = playedMap[videoInfo.bvid];
     if (playedInfo) {

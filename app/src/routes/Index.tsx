@@ -9,7 +9,6 @@ import useRouteTheme from "@/hooks/useRouteTheme";
 import { useStore } from "../store";
 import type { RootStackParamList } from "../types";
 import About from "./About";
-import Collect from "./Collect";
 import Dynamic from "./Dynamic";
 import { Asset } from "expo-asset";
 import Follow from "./Follow";
@@ -131,7 +130,6 @@ function AppRoute() {
             headerTitle: "关于",
           }}
         />
-        <Stack.Screen name="Collect" component={Collect} />
         <Stack.Screen name="History" component={History} />
         <Stack.Screen name="Music" component={Music} />
       </Stack.Navigator>

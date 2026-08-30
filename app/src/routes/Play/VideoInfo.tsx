@@ -2,23 +2,16 @@ import { type RouteProp, useNavigation, useRoute } from "@react-navigation/nativ
 import { Avatar, BottomSheet, Card, Icon, Text } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import React from "react";
-import { Alert, Linking, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import { Linking, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 
 import { useWatchingCount } from "@/api/watching-count";
 import { colors } from "@/constants/colors.tw";
-import { useStore } from "@/store";
-import { useCollectedVideosMap } from "@/store/derives";
 import type { NavigationProps, RootStackParamList } from "@/types";
-import {
-  handleShareVideo,
-  parseDate,
-  parseDuration,
-  parseImgUrl,
-  parseNumber,
-  showToast,
-} from "@/utils";
+import { handleShareVideo, parseDate, parseDuration, parseImgUrl, parseNumber } from "@/utils";
 
 import { useVideoInfo } from "../../api/video-info";
+import FavoriteButton from "./FavoriteButton";
+import LikeButton from "./LikeButton";
 
 export default VideoInfo;
 
@@ -40,43 +33,6 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
 
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid);
-  const { set$collectedVideos, get$collectedVideos } = useStore();
-  const _collectedVideosMap = useCollectedVideosMap();
-  const isCollected = videoInfo.bvid && videoInfo.bvid in _collectedVideosMap;
-  const collectVideo = () => {
-    if (typeof videoInfo?.collectNum !== "number") {
-      return;
-    }
-    if (isCollected) {
-      Alert.alert("是否取消收藏？", "", [
-        {
-          text: "否",
-        },
-        {
-          text: "是",
-          onPress: () => {
-            const list = get$collectedVideos();
-            set$collectedVideos(list.filter((vi) => vi.bvid !== videoInfo.bvid));
-          },
-        },
-      ]);
-    } else {
-      const list = get$collectedVideos();
-      set$collectedVideos([
-        {
-          bvid: videoInfo.bvid,
-          name: videoInfo.name!,
-          title: videoInfo.title,
-          cover: videoInfo.cover!,
-          date: videoInfo.date!,
-          duration: videoInfo.duration!,
-          mid: videoInfo.mid!,
-        },
-        ...list,
-      ]);
-      showToast("已收藏");
-    }
-  };
   return (
     <View>
       <View className="shrink-0 flex-wrap items-center justify-between gap-3">
@@ -148,34 +104,8 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             <Icon name="chat-bubble-outline" size={16} />
             <Text className="text-sm">{parseNumber(videoInfo?.danmuNum)}弹</Text>
           </View>
-          <Pressable
-            className="flex-row items-center gap-1 px-2 py-1"
-            onPress={() => {
-              showToast(`${videoInfo?.likeNum} 点赞`);
-            }}
-          >
-            <Icon name="thumb-up-off-alt" size={18} />
-            <Text className="text-sm">{parseNumber(videoInfo?.likeNum)}</Text>
-          </Pressable>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={collectVideo}
-            className="flex-row items-center gap-1 px-2 py-1"
-          >
-            <Icon
-              name="star"
-              size={18}
-              colorClassName={isCollected ? colors.warning.accent : colors.gray8.accent}
-            />
-            <Text
-              className={clsx(
-                "text-sm",
-                isCollected ? [colors.warning.text, "font-bold"] : colors.gray8.text,
-              )}
-            >
-              {parseNumber(videoInfo?.collectNum)}
-            </Text>
-          </TouchableOpacity>
+          <LikeButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.likeNum} />
+          <FavoriteButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.collectNum} />
           <Pressable
             className="flex-row items-center gap-1 py-1 pl-2"
             onPress={() => {

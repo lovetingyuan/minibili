@@ -4,11 +4,9 @@ import React from "react";
 import {
   FlatList,
   Image,
-  ImageBackground,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  useColorScheme,
   useWindowDimensions,
   View,
 } from "react-native";
@@ -57,7 +55,6 @@ function FollowList() {
   const { isValidating, mutate } = useFollowingsState();
   const _updatedCount = useUpUpdateCount();
   const followListRef = React.useRef<FlatList | null>(null);
-  const dark = useColorScheme() === "dark";
 
   function changeSearchText(text: string) {
     setSearchText(text);
@@ -226,17 +223,7 @@ function FollowList() {
       keyboardVerticalOffset={headerHeight}
       className="flex-1"
     >
-      {dark ? (
-        content
-      ) : (
-        <ImageBackground
-          source={require("../../../assets/bg.webp")}
-          resizeMode="cover"
-          className="flex-1 justify-center"
-        >
-          {content}
-        </ImageBackground>
-      )}
+      {content}
     </KeyboardAvoidingView>
   );
 }

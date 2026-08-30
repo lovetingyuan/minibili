@@ -9,7 +9,7 @@ import WatchProgressBar from "@/components/WatchProgressBar";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
-import type { CollectVideoInfo, HistoryVideoInfo, NavigationProps } from "@/types";
+import type { VideoListItemInfo, HistoryVideoInfo, NavigationProps } from "@/types";
 import {
   isDefined,
   parseDate,
@@ -40,7 +40,7 @@ function extractTextWithEmTags(text: string, className?: string) {
   return result;
 }
 
-function VideoListItem<T extends CollectVideoInfo | HistoryVideoInfo>({
+function VideoListItem<T extends VideoListItemInfo | HistoryVideoInfo>({
   video,
   buttons,
 }: {
@@ -124,10 +124,12 @@ function VideoListItem<T extends CollectVideoInfo | HistoryVideoInfo>({
                 <Icon name="play-circle-outline" size={15} colorClassName={colors.gray6.accent} />
                 <Text className={colors.gray6.text}>{parseNumber(video.play)}</Text>
               </View>
-              <View className="flex-row items-center gap-1">
-                <Icon name="thumb-up-off-alt" colorClassName={colors.gray6.accent} size={15} />
-                <Text className={colors.gray6.text}>{parseNumber(video.like)}</Text>
-              </View>
+              {isDefined(video.like) ? (
+                <View className="flex-row items-center gap-1">
+                  <Icon name="thumb-up-off-alt" colorClassName={colors.gray6.accent} size={15} />
+                  <Text className={colors.gray6.text}>{parseNumber(video.like)}</Text>
+                </View>
+              ) : null}
             </View>
           ) : null}
         </View>

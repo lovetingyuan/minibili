@@ -5,7 +5,8 @@ import { createStore, type AtomicStoreMethodsType } from "react-atomic-store";
 import Toast from "react-native-simple-toast";
 
 import { RanksConfig } from "../constants";
-import type { CollectVideoInfo, HistoryVideoInfo, UpInfo } from "../types";
+import type { HistoryVideoInfo, UpInfo } from "../types";
+import { clearLegacyCollections } from "./legacy-collections";
 import type { RepliesInfo } from "./replies-info.type";
 import type { MusicSong, UpdateUpInfo } from "./types";
 
@@ -31,7 +32,6 @@ const getAppValue = () => {
     $upUpdateMap: {} as Record<string, UpdateUpInfo>,
     // $ignoredVersions: [] as string[],
     $videoCatesList: RanksConfig,
-    $collectedVideos: [] as CollectVideoInfo[],
     $watchedVideos: {} as Record<string, HistoryVideoInfo>,
     $musicList: [
       {
@@ -197,10 +197,19 @@ export function InitStoreComp() {
       }, 100);
     };
 
-    Promise.all(storedKeys.map((key) => hydrateStoredValue(methods, key)))
-      .then((resetStates) => {
-        const hasResetValues = resetStates.some(Boolean);
-        finishHydration(hasResetValues ? "部分本地数据异常，已重置默认值" : undefined);
+    Promise.allSettled([
+      Promise.all(storedKeys.map((key) => hydrateStoredValue(methods, key))),
+      clearLegacyCollections((key) => AsyncStorage.removeItem(key)),
+    ])
+      .then(([hydration, cleanup]) => {
+        const hasResetValues = hydration.status === "fulfilled" && hydration.value.some(Boolean);
+        const clearedCollections = cleanup.status === "fulfilled" && cleanup.value;
+        const notices = [
+          hydration.status === "rejected" ? "应用数据恢复失败，已使用默认配置启动" : "",
+          hasResetValues ? "部分本地数据异常，已重置默认值" : "",
+          clearedCollections ? "" : "旧收藏数据清理失败，将在下次启动重试",
+        ].filter(Boolean);
+        finishHydration(notices.join("；") || undefined);
       })
       .catch(() => {
         finishHydration("应用数据恢复失败，已使用默认配置启动");

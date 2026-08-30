@@ -1,4 +1,4 @@
-import type { CollectVideoInfo, UpInfo } from "@/types";
+import type { UpInfo } from "@/types";
 
 import { useStore } from ".";
 import { useActiveFollowedUps } from "./followings";
@@ -22,15 +22,6 @@ export const useUpUpdateCount = () => {
   return aa.filter((item) => {
     return item.latestId !== item.currentLatestId;
   }).length;
-};
-
-export const useCollectedVideosMap = () => {
-  const { $collectedVideos } = useStore();
-  const map: Record<string, CollectVideoInfo> = {};
-  $collectedVideos.forEach((vi) => {
-    map[vi.bvid] = vi;
-  });
-  return map;
 };
 
 export const useMusicSongsMap = () => {

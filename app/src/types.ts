@@ -13,7 +13,7 @@ export interface UpInfo {
   pin?: number;
 }
 
-export interface CollectVideoInfo {
+export interface VideoListItemInfo {
   bvid: string;
   name: string;
   title: string;
@@ -31,7 +31,7 @@ export interface CollectVideoInfo {
   like?: number;
 }
 
-export interface HistoryVideoInfo extends CollectVideoInfo {
+export interface HistoryVideoInfo extends VideoListItemInfo {
   watchProgress: number;
   watchTime: number;
 }
@@ -40,7 +40,6 @@ export type RootStackParamList = {
   Welcome: undefined;
   SearchUps: undefined;
   SearchVideos: undefined;
-  Collect: undefined;
   History: undefined;
   Music: undefined;
   WebPage: { url: string; title?: string; type?: "pc" | "mobile" };

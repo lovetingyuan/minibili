@@ -7,7 +7,7 @@ import { useBilibiliFollowings } from "@/api/followings";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import BilibiliLoginWebView from "./BilibiliLoginWebView";
-import FollowingsContent from "./FollowingsContent";
+import FollowPages from "./FollowPages";
 
 // 每次页面重新获得焦点时挂载，由 SWR 与其他入口的校验请求去重。
 function RevalidateSessionOnFocus() {
@@ -70,7 +70,15 @@ export default function Follow() {
             />
           </View>
         ) : null}
-        {account ? <FollowingsContent /> : focused ? <BilibiliLoginWebView /> : null}
+        {account && bilibiliSession.isCurrentAccount(account) ? (
+          <FollowPages key={`${account.mid}:${account.generation}`} />
+        ) : account ? (
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator />
+          </View>
+        ) : focused ? (
+          <BilibiliLoginWebView />
+        ) : null}
       </>
     );
   }
