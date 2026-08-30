@@ -5,6 +5,12 @@ import encHex from "crypto-js/enc-hex";
 import hmacSHA256 from "crypto-js/hmac-sha256";
 
 import { UA } from "../constants";
+import {
+  clearStoredBilibiliCookie,
+  getStoredBilibiliCookie,
+  setStoredBilibiliCookie,
+} from "../utils/secure-store";
+import { resolveBilibiliCookie } from "./bilibili-cookie.helpers";
 
 function getuuid(time: number) {
   const randString8 = randomString(8);
@@ -293,29 +299,73 @@ function wuzhi(now: number, buvid3: string, uuid: string) {
   });
 }
 
-let cookie = `DedeUserID=14427395; DedeUserID__ckMd5=31c2a73a97788cd3; enable_web_push=DISABLE; buvid_fp_plain=undefined; enable_feed_channel=ENABLE; fingerprint=cf3995bd73b0cccec7472975df3720f7; buvid_fp=cf3995bd73b0cccec7472975df3720f7; buvid3=1564C825-2911-762D-AC41-CCBF494B1EB966096infoc; b_nut=1750776866; _uuid=34F5EE56-810105-5456-B35E-25ED5105110321081721infoc; CURRENT_QUALITY=80; header_theme_version=OPEN; theme-tip-show=SHOWED; theme-avatar-tip-show=SHOWED; theme-switch-show=SHOWED; theme_style=light; hit-dyn-v2=1; rpdid=|()JmJ)RRJR0J'u~lJ~m~llJ; LIVE_BUVID=AUTO1517539695561800; buvid4=7B51D40C-207D-49C5-E9C2-0A4A570D10C172342-024062412-/dYVm7inctm7zvK1zBWNvw%3D%3D; home_feed_column=4; bmg_af_switch=1; bmg_src_def_domain=i0.hdslb.com; browser_resolution=1329-746; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjIwOTc0MjgsImlhdCI6MTc2MTgzODE2OCwicGx0IjotMX0.9ALIu0M8jJMmDNE1GAmPHqYh2S1s2qpdQ1z69N7zgD8; bili_ticket_expires=1762097368; bili_jct=a6a5a905ca097f04137ae3413c5d912f; sid=87perz43; PVID=2; bp_t_offset_14427395=1130616326394478592; b_lsid=63592D107_19A44648B21; CURRENT_FNVAL=4048`;
+let storedCookie: string | null | undefined;
+let storedCookieVersion = 0;
+let anonymousCookie = "";
+let anonymousCookiePromise: Promise<string> | null = null;
+
+export async function getBilibiliLoginCookie() {
+  if (storedCookie === undefined) {
+    const version = storedCookieVersion;
+    const cookie = await getStoredBilibiliCookie();
+    if (version === storedCookieVersion) {
+      storedCookie = cookie;
+    }
+  }
+  return storedCookie ?? null;
+}
 
 export async function getCookie() {
-  if (cookie) {
-    return cookie;
-  }
+  const cookie = await getBilibiliLoginCookie().catch(() => null);
+  return resolveBilibiliCookie(cookie, getAnonymousCookie);
+}
+
+export async function saveBilibiliLoginCookie(cookie: string) {
+  await setStoredBilibiliCookie(cookie);
+  storedCookieVersion += 1;
+  storedCookie = cookie;
+}
+
+export async function clearBilibiliLoginCookie() {
+  storedCookieVersion += 1;
+  storedCookie = null;
+  await clearStoredBilibiliCookie();
+}
+
+async function createAnonymousCookie() {
   const now = Date.now();
   const uuid = getuuid(now);
   const buvid3 = (await getbuvid3()) || uuid;
   const buvid4 = await getbuvid4(buvid3, uuid);
   await wuzhi(now, buvid3, uuid);
   const ticket = await getBiliTicket("");
-  cookie = `${buvid3}; _uuid=${uuid}; buvid4=${buvid4}`;
+  let cookie = `${buvid3}; _uuid=${uuid}; buvid4=${buvid4}`;
   if (ticket) {
     cookie += "; bili_ticket=" + ticket;
   }
-  // console.log('cookie', cookie)
   return cookie;
+}
+
+async function getAnonymousCookie() {
+  if (anonymousCookie) {
+    return anonymousCookie;
+  }
+
+  anonymousCookiePromise ??= createAnonymousCookie().then((cookie) => {
+    anonymousCookie = cookie;
+    return cookie;
+  });
+
+  try {
+    return await anonymousCookiePromise;
+  } finally {
+    anonymousCookiePromise = null;
+  }
 }
 
 setInterval(
   () => {
-    cookie = "";
+    anonymousCookie = "";
   },
   60 * 60 * 1000,
 );

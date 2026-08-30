@@ -3,6 +3,7 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 
 import Header from "./Banner";
+import BilibiliAccount from "./BilibiliAccount";
 import BlackTags from "./BlackTags";
 import BlackUps from "./BlackUps";
 import Collect from "./Collect";
@@ -24,6 +25,7 @@ function About() {
       <Divider className="my-4" />
       <View className="gap-2">
         <Version />
+        <BilibiliAccount />
         <Collect />
         <History />
         <Music />

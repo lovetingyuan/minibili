@@ -12,6 +12,7 @@ import type { ProviderConfiguration, SWRConfiguration } from "swr/_internal";
 
 import fetcher from "./api/fetcher";
 import ButtonsOverlay from "./components/ButtonsOverlay";
+import BilibiliFollowingsManager from "./components/BilibiliFollowingsManager";
 import CheckAppUpdate from "./components/CheckAppUpdate";
 import CheckLiveUps from "./components/CheckLiveUps";
 import CheckNetState from "./components/CheckNetState";
@@ -19,7 +20,6 @@ import CheckUpUpdate from "./components/CheckUpUpdate";
 import DevServerRecovery from "./components/DevServerRecovery";
 import ImagesView from "./components/ImagesView";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
-import UserSyncManager from "./components/UserSyncManager";
 import UserLocation from "./components/UserLocation";
 import useRNETheme from "./hooks/useRNETheme";
 import Route from "./routes/Index";
@@ -78,7 +78,7 @@ export default function App() {
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               <DevServerRecovery />
               <InitStoreComp />
-              <UserSyncManager />
+              <BilibiliFollowingsManager />
               <CheckAppUpdate />
               <CheckUpUpdate />
               <CheckNetState />

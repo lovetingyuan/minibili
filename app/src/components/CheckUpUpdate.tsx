@@ -6,14 +6,20 @@ import { useStore } from "../store";
 
 function useCheckUpdateUps() {
   const {
+    $followedUps,
     get$followedUps,
     set$upUpdateMap,
     get$upUpdateMap,
     getRequestDynamicFailed,
     setRequestDynamicFailed,
   } = useStore();
+  const followedUpsKey = $followedUps
+    .map((up) => up.mid.toString())
+    .sort()
+    .join(",");
   const checkUpdateUpsTimerRef = React.useRef(0);
   React.useEffect(() => {
+    let active = true;
     const upUpdateQueue = new PQueue({
       concurrency: 5,
       intervalCap: 5,
@@ -40,6 +46,9 @@ function useCheckUpdateUps() {
         });
       }
       upUpdateQueue.onIdle().then(() => {
+        if (!active) {
+          return;
+        }
         const updateMap = get$upUpdateMap();
         for (const mid in upUpdateIdMap) {
           const id = upUpdateIdMap[mid];
@@ -55,16 +64,18 @@ function useCheckUpdateUps() {
         set$upUpdateMap({ ...updateMap });
       });
     };
-    setTimeout(() => {
+    const initialCheckTimer = setTimeout(() => {
       checkTask(); // wait for $followedUps filled.
     }, 1000);
     checkUpdateUpsTimerRef.current = window.setInterval(checkTask, 10 * 60 * 1000);
     return () => {
+      active = false;
       upUpdateQueue.clear();
+      clearTimeout(initialCheckTimer);
       window.clearInterval(checkUpdateUpsTimerRef.current);
     };
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [followedUpsKey]);
 }
 
 export default CheckUpUpdate;

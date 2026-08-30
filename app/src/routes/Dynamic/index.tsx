@@ -3,7 +3,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Skeleton } from "@/components/styled/rneui";
 import React, { useCallback, useEffect } from "react";
 import { BackHandler, Platform, Share, View } from "react-native";
-import WebView from "react-native-webview";
+import BilibiliWebView from "@/components/BilibiliWebView";
 
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
@@ -274,7 +274,7 @@ function Dynamic({ route }: Props) {
 
   return (
     <View className="flex-1">
-      <WebView
+      <BilibiliWebView
         className="flex-1"
         key={webViewKey}
         source={{ uri: `https://m.bilibili.com/space/${upId}` }}

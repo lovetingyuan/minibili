@@ -4,9 +4,10 @@ import { Text } from "@/components/styled/rneui";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
 import { Image, View } from "react-native";
-import { WebView } from "react-native-webview";
+import BilibiliWebView from "@/components/BilibiliWebView";
 import { withUniwind } from "uniwind";
 
+import bilibiliFetch from "@/api/bilibili-fetch";
 import useLiveUrl from "@/api/get-live-url";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
@@ -212,7 +213,7 @@ function LiveWebPage({ route }: Props) {
     );
   }
   return (
-    <WebView
+    <BilibiliWebView
       className="flex-1"
       // style={{ height }}
       source={{ uri: url }}
@@ -249,7 +250,7 @@ function LiveWebPage({ route }: Props) {
 
         if (data.action === "update-live-info") {
           const { url, callback } = data.payload;
-          fetch(url, {
+          bilibiliFetch(url, {
             headers: { "user-agent": UA },
           })
             .then((r) => r.text())

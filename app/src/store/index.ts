@@ -5,24 +5,11 @@ import { createStore, type AtomicStoreMethodsType } from "react-atomic-store";
 import Toast from "react-native-simple-toast";
 
 import { RanksConfig } from "../constants";
-import type { AuthFailureReason, AuthModalMode } from "../features/user-sync/types";
 import type { CollectVideoInfo, HistoryVideoInfo, UpInfo } from "../types";
 import type { RepliesInfo } from "./replies-info.type";
 import type { MusicSong, UpdateUpInfo } from "./types";
 
 const StoragePrefix = "Store:";
-
-export const SyncToServerKeys = [
-  "$blackUps",
-  "$followedUps",
-  "$blackTags",
-  "$videoCatesList",
-  "$collectedVideos",
-  "$watchedVideos",
-  "$musicList",
-] as const;
-
-const syncToServerKeySet = new Set<string>(SyncToServerKeys);
 
 const getAppValue = () => {
   return {
@@ -63,12 +50,6 @@ const getAppValue = () => {
     $checkAppUpdateTime: 0,
     // -------------------------
     initialed: false,
-    authReady: false,
-    isAuthenticated: false,
-    authEmail: null as string | null,
-    authModalVisible: false,
-    authModalMode: "login" as AuthModalMode,
-    authFailureReason: null as AuthFailureReason | null,
     isWiFi: false,
     webViewMode: "MOBILE" as "PC" | "MOBILE",
     livingUps: {} as Record<string, string>,
@@ -107,27 +88,10 @@ export type AppContextMethodsType = AtomicStoreMethodsType<AppContextValueType>;
 
 export type StoredKeys<K extends keyof AppContextValueType = keyof AppContextValueType> =
   K extends `$${string}` ? K : never;
-export type SyncToServerKey = (typeof SyncToServerKeys)[number];
-export type SyncToServerSnapshot = Pick<AppContextValueType, SyncToServerKey>;
 type StoreSetterKey<K extends string> = `set${K}`;
-type StoreGetterKey<K extends string> = `get${K}`;
 type StoreSetterValue<K extends StoredKeys> =
   | AppContextValueType[K]
   | ((value: AppContextValueType[K]) => AppContextValueType[K]);
-
-function forEachSyncToServerKey(callback: <K extends SyncToServerKey>(key: K) => void) {
-  SyncToServerKeys.forEach((key) => {
-    callback(key);
-  });
-}
-
-function setSyncSnapshotValue<K extends SyncToServerKey>(
-  snapshot: Partial<SyncToServerSnapshot>,
-  key: K,
-  value: SyncToServerSnapshot[K],
-) {
-  snapshot[key] = value;
-}
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -176,77 +140,6 @@ function normalizeVideoCatesList(value: unknown) {
     }
   });
   return nextList;
-}
-
-function getStoredValue<K extends StoredKeys>(
-  methods: AppContextMethodsType,
-  key: K,
-): AppContextValueType[K] {
-  const getterKey = `get${key}` as StoreGetterKey<K>;
-  const getter = methods[getterKey] as () => AppContextValueType[K];
-  return getter();
-}
-
-export function isSyncToServerKey(key: string): key is SyncToServerKey {
-  return syncToServerKeySet.has(key);
-}
-
-export function normalizeSyncToServerValue<K extends SyncToServerKey>(
-  key: K,
-  value: unknown,
-): AppContextValueType[K] {
-  if (key === "$videoCatesList") {
-    const list = normalizeVideoCatesList(value);
-    if (list) {
-      return list as AppContextValueType[K];
-    }
-    return getDefaultStoredValue(key);
-  }
-
-  const defaultValue = getDefaultStoredValue(key);
-  if (isCompatibleStoredValue(value, defaultValue)) {
-    return cloneStoredValue(value as AppContextValueType[K]);
-  }
-
-  return defaultValue;
-}
-
-export function setStoredValue<K extends StoredKeys>(
-  methods: AppContextMethodsType,
-  key: K,
-  value: AppContextValueType[K],
-) {
-  const setKey = `set${key}` as StoreSetterKey<K>;
-  const setValue = methods[setKey] as (nextValue: StoreSetterValue<K>) => void;
-  setValue(value);
-}
-
-export function applySyncToServerSnapshot(
-  snapshot: Partial<SyncToServerSnapshot>,
-  methods = getStoreMethods(),
-) {
-  forEachSyncToServerKey((key) => {
-    const value = snapshot[key];
-    if (value !== undefined) {
-      setStoredValue(methods, key, value);
-    }
-  });
-}
-
-export function getDefaultSyncToServerSnapshot(): SyncToServerSnapshot {
-  const snapshot = {} as SyncToServerSnapshot;
-  forEachSyncToServerKey((key) => {
-    setSyncSnapshotValue(snapshot, key, getDefaultStoredValue(key));
-  });
-  return snapshot;
-}
-
-export function getSyncToServerSnapshot(methods = getStoreMethods()): SyncToServerSnapshot {
-  const snapshot = {} as SyncToServerSnapshot;
-  forEachSyncToServerKey((key) => {
-    setSyncSnapshotValue(snapshot, key, cloneStoredValue(getStoredValue(methods, key)));
-  });
-  return snapshot;
 }
 
 async function hydrateStoredValue<K extends StoredKeys>(methods: AppContextMethodsType, key: K) {

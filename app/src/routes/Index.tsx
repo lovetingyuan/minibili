@@ -13,7 +13,7 @@ import Collect from "./Collect";
 import Dynamic from "./Dynamic";
 import { Asset } from "expo-asset";
 import Follow from "./Follow";
-import { followHeaderRight } from "./Follow/Header";
+import { followHeaderRight, followHeaderTitle } from "./Follow/Header";
 import History from "./History";
 import Music from "./Music";
 import Play from "./Play";
@@ -87,6 +87,8 @@ function AppRoute() {
           name="Follow"
           component={Follow}
           options={{
+            headerTitle: followHeaderTitle,
+            headerTitleAlign: "left",
             headerRight: followHeaderRight,
           }}
         />

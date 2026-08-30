@@ -10,6 +10,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "knip:app": "knip --workspace @minibili/app",
     "android": "npm run android -w=@minibili/app",
+    "dev": "npm run dev -w=@minibili/app",
     "build:preview": "npm run build:android:preview -w=@minibili/app",
     "update": "npm run update -w=@minibili/app",
     "upgrade": "npm run update-expo -w=@minibili/app",
@@ -27,5 +28,5 @@
   "engines": {
     "npm": ">=10"
   },
-  "packageManager": "npm@11.6.2"
+  "packageManager": "npm@10.9.8"
 }

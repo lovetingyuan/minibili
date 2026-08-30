@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 // import { ResizeMode, Video } from 'expo-av'
 import React from "react";
 import { BackHandler, Image, Linking, Platform, View } from "react-native";
-import { WebView } from "react-native-webview";
+import BilibiliWebView from "@/components/BilibiliWebView";
 
 // import useLiveUrl from '@/api/get-live-url'
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
@@ -114,7 +114,7 @@ function DynamicDetailPage({ route }: Props) {
   );
 
   return (
-    <WebView
+    <BilibiliWebView
       className="flex-1"
       source={{ uri: url }}
       key={webViewKey}

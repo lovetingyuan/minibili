@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 // import { ResizeMode, Video } from 'expo-av'
 import React from "react";
 import { Dimensions, Image, RefreshControl, ScrollView, useColorScheme, View } from "react-native";
-import { WebView } from "react-native-webview";
+import BilibiliWebView from "@/components/BilibiliWebView";
 
 // import useLiveUrl from '@/api/get-live-url'
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
@@ -93,7 +93,7 @@ function WebPage({ route }: Props) {
   });
 
   const webview = (
-    <WebView
+    <BilibiliWebView
       className="flex-1"
       style={{ height }}
       source={{ uri: url }}

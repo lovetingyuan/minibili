@@ -1,6 +1,6 @@
 {
   "name": "@minibili/app",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "gitHead": "11a7ca2",
   "description": "minimum bilibili apk",
   "homepage": "https://lovetingyuan.github.io/minibili/",
@@ -15,8 +15,9 @@
   },
   "scripts": {
     "prepare-android": "node scripts/prepare-android.js",
+    "dev": "npx expo start --dev-client",
     "start": "npm run prepare-android && expo start",
-    "android": "npm run prepare-android && npx expo start --android --localhost",
+    "android": "npm run prepare-android && npx expo start --android --lan",
     "ios": "npm run prepare-android && npx expo start --ios",
     "web": "npm run prepare-android && expo start --web",
     "build:android": "zx scripts/build.mjs",
@@ -29,6 +30,7 @@
     "bundle-analyze": "npx --yes react-native-bundle-visualizer --platform android --entry-file index.js --expo true"
   },
   "dependencies": {
+    "@preeternal/react-native-cookie-manager": "^6.4.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/hooks": "^100.1.0",
     "@react-native-community/netinfo": "12.0.1",
@@ -46,26 +48,27 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "clsx": "^2.1.0",
     "crypto-js": "^4.2.0",
-    "expo": "^57.0.15",
+    "expo": "~57.0.18",
     "expo-application": "~57.0.2",
-    "expo-asset": "~57.0.13",
+    "expo-asset": "~57.0.15",
     "expo-audio": "~57.0.4",
     "expo-clipboard": "~57.0.1",
-    "expo-constants": "~57.0.13",
-    "expo-font": "~57.0.1",
+    "expo-constants": "~57.0.16",
+    "expo-dev-client": "~57.0.16",
+    "expo-font": "~57.0.2",
     "expo-image": "~57.0.3",
     "expo-keep-awake": "~57.0.1",
-    "expo-secure-store": "~57.0.1",
-    "expo-splash-screen": "~57.0.7",
+    "expo-secure-store": "~57.0.2",
+    "expo-splash-screen": "~57.0.8",
     "expo-status-bar": "~57.0.1",
-    "expo-system-ui": "~57.0.2",
-    "expo-updates": "~57.0.16",
-    "expo-video": "~57.0.2",
+    "expo-system-ui": "~57.0.3",
+    "expo-updates": "~57.0.19",
+    "expo-video": "~57.0.3",
     "he": "^1.2.0",
     "p-queue": "^9.1.0",
     "react": "19.2.3",
     "react-atomic-store": "^0.0.8",
-    "react-native": "0.86.2",
+    "react-native": "0.86.3",
     "react-native-error-boundary": "^3.1.0",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-gesture-image-viewer": "^2.1.3",
@@ -101,6 +104,6 @@
   },
   "config": {
     "changelog": "修复已知问题",
-    "versionCode": 74
+    "versionCode": 75
   }
 }

@@ -3,7 +3,7 @@
 import { UA } from "../constants";
 // import dm from '../constants/dm'
 import encWbi from "../utils/wbi";
-import { getCookie } from "./get-cookie";
+import bilibiliFetch from "./bilibili-fetch";
 import { getWBIInfo } from "./user-nav";
 
 type ResponseType<D = any> = {
@@ -48,8 +48,6 @@ export default async function request<D>(url: string): Promise<D> {
     // 'sec-fetch-dest': 'empty',
     // 'sec-fetch-mode': 'cors',
     // 'sec-fetch-site': 'same-site',
-    // Cookie: '',
-    cookie: await getCookie(),
     origin: "https://www.bilibili.com",
     referer: "https://space.bilibili.com",
     "user-agent": UA, // 'user-agent': 'Mozilla/5.0',
@@ -63,13 +61,6 @@ export default async function request<D>(url: string): Promise<D> {
     mode: "cors",
     credentials: "include",
   } satisfies Parameters<typeof fetch>[1];
-  if (url.includes("/reply/") || url.includes("/x/v2/search/trending/ranking")) {
-    // @ts-ignore
-    headers.cookie = undefined;
-    // @ts-ignore
-    options.credentials = "omit";
-  }
-
   if (url.includes("/wbi/") || url.includes("v1/feed/space")) {
     const wbiImg = await getWBIInfo(request);
     const [_url, _query] = requestUrl.split("?");
@@ -98,7 +89,7 @@ export default async function request<D>(url: string): Promise<D> {
   //   })
   //   return objects.elems
   // }
-  let resText = await fetch(requestUrl, options).then((r) => r.text());
+  let resText = await bilibiliFetch(requestUrl, options).then((r) => r.text());
   const index = resText.indexOf('}{"code":');
   if (index > -1) {
     resText = resText.substring(index + 1);

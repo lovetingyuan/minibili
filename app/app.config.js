@@ -51,6 +51,12 @@ module.exports = {
     "expo-image",
     "expo-status-bar",
     "expo-secure-store",
+    [
+      "@preeternal/react-native-cookie-manager",
+      {
+        androidWebkitVersion: "1.16.0",
+      },
+    ],
     "expo-font",
     [
       "expo-splash-screen",

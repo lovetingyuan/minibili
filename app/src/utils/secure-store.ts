@@ -1,33 +1,23 @@
-import * as SecureStore from "expo-secure-store";
+const BILIBILI_COOKIE_KEY = "bilibili_cookie";
 
-const AUTH_KEYS = {
-  email: "auth_email",
-  token: "auth_token",
-} as const;
+let secureStorePromise: Promise<typeof import("expo-secure-store")> | null = null;
 
-export async function clearAuthData() {
-  await Promise.all([
-    SecureStore.deleteItemAsync(AUTH_KEYS.email),
-    SecureStore.deleteItemAsync(AUTH_KEYS.token),
-  ]);
+function getSecureStore() {
+  secureStorePromise ??= import("expo-secure-store");
+  return secureStorePromise;
 }
 
-export async function clearAuthToken() {
-  await SecureStore.deleteItemAsync(AUTH_KEYS.token);
+export async function getStoredBilibiliCookie() {
+  const SecureStore = await getSecureStore();
+  return SecureStore.getItemAsync(BILIBILI_COOKIE_KEY);
 }
 
-export async function getAuthData() {
-  const [email, token] = await Promise.all([
-    SecureStore.getItemAsync(AUTH_KEYS.email),
-    SecureStore.getItemAsync(AUTH_KEYS.token),
-  ]);
-
-  return { email, token };
+export async function setStoredBilibiliCookie(cookie: string) {
+  const SecureStore = await getSecureStore();
+  return SecureStore.setItemAsync(BILIBILI_COOKIE_KEY, cookie);
 }
 
-export async function setAuthData(email: string, token: string) {
-  await Promise.all([
-    SecureStore.setItemAsync(AUTH_KEYS.email, email),
-    SecureStore.setItemAsync(AUTH_KEYS.token, token),
-  ]);
+export async function clearStoredBilibiliCookie() {
+  const SecureStore = await getSecureStore();
+  await SecureStore.deleteItemAsync(BILIBILI_COOKIE_KEY);
 }

@@ -11,7 +11,8 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import WebView, { type WebViewMessageEvent } from "react-native-webview";
+import type { WebViewMessageEvent } from "react-native-webview";
+import BilibiliWebView from "@/components/BilibiliWebView";
 
 import { useVideoMp4Url } from "@/api/play-url";
 import { UA } from "@/constants";
@@ -377,7 +378,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       ) : null}
     </Pressable>
   ) : playPageUrl ? (
-    <WebView
+    <BilibiliWebView
       source={{
         // uri: 'player.bilibili.com/player.html?isOutside=true&aid=116255201697323&bvid=BV1NLw1zoECS&cid=36813670314&p=1', // playPageUrl,
         uri: playPageUrl,
