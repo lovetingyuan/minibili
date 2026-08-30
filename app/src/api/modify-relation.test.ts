@@ -7,7 +7,6 @@ import type { RelationChange, RelationRequestDependencies } from "./modify-relat
 const account = { mid: "123", generation: 2 };
 const cookie = "SESSDATA=test-session; DedeUserID=123; bili_jct=csrf-test";
 const up = { mid: "397490386", name: "测试UP", face: "", sign: "" };
-const follow: RelationChange = { up, act: 1 };
 
 function setup(value: string | null = cookie) {
   const request = vi
@@ -26,54 +25,56 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe("Bilibili relationship modification", () => {
-  test.each([1, 2] as const)(
-    "sends act=%s with form data and a single credential snapshot",
-    async (act) => {
-      const { request, dependencies } = setup();
-      const change = { up, act };
-      await expect(modifyBilibiliRelation(account, change, dependencies)).resolves.toEqual(change);
-      expect(request).toHaveBeenCalledOnce();
-      expect(dependencies.readCookie).toHaveBeenCalledOnce();
-      const [url, options] = request.mock.calls[0];
-      const parsedUrl = new URL(String(url));
-      expect(parsedUrl.origin + parsedUrl.pathname).toBe(
-        "https://api.bilibili.com/x/relation/modify",
-      );
-      expect(JSON.parse(parsedUrl.searchParams.get("statistics") || "")).toEqual({
-        appId: 100,
-        platform: 5,
-      });
+describe.each([1, 2, 5] as const)("Bilibili relationship modification act=%s", (act) => {
+  const follow: RelationChange = { up, act };
+  test("sends form data and a single credential snapshot", async () => {
+    const { request, dependencies } = setup();
+    const change = { up, act };
+    await expect(modifyBilibiliRelation(account, change, dependencies)).resolves.toEqual(change);
+    expect(request).toHaveBeenCalledOnce();
+    expect(dependencies.readCookie).toHaveBeenCalledOnce();
+    const [url, options] = request.mock.calls[0];
+    const parsedUrl = new URL(String(url));
+    expect(parsedUrl.origin + parsedUrl.pathname).toBe(
+      "https://api.bilibili.com/x/relation/modify",
+    );
+    expect(JSON.parse(parsedUrl.searchParams.get("statistics") || "")).toEqual({
+      appId: 100,
+      platform: 5,
+    });
+    if (act === 5) {
+      expect(parsedUrl.searchParams.has("x-bili-device-req-json")).toBe(false);
+    } else {
       expect(JSON.parse(parsedUrl.searchParams.get("x-bili-device-req-json") || "")).toEqual({
         platform: "web",
         device: "pc",
         spmid: "333.1387",
       });
-      const headers = new Headers(options?.headers);
-      expect(headers.get("cookie")).toBe(cookie);
-      expect(headers.get("content-type")).toBe("application/x-www-form-urlencoded");
-      expect(headers.get("referer")).toBe("https://space.bilibili.com/" + up.mid);
-      expect(headers.has("sec-fetch-mode")).toBe(false);
-      expect(options?.method).toBe("POST");
-      expect(options?.credentials).toBe("omit");
-      const body = new URLSearchParams(String(options?.body));
-      expect(Object.fromEntries(body)).toEqual({
-        fid: up.mid,
-        act: String(act),
-        csrf: "csrf-test",
-        re_src: "11",
-        gaia_source: "web_main",
-        spmid: "333.1387",
-        is_from_frontend_component: "true",
-        extend_content: JSON.stringify({ entity: "user", entity_id: Number(up.mid) }),
-      });
-    },
-  );
+    }
+    const headers = new Headers(options?.headers);
+    expect(headers.get("cookie")).toBe(cookie);
+    expect(headers.get("content-type")).toBe("application/x-www-form-urlencoded");
+    expect(headers.get("referer")).toBe("https://space.bilibili.com/" + up.mid);
+    expect(headers.has("sec-fetch-mode")).toBe(false);
+    expect(options?.method).toBe("POST");
+    expect(options?.credentials).toBe("omit");
+    const body = new URLSearchParams(String(options?.body));
+    expect(Object.fromEntries(body)).toEqual({
+      fid: up.mid,
+      act: String(act),
+      csrf: "csrf-test",
+      re_src: "11",
+      gaia_source: "web_main",
+      spmid: act === 5 ? "333.1387.0.0" : "333.1387",
+      ...(act === 5 ? {} : { is_from_frontend_component: "true" }),
+      extend_content: JSON.stringify({ entity: "user", entity_id: Number(up.mid) }),
+    });
+  });
 
   test("uses the supplied target and encodes the CSRF value without changing the Cookie", async () => {
     const value = "SESSDATA=test; DedeUserID=123; bili_jct=a+b/==";
     const { request, dependencies } = setup(value);
-    await modifyBilibiliRelation(account, { up: { ...up, mid: 456 }, act: 1 }, dependencies);
+    await modifyBilibiliRelation(account, { up: { ...up, mid: 456 }, act }, dependencies);
     const options = request.mock.calls[0][1];
     expect(new Headers(options?.headers).get("cookie")).toBe(value);
     expect(new URLSearchParams(String(options?.body)).get("csrf")).toBe("a+b/==");
@@ -202,7 +203,7 @@ describe("Bilibili relationship modification", () => {
         }),
     );
     const result = expect(modifyBilibiliRelation(account, follow, dependencies)).rejects.toThrow(
-      "超时",
+      act === 5 ? "拉黑操作超时，请先到 B站黑名单确认结果后再操作" : "关注操作超时",
     );
     await vi.advanceTimersByTimeAsync(15000);
     await result;

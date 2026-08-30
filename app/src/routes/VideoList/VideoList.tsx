@@ -5,6 +5,7 @@ import { Alert, Linking, TouchableOpacity } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { colors } from "@/constants/colors.tw";
+import { useBlockUpActions } from "@/hooks/useBlockUpActions";
 import { useStore } from "@/store";
 import { useMarkVideoWatched } from "@/store/actions";
 import type { NavigationProps } from "@/types";
@@ -24,26 +25,13 @@ function VideoList(props: {
   onRefresh?: (fab?: boolean) => void;
   isRefreshing?: boolean;
 }) {
-  const {
-    $blackUps,
-    $blackTags,
-    set$blackTags,
-    set$blackUps,
-    setOverlayButtons,
-    currentVideosCate,
-  } = useStore();
+  const { $blackTags, set$blackTags, setOverlayButtons, currentVideosCate } = useStore();
+  const { confirmBlock } = useBlockUpActions();
   const videoList: VideoItemType[] = [];
   const uniqVideosMap: Record<string, boolean> = {};
   for (const item of props.videos) {
     let needShow = !(item.bvid in uniqVideosMap);
-    if (
-      needShow &&
-      props.type === "Hot" &&
-      (`_${item.mid}` in $blackUps || item.tag in $blackTags)
-    ) {
-      needShow = false;
-    }
-    if (needShow && props.type === "Rank" && `_${item.mid}` in $blackUps) {
+    if (needShow && props.type === "Hot" && item.tag in $blackTags) {
       needShow = false;
     }
     if (needShow) {
@@ -61,27 +49,6 @@ function VideoList(props: {
       listRef.current?.scrollToOffset({ offset: 0, animated: false });
     });
   }, [currentVideosCate]);
-  const addBlackUp = () => {
-    if (!currentVideoRef.current) {
-      return;
-    }
-    Alert.alert(`不再看 ${currentVideoRef.current.name} 的视频？`, "", [
-      {
-        text: "取消",
-        style: "cancel",
-      },
-      {
-        text: "确定",
-        onPress: () => {
-          const { mid, name } = currentVideoRef.current!;
-          set$blackUps({
-            ...$blackUps,
-            [`_${mid}`]: name,
-          });
-        },
-      },
-    ]);
-  };
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
       return;
@@ -129,7 +96,7 @@ function VideoList(props: {
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item;
-          setOverlayButtons(buttons());
+          setOverlayButtons(buttons(item));
         }}
       >
         <VideoItem video={item} />
@@ -143,11 +110,11 @@ function VideoList(props: {
     }
     markVideoWatched(videoInfo, 100);
   };
-  const buttons = () =>
+  const buttons = (video: VideoItemType) =>
     [
       {
-        text: `不再看「${currentVideoRef.current?.name}」的视频`,
-        onPress: addBlackUp,
+        text: `拉黑 UP 主「${video.name}」`,
+        onPress: () => confirmBlock({ mid: video.mid, name: video.name }),
       },
       props.type === "Hot" && {
         text: `不再看「${currentVideoRef.current?.tag}」类型的视频`,

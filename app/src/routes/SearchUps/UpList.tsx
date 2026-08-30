@@ -3,12 +3,11 @@ import { Avatar, Button, Skeleton, Text } from "@/components/styled/rneui";
 import { FlashList } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import React from "react";
-import { Alert, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 import { type SearchedUpType, useSearchUps } from "@/api/search-up";
 import { colors } from "@/constants/colors.tw";
 import { useFollowActions } from "@/hooks/useFollowActions";
-import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
 import type { NavigationProps } from "@/types";
 import { parseNumber } from "@/utils";
@@ -16,12 +15,10 @@ import type { FlashListRef } from "@/components/styled/rneui";
 
 function SearchUpItem(props: { up: SearchedUpType }) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
-  const { $blackUps } = useStore();
   const actions = useFollowActions();
   const _followedUpsMap = useFollowedUpsMap();
 
   const isFollowed = props.up.mid in _followedUpsMap;
-  const isBlackUp = `_${props.up.mid}` in $blackUps;
   return (
     <View className="mb-5 flex-1 flex-row items-center justify-between px-4">
       <TouchableOpacity
@@ -44,7 +41,6 @@ function SearchUpItem(props: { up: SearchedUpType }) {
           numberOfLines={2}
           className={clsx(
             colors.primary.text,
-            isBlackUp && `line-through ${colors.gray4.text}`,
             isFollowed && colors.secondary.text,
             "flex-1 text-base",
           )}
@@ -66,21 +62,7 @@ function SearchUpItem(props: { up: SearchedUpType }) {
             mid: props.up.mid,
             sign: props.up.sign,
           };
-          if (isBlackUp) {
-            Alert.alert("是否关注", "该UP在你的黑名单中", [
-              {
-                text: "否",
-              },
-              {
-                text: "是",
-                onPress: () => {
-                  void actions.follow(user);
-                },
-              },
-            ]);
-          } else {
-            void actions.follow(user);
-          }
+          void actions.follow(user);
         }}
         title={isFollowed ? "已关注" : actions.isPreparing ? "同步中" : "关注"}
       />

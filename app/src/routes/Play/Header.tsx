@@ -25,18 +25,12 @@ export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
   const { data: vi } = useVideoInfo(route.params.bvid);
   const { data: fans } = useUserRelation(route.params?.mid || vi?.mid);
-  const { $blackUps } = useStore();
   const _followedUpsMap = useFollowedUpsMap();
   const followed = route.params?.mid && route.params.mid in _followedUpsMap;
-  const isBlackUp = route.params?.mid && `_${route.params.mid}` in $blackUps;
   return (
     <View className="relative left-[-10px] flex-row items-center">
       <Text
-        className={clsx(
-          "text-lg font-semibold",
-          isBlackUp && "line-through",
-          followed && colors.secondary.text,
-        )}
+        className={clsx("text-lg font-semibold", followed && colors.secondary.text)}
       >
         {route.params?.name || vi?.name}
       </Text>

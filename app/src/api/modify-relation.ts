@@ -15,9 +15,9 @@ import type {
 
 export class RelationLoginRequiredError extends Error {}
 
-export async function modifyBilibiliRelation(
+export async function modifyBilibiliRelation<T extends RelationChange>(
   account: RelationAccount,
-  change: RelationChange,
+  change: T,
   dependencies: RelationRequestDependencies,
 ) {
   const assertCurrent = () => {
@@ -42,21 +42,31 @@ export async function modifyBilibiliRelation(
   if (!/^[1-9]\d*$/.test(fid) || !Number.isSafeInteger(Number(fid))) {
     throw new Error("UP 主 ID 无效");
   }
+  const isBlock = change.act === 5;
+  const operation = isBlock ? "拉黑" : "关注";
+  const confirmResult = isBlock ? "请先到 B站黑名单确认结果" : "请刷新关注列表确认结果";
   const query = new URLSearchParams({
     statistics: JSON.stringify({ appId: 100, platform: 5 }),
-    "x-bili-device-req-json": JSON.stringify({ platform: "web", device: "pc", spmid: "333.1387" }),
   });
+  if (!isBlock) {
+    query.set(
+      "x-bili-device-req-json",
+      JSON.stringify({ platform: "web", device: "pc", spmid: "333.1387" }),
+    );
+  }
   const url = "https://api.bilibili.com/x/relation/modify?" + query.toString();
   const body = new URLSearchParams({
     fid,
     act: change.act.toString(),
     re_src: "11",
     gaia_source: "web_main",
-    spmid: "333.1387",
+    spmid: isBlock ? "333.1387.0.0" : "333.1387",
     extend_content: JSON.stringify({ entity: "user", entity_id: Number(fid) }),
-    is_from_frontend_component: "true",
     csrf,
   });
+  if (!isBlock) {
+    body.set("is_from_frontend_component", "true");
+  }
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
@@ -79,25 +89,28 @@ export async function modifyBilibiliRelation(
     });
     assertCurrent();
     if (!response.ok) {
-      throw new Error("关注操作失败（HTTP " + response.status + "）");
+      throw new Error(operation + "操作失败（HTTP " + response.status + "）");
     }
     const parsed = ModifyRelationResponseSchema.safeParse(await response.json());
     assertCurrent();
     if (!parsed.success) {
-      throw new Error("关注操作响应格式异常，请刷新关注列表确认结果");
+      throw new Error(operation + "操作响应格式异常，" + confirmResult);
     }
     const { code, message } = parsed.data;
     if (code === -101 || code === -111) {
       throw new RelationLoginRequiredError("登录凭据失效，请重新登录 B站");
     }
     if (code !== 0) {
-      throw new Error("关注操作失败（" + code + "）：" + (message || "请稍后重试"));
+      throw new Error(operation + "操作失败（" + code + "）：" + (message || "请稍后重试"));
     }
     return change;
   } catch (error) {
     assertCurrent();
     if (controller.signal.aborted) {
-      throw new Error("关注操作超时，请刷新关注列表确认结果后再操作");
+      throw new Error(operation + "操作超时，" + confirmResult + "后再操作");
+    }
+    if (error instanceof SyntaxError) {
+      throw new Error(operation + "操作响应格式异常，" + confirmResult);
     }
     throw error;
   } finally {

@@ -1,29 +1,24 @@
 import { useSyncExternalStore } from "react";
 import useSWRMutation from "swr/mutation";
 
-import {
-  applyRelationChange,
-  createRelationMutationController,
-  relationAccountKey,
-} from "../features/bilibili-followings/mutations";
+import { applyRelationChange, relationAccountKey } from "../features/bilibili-followings/mutations";
+import { relationMutations as mutations } from "../features/bilibili-followings/relation-mutations";
 import { useFollowingsState } from "../features/bilibili-followings/useFollowingsState";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import type { UpInfo } from "../types";
 import { getBilibiliLoginCookie } from "./get-cookie";
 import type { FollowingsKey } from "./followings.types";
 import { modifyBilibiliRelation, RelationLoginRequiredError } from "./modify-relation";
-import type { RelationAccount, RelationChange } from "./modify-relation.types";
-
-const mutations = createRelationMutationController(bilibiliSession.isCurrentAccount);
+import type { RelationAccount, FollowRelationChange } from "./modify-relation.types";
 
 export function useModifyRelation() {
   const state = useFollowingsState();
   const pending = useSyncExternalStore(mutations.subscribe, mutations.getSnapshot);
   const { trigger, error } = useSWRMutation<
-    RelationChange,
+    FollowRelationChange,
     Error,
     FollowingsKey | null,
-    RelationChange & { account: RelationAccount },
+    FollowRelationChange & { account: RelationAccount },
     UpInfo[]
   >(
     state.key,
@@ -38,7 +33,7 @@ export function useModifyRelation() {
     },
   );
 
-  async function submit(change: RelationChange) {
+  async function submit(change: FollowRelationChange) {
     const account = state.currentAccount;
     if (!account) {
       throw new RelationLoginRequiredError("请先登录 B站");

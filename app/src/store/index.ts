@@ -18,10 +18,6 @@ const getAppValue = () => {
      */
     $firstRun: -1,
     /**
-     * 拉黑的up主，key是下划线加上up的mid
-     */
-    $blackUps: {} as Record<string, string>,
-    /**
      * 关注的up主
      */
     $followedUps: [] as UpInfo[],

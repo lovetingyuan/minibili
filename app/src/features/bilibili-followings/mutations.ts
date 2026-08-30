@@ -7,6 +7,10 @@ export function relationAccountKey(account: RelationAccount) {
 }
 
 export function applyRelationChange(ups: UpInfo[], change: RelationChange) {
+  // 拉黑后的关注关系由 B站重新同步，不能把拉黑误当作关注。
+  if (change.act === 5) {
+    return ups;
+  }
   const mid = change.up.mid.toString();
   const remaining = ups.filter((up) => up.mid.toString() !== mid);
   if (change.act === 2) {
@@ -45,7 +49,7 @@ export function createRelationMutationController(
       }
       const key = relationAccountKey(account);
       if (pending.has(key)) {
-        throw new Error("关注操作正在进行，请稍候");
+        throw new Error("关系操作正在进行，请稍候");
       }
       publish(new Map(pending).set(key, mid));
       try {

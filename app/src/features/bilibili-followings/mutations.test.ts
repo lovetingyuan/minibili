@@ -135,4 +135,11 @@ describe("shared relationship mutations", () => {
     ]);
     expect(applyRelationChange([pinned], { up, act: 2 })).toEqual([]);
   });
+
+  test("never adds a blocked UP to the following cache or guesses the server relationship", () => {
+    const existing = [{ ...up, pin: 9 }];
+    expect(applyRelationChange(existing, { up, act: 5 })).toBe(existing);
+    const empty: UpInfo[] = [];
+    expect(applyRelationChange(empty, { up, act: 5 })).toBe(empty);
+  });
 });

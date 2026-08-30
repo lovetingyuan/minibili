@@ -39,10 +39,9 @@ export function HeaderLeft() {
   const userName = dynamicUser?.name || ""; // ? dynamicUser.name + level : ''
   // const sex =
   //   dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
-  const { setCheckLiveTimeStamp, $blackUps } = useStore();
+  const { setCheckLiveTimeStamp } = useStore();
   const _followedUpsMap = useFollowedUpsMap();
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
-  const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps;
   return (
     <View className="left-[-12px] mr-4 flex-none flex-row items-center">
       {dynamicUser?.face ? (
@@ -76,11 +75,7 @@ export function HeaderLeft() {
 
       <View className="ml-3 flex-1 flex-row flex-wrap items-center">
         <Text
-          className={clsx(
-            followed && [colors.secondary.text, "font-bold"],
-            "text-lg",
-            isBlackUp && "line-through",
-          )}
+          className={clsx(followed && [colors.secondary.text, "font-bold"], "text-lg")}
           // adjustsFontSizeToFit
           numberOfLines={1}
         >
@@ -110,14 +105,12 @@ function HeaderRight() {
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
   const {
-    $blackUps,
     setReloadUerProfile,
     // setDynamicOpenUrl,
   } = useStore();
   const actions = useFollowActions();
   const _followedUpsMap = useFollowedUpsMap();
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
-  const isBlackUp = dynamicUser?.mid && `_${dynamicUser.mid}` in $blackUps;
   return (
     <View className="flex-row items-center gap-2">
       <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
@@ -125,7 +118,7 @@ function HeaderRight() {
           <Icon name="dots-vertical" type="material-community" />
         </MenuTrigger>
         <MenuOptions>
-          {!followed && !isBlackUp && (
+          {!followed && (
             <MenuOption
               text={
                 actions.isPreparing

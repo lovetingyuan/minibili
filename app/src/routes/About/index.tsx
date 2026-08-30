@@ -5,7 +5,6 @@ import { ScrollView, View } from "react-native";
 import Header from "./Banner";
 import BilibiliAccount from "./BilibiliAccount";
 import BlackTags from "./BlackTags";
-import BlackUps from "./BlackUps";
 import Collect from "./Collect";
 import History from "./History";
 import Music from "./Music";
@@ -32,7 +31,6 @@ function About() {
       </View>
       <Divider className="my-4" />
       <BlackTags />
-      <BlackUps />
       <SortCate />
       <View className="h-10" />
     </ScrollView>
