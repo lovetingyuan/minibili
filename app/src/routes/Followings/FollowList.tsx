@@ -20,7 +20,7 @@ import { useActiveFollowedUps } from "@/store/followings";
 
 import { useStore } from "../../store";
 import type { UpInfo } from "../../types";
-import UpList from "../SearchUps/UpList";
+import UpList from "./UpList";
 import FollowItem from "./FollowItem";
 
 const tvL = require("../../../assets/tv-l.png");

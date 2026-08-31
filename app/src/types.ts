@@ -32,7 +32,6 @@ export interface VideoListItemInfo {
 
 export type RootStackParamList = {
   Welcome: undefined;
-  SearchUps: undefined;
   SearchVideos: undefined;
   WebPage: { url: string; title?: string; type?: "pc" | "mobile" };
   Play: {
