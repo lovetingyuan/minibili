@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Text } from "@/components/styled/rneui";
+import UpName from "./UpName";
 import { Image } from "@/components/styled/expo";
 import he from "he";
 import React from "react";
@@ -124,7 +125,12 @@ function VideoListItem<T extends VideoListItemInfo>({
         <View className="gap-2">
           <Text className={isFollowed ? colors.secondary.text : colors.primary.text}>
             <Text className={colors.gray7.text}>UP: </Text>
-            {video.name}
+            <UpName
+              mid={video.mid}
+              className={isFollowed ? colors.secondary.text : colors.primary.text}
+            >
+              {video.name}
+            </UpName>
           </Text>
           {watchedAt !== undefined ? (
             <Text className={`text-xs ${colors.gray6.text}`}>{formatWatchTime(watchedAt)}</Text>

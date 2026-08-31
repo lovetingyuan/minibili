@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { Avatar, Button, Skeleton, Text } from "@/components/styled/rneui";
+import UpName from "@/components/UpName";
 import { FlashList } from "@/components/styled/rneui";
 import { clsx } from "clsx";
 import React from "react";
@@ -37,7 +38,8 @@ function SearchUpItem(props: { up: SearchedUpType }) {
         className="flex-1 flex-row items-center gap-4"
       >
         <Avatar rounded source={{ uri: props.up.face }} size={40} />
-        <Text
+        <UpName
+          mid={props.up.mid}
           numberOfLines={2}
           className={clsx(
             colors.primary.text,
@@ -47,7 +49,7 @@ function SearchUpItem(props: { up: SearchedUpType }) {
           ellipsizeMode="tail"
         >
           {props.up.name}
-        </Text>
+        </UpName>
       </TouchableOpacity>
       <Text className={`${colors.gray6.text} px-2 text-sm`}>{parseNumber(props.up.fans)}粉丝</Text>
       <Button

@@ -13,6 +13,8 @@ import type { ProviderConfiguration, SWRConfiguration } from "swr/_internal";
 import fetcher from "./api/fetcher";
 import ButtonsOverlay from "./components/ButtonsOverlay";
 import BilibiliFollowingsManager from "./components/BilibiliFollowingsManager";
+import BilibiliBlacklistManager from "./components/BilibiliBlacklistManager";
+import UserDataManager from "./components/UserDataManager";
 import CheckAppUpdate from "./components/CheckAppUpdate";
 import CheckLiveUps from "./components/CheckLiveUps";
 import CheckNetState from "./components/CheckNetState";
@@ -79,6 +81,8 @@ export default function App() {
               <DevServerRecovery />
               <InitStoreComp />
               <BilibiliFollowingsManager />
+              <BilibiliBlacklistManager />
+              <UserDataManager />
               <CheckAppUpdate />
               <CheckUpUpdate />
               <CheckNetState />

@@ -1,9 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import { Avatar, Badge, Text } from "@/components/styled/rneui";
+import UpName from "@/components/UpName";
 import React from "react";
 import { Alert, Linking, Pressable, TouchableOpacity, View } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
+import { usePinnedUps } from "@/features/user-data/usePinnedUps";
 import { useFollowActions } from "@/hooks/useFollowActions";
 
 import { useStore } from "../../store";
@@ -13,19 +15,14 @@ import { parseImgUrl, parseUrl } from "../../utils";
 function FollowItem(props: { item: UpInfo; index?: number }) {
   // __DEV__ && console.log('follow item', props.item.name)
   const {
-    item: { face, name, sign, mid, pin },
+    item: { face, name, sign, mid },
     index,
   } = props;
-  const {
-    $upUpdateMap,
-    set$upUpdateMap,
-    livingUps,
-    setOverlayButtons,
-    set$followedUps,
-    get$followedUps,
-    setCheckLiveTimeStamp,
-  } = useStore();
+  const { $upUpdateMap, set$upUpdateMap, livingUps, setOverlayButtons, setCheckLiveTimeStamp } =
+    useStore();
   const actions = useFollowActions();
+  const pins = usePinnedUps();
+  const isPinned = pins.pinnedUpIds.includes(mid.toString());
   let hasUpdate = false;
   if ($upUpdateMap[mid]) {
     const { latestId, currentLatestId } = $upUpdateMap[mid];
@@ -49,6 +46,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       navigation.navigate("Living", {
         url: liveUrl,
         title: `${name}的直播间`,
+        user: { mid, name },
       });
     }
   };
@@ -112,38 +110,21 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
           Linking.openURL(parseUrl(face));
         },
       },
-      pin && index === 0
+      pins.disabled || (isPinned && index === 0)
         ? null
         : {
             text: "置顶UP",
             onPress: () => {
-              const followedUps = get$followedUps();
-              const i = followedUps.findIndex((u) => u.mid.toString() === mid.toString());
-              if (i < 0) {
-                return;
-              }
-              followedUps[i] = {
-                ...followedUps[i],
-                pin: Date.now(),
-              };
-              set$followedUps(followedUps.slice());
+              pins.pin(mid);
             },
           },
-      pin && {
-        text: "取消置顶",
-        onPress: () => {
-          const followedUps = get$followedUps();
-          const i = followedUps.findIndex((u) => u.mid.toString() === mid.toString());
-          if (i < 0) {
-            return;
-          }
-          followedUps[i] = {
-            ...followedUps[i],
-            pin: 0,
-          };
-          set$followedUps(followedUps.slice());
+      !pins.disabled &&
+        isPinned && {
+          text: "取消置顶",
+          onPress: () => {
+            pins.unpin(mid);
+          },
         },
-      },
       __DEV__ && {
         text: `${$upUpdateMap[mid]?.latestId} - ${$upUpdateMap[mid]?.currentLatestId}`,
         onPress: () => {},
@@ -185,17 +166,18 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
           />
         ) : null}
       </View>
-      <Text
+      <UpName
+        mid={mid}
         className={`
           flex-1 shrink-0 py-2 text-center text-sm
-          ${pin ? `font-bold ${colors.primary.text}` : ""}
+          ${isPinned ? `font-bold ${colors.primary.text}` : ""}
           ${hasUpdate ? colors.secondary.text : ""}
         `}
         numberOfLines={2}
         ellipsizeMode="tail"
       >
         {name}
-      </Text>
+      </UpName>
     </TouchableOpacity>
   );
 }

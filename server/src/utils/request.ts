@@ -1,117 +1,82 @@
-import type { AppContext, SyncOperations, SyncSetPayload, SyncToServerKey } from "../types";
-import { SYNC_TO_SERVER_KEYS } from "../types";
+import { MAX_SYNC_BYTES, MAX_SYNC_KEYS } from "../../../shared/user-data";
+import type { JsonValue, SyncOperations } from "../../../shared/user-data";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const TOKEN_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const syncToServerKeySet = new Set<string>(SYNC_TO_SERVER_KEYS);
-
-// 只接受标准 Bearer token，并在进入业务逻辑前完成格式过滤。
-function getBearerToken(authorization: string | undefined) {
-  if (!authorization) {
-    return null;
-  }
-
-  const match = authorization.match(/^Bearer\s+([^\s]+)$/i);
-  if (!match) {
-    return null;
-  }
-
-  const token = match[1];
-  if (!TOKEN_PATTERN.test(token)) {
-    return null;
-  }
-
-  return token;
-}
-
-function getUserStorage(c: AppContext, email: string) {
-  const id = c.env.USER_STORAGE.idFromName(email);
-  return c.env.USER_STORAGE.get(id);
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function isSyncToServerKey(value: string): value is SyncToServerKey {
-  return syncToServerKeySet.has(value);
+function isKey(key: string) {
+  return /^[\w$:.-]{1,128}$/.test(key) && !["__proto__", "constructor", "prototype"].includes(key);
 }
 
-// 路由参数和请求体里的邮箱都统一做 decode、trim 和小写化，避免同一邮箱产生多份存储。
-function normalizeEmail(value: string) {
-  try {
-    const email = decodeURIComponent(value).trim().toLowerCase();
-    if (!EMAIL_PATTERN.test(email)) {
-      return null;
-    }
-
-    return email;
-  } catch {
-    return null;
-  }
+function isJson(value: unknown, depth = 0): value is JsonValue {
+  if (depth > 32) return false;
+  if (value === null || typeof value === "string" || typeof value === "boolean") return true;
+  if (typeof value === "number") return Number.isFinite(value);
+  if (Array.isArray(value)) return value.every((item) => isJson(item, depth + 1));
+  return isRecord(value) && Object.values(value).every((item) => isJson(item, depth + 1));
 }
 
-// 同步请求支持 get / set / delete 三类操作，这里集中做结构校验和 key 白名单过滤。
-function parseSyncOperations(value: unknown): SyncOperations | null {
-  if (!isRecord(value)) {
+export function parseSyncOperations(value: unknown): SyncOperations | null {
+  if (
+    !isRecord(value) ||
+    Object.keys(value).some((key) => !["get", "set", "delete"].includes(key))
+  ) {
     return null;
   }
-
   const operations: SyncOperations = {};
-
-  if (value.get !== undefined) {
+  const keys = new Set<string>();
+  for (const operation of ["get", "delete"] as const) {
+    const list = value[operation];
+    if (list === undefined) continue;
     if (
-      !Array.isArray(value.get) ||
-      !value.get.every((item) => typeof item === "string" && isSyncToServerKey(item))
-    ) {
+      !Array.isArray(list) ||
+      list.length > MAX_SYNC_KEYS ||
+      !list.every((key): key is string => typeof key === "string" && isKey(key))
+    )
       return null;
-    }
-
-    operations.get = value.get;
+    operations[operation] = [...new Set(list)];
+    list.forEach((key) => keys.add(key));
   }
-
-  if (value.delete !== undefined) {
-    if (
-      !Array.isArray(value.delete) ||
-      !value.delete.every((item) => typeof item === "string" && isSyncToServerKey(item))
-    ) {
-      return null;
-    }
-
-    operations.delete = value.delete;
-  }
-
   if (value.set !== undefined) {
-    if (!isRecord(value.set)) {
-      return null;
+    if (!isRecord(value.set)) return null;
+    const entries: [string, JsonValue][] = [];
+    for (const [key, item] of Object.entries(value.set)) {
+      if (!isKey(key) || !isJson(item)) return null;
+      entries.push([key, item]);
+      keys.add(key);
     }
-
-    const nextSet: SyncSetPayload = {};
-    for (const [key, itemValue] of Object.entries(value.set)) {
-      if (!isSyncToServerKey(key)) {
-        return null;
-      }
-
-      nextSet[key] = itemValue;
-    }
-
-    operations.set = nextSet;
+    operations.set = Object.fromEntries(entries);
   }
-
-  return operations;
+  return keys.size > 0 && keys.size <= MAX_SYNC_KEYS ? operations : null;
 }
 
-// 只接受对象类型 JSON，数组、字符串等 payload 会直接按非法请求处理。
-async function readJsonBody(c: AppContext) {
-  const payload = await c.req.json().catch(() => null);
-  return isRecord(payload) ? payload : null;
-}
+export class SyncPayloadTooLargeError extends Error {}
 
-export {
-  getBearerToken,
-  getUserStorage,
-  isRecord,
-  normalizeEmail,
-  parseSyncOperations,
-  readJsonBody,
-};
+// 读取流时计数，不信任 Content-Length，也不先将无限请求体加载到内存。
+export async function readSyncBody(request: Request): Promise<unknown> {
+  const reader = request.body?.getReader();
+  if (!reader) return null;
+  const decoder = new TextDecoder();
+  let size = 0;
+  let text = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_SYNC_BYTES) {
+        await reader.cancel();
+        throw new SyncPayloadTooLargeError();
+      }
+      text += decoder.decode(value, { stream: true });
+    }
+    text += decoder.decode();
+    return JSON.parse(text) as unknown;
+  } catch (error) {
+    if (error instanceof SyncPayloadTooLargeError) throw error;
+    return null;
+  } finally {
+    reader.releaseLock();
+  }
+}

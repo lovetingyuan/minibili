@@ -1,4 +1,5 @@
 import { Icon, Text } from "@/components/styled/rneui";
+import UpName from "@/components/UpName";
 import { clsx } from "clsx";
 import { Image } from "@/components/styled/expo";
 import React from "react";
@@ -7,6 +8,7 @@ import { View } from "react-native";
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
+import { useUserSettings } from "@/features/user-data/useUserSettings";
 import { useFollowedUpsMap } from "@/store/derives";
 import { parseDate, parseDuration, parseImgUrl, parseNumber } from "@/utils";
 
@@ -15,11 +17,14 @@ export default VideoItem;
 function VideoItem({ video }: { video: VideoItemType }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum);
-  const { isWiFi, $blackTags } = useStore();
+  const { isWiFi } = useStore();
+  const {
+    values: { $blackTags },
+  } = useUserSettings();
   const _followedUpsMap = useFollowedUpsMap();
 
   const isFollowed = video.mid in _followedUpsMap;
-  const isBlackTag = video.tag in $blackTags;
+  const isBlackTag = Object.hasOwn($blackTags, video.tag);
   // console.log(parseImgUrl(video.cover, 480, 300))
   return (
     <View className="flex-1">
@@ -72,7 +77,8 @@ function VideoItem({ video }: { video: VideoItemType }) {
                 colorClassName={colors.primary.accent}
               />
             )}
-            <Text
+            <UpName
+              mid={video.mid}
               numberOfLines={1}
               ellipsizeMode="tail"
               className={clsx(
@@ -81,7 +87,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
               )}
             >
               {video.name}
-            </Text>
+            </UpName>
           </View>
           <View className="shrink-0 flex-row items-center">
             <Icon

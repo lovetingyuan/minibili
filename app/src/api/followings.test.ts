@@ -109,9 +109,9 @@ describe("Bilibili followings", () => {
     await expect(fetchBilibiliFollowings("1", request)).rejects.toThrow("network error");
   });
 
-  test("removes local-only entries while updating profiles and preserving pin", () => {
+  test("removes local-only entries while updating profiles", () => {
     const local: UpInfo[] = [
-      { mid: "1", name: "old", face: "old-face", sign: "old-sign", pin: 10 },
+      { mid: "1", name: "old", face: "old-face", sign: "old-sign" },
       { mid: 2, name: "manual", face: "manual-face", sign: "manual-sign" },
       { mid: 2, name: "duplicate", face: "duplicate-face", sign: "duplicate-sign" },
     ];
@@ -122,19 +122,19 @@ describe("Bilibili followings", () => {
     ];
 
     expect(mergeFollowedUps(local, imported)).toEqual([
-      { mid: 1, name: "new", face: "new-face", sign: "new-sign", pin: 10 },
+      { mid: 1, name: "new", face: "new-face", sign: "new-sign" },
       { mid: 3, name: "remote", face: "remote-face", sign: "remote-sign" },
     ]);
   });
 
   test("follows remote order and clears local records on an empty remote list", () => {
     const local: UpInfo[] = [
-      { mid: 1, name: "one", face: "", sign: "", pin: 7 },
+      { mid: 1, name: "one", face: "", sign: "" },
       { mid: 2, name: "two", face: "", sign: "" },
     ];
     expect(
       mergeFollowedUps(local, [local[1], { mid: "1", name: "new", face: "", sign: "" }]),
-    ).toEqual([local[1], { mid: "1", name: "new", face: "", sign: "", pin: 7 }]);
+    ).toEqual([local[1], { mid: "1", name: "new", face: "", sign: "" }]);
     expect(mergeFollowedUps(local, [])).toEqual([]);
   });
 

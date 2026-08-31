@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 const state = vi.hoisted(() => ({
   control: { generation: 1, phase: "ready" },
   followingsGeneration: -1,
-  ups: [{ mid: 456, name: "cached", face: "", sign: "", pin: 7 }],
+  ups: [{ mid: 456, name: "cached", face: "", sign: "" }],
 }));
 
 vi.mock(".", () => ({

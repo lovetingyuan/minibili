@@ -2,7 +2,7 @@ import type { UpInfo } from "@/types";
 
 import { useStore } from ".";
 import { useActiveFollowedUps } from "./followings";
-import type { MusicSong, UpdateUpInfo } from "./types";
+import type { UpdateUpInfo } from "./types";
 
 export const useFollowedUpsMap = () => {
   const $followedUps = useActiveFollowedUps();
@@ -22,15 +22,4 @@ export const useUpUpdateCount = () => {
   return aa.filter((item) => {
     return item.latestId !== item.currentLatestId;
   }).length;
-};
-
-export const useMusicSongsMap = () => {
-  const { $musicList } = useStore();
-  const map: Record<string, MusicSong> = {};
-  $musicList.forEach((music) => {
-    music.songs.forEach((song) => {
-      map[`${song.bvid}_${song.cid}`] = song;
-    });
-  });
-  return map;
 };

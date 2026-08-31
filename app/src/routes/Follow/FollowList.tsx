@@ -12,7 +12,9 @@ import {
 } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
+import { orderFollowedUps } from "@/features/bilibili-followings/order-followings";
 import { useFollowingsState } from "@/features/bilibili-followings/useFollowingsState";
+import { useUserSettings } from "@/features/user-data/useUserSettings";
 import { useUpUpdateCount } from "@/store/derives";
 import { useActiveFollowedUps } from "@/store/followings";
 
@@ -52,6 +54,7 @@ function FollowList() {
   const [searchKeyword, setSearchKeyword] = React.useState("");
   const { $upUpdateMap, livingUps, requestDynamicFailed } = useStore();
   const $followedUps = useActiveFollowedUps();
+  const { values } = useUserSettings();
   const { isValidating, mutate } = useFollowingsState();
   const _updatedCount = useUpUpdateCount();
   const followListRef = React.useRef<FlatList | null>(null);
@@ -102,25 +105,7 @@ function FollowList() {
   const rest = followedUpListLen
     ? columns - (followedUpListLen ? followedUpListLen % columns : 0)
     : 0;
-  const pinUps: UpInfo[] = [];
-  const liveUps: UpInfo[] = [];
-  const updateUps: UpInfo[] = [];
-  const otherUps: UpInfo[] = [];
-
-  for (const up of $followedUps) {
-    if (up.pin) {
-      pinUps.push({ ...up });
-    } else if (livingUps[up.mid]) {
-      liveUps.push({ ...up });
-    } else if (
-      up.mid in $upUpdateMap &&
-      $upUpdateMap[up.mid].latestId !== $upUpdateMap[up.mid].currentLatestId
-    ) {
-      updateUps.push({ ...up });
-    } else {
-      otherUps.push({ ...up });
-    }
-  }
+  const orderedUps = orderFollowedUps($followedUps, values.$pinnedUpIds, livingUps, $upUpdateMap);
 
   const content = (
     <View className="flex-1">
@@ -184,13 +169,7 @@ function FollowList() {
           onRefresh={() => {
             void mutate().catch(() => {});
           }}
-          data={[
-            ...pinUps.sort((a, b) => b.pin! - a.pin!),
-            ...liveUps,
-            ...updateUps,
-            ...otherUps,
-            ...(rest ? Array.from({ length: rest }).map(() => null) : []),
-          ]}
+          data={[...orderedUps, ...(rest ? Array.from({ length: rest }).map(() => null) : [])]}
           renderItem={renderItem}
           keyExtractor={(item, index) => (item ? `${item.mid}` : `${index}`)}
           onEndReachedThreshold={1}

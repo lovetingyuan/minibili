@@ -7,7 +7,7 @@ test("removes only local legacy favorites and history and is safe to repeat", as
     ["Store:$collectedVideos", "old favorites"],
     ["Store:$followedUps", "followings"],
     ["Store:$watchedVideos", "history"],
-    ["Store:$musicList", "music"],
+    ["Store:$watchedHotSearch", "search"],
     ["Store:$blackTags", "settings"],
   ]);
   const remove = vi.fn(async (key: string) => {
@@ -15,7 +15,7 @@ test("removes only local legacy favorites and history and is safe to repeat", as
   });
   await expect(clearLegacyCollections(remove)).resolves.toBe(true);
   await expect(clearLegacyCollections(remove)).resolves.toBe(true);
-  expect([...values.values()]).toEqual(["followings", "music", "settings"]);
+  expect([...values.values()]).toEqual(["followings", "search", "settings"]);
   expect(remove.mock.calls).toEqual([
     ["Store:$collectedVideos"],
     ["Store:$watchedVideos"],

@@ -1,6 +1,7 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button, Text } from "@/components/styled/rneui";
+import UpName from "./UpName";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
@@ -35,7 +36,8 @@ function CommentText(props: {
         if (node.type === "at") {
           const name = node.text.substring(1);
           return (
-            <Text
+            <UpName
+              mid={node.mid}
               key={key}
               className={clsx(
                 textClassName,
@@ -53,7 +55,7 @@ function CommentText(props: {
               }}
             >
               {node.text}
-            </Text>
+            </UpName>
           );
         }
         if (node.type === "url") {
@@ -147,7 +149,8 @@ export function CommentItem(props: {
   // console.log(999, clsx(fontSize, comment.upLike && 'font-bold'))
   return (
     <Text className="py-0.5">
-      <Text
+      <UpName
+        mid={comment.mid}
         className={clsx(
           colors.primary.text,
           upName === comment.name && [colors.secondary.text, "font-bold"],
@@ -165,7 +168,7 @@ export function CommentItem(props: {
         }}
       >
         {comment.name}
-      </Text>
+      </UpName>
       <Text className={fontSize}>
         {comment.sex === "男" ? "♂：" : comment.sex === "女" ? "♀：" : "："}
       </Text>

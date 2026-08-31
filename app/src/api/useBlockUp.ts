@@ -7,6 +7,8 @@ import { relationMutations } from "../features/bilibili-followings/relation-muta
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import { getFollowingsKey } from "./followings";
+import { getBlacklistKey } from "./blacklist";
+import type { Blacklist } from "./blacklist.types";
 import { getBilibiliLoginCookie } from "./get-cookie";
 import { modifyBilibiliRelation } from "./modify-relation";
 import type {
@@ -44,7 +46,22 @@ export function useBlockUp() {
       confirmedAccount,
       up.mid.toString(),
       () => trigger({ up, act: 5, account: confirmedAccount }),
-      () => mutate(getFollowingsKey(confirmedAccount.mid, confirmedAccount.generation)),
+      () =>
+        Promise.allSettled([
+          mutate<Blacklist>(
+            getBlacklistKey(confirmedAccount.mid, confirmedAccount.generation),
+            (current) =>
+              new Map(current).set(String(up.mid), {
+                face: "",
+                sign: "",
+                ...current?.get(String(up.mid)),
+                mid: up.mid,
+                name: up.name,
+              }),
+            { revalidate: true },
+          ),
+          mutate(getFollowingsKey(confirmedAccount.mid, confirmedAccount.generation)),
+        ]),
     );
   }
 

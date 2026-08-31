@@ -1,66 +1,18 @@
 import type { Context, Hono } from "hono";
-
-export const SYNC_TO_SERVER_KEYS = [
-  "$blackUps",
-  "$followedUps",
-  "$blackTags",
-  "$videoCatesList",
-  "$collectedVideos",
-  "$watchedVideos",
-  "$musicList",
-] as const;
-
-export type SyncToServerKey = (typeof SYNC_TO_SERVER_KEYS)[number];
-
-export type SyncSetPayload = Partial<Record<SyncToServerKey, unknown>>;
-
-export interface SyncOperations {
-  delete?: SyncToServerKey[];
-  get?: SyncToServerKey[];
-  set?: SyncSetPayload;
-}
-
-export type AuthFailureReason = "expired" | "invalid";
+import type { JsonValue, SyncOperations } from "../../shared/user-data";
 
 export interface AssetsBinding {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
 }
 
+// 仅依赖实际使用的 RPC，生产绑定仍由 Wrangler 生成完整类型。
 export interface UserStorageStub {
-  canSendOtp(): Promise<{ canSend: boolean; waitSeconds: number }>;
-  clearAuthState(): Promise<void>;
-  clearTokenState(): Promise<void>;
-  clearOtpState(): Promise<void>;
-  consumeRateLimit(
-    key: string,
-    limit: number,
-    windowMs: number,
-  ): Promise<{ allowed: boolean; waitSeconds: number }>;
-  issueToken(): Promise<{ expiresAt: number; token: string }>;
-  rotateToken(): Promise<{ expiresAt: number; token: string }>;
-  saveOtp(otp: string): Promise<void>;
-  syncData(operations: SyncOperations): Promise<Partial<Record<SyncToServerKey, unknown>>>;
-  verifyOtp(otp: string): Promise<{ reason?: "exhausted" | "expired" | "invalid"; valid: boolean }>;
-  verifyToken(
-    token: string,
-  ): Promise<{
-    expiresAt?: number;
-    needRefresh?: boolean;
-    reason?: AuthFailureReason;
-    valid: boolean;
-  }>;
-}
-
-export interface UserStorageNamespace {
-  get(id: DurableObjectId | string): UserStorageStub;
-  idFromName(name: string): DurableObjectId | string;
+  syncData(operations: SyncOperations): Promise<Record<string, JsonValue>>;
 }
 
 export interface ServerBindings {
   ASSETS: AssetsBinding;
-  RESEND_API_KEY: string;
-  RESEND_FROM_EMAIL: string;
-  USER_STORAGE: UserStorageNamespace;
+  USER_STORAGE: { getByName(name: string): UserStorageStub };
 }
 
 export type AppType = Hono<{ Bindings: ServerBindings }>;

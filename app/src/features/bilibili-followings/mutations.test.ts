@@ -128,16 +128,16 @@ describe("shared relationship mutations", () => {
     expect(controller.getSnapshot().size).toBe(0);
   });
 
-  test("updates membership by MID without losing pin or duplicating numeric/string IDs", () => {
-    const pinned = { ...up, mid: "456", pin: 9 };
-    expect(applyRelationChange([pinned], { up: { ...up, name: "new" }, act: 1 })).toEqual([
-      { ...up, name: "new", pin: 9 },
+  test("updates membership by MID without duplicating numeric/string IDs", () => {
+    const existing = { ...up, mid: "456" };
+    expect(applyRelationChange([existing], { up: { ...up, name: "new" }, act: 1 })).toEqual([
+      { ...up, name: "new" },
     ]);
-    expect(applyRelationChange([pinned], { up, act: 2 })).toEqual([]);
+    expect(applyRelationChange([existing], { up, act: 2 })).toEqual([]);
   });
 
   test("never adds a blocked UP to the following cache or guesses the server relationship", () => {
-    const existing = [{ ...up, pin: 9 }];
+    const existing = [up];
     expect(applyRelationChange(existing, { up, act: 5 })).toBe(existing);
     const empty: UpInfo[] = [];
     expect(applyRelationChange(empty, { up, act: 5 })).toBe(empty);

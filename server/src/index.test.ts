@@ -1,409 +1,231 @@
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import type { SyncOperations } from "../../shared/user-data";
+import { MAX_SYNC_BYTES } from "../../shared/user-data";
 
-vi.mock("cloudflare:workers", () => {
-  class TestDurableObject {
-    protected readonly ctx: DurableObjectState;
-    protected readonly env: unknown;
-
-    constructor(ctx: DurableObjectState, env: unknown) {
-      this.ctx = ctx;
-      this.env = env;
-    }
-  }
-
-  return {
-    DurableObject: TestDurableObject,
-  };
-});
+vi.mock("cloudflare:workers", () => ({ DurableObject: class {} }));
 
 import { createApp } from "./index";
-import type { ServerBindings, SyncOperations } from "./types";
-import { MemoryStorageAdapter, UserRecordStore } from "./user-record-store";
+import { AUTH_TIMEOUT_MS } from "./services/bilibili-auth";
+import { syncUserData } from "./user-data-store";
+import { MemoryKvStorage } from "./testing/memory-kv";
 
-type UserStorageLike = {
-  canSendOtp: () => Promise<{ canSend: boolean; waitSeconds: number }>;
-  clearAuthState: () => Promise<void>;
-  clearTokenState: () => Promise<void>;
-  clearOtpState: () => Promise<void>;
-  consumeRateLimit: (
-    key: string,
-    limit: number,
-    windowMs: number,
-  ) => Promise<{ allowed: boolean; waitSeconds: number }>;
-  issueToken: () => Promise<{ expiresAt: number; token: string }>;
-  rotateToken: () => Promise<{ expiresAt: number; token: string }>;
-  saveOtp: (otp: string) => Promise<void>;
-  syncData: (operations: SyncOperations) => Promise<Partial<Record<string, unknown>>>;
-  verifyOtp: (otp: string) => Promise<{ reason?: string; valid: boolean }>;
-  verifyToken: (
-    token: string,
-  ) => Promise<{
-    expiresAt?: number;
-    needRefresh?: boolean;
-    reason?: "expired" | "invalid";
-    valid: boolean;
-  }>;
-};
+const COOKIE = "SESSDATA=session; DedeUserID=123";
+const validPayload = { code: 0, data: { profile: { mid: 123 } } };
+const upstream = vi.fn<typeof fetch>();
 
-function createStorageNamespace() {
-  const stores = new Map<string, UserStorageLike>();
-
-  return {
-    getStore(email: string) {
-      if (!stores.has(email)) {
-        const recordStore = new UserRecordStore(new MemoryStorageAdapter());
-        stores.set(email, {
-          canSendOtp: () => recordStore.canSendOtp(),
-          clearAuthState: () => recordStore.clearAuthState(),
-          clearTokenState: () => recordStore.clearTokenState(),
-          clearOtpState: () => recordStore.clearOtpState(),
-          consumeRateLimit: (key, limit, windowMs) =>
-            recordStore.consumeRateLimit(key, limit, windowMs),
-          issueToken: () => recordStore.issueToken(),
-          rotateToken: () => recordStore.rotateToken(),
-          saveOtp: (otp) => recordStore.saveOtp(otp),
-          syncData: (operations) => recordStore.syncData(operations),
-          verifyOtp: (otp) => recordStore.verifyOtp(otp),
-          verifyToken: (token) => recordStore.verifyToken(token),
-        });
-      }
-
-      return stores.get(email)!;
-    },
-    idFromName(name: string) {
-      return name;
-    },
-    get(id: string) {
-      return this.getStore(id);
-    },
-  };
-}
-
-function createEnv() {
-  return {
-    ASSETS: {
-      fetch: () => Promise.resolve(new Response("ok")),
-    },
-    RESEND_API_KEY: "test-key",
-    RESEND_FROM_EMAIL: "minibili@tingyuan.in",
-    USER_STORAGE: createStorageNamespace(),
-  };
-}
-
-describe("server routes", () => {
-  test("health returns service status payload", async () => {
-    const app = createApp();
-    const response = await app.fetch(
-      new Request("https://example.com/health"),
-      createEnv() as ServerBindings,
-    );
-
-    const payload = (await response.json()) as {
-      service: string;
-      status: string;
-      timestamp: string;
-    };
-
-    expect(response.status).toBe(200);
-    expect(payload.service).toBe("minibili-server");
-    expect(payload.status).toBe("ok");
-    expect(Number.isNaN(Date.parse(payload.timestamp))).toBe(false);
-  });
-
-  test("static asset requests fall back to assets binding", async () => {
-    const app = createApp();
-    const assetFetch = vi.fn(() => Promise.resolve(new Response("asset-content")));
-    const env = {
-      ...createEnv(),
-      ASSETS: {
-        fetch: assetFetch,
-      },
-    };
-
-    const response = await app.fetch(
-      new Request("https://example.com/styles.css"),
-      env as ServerBindings,
-    );
-
-    expect(response.status).toBe(200);
-    await expect(response.text()).resolves.toBe("asset-content");
-    expect(assetFetch).toHaveBeenCalledTimes(1);
-  });
-
-  test("unknown api routes still return 404 instead of hitting assets", async () => {
-    const app = createApp();
-    const assetFetch = vi.fn(() => Promise.resolve(new Response("asset-content")));
-    const env = {
-      ...createEnv(),
-      ASSETS: {
-        fetch: assetFetch,
-      },
-    };
-
-    const response = await app.fetch(
-      new Request("https://example.com/api/unknown"),
-      env as ServerBindings,
-    );
-
-    expect(response.status).toBe(404);
-    expect(assetFetch).not.toHaveBeenCalled();
-  });
-
-  test("sync rejects missing authorization", async () => {
-    const app = createApp();
-    const response = await app.fetch(
-      new Request("https://example.com/api/users/user%40example.com/sync", {
-        body: JSON.stringify({ get: ["$followedUps"] }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }),
-      createEnv() as ServerBindings,
-    );
-
-    expect(response.status).toBe(401);
-  });
-
-  test("sync rejects authorization header without bearer scheme", async () => {
-    const app = createApp();
-    const env = createEnv();
-    const email = "user@example.com";
-    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
-
-    const response = await app.fetch(
-      new Request(`https://example.com/api/users/${encodeURIComponent(email)}/sync`, {
-        body: JSON.stringify({ get: ["$followedUps"] }),
-        headers: {
-          Authorization: issuedToken.token,
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }),
-      env as ServerBindings,
-    );
-
-    expect(response.status).toBe(401);
-  });
-
-  test("sync rejects unsupported keys", async () => {
-    const app = createApp();
-    const env = createEnv();
-    const email = "user@example.com";
-    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
-
-    const response = await app.fetch(
-      new Request(`https://example.com/api/users/${encodeURIComponent(email)}/sync`, {
-        body: JSON.stringify({ get: ["$unknown"] }),
-        headers: {
-          Authorization: `Bearer ${issuedToken.token}`,
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }),
-      env as ServerBindings,
-    );
-
-    expect(response.status).toBe(400);
-  });
-
-  test("status clears auth state when token is expired", async () => {
-    const app = createApp();
-    const env = createEnv();
-    const email = "user@example.com";
-
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-03-23T00:00:00.000Z"));
-    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
-    vi.advanceTimersByTime(30 * 24 * 60 * 60 * 1000 + 1);
-
-    const response = await app.fetch(
-      new Request("https://example.com/api/auth/status", {
-        body: JSON.stringify({ email, token: issuedToken.token }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }),
-      env as ServerBindings,
-    );
-
-    expect(response.status).toBe(200);
-    await expect(env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token)).resolves.toEqual({
-      reason: "invalid",
-      valid: false,
-    });
-    vi.useRealTimers();
-  });
-
-  test("status rejects invalid token without clearing valid session", async () => {
-    const app = createApp();
-    const env = createEnv();
-    const email = "user@example.com";
-    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
-    const invalidToken = "00000000-0000-4000-8000-000000000000";
-
-    const response = await app.fetch(
-      new Request("https://example.com/api/auth/status", {
-        body: JSON.stringify({ email, token: invalidToken }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }),
-      env as ServerBindings,
-    );
-
-    expect(response.status).toBe(200);
-    await expect(
-      env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token),
-    ).resolves.toMatchObject({
-      valid: true,
-    });
-  });
-
-  test("status preserves token before refresh threshold and preserves synced data", async () => {
-    const app = createApp();
-    const env = createEnv();
-    const email = "user@example.com";
-    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
-
-    await env.USER_STORAGE.getStore(email).syncData({
-      set: {
-        $followedUps: [{ face: "", mid: "1", name: "up-1" }],
-      },
-    });
-
-    const response = await app.fetch(
-      new Request("https://example.com/api/auth/status", {
-        body: JSON.stringify({ email, token: issuedToken.token }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }),
-      env as ServerBindings,
-    );
-
-    const payload = (await response.json()) as {
-      expiresAt: number;
-      success: true;
-      token: string;
-      valid: true;
-    };
-
-    expect(response.status).toBe(200);
-    expect(payload.valid).toBe(true);
-    expect(payload.token).toBe(issuedToken.token);
-    await expect(
-      env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token),
-    ).resolves.toMatchObject({
-      valid: true,
-    });
-    await expect(
-      env.USER_STORAGE.getStore(email).verifyToken(payload.token),
-    ).resolves.toMatchObject({
-      valid: true,
-    });
-    await expect(
-      env.USER_STORAGE.getStore(email).syncData({
-        get: ["$followedUps"],
-      }),
-    ).resolves.toEqual({
-      $followedUps: [{ face: "", mid: "1", name: "up-1" }],
-    });
-  });
-
-  test("otp send enforces global rate limit across target emails", async () => {
-    const app = createApp();
-    const env = createEnv();
-    const emailFetch = vi.fn(() => Promise.resolve(new Response("{}", { status: 200 })));
-    vi.stubGlobal("fetch", emailFetch);
-
-    try {
-      let lastResponse = new Response(null);
-      for (let index = 0; index < 121; index += 1) {
-        lastResponse = await app.fetch(
-          new Request("https://example.com/api/auth/otp", {
-            body: JSON.stringify({ email: `user-${index}@example.com` }),
-            headers: {
-              "Content-Type": "application/json",
-            },
-            method: "POST",
-          }),
-          env as ServerBindings,
-        );
-      }
-
-      expect(lastResponse.status).toBe(429);
-      expect(emailFetch).toHaveBeenCalledTimes(120);
-    } finally {
-      vi.unstubAllGlobals();
+function setup() {
+  const app = createApp();
+  const stores = new Map<string, MemoryKvStorage>();
+  const getByName = vi.fn((uid: string) => {
+    let storage = stores.get(uid);
+    if (!storage) {
+      storage = new MemoryKvStorage();
+      stores.set(uid, storage);
     }
+    const current = storage;
+    return { syncData: async (operations: SyncOperations) => syncUserData(current, operations) };
+  });
+  const assets = vi.fn(async () => new Response("asset"));
+  const env = { ASSETS: { fetch: assets }, USER_STORAGE: { getByName } };
+  return {
+    getByName,
+    assets,
+    request: (path: string, init?: RequestInit) =>
+      app.fetch(new Request(`https://example.com${path}`, init), env),
+    sync: (body: unknown = { get: ["setting"] }, cookie: string | null = COOKIE) =>
+      app.fetch(
+        new Request("https://example.com/api/user-data/sync", {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+            ...(cookie === null ? {} : { "X-Bilibili-Cookie": cookie }),
+          },
+        }),
+        env,
+      ),
+  };
+}
+beforeEach(() => {
+  upstream.mockReset().mockImplementation(async () => Response.json(validPayload));
+  vi.stubGlobal("fetch", upstream);
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
+
+describe("B站 identity boundary", () => {
+  test.each([null, "", "DedeUserID=123", "buvid3=anonymous", "SESSDATA=; DedeUserID=123"])(
+    "denies missing login credential %s without accessing DO",
+    async (cookie) => {
+      const server = setup();
+      expect((await server.sync(undefined, cookie)).status).toBe(401);
+      expect(server.getByName).not.toHaveBeenCalled();
+      expect(upstream).not.toHaveBeenCalled();
+    },
+  );
+
+  test("forged and expired credentials cannot read, write, or delete", async () => {
+    const server = setup();
+    upstream.mockImplementation(async () => Response.json({ code: -101 }));
+    for (const operations of [
+      { get: ["setting"] },
+      { set: { setting: true } },
+      { delete: ["setting"] },
+    ]) {
+      const response = await server.sync(operations);
+      expect(response.status).toBe(401);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+    }
+    expect(server.getByName).not.toHaveBeenCalled();
   });
 
-  test("logout clears auth state", async () => {
-    const app = createApp();
-    const env = createEnv();
-    const email = "user@example.com";
-    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
+  test.each([
+    { code: -352 },
+    { code: 0 },
+    { code: 0, data: { profile: { mid: -1 } } },
+    { code: 0, data: { profile: { mid: "123" } } },
+    null,
+  ])("fails closed for unexpected upstream payload %j", async (payload) => {
+    const server = setup();
+    upstream.mockImplementation(async () => Response.json(payload));
+    expect((await server.sync()).status).toBe(503);
+    expect(server.getByName).not.toHaveBeenCalled();
+  });
 
-    const response = await app.fetch(
-      new Request("https://example.com/api/auth/logout", {
-        body: JSON.stringify({ email, token: issuedToken.token }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }),
-      env as ServerBindings,
+  test.each([302, 403, 429, 500])("fails closed for upstream HTTP %i", async (status) => {
+    const server = setup();
+    upstream.mockImplementation(async () => new Response("upstream", { status }));
+    expect((await server.sync()).status).toBe(503);
+    expect(server.getByName).not.toHaveBeenCalled();
+  });
+
+  test("timeouts and network errors never fall back to an unverified UID", async () => {
+    vi.useFakeTimers();
+    const server = setup();
+    upstream.mockImplementation(
+      (_url, options) =>
+        new Promise((_resolve, reject) => {
+          options?.signal?.addEventListener("abort", () => reject(new Error("aborted")));
+        }),
     );
+    const request = server.sync();
+    await vi.advanceTimersByTimeAsync(AUTH_TIMEOUT_MS + 10);
+    expect((await request).status).toBe(503);
+    expect(server.getByName).not.toHaveBeenCalled();
+    upstream.mockRejectedValue(new Error("network"));
+    expect((await server.sync()).status).toBe(503);
+    expect(server.getByName).not.toHaveBeenCalled();
+  });
 
-    expect(response.status).toBe(200);
-    await expect(env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token)).resolves.toEqual({
-      reason: "invalid",
-      valid: false,
+  test("routes solely by verified UID and checks the upstream on every request", async () => {
+    const server = setup();
+    const response = await server.sync(
+      { set: { futureSetting: [true, 3] }, get: ["futureSetting"] },
+      "SESSDATA=session; DedeUserID=999",
+    );
+    expect(await response.json()).toEqual({
+      success: true,
+      uid: "123",
+      result: { futureSetting: [true, 3] },
+    });
+    expect(server.getByName).toHaveBeenCalledExactlyOnceWith("123");
+    expect(upstream).toHaveBeenCalledWith(
+      "https://api.bilibili.com/x/space/v2/myinfo",
+      expect.objectContaining({
+        redirect: "manual",
+        headers: expect.objectContaining({ cookie: "SESSDATA=session; DedeUserID=999" }),
+      }),
+    );
+    upstream.mockImplementation(async () =>
+      Response.json({ code: 0, data: { profile: { mid: 456 } } }),
+    );
+    expect(await (await server.sync({ get: ["futureSetting"] })).json()).toEqual({
+      success: true,
+      uid: "456",
+      result: {},
+    });
+    expect(upstream).toHaveBeenCalledTimes(2);
+    upstream.mockImplementation(async () => Response.json({ code: -101 }));
+    expect((await server.sync()).status).toBe(401);
+    expect(server.getByName).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("sync contract and unaffected routes", () => {
+  test("persists ordered pinned IDs per verified account and supports clearing the array", async () => {
+    const server = setup();
+    const saved = await server.sync({
+      set: { $pinnedUpIds: ["789", "456"] },
+      get: ["$pinnedUpIds"],
+    });
+    expect(saved.status).toBe(200);
+    expect(await saved.json()).toEqual({
+      success: true,
+      uid: "123",
+      result: { $pinnedUpIds: ["789", "456"] },
+    });
+    expect(await (await server.sync({ get: ["$pinnedUpIds"] })).json()).toMatchObject({
+      result: { $pinnedUpIds: ["789", "456"] },
+    });
+    upstream.mockResolvedValueOnce(Response.json({ code: 0, data: { profile: { mid: 999 } } }));
+    expect(await (await server.sync({ get: ["$pinnedUpIds"] })).json()).toEqual({
+      success: true,
+      uid: "999",
+      result: {},
+    });
+    expect((await server.sync({ set: { $pinnedUpIds: [] } })).status).toBe(200);
+    expect(await (await server.sync({ get: ["$pinnedUpIds"] })).json()).toMatchObject({
+      result: { $pinnedUpIds: [] },
     });
   });
 
-  test("logout preserves synced data", async () => {
-    const app = createApp();
-    const env = createEnv();
-    const email = "user@example.com";
-    const issuedToken = await env.USER_STORAGE.getStore(email).issueToken();
-
-    await env.USER_STORAGE.getStore(email).syncData({
-      set: {
-        $blackUps: {
-          _1: "blocked",
-        },
-      },
+  test.each(
+    [
+      {},
+      [],
+      { uid: "999", get: ["setting"] },
+      { get: "setting" },
+      { get: ["__proto__"] },
+      { set: { constructor: true } },
+      { set: { "": true } },
+      { get: ["x".repeat(129)] },
+      { get: Array.from({ length: 129 }, (_, i) => `key${i}`) },
+    ].map((body) => ({ body })),
+  )("rejects malformed operations $body before touching storage", async ({ body }) => {
+    const server = setup();
+    expect((await server.sync(body)).status).toBe(400);
+    expect(server.getByName).not.toHaveBeenCalled();
+  });
+  test("limits the streamed request body without Content-Length", async () => {
+    const server = setup();
+    const response = await server.sync({ set: { large: "x".repeat(MAX_SYNC_BYTES) } });
+    expect(response.status).toBe(413);
+    expect(server.getByName).not.toHaveBeenCalled();
+  });
+  test("old email endpoints return 404 and cannot access DO", async () => {
+    const server = setup();
+    for (const path of [
+      "/api/auth/otp",
+      "/api/auth/verify",
+      "/api/auth/status",
+      "/api/auth/logout",
+      "/api/users/user%40example.com/sync",
+    ]) {
+      expect((await server.request(path, { method: "POST" })).status).toBe(404);
+    }
+    expect(server.getByName).not.toHaveBeenCalled();
+    expect(server.assets).not.toHaveBeenCalled();
+  });
+  test("keeps health and static assets working", async () => {
+    const server = setup();
+    expect(await (await server.request("/health")).json()).toMatchObject({
+      service: "minibili-server",
+      status: "ok",
     });
-
-    const response = await app.fetch(
-      new Request("https://example.com/api/auth/logout", {
-        body: JSON.stringify({ email, token: issuedToken.token }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }),
-      env as ServerBindings,
-    );
-
-    expect(response.status).toBe(200);
-    await expect(env.USER_STORAGE.getStore(email).verifyToken(issuedToken.token)).resolves.toEqual({
-      reason: "invalid",
-      valid: false,
-    });
-    await expect(
-      env.USER_STORAGE.getStore(email).syncData({
-        get: ["$blackUps"],
-      }),
-    ).resolves.toEqual({
-      $blackUps: {
-        _1: "blocked",
-      },
-    });
+    expect(await (await server.request("/styles.css")).text()).toBe("asset");
+    expect((await server.request("/api/unknown")).status).toBe(404);
+    expect(server.assets).toHaveBeenCalledTimes(1);
   });
 });

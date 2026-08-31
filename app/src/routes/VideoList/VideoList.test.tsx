@@ -39,10 +39,14 @@ vi.mock("@/hooks/useBlockUpActions", () => ({
 }));
 vi.mock("@/store", () => ({
   useStore: () => ({
-    $blackTags: { 游戏: "游戏" },
-    set$blackTags: mocks.setBlackTags,
     setOverlayButtons: mocks.setOverlayButtons,
     currentVideosCate: {},
+  }),
+}));
+vi.mock("@/features/user-data/useUserSettings", () => ({
+  useUserSettings: () => ({
+    values: { $blackTags: { 游戏: "游戏" } },
+    setSetting: mocks.setBlackTags,
   }),
 }));
 vi.mock("@/utils", () => ({ handleShareVideo: vi.fn(), parseNumber: String, parseUrl: String }));

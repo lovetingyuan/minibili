@@ -72,12 +72,6 @@ module.exports = {
       },
     ],
     [
-      "expo-audio",
-      {
-        enableBackgroundPlayback: true,
-      },
-    ],
-    [
       "expo-video",
       {
         supportsBackgroundPlayback: true,

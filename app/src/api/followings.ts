@@ -73,7 +73,6 @@ export async function fetchBilibiliFollowings(
 }
 
 export function mergeFollowedUps(localUps: UpInfo[], importedUps: UpInfo[]) {
-  const localByMid = new Map(localUps.map((up) => [up.mid.toString(), up]));
   const seenMids = new Set<string>();
   const merged: UpInfo[] = [];
 
@@ -81,11 +80,7 @@ export function mergeFollowedUps(localUps: UpInfo[], importedUps: UpInfo[]) {
     const mid = importedUp.mid.toString();
     if (!seenMids.has(mid)) {
       seenMids.add(mid);
-      const localUp = localByMid.get(mid);
-      merged.push({
-        ...importedUp,
-        ...(localUp?.pin !== undefined ? { pin: localUp.pin } : {}),
-      });
+      merged.push({ ...importedUp });
     }
   }
 
@@ -97,8 +92,7 @@ export function mergeFollowedUps(localUps: UpInfo[], importedUps: UpInfo[]) {
         up.mid.toString() === local.mid.toString() &&
         up.name === local.name &&
         up.face === local.face &&
-        up.sign === local.sign &&
-        up.pin === local.pin
+        up.sign === local.sign
       );
     });
   return unchanged ? localUps : merged;

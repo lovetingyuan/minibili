@@ -1,6 +1,7 @@
 import { useBackHandler } from "@react-native-community/hooks";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text } from "@/components/styled/rneui";
+import UpName from "@/components/UpName";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
 import { Image, View } from "react-native";
@@ -60,11 +61,7 @@ function parseUpdateLiveInfoPayload(data: string) {
     return null;
   }
 
-  if (
-    isRecord(parsed) &&
-    typeof parsed.url === "string" &&
-    typeof parsed.callback === "string"
-  ) {
+  if (isRecord(parsed) && typeof parsed.url === "string" && typeof parsed.callback === "string") {
     return {
       url: parsed.url,
       callback: parsed.callback,
@@ -135,7 +132,14 @@ function LiveWebPage({ route }: Props) {
         }}
       />
     ),
-    headerTitle: pageTitle,
+    headerTitle: () => (
+      <Text className="text-lg font-semibold" numberOfLines={1}>
+        <UpName mid={route.params.user?.mid} className="text-lg font-semibold">
+          {route.params.user?.name || pageTitle}
+        </UpName>
+        {route.params.user ? "的直播间" : ""}
+      </Text>
+    ),
   });
   const [enableBackgroundPlay, setEnableBackgroundPlay] = React.useState(false);
   const roomId = url.startsWith("https://live.bilibili.com/h5/") ? url.split("/")[4] : "";

@@ -1,6 +1,7 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Avatar, Icon, Text } from "@/components/styled/rneui";
+import UpName from "@/components/UpName";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
@@ -61,6 +62,7 @@ export function HeaderLeft() {
                   setCheckLiveTimeStamp(Date.now());
                   navigation.navigate("Living", {
                     title: `${dynamicUser.name}的直播间`,
+                    user: { mid: dynamicUser.mid, name: userName },
                     url: livingUrl,
                   });
                 }
@@ -74,13 +76,14 @@ export function HeaderLeft() {
       ) : null}
 
       <View className="ml-3 flex-1 flex-row flex-wrap items-center">
-        <Text
+        <UpName
+          mid={dynamicUser.mid}
           className={clsx(followed && [colors.secondary.text, "font-bold"], "text-lg")}
           // adjustsFontSizeToFit
           numberOfLines={1}
         >
           {userName}
-        </Text>
+        </UpName>
         {/* {fans ? (
           <Text
             className="text-sm text-gray-500 dark:text-gray-400"

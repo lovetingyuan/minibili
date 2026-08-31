@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { Icon, Text } from "@/components/styled/rneui";
+import UpName from "./UpName";
 import { clsx } from "clsx";
 import React from "react";
 import { Image, Linking, type TextProps, View } from "react-native";
@@ -80,7 +81,8 @@ function RichTexts(props: {
       );
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AT) {
       reactNodes.push(
-        <Text
+        <UpName
+          mid={node.rid}
           key={key++}
           onPress={() => {
             navigation.push("Dynamic", {
@@ -95,7 +97,7 @@ function RichTexts(props: {
           className={clsx(colors.primary.text, textSizeClassName)}
         >
           {node.text}
-        </Text>,
+        </UpName>,
       );
     } else if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_EMOJI) {
       reactNodes.push(

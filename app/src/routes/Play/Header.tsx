@@ -1,23 +1,18 @@
 import { type RouteProp, useRoute } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Dialog, Icon, Input, Text } from "@/components/styled/rneui";
+import { Icon, Text } from "@/components/styled/rneui";
+import UpName from "@/components/UpName";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, View } from "react-native";
-import {
-  Menu,
-  MenuOption,
-  MenuOptions,
-  MenuTrigger,
-} from "@/components/Menu";
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 
 import { getDownloadUrl } from "@/api/play-url";
 import { useUserRelation } from "@/api/user-relation";
 import { useVideoInfo } from "@/api/video-info";
 import { colors } from "@/constants/colors.tw";
-import { useStore } from "@/store";
-import { useFollowedUpsMap, useMusicSongsMap } from "@/store/derives";
+import { useFollowedUpsMap } from "@/store/derives";
 import type { RootStackParamList } from "@/types";
 import { parseImgUrl, parseNumber, showToast } from "@/utils";
 
@@ -29,11 +24,12 @@ export function PlayHeaderTitle() {
   const followed = route.params?.mid && route.params.mid in _followedUpsMap;
   return (
     <View className="relative left-[-10px] flex-row items-center">
-      <Text
+      <UpName
+        mid={route.params?.mid || vi?.mid}
         className={clsx("text-lg font-semibold", followed && colors.secondary.text)}
       >
         {route.params?.name || vi?.name}
-      </Text>
+      </UpName>
       <Text
         className="ml-3 text-gray-500 dark:text-gray-400"
         onPress={() => {
@@ -48,95 +44,6 @@ export function PlayHeaderTitle() {
   );
 }
 
-function SongInfoModal(props: { videoInfo: any; cid: number; onClose: () => void }) {
-  const [title, setTitle] = React.useState(props.videoInfo.title);
-  const [singer, setSinger] = React.useState("");
-  const [year, setYear] = React.useState("");
-  const { set$musicList, get$musicList } = useStore();
-
-  const handleSearchInternet = () => {
-    Linking.openURL(`https://www.baidu.com/s?wd=${encodeURIComponent(title)}`);
-  };
-  const handleAddSong = () => {
-    const musicList = get$musicList();
-    // console.log(videoInfo)
-    musicList[0].songs.unshift({
-      name: title,
-      bvid: props.videoInfo.bvid,
-      cid: props.cid,
-      cover: props.videoInfo.cover,
-      singer,
-      year,
-      duration: props.videoInfo.duration,
-      createTime: Date.now(),
-    });
-    set$musicList([...musicList]);
-    showToast("添加成功");
-    props.onClose();
-  };
-  return (
-    <Dialog
-      isVisible={true}
-      overlayClassName={colors.gray2.bg}
-      backdropClassName="bg-neutral-900/90"
-      onBackdropPress={props.onClose}
-    >
-      <Dialog.Title title={"添加到歌单"} titleClassName={colors.black.text} />
-      <View className="mt-3">
-        <Input
-          label="歌曲名称"
-          placeholder="歌曲名称"
-          autoFocus
-          // className="mt-5 h-20"
-          maxLength={100}
-          value={title}
-          placeholderTextColorClassName={colors.gray4.accent}
-          onChangeText={(value) => {
-            setTitle(value);
-          }}
-        />
-        <Input
-          label="演唱者"
-          placeholder="演唱者名称"
-          // className="mt-5 h-20"
-          maxLength={60}
-          value={singer}
-          placeholderTextColorClassName={colors.gray4.accent}
-          onChangeText={(value) => {
-            setSinger(value);
-          }}
-        />
-        <Input
-          label="年份"
-          placeholder="创作年份"
-          // className="mt-5 h-20"
-          maxLength={10}
-          value={`${year}`}
-          placeholderTextColorClassName={colors.gray4.accent}
-          onChangeText={(value) => {
-            setYear(value);
-          }}
-        />
-      </View>
-      <Dialog.Actions>
-        <Dialog.Button title="添加到歌单" onPress={handleAddSong} />
-        <Dialog.Button
-          title="网络搜索"
-          titleClassName={colors.success.text}
-          onPress={handleSearchInternet}
-        />
-        <Dialog.Button
-          titleClassName={colors.gray6.text}
-          title="取消"
-          onPress={() => {
-            props.onClose();
-          }}
-        />
-      </Dialog.Actions>
-    </Dialog>
-  );
-}
-
 export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
   const [visible, setVisible] = React.useState(false);
   const hideMenu = () => setVisible(false);
@@ -147,8 +54,6 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
     ...route.params,
     ...data,
   };
-  const [showAddSongInfoModal, setShowAddSongInfoModal] = React.useState(false);
-  const musicSongsMap = useMusicSongsMap();
   return (
     <View className="flex-row items-center gap-2">
       <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
@@ -214,34 +119,8 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
               );
             }}
           />
-          <MenuOption
-            text="添加到歌单"
-            onSelect={() => {
-              hideMenu();
-              if (!props.cid || !videoInfo.cover || !videoInfo.duration) {
-                showToast("请稍候再试");
-                return;
-              }
-              const id = `${videoInfo.bvid}_${props.cid}`;
-              if (id in musicSongsMap) {
-                showToast("当前视频已经在歌单当中");
-                return;
-              }
-              setShowAddSongInfoModal(true);
-            }}
-          />
         </MenuOptions>
       </Menu>
-      {showAddSongInfoModal && props.cid ? (
-        <SongInfoModal
-          videoInfo={videoInfo}
-          cid={props.cid}
-          // mid={videoInfo.mid}
-          onClose={() => {
-            setShowAddSongInfoModal(false);
-          }}
-        />
-      ) : null}
     </View>
   );
 }

@@ -5,7 +5,8 @@ import { ScrollView, View } from "react-native";
 import Header from "./Banner";
 import BilibiliAccount from "./BilibiliAccount";
 import BlackTags from "./BlackTags";
-import Music from "./Music";
+import Blacklist from "./Blacklist";
+import SettingsSync from "./SettingsSync";
 import SortCate from "./SortCate";
 import Version from "./Version";
 import { headerRight } from "./Header";
@@ -23,10 +24,11 @@ function About() {
       <View className="gap-2">
         <Version />
         <BilibiliAccount />
-        <Music />
+        <SettingsSync />
       </View>
       <Divider className="my-4" />
       <BlackTags />
+      <Blacklist />
       <SortCate />
       <View className="h-10" />
     </ScrollView>

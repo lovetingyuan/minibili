@@ -340,7 +340,7 @@ function Dynamic({ route }: Props) {
             });
           } else if (data.action === "open-dynamic-detail") {
             const { url, title } = data.payload;
-            navigation.navigate("DynamicDetail", { url, title });
+            navigation.navigate("DynamicDetail", { url, title, user: route.params?.user });
           } else if (data.action === "open-topic") {
             const { url, title } = data.payload;
             navigation.navigate("WebPage", { url, title });

@@ -4,6 +4,8 @@ import type { ReactElement, ReactNode } from "react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import type { VideoListItemInfo } from "../types";
 
+vi.mock("./UpName", () => ({ default: "UpName" }));
+
 const mocks = vi.hoisted(() => ({ navigate: vi.fn(), parseDate: vi.fn(() => "08-30") }));
 vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),

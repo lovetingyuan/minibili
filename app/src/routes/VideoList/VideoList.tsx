@@ -7,6 +7,7 @@ import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { colors } from "@/constants/colors.tw";
 import { useBlockUpActions } from "@/hooks/useBlockUpActions";
 import { useStore } from "@/store";
+import { useUserSettings } from "@/features/user-data/useUserSettings";
 import type { NavigationProps } from "@/types";
 import { handleShareVideo, parseNumber, parseUrl } from "@/utils";
 import type { FlashListRef } from "@/components/styled/rneui";
@@ -24,13 +25,17 @@ function VideoList(props: {
   onRefresh?: (fab?: boolean) => void;
   isRefreshing?: boolean;
 }) {
-  const { $blackTags, set$blackTags, setOverlayButtons, currentVideosCate } = useStore();
+  const { setOverlayButtons, currentVideosCate } = useStore();
+  const {
+    values: { $blackTags },
+    setSetting,
+  } = useUserSettings();
   const { confirmBlock } = useBlockUpActions();
   const videoList: VideoItemType[] = [];
   const uniqVideosMap: Record<string, boolean> = {};
   for (const item of props.videos) {
     let needShow = !(item.bvid in uniqVideosMap);
-    if (needShow && props.type === "Hot" && item.tag in $blackTags) {
+    if (needShow && props.type === "Hot" && Object.hasOwn($blackTags, item.tag)) {
       needShow = false;
     }
     if (needShow) {
@@ -51,7 +56,8 @@ function VideoList(props: {
     if (!currentVideoRef.current) {
       return;
     }
-    Alert.alert(`不再看 ${currentVideoRef.current.tag} 类型的视频？`, "", [
+    const { tag } = currentVideoRef.current;
+    Alert.alert(`不再看 ${tag} 类型的视频？`, "", [
       {
         text: "取消",
         style: "cancel",
@@ -59,11 +65,7 @@ function VideoList(props: {
       {
         text: "确定",
         onPress: () => {
-          const { tag } = currentVideoRef.current!;
-          set$blackTags({
-            ...$blackTags,
-            [tag]: tag,
-          });
+          setSetting("$blackTags", (previous) => ({ ...previous, [tag]: tag }));
         },
       },
     ]);

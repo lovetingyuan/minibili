@@ -10,7 +10,6 @@ export interface UpInfo {
   name: string;
   face: string;
   sign: string;
-  pin?: number;
 }
 
 export interface VideoListItemInfo {
@@ -35,7 +34,6 @@ export type RootStackParamList = {
   Welcome: undefined;
   SearchUps: undefined;
   SearchVideos: undefined;
-  Music: undefined;
   WebPage: { url: string; title?: string; type?: "pc" | "mobile" };
   Play: {
     bvid: string;
@@ -58,11 +56,12 @@ export type RootStackParamList = {
     // detail: DynamicItemAllType
     title: string;
     url: string;
+    user?: Pick<UpInfo, "mid" | "name">;
   };
   VideoList: undefined;
   Follow: undefined;
   About: undefined;
-  Living: { url: string; title: string };
+  Living: { url: string; title: string; user?: Pick<UpInfo, "mid" | "name"> };
 };
 
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>;

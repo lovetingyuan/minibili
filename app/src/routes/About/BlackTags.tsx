@@ -3,13 +3,16 @@ import React from "react";
 
 import { colors } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
-import { useStore } from "@/store";
+import { useUserSettings } from "@/features/user-data/useUserSettings";
 
 export default BlackTags;
 
 function BlackTags() {
   const [expanded, setExpanded] = React.useState(false);
-  const { $blackTags, set$blackTags } = useStore();
+  const {
+    values: { $blackTags },
+    setSetting,
+  } = useUserSettings();
   const gray5Color = useResolvedColor(colors.gray5.text);
   return (
     <ListItem.Accordion
@@ -39,9 +42,11 @@ function BlackTags() {
                   size={16}
                   color={gray5Color}
                   onPress={() => {
-                    const blackTags = { ...$blackTags };
-                    delete blackTags[tag];
-                    set$blackTags(blackTags);
+                    setSetting("$blackTags", (previous) => {
+                      const blackTags = { ...previous };
+                      delete blackTags[tag];
+                      return blackTags;
+                    });
                   }}
                 />
               }

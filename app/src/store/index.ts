@@ -8,7 +8,7 @@ import { RanksConfig } from "../constants";
 import type { UpInfo } from "../types";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { RepliesInfo } from "./replies-info.type";
-import type { MusicSong, UpdateUpInfo } from "./types";
+import type { UpdateUpInfo } from "./types";
 
 const StoragePrefix = "Store:";
 
@@ -23,24 +23,10 @@ const getAppValue = () => {
      */
     $followedUps: [] as UpInfo[],
     /**
-     * 不感兴趣的分类
-     */
-    $blackTags: {} as Record<string, string>,
-    /**
      * 有更新的up主
      */
     $upUpdateMap: {} as Record<string, UpdateUpInfo>,
     // $ignoredVersions: [] as string[],
-    $videoCatesList: RanksConfig,
-    $musicList: [
-      {
-        name: "默认",
-        songs: [],
-      },
-    ] as {
-      name: string;
-      songs: MusicSong[];
-    }[],
     $watchedHotSearch: {} as Record<string, number>,
     $checkAppUpdateTime: 0,
     // -------------------------
@@ -62,7 +48,6 @@ const getAppValue = () => {
     moreRepliesUrl: "",
     repliesInfo: null as RepliesInfo | null,
     checkLiveTimeStamp: Date.now(),
-    playingSong: null as MusicSong | null,
     releaseList: [] as {
       version: string;
       changelog: string;
@@ -120,25 +105,6 @@ function isCompatibleStoredValue<K extends StoredKeys>(
   return typeof value === typeof defaultValue;
 }
 
-function normalizeVideoCatesList(value: unknown) {
-  if (!Array.isArray(value)) {
-    return null;
-  }
-  const list = value.filter((item): item is (typeof RanksConfig)[number] => {
-    return isPlainObject(item) && typeof item.rid === "number";
-  });
-  if (list.length === 0) {
-    return null;
-  }
-  const nextList = list.map((item) => ({ ...item }));
-  RanksConfig.forEach((rank) => {
-    if (!nextList.find((item) => item.rid === rank.rid)) {
-      nextList.push({ ...rank });
-    }
-  });
-  return nextList;
-}
-
 async function hydrateStoredValue<K extends StoredKeys>(methods: AppContextMethodsType, key: K) {
   const data = await AsyncStorage.getItem(StoragePrefix + key);
   if (!data) {
@@ -146,15 +112,6 @@ async function hydrateStoredValue<K extends StoredKeys>(methods: AppContextMetho
   }
   try {
     const parsed = JSON.parse(data) as unknown;
-    if (key === "$videoCatesList") {
-      const list = normalizeVideoCatesList(parsed);
-      if (list) {
-        methods.set$videoCatesList(list);
-        return false;
-      }
-      methods.set$videoCatesList(getDefaultStoredValue(key as "$videoCatesList"));
-      return true;
-    }
     const defaultValue = getDefaultStoredValue(key);
     const setKey = `set${key}` as StoreSetterKey<K>;
     const setValue = methods[setKey] as (value: StoreSetterValue<K>) => void;

@@ -1,58 +1,11 @@
 import { DurableObject } from "cloudflare:workers";
+import type { SyncOperations } from "../../shared/user-data";
+import type { ServerBindings } from "./types";
+import { syncUserData } from "./user-data-store";
 
-import type { ServerBindings, SyncOperations } from "./types";
-import { DurableObjectStorageAdapter, UserRecordStore } from "./user-record-store";
-
-// Durable Object 作为每个邮箱的状态容器，对外只暴露 UserRecordStore 的领域方法。
+// 每个已验证的 B站 UID 对应一个 DO；认证只在 Worker 边界处理。
 export class UserStorage extends DurableObject<ServerBindings> {
-  private readonly store: UserRecordStore;
-
-  constructor(ctx: DurableObjectState, env: ServerBindings) {
-    super(ctx, env);
-    this.store = new UserRecordStore(new DurableObjectStorageAdapter(ctx.storage));
-  }
-
-  canSendOtp() {
-    return this.store.canSendOtp();
-  }
-
-  clearAuthState() {
-    return this.store.clearAuthState();
-  }
-
-  clearTokenState() {
-    return this.store.clearTokenState();
-  }
-
-  clearOtpState() {
-    return this.store.clearOtpState();
-  }
-
-  consumeRateLimit(key: string, limit: number, windowMs: number) {
-    return this.store.consumeRateLimit(key, limit, windowMs);
-  }
-
-  issueToken() {
-    return this.store.issueToken();
-  }
-
-  rotateToken() {
-    return this.store.rotateToken();
-  }
-
-  saveOtp(otp: string) {
-    return this.store.saveOtp(otp);
-  }
-
-  syncData(operations: SyncOperations) {
-    return this.store.syncData(operations);
-  }
-
-  verifyOtp(otp: string) {
-    return this.store.verifyOtp(otp);
-  }
-
-  verifyToken(token: string) {
-    return this.store.verifyToken(token);
+  async syncData(operations: SyncOperations) {
+    return syncUserData(this.ctx.storage, operations);
   }
 }

@@ -5,6 +5,8 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React from "react";
 import { BackHandler, Image, Linking, Platform, View } from "react-native";
 import BilibiliWebView from "@/components/BilibiliWebView";
+import { Text } from "@/components/styled/rneui";
+import UpName from "@/components/UpName";
 
 // import useLiveUrl from '@/api/get-live-url'
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
@@ -80,7 +82,14 @@ function DynamicDetailPage({ route }: Props) {
     headerRight: () => {
       return <HeaderRight reload={onRefresh} />;
     },
-    headerTitle: title,
+    headerTitle: () => (
+      <Text className="text-lg font-semibold" numberOfLines={1}>
+        <UpName mid={route.params.user?.mid} className="text-lg font-semibold">
+          {route.params.user?.name || title}
+        </UpName>
+        {route.params.user ? "的动态" : ""}
+      </Text>
+    ),
   });
 
   const currentNavigationStateRef = React.useRef<{

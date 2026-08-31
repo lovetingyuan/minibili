@@ -1,76 +1,79 @@
 import { Chip, Icon, ListItem, Text } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
-
 import { colors } from "@/constants/colors.tw";
+import { useUserSettings } from "@/features/user-data/useUserSettings";
+import type { UserSettings } from "@/features/user-data/types";
+import type { CategorySelection } from "./SortCate.types";
 
-import { useStore } from "../../store";
+export default function SortCate() {
+  const [expanded, setExpanded] = React.useState(false);
+  const {
+    values: { $videoCatesList },
+    scope,
+    generation,
+    setSetting,
+  } = useUserSettings();
+  const [selection, setSelection] = React.useState<CategorySelection>({ stamp: "", rids: [] });
+  const stampFor = (list: UserSettings["$videoCatesList"]) =>
+    `${scope}:${generation}:${list.map((item) => item.rid).join(",")}`;
+  // 远端重新排序或切换账号后，以最新设置派生列表，不保留旧账号的编辑草稿。
+  const selected = selection.stamp === stampFor($videoCatesList) ? selection.rids : [];
+  const categories = $videoCatesList.slice(1);
+  const sorted = categories.filter((item) => selected.includes(item.rid));
+  const unsorted = categories.filter((item) => !selected.includes(item.rid));
 
-export default SortCate;
-
-function SortCate() {
-  const [expandedCate, setExpandedCate] = React.useState(false);
-  const { $videoCatesList, set$videoCatesList } = useStore();
-  const [sortedRankList, setSortedRankList] = React.useState<{ rid: number; label: string }[]>([]);
-  const [, ...initUnsortedRankList] = $videoCatesList;
-  const [unsortedRankList, setUnSortedRankList] = React.useState(initUnsortedRankList);
+  function move(rid: number, select: boolean) {
+    const item = categories.find((category) => category.rid === rid);
+    if (!item) return;
+    const nextSelected = select ? [...selected, rid] : selected.filter((id) => id !== rid);
+    const nextSorted = select ? [...sorted, item] : sorted.filter((entry) => entry.rid !== rid);
+    const nextUnsorted = select
+      ? unsorted.filter((entry) => entry.rid !== rid)
+      : [...unsorted, item];
+    const next = [$videoCatesList[0], ...nextSorted, ...nextUnsorted];
+    if (setSetting("$videoCatesList", next))
+      setSelection({ stamp: stampFor(next), rids: nextSelected });
+  }
   return (
     <ListItem.Accordion
-      icon={<Icon name={"chevron-down"} type="material-community" />}
+      icon={<Icon name="chevron-down" type="material-community" />}
       containerClassName="p-0 mt-1 mb-3 bg-transparent"
       content={
         <ListItem.Content>
           <ListItem.Title>调整分区顺序</ListItem.Title>
         </ListItem.Content>
       }
-      isExpanded={expandedCate}
-      onPress={() => {
-        setExpandedCate(!expandedCate);
-      }}
+      isExpanded={expanded}
+      onPress={() => setExpanded(!expanded)}
     >
       <ListItem containerClassName="flex-wrap p-0 flex-row px-1 bg-transparent">
         <View className="w-full flex-1 flex-row flex-wrap gap-x-3 border-b-[0.5px] border-b-gray-400">
-          {sortedRankList.map((cate) => {
-            return (
-              <Chip
-                title={cate.label}
-                key={cate.rid}
-                type="outline"
-                onPress={() => {
-                  const a = sortedRankList.filter((v) => v.rid !== cate.rid);
-                  const b = unsortedRankList.concat(cate);
-                  setSortedRankList(a);
-                  setUnSortedRankList(b);
-                  set$videoCatesList([$videoCatesList[0], ...a, ...b]);
-                }}
-                containerClassName="mb-2"
-                buttonClassName="px-[6px] py-[2px]"
-              />
-            );
-          })}
-          {sortedRankList.length === 0 && (
-            <Text className={`mb-1 flex-1 ${colors.gray6.text}`}> 点击名称调整顺序</Text>
+          {sorted.map((category) => (
+            <Chip
+              key={category.rid}
+              title={category.label}
+              type="outline"
+              onPress={() => move(category.rid, false)}
+              containerClassName="mb-2"
+              buttonClassName="px-[6px] py-[2px]"
+            />
+          ))}
+          {!sorted.length && (
+            <Text className={`mb-1 flex-1 ${colors.gray6.text}`}>点击名称调整顺序</Text>
           )}
         </View>
         <View className="mt-5 flex-row flex-wrap gap-x-3">
-          {unsortedRankList.map((cate) => {
-            return (
-              <Chip
-                title={cate.label}
-                key={cate.rid}
-                type="outline"
-                onPress={() => {
-                  const a = sortedRankList.concat(cate);
-                  const b = unsortedRankList.filter((v) => v.rid !== cate.rid);
-                  setSortedRankList(a);
-                  setUnSortedRankList(b);
-                  set$videoCatesList([$videoCatesList[0], ...a, ...b]);
-                }}
-                containerClassName="mb-2"
-                buttonClassName="px-2 py-[2px]"
-              />
-            );
-          })}
+          {unsorted.map((category) => (
+            <Chip
+              key={category.rid}
+              title={category.label}
+              type="outline"
+              onPress={() => move(category.rid, true)}
+              containerClassName="mb-2"
+              buttonClassName="px-2 py-[2px]"
+            />
+          ))}
         </View>
       </ListItem>
     </ListItem.Accordion>

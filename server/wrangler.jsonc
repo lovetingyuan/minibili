@@ -50,9 +50,6 @@
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/
    */
-  "vars": {
-    "RESEND_FROM_EMAIL": "minibili@tingyuan.in",
-  },
   /**
    * Service Bindings (communicate between multiple Workers)
    * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

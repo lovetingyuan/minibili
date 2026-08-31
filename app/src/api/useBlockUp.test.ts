@@ -1,12 +1,21 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { RelationAccount, RelationChange } from "./modify-relation.types";
+import type { Blacklist } from "./blacklist.types";
 
 const state = vi.hoisted(() => ({
   account: { mid: "123", generation: 1 } as RelationAccount | null | undefined,
   generation: 1,
   followingsReady: true,
-  mutate: vi.fn(async () => undefined),
+  mutate: vi
+    .fn<
+      (
+        key: readonly unknown[],
+        updater?: (current: Blacklist | undefined) => Blacklist,
+        options?: { revalidate: boolean },
+      ) => Promise<unknown>
+    >()
+    .mockResolvedValue(undefined),
   readCookie: vi.fn(async () => "SESSDATA=test; DedeUserID=123; bili_jct=csrf-test"),
   mutationConfig: vi.fn(),
 }));
@@ -86,7 +95,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("block UP mutation", () => {
-  test("blocks without waiting for following sync and only revalidates the account's following list", async () => {
+  test("blocks without following sync and immediately updates the account's blacklist", async () => {
     state.followingsReady = false;
     const mutation = useBlockUp();
     expect(mutation.isPreparing).toBe(false);
@@ -98,7 +107,26 @@ describe("block UP mutation", () => {
     expect(new URLSearchParams(String(vi.mocked(fetch).mock.calls[0][1]?.body)).get("act")).toBe(
       "5",
     );
-    expect(state.mutate).toHaveBeenCalledExactlyOnceWith(["bilibili-followings", "123", 1]);
+    expect(state.mutate).toHaveBeenCalledWith(["bilibili-followings", "123", 1]);
+    expect(state.mutate).toHaveBeenCalledWith(
+      ["bilibili-blacklist", "123", 1],
+      expect.any(Function),
+      { revalidate: true },
+    );
+    const update = state.mutate.mock.calls[0][1];
+    const otherUp = { ...up, mid: 789 };
+    const previous = new Map([["789", otherUp]]);
+    expect(update?.(previous)).toEqual(
+      new Map([
+        ["789", otherUp],
+        ["456", up],
+      ]),
+    );
+    expect(previous).toEqual(new Map([["789", otherUp]]));
+    expect(update?.(undefined)).toEqual(new Map([["456", up]]));
+    const existing = { ...up, face: "avatar.jpg", sign: "已有简介" };
+    // 拉黑入口仅提供 UID 和名称时，也不能丢掉缓存中的头像、简介。
+    expect(update?.(new Map([["456", existing]]))?.get("456")).toEqual(existing);
   });
 
   test.each(["block", "follow"] as const)(
@@ -144,7 +172,7 @@ describe("block UP mutation", () => {
   test("does not turn a failed followings refresh into a failed block", async () => {
     state.mutate.mockRejectedValue(new Error("GET failed"));
     await expect(useBlockUp().block(up, account)).resolves.toMatchObject({ up, act: 5 });
-    expect(state.mutate).toHaveBeenCalledOnce();
+    expect(state.mutate).toHaveBeenCalledTimes(2);
     expect(fetch).toHaveBeenCalledOnce();
   });
 

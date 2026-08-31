@@ -3,6 +3,8 @@ import { describe, expect, test, vi } from "vitest";
 
 import type { ReactElement, ReactNode } from "react";
 
+vi.mock("@/components/UpName", () => ({ default: "UpName" }));
+
 vi.mock("react-native", () => ({
   View: function View() {
     return null;
@@ -39,9 +41,11 @@ vi.mock("@/constants/colors.tw", () => ({
 
 vi.mock("@/store", () => ({
   useStore: () => ({
-    $blackTags: {},
     isWiFi: true,
   }),
+}));
+vi.mock("@/features/user-data/useUserSettings", () => ({
+  useUserSettings: () => ({ values: { $blackTags: {} } }),
 }));
 
 vi.mock("@/store/derives", () => ({
