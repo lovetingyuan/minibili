@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   current: true,
@@ -34,12 +34,19 @@ const account = { mid: "123", generation: 1 };
 const video = { aid: "456", bvid: "BV1" };
 
 beforeEach(() => {
+  vi.useFakeTimers();
   vi.clearAllMocks();
   mocks.current = true;
   mocks.swr.mockReturnValue({ data: { favorite: true } });
   mocks.mutation.mockReturnValue({ trigger: mocks.trigger });
   mocks.trigger.mockResolvedValue({ video, initialIds: [], selectedIds: [11] });
   mocks.mutate.mockResolvedValue(undefined);
+});
+
+afterEach(async () => {
+  await vi.advanceTimersByTimeAsync(0);
+  vi.clearAllTimers();
+  vi.useRealTimers();
 });
 
 describe("video favorite hooks", () => {

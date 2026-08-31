@@ -1,4 +1,10 @@
-import type { FavoriteFolder } from "@/api/favorites.types";
+import type { FavoriteAccount, FavoriteFolder } from "@/api/favorites.types";
+import type { FavoriteVideo } from "@/api/video-favorites.types";
+
+export type FavoriteEditorTarget = {
+  account: FavoriteAccount;
+  video: FavoriteVideo;
+};
 
 export type FavoriteFolderTabsProps = {
   folders: FavoriteFolder[];

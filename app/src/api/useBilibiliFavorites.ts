@@ -1,7 +1,11 @@
 import { useEffect, useRef } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 
+import {
+  FavoriteResourcesChangedError,
+  getFavoriteResourceRevision,
+} from "../features/bilibili-favorites/resource-revisions";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
@@ -19,7 +23,10 @@ const favoriteOptions = {
   keepPreviousData: false,
   revalidateOnFocus: false,
   revalidateOnReconnect: true,
-  shouldRetryOnError: (error: Error) => !(error instanceof BilibiliSessionChangedError),
+  shouldRetryOnError: (error: Error) =>
+    !(
+      error instanceof BilibiliSessionChangedError || error instanceof FavoriteResourcesChangedError
+    ),
   errorRetryCount: 2,
 };
 
@@ -45,14 +52,23 @@ export function useBilibiliFavoriteFolders() {
 
 export function useBilibiliFavoriteResources(folderId?: number) {
   const account = useFavoriteAccount();
+  const { mutate: mutateCache } = useSWRConfig();
   const pending = useRef(false);
   const response = useSWRInfinite<FavoriteResources, Error, FavoriteResourcesKeyLoader>(
     (index, previous: FavoriteResources | null) =>
       getFavoriteResourcesKey(account, folderId, index, previous),
-    ([, mid, generation, mediaId, page]) =>
-      fetchBilibiliFavoriteResources(mediaId, page, fetcher, () =>
-        bilibiliSession.isCurrentAccount({ mid, generation }),
-      ),
+    async ([, mid, generation, mediaId, page]) => {
+      const current = { mid, generation };
+      const revision = getFavoriteResourceRevision(mutateCache, current, mediaId);
+      const data = await fetchBilibiliFavoriteResources(mediaId, page, fetcher, () =>
+        bilibiliSession.isCurrentAccount(current),
+      );
+      // SWR Infinite 对单页缓存的写入不受聚合 key 的竞态保护，必须在返回数据前拦截。
+      if (getFavoriteResourceRevision(mutateCache, current, mediaId) !== revision) {
+        throw new FavoriteResourcesChangedError();
+      }
+      return data;
+    },
     { ...favoriteOptions, revalidateFirstPage: false, persistSize: false },
   );
   const { data, size, setSize, mutate, isLoading, isValidating, error } = response;

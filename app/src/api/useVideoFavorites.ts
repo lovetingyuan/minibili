@@ -6,6 +6,7 @@ import {
   favoriteMutationKey,
   refreshFavoriteCaches,
 } from "../features/bilibili-favorites/mutations";
+import { syncFavoriteCaches } from "../features/bilibili-favorites/sync";
 import { videoRelationMutations as mutations } from "../features/bilibili-favorites/video-relation-mutations";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { bilibiliSession } from "../features/bilibili-session/session";
@@ -91,9 +92,12 @@ export function useModifyVideoFavorites(account: FavoriteAccount, video: Favorit
     await mutations.run(account, video.aid, () => trigger(change));
     // 刷新错误与已经成功的写操作分离，不延迟弹窗关闭。
     void Promise.resolve()
-      .then(() => {
-        if (bilibiliSession.isCurrentAccount(account))
-          return refreshFavoriteCaches(account, change, mutate);
+      .then(async () => {
+        if (!bilibiliSession.isCurrentAccount(account)) return;
+        await refreshFavoriteCaches(account, change, mutate);
+        await syncFavoriteCaches(account, change, mutate, () =>
+          bilibiliSession.isCurrentAccount(account),
+        );
       })
       .catch(() => {});
   }

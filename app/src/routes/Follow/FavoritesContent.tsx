@@ -1,14 +1,32 @@
+import { useIsFocused } from "@react-navigation/native";
 import React from "react";
-import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import {
   useBilibiliFavoriteFolders,
   useBilibiliFavoriteResources,
 } from "@/api/useBilibiliFavorites";
+import type { FavoriteListItem } from "@/api/favorites.types";
 import { Button, FlashList, Icon, Text } from "@/components/styled/rneui";
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
+import { bilibiliSession } from "@/features/bilibili-session/session";
+import {
+  useBilibiliSessionActions,
+  useBilibiliSessionState,
+} from "@/features/bilibili-session/useBilibiliSession";
+import { useStore } from "@/store";
+import { showToast } from "@/utils";
+import FavoriteDialog from "../Play/FavoriteDialog";
 import FavoriteFolderTabs from "./FavoriteFolderTabs";
+import type { FavoriteEditorTarget } from "./Favorites.types";
 
 export default function FavoritesContent() {
   const folders = useBilibiliFavoriteFolders();
@@ -18,6 +36,55 @@ export default function FavoritesContent() {
   const folderList = folders.data?.list ?? [];
   const folder = folderList.find((item) => item.id === selectedId) ?? folderList[0];
   const resources = useBilibiliFavoriteResources(folder?.id);
+  const { setOverlayButtons } = useStore();
+  const { account } = useBilibiliSessionState();
+  const { logout } = useBilibiliSessionActions();
+  const focused = useIsFocused();
+  const [editing, setEditing] = React.useState<FavoriteEditorTarget | null>(null);
+  const canEdit = Boolean(editing && focused && bilibiliSession.isCurrentAccount(editing.account));
+
+  React.useEffect(() => {
+    if (!canEdit) setEditing(null);
+  }, [canEdit]);
+
+  function buttons(item: FavoriteListItem) {
+    return [
+      {
+        text: "取消收藏",
+        onPress: () => {
+          if (!account || !bilibiliSession.isCurrentAccount(account)) {
+            showToast("登录状态已改变，请重新登录后操作");
+            return;
+          }
+          if (!item.video?.aid || !item.video.bvid) {
+            showToast("该收藏内容暂不支持编辑，请到 B站操作");
+            return;
+          }
+          setEditing({
+            account,
+            video: { aid: String(item.video.aid), bvid: item.video.bvid },
+          });
+        },
+      },
+    ];
+  }
+
+  function loginRequired(error: Error) {
+    Alert.alert("请重新登录 B站", error.message, [
+      { text: "取消", style: "cancel" },
+      {
+        text: "重新登录",
+        onPress: () => {
+          if (!editing || !bilibiliSession.isCurrentAccount(editing.account)) {
+            showToast("登录状态已改变，请重新操作");
+            return;
+          }
+          setEditing(null);
+          void logout().catch(() => showToast("退出登录失败，请在设置页重试"));
+        },
+      },
+    ]);
+  }
 
   React.useEffect(() => {
     setSelectedId(folder?.id);
@@ -63,6 +130,15 @@ export default function FavoritesContent() {
 
   return (
     <View className="flex-1">
+      {editing && canEdit ? (
+        <FavoriteDialog
+          key={`${editing.account.mid}:${editing.account.generation}:${editing.video.aid}`}
+          account={editing.account}
+          video={editing.video}
+          onClose={() => setEditing(null)}
+          onLoginRequired={loginRequired}
+        />
+      ) : null}
       {folders.error ? (
         <View className="flex-row items-center justify-center gap-2 px-3 py-2">
           <Text className="shrink text-xs">收藏夹刷新失败，正在显示上次数据</Text>
@@ -91,16 +167,21 @@ export default function FavoritesContent() {
             keyExtractor={(item) => item.key}
             renderItem={({ item }) =>
               item.video ? (
-                <VideoListItem video={item.video} playCountOnCover />
+                <VideoListItem video={item.video} playCountOnCover buttons={() => buttons(item)} />
               ) : (
-                <View className={`mx-3 my-2 gap-2 rounded-lg p-4 ${colors.gray1.bg}`}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onLongPress={() => setOverlayButtons(buttons(item))}
+                  accessibilityHint="长按打开收藏操作菜单"
+                  className={`mx-3 my-2 gap-2 rounded-lg p-4 ${colors.gray1.bg}`}
+                >
                   <Text className={colors.gray7.text} numberOfLines={2}>
                     {item.title || "不可用的收藏内容"}
                   </Text>
                   <Text className={`text-sm ${colors.gray6.text}`}>
                     该收藏内容暂不支持播放或已失效
                   </Text>
-                </View>
+                </TouchableOpacity>
               )
             }
             refreshing={refreshing}

@@ -1,60 +1,53 @@
-import React from "react";
-import {
-  Keyboard,
-  Pressable,
-  ScrollView,
-  UIManager,
-  useWindowDimensions,
-  View,
-} from "react-native";
-import PagerView from "react-native-pager-view";
-import { useResolveClassNames } from "uniwind";
+import React from 'react'
+import { Keyboard, Pressable, ScrollView, UIManager, useWindowDimensions, View } from 'react-native'
+import PagerView from 'react-native-pager-view'
+import { useResolveClassNames } from 'uniwind'
 
-import { Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
-import FavoritesContent from "./FavoritesContent";
-import FollowingsContent from "./FollowingsContent";
-import HistoryContent from "./HistoryContent";
+import { Text } from '@/components/styled/rneui'
+import { colors } from '@/constants/colors.tw'
+import FavoritesContent from './FavoritesContent'
+import FollowingsContent from './FollowingsContent'
+import HistoryContent from './HistoryContent'
 
-const titles = ["UP主", "我的收藏", "观看历史"];
+const titles = ['我的关注', '我的收藏', '观看历史']
 
 export default function FollowPages() {
   // 旧开发包/OTA 安装包可能尚未编入新增的原生依赖，不能挂载缺失的 ViewManager。
-  const nativePagerAvailable = UIManager.hasViewManagerConfig("RNCViewPager");
-  const pager = React.useRef<PagerView>(null);
-  const scrollPager = React.useRef<ScrollView>(null);
-  const currentPage = React.useRef(0);
-  const [page, setPage] = React.useState(0);
-  const [favoritesVisited, setFavoritesVisited] = React.useState(false);
-  const [historyVisited, setHistoryVisited] = React.useState(false);
-  const { width } = useWindowDimensions();
-  const [pageWidth, setPageWidth] = React.useState(width);
-  const pagerStyle = useResolveClassNames("flex-1");
+  const nativePagerAvailable = UIManager.hasViewManagerConfig('RNCViewPager')
+  const pager = React.useRef<PagerView>(null)
+  const scrollPager = React.useRef<ScrollView>(null)
+  const currentPage = React.useRef(0)
+  const [page, setPage] = React.useState(0)
+  const [favoritesVisited, setFavoritesVisited] = React.useState(false)
+  const [historyVisited, setHistoryVisited] = React.useState(false)
+  const { width } = useWindowDimensions()
+  const [pageWidth, setPageWidth] = React.useState(width)
+  const pagerStyle = useResolveClassNames('flex-1')
 
   React.useEffect(() => {
     if (!nativePagerAvailable) {
-      scrollPager.current?.scrollTo({ x: currentPage.current * pageWidth, animated: false });
+      scrollPager.current?.scrollTo({ x: currentPage.current * pageWidth, animated: false })
     }
-  }, [nativePagerAvailable, pageWidth]);
+  }, [nativePagerAvailable, pageWidth])
 
   function updatePage(index: number) {
-    Keyboard.dismiss();
-    currentPage.current = index;
-    setPage(index);
+    Keyboard.dismiss()
+    currentPage.current = index
+    setPage(index)
     if (index === 1) {
-      setFavoritesVisited(true);
+      setFavoritesVisited(true)
     }
     if (index === 2) {
-      setHistoryVisited(true);
+      setHistoryVisited(true)
     }
   }
 
   function selectPage(index: number) {
-    updatePage(index);
+    updatePage(index)
     if (nativePagerAvailable) {
-      pager.current?.setPage(index);
+      pager.current?.setPage(index)
     } else {
-      scrollPager.current?.scrollTo({ x: index * pageWidth, animated: true });
+      scrollPager.current?.scrollTo({ x: index * pageWidth, animated: true })
     }
   }
 
@@ -83,7 +76,7 @@ export default function FollowPages() {
     >
       {historyVisited ? <HistoryContent /> : null}
     </View>,
-  ];
+  ]
 
   return (
     <View className="flex-1">
@@ -103,7 +96,7 @@ export default function FollowPages() {
               {title}
             </Text>
             <View
-              className={`mt-2 h-0.5 w-8 rounded-full ${page === index ? colors.primary.bg : "bg-transparent"}`}
+              className={`mt-2 h-0.5 w-8 rounded-full ${page === index ? colors.primary.bg : 'bg-transparent'}`}
             />
           </Pressable>
         ))}
@@ -123,7 +116,7 @@ export default function FollowPages() {
           className="flex-1"
           onLayout={({ nativeEvent }) => {
             if (nativeEvent.layout.width > 0) {
-              setPageWidth(nativeEvent.layout.width);
+              setPageWidth(nativeEvent.layout.width)
             }
           }}
         >
@@ -138,10 +131,10 @@ export default function FollowPages() {
             className="flex-1"
             contentContainerClassName="h-full"
             onMomentumScrollEnd={({ nativeEvent }) => {
-              const measuredWidth = nativeEvent.layoutMeasurement.width;
+              const measuredWidth = nativeEvent.layoutMeasurement.width
               if (measuredWidth > 0) {
-                const nextPage = Math.round(nativeEvent.contentOffset.x / measuredWidth);
-                updatePage(Math.max(0, Math.min(titles.length - 1, nextPage)));
+                const nextPage = Math.round(nativeEvent.contentOffset.x / measuredWidth)
+                updatePage(Math.max(0, Math.min(titles.length - 1, nextPage)))
               }
             }}
           >
@@ -150,5 +143,5 @@ export default function FollowPages() {
         </View>
       )}
     </View>
-  );
+  )
 }

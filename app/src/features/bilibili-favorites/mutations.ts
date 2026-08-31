@@ -2,14 +2,15 @@ import type { ScopedMutator } from "swr";
 import { unstable_serialize } from "swr/infinite";
 
 import { getFavoriteFoldersKey, getFavoriteResourcesKey } from "../../api/favorites";
-import type { FavoriteAccount } from "../../api/favorites.types";
-import {
-  getFavoriteChanges,
-  getVideoFavoriteFoldersKey,
-  getVideoRelationKey,
-} from "../../api/video-favorites";
+import type {
+  FavoriteAccount,
+  FavoriteFolders,
+  FavoriteResources,
+} from "../../api/favorites.types";
+import { getFavoriteChanges, getVideoFavoriteFoldersKey } from "../../api/video-favorites";
 import type { VideoFavoriteChange } from "../../api/video-favorites.types";
 import { BilibiliSessionChangedError } from "../bilibili-session/controller";
+import { invalidateFavoriteResourceRequests } from "./resource-revisions";
 
 export function favoriteMutationKey(account: FavoriteAccount, aid: string) {
   return `${account.mid}:${account.generation}:${aid}`;
@@ -58,8 +59,56 @@ export async function refreshFavoriteCaches(
 ) {
   const { add, remove } = getFavoriteChanges(change.initialIds, change.selectedIds);
   const folderIds = new Set([...add, ...remove]);
+  const removedIds = new Set(remove);
+  const addedIds = new Set(add);
+  invalidateFavoriteResourceRequests(mutate, account, folderIds);
+
+  function updateCount(folderId: number, count: number) {
+    return Math.max(0, count + Number(addedIds.has(folderId)) - Number(removedIds.has(folderId)));
+  }
   // 清除未挂载列表的页缓存；只触发 mutate(key) 不会使这些旧数据失效。
-  await mutate(
+  await clearFavoriteResourcePages(account, folderIds, mutate);
+  return Promise.allSettled([
+    // 保留收藏夹，避免 selectedId 和分页 key 暂时变成 undefined，触发列表重建。
+    mutate<FavoriteFolders>(
+      getFavoriteFoldersKey(account),
+      (current) =>
+        current && {
+          ...current,
+          list: current.list.map((folder) => ({
+            ...folder,
+            media_count: updateCount(folder.id, folder.media_count),
+          })),
+        },
+      { revalidate: false },
+    ),
+    mutate(getVideoFavoriteFoldersKey(account, change.video), undefined, { revalidate: false }),
+    ...[...folderIds].map((folderId) =>
+      mutate<FavoriteResources[]>(
+        unstable_serialize(() => getFavoriteResourcesKey(account, folderId, 0, null)),
+        // POST 已确认成功：立即移除对应视频；稍后独立发起 GET，给服务端同步时间。
+        (pages) =>
+          pages?.map((page) => ({
+            ...page,
+            info: { ...page.info, media_count: updateCount(folderId, page.info.media_count) },
+            medias: removedIds.has(folderId)
+              ? page.medias.filter(
+                  (media) => media.type !== 2 || String(media.id) !== change.video.aid,
+                )
+              : page.medias,
+          })),
+        { revalidate: false },
+      ),
+    ),
+  ]);
+}
+
+export function clearFavoriteResourcePages(
+  account: FavoriteAccount,
+  folderIds: ReadonlySet<number>,
+  mutate: ScopedMutator,
+) {
+  return mutate(
     (key) =>
       Array.isArray(key) &&
       key[0] === "bilibili-favorite-resources" &&
@@ -69,17 +118,4 @@ export async function refreshFavoriteCaches(
     undefined,
     { revalidate: false },
   );
-  return Promise.allSettled([
-    mutate(getVideoRelationKey(account, change.video)),
-    mutate(`/x/web-interface/view?bvid=${change.video.bvid}`),
-    mutate(getFavoriteFoldersKey(account), undefined, { revalidate: true }),
-    mutate(getVideoFavoriteFoldersKey(account, change.video), undefined, { revalidate: false }),
-    ...[...folderIds].map((folderId) =>
-      mutate(
-        unstable_serialize(() => getFavoriteResourcesKey(account, folderId, 0, null)),
-        undefined,
-        { revalidate: true },
-      ),
-    ),
-  ]);
 }

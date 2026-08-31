@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import type {
   FavoriteAccount,
   FavoriteResources,
+  FavoriteResourcesKey,
   FavoriteResourcesKeyLoader,
 } from "./favorites.types";
 
@@ -14,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   infinite: vi.fn(),
   swr: vi.fn(),
   request: vi.fn(),
+  mutateCache: vi.fn(),
   response: {
     data: undefined as FavoriteResources[] | undefined,
     size: 1,
@@ -34,7 +36,10 @@ vi.mock("react", () => ({
     mocks.effects.push(effect);
   },
 }));
-vi.mock("swr", () => ({ default: mocks.swr }));
+vi.mock("swr", () => ({
+  default: mocks.swr,
+  useSWRConfig: () => ({ mutate: mocks.mutateCache }),
+}));
 vi.mock("swr/infinite", () => ({ default: mocks.infinite }));
 vi.mock("../features/bilibili-session/session", () => ({
   bilibiliSession: { isCurrentAccount: () => mocks.current },
@@ -45,6 +50,10 @@ vi.mock("../features/bilibili-session/useBilibiliSession", () => ({
 vi.mock("./fetcher", () => ({ default: mocks.request }));
 
 import { useBilibiliFavoriteFolders, useBilibiliFavoriteResources } from "./useBilibiliFavorites";
+import {
+  FavoriteResourcesChangedError,
+  invalidateFavoriteResourceRequests,
+} from "../features/bilibili-favorites/resource-revisions";
 
 const page: FavoriteResources = {
   info: { id: 123, fid: 1, mid: 1, title: "默认收藏夹", media_count: 41 },
@@ -69,9 +78,45 @@ beforeEach(() => {
   mocks.response.mutate.mockResolvedValue([page]);
   mocks.infinite.mockReturnValue(mocks.response);
   mocks.swr.mockReturnValue({ data: { count: 1, list: [page.info] } });
+  mocks.request.mockResolvedValue(page);
 });
 
 describe("favorite hooks", () => {
+  test("rejects a pre-mutation page response even when it finishes after the refreshed page", async () => {
+    const oldRequest = Promise.withResolvers<FavoriteResources>();
+    mocks.request.mockReturnValueOnce(oldRequest.promise);
+    useBilibiliFavoriteResources(123);
+    const fetchPage: (key: FavoriteResourcesKey) => Promise<FavoriteResources> =
+      mocks.infinite.mock.calls[0][1];
+    const oldResult = fetchPage(["bilibili-favorite-resources", "1", 1, 123, 1]);
+    const rejected = expect(oldResult).rejects.toBeInstanceOf(FavoriteResourcesChangedError);
+
+    invalidateFavoriteResourceRequests(mocks.mutateCache, { mid: "1", generation: 1 }, [123]);
+    const freshPage = { ...page, medias: [] };
+    mocks.request.mockResolvedValueOnce(freshPage);
+    expect(await fetchPage(["bilibili-favorite-resources", "1", 1, 123, 1])).toEqual(freshPage);
+    oldRequest.resolve(page);
+    await rejected;
+    expect(
+      mocks.infinite.mock.calls[0][2].shouldRetryOnError(new FavoriteResourcesChangedError()),
+    ).toBe(false);
+  });
+
+  test("does not discard reads for another folder, account, login generation or cache provider", async () => {
+    const request = Promise.withResolvers<FavoriteResources>();
+    mocks.request.mockReturnValueOnce(request.promise);
+    useBilibiliFavoriteResources(123);
+    const fetchPage: (key: FavoriteResourcesKey) => Promise<FavoriteResources> =
+      mocks.infinite.mock.calls[0][1];
+    const result = fetchPage(["bilibili-favorite-resources", "1", 1, 123, 1]);
+    invalidateFavoriteResourceRequests(mocks.mutateCache, { mid: "1", generation: 1 }, [456]);
+    invalidateFavoriteResourceRequests(mocks.mutateCache, { mid: "2", generation: 1 }, [123]);
+    invalidateFavoriteResourceRequests(mocks.mutateCache, { mid: "1", generation: 2 }, [123]);
+    invalidateFavoriteResourceRequests(vi.fn(), { mid: "1", generation: 1 }, [123]);
+    request.resolve(page);
+    await expect(result).resolves.toEqual(page);
+  });
+
   test("disables fetching and hides cached contents when the session is no longer current", () => {
     mocks.current = false;
     expect(useBilibiliFavoriteFolders().data).toBeUndefined();
