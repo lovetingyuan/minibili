@@ -117,7 +117,7 @@ export const CommentCursorSchema = z.object({
   name: z.string(),
   pagination_reply: z
     .object({
-      next_offset: z.string(),
+      next_offset: z.string().optional(),
     })
     .nullish(),
   session_id: z.string().optional(),

@@ -1,7 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { BottomSheet, Icon, Text } from "@/components/styled/rneui";
 import { FlashList } from "@/components/styled/rneui";
-import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { type ReplyItemType, useReplies } from "@/api/replies";
@@ -10,7 +9,7 @@ import { useStore } from "@/store";
 
 import { CommentItem } from "./Comment";
 
-export default function ReplyList() {
+export default function ReplyList(props: { ownerName?: string }) {
   const {
     data: { replies, allCount, root },
     isLoading,
@@ -26,11 +25,9 @@ export default function ReplyList() {
     setRepliesInfo(null);
   }
 
-  useFocusEffect(
-    React.useCallback(() => {
-      setRepliesInfo(null);
-    }, [setRepliesInfo]),
-  );
+  useFocusEffect(() => {
+    setRepliesInfo(null);
+  });
 
   return (
     <BottomSheet
@@ -56,14 +53,14 @@ export default function ReplyList() {
             renderItem={({ item }: { item: ReplyItemType }) => {
               return (
                 <View className="mb-2 px-5">
-                  <CommentItem comment={item} smallFont={false} />
+                  <CommentItem comment={item} ownerName={props.ownerName} smallFont={false} />
                 </View>
               );
             }}
             ListHeaderComponent={
               root ? (
                 <View className="mb-5 border-b-[18px] border-b-neutral-300 p-4 dark:border-b-neutral-700">
-                  <CommentItem comment={root} />
+                  <CommentItem comment={root} ownerName={props.ownerName} />
                 </View>
               ) : null
             }

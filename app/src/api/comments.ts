@@ -194,8 +194,8 @@ export function getCommentsPageUrl(
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1
 
 export function useComments(oid: string | number, type: number, mode = 3) {
-  const { data, error, size, setSize, isValidating, isLoading } = useSWRInfinite<CommentResponse>(
-    (index, previousPageData) => {
+  const { data, error, size, setSize, mutate, isValidating, isLoading } =
+    useSWRInfinite<CommentResponse>((index, previousPageData) => {
       if (index > 0 && !previousPageData) {
         return null;
       }
@@ -205,9 +205,7 @@ export function useComments(oid: string | number, type: number, mode = 3) {
         mode,
         index === 0 ? undefined : previousPageData?.cursor,
       );
-    },
-    fetcher,
-  );
+    }, fetcher);
   // const isLoadingMore =
   //   isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined')
   // const isEmpty = data?.[0]?.replies.length === 0
@@ -232,6 +230,7 @@ export function useComments(oid: string | number, type: number, mode = 3) {
   const isReachingEnd = !!error || isPageEnd;
   const allCount = data?.[0]?.cursor.all_count;
   const isLimited = typeof allCount === "number" && allCount > replies.length && isReachingEnd;
+  const isLoadingMore = Boolean(data && size > data.length);
   return {
     data: {
       allCount,
@@ -245,6 +244,11 @@ export function useComments(oid: string | number, type: number, mode = 3) {
       setSize(size + 1);
     },
     isValidating,
+    isRefreshing: isValidating && Boolean(data) && !isLoadingMore,
+    refresh: async () => {
+      await setSize(1);
+      await mutate();
+    },
     isLimited,
     isReachingEnd,
     error,

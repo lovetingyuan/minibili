@@ -52,9 +52,8 @@ export type RootStackParamList = {
     user: UpInfo;
   };
   DynamicDetail: {
-    // detail: DynamicItemAllType
+    dynamicId: string;
     title: string;
-    url: string;
     user?: Pick<UpInfo, "mid" | "name">;
   };
   VideoList: undefined;

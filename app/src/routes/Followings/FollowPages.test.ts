@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => ({
   currentPage: { current: 0 },
   stateIndex: 0,
   refIndex: 0,
-  values: [0, false, false, 360] as unknown[],
+  values: [0, false, false, false, 360] as unknown[],
   effects: [] as (() => void)[],
 }));
 
@@ -51,6 +51,7 @@ vi.mock("uniwind", () => ({ useResolveClassNames: () => ({ flex: 1 }) }));
 vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("./FollowingsContent", () => ({ default: "FollowingsContent" }));
+vi.mock("./FollowingDynamicsContent", () => ({ default: "FollowingDynamicsContent" }));
 vi.mock("./FavoritesContent", () => ({ default: "FavoritesContent" }));
 vi.mock("./HistoryContent", () => ({ default: "HistoryContent" }));
 
@@ -83,7 +84,7 @@ beforeEach(() => {
   mocks.hasViewManagerConfig.mockImplementation(() => mocks.nativeAvailable);
   mocks.nativeAvailable = false;
   mocks.currentPage.current = 0;
-  mocks.values = [0, false, false, 360];
+  mocks.values = [0, false, false, false, 360];
   mocks.effects = [];
 });
 
@@ -97,14 +98,15 @@ describe("Follow pager native compatibility", () => {
           throw new Error("Missing tab");
         return tab.props.accessibilityLabel;
       }),
-    ).toEqual(["UP主", "我的收藏", "观看历史"]);
-    if (!React.isValidElement<{ onPress: () => void }>(tabs[2]))
+    ).toEqual(["关注动态", "我的关注", "我的收藏", "观看历史"]);
+    if (!React.isValidElement<{ onPress: () => void }>(tabs[3]))
       throw new Error("Missing history tab");
-    tabs[2].props.onPress();
-    if (native) expect(mocks.nativeRef.current.setPage).toHaveBeenCalledWith(2);
-    else expect(mocks.scrollRef.current.scrollTo).toHaveBeenCalledWith({ x: 720, animated: true });
+    tabs[3].props.onPress();
+    if (native) expect(mocks.nativeRef.current.setPage).toHaveBeenCalledWith(3);
+    else expect(mocks.scrollRef.current.scrollTo).toHaveBeenCalledWith({ x: 1080, animated: true });
     const visited = render();
     expect(elements(visited).some((element) => element.type === "HistoryContent")).toBe(true);
+    expect(elements(visited).some((element) => element.type === "FollowingsContent")).toBe(false);
     expect(elements(visited).some((element) => element.type === "FavoritesContent")).toBe(false);
     find<{ onPress: () => void }>(visited, "Pressable").props.onPress();
     expect(elements(render()).some((element) => element.type === "HistoryContent")).toBe(true);
@@ -117,14 +119,14 @@ describe("Follow pager native compatibility", () => {
       const root = render();
       if (native) {
         find<ComponentProps<typeof PagerView>>(root, "PagerView").props.onPageSelected?.({
-          nativeEvent: { position: 2 },
+          nativeEvent: { position: 3 },
         } as Parameters<NonNullable<ComponentProps<typeof PagerView>["onPageSelected"]>>[0]);
       } else {
         find<ScrollViewProps>(root, "ScrollView").props.onMomentumScrollEnd?.({
-          nativeEvent: { contentOffset: { x: 720 }, layoutMeasurement: { width: 360 } },
+          nativeEvent: { contentOffset: { x: 1080 }, layoutMeasurement: { width: 360 } },
         } as Parameters<NonNullable<ScrollViewProps["onMomentumScrollEnd"]>>[0]);
       }
-      expect(mocks.values.slice(0, 3)).toEqual([2, false, true]);
+      expect(mocks.values.slice(0, 4)).toEqual([3, false, false, true]);
       expect(elements(render()).some((element) => element.type === "HistoryContent")).toBe(true);
     },
   );
@@ -133,6 +135,8 @@ describe("Follow pager native compatibility", () => {
     const root = render();
     expect(mocks.hasViewManagerConfig).toHaveBeenCalledWith("RNCViewPager");
     expect(elements(root).some((element) => element.type === "PagerView")).toBe(false);
+    expect(elements(root).some((element) => element.type === "FollowingDynamicsContent")).toBe(true);
+    expect(elements(root).some((element) => element.type === "FollowingsContent")).toBe(false);
     expect(elements(root).some((element) => element.type === "FavoritesContent")).toBe(false);
     expect(elements(root).some((element) => element.type === "HistoryContent")).toBe(false);
     const scroll = find<ScrollViewProps>(root, "ScrollView");
@@ -142,17 +146,17 @@ describe("Follow pager native compatibility", () => {
 
   test("clicking favorites scrolls the fallback and preserves mounted pages after returning", () => {
     const tabs = elements(render()).filter((element) => element.type === "Pressable");
-    if (!React.isValidElement<{ onPress: () => void }>(tabs[1]))
+    if (!React.isValidElement<{ onPress: () => void }>(tabs[2]))
       throw new Error("Missing favorites tab");
-    tabs[1].props.onPress();
-    expect(mocks.scrollRef.current.scrollTo).toHaveBeenCalledWith({ x: 360, animated: true });
+    tabs[2].props.onPress();
+    expect(mocks.scrollRef.current.scrollTo).toHaveBeenCalledWith({ x: 720, animated: true });
     expect(mocks.nativeRef.current.setPage).not.toHaveBeenCalled();
-    expect(mocks.values.slice(0, 2)).toEqual([1, true]);
+    expect(mocks.values.slice(0, 3)).toEqual([2, false, true]);
     const mounted = render();
     expect(elements(mounted).some((element) => element.type === "FavoritesContent")).toBe(true);
     const first = find<{ onPress: () => void }>(mounted, "Pressable");
     first.props.onPress();
-    expect(mocks.values.slice(0, 2)).toEqual([0, true]);
+    expect(mocks.values.slice(0, 3)).toEqual([0, false, true]);
   });
 
   test("swipe events update the selected tab and width changes retain the selected page", () => {

@@ -70,6 +70,7 @@ function Play({ route }: Props) {
       <CommentList
         commentId={videoInfo?.aid || ""}
         commentType={1}
+        ownerName={videoInfo.name}
         dividerRight={
           <View className="flex-row items-center">
             <Text

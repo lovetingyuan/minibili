@@ -6,10 +6,11 @@ import { useResolveClassNames } from 'uniwind'
 import { Text } from '@/components/styled/rneui'
 import { colors } from '@/constants/colors.tw'
 import FavoritesContent from './FavoritesContent'
+import FollowingDynamicsContent from './FollowingDynamicsContent'
 import FollowingsContent from './FollowingsContent'
 import HistoryContent from './HistoryContent'
 
-const titles = ['我的关注', '我的收藏', '观看历史']
+const titles = ['关注动态', '我的关注', '我的收藏', '观看历史']
 
 export default function FollowPages() {
   // 旧开发包/OTA 安装包可能尚未编入新增的原生依赖，不能挂载缺失的 ViewManager。
@@ -18,6 +19,7 @@ export default function FollowPages() {
   const scrollPager = React.useRef<ScrollView>(null)
   const currentPage = React.useRef(0)
   const [page, setPage] = React.useState(0)
+  const [followingsVisited, setFollowingsVisited] = React.useState(false)
   const [favoritesVisited, setFavoritesVisited] = React.useState(false)
   const [historyVisited, setHistoryVisited] = React.useState(false)
   const { width } = useWindowDimensions()
@@ -35,9 +37,12 @@ export default function FollowPages() {
     currentPage.current = index
     setPage(index)
     if (index === 1) {
-      setFavoritesVisited(true)
+      setFollowingsVisited(true)
     }
     if (index === 2) {
+      setFavoritesVisited(true)
+    }
+    if (index === 3) {
       setHistoryVisited(true)
     }
   }
@@ -53,12 +58,20 @@ export default function FollowPages() {
 
   const pages = [
     <View
+      key="following-dynamics"
+      collapsable={false}
+      className="h-full w-full"
+      style={nativePagerAvailable ? undefined : { width: pageWidth }}
+    >
+      <FollowingDynamicsContent />
+    </View>,
+    <View
       key="followings"
       collapsable={false}
       className="h-full w-full"
       style={nativePagerAvailable ? undefined : { width: pageWidth }}
     >
-      <FollowingsContent />
+      {followingsVisited ? <FollowingsContent /> : null}
     </View>,
     <View
       key="favorites"
@@ -88,7 +101,7 @@ export default function FollowPages() {
             accessibilityState={{ selected: page === index }}
             accessibilityLabel={title}
             onPress={() => selectPage(index)}
-            className="flex-1 items-center px-4 pt-3"
+            className="flex-1 items-center px-1 pt-3"
           >
             <Text
               className={`text-base ${page === index ? `${colors.primary.text} font-bold` : colors.gray6.text}`}

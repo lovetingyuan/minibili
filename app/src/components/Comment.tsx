@@ -1,5 +1,4 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
 import { Button, Text } from "@/components/styled/rneui";
 import UpName from "./UpName";
 import { clsx } from "clsx";
@@ -12,23 +11,17 @@ import { colors } from "@/constants/colors.tw";
 import type { CommentItemType, CommentMessageContent } from "../api/comments";
 import { shouldShowReplySection } from "../api/replies.helpers";
 import { useStore } from "../store";
-import type { NavigationProps, RootStackParamList } from "../types";
+import type { NavigationProps } from "../types";
 import { parseImgUrl, showToast } from "../utils";
 
 function CommentText(props: {
   nodes: CommentMessageContent;
   idStr: string;
+  ownerName?: string;
   textClassName?: string;
 }) {
-  const { nodes, idStr, textClassName } = props;
+  const { nodes, idStr, ownerName, textClassName } = props;
   const navigation = useNavigation<NavigationProps["navigation"]>();
-  const route = useRoute<
-    NativeStackScreenProps<
-      RootStackParamList,
-      "Play" // | 'DynamicDetail'
-    >["route"]
-  >();
-  const upName = route.params ? route.params.name : "";
   return (
     <>
       {nodes.map((node, i) => {
@@ -41,7 +34,7 @@ function CommentText(props: {
               key={key}
               className={clsx(
                 textClassName,
-                upName === name ? colors.secondary.text : colors.primary.text,
+                ownerName === name ? colors.secondary.text : colors.primary.text,
               )}
               onPress={() => {
                 navigation.push("Dynamic", {
@@ -133,17 +126,11 @@ function CommentText(props: {
 
 export function CommentItem(props: {
   comment: CommentItemType | CommentItemType["replies"][0];
+  ownerName?: string;
   smallFont?: boolean;
 }) {
   const { comment } = props;
   const { setImagesList, setCurrentImageIndex } = useStore();
-  const route = useRoute<
-    NativeStackScreenProps<
-      RootStackParamList,
-      "Play" // | 'DynamicDetail'
-    >["route"]
-  >();
-  const upName = route.params ? route.params.name : "";
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const fontSize = props.smallFont ? "text-sm" : "text-base";
   // console.log(999, clsx(fontSize, comment.upLike && 'font-bold'))
@@ -153,7 +140,7 @@ export function CommentItem(props: {
         mid={comment.mid}
         className={clsx(
           colors.primary.text,
-          upName === comment.name && [colors.secondary.text, "font-bold"],
+          props.ownerName === comment.name && [colors.secondary.text, "font-bold"],
           fontSize,
         )}
         onPress={() => {
@@ -180,6 +167,7 @@ export function CommentItem(props: {
           textClassName={clsx(fontSize, comment.upLike && "font-bold")}
           nodes={comment.message}
           idStr={`${comment.id}_`}
+          ownerName={props.ownerName}
         />
       ) : null}
       {"time" in comment && comment.time ? (
@@ -209,18 +197,20 @@ export function CommentItem(props: {
 
 export const Comment = CommentBlock;
 
-function CommentBlock(props: { comment: CommentItemType; className?: string }) {
+function CommentBlock(props: { comment: CommentItemType; className?: string; ownerName?: string }) {
   const { comment } = props;
   const { setRepliesInfo } = useStore();
   const hasReplies = shouldShowReplySection(comment.rcount, comment.replies.length);
 
   return (
     <View className={clsx([hasReplies ? "mb-7" : "mb-4", props.className])}>
-      <CommentItem comment={comment} />
+      <CommentItem comment={comment} ownerName={props.ownerName} />
       {hasReplies ? (
         <View className="mt-1 flex-1 shrink-0 gap-1 rounded border-gray-500 bg-neutral-200 p-2 opacity-90 dark:bg-neutral-900">
           {comment.replies.map((reply) => {
-            return <CommentItem key={reply.id} comment={reply} smallFont />;
+            return (
+              <CommentItem key={reply.id} comment={reply} ownerName={props.ownerName} smallFont />
+            );
           })}
           {comment.rcount > 0 ? (
             <Button

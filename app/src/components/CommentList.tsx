@@ -32,6 +32,9 @@ export default function CommentList(
   props: React.PropsWithChildren<{
     commentId: string | number;
     commentType: number;
+    ownerName?: string;
+    refreshing?: boolean;
+    onRefresh?: () => void | Promise<void>;
     dividerRight?: React.ReactNode;
   }>,
 ) {
@@ -40,10 +43,12 @@ export default function CommentList(
     data: { replies: comments, allCount },
     isLoading,
     isValidating,
+    isRefreshing,
     isLimited,
     isReachingEnd,
     error,
     update,
+    refresh,
   } = useComments(props.commentId, props.commentType, mode);
 
   return (
@@ -52,7 +57,7 @@ export default function CommentList(
         data={comments}
         keyExtractor={(v: CommentItemType) => `${v.id}@${v.root}`}
         renderItem={({ item }: { item: CommentItemType }) => {
-          return <Comment comment={item} />;
+          return <Comment comment={item} ownerName={props.ownerName} />;
         }}
         // persistentScrollbar
         ListHeaderComponent={
@@ -109,13 +114,17 @@ export default function CommentList(
           ) : null
         }
         contentContainerClassName="p-3 pt-4"
+        refreshing={isRefreshing || props.refreshing}
+        onRefresh={() => {
+          void Promise.all([refresh(), props.onRefresh?.()]);
+        }}
         onEndReached={() => {
           update();
         }}
         onEndReachedThreshold={1}
       />
       {/* <MoreReplies /> */}
-      <ReplyList />
+      <ReplyList ownerName={props.ownerName} />
     </View>
   );
 }
