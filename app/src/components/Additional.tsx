@@ -4,7 +4,7 @@ import { Linking, Pressable, View } from "react-native";
 
 import type { DynamicAdditional } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
-import { parseImgUrl } from "@/utils";
+import { getImagePixelDimensions, parseImgUrl } from "@/utils";
 
 export function Additional(props: { additional: DynamicAdditional | null }) {
   const { additional } = props;
@@ -12,6 +12,7 @@ export function Additional(props: { additional: DynamicAdditional | null }) {
     return null;
   }
   const value = additional;
+  const coverSize = getImagePixelDimensions(80, 64);
 
   function open() {
     if (value.url) {
@@ -27,7 +28,7 @@ export function Additional(props: { additional: DynamicAdditional | null }) {
     >
       {additional.cover ? (
         <Image
-          source={{ uri: parseImgUrl(additional.cover, 160, 120) }}
+          source={{ uri: parseImgUrl(additional.cover, coverSize) }}
           contentFit="cover"
           className="mr-3 h-16 w-20 rounded-md"
         />

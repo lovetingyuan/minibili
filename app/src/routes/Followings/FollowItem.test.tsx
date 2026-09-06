@@ -20,7 +20,11 @@ vi.mock("@/hooks/useFollowActions", () => ({ useFollowActions: () => ({ disabled
 vi.mock("../../store", () => ({
   useStore: () => ({ $upUpdateMap: {}, livingUps: {}, setOverlayButtons: mocks.setOverlayButtons }),
 }));
-vi.mock("../../utils", () => ({ parseImgUrl: () => "", parseUrl: () => "" }));
+vi.mock("../../utils", () => ({
+  getImagePixelSize: (size: number) => size,
+  getOriginalImgUrl: () => "",
+  parseImgUrl: () => "",
+}));
 
 import FollowItem from "./FollowItem";
 

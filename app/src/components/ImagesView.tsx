@@ -1,59 +1,90 @@
 import { Image } from "@/components/styled/expo";
 import { Icon, Text } from "@/components/styled/rneui";
 import React from "react";
-import { FlatList, Linking, Modal, Pressable, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { GestureViewer, useGestureViewerState } from "react-native-gesture-image-viewer";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { parseImgUrl } from "@/utils";
+import { showToast } from "@/utils";
 
 import { useStore } from "../store";
+import type { ImageViewerItem } from "./image-viewer.types";
+import { normalizeImages } from "./image-viewer-images";
+import { getOriginalImageButtonLabel, updateOriginalImageStatuses } from "./image-viewer-state";
 
 const ViewerId = "images-viewer";
 const LoadingPlaceholder = require("../../assets/loading2.gif");
 
-function normalizeImages(
-  imagesList: {
-    src: string;
-    width: number;
-    height: number;
-    ratio?: number;
-  }[],
-) {
-  return imagesList.map((image) => {
-    return {
-      uri: parseImgUrl(image.src),
-      originalUri: image.src.split("@")[0],
-      width: image.width,
-      height: image.height,
-    };
-  });
-}
-
 function ImagesView() {
   const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } = useStore();
   const { currentIndex, totalCount } = useGestureViewerState(ViewerId);
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const [originalImageStatuses, dispatchOriginalImageStatus] = React.useReducer(
+    updateOriginalImageStatuses,
+    {},
+  );
 
-  const images = normalizeImages(imagesList);
+  const images = normalizeImages(imagesList, windowWidth, windowHeight);
   const visible = images.length > 0;
-  const activeIndex = totalCount > 0 ? currentIndex : currentImageIndex;
+  const viewerStateReady = totalCount > 0 && totalCount === images.length;
+  const activeIndex = viewerStateReady ? currentIndex : currentImageIndex;
   const safeActiveIndex =
     images.length > 0 ? Math.min(Math.max(activeIndex, 0), images.length - 1) : 0;
-  const activeTotal = totalCount || images.length;
+  const activeTotal = images.length;
   const viewerKey = `${currentImageIndex}:${images.map((image) => image.uri).join("|")}`;
+  const galleryKey = images.map((image) => image.originalUri).join("|");
+  const activeImage = images[safeActiveIndex] ?? images[0];
+  const activeOriginalStatus = activeImage
+    ? (originalImageStatuses[activeImage.originalUri] ?? "idle")
+    : "idle";
+  const activeImageIsOriginal = activeImage?.uri === activeImage?.originalUri;
+  const originalButtonLabel = getOriginalImageButtonLabel(
+    activeOriginalStatus,
+    Boolean(activeImageIsOriginal),
+  );
+  const originalButtonDisabled =
+    !activeImage || activeImageIsOriginal || activeOriginalStatus !== "idle";
+
+  React.useEffect(() => {
+    dispatchOriginalImageStatus({ type: "reset" });
+  }, [galleryKey]);
 
   const closeViewer = () => {
+    dispatchOriginalImageStatus({ type: "reset" });
     setImagesList([]);
     setCurrentImageIndex(0);
   };
 
   const openOriginalImage = () => {
-    const image = images[safeActiveIndex] ?? images[0];
-
-    if (!image) {
+    if (originalButtonDisabled || !activeImage) {
       return;
     }
 
-    void Linking.openURL(image.originalUri);
+    dispatchOriginalImageStatus({ type: "request", uri: activeImage.originalUri });
+  };
+
+  const handleOriginalImageLoad = (image: ImageViewerItem) => {
+    if (originalImageStatuses[image.originalUri] !== "loading") {
+      return;
+    }
+    dispatchOriginalImageStatus({ type: "loaded", uri: image.originalUri });
+  };
+
+  const handleOriginalImageError = (image: ImageViewerItem) => {
+    if (originalImageStatuses[image.originalUri] !== "loading") {
+      return;
+    }
+    dispatchOriginalImageStatus({ type: "failed", uri: image.originalUri });
+    showToast("原图加载失败，请稍后重试");
   };
 
   const renderContainer = (children: React.ReactElement, _helpers: { dismiss: () => void }) => {
@@ -61,10 +92,26 @@ function ImagesView() {
       <View style={styles.container}>
         {children}
         <View pointerEvents="box-none" style={styles.overlay}>
-          <View pointerEvents="box-none" style={styles.bottomBarWrap}>
+          <View
+            pointerEvents="box-none"
+            style={[styles.bottomBarWrap, { bottom: Math.max(28, insets.bottom + 12) }]}
+          >
             <View style={styles.bottomBar}>
-              <Pressable hitSlop={12} onPress={openOriginalImage}>
-                <Icon color="#fff" name="download" size={20} type="fontisto" />
+              <Pressable
+                accessibilityLabel={originalButtonLabel}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: originalButtonDisabled }}
+                disabled={originalButtonDisabled}
+                hitSlop={12}
+                onPress={openOriginalImage}
+                style={[styles.originalButton, originalButtonDisabled && styles.disabledButton]}
+              >
+                {activeOriginalStatus === "loading" ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Icon color="#fff" name="image-search" size={20} type="material" />
+                )}
+                <Text style={styles.originalButtonText}>{originalButtonLabel}</Text>
               </Pressable>
               <Text style={styles.counterText}>{`${safeActiveIndex + 1} / ${activeTotal}`}</Text>
             </View>
@@ -96,12 +143,18 @@ function ImagesView() {
           onDismiss={closeViewer}
           renderContainer={renderContainer}
           renderItem={(item) => {
+            const originalStatus = originalImageStatuses[item.originalUri] ?? "idle";
+            const showOriginal = originalStatus === "loading" || originalStatus === "loaded";
+            const sourceUri = showOriginal ? item.originalUri : item.uri;
+
             return (
               <Image
                 contentFit="contain"
-                placeholder={LoadingPlaceholder}
-                recyclingKey={item.uri}
-                source={{ uri: item.uri }}
+                onError={() => handleOriginalImageError(item)}
+                onLoad={() => handleOriginalImageLoad(item)}
+                placeholder={showOriginal ? { uri: item.uri } : LoadingPlaceholder}
+                recyclingKey={`${item.originalUri}:${sourceUri}`}
+                source={{ uri: sourceUri }}
                 style={styles.image}
               />
             );
@@ -119,7 +172,7 @@ const styles = StyleSheet.create({
   bottomBar: {
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.35)",
-    borderRadius: 18,
+    borderRadius: 22,
     flexDirection: "row",
     gap: 20,
     paddingHorizontal: 16,
@@ -127,7 +180,6 @@ const styles = StyleSheet.create({
   },
   bottomBarWrap: {
     alignItems: "center",
-    bottom: 28,
     left: 0,
     position: "absolute",
     right: 0,
@@ -138,6 +190,7 @@ const styles = StyleSheet.create({
   counterText: {
     color: "#fff",
     fontSize: 16,
+    fontVariant: ["tabular-nums"],
     textAlign: "center",
     textShadowColor: "#000",
     textShadowOffset: {
@@ -146,9 +199,21 @@ const styles = StyleSheet.create({
     },
     textShadowRadius: 5,
   },
+  disabledButton: {
+    opacity: 0.7,
+  },
   image: {
     height: "100%",
     width: "100%",
+  },
+  originalButton: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 7,
+  },
+  originalButtonText: {
+    color: "#fff",
+    fontSize: 14,
   },
   overlay: {
     bottom: 0,

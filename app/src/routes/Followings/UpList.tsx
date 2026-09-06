@@ -11,7 +11,7 @@ import { colors } from "@/constants/colors.tw";
 import { useFollowActions } from "@/hooks/useFollowActions";
 import { useFollowedUpsMap } from "@/store/derives";
 import type { NavigationProps } from "@/types";
-import { parseNumber } from "@/utils";
+import { getImagePixelSize, parseImgUrl, parseNumber } from "@/utils";
 import type { FlashListRef } from "@/components/styled/rneui";
 
 function SearchUpItem(props: { up: SearchedUpType }) {
@@ -37,7 +37,11 @@ function SearchUpItem(props: { up: SearchedUpType }) {
         }}
         className="flex-1 flex-row items-center gap-4"
       >
-        <Avatar rounded source={{ uri: props.up.face }} size={40} />
+        <Avatar
+          rounded
+          source={{ uri: parseImgUrl(props.up.face, getImagePixelSize(40)) }}
+          size={40}
+        />
         <UpName
           mid={props.up.mid}
           numberOfLines={2}

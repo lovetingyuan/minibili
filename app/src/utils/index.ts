@@ -7,6 +7,15 @@ import { throttle } from "throttle-debounce";
 import { fetchVersion } from "@/api/check-update";
 import { site } from "@/constants";
 
+export {
+  getImagePixelDimensions,
+  getImagePixelSize,
+  getOriginalImgUrl,
+  parseImgUrl,
+  parseUrl,
+} from "./image";
+export type { BilibiliImageOptions } from "./image.types";
+
 export const parseNumber = (num?: number | null) => {
   if (num == null) {
     return "";
@@ -132,11 +141,6 @@ export async function handleShareUp(name: string, mid: number | string, sign: st
   }
 }
 
-export const parseUrl = (url: string) => {
-  const u = url.startsWith("//") ? `https:${url}` : url;
-  return u.replace("http://", "https://");
-};
-
 export function delay(ms: number) {
   return new Promise((r) => {
     setTimeout(r, ms);
@@ -209,21 +213,6 @@ export async function showFatalError(error: any) {
       },
     },
   );
-}
-
-export function parseImgUrl(url: string): string;
-export function parseImgUrl(url: string, size: number): string;
-export function parseImgUrl(url: string, width: number, height: number): string;
-export function parseImgUrl(url: string, width?: number, height?: number): string;
-export function parseImgUrl(url: string, width?: number, height?: number): string {
-  url = parseUrl(url);
-  if (typeof width === "number") {
-    height = typeof height === "number" ? height : width;
-    width = Math.round(width);
-    height = Math.round(height);
-    return `${url}@${width}w_${height}h_1c.webp`;
-  }
-  return url;
 }
 
 // export function openUrl(url: string) {

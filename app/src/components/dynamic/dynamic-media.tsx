@@ -1,19 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
 import type { ReactNode } from "react";
-import { Linking, Pressable, View } from "react-native";
+import { Linking, Pressable, useWindowDimensions, View } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
 import type { DynamicAuthor, DynamicContent, DynamicImage } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
-import { parseImgUrl, parseNumber } from "@/utils";
+import { getImagePixelDimensions, parseImgUrl, parseNumber } from "@/utils";
 
 import { Image } from "../styled/expo";
 import { Icon, Text } from "../styled/rneui";
 
 function DynamicImageGrid(props: { images: DynamicImage[]; detail?: boolean }) {
   const { setImagesList, setCurrentImageIndex } = useStore();
+  const { width: windowWidth } = useWindowDimensions();
   const visibleImages = props.detail ? props.images : props.images.slice(0, 9);
   const columns =
     visibleImages.length === 1
@@ -22,35 +23,42 @@ function DynamicImageGrid(props: { images: DynamicImage[]; detail?: boolean }) {
         ? 2
         : 3;
   const widthClass = columns === 1 ? "w-full" : columns === 2 ? "w-[49%]" : "w-[32%]";
+  const imageLayoutWidth = (windowWidth * 0.9) / columns;
 
   return (
     <View className="mb-3 flex-row flex-wrap gap-[1%] gap-y-1.5 overflow-hidden rounded-lg">
-      {visibleImages.map((image, index) => (
-        <Pressable
-          key={`${image.src}-${index}`}
-          className={widthClass}
-          onPress={() => {
-            setImagesList(props.images);
-            setCurrentImageIndex(index);
-          }}
-        >
-          <Image
-            source={{ uri: parseImgUrl(image.src) }}
-            contentFit="cover"
-            className={columns === 1 ? "w-full rounded-lg" : "aspect-square w-full"}
-            style={
-              columns === 1
-                ? { aspectRatio: Math.max(0.55, Math.min(image.ratio, 1.8)) }
-                : undefined
-            }
-          />
-          {!props.detail && index === 8 && props.images.length > 9 ? (
-            <View className="absolute inset-0 items-center justify-center bg-black/50">
-              <Text className="text-lg font-semibold text-white">+{props.images.length - 9}</Text>
-            </View>
-          ) : null}
-        </Pressable>
-      ))}
+      {visibleImages.map((image, index) => {
+        const aspectRatio = columns === 1 ? Math.max(0.55, Math.min(image.ratio, 1.8)) : 1;
+        const requestSize = getImagePixelDimensions(
+          imageLayoutWidth,
+          imageLayoutWidth / aspectRatio,
+          image.width,
+          image.height,
+        );
+
+        return (
+          <Pressable
+            key={`${image.src}-${index}`}
+            className={widthClass}
+            onPress={() => {
+              setImagesList(props.images);
+              setCurrentImageIndex(index);
+            }}
+          >
+            <Image
+              source={{ uri: parseImgUrl(image.src, requestSize) }}
+              contentFit="cover"
+              className={columns === 1 ? "w-full rounded-lg" : "aspect-square w-full"}
+              style={columns === 1 ? { aspectRatio } : undefined}
+            />
+            {!props.detail && index === 8 && props.images.length > 9 ? (
+              <View className="absolute inset-0 items-center justify-center bg-black/50">
+                <Text className="text-lg font-semibold text-white">+{props.images.length - 9}</Text>
+              </View>
+            ) : null}
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -61,7 +69,9 @@ function VideoCard(props: {
   detail?: boolean;
 }) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
+  const { width: windowWidth } = useWindowDimensions();
   const { content, author } = props;
+  const coverSize = getImagePixelDimensions(windowWidth * 0.9, (windowWidth * 0.9 * 9) / 16);
 
   function openVideo(event?: GestureResponderEvent) {
     if (!content.bvid) {
@@ -84,7 +94,7 @@ function VideoCard(props: {
     <>
       {content.cover ? (
         <Image
-          source={{ uri: parseImgUrl(content.cover, 960, 540) }}
+          source={{ uri: parseImgUrl(content.cover, coverSize) }}
           contentFit="cover"
           className="h-full w-full"
         />
@@ -147,6 +157,7 @@ function LinkCard(props: {
   content: Exclude<DynamicContent, { kind: "video" | "images" | "text" }>;
 }) {
   const { content } = props;
+  const coverSize = getImagePixelDimensions(96, 80);
   if (content.kind === "unavailable") {
     return (
       <View className="mb-3 rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
@@ -162,7 +173,7 @@ function LinkCard(props: {
     >
       {content.cover ? (
         <Image
-          source={{ uri: parseImgUrl(content.cover, 240, 180) }}
+          source={{ uri: parseImgUrl(content.cover, coverSize) }}
           contentFit="cover"
           className="mr-3 h-20 w-24 rounded-md"
         />

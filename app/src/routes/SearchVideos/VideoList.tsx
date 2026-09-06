@@ -11,7 +11,7 @@ import { type SearchedVideoType, useSearchVideos } from "@/api/search-video";
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
-import { parseImgUrl } from "@/utils";
+import { getImagePixelSize, parseImgUrl } from "@/utils";
 import type { FlashListRef } from "@/components/styled/rneui";
 
 const EMPTY_LIST_BOTTOM_SPACING = 16;
@@ -50,7 +50,7 @@ function useKeyboardInset() {
 
 function HotSearchIcon(props: { icon: string }) {
   const [aspectRatio, setAspectRatio] = React.useState<number | null>(null);
-  const source = { uri: parseImgUrl(props.icon) };
+  const source = { uri: parseImgUrl(props.icon, { height: getImagePixelSize(16) }) };
 
   function handleLoad(event: ImageLoadEventData) {
     if (event.source.width > 0 && event.source.height > 0) {

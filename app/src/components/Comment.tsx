@@ -1,10 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import { Button, Text } from "@/components/styled/rneui";
+import { Image } from "@/components/styled/expo";
 import UpName from "./UpName";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
-import { Image, Linking, View } from "react-native";
+import { Linking, View } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
 
@@ -12,7 +13,7 @@ import type { CommentItemType, CommentMessageContent } from "../api/comments";
 import { shouldShowReplySection } from "../api/replies.helpers";
 import { useStore } from "../store";
 import type { NavigationProps } from "../types";
-import { parseImgUrl, showToast } from "../utils";
+import { getImagePixelSize, parseImgUrl, showToast } from "../utils";
 
 function CommentText(props: {
   nodes: CommentMessageContent;
@@ -73,7 +74,7 @@ function CommentText(props: {
           return (
             <Image
               key={key}
-              source={{ uri: parseImgUrl(node.url) }}
+              source={{ uri: parseImgUrl(node.url, getImagePixelSize(18)) }}
               className="mx-1 h-[18px] w-[18px]"
             />
           );

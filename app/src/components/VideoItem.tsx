@@ -4,7 +4,7 @@ import UpName from "./UpName";
 import { Image } from "@/components/styled/expo";
 import he from "he";
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, useWindowDimensions, View } from "react-native";
 
 import type { VideoListItemProps } from "./VideoItem.types";
 import { colors } from "@/constants/colors.tw";
@@ -13,6 +13,7 @@ import { useFollowedUpsMap } from "@/store/derives";
 import type { VideoListItemInfo, NavigationProps } from "@/types";
 import { formatWatchTime } from "@/utils/watch-time";
 import {
+  getImagePixelDimensions,
   isDefined,
   parseDate,
   parseDuration,
@@ -49,7 +50,10 @@ function VideoListItem<T extends VideoListItemInfo>({
   watchedAt,
 }: VideoListItemProps<T>) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
+  const { width: windowWidth } = useWindowDimensions();
   const { setOverlayButtons } = useStore();
+  const coverLayoutWidth = ((windowWidth - 28) * 3) / 7;
+  const coverSize = getImagePixelDimensions(coverLayoutWidth, (coverLayoutWidth * 5) / 8);
   const _followedUpsMap = useFollowedUpsMap();
   const isFollowed = video.mid && video.mid in _followedUpsMap;
   return (
@@ -82,7 +86,7 @@ function VideoListItem<T extends VideoListItemInfo>({
         <View className="relative aspect-8/5 w-full content-center justify-center">
           <Image
             className="h-full w-full rounded"
-            source={{ uri: parseImgUrl(video.cover, 480, 300) }}
+            source={{ uri: parseImgUrl(video.cover, coverSize) }}
             placeholder={require("../../assets/video-loading.png")}
           />
           <View className="absolute right-0 top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">

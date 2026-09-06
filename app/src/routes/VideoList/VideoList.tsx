@@ -9,7 +9,7 @@ import { useBlockUpActions } from "@/hooks/useBlockUpActions";
 import { useStore } from "@/store";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 import type { NavigationProps } from "@/types";
-import { handleShareVideo, parseNumber, parseUrl } from "@/utils";
+import { getOriginalImgUrl, handleShareVideo, parseNumber } from "@/utils";
 import type { FlashListRef } from "@/components/styled/rneui";
 
 import Loading from "./Loading";
@@ -128,7 +128,7 @@ function VideoList(props: {
           if (!currentVideoRef.current) {
             return;
           }
-          Linking.openURL(parseUrl(currentVideoRef.current.cover));
+          Linking.openURL(getOriginalImgUrl(currentVideoRef.current.cover));
         },
       },
     ].filter((v) => v && typeof v === "object");

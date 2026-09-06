@@ -6,6 +6,7 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 // import { RootSiblingParent } from 'react-native-root-siblings'
 import { SWRConfig } from "swr";
 import type { ProviderConfiguration, SWRConfiguration } from "swr/_internal";
@@ -73,29 +74,31 @@ const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
 export default function App() {
   const rneTheme = useRNETheme();
   return (
-    <SWRConfig value={SWRConfigValue}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <ThemeProvider theme={rneTheme}>
-          <MenuProvider backHandler customStyles={menuProviderCustomStyles}>
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-              <DevServerRecovery />
-              <InitStoreComp />
-              <BilibiliFollowingsManager />
-              <BilibiliBlacklistManager />
-              <UserDataManager />
-              <CheckAppUpdate />
-              <CheckUpUpdate />
-              <CheckNetState />
-              <CheckLiveUps />
-              <ButtonsOverlay />
-              <ImagesView />
-              <UserLocation />
-              <Route />
-            </ErrorBoundary>
-          </MenuProvider>
-        </ThemeProvider>
-        <StatusBar style="auto" />
-      </GestureHandlerRootView>
-    </SWRConfig>
+    <SafeAreaProvider>
+      <SWRConfig value={SWRConfigValue}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <ThemeProvider theme={rneTheme}>
+            <MenuProvider backHandler customStyles={menuProviderCustomStyles}>
+              <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <DevServerRecovery />
+                <InitStoreComp />
+                <BilibiliFollowingsManager />
+                <BilibiliBlacklistManager />
+                <UserDataManager />
+                <CheckAppUpdate />
+                <CheckUpUpdate />
+                <CheckNetState />
+                <CheckLiveUps />
+                <ButtonsOverlay />
+                <ImagesView />
+                <UserLocation />
+                <Route />
+              </ErrorBoundary>
+            </MenuProvider>
+          </ThemeProvider>
+          <StatusBar style="auto" />
+        </GestureHandlerRootView>
+      </SWRConfig>
+    </SafeAreaProvider>
   );
 }

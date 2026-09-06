@@ -10,7 +10,7 @@ import { useFollowActions } from "@/hooks/useFollowActions";
 
 import { useStore } from "../../store";
 import type { NavigationProps, UpInfo } from "../../types";
-import { parseImgUrl, parseUrl } from "../../utils";
+import { getImagePixelSize, getOriginalImgUrl, parseImgUrl } from "../../utils";
 
 function FollowItem(props: { item: UpInfo; index?: number }) {
   // __DEV__ && console.log('follow item', props.item.name)
@@ -107,7 +107,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       {
         text: "查看头像",
         onPress: () => {
-          Linking.openURL(parseUrl(face));
+          Linking.openURL(getOriginalImgUrl(face));
         },
       },
       pins.disabled || (isPinned && index === 0)
@@ -145,7 +145,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
           size={48}
           rounded
           source={{
-            uri: parseImgUrl(face, 120),
+            uri: parseImgUrl(face, getImagePixelSize(48)),
           }}
         />
         {livingUps[mid] ? (

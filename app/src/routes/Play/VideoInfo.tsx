@@ -7,7 +7,14 @@ import { Linking, Pressable, ScrollView, TouchableOpacity, View } from "react-na
 import { useWatchingCount } from "@/api/watching-count";
 import { colors } from "@/constants/colors.tw";
 import type { NavigationProps, RootStackParamList } from "@/types";
-import { handleShareVideo, parseDate, parseDuration, parseImgUrl, parseNumber } from "@/utils";
+import {
+  getImagePixelSize,
+  handleShareVideo,
+  parseDate,
+  parseDuration,
+  parseImgUrl,
+  parseNumber,
+} from "@/utils";
 
 import { useVideoInfo } from "../../api/video-info";
 import FavoriteButton from "./FavoriteButton";
@@ -73,7 +80,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
               source={
                 face
                   ? {
-                      uri: parseImgUrl(face, 80),
+                      uri: parseImgUrl(face, getImagePixelSize(36)),
                     }
                   : require("../../../assets/loading.png")
               }

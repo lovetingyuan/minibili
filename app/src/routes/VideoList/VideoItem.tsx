@@ -3,21 +3,26 @@ import UpName from "@/components/UpName";
 import { clsx } from "clsx";
 import { Image } from "@/components/styled/expo";
 import React from "react";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { colors } from "@/constants/colors.tw";
-import { useStore } from "@/store";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 import { useFollowedUpsMap } from "@/store/derives";
-import { parseDate, parseDuration, parseImgUrl, parseNumber } from "@/utils";
+import {
+  getImagePixelDimensions,
+  parseDate,
+  parseDuration,
+  parseImgUrl,
+  parseNumber,
+} from "@/utils";
 
 export default VideoItem;
 
 function VideoItem({ video }: { video: VideoItemType }) {
   // __DEV__ && console.log('hot video', video.title);
   const playNum = parseNumber(video.playNum);
-  const { isWiFi } = useStore();
+  const { width: windowWidth } = useWindowDimensions();
   const {
     values: { $blackTags },
   } = useUserSettings();
@@ -25,6 +30,8 @@ function VideoItem({ video }: { video: VideoItemType }) {
 
   const isFollowed = video.mid in _followedUpsMap;
   const isBlackTag = Object.hasOwn($blackTags, video.tag);
+  const coverLayoutWidth = windowWidth / 2 - 10;
+  const coverSize = getImagePixelDimensions(coverLayoutWidth, (coverLayoutWidth * 5) / 8);
   // console.log(parseImgUrl(video.cover, 480, 300))
   return (
     <View className="flex-1">
@@ -32,7 +39,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
         <Image
           className="aspect-8/5 w-full rounded"
           contentFit="cover"
-          source={isWiFi ? parseImgUrl(video.cover, 480, 300) : parseImgUrl(video.cover, 320, 200)}
+          source={{ uri: parseImgUrl(video.cover, coverSize) }}
         />
         <View className="absolute m-1 items-center rounded-sm bg-gray-900/70 px-1  py-0.5">
           <Text className="text-xs text-white">{parseDuration(video.duration)}</Text>

@@ -10,7 +10,11 @@ const mocks = vi.hoisted(() => ({ navigate: vi.fn(), parseDate: vi.fn(() => "08-
 vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),
 }));
-vi.mock("react-native", () => ({ TouchableOpacity: "TouchableOpacity", View: "View" }));
+vi.mock("react-native", () => ({
+  TouchableOpacity: "TouchableOpacity",
+  useWindowDimensions: () => ({ width: 400, height: 800 }),
+  View: "View",
+}));
 vi.mock("@/components/styled/rneui", () => ({ Icon: "Icon", Text: "Text" }));
 vi.mock("@/components/styled/expo", () => ({ Image: "Image" }));
 vi.mock("@/constants/colors.tw", () => import("../constants/colors.tw"));
@@ -18,6 +22,7 @@ vi.mock("@/store", () => ({ useStore: () => ({ setOverlayButtons: vi.fn() }) }))
 vi.mock("@/store/derives", () => ({ useFollowedUpsMap: () => ({}) }));
 vi.mock("@/utils/watch-time", () => import("../utils/watch-time"));
 vi.mock("@/utils", () => ({
+  getImagePixelDimensions: (width: number, height: number) => ({ width, height }),
   isDefined: (value: unknown) => value !== undefined && value !== null,
   parseDate: mocks.parseDate,
   parseDuration: String,

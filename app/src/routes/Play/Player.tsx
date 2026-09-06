@@ -23,7 +23,7 @@ import type { RootStackParamList } from "@/types";
 import { useVideoInfo } from "../../api/video-info";
 import { useAppStateChange } from "../../hooks/useAppState";
 import { useStore } from "../../store";
-import { parseDuration, parseImgUrl, showToast } from "../../utils";
+import { getImagePixelDimensions, parseDuration, parseImgUrl, showToast } from "../../utils";
 import { INJECTED_JAVASCRIPT } from "./inject-play";
 
 const PlayUrl = "https://www.bilibili.com/blackboard/html5mobileplayer.html";
@@ -182,6 +182,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
       }
     }
   }
+  const coverSize = getImagePixelDimensions(width, videoViewHeight);
   const handleMessage = (evt: WebViewMessageEvent) => {
     try {
       const eventData = JSON.parse(evt.nativeEvent.data) as PlayerMessage;
@@ -225,7 +226,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     if (videoInfo?.cover) {
       return (
         <ImageBackground
-          source={{ uri: parseImgUrl(videoInfo.cover, 672, 420) }}
+          source={{ uri: parseImgUrl(videoInfo.cover, coverSize) }}
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
@@ -297,7 +298,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     >
       {videoInfo?.cover ? (
         <ImageBackground
-          source={{ uri: parseImgUrl(videoInfo.cover, 500, 312) }}
+          source={{ uri: parseImgUrl(videoInfo.cover, coverSize) }}
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >

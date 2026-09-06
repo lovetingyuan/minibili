@@ -14,7 +14,7 @@ import { useVideoInfo } from "@/api/video-info";
 import { colors } from "@/constants/colors.tw";
 import { useFollowedUpsMap } from "@/store/derives";
 import type { RootStackParamList } from "@/types";
-import { parseImgUrl, parseNumber, showToast } from "@/utils";
+import { getOriginalImgUrl, parseNumber, showToast } from "@/utils";
 
 export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
@@ -88,7 +88,7 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
             onSelect={() => {
               hideMenu();
               if (videoInfo.cover) {
-                Linking.openURL(parseImgUrl(videoInfo.cover));
+                Linking.openURL(getOriginalImgUrl(videoInfo.cover));
               } else {
                 showToast("暂时无法获取封面");
               }

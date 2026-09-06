@@ -2,7 +2,7 @@ import { Pressable, View } from "react-native";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
-import { parseDate, parseImgUrl, parseNumber } from "@/utils";
+import { getImagePixelSize, parseDate, parseImgUrl, parseNumber } from "@/utils";
 
 import { Additional } from "../Additional";
 import RichTexts from "../RichTexts";
@@ -17,7 +17,11 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
       <Avatar
         rounded
         size={compact ? 30 : 42}
-        source={item.author.face ? { uri: parseImgUrl(item.author.face, 100) } : undefined}
+        source={
+          item.author.face
+            ? { uri: parseImgUrl(item.author.face, getImagePixelSize(compact ? 30 : 42)) }
+            : undefined
+        }
         containerClassName="bg-neutral-200 dark:bg-neutral-700"
       />
       <View className="ml-3 min-w-0 flex-1">

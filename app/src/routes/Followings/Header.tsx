@@ -5,7 +5,7 @@ import { View } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
-import { parseImgUrl, parseNumber } from "@/utils";
+import { getImagePixelSize, parseImgUrl, parseNumber } from "@/utils";
 
 import type { NavigationProps } from "../../types";
 
@@ -29,7 +29,9 @@ export function HeaderTitle() {
         title={Array.from(profile.name)[0] || "B"}
         titleClassName={colors.gray8.text}
         containerClassName={`shrink-0 ${colors.gray2.bg}`}
-        source={profile.face ? { uri: parseImgUrl(profile.face, 96) } : undefined}
+        source={
+          profile.face ? { uri: parseImgUrl(profile.face, getImagePixelSize(32)) } : undefined
+        }
       />
       <Text
         className={`shrink text-lg ${colors.gray8.text}`}

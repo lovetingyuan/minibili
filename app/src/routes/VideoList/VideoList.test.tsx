@@ -49,7 +49,11 @@ vi.mock("@/features/user-data/useUserSettings", () => ({
     setSetting: mocks.setBlackTags,
   }),
 }));
-vi.mock("@/utils", () => ({ handleShareVideo: vi.fn(), parseNumber: String, parseUrl: String }));
+vi.mock("@/utils", () => ({
+  getOriginalImgUrl: String,
+  handleShareVideo: vi.fn(),
+  parseNumber: String,
+}));
 vi.mock("./Loading", () => ({ default: () => null }));
 vi.mock("./VideoItem", () => ({ default: () => null }));
 

@@ -6,6 +6,7 @@ import type { ReactElement, ReactNode } from "react";
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
 
 vi.mock("react-native", () => ({
+  useWindowDimensions: () => ({ width: 400, height: 800 }),
   View: function View() {
     return null;
   },
@@ -53,6 +54,7 @@ vi.mock("@/store/derives", () => ({
 }));
 
 vi.mock("@/utils", () => ({
+  getImagePixelDimensions: (width: number, height: number) => ({ width, height }),
   parseDate: () => "05-10",
   parseDuration: () => "03:31",
   parseImgUrl: (url: string) => url,

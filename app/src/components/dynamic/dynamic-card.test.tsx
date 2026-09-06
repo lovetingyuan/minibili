@@ -7,6 +7,7 @@ import type { DynamicItem } from "@/api/dynamic-items.type";
 vi.mock("react-native", () => ({ Pressable: "Pressable", View: "View" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/utils", () => ({
+  getImagePixelSize: (size: number) => size,
   parseDate: String,
   parseImgUrl: String,
   parseNumber: String,

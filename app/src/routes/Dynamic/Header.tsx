@@ -16,7 +16,7 @@ import { useLivingInfo } from "../../api/living-info";
 import { useUserInfo } from "../../api/user-info";
 import { useStore } from "../../store";
 import type { NavigationProps, RootStackParamList } from "../../types";
-import { handleShareUp, parseImgUrl, showToast } from "../../utils";
+import { getImagePixelSize, handleShareUp, parseImgUrl, showToast } from "../../utils";
 
 export function HeaderLeft() {
   const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
@@ -52,7 +52,7 @@ export function HeaderLeft() {
             rounded
             // onPress={gotoWebPage}
             source={{
-              uri: parseImgUrl(dynamicUser.face, 120),
+              uri: parseImgUrl(dynamicUser.face, getImagePixelSize(40)),
             }}
           />
           {dynamicUser.mid && livingUrl ? (
