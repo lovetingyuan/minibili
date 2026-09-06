@@ -1,17 +1,8 @@
-import { useHeaderHeight } from "@react-navigation/elements";
-import { Button, Icon, Input, Text } from "@/components/styled/rneui";
+import type { HeaderSearchBarRef } from "@react-navigation/elements";
+import { Text } from "@/components/styled/rneui";
 import React from "react";
-import {
-  FlatList,
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { FlatList, Image, useWindowDimensions, View } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
 import { orderFollowedUps } from "@/features/bilibili-followings/order-followings";
 import { useFollowingsState } from "@/features/bilibili-followings/useFollowingsState";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
@@ -49,9 +40,6 @@ function FollowList() {
     // oxlint-disable-next-line no-console
     console.log("Follow page");
   }
-  const headerHeight = useHeaderHeight();
-  const [searchVisible, setSearchVisible] = React.useState(false);
-  const [searchText, setSearchText] = React.useState("");
   const [searchKeyword, setSearchKeyword] = React.useState("");
   const { $upUpdateMap, livingUps, requestDynamicFailed } = useStore();
   const $followedUps = useActiveFollowedUps();
@@ -59,28 +47,24 @@ function FollowList() {
   const { isValidating, mutate } = useFollowingsState();
   const _updatedCount = useUpUpdateCount();
   const followListRef = React.useRef<FlatList | null>(null);
+  const searchBarRef = React.useRef<HeaderSearchBarRef | null>(null);
 
   function changeSearchText(text: string) {
-    setSearchText(text);
     if (!text.trim()) {
       setSearchKeyword("");
     }
   }
 
-  function submitSearch() {
-    const keyword = searchText.trim();
+  function submitSearch(text: string) {
+    const keyword = text.trim();
     if (!keyword) {
       return;
     }
     setSearchKeyword(keyword);
-    Keyboard.dismiss();
   }
 
   function cancelSearch() {
-    setSearchVisible(false);
-    setSearchText("");
     setSearchKeyword("");
-    Keyboard.dismiss();
   }
 
   const { width } = useWindowDimensions();
@@ -96,10 +80,11 @@ function FollowList() {
   }`;
   useFollowListHeader({
     title: followSummary,
-    searchVisible,
-    onSearch: () => {
-      setSearchVisible(true);
-    },
+    onChangeText: changeSearchText,
+    onClose: cancelSearch,
+    onSubmit: submitSearch,
+    searchActive: Boolean(searchKeyword),
+    searchBarRef,
   });
 
   const renderItem = ({ item, index }: { item: UpInfo | null; index: number }) => {
@@ -115,42 +100,8 @@ function FollowList() {
     : 0;
   const orderedUps = orderFollowedUps($followedUps, values.$pinnedUpIds, livingUps, $upUpdateMap);
 
-  const content = (
+  return (
     <View className="flex-1">
-      {searchVisible ? (
-        <View className="flex-row items-center justify-between gap-3 px-4 py-2">
-          <Input
-            autoFocus
-            accessibilityLabel="搜索UP主"
-            placeholder="搜索UP主"
-            value={searchText}
-            onChangeText={changeSearchText}
-            onSubmitEditing={submitSearch}
-            returnKeyType="search"
-            submitBehavior="submit"
-            autoCapitalize="none"
-            autoCorrect={false}
-            renderErrorMessage={false}
-            containerClassName="flex-1 px-0"
-            inputContainerClassName={`rounded-lg border-b-0 px-3 ${colors.gray1.bg}`}
-            inputClassName={`text-base ${colors.gray8.text}`}
-            placeholderTextColorClassName={colors.gray6.accent}
-            selectionColorClassName={colors.primary.accent}
-            rightIcon={
-              searchText ? (
-                <Button
-                  type="clear"
-                  accessibilityLabel="清空搜索"
-                  onPress={() => changeSearchText("")}
-                >
-                  <Icon name="close" size={20} colorClassName={colors.gray6.accent} />
-                </Button>
-              ) : undefined
-            }
-          />
-          <Button title="取消" type="clear" onPress={cancelSearch} />
-        </View>
-      ) : null}
       {searchKeyword ? (
         <UpList keyword={searchKeyword} />
       ) : (
@@ -167,6 +118,7 @@ function FollowList() {
           key={columns} // FlatList不支持直接更改columns
           numColumns={columns}
           ref={followListRef}
+          contentContainerClassName="pt-6"
           columnWrapperClassName="px-3"
           ListEmptyComponent={
             <View>
@@ -184,16 +136,6 @@ function FollowList() {
         />
       )}
     </View>
-  );
-
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={headerHeight}
-      className="flex-1"
-    >
-      {content}
-    </KeyboardAvoidingView>
   );
 }
 

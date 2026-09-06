@@ -35,13 +35,11 @@ function Hot() {
       videos={list || []}
       isRefreshing={isRefreshing}
       onReachEnd={update}
-      onRefresh={(fab) => {
-        // mutate()
-        if (!fab) {
-          setReload((current) => current + 1);
-        } else {
-          mutate();
-        }
+      onRefresh={() => {
+        setReload((current) => current + 1);
+      }}
+      onTabReselect={() => {
+        void mutate();
       }}
       footer={getFooter}
     />

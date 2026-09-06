@@ -14,4 +14,5 @@ export type DynamicListProps = {
   loadMore: () => void | Promise<unknown>;
   retry: () => void | Promise<unknown>;
   onItemPress: (item: DynamicItem) => void;
+  onTabReselect?: () => void;
 };

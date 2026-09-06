@@ -1,30 +1,49 @@
-import React from "react";
+import { useBackHandler } from "@react-native-community/hooks";
+import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
+import { useIsFocused } from "@react-navigation/native";
 
-import { Button, Icon } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import type { FollowListHeaderProps } from "./FollowListHeader.types";
 
 export default function useFollowListHeader({
-  onSearch,
-  searchVisible,
+  onChangeText,
+  onClose,
+  onSubmit,
+  searchActive,
+  searchBarRef,
   title,
 }: FollowListHeaderProps) {
-  useUpdateNavigationOptions({
-    headerTitle: title,
-    headerRight: searchVisible
-      ? undefined
-      : () => (
-          <Button
-            radius="sm"
-            type="clear"
-            accessibilityLabel="搜索UP主"
-            containerClassName="mr-2"
-            onPress={onSearch}
-          >
-            <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
-          </Button>
-        ),
+  const focused = useIsFocused();
+  useBackHandler(() => {
+    if (!searchActive || !focused) {
+      return false;
+    }
+    if (searchBarRef.current) {
+      searchBarRef.current.cancelSearch();
+    } else {
+      onClose();
+    }
+    return true;
   });
+
+  const options: Partial<BottomTabNavigationOptions> = {
+    headerTitle: title,
+    headerRight: undefined,
+    headerSearchBarOptions: {
+      ref: searchBarRef,
+      autoCapitalize: "none",
+      cancelButtonText: "取消",
+      enterKeyHint: "search",
+      placeholder: "搜索UP主",
+      onChangeText: ({ nativeEvent: { text } }) => {
+        onChangeText(text);
+      },
+      onClose,
+      onSubmitEditing: ({ nativeEvent: { text } }) => {
+        onSubmit(text);
+      },
+    },
+  };
+  useUpdateNavigationOptions(options);
 }

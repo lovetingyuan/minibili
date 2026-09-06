@@ -1,14 +1,13 @@
 import { useNavigation } from "@react-navigation/native";
-import { FAB, FlashList, Icon } from "@/components/styled/rneui";
+import { FlashList } from "@/components/styled/rneui";
 import React from "react";
 import { Alert, Linking, TouchableOpacity } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
-import { colors } from "@/constants/colors.tw";
 import { useBlockUpActions } from "@/hooks/useBlockUpActions";
 import { useStore } from "@/store";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
-import type { NavigationProps } from "@/types";
+import type { MainTabNavigationProp } from "@/types";
 import { getOriginalImgUrl, handleShareVideo, parseNumber } from "@/utils";
 import type { FlashListRef } from "@/components/styled/rneui";
 
@@ -22,7 +21,8 @@ function VideoList(props: {
   type: "Hot" | "Rank" | "Search";
   footer?: Footer | ((l: VideoItemType[]) => Footer);
   onReachEnd?: () => void;
-  onRefresh?: (fab?: boolean) => void;
+  onRefresh?: () => void;
+  onTabReselect?: () => void;
   isRefreshing?: boolean;
 }) {
   const { setOverlayButtons, currentVideosCate } = useStore();
@@ -44,7 +44,7 @@ function VideoList(props: {
     }
   }
 
-  const navigation = useNavigation<NavigationProps["navigation"]>();
+  const navigation = useNavigation<MainTabNavigationProp>();
   const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null);
   const currentVideoRef = React.useRef<VideoItemType | null>(null);
   React.useEffect(() => {
@@ -52,6 +52,19 @@ function VideoList(props: {
       listRef.current?.scrollToOffset({ offset: 0, animated: false });
     });
   }, [currentVideosCate]);
+  React.useEffect(() => {
+    if (props.type !== "Hot" || !props.onTabReselect) {
+      return;
+    }
+
+    return navigation.addListener("tabPress", () => {
+      if (!navigation.isFocused()) {
+        return;
+      }
+      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      props.onTabReselect?.();
+    });
+  }, [navigation, props.onTabReselect, props.type]);
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
       return;
@@ -145,38 +158,22 @@ function VideoList(props: {
       }
     : null;
   return (
-    <>
-      <FlashList
-        ref={(v) => {
-          listRef.current = v;
-        }}
-        numColumns={2}
-        data={videoList}
-        renderItem={renderItem}
-        persistentScrollbar
-        ListEmptyComponent={<Loading />}
-        ListFooterComponent={
-          typeof props.footer === "function" ? props.footer(videoList) : props.footer
-        }
-        contentContainerClassName="px-1 pt-6"
-        {...refreshProps}
-        {...reachEndProps}
-      />
-      {props.type === "Hot" && (
-        <FAB
-          visible
-          colorClassName={colors.secondary.accent}
-          placement="right"
-          icon={<Icon name="refresh" color="white" />}
-          className="bottom-3 opacity-90"
-          size="small"
-          onPress={() => {
-            listRef.current?.scrollToOffset({ offset: 0, animated: true });
-            props.onRefresh?.(true);
-          }}
-        />
-      )}
-    </>
+    <FlashList
+      ref={(v) => {
+        listRef.current = v;
+      }}
+      numColumns={2}
+      data={videoList}
+      renderItem={renderItem}
+      persistentScrollbar
+      ListEmptyComponent={<Loading />}
+      ListFooterComponent={
+        typeof props.footer === "function" ? props.footer(videoList) : props.footer
+      }
+      contentContainerClassName="px-1 pt-6"
+      {...refreshProps}
+      {...reachEndProps}
+    />
   );
 }
 

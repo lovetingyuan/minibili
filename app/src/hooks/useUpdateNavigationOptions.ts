@@ -1,11 +1,15 @@
+import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
+import type { NavigationProp, ParamListBase } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import React from "react";
 
-import type { NavigationProps } from "@/types";
+type NavigationOptions =
+  | Partial<BottomTabNavigationOptions>
+  | Partial<NativeStackNavigationOptions>;
 
-export default function useUpdateNavigationOptions(options: Partial<NativeStackNavigationOptions>) {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
+export default function useUpdateNavigationOptions(options: NavigationOptions) {
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   React.useEffect(() => {
     navigation.setOptions(options);
   }, [navigation, options]);

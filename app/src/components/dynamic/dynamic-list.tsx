@@ -1,7 +1,12 @@
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
 
+import type { DynamicItem } from "@/api/dynamic-items.type";
 import { Button, FlashList, Skeleton, Text } from "@/components/styled/rneui";
+import type { FlashListRef } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
+import type { MainTabNavigationProp } from "@/types";
 
 import { DynamicCard } from "./dynamic-card";
 import type { DynamicListProps } from "./dynamic-list.types";
@@ -30,10 +35,14 @@ function DynamicListLoading(props: { text: string }) {
   );
 }
 
-function DynamicListEmpty(props: Pick<DynamicListProps, "error" | "emptyTitle" | "emptyMessage" | "retry">) {
+function DynamicListEmpty(
+  props: Pick<DynamicListProps, "error" | "emptyTitle" | "emptyMessage" | "retry">,
+) {
   return (
     <View className="items-center gap-3 px-8 py-24">
-      <Text className="text-lg font-semibold">{props.error ? "动态加载失败" : props.emptyTitle}</Text>
+      <Text className="text-lg font-semibold">
+        {props.error ? "动态加载失败" : props.emptyTitle}
+      </Text>
       <Text selectable className={`text-center text-sm ${colors.gray6.text}`}>
         {props.error?.message || props.emptyMessage}
       </Text>
@@ -51,12 +60,30 @@ function DynamicListEmpty(props: Pick<DynamicListProps, "error" | "emptyTitle" |
 }
 
 export function DynamicList(props: DynamicListProps) {
+  const navigation = useNavigation<MainTabNavigationProp>();
+  const listRef = React.useRef<FlashListRef<DynamicItem> | null>(null);
+
+  React.useEffect(() => {
+    if (!props.onTabReselect) {
+      return;
+    }
+
+    return navigation.addListener("tabPress", () => {
+      if (!navigation.isFocused()) {
+        return;
+      }
+      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      props.onTabReselect?.();
+    });
+  }, [navigation, props.onTabReselect]);
+
   if (props.isLoading && !props.list.length) {
     return <DynamicListLoading text={props.loadingText} />;
   }
 
   return (
     <FlashList
+      ref={listRef}
       className="flex-1 bg-neutral-100 dark:bg-black"
       contentInsetAdjustmentBehavior="automatic"
       contentContainerClassName="pb-6"

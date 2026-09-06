@@ -40,7 +40,7 @@ import AppRoute, { FollowingDynamicsRoute, FollowingsRoute, MainTabs } from "./I
 type TabScreenProps = {
   name: string;
   component: React.ComponentType;
-  options: { title: string };
+  options: { title: string; headerTitle?: string };
 };
 
 function tabScreens(node: ReactNode) {
@@ -81,6 +81,7 @@ test("main tabs keep the requested order, labels, and default route", () => {
     "我的",
   ]);
   expect(screens[0].props.component).toBe("VideoList");
+  expect(screens[1].props.options.headerTitle).toBe("关注的动态");
   expect(screens[3].props.component).toBe("About");
 });
 

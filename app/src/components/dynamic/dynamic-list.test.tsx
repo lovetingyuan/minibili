@@ -4,6 +4,34 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
 
+const mocks = vi.hoisted(() => ({
+  addListener: vi.fn(),
+  isFocused: vi.fn(() => true),
+  tabPressListener: undefined as (() => void) | undefined,
+  refs: [] as { current: unknown }[],
+}));
+
+vi.mock("react", async (importOriginal) => {
+  const original = await importOriginal<typeof import("react")>();
+  return {
+    ...original,
+    default: {
+      ...original,
+      useRef: (current: unknown) => {
+        const ref = { current };
+        mocks.refs.push(ref);
+        return ref;
+      },
+      useEffect: (effect: () => void | (() => void)) => effect(),
+    },
+  };
+});
+vi.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({
+    addListener: mocks.addListener,
+    isFocused: mocks.isFocused,
+  }),
+}));
 vi.mock("react-native", () => ({
   ActivityIndicator: "ActivityIndicator",
   Pressable: "Pressable",
@@ -87,7 +115,16 @@ type ListProps = {
 };
 
 describe("shared dynamic list", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.tabPressListener = undefined;
+    mocks.refs.length = 0;
+    mocks.isFocused.mockReturnValue(true);
+    mocks.addListener.mockImplementation((_event, listener: () => void) => {
+      mocks.tabPressListener = listener;
+      return vi.fn();
+    });
+  });
 
   test("shows the configured initial loading state", () => {
     const loading = DynamicList({ ...baseProps, isLoading: true });
@@ -98,7 +135,10 @@ describe("shared dynamic list", () => {
     const empty = DynamicList(baseProps) as ReactElement<ListProps>;
     expect(text(renderFunction(empty.props.ListEmptyComponent))).toContain("这里还没有关注动态");
 
-    const failed = DynamicList({ ...baseProps, error: new Error("登录已失效") }) as ReactElement<ListProps>;
+    const failed = DynamicList({
+      ...baseProps,
+      error: new Error("登录已失效"),
+    }) as ReactElement<ListProps>;
     const errorState = renderFunction(failed.props.ListEmptyComponent);
     expect(text(errorState)).toContain("登录已失效");
     const button = React.Children.toArray(errorState.props.children).find(
@@ -110,7 +150,11 @@ describe("shared dynamic list", () => {
   });
 
   test("forwards item presses, refreshes and lazy-loads", () => {
-    const list = DynamicList({ ...baseProps, list: [item], isRefreshing: true }) as ReactElement<ListProps>;
+    const list = DynamicList({
+      ...baseProps,
+      list: [item],
+      isRefreshing: true,
+    }) as ReactElement<ListProps>;
     const row = list.props.renderItem({ item });
     const card = row.props.children;
     card.props.onPress();
@@ -124,15 +168,43 @@ describe("shared dynamic list", () => {
   });
 
   test("shows continuation progress, terminal state and retry", () => {
-    const loading = DynamicList({ ...baseProps, list: [item], isLoadingMore: true }) as ReactElement<ListProps>;
+    const loading = DynamicList({
+      ...baseProps,
+      list: [item],
+      isLoadingMore: true,
+    }) as ReactElement<ListProps>;
     expect(text(loading.props.ListFooterComponent)).toBe("");
 
-    const terminal = DynamicList({ ...baseProps, list: [item], isReachingEnd: true }) as ReactElement<ListProps>;
+    const terminal = DynamicList({
+      ...baseProps,
+      list: [item],
+      isReachingEnd: true,
+    }) as ReactElement<ListProps>;
     expect(text(terminal.props.ListFooterComponent)).toContain("暂无更多");
 
-    const failed = DynamicList({ ...baseProps, list: [item], error: new Error("续页失败") }) as ReactElement<ListProps>;
+    const failed = DynamicList({
+      ...baseProps,
+      list: [item],
+      error: new Error("续页失败"),
+    }) as ReactElement<ListProps>;
     expect(text(failed.props.ListFooterComponent)).toContain("加载下一页失败，点击重试");
     failed.props.ListFooterComponent?.props.onPress?.();
     expect(actions.retry).toHaveBeenCalledOnce();
+  });
+
+  test("reselecting the focused tab scrolls to the top and refreshes", () => {
+    const onTabReselect = vi.fn();
+    const scrollToOffset = vi.fn();
+
+    DynamicList({ ...baseProps, list: [item], onTabReselect });
+    mocks.refs[0].current = { scrollToOffset };
+    mocks.isFocused.mockReturnValue(false);
+    mocks.tabPressListener?.();
+    expect(onTabReselect).not.toHaveBeenCalled();
+
+    mocks.isFocused.mockReturnValue(true);
+    mocks.tabPressListener?.();
+    expect(scrollToOffset).toHaveBeenCalledExactlyOnceWith({ offset: 0, animated: true });
+    expect(onTabReselect).toHaveBeenCalledOnce();
   });
 });

@@ -20,7 +20,9 @@ const mocks = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@react-navigation/native", () => ({ useNavigation: () => ({ navigate: mocks.navigate }) }));
+vi.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ navigate: mocks.navigate }),
+}));
 vi.mock("@/api/useFollowingDynamicItems", () => ({
   useFollowingDynamicItems: () => mocks.dynamics,
 }));
@@ -63,5 +65,8 @@ describe("following dynamics content", () => {
       title: "这是关注动态",
       user: { mid: "42", name: "关注的UP" },
     });
+
+    screen.props.onTabReselect?.();
+    expect(mocks.dynamics.refresh).toHaveBeenCalledOnce();
   });
 });

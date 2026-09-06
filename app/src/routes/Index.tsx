@@ -79,6 +79,7 @@ export function MainTabs() {
         component={FollowingDynamicsRoute}
         options={{
           title: "动态",
+          headerTitle: "关注的动态",
           tabBarIcon: ({ color, size }) => (
             <Icon name="dynamic-feed" type="material" color={color} size={size} />
           ),

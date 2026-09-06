@@ -24,6 +24,9 @@ export default function FollowingDynamicsContent() {
       emptyTitle="这里还没有关注动态"
       emptyMessage="已关注的 UP 主暂时没有新动态"
       onItemPress={openDynamicDetail}
+      onTabReselect={() => {
+        void dynamics.refresh();
+      }}
     />
   );
 }

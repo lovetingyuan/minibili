@@ -10,6 +10,11 @@ const mocks = vi.hoisted(() => ({
   setOverlayButtons: vi.fn<(buttons: { text: string; onPress: () => void }[]) => void>(),
   setBlackTags: vi.fn(),
   alert: vi.fn(),
+  navigate: vi.fn(),
+  isFocused: vi.fn(() => true),
+  addListener: vi.fn(),
+  tabPressListener: undefined as (() => void) | undefined,
+  refs: [] as { current: unknown }[],
 }));
 vi.mock("react", async (importOriginal) => {
   const original = await importOriginal<typeof import("react")>();
@@ -17,23 +22,30 @@ vi.mock("react", async (importOriginal) => {
     ...original,
     default: {
       ...original,
-      useRef: (current: unknown) => ({ current }),
-      useEffect: () => {},
+      useRef: (current: unknown) => {
+        const ref = { current };
+        mocks.refs.push(ref);
+        return ref;
+      },
+      useEffect: (effect: () => void | (() => void)) => effect(),
     },
   };
 });
-vi.mock("@react-navigation/native", () => ({ useNavigation: () => ({ navigate: vi.fn() }) }));
+vi.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({
+    navigate: mocks.navigate,
+    isFocused: mocks.isFocused,
+    addListener: mocks.addListener,
+  }),
+}));
 vi.mock("react-native", () => ({
   TouchableOpacity: () => null,
   Alert: { alert: mocks.alert },
   Linking: { openURL: vi.fn() },
 }));
 vi.mock("@/components/styled/rneui", () => ({
-  FAB: () => null,
   FlashList: () => null,
-  Icon: () => null,
 }));
-vi.mock("@/constants/colors.tw", () => ({ colors: { secondary: { accent: "accent-secondary" } } }));
 vi.mock("@/hooks/useBlockUpActions", () => ({
   useBlockUpActions: () => ({ confirmBlock: mocks.confirmBlock }),
 }));
@@ -82,16 +94,28 @@ const video: VideoItemType = {
   width: 480,
 };
 
-function getList(type: ComponentProps<typeof VideoList>["type"], videos: VideoItemType[]) {
-  const root = VideoList({ type, videos });
-  const list = React.Children.toArray(root.props.children)[0];
-  if (!React.isValidElement<ComponentProps<typeof FlashList<VideoItemType>>>(list)) {
+function getList(
+  type: ComponentProps<typeof VideoList>["type"],
+  videos: VideoItemType[],
+  props: Pick<ComponentProps<typeof VideoList>, "onTabReselect"> = {},
+) {
+  const root = VideoList({ type, videos, ...props });
+  if (!React.isValidElement<ComponentProps<typeof FlashList<VideoItemType>>>(root)) {
     throw new Error("Expected FlashList");
   }
-  return list.props;
+  return root.props;
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  mocks.tabPressListener = undefined;
+  mocks.refs.length = 0;
+  mocks.isFocused.mockReturnValue(true);
+  mocks.addListener.mockImplementation((_event, listener: () => void) => {
+    mocks.tabPressListener = listener;
+    return vi.fn();
+  });
+});
 
 describe("video list after replacing local UP blocking", () => {
   test.each(["Hot", "Rank", "Search"] as const)(
@@ -121,5 +145,27 @@ describe("video list after replacing local UP blocking", () => {
     expect(mocks.confirmBlock).toHaveBeenCalledExactlyOnceWith({ mid: 456, name: "UP" });
     expect(mocks.setBlackTags).not.toHaveBeenCalled();
     expect(list.data).toEqual([video, other]);
+  });
+
+  test("reselecting the focused hot tab scrolls to the top and refreshes", () => {
+    const onTabReselect = vi.fn();
+    getList("Hot", [video], { onTabReselect });
+    const scrollToOffset = vi.fn();
+
+    mocks.refs[0].current = { scrollToOffset };
+    mocks.tabPressListener?.();
+
+    expect(scrollToOffset).toHaveBeenCalledExactlyOnceWith({ offset: 0, animated: true });
+    expect(onTabReselect).toHaveBeenCalledOnce();
+  });
+
+  test("entering the hot tab from another tab does not refresh", () => {
+    const onTabReselect = vi.fn();
+    mocks.isFocused.mockReturnValue(false);
+
+    VideoList({ type: "Hot", videos: [video], onTabReselect });
+    mocks.tabPressListener?.();
+
+    expect(onTabReselect).not.toHaveBeenCalled();
   });
 });
