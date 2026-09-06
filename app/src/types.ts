@@ -1,4 +1,9 @@
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { CompositeNavigationProp, NavigatorScreenParams } from "@react-navigation/native";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from "@react-navigation/native-stack";
 
 // import { VideoInfo } from './api/video-info'
 // import { getInitVideoInfoValue } from './store/play'
@@ -30,8 +35,16 @@ export interface VideoListItemInfo {
   like?: number;
 }
 
+export type MainTabParamList = {
+  Hot: undefined;
+  FollowingDynamics: undefined;
+  Followings: undefined;
+  Mine: undefined;
+};
+
 export type RootStackParamList = {
   Welcome: undefined;
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   SearchVideos: undefined;
   WebPage: { url: string; title?: string; type?: "pc" | "mobile" };
   Play: {
@@ -56,10 +69,16 @@ export type RootStackParamList = {
     title: string;
     user?: Pick<UpInfo, "mid" | "name">;
   };
-  VideoList: undefined;
-  Follow: undefined;
-  About: undefined;
+  Favorites: undefined;
+  History: undefined;
   Living: { url: string; title: string; user?: Pick<UpInfo, "mid" | "name"> };
 };
+
+export type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+export type MainTabNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList>,
+  RootNavigationProp
+>;
 
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>;

@@ -2,25 +2,31 @@ import { useIsFocused } from "@react-navigation/native";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
-import { Button, Text } from "@/components/styled/rneui";
 import { useBilibiliFollowings } from "@/api/followings";
+import { Button, Text } from "@/components/styled/rneui";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
-import BilibiliLoginWebView from "./BilibiliLoginWebView";
-import FollowPages from "./FollowPages";
 
-// 每次页面重新获得焦点时挂载，由 SWR 与其他入口的校验请求去重。
-function RevalidateSessionOnFocus() {
+import BilibiliLoginWebView from "./BilibiliLoginWebView";
+
+type Props = {
+  Content: React.ComponentType;
+  syncFollowings?: boolean;
+};
+
+function RevalidateSessionOnFocus({ syncFollowings }: Pick<Props, "syncFollowings">) {
   const { account } = useBilibiliSession();
   useBilibiliFollowings(
-    account && bilibiliSession.isCurrentAccount(account) ? account.mid : undefined,
+    syncFollowings && account && bilibiliSession.isCurrentAccount(account)
+      ? account.mid
+      : undefined,
     account?.generation,
     () => Boolean(account && bilibiliSession.isCurrentAccount(account)),
   );
   return null;
 }
 
-export default function Follow() {
+export default function BilibiliAccountGate({ Content, syncFollowings }: Props) {
   const focused = useIsFocused();
   const { account, error, isChecking, control, revalidate } = useBilibiliSession();
 
@@ -71,7 +77,7 @@ export default function Follow() {
           </View>
         ) : null}
         {account && bilibiliSession.isCurrentAccount(account) ? (
-          <FollowPages key={`${account.mid}:${account.generation}`} />
+          <Content key={`${account.mid}:${account.generation}`} />
         ) : account ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator />
@@ -85,7 +91,7 @@ export default function Follow() {
 
   return (
     <View className="flex-1">
-      {focused ? <RevalidateSessionOnFocus /> : null}
+      {focused ? <RevalidateSessionOnFocus syncFollowings={syncFollowings} /> : null}
       {content}
     </View>
   );

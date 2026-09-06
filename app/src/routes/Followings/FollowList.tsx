@@ -22,6 +22,7 @@ import { useStore } from "../../store";
 import type { UpInfo } from "../../types";
 import UpList from "./UpList";
 import FollowItem from "./FollowItem";
+import useFollowListHeader from "./FollowListHeader";
 
 const tvL = require("../../../assets/tv-l.png");
 const tvR = require("../../../assets/tv-r.png");
@@ -93,6 +94,13 @@ function FollowList() {
         : ` (${count}${failed ? "！" : ""})`
       : ""
   }`;
+  useFollowListHeader({
+    title: followSummary,
+    searchVisible,
+    onSearch: () => {
+      setSearchVisible(true);
+    },
+  });
 
   const renderItem = ({ item, index }: { item: UpInfo | null; index: number }) => {
     if (item) {
@@ -109,58 +117,40 @@ function FollowList() {
 
   const content = (
     <View className="flex-1">
-      <View className="flex-row items-center justify-between gap-3 px-4 py-2">
-        {searchVisible ? (
-          <>
-            <Input
-              autoFocus
-              accessibilityLabel="搜索UP主"
-              placeholder="搜索UP主"
-              value={searchText}
-              onChangeText={changeSearchText}
-              onSubmitEditing={submitSearch}
-              returnKeyType="search"
-              submitBehavior="submit"
-              autoCapitalize="none"
-              autoCorrect={false}
-              renderErrorMessage={false}
-              containerClassName="flex-1 px-0"
-              inputContainerClassName={`rounded-lg border-b-0 px-3 ${colors.gray1.bg}`}
-              inputClassName={`text-base ${colors.gray8.text}`}
-              placeholderTextColorClassName={colors.gray6.accent}
-              selectionColorClassName={colors.primary.accent}
-              rightIcon={
-                searchText ? (
-                  <Button
-                    type="clear"
-                    accessibilityLabel="清空搜索"
-                    onPress={() => changeSearchText("")}
-                  >
-                    <Icon name="close" size={20} colorClassName={colors.gray6.accent} />
-                  </Button>
-                ) : undefined
-              }
-            />
-            <Button title="取消" type="clear" onPress={cancelSearch} />
-          </>
-        ) : (
-          <>
-            <Text className={`shrink text-base ${colors.gray7.text}`} numberOfLines={1}>
-              {followSummary}
-            </Text>
-            <Button
-              radius="sm"
-              type="clear"
-              accessibilityLabel="搜索UP主"
-              onPress={() => {
-                setSearchVisible(true);
-              }}
-            >
-              <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
-            </Button>
-          </>
-        )}
-      </View>
+      {searchVisible ? (
+        <View className="flex-row items-center justify-between gap-3 px-4 py-2">
+          <Input
+            autoFocus
+            accessibilityLabel="搜索UP主"
+            placeholder="搜索UP主"
+            value={searchText}
+            onChangeText={changeSearchText}
+            onSubmitEditing={submitSearch}
+            returnKeyType="search"
+            submitBehavior="submit"
+            autoCapitalize="none"
+            autoCorrect={false}
+            renderErrorMessage={false}
+            containerClassName="flex-1 px-0"
+            inputContainerClassName={`rounded-lg border-b-0 px-3 ${colors.gray1.bg}`}
+            inputClassName={`text-base ${colors.gray8.text}`}
+            placeholderTextColorClassName={colors.gray6.accent}
+            selectionColorClassName={colors.primary.accent}
+            rightIcon={
+              searchText ? (
+                <Button
+                  type="clear"
+                  accessibilityLabel="清空搜索"
+                  onPress={() => changeSearchText("")}
+                >
+                  <Icon name="close" size={20} colorClassName={colors.gray6.accent} />
+                </Button>
+              ) : undefined
+            }
+          />
+          <Button title="取消" type="clear" onPress={cancelSearch} />
+        </View>
+      ) : null}
       {searchKeyword ? (
         <UpList keyword={searchKeyword} />
       ) : (

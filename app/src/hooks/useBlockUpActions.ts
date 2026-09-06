@@ -37,7 +37,7 @@ export function useBlockUpActions() {
                 return;
               }
               void logout()
-                .then(() => navigation.navigate("Follow"))
+                .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
                 .catch(() => showToast("退出登录失败，请在设置页重试"));
             },
           },
@@ -61,7 +61,7 @@ export function useBlockUpActions() {
     }
     if (!mutation.account) {
       showToast("请先登录 B站，登录后重新点击拉黑");
-      navigation.navigate("Follow");
+      navigation.navigate("MainTabs", { screen: "Followings" });
       return;
     }
     if (mutation.isMutating) {

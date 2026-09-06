@@ -1,17 +1,15 @@
 import { useNavigation } from "@react-navigation/native";
-import { Badge, Button, Icon, Text } from "@/components/styled/rneui";
+import { Button, Icon, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Animated, ScrollView, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuTrigger, menuOptionClassName } from "@/components/Menu";
 
 import { useAppUpdateInfo } from "@/api/check-update";
 import { colors } from "@/constants/colors.tw";
-import { useUpUpdateCount } from "@/store/derives";
-import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 
 import { useStore } from "../../store";
-import type { NavigationProps } from "../../types";
+import type { MainTabNavigationProp } from "../../types";
 
 function HeaderTitleComp() {
   const { current: opacityValue } = React.useRef(new Animated.Value(0));
@@ -146,43 +144,20 @@ function HeaderLeftComp() {
 }
 
 function HeaderRightComp() {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  const { account, error, isAuthenticated } = useBilibiliSession();
-  const { livingUps } = useStore();
-  const _updatedCount = useUpUpdateCount();
-  const hasLiving = Object.values(livingUps).filter(Boolean).length > 0;
+  const navigation = useNavigation<MainTabNavigationProp>();
   return (
-    <View className="mr-2 flex-row items-center gap-1">
+    <View className="mr-2">
       <Button
         radius={"sm"}
         size="sm"
         type="clear"
+        accessibilityLabel="搜索视频"
         onPress={() => {
           navigation.navigate("SearchVideos");
         }}
       >
         <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
       </Button>
-      <View className="relative">
-        {_updatedCount ? (
-          <Badge
-            status="success"
-            value={_updatedCount}
-            badgeClassName={`absolute left-12 top-1 ${hasLiving ? colors.primary.bg : colors.secondary.bg}`}
-            textClassName="text-[10px]"
-          />
-        ) : null}
-        <Button
-          type="clear"
-          size="sm"
-          loading={account === undefined && !error}
-          onPress={() => {
-            navigation.navigate("Follow");
-          }}
-        >
-          {` ${isAuthenticated ? "我的" : "登录"} ${_updatedCount ? "  " : ""}`}
-        </Button>
-      </View>
     </View>
   );
 }

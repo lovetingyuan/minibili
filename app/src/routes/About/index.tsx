@@ -6,6 +6,7 @@ import Header from "./Banner";
 import BilibiliAccount from "./BilibiliAccount";
 import BlackTags from "./BlackTags";
 import Blacklist from "./Blacklist";
+import LibraryLinks from "./LibraryLinks";
 import SettingsSync from "./SettingsSync";
 import SortCate from "./SortCate";
 import Version from "./Version";
@@ -18,8 +19,10 @@ function About() {
   });
 
   return (
-    <ScrollView className="p-5">
+    <ScrollView contentContainerClassName="p-5 pb-10">
       <Header />
+      <Divider className="my-4" />
+      <LibraryLinks />
       <Divider className="my-4" />
       <View className="gap-2">
         <Version />

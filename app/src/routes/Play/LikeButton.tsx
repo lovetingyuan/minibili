@@ -49,7 +49,7 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
     }
     if (!account) {
       showToast("请先登录 B站，登录后重新点击点赞");
-      navigation.navigate("Follow");
+      navigation.navigate("MainTabs", { screen: "Followings" });
       return;
     }
     if (!aid) {
@@ -74,7 +74,7 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
             onPress: () => {
               if (!active.current || !bilibiliSession.isCurrentAccount(account)) return;
               void logout()
-                .then(() => navigation.navigate("Follow"))
+                .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
                 .catch(() => showToast("退出登录失败，请在设置页重试"));
             },
           },

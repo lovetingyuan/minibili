@@ -54,7 +54,7 @@ function FavoriteButtonContent({
     }
     if (!account) {
       showToast("请先登录 B站，登录后重新点击收藏");
-      navigation.navigate("Follow");
+      navigation.navigate("MainTabs", { screen: "Followings" });
       return;
     }
     if (!video) {
@@ -76,7 +76,7 @@ function FavoriteButtonContent({
           }
           setVisible(false);
           void logout()
-            .then(() => navigation.navigate("Follow"))
+            .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
             .catch(() => {
               showToast("退出登录失败，请在设置页重试");
             });

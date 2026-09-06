@@ -17,12 +17,12 @@ export function useFollowActions() {
   async function act(up: UpInfo, follow: boolean) {
     if (mutation.account === null) {
       showToast("请先登录 B站，登录后重新点击关注");
-      navigation.navigate("Follow");
+      navigation.navigate("MainTabs", { screen: "Followings" });
       return;
     }
     if (!mutation.isReady) {
       showToast("请先完成登录和 B站关注列表同步");
-      navigation.navigate("Follow");
+      navigation.navigate("MainTabs", { screen: "Followings" });
       return;
     }
     try {
@@ -39,9 +39,9 @@ export function useFollowActions() {
                 showToast("登录状态已改变，请重新操作");
                 return;
               }
-              // 用户确认后退出，Follow 页的会话检查会显示已有登录入口。
+              // 用户确认后退出，关注 Tab 的会话检查会显示登录入口。
               void logout()
-                .then(() => navigation.navigate("Follow"))
+                .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
                 .catch(() => {
                   showToast("退出登录失败，请在设置页重试");
                 });

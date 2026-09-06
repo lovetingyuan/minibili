@@ -1,47 +1,127 @@
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Assets as NavigationAssets } from "@react-navigation/elements";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Asset } from "expo-asset";
 
-import { colors } from '@/constants/colors.tw'
-import useResolvedColor from '@/hooks/useResolvedColor'
-import useRouteTheme from '@/hooks/useRouteTheme'
+import { Icon } from "@/components/styled/rneui";
+import { colors } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
+import useRouteTheme from "@/hooks/useRouteTheme";
+import { useStore } from "@/store";
+import type { MainTabParamList, RootStackParamList } from "@/types";
 
-import { useStore } from '../store'
-import type { RootStackParamList } from '../types'
-import About from './About'
-import Dynamic from './Dynamic'
-import { Asset } from 'expo-asset'
-import Follow from './Followings'
-import { followHeaderRight, followHeaderTitle } from './Followings/Header'
-import Play from './Play'
-import SearchVideos from './SearchVideos'
-import VideoList from './VideoList'
+import About from "./About";
+import Dynamic from "./Dynamic";
+import DynamicDetail from "./DynamicDetail";
+import BilibiliAccountGate from "./Followings/BilibiliAccountGate";
+import FavoritesContent from "./Followings/FavoritesContent";
+import FollowingDynamicsContent from "./Followings/FollowingDynamicsContent";
+import FollowingsContent from "./Followings/FollowingsContent";
+import HistoryContent from "./Followings/HistoryContent";
+import Living from "./Living";
+import Play from "./Play";
+import SearchVideos from "./SearchVideos";
+import VideoList from "./VideoList";
+import WebPage from "./WebPage";
+import Welcome from "./Welcome";
 
-import WebPage from './WebPage'
-import Welcome from './Welcome'
+Asset.loadAsync([...NavigationAssets]);
 
-import { Assets as NavigationAssets } from '@react-navigation/elements'
-import Living from './Living'
-import DynamicDetail from './DynamicDetail'
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
-Asset.loadAsync([...NavigationAssets])
+export function FollowingDynamicsRoute() {
+  return <BilibiliAccountGate Content={FollowingDynamicsContent} syncFollowings />;
+}
 
-const Stack = createNativeStackNavigator<RootStackParamList>()
+export function FollowingsRoute() {
+  return <BilibiliAccountGate Content={FollowingsContent} syncFollowings />;
+}
+
+function FavoritesRoute() {
+  return <BilibiliAccountGate Content={FavoritesContent} />;
+}
+
+function HistoryRoute() {
+  return <BilibiliAccountGate Content={HistoryContent} />;
+}
+
+export function MainTabs() {
+  const activeTintColor = useResolvedColor(colors.primary.text);
+  const inactiveTintColor = useResolvedColor(colors.gray6.text);
+  const headerTitleColor = useResolvedColor(colors.gray8.text);
+
+  return (
+    <Tab.Navigator
+      initialRouteName="Hot"
+      screenOptions={{
+        headerTitleStyle: {
+          fontSize: 18,
+          color: headerTitleColor,
+        },
+        tabBarActiveTintColor: activeTintColor,
+        tabBarInactiveTintColor: inactiveTintColor,
+      }}
+    >
+      <Tab.Screen
+        name="Hot"
+        component={VideoList}
+        options={{
+          title: "热门",
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="whatshot" type="material" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="FollowingDynamics"
+        component={FollowingDynamicsRoute}
+        options={{
+          title: "动态",
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="dynamic-feed" type="material" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Followings"
+        component={FollowingsRoute}
+        options={{
+          title: "关注",
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="people-outline" type="material" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Mine"
+        component={About}
+        options={{
+          title: "我的",
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="person-outline" type="material" color={color} size={size} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
 
 function AppRoute() {
-  const routeTheme = useRouteTheme()
-
-  const { $firstRun, initialed } = useStore()
-  const isFirstRun = $firstRun === -1
-  const headerTitleColor = useResolvedColor(colors.gray8.text)
+  const routeTheme = useRouteTheme();
+  const { $firstRun, initialed } = useStore();
+  const isFirstRun = $firstRun === -1;
+  const headerTitleColor = useResolvedColor(colors.gray8.text);
 
   if (!initialed) {
-    return null
+    return null;
   }
 
   return (
     <NavigationContainer theme={routeTheme}>
       <Stack.Navigator
-        initialRouteName={isFirstRun ? 'Welcome' : 'VideoList'}
+        initialRouteName={isFirstRun ? "Welcome" : "MainTabs"}
         screenOptions={{
           headerTransparent: false,
           headerTitleStyle: {
@@ -53,62 +133,40 @@ function AppRoute() {
         <Stack.Screen
           name="Welcome"
           component={Welcome}
-          options={{
-            headerTitle: '欢迎使用 MiniBili',
-          }}
+          options={{ headerTitle: "欢迎使用 MiniBili" }}
         />
-        <Stack.Screen name="VideoList" component={VideoList} />
+        <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
         <Stack.Screen
           name="SearchVideos"
           component={SearchVideos}
-          options={{
-            headerTitle: '搜索视频',
-          }}
+          options={{ headerTitle: "搜索视频" }}
         />
-        <Stack.Screen
-          name="Follow"
-          component={Follow}
-          options={{
-            headerTitle: followHeaderTitle,
-            headerTitleAlign: 'left',
-            headerRight: followHeaderRight,
-          }}
-        />
-        <Stack.Screen
-          name="Dynamic"
-          component={Dynamic}
-          options={{
-            headerTitle: '动态',
-          }}
-        />
+        <Stack.Screen name="Dynamic" component={Dynamic} options={{ headerTitle: "动态" }} />
         <Stack.Screen name="Play" component={Play} />
         <Stack.Screen name="Living" component={Living} />
         <Stack.Screen
           name="DynamicDetail"
           component={DynamicDetail}
-          options={{
-            headerTitle: '动态详情',
-          }}
+          options={{ headerTitle: "动态详情" }}
         />
         <Stack.Screen
-          name={'WebPage'}
+          name="WebPage"
           component={WebPage}
-          options={props => {
-            return {
-              headerTitle: props.route.params.title || '-',
-            }
-          }}
+          options={({ route }) => ({ headerTitle: route.params.title || "-" })}
         />
         <Stack.Screen
-          name="About"
-          component={About}
-          options={{
-            headerTitle: '关于',
-          }}
+          name="Favorites"
+          component={FavoritesRoute}
+          options={{ headerTitle: "我的收藏" }}
+        />
+        <Stack.Screen
+          name="History"
+          component={HistoryRoute}
+          options={{ headerTitle: "观看历史" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
-  )
+  );
 }
 
-export default AppRoute
+export default AppRoute;

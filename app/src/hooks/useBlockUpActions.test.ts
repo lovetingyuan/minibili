@@ -92,7 +92,7 @@ describe("block UP confirmation", () => {
   test("routes logged-out users to login without automatically resuming the block", () => {
     mocks.account = null;
     useBlockUpActions().confirmBlock({ mid: 456, name: "UP" });
-    expect(mocks.navigate).toHaveBeenCalledWith("Follow");
+    expect(mocks.navigate).toHaveBeenCalledWith("MainTabs", { screen: "Followings" });
     expect(mocks.showToast).toHaveBeenCalledWith("请先登录 B站，登录后重新点击拉黑");
     mocks.account = { mid: "123", generation: 2 };
     expect(mocks.alert).not.toHaveBeenCalled();
@@ -137,7 +137,9 @@ describe("block UP confirmation", () => {
     expect(mocks.logout).not.toHaveBeenCalled();
     expect(mocks.showToast).not.toHaveBeenCalled();
     pressButton("重新登录");
-    await vi.waitFor(() => expect(mocks.navigate).toHaveBeenCalledWith("Follow"));
+    await vi.waitFor(() =>
+      expect(mocks.navigate).toHaveBeenCalledWith("MainTabs", { screen: "Followings" }),
+    );
     expect(mocks.logout).toHaveBeenCalledOnce();
     expect(mocks.block).toHaveBeenCalledOnce();
   });
