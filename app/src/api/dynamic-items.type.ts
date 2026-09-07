@@ -126,7 +126,7 @@ export type DynamicItem = {
   additional: DynamicAdditional | null;
   commentId: string;
   commentType: number;
-  stats: { comment: number; like: number; forward: number };
+  stats: { comment: number; like: number; forward: number; liked?: boolean };
   url: string;
   original: DynamicItem | null;
 };

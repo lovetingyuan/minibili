@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { useStore } from "../../store";
 import HotList from "./HotList";
 import Ranks from "./Ranks";
-import { videoListHeaderLeft, videoListHeaderRight, videoListHeaderTitle } from "./Header";
+import { videoListHeaderLeft, videoListHeaderRight } from "./Header";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 function VideoList() {
@@ -12,7 +12,6 @@ function VideoList() {
   useUpdateNavigationOptions({
     headerLeft: videoListHeaderLeft,
     headerTitleAlign: "left",
-    headerTitle: videoListHeaderTitle,
     headerRight: videoListHeaderRight,
   });
 

@@ -40,6 +40,11 @@ function toNumber(value: string | number | null | undefined) {
   return Number.isFinite(result) ? result : 0;
 }
 
+function normalizeText(value: string | null | undefined) {
+  const text = value?.trim();
+  return text && text !== "-" ? text : "";
+}
+
 function optionalUrl(value: string | null | undefined) {
   return value ? normalizeUrl(value) : undefined;
 }
@@ -77,7 +82,9 @@ function normalizeAdditional(item: RawDynamicItem): DynamicAdditional | null {
       ? {
           head: "预约",
           title: reserve.title ?? "预约活动",
-          description: [reserve.desc1?.text, reserve.desc2?.text].filter(Boolean).join(" · "),
+          description: [normalizeText(reserve.desc1?.text), normalizeText(reserve.desc2?.text)]
+            .filter(Boolean)
+            .join(" · "),
           url: optionalUrl(reserve.button?.jump_url || reserve.jump_url),
           actionLabel: reserve.button?.text,
         }
@@ -89,7 +96,7 @@ function normalizeAdditional(item: RawDynamicItem): DynamicAdditional | null {
       ? {
           head: "视频",
           title: ugc.title ?? "关联视频",
-          description: ugc.desc_second ?? "",
+          description: normalizeText(ugc.desc_second),
           cover: optionalUrl(ugc.cover),
           url: optionalUrl(ugc.jump_url),
         }
@@ -101,7 +108,9 @@ function normalizeAdditional(item: RawDynamicItem): DynamicAdditional | null {
       ? {
           head: common.head_text ?? "相关内容",
           title: common.title ?? "相关内容",
-          description: [common.desc1, common.desc2].filter(Boolean).join(" · "),
+          description: [normalizeText(common.desc1), normalizeText(common.desc2)]
+            .filter(Boolean)
+            .join(" · "),
           cover: optionalUrl(common.cover),
           url: optionalUrl(common.button?.jump_url || common.jump_url),
           actionLabel: common.button?.text,
@@ -115,7 +124,9 @@ function normalizeAdditional(item: RawDynamicItem): DynamicAdditional | null {
       ? {
           head: goods.head_text ?? "商品",
           title: first?.name ?? "相关商品",
-          description: [first?.brief, first?.price].filter(Boolean).join(" · "),
+          description: [normalizeText(first?.brief), normalizeText(first?.price)]
+            .filter(Boolean)
+            .join(" · "),
           cover: optionalUrl(first?.cover),
           url: optionalUrl(first?.jump_url || goods.jump_url),
         }
@@ -137,7 +148,7 @@ function normalizeAdditional(item: RawDynamicItem): DynamicAdditional | null {
       ? {
           head: "抽奖",
           title: lottery.title ?? "抽奖活动",
-          description: lottery.desc ?? "",
+          description: normalizeText(lottery.desc),
           url: optionalUrl(lottery.jump_url),
         }
       : null;
@@ -192,7 +203,7 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
       bvid: archive.bvid ?? "",
       cover: optionalUrl(archive.cover) ?? "",
       title: archive.title ?? "视频",
-      description: archive.desc ?? "",
+      description: normalizeText(archive.desc),
       duration: archive.duration_text ?? "",
       play: toNumber(archive.stat?.play),
       danmaku: toNumber(archive.stat?.danmaku),
@@ -204,7 +215,7 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
       return {
         kind: "article",
         title: major.opus.title ?? "专栏",
-        description: major.opus.summary.text,
+        description: normalizeText(major.opus.summary.text),
         cover: images[0]?.src,
         url: optionalUrl(major.opus.jump_url) ?? `https://www.bilibili.com/opus/${item.id_str}`,
         hasMore: major.opus.summary.has_more === true,
@@ -219,7 +230,7 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
     return {
       kind: "article",
       title: major.article.title ?? "专栏",
-      description: major.article.desc ?? "",
+      description: normalizeText(major.article.desc),
       cover: optionalUrl(major.article.covers?.[0]),
       url: optionalUrl(major.article.jump_url) ?? `https://www.bilibili.com/opus/${item.id_str}`,
       hasMore: true,
@@ -230,7 +241,7 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
     return {
       kind: "link",
       title: common.title ?? "相关内容",
-      description: common.desc ?? "",
+      description: normalizeText(common.desc),
       cover: optionalUrl(common.cover),
       url: optionalUrl(common.jump_url),
       label: common.badge?.text || common.label,
@@ -250,7 +261,7 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
     return {
       kind: "link",
       title: major.music.title ?? "音乐",
-      description: major.music.label ?? "",
+      description: normalizeText(major.music.label),
       cover: optionalUrl(major.music.cover),
       url: optionalUrl(major.music.jump_url),
       label: "音乐",
@@ -260,7 +271,9 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
     return {
       kind: "link",
       title: major.live.title ?? "直播",
-      description: [major.live.desc_first, major.live.desc_second].filter(Boolean).join(" · "),
+      description: [normalizeText(major.live.desc_first), normalizeText(major.live.desc_second)]
+        .filter(Boolean)
+        .join(" · "),
       cover: optionalUrl(major.live.cover),
       url: optionalUrl(major.live.jump_url),
       label: major.live.badge?.text || "直播",
@@ -296,7 +309,7 @@ export function mapDynamicItem(item: RawDynamicItem): DynamicItem {
     time: toNumber(author.pub_ts),
     pubAction: author.pub_action,
     top: item.modules.module_tag?.text === "置顶",
-    text: summary?.text ?? "",
+    text: normalizeText(summary?.text),
     richTextNodes: summary?.rich_text_nodes ?? [],
     topic: dynamic.topic
       ? { name: dynamic.topic.name, jump_url: optionalUrl(dynamic.topic.jump_url) ?? "" }
@@ -309,6 +322,7 @@ export function mapDynamicItem(item: RawDynamicItem): DynamicItem {
       comment: toNumber(item.modules.module_stat?.comment.count),
       like: toNumber(item.modules.module_stat?.like.count),
       forward: toNumber(item.modules.module_stat?.forward.count),
+      liked: item.modules.module_stat?.like.status === true,
     },
     url: optionalUrl(item.basic.jump_url) ?? `https://www.bilibili.com/opus/${id}`,
     original: original.success ? mapDynamicItem(original.data) : null,

@@ -239,7 +239,12 @@ const ModulesSchema = z
       .object({
         comment: z.object({ count: StringOrNumberSchema.default(0) }).passthrough(),
         forward: z.object({ count: StringOrNumberSchema.default(0) }).passthrough(),
-        like: z.object({ count: StringOrNumberSchema.default(0) }).passthrough(),
+        like: z
+          .object({
+            count: StringOrNumberSchema.default(0),
+            status: z.boolean().optional(),
+          })
+          .passthrough(),
       })
       .passthrough()
       .nullish(),

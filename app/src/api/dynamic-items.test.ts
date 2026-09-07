@@ -166,6 +166,22 @@ describe("dynamic item mapping", () => {
     expect(item.content.kind).toBe("text");
   });
 
+  it("normalizes dash-only descriptions to empty text", () => {
+    const item = mapDynamicItem(
+      fixture({
+        type: "DYNAMIC_TYPE_WORD",
+        desc: { text: "-", rich_text_nodes: [] },
+        major: {
+          type: "MAJOR_TYPE_COMMON",
+          common: { title: "链接卡", desc: "-" },
+        },
+      }),
+    );
+
+    expect(item.text).toBe("");
+    expect(item.content).toMatchObject({ kind: "link", description: "" });
+  });
+
   it("reuses the mapper for forwarded video and forwarded OPUS", () => {
     const forwardedVideo = fixture({
       id: "forward-video",

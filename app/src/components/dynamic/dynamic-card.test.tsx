@@ -16,6 +16,7 @@ vi.mock("../Additional", () => ({ Additional: "Additional" }));
 vi.mock("../RichTexts", () => ({ default: "RichTexts" }));
 vi.mock("../styled/rneui", () => ({ Avatar: "Avatar", Icon: "Icon", Text: "Text" }));
 vi.mock("../UpName", () => ({ default: "UpName" }));
+vi.mock("./dynamic-actions", () => ({ DynamicActions: "DynamicActions" }));
 vi.mock("./dynamic-media", () => ({ DynamicMedia: "DynamicMedia" }));
 
 import { DynamicCard } from "./dynamic-card";
@@ -51,11 +52,15 @@ function text(node: ReactNode): string {
     .join("");
 }
 
-test("the dynamic card no longer renders a separate navigation action", () => {
+test("keeps the card body pressable and renders the action bar separately", () => {
   const card = DynamicCard({ item, onPress: vi.fn() });
   const directChildren = React.Children.toArray(card.props.children) as ReactElement[];
+  const bodyPressable = directChildren.find((child) => child.type === "Pressable");
 
-  expect(directChildren.some((child) => child.type === "Pressable")).toBe(false);
+  if (!bodyPressable) {
+    throw new Error("Missing body pressable");
+  }
+  expect(directChildren.some((child) => child.type === "DynamicActions")).toBe(true);
   expect(text(card)).not.toContain("播放视频");
   expect(text(card)).not.toContain("查看动态详情");
 });

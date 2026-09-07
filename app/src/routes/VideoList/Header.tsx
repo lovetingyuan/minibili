@@ -1,59 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import { Button, Icon, Text } from "@/components/styled/rneui";
 import React from "react";
-import { Animated, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuTrigger, menuOptionClassName } from "@/components/Menu";
 
-import { useAppUpdateInfo } from "@/api/check-update";
 import { colors } from "@/constants/colors.tw";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 
 import { useStore } from "../../store";
 import type { MainTabNavigationProp } from "../../types";
-
-function HeaderTitleComp() {
-  const { current: opacityValue } = React.useRef(new Animated.Value(0));
-  const appUpdateInfo = useAppUpdateInfo();
-  React.useEffect(() => {
-    const blinkAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacityValue, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityValue, {
-          toValue: 0,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ]),
-    );
-
-    blinkAnimation.start();
-
-    return () => {
-      blinkAnimation.stop();
-    };
-  }, [opacityValue]);
-
-  return appUpdateInfo.hasUpdate ? (
-    <Button
-      type="clear"
-      size="sm"
-      buttonClassName="mx-2"
-      titleClassName={`text-sm ${colors.primary.text}`}
-      onPress={() => {
-        appUpdateInfo.showAlert();
-      }}
-    >
-      有新版本
-      <Animated.View style={{ opacity: opacityValue }}>
-        <Icon name="fiber-new" colorClassName={colors.secondary.accent} size={24} />
-      </Animated.View>
-    </Button>
-  ) : null;
-}
 
 function splitArrayIntoChunks(arr: any[]) {
   const result = [[arr[0]]];
@@ -164,4 +119,3 @@ function HeaderRightComp() {
 
 export const videoListHeaderLeft = () => <HeaderLeftComp />;
 export const videoListHeaderRight = () => <HeaderRightComp />;
-export const videoListHeaderTitle = () => <HeaderTitleComp />;

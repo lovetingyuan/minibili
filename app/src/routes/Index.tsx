@@ -10,6 +10,7 @@ import useResolvedColor from "@/hooks/useResolvedColor";
 import useRouteTheme from "@/hooks/useRouteTheme";
 import { useStore } from "@/store";
 import type { MainTabParamList, RootStackParamList } from "@/types";
+import { useAppUpdateInfo } from "@/api/check-update";
 
 import About from "./About";
 import Dynamic from "./Dynamic";
@@ -51,6 +52,7 @@ export function MainTabs() {
   const activeTintColor = useResolvedColor(colors.primary.text);
   const inactiveTintColor = useResolvedColor(colors.gray6.text);
   const headerTitleColor = useResolvedColor(colors.gray8.text);
+  const { hasUpdate } = useAppUpdateInfo();
 
   return (
     <Tab.Navigator
@@ -100,6 +102,19 @@ export function MainTabs() {
         component={About}
         options={{
           title: "我的",
+          tabBarBadge: hasUpdate ? "新" : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: "#FF6699",
+            color: "#FFFFFF",
+            fontSize: 8,
+            lineHeight: 14,
+            height: 14,
+            minWidth: 14,
+            paddingHorizontal: 3,
+            borderRadius: 7,
+            end: -6,
+            top: 1,
+          },
           tabBarIcon: ({ color, size }) => (
             <Icon name="person-outline" type="material" color={color} size={size} />
           ),

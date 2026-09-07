@@ -185,9 +185,11 @@ function LinkCard(props: {
         <Text className="text-sm font-semibold" numberOfLines={2}>
           {content.title}
         </Text>
-        <Text className={`text-xs ${colors.gray6.text}`} numberOfLines={3}>
-          {content.description}
-        </Text>
+        {content.description ? (
+          <Text className={`text-xs ${colors.gray6.text}`} numberOfLines={3}>
+            {content.description}
+          </Text>
+        ) : null}
         {content.kind === "article" && content.hasMore ? (
           <Text className={`text-xs ${colors.primary.text}`}>查看全文</Text>
         ) : null}

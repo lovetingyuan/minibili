@@ -2,12 +2,13 @@ import { Pressable, View } from "react-native";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
-import { getImagePixelSize, parseDate, parseImgUrl, parseNumber } from "@/utils";
+import { getImagePixelSize, parseDate, parseImgUrl } from "@/utils";
 
 import { Additional } from "../Additional";
 import RichTexts from "../RichTexts";
-import { Avatar, Icon, Text } from "../styled/rneui";
+import { Avatar, Text } from "../styled/rneui";
 import UpName from "../UpName";
+import { DynamicActions } from "./dynamic-actions";
 import { DynamicMedia } from "./dynamic-media";
 
 function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
@@ -87,48 +88,23 @@ function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
   );
 }
 
-function DynamicStats(props: { item: DynamicItem; onPress?: () => void }) {
-  const entries = [
-    { name: "share-outline", value: props.item.stats.forward },
-    { name: "comment-outline", value: props.item.stats.comment },
-    { name: "thumb-up-outline", value: props.item.stats.like },
-  ];
-  return (
-    <View className="flex-row border-t border-neutral-100 pt-3 dark:border-neutral-800">
-      {entries.map((entry) => (
-        <Pressable
-          key={entry.name}
-          onPress={props.onPress}
-          className="flex-1 flex-row items-center justify-center gap-1"
-        >
-          <Icon
-            name={entry.name}
-            type="material-community"
-            size={18}
-            colorClassName={colors.gray6.accent}
-          />
-          <Text className={`text-xs ${colors.gray6.text}`}>
-            {entry.value ? parseNumber(entry.value) : "-"}
-          </Text>
-        </Pressable>
-      ))}
-    </View>
-  );
-}
-
 export function DynamicCard(props: { item: DynamicItem; detail?: boolean; onPress?: () => void }) {
   const { item, detail, onPress } = props;
+  const body = (
+    <>
+      <DynamicAuthorRow item={item} />
+      <DynamicBody item={item} detail={detail} />
+      {item.original ? <ForwardCard item={item.original} detail={detail} /> : null}
+    </>
+  );
   return (
-    <Pressable
-      onPress={onPress}
+    <View
       className={
         detail ? "bg-white px-3 py-4 dark:bg-neutral-950" : "bg-white p-4 dark:bg-neutral-950"
       }
     >
-      <DynamicAuthorRow item={item} />
-      <DynamicBody item={item} detail={detail} />
-      {item.original ? <ForwardCard item={item.original} detail={detail} /> : null}
-      <DynamicStats item={item} onPress={onPress} />
-    </Pressable>
+      {onPress ? <Pressable onPress={onPress}>{body}</Pressable> : <View>{body}</View>}
+      <DynamicActions item={item} onCommentPress={detail ? undefined : onPress} />
+    </View>
   );
 }

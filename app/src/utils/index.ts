@@ -141,6 +141,17 @@ export async function handleShareUp(name: string, mid: number | string, sign: st
   }
 }
 
+export async function handleShareDynamic(title: string, url: string) {
+  try {
+    const message = Array.from(title).slice(0, 40).join("");
+    await Share.share({
+      message: [message, url].filter(Boolean).join("\n"),
+    });
+  } catch {
+    showToast("分享失败");
+  }
+}
+
 export function delay(ms: number) {
   return new Promise((r) => {
     setTimeout(r, ms);

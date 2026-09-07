@@ -12,6 +12,9 @@ vi.mock("@react-navigation/elements", () => ({ Assets: [] }));
 vi.mock("@react-navigation/native", () => ({ NavigationContainer: "NavigationContainer" }));
 vi.mock("expo-asset", () => ({ Asset: { loadAsync: vi.fn() } }));
 vi.mock("@/components/styled/rneui", () => ({ Icon: "Icon" }));
+vi.mock("@/api/check-update", () => ({
+  useAppUpdateInfo: () => ({ hasUpdate: false }),
+}));
 vi.mock("@/constants/colors.tw", () => ({
   colors: { primary: { text: "primary" }, gray6: { text: "gray6" }, gray8: { text: "gray8" } },
 }));
