@@ -1,6 +1,7 @@
-import { Button, Icon, Text } from "@/components/styled/rneui";
 import React from "react";
-import { Image, Linking, Pressable, View } from "react-native";
+import { Image, Linking, Pressable, Share, View } from "react-native";
+
+import { Button, Icon, Text } from "@/components/styled/rneui";
 
 import { githubLink, site } from "../../constants";
 
@@ -21,20 +22,33 @@ function Header() {
         />
       </Pressable>
       <View className="mb-2 flex-row items-center justify-between">
-        <Text className="shrink text-2xl" numberOfLines={2}>
+        <Text className="shrink text-lg" numberOfLines={2}>
           一款简单的B站浏览App
         </Text>
-        <Button
-          radius={"sm"}
-          type="clear"
-          size="sm"
-          containerClassName="self-start"
-          onPress={() => {
-            Linking.openURL(githubLink);
-          }}
-        >
-          <Icon name="github" type="material-community" size={20} />
-        </Button>
+        <View className="flex-row items-center gap-2">
+          <Button
+            radius={"sm"}
+            type="clear"
+            size="sm"
+            onPress={() => {
+              Linking.openURL(githubLink);
+            }}
+          >
+            <Icon name="github" type="material-community" size={20} />
+          </Button>
+          <Button
+            radius={"sm"}
+            type="clear"
+            size="sm"
+            onPress={() => {
+              Share.share({
+                message: `MiniBili - 简单的B站浏览\n点击下载：${site}`,
+              });
+            }}
+          >
+            <Icon name="share" type="material-community" size={20} />
+          </Button>
+        </View>
       </View>
     </>
   );

@@ -11,7 +11,7 @@ function VideoList() {
   const { currentVideosCate } = useStore();
   useUpdateNavigationOptions({
     headerLeft: videoListHeaderLeft,
-    headerTitleAlign: "left",
+    headerTitle: "",
     headerRight: videoListHeaderRight,
   });
 

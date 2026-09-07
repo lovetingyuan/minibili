@@ -3,7 +3,6 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 
 import Header from "./Banner";
-import BilibiliAccount from "./BilibiliAccount";
 import BlackTags from "./BlackTags";
 import Blacklist from "./Blacklist";
 import LibraryLinks from "./LibraryLinks";
@@ -27,7 +26,6 @@ function About() {
       <Divider className="my-4" />
       <View className="gap-2">
         <Version />
-        <BilibiliAccount />
         <SettingsSync />
       </View>
       <Divider className="my-4" />

@@ -50,7 +50,7 @@ function HeaderLeftComp() {
     );
   };
   return (
-    <View className="flex-row items-center gap-4">
+    <View className="ml-2 flex-row items-center gap-4">
       <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
         <MenuTrigger onPress={showMenu}>
           <View className="h-full flex-row items-center">
