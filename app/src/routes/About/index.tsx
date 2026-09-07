@@ -10,12 +10,13 @@ import LibraryLinks from "./LibraryLinks";
 import SettingsSync from "./SettingsSync";
 import SortCate from "./SortCate";
 import Version from "./Version";
-import { headerRight } from "./Header";
+import { headerRight, headerTitle } from "./Header";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 function About() {
   useUpdateNavigationOptions({
     headerRight,
+    headerTitle,
   });
 
   return (
