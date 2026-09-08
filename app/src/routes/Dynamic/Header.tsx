@@ -13,10 +13,11 @@ import { useFollowActions } from "@/hooks/useFollowActions";
 import { useFollowedUpsMap } from "@/store/derives";
 
 import { useLivingInfo } from "../../api/living-info";
+import { useUserRelation } from "../../api/user-relation";
 import { useUserInfo } from "../../api/user-info";
 import { useStore } from "../../store";
 import type { NavigationProps, RootStackParamList } from "../../types";
-import { getImagePixelSize, handleShareUp, parseImgUrl, showToast } from "../../utils";
+import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast } from "../../utils";
 
 export function HeaderLeft() {
   const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
@@ -26,7 +27,7 @@ export function HeaderLeft() {
     ...route.params?.user,
     ...userInfo,
   };
-  // const { data: fans } = useUserRelation(dynamicUser?.mid)
+  const { data: fans } = useUserRelation(dynamicUser?.mid);
   const navigation = useNavigation<NavigationProps["navigation"]>();
   // const gotoWebPage = () => {
   //   if (dynamicUser) {
@@ -40,7 +41,6 @@ export function HeaderLeft() {
   const userName = dynamicUser?.name || ""; // ? dynamicUser.name + level : ''
   // const sex =
   //   dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
-  const { setCheckLiveTimeStamp } = useStore();
   const _followedUpsMap = useFollowedUpsMap();
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
   return (
@@ -59,7 +59,6 @@ export function HeaderLeft() {
             <Pressable
               onPress={() => {
                 if (dynamicUser.mid) {
-                  setCheckLiveTimeStamp(Date.now());
                   navigation.navigate("Living", {
                     title: `${dynamicUser.name}的直播间`,
                     user: { mid: dynamicUser.mid, name: userName },
@@ -84,15 +83,15 @@ export function HeaderLeft() {
         >
           {userName}
         </UpName>
-        {/* {fans ? (
+        {fans ? (
           <Text
-            className="text-sm text-gray-500 dark:text-gray-400"
+            className="ml-2 text-sm text-gray-500 dark:text-gray-400"
             onPress={() => {
               showToast(`粉丝：${fans.follower}`)
             }}>
             {parseNumber(fans.follower)}粉丝
           </Text>
-        ) : null} */}
+        ) : null}
       </View>
     </View>
   );

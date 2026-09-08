@@ -53,6 +53,8 @@ export function MainTabs() {
   const inactiveTintColor = useResolvedColor(colors.gray6.text);
   const headerTitleColor = useResolvedColor(colors.gray8.text);
   const { hasUpdate } = useAppUpdateInfo();
+  const { livingUps } = useStore();
+  const hasLiveUps = Object.keys(livingUps).length > 0;
 
   return (
     <Tab.Navigator
@@ -92,6 +94,19 @@ export function MainTabs() {
         component={FollowingsRoute}
         options={{
           title: "关注",
+          tabBarBadge: hasLiveUps ? "live" : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: "#00AEEC",
+            color: "#FFFFFF",
+            fontSize: 8,
+            lineHeight: 14,
+            height: 14,
+            minWidth: 14,
+            paddingHorizontal: 3,
+            borderRadius: 7,
+            end: -8,
+            top: 1,
+          },
           tabBarIcon: ({ color, size }) => (
             <Icon name="people-outline" type="material" color={color} size={size} />
           ),

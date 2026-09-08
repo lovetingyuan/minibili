@@ -17,13 +17,12 @@ import BilibiliFollowingsManager from "./components/BilibiliFollowingsManager";
 import BilibiliBlacklistManager from "./components/BilibiliBlacklistManager";
 import UserDataManager from "./components/UserDataManager";
 import CheckAppUpdate from "./components/CheckAppUpdate";
-import CheckLiveUps from "./components/CheckLiveUps";
+import LiveUpsManager from "./components/LiveUpsManager";
 import CheckNetState from "./components/CheckNetState";
 import CheckUpUpdate from "./components/CheckUpUpdate";
 import DevServerRecovery from "./components/DevServerRecovery";
 import ImagesView from "./components/ImagesView";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
-import UserLocation from "./components/UserLocation";
 import useRNETheme from "./hooks/useRNETheme";
 import Route from "./routes/Index";
 import ErrorBoundary from "react-native-error-boundary";
@@ -88,10 +87,9 @@ export default function App() {
                 <CheckAppUpdate />
                 <CheckUpUpdate />
                 <CheckNetState />
-                <CheckLiveUps />
+                <LiveUpsManager />
                 <ButtonsOverlay />
                 <ImagesView />
-                <UserLocation />
                 <Route />
               </ErrorBoundary>
             </MenuProvider>

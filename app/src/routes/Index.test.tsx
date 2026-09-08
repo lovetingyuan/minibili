@@ -2,6 +2,10 @@ import React from "react";
 import type { ReactElement, ReactNode } from "react";
 import { expect, test, vi } from "vitest";
 
+const mocks = vi.hoisted(() => ({
+  livingUps: {} as Record<string, string>,
+}));
+
 vi.mock("@react-navigation/bottom-tabs", () => ({
   createBottomTabNavigator: () => ({ Navigator: "TabNavigator", Screen: "TabScreen" }),
 }));
@@ -20,7 +24,9 @@ vi.mock("@/constants/colors.tw", () => ({
 }));
 vi.mock("@/hooks/useResolvedColor", () => ({ default: (value: string) => value }));
 vi.mock("@/hooks/useRouteTheme", () => ({ default: () => ({}) }));
-vi.mock("@/store", () => ({ useStore: () => ({ $firstRun: 1, initialed: true }) }));
+vi.mock("@/store", () => ({
+  useStore: () => ({ $firstRun: 1, initialed: true, livingUps: mocks.livingUps }),
+}));
 vi.mock("./About", () => ({ default: "About" }));
 vi.mock("./Dynamic", () => ({ default: "Dynamic" }));
 vi.mock("./DynamicDetail", () => ({ default: "DynamicDetail" }));
@@ -43,7 +49,12 @@ import AppRoute, { FollowingDynamicsRoute, FollowingsRoute, MainTabs } from "./I
 type TabScreenProps = {
   name: string;
   component: React.ComponentType;
-  options: { title: string; headerTitle?: string };
+  options: {
+    title: string;
+    headerTitle?: string;
+    tabBarBadge?: string | number;
+    tabBarBadgeStyle?: Record<string, unknown>;
+  };
 };
 
 function tabScreens(node: ReactNode) {
@@ -86,6 +97,19 @@ test("main tabs keep the requested order, labels, and default route", () => {
   expect(screens[0].props.component).toBe("VideoList");
   expect(screens[1].props.options.headerTitle).toBe("关注的动态");
   expect(screens[3].props.component).toBe("About");
+});
+
+test("followings tab shows the live badge only while followed ups are live", () => {
+  mocks.livingUps = { 1625060795: "https://live.bilibili.com/25334922" };
+  const withBadge = tabScreens(MainTabs());
+  expect(withBadge[2].props.options.tabBarBadge).toBe("live");
+  expect(withBadge[2].props.options.tabBarBadgeStyle).toMatchObject({
+    backgroundColor: "#00AEEC",
+  });
+
+  mocks.livingUps = {};
+  const withoutBadge = tabScreens(MainTabs());
+  expect(withoutBadge[2].props.options.tabBarBadge).toBeUndefined();
 });
 
 test("account tabs render their direct list content through the shared gate", () => {

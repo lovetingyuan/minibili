@@ -2,7 +2,7 @@ import useSWRInfinite from "swr/infinite";
 import type { z } from "zod";
 
 import type { VideoItemResponseSchema } from "./hot-videos.schema";
-import fetcher from "./fetcher";
+import request from "./fetcher";
 
 export type HotVideoResponse = z.infer<typeof VideoItemResponseSchema>;
 
@@ -43,7 +43,7 @@ export function useHotVideos(t: number) {
     (index) => {
       return `/x/web-interface/popular?ps=30&pn=${index + 1}&_t=${t}`;
     },
-    fetcher,
+    (key) => request(key, { withCookie: false }),
     {
       revalidateFirstPage: false,
       // revalidateAll: true,

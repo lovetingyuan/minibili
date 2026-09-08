@@ -18,8 +18,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
     item: { face, name, sign, mid },
     index,
   } = props;
-  const { $upUpdateMap, set$upUpdateMap, livingUps, setOverlayButtons, setCheckLiveTimeStamp } =
-    useStore();
+  const { $upUpdateMap, set$upUpdateMap, livingUps, setOverlayButtons } = useStore();
   const actions = useFollowActions();
   const pins = usePinnedUps();
   const isPinned = pins.pinnedUpIds.includes(mid.toString());
@@ -42,7 +41,6 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
   const gotoLivePage = () => {
     const liveUrl = livingUps[mid];
     if (liveUrl) {
-      setCheckLiveTimeStamp(Date.now());
       navigation.navigate("Living", {
         url: liveUrl,
         title: `${name}的直播间`,

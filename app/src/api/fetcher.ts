@@ -25,6 +25,8 @@ export class ApiError extends Error {
   }
 }
 
+export type RequestOptions = { withCookie?: boolean };
+
 // const root = protobuf.Root.fromJSON(dm as any)
 // const lp = root.lookupType('DmSegMobileReply')
 
@@ -35,7 +37,10 @@ if (typeof __DEV__ === "undefined") {
   } catch {}
 }
 
-export default async function request<D>(url: string): Promise<D> {
+export default async function request<D>(
+  url: string,
+  requestOptions: RequestOptions = {},
+): Promise<D> {
   let requestUrl = url.startsWith("http") ? url : `https://api.bilibili.com${url}`;
   if (__DEV__) {
     // oxlint-disable-next-line no-console
@@ -89,7 +94,9 @@ export default async function request<D>(url: string): Promise<D> {
   //   })
   //   return objects.elems
   // }
-  let resText = await bilibiliFetch(requestUrl, options).then((r) => r.text());
+  let resText = await bilibiliFetch(requestUrl, options, requestOptions.withCookie !== false).then(
+    (r) => r.text(),
+  );
   const index = resText.indexOf('}{"code":');
   if (index > -1) {
     resText = resText.substring(index + 1);

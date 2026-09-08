@@ -115,15 +115,9 @@ function LiveWebPage({ route }: Props) {
     handleRenderProcessGone,
     handleContentProcessDidTerminate,
   } = useRecoverableWebView();
-  const { webViewMode, setCheckLiveTimeStamp } = useStore();
+  const { webViewMode } = useStore();
   // const [pageTitle, setPageTitle] = React.useState(title)
 
-  React.useEffect(() => {
-    return () => {
-      setCheckLiveTimeStamp(Date.now());
-    };
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   useUpdateNavigationOptions({
     headerRight: () => (
       <HeaderRight

@@ -47,7 +47,6 @@ const getAppValue = () => {
     overlayButtons: [] as { text: string; onPress: () => void }[],
     moreRepliesUrl: "",
     repliesInfo: null as RepliesInfo | null,
-    checkLiveTimeStamp: Date.now(),
     releaseList: [] as {
       version: string;
       changelog: string;

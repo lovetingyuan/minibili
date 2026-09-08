@@ -5,6 +5,7 @@ vi.mock("./get-cookie", () => ({ getCookie: vi.fn(async () => "SESSDATA=saved; D
 import bilibiliFetch from "./bilibili-fetch";
 
 afterEach(() => {
+  vi.clearAllMocks();
   vi.unstubAllGlobals();
 });
 
@@ -24,5 +25,16 @@ describe("Bilibili request credentials", () => {
     const options = { credentials: "include" } satisfies RequestInit;
     await bilibiliFetch("https://minibili.tingyuan.in/api/test", options);
     expect(request).toHaveBeenCalledWith("https://minibili.tingyuan.in/api/test", options);
+  });
+
+  test("skips the cookie entirely when disabled", async () => {
+    const request = vi.fn<typeof fetch>().mockResolvedValue(Response.json({}));
+    vi.stubGlobal("fetch", request);
+    const { getCookie } = await import("./get-cookie");
+    await bilibiliFetch("https://api.bilibili.com/x/test", {}, false);
+    const options = request.mock.calls[0][1];
+    expect(options?.credentials).toBe("omit");
+    expect(new Headers(options?.headers).get("cookie")).toBeNull();
+    expect(getCookie).not.toHaveBeenCalled();
   });
 });
