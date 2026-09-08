@@ -21,13 +21,12 @@ function About() {
   return (
     <ScrollView contentContainerClassName="p-5 pb-10">
       <Header />
-      <Divider className="my-4" />
-      <LibraryLinks />
-      <Divider className="my-4" />
       <View className="gap-2">
         <Version />
         <SettingsSync />
       </View>
+      <Divider className="my-4" />
+      <LibraryLinks />
       <Divider className="my-4" />
       <BlackTags />
       <Blacklist />
