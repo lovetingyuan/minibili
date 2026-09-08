@@ -338,7 +338,6 @@ export function buildDynamicListUrl(mid: string | number, offset = "") {
       timezone_offset: "-480",
       platform: "web",
       features: DYNAMIC_FEATURES,
-      web_location: "333.1387",
     }).toString()
   );
 }

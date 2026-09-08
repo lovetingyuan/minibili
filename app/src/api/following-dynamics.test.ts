@@ -77,7 +77,6 @@ describe("following dynamics paging", () => {
       type: "all",
       platform: "web",
       page: "1",
-      web_location: "333.1365",
     });
     expect(first.searchParams.has("offset")).toBe(false);
     expect(first.searchParams.get("features")).toContain("eva3CardVideo");
@@ -153,9 +152,8 @@ describe("following dynamics paging", () => {
 });
 
 describe("following dynamics nav", () => {
-  test("builds nav requests with the fixed web_location and optional delta fields", () => {
+  test("builds nav requests with optional delta fields", () => {
     const base = new URL(buildFollowingDynamicsNavUrl(), "https://api.bilibili.com");
-    expect(base.searchParams.get("web_location")).toBe("333.1007");
     expect(base.searchParams.has("update_baseline")).toBe(false);
     expect(base.searchParams.has("offset")).toBe(false);
 

@@ -16,7 +16,7 @@ export class FollowingsCancelledError extends Error {
 }
 
 function getFollowingUrl(vmid: string, page: number) {
-  return `/x/relation/followings?order=desc&order_type=&vmid=${encodeURIComponent(vmid)}&pn=${page}&ps=${FOLLOWINGS_PAGE_SIZE}&gaia_source=main_web&web_location=333.1387`;
+  return `/x/relation/followings?order=desc&order_type=&vmid=${encodeURIComponent(vmid)}&pn=${page}&ps=${FOLLOWINGS_PAGE_SIZE}&gaia_source=main_web`;
 }
 
 function toUpInfo(item: FollowingItem): UpInfo {

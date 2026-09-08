@@ -45,7 +45,6 @@ export function buildFollowingDynamicsUrl(page = 1, offset = "") {
     platform: "web",
     page: String(page),
     features: FOLLOWING_DYNAMIC_FEATURES,
-    web_location: "333.1365",
     "x-bili-device-req-json": FOLLOWING_DYNAMIC_DEVICE,
   });
   if (offset) params.set("offset", offset);
@@ -53,12 +52,11 @@ export function buildFollowingDynamicsUrl(page = 1, offset = "") {
 }
 
 export function buildFollowingDynamicsNavUrl(updateBaseline = "", offset = "") {
-  const params = new URLSearchParams({
-    web_location: "333.1007",
-  });
+  const params = new URLSearchParams();
   if (updateBaseline) params.set("update_baseline", updateBaseline);
   if (offset) params.set("offset", offset);
-  return `/x/polymer/web-dynamic/v1/feed/nav?${params}`;
+  const query = params.toString();
+  return query ? `/x/polymer/web-dynamic/v1/feed/nav?${query}` : "/x/polymer/web-dynamic/v1/feed/nav";
 }
 
 export function getFollowingDynamicsKey(

@@ -80,7 +80,7 @@ export async function fetchVideoRelation(
   isCurrent: () => boolean,
 ) {
   assertVideo(video);
-  const query = new URLSearchParams({ aid: video.aid, bvid: video.bvid, web_location: "333.788" });
+  const query = new URLSearchParams({ aid: video.aid, bvid: video.bvid });
   return VideoRelationSchema.parse(
     await readForAccount(`/x/web-interface/archive/relation?${query}`, request, isCurrent),
   );
@@ -97,7 +97,6 @@ export async function fetchVideoFavoriteFolders(
     up_mid: account.mid,
     type: "2",
     rid: video.aid,
-    web_location: "333.1387",
   });
   return VideoFavoriteFoldersSchema.parse(
     await readForAccount(`/x/v3/fav/folder/created/list-all?${query}`, request, isCurrent),

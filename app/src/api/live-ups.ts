@@ -6,7 +6,7 @@ import fetcher from "./fetcher";
 import { LiveUpsDataSchema } from "./live-ups.schema";
 import type { LiveUpsData } from "./live-ups.schema";
 
-const LIVE_UPS_URL = "/x/polymer/web-dynamic/v1/live-up?web_location=333.1007";
+const LIVE_UPS_URL = "/x/polymer/web-dynamic/v1/live-up";
 
 export async function fetchLiveUps() {
   const payload = await fetcher(LIVE_UPS_URL);

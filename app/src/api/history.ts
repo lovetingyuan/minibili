@@ -47,7 +47,6 @@ export async function fetchBilibiliHistory(
     business: cursor.business,
     ps: String(HISTORY_PAGE_SIZE),
     type: "archive",
-    web_location: "333.1391",
   });
   try {
     const data = await request(`/x/web-interface/history/cursor?${params}`);

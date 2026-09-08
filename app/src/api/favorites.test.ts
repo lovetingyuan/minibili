@@ -55,9 +55,7 @@ describe("Bilibili favorite folders and resources", () => {
       request,
       () => true,
     );
-    expect(request.mock.calls[0][0]).toBe(
-      "/x/v3/fav/folder/created/list-all?up_mid=98765&web_location=333.1387",
-    );
+    expect(request.mock.calls[0][0]).toBe("/x/v3/fav/folder/created/list-all?up_mid=98765");
     expect(result.list.map((item) => item.title)).toEqual(["默认收藏夹", "研究生学习"]);
   });
 
@@ -74,7 +72,6 @@ describe("Bilibili favorite folders and resources", () => {
       type: "0",
       tid: "0",
       platform: "web",
-      web_location: "333.1387",
     });
     expect(url.searchParams.get("media_id")).not.toBe(String(folder.fid));
   });

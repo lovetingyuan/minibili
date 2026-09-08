@@ -53,7 +53,7 @@ export async function fetchBilibiliFavoriteFolders(
   request: FavoriteRequest,
   isCurrentAccount: () => boolean,
 ) {
-  const url = `/x/v3/fav/folder/created/list-all?up_mid=${encodeURIComponent(account.mid)}&web_location=333.1387`;
+  const url = `/x/v3/fav/folder/created/list-all?up_mid=${encodeURIComponent(account.mid)}`;
   return FavoriteFoldersSchema.parse(
     await requestForCurrentAccount(url, request, isCurrentAccount),
   );
@@ -65,7 +65,7 @@ export async function fetchBilibiliFavoriteResources(
   request: FavoriteRequest,
   isCurrentAccount: () => boolean,
 ) {
-  const url = `/x/v3/fav/resource/list?media_id=${folderId}&pn=${page}&ps=${FAVORITE_PAGE_SIZE}&keyword=&order=mtime&type=0&tid=0&platform=web&web_location=333.1387`;
+  const url = `/x/v3/fav/resource/list?media_id=${folderId}&pn=${page}&ps=${FAVORITE_PAGE_SIZE}&keyword=&order=mtime&type=0&tid=0&platform=web`;
   const data = FavoriteResourcesSchema.parse(
     await requestForCurrentAccount(url, request, isCurrentAccount),
   );

@@ -40,7 +40,6 @@ describe("Bilibili cursor history", () => {
       business: "",
       ps: "20",
       type: "archive",
-      web_location: "333.1391",
     });
     expect(getHistoryKey(account, 0, null)).toEqual(["bilibili-history", "123", 4, "0", 0, "", 0]);
     expect(getHistoryKey(account, 1, first)).toEqual([

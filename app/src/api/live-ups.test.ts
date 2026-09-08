@@ -48,9 +48,7 @@ test("fetchLiveUps requests the live-up endpoint and parses items", async () => 
 
   const result = await fetchLiveUps();
 
-  expect(mocks.fetcher).toHaveBeenCalledWith(
-    "/x/polymer/web-dynamic/v1/live-up?web_location=333.1007",
-  );
+  expect(mocks.fetcher).toHaveBeenCalledWith("/x/polymer/web-dynamic/v1/live-up");
   expect(result).toEqual(liveUpsData);
 });
 

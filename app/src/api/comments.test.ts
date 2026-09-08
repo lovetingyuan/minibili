@@ -84,7 +84,6 @@ describe("reply-list", () => {
     const firstParams = new URL(firstUrl!, "https://api.bilibili.com").searchParams;
     expect(firstParams.get("pagination_str")).toBe('{"offset":""}');
     expect(firstParams.get("plat")).toBe("1");
-    expect(firstParams.get("web_location")).toBe("1315875");
 
     const nextUrl = getCommentsPageUrl("117142179616374", 1, 2, {
       is_end: false,

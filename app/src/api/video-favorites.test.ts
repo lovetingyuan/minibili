@@ -63,10 +63,10 @@ describe("video favorite reads", () => {
     const result = await fetchVideoFavoriteFolders(account, video, request, () => true);
     expect(result.list[0].fav_state).toBe(1);
     expect(request.mock.calls[0][0]).toBe(
-      `/x/web-interface/archive/relation?aid=${video.aid}&bvid=${video.bvid}&web_location=333.788`,
+      `/x/web-interface/archive/relation?aid=${video.aid}&bvid=${video.bvid}`,
     );
     expect(request.mock.calls[1][0]).toBe(
-      `/x/v3/fav/folder/created/list-all?up_mid=123&type=2&rid=${video.aid}&web_location=333.1387`,
+      `/x/v3/fav/folder/created/list-all?up_mid=123&type=2&rid=${video.aid}`,
     );
   });
 

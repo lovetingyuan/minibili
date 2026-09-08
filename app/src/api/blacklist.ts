@@ -26,7 +26,6 @@ export async function fetchBilibiliBlacklist(
       pn: String(page),
       ps: String(PAGE_SIZE),
       jsonp: "jsonp",
-      web_location: "333.33",
       "x-bili-redirect": "1",
     });
     const payload = await request(`/x/relation/blacks?${query}`);

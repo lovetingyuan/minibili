@@ -188,7 +188,7 @@ export function getCommentsPageUrl(
     return null;
   }
   const pagination = encodeURIComponent(JSON.stringify({ offset: offset || "" }));
-  return `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&pagination_str=${pagination}&plat=1&seek_rpid=&web_location=1315875`;
+  return `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&pagination_str=${pagination}&plat=1&seek_rpid=`;
 }
 
 // https://api.bilibili.com/x/v2/reply/main?csrf=dec0b143f0b4817a39b305dca99a195c&mode=3&next=4&oid=259736997&plat=1&type=1

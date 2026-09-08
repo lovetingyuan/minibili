@@ -11,7 +11,6 @@ const querys = [
   ["pagination_str", '{"offset":""}'],
   ["plat", "1"],
   ["seek_rpid", ""],
-  ["web_location", "1315875"],
   // ['w_rid', '154ee21628c4026eb397b14c3dbda3e2'],
   // ['wts', '1706280981'],
 ];

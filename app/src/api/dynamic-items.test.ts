@@ -314,7 +314,6 @@ describe("dynamic paging schema", () => {
 
     expect(page.items).toHaveLength(3);
     expect(query.get("platform")).toBe("web");
-    expect(query.get("web_location")).toBe("333.1387");
     expect(query.get("timezone_offset")).toBe("-480");
     expect(query.get("features")).toContain("itemOpusStyle");
     expect(getDynamicPageKey(1567446009, 1, page)).toContain("offset=next-offset");
