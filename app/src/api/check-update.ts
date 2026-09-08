@@ -10,7 +10,12 @@ export const fetchVersion = () => {
   return fetch(
     "https://tingyuan.in/api/github/releases?user=lovetingyuan&repo=minibili&_t=" + Date.now(),
   )
-    .then((r) => r.json())
+    .then((r) => {
+      if (!r.ok) {
+        throw new Error("检查更新失败：" + r.status);
+      }
+      return r.json();
+    })
     .then((r) => {
       if (r.code !== 0) {
         throw new Error(r.code + ":" + r.message);

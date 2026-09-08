@@ -42,20 +42,18 @@ export const useSearchVideos = (name: string) => {
   const bvidMap: Record<string, boolean> = {};
   const list = data?.reduce((a, b) => {
     if (b.result) {
-      return a.concat(
-        b.result
-          .filter((v) => {
-            if (v.type !== "video") {
-              return false;
-            }
-            if (v.bvid in bvidMap) {
-              return false;
-            }
-            bvidMap[v.bvid] = true;
-            return true;
-          })
-          .map(getVideoInfo),
-      );
+      const pageList: SearchedVideoType[] = [];
+      for (const v of b.result) {
+        if (v.type !== "video") {
+          continue;
+        }
+        if (v.bvid in bvidMap) {
+          continue;
+        }
+        bvidMap[v.bvid] = true;
+        pageList.push(getVideoInfo(v));
+      }
+      return a.concat(pageList);
     }
     return a;
   }, [] as SearchedVideoType[]);

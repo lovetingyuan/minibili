@@ -78,14 +78,14 @@ function HeaderLeftComp() {
             {list.map((items, i) => {
               if (i === 0) {
                 return (
-                  <View key={i} className="w-48 flex-1">
+                  <View key={items[0].rid} className="w-48 flex-1">
                     <View>{getItem(items[0])}</View>
                     <View className={`flex-1 border-b-[0.5px] ${colors.gray3.border}`} />
                   </View>
                 );
               }
               return (
-                <View key={i} className="w-48 flex-row">
+                <View key={items[0].rid} className="w-48 flex-row">
                   <View className="w-[50%]">{getItem(items[0])}</View>
                   {items[1] ? <View className="w-[50%]">{getItem(items[1])}</View> : null}
                 </View>

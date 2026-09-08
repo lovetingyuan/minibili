@@ -163,9 +163,12 @@ const getCommentItem = (item: CommentResItem, type: number, top: boolean) => {
 };
 
 export const getComments = (response: CommentResponse, type: number) => {
-  const replies = (response.replies || [])
-    .filter((item) => !item.invisible)
-    .map((item) => getCommentItem(item, type, false));
+  const replies: ReturnType<typeof getCommentItem>[] = [];
+  for (const item of response.replies || []) {
+    if (!item.invisible) {
+      replies.push(getCommentItem(item, type, false));
+    }
+  }
   if (response.top?.upper) {
     replies.unshift(getCommentItem(response.top.upper, type, true));
   }

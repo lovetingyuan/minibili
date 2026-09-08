@@ -13,9 +13,14 @@ function __$hack() {
   };
   const roomId = window.location.pathname.split("/").pop();
   fetch(`https://api.live.bilibili.com/xlive/web-room/v1/index/getH5InfoByRoom?room_id=${roomId}`)
-    .then((res) => res.json())
     .then((res) => {
-      if (res.code === 0) {
+      if (!res.ok) {
+        return null;
+      }
+      return res.json();
+    })
+    .then((res) => {
+      if (res?.code === 0) {
         waitDom(".web-player-danmaku", (dom) => {
           dom.nextElementSibling?.click();
           setTimeout(() => {

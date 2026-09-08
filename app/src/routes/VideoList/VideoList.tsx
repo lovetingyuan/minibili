@@ -48,9 +48,10 @@ function VideoList(props: {
   const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null);
   const currentVideoRef = React.useRef<VideoItemType | null>(null);
   React.useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       listRef.current?.scrollToOffset({ offset: 0, animated: false });
     });
+    return () => clearTimeout(timer);
   }, [currentVideosCate]);
   React.useEffect(() => {
     if (props.type !== "Hot" || !props.onTabReselect) {

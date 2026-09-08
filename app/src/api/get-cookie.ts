@@ -85,7 +85,12 @@ function getbuvid4(buvid3: string, uuid: string) {
     mode: "cors",
     credentials: "include",
   })
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("get buvid4 failed");
+      }
+      return res.json();
+    })
     .then((res) => {
       return res.data.b_4.replaceAll("=", "%3D");
     });

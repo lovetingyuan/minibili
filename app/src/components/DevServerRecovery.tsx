@@ -15,7 +15,9 @@ export default function DevServerRecovery() {
 
     const subscription = AppState.addEventListener("change", (nextState) => {
       if (nextState === "background") {
-        backgroundedAt ??= Date.now();
+        if (backgroundedAt === undefined) {
+          backgroundedAt = Date.now();
+        }
         return;
       }
 

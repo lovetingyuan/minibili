@@ -10,6 +10,12 @@ import { useBilibiliSessionActions } from "../features/bilibili-session/useBilib
 import type { NavigationProps } from "../types";
 import { showToast } from "../utils";
 
+function assertAccountIsCurrent(account: RelationAccount) {
+  if (!bilibiliSession.isCurrentAccount(account)) {
+    throw new BilibiliSessionChangedError();
+  }
+}
+
 export function useBlockUpActions() {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const mutation = useBlockUp();
@@ -17,13 +23,9 @@ export function useBlockUpActions() {
 
   async function submit(up: BlockRelationChange["up"], account: RelationAccount) {
     try {
-      if (!bilibiliSession.isCurrentAccount(account)) {
-        throw new BilibiliSessionChangedError();
-      }
+      assertAccountIsCurrent(account);
       await mutation.block(up, account);
-      if (!bilibiliSession.isCurrentAccount(account)) {
-        throw new BilibiliSessionChangedError();
-      }
+      assertAccountIsCurrent(account);
       showToast("已拉黑");
     } catch (error) {
       if (error instanceof RelationLoginRequiredError) {

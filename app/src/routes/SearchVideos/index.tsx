@@ -59,10 +59,11 @@ function SearchVideos() {
   });
 
   React.useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       searchBarRef.current?.focus();
       searchBarRef.current?.setText("");
     }, 200);
+    return () => clearTimeout(timer);
   }, []);
 
   return (

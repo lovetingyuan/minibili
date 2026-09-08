@@ -3,7 +3,14 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 // import { Text } from '@/components/styled/rneui'
 // import { ResizeMode, Video } from 'expo-av'
 import React from "react";
-import { Dimensions, Image, RefreshControl, ScrollView, useColorScheme, View } from "react-native";
+import {
+  Image,
+  RefreshControl,
+  ScrollView,
+  useColorScheme,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import BilibiliWebView from "@/components/BilibiliWebView";
 
 // import useLiveUrl from '@/api/get-live-url'
@@ -75,7 +82,8 @@ function WebPage({ route }: Props) {
   } = useRecoverableWebView();
   const { webViewMode } = useStore();
   const isDark = useColorScheme() === "dark";
-  const [height, setHeight] = React.useState(Dimensions.get("screen").height);
+  const { height: screenHeight } = useWindowDimensions();
+  const [height, setHeight] = React.useState(screenHeight);
   const [isEnabled, setEnabled] = React.useState(true);
   const [pageTitle, setPageTitle] = React.useState(title);
   const { isRefreshing, onRefresh } = useRefresh(() => {

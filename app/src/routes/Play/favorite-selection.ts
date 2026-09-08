@@ -5,7 +5,12 @@ export function createFavoriteSelection(
   folders: VideoFavoriteFolder[],
   desiredIds?: number[],
 ): FavoriteSelection {
-  const initialIds = folders.filter((folder) => folder.fav_state === 1).map((folder) => folder.id);
+  const initialIds: number[] = [];
+  for (const folder of folders) {
+    if (folder.fav_state === 1) {
+      initialIds.push(folder.id);
+    }
+  }
   const available = new Set(folders.map((folder) => folder.id));
   return {
     folders,

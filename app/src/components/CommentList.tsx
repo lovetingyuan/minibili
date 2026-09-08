@@ -10,6 +10,8 @@ import { type CommentItemType, useComments } from "../api/comments";
 import { Comment } from "./Comment";
 import ReplyList from "./ReplyList";
 
+const LOADING_COMMENT_WIDTHS = [78, 62, 90, 45, 72, 55, 85, 68, 40, 95];
+
 function Loading() {
   return (
     <View>
@@ -20,7 +22,11 @@ function Loading() {
             <View className="mb-5 flex-1 gap-1" key={i}>
               <Skeleton animation="wave" width="100%" height={16} />
               {i % 2 ? <Skeleton animation="wave" width="100%" height={16} /> : null}
-              <Skeleton animation="wave" width={`${Math.random() * 100}%`} height={16} />
+              <Skeleton
+                animation="wave"
+                width={`${LOADING_COMMENT_WIDTHS[i % LOADING_COMMENT_WIDTHS.length]}%`}
+                height={16}
+              />
             </View>
           );
         })}
