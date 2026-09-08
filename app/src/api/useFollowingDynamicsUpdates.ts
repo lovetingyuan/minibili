@@ -4,8 +4,8 @@ import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import { useStore } from "../store";
 import request from "./fetcher";
-import { fetchFollowingDynamicsNav } from "./following-dynamics";
-import type { FollowingDynamicsNavResponse } from "./following-dynamics-nav.schema";
+import { fetchFollowingDynamicsUpdateCount } from "./following-dynamics";
+import type { FollowingDynamicsUpdateCount } from "./following-dynamics-update.schema";
 
 const FOLLOWING_DYNAMICS_UPDATES_KEY = "bilibili-following-dynamics-updates";
 const FOLLOWING_DYNAMICS_UPDATES_INTERVAL = 30 * 60 * 1000;
@@ -22,13 +22,13 @@ export function useFollowingDynamicsUpdates() {
       : null
     : null;
 
-  return useSWR<FollowingDynamicsNavResponse, Error>(
+  return useSWR<FollowingDynamicsUpdateCount, Error>(
     key,
     () => {
       if (!account || !baseline) {
         throw new Error("动态更新轮询缺少当前账号或动态基线");
       }
-      return fetchFollowingDynamicsNav(
+      return fetchFollowingDynamicsUpdateCount(
         baseline,
         request,
         () => bilibiliSession.isCurrentAccount(account),

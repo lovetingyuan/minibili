@@ -1,6 +1,6 @@
 import React from "react";
 
-import { getFollowingDynamicsNavState } from "@/api/following-dynamics";
+import { getFollowingDynamicsUpdateCount } from "@/api/following-dynamics";
 import { useFollowingDynamicsUpdates } from "@/api/useFollowingDynamicsUpdates";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSessionState } from "@/features/bilibili-session/useBilibiliSession";
@@ -30,14 +30,15 @@ function FollowingDynamicsUpdatesManager() {
       return;
     }
 
-    const next = getFollowingDynamicsNavState(current?.baseline, data);
+    const count = getFollowingDynamicsUpdateCount(data);
     methods.set$followingDynamicsUpdateMap({
       ...updateMap,
       [mid]: {
-        ...next,
+        baseline: current.baseline,
+        count,
       },
     });
-    methods.setFollowingDynamicsUpdateCount(next.count);
+    methods.setFollowingDynamicsUpdateCount(count);
   }, [account, data]);
 
   return null;

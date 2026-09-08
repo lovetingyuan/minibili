@@ -2,17 +2,13 @@ import { describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { DynamicItemResponseSchema, DynamicListResponseSchema } from "./dynamic-items.schema";
+import { FollowingDynamicsUpdateCountSchema } from "./following-dynamics-update.schema";
 import {
-  FollowingDynamicsNavResponseSchema,
-} from "./following-dynamics-nav.schema";
-import {
-  buildFollowingDynamicsNavUrl,
+  buildFollowingDynamicsUpdateUrl,
   buildFollowingDynamicsUrl,
-  fetchFollowingDynamicsNav,
+  fetchFollowingDynamicsUpdateCount,
   fetchFollowingDynamicsPage,
-  getFollowingDynamicsNavBaseline,
-  getFollowingDynamicsNavCount,
-  getFollowingDynamicsNavState,
+  getFollowingDynamicsUpdateCount,
   getFollowingDynamicsLatestId,
   getFollowingDynamicsKey,
   getFollowingDynamicsListItems,
@@ -55,17 +51,9 @@ function page(ids: string[], offset = "next", hasMore = true) {
   });
 }
 
-function navPage(values: {
-  updateBaseline?: string;
-  updateNum?: string | number;
-  ids?: string[];
-}) {
-  return FollowingDynamicsNavResponseSchema.parse({
-    has_more: true,
-    offset: "next",
-    update_baseline: values.updateBaseline,
-    update_num: values.updateNum,
-    items: (values.ids ?? ["3", "2", "1"]).map((id_str) => ({ id_str })),
+function updatePage(values: { updateNum?: string | number }) {
+  return FollowingDynamicsUpdateCountSchema.parse({
+    update_num: values.updateNum ?? 0,
   });
 }
 
@@ -151,51 +139,35 @@ describe("following dynamics paging", () => {
   });
 });
 
-describe("following dynamics nav", () => {
-  test("builds nav requests with optional delta fields", () => {
-    const base = new URL(buildFollowingDynamicsNavUrl(), "https://api.bilibili.com");
+describe("following dynamics update count", () => {
+  test("builds update count requests with type and optional baseline", () => {
+    const base = new URL(buildFollowingDynamicsUpdateUrl(), "https://api.bilibili.com");
+    expect(base.pathname).toBe("/x/polymer/web-dynamic/v1/feed/all/update");
+    expect(base.searchParams.get("type")).toBe("all");
     expect(base.searchParams.has("update_baseline")).toBe(false);
-    expect(base.searchParams.has("offset")).toBe(false);
 
-    const withDelta = new URL(
-      buildFollowingDynamicsNavUrl("baseline-1", "offset-2"),
+    const withBaseline = new URL(
+      buildFollowingDynamicsUpdateUrl("baseline-1"),
       "https://api.bilibili.com",
     );
-    expect(withDelta.searchParams.get("update_baseline")).toBe("baseline-1");
-    expect(withDelta.searchParams.get("offset")).toBe("offset-2");
+    expect(withBaseline.searchParams.get("update_baseline")).toBe("baseline-1");
   });
 
-  test("parses nav responses and normalizes count and baseline", () => {
-    const parsed = FollowingDynamicsNavResponseSchema.parse({
-      has_more: false,
-      items: [{ id_str: "newest" }, { id_str: 2, unknown: true }],
-      offset: "",
-      update_baseline: "",
+  test("parses update count responses and normalizes count", () => {
+    const parsed = FollowingDynamicsUpdateCountSchema.parse({
       update_num: "12",
       future_server_field: true,
     });
-    expect(getFollowingDynamicsNavBaseline(parsed)).toBe("newest");
-    expect(getFollowingDynamicsNavCount(parsed)).toBe(12);
-
-    expect(getFollowingDynamicsNavBaseline(navPage({ ids: [] }))).toBe("");
-    expect(getFollowingDynamicsNavCount(navPage({ updateNum: "150" }))).toBe(99);
-    expect(getFollowingDynamicsNavCount(navPage({ updateNum: "bad" }))).toBe(0);
+    expect(getFollowingDynamicsUpdateCount(parsed)).toBe(12);
+    expect(getFollowingDynamicsUpdateCount(updatePage({ updateNum: "150" }))).toBe(99);
+    expect(getFollowingDynamicsUpdateCount(updatePage({ updateNum: "bad" }))).toBe(0);
   });
 
-  test("initializes nav state without baseline and preserves the read baseline later", () => {
-    expect(getFollowingDynamicsNavState(undefined, navPage({ updateNum: "12", ids: ["a"] }))).toEqual({
-      baseline: "a",
-      count: 0,
-    });
-    expect(getFollowingDynamicsNavState("read-baseline", navPage({ updateNum: "8" }))).toEqual({
-      baseline: "read-baseline",
-      count: 8,
-    });
-  });
-
-  test("fetching nav rejects stale sessions before and after the request", async () => {
+  test("fetching update count rejects stale sessions before and after the request", async () => {
     const request = vi.fn<FollowingDynamicsRequest>();
-    await expect(fetchFollowingDynamicsNav("", request, () => false)).rejects.toBeInstanceOf(
+    await expect(
+      fetchFollowingDynamicsUpdateCount("baseline-1", request, () => false),
+    ).rejects.toBeInstanceOf(
       BilibiliSessionChangedError,
     );
     expect(request).not.toHaveBeenCalled();
@@ -203,10 +175,10 @@ describe("following dynamics nav", () => {
     let current = true;
     request.mockImplementationOnce(async () => {
       current = false;
-      return navPage({ ids: ["1"] });
+      return updatePage({ updateNum: 1 });
     });
-    await expect(fetchFollowingDynamicsNav("", request, () => current)).rejects.toBeInstanceOf(
-      BilibiliSessionChangedError,
-    );
+    await expect(
+      fetchFollowingDynamicsUpdateCount("baseline-1", request, () => current),
+    ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
   });
 });
