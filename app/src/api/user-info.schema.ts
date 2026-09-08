@@ -1,30 +1,5 @@
 import { z } from "zod";
 
-export const UserInfoResponseSchema = z.object({
-  birthday: z.string(),
-  coins: z.number(),
-  face: z.string(),
-  level: z.number(),
-  mid: z.number(),
-  name: z.string(),
-  sex: z.string(),
-  sign: z.string(),
-  is_followed: z.boolean(),
-  is_risk: z.boolean(),
-  silence: z.union([z.literal(0), z.literal(1)]),
-  live_room: z
-    .object({
-      roomStatus: z.number(),
-      liveStatus: z.number(),
-      url: z.string(),
-      title: z.string(),
-      cover: z.string(),
-      roomid: z.number(),
-      roundStatus: z.number(),
-    })
-    .nullable(),
-});
-
 export const UserCardInfoResponseSchema = z.object({
   card: z.object({
     mid: z.string(),
@@ -48,19 +23,3 @@ export const UserCardInfoResponseSchema = z.object({
   following: z.boolean(),
   follower: z.number(),
 });
-
-export const UserBatchInfoResponseSchema = z
-  .object({
-    mid: z.number(),
-    name: z.string(),
-    sex: z.string().nullish(),
-    face: z.string(),
-    sign: z.string(),
-    level: z.number(),
-    silence: z.union([z.literal(0), z.literal(1)]),
-    // birthday: z.number(),
-    // vip: z.object({
-    //   status: z.number(),
-    // }),
-  })
-  .array();

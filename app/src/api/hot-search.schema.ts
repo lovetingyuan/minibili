@@ -17,7 +17,7 @@ export const HotSearchSchema = z.object({
 
 export type HotSearchResType = z.infer<typeof HotSearchSchema>;
 
-export const HotSearchWebSchema = z.object({
+const HotSearchWebSchema = z.object({
   trending: z.object({
     trackid: z.string(),
     list: z

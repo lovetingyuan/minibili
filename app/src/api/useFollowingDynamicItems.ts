@@ -11,10 +11,7 @@ import {
   getFollowingDynamicsKey,
   getFollowingDynamicsListItems,
 } from "./following-dynamics";
-import type {
-  FollowingDynamicsKeyLoader,
-  FollowingDynamicsPage,
-} from "./following-dynamics.types";
+import type { FollowingDynamicsKeyLoader, FollowingDynamicsPage } from "./following-dynamics.types";
 
 export function useFollowingDynamicItems() {
   const session = useBilibiliSessionState();
@@ -26,11 +23,8 @@ export function useFollowingDynamicItems() {
   const swr = useSWRInfinite<FollowingDynamicsPage, Error, FollowingDynamicsKeyLoader>(
     (index, previous) => getFollowingDynamicsKey(account, index, previous),
     ([, mid, generation, page, offset]) =>
-      fetchFollowingDynamicsPage(
-        page,
-        offset,
-        request,
-        () => bilibiliSession.isCurrentAccount({ mid, generation }),
+      fetchFollowingDynamicsPage(page, offset, request, () =>
+        bilibiliSession.isCurrentAccount({ mid, generation }),
       ),
     {
       keepPreviousData: false,
@@ -65,9 +59,7 @@ export function useFollowingDynamicItems() {
   const isReachingEnd = Boolean(
     lastPage && (!lastPage.has_more || !lastPage.items.length || !lastPage.offset),
   );
-  const isLoadingMore = Boolean(
-    account && !swr.error && swr.size > pages.length && !isReachingEnd,
-  );
+  const isLoadingMore = Boolean(account && !swr.error && swr.size > pages.length && !isReachingEnd);
 
   async function loadMore() {
     if (

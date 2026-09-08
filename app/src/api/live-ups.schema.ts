@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const LiveUpItemSchema = z.object({
+const LiveUpItemSchema = z.object({
   link: z.string(),
   is_reserve_recall: z.boolean(),
   mid: z.string(),

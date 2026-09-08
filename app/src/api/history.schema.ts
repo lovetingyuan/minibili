@@ -8,7 +8,7 @@ export const HistoryCursorSchema = z.object({
   business: z.string(),
 });
 
-export const HistoryRecordSchema = z.object({
+const HistoryRecordSchema = z.object({
   title: z.string().nullish(),
   cover: z.string().nullish(),
   author_name: z.string().nullish(),

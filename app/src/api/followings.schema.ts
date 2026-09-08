@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const FollowingItemSchema = z.object({
+const FollowingItemSchema = z.object({
   mid: z.number(),
   uname: z.string(),
   face: z.string(),

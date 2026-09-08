@@ -74,31 +74,6 @@ export const parseDuration = (seconds?: number | string) => {
   return `${(hourString === "00" ? "" : `${hourString}:`) + minuteString}:${secondString}`;
 };
 
-export function parseTime(milliseconds: number) {
-  if (typeof milliseconds === "string") {
-    return milliseconds;
-  }
-  let seconds = Math.floor(milliseconds / 1000);
-  const hours = Math.floor(seconds / 3600);
-  seconds %= 3600;
-  const minutes = Math.floor(seconds / 60);
-  seconds %= 60;
-
-  let timeString = "";
-
-  if (hours > 0) {
-    const hh = hours.toString().padStart(2, "0");
-    timeString += `${hh}:`;
-  }
-
-  const mm = minutes.toString().padStart(2, "0");
-  const ss = seconds.toString().padStart(2, "0");
-
-  timeString += `${mm}:${ss}`;
-
-  return timeString;
-}
-
 export function parseDurationStr(duration: string) {
   return duration
     .split(":")
@@ -150,12 +125,6 @@ export async function handleShareDynamic(title: string, url: string) {
   } catch {
     showToast("分享失败");
   }
-}
-
-export function delay(ms: number) {
-  return new Promise((r) => {
-    setTimeout(r, ms);
-  });
 }
 
 const toastFuncMap: Record<string, () => void> = {};

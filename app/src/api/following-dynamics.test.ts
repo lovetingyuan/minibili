@@ -167,9 +167,7 @@ describe("following dynamics update count", () => {
     const request = vi.fn<FollowingDynamicsRequest>();
     await expect(
       fetchFollowingDynamicsUpdateCount("baseline-1", request, () => false),
-    ).rejects.toBeInstanceOf(
-      BilibiliSessionChangedError,
-    );
+    ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
     expect(request).not.toHaveBeenCalled();
 
     let current = true;

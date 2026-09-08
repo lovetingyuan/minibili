@@ -3,12 +3,7 @@ import { Icon } from "@/components/styled/rneui";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, Share, View } from "react-native";
-import {
-  Menu,
-  MenuOption,
-  MenuOptions,
-  MenuTrigger,
-} from "@/components/Menu";
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 
 import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";

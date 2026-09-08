@@ -9,7 +9,7 @@ import type {
   HistoryRequest,
 } from "./history.types";
 
-export const HISTORY_PAGE_SIZE = 20;
+const HISTORY_PAGE_SIZE = 20;
 export const INITIAL_HISTORY_CURSOR: HistoryCursor = { max: 0, view_at: 0, business: "" };
 let nextChainId = 0;
 

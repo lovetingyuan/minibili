@@ -10,7 +10,7 @@ import type {
   UserSettings,
 } from "./types";
 
-export const settingKeys = Object.keys(UserSettingsSchema.shape) as SettingKey[];
+const settingKeys = Object.keys(UserSettingsSchema.shape) as SettingKey[];
 export const createDefaultSettings = () => UserSettingsSchema.parse({});
 export const userDataScope = (account: UserDataAccount | null) =>
   account ? `uid:${account.mid}` : "guest";

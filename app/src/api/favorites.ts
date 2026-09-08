@@ -9,7 +9,7 @@ import type {
   FavoriteResourcesKey,
 } from "./favorites.types";
 
-export const FAVORITE_PAGE_SIZE = 40;
+const FAVORITE_PAGE_SIZE = 40;
 
 export function getFavoriteFoldersKey(account: FavoriteAccount): FavoriteFoldersKey {
   return ["bilibili-favorite-folders", account.mid, account.generation];

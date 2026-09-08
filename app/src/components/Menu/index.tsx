@@ -7,30 +7,16 @@ import {
   MenuOptions as PopupMenuOptions,
   MenuProvider,
   MenuTrigger,
-  renderers,
 } from "react-native-popup-menu";
 
-import {
-  enhanceMenuChildren,
-  handleControlledMenuBackPress,
-} from "./Menu.helpers";
-import {
-  menuOptionClassName,
-  menuOptionTextClassName,
-  menuOptionWrapperStyle,
-  menuProviderCustomStyles,
-} from "./Menu.styles";
+import { enhanceMenuChildren, handleControlledMenuBackPress } from "./Menu.helpers";
+import { menuOptionClassName, menuProviderCustomStyles } from "./Menu.styles";
 
 type PopupMenuProps = ComponentProps<typeof PopupMenu>;
 type PopupMenuOptionProps = ComponentProps<typeof PopupMenuOption>;
 
-export { MenuProvider, PopupMenuOptions as MenuOptions, MenuTrigger, renderers };
-export {
-  menuOptionClassName,
-  menuOptionTextClassName,
-  menuOptionWrapperStyle,
-  menuProviderCustomStyles,
-};
+export { MenuProvider, PopupMenuOptions as MenuOptions, MenuTrigger };
+export { menuOptionClassName, menuProviderCustomStyles };
 
 export function Menu({ children, opened, onClose, ...props }: PopupMenuProps) {
   React.useEffect(() => {
@@ -54,12 +40,7 @@ export function Menu({ children, opened, onClose, ...props }: PopupMenuProps) {
   );
 }
 
-export function MenuOption({
-  children,
-  disabled,
-  text,
-  ...props
-}: PopupMenuOptionProps) {
+export function MenuOption({ children, disabled, text, ...props }: PopupMenuOptionProps) {
   if (text === undefined) {
     return (
       <PopupMenuOption {...props} disabled={disabled}>
@@ -68,7 +49,5 @@ export function MenuOption({
     );
   }
 
-  return (
-    <PopupMenuOption {...props} disabled={disabled} text={text} />
-  );
+  return <PopupMenuOption {...props} disabled={disabled} text={text} />;
 }

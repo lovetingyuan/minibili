@@ -10,7 +10,7 @@ import fetcher from "./fetcher";
 
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/;
 
-export const parseCommentMessage = (content: CommentResItem["content"]) => {
+const parseCommentMessage = (content: CommentResItem["content"]) => {
   let keys: string[] = [];
   let message = content.message;
   const emojiMap: Record<

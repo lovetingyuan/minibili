@@ -65,7 +65,8 @@ const getAppValue = () => {
 };
 
 const initValue = getAppValue();
-export const { getStoreMethods, useStore, subscribeStore } = createStore("AppStore", initValue);
+const { getStoreMethods, useStore, subscribeStore } = createStore("AppStore", initValue);
+export { getStoreMethods, useStore };
 const storedKeys = Object.keys(initValue).filter((key): key is StoredKeys => key.startsWith("$"));
 
 export type AppContextValueType = ReturnType<typeof getAppValue>;
@@ -89,7 +90,7 @@ function cloneStoredValue<K extends StoredKeys>(
   return JSON.parse(JSON.stringify(value)) as AppContextValueType[K];
 }
 
-export function getDefaultStoredValue<K extends StoredKeys>(key: K): AppContextValueType[K] {
+function getDefaultStoredValue<K extends StoredKeys>(key: K): AppContextValueType[K] {
   return cloneStoredValue(getAppValue()[key]);
 }
 

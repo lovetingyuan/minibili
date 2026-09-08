@@ -44,9 +44,7 @@ export const menuOptionTouchableProps: Pick<
   underlayColor: "rgba(127, 127, 127, 0.16)",
 };
 
-export function MenuOptionTouchableComponent(
-  props: ComponentProps<typeof TouchableHighlight>,
-) {
+export function MenuOptionTouchableComponent(props: ComponentProps<typeof TouchableHighlight>) {
   return React.createElement(TouchableHighlight, props);
 }
 
@@ -70,10 +68,4 @@ export const menuOptionTextStyle: TextStyle = {
   textAlign: "left",
 };
 
-export const menuSurfaceClassName =
-  "rounded border border-black/5 bg-white shadow-md shadow-black/15 dark:border-white/10 dark:bg-zinc-900";
-
 export const menuOptionClassName = "h-12 min-w-[124px] max-w-[248px] justify-center";
-
-export const menuOptionTextClassName =
-  "px-4 text-left text-sm font-normal text-black dark:text-gray-300";

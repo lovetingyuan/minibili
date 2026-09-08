@@ -55,11 +55,7 @@ function parseWebPageMessage(data: string): WebPageMessage | null {
     return null;
   }
 
-  if (
-    isRecord(parsed) &&
-    parsed.action === "set-title" &&
-    typeof parsed.payload === "string"
-  ) {
+  if (isRecord(parsed) && parsed.action === "set-title" && typeof parsed.payload === "string") {
     return {
       action: parsed.action,
       payload: parsed.payload,

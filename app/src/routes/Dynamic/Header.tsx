@@ -19,7 +19,7 @@ import { useStore } from "../../store";
 import type { NavigationProps, RootStackParamList } from "../../types";
 import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast } from "../../utils";
 
-export function HeaderLeft() {
+function HeaderLeft() {
   const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
   const { data: userInfo } = useUserInfo(route.params?.user.mid);
   const { livingUrl } = useLivingInfo(route.params?.user.mid);
@@ -87,8 +87,9 @@ export function HeaderLeft() {
           <Text
             className="ml-2 text-sm text-gray-500 dark:text-gray-400"
             onPress={() => {
-              showToast(`粉丝：${fans.follower}`)
-            }}>
+              showToast(`粉丝：${fans.follower}`);
+            }}
+          >
             {parseNumber(fans.follower)}粉丝
           </Text>
         ) : null}

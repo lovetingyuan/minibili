@@ -67,15 +67,11 @@ test("useLiveUps polls only for the current logged-in account", () => {
 
   useLiveUps();
 
-  expect(mocks.useSWR).toHaveBeenCalledWith(
-    ["bilibili-live-ups", "123", 3],
-    expect.any(Function),
-    {
-      refreshInterval: 10 * 60 * 1000,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    },
-  );
+  expect(mocks.useSWR).toHaveBeenCalledWith(["bilibili-live-ups", "123", 3], expect.any(Function), {
+    refreshInterval: 10 * 60 * 1000,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 });
 
 test("useLiveUps does not request for a stale or missing account", () => {

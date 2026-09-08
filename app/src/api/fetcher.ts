@@ -12,7 +12,7 @@ type ResponseType<D = any> = {
   data: D;
 };
 
-export class ApiError extends Error {
+class ApiError extends Error {
   response: ResponseType;
   url: string;
   code: number;

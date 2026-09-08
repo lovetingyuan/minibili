@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { RanksConfig } from "../../constants";
 
-export function normalizeVideoCategories(items: { rid: number }[]) {
+function normalizeVideoCategories(items: { rid: number }[]) {
   const seen = new Set([RanksConfig[0].rid]);
   const result = [{ ...RanksConfig[0] }];
   for (const item of [...items, ...RanksConfig]) {

@@ -66,8 +66,7 @@ export function getFollowingDynamicsKey(
 ): FollowingDynamicsKey | null {
   if (
     !account ||
-    (index > 0 &&
-      (!previous || !previous.has_more || !previous.items.length || !previous.offset))
+    (index > 0 && (!previous || !previous.has_more || !previous.items.length || !previous.offset))
   ) {
     return null;
   }

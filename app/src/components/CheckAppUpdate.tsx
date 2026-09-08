@@ -1,10 +1,7 @@
-import * as Application from "expo-application";
 import React from "react";
 
 import { useAppUpdateInfo } from "@/api/check-update";
 import { useStore } from "@/store";
-
-export const currentVersion = Application.nativeApplicationVersion!;
 
 function CheckAppUpdate() {
   const appUpdateInfo = useAppUpdateInfo();

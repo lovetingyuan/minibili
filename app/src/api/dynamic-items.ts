@@ -7,8 +7,6 @@ import type { DynamicListResponse } from "./dynamic-items.schema";
 import type { DynamicItem } from "./dynamic-items.type";
 import request from "./fetcher";
 
-export { buildDynamicListUrl, getDynamicPageKey, mapDynamicItem } from "./dynamic-items.mapper";
-
 async function fetchDynamicPage(url: string) {
   const response = await request<unknown>(url);
   return DynamicListResponseSchema.parse(response);

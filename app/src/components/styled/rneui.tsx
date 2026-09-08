@@ -9,13 +9,10 @@ import {
   Chip as BaseChip,
   Dialog as BaseDialog,
   Divider as BaseDivider,
-  FAB as BaseFAB,
   Icon as BaseIcon,
-  Input as BaseInput,
   ListItem as BaseListItem,
   Overlay as BaseOverlay,
   Skeleton as BaseSkeleton,
-  Slider as BaseSlider,
   Text as BaseText,
   ThemeProvider,
   createTheme,
@@ -32,14 +29,11 @@ import type {
   DialogProps as BaseDialogProps,
   DialogTitleProps as BaseDialogTitleProps,
   DividerProps as BaseDividerProps,
-  FABProps as BaseFABProps,
   IconProps as BaseIconProps,
-  InputProps as BaseInputProps,
   ListItemAccordionProps as BaseListItemAccordionProps,
   ListItemProps as BaseListItemProps,
   OverlayProps as BaseOverlayProps,
   SkeletonProps as BaseSkeletonProps,
-  SliderProps as BaseSliderProps,
   TextProps as BaseTextProps,
 } from "@rneui/base";
 import { FlashList as BaseFlashList } from "@shopify/flash-list";
@@ -391,51 +385,6 @@ export function Divider({ className, style, ...props }: DividerProps) {
   return <BaseDivider {...props} style={[style, resolvedStyle]} />;
 }
 
-type FABProps = BaseFABProps & {
-  buttonClassName?: string;
-  className?: string;
-  colorClassName?: string;
-  containerClassName?: string;
-  iconContainerClassName?: string;
-  titleClassName?: string;
-  children?: React.ReactNode;
-};
-
-export function FAB({
-  buttonClassName,
-  className,
-  colorClassName,
-  containerClassName,
-  iconContainerClassName,
-  titleClassName,
-  buttonStyle,
-  color,
-  containerStyle,
-  iconContainerStyle,
-  style,
-  titleStyle,
-  ...props
-}: FABProps) {
-  const resolvedButtonStyle = useResolvedStyle(buttonClassName);
-  const resolvedColor = useResolvedColor(colorClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedIconContainerStyle = useResolvedStyle(iconContainerClassName);
-  const resolvedStyle = useResolvedStyle(className);
-  const resolvedTitleStyle = useResolvedStyle(titleClassName);
-
-  return (
-    <FABPrimitive
-      {...props}
-      buttonStyle={[buttonStyle, resolvedButtonStyle]}
-      color={resolvedColor ?? color}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      iconContainerStyle={[iconContainerStyle, resolvedIconContainerStyle]}
-      style={[style, resolvedStyle]}
-      titleStyle={[titleStyle, resolvedTitleStyle]}
-    />
-  );
-}
-
 type StyledFlashListProps<T> = FlashListProps<T> & {
   className?: string;
   contentContainerClassName?: string;
@@ -530,70 +479,6 @@ export function Icon({
   );
 }
 
-type InputProps = BaseInputProps & {
-  containerClassName?: string;
-  disabledInputClassName?: string;
-  errorClassName?: string;
-  inputClassName?: string;
-  inputContainerClassName?: string;
-  labelClassName?: string;
-  leftIconContainerClassName?: string;
-  placeholderTextColorClassName?: string;
-  rightIconContainerClassName?: string;
-  selectionColorClassName?: string;
-};
-
-export function Input({
-  containerClassName,
-  disabledInputClassName,
-  errorClassName,
-  inputClassName,
-  inputContainerClassName,
-  labelClassName,
-  leftIconContainerClassName,
-  placeholderTextColorClassName,
-  rightIconContainerClassName,
-  selectionColorClassName,
-  containerStyle,
-  disabledInputStyle,
-  errorStyle,
-  inputContainerStyle,
-  inputStyle,
-  labelStyle,
-  leftIconContainerStyle,
-  placeholderTextColor,
-  rightIconContainerStyle,
-  selectionColor,
-  ...props
-}: InputProps) {
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedDisabledInputStyle = useResolvedStyle(disabledInputClassName);
-  const resolvedErrorStyle = useResolvedStyle(errorClassName);
-  const resolvedInputContainerStyle = useResolvedStyle(inputContainerClassName);
-  const resolvedInputStyle = useResolvedStyle(inputClassName);
-  const resolvedLabelStyle = useResolvedStyle(labelClassName);
-  const resolvedLeftIconContainerStyle = useResolvedStyle(leftIconContainerClassName);
-  const resolvedPlaceholderTextColor = useResolvedColor(placeholderTextColorClassName);
-  const resolvedRightIconContainerStyle = useResolvedStyle(rightIconContainerClassName);
-  const resolvedSelectionColor = useResolvedColor(selectionColorClassName);
-
-  return (
-    <InputPrimitive
-      {...props}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      disabledInputStyle={[disabledInputStyle, resolvedDisabledInputStyle]}
-      errorStyle={[errorStyle, resolvedErrorStyle]}
-      inputContainerStyle={[inputContainerStyle, resolvedInputContainerStyle]}
-      inputStyle={[inputStyle, resolvedInputStyle]}
-      labelStyle={[labelStyle, resolvedLabelStyle]}
-      leftIconContainerStyle={[leftIconContainerStyle, resolvedLeftIconContainerStyle]}
-      placeholderTextColor={resolvedPlaceholderTextColor ?? placeholderTextColor}
-      rightIconContainerStyle={[rightIconContainerStyle, resolvedRightIconContainerStyle]}
-      selectionColor={resolvedSelectionColor ?? selectionColor}
-    />
-  );
-}
-
 type ListItemProps = BaseListItemProps & {
   containerClassName?: string;
 };
@@ -681,50 +566,6 @@ export function Skeleton({
   );
 }
 
-type SliderProps = BaseSliderProps & {
-  className?: string;
-  maximumTrackTintColorClassName?: string;
-  minimumTrackTintColorClassName?: string;
-  thumbClassName?: string;
-  thumbTintColorClassName?: string;
-  trackClassName?: string;
-};
-
-export function Slider({
-  className,
-  maximumTrackTintColor,
-  maximumTrackTintColorClassName,
-  minimumTrackTintColor,
-  minimumTrackTintColorClassName,
-  style,
-  thumbClassName,
-  thumbStyle,
-  thumbTintColor,
-  thumbTintColorClassName,
-  trackClassName,
-  trackStyle,
-  ...props
-}: SliderProps) {
-  const resolvedMaximumTrackTintColor = useResolvedColor(maximumTrackTintColorClassName);
-  const resolvedMinimumTrackTintColor = useResolvedColor(minimumTrackTintColorClassName);
-  const resolvedStyle = useResolvedStyle(className);
-  const resolvedThumbStyle = useResolvedStyle(thumbClassName);
-  const resolvedThumbTintColor = useResolvedColor(thumbTintColorClassName);
-  const resolvedTrackStyle = useResolvedStyle(trackClassName);
-
-  return (
-    <BaseSlider
-      {...props}
-      maximumTrackTintColor={resolvedMaximumTrackTintColor ?? maximumTrackTintColor}
-      minimumTrackTintColor={resolvedMinimumTrackTintColor ?? minimumTrackTintColor}
-      style={[style, resolvedStyle]}
-      thumbStyle={[thumbStyle, resolvedThumbStyle]}
-      thumbTintColor={resolvedThumbTintColor ?? thumbTintColor}
-      trackStyle={[trackStyle, resolvedTrackStyle]}
-    />
-  );
-}
-
 type TextProps = BaseTextProps & {
   className?: string;
 };
@@ -742,9 +583,7 @@ const CheckBoxPrimitive = BaseCheckBox as unknown as React.ComponentType<CheckBo
 const ChipPrimitive = BaseChip as unknown as React.ComponentType<ChipProps>;
 const DialogButtonPrimitive =
   BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
-const FABPrimitive = BaseFAB as unknown as React.ComponentType<FABProps>;
 const IconPrimitive = BaseIcon as unknown as React.ComponentType<IconProps>;
-const InputPrimitive = BaseInput as unknown as React.ComponentType<BaseInputProps>;
 const ListItemAccordionPrimitive =
   BaseListItem.Accordion as unknown as React.ComponentType<ListItemAccordionProps>;
 const OverlayPrimitive = BaseOverlay as unknown as React.ComponentType<OverlayProps>;

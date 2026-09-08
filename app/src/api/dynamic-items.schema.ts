@@ -12,7 +12,7 @@ const DynamicImageSchema = z
   })
   .passthrough();
 
-export const RichTextSchema = z
+const RichTextSchema = z
   .object({
     type: z.string(),
     text: z.string().default(""),

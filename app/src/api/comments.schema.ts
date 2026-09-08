@@ -107,7 +107,7 @@ const RepliesSchema: z.ZodType<CommentResItem> = BaseCommentSchema.extend({
   replies: z.lazy(() => RepliesSchema.array()).nullable(),
 });
 
-export const CommentCursorSchema = z.object({
+const CommentCursorSchema = z.object({
   is_begin: z.boolean(),
   prev: z.number(),
   next: z.number(),

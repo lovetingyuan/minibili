@@ -28,10 +28,8 @@ export function useFollowingDynamicsUpdates() {
       if (!account || !baseline) {
         throw new Error("动态更新轮询缺少当前账号或动态基线");
       }
-      return fetchFollowingDynamicsUpdateCount(
-        baseline,
-        request,
-        () => bilibiliSession.isCurrentAccount(account),
+      return fetchFollowingDynamicsUpdateCount(baseline, request, () =>
+        bilibiliSession.isCurrentAccount(account),
       );
     },
     {
