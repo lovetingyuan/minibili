@@ -146,13 +146,11 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
     }
   });
 
-  useFocusEffect(
-    React.useCallback(() => {
-      return () => {
-        KeepAwake.deactivateKeepAwake("PLAY");
-      };
-    }, []),
-  );
+  useFocusEffect(() => {
+    return () => {
+      KeepAwake.deactivateKeepAwake("PLAY");
+    };
+  });
 
   const currentPageInfo = videoInfo.pages ? videoInfo.pages[props.currentPage - 1] : undefined;
   let videoWidth = 0;

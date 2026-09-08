@@ -100,8 +100,8 @@ function VideoCard(props: {
         />
       ) : null}
       <View className="absolute inset-0 items-center justify-center">
-        <View className="h-12 w-12 items-center justify-center rounded-full bg-black/55">
-          <Icon name="play-arrow" type="material" size={30} color="white" />
+        <View className="h-14 w-14 items-center justify-center rounded-full bg-black/55">
+          <Icon name="play-arrow" type="material" size={36} color="white" />
         </View>
       </View>
       <View className="absolute bottom-1.5 left-2 flex-row gap-3 rounded bg-black/60 px-2 py-1">

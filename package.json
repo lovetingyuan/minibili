@@ -19,7 +19,7 @@
     "build": "npm run build:android -w=@minibili/app"
   },
   "devDependencies": {
-    "knip": "^6.0.1",
+    "knip": "^6.34.0",
     "oxfmt": "latest",
     "oxlint": "^1.56.0",
     "typescript": "~6.0.3",
