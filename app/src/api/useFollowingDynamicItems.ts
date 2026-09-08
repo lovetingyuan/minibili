@@ -1,11 +1,13 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWRInfinite from "swr/infinite";
 
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
+import { getStoreMethods } from "../store";
 import request from "./fetcher";
 import {
   fetchFollowingDynamicsPage,
+  getFollowingDynamicsLatestId,
   getFollowingDynamicsKey,
   getFollowingDynamicsListItems,
 } from "./following-dynamics";
@@ -41,6 +43,24 @@ export function useFollowingDynamicItems() {
     },
   );
   const pages = account ? (swr.data?.slice(0, swr.size) ?? []) : [];
+  const latestId = getFollowingDynamicsLatestId(pages[0]);
+
+  useEffect(() => {
+    if (!account || latestId == null) {
+      return;
+    }
+    const methods = getStoreMethods();
+    const updateMap = methods.get$followingDynamicsUpdateMap();
+    methods.set$followingDynamicsUpdateMap({
+      ...updateMap,
+      [account.mid]: {
+        baseline: latestId,
+        count: 0,
+      },
+    });
+    methods.setFollowingDynamicsUpdateCount(0);
+  }, [account, latestId]);
+
   const lastPage = pages.at(-1);
   const isReachingEnd = Boolean(
     lastPage && (!lastPage.has_more || !lastPage.items.length || !lastPage.offset),
@@ -108,6 +128,7 @@ export function useFollowingDynamicItems() {
 
   return {
     list: getFollowingDynamicsListItems(pages),
+    latestId,
     error: swr.error,
     isLoading: swr.isLoading,
     isValidating: swr.isValidating,

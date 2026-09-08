@@ -3,8 +3,17 @@ import { describe, expect, test, vi } from "vitest";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { DynamicItemResponseSchema, DynamicListResponseSchema } from "./dynamic-items.schema";
 import {
+  FollowingDynamicsNavResponseSchema,
+} from "./following-dynamics-nav.schema";
+import {
+  buildFollowingDynamicsNavUrl,
   buildFollowingDynamicsUrl,
+  fetchFollowingDynamicsNav,
   fetchFollowingDynamicsPage,
+  getFollowingDynamicsNavBaseline,
+  getFollowingDynamicsNavCount,
+  getFollowingDynamicsNavState,
+  getFollowingDynamicsLatestId,
   getFollowingDynamicsKey,
   getFollowingDynamicsListItems,
 } from "./following-dynamics";
@@ -43,6 +52,20 @@ function page(ids: string[], offset = "next", hasMore = true) {
     has_more: hasMore,
     offset,
     items: ids.map(item),
+  });
+}
+
+function navPage(values: {
+  updateBaseline?: string;
+  updateNum?: string | number;
+  ids?: string[];
+}) {
+  return FollowingDynamicsNavResponseSchema.parse({
+    has_more: true,
+    offset: "next",
+    update_baseline: values.updateBaseline,
+    update_num: values.updateNum,
+    items: (values.ids ?? ["3", "2", "1"]).map((id_str) => ({ id_str })),
   });
 }
 
@@ -98,6 +121,7 @@ describe("following dynamics paging", () => {
       "2",
       "3",
     ]);
+    expect(getFollowingDynamicsLatestId(result)).toBe("1");
   });
 
   test("never requests stale sessions and rejects late success or failure", async () => {
@@ -125,5 +149,66 @@ describe("following dynamics paging", () => {
       .fn<FollowingDynamicsRequest>()
       .mockResolvedValue({ has_more: true, items: [{}] });
     await expect(fetchFollowingDynamicsPage(1, "", request, () => true)).rejects.toThrow();
+  });
+});
+
+describe("following dynamics nav", () => {
+  test("builds nav requests with the fixed web_location and optional delta fields", () => {
+    const base = new URL(buildFollowingDynamicsNavUrl(), "https://api.bilibili.com");
+    expect(base.searchParams.get("web_location")).toBe("333.1007");
+    expect(base.searchParams.has("update_baseline")).toBe(false);
+    expect(base.searchParams.has("offset")).toBe(false);
+
+    const withDelta = new URL(
+      buildFollowingDynamicsNavUrl("baseline-1", "offset-2"),
+      "https://api.bilibili.com",
+    );
+    expect(withDelta.searchParams.get("update_baseline")).toBe("baseline-1");
+    expect(withDelta.searchParams.get("offset")).toBe("offset-2");
+  });
+
+  test("parses nav responses and normalizes count and baseline", () => {
+    const parsed = FollowingDynamicsNavResponseSchema.parse({
+      has_more: false,
+      items: [{ id_str: "newest" }, { id_str: 2, unknown: true }],
+      offset: "",
+      update_baseline: "",
+      update_num: "12",
+      future_server_field: true,
+    });
+    expect(getFollowingDynamicsNavBaseline(parsed)).toBe("newest");
+    expect(getFollowingDynamicsNavCount(parsed)).toBe(12);
+
+    expect(getFollowingDynamicsNavBaseline(navPage({ ids: [] }))).toBe("");
+    expect(getFollowingDynamicsNavCount(navPage({ updateNum: "150" }))).toBe(99);
+    expect(getFollowingDynamicsNavCount(navPage({ updateNum: "bad" }))).toBe(0);
+  });
+
+  test("initializes nav state without baseline and preserves the read baseline later", () => {
+    expect(getFollowingDynamicsNavState(undefined, navPage({ updateNum: "12", ids: ["a"] }))).toEqual({
+      baseline: "a",
+      count: 0,
+    });
+    expect(getFollowingDynamicsNavState("read-baseline", navPage({ updateNum: "8" }))).toEqual({
+      baseline: "read-baseline",
+      count: 8,
+    });
+  });
+
+  test("fetching nav rejects stale sessions before and after the request", async () => {
+    const request = vi.fn<FollowingDynamicsRequest>();
+    await expect(fetchFollowingDynamicsNav("", request, () => false)).rejects.toBeInstanceOf(
+      BilibiliSessionChangedError,
+    );
+    expect(request).not.toHaveBeenCalled();
+
+    let current = true;
+    request.mockImplementationOnce(async () => {
+      current = false;
+      return navPage({ ids: ["1"] });
+    });
+    await expect(fetchFollowingDynamicsNav("", request, () => current)).rejects.toBeInstanceOf(
+      BilibiliSessionChangedError,
+    );
   });
 });

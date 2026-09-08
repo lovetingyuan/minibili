@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   dynamics: {
     list: [],
+    latestId: "",
     error: undefined,
     isLoading: false,
     isLoadingMore: false,
@@ -51,9 +52,13 @@ const item = {
 } satisfies DynamicItem;
 
 describe("following dynamics content", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.dynamics.latestId = "";
+  });
 
   test("uses the shared paged list and opens the selected author's dynamic detail", () => {
+    mocks.dynamics.latestId = "dynamic-1";
     const screen = FollowingDynamicsContent() as ReactElement<DynamicListProps>;
     expect(screen.type).toBe("DynamicList");
     expect(screen.props.loadingText).toBe("正在加载关注动态");

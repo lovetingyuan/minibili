@@ -21,6 +21,7 @@ import LiveUpsManager from "./components/LiveUpsManager";
 import CheckNetState from "./components/CheckNetState";
 import CheckUpUpdate from "./components/CheckUpUpdate";
 import DevServerRecovery from "./components/DevServerRecovery";
+import FollowingDynamicsUpdatesManager from "./components/FollowingDynamicsUpdatesManager";
 import ImagesView from "./components/ImagesView";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
 import useRNETheme from "./hooks/useRNETheme";
@@ -88,6 +89,7 @@ export default function App() {
                 <CheckUpUpdate />
                 <CheckNetState />
                 <LiveUpsManager />
+                <FollowingDynamicsUpdatesManager />
                 <ButtonsOverlay />
                 <ImagesView />
                 <Route />

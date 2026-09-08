@@ -1,10 +1,12 @@
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { mapDynamicItem } from "./dynamic-items.mapper";
 import { DynamicListResponseSchema } from "./dynamic-items.schema";
+import { FollowingDynamicsNavResponseSchema } from "./following-dynamics-nav.schema";
 import type {
   FollowingDynamicsAccount,
   FollowingDynamicsKey,
   FollowingDynamicsListItem,
+  FollowingDynamicsNavPage,
   FollowingDynamicsPage,
   FollowingDynamicsRequest,
 } from "./following-dynamics.types";
@@ -50,6 +52,15 @@ export function buildFollowingDynamicsUrl(page = 1, offset = "") {
   return `/x/polymer/web-dynamic/v1/feed/all?${params}`;
 }
 
+export function buildFollowingDynamicsNavUrl(updateBaseline = "", offset = "") {
+  const params = new URLSearchParams({
+    web_location: "333.1007",
+  });
+  if (updateBaseline) params.set("update_baseline", updateBaseline);
+  if (offset) params.set("offset", offset);
+  return `/x/polymer/web-dynamic/v1/feed/nav?${params}`;
+}
+
 export function getFollowingDynamicsKey(
   account: FollowingDynamicsAccount | null,
   index: number,
@@ -90,6 +101,58 @@ export async function fetchFollowingDynamicsPage(
     assertCurrent();
     throw error;
   }
+}
+
+export async function fetchFollowingDynamicsNav(
+  updateBaseline: string,
+  request: FollowingDynamicsRequest,
+  isCurrentAccount: () => boolean,
+) {
+  function assertCurrent() {
+    if (!isCurrentAccount()) throw new BilibiliSessionChangedError();
+  }
+
+  assertCurrent();
+  try {
+    const data = await request(buildFollowingDynamicsNavUrl(updateBaseline));
+    assertCurrent();
+    return FollowingDynamicsNavResponseSchema.parse(data);
+  } catch (error) {
+    assertCurrent();
+    throw error;
+  }
+}
+
+export function getFollowingDynamicsNavBaseline(data: FollowingDynamicsNavPage) {
+  return data.update_baseline || String(data.items[0]?.id_str ?? "");
+}
+
+export function getFollowingDynamicsNavCount(data: FollowingDynamicsNavPage) {
+  const count = Number(data.update_num ?? 0);
+  return Number.isFinite(count) && count > 0 ? Math.min(count, 99) : 0;
+}
+
+export function getFollowingDynamicsNavState(
+  existingBaseline: string | undefined,
+  data: FollowingDynamicsNavPage,
+) {
+  if (!existingBaseline) {
+    return {
+      baseline: getFollowingDynamicsNavBaseline(data),
+      count: 0,
+    };
+  }
+  return {
+    baseline: existingBaseline,
+    count: getFollowingDynamicsNavCount(data),
+  };
+}
+
+export function getFollowingDynamicsLatestId(page: FollowingDynamicsPage | undefined) {
+  if (page?.items[0]?.id_str != null) {
+    return String(page.items[0].id_str);
+  }
+  return page?.update_baseline ?? null;
 }
 
 export function getFollowingDynamicsListItems(pages: FollowingDynamicsPage[]) {

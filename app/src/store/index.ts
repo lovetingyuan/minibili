@@ -8,7 +8,7 @@ import { RanksConfig } from "../constants";
 import type { UpInfo } from "../types";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { RepliesInfo } from "./replies-info.type";
-import type { UpdateUpInfo } from "./types";
+import type { FollowingDynamicsUpdateState, UpdateUpInfo } from "./types";
 
 const StoragePrefix = "Store:";
 
@@ -26,6 +26,10 @@ const getAppValue = () => {
      * 有更新的up主
      */
     $upUpdateMap: {} as Record<string, UpdateUpInfo>,
+    /**
+     * 动态 tab 的已读基线和未读更新数，按 B站账号 mid 存储
+     */
+    $followingDynamicsUpdateMap: {} as Record<string, FollowingDynamicsUpdateState>,
     // $ignoredVersions: [] as string[],
     $watchedHotSearch: {} as Record<string, number>,
     $checkAppUpdateTime: 0,
@@ -36,6 +40,7 @@ const getAppValue = () => {
     isWiFi: false,
     webViewMode: "MOBILE" as "PC" | "MOBILE",
     livingUps: {} as Record<string, string>,
+    followingDynamicsUpdateCount: 0,
     currentVideosCate: RanksConfig[0] as (typeof RanksConfig)[number],
     imagesList: [] as {
       src: string;
