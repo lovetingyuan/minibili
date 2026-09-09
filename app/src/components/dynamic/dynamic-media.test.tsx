@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => {
     navigate: vi.fn(),
     setCurrentImageIndex: vi.fn(),
     setImagesList: vi.fn(),
+    setOverlayButtons: vi.fn(),
   };
 });
 
@@ -28,6 +29,7 @@ vi.mock("@/store", () => ({
   useStore: () => ({
     setCurrentImageIndex: mocks.setCurrentImageIndex,
     setImagesList: mocks.setImagesList,
+    setOverlayButtons: mocks.setOverlayButtons,
   }),
 }));
 vi.mock("@/utils", () => ({
@@ -54,6 +56,7 @@ import { DynamicMedia } from "./dynamic-media";
 type ElementProps = {
   children?: ReactNode;
   className?: string;
+  onLongPress?: (event?: { stopPropagation: () => void }) => void;
   onPress?: (event?: { stopPropagation: () => void }) => void;
   source?: { uri: string };
 };
@@ -115,6 +118,33 @@ describe("DynamicMedia video interactions", () => {
       "Play",
       expect.objectContaining({ bvid: "BV1TEST", aid: 2, title: "视频标题" }),
     );
+  });
+
+  test("long pressing the cover opens the cover-preview menu in the dynamic list", () => {
+    const card = renderVideo(video);
+    const [cover] = children(card) as ReactElement<ElementProps>[];
+
+    const stopPropagation = vi.fn();
+    cover.props.onLongPress?.({ stopPropagation });
+
+    expect(stopPropagation).toHaveBeenCalledOnce();
+    expect(mocks.setOverlayButtons).toHaveBeenCalledWith([
+      {
+        text: "查看封面",
+        onPress: expect.any(Function),
+      },
+    ]);
+
+    const [button] = mocks.setOverlayButtons.mock.calls[0][0] as {
+      text: string;
+      onPress: () => void;
+    }[];
+    button.onPress();
+
+    expect(mocks.setImagesList).toHaveBeenCalledWith([
+      { src: "cover.jpg", width: 0, height: 0, ratio: 16 / 9 },
+    ]);
+    expect(mocks.setCurrentImageIndex).toHaveBeenCalledWith(0);
   });
 
   test("a missing bvid leaves the cover non-interactive so the parent can open details", () => {

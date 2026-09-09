@@ -52,6 +52,14 @@ module.exports = {
     "expo-status-bar",
     "expo-secure-store",
     [
+      "expo-media-library",
+      {
+        "photosPermission": "允许 MiniBili 访问你的照片。",
+        "savePhotosPermission": "允许 MiniBili 保存图片到你的相册。",
+        "granularPermissions": ["photo"],
+      },
+    ],
+    [
       "@preeternal/react-native-cookie-manager",
       {
         androidWebkitVersion: "1.16.0",

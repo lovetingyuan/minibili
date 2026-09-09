@@ -3,8 +3,11 @@ import { Icon, Text } from "@/components/styled/rneui";
 import React from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
+  Linking,
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   useWindowDimensions,
@@ -16,6 +19,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { showToast } from "@/utils";
 
 import { useStore } from "../store";
+import { saveImageToLibrary } from "./image-viewer-download";
 import type { ImageViewerItem } from "./image-viewer.types";
 import { normalizeImages } from "./image-viewer-images";
 import { getOriginalImageButtonLabel, updateOriginalImageStatuses } from "./image-viewer-state";
@@ -32,6 +36,7 @@ function ImagesView() {
     updateOriginalImageStatuses,
     {},
   );
+  const [downloadStatus, setDownloadStatus] = React.useState<"idle" | "downloading">("idle");
 
   const images = normalizeImages(imagesList, windowWidth, windowHeight);
   const visible = images.length > 0;
@@ -53,15 +58,57 @@ function ImagesView() {
   );
   const originalButtonDisabled =
     !activeImage || activeImageIsOriginal || activeOriginalStatus !== "idle";
+  const downloadButtonDisabled = !activeImage || downloadStatus === "downloading";
 
   React.useEffect(() => {
     dispatchOriginalImageStatus({ type: "reset" });
+    setDownloadStatus("idle");
   }, [galleryKey]);
 
   const closeViewer = () => {
     dispatchOriginalImageStatus({ type: "reset" });
+    setDownloadStatus("idle");
     setImagesList([]);
     setCurrentImageIndex(0);
+  };
+
+  const ensureWritePermission = async () => {
+    const { requestPermissionsAsync } = await import("expo-media-library");
+    const permission = await requestPermissionsAsync(true, ["photo"]);
+    return permission.status === "granted";
+  };
+
+  const handleDownloadCurrentImage = async () => {
+    if (downloadButtonDisabled || !activeImage) {
+      return;
+    }
+
+    if (Platform.OS === "web") {
+      void Linking.openURL(activeImage.originalUri);
+      return;
+    }
+
+    setDownloadStatus("downloading");
+    const result = await saveImageToLibrary(activeImage.originalUri, ensureWritePermission);
+    setDownloadStatus("idle");
+
+    if (result === "saved") {
+      showToast("已保存到相册");
+      return;
+    }
+    if (result === "permission-denied") {
+      Alert.alert("需要相册权限", "请在系统设置中允许 MiniBili 保存图片到相册。", [
+        { text: "取消", style: "cancel" },
+        {
+          text: "去设置",
+          onPress: () => {
+            void Linking.openSettings();
+          },
+        },
+      ]);
+      return;
+    }
+    showToast("下载失败，请稍后重试");
   };
 
   const openOriginalImage = () => {
@@ -112,6 +159,24 @@ function ImagesView() {
                   <Icon color="#fff" name="image-search" size={20} type="material" />
                 )}
                 <Text style={styles.originalButtonText}>{originalButtonLabel}</Text>
+              </Pressable>
+              <Pressable
+                accessibilityLabel="下载图片"
+                accessibilityRole="button"
+                accessibilityState={{ disabled: downloadButtonDisabled }}
+                disabled={downloadButtonDisabled}
+                hitSlop={12}
+                onPress={() => {
+                  void handleDownloadCurrentImage();
+                }}
+                style={[styles.originalButton, downloadButtonDisabled && styles.disabledButton]}
+              >
+                {downloadStatus === "downloading" ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Icon color="#fff" name="download" size={20} type="material" />
+                )}
+                <Text style={styles.originalButtonText}>下载</Text>
               </Pressable>
               <Text style={styles.counterText}>{`${safeActiveIndex + 1} / ${activeTotal}`}</Text>
             </View>

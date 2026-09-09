@@ -70,6 +70,7 @@ function VideoCard(props: {
 }) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const { width: windowWidth } = useWindowDimensions();
+  const { setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore();
   const { content, author } = props;
   const coverSize = getImagePixelDimensions(windowWidth * 0.9, (windowWidth * 0.9 * 9) / 16);
 
@@ -88,6 +89,22 @@ function VideoCard(props: {
       name: author.name,
       face: author.face,
     });
+  }
+
+  function openCoverViewer(event?: GestureResponderEvent) {
+    if (!content.cover) {
+      return;
+    }
+    event?.stopPropagation();
+    setOverlayButtons([
+      {
+        text: "查看封面",
+        onPress: () => {
+          setImagesList([{ src: content.cover, width: 0, height: 0, ratio: 16 / 9 }]);
+          setCurrentImageIndex(0);
+        },
+      },
+    ]);
   }
 
   const coverContent: ReactNode = (
@@ -142,7 +159,11 @@ function VideoCard(props: {
   return (
     <View className={containerClassName}>
       {content.bvid ? (
-        <Pressable className={coverClassName} onPress={openVideo}>
+        <Pressable
+          className={coverClassName}
+          onLongPress={content.cover ? openCoverViewer : undefined}
+          onPress={openVideo}
+        >
           {coverContent}
         </Pressable>
       ) : (
