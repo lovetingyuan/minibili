@@ -1,6 +1,8 @@
 export type SaveImageResult = "saved" | "permission-denied" | "failed";
 export type EnsureWritePermission = () => Promise<boolean>;
 
+export const MiniBiliAlbumName = "MiniBili";
+
 const SupportedImageExtension = /\.(avif|gif|jpe?g|png|webp)$/i;
 const UnsafeFileNameCharacter = /[\\/:*?"<>|]/g;
 
@@ -44,13 +46,19 @@ export async function saveImageToLibrary(
       return "permission-denied";
     }
 
-    const [{ Asset }, { File, Paths }] = await Promise.all([
+    const [{ Album, Asset }, { File, Paths }] = await Promise.all([
       import("expo-media-library"),
       import("expo-file-system"),
     ]);
     const destination = new File(Paths.cache, getImageFileName(uri));
     const file = await File.downloadFileAsync(uri, destination);
-    await Asset.create(file.uri);
+    const album = await Album.get(MiniBiliAlbumName);
+
+    if (album) {
+      await Asset.create(file.uri, album);
+    } else {
+      await Album.create(MiniBiliAlbumName, [file.uri]);
+    }
 
     try {
       file.delete();

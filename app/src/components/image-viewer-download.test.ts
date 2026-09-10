@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  albumCreate: vi.fn(),
+  albumGet: vi.fn(),
   create: vi.fn(),
   deleteFile: vi.fn(),
   downloadFileAsync: vi.fn(),
@@ -33,15 +35,26 @@ vi.mock("expo-file-system", () => {
 });
 
 vi.mock("expo-media-library", () => ({
+  Album: {
+    create: mocks.albumCreate,
+    get: mocks.albumGet,
+  },
   Asset: {
     create: mocks.create,
   },
 }));
 
-import { getImageFileName, saveImageToLibrary } from "./image-viewer-download";
+import {
+  getImageFileName,
+  MiniBiliAlbumName,
+  saveImageToLibrary,
+} from "./image-viewer-download";
 
 describe("image viewer downloads", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.albumGet.mockResolvedValue({ id: "album-id" });
+  });
 
   test("keeps a supported image extension from the original URL path", () => {
     expect(
@@ -65,6 +78,7 @@ describe("image viewer downloads", () => {
 
     expect(mocks.downloadFileAsync).not.toHaveBeenCalled();
     expect(mocks.create).not.toHaveBeenCalled();
+    expect(mocks.albumGet).not.toHaveBeenCalled();
   });
 
   test("returns failed when downloading or saving the asset fails", async () => {
@@ -75,6 +89,7 @@ describe("image viewer downloads", () => {
     ).resolves.toBe("failed");
 
     expect(mocks.create).not.toHaveBeenCalled();
+    expect(mocks.albumGet).not.toHaveBeenCalled();
   });
 
   test("returns failed without cleaning up when the media library rejects the asset", async () => {
@@ -89,11 +104,13 @@ describe("image viewer downloads", () => {
       saveImageToLibrary("https://example.com/photo.jpg", vi.fn().mockResolvedValue(true)),
     ).resolves.toBe("failed");
 
-    expect(mocks.create).toHaveBeenCalledExactlyOnceWith("file:///cache/photo.jpg");
+    expect(mocks.create).toHaveBeenCalledExactlyOnceWith("file:///cache/photo.jpg", {
+      id: "album-id",
+    });
     expect(mocks.deleteFile).not.toHaveBeenCalled();
   });
 
-  test("downloads to cache, creates an asset, and cleans up on success", async () => {
+  test("adds to an existing MiniBili album and cleans up on success", async () => {
     const file = {
       uri: "file:///cache/photo.jpg",
       delete: mocks.deleteFile,
@@ -106,7 +123,31 @@ describe("image viewer downloads", () => {
     ).resolves.toBe("saved");
 
     expect(mocks.downloadFileAsync).toHaveBeenCalledOnce();
-    expect(mocks.create).toHaveBeenCalledExactlyOnceWith("file:///cache/photo.jpg");
+    expect(mocks.albumGet).toHaveBeenCalledExactlyOnceWith(MiniBiliAlbumName);
+    expect(mocks.create).toHaveBeenCalledExactlyOnceWith("file:///cache/photo.jpg", {
+      id: "album-id",
+    });
+    expect(mocks.deleteFile).toHaveBeenCalledOnce();
+  });
+
+  test("creates the MiniBili album with the file when it does not exist", async () => {
+    const file = {
+      uri: "file:///cache/photo.jpg",
+      delete: mocks.deleteFile,
+    };
+    mocks.albumGet.mockResolvedValueOnce(null);
+    mocks.albumCreate.mockResolvedValueOnce({ id: "new-album-id" });
+    mocks.downloadFileAsync.mockResolvedValueOnce(file);
+
+    await expect(
+      saveImageToLibrary("https://example.com/photo.jpg", vi.fn().mockResolvedValue(true)),
+    ).resolves.toBe("saved");
+
+    expect(mocks.albumGet).toHaveBeenCalledExactlyOnceWith(MiniBiliAlbumName);
+    expect(mocks.albumCreate).toHaveBeenCalledExactlyOnceWith(MiniBiliAlbumName, [
+      "file:///cache/photo.jpg",
+    ]);
+    expect(mocks.create).not.toHaveBeenCalled();
     expect(mocks.deleteFile).toHaveBeenCalledOnce();
   });
 });
