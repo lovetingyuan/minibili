@@ -10,7 +10,6 @@ import { GestureDetector } from "react-native-gesture-handler";
 import { useVideoPlayUrl } from "@/api/play-url";
 import { useVideoInfo } from "@/api/video-info";
 import { Icon } from "@/components/styled/rneui";
-import { UA } from "@/constants";
 import { lockAppPortrait, setFullscreenOrientationOwner } from "@/hooks/useAppOrientation";
 import { useAppStateChange } from "@/hooks/useAppState";
 import { useStore } from "@/store";
@@ -22,15 +21,15 @@ import PlayerControls from "./PlayerControls";
 import PlayerCover from "./PlayerCover";
 import PlayerError from "./PlayerError";
 import {
+  createVideoSource,
   isSeekJump,
   PLAYER_FAST_RATE,
   resolveInlinePlayerHeight,
+  resolvePlaybackFailover,
   resolvePreferredQuality,
   resolveTapAction,
 } from "./player-helpers";
 import { usePlayerGestures } from "./usePlayerGestures";
-
-const PLAY_URL_REFERER = "https://www.bilibili.com";
 
 type NativePlayerProps = {
   currentPage: number;
@@ -68,12 +67,25 @@ export default function NativePlayer(props: NativePlayerProps) {
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [currentTimeMs, setCurrentTimeMs] = React.useState(0);
   const [seekToken, setSeekToken] = React.useState(0);
+  // 当前使用的播放地址（主地址 + 备用 CDN 镜像）与自动兜底的进度
+  const [playbackAttempt, setPlaybackAttempt] = React.useState({
+    index: 0,
+    refreshCount: 0,
+    token: 0,
+  });
   const lastTimeRef = React.useRef(0);
   const pausedByImagesRef = React.useRef(false);
+  // 已经处理过的失败尝试，避免同一轮重复触发兜底
+  const handledAttemptTokenRef = React.useRef(-1);
+  // 已经为新地址补过重载的尝试
+  const reloadedAttemptTokenRef = React.useRef(0);
+  // 切换地址后需要恢复的播放进度（毫秒）
+  const resumePositionMsRef = React.useRef(0);
 
   const qn = resolvePreferredQuality(isCellular, highQuality);
-  const { uri, error: playUrlError, retry } = useVideoPlayUrl(videoInfo.bvid, cid, qn);
-  const source = uri ? { uri, headers: { Referer: PLAY_URL_REFERER, "User-Agent": UA } } : null;
+  const { urls, error: playUrlError, retry } = useVideoPlayUrl(videoInfo.bvid, cid, qn);
+  const uri = urls[Math.min(playbackAttempt.index, urls.length - 1)];
+  const source = uri ? createVideoSource(uri) : null;
 
   const player = useVideoPlayer(source, (instance) => {
     instance.timeUpdateEventInterval = 0.25;
@@ -100,16 +112,83 @@ export default function NativePlayer(props: NativePlayerProps) {
   });
 
   useEventListener(player, "statusChange", ({ status, error }) => {
-    if (status === "error") {
-      setPlayerError(error?.message ?? "视频播放失败");
-    } else if (status === "readyToPlay") {
+    if (status === "readyToPlay") {
       setPlayerError(null);
+      const resumePositionMs = resumePositionMsRef.current;
+      if (resumePositionMs > 0) {
+        resumePositionMsRef.current = 0;
+        player.currentTime = resumePositionMs / 1000;
+        lastTimeRef.current = resumePositionMs;
+        setCurrentTimeMs(resumePositionMs);
+        setSeekToken((token) => token + 1);
+      }
+      return;
     }
+    if (status !== "error" || handledAttemptTokenRef.current === playbackAttempt.token) {
+      return;
+    }
+    handledAttemptTokenRef.current = playbackAttempt.token;
+    const failover = resolvePlaybackFailover({
+      index: playbackAttempt.index,
+      total: urls.length,
+      refreshCount: playbackAttempt.refreshCount,
+    });
+    if (failover.type === "give-up") {
+      setPlayerError(error?.message ?? "视频播放失败");
+      return;
+    }
+    // 自动兜底时记住当前进度，等新地址就绪后接着播
+    resumePositionMsRef.current = Math.round(player.currentTime * 1000) || lastTimeRef.current;
+    if (__DEV__) {
+      // oxlint-disable-next-line no-console
+      console.log("playback failover", {
+        action: failover.type,
+        index: playbackAttempt.index,
+        total: urls.length,
+        refreshCount: playbackAttempt.refreshCount,
+        uri: uri?.slice(0, 90),
+      });
+    }
+    if (failover.type === "next-url") {
+      setPlaybackAttempt((current) => ({
+        index: failover.index,
+        refreshCount: current.refreshCount,
+        token: current.token + 1,
+      }));
+      return;
+    }
+    setPlaybackAttempt((current) => ({
+      index: 0,
+      refreshCount: failover.refreshCount,
+      token: current.token + 1,
+    }));
+    void retry().catch(() => {
+      setPlayerError(error?.message ?? "视频播放失败");
+    });
   });
 
   useEventListener(player, "playToEnd", () => {
     onPlayEnded();
   });
+
+  // 切换分P/清晰度时重置兜底状态与续播进度
+  React.useEffect(() => {
+    handledAttemptTokenRef.current = -1;
+    resumePositionMsRef.current = 0;
+    lastTimeRef.current = 0;
+    setPlaybackAttempt((current) => ({ index: 0, refreshCount: 0, token: current.token + 1 }));
+  }, [cid, qn]);
+
+  // 重新获取地址后如果和上一次完全相同，useVideoPlayer 不会重建播放器，这里补一次重载
+  React.useEffect(() => {
+    if (!source || reloadedAttemptTokenRef.current === playbackAttempt.token) {
+      return;
+    }
+    reloadedAttemptTokenRef.current = playbackAttempt.token;
+    if (player.status === "error") {
+      void player.replaceAsync(source);
+    }
+  }, [playbackAttempt.token, player, source]);
 
   // 非流量环境下自动开播；流量环境需要点击封面
   React.useEffect(() => {
@@ -211,11 +290,12 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
     setIsRetrying(true);
     setPlayerError(null);
+    resumePositionMsRef.current = 0;
     try {
       await retry();
-      if (player.status === "error" && source) {
-        await player.replaceAsync(source);
-      }
+      handledAttemptTokenRef.current = -1;
+      // 重置兜底进度并强制重新加载（地址没变时由 reloadedAttemptToken 的重载逻辑兜底）
+      setPlaybackAttempt((current) => ({ index: 0, refreshCount: 0, token: current.token + 1 }));
     } catch {
       // 重试失败保留错误态
     }

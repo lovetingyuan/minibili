@@ -1,7 +1,35 @@
-import { test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import request from "./fetcher";
+import { collectPlayUrls } from "./play-url";
 import { PlayUrlResponseSchema } from "./play-url.schema";
+
+describe("collectPlayUrls", () => {
+  test("keeps the primary url first and appends backup mirrors", () => {
+    expect(
+      collectPlayUrls("https://a.bilivideo.com/x.mp4", [
+        "https://b.bilivideo.com/x.mp4",
+        "https://c.bilivideo.com/x.mp4",
+      ]),
+    ).toEqual([
+      "https://a.bilivideo.com/x.mp4",
+      "https://b.bilivideo.com/x.mp4",
+      "https://c.bilivideo.com/x.mp4",
+    ]);
+  });
+
+  test("drops empty values and duplicated mirrors", () => {
+    expect(collectPlayUrls(undefined, null)).toEqual([]);
+    expect(collectPlayUrls("", [])).toEqual([]);
+    expect(
+      collectPlayUrls("https://a.bilivideo.com/x.mp4", [
+        "",
+        "https://a.bilivideo.com/x.mp4",
+        "https://c.bilivideo.com/x.mp4",
+      ]),
+    ).toEqual(["https://a.bilivideo.com/x.mp4", "https://c.bilivideo.com/x.mp4"]);
+  });
+});
 
 const sleep = () => {
   // @ts-ignore

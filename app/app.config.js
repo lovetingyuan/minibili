@@ -7,13 +7,13 @@ const versionCode = pkg.config.versionCode;
 
 const dev = process.argv.includes("start");
 const gitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || "-";
+const isPreview = process.env.APP_VARIANT === "preview";
 
-const appId =
-  process.env.APP_VARIANT === "preview" ? "com.tingyuan.minibili.preview" : "com.tingyuan.minibili";
+const appId = isPreview ? "com.tingyuan.minibili.preview" : "com.tingyuan.minibili";
 
 const release = `${appId}@${version}+${versionCode}`;
 
-const name = process.env.APP_VARIANT === "preview" ? "MiniBili-pre" : "MiniBili";
+const name = isPreview ? "MiniBili-pre" : "MiniBili";
 
 module.exports = {
   name,
@@ -121,6 +121,9 @@ module.exports = {
   // },
   updates: {
     url: "https://u.expo.dev/17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
+    // EAS 的 preview profile 会带上 channel=preview（见 eas.json），本地构建时靠 APP_VARIANT 补齐，
+    // 否则 eas update --channel preview 推的 OTA 收不到，About 页的“版本频道”也会是空的
+    ...(isPreview ? { requestHeaders: { "expo-channel-name": "preview" } } : {}),
   },
   runtimeVersion: {
     policy: "appVersion",

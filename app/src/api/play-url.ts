@@ -32,8 +32,18 @@ function createPlayUrlQuery(bvid: string, cid: number, qn: VideoQuality) {
 }
 
 /**
+ * 收集可用的播放地址：主地址优先，其后是 B站分配的 CDN 备用镜像。
+ * 同一个视频会分散在不同 CDN 上，单个镜像鉴权失败/抖动时按顺序回退。
+ */
+export function collectPlayUrls(url?: string | null, backupUrls?: string[] | null) {
+  const urls = [url, ...(backupUrls ?? [])].filter((item): item is string => Boolean(item));
+  return [...new Set(urls)];
+}
+
+/**
  * 原生播放器使用的播放地址，返回渐进式 mp4（单文件带音轨）。
  * 未登录时 B站最高只返回 720P，此时 quality 会是 64，调用方按返回的清晰度静默播放。
+ * 返回主地址与各 CDN 备用镜像，播放失败时由调用方按顺序回退。
  */
 export function useVideoPlayUrl(bvid: string, cid: number | undefined, qn: VideoQuality) {
   const search = bvid && cid ? createPlayUrlQuery(bvid, cid, qn) : null;
@@ -53,7 +63,7 @@ export function useVideoPlayUrl(bvid: string, cid: number | undefined, qn: Video
 
   const durl = data?.durl?.[0];
   return {
-    uri: durl?.url || durl?.backup_url?.[0] || undefined,
+    urls: collectPlayUrls(durl?.url, durl?.backup_url),
     quality: data?.quality,
     error,
     retry: () => mutate(),

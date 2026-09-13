@@ -9,6 +9,15 @@ export const serverUrl =
 export let UA =
   "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36";
 
+/**
+ * 视频 CDN（*.bilivideo.com）的播放地址是按 pc 平台签发的，防盗链要求：
+ * 必须带 Referer，且 UA 中不能出现 "android"（不区分大小写），否则一律 403。
+ * ExoPlayer 默认 UA（"... (Linux; Android 13 ...) ExoPlayerLib/..."）同样会被拒，
+ * 因此媒体请求必须显式使用桌面浏览器 UA；接口请求继续使用 UA。
+ */
+export const mediaUA =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+
 export const GhProxy = "https://ghfast.top";
 
 export const RanksConfig = [

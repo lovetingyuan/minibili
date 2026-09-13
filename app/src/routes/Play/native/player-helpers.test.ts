@@ -1,9 +1,12 @@
 import { expect, test } from "vitest";
 
 import {
+  createVideoSource,
   formatPlaybackTime,
   isSeekJump,
+  PLAY_URL_MAX_REFRESH,
   resolveInlinePlayerHeight,
+  resolvePlaybackFailover,
   resolvePreferredQuality,
   resolveTapAction,
 } from "./player-helpers";
@@ -51,4 +54,43 @@ test("computes inline player height for landscape and portrait videos", () => {
     }),
   ).toBe(264);
   expect(resolveInlinePlayerHeight({ screenWidth: 400, screenHeight: 800 })).toBe(240);
+});
+
+test("builds a media source with a referer and without an android user agent", () => {
+  const uri = "https://upos-sz-estghw.bilivideo.com/upgcxcode/14/03/36813670314/x.mp4?sig=1";
+  const source = createVideoSource(uri);
+
+  expect(source.uri).toBe(uri);
+  expect(source.headers?.Referer).toBe("https://www.bilibili.com");
+  // B站 CDN 会拒绝 UA 含 "android" 的请求，ExoPlayer 默认 UA 同样会被拒
+  expect(source.headers?.["User-Agent"]).not.toMatch(/android/i);
+});
+
+test("falls back to the next cdn mirror before refreshing the play url", () => {
+  expect(resolvePlaybackFailover({ index: 0, total: 3, refreshCount: 0 })).toEqual({
+    type: "next-url",
+    index: 1,
+  });
+  expect(resolvePlaybackFailover({ index: 2, total: 3, refreshCount: 0 })).toEqual({
+    type: "refresh",
+    index: 0,
+    refreshCount: 1,
+  });
+  expect(resolvePlaybackFailover({ index: 0, total: 1, refreshCount: 0 })).toEqual({
+    type: "refresh",
+    index: 0,
+    refreshCount: 1,
+  });
+});
+
+test("gives up only after the refresh limit is reached", () => {
+  expect(
+    resolvePlaybackFailover({ index: 0, total: 1, refreshCount: PLAY_URL_MAX_REFRESH - 1 }),
+  ).toEqual({ type: "refresh", index: 0, refreshCount: PLAY_URL_MAX_REFRESH });
+  expect(
+    resolvePlaybackFailover({ index: 0, total: 1, refreshCount: PLAY_URL_MAX_REFRESH }),
+  ).toEqual({ type: "give-up" });
+  expect(resolvePlaybackFailover({ index: 0, total: 0, refreshCount: PLAY_URL_MAX_REFRESH })).toEqual(
+    { type: "give-up" },
+  );
 });

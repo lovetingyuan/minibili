@@ -30,3 +30,6 @@ app/tailwind-output/
 # prebuild 生成的原生工程，仅供本机构建使用，不纳入版本管理
 app/android/
 app/ios/
+
+# dev / preview 两个变体各自的原生工程缓存（构建脚本自动切换）
+app/.native-build/
