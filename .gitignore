@@ -26,3 +26,7 @@ yalc.lock
 .VSCodeCounter
 
 app/tailwind-output/
+
+# prebuild 生成的原生工程，仅供本机构建使用，不纳入版本管理
+app/android/
+app/ios/

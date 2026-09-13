@@ -1,6 +1,7 @@
-import * as ScreenOrientation from "expo-screen-orientation";
 import React from "react";
 import { AppState, Platform } from "react-native";
+
+import { lockPortraitOrientation } from "../utils/screen-orientation";
 
 let fullscreenOwner = false;
 
@@ -19,7 +20,7 @@ export function lockAppPortrait() {
   if (Platform.OS === "web" || fullscreenOwner) {
     return;
   }
-  void ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP).catch(() => {});
+  lockPortraitOrientation();
 }
 
 export default function useAppOrientation() {

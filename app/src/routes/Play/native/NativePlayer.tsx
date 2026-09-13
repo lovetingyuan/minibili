@@ -2,7 +2,6 @@ import { NetInfoStateType, useNetInfo } from "@react-native-community/netinfo";
 import { type RouteProp, useIsFocused, useRoute } from "@react-navigation/native";
 import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
-import * as ScreenOrientation from "expo-screen-orientation";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
 import { Platform, StyleSheet, Text, useWindowDimensions, View } from "react-native";
@@ -16,6 +15,7 @@ import { lockAppPortrait, setFullscreenOrientationOwner } from "@/hooks/useAppOr
 import { useAppStateChange } from "@/hooks/useAppState";
 import { useStore } from "@/store";
 import type { RootStackParamList } from "@/types";
+import { unlockOrientation } from "@/utils/screen-orientation";
 
 import DanmakuOverlay from "./DanmakuOverlay";
 import PlayerControls from "./PlayerControls";
@@ -169,7 +169,7 @@ export default function NativePlayer(props: NativePlayerProps) {
       return;
     }
     setFullscreenOrientationOwner(true);
-    void ScreenOrientation.unlockAsync().catch(() => {});
+    unlockOrientation();
     return () => {
       setFullscreenOrientationOwner(false);
       lockAppPortrait();
