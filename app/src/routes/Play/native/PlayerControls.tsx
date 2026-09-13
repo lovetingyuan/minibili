@@ -169,7 +169,10 @@ export default function PlayerControls(props: PlayerControlsProps) {
             />
           </View>
         </GestureDetector>
-        <Text className="min-w-[84px] text-center text-xs tabular-nums text-white" numberOfLines={1}>
+        <Text
+          className="min-w-[84px] text-center text-xs tabular-nums text-white"
+          numberOfLines={1}
+        >
           {`${formatPlaybackTime(displayMs / 1000)}/${formatPlaybackTime(durationMs / 1000)}`}
         </Text>
         <ControlButton
