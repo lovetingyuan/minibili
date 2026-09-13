@@ -107,10 +107,10 @@ export function CommentItem(props: CommentItemProps) {
         >
           <Avatar
             rounded
-            size={compact ? 30 : 36}
+            size={compact ? 24 : 28}
             source={
               comment.face
-                ? { uri: parseImgUrl(comment.face, getImagePixelSize(compact ? 30 : 36)) }
+                ? { uri: parseImgUrl(comment.face, getImagePixelSize(compact ? 24 : 28)) }
                 : undefined
             }
             title={comment.name.slice(0, 1)}
@@ -185,12 +185,10 @@ export function Comment(props: CommentProps) {
   const moreRepliesButton =
     comment.rcount > 0 ? (
       <Pressable
-        className={clsx(
-          "min-h-10 flex-row items-center rounded-xl px-1",
-          !comment.replies.length && "mt-2 self-start bg-neutral-50 px-3 dark:bg-neutral-900",
-        )}
+        className={clsx("self-start", !comment.replies.length && "mt-2")}
         accessibilityRole="button"
         accessibilityLabel={`查看全部 ${comment.rcount} 条回复`}
+        hitSlop={4}
         onPress={() => openReplies(comment, false)}
       >
         <Text className={`text-sm font-medium ${colors.primary.text}`}>

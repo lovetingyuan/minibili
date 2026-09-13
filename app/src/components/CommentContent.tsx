@@ -2,14 +2,14 @@ import { useNavigation } from "@react-navigation/native";
 import * as Clipboard from "expo-clipboard";
 import { Linking } from "react-native";
 
-import { Image } from "@/components/styled/expo";
 import { Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
-import { getImagePixelSize, parseImgUrl, showToast } from "@/utils";
+import { showToast } from "@/utils";
 
 import type { CommentImageEntryProps, CommentTextProps } from "./comment.types";
+import { InlineEmoji } from "./InlineEmoji";
 import UpName from "./UpName";
 
 export function CommentText(props: CommentTextProps) {
@@ -49,13 +49,7 @@ export function CommentText(props: CommentTextProps) {
           );
         }
         if (node.type === "emoji") {
-          return (
-            <Image
-              key={key}
-              source={{ uri: parseImgUrl(node.url, getImagePixelSize(18)) }}
-              className="mx-0.5 h-[18px] w-[18px]"
-            />
-          );
+          return <InlineEmoji key={key} url={node.url} size={18} fontSize={15} />;
         }
         if (node.type === "vote") {
           return (

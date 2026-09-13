@@ -22,7 +22,8 @@ module.exports = {
   scheme: "minibili",
   version,
   githubUrl: "https://github.com/lovetingyuan/minibili",
-  orientation: "portrait",
+  // 应用默认竖屏由 useAppOrientation 在运行时锁定，播放器全屏时需要能临时解锁旋转
+  orientation: "default",
   icon: "./assets/icon/icon.png",
   userInterfaceStyle: "automatic",
   ios: {

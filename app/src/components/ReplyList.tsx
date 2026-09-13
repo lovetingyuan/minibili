@@ -1,23 +1,28 @@
 import { useIsFocused } from "@react-navigation/native";
 import type { FlashListRef } from "@shopify/flash-list";
 import { useEffect, useRef } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Pressable, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
+import type { Edge } from "react-native-safe-area-context";
 
 import { useReplies } from "@/api/replies";
 import type { ReplyItemType } from "@/api/replies";
 import { BottomSheet, FlashList, Icon, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
+import useKeyboardHeight from "@/hooks/useKeyboardHeight";
 import { useStore } from "@/store";
 
 import { CommentItem } from "./Comment";
 import type { ReplyListProps } from "./reply-list.types";
 import ReplyComposer from "./ReplyComposer";
 
+const SHEET_SAFE_AREA_EDGES: Edge[] = ["top"];
+
 export default function ReplyList(props: ReplyListProps) {
   const replies = useReplies();
   const { setRepliesInfo, repliesInfo } = useStore();
   const focused = useIsFocused();
   const listRef = useRef<FlashListRef<ReplyItemType>>(null);
+  const keyboardHeight = useKeyboardHeight();
   const loadMoreLock = useRef(false);
   const repliesInfoRef = useRef(repliesInfo);
   repliesInfoRef.current = repliesInfo;
@@ -86,13 +91,14 @@ export default function ReplyList(props: ReplyListProps) {
   return (
     <BottomSheet
       backdropClassName="bg-black/50"
+      edges={SHEET_SAFE_AREA_EDGES}
       onBackdropPress={handleClose}
       modalProps={{ onRequestClose: handleClose, statusBarTranslucent: true }}
       isVisible={Boolean(repliesInfo)}
     >
-      <KeyboardAvoidingView
-        behavior={process.env.EXPO_OS === "ios" ? "padding" : undefined}
+      <View
         className="h-[86vh] overflow-hidden rounded-t-[28px] bg-white dark:bg-neutral-950"
+        style={{ paddingBottom: keyboardHeight }}
       >
         <View className="items-center pb-1.5 pt-2.5">
           <View className="h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700" />
@@ -175,7 +181,7 @@ export default function ReplyList(props: ReplyListProps) {
             onSubmit={submitReply}
           />
         ) : null}
-      </KeyboardAvoidingView>
+      </View>
     </BottomSheet>
   );
 }

@@ -39,6 +39,14 @@ const getAppValue = () => {
     followingsGeneration: -1,
     isWiFi: false,
     webViewMode: "MOBILE" as "PC" | "MOBILE",
+    /**
+     * 播放器内弹幕开关，默认开启
+     */
+    $danmakuEnabled: true,
+    /**
+     * 是否允许 App 退到后台继续播放
+     */
+    $backgroundPlayEnabled: false,
     livingUps: {} as Record<string, string>,
     followingDynamicsUpdateCount: 0,
     currentVideosCate: RanksConfig[0] as (typeof RanksConfig)[number],

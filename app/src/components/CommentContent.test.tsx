@@ -33,7 +33,8 @@ vi.mock("@/utils", () => ({
 }));
 vi.mock("./UpName", () => ({ default: "UpName" }));
 
-import { CommentImages } from "./CommentContent";
+import { CommentImages, CommentText } from "./CommentContent";
+import { InlineEmoji } from "./InlineEmoji";
 
 type ImageEntryProps = {
   accessibilityLabel?: string;
@@ -69,5 +70,25 @@ describe("CommentImages", () => {
 
     expect(mocks.setCurrentImageIndex).toHaveBeenCalledWith(0);
     expect(mocks.setImagesList).toHaveBeenCalledWith(images);
+  });
+});
+
+describe("CommentText emoji alignment", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  test("aligns comment emoji with the 15px comment text", () => {
+    const text = CommentText({
+      idStr: "1",
+      images: [],
+      nodes: [{ type: "emoji", url: "//i0.hdslb.com/emoji.png" }],
+    }) as ReactElement<{ children: ReactElement<{ fontSize: number; size: number }>[][] }>;
+    const [emoji] = text.props.children[0];
+
+    expect(emoji.type).toBe(InlineEmoji);
+    expect(emoji.props).toMatchObject({
+      url: "//i0.hdslb.com/emoji.png",
+      size: 18,
+      fontSize: 15,
+    });
   });
 });

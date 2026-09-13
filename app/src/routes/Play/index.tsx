@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text } from "@/components/styled/rneui";
 import * as Clipboard from "expo-clipboard";
+import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Alert, View } from "react-native";
 
@@ -11,7 +12,9 @@ import CommentList from "../../components/CommentList";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 import { PlayHeaderRight, PlayHeaderTitle } from "./Header";
+import NativePlayer from "./native/NativePlayer";
 import Player from "./Player";
+import { PLAYER_MODE } from "./player-mode";
 import VideoInfo from "./VideoInfo";
 
 // https://www.bilibili.com/blackboard/webplayer/mbplayer.html?aid=1501398719&bvid=BV1HS421w7wG&cid=1458260037&p=1
@@ -45,9 +48,11 @@ function Play({ route }: Props) {
   }, [error]);
 
   const [key, setKey] = React.useState(bvid);
+  const [fullscreen, setFullscreen] = React.useState(false);
 
   useUpdateNavigationOptions({
     headerTitle: () => <PlayHeaderTitle />,
+    headerShown: !fullscreen,
     headerRight: () => (
       <PlayHeaderRight
         cid={cid2}
@@ -66,7 +71,17 @@ function Play({ route }: Props) {
 
   return (
     <View className="flex-1" key={key}>
-      <Player currentPage={currentPage} onPlayEnded={handlePlayEnd} />
+      <StatusBar hidden={fullscreen} style="auto" />
+      {PLAYER_MODE === "web" ? (
+        <Player currentPage={currentPage} onPlayEnded={handlePlayEnd} />
+      ) : (
+        <NativePlayer
+          currentPage={currentPage}
+          onPlayEnded={handlePlayEnd}
+          fullscreen={fullscreen}
+          onFullscreenChange={setFullscreen}
+        />
+      )}
       <CommentList
         commentId={videoInfo?.aid || ""}
         commentType={1}

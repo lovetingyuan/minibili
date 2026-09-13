@@ -98,19 +98,17 @@ export default function CommentList(props: CommentListProps) {
                 <Icon
                   name="comment-text-outline"
                   type="material-community"
-                  size={16}
+                  size={14}
                   colorClassName={colors.gray7.accent}
                 />
-                <Text className="text-base font-semibold">
-                  评论
-                  <Text className={`text-xs font-normal ${colors.gray6.text}`}>
-                    {typeof allCount === "number"
-                      ? ` ${allCount}`
-                      : comments.isLoading
-                        ? " 加载中"
-                        : ""}
-                  </Text>
-                </Text>
+                <View className="flex-row items-center gap-1">
+                  <Text className="text-sm font-semibold">评论</Text>
+                  {typeof allCount === "number" ? (
+                    <Text className={`text-xs font-normal ${colors.gray6.text}`}>{allCount}</Text>
+                  ) : comments.isLoading ? (
+                    <Text className={`text-xs font-normal ${colors.gray6.text}`}>加载中</Text>
+                  ) : null}
+                </View>
               </View>
               <View className="flex-row items-center gap-3">
                 {props.dividerRight}

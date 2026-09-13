@@ -24,6 +24,7 @@ import DevServerRecovery from "./components/DevServerRecovery";
 import FollowingDynamicsUpdatesManager from "./components/FollowingDynamicsUpdatesManager";
 import ImagesView from "./components/ImagesView";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
+import useAppOrientation from "./hooks/useAppOrientation";
 import useRNETheme from "./hooks/useRNETheme";
 import Route from "./routes/Index";
 import ErrorBoundary from "react-native-error-boundary";
@@ -73,6 +74,7 @@ const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
 
 export default function App() {
   const rneTheme = useRNETheme();
+  useAppOrientation();
   return (
     <SafeAreaProvider>
       <SWRConfig value={SWRConfigValue}>

@@ -39,6 +39,7 @@ import type {
 import { FlashList as BaseFlashList } from "@shopify/flash-list";
 import type { FlashListProps, FlashListRef } from "@shopify/flash-list";
 import type { StyleProp, TextStyle } from "react-native";
+import type { Edge } from "react-native-safe-area-context";
 import { useResolveClassNames } from "uniwind";
 
 function useResolvedStyle(className?: string) {
@@ -129,6 +130,8 @@ export function Badge({
 type BottomSheetProps = BaseBottomSheetProps & {
   backdropClassName?: string;
   containerClassName?: string;
+  /** 内部通过 SafeAreaView 包裹内容，默认四边都加安全区内边距，贴底场景可只保留 top */
+  edges?: Edge[];
   children?: React.ReactNode;
 };
 
@@ -137,6 +140,7 @@ export function BottomSheet({
   containerClassName,
   backdropStyle,
   containerStyle,
+  edges,
   ...props
 }: BottomSheetProps) {
   const resolvedBackdropStyle = useResolvedStyle(backdropClassName);
@@ -145,6 +149,7 @@ export function BottomSheet({
   return (
     <BottomSheetPrimitive
       {...props}
+      edges={edges}
       backdropStyle={[backdropStyle, resolvedBackdropStyle]}
       containerStyle={[containerStyle, resolvedContainerStyle]}
     />

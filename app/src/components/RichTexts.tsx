@@ -8,9 +8,9 @@ import { HandledRichTextType } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
-import { getImagePixelSize, parseImgUrl, parseUrl } from "@/utils";
+import { parseUrl } from "@/utils";
 
-import { Image } from "./styled/expo";
+import { InlineEmoji } from "./InlineEmoji";
 import { Icon, Text } from "./styled/rneui";
 import UpName from "./UpName";
 
@@ -86,13 +86,7 @@ function RichTexts(props: Props) {
       );
     }
     if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_EMOJI && node.emoji?.icon_url) {
-      return (
-        <Image
-          key={key}
-          source={{ uri: parseImgUrl(node.emoji.icon_url, getImagePixelSize(20)) }}
-          className="h-5 w-5"
-        />
-      );
+      return <InlineEmoji key={key} url={node.emoji.icon_url} size={20} fontSize={fontSize} />;
     }
     if (
       node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_BV ||
