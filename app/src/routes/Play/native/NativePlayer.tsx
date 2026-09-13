@@ -4,8 +4,17 @@ import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
-import { Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import {
+  Animated,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
+import { withUniwind } from "uniwind";
 
 import { useVideoPlayUrl } from "@/api/play-url";
 import { useVideoInfo } from "@/api/video-info";
@@ -24,12 +33,19 @@ import {
   createVideoSource,
   isSeekJump,
   PLAYER_FAST_RATE,
+  PLAYER_HEIGHT_ANIMATION_MS,
+  type PlayerSwipeDirection,
   resolveInlinePlayerHeight,
   resolvePlaybackFailover,
   resolvePreferredQuality,
 } from "./player-helpers";
 import { usePlayerControlsVisibility } from "./usePlayerControlsVisibility";
 import { usePlayerGestures } from "./usePlayerGestures";
+
+// Animated.View 需要额外包一层才能识别 className
+const StyledAnimatedView = withUniwind(Animated.View) as unknown as React.ComponentType<
+  React.ComponentProps<typeof Animated.View> & { className?: string }
+>;
 
 type NativePlayerProps = {
   currentPage: number;
@@ -61,6 +77,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [currentTimeMs, setCurrentTimeMs] = React.useState(0);
   const [seekToken, setSeekToken] = React.useState(0);
+  // 竖屏视频下滑展开，高度由屏幕高度的 33% 切换到 70%
+  const [portraitExpanded, setPortraitExpanded] = React.useState(false);
   // 当前使用的播放地址（主地址 + 备用 CDN 镜像）与自动兜底的进度
   const [playbackAttempt, setPlaybackAttempt] = React.useState({
     index: 0,
@@ -165,6 +183,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   });
 
   useEventListener(player, "playToEnd", () => {
+    setPortraitExpanded(false);
     onPlayEnded();
   });
 
@@ -173,6 +192,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     handledAttemptTokenRef.current = -1;
     resumePositionMsRef.current = 0;
     lastTimeRef.current = 0;
+    setPortraitExpanded(false);
     setPlaybackAttempt((current) => ({ index: 0, refreshCount: 0, token: current.token + 1 }));
   }, [cid, qn]);
 
@@ -308,6 +328,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     },
     onLongPressStart: handleLongPressStart,
     onLongPressEnd: handleLongPressEnd,
+    onVerticalSwipe: handleVerticalSwipe,
   });
 
   let videoWidth = pageInfo?.width ?? videoInfo.width;
@@ -317,24 +338,51 @@ export default function NativePlayer(props: NativePlayerProps) {
     videoWidth = videoHeight;
     videoHeight = swap;
   }
+  const isPortraitVideo = Boolean(videoWidth && videoHeight && videoHeight > videoWidth);
   const inlineHeight = resolveInlinePlayerHeight({
     screenWidth: width,
     screenHeight: height,
     videoWidth,
     videoHeight,
+    expanded: portraitExpanded,
   });
   const containerHeight = fullscreen ? height : inlineHeight;
   const hasError = Boolean(playerError) || (Boolean(playUrlError) && !uri);
   const showError = hasError || isRetrying;
 
+  // 高度切换用动画过渡，全屏分支不使用该值
+  const [inlineHeightAnim] = React.useState(() => new Animated.Value(inlineHeight));
+  React.useEffect(() => {
+    const animation = Animated.timing(inlineHeightAnim, {
+      toValue: inlineHeight,
+      duration: PLAYER_HEIGHT_ANIMATION_MS,
+      useNativeDriver: false,
+    });
+    animation.start();
+    return () => {
+      animation.stop();
+    };
+  }, [inlineHeight, inlineHeightAnim]);
+
+  /**
+   * 竖屏视频下滑展开到屏幕高度的 70%，上滑收回；
+   * 横屏视频、全屏、未开播以及错误态下不响应
+   */
+  function handleVerticalSwipe(direction: PlayerSwipeDirection) {
+    if (!started || !isPortraitVideo || fullscreen || showError) {
+      return;
+    }
+    setPortraitExpanded(direction === "down");
+  }
+
   return (
-    <View
+    <StyledAnimatedView
       renderToHardwareTextureAndroid
       className="relative w-full shrink-0 overflow-hidden bg-black"
       style={
         fullscreen
           ? { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 20 }
-          : { height: inlineHeight }
+          : { height: inlineHeightAnim }
       }
     >
       <VideoView
@@ -427,6 +475,6 @@ export default function NativePlayer(props: NativePlayerProps) {
           }}
         />
       ) : null}
-    </View>
+    </StyledAnimatedView>
   );
 }

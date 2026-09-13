@@ -10,6 +10,7 @@ import {
   resolveInlinePlayerHeight,
   resolvePlaybackFailover,
   resolvePreferredQuality,
+  resolveVerticalSwipe,
   toggleControlsVisible,
 } from "./player-helpers";
 
@@ -61,6 +62,34 @@ test("computes inline player height for landscape and portrait videos", () => {
     }),
   ).toBe(264);
   expect(resolveInlinePlayerHeight({ screenWidth: 400, screenHeight: 800 })).toBe(240);
+});
+
+test("expands only portrait videos to 70% of the screen height", () => {
+  const portrait = { screenWidth: 400, screenHeight: 800, videoWidth: 1080, videoHeight: 1920 };
+  expect(resolveInlinePlayerHeight({ ...portrait, expanded: true })).toBe(560);
+  expect(resolveInlinePlayerHeight({ ...portrait, expanded: false })).toBe(264);
+  expect(resolveInlinePlayerHeight(portrait)).toBe(264);
+  // 横屏视频按宽高比铺满，不受展开影响
+  const landscape = { screenWidth: 400, screenHeight: 800, videoWidth: 1920, videoHeight: 1080 };
+  expect(resolveInlinePlayerHeight({ ...landscape, expanded: true })).toBe(249);
+  // 宽高未知时按默认比例，同样不受展开影响
+  expect(resolveInlinePlayerHeight({ screenWidth: 400, screenHeight: 800, expanded: true })).toBe(
+    240,
+  );
+});
+
+test("resolves vertical swipe direction by translation", () => {
+  expect(resolveVerticalSwipe({ translationX: 0, translationY: 96 })).toBe("down");
+  expect(resolveVerticalSwipe({ translationX: 0, translationY: -96 })).toBe("up");
+  expect(resolveVerticalSwipe({ translationX: 0, translationY: 60 })).toBeNull();
+  expect(resolveVerticalSwipe({ translationX: 0, translationY: -60 })).toBeNull();
+  // 自定义阈值
+  expect(resolveVerticalSwipe({ translationX: 0, translationY: 30, minDistance: 20 })).toBe("down");
+  expect(resolveVerticalSwipe({ translationX: 0, translationY: 10, minDistance: 20 })).toBeNull();
+  // 横向位移更大时忽略
+  expect(resolveVerticalSwipe({ translationX: 120, translationY: 100 })).toBeNull();
+  expect(resolveVerticalSwipe({ translationX: -120, translationY: -100 })).toBeNull();
+  expect(resolveVerticalSwipe({ translationX: 20, translationY: 100 })).toBe("down");
 });
 
 test("builds a media source with a referer and without an android user agent", () => {

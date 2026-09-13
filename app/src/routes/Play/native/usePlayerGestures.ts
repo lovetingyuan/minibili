@@ -1,11 +1,19 @@
 import React from "react";
 import { Gesture } from "react-native-gesture-handler";
 
+import {
+  type PlayerSwipeDirection,
+  PLAYER_SWIPE_ACTIVE_OFFSET_Y,
+  PLAYER_SWIPE_FAIL_OFFSET_X,
+  resolveVerticalSwipe,
+} from "./player-helpers";
+
 type PlayerGestureOptions = {
   onSingleTap: () => void;
   onDoubleTap: () => void;
   onLongPressStart: () => void;
   onLongPressEnd: () => void;
+  onVerticalSwipe: (direction: PlayerSwipeDirection) => void;
 };
 
 /**
@@ -44,8 +52,22 @@ export function usePlayerGestures(options: PlayerGestureOptions) {
       .onFinalize(() => {
         optionsRef.current.onLongPressEnd();
       });
+    // 竖向滑动切换播放器高度，横向偏移过大时判定为其他手势
+    const verticalSwipe = Gesture.Pan()
+      .runOnJS(true)
+      .activeOffsetY([-PLAYER_SWIPE_ACTIVE_OFFSET_Y, PLAYER_SWIPE_ACTIVE_OFFSET_Y])
+      .failOffsetX([-PLAYER_SWIPE_FAIL_OFFSET_X, PLAYER_SWIPE_FAIL_OFFSET_X])
+      .onEnd((event) => {
+        const direction = resolveVerticalSwipe({
+          translationX: event.translationX,
+          translationY: event.translationY,
+        });
+        if (direction) {
+          optionsRef.current.onVerticalSwipe(direction);
+        }
+      });
 
-    return Gesture.Race(Gesture.Exclusive(doubleTap, singleTap), longPress);
+    return Gesture.Race(Gesture.Exclusive(doubleTap, singleTap), longPress, verticalSwipe);
   });
 
   return gesture;

@@ -30,9 +30,44 @@ const PLAYER_SEEK_TOLERANCE_MS = 1500;
 export const PLAYER_LANDSCAPE_VERTICAL_PADDING = 12;
 
 /**
+ * 竖屏视频内联播放时占屏幕高度的比例
+ */
+export const PLAYER_PORTRAIT_HEIGHT_RATIO = 0.33;
+
+/**
+ * 竖屏视频下滑展开后占屏幕高度的比例
+ */
+export const PLAYER_PORTRAIT_EXPANDED_HEIGHT_RATIO = 0.7;
+
+/**
  * 播放中控件无操作后自动隐藏的时间
  */
 export const PLAYER_CONTROLS_AUTO_HIDE_MS = 3000;
+
+/**
+ * 播放器高度切换的过渡时长
+ */
+export const PLAYER_HEIGHT_ANIMATION_MS = 200;
+
+/**
+ * 竖向滑动切换播放器高度所需的最小滑动距离
+ */
+export const PLAYER_SWIPE_MIN_DISTANCE = 60;
+
+/**
+ * 竖向滑动的手势激活距离（超过即认为是滑动而不是点击）
+ */
+export const PLAYER_SWIPE_ACTIVE_OFFSET_Y = 12;
+
+/**
+ * 竖向滑动时允许的横向偏移，超过则判定为横向手势
+ */
+export const PLAYER_SWIPE_FAIL_OFFSET_X = 24;
+
+/**
+ * 竖向滑动的方向，与网页播放器 change-video-height 的取值保持一致
+ */
+export type PlayerSwipeDirection = "down" | "up";
 
 /**
  * 媒体请求的 source：pc 平台的播放地址必须带 Referer，且 UA 不能包含 "android"，
@@ -123,6 +158,7 @@ export function formatPlaybackTime(seconds: number) {
 
 /**
  * 内联播放器高度：竖屏视频固定占屏幕高度的一部分，
+ * 下滑展开后占屏幕高度的 70%，
  * 横屏视频按宽高比铺满宽度并上下各留出一点黑边
  */
 export function resolveInlinePlayerHeight(options: {
@@ -130,15 +166,39 @@ export function resolveInlinePlayerHeight(options: {
   screenHeight: number;
   videoWidth?: number;
   videoHeight?: number;
+  expanded?: boolean;
 }) {
-  const { screenWidth, screenHeight, videoWidth, videoHeight } = options;
+  const { screenWidth, screenHeight, videoWidth, videoHeight, expanded = false } = options;
   if (!videoWidth || !videoHeight) {
     return Math.round(screenWidth * 0.6);
   }
   if (videoHeight > videoWidth) {
-    return Math.round(screenHeight * 0.33);
+    const ratio = expanded ? PLAYER_PORTRAIT_EXPANDED_HEIGHT_RATIO : PLAYER_PORTRAIT_HEIGHT_RATIO;
+    return Math.round(screenHeight * ratio);
   }
   return (
     Math.round((videoHeight / videoWidth) * screenWidth) + PLAYER_LANDSCAPE_VERTICAL_PADDING * 2
   );
+}
+
+/**
+ * 竖向滑动的方向：下滑展开、上滑收起。
+ * 滑动距离不足或者横向位移更大（更接近横向手势）时忽略
+ */
+export function resolveVerticalSwipe(options: {
+  translationX: number;
+  translationY: number;
+  minDistance?: number;
+}): PlayerSwipeDirection | null {
+  const { translationX, translationY, minDistance = PLAYER_SWIPE_MIN_DISTANCE } = options;
+  if (Math.abs(translationY) <= Math.abs(translationX)) {
+    return null;
+  }
+  if (translationY > minDistance) {
+    return "down";
+  }
+  if (translationY < -minDistance) {
+    return "up";
+  }
+  return null;
 }
