@@ -23,6 +23,7 @@
     "build:android": "zx scripts/build.mjs",
     "build:android:dev": "npx expo prebuild -p android && cd android && gradlew assembleDebug",
     "build:android:preview": "cross-env APP_VARIANT=preview npx --yes eas-cli@latest build --platform android --profile preview --non-interactive",
+    "build:android:dev": "node scripts/build-android-local.mjs",
     "update": "npx --yes eas-cli@latest update --channel production --platform android --environment production",
     "doctor": "npx -y expo-doctor@latest",
     "test": "npx vitest run",
