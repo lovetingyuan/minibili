@@ -1,101 +1,181 @@
-import { useFocusEffect } from "@react-navigation/native";
-import { BottomSheet, Icon, Text } from "@/components/styled/rneui";
-import { FlashList } from "@/components/styled/rneui";
-import { ActivityIndicator, View } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
+import type { FlashListRef } from "@shopify/flash-list";
+import { useEffect, useRef } from "react";
+import { ActivityIndicator, KeyboardAvoidingView, Pressable, View } from "react-native";
 
-import { type ReplyItemType, useReplies } from "@/api/replies";
+import { useReplies } from "@/api/replies";
+import type { ReplyItemType } from "@/api/replies";
+import { BottomSheet, FlashList, Icon, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 
 import { CommentItem } from "./Comment";
+import type { ReplyListProps } from "./reply-list.types";
+import ReplyComposer from "./ReplyComposer";
 
-export default function ReplyList(props: { ownerName?: string }) {
-  const {
-    data: { replies, allCount, root },
-    isLoading,
-    isValidating,
-    isLimited,
-    isReachingEnd,
-    error,
-    update,
-  } = useReplies();
+export default function ReplyList(props: ReplyListProps) {
+  const replies = useReplies();
   const { setRepliesInfo, repliesInfo } = useStore();
+  const focused = useIsFocused();
+  const listRef = useRef<FlashListRef<ReplyItemType>>(null);
+  const loadMoreLock = useRef(false);
+  const repliesInfoRef = useRef(repliesInfo);
+  repliesInfoRef.current = repliesInfo;
+
+  useEffect(() => {
+    if (!focused) setRepliesInfo(null);
+  }, [focused, setRepliesInfo]);
+
+  useEffect(() => {
+    if (!replies.isValidating) loadMoreLock.current = false;
+  }, [replies.isValidating, replies.data.replies.length]);
 
   function handleClose() {
     setRepliesInfo(null);
   }
 
-  useFocusEffect(() => {
-    setRepliesInfo(null);
-  });
+  function selectTarget(target: ReplyItemType) {
+    if (repliesInfo) {
+      setRepliesInfo({ ...repliesInfo, replyTarget: target, focusComposer: true });
+    }
+  }
+
+  async function changeAttitude(item: ReplyItemType, kind: "like" | "dislike") {
+    const next = await props.onAttitude(item, kind);
+    if (next) await replies.patchAttitude(item.id, next);
+    else await replies.refresh().catch(() => {});
+    return next;
+  }
+
+  async function submitReply(message: string) {
+    if (!repliesInfo) return false;
+    const reply = await props.onSubmitReply(repliesInfo.replyTarget, message);
+    if (!reply) {
+      await replies.refresh().catch(() => {});
+      return false;
+    }
+    await replies.prependReply(reply);
+    const currentInfo = repliesInfoRef.current;
+    if (currentInfo && String(currentInfo.root) === String(repliesInfo.root)) {
+      setRepliesInfo({
+        ...currentInfo,
+        allCount: currentInfo.allCount + 1,
+        previewReplies: [reply, ...currentInfo.previewReplies],
+        addedReplies: [reply, ...currentInfo.addedReplies],
+      });
+    }
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+    return true;
+  }
+
+  function loadMore() {
+    if (loadMoreLock.current || replies.isValidating || replies.isReachingEnd) return;
+    loadMoreLock.current = true;
+    replies.update();
+  }
+
+  const { allCount, root } = replies.data;
+  const ownerMid = repliesInfo?.ownerMid;
+  const rowProps = {
+    ownerMid,
+    onAttitude: changeAttitude,
+    onReply: selectTarget,
+    isAttitudePending: props.isAttitudePending,
+  };
 
   return (
     <BottomSheet
+      backdropClassName="bg-black/50"
       onBackdropPress={handleClose}
-      modalProps={{
-        onRequestClose: handleClose,
-        statusBarTranslucent: true,
-      }}
-      isVisible={!!repliesInfo}
+      modalProps={{ onRequestClose: handleClose, statusBarTranslucent: true }}
+      isVisible={Boolean(repliesInfo)}
     >
-      <View className="h-[68vh] bg-neutral-100 dark:bg-neutral-700">
-        <View className="flex-row items-center justify-between border-gray-500 px-3 py-2">
-          <Text className="text-base font-semibold">
-            评论详情
-            {typeof allCount === "number" ? `（${allCount}条）` : isLoading ? "..." : ""}
-          </Text>
-          <Icon name="close" size={20} className="rounded-sm p-1" onPress={handleClose} />
+      <KeyboardAvoidingView
+        behavior={process.env.EXPO_OS === "ios" ? "padding" : undefined}
+        className="h-[86vh] overflow-hidden rounded-t-[28px] bg-white dark:bg-neutral-950"
+      >
+        <View className="items-center pb-1.5 pt-2.5">
+          <View className="h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700" />
         </View>
-        <View className="flex-1 bg-neutral-200 dark:bg-neutral-900">
-          <FlashList
-            data={replies}
-            keyExtractor={(v: ReplyItemType) => `${v.id}@${v.root}`}
-            renderItem={({ item }: { item: ReplyItemType }) => {
-              return (
-                <View className="mb-2 px-5">
-                  <CommentItem comment={item} ownerName={props.ownerName} smallFont={false} />
+        <View className="relative h-12 flex-row items-center justify-center border-b border-neutral-100 px-4 dark:border-neutral-800">
+          <Text className="text-base font-semibold tabular-nums">
+            {typeof allCount === "number" ? `${allCount} 条回复` : "回复"}
+          </Text>
+          <Pressable
+            className="absolute right-2 h-11 w-11 items-center justify-center rounded-full"
+            accessibilityRole="button"
+            accessibilityLabel="关闭评论详情"
+            onPress={handleClose}
+          >
+            <Icon name="close" size={21} colorClassName={colors.gray7.accent} />
+          </Pressable>
+        </View>
+        <FlashList
+          ref={listRef}
+          data={replies.data.replies}
+          keyExtractor={(item: ReplyItemType) => item.id}
+          renderItem={({ item }: { item: ReplyItemType }) => (
+            <View className="border-b border-neutral-100 px-4 py-4 dark:border-neutral-800">
+              <CommentItem comment={item} {...rowProps} />
+            </View>
+          )}
+          ListHeaderComponent={
+            root ? (
+              <View className="px-3 pb-2 pt-3">
+                <Text className={`mb-2 px-1 text-xs font-medium ${colors.gray6.text}`}>原评论</Text>
+                <View className="rounded-2xl bg-neutral-50 p-3 dark:bg-neutral-900">
+                  <CommentItem comment={root} {...rowProps} />
                 </View>
-              );
-            }}
-            ListHeaderComponent={
-              root ? (
-                <View className="mb-5 border-b-[18px] border-b-neutral-300 p-4 dark:border-b-neutral-700">
-                  <CommentItem comment={root} ownerName={props.ownerName} />
+                <View className="flex-row items-center justify-between px-1 pb-1 pt-4">
+                  <Text className="text-sm font-semibold">全部回复</Text>
+                  <Text className={`text-xs tabular-nums ${colors.gray6.text}`}>
+                    {typeof allCount === "number" ? allCount : ""}
+                  </Text>
                 </View>
-              ) : null
-            }
-            ListEmptyComponent={
-              isLoading ? (
-                <View className="h-40 flex-1 items-center justify-center">
-                  <ActivityIndicator size={50} colorClassName={colors.secondary.accent} />
-                </View>
-              ) : (
-                <Text className="my-10 text-center text-base">
-                  {error ? "评论已关闭或加载失败" : "暂无评论"}
-                </Text>
-              )
-            }
-            ListFooterComponent={
-              replies?.length ? (
-                <Text className={`${colors.gray6.text} mt-1 text-center text-xs`}>
-                  {isValidating
+              </View>
+            ) : null
+          }
+          ListEmptyComponent={
+            replies.isLoading ? (
+              <View className="h-40 items-center justify-center">
+                <ActivityIndicator size="large" colorClassName={colors.primary.accent} />
+              </View>
+            ) : (
+              <Text className="my-10 text-center text-sm">
+                {replies.error ? "回复加载失败" : "还没有回复，来说两句吧"}
+              </Text>
+            )
+          }
+          ListFooterComponent={
+            <View className="h-10 items-center justify-center">
+              {replies.data.replies.length ? (
+                <Text className={`text-xs ${colors.gray6.text}`}>
+                  {replies.isValidating
                     ? "正在加载..."
-                    : isLimited
+                    : replies.isLimited
                       ? "匿名状态仅展示部分回复"
-                      : isReachingEnd
-                        ? "暂无更多"
+                      : replies.isReachingEnd
+                        ? "没有更多回复了"
                         : "上拉加载更多"}
                 </Text>
-              ) : null
-            }
-            contentContainerClassName="pb-5"
-            onEndReached={() => {
-              update();
-            }}
-            onEndReachedThreshold={1}
+              ) : null}
+            </View>
+          }
+          contentContainerClassName="pb-3"
+          contentInsetAdjustmentBehavior="automatic"
+          maintainVisibleContentPosition={{ disabled: true }}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.3}
+        />
+        {repliesInfo ? (
+          <ReplyComposer
+            target={repliesInfo.replyTarget}
+            pending={props.isReplyPending(repliesInfo.replyTarget.id)}
+            focusRequested={repliesInfo.focusComposer}
+            onSubmit={submitReply}
           />
-        </View>
-      </View>
+        ) : null}
+      </KeyboardAvoidingView>
     </BottomSheet>
   );
 }

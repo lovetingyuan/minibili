@@ -1,7 +1,14 @@
-export function mergeReplyItems<T extends { id: string }>(preview: T[], fetched: T[]) {
+export function mergeReplyItems<T extends { id: string }>(
+  preview: T[],
+  fetched: T[],
+  added: T[] = [],
+) {
   const items = new Map<string, T>();
-  preview.forEach((item) => items.set(item.id, item));
+  added.forEach((item) => items.set(item.id, item));
   fetched.forEach((item) => items.set(item.id, item));
+  preview.forEach((item) => {
+    if (!items.has(item.id)) items.set(item.id, item);
+  });
   return [...items.values()];
 }
 

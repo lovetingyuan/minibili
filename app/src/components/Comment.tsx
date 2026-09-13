@@ -1,243 +1,230 @@
 import { useNavigation } from "@react-navigation/native";
-import { Button, Text } from "@/components/styled/rneui";
-import { Image } from "@/components/styled/expo";
-import UpName from "./UpName";
 import { clsx } from "clsx";
-import * as Clipboard from "expo-clipboard";
-import React from "react";
-import { Linking, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 
+import { Avatar, Icon, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
+import { useStore } from "@/store";
+import type { NavigationProps } from "@/types";
+import { getImagePixelSize, parseImgUrl, parseNumber } from "@/utils";
 
-import type { CommentItemType, CommentMessageContent } from "../api/comments";
 import { shouldShowReplySection } from "../api/replies.helpers";
-import { useStore } from "../store";
-import type { NavigationProps } from "../types";
-import { getImagePixelSize, parseImgUrl, showToast } from "../utils";
+import type { CommentItemProps, CommentProps } from "./comment.types";
+import { CommentText } from "./CommentContent";
+import UpName from "./UpName";
 
-function CommentText(props: {
-  nodes: CommentMessageContent;
-  idStr: string;
-  ownerName?: string;
-  textClassName?: string;
-}) {
-  const { nodes, idStr, ownerName, textClassName } = props;
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  return (
-    <>
-      {nodes.map((node, i) => {
-        const key = idStr + i;
-        if (node.type === "at") {
-          const name = node.text.substring(1);
-          return (
-            <UpName
-              mid={node.mid}
-              key={key}
-              className={clsx(
-                textClassName,
-                ownerName === name ? colors.secondary.text : colors.primary.text,
-              )}
-              onPress={() => {
-                navigation.push("Dynamic", {
-                  user: {
-                    face: "",
-                    name,
-                    mid: node.mid,
-                    sign: "-",
-                  },
-                });
-              }}
-            >
-              {node.text}
-            </UpName>
-          );
-        }
-        if (node.type === "url") {
-          return (
-            <Text
-              key={key}
-              className={clsx(textClassName, colors.primary.text)}
-              onLongPress={() => {
-                Clipboard.setStringAsync(node.url).then(() => {
-                  showToast("已复制链接");
-                });
-              }}
-              onPress={() => {
-                Linking.openURL(node.url);
-              }}
-            >
-              {"🔗 链接 "}
-            </Text>
-          );
-        }
-        if (node.type === "emoji") {
-          return (
-            <Image
-              key={key}
-              source={{ uri: parseImgUrl(node.url, getImagePixelSize(18)) }}
-              className="mx-1 h-[18px] w-[18px]"
-            />
-          );
-        }
-        if (node.type === "vote") {
-          return (
-            <Text
-              key={key}
-              className={clsx(textClassName, colors.primary.text)}
-              onPress={() => {
-                if (node.url) {
-                  Linking.openURL(node.url);
-                }
-              }}
-            >
-              {`🗳️ ${node.text}`}
-            </Text>
-          );
-        }
-        if (node.type === "av") {
-          return (
-            <Text
-              key={key}
-              className={clsx(textClassName, colors.primary.text)}
-              onPress={() => {
-                const bvid = node.url?.split("/").pop();
-                if (bvid?.startsWith("BV")) {
-                  navigation.push("Play", {
-                    bvid,
-                    title: node.text ?? "",
-                  });
-                } else {
-                  Linking.openURL(node.url);
-                }
-              }}
-            >
-              {`📺 ${node.text}`}
-            </Text>
-          );
-        }
-        return (
-          <Text className={textClassName} key={key}>
-            {node.text}
-          </Text>
-        );
-      })}
-    </>
-  );
-}
-
-export function CommentItem(props: {
-  comment: CommentItemType | CommentItemType["replies"][0];
-  ownerName?: string;
-  smallFont?: boolean;
-}) {
+function CommentActions(props: CommentItemProps) {
   const { comment } = props;
-  const { setImagesList, setCurrentImageIndex } = useStore();
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  const fontSize = props.smallFont ? "text-sm" : "text-base";
-  // console.log(999, clsx(fontSize, comment.upLike && 'font-bold'))
+  const pending = props.isAttitudePending(comment.id);
   return (
-    <Text className="py-0.5">
-      <UpName
-        mid={comment.mid}
-        className={clsx(
-          colors.primary.text,
-          props.ownerName === comment.name && [colors.secondary.text, "font-bold"],
-          fontSize,
-        )}
-        onPress={() => {
-          navigation.push("Dynamic", {
-            user: {
-              face: comment.face,
-              name: comment.name,
-              mid: comment.mid,
-              sign: comment.sign || "-",
-            },
-          });
-        }}
+    <View className="mt-1 flex-row items-center gap-3">
+      <Pressable
+        className="min-h-11 min-w-11 flex-row items-center justify-center gap-1.5 rounded-full px-2"
+        accessibilityRole="button"
+        accessibilityLabel={comment.attitude === "like" ? "取消点赞评论" : "点赞评论"}
+        accessibilityState={{ selected: comment.attitude === "like", disabled: pending }}
+        disabled={pending}
+        hitSlop={2}
+        onPress={() => void props.onAttitude(comment, "like")}
       >
-        {comment.name}
-      </UpName>
-      <Text className={fontSize}>
-        {comment.sex === "男" ? "♂：" : comment.sex === "女" ? "♀：" : "："}
-      </Text>
-      {"top" in comment && comment.top ? (
-        <Text className={`text-sm font-bold ${colors.secondary.text}`}>{" 置顶 "}</Text>
-      ) : null}
-      {comment.message?.length ? (
-        <CommentText
-          textClassName={clsx(fontSize, comment.upLike && "font-bold")}
-          nodes={comment.message}
-          idStr={`${comment.id}_`}
-          ownerName={props.ownerName}
-        />
-      ) : null}
-      {"time" in comment && comment.time ? (
-        <Text className={`text-xs ${colors.gray6.text}`}> {comment.time.replace("发布", "")} </Text>
-      ) : null}
-      {comment.like ? (
-        <Text className={`text-xs ${colors.secondary.text} ${comment.upLike ? "font-bold" : ""}`}>
-          {` ${comment.like}${comment.upLike ? "+UP👍" : ""}`}
-        </Text>
-      ) : null}
-      {"images" in comment && comment.images?.length ? (
-        <Text
-          className={colors.primary.text}
-          onPress={() => {
-            if (comment.images) {
-              setImagesList(comment.images);
-              setCurrentImageIndex(0);
+        {pending ? (
+          <ActivityIndicator size={15} />
+        ) : (
+          <Icon
+            name={comment.attitude === "like" ? "thumb-up" : "thumb-up-off-alt"}
+            size={18}
+            colorClassName={
+              comment.attitude === "like" ? colors.primary.accent : colors.gray6.accent
             }
-          }}
+          />
+        )}
+        <Text
+          className={`text-xs ${comment.attitude === "like" ? colors.primary.text : colors.gray6.text}`}
         >
-          {`  查看图片${comment.images.length > 1 ? `(${comment.images.length})` : ""}`}
+          {comment.like ? parseNumber(comment.like) : "赞"}
         </Text>
-      ) : null}
-    </Text>
+      </Pressable>
+      <Pressable
+        className="min-h-11 min-w-11 flex-row items-center justify-center gap-1.5 rounded-full px-2"
+        accessibilityRole="button"
+        accessibilityLabel={comment.attitude === "dislike" ? "取消点踩评论" : "点踩评论"}
+        accessibilityState={{ selected: comment.attitude === "dislike", disabled: pending }}
+        disabled={pending}
+        hitSlop={2}
+        onPress={() => void props.onAttitude(comment, "dislike")}
+      >
+        <Icon
+          name={comment.attitude === "dislike" ? "thumb-down" : "thumb-down-off-alt"}
+          size={18}
+          colorClassName={
+            comment.attitude === "dislike" ? colors.primary.accent : colors.gray6.accent
+          }
+        />
+        <Text
+          className={`text-xs ${comment.attitude === "dislike" ? colors.primary.text : colors.gray6.text}`}
+        >
+          踩
+        </Text>
+      </Pressable>
+      <Pressable
+        className="min-h-11 min-w-11 flex-row items-center justify-center gap-1.5 rounded-full px-2"
+        accessibilityRole="button"
+        accessibilityLabel={`回复 ${comment.name}`}
+        hitSlop={2}
+        onPress={() => props.onReply(comment)}
+      >
+        <Icon name="reply" size={18} colorClassName={colors.gray6.accent} />
+        <Text className={`text-xs ${colors.gray6.text}`}>回复</Text>
+      </Pressable>
+    </View>
   );
 }
 
-export const Comment = CommentBlock;
+export function CommentItem(props: CommentItemProps) {
+  const { comment, compact } = props;
+  const navigation = useNavigation<NavigationProps["navigation"]>();
+  const isOwner = Boolean(props.ownerMid && String(comment.mid) === props.ownerMid);
+  const meta = [comment.time?.replace("发布", ""), comment.location?.replace("IP属地：", "")]
+    .filter(Boolean)
+    .join(" · ");
+  return (
+    <View className={compact ? "gap-1.5" : "gap-2"}>
+      <View className="flex-row items-center gap-2.5">
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`查看 ${comment.name} 的主页`}
+          hitSlop={4}
+          onPress={() =>
+            navigation.push("Dynamic", {
+              user: {
+                face: comment.face,
+                name: comment.name,
+                mid: comment.mid,
+                sign: comment.sign || "-",
+              },
+            })
+          }
+        >
+          <Avatar
+            rounded
+            size={compact ? 30 : 36}
+            source={
+              comment.face
+                ? { uri: parseImgUrl(comment.face, getImagePixelSize(compact ? 30 : 36)) }
+                : undefined
+            }
+            title={comment.name.slice(0, 1)}
+            containerClassName="bg-neutral-200 dark:bg-neutral-700"
+          />
+        </Pressable>
+        <View className="min-w-0 flex-1">
+          <View className="flex-row items-center gap-1.5">
+            <UpName
+              mid={comment.mid}
+              numberOfLines={1}
+              className={clsx(
+                "shrink text-sm font-semibold",
+                isOwner ? colors.secondary.text : colors.gray7.text,
+              )}
+            >
+              {comment.name}
+            </UpName>
+            {isOwner ? (
+              <Text className={`text-[10px] font-bold ${colors.secondary.text}`}>UP</Text>
+            ) : null}
+            {comment.top ? (
+              <Text className={`text-[10px] font-bold ${colors.secondary.text}`}>置顶</Text>
+            ) : null}
+            {meta ? (
+              <Text
+                numberOfLines={1}
+                className={`ml-auto shrink-0 text-[11px] ${colors.gray6.text}`}
+              >
+                {meta}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+      </View>
+      <View>
+        <CommentText nodes={comment.message} idStr={comment.id} images={comment.images} />
+        {comment.creatorLiked ? (
+          <View className="mt-2 self-start rounded-full bg-pink-50 px-2.5 py-1 dark:bg-pink-950/40">
+            <Text className={`text-[11px] font-medium ${colors.secondary.text}`}>
+              UP 主觉得很赞
+            </Text>
+          </View>
+        ) : null}
+        <CommentActions {...props} />
+      </View>
+    </View>
+  );
+}
 
-function CommentBlock(props: { comment: CommentItemType; className?: string; ownerName?: string }) {
-  const { comment } = props;
+export function Comment(props: CommentProps) {
   const { setRepliesInfo } = useStore();
+  const comment = props.comment;
   const hasReplies = shouldShowReplySection(comment.rcount, comment.replies.length);
 
+  function openReplies(target: CommentItemProps["comment"], focusComposer: boolean) {
+    setRepliesInfo({
+      oid: comment.oid,
+      type: comment.type,
+      root: comment.id,
+      allCount: comment.rcount,
+      rootComment: comment,
+      previewReplies: comment.replies,
+      addedReplies: [],
+      ownerMid: props.ownerMid,
+      sourceUrl: props.sourceUrl,
+      replyTarget: target,
+      focusComposer,
+    });
+  }
+
+  const moreRepliesButton =
+    comment.rcount > 0 ? (
+      <Pressable
+        className={clsx(
+          "min-h-10 flex-row items-center rounded-xl px-1",
+          !comment.replies.length && "mt-2 self-start bg-neutral-50 px-3 dark:bg-neutral-900",
+        )}
+        accessibilityRole="button"
+        accessibilityLabel={`查看全部 ${comment.rcount} 条回复`}
+        onPress={() => openReplies(comment, false)}
+      >
+        <Text className={`text-sm font-medium ${colors.primary.text}`}>
+          {comment.moreText || `查看全部 ${comment.rcount} 条回复`} ›
+        </Text>
+      </Pressable>
+    ) : null;
+
   return (
-    <View className={clsx([hasReplies ? "mb-7" : "mb-4", props.className])}>
-      <CommentItem comment={comment} ownerName={props.ownerName} />
-      {hasReplies ? (
-        <View className="mt-1 flex-1 shrink-0 gap-1 rounded border-gray-500 bg-neutral-200 p-2 opacity-90 dark:bg-neutral-900">
-          {comment.replies.map((reply) => {
-            return (
-              <CommentItem key={reply.id} comment={reply} ownerName={props.ownerName} smallFont />
-            );
-          })}
-          {comment.rcount > 0 ? (
-            <Button
-              type="clear"
-              size="sm"
-              onPress={() => {
-                setRepliesInfo({
-                  oid: comment.oid,
-                  type: comment.type,
-                  root: comment.id,
-                  allCount: comment.rcount,
-                  rootComment: comment,
-                  previewReplies: comment.replies,
-                });
-                // setMoreRepliesUrl(
-                //   `https://www.bilibili.com/h5/comment/sub?oid=${comment.oid}&pageType=${comment.type}&root=${root}`,
-                // )
-              }}
-              buttonClassName="justify-start p-[1px]"
-            >
-              <Text className={colors.primary.text}>
-                {`${comment.moreText || `共${comment.rcount}条回复`}...`}
-              </Text>
-            </Button>
-          ) : null}
+    <View className="mb-1 border-b border-neutral-100 py-4 dark:border-neutral-800">
+      <CommentItem
+        comment={comment}
+        ownerMid={props.ownerMid}
+        onAttitude={props.onAttitude}
+        onReply={(target) => openReplies(target, true)}
+        isAttitudePending={props.isAttitudePending}
+      />
+      {comment.replies.length ? (
+        <View className="mt-3 gap-3 rounded-2xl bg-neutral-50 p-3 dark:bg-neutral-900">
+          {comment.replies.map((reply) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              ownerMid={props.ownerMid}
+              compact
+              onAttitude={props.onAttitude}
+              onReply={(target) => openReplies(target, true)}
+              isAttitudePending={props.isAttitudePending}
+            />
+          ))}
+          {moreRepliesButton}
         </View>
+      ) : hasReplies ? (
+        moreRepliesButton
       ) : null}
     </View>
   );

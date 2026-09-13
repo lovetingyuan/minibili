@@ -70,7 +70,7 @@ function Play({ route }: Props) {
       <CommentList
         commentId={videoInfo?.aid || ""}
         commentType={1}
-        ownerName={videoInfo.name}
+        sourceUrl={`https://www.bilibili.com/video/${bvid}/`}
         dividerRight={
           <View className="flex-row items-center">
             <Text

@@ -68,6 +68,7 @@ const ContentSchema = z.object({
 });
 
 export const BaseCommentSchema = z.object({
+  action: z.union([z.literal(0), z.literal(1), z.literal(2)]),
   content: ContentSchema,
   count: z.number(),
   ctime: z.number(),

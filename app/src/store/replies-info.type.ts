@@ -7,4 +7,9 @@ export type RepliesInfo = {
   allCount: number;
   rootComment: CommentItemType;
   previewReplies: ReplyItemType[];
+  addedReplies: ReplyItemType[];
+  ownerMid?: string;
+  sourceUrl: string;
+  replyTarget: ReplyItemType;
+  focusComposer: boolean;
 };

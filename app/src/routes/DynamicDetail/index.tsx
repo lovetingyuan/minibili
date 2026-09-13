@@ -62,7 +62,7 @@ function DynamicDetailPage({ route }: Props) {
       <CommentList
         commentId={detail.data.commentId}
         commentType={detail.data.commentType}
-        ownerName={detail.data.author.name}
+        sourceUrl={url}
         refreshing={detail.isValidating}
         onRefresh={async () => {
           await detail.mutate();

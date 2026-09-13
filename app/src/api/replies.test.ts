@@ -16,8 +16,20 @@ test("merges preview and fetched replies without duplicates", () => {
 
   expect(mergeReplyItems(preview, fetched)).toEqual([
     { id: "1", source: "fetched" },
-    { id: "2", source: "preview" },
     { id: "3", source: "fetched" },
+    { id: "2", source: "preview" },
+  ]);
+});
+
+test("keeps a locally added reply first while preserving fetched server order", () => {
+  const preview = [{ id: "1" }, { id: "2" }];
+  const fetched = [{ id: "2" }, { id: "3" }];
+  const added = [{ id: "4" }];
+  expect(mergeReplyItems(preview, fetched, added).map((item) => item.id)).toEqual([
+    "4",
+    "2",
+    "3",
+    "1",
   ]);
 });
 
