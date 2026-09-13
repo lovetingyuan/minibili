@@ -24,7 +24,15 @@ export const PLAY_URL_MAX_REFRESH = 2;
  */
 const PLAYER_SEEK_TOLERANCE_MS = 1500;
 
-export type PlayerTapAction = "play" | "none";
+/**
+ * 横向视频内联播放时上下各留出的黑边高度
+ */
+export const PLAYER_LANDSCAPE_VERTICAL_PADDING = 12;
+
+/**
+ * 播放中控件无操作后自动隐藏的时间
+ */
+export const PLAYER_CONTROLS_AUTO_HIDE_MS = 3000;
 
 /**
  * 媒体请求的 source：pc 平台的播放地址必须带 Referer，且 UA 不能包含 "android"，
@@ -66,10 +74,17 @@ export function resolvePlaybackFailover(options: {
 }
 
 /**
- * 单击：暂停时继续播放，播放中不做处理（暂停用双击）
+ * 控件自动隐藏延时：播放中 3 秒后隐藏，暂停时不自动隐藏
  */
-export function resolveTapAction(isPlaying: boolean): PlayerTapAction {
-  return isPlaying ? "none" : "play";
+export function resolveControlsAutoHideMs(isPlaying: boolean): number | null {
+  return isPlaying ? PLAYER_CONTROLS_AUTO_HIDE_MS : null;
+}
+
+/**
+ * 点击视频切换控件显隐
+ */
+export function toggleControlsVisible(visible: boolean) {
+  return !visible;
 }
 
 /**
@@ -107,7 +122,8 @@ export function formatPlaybackTime(seconds: number) {
 }
 
 /**
- * 内联播放器高度：竖屏视频固定占屏幕高度的一部分，横屏视频按宽高比铺满宽度
+ * 内联播放器高度：竖屏视频固定占屏幕高度的一部分，
+ * 横屏视频按宽高比铺满宽度并上下各留出一点黑边
  */
 export function resolveInlinePlayerHeight(options: {
   screenWidth: number;
@@ -122,5 +138,7 @@ export function resolveInlinePlayerHeight(options: {
   if (videoHeight > videoWidth) {
     return Math.round(screenHeight * 0.33);
   }
-  return Math.round((videoHeight / videoWidth) * screenWidth);
+  return (
+    Math.round((videoHeight / videoWidth) * screenWidth) + PLAYER_LANDSCAPE_VERTICAL_PADDING * 2
+  );
 }

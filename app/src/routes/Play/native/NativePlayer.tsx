@@ -4,7 +4,7 @@ import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
-import { Platform, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 
 import { useVideoPlayUrl } from "@/api/play-url";
@@ -27,8 +27,8 @@ import {
   resolveInlinePlayerHeight,
   resolvePlaybackFailover,
   resolvePreferredQuality,
-  resolveTapAction,
 } from "./player-helpers";
+import { usePlayerControlsVisibility } from "./usePlayerControlsVisibility";
 import { usePlayerGestures } from "./usePlayerGestures";
 
 type NativePlayerProps = {
@@ -44,13 +44,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   const isFocused = useIsFocused();
   const netInfo = useNetInfo();
   const { width, height } = useWindowDimensions();
-  const {
-    imagesList,
-    $danmakuEnabled,
-    set$danmakuEnabled,
-    $backgroundPlayEnabled,
-    set$backgroundPlayEnabled,
-  } = useStore();
+  const { imagesList, $danmakuEnabled, set$danmakuEnabled, $backgroundPlayEnabled } = useStore();
   const { data } = useVideoInfo(route.params.bvid);
   const videoInfo = { ...route.params, ...data };
   const pageInfo = videoInfo.pages?.[currentPage - 1];
@@ -81,6 +75,9 @@ export default function NativePlayer(props: NativePlayerProps) {
   const reloadedAttemptTokenRef = React.useRef(0);
   // 切换地址后需要恢复的播放进度（毫秒）
   const resumePositionMsRef = React.useRef(0);
+
+  const { controlsVisible, toggleControls, keepControlsVisible } =
+    usePlayerControlsVisibility(isPlaying);
 
   const qn = resolvePreferredQuality(isCellular, highQuality);
   const { urls, error: playUrlError, retry } = useVideoPlayUrl(videoInfo.bvid, cid, qn);
@@ -269,9 +266,11 @@ export default function NativePlayer(props: NativePlayerProps) {
   }
 
   function handleSingleTap() {
-    if (resolveTapAction(isPlaying) === "play") {
-      player.play();
-    }
+    toggleControls();
+  }
+
+  function handleResume() {
+    player.play();
   }
 
   function handleLongPressStart() {
@@ -367,10 +366,16 @@ export default function NativePlayer(props: NativePlayerProps) {
         </View>
       ) : null}
       {started && !isPlaying && !hasError ? (
-        <View pointerEvents="none" className="absolute inset-0 items-center justify-center">
-          <View className="h-14 w-14 items-center justify-center rounded-full bg-black/40">
+        <View pointerEvents="box-none" className="absolute inset-0 items-center justify-center">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="继续播放"
+            hitSlop={12}
+            className="h-14 w-14 items-center justify-center rounded-full bg-black/40"
+            onPress={handleResume}
+          >
             <Icon name="play" type="material-design" size={34} color="#ffffff" />
-          </View>
+          </Pressable>
         </View>
       ) : null}
       {started ? (
@@ -379,8 +384,8 @@ export default function NativePlayer(props: NativePlayerProps) {
           currentTimeMs={currentTimeMs}
           durationMs={durationSeconds * 1000}
           danmakuEnabled={$danmakuEnabled}
-          backgroundPlayEnabled={$backgroundPlayEnabled}
           fullscreen={fullscreen}
+          visible={controlsVisible}
           onTogglePlay={() => {
             if (isPlaying) {
               player.pause();
@@ -391,13 +396,12 @@ export default function NativePlayer(props: NativePlayerProps) {
           onToggleDanmaku={() => {
             set$danmakuEnabled(!$danmakuEnabled);
           }}
-          onToggleBackgroundPlay={() => {
-            set$backgroundPlayEnabled(!$backgroundPlayEnabled);
-          }}
           onToggleFullscreen={() => {
+            keepControlsVisible();
             onFullscreenChange(!fullscreen);
           }}
           onSeek={handleSeek}
+          onInteraction={keepControlsVisible}
         />
       ) : (
         <PlayerCover

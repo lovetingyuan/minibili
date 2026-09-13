@@ -1,3 +1,5 @@
+import { useBackHandler } from "@react-native-community/hooks";
+import { useIsFocused } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text } from "@/components/styled/rneui";
 import * as Clipboard from "expo-clipboard";
@@ -49,6 +51,16 @@ function Play({ route }: Props) {
 
   const [key, setKey] = React.useState(bvid);
   const [fullscreen, setFullscreen] = React.useState(false);
+
+  const isFocused = useIsFocused();
+  // 全屏时返回键先退出全屏，而不是直接退出播放页
+  useBackHandler(() => {
+    if (fullscreen && isFocused) {
+      setFullscreen(false);
+      return true;
+    }
+    return false;
+  });
 
   useUpdateNavigationOptions({
     headerTitle: () => <PlayHeaderTitle />,

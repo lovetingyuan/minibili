@@ -4,11 +4,13 @@ import {
   createVideoSource,
   formatPlaybackTime,
   isSeekJump,
+  PLAYER_CONTROLS_AUTO_HIDE_MS,
   PLAY_URL_MAX_REFRESH,
+  resolveControlsAutoHideMs,
   resolveInlinePlayerHeight,
   resolvePlaybackFailover,
   resolvePreferredQuality,
-  resolveTapAction,
+  toggleControlsVisible,
 } from "./player-helpers";
 
 test("uses 1080P except on cellular without the high quality option", () => {
@@ -18,9 +20,14 @@ test("uses 1080P except on cellular without the high quality option", () => {
   expect(resolvePreferredQuality(true, false)).toBe(64);
 });
 
-test("only resumes playback on a single tap while paused", () => {
-  expect(resolveTapAction(false)).toBe("play");
-  expect(resolveTapAction(true)).toBe("none");
+test("auto hides controls only while playing", () => {
+  expect(resolveControlsAutoHideMs(true)).toBe(PLAYER_CONTROLS_AUTO_HIDE_MS);
+  expect(resolveControlsAutoHideMs(false)).toBeNull();
+});
+
+test("toggles controls visibility on tap", () => {
+  expect(toggleControlsVisible(true)).toBe(false);
+  expect(toggleControlsVisible(false)).toBe(true);
 });
 
 test("treats big playback jumps as seek", () => {
@@ -44,7 +51,7 @@ test("computes inline player height for landscape and portrait videos", () => {
       videoWidth: 1920,
       videoHeight: 1080,
     }),
-  ).toBe(225);
+  ).toBe(249);
   expect(
     resolveInlinePlayerHeight({
       screenWidth: 400,
