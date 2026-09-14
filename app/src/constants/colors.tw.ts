@@ -41,6 +41,15 @@ export const colors = {
     accent: "accent-red-500",
     bg: "bg-red-500",
   },
+  /**
+   * 评论点赞高亮色
+   */
+  commentLike: {
+    text: "text-[#E84B85]",
+    accent: "accent-[#E84B85]",
+    bg: "bg-[#E84B85]",
+    border: "border-[#E84B85]",
+  },
 
   gray0: {
     text: "text-gray-50 dark:text-gray-950",

@@ -28,4 +28,8 @@ export type CommentImageEntryProps = { images: CommentImage[] };
 export type CommentTextProps = CommentImageEntryProps & {
   nodes: CommentMessageContent;
   idStr: string;
+  likeText?: string;
+  likeActive?: boolean;
+  likePending?: boolean;
+  bold?: boolean;
 };

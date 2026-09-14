@@ -1,7 +1,8 @@
 import type { ReactElement, ReactNode } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import type { CommentImage } from "@/api/comments.types";
+import type { CommentImage, CommentMessageContent } from "@/api/comments.types";
+import { colors } from "@/constants/colors.tw";
 
 const mocks = vi.hoisted(() => ({
   setCurrentImageIndex: vi.fn(),
@@ -90,5 +91,122 @@ describe("CommentText emoji alignment", () => {
       size: 18,
       fontSize: 15,
     });
+  });
+});
+
+describe("CommentText like count", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  type LikeCountProps = { children?: ReactNode; className?: string };
+
+  function lastChild(likeProps: {
+    likeText?: string;
+    likeActive?: boolean;
+    likePending?: boolean;
+  }) {
+    const text = CommentText({
+      idStr: "1",
+      images: [],
+      nodes: [{ type: "text", text: "评论" }],
+      ...likeProps,
+    }) as ReactElement<{ children: ReactNode[] }>;
+    return text.props.children.at(-1) as ReactElement<LikeCountProps> | null;
+  }
+
+  type BodyProps = { className?: string };
+
+  function bodyClassName(likeProps: { bold?: boolean }) {
+    const text = CommentText({
+      idStr: "1",
+      images: [],
+      nodes: [{ type: "text", text: "评论" }],
+      ...likeProps,
+    }) as ReactElement<BodyProps>;
+    return text.props.className ?? "";
+  }
+
+  test("appends the like count at the end of the comment body", () => {
+    const count = lastChild({ likeText: "👍12" }) as ReactElement<LikeCountProps>;
+
+    expect(count.type).toBe("Text");
+    expect(count.props.className).toContain(colors.gray6.text);
+    expect(count.props.children).toContain("👍12");
+  });
+
+  test("highlights the like count when the comment is liked", () => {
+    const count = lastChild({
+      likeText: "👍12",
+      likeActive: true,
+    }) as ReactElement<LikeCountProps>;
+
+    expect(count.props.className).toContain(colors.commentLike.text);
+  });
+
+  test("dims the like count while the attitude request is pending", () => {
+    const count = lastChild({
+      likeText: "👍12",
+      likePending: true,
+    }) as ReactElement<LikeCountProps>;
+
+    expect(count.props.className).toContain("opacity-60");
+  });
+
+  test("does not append anything when the comment has no likes", () => {
+    expect(lastChild({ likeText: "" })).toBeNull();
+    expect(lastChild({})).toBeNull();
+  });
+
+  test("keeps the like count at normal weight for a bold body", () => {
+    const count = lastChild({
+      likeText: "👍12",
+      likeActive: true,
+    }) as ReactElement<LikeCountProps>;
+
+    expect(count.props.className).toContain("font-normal");
+  });
+
+  test("leaves a wider gap between the body and the like count", () => {
+    const count = lastChild({ likeText: "👍12" }) as ReactElement<LikeCountProps>;
+
+    expect(String(count.props.children)).toBe("\u2003👍12");
+  });
+
+  test("bolds the comment body when the comment is liked", () => {
+    expect(bodyClassName({ bold: true })).toContain("font-bold");
+    expect(bodyClassName({})).not.toContain("font-bold");
+  });
+
+  function renderedNodes(nodes: CommentMessageContent, bold: boolean) {
+    const text = CommentText({
+      idStr: "1",
+      images: [],
+      nodes,
+      bold,
+    }) as ReactElement<{ children: [ReactElement<{ className?: string }>[], ...unknown[]] }>;
+    return text.props.children[0];
+  }
+
+  const BOLD_NODES: CommentMessageContent = [
+    { type: "text", text: "评论" },
+    { type: "at", text: "@某人", mid: 1 },
+    { type: "url", url: "https://example.com" },
+    { type: "vote", text: "投票", url: "https://example.com" },
+    { type: "av", text: "视频", url: "https://example.com/BV1TEST" },
+  ];
+
+  test("applies the bold weight to every text node so Android keeps the weight", () => {
+    // RNEUI 的 Text 会给每个节点加默认 fontWeight，父级字重不会被子节点继承
+    const classNames = renderedNodes(BOLD_NODES, true).map((node) => node.props.className ?? "");
+
+    expect(classNames).toHaveLength(BOLD_NODES.length);
+    expect(classNames.filter((className) => className.includes("font-bold"))).toHaveLength(
+      BOLD_NODES.length,
+    );
+  });
+
+  test("keeps the text nodes at the default weight for a normal body", () => {
+    const classNames = renderedNodes(BOLD_NODES, false).map((node) => node.props.className ?? "");
+
+    expect(classNames.filter((className) => className.includes("font-bold"))).toHaveLength(0);
   });
 });

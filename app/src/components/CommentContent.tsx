@@ -14,8 +14,12 @@ import UpName from "./UpName";
 
 export function CommentText(props: CommentTextProps) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
+  // RNEUI 的 Text 在 Android 上会给每个文本节点加默认的 fontFamily/fontWeight，
+  // 嵌套节点不会继承父级字重，所以加粗必须下发到每个节点。
+  const boldClassName = props.bold ? "font-bold" : "";
+  const accentTextClassName = `${colors.primary.text} ${boldClassName}`;
   return (
-    <Text className="text-[15px] leading-6">
+    <Text className={`text-[15px] leading-6 ${boldClassName}`}>
       {props.nodes.map((node, index) => {
         const key = `${props.idStr}:${index}`;
         if (node.type === "at") {
@@ -23,7 +27,7 @@ export function CommentText(props: CommentTextProps) {
             <UpName
               mid={node.mid}
               key={key}
-              className={colors.primary.text}
+              className={accentTextClassName}
               onPress={() =>
                 navigation.push("Dynamic", {
                   user: { face: "", name: node.text.slice(1), mid: node.mid, sign: "-" },
@@ -38,7 +42,7 @@ export function CommentText(props: CommentTextProps) {
           return (
             <Text
               key={key}
-              className={colors.primary.text}
+              className={accentTextClassName}
               onLongPress={() => {
                 void Clipboard.setStringAsync(node.url).then(() => showToast("已复制链接"));
               }}
@@ -55,7 +59,7 @@ export function CommentText(props: CommentTextProps) {
           return (
             <Text
               key={key}
-              className={colors.primary.text}
+              className={accentTextClassName}
               onPress={() => node.url && void Linking.openURL(node.url)}
             >
               {`🗳️ ${node.text || "投票"}`}
@@ -66,7 +70,7 @@ export function CommentText(props: CommentTextProps) {
           return (
             <Text
               key={key}
-              className={colors.primary.text}
+              className={accentTextClassName}
               onPress={() => {
                 const bvid = node.url.split("/").pop();
                 if (bvid?.startsWith("BV")) {
@@ -78,9 +82,23 @@ export function CommentText(props: CommentTextProps) {
             </Text>
           );
         }
-        return <Text key={key}>{node.text}</Text>;
+        return (
+          <Text key={key} className={boldClassName}>
+            {node.text}
+          </Text>
+        );
       })}
       <CommentImages images={props.images} />
+      {props.likeText ? (
+        <Text
+          className={`text-[13px] font-normal ${
+            props.likeActive ? colors.commentLike.text : colors.gray6.text
+          } ${props.likePending ? "opacity-60" : ""}`}
+        >
+          {/* 嵌套 Text 在原生端不支持 margin/padding，用全角空格拉开与正文的间距 */}
+          {`\u2003${props.likeText}`}
+        </Text>
+      ) : null}
     </Text>
   );
 }

@@ -34,11 +34,6 @@ function Loading() {
           </View>
           <Skeleton animation="wave" width={`${width}%`} height={16} />
           {index % 2 ? <Skeleton animation="wave" width="55%" height={16} /> : null}
-          <View className="flex-row gap-3">
-            <Skeleton animation="wave" width={52} height={28} />
-            <Skeleton animation="wave" width={44} height={28} />
-            <Skeleton animation="wave" width={58} height={28} />
-          </View>
         </View>
       ))}
     </View>

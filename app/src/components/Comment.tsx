@@ -1,8 +1,8 @@
 import { useNavigation } from "@react-navigation/native";
 import { clsx } from "clsx";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 
-import { Avatar, Icon, Text } from "@/components/styled/rneui";
+import { Avatar, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
@@ -13,82 +13,43 @@ import type { CommentItemProps, CommentProps } from "./comment.types";
 import { CommentText } from "./CommentContent";
 import UpName from "./UpName";
 
-function CommentActions(props: CommentItemProps) {
-  const { comment } = props;
-  const pending = props.isAttitudePending(comment.id);
-  return (
-    <View className="mt-1 flex-row items-center gap-3">
-      <Pressable
-        className="min-h-11 min-w-11 flex-row items-center justify-center gap-1.5 rounded-full px-2"
-        accessibilityRole="button"
-        accessibilityLabel={comment.attitude === "like" ? "取消点赞评论" : "点赞评论"}
-        accessibilityState={{ selected: comment.attitude === "like", disabled: pending }}
-        disabled={pending}
-        hitSlop={2}
-        onPress={() => void props.onAttitude(comment, "like")}
-      >
-        {pending ? (
-          <ActivityIndicator size={15} />
-        ) : (
-          <Icon
-            name={comment.attitude === "like" ? "thumb-up" : "thumb-up-off-alt"}
-            size={18}
-            colorClassName={
-              comment.attitude === "like" ? colors.primary.accent : colors.gray6.accent
-            }
-          />
-        )}
-        <Text
-          className={`text-xs ${comment.attitude === "like" ? colors.primary.text : colors.gray6.text}`}
-        >
-          {comment.like ? parseNumber(comment.like) : "赞"}
-        </Text>
-      </Pressable>
-      <Pressable
-        className="min-h-11 min-w-11 flex-row items-center justify-center gap-1.5 rounded-full px-2"
-        accessibilityRole="button"
-        accessibilityLabel={comment.attitude === "dislike" ? "取消点踩评论" : "点踩评论"}
-        accessibilityState={{ selected: comment.attitude === "dislike", disabled: pending }}
-        disabled={pending}
-        hitSlop={2}
-        onPress={() => void props.onAttitude(comment, "dislike")}
-      >
-        <Icon
-          name={comment.attitude === "dislike" ? "thumb-down" : "thumb-down-off-alt"}
-          size={18}
-          colorClassName={
-            comment.attitude === "dislike" ? colors.primary.accent : colors.gray6.accent
-          }
-        />
-        <Text
-          className={`text-xs ${comment.attitude === "dislike" ? colors.primary.text : colors.gray6.text}`}
-        >
-          踩
-        </Text>
-      </Pressable>
-      <Pressable
-        className="min-h-11 min-w-11 flex-row items-center justify-center gap-1.5 rounded-full px-2"
-        accessibilityRole="button"
-        accessibilityLabel={`回复 ${comment.name}`}
-        hitSlop={2}
-        onPress={() => props.onReply(comment)}
-      >
-        <Icon name="reply" size={18} colorClassName={colors.gray6.accent} />
-        <Text className={`text-xs ${colors.gray6.text}`}>回复</Text>
-      </Pressable>
-    </View>
-  );
-}
-
 export function CommentItem(props: CommentItemProps) {
   const { comment, compact } = props;
   const navigation = useNavigation<NavigationProps["navigation"]>();
+  const { setOverlayButtons } = useStore();
   const isOwner = Boolean(props.ownerMid && String(comment.mid) === props.ownerMid);
   const meta = [comment.time?.replace("发布", ""), comment.location?.replace("IP属地：", "")]
     .filter(Boolean)
     .join(" · ");
+  const liked = comment.attitude === "like";
+  const likeText = [
+    comment.like ? `👍${parseNumber(comment.like)}${comment.creatorLiked ? "+UP" : ""}` : "",
+    comment.attitude === "dislike" ? "👎" : "",
+  ].join("");
+
+  function openActions() {
+    setOverlayButtons([
+      {
+        text: comment.attitude === "like" ? "取消点赞" : "点赞",
+        onPress: () => void props.onAttitude(comment, "like"),
+      },
+      {
+        text: comment.attitude === "dislike" ? "取消点踩" : "点踩",
+        onPress: () => void props.onAttitude(comment, "dislike"),
+      },
+      {
+        text: "回复",
+        onPress: () => props.onReply(comment),
+      },
+    ]);
+  }
+
   return (
-    <View className={compact ? "gap-1.5" : "gap-2"}>
+    <Pressable
+      className={compact ? "gap-1.5" : "gap-2"}
+      accessibilityHint="长按可点赞、点踩或回复"
+      onLongPress={openActions}
+    >
       <View className="flex-row items-center gap-2.5">
         <Pressable
           accessibilityRole="button"
@@ -146,8 +107,16 @@ export function CommentItem(props: CommentItemProps) {
           </View>
         </View>
       </View>
-      <View>
-        <CommentText nodes={comment.message} idStr={comment.id} images={comment.images} />
+      <View className="pl-2">
+        <CommentText
+          nodes={comment.message}
+          idStr={comment.id}
+          images={comment.images}
+          likeText={likeText}
+          likeActive={liked}
+          likePending={props.isAttitudePending(comment.id)}
+          bold={liked}
+        />
         {comment.creatorLiked ? (
           <View className="mt-2 self-start rounded-full bg-pink-50 px-2.5 py-1 dark:bg-pink-950/40">
             <Text className={`text-[11px] font-medium ${colors.secondary.text}`}>
@@ -155,9 +124,8 @@ export function CommentItem(props: CommentItemProps) {
             </Text>
           </View>
         ) : null}
-        <CommentActions {...props} />
       </View>
-    </View>
+    </Pressable>
   );
 }
 
