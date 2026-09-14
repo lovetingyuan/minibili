@@ -22,6 +22,8 @@ export type CommentProps = Omit<CommentInteractionProps, "onReply"> & {
   comment: CommentItemType;
   ownerMid?: string;
   sourceUrl: string;
+  /** 首条评论紧贴评论栏，顶部不保留圆角 */
+  first?: boolean;
 };
 
 export type CommentImageEntryProps = { images: CommentImage[] };
@@ -32,4 +34,6 @@ export type CommentTextProps = CommentImageEntryProps & {
   likeActive?: boolean;
   likePending?: boolean;
   bold?: boolean;
+  /** UP 主觉得很赞：正文使用主题粉色高亮 */
+  creatorLiked?: boolean;
 };

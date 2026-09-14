@@ -1,28 +1,35 @@
-import { clsx } from "clsx";
-import { useEffect, useRef, useState } from "react";
-import { Pressable, View } from "react-native";
+import { clsx } from 'clsx'
+import { useEffect, useRef, useState } from 'react'
+import { Pressable, View } from 'react-native'
 
-import type { CommentAttitudeKind } from "@/api/comment-actions.types";
-import type { CommentItemType, ReplyItemType } from "@/api/comments";
-import { useComments } from "@/api/comments";
-import { useCommentActions } from "@/api/useCommentActions";
-import { colors } from "@/constants/colors.tw";
+import type { CommentAttitudeKind } from '@/api/comment-actions.types'
+import type { CommentItemType, ReplyItemType } from '@/api/comments'
+import { useComments } from '@/api/comments'
+import { useCommentActions } from '@/api/useCommentActions'
+import { colors } from '@/constants/colors.tw'
 
-import { Comment } from "./Comment";
-import type { CommentListProps } from "./comment-list.types";
-import ReplyList from "./ReplyList";
-import { FlashList, Icon, Skeleton, Text } from "./styled/rneui";
+import { Comment } from './Comment'
+import type { CommentListProps } from './comment-list.types'
+import ReplyList from './ReplyList'
+import { FlashList, Icon, Skeleton, Text } from './styled/rneui'
 
-export type { CommentListProps } from "./comment-list.types";
+export type { CommentListProps } from './comment-list.types'
 
-const LOADING_COMMENT_WIDTHS = [78, 62, 90, 45, 72, 55];
+const LOADING_COMMENT_WIDTHS = [78, 62, 90, 45, 72, 55]
+
+function CommentSeparator() {
+  return <View className="h-3" />
+}
 
 function Loading() {
   return (
-    <View className="gap-5 py-2">
+    <View className="gap-3">
       {LOADING_COMMENT_WIDTHS.map((width, index) => (
         <View
-          className="gap-2.5 border-b border-neutral-100 pb-4 dark:border-neutral-800"
+          className={clsx(
+            'gap-2.5 bg-white p-3 dark:bg-neutral-900',
+            index === 0 ? 'rounded-b-2xl' : 'rounded-2xl',
+          )}
           key={width}
         >
           <View className="flex-row items-center gap-2.5">
@@ -37,58 +44,62 @@ function Loading() {
         </View>
       ))}
     </View>
-  );
+  )
 }
 
 export default function CommentList(props: CommentListProps) {
-  const [mode, setMode] = useState(3);
-  const comments = useComments(props.commentId, props.commentType, mode);
-  const loadMoreLock = useRef(false);
-  const actions = useCommentActions(props.sourceUrl, comments.refresh);
+  const [mode, setMode] = useState(3)
+  const comments = useComments(props.commentId, props.commentType, mode)
+  const loadMoreLock = useRef(false)
+  const actions = useCommentActions(props.sourceUrl, comments.refresh)
 
   useEffect(() => {
-    if (!comments.isValidating) loadMoreLock.current = false;
-  }, [comments.isValidating, comments.data.replies.length]);
+    if (!comments.isValidating) loadMoreLock.current = false
+  }, [comments.isValidating, comments.data.replies.length])
 
   async function changeAttitude(item: ReplyItemType, kind: CommentAttitudeKind) {
-    const next = await actions.changeAttitude(item, item.attitude, kind);
-    if (next) await comments.patchAttitude(item.id, next);
-    return next;
+    const next = await actions.changeAttitude(item, item.attitude, kind)
+    if (next) await comments.patchAttitude(item.id, next)
+    return next
   }
 
   async function submitReply(target: ReplyItemType, message: string) {
-    const reply = await actions.submitReply(target, message);
-    if (!reply) return null;
-    const rootId = String(target.root) === "0" ? target.id : String(target.root);
-    await comments.prependReply(rootId, reply);
-    return reply;
+    const reply = await actions.submitReply(target, message)
+    if (!reply) return null
+    const rootId = String(target.root) === '0' ? target.id : String(target.root)
+    await comments.prependReply(rootId, reply)
+    return reply
   }
 
   function loadMore() {
-    if (loadMoreLock.current || comments.isValidating || comments.isReachingEnd) return;
-    loadMoreLock.current = true;
-    comments.update();
+    if (loadMoreLock.current || comments.isValidating || comments.isReachingEnd) return
+    loadMoreLock.current = true
+    comments.update()
   }
 
-  const allCount = comments.data.allCount;
+  const allCount = comments.data.allCount
   return (
-    <View className="flex-1 bg-white dark:bg-neutral-950">
+    <View className="flex-1">
       <FlashList
+        className="flex-1 bg-neutral-100 dark:bg-black"
         data={comments.data.replies}
         keyExtractor={(item: CommentItemType) => item.id}
-        renderItem={({ item }: { item: CommentItemType }) => (
+        renderItem={({ item, index }: { item: CommentItemType; index: number }) => (
           <Comment
             comment={item}
+            first={index === 0}
             ownerMid={comments.data.ownerMid}
             sourceUrl={props.sourceUrl}
             onAttitude={changeAttitude}
             isAttitudePending={actions.isAttitudePending}
           />
         )}
+        ItemSeparatorComponent={CommentSeparator}
         ListHeaderComponent={
           <View>
-            {props.children}
-            <View className="mt-3 flex-row items-center justify-between border-b border-neutral-100 pb-2 dark:border-neutral-800">
+            <View className="bg-white px-3 pt-4 pb-3 dark:bg-neutral-950">{props.children}</View>
+            <View className="h-2 bg-neutral-100 dark:bg-black" />
+            <View className="flex-row items-center justify-between border-b border-neutral-100 bg-white px-3 pb-2 pt-3 dark:border-neutral-800 dark:bg-neutral-950">
               <View className="flex-row items-center gap-1.5">
                 <Icon
                   name="comment-text-outline"
@@ -98,8 +109,8 @@ export default function CommentList(props: CommentListProps) {
                 />
                 <View className="flex-row items-center gap-1">
                   <Text className="text-sm font-semibold">评论</Text>
-                  {typeof allCount === "number" ? (
-                    <Text className={`text-xs font-normal ${colors.gray6.text}`}>{allCount}</Text>
+                  {typeof allCount === 'number' ? (
+                    <Text className={`text-xs font-normal ${colors.gray6.text}`}>{allCount}条</Text>
                   ) : comments.isLoading ? (
                     <Text className={`text-xs font-normal ${colors.gray6.text}`}>加载中</Text>
                   ) : null}
@@ -110,11 +121,11 @@ export default function CommentList(props: CommentListProps) {
                 <Pressable
                   className="rounded-full bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800"
                   accessibilityRole="button"
-                  accessibilityLabel={`当前按${mode === 3 ? "热度" : "时间"}排序，点击切换`}
-                  onPress={() => setMode((current) => (current === 3 ? 2 : 3))}
+                  accessibilityLabel={`当前按${mode === 3 ? '热度' : '时间'}排序，点击切换`}
+                  onPress={() => setMode(current => (current === 3 ? 2 : 3))}
                 >
-                  <Text className={clsx("text-xs font-medium", colors.primary.text)}>
-                    {mode === 3 ? "按热度" : "按时间"}
+                  <Text className={clsx('text-xs font-medium', colors.primary.text)}>
+                    {mode === 3 ? '按热度' : '按时间'}
                   </Text>
                 </Pressable>
               </View>
@@ -126,7 +137,7 @@ export default function CommentList(props: CommentListProps) {
             <Loading />
           ) : (
             <Text className="my-12 text-center text-sm">
-              {comments.error ? "评论已关闭或加载失败" : "还没有评论"}
+              {comments.error ? '评论已关闭或加载失败' : '还没有评论'}
             </Text>
           )
         }
@@ -135,17 +146,16 @@ export default function CommentList(props: CommentListProps) {
             {comments.data.replies.length ? (
               <Text className={`text-xs ${colors.gray6.text}`}>
                 {comments.isValidating
-                  ? "正在加载..."
+                  ? '正在加载...'
                   : comments.isLimited
-                    ? "匿名状态仅展示部分评论"
+                    ? '匿名状态仅展示部分评论'
                     : comments.isReachingEnd
-                      ? "没有更多评论了"
-                      : "上拉加载更多"}
+                      ? '没有更多评论了'
+                      : '上拉加载更多'}
               </Text>
             ) : null}
           </View>
         }
-        contentContainerClassName="px-3 pt-4"
         contentInsetAdjustmentBehavior="automatic"
         maintainVisibleContentPosition={{ disabled: true }}
         refreshing={comments.isRefreshing || props.refreshing}
@@ -160,5 +170,5 @@ export default function CommentList(props: CommentListProps) {
         isReplyPending={actions.isReplyPending}
       />
     </View>
-  );
+  )
 }

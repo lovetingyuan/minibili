@@ -17,9 +17,11 @@ export function CommentText(props: CommentTextProps) {
   // RNEUI 的 Text 在 Android 上会给每个文本节点加默认的 fontFamily/fontWeight，
   // 嵌套节点不会继承父级字重，所以加粗必须下发到每个节点。
   const boldClassName = props.bold ? "font-bold" : "";
+  // 同理，UP 主觉得很赞的主题粉色也要下发到每个节点，避免原生端嵌套节点回落到默认文字色。
+  const bodyTextClassName = `${props.creatorLiked ? colors.secondary.text : ""} ${boldClassName}`;
   const accentTextClassName = `${colors.primary.text} ${boldClassName}`;
   return (
-    <Text className={`text-[15px] leading-6 ${boldClassName}`}>
+    <Text className={`text-[15px] leading-6 ${bodyTextClassName}`}>
       {props.nodes.map((node, index) => {
         const key = `${props.idStr}:${index}`;
         if (node.type === "at") {
@@ -83,7 +85,7 @@ export function CommentText(props: CommentTextProps) {
           );
         }
         return (
-          <Text key={key} className={boldClassName}>
+          <Text key={key} className={bodyTextClassName}>
             {node.text}
           </Text>
         );

@@ -210,3 +210,45 @@ describe("CommentText like count", () => {
     expect(classNames.filter((className) => className.includes("font-bold"))).toHaveLength(0);
   });
 });
+
+describe("CommentText creator liked highlight", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const NODES: CommentMessageContent = [
+    { type: "text", text: "评论" },
+    { type: "at", text: "@某人", mid: 1 },
+  ];
+
+  function renderText(creatorLiked: boolean) {
+    const text = CommentText({
+      idStr: "1",
+      images: [],
+      nodes: NODES,
+      creatorLiked,
+    }) as ReactElement<{
+      className?: string;
+      children: [ReactElement<{ className?: string }>[], ...unknown[]];
+    }>;
+    return { bodyClassName: text.props.className ?? "", nodes: text.props.children[0] };
+  }
+
+  test("paints the comment body with the theme pink when the UP liked it", () => {
+    const { bodyClassName, nodes } = renderText(true);
+
+    expect(bodyClassName).toContain(colors.secondary.text);
+    expect(nodes[0].props.className).toContain(colors.secondary.text);
+  });
+
+  test("keeps the accent color of mentions inside a highlighted body", () => {
+    const { nodes } = renderText(true);
+
+    expect(nodes[1].props.className).toContain(colors.primary.text);
+  });
+
+  test("leaves the body color untouched when the UP did not like the comment", () => {
+    const { bodyClassName, nodes } = renderText(false);
+
+    expect(bodyClassName).not.toContain(colors.secondary.text);
+    expect(nodes[0].props.className).not.toContain(colors.secondary.text);
+  });
+});

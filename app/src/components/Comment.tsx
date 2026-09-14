@@ -107,7 +107,7 @@ export function CommentItem(props: CommentItemProps) {
           </View>
         </View>
       </View>
-      <View className="pl-2">
+      <View>
         <CommentText
           nodes={comment.message}
           idStr={comment.id}
@@ -116,14 +116,8 @@ export function CommentItem(props: CommentItemProps) {
           likeActive={liked}
           likePending={props.isAttitudePending(comment.id)}
           bold={liked}
+          creatorLiked={comment.creatorLiked}
         />
-        {comment.creatorLiked ? (
-          <View className="mt-2 self-start rounded-full bg-pink-50 px-2.5 py-1 dark:bg-pink-950/40">
-            <Text className={`text-[11px] font-medium ${colors.secondary.text}`}>
-              UP 主觉得很赞
-            </Text>
-          </View>
-        ) : null}
       </View>
     </Pressable>
   );
@@ -153,10 +147,12 @@ export function Comment(props: CommentProps) {
   const moreRepliesButton =
     comment.rcount > 0 ? (
       <Pressable
-        className={clsx("self-start", !comment.replies.length && "mt-2")}
+        className={clsx(
+          "-mx-2 rounded-lg px-2 py-1.5 active:bg-neutral-400/20",
+          !comment.replies.length && "mt-2",
+        )}
         accessibilityRole="button"
         accessibilityLabel={`查看全部 ${comment.rcount} 条回复`}
-        hitSlop={4}
         onPress={() => openReplies(comment, false)}
       >
         <Text className={`text-sm font-medium ${colors.primary.text}`}>
@@ -166,7 +162,12 @@ export function Comment(props: CommentProps) {
     ) : null;
 
   return (
-    <View className="mb-1 border-b border-neutral-100 py-4 dark:border-neutral-800">
+    <View
+      className={clsx(
+        "bg-white p-3 dark:bg-neutral-900",
+        props.first ? "rounded-b-2xl" : "rounded-2xl",
+      )}
+    >
       <CommentItem
         comment={comment}
         ownerMid={props.ownerMid}
@@ -175,7 +176,7 @@ export function Comment(props: CommentProps) {
         isAttitudePending={props.isAttitudePending}
       />
       {comment.replies.length ? (
-        <View className="mt-3 gap-3 rounded-2xl bg-neutral-50 p-3 dark:bg-neutral-900">
+        <View className="mt-3 gap-3 rounded-2xl bg-neutral-100 p-3 dark:bg-neutral-800">
           {comment.replies.map((reply) => (
             <CommentItem
               key={reply.id}

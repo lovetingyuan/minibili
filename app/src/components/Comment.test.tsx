@@ -42,6 +42,7 @@ import { Comment, CommentItem } from "./Comment";
 
 type ElementProps = {
   children?: ReactNode;
+  className?: string;
   onLongPress?: () => void;
   onPress?: () => void;
 };
@@ -198,7 +199,7 @@ describe("Comment like count", () => {
     expect(renderLikeCount(makeComment({ like: 0, creatorLiked: true })).likeText).toBe("");
   });
 
-  test("indents the comment body", () => {
+  test("keeps the comment body flush with the avatar", () => {
     const item = CommentItem({
       comment: makeComment(),
       onAttitude: vi.fn().mockResolvedValue(null),
@@ -207,7 +208,8 @@ describe("Comment like count", () => {
     }) as ReactElement<ElementProps>;
     const [, body] = children(item) as ReactElement<{ className?: string }>[];
 
-    expect(body.props.className).toBe("pl-2");
+    expect(body.type).toBe("View");
+    expect(body.props.className ?? "").not.toContain("pl-");
   });
 });
 
@@ -272,5 +274,79 @@ describe("Comment reply entry intent", () => {
     expect(mocks.setRepliesInfo).toHaveBeenCalledWith(
       expect.objectContaining({ replyTarget: comment, focusComposer: false }),
     );
+  });
+});
+
+describe("Comment card layout", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  function renderComment(comment = makeComment()) {
+    return Comment({
+      comment,
+      sourceUrl: "https://www.bilibili.com/video/BV1TEST",
+      onAttitude: vi.fn().mockResolvedValue(null),
+      isAttitudePending: () => false,
+    }) as ReactElement<ElementProps>;
+  }
+
+  test("renders each comment as an inset card instead of a bordered row", () => {
+    const tree = renderComment();
+
+    expect(tree.type).toBe("View");
+    expect(tree.props.className).toContain("rounded-2xl");
+    expect(tree.props.className).toContain("bg-white");
+    expect(tree.props.className).not.toContain("border-b");
+  });
+
+  test("keeps the previewed replies visually separated inside the card", () => {
+    const comment = makeComment({ rcount: 1, replies: [makeComment({ id: "11", root: "10" })] });
+    const tree = renderComment(comment);
+    const [, replyGroup] = children(tree) as ReactElement<ElementProps>[];
+
+    expect(replyGroup.type).toBe("View");
+    expect(replyGroup.props.className).toContain("bg-neutral-100");
+  });
+
+  test("makes the more-replies row full width with left-aligned text", () => {
+    const comment = makeComment({ rcount: 3, replies: [makeComment({ id: "11", root: "10" })] });
+    const tree = renderComment(comment);
+    const [, replyGroup] = children(tree) as ReactElement<ElementProps>[];
+    const viewAll = children(replyGroup).find(
+      (child) => (child as ReactElement).type === "Pressable",
+    ) as ReactElement<ElementProps>;
+
+    expect(viewAll.props.className).not.toContain("self-start");
+    expect(viewAll.props.className).toContain("active:bg-neutral-400/20");
+    expect(viewAll.props.className).not.toContain("items-center");
+  });
+});
+
+describe("Comment creator liked highlight", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  type BodyNodeProps = { creatorLiked?: boolean };
+
+  function renderBody(comment: ReplyItemType) {
+    const item = CommentItem({
+      comment,
+      onAttitude: vi.fn().mockResolvedValue(null),
+      onReply: vi.fn(),
+      isAttitudePending: () => false,
+    }) as ReactElement<ElementProps>;
+    const [, body] = children(item) as ReactElement<ElementProps>[];
+    return children(body);
+  }
+
+  test("asks the body to highlight itself when the UP liked the comment", () => {
+    const [text] = renderBody(makeComment({ creatorLiked: true })) as ReactElement<BodyNodeProps>[];
+
+    expect(text.type).toBe("CommentText");
+    expect(text.props.creatorLiked).toBe(true);
+  });
+
+  test("no longer renders the UP 主觉得很赞 label inside the body", () => {
+    const body = renderBody(makeComment({ creatorLiked: true }));
+
+    expect(body).toHaveLength(1);
   });
 });
