@@ -24,6 +24,7 @@ import CheckUpUpdate from "./components/CheckUpUpdate";
 import DevServerRecovery from "./components/DevServerRecovery";
 import FollowingDynamicsUpdatesManager from "./components/FollowingDynamicsUpdatesManager";
 import ImagesView from "./components/ImagesView";
+import VideoDownloadManager from "./components/VideoDownloadManager";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
 import useAppOrientation from "./hooks/useAppOrientation";
 import useRNETheme from "./hooks/useRNETheme";
@@ -94,6 +95,7 @@ export default function App() {
                 <LiveUpsManager />
                 <FollowingDynamicsUpdatesManager />
                 <WatchLaterManager />
+                <VideoDownloadManager />
                 <ButtonsOverlay />
                 <ImagesView />
                 <Route />

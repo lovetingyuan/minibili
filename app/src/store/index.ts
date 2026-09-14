@@ -5,6 +5,7 @@ import { createStore, type AtomicStoreMethodsType } from "react-atomic-store";
 import Toast from "react-native-simple-toast";
 
 import { RanksConfig } from "../constants";
+import type { VideoDownloadTask } from "../features/video-download/types";
 import type { UpInfo } from "../types";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { RepliesInfo } from "./replies-info.type";
@@ -62,6 +63,10 @@ const getAppValue = () => {
      * 稍后再看视频 aid 集合，仅当前运行会话有效，不做持久化
      */
     watchLaterAids: {} as Record<string, true>,
+    /**
+     * 当前的视频下载任务，仅当前运行会话有效，不做持久化
+     */
+    videoDownloadTask: null as VideoDownloadTask | null,
     moreRepliesUrl: "",
     repliesInfo: null as RepliesInfo | null,
     releaseList: [] as {

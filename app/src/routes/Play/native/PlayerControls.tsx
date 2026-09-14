@@ -55,6 +55,34 @@ function ControlButton(props: {
   );
 }
 
+/**
+ * 使用单个汉字代替图标，字形大小与同尺寸图标保持一致
+ */
+function CharacterButton(props: {
+  character: string;
+  label: string;
+  color: string;
+  size: number;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={props.label}
+      hitSlop={10}
+      className="px-1 py-1"
+      onPress={props.onPress}
+    >
+      <Text
+        className="text-center font-medium"
+        style={{ color: props.color, fontSize: props.size, lineHeight: props.size + 2 }}
+      >
+        {props.character}
+      </Text>
+    </Pressable>
+  );
+}
+
 export default function PlayerControls(props: PlayerControlsProps) {
   const { isPlaying, danmakuEnabled, fullscreen, visible } = props;
   const accentColor = useResolvedColor(colors.secondary.text) ?? "#ff6699";
@@ -175,10 +203,10 @@ export default function PlayerControls(props: PlayerControlsProps) {
         >
           {`${formatPlaybackTime(displayMs / 1000)}/${formatPlaybackTime(durationMs / 1000)}`}
         </Text>
-        <ControlButton
-          name={danmakuEnabled ? "comment-text-outline" : "comment-off-outline"}
+        <CharacterButton
+          character="弹"
           label={danmakuEnabled ? "关闭弹幕" : "打开弹幕"}
-          size={18}
+          size={14}
           color={danmakuEnabled ? accentColor : "#ffffff"}
           onPress={() => {
             press(props.onToggleDanmaku);

@@ -35,7 +35,9 @@ function Play({ route }: Props) {
     ...data,
   };
   const [currentPage, setCurrentPage] = React.useState(1);
-  const cid2 = videoInfo.pages ? videoInfo.pages[currentPage - 1].cid : 0;
+  const pageInfo = videoInfo.pages?.[currentPage - 1];
+  // 下载用当前分P 的 cid，没有分P 信息时退回视频自身的 cid
+  const downloadCid = pageInfo?.cid ?? videoInfo.cid ?? 0;
 
   const errorShowedRef = React.useRef(false);
 
@@ -61,7 +63,9 @@ function Play({ route }: Props) {
   useUpdateNavigationOptions({
     headerTitle: () => <PlayHeaderTitle />,
     headerShown: !fullscreen,
-    headerRight: () => <PlayHeaderRight cid={cid2} />,
+    headerRight: () => (
+      <PlayHeaderRight cid={downloadCid} page={currentPage} pageTitle={pageInfo?.title} />
+    ),
   });
 
   const handlePlayEnd = () => {

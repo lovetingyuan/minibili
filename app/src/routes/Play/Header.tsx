@@ -5,13 +5,14 @@ import UpName from "@/components/UpName";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
-import { Linking, View } from "react-native";
+import { View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 
-import { getDownloadUrl } from "@/api/play-url";
 import { useUserRelation } from "@/api/user-relation";
 import { useVideoInfo } from "@/api/video-info";
 import { colors } from "@/constants/colors.tw";
+import { isDownloadingVideo } from "@/features/video-download/controller";
+import { useVideoDownload } from "@/features/video-download/useVideoDownload";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
@@ -46,7 +47,7 @@ export function PlayHeaderTitle() {
   );
 }
 
-export function PlayHeaderRight(props: { cid?: number }) {
+export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?: string }) {
   const [visible, setVisible] = React.useState(false);
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
@@ -54,10 +55,42 @@ export function PlayHeaderRight(props: { cid?: number }) {
   const { data } = useVideoInfo(route.params.bvid);
   const watchLater = useWatchLaterActions();
   const { setImagesList, setCurrentImageIndex } = useStore();
+  const { task: downloadTask, start: startDownload, cancel: cancelDownload } = useVideoDownload();
   const videoInfo = {
     ...route.params,
     ...data,
   };
+  const downloading = isDownloadingVideo(downloadTask, videoInfo.bvid ?? "", props.cid ?? 0);
+
+  /**
+   * 下载当前分P：地址解析阶段的失败原因即时用 toast 反馈，
+   * 下载过程中的进度与结果由通知展示，这里不再等待。
+   */
+  async function handleDownloadVideo() {
+    if (!props.cid) {
+      showToast("稍后再试");
+      return;
+    }
+    const result = await startDownload({
+      bvid: videoInfo.bvid ?? "",
+      cid: props.cid,
+      title: videoInfo.title,
+      page: props.page,
+      pageTitle: props.pageTitle,
+    });
+    if (result === "busy") {
+      showToast("已有下载任务进行中");
+      return;
+    }
+    if (result === "unsupported") {
+      showToast("暂不支持下载");
+      return;
+    }
+    if (result === "failed") {
+      showToast("下载失败，请稍后重试");
+    }
+  }
+
   return (
     <View className="flex-row items-center gap-2">
       <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
@@ -73,25 +106,14 @@ export function PlayHeaderRight(props: { cid?: number }) {
             }}
           />
           <MenuOption
-            text="下载视频"
+            text={downloading ? "取消下载" : "下载视频"}
             onSelect={() => {
-              if (props.cid) {
-                showToast("请稍后在浏览器中下载");
-                getDownloadUrl(videoInfo.bvid, props.cid)
-                  ?.then((url) => {
-                    if (url) {
-                      Linking.openURL(url);
-                    } else {
-                      return Promise.reject();
-                    }
-                  })
-                  .catch(() => {
-                    showToast("暂不支持下载");
-                  });
-              } else {
-                showToast("稍后再试");
-              }
               hideMenu();
+              if (downloading) {
+                cancelDownload();
+                return;
+              }
+              void handleDownloadVideo();
             }}
           />
           <MenuOption

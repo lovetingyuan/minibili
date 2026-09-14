@@ -86,6 +86,7 @@ module.exports = {
         supportsBackgroundPlayback: true,
       },
     ],
+    "expo-notifications",
   ],
   experiments: {
     reactCompiler: true,
