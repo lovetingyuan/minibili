@@ -62,6 +62,7 @@ function DynamicListEmpty(
 export function DynamicList(props: DynamicListProps) {
   const navigation = useNavigation<MainTabNavigationProp>();
   const listRef = React.useRef<FlashListRef<DynamicItem> | null>(null);
+  const pendingScrollTopRef = React.useRef(false);
 
   React.useEffect(() => {
     if (!props.onTabReselect) {
@@ -72,10 +73,19 @@ export function DynamicList(props: DynamicListProps) {
       if (!navigation.isFocused()) {
         return;
       }
-      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      // 刷新会替换整个列表，等新列表渲染出来后再滚动，否则滚动位置会被新数据覆盖
+      pendingScrollTopRef.current = true;
       props.onTabReselect?.();
     });
   }, [navigation, props.onTabReselect]);
+
+  React.useEffect(() => {
+    if (!pendingScrollTopRef.current || props.isRefreshing) {
+      return;
+    }
+    pendingScrollTopRef.current = false;
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, [props.isRefreshing]);
 
   if (props.isLoading && !props.list.length) {
     return <DynamicListLoading text={props.loadingText} />;
