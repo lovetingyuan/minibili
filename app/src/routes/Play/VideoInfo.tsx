@@ -17,8 +17,10 @@ import {
 } from "@/utils";
 
 import { useVideoInfo } from "../../api/video-info";
+import { getVideoDescription } from "./description";
 import FavoriteButton from "./FavoriteButton";
 import LikeButton from "./LikeButton";
+import VideoDescription from "./VideoDescription";
 
 export default VideoInfo;
 
@@ -30,12 +32,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
     ...data,
   };
   const { name, face, mid, date, title, desc, pages } = videoInfo;
-  let videoDesc = desc;
-  if (videoDesc === "-") {
-    videoDesc = "";
-  } else if (videoDesc && videoDesc === title) {
-    videoDesc = "";
-  }
+  const videoDesc = getVideoDescription(desc, title);
   const [showPagesModal, setShowPagesModal] = React.useState(false);
 
   const navigation = useNavigation<NavigationProps["navigation"]>();
@@ -128,11 +125,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
         </View>
       </View>
       <Text className="mt-3 text-base">{title}</Text>
-      {videoDesc ? (
-        <Text className="mt-3" selectable>
-          {videoDesc}
-        </Text>
-      ) : null}
+      <VideoDescription text={videoDesc} />
       {pages && pages.length > 1 ? (
         <View className="mt-3 flex-row items-center">
           <TouchableOpacity
