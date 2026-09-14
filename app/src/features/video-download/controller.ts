@@ -185,6 +185,7 @@ async function runDownload(options: {
 
     if (notifyEnabled) {
       publish(true);
+      showToast("开始下载，可在通知栏查看进度");
     } else {
       showToast("已开始下载，未开启通知权限无法显示进度");
     }

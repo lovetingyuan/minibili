@@ -43,7 +43,7 @@ export function useHotVideos(t: number) {
     (index) => {
       return `/x/web-interface/popular?ps=30&pn=${index + 1}&_t=${t}`;
     },
-    (key) => request(key, { withCookie: false }),
+    (key) => request(key, { withCookie: true }),
     {
       revalidateFirstPage: false,
       // revalidateAll: true,

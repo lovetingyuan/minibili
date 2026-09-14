@@ -176,6 +176,7 @@ describe("video download controller", () => {
     expect(mocks.state.current?.bytesWritten).toBe(1000);
     expect(mocks.state.current?.speed).toBe(0);
     expect(mocks.deleteTarget).toHaveBeenCalled();
+    expect(mocks.showToast).toHaveBeenCalledWith("开始下载，可在通知栏查看进度");
     expect(mocks.showToast).toHaveBeenCalledWith("已保存到相册 MiniBili");
     expect(mocks.finishVideoDownloadNotification).toHaveBeenLastCalledWith({
       title: "测试视频",
