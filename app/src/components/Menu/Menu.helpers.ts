@@ -3,12 +3,14 @@ import type { ComponentProps, ElementType, ReactNode } from "react";
 import type { MenuOptions as PopupMenuOptions } from "react-native-popup-menu";
 
 import {
+  defaultMenuThemeStyles,
   MenuOptionTouchableComponent,
   menuOptionTextStyle,
   menuOptionTouchableProps,
   menuOptionWrapperStyle,
   menuOptionsContainerStyle,
   menuSurfaceStyle,
+  type MenuThemeStyles,
 } from "./Menu.styles";
 
 type ControlledMenuBackPressInput = {
@@ -22,6 +24,7 @@ export type MenuOptionsCustomStyles = NonNullable<
 
 export { menuOptionTextStyle, menuOptionWrapperStyle, menuSurfaceStyle };
 export { MenuOptionTouchableComponent, menuOptionTouchableProps };
+export type { MenuThemeStyles };
 
 export function handleControlledMenuBackPress({
   opened,
@@ -37,13 +40,14 @@ export function handleControlledMenuBackPress({
 
 export function createMenuOptionsCustomStyles(
   customStyles: MenuOptionsCustomStyles,
+  themeStyles: MenuThemeStyles = defaultMenuThemeStyles,
 ): MenuOptionsCustomStyles {
   return {
     OptionTouchableComponent: MenuOptionTouchableComponent,
     optionTouchable: menuOptionTouchableProps,
-    optionsWrapper: menuSurfaceStyle,
+    optionsWrapper: themeStyles.optionsWrapper,
     optionWrapper: menuOptionWrapperStyle,
-    optionText: menuOptionTextStyle,
+    optionText: themeStyles.optionText,
     ...customStyles,
   };
 }
@@ -51,6 +55,7 @@ export function createMenuOptionsCustomStyles(
 export function enhanceMenuChildren(
   children: ReactNode,
   menuOptionsComponent: ElementType,
+  themeStyles: MenuThemeStyles = defaultMenuThemeStyles,
 ): ReactNode {
   return React.Children.map(children, (child) => {
     if (!React.isValidElement<ComponentProps<typeof PopupMenuOptions>>(child)) {
@@ -63,7 +68,7 @@ export function enhanceMenuChildren(
 
     return React.cloneElement(child, {
       optionsContainerStyle: [menuOptionsContainerStyle, child.props.optionsContainerStyle],
-      customStyles: createMenuOptionsCustomStyles(child.props.customStyles ?? {}),
+      customStyles: createMenuOptionsCustomStyles(child.props.customStyles ?? {}, themeStyles),
     });
   });
 }

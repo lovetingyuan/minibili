@@ -5,6 +5,7 @@ import { Alert, Linking, TouchableOpacity } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { useBlockUpActions } from "@/hooks/useBlockUpActions";
+import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 import type { MainTabNavigationProp } from "@/types";
@@ -31,6 +32,7 @@ function VideoList(props: {
     setSetting,
   } = useUserSettings();
   const { confirmBlock } = useBlockUpActions();
+  const watchLater = useWatchLaterActions();
   const videoList: VideoItemType[] = [];
   const uniqVideosMap: Record<string, boolean> = {};
   for (const item of props.videos) {
@@ -119,6 +121,12 @@ function VideoList(props: {
   };
   const buttons = (video: VideoItemType) =>
     [
+      {
+        text: watchLater.isAdded(video.aid) ? "从稍后再看移除" : "添加到稍后再看",
+        onPress: () => {
+          void watchLater.toggle({ aid: video.aid });
+        },
+      },
       {
         text: `拉黑 UP 主「${video.name}」`,
         onPress: () => confirmBlock({ mid: video.mid, name: video.name }),

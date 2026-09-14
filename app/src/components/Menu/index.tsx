@@ -11,6 +11,7 @@ import {
 
 import { enhanceMenuChildren, handleControlledMenuBackPress } from "./Menu.helpers";
 import { menuOptionClassName, menuProviderCustomStyles } from "./Menu.styles";
+import { useMenuThemeStyles } from "./useMenuThemeStyles";
 
 type PopupMenuProps = ComponentProps<typeof PopupMenu>;
 type PopupMenuOptionProps = ComponentProps<typeof PopupMenuOption>;
@@ -19,6 +20,8 @@ export { MenuProvider, PopupMenuOptions as MenuOptions, MenuTrigger };
 export { menuOptionClassName, menuProviderCustomStyles };
 
 export function Menu({ children, opened, onClose, ...props }: PopupMenuProps) {
+  const menuThemeStyles = useMenuThemeStyles();
+
   React.useEffect(() => {
     if (!opened) {
       return;
@@ -35,7 +38,7 @@ export function Menu({ children, opened, onClose, ...props }: PopupMenuProps) {
 
   return (
     <PopupMenu {...props} opened={opened} onClose={onClose}>
-      {enhanceMenuChildren(children, PopupMenuOptions)}
+      {enhanceMenuChildren(children, PopupMenuOptions, menuThemeStyles)}
     </PopupMenu>
   );
 }

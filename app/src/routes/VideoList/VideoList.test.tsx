@@ -7,6 +7,7 @@ import type { FlashList } from "../../components/styled/rneui";
 
 const mocks = vi.hoisted(() => ({
   confirmBlock: vi.fn(),
+  toggleWatchLater: vi.fn(),
   setOverlayButtons: vi.fn<(buttons: { text: string; onPress: () => void }[]) => void>(),
   setBlackTags: vi.fn(),
   alert: vi.fn(),
@@ -48,6 +49,13 @@ vi.mock("@/components/styled/rneui", () => ({
 }));
 vi.mock("@/hooks/useBlockUpActions", () => ({
   useBlockUpActions: () => ({ confirmBlock: mocks.confirmBlock }),
+}));
+vi.mock("@/hooks/useWatchLaterActions", () => ({
+  useWatchLaterActions: () => ({
+    isAdded: () => false,
+    isPending: () => false,
+    toggle: mocks.toggleWatchLater,
+  }),
 }));
 vi.mock("@/store", () => ({
   useStore: () => ({
@@ -138,10 +146,13 @@ describe("video list after replacing local UP blocking", () => {
     longPress(video, 0);
     const buttons = mocks.setOverlayButtons.mock.calls[0][0];
     expect(buttons.some((button) => button.text === "标记观看完成")).toBe(false);
-    expect(buttons[0].text).toBe("拉黑 UP 主「UP」");
-    expect(buttons[1].text).toBe("不再看「音乐」类型的视频");
-    longPress(other, 1);
+    expect(buttons[0].text).toBe("添加到稍后再看");
+    expect(buttons[1].text).toBe("拉黑 UP 主「UP」");
+    expect(buttons[2].text).toBe("不再看「音乐」类型的视频");
     buttons[0].onPress();
+    expect(mocks.toggleWatchLater).toHaveBeenCalledExactlyOnceWith({ aid: video.aid });
+    longPress(other, 1);
+    buttons[1].onPress();
     expect(mocks.confirmBlock).toHaveBeenCalledExactlyOnceWith({ mid: 456, name: "UP" });
     expect(mocks.setBlackTags).not.toHaveBeenCalled();
     expect(list.data).toEqual([video, other]);

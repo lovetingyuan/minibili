@@ -178,7 +178,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
         <ControlButton
           name={danmakuEnabled ? "comment-text-outline" : "comment-off-outline"}
           label={danmakuEnabled ? "关闭弹幕" : "打开弹幕"}
-          size={22}
+          size={18}
           color={danmakuEnabled ? accentColor : "#ffffff"}
           onPress={() => {
             press(props.onToggleDanmaku);

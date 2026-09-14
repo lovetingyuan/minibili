@@ -3,6 +3,8 @@ import { TouchableHighlight } from "react-native";
 import type { ComponentProps } from "react";
 import type { TextStyle, ViewStyle } from "react-native";
 
+import { colors } from "@/constants/colors.tw";
+
 const SCREEN_INDENT = 8;
 
 type MenuProviderCustomStyles = {
@@ -48,6 +50,10 @@ export function MenuOptionTouchableComponent(props: ComponentProps<typeof Toucha
   return React.createElement(TouchableHighlight, props);
 }
 
+export const menuSurfaceClassName = `${colors.white.bg} ${colors.gray2.border}`;
+
+export const menuOptionTextClassName = colors.black.text;
+
 export const menuSurfaceStyle: ViewStyle = {
   backgroundColor: "#fff",
   borderColor: "rgba(0, 0, 0, 0.05)",
@@ -67,5 +73,42 @@ export const menuOptionTextStyle: TextStyle = {
   paddingHorizontal: 16,
   textAlign: "left",
 };
+
+export type MenuThemeStyles = {
+  optionText: TextStyle;
+  optionsWrapper: ViewStyle;
+};
+
+export function resolveStyleColor(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+export function createMenuSurfaceStyle(backgroundColor?: string, borderColor?: string): ViewStyle {
+  return {
+    ...menuSurfaceStyle,
+    ...(backgroundColor ? { backgroundColor } : {}),
+    ...(borderColor ? { borderColor } : {}),
+  };
+}
+
+export function createMenuOptionTextStyle(color?: string): TextStyle {
+  return {
+    ...menuOptionTextStyle,
+    ...(color ? { color } : {}),
+  };
+}
+
+export function createMenuThemeStyles(theme: {
+  optionTextColor?: string;
+  surfaceBackgroundColor?: string;
+  surfaceBorderColor?: string;
+}): MenuThemeStyles {
+  return {
+    optionText: createMenuOptionTextStyle(theme.optionTextColor),
+    optionsWrapper: createMenuSurfaceStyle(theme.surfaceBackgroundColor, theme.surfaceBorderColor),
+  };
+}
+
+export const defaultMenuThemeStyles: MenuThemeStyles = createMenuThemeStyles({});
 
 export const menuOptionClassName = "h-12 min-w-[124px] max-w-[248px] justify-center";

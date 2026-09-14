@@ -12,9 +12,11 @@ import { getDownloadUrl } from "@/api/play-url";
 import { useUserRelation } from "@/api/user-relation";
 import { useVideoInfo } from "@/api/video-info";
 import { colors } from "@/constants/colors.tw";
+import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
+import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
 import type { RootStackParamList } from "@/types";
-import { getOriginalImgUrl, parseNumber, showToast } from "@/utils";
+import { parseNumber, showToast } from "@/utils";
 
 export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
@@ -44,12 +46,14 @@ export function PlayHeaderTitle() {
   );
 }
 
-export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
+export function PlayHeaderRight(props: { cid?: number }) {
   const [visible, setVisible] = React.useState(false);
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
   const route = useRoute<NativeStackScreenProps<RootStackParamList, "Play">["route"]>();
   const { data } = useVideoInfo(route.params.bvid);
+  const watchLater = useWatchLaterActions();
+  const { setImagesList, setCurrentImageIndex } = useStore();
   const videoInfo = {
     ...route.params,
     ...data,
@@ -61,6 +65,13 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
           <Icon name="dots-vertical" type="material-community" />
         </MenuTrigger>
         <MenuOptions>
+          <MenuOption
+            text={watchLater.isAdded(videoInfo.aid) ? "从稍后再看移除" : "添加到稍后再看"}
+            onSelect={() => {
+              hideMenu();
+              void watchLater.toggle({ aid: videoInfo.aid });
+            }}
+          />
           <MenuOption
             text="下载视频"
             onSelect={() => {
@@ -84,39 +95,25 @@ export function PlayHeaderRight(props: { cid?: number; refresh: () => void }) {
             }}
           />
           <MenuOption
-            text="下载封面"
+            text="查看封面"
             onSelect={() => {
               hideMenu();
-              if (videoInfo.cover) {
-                Linking.openURL(getOriginalImgUrl(videoInfo.cover));
-              } else {
+              if (!videoInfo.cover) {
                 showToast("暂时无法获取封面");
+                return;
               }
+
+              setImagesList([{ src: videoInfo.cover, width: 0, height: 0, ratio: 16 / 9 }]);
+              setCurrentImageIndex(0);
             }}
           />
           <MenuOption
-            text="刷新"
+            text="复制视频ID"
             onSelect={() => {
-              hideMenu();
-              props.refresh();
-            }}
-          />
-          <MenuOption
-            text="浏览器打开"
-            onSelect={() => {
-              hideMenu();
-              Linking.openURL(`https://www.bilibili.com/video/${videoInfo.bvid}`);
-            }}
-          />
-          <MenuOption
-            text="复制链接"
-            onSelect={() => {
-              Clipboard.setStringAsync(`https://www.bilibili.com/video/${videoInfo.bvid}`).then(
-                () => {
-                  showToast("已复制视频链接");
-                  hideMenu();
-                },
-              );
+              Clipboard.setStringAsync(videoInfo.bvid).then(() => {
+                showToast(`已复制视频ID：${videoInfo.bvid}`);
+                hideMenu();
+              });
             }}
           />
         </MenuOptions>

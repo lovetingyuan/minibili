@@ -71,6 +71,7 @@ export type RootStackParamList = {
   };
   Favorites: undefined;
   History: undefined;
+  WatchLater: undefined;
   Living: { url: string; title: string; user?: Pick<UpInfo, "mid" | "name"> };
 };
 

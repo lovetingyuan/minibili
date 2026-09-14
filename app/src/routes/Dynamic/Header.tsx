@@ -5,7 +5,7 @@ import UpName from "@/components/UpName";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
-import { Linking, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 
 import { colors } from "@/constants/colors.tw";
@@ -43,6 +43,25 @@ function HeaderLeft() {
   //   dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   const _followedUpsMap = useFollowedUpsMap();
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
+  const { setImagesList, setCurrentImageIndex } = useStore();
+
+  const copyUserName = () => {
+    if (!dynamicUser?.name) {
+      return;
+    }
+    void Clipboard.setStringAsync(dynamicUser.name).then(() => {
+      showToast("已复制用户名");
+    });
+  };
+
+  const viewAvatar = () => {
+    if (!dynamicUser?.face) {
+      return;
+    }
+    setImagesList([{ src: dynamicUser.face, width: 0, height: 0, ratio: 1 }]);
+    setCurrentImageIndex(0);
+  };
+
   return (
     <View className="left-[-12px] mr-4 flex-none flex-row items-center">
       {dynamicUser?.face ? (
@@ -50,7 +69,7 @@ function HeaderLeft() {
           <Avatar
             size={40}
             rounded
-            // onPress={gotoWebPage}
+            onPress={viewAvatar}
             source={{
               uri: parseImgUrl(dynamicUser.face, getImagePixelSize(40)),
             }}
@@ -74,18 +93,20 @@ function HeaderLeft() {
         </View>
       ) : null}
 
-      <View className="ml-3 flex-1 flex-row flex-wrap items-center">
+      <View className="ml-3 flex-1 flex-row items-center">
         <UpName
           mid={dynamicUser.mid}
-          className={clsx(followed && [colors.secondary.text, "font-bold"], "text-lg")}
+          className={clsx("shrink text-lg", followed && [colors.secondary.text, "font-bold"])}
           // adjustsFontSizeToFit
+          onPress={copyUserName}
           numberOfLines={1}
+          ellipsizeMode="tail"
         >
           {userName}
         </UpName>
         {fans ? (
           <Text
-            className="ml-2 text-sm text-gray-500 dark:text-gray-400"
+            className="ml-2 shrink-0 text-sm text-gray-500 dark:text-gray-400"
             onPress={() => {
               showToast(`粉丝：${fans.follower}`);
             }}
@@ -107,13 +128,17 @@ function HeaderRight() {
   const [visible, setVisible] = React.useState(false);
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
-  const {
-    setReloadUerProfile,
-    // setDynamicOpenUrl,
-  } = useStore();
   const actions = useFollowActions();
   const _followedUpsMap = useFollowedUpsMap();
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
+  const followOptionText = actions.isPreparing
+    ? "同步关注列表中"
+    : actions.pendingMid
+      ? "关注处理中"
+      : followed
+        ? "取消关注"
+        : "关注UP";
+
   return (
     <View className="flex-row items-center gap-2">
       <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
@@ -121,24 +146,16 @@ function HeaderRight() {
           <Icon name="dots-vertical" type="material-community" />
         </MenuTrigger>
         <MenuOptions>
-          {!followed && (
-            <MenuOption
-              text={
-                actions.isPreparing
-                  ? "同步关注列表中"
-                  : actions.pendingMid
-                    ? "关注处理中"
-                    : "关注UP"
+          <MenuOption
+            text={followOptionText}
+            disabled={actions.disabled}
+            onSelect={() => {
+              if (dynamicUser) {
+                void (followed ? actions.unfollow(dynamicUser) : actions.follow(dynamicUser));
               }
-              disabled={actions.disabled}
-              onSelect={() => {
-                if (dynamicUser) {
-                  void actions.follow(dynamicUser);
-                }
-                hideMenu();
-              }}
-            />
-          )}
+              hideMenu();
+            }}
+          />
           <MenuOption
             text="分享UP"
             onSelect={() => {
@@ -147,57 +164,6 @@ function HeaderRight() {
                 handleShareUp(name, mid, sign);
               }
               hideMenu();
-            }}
-          />
-          <MenuOption
-            text="查看头像"
-            onSelect={() => {
-              if (dynamicUser?.face) {
-                Linking.openURL(dynamicUser.face);
-              }
-              hideMenu();
-            }}
-          />
-          <MenuOption
-            text="复制用户名"
-            onSelect={() => {
-              if (!dynamicUser) {
-                return;
-              }
-              Clipboard.setStringAsync(dynamicUser.name).then(() => {
-                showToast("已复制用户名");
-                hideMenu();
-              });
-            }}
-          />
-          <MenuOption
-            text="复制用户ID"
-            onSelect={() => {
-              if (!dynamicUser) {
-                return;
-              }
-              Clipboard.setStringAsync(`${dynamicUser.mid}`).then(() => {
-                showToast("已复制用户ID");
-                hideMenu();
-              });
-            }}
-          />
-          <MenuOption
-            text="浏览器打开"
-            onSelect={() => {
-              if (!dynamicUser) {
-                return;
-              }
-              Linking.openURL(`https://space.bilibili.com/${dynamicUser.mid}`);
-              // setDynamicOpenUrl(Date.now())
-              hideMenu();
-            }}
-          />
-          <MenuOption
-            text="刷新"
-            onSelect={() => {
-              hideMenu();
-              setReloadUerProfile(Date.now());
             }}
           />
         </MenuOptions>

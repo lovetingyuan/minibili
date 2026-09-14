@@ -65,6 +65,36 @@ export const PLAYER_SWIPE_ACTIVE_OFFSET_Y = 12;
 export const PLAYER_SWIPE_FAIL_OFFSET_X = 24;
 
 /**
+ * 一次左右滑动调整的播放进度（秒）
+ */
+export const PLAYER_SEEK_STEP_SECONDS = 10;
+
+/**
+ * 左右滑动调整进度所需的最小滑动距离
+ */
+export const PLAYER_SEEK_SWIPE_MIN_DISTANCE = 40;
+
+/**
+ * 左右滑动的手势激活距离（超过即认为是滑动而不是点击）
+ */
+export const PLAYER_SEEK_SWIPE_ACTIVE_OFFSET_X = 12;
+
+/**
+ * 左右滑动时允许的纵向偏移，超过则判定为竖向手势
+ */
+export const PLAYER_SEEK_SWIPE_FAIL_OFFSET_Y = 24;
+
+/**
+ * 左右滑动结束后进度提示浮层的停留时间
+ */
+export const PLAYER_SEEK_HINT_HOLD_MS = 400;
+
+/**
+ * 判定播放进度是否停在结尾的容差（播放结束后的进度就等于总时长）
+ */
+export const PLAYER_REPLAY_END_TOLERANCE_MS = 300;
+
+/**
  * 竖向滑动的方向，与网页播放器 change-video-height 的取值保持一致
  */
 export type PlayerSwipeDirection = "down" | "up";
@@ -201,4 +231,67 @@ export function resolveVerticalSwipe(options: {
     return "up";
   }
   return null;
+}
+
+/**
+ * 左右滑动需要调整的播放进度：右滑快进、左滑后退，单位秒。
+ * 滑动距离不足或者纵向位移更大（更接近竖向手势）时返回 0
+ */
+export function resolveSeekSwipeSeconds(options: {
+  translationX: number;
+  translationY: number;
+  minDistance?: number;
+  stepSeconds?: number;
+}): number {
+  const {
+    translationX,
+    translationY,
+    minDistance = PLAYER_SEEK_SWIPE_MIN_DISTANCE,
+    stepSeconds = PLAYER_SEEK_STEP_SECONDS,
+  } = options;
+  if (Math.abs(translationX) <= Math.abs(translationY)) {
+    return 0;
+  }
+  if (translationX >= minDistance) {
+    return stepSeconds;
+  }
+  if (translationX <= -minDistance) {
+    return -stepSeconds;
+  }
+  return 0;
+}
+
+/**
+ * 左右滑动后的目标播放进度：起点两侧都夹在可播放区间内，
+ * 总时长未知（<= 0）时只保证不越过头
+ */
+export function resolveSeekTargetMs(options: {
+  currentMs: number;
+  deltaMs: number;
+  durationMs: number;
+}): number {
+  const { currentMs, deltaMs, durationMs } = options;
+  const targetMs = Math.max(0, Math.round(currentMs + deltaMs));
+  if (durationMs <= 0) {
+    return targetMs;
+  }
+  return Math.min(durationMs, targetMs);
+}
+
+/**
+ * 再次点击播放时是否需要从头开始：
+ * expo-video 在播放到结尾后调用 play() 不会有任何反应，
+ * 需要先回到开头再播放，因此进度停在结尾（容差内）时判定为重新播放。
+ * 总时长未知时无法判断，按普通续播处理
+ */
+export function shouldRestartPlayback(options: {
+  currentMs: number;
+  durationMs: number;
+  toleranceMs?: number;
+}): boolean {
+  const { currentMs, durationMs, toleranceMs = PLAYER_REPLAY_END_TOLERANCE_MS } = options;
+  if (durationMs <= 0) {
+    return false;
+  }
+  return currentMs >= durationMs - toleranceMs;
 }

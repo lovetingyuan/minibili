@@ -5,6 +5,7 @@ import type { GestureResponderEvent } from "react-native";
 
 import type { DynamicAuthor, DynamicContent, DynamicImage } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
+import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
 import { getImagePixelDimensions, parseImgUrl, parseNumber } from "@/utils";
@@ -71,6 +72,7 @@ function VideoCard(props: {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const { width: windowWidth } = useWindowDimensions();
   const { setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore();
+  const watchLater = useWatchLaterActions();
   const { content, author } = props;
   const coverSize = getImagePixelDimensions(windowWidth * 0.9, (windowWidth * 0.9 * 9) / 16);
 
@@ -91,20 +93,29 @@ function VideoCard(props: {
     });
   }
 
-  function openCoverViewer(event?: GestureResponderEvent) {
-    if (!content.cover) {
-      return;
-    }
+  function openMenu(event?: GestureResponderEvent) {
     event?.stopPropagation();
-    setOverlayButtons([
-      {
+    const buttons: { text: string; onPress: () => void }[] = [];
+    if (content.bvid) {
+      buttons.push({
+        text: watchLater.isAdded(content.aid) ? "从稍后再看移除" : "添加到稍后再看",
+        onPress: () => {
+          void watchLater.toggle({ aid: content.aid });
+        },
+      });
+    }
+    if (content.cover) {
+      buttons.push({
         text: "查看封面",
         onPress: () => {
           setImagesList([{ src: content.cover, width: 0, height: 0, ratio: 16 / 9 }]);
           setCurrentImageIndex(0);
         },
-      },
-    ]);
+      });
+    }
+    if (buttons.length) {
+      setOverlayButtons(buttons);
+    }
   }
 
   const coverContent: ReactNode = (
@@ -161,7 +172,7 @@ function VideoCard(props: {
       {content.bvid ? (
         <Pressable
           className={coverClassName}
-          onLongPress={content.cover ? openCoverViewer : undefined}
+          onLongPress={openMenu}
           onPress={openVideo}
         >
           {coverContent}

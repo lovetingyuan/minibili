@@ -118,7 +118,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             className="flex-row items-center gap-1 py-1 pl-2"
             onPress={() => {
               if (name && title && route.params.bvid) {
-                handleShareVideo(name, title, route.params.bvid);
+                handleShareVideo(name, title, route.params.bvid, props.currentPage);
               }
             }}
           >

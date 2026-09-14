@@ -20,6 +20,7 @@ import FavoritesContent from "./Followings/FavoritesContent";
 import FollowingDynamicsContent from "./Followings/FollowingDynamicsContent";
 import FollowingsContent from "./Followings/FollowingsContent";
 import HistoryContent from "./Followings/HistoryContent";
+import WatchLaterContent from "./Followings/WatchLaterContent";
 import Living from "./Living";
 import Play from "./Play";
 import SearchVideos from "./SearchVideos";
@@ -46,6 +47,10 @@ function FavoritesRoute() {
 
 function HistoryRoute() {
   return <BilibiliAccountGate Content={HistoryContent} />;
+}
+
+function WatchLaterRoute() {
+  return <BilibiliAccountGate Content={WatchLaterContent} />;
 }
 
 export function MainTabs() {
@@ -213,6 +218,11 @@ function AppRoute() {
           name="History"
           component={HistoryRoute}
           options={{ headerTitle: "观看历史" }}
+        />
+        <Stack.Screen
+          name="WatchLater"
+          component={WatchLaterRoute}
+          options={{ headerTitle: "稍后再看" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

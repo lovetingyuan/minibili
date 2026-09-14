@@ -8,8 +8,4 @@ function handleHealth(c: AppContext) {
   });
 }
 
-async function handleIndexPage(c: AppContext) {
-  return c.env.ASSETS.fetch(new URL("/index.html", c.req.url));
-}
-
-export { handleHealth, handleIndexPage };
+export { handleHealth };

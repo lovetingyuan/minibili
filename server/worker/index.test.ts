@@ -25,11 +25,9 @@ function setup() {
     const current = storage;
     return { syncData: async (operations: SyncOperations) => syncUserData(current, operations) };
   });
-  const assets = vi.fn(async () => new Response("asset"));
-  const env = { ASSETS: { fetch: assets }, USER_STORAGE: { getByName } };
+  const env = { USER_STORAGE: { getByName } };
   return {
     getByName,
-    assets,
     request: (path: string, init?: RequestInit) =>
       app.fetch(new Request(`https://example.com${path}`, init), env),
     sync: (body: unknown = { get: ["setting"] }, cookie: string | null = COOKIE) =>
@@ -216,16 +214,14 @@ describe("sync contract and unaffected routes", () => {
       expect((await server.request(path, { method: "POST" })).status).toBe(404);
     }
     expect(server.getByName).not.toHaveBeenCalled();
-    expect(server.assets).not.toHaveBeenCalled();
   });
-  test("keeps health and static assets working", async () => {
+  test("keeps health working and rejects unknown paths", async () => {
     const server = setup();
     expect(await (await server.request("/health")).json()).toMatchObject({
       service: "minibili-server",
       status: "ok",
     });
-    expect(await (await server.request("/styles.css")).text()).toBe("asset");
     expect((await server.request("/api/unknown")).status).toBe(404);
-    expect(server.assets).toHaveBeenCalledTimes(1);
+    expect(await (await server.request("/api/unknown")).text()).toBe("Not Found");
   });
 });

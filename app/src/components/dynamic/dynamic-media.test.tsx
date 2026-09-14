@@ -6,10 +6,12 @@ import type { DynamicAuthor, DynamicImage, DynamicVideoContent } from "@/api/dyn
 const mocks = vi.hoisted(() => {
   vi.stubGlobal("__DEV__", false);
   return {
+    isWatchLaterAdded: false,
     navigate: vi.fn(),
     setCurrentImageIndex: vi.fn(),
     setImagesList: vi.fn(),
     setOverlayButtons: vi.fn(),
+    toggleWatchLater: vi.fn(),
   };
 });
 
@@ -30,6 +32,13 @@ vi.mock("@/store", () => ({
     setCurrentImageIndex: mocks.setCurrentImageIndex,
     setImagesList: mocks.setImagesList,
     setOverlayButtons: mocks.setOverlayButtons,
+  }),
+}));
+vi.mock("@/hooks/useWatchLaterActions", () => ({
+  useWatchLaterActions: () => ({
+    isAdded: () => mocks.isWatchLaterAdded,
+    isPending: () => false,
+    toggle: mocks.toggleWatchLater,
   }),
 }));
 vi.mock("@/utils", () => ({
@@ -101,7 +110,10 @@ function children(element: ReactElement<ElementProps>) {
 }
 
 describe("DynamicMedia video interactions", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.isWatchLaterAdded = false;
+  });
 
   test("only the cover opens Play in the dynamic list", () => {
     const card = renderVideo(video);
@@ -120,7 +132,7 @@ describe("DynamicMedia video interactions", () => {
     );
   });
 
-  test("long pressing the cover opens the cover-preview menu in the dynamic list", () => {
+  test("long pressing the cover opens the watch later and cover-preview menu", () => {
     const card = renderVideo(video);
     const [cover] = children(card) as ReactElement<ElementProps>[];
 
@@ -130,21 +142,41 @@ describe("DynamicMedia video interactions", () => {
     expect(stopPropagation).toHaveBeenCalledOnce();
     expect(mocks.setOverlayButtons).toHaveBeenCalledWith([
       {
+        text: "添加到稍后再看",
+        onPress: expect.any(Function),
+      },
+      {
         text: "查看封面",
         onPress: expect.any(Function),
       },
     ]);
 
-    const [button] = mocks.setOverlayButtons.mock.calls[0][0] as {
+    const buttons = mocks.setOverlayButtons.mock.calls[0][0] as {
       text: string;
       onPress: () => void;
     }[];
-    button.onPress();
+    buttons[0].onPress();
+    expect(mocks.toggleWatchLater).toHaveBeenCalledExactlyOnceWith({ aid: 2 });
+
+    buttons[1].onPress();
 
     expect(mocks.setImagesList).toHaveBeenCalledWith([
       { src: "cover.jpg", width: 0, height: 0, ratio: 16 / 9 },
     ]);
     expect(mocks.setCurrentImageIndex).toHaveBeenCalledWith(0);
+  });
+
+  test("offers removing from watch later when the video is already added", () => {
+    mocks.isWatchLaterAdded = true;
+    const card = renderVideo(video);
+    const [cover] = children(card) as ReactElement<ElementProps>[];
+
+    cover.props.onLongPress?.({ stopPropagation: vi.fn() });
+
+    expect(mocks.setOverlayButtons.mock.calls[0][0]).toEqual([
+      { text: "从稍后再看移除", onPress: expect.any(Function) },
+      { text: "查看封面", onPress: expect.any(Function) },
+    ]);
   });
 
   test("a missing bvid leaves the cover non-interactive so the parent can open details", () => {

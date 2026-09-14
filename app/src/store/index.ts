@@ -58,6 +58,10 @@ const getAppValue = () => {
     }[],
     currentImageIndex: 0,
     overlayButtons: [] as { text: string; onPress: () => void }[],
+    /**
+     * 稍后再看视频 aid 集合，仅当前运行会话有效，不做持久化
+     */
+    watchLaterAids: {} as Record<string, true>,
     moreRepliesUrl: "",
     repliesInfo: null as RepliesInfo | null,
     releaseList: [] as {
@@ -66,7 +70,6 @@ const getAppValue = () => {
       apkLink: string;
     }[],
     requestDynamicFailed: 0,
-    reloadUerProfile: 0,
     // dynamicWebviewLink: '',
     // dynamicOpenUrl: 0,
   };

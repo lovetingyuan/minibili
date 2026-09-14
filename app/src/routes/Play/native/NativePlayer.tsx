@@ -29,15 +29,20 @@ import DanmakuOverlay from "./DanmakuOverlay";
 import PlayerControls from "./PlayerControls";
 import PlayerCover from "./PlayerCover";
 import PlayerError from "./PlayerError";
+import PlayerPoster from "./PlayerPoster";
+import PlayerSeekHint from "./PlayerSeekHint";
 import {
   createVideoSource,
   isSeekJump,
   PLAYER_FAST_RATE,
   PLAYER_HEIGHT_ANIMATION_MS,
+  PLAYER_SEEK_HINT_HOLD_MS,
   type PlayerSwipeDirection,
   resolveInlinePlayerHeight,
   resolvePlaybackFailover,
   resolvePreferredQuality,
+  resolveSeekTargetMs,
+  shouldRestartPlayback,
 } from "./player-helpers";
 import { usePlayerControlsVisibility } from "./usePlayerControlsVisibility";
 import { usePlayerGestures } from "./usePlayerGestures";
@@ -71,12 +76,19 @@ export default function NativePlayer(props: NativePlayerProps) {
   const networkReady = netInfo.type !== null && netInfo.type !== undefined;
   const [highQuality, setHighQuality] = React.useState(false);
   const [started, setStarted] = React.useState(false);
+  // 视频首帧是否已经渲染到播放器上，未渲染前用封面盖住画面
+  const [firstFrameRendered, setFirstFrameRendered] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [fastRate, setFastRate] = React.useState(false);
   const [playerError, setPlayerError] = React.useState<string | null>(null);
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [currentTimeMs, setCurrentTimeMs] = React.useState(0);
   const [seekToken, setSeekToken] = React.useState(0);
+  // 左右滑动调整进度时的目标进度与方向提示
+  const [seekHint, setSeekHint] = React.useState<{
+    targetMs: number;
+    deltaSeconds: number;
+  } | null>(null);
   // 竖屏视频下滑展开，高度由屏幕高度的 33% 切换到 70%
   const [portraitExpanded, setPortraitExpanded] = React.useState(false);
   // 当前使用的播放地址（主地址 + 备用 CDN 镜像）与自动兜底的进度
@@ -87,6 +99,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   });
   const lastTimeRef = React.useRef(0);
   const pausedByImagesRef = React.useRef(false);
+  // 左右滑动提示浮层的隐藏计时器
+  const seekHintTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   // 已经处理过的失败尝试，避免同一轮重复触发兜底
   const handledAttemptTokenRef = React.useRef(-1);
   // 已经为新地址补过重载的尝试
@@ -94,7 +108,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 切换地址后需要恢复的播放进度（毫秒）
   const resumePositionMsRef = React.useRef(0);
 
-  const { controlsVisible, toggleControls, keepControlsVisible } =
+  const { controlsVisible, toggleControls, keepControlsVisible, hideControls } =
     usePlayerControlsVisibility(isPlaying);
 
   const qn = resolvePreferredQuality(isCellular, highQuality);
@@ -183,6 +197,10 @@ export default function NativePlayer(props: NativePlayerProps) {
   });
 
   useEventListener(player, "playToEnd", () => {
+    // 部分设备播放结束后不会再派发 playingChange，这里主动收敛播放状态，
+    // 保证播放按钮能切回“播放”，点击时可以重新播放
+    setIsPlaying(false);
+    KeepAwake.deactivateKeepAwake("PLAY");
     setPortraitExpanded(false);
     onPlayEnded();
   });
@@ -195,6 +213,11 @@ export default function NativePlayer(props: NativePlayerProps) {
     setPortraitExpanded(false);
     setPlaybackAttempt((current) => ({ index: 0, refreshCount: 0, token: current.token + 1 }));
   }, [cid, qn]);
+
+  // 播放地址变化后需要重新等待首帧，等待期间继续展示封面
+  React.useEffect(() => {
+    setFirstFrameRendered(false);
+  }, [uri, playbackAttempt.token]);
 
   // 重新获取地址后如果和上一次完全相同，useVideoPlayer 不会重建播放器，这里补一次重载
   React.useEffect(() => {
@@ -275,6 +298,9 @@ export default function NativePlayer(props: NativePlayerProps) {
   React.useEffect(() => {
     return () => {
       KeepAwake.deactivateKeepAwake("PLAY");
+      if (seekHintTimerRef.current !== null) {
+        clearTimeout(seekHintTimerRef.current);
+      }
     };
   }, []);
 
@@ -289,8 +315,89 @@ export default function NativePlayer(props: NativePlayerProps) {
     toggleControls();
   }
 
-  function handleResume() {
+  /**
+   * 播放总时长（毫秒）：优先用播放器实际时长，拿不到时退回视频信息
+   */
+  function resolvePlaybackDurationMs() {
+    const playerDurationMs = Math.round(player.duration * 1000);
+    if (Number.isFinite(playerDurationMs) && playerDurationMs > 0) {
+      return playerDurationMs;
+    }
+    return Math.round(durationSeconds * 1000);
+  }
+
+  /**
+   * 点击继续播放：先隐藏控件，避免暂停态强制显示后再等 3 秒自动隐藏。
+   * 播放到结尾后 expo-video 的 play() 不会有任何反应，需要先回到开头
+   */
+  function resumePlayback() {
+    hideControls();
+    if (
+      shouldRestartPlayback({
+        currentMs: Math.round(player.currentTime * 1000),
+        durationMs: resolvePlaybackDurationMs(),
+      })
+    ) {
+      handleSeek(0);
+    }
     player.play();
+  }
+
+  /**
+   * 播放/暂停按钮：以播放器的实时状态判断，避免 React 状态滞后导致点击没反应
+   */
+  function handleTogglePlay() {
+    if (player.playing) {
+      player.pause();
+      return;
+    }
+    resumePlayback();
+  }
+
+  function clearSeekHint() {
+    if (seekHintTimerRef.current !== null) {
+      clearTimeout(seekHintTimerRef.current);
+      seekHintTimerRef.current = null;
+    }
+    setSeekHint(null);
+  }
+
+  function resolveSeekTarget(deltaSeconds: number) {
+    return resolveSeekTargetMs({
+      currentMs: currentTimeMs,
+      deltaMs: deltaSeconds * 1000,
+      durationMs: durationSeconds * 1000,
+    });
+  }
+
+  /**
+   * 左右滑动过程中预览调整后的进度，滑动距离不足时收起提示
+   */
+  function handleSeekSwipePreview(deltaSeconds: number) {
+    if (!started || showError || deltaSeconds === 0) {
+      clearSeekHint();
+      return;
+    }
+    setSeekHint({ targetMs: resolveSeekTarget(deltaSeconds), deltaSeconds });
+  }
+
+  /**
+   * 左右滑动结束时调整进度，提示浮层短暂停留后收起
+   */
+  function handleSeekSwipeCommit(deltaSeconds: number) {
+    if (!started || showError || deltaSeconds === 0) {
+      return;
+    }
+    const targetMs = resolveSeekTarget(deltaSeconds);
+    handleSeek(targetMs);
+    setSeekHint({ targetMs, deltaSeconds });
+    if (seekHintTimerRef.current !== null) {
+      clearTimeout(seekHintTimerRef.current);
+    }
+    seekHintTimerRef.current = setTimeout(() => {
+      seekHintTimerRef.current = null;
+      setSeekHint(null);
+    }, PLAYER_SEEK_HINT_HOLD_MS);
   }
 
   function handleLongPressStart() {
@@ -329,6 +436,9 @@ export default function NativePlayer(props: NativePlayerProps) {
     onLongPressStart: handleLongPressStart,
     onLongPressEnd: handleLongPressEnd,
     onVerticalSwipe: handleVerticalSwipe,
+    onSeekSwipePreview: handleSeekSwipePreview,
+    onSeekSwipeCommit: handleSeekSwipeCommit,
+    onSeekSwipeCancel: clearSeekHint,
   });
 
   let videoWidth = pageInfo?.width ?? videoInfo.width;
@@ -391,7 +501,17 @@ export default function NativePlayer(props: NativePlayerProps) {
         nativeControls={false}
         contentFit="contain"
         allowsPictureInPicture={false}
+        onFirstFrameRender={() => {
+          setFirstFrameRendered(true);
+        }}
       />
+      {started && !firstFrameRendered ? (
+        <PlayerPoster
+          cover={videoInfo.cover}
+          containerWidth={width}
+          containerHeight={containerHeight}
+        />
+      ) : null}
       {started ? (
         <DanmakuOverlay
           cid={cid}
@@ -413,14 +533,18 @@ export default function NativePlayer(props: NativePlayerProps) {
           <Text className="text-xs font-bold text-white">{`${PLAYER_FAST_RATE}x`}</Text>
         </View>
       ) : null}
-      {started && !isPlaying && !hasError ? (
+      {seekHint ? (
+        <PlayerSeekHint targetMs={seekHint.targetMs} deltaSeconds={seekHint.deltaSeconds} />
+      ) : null}
+      {/* 首帧渲染前画面被封面盖住，此时不显示播放按钮，避免和封面叠在一起 */}
+      {started && firstFrameRendered && !isPlaying && !hasError && !seekHint ? (
         <View pointerEvents="box-none" className="absolute inset-0 items-center justify-center">
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="继续播放"
             hitSlop={12}
             className="h-14 w-14 items-center justify-center rounded-full bg-black/40"
-            onPress={handleResume}
+            onPress={resumePlayback}
           >
             <Icon name="play" type="material-design" size={34} color="#ffffff" />
           </Pressable>
@@ -434,13 +558,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           danmakuEnabled={$danmakuEnabled}
           fullscreen={fullscreen}
           visible={controlsVisible}
-          onTogglePlay={() => {
-            if (isPlaying) {
-              player.pause();
-            } else {
-              player.play();
-            }
-          }}
+          onTogglePlay={handleTogglePlay}
           onToggleDanmaku={() => {
             set$danmakuEnabled(!$danmakuEnabled);
           }}

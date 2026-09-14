@@ -37,11 +37,16 @@ function listItems(node: ReactNode) {
 
 beforeEach(() => vi.clearAllMocks());
 
-test("opens favorites and history as root stack routes", () => {
+test("opens favorites, history and watch later as root stack routes", () => {
   const items = listItems(LibraryLinks());
-  expect(items.map((item) => item.props.accessibilityLabel)).toEqual(["我的收藏", "观看历史"]);
+  expect(items.map((item) => item.props.accessibilityLabel)).toEqual([
+    "我的收藏",
+    "观看历史",
+    "稍后再看",
+  ]);
 
   items[0].props.onPress();
   items[1].props.onPress();
-  expect(mocks.navigate.mock.calls).toEqual([["Favorites"], ["History"]]);
+  items[2].props.onPress();
+  expect(mocks.navigate.mock.calls).toEqual([["Favorites"], ["History"], ["WatchLater"]]);
 });

@@ -35,6 +35,18 @@ export default function LibraryLinks() {
         </ListItem.Content>
         <ListItem.Chevron />
       </ListItem>
+      <ListItem
+        accessibilityRole="button"
+        accessibilityLabel="稍后再看"
+        containerClassName="rounded-lg bg-transparent px-0 py-3"
+        onPress={() => navigation.navigate("WatchLater")}
+      >
+        <Icon name="watch-later" colorClassName={colors.primary.accent} />
+        <ListItem.Content>
+          <ListItem.Title>稍后再看</ListItem.Title>
+        </ListItem.Content>
+        <ListItem.Chevron />
+      </ListItem>
     </View>
   );
 }

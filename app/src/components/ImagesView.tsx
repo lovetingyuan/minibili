@@ -3,11 +3,8 @@ import { Icon, Text } from "@/components/styled/rneui";
 import React from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
-  Linking,
   Modal,
-  Platform,
   Pressable,
   StyleSheet,
   useWindowDimensions,
@@ -18,8 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { showToast } from "@/utils";
 
+import { useSaveImage } from "../hooks/useSaveImage";
 import { useStore } from "../store";
-import { saveImageToLibrary } from "./image-viewer-download";
 import type { ImageViewerItem } from "./image-viewer.types";
 import { normalizeImages } from "./image-viewer-images";
 import { getOriginalImageButtonLabel, updateOriginalImageStatuses } from "./image-viewer-state";
@@ -36,7 +33,7 @@ function ImagesView() {
     updateOriginalImageStatuses,
     {},
   );
-  const [downloadStatus, setDownloadStatus] = React.useState<"idle" | "downloading">("idle");
+  const { saving, saveImage } = useSaveImage();
 
   const images = normalizeImages(imagesList, windowWidth, windowHeight);
   const visible = images.length > 0;
@@ -58,57 +55,24 @@ function ImagesView() {
   );
   const originalButtonDisabled =
     !activeImage || activeImageIsOriginal || activeOriginalStatus !== "idle";
-  const downloadButtonDisabled = !activeImage || downloadStatus === "downloading";
+  const downloadButtonDisabled = !activeImage || saving;
 
   React.useEffect(() => {
     dispatchOriginalImageStatus({ type: "reset" });
-    setDownloadStatus("idle");
   }, [galleryKey]);
 
   const closeViewer = () => {
     dispatchOriginalImageStatus({ type: "reset" });
-    setDownloadStatus("idle");
     setImagesList([]);
     setCurrentImageIndex(0);
   };
 
-  const ensureWritePermission = async () => {
-    const { requestPermissionsAsync } = await import("expo-media-library");
-    const permission = await requestPermissionsAsync(true, ["photo"]);
-    return permission.status === "granted";
-  };
-
-  const handleDownloadCurrentImage = async () => {
+  const handleDownloadCurrentImage = () => {
     if (downloadButtonDisabled || !activeImage) {
       return;
     }
 
-    if (Platform.OS === "web") {
-      void Linking.openURL(activeImage.originalUri);
-      return;
-    }
-
-    setDownloadStatus("downloading");
-    const result = await saveImageToLibrary(activeImage.originalUri, ensureWritePermission);
-    setDownloadStatus("idle");
-
-    if (result === "saved") {
-      showToast("已保存到相册");
-      return;
-    }
-    if (result === "permission-denied") {
-      Alert.alert("需要相册权限", "请在系统设置中允许 MiniBili 保存图片到相册。", [
-        { text: "取消", style: "cancel" },
-        {
-          text: "去设置",
-          onPress: () => {
-            void Linking.openSettings();
-          },
-        },
-      ]);
-      return;
-    }
-    showToast("下载失败，请稍后重试");
+    void saveImage(activeImage.originalUri);
   };
 
   const openOriginalImage = () => {
@@ -141,6 +105,20 @@ function ImagesView() {
         <View pointerEvents="box-none" style={styles.overlay}>
           <View
             pointerEvents="box-none"
+            style={[styles.topBarWrap, { top: Math.max(12, insets.top + 8) }]}
+          >
+            <Pressable
+              accessibilityLabel="关闭"
+              accessibilityRole="button"
+              hitSlop={12}
+              onPress={closeViewer}
+              style={styles.closeButton}
+            >
+              <Icon color="#fff" name="close" size={24} type="material" />
+            </Pressable>
+          </View>
+          <View
+            pointerEvents="box-none"
             style={[styles.bottomBarWrap, { bottom: Math.max(28, insets.bottom + 12) }]}
           >
             <View style={styles.bottomBar}>
@@ -166,12 +144,10 @@ function ImagesView() {
                 accessibilityState={{ disabled: downloadButtonDisabled }}
                 disabled={downloadButtonDisabled}
                 hitSlop={12}
-                onPress={() => {
-                  void handleDownloadCurrentImage();
-                }}
+                onPress={handleDownloadCurrentImage}
                 style={[styles.originalButton, downloadButtonDisabled && styles.disabledButton]}
               >
-                {downloadStatus === "downloading" ? (
+                {saving ? (
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
                   <Icon color="#fff" name="download" size={20} type="material" />
@@ -249,6 +225,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
   },
+  closeButton: {
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.35)",
+    borderRadius: 20,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
   container: {
     flex: 1,
   },
@@ -286,6 +270,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
     top: 0,
+  },
+  topBarWrap: {
+    position: "absolute",
+    right: 16,
   },
 });
 

@@ -43,6 +43,7 @@ vi.mock("./Followings/FollowingDynamicsContent", () => ({
 }));
 vi.mock("./Followings/FollowingsContent", () => ({ default: "FollowingsContent" }));
 vi.mock("./Followings/HistoryContent", () => ({ default: "HistoryContent" }));
+vi.mock("./Followings/WatchLaterContent", () => ({ default: "WatchLaterContent" }));
 vi.mock("./Living", () => ({ default: "Living" }));
 vi.mock("./Play", () => ({ default: "Play" }));
 vi.mock("./SearchVideos", () => ({ default: "SearchVideos" }));
@@ -159,8 +160,12 @@ test("full-screen routes live above the tab navigator", () => {
     "WebPage",
     "Favorites",
     "History",
+    "WatchLater",
   ]);
   expect(screens.find((screen) => screen.props.name === "MainTabs")?.props.options).toEqual({
     headerShown: false,
+  });
+  expect(screens.find((screen) => screen.props.name === "WatchLater")?.props.options).toEqual({
+    headerTitle: "稍后再看",
   });
 });

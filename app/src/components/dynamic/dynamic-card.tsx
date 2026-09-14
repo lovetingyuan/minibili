@@ -13,34 +13,37 @@ import { DynamicMedia } from "./dynamic-media";
 
 function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
   const { item, compact } = props;
+  const avatarSize = compact ? 28 : 36;
+  const meta = [item.date || parseDate(item.time, true), item.pubAction].filter(Boolean).join(" · ");
+
   return (
     <View className="mb-3 flex-row items-center">
       <Avatar
         rounded
-        size={compact ? 30 : 42}
+        size={avatarSize}
         source={
           item.author.face
-            ? { uri: parseImgUrl(item.author.face, getImagePixelSize(compact ? 30 : 42)) }
+            ? { uri: parseImgUrl(item.author.face, getImagePixelSize(avatarSize)) }
             : undefined
         }
         containerClassName="bg-neutral-200 dark:bg-neutral-700"
       />
-      <View className="ml-3 min-w-0 flex-1">
-        <View className="flex-row items-center gap-2">
-          <UpName
-            mid={item.author.mid}
-            numberOfLines={1}
-            className={compact ? "text-sm font-semibold" : "text-base font-semibold"}
-          >
-            {item.author.name || "未知用户"}
-          </UpName>
-          {item.top ? (
-            <Text className={`text-xs font-semibold ${colors.secondary.text}`}>置顶</Text>
-          ) : null}
-        </View>
-        <Text className={`text-xs ${colors.gray6.text}`}>
-          {[item.date || parseDate(item.time, true), item.pubAction].filter(Boolean).join(" · ")}
-        </Text>
+      <View className="ml-3 min-w-0 flex-1 flex-row items-center gap-2">
+        <UpName
+          mid={item.author.mid}
+          numberOfLines={1}
+          className={`shrink ${compact ? "text-sm font-semibold" : "text-base font-semibold"}`}
+        >
+          {item.author.name || "未知用户"}
+        </UpName>
+        {item.top ? (
+          <Text className={`shrink-0 text-xs font-semibold ${colors.secondary.text}`}>置顶</Text>
+        ) : null}
+        {meta ? (
+          <Text numberOfLines={1} className={`ml-auto shrink-0 text-xs ${colors.gray6.text}`}>
+            {meta}
+          </Text>
+        ) : null}
       </View>
     </View>
   );

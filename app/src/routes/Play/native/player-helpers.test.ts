@@ -5,12 +5,16 @@ import {
   formatPlaybackTime,
   isSeekJump,
   PLAYER_CONTROLS_AUTO_HIDE_MS,
+  PLAYER_SEEK_STEP_SECONDS,
   PLAY_URL_MAX_REFRESH,
   resolveControlsAutoHideMs,
   resolveInlinePlayerHeight,
   resolvePlaybackFailover,
   resolvePreferredQuality,
+  resolveSeekSwipeSeconds,
+  resolveSeekTargetMs,
   resolveVerticalSwipe,
+  shouldRestartPlayback,
   toggleControlsVisible,
 } from "./player-helpers";
 
@@ -92,6 +96,80 @@ test("resolves vertical swipe direction by translation", () => {
   expect(resolveVerticalSwipe({ translationX: 20, translationY: 100 })).toBe("down");
 });
 
+test("resolves horizontal seek by translation", () => {
+  // 右滑快进、左滑后退，一次滑动只调整 10s
+  expect(resolveSeekSwipeSeconds({ translationX: 96, translationY: 0 })).toBe(
+    PLAYER_SEEK_STEP_SECONDS,
+  );
+  expect(resolveSeekSwipeSeconds({ translationX: -96, translationY: 0 })).toBe(
+    -PLAYER_SEEK_STEP_SECONDS,
+  );
+  // 达到最小滑动距离即触发
+  expect(resolveSeekSwipeSeconds({ translationX: 40, translationY: 0 })).toBe(
+    PLAYER_SEEK_STEP_SECONDS,
+  );
+  expect(resolveSeekSwipeSeconds({ translationX: -40, translationY: 0 })).toBe(
+    -PLAYER_SEEK_STEP_SECONDS,
+  );
+  // 滑动距离不足时忽略
+  expect(resolveSeekSwipeSeconds({ translationX: 39, translationY: 0 })).toBe(0);
+  expect(resolveSeekSwipeSeconds({ translationX: -39, translationY: 0 })).toBe(0);
+  // 纵向位移更大时忽略
+  expect(resolveSeekSwipeSeconds({ translationX: 100, translationY: 120 })).toBe(0);
+  expect(resolveSeekSwipeSeconds({ translationX: -100, translationY: -120 })).toBe(0);
+  expect(resolveSeekSwipeSeconds({ translationX: 100, translationY: 20 })).toBe(
+    PLAYER_SEEK_STEP_SECONDS,
+  );
+  // 自定义阈值与步长
+  expect(
+    resolveSeekSwipeSeconds({ translationX: 30, translationY: 0, minDistance: 20, stepSeconds: 5 }),
+  ).toBe(5);
+  expect(
+    resolveSeekSwipeSeconds({
+      translationX: -30,
+      translationY: 0,
+      minDistance: 20,
+      stepSeconds: 5,
+    }),
+  ).toBe(-5);
+  expect(
+    resolveSeekSwipeSeconds({ translationX: 30, translationY: 0, minDistance: 40, stepSeconds: 5 }),
+  ).toBe(0);
+});
+
+test("clamps the seek target into the playable range", () => {
+  expect(resolveSeekTargetMs({ currentMs: 30_000, deltaMs: 10_000, durationMs: 120_000 })).toBe(
+    40_000,
+  );
+  expect(resolveSeekTargetMs({ currentMs: 30_000, deltaMs: -10_000, durationMs: 120_000 })).toBe(
+    20_000,
+  );
+  // 视频开头左滑
+  expect(resolveSeekTargetMs({ currentMs: 5_000, deltaMs: -10_000, durationMs: 120_000 })).toBe(0);
+  // 视频结尾右滑
+  expect(resolveSeekTargetMs({ currentMs: 115_000, deltaMs: 10_000, durationMs: 120_000 })).toBe(
+    120_000,
+  );
+  // 总时长未知时只保证不越过头
+  expect(resolveSeekTargetMs({ currentMs: 115_000, deltaMs: 10_000, durationMs: 0 })).toBe(125_000);
+  expect(resolveSeekTargetMs({ currentMs: 0, deltaMs: -10_000, durationMs: 0 })).toBe(0);
+});
+
+test("restarts playback only when the progress stopped at the end", () => {
+  // 播放结束后进度停在总时长处，再次点击播放需要从头开始
+  expect(shouldRestartPlayback({ currentMs: 120_000, durationMs: 120_000 })).toBe(true);
+  expect(shouldRestartPlayback({ currentMs: 119_800, durationMs: 120_000 })).toBe(true);
+  expect(shouldRestartPlayback({ currentMs: 119_000, durationMs: 120_000 })).toBe(false);
+  // 中途暂停后继续播放
+  expect(shouldRestartPlayback({ currentMs: 30_000, durationMs: 120_000 })).toBe(false);
+  // 总时长未知时按普通续播处理
+  expect(shouldRestartPlayback({ currentMs: 120_000, durationMs: 0 })).toBe(false);
+  // 自定义容差
+  expect(
+    shouldRestartPlayback({ currentMs: 118_000, durationMs: 120_000, toleranceMs: 3000 }),
+  ).toBe(true);
+});
+
 test("builds a media source with a referer and without an android user agent", () => {
   const uri = "https://upos-sz-estghw.bilivideo.com/upgcxcode/14/03/36813670314/x.mp4?sig=1";
   const source = createVideoSource(uri);
@@ -126,7 +204,7 @@ test("gives up only after the refresh limit is reached", () => {
   expect(
     resolvePlaybackFailover({ index: 0, total: 1, refreshCount: PLAY_URL_MAX_REFRESH }),
   ).toEqual({ type: "give-up" });
-  expect(resolvePlaybackFailover({ index: 0, total: 0, refreshCount: PLAY_URL_MAX_REFRESH })).toEqual(
-    { type: "give-up" },
-  );
+  expect(
+    resolvePlaybackFailover({ index: 0, total: 0, refreshCount: PLAY_URL_MAX_REFRESH }),
+  ).toEqual({ type: "give-up" });
 });

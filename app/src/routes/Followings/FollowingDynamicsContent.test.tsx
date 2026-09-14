@@ -28,6 +28,10 @@ vi.mock("@/api/useFollowingDynamicItems", () => ({
   useFollowingDynamicItems: () => mocks.dynamics,
 }));
 vi.mock("@/components/dynamic/dynamic-list", () => ({ DynamicList: "DynamicList" }));
+vi.mock(
+  "@/components/dynamic/dynamic-target",
+  async () => await vi.importActual("../../components/dynamic/dynamic-target"),
+);
 
 import FollowingDynamicsContent from "./FollowingDynamicsContent";
 
@@ -73,5 +77,28 @@ describe("following dynamics content", () => {
 
     screen.props.onTabReselect?.();
     expect(mocks.dynamics.refresh).toHaveBeenCalledOnce();
+  });
+
+  test("video dynamics open the player instead of the dynamic detail page", () => {
+    const screen = FollowingDynamicsContent() as ReactElement<DynamicListProps>;
+    screen.props.onItemPress({
+      ...item,
+      content: {
+        kind: "video",
+        aid: 2,
+        bvid: "BV1TEST",
+        cover: "cover.jpg",
+        title: "视频标题",
+        description: "视频简介",
+        duration: "01:30",
+        play: 100,
+        danmaku: 20,
+      },
+    });
+    expect(mocks.navigate).toHaveBeenCalledWith(
+      "Play",
+      expect.objectContaining({ aid: 2, bvid: "BV1TEST", title: "视频标题" }),
+    );
+    expect(mocks.navigate).not.toHaveBeenCalledWith("DynamicDetail", expect.anything());
   });
 });

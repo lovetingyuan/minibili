@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
   refresh: vi.fn(),
 }));
 
-vi.mock("react", () => ({ default: { useEffect: vi.fn() } }));
 vi.mock("react-native", () => ({
   ActivityIndicator: "ActivityIndicator",
   Pressable: "Pressable",
@@ -29,6 +28,10 @@ vi.mock("@/api/dynamic-items", () => ({
   }),
 }));
 vi.mock("@/components/dynamic/dynamic-list", () => ({ DynamicList: "DynamicList" }));
+vi.mock(
+  "@/components/dynamic/dynamic-target",
+  async () => await vi.importActual("../../components/dynamic/dynamic-target"),
+);
 vi.mock("@/components/styled/rneui", () => ({
   Button: "Button",
   FlashList: "FlashList",
@@ -37,7 +40,6 @@ vi.mock("@/components/styled/rneui", () => ({
 }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/hooks/useUpdateNavigationOptions", () => ({ default: vi.fn() }));
-vi.mock("@/store", () => ({ useStore: () => ({ reloadUerProfile: 0 }) }));
 vi.mock("./Header", () => ({ headerRight: vi.fn(), headerTitle: vi.fn() }));
 
 import Dynamic from "./index";
@@ -95,7 +97,7 @@ describe("Dynamic list navigation", () => {
     });
   });
 
-  test("video cards also use the outer card press to open dynamic detail", () => {
+  test("video cards skip the dynamic detail page and open the player directly", () => {
     pressRenderedCard({
       ...baseItem,
       content: {
@@ -112,9 +114,15 @@ describe("Dynamic list navigation", () => {
     });
 
     expect(mocks.navigate).toHaveBeenCalledWith(
-      "DynamicDetail",
-      expect.objectContaining({ dynamicId: "dynamic-1" }),
+      "Play",
+      expect.objectContaining({
+        aid: 2,
+        bvid: "BV1TEST",
+        title: "视频标题",
+        mid: 123,
+        name: "UP",
+      }),
     );
-    expect(mocks.navigate).not.toHaveBeenCalledWith("Play", expect.anything());
+    expect(mocks.navigate).not.toHaveBeenCalledWith("DynamicDetail", expect.anything());
   });
 });

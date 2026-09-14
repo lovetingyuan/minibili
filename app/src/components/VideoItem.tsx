@@ -48,12 +48,14 @@ function VideoListItem<T extends VideoListItemInfo>({
   buttons,
   playCountOnCover = false,
   watchedAt,
+  progressRatio = 0,
 }: VideoListItemProps<T>) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const { width: windowWidth } = useWindowDimensions();
   const { setOverlayButtons } = useStore();
   const coverLayoutWidth = ((windowWidth - 28) * 3) / 7;
   const coverSize = getImagePixelDimensions(coverLayoutWidth, (coverLayoutWidth * 5) / 8);
+  const watchedPercent = Math.round(Math.min(1, Math.max(0, progressRatio)) * 100);
   const _followedUpsMap = useFollowedUpsMap();
   const isFollowed = video.mid && video.mid in _followedUpsMap;
   return (
@@ -118,6 +120,11 @@ function VideoListItem<T extends VideoListItemInfo>({
           {isDefined(video.danmaku) ? (
             <View className="absolute bottom-0 right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
               <Text className="text-xs font-thin text-white">{parseNumber(video.danmaku)}弹</Text>
+            </View>
+          ) : null}
+          {watchedPercent > 0 ? (
+            <View className="absolute bottom-0 left-0 h-[3px] w-full overflow-hidden rounded-b bg-gray-900/40">
+              <View className={`h-full ${colors.primary.bg}`} style={{ width: `${watchedPercent}%` }} />
             </View>
           ) : null}
         </View>

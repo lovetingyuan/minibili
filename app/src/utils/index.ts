@@ -7,6 +7,8 @@ import { throttle } from "throttle-debounce";
 import { fetchVersion } from "@/api/check-update";
 import { site } from "@/constants";
 
+import { buildVideoShareMessage, buildVideoShareUrl } from "./share";
+
 export {
   getImagePixelDimensions,
   getImagePixelSize,
@@ -86,18 +88,15 @@ export function parseDurationStr(duration: string) {
     .join(":");
 }
 
-export async function handleShareVideo(name: string, title: string, bvid: string | number) {
+export async function handleShareVideo(
+  name: string,
+  title: string,
+  bvid: string | number,
+  p = 1,
+) {
   try {
-    const message = title.length < 40 ? title : `${title.substring(0, 40)}……`;
     await Share.share({
-      // title: 'MiniBili - ' + video.owner.name,
-      message: [
-        `MiniBili - ${name}`,
-        message,
-        /^\d+$/.test(`${bvid}`)
-          ? `https://m.bilibili.com/dynamic/${bvid}`
-          : `https://b23.tv/${bvid}`,
-      ].join("\n"),
+      message: buildVideoShareMessage(name, title, buildVideoShareUrl(bvid, p)),
     });
   } catch {
     showToast("分享失败");

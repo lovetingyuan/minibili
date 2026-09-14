@@ -19,10 +19,10 @@ function DynamicListLoading(props: { text: string }) {
         {[0, 1, 2].map((index) => (
           <View key={index} className="gap-3 bg-white p-4 dark:bg-neutral-950">
             <View className="flex-row items-center gap-3">
-              <Skeleton animation="pulse" circle width={42} height={42} />
-              <View className="flex-1 gap-2">
+              <Skeleton animation="pulse" circle width={36} height={36} />
+              <View className="flex-1 flex-row items-center justify-between gap-3">
                 <Skeleton animation="wave" width="35%" height={16} />
-                <Skeleton animation="wave" width="50%" height={12} />
+                <Skeleton animation="wave" width={72} height={12} />
               </View>
             </View>
             <Skeleton animation="wave" width="92%" height={16} />

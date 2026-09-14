@@ -101,3 +101,29 @@ test("ordinary cards retain publication dates and the existing cover play-count 
     false,
   );
 });
+
+test("watch later cards show a cover progress bar only when there is progress", () => {
+  const row = VideoListItem({ video, progressRatio: 0.25 });
+  const track = elements(row).find((element) =>
+    element.props.className?.includes("bg-gray-900/40"),
+  );
+  expect(track).toBeDefined();
+  const fill = elements(track).find((element) =>
+    element.props.className?.includes("bg-sky-500"),
+  ) as unknown as ReactElement<{ style?: { width?: string } }> | undefined;
+  expect(fill?.props.style).toEqual({ width: "25%" });
+
+  expect(VideoListItem({ video, progressRatio: 1 })).toBeDefined();
+  const complete = elements(VideoListItem({ video, progressRatio: 1 }));
+  const completeFill = elements(
+    complete.find((element) => element.props.className?.includes("bg-gray-900/40")),
+  ).find((element) => element.props.className?.includes("bg-sky-500")) as unknown as
+    | ReactElement<{ style?: { width?: string } }>
+    | undefined;
+  expect(completeFill?.props.style).toEqual({ width: "100%" });
+
+  const plain = VideoListItem({ video, progressRatio: 0 });
+  expect(elements(plain).some((element) => element.props.className?.includes("bg-gray-900/40"))).toBe(
+    false,
+  );
+});
