@@ -1,4 +1,5 @@
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { getProgressRatio } from "../utils/watch-progress";
 import { HistoryResponseSchema } from "./history.schema";
 import type {
   HistoryAccount,
@@ -9,7 +10,8 @@ import type {
   HistoryRequest,
 } from "./history.types";
 
-const HISTORY_PAGE_SIZE = 20;
+/** 历史接口单页条数：实测 ps 上限为 30，超过会返回 -400，这里沿用列表页的 20 */
+export const HISTORY_PAGE_SIZE = 20;
 export const INITIAL_HISTORY_CURSOR: HistoryCursor = { max: 0, view_at: 0, business: "" };
 let nextChainId = 0;
 
@@ -36,6 +38,7 @@ export async function fetchBilibiliHistory(
   request: HistoryRequest,
   isCurrentAccount: () => boolean,
   chainId = 0,
+  pageSize = HISTORY_PAGE_SIZE,
 ): Promise<HistoryPage> {
   function assertCurrent() {
     if (!isCurrentAccount()) throw new BilibiliSessionChangedError();
@@ -45,7 +48,7 @@ export async function fetchBilibiliHistory(
     max: String(cursor.max),
     view_at: String(cursor.view_at),
     business: cursor.business,
-    ps: String(HISTORY_PAGE_SIZE),
+    ps: String(pageSize),
     type: "archive",
   });
   try {
@@ -83,6 +86,11 @@ export function getHistoryListItems(pages: HistoryPage[]): HistoryListItem[] {
         key,
         title: record.title || "不可用的视频",
         watchedAt: record.view_at,
+        progressRatio: getProgressRatio(
+          record.progress ?? 0,
+          record.duration ?? 0,
+          record.is_finish === 1,
+        ),
         video: bvid
           ? {
               bvid,

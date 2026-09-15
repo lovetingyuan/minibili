@@ -8,6 +8,7 @@ import React from 'react';
 import { Alert, View } from 'react-native';
 
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions';
+import { useWatchProgressRefresh } from '@/hooks/useWatchProgressRefresh';
 
 import { useVideoInfo } from '../../api/video-info';
 import CommentList from '../../components/CommentList';
@@ -30,6 +31,8 @@ function Play({ route }: Props) {
   const { bvid } = route.params;
 
   const { data, error } = useVideoInfo(bvid);
+  // 离开播放页时把刚看完的进度同步到封面进度条
+  useWatchProgressRefresh();
   const videoInfo = {
     ...route.params,
     ...data,

@@ -3,7 +3,6 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import {
   fetchBilibiliWatchLater,
-  getProgressRatio,
   getWatchLaterKey,
   getWatchLaterListItems,
   modifyWatchLater,
@@ -100,16 +99,6 @@ describe("Bilibili watch later list", () => {
     expect(items[1].progressRatio).toBeCloseTo(15 / 734);
     expect(items[2]).toMatchObject({ title: "不可用的视频", video: null, progressRatio: 0 });
     expect(getWatchLaterListItems(undefined)).toEqual([]);
-  });
-
-  test("computes the progress ratio boundaries", () => {
-    expect(getProgressRatio(15, 734, false)).toBeCloseTo(15 / 734);
-    expect(getProgressRatio(734, 734, false)).toBe(1);
-    expect(getProgressRatio(900, 734, false)).toBe(1);
-    expect(getProgressRatio(0, 734, false)).toBe(0);
-    expect(getProgressRatio(0, 0, false)).toBe(0);
-    expect(getProgressRatio(0, 0, true)).toBe(1);
-    expect(getProgressRatio(10, 100, true)).toBe(1);
   });
 
   test("rejects results that arrive after the account changed", async () => {

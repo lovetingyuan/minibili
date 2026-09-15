@@ -17,6 +17,7 @@ import BilibiliFollowingsManager from "./components/BilibiliFollowingsManager";
 import BilibiliBlacklistManager from "./components/BilibiliBlacklistManager";
 import UserDataManager from "./components/UserDataManager";
 import WatchLaterManager from "./components/WatchLaterManager";
+import WatchProgressManager from "./components/WatchProgressManager";
 import CheckAppUpdate from "./components/CheckAppUpdate";
 import LiveUpsManager from "./components/LiveUpsManager";
 import CheckNetState from "./components/CheckNetState";
@@ -93,6 +94,7 @@ export default function App() {
                 <LiveUpsManager />
                 <FollowingDynamicsUpdatesManager />
                 <WatchLaterManager />
+                <WatchProgressManager />
                 <VideoDownloadManager />
                 <ButtonsOverlay />
                 <ImagesView />

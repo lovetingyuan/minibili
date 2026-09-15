@@ -7,6 +7,7 @@ import Toast from "react-native-simple-toast";
 import { RanksConfig } from "../constants";
 import type { VideoDownloadTask } from "../features/video-download/types";
 import type { UpInfo } from "../types";
+import type { WatchProgressSnapshot } from "../utils/watch-progress";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { RepliesInfo } from "./replies-info.type";
 import type { FollowingDynamicsUpdateState, UpdateUpInfo } from "./types";
@@ -63,6 +64,10 @@ const getAppValue = () => {
      * 稍后再看视频 aid 集合，仅当前运行会话有效，不做持久化
      */
     watchLaterAids: {} as Record<string, true>,
+    /**
+     * bvid → 观看历史接口返回的进度快照（比例 + 观看时间），仅当前运行会话有效，不做持久化
+     */
+    watchProgressMap: {} as Record<string, WatchProgressSnapshot>,
     /**
      * 当前的视频下载任务，仅当前运行会话有效，不做持久化
      */

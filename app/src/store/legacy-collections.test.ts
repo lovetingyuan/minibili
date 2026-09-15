@@ -2,11 +2,12 @@ import { expect, test, vi } from "vitest";
 
 import { clearLegacyCollections } from "./legacy-collections";
 
-test("removes only local legacy favorites and history and is safe to repeat", async () => {
+test("removes only local legacy favorites, history and play progress and is safe to repeat", async () => {
   const values = new Map([
     ["Store:$collectedVideos", "old favorites"],
     ["Store:$followedUps", "followings"],
     ["Store:$watchedVideos", "history"],
+    ["Store:$localPlayProgress", "play progress"],
     ["Store:$watchedHotSearch", "search"],
     ["Store:$blackTags", "settings"],
   ]);
@@ -19,8 +20,10 @@ test("removes only local legacy favorites and history and is safe to repeat", as
   expect(remove.mock.calls).toEqual([
     ["Store:$collectedVideos"],
     ["Store:$watchedVideos"],
+    ["Store:$localPlayProgress"],
     ["Store:$collectedVideos"],
     ["Store:$watchedVideos"],
+    ["Store:$localPlayProgress"],
   ]);
 });
 
@@ -31,13 +34,14 @@ test("reports a failed cleanup without rejecting startup and retries next time",
     .mockResolvedValueOnce(undefined);
   await expect(clearLegacyCollections(remove)).resolves.toBe(false);
   await expect(clearLegacyCollections(remove)).resolves.toBe(true);
-  expect(remove).toHaveBeenCalledTimes(4);
+  expect(remove).toHaveBeenCalledTimes(6);
 });
 
-test("history cleanup runs even if favorites cleanup fails", async () => {
+test("history and play progress cleanup run even if favorites cleanup fails", async () => {
   const remove = vi.fn(async (key: string) => {
     if (key === "Store:$collectedVideos") throw new Error("storage unavailable");
   });
   await expect(clearLegacyCollections(remove)).resolves.toBe(false);
   expect(remove).toHaveBeenCalledWith("Store:$watchedVideos");
+  expect(remove).toHaveBeenCalledWith("Store:$localPlayProgress");
 });

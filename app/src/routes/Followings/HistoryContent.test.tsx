@@ -83,11 +83,15 @@ test("list interactions call refresh and loadMore and first-page errors expose r
 test("renders playable history through the shared card and keeps unavailable records inert", () => {
   const watchedAt = new Date(2026, 7, 30, 13, 5).getTime() / 1000;
   const video = { bvid: "BV1", title: "title", name: "UP", mid: 1, cover: "", duration: 90 };
-  const item = { key: "1", title: "title", watchedAt, video };
+  const item = { key: "1", title: "title", watchedAt, video, progressRatio: 0.4 };
   const list = HistoryContent().props;
   const playable = list.renderItem({ item });
   expect(playable.type).toBe("VideoListItem");
-  expect(playable.props).toMatchObject({ video, watchedAt });
+  expect(playable.props).toMatchObject({
+    video,
+    watchedAt,
+    progressRatio: 0.4,
+  });
   const unavailable = list.renderItem({ item: { ...item, video: null } });
   expect(text(unavailable)).toContain("暂不支持播放或已失效");
   expect(text(unavailable)).toContain("观看于 2026-08-30 13:05");
@@ -95,7 +99,7 @@ test("renders playable history through the shared card and keeps unavailable rec
 });
 
 test("append failure preserves rows and shows a footer retry", () => {
-  mocks.history.items = [{ key: "1", title: "video", watchedAt: 1, video: null }];
+  mocks.history.items = [{ key: "1", title: "video", watchedAt: 1, video: null, progressRatio: 0 }];
   mocks.history.error = new Error("offline");
   const list = HistoryContent().props;
   expect(list.data).toEqual(mocks.history.items);

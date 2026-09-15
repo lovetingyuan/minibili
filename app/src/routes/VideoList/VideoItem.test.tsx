@@ -3,6 +3,8 @@ import { describe, expect, test, vi } from "vitest";
 
 import type { ReactElement, ReactNode } from "react";
 
+const mocks = vi.hoisted(() => ({ progressRatio: 0 }));
+
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
 
 vi.mock("react-native", () => ({
@@ -53,6 +55,12 @@ vi.mock("@/store/derives", () => ({
   useFollowedUpsMap: () => ({}),
 }));
 
+vi.mock("@/store/watch-progress", () => ({
+  useWatchProgressRatio: () => mocks.progressRatio,
+}));
+
+vi.mock("@/components/WatchProgressBar", () => import("../../components/WatchProgressBar"));
+
 vi.mock("@/utils", () => ({
   getImagePixelDimensions: (width: number, height: number) => ({ width, height }),
   parseDate: () => "05-10",
@@ -62,6 +70,7 @@ vi.mock("@/utils", () => ({
 }));
 
 import VideoItem from "./VideoItem";
+import { WatchProgressBar } from "../../components/WatchProgressBar";
 
 type ElementProps = {
   children?: ReactNode;
@@ -82,6 +91,45 @@ function getChildren(element: ReactElement<ElementProps>) {
 }
 
 describe("VideoItem", () => {
+  test("shows the cover progress bar when the bvid is in the watch history", () => {
+    const video: React.ComponentProps<typeof VideoItem>["video"] = {
+      aid: 1,
+      bvid: "BV1",
+      cid: 1,
+      commentNum: 1,
+      cover: "https://example.com/cover.jpg",
+      danmuNum: 1,
+      date: 1,
+      desc: "",
+      duration: 211,
+      face: "https://example.com/face.jpg",
+      height: 300,
+      likeNum: 1,
+      mid: 1,
+      name: "UP",
+      playNum: 1000,
+      shareNum: 1,
+      tag: "小剧场",
+      title: "一行标题",
+      videosNum: 1,
+      width: 480,
+    };
+
+    mocks.progressRatio = 0.5;
+    const [cover] = getChildren(VideoItem({ video }));
+    const bar = React.Children.toArray(cover.props.children)
+      .map(expectElement)
+      .find((child) => child.type === WatchProgressBar);
+    expect(bar?.props).toMatchObject({ ratio: 0.5 });
+
+    mocks.progressRatio = 0;
+    const [otherCover] = getChildren(VideoItem({ video }));
+    const otherBar = React.Children.toArray(otherCover.props.children)
+      .map(expectElement)
+      .find((child) => child.type === WatchProgressBar);
+    expect(otherBar?.props).toMatchObject({ ratio: 0 });
+  });
+
   test("keeps the title in a two-line top-aligned slot", () => {
     const video: React.ComponentProps<typeof VideoItem>["video"] = {
       aid: 1,

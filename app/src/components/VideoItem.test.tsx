@@ -6,7 +6,10 @@ import type { VideoListItemInfo } from "../types";
 
 vi.mock("./UpName", () => ({ default: "UpName" }));
 
-const mocks = vi.hoisted(() => ({ navigate: vi.fn(), parseDate: vi.fn(() => "08-30") }));
+const mocks = vi.hoisted(() => ({
+  navigate: vi.fn(),
+  parseDate: vi.fn(() => "08-30"),
+}));
 vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),
 }));
@@ -32,6 +35,7 @@ vi.mock("@/utils", () => ({
 }));
 
 import VideoListItem from "./VideoItem";
+import { WatchProgressBar } from "./WatchProgressBar";
 
 function text(node: ReactNode): string {
   return React.Children.toArray(node)
@@ -104,26 +108,18 @@ test("ordinary cards retain publication dates and the existing cover play-count 
 
 test("watch later cards show a cover progress bar only when there is progress", () => {
   const row = VideoListItem({ video, progressRatio: 0.25 });
-  const track = elements(row).find((element) =>
-    element.props.className?.includes("bg-gray-900/40"),
-  );
-  expect(track).toBeDefined();
-  const fill = elements(track).find((element) =>
-    element.props.className?.includes("bg-sky-500"),
-  ) as unknown as ReactElement<{ style?: { width?: string } }> | undefined;
-  expect(fill?.props.style).toEqual({ width: "25%" });
+  const bars = elements(row).filter((element) => element.type === WatchProgressBar);
+  expect(bars).toHaveLength(1);
+  expect(bars[0].props).toMatchObject({ ratio: 0.25 });
 
   expect(VideoListItem({ video, progressRatio: 1 })).toBeDefined();
-  const complete = elements(VideoListItem({ video, progressRatio: 1 }));
-  const completeFill = elements(
-    complete.find((element) => element.props.className?.includes("bg-gray-900/40")),
-  ).find((element) => element.props.className?.includes("bg-sky-500")) as unknown as
-    | ReactElement<{ style?: { width?: string } }>
-    | undefined;
-  expect(completeFill?.props.style).toEqual({ width: "100%" });
-
-  const plain = VideoListItem({ video, progressRatio: 0 });
-  expect(elements(plain).some((element) => element.props.className?.includes("bg-gray-900/40"))).toBe(
-    false,
+  const complete = elements(VideoListItem({ video, progressRatio: 1 })).find(
+    (element) => element.type === WatchProgressBar,
   );
+  expect(complete?.props).toMatchObject({ ratio: 1 });
+
+  const plain = elements(VideoListItem({ video })).find(
+    (element) => element.type === WatchProgressBar,
+  );
+  expect(plain?.props).toMatchObject({ ratio: 0 });
 });

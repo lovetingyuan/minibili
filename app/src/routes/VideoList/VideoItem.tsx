@@ -1,5 +1,6 @@
 import { Icon, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
+import { WatchProgressBar } from "@/components/WatchProgressBar";
 import { clsx } from "clsx";
 import { Image } from "@/components/styled/expo";
 import React from "react";
@@ -9,6 +10,7 @@ import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { colors } from "@/constants/colors.tw";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 import { useFollowedUpsMap } from "@/store/derives";
+import { useWatchProgressRatio } from "@/store/watch-progress";
 import {
   getImagePixelDimensions,
   parseDate,
@@ -27,6 +29,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
     values: { $blackTags },
   } = useUserSettings();
   const _followedUpsMap = useFollowedUpsMap();
+  const progressRatio = useWatchProgressRatio(video.bvid);
 
   const isFollowed = video.mid in _followedUpsMap;
   const isBlackTag = Object.hasOwn($blackTags, video.tag);
@@ -57,6 +60,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
             </Text>
           </View>
         ) : null}
+        <WatchProgressBar ratio={progressRatio} />
       </View>
       <View className="mt-3 flex-1 justify-between">
         <View className="h-10 justify-start">

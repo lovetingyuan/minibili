@@ -8,17 +8,19 @@ import {
   INITIAL_HISTORY_CURSOR,
 } from "./history";
 import { HistoryResponseSchema } from "./history.schema";
-import type { HistoryPage, HistoryRequest } from "./history.types";
+import type { HistoryPage, HistoryRecord, HistoryRequest } from "./history.types";
 
 const account = { mid: "123", generation: 4 };
 const cursor = { max: 117169106979640, view_at: 1788001866, business: "archive" };
-const record = {
+const record: HistoryRecord = {
   title: "视频标题",
   cover: "https://example.com/cover.jpg",
   author_mid: 42,
   author_name: "UP",
   author_face: "",
   duration: 120,
+  progress: 30,
+  is_finish: 0,
   view_at: 1788001866,
   history: { business: "archive", oid: 117169106979640, bvid: "BV1example", cid: 12, page: 1 },
 };
@@ -76,6 +78,25 @@ describe("Bilibili cursor history", () => {
     expect(items[0].video).not.toHaveProperty("date");
     expect(items[0].watchedAt).toBe(record.view_at);
     expect(items.at(-1)?.video).toBeNull();
+  });
+
+  test("carries the watched progress of each record and requests a custom page size", async () => {
+    const items = getHistoryListItems([
+      page([
+        record,
+        { ...record, progress: 0, is_finish: 1, view_at: record.view_at - 1 },
+        { ...record, progress: 900, duration: 120, view_at: record.view_at - 2 },
+        { ...record, progress: undefined, duration: 0, view_at: record.view_at - 3 },
+        { ...record, progress: null, is_finish: null, view_at: record.view_at - 4 },
+        { ...record, progress: -1, is_finish: 0, view_at: record.view_at - 5 },
+      ]),
+    ]);
+    expect(items.map((item) => item.progressRatio)).toEqual([0.25, 1, 1, 0, 0, 1]);
+
+    const request = vi.fn<HistoryRequest>().mockResolvedValue({ cursor, list: [record] });
+    await fetchBilibiliHistory(INITIAL_HISTORY_CURSOR, request, () => true, 0, 100);
+    const params = new URL(request.mock.calls[0][0], "https://api.bilibili.com").searchParams;
+    expect(params.get("ps")).toBe("100");
   });
 
   test("ends only for empty raw pages or unchanged cursor, not short or filtered pages", async () => {

@@ -1,5 +1,6 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { getProgressRatio } from "../utils/watch-progress";
 import {
   createBilibiliRequestHeaders,
   getBilibiliCsrf,
@@ -43,16 +44,6 @@ function assertVideoAid(aid: string) {
   if (!/^[1-9]\d*$/.test(aid) || !Number.isSafeInteger(Number(aid))) {
     throw new Error("视频 ID 无效，请重新打开视频");
   }
-}
-
-export function getProgressRatio(progress: number, duration: number, viewed: boolean) {
-  if (viewed) {
-    return 1;
-  }
-  if (!Number.isFinite(progress) || !Number.isFinite(duration) || duration <= 0 || progress <= 0) {
-    return 0;
-  }
-  return Math.min(1, progress / duration);
 }
 
 export function getWatchLaterListItems(

@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
+import { Children, isValidElement } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { DynamicAuthor, DynamicImage, DynamicVideoContent } from "@/api/dynamic-items.type";
@@ -7,6 +8,7 @@ const mocks = vi.hoisted(() => {
   vi.stubGlobal("__DEV__", false);
   return {
     isWatchLaterAdded: false,
+    progressRatio: 0,
     navigate: vi.fn(),
     setCurrentImageIndex: vi.fn(),
     setImagesList: vi.fn(),
@@ -33,6 +35,9 @@ vi.mock("@/store", () => ({
     setImagesList: mocks.setImagesList,
     setOverlayButtons: mocks.setOverlayButtons,
   }),
+}));
+vi.mock("@/store/watch-progress", () => ({
+  useWatchProgressRatio: () => mocks.progressRatio,
 }));
 vi.mock("@/hooks/useWatchLaterActions", () => ({
   useWatchLaterActions: () => ({
@@ -61,6 +66,7 @@ vi.mock("@/utils", () => ({
 }));
 
 import { DynamicMedia } from "./dynamic-media";
+import { WatchProgressBar } from "../WatchProgressBar";
 
 type ElementProps = {
   children?: ReactNode;
@@ -109,10 +115,21 @@ function children(element: ReactElement<ElementProps>) {
     : [element.props.children].filter(Boolean);
 }
 
+function flatten(node: ReactNode): ReactElement<ElementProps>[] {
+  const result: ReactElement<ElementProps>[] = [];
+  Children.forEach(node, (child) => {
+    if (isValidElement<ElementProps>(child)) {
+      result.push(child, ...flatten(child.props.children));
+    }
+  });
+  return result;
+}
+
 describe("DynamicMedia video interactions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.isWatchLaterAdded = false;
+    mocks.progressRatio = 0;
   });
 
   test("only the cover opens Play in the dynamic list", () => {
@@ -198,6 +215,17 @@ describe("DynamicMedia video interactions", () => {
       "Play",
       expect.objectContaining({ bvid: "BV1TEST" }),
     );
+  });
+
+  test("shows the cover progress bar when the dynamic video is in the watch history", () => {
+    mocks.progressRatio = 0.4;
+    const bar = flatten(renderVideo(video)).find((child) => child.type === WatchProgressBar);
+    expect(bar?.props).toMatchObject({ ratio: 0.4 });
+
+    mocks.progressRatio = 0;
+    expect(
+      flatten(renderVideo(video)).find((child) => child.type === WatchProgressBar)?.props,
+    ).toMatchObject({ ratio: 0 });
   });
 });
 

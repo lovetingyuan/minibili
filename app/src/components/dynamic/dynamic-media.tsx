@@ -7,11 +7,13 @@ import type { DynamicAuthor, DynamicContent, DynamicImage } from "@/api/dynamic-
 import { colors } from "@/constants/colors.tw";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
+import { useWatchProgressRatio } from "@/store/watch-progress";
 import type { NavigationProps } from "@/types";
 import { getImagePixelDimensions, parseImgUrl, parseNumber } from "@/utils";
 
 import { Image } from "../styled/expo";
 import { Icon, Text } from "../styled/rneui";
+import { WatchProgressBar } from "../WatchProgressBar";
 
 function DynamicImageGrid(props: { images: DynamicImage[]; detail?: boolean }) {
   const { setImagesList, setCurrentImageIndex } = useStore();
@@ -74,6 +76,7 @@ function VideoCard(props: {
   const { setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore();
   const watchLater = useWatchLaterActions();
   const { content, author } = props;
+  const progressRatio = useWatchProgressRatio(content.bvid);
   const coverSize = getImagePixelDimensions(windowWidth * 0.9, (windowWidth * 0.9 * 9) / 16);
 
   function openVideo(event?: GestureResponderEvent) {
@@ -141,6 +144,7 @@ function VideoCard(props: {
           {content.duration}
         </Text>
       ) : null}
+      <WatchProgressBar ratio={progressRatio} />
     </>
   );
   const description = (

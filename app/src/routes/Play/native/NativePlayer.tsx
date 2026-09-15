@@ -16,11 +16,13 @@ import {
 import { GestureDetector } from "react-native-gesture-handler";
 import { withUniwind } from "uniwind";
 
+import { usePlayResumePosition } from "@/api/play-resume";
 import { useVideoPlayUrl } from "@/api/play-url";
 import { useVideoInfo } from "@/api/video-info";
 import { Icon } from "@/components/styled/rneui";
 import { lockAppPortrait, setFullscreenOrientationOwner } from "@/hooks/useAppOrientation";
 import { useAppStateChange } from "@/hooks/useAppState";
+import { usePlayHeartbeatReporter } from "@/hooks/usePlayHeartbeatReporter";
 import { useStore } from "@/store";
 import type { RootStackParamList } from "@/types";
 import { unlockOrientation } from "@/utils/screen-orientation";
@@ -107,6 +109,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   const reloadedAttemptTokenRef = React.useRef(0);
   // 切换地址后需要恢复的播放进度（毫秒）
   const resumePositionMsRef = React.useRef(0);
+  // 已经按 B站记录跳转过的分P，避免每次就绪都重复跳转
+  const resumeAppliedRef = React.useRef("");
 
   const { controlsVisible, toggleControls, keepControlsVisible, hideControls } =
     usePlayerControlsVisibility(isPlaying);
@@ -121,6 +125,41 @@ export default function NativePlayer(props: NativePlayerProps) {
     instance.staysActiveInBackground = $backgroundPlayEnabled;
     instance.showNowPlayingNotification = $backgroundPlayEnabled;
   });
+
+  // B站记录的上次播放位置（毫秒），0 表示从头播放
+  const playResumePositionMs = usePlayResumePosition(videoInfo.aid, cid);
+
+  // 登录后按 B站网页播放器的方式上报播放进度，写入观看历史
+  const { reportEnded } = usePlayHeartbeatReporter({
+    bvid: videoInfo.bvid,
+    aid: videoInfo.aid,
+    cid,
+    page: currentPage,
+    durationSeconds,
+    quality: qn,
+    isPlaying,
+    currentTimeMs,
+  });
+
+  /**
+   * 播放器就绪后跳到 B站记录的上次播放位置，同一个分P 只跳一次。
+   * 位置接口比播放器就绪晚返回时，由下面的 effect 再补一次。
+   */
+  function applyServerResumeIfReady() {
+    if (playResumePositionMs <= 0) {
+      return;
+    }
+    const resumeKey = `${videoInfo.bvid}:${cid}`;
+    if (resumeAppliedRef.current === resumeKey || player.status !== "readyToPlay") {
+      return;
+    }
+    resumeAppliedRef.current = resumeKey;
+    applyResumePosition(playResumePositionMs);
+  }
+
+  React.useEffect(() => {
+    applyServerResumeIfReady();
+  }, [playResumePositionMs, cid, videoInfo.bvid]);
 
   useEventListener(player, "playingChange", ({ isPlaying: playing }) => {
     setIsPlaying(playing);
@@ -146,11 +185,10 @@ export default function NativePlayer(props: NativePlayerProps) {
       const resumePositionMs = resumePositionMsRef.current;
       if (resumePositionMs > 0) {
         resumePositionMsRef.current = 0;
-        player.currentTime = resumePositionMs / 1000;
-        lastTimeRef.current = resumePositionMs;
-        setCurrentTimeMs(resumePositionMs);
-        setSeekToken((token) => token + 1);
+        applyResumePosition(resumePositionMs);
+        return;
       }
+      applyServerResumeIfReady();
       return;
     }
     if (status !== "error" || handledAttemptTokenRef.current === playbackAttempt.token) {
@@ -199,6 +237,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   useEventListener(player, "playToEnd", () => {
     // 部分设备播放结束后不会再派发 playingChange，这里主动收敛播放状态，
     // 保证播放按钮能切回“播放”，点击时可以重新播放
+    reportEnded();
     setIsPlaying(false);
     KeepAwake.deactivateKeepAwake("PLAY");
     setPortraitExpanded(false);
@@ -308,6 +347,14 @@ export default function NativePlayer(props: NativePlayerProps) {
     player.currentTime = timeMs / 1000;
     lastTimeRef.current = Math.round(timeMs);
     setCurrentTimeMs(Math.round(timeMs));
+    setSeekToken((token) => token + 1);
+  }
+
+  /** 播放器就绪后跳到指定进度（毫秒），并同步控件与弹幕状态 */
+  function applyResumePosition(positionMs: number) {
+    player.currentTime = positionMs / 1000;
+    lastTimeRef.current = positionMs;
+    setCurrentTimeMs(positionMs);
     setSeekToken((token) => token + 1);
   }
 
