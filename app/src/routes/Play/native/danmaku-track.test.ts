@@ -8,6 +8,7 @@ import {
   mergeDanmakuSegments,
   resolveDanmakuBatch,
   resolveDanmakuLaneCount,
+  selectDueLocalDanmaku,
   toDanmakuColor,
 } from "./danmaku-track";
 
@@ -88,6 +89,37 @@ describe("findDanmakuStartIndex", () => {
     expect(findDanmakuStartIndex(items, 150)).toBe(2);
     expect(findDanmakuStartIndex(items, 200)).toBe(2);
     expect(findDanmakuStartIndex(items, 1000)).toBe(3);
+  });
+});
+
+describe("selectDueLocalDanmaku", () => {
+  const items = [createItem(1000, "第一条"), createItem(2000, "第二条"), createItem(3000)];
+
+  test("takes the items whose time has arrived and advances the index", () => {
+    const result = selectDueLocalDanmaku(items, 2000, 0);
+
+    expect(result.items.map((item) => item.content)).toEqual(["第一条", "第二条"]);
+    expect(result.nextIndex).toBe(2);
+  });
+
+  test("keeps future items for later", () => {
+    const result = selectDueLocalDanmaku(items, 500, 0);
+
+    expect(result.items).toEqual([]);
+    expect(result.nextIndex).toBe(0);
+  });
+
+  test("does not consume an item twice", () => {
+    const first = selectDueLocalDanmaku(items, 2000, 0);
+    const second = selectDueLocalDanmaku(items, 3000, first.nextIndex);
+
+    expect(second.items).toHaveLength(1);
+    expect(second.nextIndex).toBe(3);
+  });
+
+  test("clamps a stale index", () => {
+    expect(selectDueLocalDanmaku(items, 0, 99)).toEqual({ items: [], nextIndex: 3 });
+    expect(selectDueLocalDanmaku([], 1000, 0)).toEqual({ items: [], nextIndex: 0 });
   });
 });
 

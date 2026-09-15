@@ -96,6 +96,37 @@ export function findDanmakuStartIndex(items: DanmakuItem[], currentTimeMs: numbe
   return low;
 }
 
+export type DueLocalDanmaku = {
+  /**
+   * 已经到达播放时间、还没有展示过的本地弹幕
+   */
+  items: DanmakuItem[];
+  /**
+   * 下一次消费的起始下标
+   */
+  nextIndex: number;
+};
+
+/**
+ * 取出本地回显弹幕里已经到播放时间、还没有展示过的部分。
+ * items 按 progressMs 升序排列，startIndex 指向下一条待消费的弹幕。
+ */
+export function selectDueLocalDanmaku(
+  items: DanmakuItem[],
+  currentTimeMs: number,
+  startIndex: number,
+): DueLocalDanmaku {
+  let index = Math.max(0, Math.min(startIndex, items.length));
+  const due: DanmakuItem[] = [];
+
+  while (index < items.length && items[index].progressMs <= currentTimeMs) {
+    due.push(items[index]);
+    index += 1;
+  }
+
+  return { items: due, nextIndex: index };
+}
+
 function sortDanmakuItems(items: DanmakuItem[]) {
   return [...items].sort((a, b) => a.progressMs - b.progressMs);
 }

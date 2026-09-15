@@ -20,6 +20,20 @@ export function getDanmakuSegmentCount(durationSeconds: number) {
   return Math.max(1, Math.ceil(durationSeconds / DANMAKU_SEGMENT_SECONDS));
 }
 
+/**
+ * 播放进度所在的分段下标，用于发送弹幕后定位需要失效的分段
+ */
+export function getDanmakuSegmentIndex(progressMs: number) {
+  return Math.max(0, Math.floor(progressMs / (DANMAKU_SEGMENT_SECONDS * 1000)));
+}
+
+/**
+ * 失效一个弹幕分段的缓存，下次拉取时会重新请求（发送弹幕后调用）
+ */
+export function invalidateDanmakuSegment(cid: number, index: number) {
+  segmentCache.delete(`${cid}-${index}`);
+}
+
 async function requestDanmakuSegment(cid: number, index: number) {
   const url = `https://api.bilibili.com/x/v2/dm/web/seg.so?type=1&oid=${cid}&segment_index=${index}`;
   const headers = createBilibiliRequestHeaders(

@@ -1,12 +1,14 @@
 import React from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 
+import type { DanmakuItem } from "@/api/danmaku.types";
 import useLatest from "@/hooks/useLatest";
 
 import {
   DANMAKU_DEFAULT_FONTSIZE,
   findDanmakuStartIndex,
   resolveDanmakuBatch,
+  selectDueLocalDanmaku,
   type DanmakuRenderItem,
 } from "./danmaku-track";
 import { useDanmakuFeed } from "./use-danmaku-feed";
@@ -27,12 +29,20 @@ type DanmakuOverlayProps = {
   width: number;
   height: number;
   fontSize?: number;
+  /**
+   * 本地回显的弹幕（自己刚发送的那条），与网络弹幕共用轨道避免重叠
+   */
+  localItems?: DanmakuItem[];
 };
 
 type ConsumerState = {
   lanes: number[];
   nextIndex: number;
+  localNextIndex: number;
 };
+
+// 默认值保持同一引用，避免每次渲染都重启消费 effect
+const EMPTY_LOCAL_ITEMS: DanmakuItem[] = [];
 
 function resolveItemTranslateX(item: DanmakuRenderItem, currentTimeMs: number) {
   const elapsed = Math.min(item.durationMs, Math.max(0, currentTimeMs - item.startMs));
@@ -104,12 +114,18 @@ function DanmakuItemView(props: {
 export default function DanmakuOverlay(props: DanmakuOverlayProps) {
   const { cid, durationSeconds, enabled, isPlaying, currentTimeMs, width, height } = props;
   const fontSize = props.fontSize ?? DANMAKU_DEFAULT_FONTSIZE;
+  const localItems = props.localItems ?? EMPTY_LOCAL_ITEMS;
   const { items, resetToken } = useDanmakuFeed({ cid, durationSeconds, enabled, currentTimeMs });
 
   const [activeItems, setActiveItems] = React.useState<DanmakuRenderItem[]>([]);
-  const consumerRef = React.useRef<ConsumerState>({ lanes: [], nextIndex: 0 });
+  const consumerRef = React.useRef<ConsumerState>({
+    lanes: [],
+    nextIndex: 0,
+    localNextIndex: 0,
+  });
   const itemsRef = useLatest(items);
   const currentTimeRef = useLatest(currentTimeMs);
+  const localItemsRef = useLatest(localItems);
 
   // 切分P、跳转、开关弹幕、分段乱序补拉时重新定位
   const resetKey = `${cid}-${props.seekToken}-${resetToken}-${enabled ? 1 : 0}`;
@@ -117,9 +133,10 @@ export default function DanmakuOverlay(props: DanmakuOverlayProps) {
     consumerRef.current = {
       lanes: [],
       nextIndex: findDanmakuStartIndex(itemsRef.current, currentTimeRef.current),
+      localNextIndex: findDanmakuStartIndex(localItemsRef.current, currentTimeRef.current),
     };
     setActiveItems([]);
-  }, [resetKey, itemsRef, currentTimeRef]);
+  }, [resetKey, itemsRef, currentTimeRef, localItemsRef]);
 
   React.useEffect(() => {
     if (!enabled || width <= 0 || height <= 0) {
@@ -127,19 +144,26 @@ export default function DanmakuOverlay(props: DanmakuOverlayProps) {
     }
 
     const consumer = consumerRef.current;
-    const result = resolveDanmakuBatch(items, consumer.nextIndex, consumer.lanes, {
+    const options = {
       currentTimeMs,
       containerWidth: width,
       containerHeight: height,
       fontSize,
-    });
+    };
+    const result = resolveDanmakuBatch(items, consumer.nextIndex, consumer.lanes, options);
     consumer.lanes = result.lanes;
     consumer.nextIndex = result.nextIndex;
 
-    if (result.items.length > 0) {
-      setActiveItems((previous) => [...previous, ...result.items]);
+    // 本地回显弹幕排在网络弹幕之后消费，复用同一份轨道状态
+    const local = selectDueLocalDanmaku(localItems, currentTimeMs, consumer.localNextIndex);
+    consumer.localNextIndex = local.nextIndex;
+    const localResult = resolveDanmakuBatch(local.items, 0, consumer.lanes, options);
+    consumer.lanes = localResult.lanes;
+
+    if (result.items.length > 0 || localResult.items.length > 0) {
+      setActiveItems((previous) => [...previous, ...result.items, ...localResult.items]);
     }
-  }, [currentTimeMs, items, enabled, width, height, fontSize]);
+  }, [currentTimeMs, items, localItems, enabled, width, height, fontSize]);
 
   React.useEffect(() => {
     setActiveItems((previous) => {

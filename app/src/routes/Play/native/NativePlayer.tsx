@@ -1,11 +1,13 @@
 import { NetInfoStateType, useNetInfo } from "@react-native-community/netinfo";
-import { type RouteProp, useIsFocused, useRoute } from "@react-navigation/native";
+import { type RouteProp, useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
 import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
 import {
+  Alert,
   Animated,
+  Keyboard,
   Platform,
   Pressable,
   StyleSheet,
@@ -16,17 +18,28 @@ import {
 import { GestureDetector } from "react-native-gesture-handler";
 import { withUniwind } from "uniwind";
 
+import { getDanmakuSegmentIndex, invalidateDanmakuSegment } from "@/api/danmaku";
+import type { DanmakuItem } from "@/api/danmaku.types";
 import { usePlayResumePosition } from "@/api/play-resume";
 import { useVideoPlayUrl } from "@/api/play-url";
+import { DANMAKU_SEND_STYLE, DanmakuLoginRequiredError } from "@/api/send-danmaku";
+import { useSendDanmaku } from "@/api/useSendDanmaku";
 import { useVideoInfo } from "@/api/video-info";
 import { Icon } from "@/components/styled/rneui";
+import { bilibiliSession } from "@/features/bilibili-session/session";
+import {
+  useBilibiliSessionActions,
+  useBilibiliSessionState,
+} from "@/features/bilibili-session/useBilibiliSession";
 import { lockAppPortrait, setFullscreenOrientationOwner } from "@/hooks/useAppOrientation";
 import { useAppStateChange } from "@/hooks/useAppState";
 import { usePlayHeartbeatReporter } from "@/hooks/usePlayHeartbeatReporter";
 import { useStore } from "@/store";
-import type { RootStackParamList } from "@/types";
+import type { NavigationProps, RootStackParamList } from "@/types";
+import { showToast } from "@/utils";
 import { unlockOrientation } from "@/utils/screen-orientation";
 
+import DanmakuComposer from "./DanmakuComposer";
 import DanmakuOverlay from "./DanmakuOverlay";
 import PlayerControls from "./PlayerControls";
 import PlayerCover from "./PlayerCover";
@@ -64,15 +77,22 @@ type NativePlayerProps = {
 export default function NativePlayer(props: NativePlayerProps) {
   const { currentPage, onPlayEnded, fullscreen, onFullscreenChange } = props;
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
+  const navigation = useNavigation<NavigationProps["navigation"]>();
   const isFocused = useIsFocused();
   const netInfo = useNetInfo();
   const { width, height } = useWindowDimensions();
   const { imagesList, $danmakuEnabled, set$danmakuEnabled, $backgroundPlayEnabled } = useStore();
+  const { account } = useBilibiliSessionState();
+  const { logout } = useBilibiliSessionActions();
   const { data } = useVideoInfo(route.params.bvid);
   const videoInfo = { ...route.params, ...data };
   const pageInfo = videoInfo.pages?.[currentPage - 1];
   const cid = pageInfo?.cid ?? videoInfo.cid ?? 0;
   const durationSeconds = pageInfo?.duration ?? videoInfo.duration ?? 0;
+  // 会话未就绪或已失效时不展示发送弹幕入口，其余播放控件不受影响
+  const danmakuAccount = account && bilibiliSession.isCurrentAccount(account) ? account : null;
+  const danmakuVideo = videoInfo.aid ? { aid: String(videoInfo.aid), bvid: videoInfo.bvid } : null;
+  const { send: sendDanmaku, isSending } = useSendDanmaku(danmakuAccount, danmakuVideo, cid);
 
   const isCellular = netInfo.type === NetInfoStateType.cellular;
   const networkReady = netInfo.type !== null && netInfo.type !== undefined;
@@ -93,6 +113,12 @@ export default function NativePlayer(props: NativePlayerProps) {
   } | null>(null);
   // 竖屏视频下滑展开，高度由屏幕高度的 33% 切换到 70%
   const [portraitExpanded, setPortraitExpanded] = React.useState(false);
+  // 弹幕输入条是否展开
+  const [danmakuComposerOpen, setDanmakuComposerOpen] = React.useState(false);
+  // 自己刚发送的弹幕，本地立即回显
+  const [localDanmaku, setLocalDanmaku] = React.useState<DanmakuItem[]>([]);
+  // 打开输入条前是否在播放，发送或取消后据此恢复
+  const resumeAfterDanmakuRef = React.useRef(false);
   // 当前使用的播放地址（主地址 + 备用 CDN 镜像）与自动兜底的进度
   const [playbackAttempt, setPlaybackAttempt] = React.useState({
     index: 0,
@@ -253,6 +279,19 @@ export default function NativePlayer(props: NativePlayerProps) {
     setPlaybackAttempt((current) => ({ index: 0, refreshCount: 0, token: current.token + 1 }));
   }, [cid, qn]);
 
+  // 切分P时收起弹幕输入条并清空本地回显
+  React.useEffect(() => {
+    setDanmakuComposerOpen(false);
+    setLocalDanmaku([]);
+  }, [cid]);
+
+  // 进出全屏会改变屏幕方向与键盘状态，先收起输入条
+  React.useEffect(() => {
+    if (fullscreen) {
+      setDanmakuComposerOpen(false);
+    }
+  }, [fullscreen]);
+
   // 播放地址变化后需要重新等待首帧，等待期间继续展示封面
   React.useEffect(() => {
     setFirstFrameRendered(false);
@@ -399,6 +438,81 @@ export default function NativePlayer(props: NativePlayerProps) {
       return;
     }
     resumePlayback();
+  }
+
+  /**
+   * 打开弹幕输入条：暂停播放并记住原来的播放状态
+   */
+  function openDanmakuComposer() {
+    resumeAfterDanmakuRef.current = player.playing;
+    player.pause();
+    keepControlsVisible();
+    setDanmakuComposerOpen(true);
+  }
+
+  /**
+   * 关闭输入条后恢复打开前的播放状态，避免用户手动再点一次播放
+   */
+  function resumeDanmakuPlayback() {
+    if (!resumeAfterDanmakuRef.current) {
+      return;
+    }
+    resumeAfterDanmakuRef.current = false;
+    player.play();
+  }
+
+  function closeDanmakuComposer() {
+    setDanmakuComposerOpen(false);
+    Keyboard.dismiss();
+    resumeDanmakuPlayback();
+  }
+
+  function handleDanmakuLoginRequired(error: Error) {
+    Alert.alert("请重新登录 B站", error.message, [
+      { text: "取消", style: "cancel" },
+      {
+        text: "重新登录",
+        onPress: () => {
+          if (!isFocused) return;
+          void logout()
+            .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
+            .catch(() => showToast("退出登录失败，请在设置页重试"));
+        },
+      },
+    ]);
+  }
+
+  /**
+   * 发送弹幕：成功后本地回显并恢复播放，失败保留输入内容并提示原因
+   */
+  async function submitDanmaku(text: string) {
+    const progressMs = Math.round(player.currentTime * 1000);
+    try {
+      const sent = await sendDanmaku(text, progressMs);
+      setLocalDanmaku((current) => [
+        ...current,
+        {
+          progressMs: sent.progressMs,
+          content: sent.text,
+          color: Number(DANMAKU_SEND_STYLE.color),
+          fontsize: Number(DANMAKU_SEND_STYLE.fontsize),
+        },
+      ]);
+      // 分段缓存失效后，再次拉取该分段能拿到这条新弹幕
+      invalidateDanmakuSegment(cid, getDanmakuSegmentIndex(sent.progressMs));
+      setDanmakuComposerOpen(false);
+      Keyboard.dismiss();
+      resumeDanmakuPlayback();
+      showToast("弹幕已发送");
+      return true;
+    } catch (error) {
+      if (error instanceof DanmakuLoginRequiredError) {
+        handleDanmakuLoginRequired(error);
+        return false;
+      }
+      showToast(error instanceof Error ? error.message : "弹幕发送失败，请稍后重试");
+      return false;
+    }
   }
 
   function clearSeekHint() {
@@ -570,6 +684,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           width={width}
           height={containerHeight}
           fontSize={fullscreen ? 18 : 15}
+          localItems={localDanmaku}
         />
       ) : null}
       <GestureDetector gesture={gesture}>
@@ -584,7 +699,12 @@ export default function NativePlayer(props: NativePlayerProps) {
         <PlayerSeekHint targetMs={seekHint.targetMs} deltaSeconds={seekHint.deltaSeconds} />
       ) : null}
       {/* 首帧渲染前画面被封面盖住，此时不显示播放按钮，避免和封面叠在一起 */}
-      {started && firstFrameRendered && !isPlaying && !hasError && !seekHint ? (
+      {started &&
+      firstFrameRendered &&
+      !isPlaying &&
+      !hasError &&
+      !seekHint &&
+      !danmakuComposerOpen ? (
         <View pointerEvents="box-none" className="absolute inset-0 items-center justify-center">
           <Pressable
             accessibilityRole="button"
@@ -603,12 +723,14 @@ export default function NativePlayer(props: NativePlayerProps) {
           currentTimeMs={currentTimeMs}
           durationMs={durationSeconds * 1000}
           danmakuEnabled={$danmakuEnabled}
+          canSendDanmaku={Boolean(danmakuAccount)}
           fullscreen={fullscreen}
           visible={controlsVisible}
           onTogglePlay={handleTogglePlay}
           onToggleDanmaku={() => {
             set$danmakuEnabled(!$danmakuEnabled);
           }}
+          onSendDanmaku={openDanmakuComposer}
           onToggleFullscreen={() => {
             keepControlsVisible();
             onFullscreenChange(!fullscreen);
@@ -638,6 +760,13 @@ export default function NativePlayer(props: NativePlayerProps) {
           onRetry={() => {
             void handleRetry();
           }}
+        />
+      ) : null}
+      {danmakuComposerOpen ? (
+        <DanmakuComposer
+          pending={isSending}
+          onSubmit={submitDanmaku}
+          onClose={closeDanmakuComposer}
         />
       ) : null}
     </StyledAnimatedView>

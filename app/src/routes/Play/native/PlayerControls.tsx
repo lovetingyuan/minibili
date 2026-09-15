@@ -4,6 +4,7 @@ import useResolvedColor from "@/hooks/useResolvedColor";
 import React from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 
 import { formatPlaybackTime } from "./player-helpers";
@@ -23,10 +24,15 @@ type PlayerControlsProps = {
   currentTimeMs: number;
   durationMs: number;
   danmakuEnabled: boolean;
+  /**
+   * 未登录 B站 时不展示发送弹幕按钮
+   */
+  canSendDanmaku: boolean;
   fullscreen: boolean;
   visible: boolean;
   onTogglePlay: () => void;
   onToggleDanmaku: () => void;
+  onSendDanmaku: () => void;
   onToggleFullscreen: () => void;
   onSeek: (timeMs: number) => void;
   /**
@@ -86,6 +92,7 @@ function CharacterButton(props: {
 export default function PlayerControls(props: PlayerControlsProps) {
   const { isPlaying, danmakuEnabled, fullscreen, visible } = props;
   const accentColor = useResolvedColor(colors.secondary.text) ?? "#ff6699";
+  const insets = useSafeAreaInsets();
   const [trackWidth, setTrackWidth] = React.useState(0);
   const [scrubMs, setScrubMs] = React.useState<number | null>(null);
   const scrubRef = React.useRef<number | null>(null);
@@ -161,67 +168,91 @@ export default function PlayerControls(props: PlayerControlsProps) {
   }
 
   return (
-    <StyledAnimatedView
-      className="absolute bottom-0 left-0 right-0 bg-black/40 px-3 pb-1 pt-1"
-      style={{ opacity }}
-      pointerEvents={visible ? "auto" : "none"}
-      accessibilityElementsHidden={!visible}
-      importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
-    >
-      <View className="flex-row items-center gap-2">
-        <ControlButton
-          name={isPlaying ? "pause" : "play"}
-          label={isPlaying ? "暂停" : "播放"}
-          size={26}
-          color="#ffffff"
-          onPress={() => {
-            press(props.onTogglePlay);
-          }}
-        />
-        <GestureDetector gesture={scrubGesture}>
-          <View
-            className="h-7 flex-1 justify-center"
-            onLayout={(event) => {
-              setTrackWidth(event.nativeEvent.layout.width);
+    <>
+      {/* 右上角：发送弹幕，与底部控件同步显隐；全屏时避让状态栏与刘海 */}
+      <StyledAnimatedView
+        className="absolute left-0 right-0 top-0 flex-row justify-end px-3"
+        style={{ opacity, paddingTop: fullscreen ? Math.max(insets.top, 8) : 8 }}
+        pointerEvents={visible ? "box-none" : "none"}
+        accessibilityElementsHidden={!visible}
+        importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
+      >
+        {props.canSendDanmaku ? (
+          <Pressable
+            className="h-9 w-9 items-center justify-center rounded-full bg-black/40"
+            accessibilityRole="button"
+            accessibilityLabel="发送弹幕"
+            hitSlop={8}
+            onPress={() => {
+              press(props.onSendDanmaku);
             }}
           >
-            <View className="h-[3px] w-full rounded bg-white/30">
+            <Icon name="pencil" type="material-design" size={20} color="#ffffff" />
+          </Pressable>
+        ) : null}
+      </StyledAnimatedView>
+      <StyledAnimatedView
+        className="absolute bottom-0 left-0 right-0 bg-black/40 px-3 pb-1 pt-1"
+        style={{ opacity }}
+        pointerEvents={visible ? "auto" : "none"}
+        accessibilityElementsHidden={!visible}
+        importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
+      >
+        <View className="flex-row items-center gap-2">
+          <ControlButton
+            name={isPlaying ? "pause" : "play"}
+            label={isPlaying ? "暂停" : "播放"}
+            size={26}
+            color="#ffffff"
+            onPress={() => {
+              press(props.onTogglePlay);
+            }}
+          />
+          <GestureDetector gesture={scrubGesture}>
+            <View
+              className="h-7 flex-1 justify-center"
+              onLayout={(event) => {
+                setTrackWidth(event.nativeEvent.layout.width);
+              }}
+            >
+              <View className="h-[3px] w-full rounded bg-white/30">
+                <View
+                  className="h-[3px] rounded bg-pink-400"
+                  style={{ width: `${progress * 100}%` }}
+                />
+              </View>
               <View
-                className="h-[3px] rounded bg-pink-400"
-                style={{ width: `${progress * 100}%` }}
+                className="absolute top-2 h-3 w-3 rounded-full bg-pink-400"
+                style={{ left: Math.max(0, progress * trackWidth - 6) }}
               />
             </View>
-            <View
-              className="absolute top-2 h-3 w-3 rounded-full bg-pink-400"
-              style={{ left: Math.max(0, progress * trackWidth - 6) }}
-            />
-          </View>
-        </GestureDetector>
-        <Text
-          className="min-w-[84px] text-center text-xs tabular-nums text-white"
-          numberOfLines={1}
-        >
-          {`${formatPlaybackTime(displayMs / 1000)}/${formatPlaybackTime(durationMs / 1000)}`}
-        </Text>
-        <CharacterButton
-          character="弹"
-          label={danmakuEnabled ? "关闭弹幕" : "打开弹幕"}
-          size={14}
-          color={danmakuEnabled ? accentColor : "#ffffff"}
-          onPress={() => {
-            press(props.onToggleDanmaku);
-          }}
-        />
-        <ControlButton
-          name={fullscreen ? "fullscreen-exit" : "fullscreen"}
-          label={fullscreen ? "退出全屏" : "全屏"}
-          size={24}
-          color="#ffffff"
-          onPress={() => {
-            press(props.onToggleFullscreen);
-          }}
-        />
-      </View>
-    </StyledAnimatedView>
+          </GestureDetector>
+          <Text
+            className="min-w-[84px] text-center text-xs tabular-nums text-white"
+            numberOfLines={1}
+          >
+            {`${formatPlaybackTime(displayMs / 1000)}/${formatPlaybackTime(durationMs / 1000)}`}
+          </Text>
+          <CharacterButton
+            character="弹"
+            label={danmakuEnabled ? "关闭弹幕" : "打开弹幕"}
+            size={14}
+            color={danmakuEnabled ? accentColor : "#ffffff"}
+            onPress={() => {
+              press(props.onToggleDanmaku);
+            }}
+          />
+          <ControlButton
+            name={fullscreen ? "fullscreen-exit" : "fullscreen"}
+            label={fullscreen ? "退出全屏" : "全屏"}
+            size={24}
+            color="#ffffff"
+            onPress={() => {
+              press(props.onToggleFullscreen);
+            }}
+          />
+        </View>
+      </StyledAnimatedView>
+    </>
   );
 }
