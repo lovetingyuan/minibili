@@ -7,12 +7,14 @@ import type { CommentItemProps } from "./comment.types";
 const mocks = vi.hoisted(() => ({
   setRepliesInfo: vi.fn(),
   setOverlayButtons: vi.fn(),
+  alert: vi.fn<(title: string, message?: string, actions?: AlertAction[]) => void>(),
 }));
 
 vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ push: vi.fn() }),
 }));
 vi.mock("react-native", () => ({
+  Alert: { alert: mocks.alert },
   Pressable: "Pressable",
   View: "View",
 }));
@@ -43,11 +45,14 @@ import { Comment, CommentItem } from "./Comment";
 type ElementProps = {
   children?: ReactNode;
   className?: string;
+  accessibilityLabel?: string;
+  disabled?: boolean;
   onLongPress?: () => void;
   onPress?: () => void;
 };
 
 type OverlayButton = { text: string; onPress: () => void };
+type AlertAction = { text: string; onPress?: () => void };
 
 function makeComment(overrides: Partial<ReplyItemType> = {}): ReplyItemType {
   return {
@@ -92,6 +97,24 @@ function openItemActions(props: CommentItemProps) {
   const buttons = lastOverlayButtons();
   if (!buttons) throw new Error("Expected the long press to open the comment actions overlay");
   return buttons;
+}
+
+function findElement(
+  element: ReactNode,
+  match: (props: ElementProps) => boolean,
+): ReactElement<ElementProps> | null {
+  if (!element || typeof element !== "object" || !("props" in element)) return null;
+  const node = element as ReactElement<ElementProps>;
+  if (match(node.props)) return node;
+  for (const child of children(node)) {
+    const found = findElement(child, match);
+    if (found) return found;
+  }
+  return null;
+}
+
+function deleteButtonOf(props: CommentItemProps) {
+  return findElement(CommentItem(props), (nodeProps) => nodeProps.accessibilityLabel === "删除评论");
 }
 
 describe("Comment long press actions", () => {
@@ -348,5 +371,51 @@ describe("Comment creator liked highlight", () => {
     const body = renderBody(makeComment({ creatorLiked: true }));
 
     expect(body).toHaveLength(1);
+  });
+});
+
+describe("Comment delete entry", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  function makeProps(overrides: Partial<CommentItemProps> = {}): CommentItemProps {
+    return {
+      comment: makeComment({ id: "11", mid: "999", time: "2026-09-01 12:00", location: "上海" }),
+      onAttitude: vi.fn().mockResolvedValue(null),
+      onReply: vi.fn(),
+      isAttitudePending: () => false,
+      ...overrides,
+    };
+  }
+
+  test("offers delete for own comments and confirms before deleting", () => {
+    const onDelete = vi.fn();
+    const props = makeProps({ onDelete, viewerMid: "999" });
+    const button = deleteButtonOf(props);
+
+    expect(button).not.toBeNull();
+    button?.props.onPress?.();
+    expect(mocks.alert).toHaveBeenCalledOnce();
+    const [title, message, actions] = mocks.alert.mock.calls[0];
+    expect(title).toBe("删除评论");
+    expect(message).toContain("删除评论后");
+    expect(actions?.map((action) => action.text)).toEqual(["取消", "确定"]);
+    actions?.[1]?.onPress?.();
+    expect(onDelete).toHaveBeenCalledWith(props.comment);
+  });
+
+  test("hides delete for other users' comments", () => {
+    expect(deleteButtonOf(makeProps({ onDelete: vi.fn(), viewerMid: "123" }))).toBeNull();
+  });
+
+  test("hides delete when the caller does not provide a delete handler", () => {
+    expect(deleteButtonOf(makeProps({ viewerMid: "999" }))).toBeNull();
+  });
+
+  test("disables delete while the request is in flight", () => {
+    const button = deleteButtonOf(
+      makeProps({ onDelete: vi.fn(), viewerMid: "999", isDeletePending: (id) => id === "11" }),
+    );
+
+    expect(button?.props.disabled).toBe(true);
   });
 });

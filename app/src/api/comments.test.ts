@@ -8,8 +8,11 @@ import {
   getReplyItem,
   mergeCommentPages,
   patchCommentTree,
+  prependCommentToPages,
+  removeCommentFromPages,
   transitionCommentAttitude,
 } from "./comments";
+import type { CommentsPage } from "./comments.types";
 import fetcher from "./fetcher";
 
 function createComment(id: string): CommentResItem {
@@ -181,6 +184,59 @@ describe("reply-list", () => {
     expect(next).not.toBe(root);
     expect(next.replies[0]).toMatchObject({ id: "21", attitude: "like", like: 1 });
     expect(next.replies[1]).toBe(root.replies[1]);
+  });
+
+  test("prepends a new comment to the first page and bumps the total count", () => {
+    const cursor = createCommentResponse(null).cursor;
+    const pages: CommentsPage[] = [
+      {
+        cursor: { ...cursor, all_count: 1 },
+        replies: getComments(createCommentResponse([createComment("1")]), 1),
+        ownerMid: "1",
+      },
+      {
+        cursor: { ...cursor, all_count: 1 },
+        replies: getComments(createCommentResponse([createComment("2")]), 1),
+        ownerMid: "1",
+      },
+    ];
+    const added = getReplyItem(createComment("9"));
+    const next = prependCommentToPages(pages, added);
+    expect(next?.[0].replies.map((comment) => comment.id)).toEqual(["9", "1"]);
+    expect(next?.[0].replies[0]).toBe(added);
+    expect(next?.[0].cursor.all_count).toBe(2);
+    expect(next?.[1]).toBe(pages[1]);
+    expect(pages[0].replies.map((comment) => comment.id)).toEqual(["1"]);
+    expect(pages[0].cursor.all_count).toBe(1);
+    expect(prependCommentToPages(undefined, added)).toBeUndefined();
+    expect(prependCommentToPages([], added)).toEqual([]);
+  });
+
+  test("removes a deleted comment and keeps the counters consistent", () => {
+    const cursor = createCommentResponse(null).cursor;
+    const rootSource = createComment("20");
+    rootSource.rcount = 1;
+    rootSource.replies = [createComment("21")];
+    const page: CommentsPage = {
+      cursor: { ...cursor, all_count: 2 },
+      replies: getComments(createCommentResponse([createComment("1"), rootSource]), 1),
+      ownerMid: "1",
+    };
+    const pages = [page];
+
+    const afterRoot = removeCommentFromPages(pages, "1");
+    expect(afterRoot?.[0].replies.map((comment) => comment.id)).toEqual(["20"]);
+    expect(afterRoot?.[0].cursor.all_count).toBe(1);
+
+    const afterReply = removeCommentFromPages(pages, "21");
+    expect(afterReply?.[0].replies[1].replies).toEqual([]);
+    expect(afterReply?.[0].replies[1].rcount).toBe(0);
+    expect(afterReply?.[0].replies[1]).not.toBe(page.replies[1]);
+    expect(afterReply?.[0].replies[0]).toBe(page.replies[0]);
+    expect(afterReply?.[0].cursor.all_count).toBe(2);
+
+    expect(removeCommentFromPages(pages, "999")?.[0]).toBe(page);
+    expect(removeCommentFromPages(undefined, "1")).toBeUndefined();
   });
 
   test("video-comment", async () => {

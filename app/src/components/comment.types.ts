@@ -9,6 +9,11 @@ export type CommentInteractionProps = {
     kind: CommentAttitudeKind,
   ) => Promise<CommentAttitude | null>;
   onReply: (comment: ReplyItemType) => void;
+  /** 本人评论的删除入口，未提供时评论行内不展示删除 */
+  onDelete?: (comment: ReplyItemType) => void | Promise<void>;
+  /** 当前登录用户的 mid，用于判断评论是否本人发表 */
+  viewerMid?: string;
+  isDeletePending?: (id: string) => boolean;
   isAttitudePending: (id: string) => boolean;
 };
 

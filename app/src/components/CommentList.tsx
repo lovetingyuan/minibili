@@ -1,14 +1,17 @@
 import { clsx } from 'clsx'
 import { useEffect, useRef, useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Keyboard, Pressable, View } from 'react-native'
 
 import type { CommentAttitudeKind } from '@/api/comment-actions.types'
 import type { CommentItemType, ReplyItemType } from '@/api/comments'
 import { useComments } from '@/api/comments'
 import { useCommentActions } from '@/api/useCommentActions'
 import { colors } from '@/constants/colors.tw'
+import useKeyboardHeight from '@/hooks/useKeyboardHeight'
+import { showToast } from '@/utils'
 
 import { Comment } from './Comment'
+import CommentComposer from './CommentComposer'
 import type { CommentListProps } from './comment-list.types'
 import ReplyList from './ReplyList'
 import { FlashList, Icon, Skeleton, Text } from './styled/rneui'
@@ -49,9 +52,16 @@ function Loading() {
 
 export default function CommentList(props: CommentListProps) {
   const [mode, setMode] = useState(3)
+  const [composing, setComposing] = useState(false)
   const comments = useComments(props.commentId, props.commentType, mode)
+  const keyboardHeight = useKeyboardHeight()
   const loadMoreLock = useRef(false)
-  const actions = useCommentActions(props.sourceUrl, comments.refresh)
+  const actions = useCommentActions(
+    props.commentId,
+    props.commentType,
+    props.sourceUrl,
+    comments.refresh,
+  )
 
   useEffect(() => {
     if (!comments.isValidating) loadMoreLock.current = false
@@ -69,6 +79,30 @@ export default function CommentList(props: CommentListProps) {
     const rootId = String(target.root) === '0' ? target.id : String(target.root)
     await comments.prependReply(rootId, reply)
     return reply
+  }
+
+  async function submitComment(message: string) {
+    const comment = await actions.submitComment(message)
+    if (!comment) return false
+    await comments.prependComment(comment)
+    Keyboard.dismiss()
+    setComposing(false)
+    showToast('评论成功')
+    return true
+  }
+
+  async function deleteComment(target: ReplyItemType) {
+    if (!(await actions.removeComment(target))) return
+    await comments.removeComment(target.id)
+  }
+
+  function openComposer() {
+    setComposing(true)
+  }
+
+  function closeComposer() {
+    Keyboard.dismiss()
+    setComposing(false)
   }
 
   function loadMore() {
@@ -91,6 +125,9 @@ export default function CommentList(props: CommentListProps) {
             ownerMid={comments.data.ownerMid}
             sourceUrl={props.sourceUrl}
             onAttitude={changeAttitude}
+            onDelete={deleteComment}
+            viewerMid={actions.viewerMid}
+            isDeletePending={actions.isDeletePending}
             isAttitudePending={actions.isAttitudePending}
           />
         )}
@@ -128,6 +165,20 @@ export default function CommentList(props: CommentListProps) {
                     {mode === 3 ? '按热度' : '按时间'}
                   </Text>
                 </Pressable>
+                <Pressable
+                  className="flex-row items-center gap-1 rounded-full bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800"
+                  accessibilityRole="button"
+                  accessibilityLabel="写评论"
+                  onPress={openComposer}
+                >
+                  <Icon
+                    name="comment-plus-outline"
+                    type="material-community"
+                    size={14}
+                    colorClassName={colors.primary.accent}
+                  />
+                  <Text className={clsx('text-xs font-medium', colors.primary.text)}>评论</Text>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -163,6 +214,15 @@ export default function CommentList(props: CommentListProps) {
         onEndReached={loadMore}
         onEndReachedThreshold={0.3}
       />
+      {composing ? (
+        <View className="absolute left-0 right-0" style={{ bottom: keyboardHeight }}>
+          <CommentComposer
+            pending={actions.isCommentPending}
+            onSubmit={submitComment}
+            onClose={closeComposer}
+          />
+        </View>
+      ) : null}
       <ReplyList
         onAttitude={changeAttitude}
         onSubmitReply={submitReply}

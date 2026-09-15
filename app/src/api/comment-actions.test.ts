@@ -4,9 +4,11 @@ import { BilibiliSessionChangedError } from "../features/bilibili-session/contro
 import type { BilibiliAccount } from "../features/bilibili-session/types";
 
 import {
+  addComment,
   addCommentReply,
   CommentLoginRequiredError,
   CommentResultUnknownError,
+  deleteComment,
   modifyCommentAttitude,
 } from "./comment-actions";
 import type { CommentRequestDependencies, CommentTarget } from "./comment-actions.types";
@@ -117,6 +119,149 @@ test("replies to a root and a child with correct root/parent fields", async () =
   );
   expect(firstBody).toMatchObject({ message: "hello", root: "456", parent: "456", csrf: "a+b/==" });
   expect(secondBody).toMatchObject({ message: "child", root: "456", parent: "789" });
+});
+
+describe("top-level comment", () => {
+  const input = { oid: "1000", type: 1, message: " 新评论 ", sourceUrl };
+
+  test("posts the exact web payload without root and parent", async () => {
+    const { request, dependencies } = setup({
+      code: 0,
+      message: "OK",
+      data: { reply: createReply() },
+    });
+    const comment = await addComment(account, input, dependencies);
+    expect(request).toHaveBeenCalledOnce();
+    const [url, options] = request.mock.calls[0];
+    const headers = new Headers(options?.headers);
+    expect(url).toBe("https://api.bilibili.com/x/v2/reply/add");
+    expect(options?.method).toBe("POST");
+    expect(headers.get("cookie")).toBe(cookie);
+    expect(headers.get("referer")).toBe(sourceUrl);
+    expect(headers.get("origin")).toBe("https://www.bilibili.com");
+    expect(headers.get("content-type")).toBe("application/x-www-form-urlencoded");
+    expect(Object.fromEntries(new URLSearchParams(String(options?.body)))).toEqual({
+      plat: "1",
+      oid: "1000",
+      type: "1",
+      message: "新评论",
+      at_name_to_mid: "{}",
+      gaia_source: "main_web",
+      statistics: '{"appId":100,"platform":5}',
+      csrf: "a+b/==",
+    });
+    expect(comment).toMatchObject({ id: "999", oid: 1000, type: 1, root: "456", rcount: 0 });
+  });
+
+  test("validates the message before reading credentials", async () => {
+    const { request, dependencies } = setup();
+    await expect(
+      addComment(account, { ...input, message: "   " }, dependencies),
+    ).rejects.toThrow("请输入评论内容");
+    await expect(
+      addComment(account, { ...input, message: "😀".repeat(1001) }, dependencies),
+    ).rejects.toThrow("1000");
+    expect(dependencies.readCookie).not.toHaveBeenCalled();
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test("rejects invalid comment targets and source urls", async () => {
+    const { request, dependencies } = setup();
+    await expect(addComment(account, { ...input, oid: "0" }, dependencies)).rejects.toThrow(
+      "评论来源 ID",
+    );
+    await expect(addComment(account, { ...input, type: 0 }, dependencies)).rejects.toThrow(
+      "评论类型",
+    );
+    await expect(
+      addComment(
+        account,
+        { ...input, sourceUrl: "https://example.com/video/BV1test/" },
+        dependencies,
+      ),
+    ).rejects.toThrow("评论来源地址无效");
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test("requires a login before posting", async () => {
+    const { request, dependencies } = setup();
+    dependencies.readCookie = vi.fn(async () => null);
+    await expect(addComment(account, input, dependencies)).rejects.toBeInstanceOf(
+      CommentLoginRequiredError,
+    );
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test("marks a successful response without a reply payload as uncertain", async () => {
+    const { request, dependencies } = setup({ code: 0, message: "OK", data: null });
+    await expect(addComment(account, input, dependencies)).rejects.toBeInstanceOf(
+      CommentResultUnknownError,
+    );
+    expect(request).toHaveBeenCalledOnce();
+  });
+});
+
+describe("delete comment", () => {
+  test("posts oid, type and rpid without the attitude statistics payload", async () => {
+    const { request, dependencies } = setup({ code: 0, message: "0" });
+    await deleteComment(account, { target, sourceUrl }, dependencies);
+    expect(request).toHaveBeenCalledOnce();
+    const [url, options] = request.mock.calls[0];
+    const headers = new Headers(options?.headers);
+    expect(url).toBe("https://api.bilibili.com/x/v2/reply/del");
+    expect(options?.method).toBe("POST");
+    expect(headers.get("cookie")).toBe(cookie);
+    expect(headers.get("referer")).toBe(sourceUrl);
+    expect(headers.get("content-type")).toBe("application/x-www-form-urlencoded");
+    expect(Object.fromEntries(new URLSearchParams(String(options?.body)))).toEqual({
+      oid: "1000",
+      type: "1",
+      rpid: "456",
+      csrf: "a+b/==",
+    });
+  });
+
+  test("rejects invalid targets before reading credentials", async () => {
+    const { request, dependencies } = setup();
+    await expect(
+      deleteComment(account, { target: { ...target, id: "0" }, sourceUrl }, dependencies),
+    ).rejects.toThrow("评论 ID");
+    await expect(
+      deleteComment(
+        account,
+        { target, sourceUrl: "https://example.com/video/BV1test/" },
+        dependencies,
+      ),
+    ).rejects.toThrow("评论来源地址无效");
+    expect(dependencies.readCookie).not.toHaveBeenCalled();
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test("requires a login before deleting", async () => {
+    const { request, dependencies } = setup();
+    dependencies.readCookie = vi.fn(async () => null);
+    await expect(deleteComment(account, { target, sourceUrl }, dependencies)).rejects.toBeInstanceOf(
+      CommentLoginRequiredError,
+    );
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test("reports a business rejection", async () => {
+    const { request, dependencies } = setup({ code: -404, message: "啥都木有" });
+    await expect(deleteComment(account, { target, sourceUrl }, dependencies)).rejects.toThrow(
+      "删除评论失败（-404）：啥都木有",
+    );
+    expect(request).toHaveBeenCalledOnce();
+  });
+
+  test("marks a network failure as uncertain without retrying", async () => {
+    const { request, dependencies } = setup();
+    request.mockRejectedValue(new Error("offline"));
+    await expect(deleteComment(account, { target, sourceUrl }, dependencies)).rejects.toBeInstanceOf(
+      CommentResultUnknownError,
+    );
+    expect(request).toHaveBeenCalledOnce();
+  });
 });
 
 describe("comment mutation safety", () => {

@@ -11,6 +11,7 @@ import type { NavigationProps } from "@/types";
 import { parseUrl } from "@/utils";
 
 import { InlineEmoji } from "./InlineEmoji";
+import { getRichTextsContainerClassName } from "./rich-texts.helpers";
 import { Icon, Text } from "./styled/rneui";
 import UpName from "./UpName";
 
@@ -193,7 +194,8 @@ function RichTexts(props: Props) {
   const textOverflow =
     typeof props.textProps?.numberOfLines === "number" && lines > props.textProps.numberOfLines;
   return (
-    <View className={clsx("flex-1", textOverflow ? "mb-4" : "mb-3", props.className)}>
+    // 容器必须是内容撑开的高度，见 rich-texts.helpers.ts（加 flex-1 会在头部重排时塌成 0 高）
+    <View className={getRichTextsContainerClassName(textOverflow, props.className)}>
       {topic}
       {hasNodes ? (
         <Text

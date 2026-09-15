@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import { clsx } from "clsx";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 
 import { Avatar, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
@@ -18,6 +18,9 @@ export function CommentItem(props: CommentItemProps) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const { setOverlayButtons } = useStore();
   const isOwner = Boolean(props.ownerMid && String(comment.mid) === props.ownerMid);
+  const onDelete = props.onDelete;
+  const canDelete = Boolean(onDelete && props.viewerMid && String(comment.mid) === props.viewerMid);
+  const deletePending = props.isDeletePending?.(comment.id) ?? false;
   const meta = [comment.time?.replace("发布", ""), comment.location?.replace("IP属地：", "")]
     .filter(Boolean)
     .join(" · ");
@@ -40,6 +43,18 @@ export function CommentItem(props: CommentItemProps) {
       {
         text: "回复",
         onPress: () => props.onReply(comment),
+      },
+    ]);
+  }
+
+  function confirmDelete() {
+    if (!onDelete || deletePending) return;
+    Alert.alert("删除评论", "删除评论后，评论下所有回复都会被删除，是否继续？", [
+      { text: "取消", style: "cancel" },
+      {
+        text: "确定",
+        style: "destructive",
+        onPress: () => void onDelete(comment),
       },
     ]);
   }
@@ -96,14 +111,30 @@ export function CommentItem(props: CommentItemProps) {
             {comment.top ? (
               <Text className={`text-[10px] font-bold ${colors.secondary.text}`}>置顶</Text>
             ) : null}
-            {meta ? (
-              <Text
-                numberOfLines={1}
-                className={`ml-auto shrink-0 text-[11px] ${colors.gray6.text}`}
-              >
-                {meta}
-              </Text>
-            ) : null}
+            <View className="ml-auto shrink-0 flex-row items-center gap-2">
+              {meta ? (
+                <Text numberOfLines={1} className={`text-[11px] ${colors.gray6.text}`}>
+                  {meta}
+                </Text>
+              ) : null}
+              {canDelete ? (
+                <Pressable
+                  className="rounded px-0.5 py-1"
+                  accessibilityRole="button"
+                  accessibilityLabel="删除评论"
+                  accessibilityState={{ disabled: deletePending, busy: deletePending }}
+                  disabled={deletePending}
+                  hitSlop={8}
+                  onPress={confirmDelete}
+                >
+                  <Text
+                    className={`text-[11px] font-medium ${deletePending ? colors.gray6.text : colors.error.text}`}
+                  >
+                    删除
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
           </View>
         </View>
       </View>
@@ -173,6 +204,9 @@ export function Comment(props: CommentProps) {
         ownerMid={props.ownerMid}
         onAttitude={props.onAttitude}
         onReply={(target) => openReplies(target, true)}
+        onDelete={props.onDelete}
+        viewerMid={props.viewerMid}
+        isDeletePending={props.isDeletePending}
         isAttitudePending={props.isAttitudePending}
       />
       {comment.replies.length ? (
@@ -185,6 +219,9 @@ export function Comment(props: CommentProps) {
               compact
               onAttitude={props.onAttitude}
               onReply={(target) => openReplies(target, true)}
+              onDelete={props.onDelete}
+              viewerMid={props.viewerMid}
+              isDeletePending={props.isDeletePending}
               isAttitudePending={props.isAttitudePending}
             />
           ))}

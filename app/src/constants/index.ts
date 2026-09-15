@@ -1,9 +1,11 @@
+import { readMetroHostUri, resolveDevServerUrl } from "./dev-server-url";
+
 export const githubLink = "https://github.com/lovetingyuan/minibili";
 export const site = "https://minibili.tingyuan.in/";
 
 export const serverUrl =
   typeof __DEV__ === "boolean" && __DEV__
-    ? `http://${process.env.EXPO_PUBLIC_IPV4}:8787`
+    ? resolveDevServerUrl(readMetroHostUri())
     : "https://minibili.tingyuan.in";
 
 export let UA =

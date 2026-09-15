@@ -1,32 +1,32 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Assets as NavigationAssets } from "@react-navigation/elements";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Asset } from "expo-asset";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Assets as NavigationAssets } from '@react-navigation/elements';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Asset } from 'expo-asset';
 
-import { Icon } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
-import useResolvedColor from "@/hooks/useResolvedColor";
-import useRouteTheme from "@/hooks/useRouteTheme";
-import { useStore } from "@/store";
-import type { MainTabParamList, RootStackParamList } from "@/types";
-import { useAppUpdateInfo } from "@/api/check-update";
+import { Icon } from '@/components/styled/rneui';
+import { colors } from '@/constants/colors.tw';
+import useResolvedColor from '@/hooks/useResolvedColor';
+import useRouteTheme from '@/hooks/useRouteTheme';
+import { useStore } from '@/store';
+import type { MainTabParamList, RootStackParamList } from '@/types';
+import { useAppUpdateInfo } from '@/api/check-update';
 
-import About from "./About";
-import Dynamic from "./Dynamic";
-import DynamicDetail from "./DynamicDetail";
-import BilibiliAccountGate from "./Followings/BilibiliAccountGate";
-import FavoritesContent from "./Followings/FavoritesContent";
-import FollowingDynamicsContent from "./Followings/FollowingDynamicsContent";
-import FollowingsContent from "./Followings/FollowingsContent";
-import HistoryContent from "./Followings/HistoryContent";
-import WatchLaterContent from "./Followings/WatchLaterContent";
-import Living from "./Living";
-import Play from "./Play";
-import SearchVideos from "./SearchVideos";
-import VideoList from "./VideoList";
-import WebPage from "./WebPage";
-import Welcome from "./Welcome";
+import About from './About';
+import Dynamic from './Dynamic';
+import DynamicDetail from './DynamicDetail';
+import BilibiliAccountGate from './Followings/BilibiliAccountGate';
+import FavoritesContent from './Followings/FavoritesContent';
+import FollowingDynamicsContent from './Followings/FollowingDynamicsContent';
+import FollowingsContent from './Followings/FollowingsContent';
+import HistoryContent from './Followings/HistoryContent';
+import WatchLaterContent from './Followings/WatchLaterContent';
+import Living from './Living';
+import Play from './Play';
+import SearchVideos from './SearchVideos';
+import VideoList from './VideoList';
+import WebPage from './WebPage';
+import Welcome from './Welcome';
 
 Asset.loadAsync([...NavigationAssets]);
 
@@ -64,7 +64,7 @@ export function MainTabs() {
     followingDynamicsUpdateCount === 0
       ? undefined
       : followingDynamicsUpdateCount >= 99
-        ? "99+"
+        ? '99+'
         : followingDynamicsUpdateCount;
 
   return (
@@ -83,22 +83,20 @@ export function MainTabs() {
         name="Hot"
         component={VideoList}
         options={{
-          title: "热门",
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="whatshot" type="material" color={color} size={size} />
-          ),
+          title: '热门',
+          tabBarIcon: ({ color, size }) => <Icon name="whatshot" type="material" color={color} size={size} />,
         }}
       />
       <Tab.Screen
         name="FollowingDynamics"
         component={FollowingDynamicsRoute}
         options={{
-          title: "动态",
-          headerTitle: "关注的动态",
+          title: '动态',
+          headerTitle: '关注的动态',
           tabBarBadge: followingDynamicsBadge,
           tabBarBadgeStyle: {
-            backgroundColor: "#FF6699",
-            color: "#FFFFFF",
+            backgroundColor: '#FF6699',
+            color: '#FFFFFF',
             fontSize: 8,
             lineHeight: 14,
             height: 14,
@@ -108,20 +106,18 @@ export function MainTabs() {
             end: -8,
             top: 1,
           },
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="dynamic-feed" type="material" color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="dynamic-feed" type="material" color={color} size={size} />,
         }}
       />
       <Tab.Screen
         name="Followings"
         component={FollowingsRoute}
         options={{
-          title: "关注",
-          tabBarBadge: hasLiveUps ? "𝘭𝘪𝘷𝘦" : undefined,
+          title: '关注',
+          tabBarBadge: hasLiveUps ? '𝘭𝘪𝘷𝘦' : undefined,
           tabBarBadgeStyle: {
-            backgroundColor: "#00AEEC",
-            color: "#FFFFFF",
+            backgroundColor: '#00AEEC',
+            color: '#FFFFFF',
             fontSize: 8,
             lineHeight: 14,
             height: 14,
@@ -131,20 +127,18 @@ export function MainTabs() {
             end: -8,
             top: 1,
           },
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="people-outline" type="material" color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="people-outline" type="material" color={color} size={size} />,
         }}
       />
       <Tab.Screen
         name="Mine"
         component={About}
         options={{
-          title: "我的",
-          tabBarBadge: hasUpdate ? "新" : undefined,
+          title: '我的',
+          tabBarBadge: hasUpdate ? '新' : undefined,
           tabBarBadgeStyle: {
-            backgroundColor: "#FF6699",
-            color: "#FFFFFF",
+            backgroundColor: '#FF6699',
+            color: '#FFFFFF',
             fontSize: 8,
             lineHeight: 14,
             height: 14,
@@ -154,9 +148,7 @@ export function MainTabs() {
             end: -6,
             top: 1,
           },
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="person-outline" type="material" color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => <Icon name="person-outline" type="material" color={color} size={size} />,
         }}
       />
     </Tab.Navigator>
@@ -176,7 +168,7 @@ function AppRoute() {
   return (
     <NavigationContainer theme={routeTheme}>
       <Stack.Navigator
-        initialRouteName={isFirstRun ? "Welcome" : "MainTabs"}
+        initialRouteName={isFirstRun ? 'Welcome' : 'MainTabs'}
         screenOptions={{
           headerTransparent: false,
           headerTitleStyle: {
@@ -185,45 +177,21 @@ function AppRoute() {
           },
         }}
       >
-        <Stack.Screen
-          name="Welcome"
-          component={Welcome}
-          options={{ headerTitle: "欢迎使用 MiniBili" }}
-        />
+        <Stack.Screen name="Welcome" component={Welcome} options={{ headerTitle: '欢迎使用 MiniBili' }} />
         <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="SearchVideos"
-          component={SearchVideos}
-          options={{ headerTitle: "搜索视频" }}
-        />
-        <Stack.Screen name="Dynamic" component={Dynamic} options={{ headerTitle: "动态" }} />
+        <Stack.Screen name="SearchVideos" component={SearchVideos} options={{ headerTitle: '搜索视频' }} />
+        <Stack.Screen name="Dynamic" component={Dynamic} options={{ headerTitle: '动态' }} />
         <Stack.Screen name="Play" component={Play} />
         <Stack.Screen name="Living" component={Living} />
-        <Stack.Screen
-          name="DynamicDetail"
-          component={DynamicDetail}
-          options={{ headerTitle: "动态详情" }}
-        />
+        <Stack.Screen name="DynamicDetail" component={DynamicDetail} options={{ headerTitle: '动态详情' }} />
         <Stack.Screen
           name="WebPage"
           component={WebPage}
-          options={({ route }) => ({ headerTitle: route.params.title || "-" })}
+          options={({ route }) => ({ headerTitle: route.params.title || '-' })}
         />
-        <Stack.Screen
-          name="Favorites"
-          component={FavoritesRoute}
-          options={{ headerTitle: "我的收藏" }}
-        />
-        <Stack.Screen
-          name="History"
-          component={HistoryRoute}
-          options={{ headerTitle: "观看历史" }}
-        />
-        <Stack.Screen
-          name="WatchLater"
-          component={WatchLaterRoute}
-          options={{ headerTitle: "稍后再看" }}
-        />
+        <Stack.Screen name="Favorites" component={FavoritesRoute} options={{ headerTitle: '我的收藏' }} />
+        <Stack.Screen name="History" component={HistoryRoute} options={{ headerTitle: '观看历史' }} />
+        <Stack.Screen name="WatchLater" component={WatchLaterRoute} options={{ headerTitle: '稍后再看' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

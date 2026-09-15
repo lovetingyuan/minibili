@@ -21,7 +21,6 @@ import CheckAppUpdate from "./components/CheckAppUpdate";
 import LiveUpsManager from "./components/LiveUpsManager";
 import CheckNetState from "./components/CheckNetState";
 import CheckUpUpdate from "./components/CheckUpUpdate";
-import DevServerRecovery from "./components/DevServerRecovery";
 import FollowingDynamicsUpdatesManager from "./components/FollowingDynamicsUpdatesManager";
 import ImagesView from "./components/ImagesView";
 import VideoDownloadManager from "./components/VideoDownloadManager";
@@ -84,7 +83,6 @@ export default function App() {
           <ThemeProvider theme={rneTheme}>
             <MenuProvider backHandler customStyles={menuProviderCustomStyles}>
               <ErrorBoundary FallbackComponent={ErrorFallback}>
-                <DevServerRecovery />
                 <InitStoreComp />
                 <BilibiliFollowingsManager />
                 <BilibiliBlacklistManager />

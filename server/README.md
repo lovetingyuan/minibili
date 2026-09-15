@@ -3,7 +3,7 @@ npm install
 npm run dev
 ```
 
-开发服务器（`vite`）监听 `0.0.0.0:8787`，与 app 的 `EXPO_PUBLIC_IPV4:8787` 对应。Worker 处理 `/share`、`/share.html`、`/api/*` 与 `/health`，其余路径由静态资源与 SPA 回退处理。
+开发服务器（`vite`）监听 `0.0.0.0:8787`，对应 app 开发构建里的 `127.0.0.1:8787`（由 `npm run dev` 通过 `adb reverse` 反代）。Worker 处理 `/share`、`/share.html`、`/api/*` 与 `/health`，其余路径由静态资源与 SPA 回退处理。
 
 ```txt
 npm run deploy

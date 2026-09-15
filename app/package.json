@@ -14,12 +14,9 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "prepare-android": "node scripts/prepare-android.js",
-    "dev": "npx expo start --dev-client",
-    "start": "npm run prepare-android && expo start",
-    "android": "npm run prepare-android && npx expo start --android --lan",
-    "ios": "npm run prepare-android && npx expo start --ios",
-    "web": "npm run prepare-android && expo start --web",
+    "dev": "node scripts/dev.mjs",
+    "android": "npm run dev -- --android",
+    "ios": "npm run dev -- --ios",
     "build:android": "zx scripts/build.mjs",
     "build:android:preview": "node scripts/build-android-local.mjs preview",
     "build:android:preview:eas": "cross-env APP_VARIANT=preview npx --yes eas-cli@latest build --platform android --profile preview --non-interactive",

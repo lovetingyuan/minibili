@@ -176,6 +176,65 @@ export function mergeCommentPages(
   return replies;
 }
 
+/**
+ * 新发表的评论排在列表首位，同时把第一页的评论总数加一，与网页端行为一致。
+ */
+export function prependCommentToPages(
+  pages: readonly CommentsPage[] | undefined,
+  comment: ReplyItemType,
+): CommentsPage[] | undefined {
+  return pages?.map((page, index) =>
+    index === 0
+      ? {
+          ...page,
+          cursor: { ...page.cursor, all_count: page.cursor.all_count + 1 },
+          replies: [comment, ...page.replies],
+        }
+      : page,
+  );
+}
+
+/**
+ * 删除评论后的本地同步：删主评论时列表总数减一，删楼中楼时对应主评论的回复数减一。
+ */
+export function removeCommentFromPages(
+  pages: readonly CommentsPage[] | undefined,
+  id: string,
+): CommentsPage[] | undefined {
+  return pages?.map((page, pageIndex) => {
+    let removedRootComment = false;
+    let changed = false;
+    const replies: CommentItemType[] = [];
+    for (const comment of page.replies) {
+      if (comment.id === id) {
+        changed = true;
+        if (pageIndex === 0) removedRootComment = true;
+        continue;
+      }
+      const replyIndex = comment.replies.findIndex((reply) => reply.id === id);
+      if (replyIndex < 0) {
+        replies.push(comment);
+        continue;
+      }
+      changed = true;
+      replies.push({
+        ...comment,
+        rcount: Math.max(0, comment.rcount - 1),
+        replies: comment.replies.filter((reply) => reply.id !== id),
+      });
+    }
+    if (!changed) return page;
+    return {
+      ...page,
+      cursor:
+        pageIndex === 0 && removedRootComment
+          ? { ...page.cursor, all_count: Math.max(0, page.cursor.all_count - 1) }
+          : page.cursor,
+      replies,
+    };
+  });
+}
+
 export function useComments(oid: string | number, type: number, mode = 3) {
   const { data, error, size, setSize, mutate, isValidating, isLoading } =
     useSWRInfinite<CommentsPage>(
@@ -229,6 +288,14 @@ export function useComments(oid: string | number, type: number, mode = 3) {
     );
   }
 
+  async function prependComment(comment: ReplyItemType) {
+    await mutate((pages) => prependCommentToPages(pages, comment), { revalidate: false });
+  }
+
+  async function removeComment(id: string) {
+    await mutate((pages) => removeCommentFromPages(pages, id), { revalidate: false });
+  }
+
   return {
     data: { allCount, replies, ownerMid: data?.[0]?.ownerMid },
     isLoading,
@@ -244,6 +311,8 @@ export function useComments(oid: string | number, type: number, mode = 3) {
     },
     patchAttitude,
     prependReply,
+    prependComment,
+    removeComment,
     isLimited,
     isReachingEnd,
     error,

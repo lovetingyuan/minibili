@@ -4,6 +4,7 @@ import React from "react";
 import { Alert } from "react-native";
 
 import { useAppUpdateInfo } from "@/api/check-update";
+import { serverUrl } from "@/constants";
 
 import TextAction from "./TextAction";
 
@@ -38,6 +39,7 @@ function Version() {
             `更新时间：${updateTime || "-"}`,
             `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
             Updates.updateId && `更新ID：${Updates.updateId}`,
+            __DEV__ && `本地接口地址：${serverUrl}`,
           ]
             .filter(Boolean)
             .join("\n"),

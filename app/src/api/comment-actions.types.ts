@@ -25,8 +25,20 @@ export type CommentAttitudeChange = {
   sourceUrl: string;
 };
 
+export type CommentDeleteChange = {
+  target: CommentTarget;
+  sourceUrl: string;
+};
+
 export type AddCommentReplyInput = {
   target: CommentTarget;
+  message: string;
+  sourceUrl: string;
+};
+
+export type AddCommentInput = {
+  oid: string | number;
+  type: number;
   message: string;
   sourceUrl: string;
 };

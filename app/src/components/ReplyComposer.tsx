@@ -64,7 +64,7 @@ export default function ReplyComposer(props: ReplyComposerProps) {
           {props.pending ? (
             <ActivityIndicator size="small" colorClassName={colors.coverBadge.accent} />
           ) : (
-            <Icon name="send" size={19} colorClassName={colors.coverBadge.accent} />
+            <Icon name="arrow-upward" size={19} colorClassName={colors.coverBadge.accent} />
           )}
         </Pressable>
       </View>

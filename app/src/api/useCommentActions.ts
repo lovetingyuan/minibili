@@ -12,16 +12,23 @@ import type { NavigationProps } from "@/types";
 import { showToast } from "@/utils";
 
 import {
+  addComment,
   addCommentReply,
   CommentLoginRequiredError,
   CommentResultUnknownError,
+  deleteComment,
   modifyCommentAttitude,
 } from "./comment-actions";
 import type { CommentAttitude, CommentAttitudeKind, CommentTarget } from "./comment-actions.types";
 import type { ReplyItemType } from "./comments.types";
 import { getBilibiliLoginCookie } from "./get-cookie";
 
-export function useCommentActions(sourceUrl: string, refreshAfterUnknown: () => Promise<unknown>) {
+export function useCommentActions(
+  commentId: string | number,
+  commentType: number,
+  sourceUrl: string,
+  refreshAfterUnknown: () => Promise<unknown>,
+) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const { account, control } = useBilibiliSessionState();
   const { logout } = useBilibiliSessionActions();
@@ -142,10 +149,59 @@ export function useCommentActions(sourceUrl: string, refreshAfterUnknown: () => 
     }
   }
 
+  async function submitComment(message: string): Promise<ReplyItemType | null> {
+    const confirmedAccount = requireAccount();
+    const key = `comment:${commentId}`;
+    if (!confirmedAccount || !startPending(key)) return null;
+    try {
+      return await addComment(
+        confirmedAccount,
+        { oid: commentId, type: commentType, message, sourceUrl },
+        {
+          readCookie: getBilibiliLoginCookie,
+          isCurrentAccount: bilibiliSession.isCurrentAccount,
+        },
+      );
+    } catch (error) {
+      await handleError(error, "评论");
+      return null;
+    } finally {
+      finishPending(key);
+    }
+  }
+
+  async function removeComment(target: CommentTarget): Promise<boolean> {
+    const confirmedAccount = requireAccount();
+    const key = `delete:${target.id}`;
+    if (!confirmedAccount || !startPending(key)) return false;
+    try {
+      await deleteComment(
+        confirmedAccount,
+        { target, sourceUrl },
+        {
+          readCookie: getBilibiliLoginCookie,
+          isCurrentAccount: bilibiliSession.isCurrentAccount,
+        },
+      );
+      return true;
+    } catch (error) {
+      await handleError(error, "删除评论");
+      return false;
+    } finally {
+      finishPending(key);
+    }
+  }
+
   return {
     changeAttitude,
     submitReply,
+    submitComment,
+    removeComment,
+    /** 当前登录用户的 mid，用于判断某条评论是不是本人发表的 */
+    viewerMid: currentAccount?.mid,
     isAttitudePending: (id: string) => pending.has(`attitude:${id}`),
     isReplyPending: (id: string) => pending.has(`reply:${id}`),
+    isCommentPending: pending.has(`comment:${commentId}`),
+    isDeletePending: (id: string) => pending.has(`delete:${id}`),
   };
 }
