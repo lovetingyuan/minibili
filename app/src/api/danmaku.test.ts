@@ -56,6 +56,28 @@ describe("danmaku segment cache", () => {
     await fetchDanmakuSegment(4321, 0);
     expect(mockedFetch).toHaveBeenCalledTimes(2);
   });
+
+  test("treats an out of range segment as empty", async () => {
+    mockedFetch.mockResolvedValue({
+      status: 304,
+      arrayBuffer: async () => new ArrayBuffer(0),
+    } as unknown as SegmentResponse);
+
+    await expect(fetchDanmakuSegment(4321, 7)).resolves.toEqual([]);
+  });
+
+  test("throws on a failed request and does not cache the failure", async () => {
+    mockedFetch.mockResolvedValue({
+      status: 500,
+      arrayBuffer: async () => new ArrayBuffer(0),
+    } as unknown as SegmentResponse);
+
+    await expect(fetchDanmakuSegment(4321, 8)).rejects.toThrow("弹幕分段请求失败：500");
+
+    mockedFetch.mockResolvedValue(emptySegment());
+    await expect(fetchDanmakuSegment(4321, 8)).resolves.toEqual([]);
+    expect(mockedFetch).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe("getDanmakuSegmentIndex", () => {

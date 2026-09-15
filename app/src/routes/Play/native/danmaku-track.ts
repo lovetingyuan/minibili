@@ -1,7 +1,17 @@
 import type { DanmakuItem } from "@/api/danmaku.types";
 
 export const DANMAKU_DEFAULT_FONTSIZE = 16;
-const DANMAKU_DEFAULT_CROSS_SECONDS = 8;
+
+/**
+ * 一条滚动弹幕从「左边缘贴右边界」到「右边缘贴左边界」的总时长。
+ * 对齐 B站网页播放器默认设置下的实测值（约 7.07s，与文本长度无关）
+ */
+export const DANMAKU_SCROLL_DURATION_MS = 7000;
+
+/**
+ * 轨道高度相对字号的倍率
+ */
+const DANMAKU_LANE_HEIGHT_RATIO = 1.7;
 
 export type DanmakuRenderItem = {
   key: string;
@@ -15,39 +25,52 @@ export type DanmakuRenderItem = {
    */
   textWidth: number;
   /**
-   * 起始位置（容器宽度，即整个弹幕在右侧屏幕外）
+   * 弹幕自身的出现时间（毫秒），位置由它与播放进度共同决定
    */
-  startX: number;
+  progressMs: number;
   /**
-   * 从右侧进入到完全离开左侧的总位移
+   * 从右侧屏外到左侧屏外的总时长（毫秒）
    */
-  travel: number;
-  /**
-   * 开始移动时的播放时间（毫秒）
-   */
-  startMs: number;
   durationMs: number;
+  /**
+   * 挂载时已经过去的时长（毫秒）
+   */
+  elapsedMs: number;
+  /**
+   * 挂载时应处的横坐标
+   */
+  currentX: number;
+  /**
+   * 完全离开左侧时的横坐标
+   */
+  endX: number;
 };
 
-export type DanmakuTrackOptions = {
-  currentTimeMs: number;
+export type DanmakuLayoutOptions = {
   containerWidth: number;
   containerHeight: number;
   fontSize?: number;
   laneHeight?: number;
-  /**
-   * 一条弹幕横穿一屏宽度所需秒数
-   */
-  crossSeconds?: number;
 };
 
-export type DanmakuTrackResult = {
-  items: DanmakuRenderItem[];
+export type DanmakuLayout = {
   /**
-   * 每条轨道可以放下一条弹幕的播放时间（毫秒）
+   * 每条弹幕的轨道下标，-1 表示轨道占满被丢弃
    */
-  lanes: number[];
-  nextIndex: number;
+  lanes: Int16Array;
+  containerWidth: number;
+  containerHeight: number;
+  laneHeight: number;
+  laneCount: number;
+  fontSize: number;
+};
+
+export type DanmakuVisibleQuery = {
+  currentTimeMs: number;
+  /**
+   * 弹幕从这一刻开始渲染，更早的弹幕不补画（跳转/续播/开关弹幕后重新开始）
+   */
+  anchorTimeMs: number;
 };
 
 function isWideChar(code: number) {
@@ -75,19 +98,127 @@ export function toDanmakuColor(color: number) {
   return `#${value.toString(16).padStart(6, "0")}`;
 }
 
+/**
+ * 轨道高度：字号越大轨道越高，同一轨道的弹幕纵向不重叠
+ */
+export function resolveDanmakuLaneHeight(fontSize: number) {
+  return Math.max(1, Math.round(fontSize * DANMAKU_LANE_HEIGHT_RATIO));
+}
+
 export function resolveDanmakuLaneCount(containerHeight: number, laneHeight: number) {
   return Math.max(1, Math.floor(containerHeight / laneHeight));
 }
 
+function resolveLaneHeight(options: DanmakuLayoutOptions) {
+  const fontSize = options.fontSize ?? DANMAKU_DEFAULT_FONTSIZE;
+  return options.laneHeight ?? resolveDanmakuLaneHeight(fontSize);
+}
+
 /**
- * 找出从 currentTimeMs 开始还需要展示的弹幕下标（跳转后重新定位用）
+ * 弹幕横向速度：全程时长固定，文本越宽移动越快
  */
-export function findDanmakuStartIndex(items: DanmakuItem[], currentTimeMs: number) {
+export function resolveDanmakuSpeed(containerWidth: number, textWidth: number) {
+  return ((containerWidth + textWidth) * 1000) / DANMAKU_SCROLL_DURATION_MS;
+}
+
+/**
+ * 弹幕在播放进度 currentTimeMs 时的横坐标：
+ * 出现时间点位于右边界外，之后线性左移，走完整程刚好完全离开左侧
+ */
+export function resolveDanmakuX(
+  progressMs: number,
+  textWidth: number,
+  containerWidth: number,
+  currentTimeMs: number,
+) {
+  const elapsed = currentTimeMs - progressMs;
+  if (elapsed <= 0) {
+    return containerWidth;
+  }
+  if (elapsed >= DANMAKU_SCROLL_DURATION_MS) {
+    return -textWidth;
+  }
+  return containerWidth - (resolveDanmakuSpeed(containerWidth, textWidth) * elapsed) / 1000;
+}
+
+/**
+ * 轨道可以放下一条弹幕的播放时间：前一条弹幕的尾部完全进入右边界之后
+ */
+export function resolveDanmakuLaneFreeAt(
+  progressMs: number,
+  textWidth: number,
+  containerWidth: number,
+) {
+  const travel = containerWidth + textWidth;
+  if (travel <= 0) {
+    return progressMs + DANMAKU_SCROLL_DURATION_MS;
+  }
+  return progressMs + (DANMAKU_SCROLL_DURATION_MS * textWidth) / travel;
+}
+
+/**
+ * 轨道表是否仍适用于当前容器尺寸
+ */
+export function isDanmakuLayoutFresh(layout: DanmakuLayout, options: DanmakuLayoutOptions) {
+  return (
+    layout.containerWidth === options.containerWidth &&
+    layout.containerHeight === options.containerHeight &&
+    layout.fontSize === (options.fontSize ?? DANMAKU_DEFAULT_FONTSIZE) &&
+    layout.laneHeight === resolveLaneHeight(options)
+  );
+}
+
+/**
+ * 按弹幕自身时间前向分配轨道：取第一条空闲的轨道，没有空闲轨道则丢弃。
+ * 结果只取决于弹幕数据与容器尺寸，与播放进度无关，跳转后依然是同一张轨道表
+ */
+export function resolveDanmakuLayout(
+  items: DanmakuItem[],
+  options: DanmakuLayoutOptions,
+): DanmakuLayout {
+  const fontSize = options.fontSize ?? DANMAKU_DEFAULT_FONTSIZE;
+  const laneHeight = resolveLaneHeight(options);
+  const laneCount = resolveDanmakuLaneCount(options.containerHeight, laneHeight);
+  const containerWidth = options.containerWidth;
+  const lanes = new Int16Array(items.length);
+  lanes.fill(-1);
+  const laneFreeAt = Array.from({ length: laneCount }, () => 0);
+
+  if (containerWidth > 0) {
+    for (let index = 0; index < items.length; index += 1) {
+      const item = items[index];
+      if (!item.content) {
+        continue;
+      }
+      const textWidth = estimateDanmakuWidth(item.content, fontSize);
+      const lane = laneFreeAt.findIndex((freeAt) => freeAt <= item.progressMs);
+      if (lane < 0) {
+        continue;
+      }
+      lanes[index] = lane;
+      laneFreeAt[lane] = resolveDanmakuLaneFreeAt(item.progressMs, textWidth, containerWidth);
+    }
+  }
+
+  return {
+    lanes,
+    containerWidth,
+    containerHeight: options.containerHeight,
+    laneHeight,
+    laneCount,
+    fontSize,
+  };
+}
+
+/**
+ * 找出第一条不早于 minProgressMs 的弹幕下标（items 按 progressMs 升序）
+ */
+export function findVisibleStartIndex(items: DanmakuItem[], minProgressMs: number) {
   let low = 0;
   let high = items.length;
   while (low < high) {
     const middle = Math.floor((low + high) / 2);
-    if (items[middle].progressMs < currentTimeMs) {
+    if (items[middle].progressMs < minProgressMs) {
       low = middle + 1;
     } else {
       high = middle;
@@ -96,109 +227,46 @@ export function findDanmakuStartIndex(items: DanmakuItem[], currentTimeMs: numbe
   return low;
 }
 
-export type DueLocalDanmaku = {
-  /**
-   * 已经到达播放时间、还没有展示过的本地弹幕
-   */
-  items: DanmakuItem[];
-  /**
-   * 下一次消费的起始下标
-   */
-  nextIndex: number;
-};
-
 /**
- * 取出本地回显弹幕里已经到播放时间、还没有展示过的部分。
- * items 按 progressMs 升序排列，startIndex 指向下一条待消费的弹幕。
+ * 合并本地回显与网络弹幕（共用同一张轨道表）。
+ * 本地弹幕数量很少，直接合并后排序，顺带兜住「回跳后再发送」导致的乱序
  */
-export function selectDueLocalDanmaku(
-  items: DanmakuItem[],
-  currentTimeMs: number,
-  startIndex: number,
-): DueLocalDanmaku {
-  let index = Math.max(0, Math.min(startIndex, items.length));
-  const due: DanmakuItem[] = [];
-
-  while (index < items.length && items[index].progressMs <= currentTimeMs) {
-    due.push(items[index]);
-    index += 1;
-  }
-
-  return { items: due, nextIndex: index };
-}
-
-function sortDanmakuItems(items: DanmakuItem[]) {
-  return [...items].sort((a, b) => a.progressMs - b.progressMs);
-}
-
-export type DanmakuMergeResult = {
-  items: DanmakuItem[];
-  /**
-   * 新分段是否只是追加在末尾（顺序加载），否则说明需要重置播放进度
-   */
-  appended: boolean;
-};
-
-/**
- * 合并新加载的弹幕分段，顺序加载时保持已有下标稳定
- */
-export function mergeDanmakuSegments(
-  existing: DanmakuItem[],
-  incoming: DanmakuItem[],
-): DanmakuMergeResult {
+export function mergeDanmakuItems(items: DanmakuItem[], incoming: DanmakuItem[]) {
   if (incoming.length === 0) {
-    return { items: existing, appended: true };
+    return items;
   }
-  if (existing.length === 0) {
-    return { items: sortDanmakuItems(incoming), appended: true };
-  }
-  const last = existing[existing.length - 1];
-  if (incoming[0].progressMs >= last.progressMs) {
-    return { items: [...existing, ...incoming], appended: true };
-  }
-  return { items: sortDanmakuItems([...existing, ...incoming]), appended: false };
+  return [...items, ...incoming].sort((a, b) => a.progressMs - b.progressMs);
 }
 
 /**
- * 消费已到时间的弹幕，分配轨道并计算移动参数；轨道满了直接丢弃
+ * 挑出当前应当渲染的弹幕：出现时间落在 [max(anchor, 当前进度 - 全程时长), 当前进度]
+ * 且分配到了轨道，位置与剩余时长按播放进度推导
  */
-export function resolveDanmakuBatch(
+export function selectVisibleDanmaku(
   items: DanmakuItem[],
-  nextIndex: number,
-  lanes: number[],
-  options: DanmakuTrackOptions,
-): DanmakuTrackResult {
-  const { currentTimeMs, containerWidth, containerHeight } = options;
-  const fontSize = options.fontSize ?? DANMAKU_DEFAULT_FONTSIZE;
-  const laneHeight = options.laneHeight ?? Math.round(fontSize * 1.7);
-  const crossSeconds = options.crossSeconds ?? DANMAKU_DEFAULT_CROSS_SECONDS;
+  layout: DanmakuLayout,
+  query: DanmakuVisibleQuery,
+): DanmakuRenderItem[] {
+  const { currentTimeMs, anchorTimeMs } = query;
+  const { lanes, laneCount, laneHeight, fontSize, containerWidth } = layout;
+  if (containerWidth <= 0 || laneCount <= 0 || lanes.length !== items.length) {
+    return [];
+  }
 
-  const laneCount = resolveDanmakuLaneCount(containerHeight, laneHeight);
-  const laneFreeAt =
-    lanes.length === laneCount ? [...lanes] : Array.from({ length: laneCount }, () => 0);
-  const created: DanmakuRenderItem[] = [];
-  const speed = containerWidth / Math.max(1, crossSeconds);
+  const minProgressMs = Math.max(anchorTimeMs, currentTimeMs - DANMAKU_SCROLL_DURATION_MS);
+  const visible: DanmakuRenderItem[] = [];
 
-  let index = Math.max(0, Math.min(nextIndex, items.length));
-
-  while (index < items.length && items[index].progressMs <= currentTimeMs) {
+  for (let index = findVisibleStartIndex(items, minProgressMs); index < items.length; index += 1) {
     const item = items[index];
-    index += 1;
-
-    if (!item.content || speed <= 0) {
-      continue;
+    if (item.progressMs > currentTimeMs) {
+      break;
     }
-
-    const textWidth = estimateDanmakuWidth(item.content, fontSize);
-    const travel = containerWidth + textWidth;
-    const durationMs = (travel / speed) * 1000;
-    const lane = laneFreeAt.findIndex((freeAt) => freeAt <= currentTimeMs);
+    const lane = lanes[index];
     if (lane < 0) {
       continue;
     }
-
-    laneFreeAt[lane] = currentTimeMs + (durationMs * textWidth) / travel;
-    created.push({
+    const textWidth = estimateDanmakuWidth(item.content, fontSize);
+    visible.push({
       key: `${index}-${item.progressMs}`,
       content: item.content,
       color: toDanmakuColor(item.color),
@@ -206,12 +274,13 @@ export function resolveDanmakuBatch(
       lane,
       top: lane * laneHeight,
       textWidth,
-      startX: containerWidth,
-      travel,
-      startMs: currentTimeMs,
-      durationMs,
+      progressMs: item.progressMs,
+      durationMs: DANMAKU_SCROLL_DURATION_MS,
+      elapsedMs: currentTimeMs - item.progressMs,
+      currentX: resolveDanmakuX(item.progressMs, textWidth, containerWidth, currentTimeMs),
+      endX: -textWidth,
     });
   }
 
-  return { items: created, lanes: laneFreeAt, nextIndex: index };
+  return visible;
 }

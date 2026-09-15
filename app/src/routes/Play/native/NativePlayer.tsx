@@ -105,7 +105,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   const [playerError, setPlayerError] = React.useState<string | null>(null);
   const [isRetrying, setIsRetrying] = React.useState(false);
   const [currentTimeMs, setCurrentTimeMs] = React.useState(0);
-  const [seekToken, setSeekToken] = React.useState(0);
+  // 弹幕从这一刻开始渲染，跳转、续播、开关弹幕时重新定位
+  const [danmakuAnchorMs, setDanmakuAnchorMs] = React.useState(0);
   // 左右滑动调整进度时的目标进度与方向提示
   const [seekHint, setSeekHint] = React.useState<{
     targetMs: number;
@@ -199,7 +200,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   useEventListener(player, "timeUpdate", ({ currentTime }) => {
     const next = Math.max(0, Math.round(currentTime * 1000));
     if (isSeekJump(lastTimeRef.current, next)) {
-      setSeekToken((token) => token + 1);
+      setDanmakuAnchorMs(next);
     }
     lastTimeRef.current = next;
     setCurrentTimeMs(next);
@@ -283,6 +284,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   React.useEffect(() => {
     setDanmakuComposerOpen(false);
     setLocalDanmaku([]);
+    setDanmakuAnchorMs(0);
   }, [cid]);
 
   // 进出全屏会改变屏幕方向与键盘状态，先收起输入条
@@ -386,7 +388,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     player.currentTime = timeMs / 1000;
     lastTimeRef.current = Math.round(timeMs);
     setCurrentTimeMs(Math.round(timeMs));
-    setSeekToken((token) => token + 1);
+    setDanmakuAnchorMs(Math.round(timeMs));
   }
 
   /** 播放器就绪后跳到指定进度（毫秒），并同步控件与弹幕状态 */
@@ -394,7 +396,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     player.currentTime = positionMs / 1000;
     lastTimeRef.current = positionMs;
     setCurrentTimeMs(positionMs);
-    setSeekToken((token) => token + 1);
+    setDanmakuAnchorMs(positionMs);
   }
 
   function handleSingleTap() {
@@ -676,11 +678,11 @@ export default function NativePlayer(props: NativePlayerProps) {
       {started ? (
         <DanmakuOverlay
           cid={cid}
-          durationSeconds={durationSeconds}
           enabled={$danmakuEnabled}
           isPlaying={isPlaying}
           currentTimeMs={currentTimeMs}
-          seekToken={seekToken}
+          anchorTimeMs={danmakuAnchorMs}
+          playbackRate={fastRate ? PLAYER_FAST_RATE : 1}
           width={width}
           height={containerHeight}
           fontSize={fullscreen ? 18 : 15}
@@ -729,6 +731,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           onTogglePlay={handleTogglePlay}
           onToggleDanmaku={() => {
             set$danmakuEnabled(!$danmakuEnabled);
+            setDanmakuAnchorMs(currentTimeMs);
           }}
           onSendDanmaku={openDanmakuComposer}
           onToggleFullscreen={() => {

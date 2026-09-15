@@ -3,18 +3,26 @@ import { describe, expect, test } from "vitest";
 import type { DanmakuItem } from "@/api/danmaku.types";
 
 import {
+  DANMAKU_SCROLL_DURATION_MS,
   estimateDanmakuWidth,
-  findDanmakuStartIndex,
-  mergeDanmakuSegments,
-  resolveDanmakuBatch,
+  findVisibleStartIndex,
+  isDanmakuLayoutFresh,
+  mergeDanmakuItems,
   resolveDanmakuLaneCount,
-  selectDueLocalDanmaku,
+  resolveDanmakuLaneFreeAt,
+  resolveDanmakuLaneHeight,
+  resolveDanmakuLayout,
+  resolveDanmakuSpeed,
+  resolveDanmakuX,
+  selectVisibleDanmaku,
   toDanmakuColor,
 } from "./danmaku-track";
 
 function createItem(progressMs: number, content = "你好"): DanmakuItem {
   return { progressMs, content, color: 0xffffff, fontsize: 25 };
 }
+
+const layoutOptions = { containerWidth: 400, containerHeight: 100, fontSize: 16, laneHeight: 27 };
 
 describe("danmaku text helpers", () => {
   test("estimates wide characters as a full font size", () => {
@@ -33,110 +41,177 @@ describe("danmaku text helpers", () => {
   test("derives lane count from container height", () => {
     expect(resolveDanmakuLaneCount(100, 27)).toBe(3);
     expect(resolveDanmakuLaneCount(10, 27)).toBe(1);
+    expect(resolveDanmakuLaneHeight(15)).toBe(26);
+    expect(resolveDanmakuLaneHeight(18)).toBe(31);
   });
 });
 
-describe("resolveDanmakuBatch", () => {
-  const options = {
-    currentTimeMs: 250,
-    containerWidth: 400,
-    containerHeight: 100,
-    fontSize: 16,
-    laneHeight: 27,
-  };
+describe("danmaku movement", () => {
+  test("keeps the whole traverse duration for every text width", () => {
+    // (400 + 32) / 7s = 61.7px/s，与文本宽度无关的定长模型
+    expect(Math.round(resolveDanmakuSpeed(400, 32))).toBe(62);
+    expect(Math.round(resolveDanmakuSpeed(400, 320))).toBe(103);
+  });
 
-  test("assigns free lanes in order and consumes all due items", () => {
+  test("places a danmaku outside the right edge at its own timestamp", () => {
+    expect(resolveDanmakuX(0, 32, 400, 0)).toBe(400);
+    expect(resolveDanmakuX(0, 32, 400, -500)).toBe(400);
+    expect(Math.round(resolveDanmakuX(0, 32, 400, 3500))).toBe(184);
+  });
+
+  test("finishes the traverse exactly when the tail leaves the left edge", () => {
+    expect(resolveDanmakuX(0, 32, 400, DANMAKU_SCROLL_DURATION_MS)).toBe(-32);
+    expect(resolveDanmakuX(0, 320, 400, DANMAKU_SCROLL_DURATION_MS)).toBe(-320);
+    expect(resolveDanmakuX(0, 32, 400, DANMAKU_SCROLL_DURATION_MS + 1000)).toBe(-32);
+  });
+
+  test("frees a lane once the previous tail has entered the screen", () => {
+    // 0 + 7s * 32 / 432 ≈ 518ms
+    expect(Math.round(resolveDanmakuLaneFreeAt(0, 32, 400))).toBe(519);
+  });
+});
+
+describe("resolveDanmakuLayout", () => {
+  test("assigns free lanes in order and is independent of playback time", () => {
     const items = [createItem(0), createItem(100), createItem(200)];
-    const result = resolveDanmakuBatch(items, 0, [], options);
+    const first = resolveDanmakuLayout(items, layoutOptions);
+    const second = resolveDanmakuLayout(items, layoutOptions);
 
-    expect(result.items.map((item) => item.lane)).toEqual([0, 1, 2]);
-    expect(result.items[0].top).toBe(0);
-    expect(result.items[1].top).toBe(27);
-    expect(result.items[0].startX).toBe(400);
-    // 400 / 8s = 50px/s，(400 + 32) / 50 = 8.64s
-    expect(Math.round(result.items[0].durationMs)).toBe(8640);
-    expect(result.nextIndex).toBe(3);
-    // 尾部离开右边缘后才能复用车道的播放时间
-    expect(Math.round(result.lanes[0])).toBe(890);
+    expect([...first.lanes]).toEqual([0, 1, 2]);
+    expect([...second.lanes]).toEqual([...first.lanes]);
+    expect(first.laneCount).toBe(3);
   });
 
-  test("drops danmaku when every lane is busy", () => {
-    const items = [createItem(0), createItem(10), createItem(20), createItem(30)];
-    const first = resolveDanmakuBatch(items, 0, [], options);
-    const second = resolveDanmakuBatch(items, first.nextIndex, first.lanes, {
-      ...options,
-      currentTimeMs: 300,
-    });
+  test("drops danmaku once every lane is busy", () => {
+    const items = [
+      createItem(0),
+      createItem(10),
+      createItem(20),
+      createItem(30, "一条很长的弹幕内容"),
+    ];
 
-    expect(second.items).toEqual([]);
-    expect(second.nextIndex).toBe(4);
+    expect([...resolveDanmakuLayout(items, layoutOptions).lanes]).toEqual([0, 1, 2, -1]);
   });
 
-  test("keeps the remaining items for the next tick", () => {
-    const items = [createItem(100), createItem(2000)];
-    const result = resolveDanmakuBatch(items, 0, [], { ...options, currentTimeMs: 200 });
+  test("reuses a lane after the previous tail has cleared the right edge", () => {
+    const items = [createItem(0), createItem(600)];
+    const lanes = resolveDanmakuLayout(items, { ...layoutOptions, containerHeight: 27 }).lanes;
 
-    expect(result.items).toHaveLength(1);
-    expect(result.nextIndex).toBe(1);
+    // 第一条在 519ms 后让出轨道，600ms 的弹幕可以复用同一条
+    expect([...lanes]).toEqual([0, 0]);
+  });
+
+  test("recomputes lanes when the container changes", () => {
+    const items = [createItem(0), createItem(10), createItem(20)];
+    const single = resolveDanmakuLayout(items, { ...layoutOptions, containerHeight: 27 });
+
+    expect([...single.lanes]).toEqual([0, -1, -1]);
+    expect(isDanmakuLayoutFresh(single, layoutOptions)).toBe(false);
+    expect(isDanmakuLayoutFresh(single, { ...layoutOptions, containerHeight: 27 })).toBe(true);
+  });
+
+  test("drops everything when the container is not measurable yet", () => {
+    const items = [createItem(0)];
+
+    expect([...resolveDanmakuLayout(items, { ...layoutOptions, containerWidth: 0 }).lanes]).toEqual(
+      [-1],
+    );
   });
 });
 
-describe("findDanmakuStartIndex", () => {
+describe("findVisibleStartIndex", () => {
   const items = [createItem(0), createItem(100), createItem(200)];
 
   test("locates the first danmaku not older than the given time", () => {
-    expect(findDanmakuStartIndex(items, 0)).toBe(0);
-    expect(findDanmakuStartIndex(items, 150)).toBe(2);
-    expect(findDanmakuStartIndex(items, 200)).toBe(2);
-    expect(findDanmakuStartIndex(items, 1000)).toBe(3);
+    expect(findVisibleStartIndex(items, 0)).toBe(0);
+    expect(findVisibleStartIndex(items, 150)).toBe(2);
+    expect(findVisibleStartIndex(items, 200)).toBe(2);
+    expect(findVisibleStartIndex(items, 1000)).toBe(3);
   });
 });
 
-describe("selectDueLocalDanmaku", () => {
-  const items = [createItem(1000, "第一条"), createItem(2000, "第二条"), createItem(3000)];
+describe("mergeDanmakuItems", () => {
+  test("merges two sorted lists and keeps the original reference when empty", () => {
+    const items = [createItem(0), createItem(200, "网络")];
+    const merged = mergeDanmakuItems(items, [createItem(100, "本地"), createItem(300, "本地2")]);
 
-  test("takes the items whose time has arrived and advances the index", () => {
-    const result = selectDueLocalDanmaku(items, 2000, 0);
-
-    expect(result.items.map((item) => item.content)).toEqual(["第一条", "第二条"]);
-    expect(result.nextIndex).toBe(2);
-  });
-
-  test("keeps future items for later", () => {
-    const result = selectDueLocalDanmaku(items, 500, 0);
-
-    expect(result.items).toEqual([]);
-    expect(result.nextIndex).toBe(0);
-  });
-
-  test("does not consume an item twice", () => {
-    const first = selectDueLocalDanmaku(items, 2000, 0);
-    const second = selectDueLocalDanmaku(items, 3000, first.nextIndex);
-
-    expect(second.items).toHaveLength(1);
-    expect(second.nextIndex).toBe(3);
-  });
-
-  test("clamps a stale index", () => {
-    expect(selectDueLocalDanmaku(items, 0, 99)).toEqual({ items: [], nextIndex: 3 });
-    expect(selectDueLocalDanmaku([], 1000, 0)).toEqual({ items: [], nextIndex: 0 });
+    expect(merged.map((item) => item.progressMs)).toEqual([0, 100, 200, 300]);
+    expect(mergeDanmakuItems(items, [])).toBe(items);
   });
 });
 
-describe("mergeDanmakuSegments", () => {
-  test("appends a later segment without moving existing indexes", () => {
-    const existing = [createItem(0), createItem(100)];
-    const merged = mergeDanmakuSegments(existing, [createItem(200)]);
+describe("selectVisibleDanmaku", () => {
+  const items = [createItem(0, "第一条"), createItem(1000, "第二条"), createItem(2500, "第三条")];
+  const layout = resolveDanmakuLayout(items, layoutOptions);
 
-    expect(merged.appended).toBe(true);
-    expect(merged.items.map((item) => item.progressMs)).toEqual([0, 100, 200]);
-    expect(merged.items[0]).toBe(existing[0]);
+  test("renders danmaku by their own timestamp", () => {
+    const visible = selectVisibleDanmaku(items, layout, { currentTimeMs: 0, anchorTimeMs: 0 });
+
+    expect(visible).toHaveLength(1);
+    expect(visible[0].content).toBe("第一条");
+    expect(visible[0].currentX).toBe(400);
+    expect(visible[0].elapsedMs).toBe(0);
+    expect(visible[0].endX).toBe(-48);
+    expect(visible[0].durationMs).toBe(DANMAKU_SCROLL_DURATION_MS);
   });
 
-  test("sorts and asks for a reset when a segment arrives out of order", () => {
-    const merged = mergeDanmakuSegments([createItem(200)], [createItem(50)]);
+  test("keeps already flying danmaku inside the window and drops expired ones", () => {
+    const flying = selectVisibleDanmaku(items, layout, {
+      currentTimeMs: 6000,
+      anchorTimeMs: 0,
+    });
+    expect(flying.map((item) => item.content)).toEqual(["第一条", "第二条", "第三条"]);
+    expect(flying[0].elapsedMs).toBe(6000);
 
-    expect(merged.appended).toBe(false);
-    expect(merged.items.map((item) => item.progressMs)).toEqual([50, 200]);
+    const expired = selectVisibleDanmaku(items, layout, {
+      currentTimeMs: DANMAKU_SCROLL_DURATION_MS + 1,
+      anchorTimeMs: 0,
+    });
+    expect(expired.map((item) => item.content)).toEqual(["第二条", "第三条"]);
+    expect(expired[0].elapsedMs).toBe(DANMAKU_SCROLL_DURATION_MS + 1 - 1000);
+  });
+
+  test("does not backfill danmaku from before the anchor", () => {
+    // 跳到 2000ms：窗口 [2000, 2500] 内只有 2500ms 的弹幕，
+    // 更早的两条虽然还在全程时长内，也不补画
+    const forwarded = selectVisibleDanmaku(items, layout, {
+      currentTimeMs: 2500,
+      anchorTimeMs: 2000,
+    });
+    expect(forwarded.map((item) => item.content)).toEqual(["第三条"]);
+    expect(forwarded[0].elapsedMs).toBe(0);
+
+    const resumed = selectVisibleDanmaku(items, layout, {
+      currentTimeMs: 3500,
+      anchorTimeMs: 2000,
+    });
+    expect(resumed.map((item) => item.content)).toEqual(["第三条"]);
+    expect(resumed[0].elapsedMs).toBe(1000);
+  });
+
+  test("ignores danmaku without a lane and mismatched layouts", () => {
+    const crowded = [
+      createItem(0),
+      createItem(1, "第一条"),
+      createItem(2, "第二条"),
+      createItem(3, "第三条"),
+    ];
+    const crowdedLayout = resolveDanmakuLayout(crowded, layoutOptions);
+    const visible = selectVisibleDanmaku(crowded, crowdedLayout, {
+      currentTimeMs: 10,
+      anchorTimeMs: 0,
+    });
+
+    expect(visible.map((item) => item.content)).toEqual(["你好", "第一条", "第二条"]);
+    expect(
+      selectVisibleDanmaku(
+        items,
+        { ...layout, lanes: new Int16Array(1) },
+        {
+          currentTimeMs: 0,
+          anchorTimeMs: 0,
+        },
+      ),
+    ).toEqual([]);
   });
 });

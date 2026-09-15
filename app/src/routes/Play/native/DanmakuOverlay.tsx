@@ -6,26 +6,28 @@ import useLatest from "@/hooks/useLatest";
 
 import {
   DANMAKU_DEFAULT_FONTSIZE,
-  findDanmakuStartIndex,
-  resolveDanmakuBatch,
-  selectDueLocalDanmaku,
+  isDanmakuLayoutFresh,
+  mergeDanmakuItems,
+  resolveDanmakuLayout,
+  selectVisibleDanmaku,
+  type DanmakuLayout,
   type DanmakuRenderItem,
 } from "./danmaku-track";
 import { useDanmakuFeed } from "./use-danmaku-feed";
 
 type DanmakuOverlayProps = {
   cid: number;
-  /**
-   * 视频总时长（秒），用于计算分段数量
-   */
-  durationSeconds: number;
   enabled: boolean;
   isPlaying: boolean;
   currentTimeMs: number;
   /**
-   * 播放进度跳变时自增，用于重置弹幕
+   * 弹幕从这一刻开始渲染，更早的弹幕不再补画（跳转、续播、开关弹幕时更新）
    */
-  seekToken: number;
+  anchorTimeMs: number;
+  /**
+   * 播放倍速，弹幕位移跟随倍速
+   */
+  playbackRate: number;
   width: number;
   height: number;
   fontSize?: number;
@@ -35,33 +37,54 @@ type DanmakuOverlayProps = {
   localItems?: DanmakuItem[];
 };
 
-type ConsumerState = {
-  lanes: number[];
-  nextIndex: number;
-  localNextIndex: number;
-};
-
-// 默认值保持同一引用，避免每次渲染都重启消费 effect
+// 默认值保持同一引用，避免每次渲染都重算轨道表
 const EMPTY_LOCAL_ITEMS: DanmakuItem[] = [];
+const EMPTY_VISIBLE_ITEMS: DanmakuRenderItem[] = [];
 
-function resolveItemTranslateX(item: DanmakuRenderItem, currentTimeMs: number) {
-  const elapsed = Math.min(item.durationMs, Math.max(0, currentTimeMs - item.startMs));
-  return item.startX - (elapsed / item.durationMs) * item.travel;
+// 轨道表只取决于弹幕数据与容器尺寸，与播放进度无关，因此可以按数据缓存
+const layoutCache = new WeakMap<DanmakuItem[], DanmakuLayout>();
+const mergeCache = new WeakMap<
+  DanmakuItem[],
+  { localItems: DanmakuItem[]; items: DanmakuItem[] }
+>();
+
+function getDanmakuLayout(
+  items: DanmakuItem[],
+  containerWidth: number,
+  containerHeight: number,
+  fontSize: number,
+) {
+  const cached = layoutCache.get(items);
+  if (cached && isDanmakuLayoutFresh(cached, { containerWidth, containerHeight, fontSize })) {
+    return cached;
+  }
+  const layout = resolveDanmakuLayout(items, { containerWidth, containerHeight, fontSize });
+  layoutCache.set(items, layout);
+  return layout;
+}
+
+function getDanmakuItems(items: DanmakuItem[], localItems: DanmakuItem[]) {
+  if (localItems.length === 0) {
+    return items;
+  }
+  const cached = mergeCache.get(items);
+  if (cached && cached.localItems === localItems) {
+    return cached.items;
+  }
+  const merged = mergeDanmakuItems(items, localItems);
+  mergeCache.set(items, { localItems, items: merged });
+  return merged;
 }
 
 function DanmakuItemView(props: {
   item: DanmakuRenderItem;
   isPlaying: boolean;
-  currentTimeMs: number;
-  onFinished: (key: string) => void;
+  playbackRate: number;
 }) {
-  const { item, isPlaying, currentTimeMs } = props;
-  // 挂载时按当前播放时间定位，暂停状态下进入的弹幕也能停在正确位置
-  const [translateX] = React.useState(
-    () => new Animated.Value(resolveItemTranslateX(item, currentTimeMs)),
-  );
-  const currentTimeRef = useLatest(currentTimeMs);
-  const onFinishedRef = useLatest(props.onFinished);
+  const { item, isPlaying, playbackRate } = props;
+  // 挂载时按当前播放进度定位，暂停状态下进入的弹幕也能停在正确位置
+  const [translateX] = React.useState(() => new Animated.Value(item.currentX));
+  const itemRef = useLatest(item);
 
   React.useEffect(() => {
     if (!isPlaying) {
@@ -69,23 +92,26 @@ function DanmakuItemView(props: {
       return;
     }
 
-    const elapsed = Math.min(item.durationMs, Math.max(0, currentTimeRef.current - item.startMs));
+    const latest = itemRef.current;
+    const remainingMs = Math.max(0, latest.durationMs - latest.elapsedMs);
+    if (remainingMs === 0) {
+      translateX.setValue(latest.endX);
+      return;
+    }
+
     const animation = Animated.timing(translateX, {
-      toValue: item.startX - item.travel,
-      duration: Math.max(16, item.durationMs - elapsed),
+      toValue: latest.endX,
+      // 剩余行程按播放倍速折算成真实时间，长按加速时弹幕同步变快
+      duration: Math.max(16, Math.round(remainingMs / Math.max(0.1, playbackRate))),
       easing: Easing.linear,
       useNativeDriver: true,
     });
-    animation.start(({ finished }) => {
-      if (finished) {
-        onFinishedRef.current(item.key);
-      }
-    });
+    animation.start();
 
     return () => {
       animation.stop();
     };
-  }, [translateX, item, isPlaying, currentTimeRef, onFinishedRef]);
+  }, [translateX, isPlaying, playbackRate, itemRef]);
 
   return (
     <Animated.View
@@ -112,83 +138,34 @@ function DanmakuItemView(props: {
 }
 
 export default function DanmakuOverlay(props: DanmakuOverlayProps) {
-  const { cid, durationSeconds, enabled, isPlaying, currentTimeMs, width, height } = props;
+  const { cid, enabled, isPlaying, currentTimeMs, anchorTimeMs, playbackRate, width, height } =
+    props;
   const fontSize = props.fontSize ?? DANMAKU_DEFAULT_FONTSIZE;
   const localItems = props.localItems ?? EMPTY_LOCAL_ITEMS;
-  const { items, resetToken } = useDanmakuFeed({ cid, durationSeconds, enabled, currentTimeMs });
+  const { items } = useDanmakuFeed({ cid, enabled, currentTimeMs });
 
-  const [activeItems, setActiveItems] = React.useState<DanmakuRenderItem[]>([]);
-  const consumerRef = React.useRef<ConsumerState>({
-    lanes: [],
-    nextIndex: 0,
-    localNextIndex: 0,
-  });
-  const itemsRef = useLatest(items);
-  const currentTimeRef = useLatest(currentTimeMs);
-  const localItemsRef = useLatest(localItems);
-
-  // 切分P、跳转、开关弹幕、分段乱序补拉时重新定位
-  const resetKey = `${cid}-${props.seekToken}-${resetToken}-${enabled ? 1 : 0}`;
-  React.useEffect(() => {
-    consumerRef.current = {
-      lanes: [],
-      nextIndex: findDanmakuStartIndex(itemsRef.current, currentTimeRef.current),
-      localNextIndex: findDanmakuStartIndex(localItemsRef.current, currentTimeRef.current),
-    };
-    setActiveItems([]);
-  }, [resetKey, itemsRef, currentTimeRef, localItemsRef]);
-
-  React.useEffect(() => {
-    if (!enabled || width <= 0 || height <= 0) {
-      return;
-    }
-
-    const consumer = consumerRef.current;
-    const options = {
-      currentTimeMs,
-      containerWidth: width,
-      containerHeight: height,
-      fontSize,
-    };
-    const result = resolveDanmakuBatch(items, consumer.nextIndex, consumer.lanes, options);
-    consumer.lanes = result.lanes;
-    consumer.nextIndex = result.nextIndex;
-
-    // 本地回显弹幕排在网络弹幕之后消费，复用同一份轨道状态
-    const local = selectDueLocalDanmaku(localItems, currentTimeMs, consumer.localNextIndex);
-    consumer.localNextIndex = local.nextIndex;
-    const localResult = resolveDanmakuBatch(local.items, 0, consumer.lanes, options);
-    consumer.lanes = localResult.lanes;
-
-    if (result.items.length > 0 || localResult.items.length > 0) {
-      setActiveItems((previous) => [...previous, ...result.items, ...localResult.items]);
-    }
-  }, [currentTimeMs, items, localItems, enabled, width, height, fontSize]);
-
-  React.useEffect(() => {
-    setActiveItems((previous) => {
-      const next = previous.filter((item) => item.startMs + item.durationMs > currentTimeMs - 500);
-      return next.length === previous.length ? previous : next;
-    });
-  }, [currentTimeMs]);
-
-  function handleItemFinished(key: string) {
-    setActiveItems((previous) => previous.filter((item) => item.key !== key));
-  }
+  const mergedItems = getDanmakuItems(items, localItems);
+  const layout = getDanmakuLayout(mergedItems, width, height, fontSize);
+  const visibleItems =
+    enabled && width > 0 && height > 0
+      ? selectVisibleDanmaku(mergedItems, layout, { currentTimeMs, anchorTimeMs })
+      : EMPTY_VISIBLE_ITEMS;
 
   if (!enabled) {
     return null;
   }
 
+  // 容器尺寸变化（切全屏、旋转）后重建弹幕视图，避免残留旧坐标
+  const geometryKey = `${width}x${height}x${fontSize}`;
+
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      {activeItems.map((item) => (
+      {visibleItems.map((item) => (
         <DanmakuItemView
-          key={item.key}
+          key={`${item.key}#${geometryKey}`}
           item={item}
           isPlaying={isPlaying}
-          currentTimeMs={currentTimeMs}
-          onFinished={handleItemFinished}
+          playbackRate={playbackRate}
         />
       ))}
     </View>

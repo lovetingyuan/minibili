@@ -13,13 +13,6 @@ export const DANMAKU_SEGMENT_SECONDS = 360;
 
 const segmentCache = new Map<string, Promise<DanmakuItem[]>>();
 
-export function getDanmakuSegmentCount(durationSeconds: number) {
-  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
-    return 1;
-  }
-  return Math.max(1, Math.ceil(durationSeconds / DANMAKU_SEGMENT_SECONDS));
-}
-
 /**
  * 播放进度所在的分段下标，用于发送弹幕后定位需要失效的分段
  */
@@ -46,16 +39,19 @@ async function requestDanmakuSegment(cid: number, index: number) {
     await getCookie(),
   );
   const response = await expoFetch(url, { headers });
-  // 越界的分段会返回 304
-  if (response.status !== 200) {
+  // 越界的分段会返回 304，按空分段处理
+  if (response.status === 304 || response.status === 404) {
     return [] as DanmakuItem[];
+  }
+  if (response.status !== 200) {
+    throw new Error(`弹幕分段请求失败：${response.status}`);
   }
   const buffer = await response.arrayBuffer();
   return decodeDanmakuSegment(new Uint8Array(buffer));
 }
 
 /**
- * 拉取一个弹幕分段，失败时静默返回空数组（弹幕不是关键路径）
+ * 拉取一个弹幕分段，失败时抛错并清掉缓存，交给调用方重试
  */
 export function fetchDanmakuSegment(cid: number, index: number): Promise<DanmakuItem[]> {
   const key = `${cid}-${index}`;
@@ -64,9 +60,9 @@ export function fetchDanmakuSegment(cid: number, index: number): Promise<Danmaku
     return cached;
   }
 
-  const task = requestDanmakuSegment(cid, index).catch(() => {
+  const task = requestDanmakuSegment(cid, index).catch((error: unknown) => {
     segmentCache.delete(key);
-    return [] as DanmakuItem[];
+    throw error;
   });
   segmentCache.set(key, task);
   return task;
