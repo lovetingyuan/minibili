@@ -1,40 +1,40 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Avatar, Icon, Text } from "@/components/styled/rneui";
-import UpName from "@/components/UpName";
-import { clsx } from "clsx";
-import * as Clipboard from "expo-clipboard";
-import React from "react";
-import { Pressable, View } from "react-native";
+import { useNavigation, useRoute } from '@react-navigation/native'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Avatar, Icon, Text } from '@/components/styled/rneui'
+import UpName from '@/components/UpName'
+import { clsx } from 'clsx'
+import * as Clipboard from 'expo-clipboard'
+import React from 'react'
+import { Pressable, View } from 'react-native'
 import {
   Menu,
   MenuOption,
   MenuOptions,
   MenuTrigger,
   menuTriggerIconButtonStyles,
-} from "@/components/Menu";
+} from '@/components/Menu'
 
-import { colors } from "@/constants/colors.tw";
-import { useFollowActions } from "@/hooks/useFollowActions";
-import { useFollowedUpsMap } from "@/store/derives";
+import { colors } from '@/constants/colors.tw'
+import { useFollowActions } from '@/hooks/useFollowActions'
+import { useFollowedUpsMap } from '@/store/derives'
 
-import { useLivingInfo } from "../../api/living-info";
-import { useUserRelation } from "../../api/user-relation";
-import { useUserInfo } from "../../api/user-info";
-import { useStore } from "../../store";
-import type { NavigationProps, RootStackParamList } from "../../types";
-import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast } from "../../utils";
+import { useLivingInfo } from '../../api/living-info'
+import { useUserRelation } from '../../api/user-relation'
+import { useUserInfo } from '../../api/user-info'
+import { useStore } from '../../store'
+import type { NavigationProps, RootStackParamList } from '../../types'
+import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast } from '../../utils'
 
 function HeaderLeft() {
-  const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
-  const { data: userInfo } = useUserInfo(route.params?.user.mid);
-  const { livingUrl } = useLivingInfo(route.params?.user.mid);
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
+  const { data: userInfo } = useUserInfo(route.params?.user.mid)
+  const { livingUrl } = useLivingInfo(route.params?.user.mid)
   const dynamicUser = {
     ...route.params?.user,
     ...userInfo,
-  };
-  const { data: fans } = useUserRelation(dynamicUser?.mid);
-  const navigation = useNavigation<NavigationProps["navigation"]>();
+  }
+  const { data: fans } = useUserRelation(dynamicUser?.mid)
+  const navigation = useNavigation<NavigationProps['navigation']>()
   // const gotoWebPage = () => {
   //   if (dynamicUser) {
   //     navigation.navigate('WebPage', {
@@ -44,29 +44,29 @@ function HeaderLeft() {
   //   }
   // }
   // const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
-  const userName = dynamicUser?.name || ""; // ? dynamicUser.name + level : ''
+  const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
   // const sex =
   //   dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
-  const _followedUpsMap = useFollowedUpsMap();
-  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
-  const { setImagesList, setCurrentImageIndex } = useStore();
+  const _followedUpsMap = useFollowedUpsMap()
+  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
+  const { setImagesList, setCurrentImageIndex } = useStore()
 
   const copyUserName = () => {
     if (!dynamicUser?.name) {
-      return;
+      return
     }
     void Clipboard.setStringAsync(dynamicUser.name).then(() => {
-      showToast("已复制用户名");
-    });
-  };
+      showToast(`已复制：${dynamicUser.name}`)
+    })
+  }
 
   const viewAvatar = () => {
     if (!dynamicUser?.face) {
-      return;
+      return
     }
-    setImagesList([{ src: dynamicUser.face, width: 0, height: 0, ratio: 1 }]);
-    setCurrentImageIndex(0);
-  };
+    setImagesList([{ src: dynamicUser.face, width: 0, height: 0, ratio: 1 }])
+    setCurrentImageIndex(0)
+  }
 
   return (
     <View className="left-[-12px] mr-4 flex-none flex-row items-center">
@@ -84,16 +84,16 @@ function HeaderLeft() {
             <Pressable
               onPress={() => {
                 if (dynamicUser.mid) {
-                  navigation.navigate("Living", {
+                  navigation.navigate('Living', {
                     title: `${dynamicUser.name}的直播间`,
                     user: { mid: dynamicUser.mid, name: userName },
                     url: livingUrl,
-                  });
+                  })
                 }
               }}
               className="absolute inset-0 h-10 w-10 items-center justify-center rounded-full bg-neutral-950/60"
             >
-              <Text className={"text-center text-xs font-bold text-teal-300"}>直播中</Text>
+              <Text className={'text-center text-xs font-bold text-teal-300'}>直播中</Text>
             </Pressable>
           ) : null}
         </View>
@@ -102,7 +102,7 @@ function HeaderLeft() {
       <View className="ml-3 flex-1 flex-row items-center">
         <UpName
           mid={dynamicUser.mid}
-          className={clsx("shrink text-lg", followed && [colors.secondary.text, "font-bold"])}
+          className={clsx('shrink text-lg', followed && [colors.secondary.text, 'font-bold'])}
           // adjustsFontSizeToFit
           onPress={copyUserName}
           numberOfLines={1}
@@ -114,7 +114,7 @@ function HeaderLeft() {
           <Text
             className="ml-2 shrink-0 text-sm text-gray-500 dark:text-gray-400"
             onPress={() => {
-              showToast(`粉丝：${fans.follower}`);
+              showToast(`粉丝：${fans.follower}`)
             }}
           >
             {parseNumber(fans.follower)}粉丝
@@ -122,28 +122,28 @@ function HeaderLeft() {
         ) : null}
       </View>
     </View>
-  );
+  )
 }
 
-export const headerRight = () => <HeaderRight />;
-export const headerTitle = () => <HeaderLeft />;
+export const headerRight = () => <HeaderRight />
+export const headerTitle = () => <HeaderLeft />
 
 function HeaderRight() {
-  const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
-  const dynamicUser = route.params?.user;
-  const [visible, setVisible] = React.useState(false);
-  const hideMenu = () => setVisible(false);
-  const showMenu = () => setVisible(true);
-  const actions = useFollowActions();
-  const _followedUpsMap = useFollowedUpsMap();
-  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
+  const dynamicUser = route.params?.user
+  const [visible, setVisible] = React.useState(false)
+  const hideMenu = () => setVisible(false)
+  const showMenu = () => setVisible(true)
+  const actions = useFollowActions()
+  const _followedUpsMap = useFollowedUpsMap()
+  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   const followOptionText = actions.isPreparing
-    ? "同步关注列表中"
+    ? '同步关注列表中'
     : actions.pendingMid
-      ? "关注处理中"
+      ? '关注处理中'
       : followed
-        ? "取消关注"
-        : "关注UP";
+        ? '取消关注'
+        : '关注UP'
 
   return (
     <View className="flex-row items-center gap-2">
@@ -162,23 +162,23 @@ function HeaderRight() {
             disabled={actions.disabled}
             onSelect={() => {
               if (dynamicUser) {
-                void (followed ? actions.unfollow(dynamicUser) : actions.follow(dynamicUser));
+                void (followed ? actions.unfollow(dynamicUser) : actions.follow(dynamicUser))
               }
-              hideMenu();
+              hideMenu()
             }}
           />
           <MenuOption
             text="分享UP"
             onSelect={() => {
               if (dynamicUser) {
-                const { name, mid, sign } = dynamicUser;
-                handleShareUp(name, mid, sign);
+                const { name, mid, sign } = dynamicUser
+                handleShareUp(name, mid, sign)
               }
-              hideMenu();
+              hideMenu()
             }}
           />
         </MenuOptions>
       </Menu>
     </View>
-  );
+  )
 }

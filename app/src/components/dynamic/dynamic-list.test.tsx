@@ -138,6 +138,7 @@ type ListProps = {
   refreshing: boolean;
   renderItem: (info: { item: DynamicItem }) => ReactElement<{
     children: ReactElement<{ onPress: () => void }>;
+    className?: string;
   }>;
   onRefresh: () => void;
   onEndReached: () => void;
@@ -176,6 +177,13 @@ describe("shared dynamic list", () => {
   test("shows the configured initial loading state", () => {
     const loading = renderList({ list: [], isLoading: true });
     expect(text(renderFunction(loading))).toContain("正在加载关注动态");
+  });
+
+  test("uses a larger gap between dynamic cards", () => {
+    const list = renderList({ list: [item] });
+    const row = list.props.renderItem({ item });
+
+    expect(row.props.className).toBe("mb-3");
   });
 
   test("shows empty and error states and retries a failed first page", () => {

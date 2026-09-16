@@ -89,6 +89,15 @@ test("keeps the card body pressable and renders the action bar separately", () =
   expect(text(card)).not.toContain("查看动态详情");
 });
 
+test("renders a pinned dynamic as a tag", () => {
+  const elements = flatten(DynamicCard({ item: { ...item, top: true } }));
+  const tag = elements.find((element) => element.props.accessibilityLabel === "置顶标签");
+
+  expect(tag?.type).toBe("View");
+  expect(tag?.props.className).toContain("rounded");
+  expect(tag?.props.className).toContain("bg-pink-50");
+});
+
 test("opens the author space from the avatar and the UP name", () => {
   mocks.navigate.mockClear();
   const elements = flatten(DynamicCard({ item, onPress: vi.fn() }));

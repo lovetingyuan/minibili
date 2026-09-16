@@ -15,7 +15,7 @@ function DynamicListLoading(props: { text: string }) {
   return (
     <View className="flex-1 bg-neutral-100 dark:bg-black">
       <Text className={`px-4 py-3 text-center text-xs ${colors.gray6.text}`}>{props.text}</Text>
-      <View className="gap-2">
+      <View className="gap-3">
         {[0, 1, 2].map((index) => (
           <View key={index} className="gap-3 bg-white p-4 dark:bg-neutral-950">
             <View className="flex-row items-center gap-3">
@@ -100,7 +100,7 @@ export function DynamicList(props: DynamicListProps) {
       data={props.list}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <View className="mb-2">
+        <View className="mb-3">
           <DynamicCard item={item} onPress={() => props.onItemPress(item)} />
         </View>
       )}

@@ -24,7 +24,7 @@ function DynamicDetailPage({ route }: Props) {
   }
 
   useUpdateNavigationOptions({
-    headerRight: () => <HeaderRight url={url} title={title} reload={refresh} />,
+    headerRight: () => <HeaderRight url={url} title={title} />,
     headerTitle: () => (
       <Text className="text-lg font-semibold" numberOfLines={1}>
         <UpName mid={user?.mid} className="text-lg font-semibold">

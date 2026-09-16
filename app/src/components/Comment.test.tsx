@@ -167,6 +167,22 @@ describe("Comment long press actions", () => {
   });
 });
 
+test("renders a pinned comment as a tag", () => {
+  const tag = findElement(
+    CommentItem({
+      comment: makeComment({ top: true }),
+      onAttitude: vi.fn().mockResolvedValue(null),
+      onReply: vi.fn(),
+      isAttitudePending: () => false,
+    }),
+    (nodeProps) => nodeProps.accessibilityLabel === "置顶标签",
+  );
+
+  expect(tag?.type).toBe("View");
+  expect(tag?.props.className).toContain("rounded");
+  expect(tag?.props.className).toContain("bg-pink-50");
+});
+
 describe("Comment like count", () => {
   beforeEach(() => vi.clearAllMocks());
 

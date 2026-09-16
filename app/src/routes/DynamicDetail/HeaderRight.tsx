@@ -12,7 +12,7 @@ import {
 import { Icon } from "@/components/styled/rneui";
 import { showToast } from "@/utils";
 
-export default function HeaderRight(props: { url: string; title: string; reload: () => void }) {
+export default function HeaderRight(props: { url: string; title: string }) {
   const [visible, setVisible] = React.useState(false);
   function hideMenu() {
     setVisible(false);
@@ -34,13 +34,6 @@ export default function HeaderRight(props: { url: string; title: string; reload:
           onSelect={() => {
             hideMenu();
             void Linking.openURL(props.url);
-          }}
-        />
-        <MenuOption
-          text="刷新"
-          onSelect={() => {
-            hideMenu();
-            props.reload();
           }}
         />
         <MenuOption

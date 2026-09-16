@@ -109,7 +109,14 @@ export function CommentItem(props: CommentItemProps) {
               <Text className={`text-[10px] font-bold ${colors.secondary.text}`}>UP</Text>
             ) : null}
             {comment.top ? (
-              <Text className={`text-[10px] font-bold ${colors.secondary.text}`}>置顶</Text>
+              <View
+                accessibilityLabel="置顶标签"
+                className="shrink-0 rounded bg-pink-50 px-1.5 py-0.5 dark:bg-pink-950/40"
+              >
+                <Text className={`text-[10px] font-bold leading-3.5 ${colors.secondary.text}`}>
+                  置顶
+                </Text>
+              </View>
             ) : null}
             <View className="ml-auto shrink-0 flex-row items-center gap-2">
               {meta ? (
