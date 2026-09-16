@@ -3,7 +3,9 @@ import type { ReactElement, ReactNode } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
+  blacklist: new Map<string, { mid: number; name: string }>(),
   clipboardSetStringAsync: vi.fn(async () => {}),
+  confirmBlock: vi.fn(),
   follow: vi.fn(async () => {}),
   followedUps: {} as Record<string, { mid: number; name: string; face: string; sign: string }>,
   livingUrl: '',
@@ -15,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   relation: { data: { follower: 12345 } } as { data: { follower: number } | undefined },
   setCurrentImageIndex: vi.fn(),
   setImagesList: vi.fn(),
+  setMenuVisible: vi.fn(),
   showToast: vi.fn(),
   shareUp: vi.fn(),
   state: { disabled: false, isPreparing: false, pendingMid: '' },
@@ -37,7 +40,7 @@ vi.mock('react', async importOriginal => {
     ...original,
     default: {
       ...original,
-      useState: (initialState: unknown) => [initialState, vi.fn()],
+      useState: (initialState: unknown) => [initialState, mocks.setMenuVisible],
     },
   }
 })
@@ -56,6 +59,12 @@ vi.mock('@/components/Menu', () => ({
 vi.mock('@/components/UpName', () => ({ default: 'UpName' }))
 vi.mock('@/components/styled/rneui', () => ({ Avatar: 'Avatar', Icon: 'Icon', Text: 'Text' }))
 vi.mock('@/constants/colors.tw', () => import('../../constants/colors.tw'))
+vi.mock('@/api/useBilibiliBlacklist', () => ({
+  useBilibiliBlacklist: () => ({ blacklist: mocks.blacklist }),
+}))
+vi.mock('@/hooks/useBlockUpActions', () => ({
+  useBlockUpActions: () => ({ confirmBlock: mocks.confirmBlock }),
+}))
 vi.mock('@/hooks/useFollowActions', () => ({
   useFollowActions: () => ({
     ...mocks.state,
@@ -92,6 +101,7 @@ type ElementProps = {
   customStyles?: unknown
   disabled?: boolean
   ellipsizeMode?: string
+  mid?: string | number
   numberOfLines?: number
   onPress?: () => void
   onSelect?: () => void
@@ -140,15 +150,16 @@ function user() {
 describe('UP 主动态页头部菜单', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mocks.blacklist = new Map()
     mocks.followedUps = {}
     mocks.state = { disabled: false, isPreparing: false, pendingMid: '' }
     mocks.livingUrl = ''
   })
 
-  test('只保留关注切换和分享两个入口', () => {
+  test('依次展示关注、拉黑和分享入口', () => {
     const options = menuOptions()
 
-    expect(options.map(option => option.props.text)).toEqual(['关注UP', '分享UP'])
+    expect(options.map(option => option.props.text)).toEqual(['关注UP', '拉黑UP', '分享UP'])
   })
 
   test('右上角三个点渲染成图标按钮', () => {
@@ -196,8 +207,35 @@ describe('UP 主动态页头部菜单', () => {
     })
   })
 
+  test('拉黑入口先关闭菜单，再确认当前 UP', () => {
+    const [, blockOption] = menuOptions()
+
+    expect(blockOption.props.disabled).toBe(false)
+    blockOption.props.onSelect?.()
+
+    expect(mocks.setMenuVisible).toHaveBeenCalledWith(false)
+    expect(mocks.confirmBlock).toHaveBeenCalledExactlyOnceWith({
+      mid: user().mid,
+      name: user().name,
+    })
+    expect(mocks.setMenuVisible.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.confirmBlock.mock.invocationCallOrder[0],
+    )
+  })
+
+  test('已拉黑时显示禁用状态且不重复提交', () => {
+    mocks.blacklist = new Map([[String(user().mid), { mid: user().mid, name: user().name }]])
+    const [, blockOption] = menuOptions()
+
+    expect(blockOption.props).toMatchObject({ disabled: true, text: '已拉黑' })
+    blockOption.props.onSelect?.()
+
+    expect(mocks.setMenuVisible).toHaveBeenCalledWith(false)
+    expect(mocks.confirmBlock).not.toHaveBeenCalled()
+  })
+
   test('分享 UP 仍然可用', () => {
-    const [, shareOption] = menuOptions()
+    const [, , shareOption] = menuOptions()
 
     shareOption.props.onSelect?.()
 
@@ -208,6 +246,7 @@ describe('UP 主动态页头部菜单', () => {
 describe('UP 主动态页头部标题', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mocks.blacklist = new Map()
     mocks.followedUps = {}
     mocks.state = { disabled: false, isPreparing: false, pendingMid: '' }
     mocks.livingUrl = ''
@@ -221,6 +260,8 @@ describe('UP 主动态页头部标题', () => {
     expect(nameRow.props.className).toContain('flex-1')
     expect(nameRow.props.className).not.toContain('flex-wrap')
     expect(name.props.className).toContain('shrink')
+    expect(name.type).toBe('UpName')
+    expect(name.props.mid).toBe(user().mid)
     expect(name.props.numberOfLines).toBe(1)
     expect(name.props.ellipsizeMode).toBe('tail')
     expect(fans.props.className).toContain('shrink-0')

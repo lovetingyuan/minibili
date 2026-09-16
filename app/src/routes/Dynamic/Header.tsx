@@ -14,7 +14,9 @@ import {
   menuTriggerIconButtonStyles,
 } from '@/components/Menu'
 
+import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
 import { colors } from '@/constants/colors.tw'
+import { useBlockUpActions } from '@/hooks/useBlockUpActions'
 import { useFollowActions } from '@/hooks/useFollowActions'
 import { useFollowedUpsMap } from '@/store/derives'
 
@@ -135,8 +137,11 @@ function HeaderRight() {
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
   const actions = useFollowActions()
+  const { confirmBlock } = useBlockUpActions()
+  const { blacklist } = useBilibiliBlacklist()
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
+  const blocked = dynamicUser?.mid !== undefined && blacklist.has(String(dynamicUser.mid))
   const followOptionText = actions.isPreparing
     ? '同步关注列表中'
     : actions.pendingMid
@@ -165,6 +170,16 @@ function HeaderRight() {
                 void (followed ? actions.unfollow(dynamicUser) : actions.follow(dynamicUser))
               }
               hideMenu()
+            }}
+          />
+          <MenuOption
+            text={blocked ? '已拉黑' : '拉黑UP'}
+            disabled={blocked}
+            onSelect={() => {
+              hideMenu()
+              if (!blocked && dynamicUser) {
+                confirmBlock({ mid: dynamicUser.mid, name: dynamicUser.name })
+              }
             }}
           />
           <MenuOption
