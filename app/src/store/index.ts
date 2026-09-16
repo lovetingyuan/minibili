@@ -9,6 +9,7 @@ import type { VideoDownloadTask } from "../features/video-download/types";
 import type { UpInfo } from "../types";
 import type { WatchProgressSnapshot } from "../utils/watch-progress";
 import { clearLegacyCollections } from "./legacy-collections";
+import type { PartPlayProgressMap } from "./part-play-progress.types";
 import type { RepliesInfo } from "./replies-info.type";
 import type { FollowingDynamicsUpdateState, UpdateUpInfo } from "./types";
 
@@ -49,6 +50,10 @@ const getAppValue = () => {
      * 是否允许 App 退到后台继续播放
      */
     $backgroundPlayEnabled: false,
+    /**
+     * 每个分P 的本地续播位置，按 `bvid:cid` 持久化。
+     */
+    $partPlayProgressMap: {} as PartPlayProgressMap,
     livingUps: {} as Record<string, string>,
     followingDynamicsUpdateCount: 0,
     currentVideosCate: RanksConfig[0] as (typeof RanksConfig)[number],

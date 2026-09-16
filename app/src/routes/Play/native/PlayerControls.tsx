@@ -36,12 +36,17 @@ type PlayerControlsProps = {
    * 退到后台（含息屏）后是否继续播放
    */
   backgroundPlayEnabled: boolean;
+  loopEnabled: boolean;
+  autoNextEnabled: boolean;
+  showAutoNext: boolean;
   fullscreen: boolean;
   visible: boolean;
   onTogglePlay: () => void;
   onToggleDanmaku: () => void;
   onSendDanmaku: () => void;
   onToggleBackgroundPlay: () => void;
+  onToggleLoop: () => void;
+  onToggleAutoNext: () => void;
   onToggleFullscreen: () => void;
   onSeek: (timeMs: number) => void;
   /**
@@ -187,10 +192,19 @@ export default function PlayerControls(props: PlayerControlsProps) {
         importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
       >
         <PlayerTopActions
+          loopEnabled={props.loopEnabled}
+          autoNextEnabled={props.autoNextEnabled}
+          showAutoNext={props.showAutoNext}
           backgroundPlayEnabled={props.backgroundPlayEnabled}
           canSendDanmaku={props.canSendDanmaku}
           onToggleBackgroundPlay={() => {
             press(props.onToggleBackgroundPlay);
+          }}
+          onToggleLoop={() => {
+            press(props.onToggleLoop);
+          }}
+          onToggleAutoNext={() => {
+            press(props.onToggleAutoNext);
           }}
           onSendDanmaku={() => {
             press(props.onSendDanmaku);

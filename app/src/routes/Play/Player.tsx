@@ -25,6 +25,7 @@ import { useAppStateChange } from "../../hooks/useAppState";
 import { useStore } from "../../store";
 import { getImagePixelDimensions, parseDuration, parseImgUrl, showToast } from "../../utils";
 import { INJECTED_JAVASCRIPT } from "./inject-play";
+import type { PlayEndedEvent } from "./playback-mode";
 
 const PlayUrl = "https://www.bilibili.com/blackboard/html5mobileplayer.html";
 
@@ -35,7 +36,7 @@ type PlayerMessage = {
 
 type PlayerErrorType = "play-url" | "webview";
 
-function Player(props: { currentPage: number; onPlayEnded: () => void }) {
+function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEvent) => void }) {
   const { getIsWiFi, imagesList } = useStore();
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
   const { width, height } = useWindowDimensions();
@@ -193,7 +194,7 @@ function Player(props: { currentPage: number; onPlayEnded: () => void }) {
         }
         if (eventData.payload === "ended") {
           setVerticalExpand(false);
-          props.onPlayEnded();
+          props.onPlayEnded({ cid, page: props.currentPage });
         }
         // 'play', 'ended', 'pause', 'waiting', 'playing'
       }

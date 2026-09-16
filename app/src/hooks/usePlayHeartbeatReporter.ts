@@ -34,6 +34,8 @@ export type PlayHeartbeatReporterProps = {
   currentTimeMs: number;
 };
 
+export type PlayHeartbeatEndTarget = Pick<PlayHeartbeatReporterProps, "bvid" | "cid">;
+
 type MutableRef<T> = { current: T };
 
 type PlayHeartbeatInput = {
@@ -304,7 +306,10 @@ export function usePlayHeartbeatReporter(props: PlayHeartbeatReporterProps) {
     };
   }, []);
 
-  function reportEnded() {
+  function reportEnded(target?: PlayHeartbeatEndTarget) {
+    if (target && stateRef.current.key !== `${target.bvid}:${target.cid}`) {
+      return;
+    }
     endPlayHeartbeat(stateRef.current, inputRef, tickRef, Date.now());
   }
 

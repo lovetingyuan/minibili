@@ -1,26 +1,20 @@
 import { type RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Avatar, BottomSheet, Card, Icon, Text } from "@/components/styled/rneui";
-import { clsx } from "clsx";
+import { Avatar, Icon, Text } from "@/components/styled/rneui";
 import React from "react";
-import { Linking, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import { Linking, Pressable, View } from "react-native";
 
 import { useWatchingCount } from "@/api/watching-count";
 import { colors } from "@/constants/colors.tw";
 import type { NavigationProps, RootStackParamList } from "@/types";
-import {
-  getImagePixelSize,
-  handleShareVideo,
-  parseDate,
-  parseDuration,
-  parseImgUrl,
-  parseNumber,
-} from "@/utils";
+import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumber } from "@/utils";
 
 import { useVideoInfo } from "../../api/video-info";
 import { getVideoDescription } from "./description";
 import FavoriteButton from "./FavoriteButton";
 import LikeButton from "./LikeButton";
 import VideoDescription from "./VideoDescription";
+import VideoPagesSheet from "./VideoPagesSheet";
+import { formatVideoPageTitle } from "./video-pages-sheet.helpers";
 
 export default VideoInfo;
 
@@ -124,74 +118,45 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
           </Pressable>
         </View>
       </View>
-      <Text className="mt-3 text-base">{title}</Text>
-      <VideoDescription text={videoDesc} />
       {pages && pages.length > 1 ? (
-        <View className="mt-3 flex-row items-center">
-          <TouchableOpacity
-            activeOpacity={0.7}
-            className="flex-1"
+        <View className="mt-2">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="打开分P列表"
+            android_ripple={{ color: "transparent" }}
+            className="flex-row items-center gap-2.5 rounded-2xl bg-neutral-100 px-3 py-2 dark:bg-neutral-900"
+            style={({ pressed }) => ({ opacity: pressed ? 0.72 : 1 })}
             onPress={() => {
               setShowPagesModal(true);
             }}
           >
-            <Text className="flex-1 flex-wrap text-base" numberOfLines={1} ellipsizeMode="tail">
-              视频分集【{props.currentPage}/{videoInfo?.pages?.length}】：
-              <Text
-                className={clsx(
-                  colors.primary.text,
-                  "flex-1 flex-wrap border align-middle text-base",
-                )}
-              >
-                {pages[props.currentPage - 1].title}
-              </Text>
+            <View className="h-9 w-9 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-950/50">
+              <Icon name="playlist-play" size={21} colorClassName={colors.primary.accent} />
+            </View>
+            <Text className="min-w-0 flex-1 text-base" numberOfLines={1} ellipsizeMode="tail">
+              {formatVideoPageTitle(
+                pages[props.currentPage - 1].title,
+                pages[props.currentPage - 1].page,
+              )}
             </Text>
-          </TouchableOpacity>
-          <BottomSheet
-            onBackdropPress={() => {
+            <Text className={`shrink-0 text-sm tabular-nums ${colors.gray6.text}`}>
+              {`P${props.currentPage}/${pages.length}`}
+            </Text>
+            <Icon name="chevron-right" size={22} colorClassName={colors.gray6.accent} />
+          </Pressable>
+          <VideoPagesSheet
+            currentPage={props.currentPage}
+            pages={pages}
+            visible={showPagesModal}
+            onClose={() => {
               setShowPagesModal(false);
             }}
-            modalProps={{
-              onRequestClose: () => {
-                setShowPagesModal(false);
-              },
-              statusBarTranslucent: true,
-            }}
-            isVisible={showPagesModal}
-          >
-            <Card containerClassName="m-0">
-              <Card.Title className="text-left text-lg">{`视频分集【${props.currentPage}/${pages.length}】`}</Card.Title>
-              <Card.Divider />
-              <ScrollView className="max-h-[80vh] flex-1">
-                {pages.map((item) => {
-                  const selected = item.page === props.currentPage;
-                  return (
-                    <TouchableOpacity
-                      key={item.cid}
-                      activeOpacity={0.8}
-                      onPress={() => {
-                        props.setCurrentPage(item.page);
-                        // props.setCurrentCid(item.cid)
-                        setShowPagesModal(false);
-                      }}
-                      className="py-2"
-                    >
-                      <Text
-                        className={clsx(
-                          "text-base",
-                          selected && [colors.primary.text, "font-bold"],
-                        )}
-                      >
-                        {item.page}. {item.title} ({parseDuration(item.duration)})
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
-            </Card>
-          </BottomSheet>
+            onSelectPage={props.setCurrentPage}
+          />
         </View>
       ) : null}
+      <Text className="mt-3 text-base">{title}</Text>
+      <VideoDescription text={videoDesc} />
       {!isLoading && videoInfo?.interactive ? (
         <Text className={`mt-3 italic ${colors.warning.text}`}>【该视频为交互视频，暂不支持】</Text>
       ) : null}

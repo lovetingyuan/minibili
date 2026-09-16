@@ -41,12 +41,32 @@ function expectElement(node: ReactNode): ReactElement<ElementProps> {
   return node;
 }
 
-function renderActions(options: { backgroundPlayEnabled: boolean; canSendDanmaku: boolean }) {
+function renderActions(
+  options: Partial<{
+    autoNextEnabled: boolean;
+    backgroundPlayEnabled: boolean;
+    canSendDanmaku: boolean;
+    loopEnabled: boolean;
+    showAutoNext: boolean;
+  }> = {},
+) {
   const handlers = {
     onSendDanmaku: vi.fn(),
+    onToggleAutoNext: vi.fn(),
     onToggleBackgroundPlay: vi.fn(),
+    onToggleLoop: vi.fn(),
   };
-  const root = expectElement(PlayerTopActions({ ...options, ...handlers }));
+  const root = expectElement(
+    PlayerTopActions({
+      autoNextEnabled: true,
+      backgroundPlayEnabled: false,
+      canSendDanmaku: false,
+      loopEnabled: false,
+      showAutoNext: true,
+      ...options,
+      ...handlers,
+    }),
+  );
   const buttons = React.Children.toArray(root.props.children).map(expectElement);
 
   return { handlers, buttons };
@@ -57,44 +77,56 @@ function getIcon(button: ReactElement<ElementProps>) {
 }
 
 describe("PlayerTopActions", () => {
-  test("always shows the background play switch, also without login", () => {
-    const { buttons } = renderActions({ backgroundPlayEnabled: false, canSendDanmaku: false });
-
-    expect(buttons).toHaveLength(1);
-    expect(buttons[0].props.accessibilityLabel).toBe("开启后台播放");
-    expect(buttons[0].props.accessibilityState).toEqual({ selected: false });
-    expect(getIcon(buttons[0]).props.name).toBe("headphones");
-    expect(getIcon(buttons[0]).props.color).toBe("#ffffff");
-  });
-
-  test("places the background play switch on the left of the danmaku button", () => {
-    const { buttons } = renderActions({ backgroundPlayEnabled: false, canSendDanmaku: true });
+  test("shows loop and background play but hides auto next for a single part", () => {
+    const { buttons } = renderActions({ showAutoNext: false });
 
     expect(buttons).toHaveLength(2);
-    expect(buttons[0].props.accessibilityLabel).toBe("开启后台播放");
-    expect(buttons[1].props.accessibilityLabel).toBe("发送弹幕");
-    expect(getIcon(buttons[1]).props.name).toBe("pencil");
+    expect(buttons[0].props.accessibilityLabel).toBe("开启循环播放");
+    expect(buttons[1].props.accessibilityLabel).toBe("开启后台播放");
+    expect(getIcon(buttons[0]).props.name).toBe("repeat");
+    expect(getIcon(buttons[1]).props.name).toBe("headphones");
   });
 
-  test("highlights the switch with the accent color while enabled", () => {
-    const { buttons } = renderActions({ backgroundPlayEnabled: true, canSendDanmaku: true });
+  test("places playback modes before background play and danmaku", () => {
+    const { buttons } = renderActions({ canSendDanmaku: true });
 
-    expect(buttons[0].props.accessibilityLabel).toBe("关闭后台播放");
+    expect(buttons).toHaveLength(4);
+    expect(buttons.map((button) => getIcon(button).props.name)).toEqual([
+      "repeat",
+      "playlist-play",
+      "headphones",
+      "pencil",
+    ]);
+  });
+
+  test("highlights every enabled switch with the accent color", () => {
+    const { buttons } = renderActions({
+      autoNextEnabled: false,
+      backgroundPlayEnabled: true,
+      loopEnabled: true,
+    });
+
+    expect(buttons[0].props.accessibilityLabel).toBe("关闭循环播放");
     expect(buttons[0].props.accessibilityState).toEqual({ selected: true });
     expect(getIcon(buttons[0]).props.color).toBe(ACCENT_COLOR);
+    expect(getIcon(buttons[1]).props.color).toBe("#ffffff");
+    expect(getIcon(buttons[2]).props.color).toBe(ACCENT_COLOR);
   });
 
   test("calls the matching handler on press", () => {
     const { handlers, buttons } = renderActions({
-      backgroundPlayEnabled: true,
       canSendDanmaku: true,
     });
 
     buttons[0].props.onPress?.();
+    expect(handlers.onToggleLoop).toHaveBeenCalledOnce();
+    buttons[1].props.onPress?.();
+    expect(handlers.onToggleAutoNext).toHaveBeenCalledOnce();
+    buttons[2].props.onPress?.();
     expect(handlers.onToggleBackgroundPlay).toHaveBeenCalledOnce();
     expect(handlers.onSendDanmaku).not.toHaveBeenCalled();
 
-    buttons[1].props.onPress?.();
+    buttons[3].props.onPress?.();
     expect(handlers.onSendDanmaku).toHaveBeenCalledOnce();
   });
 });

@@ -34,8 +34,10 @@ import {
 } from "@/features/bilibili-session/useBilibiliSession";
 import { lockAppPortrait, setFullscreenOrientationOwner } from "@/hooks/useAppOrientation";
 import { useAppStateChange } from "@/hooks/useAppState";
+import { usePartPlayProgressRecorder } from "@/hooks/usePartPlayProgressRecorder";
 import { usePlayHeartbeatReporter } from "@/hooks/usePlayHeartbeatReporter";
 import { useStore } from "@/store";
+import { usePartPlayProgressPosition } from "@/store/part-play-progress";
 import type { NavigationProps, RootStackParamList } from "@/types";
 import { showToast } from "@/utils";
 import { unlockOrientation } from "@/utils/screen-orientation";
@@ -47,6 +49,7 @@ import PlayerCover from "./PlayerCover";
 import PlayerError from "./PlayerError";
 import PlayerPoster from "./PlayerPoster";
 import PlayerSeekHint from "./PlayerSeekHint";
+import type { PlaybackMode, PlayEndedEvent } from "../playback-mode";
 import {
   createVideoSource,
   isSeekJump,
@@ -72,13 +75,17 @@ const StyledAnimatedView = withUniwind(Animated.View) as unknown as React.Compon
 
 type NativePlayerProps = {
   currentPage: number;
-  onPlayEnded: () => void;
+  onPlayEnded: (event: PlayEndedEvent) => void;
+  playbackMode: PlaybackMode;
+  showAutoNext: boolean;
+  onToggleAutoNext: () => void;
+  onToggleLoop: () => void;
   fullscreen: boolean;
   onFullscreenChange: (fullscreen: boolean) => void;
 };
 
 export default function NativePlayer(props: NativePlayerProps) {
-  const { currentPage, onPlayEnded, fullscreen, onFullscreenChange } = props;
+  const { currentPage, onPlayEnded, playbackMode, fullscreen, onFullscreenChange } = props;
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const isFocused = useIsFocused();
@@ -167,12 +174,15 @@ export default function NativePlayer(props: NativePlayerProps) {
 
   const player = useVideoPlayer(source, (instance) => {
     instance.timeUpdateEventInterval = 0.25;
+    instance.loop = playbackMode.loop;
     instance.staysActiveInBackground = $backgroundPlayEnabled;
     instance.showNowPlayingNotification = $backgroundPlayEnabled;
   });
 
-  // B站记录的上次播放位置（毫秒），0 表示从头播放
-  const playResumePositionMs = usePlayResumePosition(videoInfo.aid, cid);
+  // 本地按分P 记录的位置优先；当前分P 没有本地记录时再回退 B站记录。
+  const localPlayResumePositionMs = usePartPlayProgressPosition(videoInfo.bvid, cid);
+  const serverPlayResumePositionMs = usePlayResumePosition(videoInfo.aid, cid);
+  const playResumePositionMs = localPlayResumePositionMs ?? serverPlayResumePositionMs;
 
   // 登录后按 B站网页播放器的方式上报播放进度，写入观看历史
   const { reportEnded } = usePlayHeartbeatReporter({
@@ -185,6 +195,33 @@ export default function NativePlayer(props: NativePlayerProps) {
     isPlaying,
     currentTimeMs,
   });
+  const { reportEnded: reportPartProgressEnded } = usePartPlayProgressRecorder({
+    bvid: videoInfo.bvid,
+    cid,
+    currentTimeMs,
+    durationMs: durationSeconds * 1000,
+    isPlaying,
+  });
+  const activePlayerRef = React.useRef({ player, cid, page: currentPage, hasPlayed: false });
+  const previousActivePlayer = activePlayerRef.current;
+  activePlayerRef.current = {
+    player,
+    cid,
+    page: currentPage,
+    hasPlayed:
+      previousActivePlayer.player === player &&
+      previousActivePlayer.cid === cid &&
+      previousActivePlayer.page === currentPage
+        ? previousActivePlayer.hasPlayed
+        : false,
+  };
+  const playEndGuardRef = React.useRef({ player, handled: false });
+  const onPlayEndedRef = React.useRef(onPlayEnded);
+  onPlayEndedRef.current = onPlayEnded;
+  const reportHeartbeatEndedRef = React.useRef(reportEnded);
+  reportHeartbeatEndedRef.current = reportEnded;
+  const reportPartProgressEndedRef = React.useRef(reportPartProgressEnded);
+  reportPartProgressEndedRef.current = reportPartProgressEnded;
 
   /**
    * 播放器就绪后跳到 B站记录的上次播放位置，同一个分P 只跳一次。
@@ -209,6 +246,9 @@ export default function NativePlayer(props: NativePlayerProps) {
   useEventListener(player, "playingChange", ({ isPlaying: playing }) => {
     setIsPlaying(playing);
     if (playing) {
+      if (activePlayerRef.current.player === player) {
+        activePlayerRef.current.hasPlayed = true;
+      }
       setPlaybackStarted(true);
       void KeepAwake.activateKeepAwakeAsync("PLAY");
     } else {
@@ -218,6 +258,13 @@ export default function NativePlayer(props: NativePlayerProps) {
 
   useEventListener(player, "timeUpdate", ({ currentTime }) => {
     const next = Math.max(0, Math.round(currentTime * 1000));
+    if (
+      playbackMode.loop &&
+      next < lastTimeRef.current &&
+      playEndGuardRef.current.player === player
+    ) {
+      playEndGuardRef.current.handled = false;
+    }
     if (isSeekJump(lastTimeRef.current, next)) {
       setDanmakuAnchorMs(next);
     }
@@ -281,15 +328,39 @@ export default function NativePlayer(props: NativePlayerProps) {
     });
   });
 
-  useEventListener(player, "playToEnd", () => {
-    // 部分设备播放结束后不会再派发 playingChange，这里主动收敛播放状态，
-    // 保证播放按钮能切回“播放”，点击时可以重新播放
-    reportEnded();
-    setIsPlaying(false);
-    KeepAwake.deactivateKeepAwake("PLAY");
-    setPortraitExpanded(false);
-    onPlayEnded();
-  });
+  React.useEffect(() => {
+    if (!uri) {
+      return;
+    }
+    const endedPlayer = player;
+    const endedCid = cid;
+    const endedPage = currentPage;
+    playEndGuardRef.current = { player: endedPlayer, handled: false };
+    const subscription = endedPlayer.addListener("playToEnd", () => {
+      const active = activePlayerRef.current;
+      if (
+        playEndGuardRef.current.player !== endedPlayer ||
+        playEndGuardRef.current.handled ||
+        active.player !== endedPlayer ||
+        active.cid !== endedCid ||
+        active.page !== endedPage ||
+        !active.hasPlayed
+      ) {
+        return;
+      }
+      playEndGuardRef.current.handled = true;
+      // 部分设备播放结束后不会再派发 playingChange，这里主动收敛播放状态。
+      reportHeartbeatEndedRef.current({ bvid: videoInfo.bvid, cid: endedCid });
+      reportPartProgressEndedRef.current(videoInfo.bvid, endedCid);
+      setIsPlaying(false);
+      KeepAwake.deactivateKeepAwake("PLAY");
+      setPortraitExpanded(false);
+      onPlayEndedRef.current({ cid: endedCid, page: endedPage });
+    });
+    return () => {
+      subscription.remove();
+    };
+  }, [cid, currentPage, player, uri, videoInfo.bvid]);
 
   // 切换分P/清晰度时重置兜底状态与续播进度
   React.useEffect(() => {
@@ -302,6 +373,10 @@ export default function NativePlayer(props: NativePlayerProps) {
 
   // 切分P时收起弹幕输入条并清空本地回显
   React.useEffect(() => {
+    // 先清掉上一P 的运行时位置，避免新播放器尚未回报时间时把旧位置写到新 cid。
+    setCurrentTimeMs(0);
+    setIsPlaying(false);
+    setPlaybackStarted(false);
     setDanmakuComposerOpen(false);
     setLocalDanmaku([]);
     setDanmakuAnchorMs(0);
@@ -349,6 +424,10 @@ export default function NativePlayer(props: NativePlayerProps) {
     player.staysActiveInBackground = $backgroundPlayEnabled;
     player.showNowPlayingNotification = $backgroundPlayEnabled;
   }, [player, $backgroundPlayEnabled]);
+
+  React.useEffect(() => {
+    player.loop = playbackMode.loop;
+  }, [playbackMode.loop, player]);
 
   // 离开播放页暂停，回到页面后由用户手动继续
   React.useEffect(() => {
@@ -446,6 +525,9 @@ export default function NativePlayer(props: NativePlayerProps) {
         durationMs: resolvePlaybackDurationMs(),
       })
     ) {
+      if (playEndGuardRef.current.player === player) {
+        playEndGuardRef.current.handled = false;
+      }
       handleSeek(0);
     }
     player.play();
@@ -750,6 +832,9 @@ export default function NativePlayer(props: NativePlayerProps) {
           danmakuEnabled={$danmakuEnabled}
           canSendDanmaku={Boolean(danmakuAccount)}
           backgroundPlayEnabled={$backgroundPlayEnabled}
+          loopEnabled={playbackMode.loop}
+          autoNextEnabled={playbackMode.autoNext}
+          showAutoNext={props.showAutoNext}
           fullscreen={fullscreen}
           visible={controlsVisible}
           onTogglePlay={handleTogglePlay}
@@ -763,6 +848,8 @@ export default function NativePlayer(props: NativePlayerProps) {
             set$backgroundPlayEnabled(next);
             showToast(next ? "后台播放已开启" : "后台播放已关闭");
           }}
+          onToggleLoop={props.onToggleLoop}
+          onToggleAutoNext={props.onToggleAutoNext}
           onToggleFullscreen={() => {
             keepControlsVisible();
             onFullscreenChange(!fullscreen);

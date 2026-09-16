@@ -294,6 +294,18 @@ describe("play heartbeat reporter", () => {
     expect(mocks.sessions[1].session).not.toBe(mocks.sessions[0].session);
   });
 
+  test("ignores a stale end event from the previous part", () => {
+    const first = render({ cid: 1458260037, page: 1, currentTimeMs: 30_000 });
+    render({ cid: 999, page: 2, currentTimeMs: 10_000 });
+    mocks.heartbeat.mockClear();
+
+    first.reportEnded({ bvid: "BV1HS421w7wG", cid: 1458260037 });
+    expect(mocks.heartbeat).not.toHaveBeenCalled();
+
+    first.reportEnded({ bvid: "BV1HS421w7wG", cid: 999 });
+    expect(lastReport()).toMatchObject({ type: 4, playedTime: -1 });
+  });
+
   test("flushes a pause report when the play screen unmounts", () => {
     render({ currentTimeMs: 60_000 });
     vi.advanceTimersByTime(20_000);
