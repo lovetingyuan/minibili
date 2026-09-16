@@ -1,7 +1,9 @@
+import { useNavigation } from "@react-navigation/native";
 import { Pressable, View } from "react-native";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
+import type { NavigationProps } from "@/types";
 import { getImagePixelSize, parseDate, parseImgUrl } from "@/utils";
 
 import { Additional } from "../Additional";
@@ -10,28 +12,43 @@ import { Avatar, Text } from "../styled/rneui";
 import UpName from "../UpName";
 import { DynamicActions } from "./dynamic-actions";
 import { DynamicMedia } from "./dynamic-media";
+import { getDynamicUpTarget } from "./dynamic-target";
 
 function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
   const { item, compact } = props;
+  const navigation = useNavigation<NavigationProps["navigation"]>();
   const avatarSize = compact ? 28 : 36;
-  const meta = [item.date || parseDate(item.time, true), item.pubAction].filter(Boolean).join(" · ");
+  const meta = [item.date || parseDate(item.time, true), item.pubAction]
+    .filter(Boolean)
+    .join(" · ");
+  const openUpSpace = () => {
+    navigation.navigate("Dynamic", getDynamicUpTarget(item.author));
+  };
 
   return (
     <View className="mb-3 flex-row items-center">
-      <Avatar
-        rounded
-        size={avatarSize}
-        source={
-          item.author.face
-            ? { uri: parseImgUrl(item.author.face, getImagePixelSize(avatarSize)) }
-            : undefined
-        }
-        containerClassName="bg-neutral-200 dark:bg-neutral-700"
-      />
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`查看 ${item.author.name} 的主页`}
+        hitSlop={4}
+        onPress={openUpSpace}
+      >
+        <Avatar
+          rounded
+          size={avatarSize}
+          source={
+            item.author.face
+              ? { uri: parseImgUrl(item.author.face, getImagePixelSize(avatarSize)) }
+              : undefined
+          }
+          containerClassName="bg-neutral-200 dark:bg-neutral-700"
+        />
+      </Pressable>
       <View className="ml-3 min-w-0 flex-1 flex-row items-center gap-2">
         <UpName
           mid={item.author.mid}
           numberOfLines={1}
+          onPress={openUpSpace}
           className={`shrink ${compact ? "text-sm font-semibold" : "text-base font-semibold"}`}
         >
           {item.author.name || "未知用户"}

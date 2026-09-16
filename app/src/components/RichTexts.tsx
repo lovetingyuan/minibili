@@ -11,7 +11,7 @@ import type { NavigationProps } from "@/types";
 import { parseUrl } from "@/utils";
 
 import { InlineEmoji } from "./InlineEmoji";
-import { getRichTextsContainerClassName } from "./rich-texts.helpers";
+import { getRichTextsContainerClassName, getRichTextsTextClassName } from "./rich-texts.helpers";
 import { Icon, Text } from "./styled/rneui";
 import UpName from "./UpName";
 
@@ -199,7 +199,7 @@ function RichTexts(props: Props) {
       {topic}
       {hasNodes ? (
         <Text
-          className="flex-1 flex-row flex-wrap items-center"
+          className={getRichTextsTextClassName()}
           {...props.textProps}
           onTextLayout={(event) => setLines(event.nativeEvent.lines.length)}
         >

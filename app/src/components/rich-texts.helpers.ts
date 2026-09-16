@@ -11,3 +11,15 @@ import { clsx } from "clsx";
 export function getRichTextsContainerClassName(textOverflow: boolean, className?: string) {
   return clsx(textOverflow ? "mb-4" : "mb-3", className);
 }
+
+/**
+ * 正文文本节点的样式：同样禁止 `flex-1`，理由与上面的容器一致。
+ *
+ * uniwind 把 `flex-1` 编译成 `flexBasis: "0%"`，列向父级高度有界时它会按父级高度解析：
+ * 剩余空间为 0 时正文塌成 0 高（文案消失），剩余空间大时正文把空间全部吃掉（把图片、操作栏顶出可视区，
+ * 评论条目还会按旧的头部高度和头部重叠）。
+ * 这里保留 `flex-row flex-wrap`，混排的文字与行内表情仍需按行换行；宽度靠列向容器默认的 stretch 撑满。
+ */
+export function getRichTextsTextClassName() {
+  return "flex-row flex-wrap items-center";
+}

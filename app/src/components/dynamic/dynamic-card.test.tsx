@@ -4,6 +4,11 @@ import { expect, test, vi } from "vitest";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
 
+const mocks = vi.hoisted(() => ({ navigate: vi.fn() }));
+
+vi.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ navigate: mocks.navigate }),
+}));
 vi.mock("react-native", () => ({ Pressable: "Pressable", View: "View" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/utils", () => ({
@@ -52,6 +57,25 @@ function text(node: ReactNode): string {
     .join("");
 }
 
+type TestElement = ReactElement<Record<string, unknown>>;
+
+function flatten(node: ReactNode): TestElement[] {
+  const elements: TestElement[] = [];
+  React.Children.forEach(node, (child) => {
+    if (!React.isValidElement<Record<string, unknown>>(child)) {
+      return;
+    }
+    if (typeof child.type === "function") {
+      const Component = child.type as (props: Record<string, unknown>) => ReactNode;
+      elements.push(...flatten(Component(child.props)));
+      return;
+    }
+    elements.push(child);
+    elements.push(...flatten(child.props.children as ReactNode));
+  });
+  return elements;
+}
+
 test("keeps the card body pressable and renders the action bar separately", () => {
   const card = DynamicCard({ item, onPress: vi.fn() });
   const directChildren = React.Children.toArray(card.props.children) as ReactElement[];
@@ -63,4 +87,53 @@ test("keeps the card body pressable and renders the action bar separately", () =
   expect(directChildren.some((child) => child.type === "DynamicActions")).toBe(true);
   expect(text(card)).not.toContain("播放视频");
   expect(text(card)).not.toContain("查看动态详情");
+});
+
+test("opens the author space from the avatar and the UP name", () => {
+  mocks.navigate.mockClear();
+  const elements = flatten(DynamicCard({ item, onPress: vi.fn() }));
+  const avatar = elements.find(
+    (element) =>
+      element.type === "Pressable" && typeof element.props.accessibilityLabel === "string",
+  );
+  const name = elements.find((element) => element.type === "UpName");
+
+  if (!avatar || !name) {
+    throw new Error("Missing author avatar or name");
+  }
+
+  (avatar.props.onPress as () => void)();
+  expect(mocks.navigate).toHaveBeenLastCalledWith("Dynamic", {
+    user: { face: "", mid: 1, name: "UP", sign: "" },
+  });
+
+  (name.props.onPress as () => void)();
+  expect(mocks.navigate).toHaveBeenLastCalledWith("Dynamic", {
+    user: { face: "", mid: 1, name: "UP", sign: "" },
+  });
+  expect(mocks.navigate).toHaveBeenCalledTimes(2);
+});
+
+test("opens the original author space from a forwarded dynamic", () => {
+  mocks.navigate.mockClear();
+  const elements = flatten(
+    DynamicCard({
+      item: {
+        ...item,
+        original: {
+          ...item,
+          id: "dynamic-2",
+          author: { mid: 2, name: "原作者", face: "face.jpg" },
+        },
+      },
+      onPress: vi.fn(),
+    }),
+  );
+  const names = elements.filter((element) => element.type === "UpName");
+
+  expect(names).toHaveLength(2);
+  (names[1].props.onPress as () => void)();
+  expect(mocks.navigate).toHaveBeenLastCalledWith("Dynamic", {
+    user: { face: "face.jpg", mid: 2, name: "原作者", sign: "" },
+  });
 });

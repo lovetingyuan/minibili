@@ -1,5 +1,17 @@
-import type { DynamicItem } from "@/api/dynamic-items.type";
+import type { DynamicAuthor, DynamicItem } from "@/api/dynamic-items.type";
 import type { RootStackParamList, UpInfo } from "@/types";
+
+/** UP 主页即该 UP 的动态列表页。 */
+export function getDynamicUpTarget(author: DynamicAuthor): RootStackParamList["Dynamic"] {
+  return {
+    user: {
+      face: author.face,
+      mid: author.mid,
+      name: author.name,
+      sign: "",
+    },
+  };
+}
 
 /** 视频类型的动态没有独立详情页，直接在播放页打开。 */
 export function getDynamicVideoTarget(item: DynamicItem): RootStackParamList["Play"] | null {
