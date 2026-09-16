@@ -15,6 +15,19 @@ export type FavoriteFolders = z.infer<typeof FavoriteFoldersSchema>;
 export type FavoriteResource = z.infer<typeof FavoriteResourceSchema>;
 export type FavoriteResources = z.infer<typeof FavoriteResourcesSchema>;
 export type FavoriteRequest = (url: string) => Promise<unknown>;
+export type FavoriteRequestDependencies = {
+  readCookie: () => Promise<string | null>;
+  isCurrentAccount: (account: FavoriteAccount) => boolean;
+};
+export type CreateFavoriteFolderInput = {
+  account: FavoriteAccount;
+  title: string;
+  privacy: 0 | 1;
+};
+export type DeleteFavoriteFolderInput = {
+  account: FavoriteAccount;
+  folderId: number;
+};
 export type FavoriteFoldersKey = readonly ["bilibili-favorite-folders", string, number];
 export type FavoriteResourcesKey = readonly [
   "bilibili-favorite-resources",

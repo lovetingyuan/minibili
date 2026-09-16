@@ -13,6 +13,7 @@ import {
   ListItem as BaseListItem,
   Overlay as BaseOverlay,
   Skeleton as BaseSkeleton,
+  Switch as BaseSwitch,
   Text as BaseText,
   ThemeProvider,
   createTheme,
@@ -34,6 +35,7 @@ import type {
   ListItemProps as BaseListItemProps,
   OverlayProps as BaseOverlayProps,
   SkeletonProps as BaseSkeletonProps,
+  SwitchProps as BaseSwitchProps,
   TextProps as BaseTextProps,
 } from "@rneui/base";
 import { FlashList as BaseFlashList } from "@shopify/flash-list";
@@ -552,6 +554,41 @@ type SkeletonProps = BaseSkeletonProps & {
   skeletonClassName?: string;
 };
 
+type SwitchProps = BaseSwitchProps & {
+  colorClassName?: string;
+  iosBackgroundColorClassName?: string;
+  trackColorOnClassName?: string;
+  trackColorOffClassName?: string;
+};
+
+export function Switch({
+  colorClassName,
+  iosBackgroundColorClassName,
+  trackColorOnClassName,
+  trackColorOffClassName,
+  color,
+  ios_backgroundColor,
+  trackColor,
+  ...props
+}: SwitchProps) {
+  const resolvedColor = useResolvedColor(colorClassName);
+  const resolvedIosBackgroundColor = useResolvedColor(iosBackgroundColorClassName);
+  const resolvedTrackColorOn = useResolvedColor(trackColorOnClassName);
+  const resolvedTrackColorOff = useResolvedColor(trackColorOffClassName);
+
+  return (
+    <SwitchPrimitive
+      {...props}
+      color={resolvedColor ?? color}
+      ios_backgroundColor={resolvedIosBackgroundColor ?? ios_backgroundColor}
+      trackColor={{
+        false: resolvedTrackColorOff ?? trackColor?.false,
+        true: resolvedTrackColorOn ?? trackColor?.true,
+      }}
+    />
+  );
+}
+
 export function Skeleton({
   className,
   skeletonClassName,
@@ -592,6 +629,7 @@ const IconPrimitive = BaseIcon as unknown as React.ComponentType<IconProps>;
 const ListItemAccordionPrimitive =
   BaseListItem.Accordion as unknown as React.ComponentType<ListItemAccordionProps>;
 const OverlayPrimitive = BaseOverlay as unknown as React.ComponentType<OverlayProps>;
+const SwitchPrimitive = BaseSwitch as unknown as React.ComponentType<SwitchProps>;
 
 export { ThemeProvider, createTheme };
 export type { FlashListProps, FlashListRef };

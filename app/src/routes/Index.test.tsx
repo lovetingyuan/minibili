@@ -38,6 +38,7 @@ vi.mock("./Dynamic", () => ({ default: "Dynamic" }));
 vi.mock("./DynamicDetail", () => ({ default: "DynamicDetail" }));
 vi.mock("./Followings/BilibiliAccountGate", () => ({ default: "BilibiliAccountGate" }));
 vi.mock("./Followings/FavoritesContent", () => ({ default: "FavoritesContent" }));
+vi.mock("./Followings/FavoritesHeader", () => ({ headerRight: "favoritesHeaderRight" }));
 vi.mock("./Followings/FollowingDynamicsContent", () => ({
   default: "FollowingDynamicsContent",
 }));
@@ -167,5 +168,9 @@ test("full-screen routes live above the tab navigator", () => {
   });
   expect(screens.find((screen) => screen.props.name === "WatchLater")?.props.options).toEqual({
     headerTitle: "稍后再看",
+  });
+  expect(screens.find((screen) => screen.props.name === "Favorites")?.props.options).toEqual({
+    headerTitle: "我的收藏",
+    headerRight: "favoritesHeaderRight",
   });
 });

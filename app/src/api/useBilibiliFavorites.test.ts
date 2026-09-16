@@ -11,11 +11,15 @@ const mocks = vi.hoisted(() => ({
   account: { mid: "1", generation: 1 } as FavoriteAccount | null,
   current: true,
   pending: { current: false },
+  refs: [] as { current: unknown }[],
+  refIndex: 0,
   effects: [] as (() => void)[],
   infinite: vi.fn(),
   swr: vi.fn(),
   request: vi.fn(),
   mutateCache: vi.fn(),
+  createFolder: vi.fn(),
+  deleteFolder: vi.fn(),
   response: {
     data: undefined as FavoriteResources[] | undefined,
     size: 1,
@@ -31,7 +35,13 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("react", () => ({
-  useRef: () => mocks.pending,
+  // 分页 hook 用 useRef(false) 作为进行中标记，其余 ref 按调用顺序独立保存
+  useRef: (initial: unknown) => {
+    if (initial === false) return mocks.pending;
+    const index = mocks.refIndex++;
+    mocks.refs[index] ??= { current: initial };
+    return mocks.refs[index];
+  },
   useEffect: (effect: () => void) => {
     mocks.effects.push(effect);
   },
@@ -48,8 +58,20 @@ vi.mock("../features/bilibili-session/useBilibiliSession", () => ({
   useBilibiliSessionState: () => ({ account: mocks.account }),
 }));
 vi.mock("./fetcher", () => ({ default: mocks.request }));
+vi.mock("./get-cookie", () => ({ getBilibiliLoginCookie: vi.fn() }));
+vi.mock("./favorites", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("./favorites")>()),
+  createBilibiliFavoriteFolder: mocks.createFolder,
+  deleteBilibiliFavoriteFolder: mocks.deleteFolder,
+}));
 
-import { useBilibiliFavoriteFolders, useBilibiliFavoriteResources } from "./useBilibiliFavorites";
+import {
+  useBilibiliFavoriteFolderActions,
+  useBilibiliFavoriteFolders,
+  useBilibiliFavoriteResources,
+} from "./useBilibiliFavorites";
+import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { FavoriteFolderResultUnknownError, getFavoriteFoldersKey } from "./favorites";
 import {
   FavoriteResourcesChangedError,
   invalidateFavoriteResourceRequests,
@@ -60,13 +82,20 @@ const page: FavoriteResources = {
   medias: [{ id: 10, type: 2, title: "video", bvid: "BV1" }],
   has_more: true,
 };
+const account = { mid: "1", generation: 1 };
+const createdFolder = { id: 456, fid: 45, mid: 1, title: "test", media_count: 0 };
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.account = { mid: "1", generation: 1 };
+  mocks.account = account;
   mocks.current = true;
   mocks.pending.current = false;
+  mocks.refs = [];
+  mocks.refIndex = 0;
   mocks.effects = [];
+  mocks.mutateCache.mockResolvedValue(undefined);
+  mocks.createFolder.mockResolvedValue(createdFolder);
+  mocks.deleteFolder.mockResolvedValue(undefined);
   Object.assign(mocks.response, {
     data: [page],
     size: 1,
@@ -181,5 +210,71 @@ describe("favorite hooks", () => {
     expect(mocks.response.setSize.mock.invocationCallOrder[0]).toBeLessThan(
       mocks.response.mutate.mock.invocationCallOrder[0],
     );
+  });
+});
+
+describe("favorite folder actions", () => {
+  const dependencies = expect.anything();
+
+  test("creates a folder with the current account and refreshes the folder list", async () => {
+    const actions = useBilibiliFavoriteFolderActions();
+    await expect(actions.createFolder({ title: "test", privacy: 0 })).resolves.toEqual(
+      createdFolder,
+    );
+    expect(mocks.createFolder).toHaveBeenCalledWith(
+      { account, title: "test", privacy: 0 },
+      dependencies,
+    );
+    expect(mocks.mutateCache).toHaveBeenCalledWith(getFavoriteFoldersKey(account));
+  });
+
+  test("deletes a folder, drops its page cache and refreshes the folder list", async () => {
+    const actions = useBilibiliFavoriteFolderActions();
+    await actions.deleteFolder(123);
+    expect(mocks.deleteFolder).toHaveBeenCalledWith({ account, folderId: 123 }, dependencies);
+    expect(mocks.mutateCache).toHaveBeenCalledWith(getFavoriteFoldersKey(account));
+    // 通过 key 过滤器清理已删除收藏夹的单页缓存
+    expect(mocks.mutateCache.mock.calls.some(([key]) => typeof key === "function")).toBe(true);
+  });
+
+  test("stays idle without a current account", async () => {
+    mocks.account = null;
+    const actions = useBilibiliFavoriteFolderActions();
+    await expect(actions.createFolder({ title: "test", privacy: 0 })).rejects.toBeInstanceOf(
+      BilibiliSessionChangedError,
+    );
+    mocks.account = account;
+    mocks.current = false;
+    await expect(actions.deleteFolder(123)).rejects.toBeInstanceOf(BilibiliSessionChangedError);
+    expect(mocks.createFolder).not.toHaveBeenCalled();
+    expect(mocks.deleteFolder).not.toHaveBeenCalled();
+    expect(mocks.mutateCache).not.toHaveBeenCalled();
+  });
+
+  test.each(["create", "delete"] as const)(
+    "refreshes the list before reporting an unknown %s result",
+    async (action) => {
+      const failed = new FavoriteFolderResultUnknownError("无法确认结果");
+      const target = action === "create" ? mocks.createFolder : mocks.deleteFolder;
+      target.mockRejectedValueOnce(failed);
+      const actions = useBilibiliFavoriteFolderActions();
+      const run =
+        action === "create"
+          ? actions.createFolder({ title: "test", privacy: 1 })
+          : actions.deleteFolder(123);
+      await expect(run).rejects.toThrow("无法确认结果，已刷新收藏夹列表");
+      expect(mocks.mutateCache).toHaveBeenCalledWith(getFavoriteFoldersKey(account));
+    },
+  );
+
+  test("blocks a repeated delete of the same folder while it is pending", async () => {
+    const pending = Promise.withResolvers<void>();
+    mocks.deleteFolder.mockReturnValueOnce(pending.promise);
+    const actions = useBilibiliFavoriteFolderActions();
+    const first = actions.deleteFolder(123);
+    await expect(actions.deleteFolder(123)).rejects.toThrow("操作正在进行，请稍候");
+    pending.resolve();
+    await first;
+    expect(mocks.deleteFolder).toHaveBeenCalledOnce();
   });
 });

@@ -17,6 +17,7 @@ import Dynamic from './Dynamic';
 import DynamicDetail from './DynamicDetail';
 import BilibiliAccountGate from './Followings/BilibiliAccountGate';
 import FavoritesContent from './Followings/FavoritesContent';
+import { headerRight as favoritesHeaderRight } from './Followings/FavoritesHeader';
 import FollowingDynamicsContent from './Followings/FollowingDynamicsContent';
 import FollowingsContent from './Followings/FollowingsContent';
 import HistoryContent from './Followings/HistoryContent';
@@ -189,7 +190,11 @@ function AppRoute() {
           component={WebPage}
           options={({ route }) => ({ headerTitle: route.params.title || '-' })}
         />
-        <Stack.Screen name="Favorites" component={FavoritesRoute} options={{ headerTitle: '我的收藏' }} />
+        <Stack.Screen
+          name="Favorites"
+          component={FavoritesRoute}
+          options={{ headerTitle: '我的收藏', headerRight: favoritesHeaderRight }}
+        />
         <Stack.Screen name="History" component={HistoryRoute} options={{ headerTitle: '观看历史' }} />
         <Stack.Screen name="WatchLater" component={WatchLaterRoute} options={{ headerTitle: '稍后再看' }} />
       </Stack.Navigator>

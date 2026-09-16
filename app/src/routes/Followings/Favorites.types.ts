@@ -11,4 +11,12 @@ export type FavoriteFolderTabsProps = {
   selectedId?: number;
   disabled: boolean;
   onSelect: (id: number) => void;
+  onLongPress?: (folder: FavoriteFolder) => void;
+};
+
+export type CreateFavoriteFolderDialogProps = {
+  account: FavoriteAccount;
+  onClose: () => void;
+  onCreated: (folder: FavoriteFolder) => void;
+  onLoginRequired: (error: Error) => void;
 };

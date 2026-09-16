@@ -10,10 +10,12 @@ import {
 } from "react-native";
 
 import {
+  useBilibiliFavoriteFolderActions,
   useBilibiliFavoriteFolders,
   useBilibiliFavoriteResources,
 } from "@/api/useBilibiliFavorites";
-import type { FavoriteListItem } from "@/api/favorites.types";
+import type { FavoriteAccount, FavoriteFolder, FavoriteListItem } from "@/api/favorites.types";
+import { FavoriteLoginRequiredError } from "@/api/video-favorites";
 import { Button, FlashList, Icon, Text } from "@/components/styled/rneui";
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
@@ -30,6 +32,7 @@ import type { FavoriteEditorTarget } from "./Favorites.types";
 
 export default function FavoritesContent() {
   const folders = useBilibiliFavoriteFolders();
+  const { deleteFolder } = useBilibiliFavoriteFolderActions();
   const [selectedId, setSelectedId] = React.useState<number>();
   const [refreshing, setRefreshing] = React.useState(false);
   const refreshingRef = React.useRef(false);
@@ -69,13 +72,13 @@ export default function FavoritesContent() {
     ];
   }
 
-  function loginRequired(error: Error) {
+  function requestRelogin(error: Error, target: FavoriteAccount) {
     Alert.alert("请重新登录 B站", error.message, [
       { text: "取消", style: "cancel" },
       {
         text: "重新登录",
         onPress: () => {
-          if (!editing || !bilibiliSession.isCurrentAccount(editing.account)) {
+          if (!bilibiliSession.isCurrentAccount(target)) {
             showToast("登录状态已改变，请重新操作");
             return;
           }
@@ -84,6 +87,54 @@ export default function FavoritesContent() {
         },
       },
     ]);
+  }
+
+  function loginRequired(error: Error) {
+    if (editing) {
+      requestRelogin(error, editing.account);
+    }
+  }
+
+  function folderButtons(folder: FavoriteFolder) {
+    return [
+      {
+        text: "删除收藏夹",
+        onPress: () => {
+          Alert.alert(
+            "删除收藏夹",
+            `删除「${folder.title}」后无法恢复，收藏夹内的视频不会从 B站删除。`,
+            [
+              { text: "取消", style: "cancel" },
+              {
+                text: "删除",
+                style: "destructive",
+                onPress: () => {
+                  void removeFolder(folder);
+                },
+              },
+            ],
+          );
+        },
+      },
+    ];
+  }
+
+  async function removeFolder(folder: FavoriteFolder) {
+    if (!account || !bilibiliSession.isCurrentAccount(account)) {
+      showToast("登录状态已改变，请重新登录后操作");
+      return;
+    }
+    try {
+      await deleteFolder(folder.id);
+      showToast(`已删除收藏夹「${folder.title}」`);
+    } catch (cause) {
+      const error = cause instanceof Error ? cause : new Error("删除收藏夹失败，请稍后重试");
+      if (error instanceof FavoriteLoginRequiredError) {
+        requestRelogin(error, account);
+        return;
+      }
+      showToast(error.message);
+    }
   }
 
   React.useEffect(() => {
@@ -159,6 +210,7 @@ export default function FavoritesContent() {
             folders={folderList}
             selectedId={folder.id}
             onSelect={setSelectedId}
+            onLongPress={(item) => setOverlayButtons(folderButtons(item))}
             disabled={refreshing}
           />
           <FlashList

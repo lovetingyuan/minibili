@@ -9,6 +9,7 @@ export default function FavoriteFolderTabs({
   selectedId,
   disabled,
   onSelect,
+  onLongPress,
 }: FavoriteFolderTabsProps) {
   return (
     <View className={`border-b ${colors.gray2.border}`}>
@@ -24,8 +25,10 @@ export default function FavoriteFolderTabs({
             accessibilityRole="tab"
             accessibilityLabel={`${folder.title}，${folder.media_count} 个收藏`}
             accessibilityState={{ selected: selectedId === folder.id, disabled }}
+            accessibilityHint={onLongPress ? "长按打开收藏夹操作菜单" : undefined}
             disabled={disabled}
             onPress={() => onSelect(folder.id)}
+            onLongPress={onLongPress ? () => onLongPress(folder) : undefined}
             className={`rounded-full px-4 py-2 ${selectedId === folder.id ? colors.gray2.bg : colors.gray1.bg}`}
           >
             <Text

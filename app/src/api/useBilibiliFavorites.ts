@@ -2,22 +2,32 @@ import { useEffect, useRef } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 
+import { clearFavoriteResourcePages } from "../features/bilibili-favorites/mutations";
 import {
   FavoriteResourcesChangedError,
   getFavoriteResourceRevision,
+  invalidateFavoriteResourceRequests,
 } from "../features/bilibili-favorites/resource-revisions";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import fetcher from "./fetcher";
 import {
+  createBilibiliFavoriteFolder,
+  deleteBilibiliFavoriteFolder,
+  FavoriteFolderResultUnknownError,
   fetchBilibiliFavoriteFolders,
   fetchBilibiliFavoriteResources,
   getFavoriteFoldersKey,
   getFavoriteListItems,
   getFavoriteResourcesKey,
 } from "./favorites";
-import type { FavoriteResources, FavoriteResourcesKeyLoader } from "./favorites.types";
+import type {
+  FavoriteAccount,
+  FavoriteResources,
+  FavoriteResourcesKeyLoader,
+} from "./favorites.types";
+import { getBilibiliLoginCookie } from "./get-cookie";
 
 const favoriteOptions = {
   keepPreviousData: false,
@@ -115,4 +125,91 @@ export function useBilibiliFavoriteResources(folderId?: number) {
     loadMore,
     refresh,
   };
+}
+
+const folderMutationDependencies = {
+  readCookie: getBilibiliLoginCookie,
+  isCurrentAccount: (account: FavoriteAccount) => bilibiliSession.isCurrentAccount(account),
+};
+
+/**
+ * 收藏夹的新建与删除。写操作成功后统一刷新收藏夹列表，
+ * 结果不确定时先刷新再抛错，避免用户重复提交。
+ */
+export function useBilibiliFavoriteFolderActions() {
+  const account = useFavoriteAccount();
+  const { mutate: mutateCache } = useSWRConfig();
+  const pending = useRef(new Set<string>());
+
+  function assertAccount() {
+    if (!account || !bilibiliSession.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
+    return account;
+  }
+
+  // 刷新失败不影响已经成功的写操作，页面仍可下拉重试
+  function refreshFolders(current: FavoriteAccount) {
+    return mutateCache(getFavoriteFoldersKey(current)).catch(() => {});
+  }
+
+  async function run<T>(key: string, work: (current: FavoriteAccount) => Promise<T>) {
+    const current = assertAccount();
+    const pendingKey = `${current.mid}:${current.generation}:${key}`;
+    if (pending.current.has(pendingKey)) {
+      throw new Error("操作正在进行，请稍候");
+    }
+    pending.current.add(pendingKey);
+    try {
+      return await work(current);
+    } finally {
+      pending.current.delete(pendingKey);
+    }
+  }
+
+  function createFolder(options: { title: string; privacy: 0 | 1 }) {
+    return run("create", async (current) => {
+      try {
+        const folder = await createBilibiliFavoriteFolder(
+          { account: current, ...options },
+          folderMutationDependencies,
+        );
+        await refreshFolders(current);
+        return folder;
+      } catch (cause) {
+        if (!(cause instanceof FavoriteFolderResultUnknownError)) {
+          throw cause;
+        }
+        await refreshFolders(current);
+        throw new FavoriteFolderResultUnknownError(
+          `${cause.message}，已刷新收藏夹列表，请确认结果后再操作`,
+        );
+      }
+    });
+  }
+
+  function deleteFolder(folderId: number) {
+    return run(`delete:${folderId}`, async (current) => {
+      try {
+        await deleteBilibiliFavoriteFolder(
+          { account: current, folderId },
+          folderMutationDependencies,
+        );
+      } catch (cause) {
+        if (!(cause instanceof FavoriteFolderResultUnknownError)) {
+          throw cause;
+        }
+        await refreshFolders(current);
+        throw new FavoriteFolderResultUnknownError(
+          `${cause.message}，已刷新收藏夹列表，请确认结果后再操作`,
+        );
+      }
+      // 已删除的收藏夹不应再缓存内容页，也不能让在途请求写回旧数据
+      invalidateFavoriteResourceRequests(mutateCache, current, [folderId]);
+      await clearFavoriteResourcePages(current, new Set([folderId]), mutateCache).catch(() => {});
+      await refreshFolders(current);
+    });
+  }
+
+  return { createFolder, deleteFolder };
 }

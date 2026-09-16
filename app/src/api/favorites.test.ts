@@ -1,7 +1,10 @@
-import { describe, expect, test, vi } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import {
+  createBilibiliFavoriteFolder,
+  deleteBilibiliFavoriteFolder,
+  FavoriteFolderResultUnknownError,
   fetchBilibiliFavoriteFolders,
   fetchBilibiliFavoriteResources,
   getFavoriteFoldersKey,
@@ -9,7 +12,8 @@ import {
   getFavoriteResourcesKey,
 } from "./favorites";
 import { FavoriteFoldersSchema, FavoriteResourcesSchema } from "./favorites.schema";
-import type { FavoriteRequest } from "./favorites.types";
+import type { FavoriteRequest, FavoriteRequestDependencies } from "./favorites.types";
+import { FavoriteLoginRequiredError } from "./video-favorites";
 
 const account = { mid: "393120021", generation: 3 };
 const folder = {
@@ -196,5 +200,175 @@ describe("Bilibili favorite folders and resources", () => {
         () => true,
       ),
     ).rejects.toThrow("不匹配");
+  });
+});
+
+describe("Bilibili favorite folder writes", () => {
+  const writeAccount = { mid: "393120021", generation: 3 };
+  const cookie = "SESSDATA=session; DedeUserID=393120021; bili_jct=csrf-token";
+  const created = {
+    id: 4069395795,
+    fid: 40693957,
+    mid: 393120021,
+    title: "test",
+    media_count: 0,
+  };
+
+  function setup(value: string | null = cookie) {
+    const request = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(Response.json({ code: 0, message: "OK", ttl: 1, data: created }));
+    vi.stubGlobal("fetch", request);
+    const dependencies: FavoriteRequestDependencies = {
+      readCookie: vi.fn(async () => value),
+      isCurrentAccount: vi.fn(() => true),
+    };
+    return { request, dependencies };
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  test("creates a folder with the captured form body and the CSRF token", async () => {
+    const { request, dependencies } = setup();
+    const result = await createBilibiliFavoriteFolder(
+      { account: writeAccount, title: "test", privacy: 0 },
+      dependencies,
+    );
+    expect(result).toEqual(created);
+    expect(request).toHaveBeenCalledOnce();
+    expect(dependencies.readCookie).toHaveBeenCalledOnce();
+    const [url, options] = request.mock.calls[0];
+    expect(url).toBe("https://api.bilibili.com/x/v3/fav/folder/add");
+    expect(options?.method).toBe("POST");
+    expect(options?.credentials).toBe("omit");
+    const headers = new Headers(options?.headers);
+    expect(headers.get("cookie")).toBe(cookie);
+    expect(headers.get("content-type")).toBe("application/x-www-form-urlencoded");
+    expect(Object.fromEntries(new URLSearchParams(String(options?.body)))).toEqual({
+      title: "test",
+      privacy: "0",
+      csrf: "csrf-token",
+    });
+  });
+
+  test("deletes a folder with the multipart body used by the web client", async () => {
+    const { request, dependencies } = setup();
+    request.mockResolvedValue(Response.json({ code: 0, message: "0", ttl: 1, data: null }));
+    await deleteBilibiliFavoriteFolder(
+      { account: writeAccount, folderId: 4069395795 },
+      dependencies,
+    );
+    const [url, options] = request.mock.calls[0];
+    expect(url).toBe("https://api.bilibili.com/x/v3/fav/folder/del");
+    expect(options?.method).toBe("POST");
+    const headers = new Headers(options?.headers);
+    expect(headers.get("cookie")).toBe(cookie);
+    // multipart boundary 由 fetch 生成，不能手写 content-type
+    expect(headers.has("content-type")).toBe(false);
+    const body = options?.body;
+    expect(body).toBeInstanceOf(FormData);
+    expect(Object.fromEntries((body as FormData).entries())).toEqual({
+      media_ids: "4069395795",
+      platform: "web",
+      csrf: "csrf-token",
+    });
+  });
+
+  test("refuses an invalid folder id before requesting", async () => {
+    const { request, dependencies } = setup();
+    for (const folderId of [0, -1, 1.5, Number.NaN]) {
+      await expect(
+        deleteBilibiliFavoriteFolder({ account: writeAccount, folderId }, dependencies),
+      ).rejects.toThrow("收藏夹 ID 无效");
+    }
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  test("requires the signed-in cookie, matching mid and a CSRF token", async () => {
+    const missingLogin = setup("SESSDATA=session").dependencies;
+    await expect(
+      createBilibiliFavoriteFolder(
+        { account: writeAccount, title: "test", privacy: 0 },
+        missingLogin,
+      ),
+    ).rejects.toBeInstanceOf(FavoriteLoginRequiredError);
+
+    const missingCsrf = setup("SESSDATA=session; DedeUserID=393120021").dependencies;
+    await expect(
+      deleteBilibiliFavoriteFolder({ account: writeAccount, folderId: 1 }, missingCsrf),
+    ).rejects.toBeInstanceOf(FavoriteLoginRequiredError);
+
+    const otherAccount = setup("SESSDATA=session; DedeUserID=1; bili_jct=csrf-token").dependencies;
+    await expect(
+      deleteBilibiliFavoriteFolder({ account: writeAccount, folderId: 1 }, otherAccount),
+    ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
+  });
+
+  test("rejects stale sessions before and after the request", async () => {
+    let current = false;
+    const request = vi.fn<typeof fetch>();
+    vi.stubGlobal("fetch", request);
+    const dependencies: FavoriteRequestDependencies = {
+      readCookie: vi.fn(async () => cookie),
+      isCurrentAccount: () => current,
+    };
+    await expect(
+      createBilibiliFavoriteFolder(
+        { account: writeAccount, title: "test", privacy: 1 },
+        dependencies,
+      ),
+    ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
+    expect(request).not.toHaveBeenCalled();
+
+    current = true;
+    request.mockImplementation(async () => {
+      current = false;
+      return Response.json({ code: 0, message: "OK", data: created });
+    });
+    await expect(
+      createBilibiliFavoriteFolder(
+        { account: writeAccount, title: "test", privacy: 1 },
+        dependencies,
+      ),
+    ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
+  });
+
+  test("reports expired credentials and API failures with the server message", async () => {
+    const expired = setup();
+    expired.request.mockResolvedValue(Response.json({ code: -101, message: "账号未登录" }));
+    await expect(
+      createBilibiliFavoriteFolder(
+        { account: writeAccount, title: "test", privacy: 0 },
+        expired.dependencies,
+      ),
+    ).rejects.toBeInstanceOf(FavoriteLoginRequiredError);
+
+    const rejected = setup();
+    rejected.request.mockResolvedValue(Response.json({ code: 22001, message: "收藏夹名称已存在" }));
+    await expect(
+      createBilibiliFavoriteFolder(
+        { account: writeAccount, title: "test", privacy: 0 },
+        rejected.dependencies,
+      ),
+    ).rejects.toThrow("创建收藏夹失败（22001）：收藏夹名称已存在");
+  });
+
+  test("reports an unknown result when the response never arrives", async () => {
+    const { request, dependencies } = setup();
+    request.mockRejectedValue(new TypeError("Network request failed"));
+    await expect(
+      deleteBilibiliFavoriteFolder({ account: writeAccount, folderId: 1 }, dependencies),
+    ).rejects.toBeInstanceOf(FavoriteFolderResultUnknownError);
+
+    const invalid = setup();
+    invalid.request.mockResolvedValue(Response.json({ code: 0, message: "OK", data: { id: 1 } }));
+    await expect(
+      createBilibiliFavoriteFolder(
+        { account: writeAccount, title: "test", privacy: 0 },
+        invalid.dependencies,
+      ),
+    ).rejects.toThrow("创建收藏夹结果异常");
   });
 });

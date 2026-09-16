@@ -16,6 +16,12 @@ export const FavoriteFoldersSchema = z.object({
     .transform((list) => list ?? []),
 });
 
+export const FavoriteFolderMutationResponseSchema = z.object({
+  code: z.number().int(),
+  message: z.string().optional(),
+  data: z.unknown().optional(),
+});
+
 export const FavoriteResourceSchema = z.object({
   id: z.number().int(),
   type: z.number().int(),
