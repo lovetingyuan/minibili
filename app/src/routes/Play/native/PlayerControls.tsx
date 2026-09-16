@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 
 import { formatPlaybackTime } from "./player-helpers";
+import PlayerTopActions from "./PlayerTopActions";
 
 /**
  * 控件显示/隐藏的淡入淡出时长
@@ -20,7 +21,10 @@ const StyledAnimatedView = withUniwind(Animated.View) as unknown as React.Compon
 >;
 
 type PlayerControlsProps = {
-  isPlaying: boolean;
+  /**
+   * 是否稳定处于暂停态（缓冲、seek 造成的短暂暂停不算，见 usePlayerPausedUi）
+   */
+  paused: boolean;
   currentTimeMs: number;
   durationMs: number;
   danmakuEnabled: boolean;
@@ -28,11 +32,16 @@ type PlayerControlsProps = {
    * 未登录 B站 时不展示发送弹幕按钮
    */
   canSendDanmaku: boolean;
+  /**
+   * 退到后台（含息屏）后是否继续播放
+   */
+  backgroundPlayEnabled: boolean;
   fullscreen: boolean;
   visible: boolean;
   onTogglePlay: () => void;
   onToggleDanmaku: () => void;
   onSendDanmaku: () => void;
+  onToggleBackgroundPlay: () => void;
   onToggleFullscreen: () => void;
   onSeek: (timeMs: number) => void;
   /**
@@ -90,7 +99,7 @@ function CharacterButton(props: {
 }
 
 export default function PlayerControls(props: PlayerControlsProps) {
-  const { isPlaying, danmakuEnabled, fullscreen, visible } = props;
+  const { paused, danmakuEnabled, fullscreen, visible } = props;
   const accentColor = useResolvedColor(colors.secondary.text) ?? "#ff6699";
   const insets = useSafeAreaInsets();
   const [trackWidth, setTrackWidth] = React.useState(0);
@@ -169,7 +178,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
 
   return (
     <>
-      {/* 右上角：发送弹幕，与底部控件同步显隐；全屏时避让状态栏与刘海 */}
+      {/* 右上角：后台播放开关与发送弹幕，与底部控件同步显隐；全屏时避让状态栏与刘海 */}
       <StyledAnimatedView
         className="absolute left-0 right-0 top-0 flex-row justify-end px-3"
         style={{ opacity, paddingTop: fullscreen ? Math.max(insets.top, 8) : 8 }}
@@ -177,19 +186,16 @@ export default function PlayerControls(props: PlayerControlsProps) {
         accessibilityElementsHidden={!visible}
         importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
       >
-        {props.canSendDanmaku ? (
-          <Pressable
-            className="h-9 w-9 items-center justify-center rounded-full bg-black/40"
-            accessibilityRole="button"
-            accessibilityLabel="发送弹幕"
-            hitSlop={8}
-            onPress={() => {
-              press(props.onSendDanmaku);
-            }}
-          >
-            <Icon name="pencil" type="material-design" size={20} color="#ffffff" />
-          </Pressable>
-        ) : null}
+        <PlayerTopActions
+          backgroundPlayEnabled={props.backgroundPlayEnabled}
+          canSendDanmaku={props.canSendDanmaku}
+          onToggleBackgroundPlay={() => {
+            press(props.onToggleBackgroundPlay);
+          }}
+          onSendDanmaku={() => {
+            press(props.onSendDanmaku);
+          }}
+        />
       </StyledAnimatedView>
       <StyledAnimatedView
         className="absolute bottom-0 left-0 right-0 bg-black/40 px-3 pb-1 pt-1"
@@ -200,8 +206,8 @@ export default function PlayerControls(props: PlayerControlsProps) {
       >
         <View className="flex-row items-center gap-2">
           <ControlButton
-            name={isPlaying ? "pause" : "play"}
-            label={isPlaying ? "暂停" : "播放"}
+            name={paused ? "play" : "pause"}
+            label={paused ? "播放" : "暂停"}
             size={26}
             color="#ffffff"
             onPress={() => {

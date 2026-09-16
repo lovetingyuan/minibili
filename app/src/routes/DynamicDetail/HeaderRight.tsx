@@ -2,7 +2,13 @@ import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, Share } from "react-native";
 
-import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuTrigger,
+  menuTriggerIconButtonStyles,
+} from "@/components/Menu";
 import { Icon } from "@/components/styled/rneui";
 import { showToast } from "@/utils";
 
@@ -14,7 +20,12 @@ export default function HeaderRight(props: { url: string; title: string; reload:
 
   return (
     <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
-      <MenuTrigger onPress={() => setVisible(true)}>
+      <MenuTrigger
+        accessibilityRole="button"
+        accessibilityLabel="更多操作"
+        customStyles={menuTriggerIconButtonStyles}
+        onPress={() => setVisible(true)}
+      >
         <Icon name="dots-vertical" type="material-community" />
       </MenuTrigger>
       <MenuOptions>

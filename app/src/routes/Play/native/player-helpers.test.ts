@@ -14,6 +14,7 @@ import {
   resolveSeekSwipeSeconds,
   resolveSeekTargetMs,
   resolveVerticalSwipe,
+  shouldShowResumeButton,
   shouldRestartPlayback,
   toggleControlsVisible,
 } from "./player-helpers";
@@ -33,6 +34,38 @@ test("auto hides controls only while playing", () => {
 test("toggles controls visibility on tap", () => {
   expect(toggleControlsVisible(true)).toBe(false);
   expect(toggleControlsVisible(false)).toBe(true);
+});
+
+const playingResumeOptions = {
+  started: true,
+  firstFrameRendered: true,
+  playbackStarted: true,
+  paused: true,
+  hasError: false,
+  overlayVisible: false,
+};
+
+test("shows the resume button after the playback was paused", () => {
+  expect(shouldShowResumeButton(playingResumeOptions)).toBe(true);
+});
+
+test("keeps the resume button hidden before the playback really started", () => {
+  // 首帧渲染比 playingChange 先到时播放还没开始，
+  // 此时展示按钮会在转圈消失后闪一下
+  expect(shouldShowResumeButton({ ...playingResumeOptions, playbackStarted: false })).toBe(false);
+  expect(shouldShowResumeButton({ ...playingResumeOptions, paused: false })).toBe(false);
+});
+
+test("hides the resume button before the video is prepared", () => {
+  expect(shouldShowResumeButton({ ...playingResumeOptions, started: false })).toBe(false);
+  expect(shouldShowResumeButton({ ...playingResumeOptions, firstFrameRendered: false })).toBe(
+    false,
+  );
+});
+
+test("hides the resume button when an overlay covers the video", () => {
+  expect(shouldShowResumeButton({ ...playingResumeOptions, hasError: true })).toBe(false);
+  expect(shouldShowResumeButton({ ...playingResumeOptions, overlayVisible: true })).toBe(false);
 });
 
 test("treats big playback jumps as seek", () => {
@@ -178,6 +211,19 @@ test("builds a media source with a referer and without an android user agent", (
   expect(source.headers?.Referer).toBe("https://www.bilibili.com");
   // B站 CDN 会拒绝 UA 含 "android" 的请求，ExoPlayer 默认 UA 同样会被拒
   expect(source.headers?.["User-Agent"]).not.toMatch(/android/i);
+});
+
+test("puts the video title into the now playing metadata", () => {
+  const source = createVideoSource("https://upos-sz-estghw.bilivideo.com/x.mp4", "【测试】标题");
+
+  expect(source.metadata).toEqual({ title: "【测试】标题" });
+});
+
+test("omits the now playing metadata when there is no title", () => {
+  expect(createVideoSource("https://upos-sz-estghw.bilivideo.com/x.mp4").metadata).toBeUndefined();
+  expect(
+    createVideoSource("https://upos-sz-estghw.bilivideo.com/x.mp4", "").metadata,
+  ).toBeUndefined();
 });
 
 test("falls back to the next cdn mirror before refreshing the play url", () => {

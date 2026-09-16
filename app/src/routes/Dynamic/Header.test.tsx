@@ -7,6 +7,10 @@ const mocks = vi.hoisted(() => ({
   follow: vi.fn(async () => {}),
   followedUps: {} as Record<string, { mid: number; name: string; face: string; sign: string }>,
   livingUrl: "",
+  menuTriggerIconButtonStyles: { TriggerTouchableComponent: "IconButton" } as Record<
+    string,
+    unknown
+  >,
   navigate: vi.fn(),
   relation: { data: { follower: 12345 } } as { data: { follower: number } | undefined },
   setCurrentImageIndex: vi.fn(),
@@ -47,6 +51,7 @@ vi.mock("@/components/Menu", () => ({
   MenuOption: "MenuOption",
   MenuOptions: "MenuOptions",
   MenuTrigger: "MenuTrigger",
+  menuTriggerIconButtonStyles: mocks.menuTriggerIconButtonStyles,
 }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
 vi.mock("@/components/styled/rneui", () => ({ Avatar: "Avatar", Icon: "Icon", Text: "Text" }));
@@ -80,8 +85,11 @@ vi.mock("../../utils", () => ({
 import { headerRight, headerTitle } from "./Header";
 
 type ElementProps = {
+  accessibilityLabel?: string;
+  accessibilityRole?: string;
   children?: ReactNode;
   className?: string;
+  customStyles?: unknown;
   disabled?: boolean;
   ellipsizeMode?: string;
   numberOfLines?: number;
@@ -113,6 +121,13 @@ function menuOptions() {
   return childElements(options);
 }
 
+function headerTrigger() {
+  const header = renderFunction(headerRight());
+  const [menu] = childElements(header);
+  const [trigger] = childElements(menu);
+  return trigger;
+}
+
 function headerTitleChildren() {
   const header = renderFunction(headerTitle());
   return childElements(header);
@@ -134,6 +149,16 @@ describe("UP 主动态页头部菜单", () => {
     const options = menuOptions();
 
     expect(options.map((option) => option.props.text)).toEqual(["关注UP", "分享UP"]);
+  });
+
+  test("右上角三个点渲染成图标按钮", () => {
+    const trigger = headerTrigger();
+
+    expect(trigger.type).toBe("MenuTrigger");
+    expect(trigger.props.accessibilityRole).toBe("button");
+    expect(trigger.props.accessibilityLabel).toBe("更多操作");
+    expect(trigger.props.customStyles).toBe(mocks.menuTriggerIconButtonStyles);
+    expect(trigger.props.onPress).toBeTypeOf("function");
   });
 
   test("未关注时点击第一项关注 UP", () => {

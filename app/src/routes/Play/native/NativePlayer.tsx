@@ -3,6 +3,7 @@ import { type RouteProp, useIsFocused, useNavigation, useRoute } from "@react-na
 import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
+import type { VideoPlayerStatus } from "expo-video";
 import React from "react";
 import {
   Alert,
@@ -57,10 +58,12 @@ import {
   resolvePlaybackFailover,
   resolvePreferredQuality,
   resolveSeekTargetMs,
+  shouldShowResumeButton,
   shouldRestartPlayback,
 } from "./player-helpers";
 import { usePlayerControlsVisibility } from "./usePlayerControlsVisibility";
 import { usePlayerGestures } from "./usePlayerGestures";
+import { usePlayerPausedUi } from "./usePlayerPausedUi";
 
 // Animated.View 需要额外包一层才能识别 className
 const StyledAnimatedView = withUniwind(Animated.View) as unknown as React.ComponentType<
@@ -81,7 +84,13 @@ export default function NativePlayer(props: NativePlayerProps) {
   const isFocused = useIsFocused();
   const netInfo = useNetInfo();
   const { width, height } = useWindowDimensions();
-  const { imagesList, $danmakuEnabled, set$danmakuEnabled, $backgroundPlayEnabled } = useStore();
+  const {
+    imagesList,
+    $danmakuEnabled,
+    set$danmakuEnabled,
+    $backgroundPlayEnabled,
+    set$backgroundPlayEnabled,
+  } = useStore();
   const { account } = useBilibiliSessionState();
   const { logout } = useBilibiliSessionActions();
   const { data } = useVideoInfo(route.params.bvid);
@@ -100,7 +109,10 @@ export default function NativePlayer(props: NativePlayerProps) {
   const [started, setStarted] = React.useState(false);
   // 视频首帧是否已经渲染到播放器上，未渲染前用封面盖住画面
   const [firstFrameRendered, setFirstFrameRendered] = React.useState(false);
+  // 播放是否真正开始过（收到过 playing=true），用于避免首帧渲染早于 playingChange 时续播按钮闪一下
+  const [playbackStarted, setPlaybackStarted] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
+  const [playerStatus, setPlayerStatus] = React.useState<VideoPlayerStatus>("idle");
   const [fastRate, setFastRate] = React.useState(false);
   const [playerError, setPlayerError] = React.useState<string | null>(null);
   const [isRetrying, setIsRetrying] = React.useState(false);
@@ -139,13 +151,19 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 已经按 B站记录跳转过的分P，避免每次就绪都重复跳转
   const resumeAppliedRef = React.useRef("");
 
+  // 真正处于暂停态：起播、seek、缓冲造成的短暂暂停不算，避免暂停态的 UI 闪一下
+  const pausedUiVisible = usePlayerPausedUi(isPlaying, playerStatus === "loading");
+  // 控件显隐跟随稳定的播放状态：播放真正开始前保持显示，之后缓冲也不会把控件弹回来
+  const controlsPlaying = playbackStarted && !pausedUiVisible;
   const { controlsVisible, toggleControls, keepControlsVisible, hideControls } =
-    usePlayerControlsVisibility(isPlaying);
+    usePlayerControlsVisibility(controlsPlaying);
 
   const qn = resolvePreferredQuality(isCellular, highQuality);
   const { urls, error: playUrlError, retry } = useVideoPlayUrl(videoInfo.bvid, cid, qn);
   const uri = urls[Math.min(playbackAttempt.index, urls.length - 1)];
-  const source = uri ? createVideoSource(uri) : null;
+  // 后台播放的系统通知标题。取路由参数里的标题，保证渲染期稳定，避免重建播放器
+  const notificationTitle = route.params.title || videoInfo.bvid;
+  const source = uri ? createVideoSource(uri, notificationTitle) : null;
 
   const player = useVideoPlayer(source, (instance) => {
     instance.timeUpdateEventInterval = 0.25;
@@ -191,6 +209,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   useEventListener(player, "playingChange", ({ isPlaying: playing }) => {
     setIsPlaying(playing);
     if (playing) {
+      setPlaybackStarted(true);
       void KeepAwake.activateKeepAwakeAsync("PLAY");
     } else {
       KeepAwake.deactivateKeepAwake("PLAY");
@@ -207,6 +226,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   });
 
   useEventListener(player, "statusChange", ({ status, error }) => {
+    setPlayerStatus(status);
     if (status === "readyToPlay") {
       setPlayerError(null);
       const resumePositionMs = resumePositionMsRef.current;
@@ -673,6 +693,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           cover={videoInfo.cover}
           containerWidth={width}
           containerHeight={containerHeight}
+          loading={!showError}
         />
       ) : null}
       {started ? (
@@ -701,12 +722,14 @@ export default function NativePlayer(props: NativePlayerProps) {
         <PlayerSeekHint targetMs={seekHint.targetMs} deltaSeconds={seekHint.deltaSeconds} />
       ) : null}
       {/* 首帧渲染前画面被封面盖住，此时不显示播放按钮，避免和封面叠在一起 */}
-      {started &&
-      firstFrameRendered &&
-      !isPlaying &&
-      !hasError &&
-      !seekHint &&
-      !danmakuComposerOpen ? (
+      {shouldShowResumeButton({
+        started,
+        firstFrameRendered,
+        playbackStarted,
+        paused: pausedUiVisible,
+        hasError,
+        overlayVisible: seekHint !== null || danmakuComposerOpen,
+      }) ? (
         <View pointerEvents="box-none" className="absolute inset-0 items-center justify-center">
           <Pressable
             accessibilityRole="button"
@@ -721,11 +744,12 @@ export default function NativePlayer(props: NativePlayerProps) {
       ) : null}
       {started ? (
         <PlayerControls
-          isPlaying={isPlaying}
+          paused={pausedUiVisible}
           currentTimeMs={currentTimeMs}
           durationMs={durationSeconds * 1000}
           danmakuEnabled={$danmakuEnabled}
           canSendDanmaku={Boolean(danmakuAccount)}
+          backgroundPlayEnabled={$backgroundPlayEnabled}
           fullscreen={fullscreen}
           visible={controlsVisible}
           onTogglePlay={handleTogglePlay}
@@ -734,6 +758,11 @@ export default function NativePlayer(props: NativePlayerProps) {
             setDanmakuAnchorMs(currentTimeMs);
           }}
           onSendDanmaku={openDanmakuComposer}
+          onToggleBackgroundPlay={() => {
+            const next = !$backgroundPlayEnabled;
+            set$backgroundPlayEnabled(next);
+            showToast(next ? "后台播放已开启" : "后台播放已关闭");
+          }}
           onToggleFullscreen={() => {
             keepControlsVisible();
             onFullscreenChange(!fullscreen);

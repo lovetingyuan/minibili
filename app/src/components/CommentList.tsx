@@ -156,11 +156,17 @@ export default function CommentList(props: CommentListProps) {
               <View className="flex-row items-center gap-3">
                 {props.dividerRight}
                 <Pressable
-                  className="rounded-full bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800"
+                  className="flex-row items-center gap-1 rounded-full bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800"
                   accessibilityRole="button"
                   accessibilityLabel={`当前按${mode === 3 ? '热度' : '时间'}排序，点击切换`}
                   onPress={() => setMode(current => (current === 3 ? 2 : 3))}
                 >
+                  <Icon
+                    name="sort-variant"
+                    type="material-community"
+                    size={14}
+                    colorClassName={colors.primary.accent}
+                  />
                   <Text className={clsx('text-xs font-medium', colors.primary.text)}>
                     {mode === 3 ? '按热度' : '按时间'}
                   </Text>

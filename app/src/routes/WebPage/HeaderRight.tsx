@@ -3,7 +3,13 @@ import { Icon } from "@/components/styled/rneui";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
 import { Linking, Share } from "react-native";
-import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuTrigger,
+  menuTriggerIconButtonStyles,
+} from "@/components/Menu";
 
 import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
@@ -20,9 +26,13 @@ function HeaderRight(props: { reload: () => void }) {
 
   const showMenu = () => setVisible(true);
   return (
-    // <View className="flex-row items-center gap-3">
     <Menu opened={visible} onBackdropPress={hideMenu} onClose={hideMenu}>
-      <MenuTrigger onPress={showMenu}>
+      <MenuTrigger
+        accessibilityRole="button"
+        accessibilityLabel="更多操作"
+        customStyles={menuTriggerIconButtonStyles}
+        onPress={showMenu}
+      >
         <Icon name="dots-vertical" type="material-community" />
       </MenuTrigger>
       <MenuOptions>
@@ -67,6 +77,5 @@ function HeaderRight(props: { reload: () => void }) {
         />
       </MenuOptions>
     </Menu>
-    // </View>
   );
 }
