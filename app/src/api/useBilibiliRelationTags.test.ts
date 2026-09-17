@@ -7,6 +7,7 @@ import {
   getSpecialFollowUpsKey,
   RelationTagResultUnknownError,
 } from "./relation-tags";
+import { getRelationTagMembersInfiniteKey } from "../features/bilibili-followings/relation-tag-members-cache";
 import type {
   RelationTagAccount,
   RelationTagMembersKeyLoader,
@@ -23,6 +24,8 @@ const mocks = vi.hoisted(() => ({
   swr: vi.fn(),
   request: vi.fn(),
   mutateCache: vi.fn(),
+  cache: { get: () => undefined as unknown },
+  tags: [] as { tagid: number; name: string; count: number; tip: string }[],
   createTag: vi.fn(),
   renameTag: vi.fn(),
   deleteTag: vi.fn(),
@@ -53,9 +56,15 @@ vi.mock("react", () => ({
 }));
 vi.mock("swr", () => ({
   default: mocks.swr,
-  useSWRConfig: () => ({ mutate: mocks.mutateCache }),
+  useSWRConfig: () => ({ mutate: mocks.mutateCache, cache: mocks.cache }),
+  unstable_serialize: (key: unknown) => JSON.stringify(key),
 }));
-vi.mock("swr/infinite", () => ({ default: mocks.infinite }));
+vi.mock("swr/infinite", () => ({
+  default: mocks.infinite,
+  // 真实实现只依赖 key 序列化，这里用等价字符串代替，方便断言聚合 key
+  unstable_serialize: (getKey: (index: number, previous: unknown) => unknown) =>
+    `$inf$${JSON.stringify(getKey(0, null))}`,
+}));
 vi.mock("../features/bilibili-session/session", () => ({
   bilibiliSession: { isCurrentAccount: () => mocks.current },
 }));
@@ -98,7 +107,17 @@ beforeEach(() => {
   mocks.refs = [];
   mocks.refIndex = 0;
   mocks.effects = [];
-  mocks.mutateCache.mockResolvedValue(undefined);
+  mocks.tags = [
+    { tagid: -10, name: "特别关注", count: 1, tip: "" },
+    { tagid: 0, name: "默认分组", count: 3, tip: "" },
+    { tagid: 446542, name: "考研", count: 2, tip: "" },
+  ];
+  // 刷新分组列表时返回最新分组：成员刷新的分组范围由它决定（这里是缓存为空的场景）
+  mocks.mutateCache.mockImplementation((key: unknown) =>
+    Promise.resolve(
+      Array.isArray(key) && key[0] === "bilibili-relation-tags" ? mocks.tags : undefined,
+    ),
+  );
   mocks.createTag.mockResolvedValue(createdTag);
   mocks.renameTag.mockResolvedValue(undefined);
   mocks.deleteTag.mockResolvedValue(undefined);
@@ -221,6 +240,8 @@ describe("relation tag actions", () => {
     expect(mocks.deleteTag).toHaveBeenCalledWith({ account, tagid: 446542 }, dependencies);
     expect(mocks.mutateCache.mock.calls.some(([key]) => typeof key === "function")).toBe(true);
     expect(mocks.mutateCache).toHaveBeenCalledWith(getRelationTagsKey(account));
+    // 被删除分组的 UP 会回到默认分组，默认分组列表要重新拉取
+    expect(mocks.mutateCache).toHaveBeenCalledWith(getRelationTagMembersInfiniteKey(account, 0));
   });
 
   test("设置分组后刷新分组列表并重新校验成员", async () => {
@@ -231,7 +252,17 @@ describe("relation tag actions", () => {
       dependencies,
     );
     expect(mocks.mutateCache).toHaveBeenCalledWith(getRelationTagsKey(account));
+    // 先清分页缓存（不重新校验单页），再重新校验每个分组的聚合 key
     expect(mocks.mutateCache.mock.calls.some(([key]) => typeof key === "function")).toBe(true);
+    expect(mocks.mutateCache).toHaveBeenCalledWith(expect.any(Function), undefined, {
+      revalidate: false,
+    });
+    // 缓存里没有分组列表时，至少保证本次选择的分组会重新拉取
+    for (const tagid of [-10, 446542]) {
+      expect(mocks.mutateCache).toHaveBeenCalledWith(
+        getRelationTagMembersInfiniteKey(account, tagid),
+      );
+    }
     expect(mocks.mutateCache).toHaveBeenCalledWith(getSpecialFollowUpsKey(account), undefined, {
       revalidate: true,
     });

@@ -5,6 +5,14 @@ import useSWRInfinite from "swr/infinite";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
+import {
+  clearRelationTagMemberPages,
+  revalidateRelationTagMembers,
+} from "../features/bilibili-followings/relation-tag-members-cache";
+import {
+  getCachedData,
+  syncRelationTagCounts,
+} from "../features/bilibili-followings/relation-tag-counts";
 import type { UpInfo } from "../types";
 import fetcher from "./fetcher";
 import { getBilibiliLoginCookie } from "./get-cookie";
@@ -15,11 +23,13 @@ import {
   fetchBilibiliRelationTags,
   fetchBilibiliUpRelationTags,
   fetchAllBilibiliRelationTagMembers,
+  getFollowGroupTags,
   getRelationTagMembersKey,
   getRelationTagsKey,
   getRelationUpTagsKey,
   getSpecialFollowUpsKey,
   RELATION_TAG_MEMBERS_PAGE_SIZE,
+  RELATION_TAG_DEFAULT_ID,
   RELATION_TAG_SPECIAL_ID,
   RelationTagLoginRequiredError,
   RelationTagResultUnknownError,
@@ -51,18 +61,6 @@ const relationTagMutationDependencies: RelationTagRequestDependencies = {
 function useRelationTagAccount() {
   const { account } = useBilibiliSessionState();
   return account && bilibiliSession.isCurrentAccount(account) ? account : null;
-}
-
-function membersKeyMatcher(account: RelationTagAccount, tagids?: readonly number[]) {
-  return (key: unknown) => {
-    if (!Array.isArray(key) || key[0] !== "bilibili-relation-tag-members") {
-      return false;
-    }
-    if (key[1] !== account.mid || key[2] !== account.generation) {
-      return false;
-    }
-    return !tagids || tagids.includes(key[3] as number);
-  };
 }
 
 export function useBilibiliRelationTags() {
@@ -203,7 +201,7 @@ export function useBilibiliSpecialFollowUps() {
  */
 export function useRelationTagActions() {
   const account = useRelationTagAccount();
-  const { mutate: mutateCache } = useSWRConfig();
+  const { mutate: mutateCache, cache } = useSWRConfig();
   const pending = useRef(new Set<string>());
 
   function assertAccount() {
@@ -215,13 +213,18 @@ export function useRelationTagActions() {
 
   // 刷新失败不影响已经成功的写操作，页面仍可下拉重试
   async function refreshTags(current: RelationTagAccount) {
-    await mutateCache(getRelationTagsKey(current)).catch(() => {});
+    return mutateCache<RelationTag[]>(getRelationTagsKey(current)).catch(() => undefined);
   }
 
-  async function revalidateMembers(current: RelationTagAccount, tagids?: readonly number[]) {
-    await mutateCache(membersKeyMatcher(current, tagids), undefined, { revalidate: true }).catch(
-      () => {},
-    );
+  // 拿不到分组列表时退回本次选择的分组，至少保证这些分组的成员列表会重新拉取
+  function toGroupTagIds(tags: RelationTag[] | undefined, fallback: readonly number[]) {
+    return tags ? getFollowGroupTags(tags).map((tag) => tag.tagid) : fallback;
+  }
+
+  // 结果不确定时只能普通刷新：分组列表刷新失败就退回本次选择的分组
+  async function refreshChangedGroups(current: RelationTagAccount, tagids: readonly number[]) {
+    const tags = await refreshTags(current);
+    await revalidateRelationTagMembers(mutateCache, current, toGroupTagIds(tags, tagids));
   }
 
   // 设置分组会改变「特别关注」成员，需要让全部列表的排序与高亮跟着更新
@@ -303,10 +306,10 @@ export function useRelationTagActions() {
         );
       }
       // 已删除的分组不再缓存在列表里
-      await mutateCache(membersKeyMatcher(current, [tagid]), undefined, {
-        revalidate: false,
-      }).catch(() => {});
+      await clearRelationTagMemberPages(mutateCache, current, [tagid]).catch(() => {});
       await refreshTags(current);
+      // 该分组下的 UP 会回到默认分组，默认分组列表需要重新拉取
+      await revalidateRelationTagMembers(mutateCache, current, [RELATION_TAG_DEFAULT_ID]);
     });
   }
 
@@ -321,15 +324,27 @@ export function useRelationTagActions() {
         if (!(cause instanceof RelationTagResultUnknownError)) {
           throw cause;
         }
-        await refreshTags(current);
-        await revalidateMembers(current);
+        await refreshChangedGroups(current, tagids);
         await revalidateSpecialFollowUps(current);
         throw new RelationTagResultUnknownError(
           `${cause.message}，已刷新分组，请确认结果后再操作`,
         );
       }
-      await refreshTags(current);
-      await revalidateMembers(current);
+      // 分组人数由 B站 异步统计，写成功后立刻拉取往往还是旧值，这里先本地更新再重试
+      void syncRelationTagCounts(
+        mutateCache,
+        cache,
+        current,
+        mid,
+        tagids,
+        () => bilibiliSession.isCurrentAccount(current),
+      );
+      // 设置分组不会改变分组本身，成员列表按缓存里的分组重新拉取
+      await revalidateRelationTagMembers(
+        mutateCache,
+        current,
+        toGroupTagIds(getCachedData<RelationTag[]>(cache, getRelationTagsKey(current)), tagids),
+      );
       await revalidateSpecialFollowUps(current);
     });
   }
