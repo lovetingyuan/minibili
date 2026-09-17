@@ -4,8 +4,8 @@ import {
   MAX_COOKIE_LENGTH,
   MAX_PATH_LENGTH,
   MAX_REQUEST_BYTES,
-} from "./contract";
-import type { BiliProfile, BiliProxyPayload } from "./contract";
+} from "./contract.js";
+import type { BiliProfile, BiliProxyPayload } from "./contract.js";
 
 export type ParseResult =
   | { ok: true; payload: BiliProxyPayload }

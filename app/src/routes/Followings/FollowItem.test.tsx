@@ -16,6 +16,7 @@ vi.mock("react-native", () => ({
 }));
 vi.mock("@/components/styled/rneui", () => ({ Avatar: "Avatar", Text: "Text" }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
+vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/hooks/useFollowActions", () => ({
   useFollowActions: () => ({ disabled: mocks.followDisabled }),
 }));
@@ -66,4 +67,12 @@ test("设置分组把当前 UP 交给弹窗", () => {
 
 test("没有设置分组入口时只展示关注与头像操作", () => {
   expect(openMenu().map((button) => button.text)).toEqual(["查看头像"]);
+});
+
+test("特别关注的 UP 名称使用主题色并加粗", () => {
+  const highlighted = FollowItem({ item, highlight: true }).props.children[1];
+  expect(highlighted.props.className).toContain("font-bold");
+  expect(highlighted.props.className).toContain("text-sky-600");
+  const plain = FollowItem({ item }).props.children[1];
+  expect(plain.props.className).not.toContain("font-bold");
 });

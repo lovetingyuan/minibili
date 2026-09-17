@@ -25,6 +25,7 @@ import type {
   RelationTagRequestDependencies,
   RelationTagsKey,
   RelationUpTagsKey,
+  SpecialFollowUpsKey,
   RenameRelationTagInput,
   SetUpRelationTagsInput,
 } from "./relation-tags.types";
@@ -40,6 +41,8 @@ export const RELATION_TAG_DEFAULT_ID = 0;
 export const RELATION_TAG_QUIET_ID = -2;
 
 const RELATION_TAG_MUTATION_TIMEOUT = 15000;
+/** 特别关注的分组人数上限很小，这里只做防御性限制，避免异常响应导致无限翻页。 */
+const RELATION_TAG_MEMBERS_MAX_PAGES = 20;
 const RELATION_TAG_CREATE_URL = "https://api.bilibili.com/x/relation/tag/create";
 const RELATION_TAG_UPDATE_URL = "https://api.bilibili.com/x/relation/tag/update";
 const RELATION_TAG_DELETE_URL = "https://api.bilibili.com/x/relation/tag/del";
@@ -81,6 +84,10 @@ export function getRelationUpTagsKey(account: RelationTagAccount, mid: string | 
     account.generation,
     String(mid),
   ] as RelationUpTagsKey;
+}
+
+export function getSpecialFollowUpsKey(account: RelationTagAccount): SpecialFollowUpsKey {
+  return ["bilibili-special-follow-ups", account.mid, account.generation];
 }
 
 /** 关注页展示的分组：特别关注 → 默认分组 → 自定义分组（保持接口顺序）。 */
@@ -145,6 +152,30 @@ export async function fetchBilibiliRelationTagMembers(
   const url = `/x/relation/tag?tagid=${tagid}&pn=${page}&ps=${RELATION_TAG_MEMBERS_PAGE_SIZE}`;
   const data = await withAccountGuard(() => request(url), isCurrentAccount);
   return RelationTagMembersSchema.parse(data).map(toUpInfo);
+}
+
+/** 「特别关注」的完整成员列表，用于全部列表的排序与高亮。 */
+export async function fetchAllBilibiliRelationTagMembers(
+  tagid: number,
+  request: RelationTagRequest,
+  isCurrentAccount: () => boolean,
+) {
+  const result: UpInfo[] = [];
+  const seen = new Set<string>();
+  for (let page = 1; page <= RELATION_TAG_MEMBERS_MAX_PAGES; page += 1) {
+    const members = await fetchBilibiliRelationTagMembers(tagid, page, request, isCurrentAccount);
+    for (const member of members) {
+      const mid = String(member.mid);
+      if (!seen.has(mid)) {
+        seen.add(mid);
+        result.push(member);
+      }
+    }
+    if (members.length < RELATION_TAG_MEMBERS_PAGE_SIZE) {
+      break;
+    }
+  }
+  return result;
 }
 
 export async function fetchBilibiliUpRelationTags(

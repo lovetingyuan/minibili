@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "部署在 Vercel（Node 运行时）的 B 站接口转发层，供 minibili-server 使用",
+  "type": "module",
   "scripts": {
     "dev": "node scripts/vercel.mjs dev",
     "deploy": "node scripts/vercel.mjs deploy --prod",

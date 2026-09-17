@@ -41,6 +41,7 @@ vi.mock("react", async (importOriginal) => {
 vi.mock("react-native", () => ({
   Pressable: "Pressable",
   ScrollView: "ScrollView",
+  TouchableOpacity: "TouchableOpacity",
   View: "View",
 }));
 vi.mock("@/components/styled/rneui", () => ({ Icon: "Icon", Text: "Text" }));
@@ -111,15 +112,29 @@ test("展示全部与分组数量，并标出当前选中项", () => {
   });
 });
 
-test("点击分组切换，只有自定义分组支持长按菜单", () => {
+test("点击分组切换，长按把目标分组交给父级处理", () => {
   const rendered = render();
-  tab("考研，2 个关注", rendered).props.onPress?.();
+  const customTab = tab("考研，2 个关注", rendered);
+  customTab.props.onPress?.();
   expect(mocks.onSelect).toHaveBeenCalledWith(tabs[2]);
+  expect(customTab.props.accessibilityHint).toBe("长按打开分组操作菜单");
 
-  expect(tab("考研，2 个关注", rendered).props.accessibilityHint).toBe("长按打开分组操作菜单");
-  expect(tab("全部，48 个关注", rendered).props.onLongPress).toBeUndefined();
-  tab("考研，2 个关注", rendered).props.onLongPress?.();
+  // 内置分组长按同样交给父级，由父级给出「不支持改名删除」的提示
+  const builtinTab = tab("全部，48 个关注", rendered);
+  expect(builtinTab.props.accessibilityHint).toBeUndefined();
+  builtinTab.props.onLongPress?.();
+  expect(mocks.onLongPress).toHaveBeenCalledWith(tabs[0]);
+
+  customTab.props.onLongPress?.();
   expect(mocks.onLongPress).toHaveBeenCalledWith(tabs[2]);
+  expect(mocks.onSelect).toHaveBeenCalledTimes(1);
+});
+
+test("再次点击已选中的自定义分组同样打开分组操作菜单", () => {
+  const customTab = tab("考研，2 个关注", render("tag-446542"));
+  customTab.props.onPress?.();
+  expect(mocks.onLongPress).toHaveBeenCalledWith(tabs[2]);
+  expect(mocks.onSelect).not.toHaveBeenCalled();
 });
 
 test("右侧加号用于新建分组，禁用时不再响应", () => {

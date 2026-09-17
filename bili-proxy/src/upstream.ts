@@ -1,4 +1,4 @@
-import { BILI_ORIGIN } from "./contract";
+import { BILI_ORIGIN } from "./contract.js";
 
 export interface UpstreamResult {
   body: string;

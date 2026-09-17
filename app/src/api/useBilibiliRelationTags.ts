@@ -14,10 +14,13 @@ import {
   fetchBilibiliRelationTagMembers,
   fetchBilibiliRelationTags,
   fetchBilibiliUpRelationTags,
+  fetchAllBilibiliRelationTagMembers,
   getRelationTagMembersKey,
   getRelationTagsKey,
   getRelationUpTagsKey,
+  getSpecialFollowUpsKey,
   RELATION_TAG_MEMBERS_PAGE_SIZE,
+  RELATION_TAG_SPECIAL_ID,
   RelationTagLoginRequiredError,
   RelationTagResultUnknownError,
   renameBilibiliRelationTag,
@@ -171,6 +174,30 @@ export function useBilibiliUpRelationTags(mid?: string | number) {
 }
 
 /**
+ * 「特别关注」成员集合：全部列表用它把特别关注的 UP 排到最前并高亮。
+ * 与「特别关注」分组页共用同一份 B站 数据源，但这里一次性取全。
+ */
+export function useBilibiliSpecialFollowUps() {
+  const account = useRelationTagAccount();
+  const response = useSWR<Set<string>, Error>(
+    account ? getSpecialFollowUpsKey(account) : null,
+    async () => {
+      if (!account) {
+        throw new Error("缺少当前账号");
+      }
+      const members = await fetchAllBilibiliRelationTagMembers(
+        RELATION_TAG_SPECIAL_ID,
+        fetcher,
+        () => bilibiliSession.isCurrentAccount(account),
+      );
+      return new Set(members.map((member) => String(member.mid)));
+    },
+    { ...relationTagOptions, dedupingInterval: 5 * 60 * 1000 },
+  );
+  return { ...response, data: account ? response.data : undefined };
+}
+
+/**
  * 分组的写操作。写成功后统一刷新分组列表；结果不确定时先刷新再抛错，
  * 避免用户重复提交。
  */
@@ -193,6 +220,13 @@ export function useRelationTagActions() {
 
   async function revalidateMembers(current: RelationTagAccount, tagids?: readonly number[]) {
     await mutateCache(membersKeyMatcher(current, tagids), undefined, { revalidate: true }).catch(
+      () => {},
+    );
+  }
+
+  // 设置分组会改变「特别关注」成员，需要让全部列表的排序与高亮跟着更新
+  async function revalidateSpecialFollowUps(current: RelationTagAccount) {
+    await mutateCache(getSpecialFollowUpsKey(current), undefined, { revalidate: true }).catch(
       () => {},
     );
   }
@@ -289,12 +323,14 @@ export function useRelationTagActions() {
         }
         await refreshTags(current);
         await revalidateMembers(current);
+        await revalidateSpecialFollowUps(current);
         throw new RelationTagResultUnknownError(
           `${cause.message}，已刷新分组，请确认结果后再操作`,
         );
       }
       await refreshTags(current);
       await revalidateMembers(current);
+      await revalidateSpecialFollowUps(current);
     });
   }
 

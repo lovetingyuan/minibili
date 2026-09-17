@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import type { UpInfo } from "../types";
-import { getRelationTagsKey, RelationTagResultUnknownError } from "./relation-tags";
+import {
+  getRelationTagsKey,
+  getSpecialFollowUpsKey,
+  RelationTagResultUnknownError,
+} from "./relation-tags";
 import type {
   RelationTagAccount,
   RelationTagMembersKeyLoader,
@@ -71,6 +75,7 @@ vi.mock("./relation-tags", async (importOriginal) => ({
 import {
   useBilibiliRelationTagMembers,
   useBilibiliRelationTags,
+  useBilibiliSpecialFollowUps,
   useRelationTagActions,
 } from "./useBilibiliRelationTags";
 
@@ -178,6 +183,16 @@ describe("relation tag hooks", () => {
       mocks.response.mutate.mock.invocationCallOrder[0],
     );
   });
+
+  test("特别关注成员集合用于全部列表的排序与高亮", async () => {
+    useBilibiliSpecialFollowUps();
+    const [key, load] = mocks.swr.mock.calls.at(-1) as [unknown, () => Promise<Set<string>>];
+    expect(key).toEqual(["bilibili-special-follow-ups", "1", 1]);
+    const member = { mid: 10, uname: "UP", face: "", sign: "" };
+    mocks.request.mockResolvedValueOnce([member, { ...member, mid: 11 }, member]);
+    await expect(load()).resolves.toEqual(new Set(["10", "11"]));
+    expect(mocks.request).toHaveBeenCalledWith("/x/relation/tag?tagid=-10&pn=1&ps=50");
+  });
 });
 
 describe("relation tag actions", () => {
@@ -217,6 +232,9 @@ describe("relation tag actions", () => {
     );
     expect(mocks.mutateCache).toHaveBeenCalledWith(getRelationTagsKey(account));
     expect(mocks.mutateCache.mock.calls.some(([key]) => typeof key === "function")).toBe(true);
+    expect(mocks.mutateCache).toHaveBeenCalledWith(getSpecialFollowUpsKey(account), undefined, {
+      revalidate: true,
+    });
   });
 
   test("结果不确定时先刷新分组再报错", async () => {

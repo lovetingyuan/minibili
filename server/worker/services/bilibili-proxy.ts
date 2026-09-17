@@ -10,7 +10,6 @@ const SOURCE_HEADER = "x-proxy-source";
 const TOKEN_HEADER = "x-proxy-token";
 
 export const BILI_VIEW_PATH = "/x/web-interface/view";
-export const BILI_VIEW_DETAIL_PATH = "/x/web-interface/view/detail";
 export const BILI_RELATION_STAT_PATH = "/x/relation/stat";
 export const BILI_MYINFO_PATH = "/x/space/v2/myinfo";
 

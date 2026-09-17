@@ -24,6 +24,8 @@ export type FollowGroupTabsProps = {
 
 export type FollowUpsGridProps = {
   ups: UpInfo[];
+  /** 特别关注的 UP：名称高亮，并在排序时排到最前 */
+  specialMids?: ReadonlySet<string>;
   onSetGroups?: (up: UpInfo) => void;
   refreshing?: boolean;
   onRefresh?: () => void;

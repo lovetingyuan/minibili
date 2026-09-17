@@ -46,11 +46,11 @@ const app = new Hono<{ Bindings: Env }>();
 
 ## B 站请求中转（bili-proxy）
 
-Worker 的出站 IP 会被 B 站风控直接拒绝（`412`/`403`），所以 server 里**没有任何直连 B 站的代码路径**：`/share` 的 `view`、`/x/relation/stat`，以及 `/api/user-data/sync` 的 `myinfo` 全部经 `bili-proxy` 子项目（部署在 Vercel，Node 运行时）转发。请求头（UA / Referer / Cookie）由 proxy 统一决定，Worker 只传 `path`、`profile` 与可选 `cookie`。
+Worker 的出站 IP 会被 B 站风控直接拒绝（`412`/`403`），所以 server 里**没有任何直连 B 站的代码路径**：`/share` 的 `view`、`/x/relation/stat`，以及 `/api/user-data/sync` 的 `myinfo` 全部经 `bili-proxy` 子项目（部署在 Vercel，Node 运行时、区域 `hkg1`）转发。请求头（Referer / Cookie，以及刻意不发的 User-Agent）由 proxy 统一决定，Worker 只传 `path`、`profile` 与可选 `cookie`；改动 `bili-proxy/src/headers.ts` 前请先读那里的实测结论，否则很容易又触发 412。
 
 需要配置：
 
-- `BILIBILI_PROXY_URL`：proxy 地址，写在 `wrangler.jsonc` 的 `vars` 里。
+- `BILIBILI_PROXY_URL`：proxy 地址，写在 `wrangler.jsonc` 的 `vars` 里（当前为 `https://bili-proxy-iota.vercel.app`）。
 - `BILIBILI_PROXY_TOKEN`：与 Vercel 侧 `BILI_PROXY_TOKEN` 一致的共享密钥，用 `npx wrangler secret put BILIBILI_PROXY_TOKEN` 注入；本地开发写进 `.dev.vars`（已 gitignore）。
 
 部署与冒烟步骤见 `bili-proxy/README.md`。上游失败时日志会输出 `[bili-proxy] ...`，带上 `path`、`profile`、`status`、`source`（`upstream` 表示 B 站返回、`relay` 表示 proxy 自身错误）与耗时，便于判断是风控还是代理故障。日志与缓存都不会包含 Cookie。

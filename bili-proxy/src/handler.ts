@@ -1,10 +1,10 @@
 import { timingSafeEqual } from "node:crypto";
 
-import { SOURCE_HEADER } from "./contract";
-import type { BiliProxyErrorBody, ProxySource } from "./contract";
-import { buildUpstreamHeaders, UPSTREAM_TIMEOUT_MS } from "./headers";
-import { parseProxyPayload } from "./parse";
-import { requestUpstream, UpstreamTimeoutError } from "./upstream";
+import { SOURCE_HEADER } from "./contract.js";
+import type { BiliProxyErrorBody, ProxySource } from "./contract.js";
+import { buildUpstreamHeaders, UPSTREAM_TIMEOUT_MS } from "./headers.js";
+import { parseProxyPayload } from "./parse.js";
+import { requestUpstream, UpstreamTimeoutError } from "./upstream.js";
 
 export interface ProxyRequestInput {
   /** 原始请求体文本，已由适配层读取。 */

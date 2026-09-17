@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-import { MAX_REQUEST_BYTES, TOKEN_HEADER } from "../src/contract";
-import { handleBiliProxy } from "../src/handler";
+import { MAX_REQUEST_BYTES, TOKEN_HEADER } from "../src/contract.js";
+import { handleBiliProxy } from "../src/handler.js";
 
 /** 与核心逻辑保持一致的超限响应，避免先把超大 body 读进来。 */
 function tooLargeResult() {

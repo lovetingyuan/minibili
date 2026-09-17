@@ -19,6 +19,7 @@ export type RelationTagMembersKey = readonly [
   number,
 ];
 export type RelationTagsKey = readonly ["bilibili-relation-tags", string, number];
+export type SpecialFollowUpsKey = readonly ["bilibili-special-follow-ups", string, number];
 export type RelationTagMembersKeyLoader = (
   index: number,
   previousPage: UpInfo[] | null,

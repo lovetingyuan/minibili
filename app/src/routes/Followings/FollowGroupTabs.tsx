@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 
 import { Icon, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
@@ -16,73 +16,108 @@ export default function FollowGroupTabs({
 }: FollowGroupTabsProps) {
   const scrollRef = React.useRef<ScrollView | null>(null);
   const [offsets, setOffsets] = React.useState<Record<string, number>>({});
-  const selectedOffset = offsets[selectedKey];
+  const [viewportWidth, setViewportWidth] = React.useState(0);
+  const tabWidthsRef = React.useRef<Record<string, number>>({});
+  const scrollXRef = React.useRef(0);
 
   React.useEffect(() => {
-    if (selectedOffset === undefined) {
+    const left = offsets[selectedKey];
+    const width = tabWidthsRef.current[selectedKey];
+    if (left === undefined || width === undefined || viewportWidth <= 0) {
       return;
     }
-    scrollRef.current?.scrollTo({ x: Math.max(0, selectedOffset - 16), animated: true });
-  }, [selectedKey, selectedOffset]);
+    const padding = 16;
+    const start = left - padding;
+    const end = left + width + padding;
+    const visibleStart = scrollXRef.current;
+    const visibleEnd = visibleStart + viewportWidth;
+    // 选中的 tab 已经完整可见时不动，否则左右滑动切换分组会让 tab 行自己也来回移动
+    if (start >= visibleStart && end <= visibleEnd) {
+      return;
+    }
+    scrollRef.current?.scrollTo({ x: Math.max(0, start), animated: true });
+  }, [offsets, selectedKey, viewportWidth]);
 
   return (
-    <View className={`flex-row items-center border-b ${colors.gray2.border}`}>
-      <ScrollView
-        ref={scrollRef}
-        horizontal
-        nestedScrollEnabled
-        showsHorizontalScrollIndicator={false}
-        className="flex-1"
-        contentContainerClassName="gap-2 py-3 pl-3"
-      >
-        {tabs.map((tab) => (
-          <Pressable
-            key={tab.key}
-            accessibilityRole="tab"
-            accessibilityLabel={`${tab.name}，${tab.count} 个关注`}
-            accessibilityState={{ selected: selectedKey === tab.key, disabled }}
-            accessibilityHint={tab.custom ? "长按打开分组操作菜单" : undefined}
-            disabled={disabled}
-            onLayout={({ nativeEvent }) => {
-              const x = nativeEvent.layout.x;
-              setOffsets((previous) => (previous[tab.key] === x ? previous : { ...previous, [tab.key]: x }));
-            }}
-            onPress={() => {
-              onSelect(tab);
-            }}
-            onLongPress={
-              tab.custom
-                ? () => {
-                    onLongPress(tab);
-                  }
-                : undefined
-            }
-            className={`rounded-full px-4 py-2 ${
-              selectedKey === tab.key ? colors.gray2.bg : colors.gray1.bg
-            }`}
-          >
-            <Text
-              className={`text-sm ${
-                selectedKey === tab.key ? `${colors.primary.text} font-bold` : colors.gray6.text
+    <View>
+      <View className="flex-row items-center">
+        <ScrollView
+          ref={scrollRef}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="flex-1"
+          contentContainerClassName="gap-2 py-3 pl-3"
+          scrollEventThrottle={32}
+          onLayout={({ nativeEvent }) => {
+            const width = nativeEvent.layout.width;
+            setViewportWidth((previous) => (previous === width ? previous : width));
+          }}
+          onScroll={({ nativeEvent }) => {
+            scrollXRef.current = nativeEvent.contentOffset.x;
+          }}
+        >
+          {tabs.map((tab) => (
+            <TouchableOpacity
+              key={tab.key}
+              activeOpacity={0.7}
+              accessibilityRole="tab"
+              accessibilityLabel={`${tab.name}，${tab.count} 个关注`}
+              accessibilityState={{ selected: selectedKey === tab.key, disabled }}
+              accessibilityHint={tab.custom ? "长按打开分组操作菜单" : undefined}
+              disabled={disabled}
+              delayLongPress={300}
+              onLayout={({ nativeEvent }) => {
+                const { x, width } = nativeEvent.layout;
+                tabWidthsRef.current[tab.key] = width;
+                setOffsets((previous) =>
+                  previous[tab.key] === x ? previous : { ...previous, [tab.key]: x },
+                );
+              }}
+              onLongPress={() => {
+                onLongPress(tab);
+              }}
+              onPress={() => {
+                // 已选中的自定义分组再次点击时也给出编辑入口，长按不便时依然能改名/删除
+                if (tab.custom && selectedKey === tab.key) {
+                  onLongPress(tab);
+                  return;
+                }
+                onSelect(tab);
+              }}
+              className={`rounded-full px-4 py-2 ${
+                selectedKey === tab.key ? colors.gray2.bg : colors.gray1.bg
               }`}
             >
-              {tab.name}（{tab.count}）
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-      <View className={`justify-center self-stretch border-l py-3 pl-2 pr-3 ${colors.gray2.border}`}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="新建分组"
-          accessibilityState={{ disabled }}
-          disabled={disabled}
-          onPress={onCreate}
-          className={`h-8 w-8 items-center justify-center rounded-full ${colors.gray1.bg}`}
-        >
-          <Icon name="plus" type="material-community" size={18} colorClassName={colors.gray7.accent} />
-        </Pressable>
+              <Text
+                className={`text-sm ${
+                  selectedKey === tab.key ? `${colors.primary.text} font-bold` : colors.gray6.text
+                }`}
+              >
+                {tab.name}（{tab.count}）
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <View className="justify-center py-3 pl-2 pr-3">
+          <TouchableOpacity
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="新建分组"
+            accessibilityState={{ disabled }}
+            disabled={disabled}
+            onPress={onCreate}
+            className={`h-8 w-8 items-center justify-center rounded-full ${colors.gray1.bg}`}
+          >
+            <Icon
+              name="plus"
+              type="material-community"
+              size={18}
+              colorClassName={colors.gray7.accent}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
+      <View className={`h-px w-full ${colors.gray2.bg}`} />
     </View>
   );
 }

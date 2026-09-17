@@ -7,6 +7,7 @@ import type { FollowUpsGridProps } from "./FollowGroups.types";
 
 export default function FollowUpsGrid({
   ups,
+  specialMids,
   onSetGroups,
   refreshing,
   onRefresh,
@@ -28,7 +29,11 @@ export default function FollowUpsGrid({
       keyExtractor={(item, index) => (item ? `${item.mid}` : `filler-${index}`)}
       renderItem={({ item }) =>
         item ? (
-          <FollowItem item={item} onSetGroups={onSetGroups} />
+          <FollowItem
+            item={item}
+            highlight={specialMids?.has(String(item.mid))}
+            onSetGroups={onSetGroups}
+          />
         ) : (
           <View className="flex-1" />
         )

@@ -3,6 +3,7 @@ import { Avatar, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
 import { Alert, Linking, Pressable, TouchableOpacity, View } from "react-native";
 
+import { colors } from "@/constants/colors.tw";
 import { useFollowActions } from "@/hooks/useFollowActions";
 
 import { useStore } from "../../store";
@@ -11,10 +12,12 @@ import { getImagePixelSize, getOriginalImgUrl, parseImgUrl } from "../../utils";
 
 type FollowItemProps = {
   item: UpInfo;
+  /** 特别关注的 UP：名称使用主题色并加粗 */
+  highlight?: boolean;
   onSetGroups?: (up: UpInfo) => void;
 };
 
-function FollowItem({ item, onSetGroups }: FollowItemProps) {
+function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
   const { face, name, sign, mid } = item;
   const { livingUps, setOverlayButtons } = useStore();
   const actions = useFollowActions();
@@ -103,7 +106,9 @@ function FollowItem({ item, onSetGroups }: FollowItemProps) {
       </View>
       <UpName
         mid={mid}
-        className="flex-1 shrink-0 py-2 text-center text-sm"
+        className={`flex-1 shrink-0 py-2 text-center text-sm ${
+          highlight ? `font-bold ${colors.primary.text}` : ""
+        }`}
         numberOfLines={2}
         ellipsizeMode="tail"
       >

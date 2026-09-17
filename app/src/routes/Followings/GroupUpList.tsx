@@ -12,14 +12,15 @@ import FollowUpsGrid from "./FollowUpsGrid";
 
 type Props = {
   tagid: number;
+  specialMids?: ReadonlySet<string>;
   onSetGroups?: (up: UpInfo) => void;
   onRefreshTags?: () => void;
 };
 
-export default function GroupUpList({ tagid, onSetGroups, onRefreshTags }: Props) {
+export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefreshTags }: Props) {
   const members = useBilibiliRelationTagMembers(tagid);
   const { livingUps } = useStore();
-  const orderedUps = orderFollowedUps(members.items, livingUps);
+  const orderedUps = orderFollowedUps(members.items, livingUps, specialMids);
   const hasItems = members.items.length > 0;
 
   async function refresh() {
@@ -29,6 +30,7 @@ export default function GroupUpList({ tagid, onSetGroups, onRefreshTags }: Props
   return (
     <FollowUpsGrid
       ups={orderedUps}
+      specialMids={specialMids}
       onSetGroups={onSetGroups}
       refreshing={hasItems && members.isValidating && !members.isLoadingMore}
       onRefresh={() => {

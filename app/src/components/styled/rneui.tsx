@@ -253,6 +253,10 @@ export function CheckBox({
   containerStyle,
   textStyle,
   wrapperStyle,
+  // RNEUI 默认使用 font-awesome 图标集，本项目没有安装，图标会渲染成 null（复选框直接看不见）
+  iconType = "material",
+  checkedIcon = "check-box",
+  uncheckedIcon = "check-box-outline-blank",
   ...props
 }: CheckBoxProps) {
   const resolvedCheckedColor = useResolvedColor(checkedColorClassName);
@@ -263,6 +267,9 @@ export function CheckBox({
   return (
     <CheckBoxPrimitive
       {...props}
+      iconType={iconType}
+      checkedIcon={checkedIcon}
+      uncheckedIcon={uncheckedIcon}
       checkedColor={resolvedCheckedColor ?? checkedColor}
       containerStyle={[containerStyle, resolvedContainerStyle]}
       textStyle={[textStyle, resolvedTextStyle]}

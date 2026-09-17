@@ -29,3 +29,14 @@ test("没有直播时不改变顺序，数字和字符串 mid 都能匹配", () 
     "6",
   ]);
 });
+
+test("特别关注排在最前，直播与其余依次排在后面", () => {
+  const special = new Set(["4", "6"]);
+  // 6 同时在直播中，仍留在特别关注分组里
+  expect(orderFollowedUps(ups, { 2: "live", 5: "live", 6: "live" }, special).map((up) => up.mid)).toEqual([
+    4, 6, 2, 5, 1, 3,
+  ]);
+  expect(orderFollowedUps(ups, { 2: "live" }, new Set()).map((up) => up.mid)).toEqual([
+    2, 1, 3, 4, 5, 6,
+  ]);
+});

@@ -32,18 +32,20 @@ function TvImg() {
 }
 
 type Props = {
+  specialMids?: ReadonlySet<string>;
   onSetGroups?: (up: UpInfo) => void;
 };
 
-export default function AllUpList({ onSetGroups }: Props) {
+export default function AllUpList({ specialMids, onSetGroups }: Props) {
   const { livingUps } = useStore();
   const $followedUps = useActiveFollowedUps();
   const { isValidating, mutate } = useFollowingsState();
-  const orderedUps = orderFollowedUps($followedUps, livingUps);
+  const orderedUps = orderFollowedUps($followedUps, livingUps, specialMids);
 
   return (
     <FollowUpsGrid
       ups={orderedUps}
+      specialMids={specialMids}
       onSetGroups={onSetGroups}
       refreshing={isValidating}
       onRefresh={() => {

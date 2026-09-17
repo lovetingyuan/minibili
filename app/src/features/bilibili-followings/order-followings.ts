@@ -1,17 +1,26 @@
 import type { UpInfo } from "../../types";
 
-/** 正在直播的 UP 排在最前，其余保持 B站 返回（或本地同步）的顺序。 */
-export function orderFollowedUps(ups: UpInfo[], livingUps: Record<string, string>) {
+/**
+ * 排序：特别关注 → 正在直播 → 其余，组内保持 B站 返回（或本地同步）的顺序。
+ */
+export function orderFollowedUps(
+  ups: UpInfo[],
+  livingUps: Record<string, string>,
+  specialMids?: ReadonlySet<string>,
+) {
+  const specialUps: UpInfo[] = [];
   const liveUps: UpInfo[] = [];
   const otherUps: UpInfo[] = [];
 
   for (const up of ups) {
-    if (livingUps[up.mid]) {
+    if (specialMids?.has(String(up.mid))) {
+      specialUps.push(up);
+    } else if (livingUps[up.mid]) {
       liveUps.push(up);
     } else {
       otherUps.push(up);
     }
   }
 
-  return [...liveUps, ...otherUps];
+  return [...specialUps, ...liveUps, ...otherUps];
 }

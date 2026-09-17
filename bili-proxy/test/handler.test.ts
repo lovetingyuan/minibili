@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import { handleBiliProxy } from "../src/handler";
-import { UPSTREAM_TIMEOUT_MS } from "../src/headers";
+import { handleBiliProxy } from "../src/handler.js";
+import { UPSTREAM_TIMEOUT_MS } from "../src/headers.js";
 
 const TOKEN = "test-token";
 const VIEW_PATH = "/x/web-interface/view?bvid=BV1XctB6PEuZ";
@@ -121,6 +121,18 @@ describe("转发行为", () => {
     upstream.mockClear();
     await call({ path: VIEW_PATH, profile: "web", cookie: "SESSDATA=session" });
     expect(upstream.mock.calls[0]?.[1]?.headers).not.toHaveProperty("cookie");
+  });
+
+  // 机房出口带 UA（哪怕伪装成 Chrome）会被 B 站风控 412 request was banned，见 src/headers.ts 注释
+  test.each(["web", "auth"] as const)("%s profile 不发送 User-Agent", async (profile) => {
+    await call({
+      path: profile === "auth" ? "/x/space/v2/myinfo" : VIEW_PATH,
+      profile,
+      ...(profile === "auth" ? { cookie: "SESSDATA=session" } : {}),
+    });
+    const headers = upstream.mock.calls[0]?.[1]?.headers as Record<string, string> | undefined;
+    expect(headers).toBeDefined();
+    expect(Object.keys(headers ?? {}).map((key) => key.toLowerCase())).not.toContain("user-agent");
   });
 
   test("超时返回 504，网络异常返回 502", async () => {

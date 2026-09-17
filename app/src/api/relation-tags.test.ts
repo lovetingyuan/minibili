@@ -7,9 +7,11 @@ import {
   fetchBilibiliRelationTagMembers,
   fetchBilibiliRelationTags,
   fetchBilibiliUpRelationTags,
+  fetchAllBilibiliRelationTagMembers,
   getFollowGroupTags,
   getRelationTagMembersKey,
   getSelectableRelationTags,
+  getSpecialFollowUpsKey,
   RELATION_TAG_MEMBERS_PAGE_SIZE,
   RelationTagLoginRequiredError,
   RelationTagResultUnknownError,
@@ -88,6 +90,28 @@ describe("Bilibili relation tags", () => {
     ]);
     expect(getRelationTagMembersKey(account, 0, 1, [])).toBeNull();
     expect(getRelationTagMembersKey(account, undefined, 0, null)).toBeNull();
+  });
+
+  test("特别关注一次性取全，按 mid 去重并在最后一页停止", async () => {
+    const fullPage = Array.from({ length: RELATION_TAG_MEMBERS_PAGE_SIZE }, (_, index) => ({
+      ...member,
+      mid: index + 1,
+    }));
+    const request = vi
+      .fn<RelationTagRequest>()
+      .mockResolvedValueOnce([...fullPage, fullPage[0]])
+      .mockResolvedValueOnce([{ ...member, mid: 999 }]);
+    const members = await fetchAllBilibiliRelationTagMembers(-10, request, () => true);
+    expect(request).toHaveBeenCalledTimes(2);
+    expect(request.mock.calls[0][0]).toBe("/x/relation/tag?tagid=-10&pn=1&ps=50");
+    expect(request.mock.calls[1][0]).toBe("/x/relation/tag?tagid=-10&pn=2&ps=50");
+    expect(members).toHaveLength(RELATION_TAG_MEMBERS_PAGE_SIZE + 1);
+    expect(new Set(members.map((item) => item.mid)).size).toBe(members.length);
+    expect(getSpecialFollowUpsKey(account)).toEqual([
+      "bilibili-special-follow-ups",
+      "393120021",
+      3,
+    ]);
   });
 
   test("账号切换时中断读取", async () => {

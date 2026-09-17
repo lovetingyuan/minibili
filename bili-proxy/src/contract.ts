@@ -6,10 +6,12 @@
 /** 唯一允许转发的上游。 */
 export const BILI_ORIGIN = "https://api.bilibili.com";
 
-/** 路径白名单：带了查询串也要命中 pathname。 */
+/**
+ * 路径白名单：带了查询串也要命中 pathname。
+ * 不含 `/x/web-interface/view/detail`：该端点在机房出口上会被风控返回 412，且本项目用不到。
+ */
 export const ALLOWED_PATHNAMES: readonly string[] = [
   "/x/web-interface/view",
-  "/x/web-interface/view/detail",
   "/x/relation/stat",
   "/x/space/v2/myinfo",
 ];
