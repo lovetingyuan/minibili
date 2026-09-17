@@ -52,6 +52,12 @@ export const PLAYER_CONTROLS_AUTO_HIDE_MS = 3000;
 export const PLAYER_PAUSED_UI_DELAY_MS = 300;
 
 /**
+ * 初始续播只允许发生在播放器仍停留在起点附近时。
+ * 即使 playingChange 丢失，进度已经向前推进后也不能再被迟到的续播数据拉回去。
+ */
+export const PLAYER_INITIAL_RESUME_MAX_CURRENT_MS = 1000;
+
+/**
  * 播放器高度切换的过渡时长
  */
 export const PLAYER_HEIGHT_ANIMATION_MS = 200;
@@ -105,6 +111,89 @@ export const PLAYER_REPLAY_END_TOLERANCE_MS = 300;
  * 竖向滑动的方向，与网页播放器 change-video-height 的取值保持一致
  */
 export type PlayerSwipeDirection = "down" | "up";
+
+export type InitialResumeSnapshot = {
+  key: string;
+  positionMs: number | null;
+};
+
+export type InitialResumeDecision = "wait" | "apply" | "consume";
+
+export type PlayerResumeDecision =
+  | { type: "wait" | "consume" }
+  | { type: "apply"; origin: "initial" | "failover"; positionMs: number };
+
+/**
+ * 每个分 P 只截取进入时的本地续播位置；播放中的定时落盘不能改变这份快照。
+ */
+export function resolveInitialResumeSnapshot(
+  current: InitialResumeSnapshot,
+  key: string,
+  positionMs: number | null,
+): InitialResumeSnapshot {
+  if (current.key === key) {
+    return current;
+  }
+  return { key, positionMs };
+}
+
+/**
+ * 初始续播的唯一入口：播放器就绪且尚未真正播放时才允许跳转。
+ * `consume` 表示续播窗口已经结束，此后同一分 P 的迟到数据都必须忽略。
+ */
+export function resolveInitialResumeDecision(options: {
+  handled: boolean;
+  positionMs: number;
+  currentTimeMs: number;
+  ready: boolean;
+  hasPlayed: boolean;
+  maxCurrentTimeMs?: number;
+}): InitialResumeDecision {
+  const {
+    handled,
+    positionMs,
+    currentTimeMs,
+    ready,
+    hasPlayed,
+    maxCurrentTimeMs = PLAYER_INITIAL_RESUME_MAX_CURRENT_MS,
+  } = options;
+  if (handled) {
+    return "consume";
+  }
+  if (hasPlayed || currentTimeMs > maxCurrentTimeMs) {
+    return "consume";
+  }
+  if (positionMs <= 0 || !ready) {
+    return "wait";
+  }
+  return "apply";
+}
+
+/**
+ * CDN 换源恢复独立于初始续播，并在新播放器 ready 时拥有更高优先级。
+ */
+export function resolvePlayerResumeDecision(
+  options: Parameters<typeof resolveInitialResumeDecision>[0] & {
+    failoverPositionMs: number;
+  },
+): PlayerResumeDecision {
+  if (options.ready && options.failoverPositionMs > 0) {
+    return {
+      type: "apply",
+      origin: "failover",
+      positionMs: options.failoverPositionMs,
+    };
+  }
+  const initialDecision = resolveInitialResumeDecision(options);
+  if (initialDecision !== "apply") {
+    return { type: initialDecision };
+  }
+  return {
+    type: "apply",
+    origin: "initial",
+    positionMs: options.positionMs,
+  };
+}
 
 /**
  * 媒体请求的 source：pc 平台的播放地址必须带 Referer，且 UA 不能包含 "android"，

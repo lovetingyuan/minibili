@@ -8,6 +8,7 @@ import {
   DANMAKU_DEFAULT_FONTSIZE,
   isDanmakuLayoutFresh,
   mergeDanmakuItems,
+  resolveDanmakuAnimation,
   resolveDanmakuLayout,
   selectVisibleDanmaku,
   type DanmakuLayout,
@@ -93,16 +94,18 @@ function DanmakuItemView(props: {
     }
 
     const latest = itemRef.current;
-    const remainingMs = Math.max(0, latest.durationMs - latest.elapsedMs);
-    if (remainingMs === 0) {
-      translateX.setValue(latest.endX);
+    const animationState = resolveDanmakuAnimation(latest, playbackRate);
+    // 原生动画在 App 进入后台时可能停止；恢复时必须先对齐最新媒体时间。
+    translateX.setValue(animationState.startX);
+    if (animationState.durationMs === 0) {
+      translateX.setValue(animationState.endX);
       return;
     }
 
     const animation = Animated.timing(translateX, {
-      toValue: latest.endX,
+      toValue: animationState.endX,
       // 剩余行程按播放倍速折算成真实时间，长按加速时弹幕同步变快
-      duration: Math.max(16, Math.round(remainingMs / Math.max(0.1, playbackRate))),
+      duration: animationState.durationMs,
       easing: Easing.linear,
       useNativeDriver: true,
     });

@@ -49,7 +49,11 @@ export function CommentItem(props: CommentItemProps) {
 
   function confirmDelete() {
     if (!onDelete || deletePending) return;
-    Alert.alert("删除评论", "删除评论后，评论下所有回复都会被删除，是否继续？", [
+    const deletingRoot = String(comment.root) === "0";
+    const message = deletingRoot
+      ? "删除评论后，评论下所有回复都会被删除，是否继续？"
+      : "删除回复后无法恢复，是否继续？";
+    Alert.alert("删除评论", message, [
       { text: "取消", style: "cancel" },
       {
         text: "确定",

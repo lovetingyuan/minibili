@@ -94,7 +94,7 @@ export function CommentText(props: CommentTextProps) {
       {props.likeText ? (
         <Text
           className={`text-[13px] font-normal ${
-            props.likeActive ? colors.commentLike.text : colors.gray6.text
+            props.likeActive ? colors.commentLike.text : colors.primary.text
           } ${props.likePending ? "opacity-60" : ""}`}
         >
           {/* 嵌套 Text 在原生端不支持 margin/padding，用全角空格拉开与正文的间距 */}

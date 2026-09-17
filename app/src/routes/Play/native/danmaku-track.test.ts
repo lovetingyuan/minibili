@@ -8,6 +8,7 @@ import {
   findVisibleStartIndex,
   isDanmakuLayoutFresh,
   mergeDanmakuItems,
+  resolveDanmakuAnimation,
   resolveDanmakuLaneCount,
   resolveDanmakuLaneFreeAt,
   resolveDanmakuLaneHeight,
@@ -47,6 +48,21 @@ describe("danmaku text helpers", () => {
 });
 
 describe("danmaku movement", () => {
+  test("resumes from the latest timeline position with the remaining duration", () => {
+    expect(
+      resolveDanmakuAnimation({ currentX: 120, endX: -60, durationMs: 7000, elapsedMs: 3000 }, 1),
+    ).toEqual({ startX: 120, endX: -60, durationMs: 4000 });
+    expect(
+      resolveDanmakuAnimation({ currentX: 120, endX: -60, durationMs: 7000, elapsedMs: 3000 }, 2),
+    ).toEqual({ startX: 120, endX: -60, durationMs: 2000 });
+  });
+
+  test("finishes an expired danmaku without restarting an animation", () => {
+    expect(
+      resolveDanmakuAnimation({ currentX: -60, endX: -60, durationMs: 7000, elapsedMs: 7000 }, 1),
+    ).toEqual({ startX: -60, endX: -60, durationMs: 0 });
+  });
+
   test("keeps the whole traverse duration for every text width", () => {
     // (400 + 32) / 7s = 61.7px/s，与文本宽度无关的定长模型
     expect(Math.round(resolveDanmakuSpeed(400, 32))).toBe(62);

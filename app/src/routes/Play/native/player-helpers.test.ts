@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import {
   createVideoSource,
@@ -9,6 +9,9 @@ import {
   PLAY_URL_MAX_REFRESH,
   resolveControlsAutoHideMs,
   resolveInlinePlayerHeight,
+  resolveInitialResumeDecision,
+  resolveInitialResumeSnapshot,
+  resolvePlayerResumeDecision,
   resolvePlaybackFailover,
   resolvePreferredQuality,
   resolveSeekSwipeSeconds,
@@ -18,6 +21,108 @@ import {
   shouldRestartPlayback,
   toggleControlsVisible,
 } from "./player-helpers";
+
+describe("initial resume", () => {
+  test("keeps the entry snapshot when playback progress is persisted later", () => {
+    const initial = resolveInitialResumeSnapshot({ key: "", positionMs: null }, "BV1:101", null);
+    const afterPeriodicWrite = resolveInitialResumeSnapshot(initial, "BV1:101", 15_000);
+
+    expect(afterPeriodicWrite).toBe(initial);
+    expect(afterPeriodicWrite.positionMs).toBeNull();
+  });
+
+  test("takes a new snapshot after switching parts", () => {
+    const first = resolveInitialResumeSnapshot({ key: "", positionMs: null }, "BV1:101", 8_000);
+
+    expect(resolveInitialResumeSnapshot(first, "BV1:102", 23_000)).toEqual({
+      key: "BV1:102",
+      positionMs: 23_000,
+    });
+  });
+
+  test("applies a valid resume only before playback starts", () => {
+    expect(
+      resolveInitialResumeDecision({
+        handled: true,
+        positionMs: 20_000,
+        currentTimeMs: 0,
+        ready: true,
+        hasPlayed: false,
+      }),
+    ).toBe("consume");
+    expect(
+      resolveInitialResumeDecision({
+        handled: false,
+        positionMs: 20_000,
+        currentTimeMs: 0,
+        ready: true,
+        hasPlayed: false,
+      }),
+    ).toBe("apply");
+    expect(
+      resolveInitialResumeDecision({
+        handled: false,
+        positionMs: 20_000,
+        currentTimeMs: 15_000,
+        ready: true,
+        hasPlayed: false,
+      }),
+    ).toBe("consume");
+    expect(
+      resolveInitialResumeDecision({
+        handled: false,
+        positionMs: 20_000,
+        currentTimeMs: 0,
+        ready: true,
+        hasPlayed: true,
+      }),
+    ).toBe("consume");
+  });
+
+  test("waits for a positive position and a ready player", () => {
+    expect(
+      resolveInitialResumeDecision({
+        handled: false,
+        positionMs: 0,
+        currentTimeMs: 0,
+        ready: true,
+        hasPlayed: false,
+      }),
+    ).toBe("wait");
+    expect(
+      resolveInitialResumeDecision({
+        handled: false,
+        positionMs: 20_000,
+        currentTimeMs: 0,
+        ready: false,
+        hasPlayed: false,
+      }),
+    ).toBe("wait");
+  });
+
+  test("keeps CDN failover resume independent from the initial position", () => {
+    expect(
+      resolvePlayerResumeDecision({
+        handled: true,
+        positionMs: 8_000,
+        failoverPositionMs: 42_000,
+        currentTimeMs: 0,
+        ready: true,
+        hasPlayed: false,
+      }),
+    ).toEqual({ type: "apply", origin: "failover", positionMs: 42_000 });
+    expect(
+      resolvePlayerResumeDecision({
+        handled: false,
+        positionMs: 8_000,
+        failoverPositionMs: 0,
+        currentTimeMs: 0,
+        ready: true,
+        hasPlayed: false,
+      }),
+    ).toEqual({ type: "apply", origin: "initial", positionMs: 8_000 });
+  });
+});
 
 test("uses 1080P except on cellular without the high quality option", () => {
   expect(resolvePreferredQuality(false, false)).toBe(80);

@@ -404,7 +404,7 @@ describe("Comment delete entry", () => {
   }
 
   test("offers delete for own comments and confirms before deleting", () => {
-    const onDelete = vi.fn();
+    const onDelete = vi.fn().mockResolvedValue(true);
     const props = makeProps({ onDelete, viewerMid: "999" });
     const button = deleteButtonOf(props);
 
@@ -417,6 +417,18 @@ describe("Comment delete entry", () => {
     expect(actions?.map((action) => action.text)).toEqual(["取消", "确定"]);
     actions?.[1]?.onPress?.();
     expect(onDelete).toHaveBeenCalledWith(props.comment);
+  });
+
+  test("uses a reply-specific confirmation message for child replies", () => {
+    const props = makeProps({
+      comment: makeComment({ id: "11", mid: "999", root: "10" }),
+      onDelete: vi.fn().mockResolvedValue(true),
+      viewerMid: "999",
+    });
+
+    deleteButtonOf(props)?.props.onPress?.();
+
+    expect(mocks.alert.mock.calls[0]?.[1]).toContain("删除回复后无法恢复");
   });
 
   test("hides delete for other users' comments", () => {

@@ -224,19 +224,46 @@ describe("reply-list", () => {
     };
     const pages = [page];
 
-    const afterRoot = removeCommentFromPages(pages, "1");
+    const afterRoot = removeCommentFromPages(pages, { id: "1", root: "0" });
     expect(afterRoot?.[0].replies.map((comment) => comment.id)).toEqual(["20"]);
     expect(afterRoot?.[0].cursor.all_count).toBe(1);
 
-    const afterReply = removeCommentFromPages(pages, "21");
+    const afterReply = removeCommentFromPages(pages, { id: "21", root: "20" });
     expect(afterReply?.[0].replies[1].replies).toEqual([]);
     expect(afterReply?.[0].replies[1].rcount).toBe(0);
     expect(afterReply?.[0].replies[1]).not.toBe(page.replies[1]);
     expect(afterReply?.[0].replies[0]).toBe(page.replies[0]);
     expect(afterReply?.[0].cursor.all_count).toBe(2);
 
-    expect(removeCommentFromPages(pages, "999")?.[0]).toBe(page);
-    expect(removeCommentFromPages(undefined, "1")).toBeUndefined();
+    expect(removeCommentFromPages(pages, { id: "999", root: "0" })?.[0]).toBe(page);
+    expect(removeCommentFromPages(undefined, { id: "1", root: "0" })).toBeUndefined();
+  });
+
+  test("updates first-page totals for later roots and counts non-previewed deleted replies", () => {
+    const cursor = createCommentResponse(null).cursor;
+    const rootSource = createComment("20");
+    rootSource.rcount = 3;
+    const root = getComments(createCommentResponse([rootSource]), 1)[0];
+    const pages: CommentsPage[] = [
+      {
+        cursor: { ...cursor, all_count: 2 },
+        replies: getComments(createCommentResponse([createComment("1")]), 1),
+        ownerMid: "1",
+      },
+      {
+        cursor: { ...cursor, all_count: 2 },
+        replies: [root],
+        ownerMid: "1",
+      },
+    ];
+
+    const afterReply = removeCommentFromPages(pages, { id: "99", root: "20" });
+    expect(afterReply?.[1].replies[0].rcount).toBe(2);
+    expect(afterReply?.[0].cursor.all_count).toBe(2);
+
+    const afterRoot = removeCommentFromPages(pages, { id: "20", root: "0" });
+    expect(afterRoot?.[0].cursor.all_count).toBe(1);
+    expect(afterRoot?.[1].replies).toEqual([]);
   });
 
   test("video-comment", async () => {

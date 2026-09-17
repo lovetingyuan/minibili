@@ -12,6 +12,7 @@ import useKeyboardHeight from "@/hooks/useKeyboardHeight";
 import { useStore } from "@/store";
 
 import { CommentItem } from "./Comment";
+import { removeReplyFromInfo } from "./reply-list.helpers";
 import type { ReplyListProps } from "./reply-list.types";
 import ReplyComposer from "./ReplyComposer";
 
@@ -73,6 +74,26 @@ export default function ReplyList(props: ReplyListProps) {
     return true;
   }
 
+  async function deleteReply(target: ReplyItemType) {
+    const deleted = await props.onDelete(target);
+    if (!deleted) {
+      await replies.refresh().catch(() => {});
+      return false;
+    }
+    const currentInfo = repliesInfoRef.current;
+    if (!currentInfo || String(currentInfo.root) !== String(repliesInfo?.root)) return true;
+    if (target.id === String(currentInfo.root)) {
+      setRepliesInfo(null);
+      return true;
+    }
+    await replies.removeReply(target.id);
+    const latestInfo = repliesInfoRef.current;
+    if (latestInfo && String(latestInfo.root) === String(currentInfo.root)) {
+      setRepliesInfo(removeReplyFromInfo(latestInfo, target.id));
+    }
+    return true;
+  }
+
   function loadMore() {
     if (loadMoreLock.current || replies.isValidating || replies.isReachingEnd) return;
     loadMoreLock.current = true;
@@ -85,6 +106,9 @@ export default function ReplyList(props: ReplyListProps) {
     ownerMid,
     onAttitude: changeAttitude,
     onReply: selectTarget,
+    onDelete: deleteReply,
+    viewerMid: props.viewerMid,
+    isDeletePending: props.isDeletePending,
     isAttitudePending: props.isAttitudePending,
   };
 
@@ -94,6 +118,7 @@ export default function ReplyList(props: ReplyListProps) {
       edges={SHEET_SAFE_AREA_EDGES}
       onBackdropPress={handleClose}
       modalProps={{ onRequestClose: handleClose, statusBarTranslucent: true }}
+      scrollViewProps={{ keyboardShouldPersistTaps: "handled" }}
       isVisible={Boolean(repliesInfo)}
     >
       <View
@@ -121,7 +146,7 @@ export default function ReplyList(props: ReplyListProps) {
           data={replies.data.replies}
           keyExtractor={(item: ReplyItemType) => item.id}
           renderItem={({ item }: { item: ReplyItemType }) => (
-            <View className="border-b border-neutral-100 px-4 py-4 dark:border-neutral-800">
+            <View className="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
               <CommentItem comment={item} {...rowProps} />
             </View>
           )}

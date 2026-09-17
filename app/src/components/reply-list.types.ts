@@ -7,6 +7,9 @@ export type ReplyListProps = {
     kind: CommentAttitudeKind,
   ) => Promise<CommentAttitude | null>;
   onSubmitReply: (target: ReplyItemType, message: string) => Promise<ReplyItemType | null>;
+  onDelete: (target: ReplyItemType) => Promise<boolean>;
+  viewerMid?: string;
   isAttitudePending: (id: string) => boolean;
   isReplyPending: (id: string) => boolean;
+  isDeletePending: (id: string) => boolean;
 };

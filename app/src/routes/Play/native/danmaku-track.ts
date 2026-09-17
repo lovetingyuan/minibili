@@ -73,6 +73,12 @@ export type DanmakuVisibleQuery = {
   anchorTimeMs: number;
 };
 
+export type DanmakuAnimation = {
+  startX: number;
+  endX: number;
+  durationMs: number;
+};
+
 function isWideChar(code: number) {
   return code >= 0x2e80;
 }
@@ -139,6 +145,23 @@ export function resolveDanmakuX(
     return -textWidth;
   }
   return containerWidth - (resolveDanmakuSpeed(containerWidth, textWidth) * elapsed) / 1000;
+}
+
+/**
+ * 恢复播放时按最新媒体时间重新定位，再播放剩余路程。
+ * 这样 JS 在后台暂停、前台恢复后不会从旧坐标重新跑一遍。
+ */
+export function resolveDanmakuAnimation(
+  item: Pick<DanmakuRenderItem, "currentX" | "durationMs" | "elapsedMs" | "endX">,
+  playbackRate: number,
+): DanmakuAnimation {
+  const remainingMs = Math.max(0, item.durationMs - item.elapsedMs);
+  return {
+    startX: item.currentX,
+    endX: item.endX,
+    durationMs:
+      remainingMs === 0 ? 0 : Math.max(16, Math.round(remainingMs / Math.max(0.1, playbackRate))),
+  };
 }
 
 /**

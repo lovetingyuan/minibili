@@ -69,6 +69,35 @@ test("keeps the playing ui while the video is only buffering", () => {
   expect(render(false, true)).toBe(false);
 });
 
+test("starts a fresh pause delay after buffering finishes", () => {
+  expect(render(false, true)).toBe(false);
+  runLastEffect();
+  vi.advanceTimersByTime(PLAYER_PAUSED_UI_DELAY_MS * 2);
+
+  expect(render(false, false)).toBe(false);
+  runLastEffect();
+  vi.advanceTimersByTime(PLAYER_PAUSED_UI_DELAY_MS - 1);
+  expect(render(false, false)).toBe(false);
+
+  vi.advanceTimersByTime(1);
+  expect(render(false, false)).toBe(true);
+});
+
+test("does not flash paused ui when playingChange follows ready shortly afterwards", () => {
+  render(false, true);
+  const clearLoadingEffect = runLastEffect();
+  clearLoadingEffect?.();
+
+  expect(render(false, false)).toBe(false);
+  const clearPauseTimer = runLastEffect();
+  vi.advanceTimersByTime(PLAYER_PAUSED_UI_DELAY_MS - 1);
+  expect(render(false, false)).toBe(false);
+
+  clearPauseTimer?.();
+  expect(render(true, false)).toBe(false);
+  runLastEffect();
+});
+
 test("shows the paused ui only after the pause lasts long enough", () => {
   expect(render(false, false)).toBe(false);
   runLastEffect();

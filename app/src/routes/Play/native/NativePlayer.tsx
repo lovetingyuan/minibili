@@ -3,11 +3,12 @@ import { type RouteProp, useIsFocused, useNavigation, useRoute } from "@react-na
 import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
-import type { VideoPlayerStatus } from "expo-video";
+import type { VideoPlayer, VideoPlayerStatus } from "expo-video";
 import React from "react";
 import {
   Alert,
   Animated,
+  AppState,
   Keyboard,
   Platform,
   Pressable,
@@ -58,12 +59,20 @@ import {
   PLAYER_SEEK_HINT_HOLD_MS,
   type PlayerSwipeDirection,
   resolveInlinePlayerHeight,
+  resolveInitialResumeSnapshot,
+  resolvePlayerResumeDecision,
   resolvePlaybackFailover,
   resolvePreferredQuality,
   resolveSeekTargetMs,
   shouldShowResumeButton,
   shouldRestartPlayback,
+  type InitialResumeSnapshot,
 } from "./player-helpers";
+import {
+  configureBackgroundPlayback,
+  resolvePlayerSynchronization,
+  type BackgroundPlaybackConfigurationResult,
+} from "./player-lifecycle";
 import { usePlayerControlsVisibility } from "./usePlayerControlsVisibility";
 import { usePlayerGestures } from "./usePlayerGestures";
 import { usePlayerPausedUi } from "./usePlayerPausedUi";
@@ -146,6 +155,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     token: 0,
   });
   const lastTimeRef = React.useRef(0);
+  const nativePlayingRef = React.useRef(false);
   const pausedByImagesRef = React.useRef(false);
   // 左右滑动提示浮层的隐藏计时器
   const seekHintTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -156,7 +166,14 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 切换地址后需要恢复的播放进度（毫秒）
   const resumePositionMsRef = React.useRef(0);
   // 已经按 B站记录跳转过的分P，避免每次就绪都重复跳转
-  const resumeAppliedRef = React.useRef("");
+  const initialResumeHandledRef = React.useRef("");
+  // App 在后台时不创建新的播放 service；需要自动播放或 CDN 兜底时等回到前台处理
+  const pendingAutoplayRef = React.useRef(false);
+  const pendingPlaybackErrorRef = React.useRef<{ token: number; message: string } | null>(null);
+  const backgroundConfigurationRef = React.useRef<{
+    player: VideoPlayer;
+    enabled: boolean;
+  } | null>(null);
 
   // 真正处于暂停态：起播、seek、缓冲造成的短暂暂停不算，避免暂停态的 UI 闪一下
   const pausedUiVisible = usePlayerPausedUi(isPlaying, playerStatus === "loading");
@@ -175,14 +192,23 @@ export default function NativePlayer(props: NativePlayerProps) {
   const player = useVideoPlayer(source, (instance) => {
     instance.timeUpdateEventInterval = 0.25;
     instance.loop = playbackMode.loop;
-    instance.staysActiveInBackground = $backgroundPlayEnabled;
-    instance.showNowPlayingNotification = $backgroundPlayEnabled;
   });
 
   // 本地按分P 记录的位置优先；当前分P 没有本地记录时再回退 B站记录。
-  const localPlayResumePositionMs = usePartPlayProgressPosition(videoInfo.bvid, cid);
+  const liveLocalPlayResumePositionMs = usePartPlayProgressPosition(videoInfo.bvid, cid);
+  const initialResumeKey = `${videoInfo.bvid}:${cid}`;
+  const initialLocalResumeRef = React.useRef<InitialResumeSnapshot>({
+    key: "",
+    positionMs: null,
+  });
+  initialLocalResumeRef.current = resolveInitialResumeSnapshot(
+    initialLocalResumeRef.current,
+    initialResumeKey,
+    liveLocalPlayResumePositionMs,
+  );
   const serverPlayResumePositionMs = usePlayResumePosition(videoInfo.aid, cid);
-  const playResumePositionMs = localPlayResumePositionMs ?? serverPlayResumePositionMs;
+  const playResumePositionMs =
+    initialLocalResumeRef.current.positionMs ?? serverPlayResumePositionMs;
 
   // 登录后按 B站网页播放器的方式上报播放进度，写入观看历史
   const { reportEnded } = usePlayHeartbeatReporter({
@@ -223,37 +249,93 @@ export default function NativePlayer(props: NativePlayerProps) {
   const reportPartProgressEndedRef = React.useRef(reportPartProgressEnded);
   reportPartProgressEndedRef.current = reportPartProgressEnded;
 
-  /**
-   * 播放器就绪后跳到 B站记录的上次播放位置，同一个分P 只跳一次。
-   * 位置接口比播放器就绪晚返回时，由下面的 effect 再补一次。
-   */
-  function applyServerResumeIfReady() {
-    if (playResumePositionMs <= 0) {
-      return;
-    }
-    const resumeKey = `${videoInfo.bvid}:${cid}`;
-    if (resumeAppliedRef.current === resumeKey || player.status !== "readyToPlay") {
-      return;
-    }
-    resumeAppliedRef.current = resumeKey;
-    applyResumePosition(playResumePositionMs);
-  }
-
-  React.useEffect(() => {
-    applyServerResumeIfReady();
-  }, [playResumePositionMs, cid, videoInfo.bvid]);
-
-  useEventListener(player, "playingChange", ({ isPlaying: playing }) => {
+  function updatePlayingState(playing: boolean, synchronizeKeepAwake = false) {
+    const changed = nativePlayingRef.current !== playing;
+    nativePlayingRef.current = playing;
     setIsPlaying(playing);
     if (playing) {
       if (activePlayerRef.current.player === player) {
         activePlayerRef.current.hasPlayed = true;
       }
+      // 真正开始播放后，本分 P 不再接受任何迟到的“初始续播”位置。
+      initialResumeHandledRef.current = initialResumeKey;
       setPlaybackStarted(true);
-      void KeepAwake.activateKeepAwakeAsync("PLAY");
-    } else {
+      if ((changed || synchronizeKeepAwake) && AppState.currentState === "active") {
+        void KeepAwake.activateKeepAwakeAsync("PLAY");
+      }
+      return;
+    }
+    if (changed || synchronizeKeepAwake) {
       KeepAwake.deactivateKeepAwake("PLAY");
     }
+  }
+
+  function synchronizePlayerFromNative(resetDanmaku: boolean) {
+    const snapshot = resolvePlayerSynchronization(player, resetDanmaku);
+    setPlayerStatus(snapshot.status);
+    setCurrentTimeMs(snapshot.currentTimeMs);
+    lastTimeRef.current = snapshot.currentTimeMs;
+    if (snapshot.danmakuAnchorMs !== null) {
+      // 后台期间的旧弹幕不补画，从当前媒体时间继续消费。
+      setDanmakuAnchorMs(snapshot.danmakuAnchorMs);
+    }
+    updatePlayingState(snapshot.isPlaying, true);
+  }
+
+  function configureCurrentPlayerBackgroundPlayback(
+    force = false,
+  ): BackgroundPlaybackConfigurationResult {
+    const previous = backgroundConfigurationRef.current;
+    if (!force && previous?.player === player && previous.enabled === $backgroundPlayEnabled) {
+      return "applied";
+    }
+    const result = configureBackgroundPlayback(
+      player,
+      $backgroundPlayEnabled,
+      AppState.currentState,
+    );
+    if (result !== "deferred") {
+      // 失败时也避免每次 timeUpdate 重渲染都重试；下一次回到前台会强制重试。
+      backgroundConfigurationRef.current = { player, enabled: $backgroundPlayEnabled };
+    }
+    if (__DEV__ && result === "failed") {
+      // oxlint-disable-next-line no-console
+      console.warn("background playback service configuration was rejected");
+    }
+    return result;
+  }
+
+  /**
+   * 播放器就绪后消费一次初始续播位置。已经开始播放或进度离开起点后，
+   * 即使服务端结果或 15 秒本地落盘迟到，也不会再次 seek。
+   */
+  function applyPendingResumeIfReady() {
+    const decision = resolvePlayerResumeDecision({
+      handled: initialResumeHandledRef.current === initialResumeKey,
+      positionMs: playResumePositionMs,
+      failoverPositionMs: resumePositionMsRef.current,
+      currentTimeMs: Math.max(0, Math.round(player.currentTime * 1000) || lastTimeRef.current),
+      ready: player.status === "readyToPlay",
+      hasPlayed: activePlayerRef.current.hasPlayed,
+    });
+    if (decision.type === "wait") {
+      return;
+    }
+    initialResumeHandledRef.current = initialResumeKey;
+    if (decision.type === "apply") {
+      if (decision.origin === "failover") {
+        resumePositionMsRef.current = 0;
+      }
+      applyResumePosition(decision.positionMs);
+    }
+  }
+
+  React.useEffect(() => {
+    applyPendingResumeIfReady();
+  }, [playResumePositionMs, cid, videoInfo.bvid]);
+
+  useEventListener(player, "playingChange", ({ isPlaying: playing }) => {
+    updatePlayingState(playing);
   });
 
   useEventListener(player, "timeUpdate", ({ currentTime }) => {
@@ -270,22 +352,12 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
     lastTimeRef.current = next;
     setCurrentTimeMs(next);
+    // 前后台切换时 playingChange 可能丢失；原生只读属性作为最终事实来源。
+    updatePlayingState(player.playing);
   });
 
-  useEventListener(player, "statusChange", ({ status, error }) => {
-    setPlayerStatus(status);
-    if (status === "readyToPlay") {
-      setPlayerError(null);
-      const resumePositionMs = resumePositionMsRef.current;
-      if (resumePositionMs > 0) {
-        resumePositionMsRef.current = 0;
-        applyResumePosition(resumePositionMs);
-        return;
-      }
-      applyServerResumeIfReady();
-      return;
-    }
-    if (status !== "error" || handledAttemptTokenRef.current === playbackAttempt.token) {
+  function recoverFromPlaybackError(message: string) {
+    if (handledAttemptTokenRef.current === playbackAttempt.token) {
       return;
     }
     handledAttemptTokenRef.current = playbackAttempt.token;
@@ -295,7 +367,7 @@ export default function NativePlayer(props: NativePlayerProps) {
       refreshCount: playbackAttempt.refreshCount,
     });
     if (failover.type === "give-up") {
-      setPlayerError(error?.message ?? "视频播放失败");
+      setPlayerError(message);
       return;
     }
     // 自动兜底时记住当前进度，等新地址就绪后接着播
@@ -324,8 +396,57 @@ export default function NativePlayer(props: NativePlayerProps) {
       token: current.token + 1,
     }));
     void retry().catch(() => {
-      setPlayerError(error?.message ?? "视频播放失败");
+      setPlayerError(message);
     });
+  }
+
+  useEventListener(player, "statusChange", ({ status, error }) => {
+    setPlayerStatus(status);
+    if (status === "readyToPlay") {
+      setPlayerError(null);
+      applyPendingResumeIfReady();
+      return;
+    }
+    if (status !== "error") {
+      return;
+    }
+    const message = error?.message ?? "视频播放失败";
+    if (AppState.currentState !== "active") {
+      pendingPlaybackErrorRef.current = { token: playbackAttempt.token, message };
+      return;
+    }
+    recoverFromPlaybackError(message);
+  });
+
+  const appState = useAppStateChange((state) => {
+    if (state !== "active") {
+      if (!$backgroundPlayEnabled) {
+        player.pause();
+      }
+      return;
+    }
+
+    // service 只能在前台创建；已在后台持续播放的同一播放器会复用现有 service。
+    configureCurrentPlayerBackgroundPlayback(true);
+    synchronizePlayerFromNative(true);
+
+    const pendingError = pendingPlaybackErrorRef.current;
+    pendingPlaybackErrorRef.current = null;
+    if (pendingError && pendingError.token === playbackAttempt.token && player.status === "error") {
+      recoverFromPlaybackError(pendingError.message);
+      return;
+    }
+
+    if (
+      pendingAutoplayRef.current &&
+      started &&
+      uri &&
+      isFocused &&
+      AppState.currentState === "active"
+    ) {
+      pendingAutoplayRef.current = false;
+      player.play();
+    }
   });
 
   React.useEffect(() => {
@@ -352,8 +473,7 @@ export default function NativePlayer(props: NativePlayerProps) {
       // 部分设备播放结束后不会再派发 playingChange，这里主动收敛播放状态。
       reportHeartbeatEndedRef.current({ bvid: videoInfo.bvid, cid: endedCid });
       reportPartProgressEndedRef.current(videoInfo.bvid, endedCid);
-      setIsPlaying(false);
-      KeepAwake.deactivateKeepAwake("PLAY");
+      updatePlayingState(false);
       setPortraitExpanded(false);
       onPlayEndedRef.current({ cid: endedCid, page: endedPage });
     });
@@ -365,6 +485,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 切换分P/清晰度时重置兜底状态与续播进度
   React.useEffect(() => {
     handledAttemptTokenRef.current = -1;
+    pendingPlaybackErrorRef.current = null;
     resumePositionMsRef.current = 0;
     lastTimeRef.current = 0;
     setPortraitExpanded(false);
@@ -375,6 +496,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   React.useEffect(() => {
     // 先清掉上一P 的运行时位置，避免新播放器尚未回报时间时把旧位置写到新 cid。
     setCurrentTimeMs(0);
+    nativePlayingRef.current = false;
     setIsPlaying(false);
     setPlaybackStarted(false);
     setDanmakuComposerOpen(false);
@@ -399,6 +521,9 @@ export default function NativePlayer(props: NativePlayerProps) {
     if (!source || reloadedAttemptTokenRef.current === playbackAttempt.token) {
       return;
     }
+    if (AppState.currentState !== "active") {
+      return;
+    }
     reloadedAttemptTokenRef.current = playbackAttempt.token;
     if (player.status === "error") {
       void player.replaceAsync(source);
@@ -417,13 +542,25 @@ export default function NativePlayer(props: NativePlayerProps) {
     if (!started || !uri) {
       return;
     }
+    if (AppState.currentState !== "active") {
+      pendingAutoplayRef.current = true;
+      return;
+    }
+    pendingAutoplayRef.current = false;
+    const configuration = configureCurrentPlayerBackgroundPlayback();
+    if (configuration === "deferred" || AppState.currentState !== "active") {
+      pendingAutoplayRef.current = true;
+      return;
+    }
     player.play();
   }, [started, uri, player]);
 
   React.useEffect(() => {
-    player.staysActiveInBackground = $backgroundPlayEnabled;
-    player.showNowPlayingNotification = $backgroundPlayEnabled;
-  }, [player, $backgroundPlayEnabled]);
+    if (appState !== "active" || AppState.currentState !== "active") {
+      return;
+    }
+    configureCurrentPlayerBackgroundPlayback();
+  }, [appState, player, $backgroundPlayEnabled]);
 
   React.useEffect(() => {
     player.loop = playbackMode.loop;
@@ -432,6 +569,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 离开播放页暂停，回到页面后由用户手动继续
   React.useEffect(() => {
     if (!isFocused) {
+      pendingAutoplayRef.current = false;
       player.pause();
     }
   }, [isFocused, player]);
@@ -447,16 +585,13 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
     if (pausedByImagesRef.current) {
       pausedByImagesRef.current = false;
+      if (AppState.currentState !== "active") {
+        pendingAutoplayRef.current = true;
+        return;
+      }
       player.play();
     }
   }, [imagesList.length, player]);
-
-  useAppStateChange((state) => {
-    if (state === "active" || $backgroundPlayEnabled) {
-      return;
-    }
-    player.pause();
-  });
 
   React.useEffect(() => {
     if (Platform.OS === "web") {

@@ -17,7 +17,7 @@ export function usePlayerPausedUi(isPlaying: boolean, loading: boolean) {
   const [paused, setPaused] = React.useState(false);
 
   React.useEffect(() => {
-    if (isPlaying) {
+    if (isPlaying || loading) {
       setPaused(false);
       return;
     }
@@ -27,7 +27,7 @@ export function usePlayerPausedUi(isPlaying: boolean, loading: boolean) {
     return () => {
       clearTimeout(timer);
     };
-  }, [isPlaying]);
+  }, [isPlaying, loading]);
 
   // 恢复播放后立刻切回播放态，不必等 effect 里的状态同步
   return !isPlaying && paused && !loading;

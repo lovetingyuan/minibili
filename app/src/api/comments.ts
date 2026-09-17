@@ -199,39 +199,38 @@ export function prependCommentToPages(
  */
 export function removeCommentFromPages(
   pages: readonly CommentsPage[] | undefined,
-  id: string,
+  target: Pick<ReplyItemType, "id" | "root">,
 ): CommentsPage[] | undefined {
-  return pages?.map((page, pageIndex) => {
-    let removedRootComment = false;
-    let changed = false;
-    const replies: CommentItemType[] = [];
-    for (const comment of page.replies) {
-      if (comment.id === id) {
-        changed = true;
-        if (pageIndex === 0) removedRootComment = true;
-        continue;
-      }
-      const replyIndex = comment.replies.findIndex((reply) => reply.id === id);
-      if (replyIndex < 0) {
-        replies.push(comment);
-        continue;
-      }
-      changed = true;
-      replies.push({
-        ...comment,
-        rcount: Math.max(0, comment.rcount - 1),
-        replies: comment.replies.filter((reply) => reply.id !== id),
-      });
+  if (!pages) return undefined;
+  const deletingRoot = String(target.root) === "0";
+  const rootId = deletingRoot ? target.id : String(target.root);
+  const rootExists = pages.some((page) => page.replies.some((comment) => comment.id === rootId));
+  if (!rootExists) return [...pages];
+
+  return pages.map((page, pageIndex) => {
+    const replies = deletingRoot
+      ? page.replies.filter((comment) => comment.id !== target.id)
+      : page.replies.map((comment) =>
+          comment.id === rootId
+            ? {
+                ...comment,
+                rcount: Math.max(0, comment.rcount - 1),
+                replies: comment.replies.filter((reply) => reply.id !== target.id),
+              }
+            : comment,
+        );
+    const cursor =
+      deletingRoot && pageIndex === 0
+        ? { ...page.cursor, all_count: Math.max(0, page.cursor.all_count - 1) }
+        : page.cursor;
+    if (
+      replies.length === page.replies.length &&
+      replies.every((reply, index) => reply === page.replies[index]) &&
+      cursor === page.cursor
+    ) {
+      return page;
     }
-    if (!changed) return page;
-    return {
-      ...page,
-      cursor:
-        pageIndex === 0 && removedRootComment
-          ? { ...page.cursor, all_count: Math.max(0, page.cursor.all_count - 1) }
-          : page.cursor,
-      replies,
-    };
+    return { ...page, cursor, replies };
   });
 }
 
@@ -292,8 +291,8 @@ export function useComments(oid: string | number, type: number, mode = 3) {
     await mutate((pages) => prependCommentToPages(pages, comment), { revalidate: false });
   }
 
-  async function removeComment(id: string) {
-    await mutate((pages) => removeCommentFromPages(pages, id), { revalidate: false });
+  async function removeComment(target: Pick<ReplyItemType, "id" | "root">) {
+    await mutate((pages) => removeCommentFromPages(pages, target), { revalidate: false });
   }
 
   return {

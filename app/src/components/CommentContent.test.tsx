@@ -129,7 +129,7 @@ describe("CommentText like count", () => {
     const count = lastChild({ likeText: "👍12" }) as ReactElement<LikeCountProps>;
 
     expect(count.type).toBe("Text");
-    expect(count.props.className).toContain(colors.gray6.text);
+    expect(count.props.className).toContain(colors.primary.text);
     expect(count.props.children).toContain("👍12");
   });
 

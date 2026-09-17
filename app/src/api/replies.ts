@@ -5,7 +5,7 @@ import { useStore } from "@/store";
 import type { CommentAttitude } from "./comment-actions.types";
 import { getReplyItem, transitionCommentAttitude } from "./comments";
 import type { ReplyItemType } from "./comments.types";
-import { isReplyPageEnd, mergeReplyItems } from "./replies.helpers";
+import { isReplyPageEnd, mergeReplyItems, removeReplyFromPages } from "./replies.helpers";
 import { ReplyResponseSchema } from "./replies.schema";
 import type { RepliesPage } from "./replies.types";
 import fetcher from "./fetcher";
@@ -81,6 +81,10 @@ export function useReplies() {
     );
   }
 
+  async function removeReply(id: string) {
+    await mutate((pages) => removeReplyFromPages(pages, id), { revalidate: false });
+  }
+
   return {
     data: {
       allCount,
@@ -94,6 +98,7 @@ export function useReplies() {
     },
     patchAttitude,
     prependReply,
+    removeReply,
     refresh: mutate,
     isValidating,
     isLimited,

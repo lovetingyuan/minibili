@@ -92,8 +92,9 @@ export default function CommentList(props: CommentListProps) {
   }
 
   async function deleteComment(target: ReplyItemType) {
-    if (!(await actions.removeComment(target))) return
-    await comments.removeComment(target.id)
+    if (!(await actions.removeComment(target))) return false
+    await comments.removeComment(target)
+    return true
   }
 
   function openComposer() {
@@ -232,8 +233,11 @@ export default function CommentList(props: CommentListProps) {
       <ReplyList
         onAttitude={changeAttitude}
         onSubmitReply={submitReply}
+        onDelete={deleteComment}
+        viewerMid={actions.viewerMid}
         isAttitudePending={actions.isAttitudePending}
         isReplyPending={actions.isReplyPending}
+        isDeletePending={actions.isDeletePending}
       />
     </View>
   )
