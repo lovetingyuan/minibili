@@ -28,7 +28,7 @@ const app = new Hono<{ Bindings: Env }>();
 
 - `bvid` 缺失或非法返回 `400`；B站返回视频不存在（`-404`）时返回 `404`；上游超时、风控或结构异常时返回 `502`。三种失败都只输出精简错误页（站头站尾 + 错误卡片 + 重新加载链接），不嵌播放器，且响应不缓存。
 - `p` 非正整数或超出分片数量时按第 1 个分片处理，`cid` 与时长也跟随实际生效的分片。
-- 取数只读、匿名可用，不携带任何 Cookie；上游请求带浏览器 UA 与 Referer，并使用 300 秒边缘缓存，页面响应头为 `Cache-Control: public, max-age=300`。UP 主粉丝数来自 `/x/relation/stat`，取不到时为 `null`。
+- 取数只读、匿名可用，不携带任何 Cookie；上游请求经 `bili-proxy` 中转（见下节），业务码为 `0` 的结果缓存 300 秒，页面响应头为 `Cache-Control: public, max-age=300`。UP 主粉丝数来自 `/x/relation/stat`，取不到时为 `null`。
 
 ## 用户设置同步
 
@@ -43,3 +43,14 @@ const app = new Hono<{ Bindings: Env }>();
 状态码：格式错误 `400`，登录缺失/失效 `401`，请求过大 `413`，B站暂不可验证或存储失败 `503`。所有同步响应均禁止缓存。邮箱接口已移除，旧版数据不迁移。
 
 游客、本地账号缓存和待同步修改分别隔离存储。有效登录时自动同步，失败保留修改；切换账号不会上传游客或其他账号的数据。同一 key 采用最后成功写入的值。
+
+## B 站请求中转（bili-proxy）
+
+Worker 的出站 IP 会被 B 站风控直接拒绝（`412`/`403`），所以 server 里**没有任何直连 B 站的代码路径**：`/share` 的 `view`、`/x/relation/stat`，以及 `/api/user-data/sync` 的 `myinfo` 全部经 `bili-proxy` 子项目（部署在 Vercel，Node 运行时）转发。请求头（UA / Referer / Cookie）由 proxy 统一决定，Worker 只传 `path`、`profile` 与可选 `cookie`。
+
+需要配置：
+
+- `BILIBILI_PROXY_URL`：proxy 地址，写在 `wrangler.jsonc` 的 `vars` 里。
+- `BILIBILI_PROXY_TOKEN`：与 Vercel 侧 `BILI_PROXY_TOKEN` 一致的共享密钥，用 `npx wrangler secret put BILIBILI_PROXY_TOKEN` 注入；本地开发写进 `.dev.vars`（已 gitignore）。
+
+部署与冒烟步骤见 `bili-proxy/README.md`。上游失败时日志会输出 `[bili-proxy] ...`，带上 `path`、`profile`、`status`、`source`（`upstream` 表示 B 站返回、`relay` 表示 proxy 自身错误）与耗时，便于判断是风控还是代理故障。日志与缓存都不会包含 Cookie。

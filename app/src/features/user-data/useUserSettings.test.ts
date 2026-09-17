@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({
   snapshot: {
     scope: "uid:123",
     generation: 1,
-    values: { $blackTags: { private: "private" }, $videoCatesList: [], $pinnedUpIds: ["789"] },
+    values: { $blackTags: { private: "private" }, $videoCatesList: [] },
     ready: true,
     syncing: false,
     authRequired: false,
@@ -36,14 +36,11 @@ import { useUserSettings } from "./useUserSettings";
 
 test("hides the previous account's snapshot synchronously before the manager effect runs", () => {
   expect(useUserSettings().values.$blackTags).toEqual({ private: "private" });
-  expect(useUserSettings().values.$pinnedUpIds).toEqual(["789"]);
   mocks.current = false;
   expect(useUserSettings().values.$blackTags).toEqual({});
-  expect(useUserSettings().values.$pinnedUpIds).toEqual([]);
   expect(useUserSettings().pendingCount).toBe(0);
   mocks.current = true;
   mocks.session.account = { mid: "456", generation: 2 };
   expect(useUserSettings().values.$blackTags).toEqual({});
-  expect(useUserSettings().values.$pinnedUpIds).toEqual([]);
   expect(useUserSettings().ready).toBe(false);
 });

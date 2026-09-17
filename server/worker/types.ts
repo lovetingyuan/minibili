@@ -7,6 +7,10 @@ export interface UserStorageStub {
 }
 
 export interface ServerBindings {
+  /** 见 bili-proxy 子项目；普通变量写在 wrangler.jsonc 的 vars 里。 */
+  BILIBILI_PROXY_URL: string;
+  /** 与 Vercel 侧 BILI_PROXY_TOKEN 一致，用 `wrangler secret put` 注入。 */
+  BILIBILI_PROXY_TOKEN: string;
   USER_STORAGE: { getByName(name: string): UserStorageStub };
 }
 

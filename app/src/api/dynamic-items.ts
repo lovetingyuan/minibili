@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 
-import { buildDynamicListUrl, getDynamicPageKey, mapDynamicItem } from "./dynamic-items.mapper";
+import { getDynamicPageKey, mapDynamicItem } from "./dynamic-items.mapper";
 import { DynamicDetailResponseSchema, DynamicListResponseSchema } from "./dynamic-items.schema";
 import type { DynamicListResponse } from "./dynamic-items.schema";
 import type { DynamicItem } from "./dynamic-items.type";
@@ -81,22 +81,4 @@ export function useDynamicDetail(dynamicId?: string) {
     },
     { shouldRetryOnError: false },
   );
-}
-
-export function checkSingleUpUpdate(mid: string | number) {
-  return fetchDynamicPage(buildDynamicListUrl(mid)).then((data) => {
-    let latestTime = 0;
-    let latestId = "";
-    data.items.forEach((item) => {
-      if (item.type === "DYNAMIC_TYPE_LIVE_RCMD") {
-        return;
-      }
-      const pubTime = Number(item.modules.module_author.pub_ts);
-      if (Number.isFinite(pubTime) && pubTime > latestTime) {
-        latestTime = pubTime;
-        latestId = String(item.id_str);
-      }
-    });
-    return latestId;
-  });
 }

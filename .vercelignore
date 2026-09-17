@@ -1,0 +1,11 @@
+# bili-proxy 部署时的上传排除表。
+# Vercel 会把「部署根目录」（从 bili-proxy 里 link 时会被识别为仓库根）整体打包上传，
+# 不排除的话连 tmp/（Vercel CLI 自身安装目录）和 dist/ 都会被打包，上传会一直卡住。
+node_modules
+.git
+.expo
+tmp
+dist
+apk
+docs
+*.log

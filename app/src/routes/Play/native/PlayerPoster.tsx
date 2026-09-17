@@ -6,24 +6,26 @@ import { getImagePixelDimensions, parseImgUrl } from "@/utils";
 type PlayerPosterProps = {
   cover?: string;
   containerWidth: number;
-  containerHeight: number;
   loading: boolean;
 };
 
 /**
  * 视频首帧渲染前的封面兜底：
- * 自动开播后播放器要先加载、解码才会出画面，这段时间用视频封面盖住，避免出现黑屏，
- * 同时叠加转圈提示用户视频正在加载，首帧渲染完成后一起撤掉
+ * 进入播放页后持续复用同一个封面实例，自动开播后播放器要先加载、解码才会出画面，
+ * 这段时间在封面上叠加转圈提示，首帧渲染完成后一起撤掉
  */
 export default function PlayerPoster(props: PlayerPosterProps) {
-  const coverSize = getImagePixelDimensions(props.containerWidth, props.containerHeight);
+  // B站视频封面固定按 16:9 请求，避免播放器上下留白或高度动画改变 CDN URL，
+  // 导致已经显示的封面被清空并重新加载。
+  const coverSize = getImagePixelDimensions(props.containerWidth, (props.containerWidth * 9) / 16);
+  const coverUri = props.cover ? parseImgUrl(props.cover, coverSize) : null;
 
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      {props.cover ? (
+      {coverUri ? (
         <ImageBackground
           style={StyleSheet.absoluteFill}
-          source={{ uri: parseImgUrl(props.cover, coverSize) }}
+          source={{ uri: coverUri }}
           resizeMode="cover"
         />
       ) : null}

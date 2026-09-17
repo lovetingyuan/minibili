@@ -1,21 +1,11 @@
 import type { VideoInfoData, VideoInfoPage } from "../../../shared/video-info";
 import { isRecord } from "../utils/request";
+import { BILI_RELATION_STAT_PATH, BILI_VIEW_PATH, callBilibili } from "./bilibili-proxy";
+import type { BilibiliProxyBindings } from "./bilibili-proxy";
 
-const VIEW_URL = "https://api.bilibili.com/x/web-interface/view";
-const RELATION_URL = "https://api.bilibili.com/x/relation/stat";
 export const VIDEO_INFO_TIMEOUT_MS = 8000;
 /** 上游缓存秒数，分享页的播放数允许 5 分钟延迟。 */
 export const VIDEO_INFO_CACHE_SECONDS = 300;
-
-// B站接口要求带浏览器 UA 与 Referer，全程不携带任何 Cookie。
-const UPSTREAM_HEADERS = {
-  accept: "application/json, text/plain, */*",
-  "accept-language": "zh-CN,zh;q=0.9",
-  "cache-control": "no-cache",
-  referer: "https://www.bilibili.com/",
-  "user-agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-};
 
 export class VideoNotFoundError extends Error {}
 export class VideoUnavailableError extends Error {}
@@ -121,31 +111,25 @@ function mapVideoInfo(value: unknown, requestedPage: number): VideoInfoData | nu
   };
 }
 
-async function fetchUpstreamJson(url: string): Promise<unknown> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), VIDEO_INFO_TIMEOUT_MS);
+// 取数只读、匿名可用，不携带任何 Cookie；请求头由 bili-proxy 决定。
+async function fetchUpstreamJson(bindings: BilibiliProxyBindings, path: string): Promise<unknown> {
   try {
-    const response = await fetch(url, {
-      cf: { cacheEverything: true, cacheTtl: VIDEO_INFO_CACHE_SECONDS },
-      headers: UPSTREAM_HEADERS,
-      // Workers 只支持 follow/manual，3xx 一律按不可用处理。
-      redirect: "manual",
-      signal: controller.signal,
+    return await callBilibili(bindings, {
+      cacheSeconds: VIDEO_INFO_CACHE_SECONDS,
+      path,
+      profile: "web",
+      timeoutMs: VIDEO_INFO_TIMEOUT_MS,
     });
-    if (!response.ok) throw new VideoUnavailableError();
-    return (await response.json()) as unknown;
   } catch (error) {
     if (error instanceof VideoNotFoundError || error instanceof VideoUnavailableError) throw error;
     throw new VideoUnavailableError();
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
-async function fetchUpFans(mid: number): Promise<number | null> {
+async function fetchUpFans(bindings: BilibiliProxyBindings, mid: number): Promise<number | null> {
   if (!Number.isSafeInteger(mid) || mid <= 0) return null;
   try {
-    const payload = await fetchUpstreamJson(`${RELATION_URL}?vmid=${mid}`);
+    const payload = await fetchUpstreamJson(bindings, `${BILI_RELATION_STAT_PATH}?vmid=${mid}`);
     if (!isRecord(payload) || payload.code !== 0 || !isRecord(payload.data)) return null;
     const follower = payload.data.follower;
     return typeof follower === "number" && Number.isFinite(follower) ? follower : null;
@@ -154,13 +138,20 @@ async function fetchUpFans(mid: number): Promise<number | null> {
   }
 }
 
-export async function fetchVideoInfo(bvid: string, requestedPage: number): Promise<VideoInfoData> {
-  const payload = await fetchUpstreamJson(`${VIEW_URL}?bvid=${encodeURIComponent(bvid)}`);
+export async function fetchVideoInfo(
+  bindings: BilibiliProxyBindings,
+  bvid: string,
+  requestedPage: number,
+): Promise<VideoInfoData> {
+  const payload = await fetchUpstreamJson(
+    bindings,
+    `${BILI_VIEW_PATH}?bvid=${encodeURIComponent(bvid)}`,
+  );
   if (!isRecord(payload)) throw new VideoUnavailableError();
   if (payload.code === -404) throw new VideoNotFoundError();
   if (payload.code !== 0) throw new VideoUnavailableError();
   const data = mapVideoInfo(payload.data, requestedPage);
   if (!data) throw new VideoUnavailableError();
-  data.owner.fans = await fetchUpFans(data.owner.mid);
+  data.owner.fans = await fetchUpFans(bindings, data.owner.mid);
   return data;
 }

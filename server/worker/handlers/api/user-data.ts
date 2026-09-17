@@ -15,7 +15,7 @@ export async function handleSyncUserData(c: AppContext) {
   if (!operations) return c.json({ success: false, error: "同步请求格式错误" }, 400);
   let uid: string;
   try {
-    uid = await verifyBilibiliIdentity(c.req.header("X-Bilibili-Cookie"));
+    uid = await verifyBilibiliIdentity(c.env, c.req.header("X-Bilibili-Cookie"));
   } catch (error) {
     return error instanceof BilibiliUnauthorizedError
       ? c.json({ success: false, error: "请重新登录 B站" }, 401)

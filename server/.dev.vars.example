@@ -1,0 +1,4 @@
+# 本地开发用的 Worker secret，复制成 .dev.vars（已 gitignore）。
+# BILIBILI_PROXY_URL 来自 wrangler.jsonc 的 vars，这里只需要密钥。
+# 取值与 Vercel 项目的 BILI_PROXY_TOKEN 完全一致。
+BILIBILI_PROXY_TOKEN=replace-with-the-same-token-as-vercel

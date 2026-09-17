@@ -1,0 +1,24 @@
+{
+  "name": "@minibili/bili-proxy",
+  "version": "0.0.0",
+  "private": true,
+  "description": "部署在 Vercel（Node 运行时）的 B 站接口转发层，供 minibili-server 使用",
+  "scripts": {
+    "dev": "node scripts/vercel.mjs dev",
+    "deploy": "node scripts/vercel.mjs deploy --prod",
+    "vercel": "node scripts/vercel.mjs",
+    "vercel:login": "node scripts/vercel.mjs login",
+    "vercel:link": "node scripts/vercel.mjs link",
+    "vercel:env": "node scripts/vercel.mjs env add BILI_PROXY_TOKEN production",
+    "vercel:install": "npm install --prefix ../tmp/vercel-cli --no-save --no-package-lock --no-audit --no-fund vercel@59.20.0",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "lint": "oxlint ."
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@vercel/node": "^13.0.1",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.0"
+  }
+}

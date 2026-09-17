@@ -11,7 +11,7 @@ import type { WatchProgressSnapshot } from "../utils/watch-progress";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { PartPlayProgressMap } from "./part-play-progress.types";
 import type { RepliesInfo } from "./replies-info.type";
-import type { FollowingDynamicsUpdateState, UpdateUpInfo } from "./types";
+import type { FollowingDynamicsUpdateState } from "./types";
 
 const StoragePrefix = "Store:";
 
@@ -25,10 +25,6 @@ const getAppValue = () => {
      * 关注的up主
      */
     $followedUps: [] as UpInfo[],
-    /**
-     * 有更新的up主
-     */
-    $upUpdateMap: {} as Record<string, UpdateUpInfo>,
     /**
      * 动态 tab 的已读基线和未读更新数，按 B站账号 mid 存储
      */
@@ -84,7 +80,6 @@ const getAppValue = () => {
       changelog: string;
       apkLink: string;
     }[],
-    requestDynamicFailed: 0,
     // dynamicWebviewLink: '',
     // dynamicOpenUrl: 0,
   };

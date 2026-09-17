@@ -57,3 +57,13 @@ npm run dev
 - 本机 8081 已被占用时（例如还开着另一个 Metro）命令会直接报错，先停掉旧 Metro，或用 `-p` 指定别的端口。
 - 参数会原样透传给 `expo start`：`npm run dev -- --android`（自动拉起手机上的开发包）、`npm run dev -- --clear`（清缓存）、`npm run dev -- -p 8082`（自定义 Metro 端口，反代端口同步）、`npm run dev -- --lan`（不使用 localhost 模式）。
 - 实际使用的接口地址可以在 app 的「关于 → 版本信息」弹窗里看到（仅开发构建）。
+
+## 仓库结构
+
+本仓库是 npm workspaces monorepo：
+
+- `app`：Expo / React Native 客户端。
+- `server`：Cloudflare Worker（分享页 SSR、设置同步接口与静态资源）。
+- `bili-proxy`：部署在 Vercel（Node 运行时）的 B 站接口转发层。Cloudflare 的出站 IP 会被 B 站风控直接拒绝，所以 `server` 里没有直连 B 站的代码，`/share` 与设置同步都经它转发。
+
+本地调试 `server` 时需要把 Vercel 上的 `BILI_PROXY_TOKEN` 填进 `server/.dev.vars`（参考 `server/.dev.vars.example`），否则 `/share` 与 `/api/user-data/sync` 会返回 502/503。`bili-proxy` 的部署与冒烟步骤见 [bili-proxy/README.md](./bili-proxy/README.md)。

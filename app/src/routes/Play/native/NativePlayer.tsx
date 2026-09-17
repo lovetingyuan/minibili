@@ -123,8 +123,10 @@ export default function NativePlayer(props: NativePlayerProps) {
   const networkReady = netInfo.type !== null && netInfo.type !== undefined;
   const [highQuality, setHighQuality] = React.useState(false);
   const [started, setStarted] = React.useState(false);
-  // 视频首帧是否已经渲染到播放器上，未渲染前用封面盖住画面
+  // 原生播放器是否已经上报首帧；Android 上该事件可能早于首帧真正稳定显示
   const [firstFrameRendered, setFirstFrameRendered] = React.useState(false);
+  // 封面只在首帧已上报且播放器 ready 后撤掉，撤掉后保持锁定，避免缓冲时重新出现
+  const [posterDismissed, setPosterDismissed] = React.useState(false);
   // 播放是否真正开始过（收到过 playing=true），用于避免首帧渲染早于 playingChange 时续播按钮闪一下
   const [playbackStarted, setPlaybackStarted] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
@@ -514,7 +516,30 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 播放地址变化后需要重新等待首帧，等待期间继续展示封面
   React.useEffect(() => {
     setFirstFrameRendered(false);
+    setPosterDismissed(false);
   }, [uri, playbackAttempt.token]);
+
+  React.useEffect(() => {
+    if (!firstFrameRendered || playerStatus !== "readyToPlay" || posterDismissed) {
+      return;
+    }
+
+    // onFirstFrameRender 只表示原生侧提交过一帧，并不保证 TextureView 已完成合成。
+    // 连续等待两个 UI 帧；若期间重新进入 loading，effect cleanup 会取消撤封面。
+    let secondFrame: number | null = null;
+    const firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => {
+        setPosterDismissed(true);
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      if (secondFrame !== null) {
+        cancelAnimationFrame(secondFrame);
+      }
+    };
+  }, [firstFrameRendered, playerStatus, posterDismissed]);
 
   // 重新获取地址后如果和上一次完全相同，useVideoPlayer 不会重建播放器，这里补一次重载
   React.useEffect(() => {
@@ -900,17 +925,17 @@ export default function NativePlayer(props: NativePlayerProps) {
         style={StyleSheet.absoluteFill}
         nativeControls={false}
         contentFit="contain"
+        surfaceType="textureView"
         allowsPictureInPicture={false}
         onFirstFrameRender={() => {
           setFirstFrameRendered(true);
         }}
       />
-      {started && !firstFrameRendered ? (
+      {!posterDismissed ? (
         <PlayerPoster
           cover={videoInfo.cover}
           containerWidth={width}
-          containerHeight={containerHeight}
-          loading={!showError}
+          loading={started && !showError}
         />
       ) : null}
       {started ? (
@@ -938,10 +963,10 @@ export default function NativePlayer(props: NativePlayerProps) {
       {seekHint ? (
         <PlayerSeekHint targetMs={seekHint.targetMs} deltaSeconds={seekHint.deltaSeconds} />
       ) : null}
-      {/* 首帧渲染前画面被封面盖住，此时不显示播放按钮，避免和封面叠在一起 */}
+      {/* 封面真正撤掉前不显示播放按钮，避免和封面叠在一起 */}
       {shouldShowResumeButton({
         started,
-        firstFrameRendered,
+        firstFrameRendered: posterDismissed,
         playbackStarted,
         paused: pausedUiVisible,
         hasError,
@@ -994,9 +1019,6 @@ export default function NativePlayer(props: NativePlayerProps) {
         />
       ) : (
         <PlayerCover
-          cover={videoInfo.cover}
-          containerWidth={width}
-          containerHeight={containerHeight}
           duration={videoInfo.duration}
           isCellular={isCellular}
           highQuality={highQuality}

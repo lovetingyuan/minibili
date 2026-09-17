@@ -22,14 +22,15 @@ async function fetchRepliesPage(url: string): Promise<RepliesPage> {
 
 export function useReplies() {
   const { repliesInfo } = useStore();
-  const { data, error, setSize, mutate, isValidating, isLoading } = useSWRInfinite<RepliesPage>(
-    (index) =>
-      repliesInfo
-        ? `/x/v2/reply/reply?oid=${repliesInfo.oid}&type=${repliesInfo.type}&root=${repliesInfo.root}&pn=${index + 1}&ps=20`
-        : null,
-    fetchRepliesPage,
-    { revalidateFirstPage: false },
-  );
+  const { data, error, size, setSize, mutate, isValidating, isLoading } =
+    useSWRInfinite<RepliesPage>(
+      (index) =>
+        repliesInfo
+          ? `/x/v2/reply/reply?oid=${repliesInfo.oid}&type=${repliesInfo.type}&root=${repliesInfo.root}&pn=${index + 1}&ps=20`
+          : null,
+      fetchRepliesPage,
+      { revalidateFirstPage: false },
+    );
 
   const fetchedReplies = data?.flatMap((page) => page.replies) || [];
   const list = mergeReplyItems(
@@ -49,8 +50,6 @@ export function useReplies() {
       lastPageReplyCount,
       fetchedReplies.length,
     );
-  const isReachingEnd = !!error || isPageEnd;
-  const isLimited = typeof allCount === "number" && allCount > list.length && isReachingEnd;
 
   async function patchAttitude(id: string, next: CommentAttitude) {
     await mutate(
@@ -93,16 +92,18 @@ export function useReplies() {
     },
     isLoading,
     update() {
-      if (isLoading || isValidating || isReachingEnd || error) return;
+      if (isLoading || isValidating || isPageEnd || error) return;
       void setSize((current) => current + 1);
+    },
+    async retry() {
+      await setSize(size);
     },
     patchAttitude,
     prependReply,
     removeReply,
     refresh: mutate,
     isValidating,
-    isLimited,
-    isReachingEnd,
+    isPageEnd,
     error,
   };
 }

@@ -12,6 +12,7 @@ import { showToast } from '@/utils'
 
 import { Comment } from './Comment'
 import CommentComposer from './CommentComposer'
+import CommentPaginationFooter from './CommentPaginationFooter'
 import type { CommentListProps } from './comment-list.types'
 import ReplyList from './ReplyList'
 import { FlashList, Icon, Skeleton, Text } from './styled/rneui'
@@ -107,7 +108,8 @@ export default function CommentList(props: CommentListProps) {
   }
 
   function loadMore() {
-    if (loadMoreLock.current || comments.isValidating || comments.isReachingEnd) return
+    if (loadMoreLock.current || comments.isValidating || comments.isPageEnd || comments.error)
+      return
     loadMoreLock.current = true
     comments.update()
   }
@@ -200,19 +202,14 @@ export default function CommentList(props: CommentListProps) {
           )
         }
         ListFooterComponent={
-          <View className="h-12 items-center justify-center">
-            {comments.data.replies.length ? (
-              <Text className={`text-xs ${colors.gray6.text}`}>
-                {comments.isValidating
-                  ? '正在加载...'
-                  : comments.isLimited
-                    ? '匿名状态仅展示部分评论'
-                    : comments.isReachingEnd
-                      ? '没有更多评论了'
-                      : '上拉加载更多'}
-              </Text>
-            ) : null}
-          </View>
+          <CommentPaginationFooter
+            error={comments.error}
+            hasItems={comments.data.replies.length > 0}
+            isPageEnd={comments.isPageEnd}
+            isValidating={comments.isValidating}
+            noun="评论"
+            onRetry={() => void comments.retry()}
+          />
         }
         contentInsetAdjustmentBehavior="automatic"
         maintainVisibleContentPosition={{ disabled: true }}

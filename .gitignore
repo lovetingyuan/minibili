@@ -16,6 +16,8 @@ web-build/
 *.log
 .env
 .env.*
+.dev.vars
+.vercel/
 tmp
 apk/
 .tmp

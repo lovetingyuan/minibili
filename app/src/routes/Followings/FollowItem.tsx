@@ -1,33 +1,25 @@
 import { useNavigation } from "@react-navigation/native";
-import { Avatar, Badge, Text } from "@/components/styled/rneui";
+import { Avatar, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
-import React from "react";
 import { Alert, Linking, Pressable, TouchableOpacity, View } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
-import { usePinnedUps } from "@/features/user-data/usePinnedUps";
 import { useFollowActions } from "@/hooks/useFollowActions";
 
 import { useStore } from "../../store";
 import type { NavigationProps, UpInfo } from "../../types";
 import { getImagePixelSize, getOriginalImgUrl, parseImgUrl } from "../../utils";
 
-function FollowItem(props: { item: UpInfo; index?: number }) {
-  // __DEV__ && console.log('follow item', props.item.name)
-  const {
-    item: { face, name, sign, mid },
-    index,
-  } = props;
-  const { $upUpdateMap, set$upUpdateMap, livingUps, setOverlayButtons } = useStore();
+type FollowItemProps = {
+  item: UpInfo;
+  onSetGroups?: (up: UpInfo) => void;
+};
+
+function FollowItem({ item, onSetGroups }: FollowItemProps) {
+  const { face, name, sign, mid } = item;
+  const { livingUps, setOverlayButtons } = useStore();
   const actions = useFollowActions();
-  const pins = usePinnedUps();
-  const isPinned = pins.pinnedUpIds.includes(mid.toString());
-  let hasUpdate = false;
-  if ($upUpdateMap[mid]) {
-    const { latestId, currentLatestId } = $upUpdateMap[mid];
-    hasUpdate = latestId !== currentLatestId;
-  }
   const navigation = useNavigation<NavigationProps["navigation"]>();
+
   const gotoDynamic = () => {
     navigation.navigate("Dynamic", {
       user: {
@@ -38,6 +30,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       },
     });
   };
+
   const gotoLivePage = () => {
     const liveUrl = livingUps[mid];
     if (liveUrl) {
@@ -48,46 +41,15 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
       });
     }
   };
+
   const buttons = () =>
     [
-      hasUpdate
-        ? {
-            text: "标记为已读",
-            onPress: () => {
-              const update = $upUpdateMap[mid];
-              set$upUpdateMap({
-                ...$upUpdateMap,
-                [mid]: {
-                  latestId: update.currentLatestId,
-                  currentLatestId: update.currentLatestId,
-                },
-              });
-            },
-          }
-        : {
-            text: "标记为未读",
-            onPress: () => {
-              if (mid in $upUpdateMap) {
-                const update = $upUpdateMap[mid];
-                set$upUpdateMap({
-                  ...$upUpdateMap,
-                  [mid]: {
-                    latestId: Math.random().toString(),
-                    currentLatestId: update.currentLatestId,
-                  },
-                });
-              } else {
-                set$upUpdateMap({
-                  ...$upUpdateMap,
-                  [mid]: {
-                    latestId: Math.random().toString(),
-                    currentLatestId: Math.random().toString(),
-                  },
-                });
-                // showToast('请稍候再操作')
-              }
-            },
-          },
+      onSetGroups && {
+        text: "设置分组",
+        onPress: () => {
+          onSetGroups(item);
+        },
+      },
       !actions.disabled && {
         text: "取消关注",
         onPress: () => {
@@ -96,7 +58,7 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
             {
               text: "确定",
               onPress() {
-                void actions.unfollow(props.item);
+                void actions.unfollow(item);
               },
             },
           ]);
@@ -107,25 +69,6 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
         onPress: () => {
           Linking.openURL(getOriginalImgUrl(face));
         },
-      },
-      pins.disabled || (isPinned && index === 0)
-        ? null
-        : {
-            text: "置顶UP",
-            onPress: () => {
-              pins.pin(mid);
-            },
-          },
-      !pins.disabled &&
-        isPinned && {
-          text: "取消置顶",
-          onPress: () => {
-            pins.unpin(mid);
-          },
-        },
-      __DEV__ && {
-        text: `${$upUpdateMap[mid]?.latestId} - ${$upUpdateMap[mid]?.currentLatestId}`,
-        onPress: () => {},
       },
     ].filter((v) => !!v && typeof v === "object");
 
@@ -157,20 +100,10 @@ function FollowItem(props: { item: UpInfo; index?: number }) {
             <Text className={"text-center font-bold text-teal-300"}>直播中</Text>
           </Pressable>
         ) : null}
-        {hasUpdate ? (
-          <Badge
-            key={mid}
-            badgeClassName={`absolute left-[38px] top-[-45px] h-4 w-4 rounded-full ${colors.secondary.bg}`}
-          />
-        ) : null}
       </View>
       <UpName
         mid={mid}
-        className={`
-          flex-1 shrink-0 py-2 text-center text-sm
-          ${isPinned ? `font-bold ${colors.primary.text}` : ""}
-          ${hasUpdate ? colors.secondary.text : ""}
-        `}
+        className="flex-1 shrink-0 py-2 text-center text-sm"
         numberOfLines={2}
         ellipsizeMode="tail"
       >

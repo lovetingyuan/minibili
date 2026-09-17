@@ -62,9 +62,6 @@ function findElement(
 
 function renderCover(highQuality: boolean, onHighQualityChange = vi.fn(), onStart = vi.fn()) {
   const root = PlayerCover({
-    cover: "https://example.com/cover.jpg",
-    containerWidth: 360,
-    containerHeight: 202,
     duration: 90,
     isCellular: true,
     highQuality,

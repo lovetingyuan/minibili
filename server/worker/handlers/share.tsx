@@ -26,7 +26,7 @@ export async function handleSharePage(c: AppContext) {
   }
 
   try {
-    const data = await fetchVideoInfo(params.bvid, params.page);
+    const data = await fetchVideoInfo(c.env, params.bvid, params.page);
     const page = normalizePage(data.currentPage, data.pages.length);
     c.header("Cache-Control", `public, max-age=${VIDEO_INFO_CACHE_SECONDS}`);
     return c.html(<SharePage data={data} page={page} origin={url.origin} />, 200);

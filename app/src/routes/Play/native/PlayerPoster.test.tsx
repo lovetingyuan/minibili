@@ -41,7 +41,7 @@ function expectElement(node: ReactNode): ReactElement<ElementProps> {
 
 function renderPoster(options: { cover?: string; loading: boolean }) {
   const root = expectElement(
-    PlayerPoster({ ...options, containerWidth: 360, containerHeight: 202 }),
+    PlayerPoster({ ...options, containerWidth: 360 }),
   );
   const children = React.Children.toArray(root.props.children).map(expectElement);
   const coverImage = children.find((child) => child.type === "ImageBackground") ?? null;

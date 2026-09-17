@@ -11,7 +11,23 @@ import { MemoryKvStorage } from "./testing/memory-kv";
 
 const COOKIE = "SESSDATA=session; DedeUserID=123";
 const validPayload = { code: 0, data: { profile: { mid: 123 } } };
+const PROXY_URL = "https://minibili-bili-proxy.vercel.app";
 const upstream = vi.fn<typeof fetch>();
+
+function requestInfo(input: RequestInfo | URL | undefined, init?: RequestInit) {
+  const url =
+    typeof input === "string" ? input : input instanceof URL ? input.href : (input?.url ?? "");
+  const payload: unknown =
+    typeof init?.body === "string" ? (JSON.parse(init.body) as unknown) : undefined;
+  const path = typeof payload === "object" && payload !== null ? Reflect.get(payload, "path") : "";
+  const cookie =
+    typeof payload === "object" && payload !== null ? Reflect.get(payload, "cookie") : undefined;
+  return {
+    cookie: typeof cookie === "string" ? cookie : null,
+    path: typeof path === "string" ? path : "",
+    url,
+  };
+}
 
 function setup() {
   const app = createApp();
@@ -25,7 +41,11 @@ function setup() {
     const current = storage;
     return { syncData: async (operations: SyncOperations) => syncUserData(current, operations) };
   });
-  const env = { USER_STORAGE: { getByName } };
+  const env = {
+    BILIBILI_PROXY_TOKEN: "test-token",
+    BILIBILI_PROXY_URL: PROXY_URL,
+    USER_STORAGE: { getByName },
+  };
   return {
     getByName,
     request: (path: string, init?: RequestInit) =>
@@ -92,9 +112,11 @@ describe("B站 identity boundary", () => {
     expect(server.getByName).not.toHaveBeenCalled();
   });
 
-  test.each([302, 403, 429, 500])("fails closed for upstream HTTP %i", async (status) => {
+  test.each([302, 403, 412, 429, 500])("fails closed for upstream HTTP %i", async (status) => {
     const server = setup();
-    upstream.mockImplementation(async () => new Response("upstream", { status }));
+    upstream.mockImplementation(
+      async () => new Response("upstream", { headers: { "x-proxy-source": "upstream" }, status }),
+    );
     expect((await server.sync()).status).toBe(503);
     expect(server.getByName).not.toHaveBeenCalled();
   });
@@ -130,12 +152,18 @@ describe("B站 identity boundary", () => {
     });
     expect(server.getByName).toHaveBeenCalledExactlyOnceWith("123");
     expect(upstream).toHaveBeenCalledWith(
-      "https://api.bilibili.com/x/space/v2/myinfo",
+      `${PROXY_URL}/api/bili`,
       expect.objectContaining({
-        redirect: "manual",
-        headers: expect.objectContaining({ cookie: "SESSDATA=session; DedeUserID=999" }),
+        headers: expect.objectContaining({ "x-proxy-token": "test-token" }),
+        method: "POST",
       }),
     );
+    const proxied = requestInfo(upstream.mock.calls[0]?.[0], upstream.mock.calls[0]?.[1]);
+    expect(proxied).toEqual({
+      cookie: "SESSDATA=session; DedeUserID=999",
+      path: "/x/space/v2/myinfo",
+      url: `${PROXY_URL}/api/bili`,
+    });
     upstream.mockImplementation(async () =>
       Response.json({ code: 0, data: { profile: { mid: 456 } } }),
     );

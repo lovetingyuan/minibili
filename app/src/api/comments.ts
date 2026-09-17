@@ -254,9 +254,7 @@ export function useComments(oid: string | number, type: number, mode = 3) {
   const lastPage = data?.[data.length - 1];
   const isPageEnd =
     !!lastPage && (lastPage.cursor.is_end || !lastPage.cursor.pagination_reply?.next_offset);
-  const isReachingEnd = !!error || isPageEnd;
   const allCount = data?.[0]?.cursor.all_count;
-  const isLimited = typeof allCount === "number" && allCount > replies.length && isReachingEnd;
   const isLoadingMore = Boolean(data && size > data.length);
 
   async function patchAttitude(id: string, next: CommentAttitude) {
@@ -299,8 +297,11 @@ export function useComments(oid: string | number, type: number, mode = 3) {
     data: { allCount, replies, ownerMid: data?.[0]?.ownerMid },
     isLoading,
     update() {
-      if (isLoading || isValidating || isReachingEnd || error) return;
+      if (isLoading || isValidating || isPageEnd || error) return;
       void setSize((current) => current + 1);
+    },
+    async retry() {
+      await setSize(size);
     },
     isValidating,
     isRefreshing: isValidating && Boolean(data) && !isLoadingMore,
@@ -312,8 +313,7 @@ export function useComments(oid: string | number, type: number, mode = 3) {
     prependReply,
     prependComment,
     removeComment,
-    isLimited,
-    isReachingEnd,
+    isPageEnd,
     error,
   };
 }

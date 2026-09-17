@@ -47,15 +47,15 @@ function setup() {
   };
 }
 
-describe("pinned UP sync", () => {
-  test("uploads only pinned IDs and restores the same order on another device", async () => {
+describe("user settings sync", () => {
+  test("uploads only the changed setting and restores it on another device", async () => {
     const { store, dependencies, cloud } = setup();
     await store.activate(alice);
-    store.setValue(alice, "$pinnedUpIds", ["789", "456"]);
+    store.setValue(alice, "$blackTags", { 睡前: "睡前", 学习: "学习" });
     await store.sync(alice);
-    expect(cloud.get(alice.mid)?.$pinnedUpIds).toEqual(["789", "456"]);
+    expect(cloud.get(alice.mid)?.$blackTags).toEqual({ 睡前: "睡前", 学习: "学习" });
     expect(vi.mocked(dependencies.sync).mock.calls[0][1].set).toEqual({
-      $pinnedUpIds: ["789", "456"],
+      $blackTags: { 睡前: "睡前", 学习: "学习" },
     });
     const otherDisk = new Map<string, string>();
     const other = createUserDataController({
@@ -67,51 +67,51 @@ describe("pinned UP sync", () => {
     });
     await other.activate(alice);
     await other.sync(alice);
-    expect(other.getSnapshot().values.$pinnedUpIds).toEqual(["789", "456"]);
+    expect(other.getSnapshot().values.$blackTags).toEqual({ 睡前: "睡前", 学习: "学习" });
     expect(vi.mocked(dependencies.sync).mock.calls[1][1].set).toBeUndefined();
     const restarted = createUserDataController(dependencies);
     await restarted.activate(alice);
-    expect(restarted.getSnapshot().values.$pinnedUpIds).toEqual(["789", "456"]);
+    expect(restarted.getSnapshot().values.$blackTags).toEqual({ 睡前: "睡前", 学习: "学习" });
   });
 
-  test("offline removal of every pin survives restart and explicitly clears the cloud list", async () => {
+  test("offline clearing of a setting survives restart and explicitly clears the cloud value", async () => {
     const { store, dependencies, cloud } = setup();
-    cloud.set(alice.mid, { $pinnedUpIds: ["789", "456"] });
+    cloud.set(alice.mid, { $blackTags: { 睡前: "睡前" } });
     await store.activate(alice);
     await store.sync(alice);
-    store.setValue(alice, "$pinnedUpIds", []);
+    store.setValue(alice, "$blackTags", {});
     vi.mocked(dependencies.sync).mockRejectedValueOnce(new Error("offline"));
     await expect(store.sync(alice)).rejects.toThrow("offline");
     const restarted = createUserDataController(dependencies);
     await restarted.activate(alice);
-    expect(restarted.getSnapshot().values.$pinnedUpIds).toEqual([]);
+    expect(restarted.getSnapshot().values.$blackTags).toEqual({});
     expect(restarted.getSnapshot().pendingCount).toBe(1);
     await restarted.sync(alice);
-    expect(vi.mocked(dependencies.sync).mock.lastCall?.[1].set).toEqual({ $pinnedUpIds: [] });
-    expect(cloud.get(alice.mid)?.$pinnedUpIds).toEqual([]);
+    expect(vi.mocked(dependencies.sync).mock.lastCall?.[1].set).toEqual({ $blackTags: {} });
+    expect(cloud.get(alice.mid)?.$blackTags).toEqual({});
     expect(restarted.getSnapshot().pendingCount).toBe(0);
   });
 
-  test("a stale response cannot undo pin changes made during an upload", async () => {
+  test("a stale response cannot undo setting changes made during an upload", async () => {
     const { store, dependencies, cloud } = setup();
     await store.activate(alice);
-    store.setValue(alice, "$pinnedUpIds", ["456"]);
+    store.setValue(alice, "$blackTags", { 学习: "学习" });
     const response = deferred<SyncResult>();
     vi.mocked(dependencies.sync).mockReturnValueOnce(response.promise);
     const sync = store.sync(alice);
     await vi.waitFor(() => expect(dependencies.sync).toHaveBeenCalledTimes(1));
-    store.setValue(alice, "$pinnedUpIds", ["789"]);
-    response.resolve({ success: true, uid: alice.mid, result: { $pinnedUpIds: ["456"] } });
+    store.setValue(alice, "$blackTags", { 音乐: "音乐" });
+    response.resolve({ success: true, uid: alice.mid, result: { $blackTags: { 学习: "学习" } } });
     await sync;
-    expect(store.getSnapshot().values.$pinnedUpIds).toEqual(["789"]);
-    expect(cloud.get(alice.mid)?.$pinnedUpIds).toEqual(["789"]);
+    expect(store.getSnapshot().values.$blackTags).toEqual({ 音乐: "音乐" });
+    expect(cloud.get(alice.mid)?.$blackTags).toEqual({ 音乐: "音乐" });
   });
 
-  test("account changes ignore late pin responses and retain each account's pending changes", async () => {
+  test("account changes ignore late setting responses and retain each account's pending changes", async () => {
     const { store, dependencies, cloud, changeAccount } = setup();
-    cloud.set(bob.mid, { $pinnedUpIds: ["999"] });
+    cloud.set(bob.mid, { $blackTags: { 舞蹈: "舞蹈" } });
     await store.activate(alice);
-    store.setValue(alice, "$pinnedUpIds", ["789"]);
+    store.setValue(alice, "$blackTags", { 音乐: "音乐" });
     const response = deferred<SyncResult>();
     vi.mocked(dependencies.sync).mockReturnValueOnce(response.promise);
     const sync = store.sync(alice);
@@ -120,13 +120,13 @@ describe("pinned UP sync", () => {
     changeAccount(bob);
     await store.activate(bob);
     await store.sync(bob);
-    response.resolve({ success: true, uid: alice.mid, result: { $pinnedUpIds: ["456"] } });
+    response.resolve({ success: true, uid: alice.mid, result: { $blackTags: { 学习: "学习" } } });
     await rejected;
-    expect(store.getSnapshot().values.$pinnedUpIds).toEqual(["999"]);
+    expect(store.getSnapshot().values.$blackTags).toEqual({ 舞蹈: "舞蹈" });
     expect(vi.mocked(dependencies.sync).mock.calls[1][1].set).toBeUndefined();
     changeAccount(alice);
     await store.activate(alice);
-    expect(store.getSnapshot().values.$pinnedUpIds).toEqual(["789"]);
+    expect(store.getSnapshot().values.$blackTags).toEqual({ 音乐: "音乐" });
     expect(store.getSnapshot().pendingCount).toBe(1);
   });
 });
@@ -147,7 +147,7 @@ describe("account scoped user data", () => {
     await store.sync(alice);
     expect(dependencies.sync).toHaveBeenCalledWith(
       alice,
-      { get: ["$blackTags", "$videoCatesList", "$pinnedUpIds"] },
+      { get: ["$blackTags", "$videoCatesList"] },
       expect.any(AbortSignal),
     );
     changeAccount(null);

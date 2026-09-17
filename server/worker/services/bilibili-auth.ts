@@ -1,12 +1,16 @@
 import { isRecord } from "../utils/request";
+import { BILI_MYINFO_PATH, callBilibili } from "./bilibili-proxy";
+import type { BilibiliProxyBindings } from "./bilibili-proxy";
 
-const MYINFO_URL = "https://api.bilibili.com/x/space/v2/myinfo";
 export const AUTH_TIMEOUT_MS = 15000;
 
 export class BilibiliUnauthorizedError extends Error {}
 export class BilibiliUnavailableError extends Error {}
 
-export async function verifyBilibiliIdentity(cookie: string | undefined): Promise<string> {
+export async function verifyBilibiliIdentity(
+  bindings: BilibiliProxyBindings,
+  cookie: string | undefined,
+): Promise<string> {
   if (
     !cookie ||
     cookie.length > 16384 ||
@@ -16,23 +20,13 @@ export async function verifyBilibiliIdentity(cookie: string | undefined): Promis
   ) {
     throw new BilibiliUnauthorizedError();
   }
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), AUTH_TIMEOUT_MS);
   try {
-    const response = await fetch(MYINFO_URL, {
-      headers: {
-        cookie,
-        accept: "application/json",
-        referer: "https://space.bilibili.com/",
-        "user-agent": "Mozilla/5.0",
-        "cache-control": "no-cache",
-      },
-      // Workers 只支持 follow/manual；不跟随重定向，并由下方 !ok 拒绝 3xx。
-      redirect: "manual",
-      signal: controller.signal,
+    const payload = await callBilibili(bindings, {
+      cookie,
+      path: BILI_MYINFO_PATH,
+      profile: "auth",
+      timeoutMs: AUTH_TIMEOUT_MS,
     });
-    if (!response.ok) throw new BilibiliUnavailableError();
-    const payload: unknown = await response.json();
     if (!isRecord(payload)) throw new BilibiliUnavailableError();
     if (payload.code === -101) throw new BilibiliUnauthorizedError();
     if (payload.code !== 0 || !isRecord(payload.data) || !isRecord(payload.data.profile)) {
@@ -47,7 +41,5 @@ export async function verifyBilibiliIdentity(cookie: string | undefined): Promis
   } catch (error) {
     if (error instanceof BilibiliUnauthorizedError) throw error;
     throw new BilibiliUnavailableError();
-  } finally {
-    clearTimeout(timeout);
   }
 }

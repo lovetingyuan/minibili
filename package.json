@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": [
     "app",
-    "server"
+    "server",
+    "bili-proxy"
   ],
   "scripts": {
     "format": "oxfmt .",
@@ -17,6 +18,8 @@
     "update": "npm run update -w=@minibili/app",
     "upgrade": "npm run update-expo -w=@minibili/app",
     "server": "npm run dev -w=@minibili/server",
+    "proxy:dev": "npm run dev -w=@minibili/bili-proxy",
+    "proxy:deploy": "npm run deploy -w=@minibili/bili-proxy",
     "deploy": "npm run deploy -w=@minibili/server",
     "build": "npm run build:android -w=@minibili/app"
   },

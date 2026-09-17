@@ -1,29 +1,17 @@
-import type { UpdateUpInfo } from "../../store/types";
 import type { UpInfo } from "../../types";
 
-export function orderFollowedUps(
-  ups: UpInfo[],
-  pinnedUpIds: string[],
-  livingUps: Record<string, string>,
-  upUpdateMap: Record<string, UpdateUpInfo>,
-) {
-  const byMid = new Map(ups.map((up) => [up.mid.toString(), up]));
-  const pinnedIds = new Set(pinnedUpIds);
-  const pinnedUps = pinnedUpIds.flatMap((id) => {
-    const up = byMid.get(id);
-    return up ? [up] : [];
-  });
+/** 正在直播的 UP 排在最前，其余保持 B站 返回（或本地同步）的顺序。 */
+export function orderFollowedUps(ups: UpInfo[], livingUps: Record<string, string>) {
   const liveUps: UpInfo[] = [];
-  const updatedUps: UpInfo[] = [];
   const otherUps: UpInfo[] = [];
 
   for (const up of ups) {
-    if (pinnedIds.has(up.mid.toString())) continue;
-    const update = upUpdateMap[up.mid];
-    if (livingUps[up.mid]) liveUps.push(up);
-    else if (update && update.latestId !== update.currentLatestId) updatedUps.push(up);
-    else otherUps.push(up);
+    if (livingUps[up.mid]) {
+      liveUps.push(up);
+    } else {
+      otherUps.push(up);
+    }
   }
 
-  return [...pinnedUps, ...liveUps, ...updatedUps, ...otherUps];
+  return [...liveUps, ...otherUps];
 }

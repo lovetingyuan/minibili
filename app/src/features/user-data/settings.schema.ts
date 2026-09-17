@@ -30,10 +30,6 @@ export const UserSettingsSchema = z.object({
     .array(z.object({ rid: z.number().int() }))
     .catch([])
     .transform(normalizeVideoCategories),
-  $pinnedUpIds: z
-    .array(z.string().regex(/^[1-9]\d*$/))
-    .catch([])
-    .transform((ids) => [...new Set(ids)]),
 });
 
 export const LocalUserDataSchema = z.object({

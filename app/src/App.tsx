@@ -21,7 +21,6 @@ import WatchProgressManager from "./components/WatchProgressManager";
 import CheckAppUpdate from "./components/CheckAppUpdate";
 import LiveUpsManager from "./components/LiveUpsManager";
 import CheckNetState from "./components/CheckNetState";
-import CheckUpUpdate from "./components/CheckUpUpdate";
 import FollowingDynamicsUpdatesManager from "./components/FollowingDynamicsUpdatesManager";
 import ImagesView from "./components/ImagesView";
 import VideoDownloadManager from "./components/VideoDownloadManager";
@@ -89,7 +88,6 @@ export default function App() {
                 <BilibiliBlacklistManager />
                 <UserDataManager />
                 <CheckAppUpdate />
-                <CheckUpUpdate />
                 <CheckNetState />
                 <LiveUpsManager />
                 <FollowingDynamicsUpdatesManager />

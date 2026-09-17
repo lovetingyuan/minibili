@@ -12,6 +12,7 @@ import useKeyboardHeight from "@/hooks/useKeyboardHeight";
 import { useStore } from "@/store";
 
 import { CommentItem } from "./Comment";
+import CommentPaginationFooter from "./CommentPaginationFooter";
 import { removeReplyFromInfo } from "./reply-list.helpers";
 import type { ReplyListProps } from "./reply-list.types";
 import ReplyComposer from "./ReplyComposer";
@@ -95,7 +96,7 @@ export default function ReplyList(props: ReplyListProps) {
   }
 
   function loadMore() {
-    if (loadMoreLock.current || replies.isValidating || replies.isReachingEnd) return;
+    if (loadMoreLock.current || replies.isValidating || replies.isPageEnd || replies.error) return;
     loadMoreLock.current = true;
     replies.update();
   }
@@ -178,19 +179,14 @@ export default function ReplyList(props: ReplyListProps) {
             )
           }
           ListFooterComponent={
-            <View className="h-10 items-center justify-center">
-              {replies.data.replies.length ? (
-                <Text className={`text-xs ${colors.gray6.text}`}>
-                  {replies.isValidating
-                    ? "正在加载..."
-                    : replies.isLimited
-                      ? "匿名状态仅展示部分回复"
-                      : replies.isReachingEnd
-                        ? "没有更多回复了"
-                        : "上拉加载更多"}
-                </Text>
-              ) : null}
-            </View>
+            <CommentPaginationFooter
+              error={replies.error}
+              hasItems={replies.data.replies.length > 0}
+              isPageEnd={replies.isPageEnd}
+              isValidating={replies.isValidating}
+              noun="回复"
+              onRetry={() => void replies.retry()}
+            />
           }
           contentContainerClassName="pb-3"
           contentInsetAdjustmentBehavior="automatic"

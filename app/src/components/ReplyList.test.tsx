@@ -107,13 +107,13 @@ beforeEach(() => {
     data: { allCount: 1, replies: [child], root: rootComment },
     isLoading: false,
     isValidating: false,
-    isReachingEnd: true,
-    isLimited: false,
+    isPageEnd: true,
     error: undefined,
     patchAttitude: vi.fn(),
     prependReply: vi.fn(),
     removeReply: vi.fn(),
     refresh: vi.fn(),
+    retry: vi.fn(),
     update: vi.fn(),
   };
 });
@@ -141,9 +141,9 @@ test("keeps keyboard taps, increases row padding and wires own-reply deletion", 
   await comment?.props.onDelete?.(child);
 
   expect(onDelete).toHaveBeenCalledWith(child);
-  expect((mocks.replies as { removeReply: ReturnType<typeof vi.fn> }).removeReply).toHaveBeenCalledWith(
-    child.id,
-  );
+  expect(
+    (mocks.replies as { removeReply: ReturnType<typeof vi.fn> }).removeReply,
+  ).toHaveBeenCalledWith(child.id);
   expect(mocks.setRepliesInfo).toHaveBeenCalledWith(
     expect.objectContaining({ allCount: 0, previewReplies: [] }),
   );

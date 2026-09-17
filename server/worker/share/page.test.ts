@@ -7,8 +7,11 @@ import type { ServerBindings } from "../types";
 
 const BVID = "BV1XctB6PEuZ";
 const upstream = vi.fn<typeof fetch>();
+const PROXY_URL = "https://minibili-bili-proxy.vercel.app";
 
 const env: ServerBindings = {
+  BILIBILI_PROXY_TOKEN: "test-token",
+  BILIBILI_PROXY_URL: PROXY_URL,
   USER_STORAGE: { getByName: () => ({ syncData: async () => ({}) }) },
 };
 
@@ -75,17 +78,39 @@ function buildViewPayload(overrides: ViewOverrides = {}) {
   };
 }
 
+function requestInfo(input: RequestInfo | URL | undefined, init?: RequestInit) {
+  const url =
+    typeof input === "string" ? input : input instanceof URL ? input.href : (input?.url ?? "");
+  const payload: unknown =
+    typeof init?.body === "string" ? (JSON.parse(init.body) as unknown) : undefined;
+  const path = typeof payload === "object" && payload !== null ? Reflect.get(payload, "path") : "";
+  return { path: typeof path === "string" ? path : "", url };
+}
+
+/** B 站把 Worker 出口拉黑时，proxy 会原样透传 412。 */
+function mockBlockedUpstream() {
+  upstream.mockImplementation(
+    async () => new Response("blocked", { headers: { "x-proxy-source": "upstream" }, status: 412 }),
+  );
+}
+
 function mockUpstream(view: unknown, options: { unavailable?: boolean } = {}) {
-  upstream.mockImplementation(async (input) => {
-    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-    if (url.includes("/x/web-interface/view")) {
-      if (options.unavailable) return new Response("upstream down", { status: 503 });
+  upstream.mockImplementation(async (input, init) => {
+    const { path, url } = requestInfo(input, init);
+    if (url !== `${PROXY_URL}/api/bili`) throw new Error(`unexpected upstream url: ${url}`);
+    if (path.includes("/x/web-interface/view")) {
+      if (options.unavailable) {
+        return new Response("upstream down", {
+          headers: { "x-proxy-source": "upstream" },
+          status: 503,
+        });
+      }
       return Response.json(view);
     }
-    if (url.includes("/x/relation/stat")) {
+    if (path.includes("/x/relation/stat")) {
       return Response.json({ code: 0, data: { follower: 12345 }, message: "0" });
     }
-    throw new Error(`unexpected upstream request: ${url}`);
+    throw new Error(`unexpected proxy path: ${path}`);
   });
 }
 
@@ -227,6 +252,22 @@ test("returns a 502 error page when the upstream is unavailable", async () => {
   expect(html).toContain("视频信息加载失败");
   expect(html).toContain(`href="/share?bvid=${BVID}&amp;p=2"`);
   expect(html).not.toContain("<iframe");
+});
+
+test("returns a 502 error page when bilibili blocks the request", async () => {
+  mockBlockedUpstream();
+  const response = await requestShare(`/share?bvid=${BVID}&p=2`);
+  const html = await response.text();
+
+  expect(response.status).toBe(502);
+  expect(response.headers.get("cache-control")).toBe("no-store");
+  expect(html).toContain("视频信息加载失败");
+  // 被风控的状态不重试，且不会再有直连 B 站的请求
+  expect(upstream).toHaveBeenCalledTimes(1);
+  for (const [input] of upstream.mock.calls) {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    expect(url.startsWith(PROXY_URL)).toBe(true);
+  }
 });
 
 test("redirects the legacy share.html link to the share page", async () => {
