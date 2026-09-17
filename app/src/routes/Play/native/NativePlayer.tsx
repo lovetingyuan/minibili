@@ -1000,9 +1000,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           duration={videoInfo.duration}
           isCellular={isCellular}
           highQuality={highQuality}
-          onToggleHighQuality={() => {
-            setHighQuality((value) => !value);
-          }}
+          onHighQualityChange={setHighQuality}
           onStart={() => {
             setStarted(true);
           }}

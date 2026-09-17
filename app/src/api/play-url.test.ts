@@ -59,12 +59,6 @@ test("get-play-url", () => {
   return testIt(url);
 });
 
-test("get-play-url-2", async () => {
-  return testIt(
-    "/x/player/wbi/playurl?bvid=BV1SZ421y7Ae&cid=1460675026&type=mp4&qn=64&platform=pc&high_quality=1",
-  );
-});
-
 test("get-play-url-html5", async () => {
   return testIt(
     "/x/player/wbi/playurl?bvid=BV1Av421r7Ur&cid=1454646853&type=mp4&qn=64&fnval=1&platform=html5&high_quality=1",

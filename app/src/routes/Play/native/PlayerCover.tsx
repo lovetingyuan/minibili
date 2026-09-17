@@ -1,5 +1,5 @@
 import { Image as ExpoImage } from "@/components/styled/expo";
-import { CheckBox } from "@/components/styled/rneui";
+import { Switch } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { ImageBackground, Pressable, Text, View } from "react-native";
 
@@ -12,32 +12,37 @@ type PlayerCoverProps = {
   duration?: number;
   isCellular: boolean;
   highQuality: boolean;
-  onToggleHighQuality: () => void;
+  onHighQualityChange: (enabled: boolean) => void;
   onStart: () => void;
 };
+
+function PlayerPlayIcon() {
+  return (
+    <ExpoImage source={require("../../../../assets/play.png")} className="h-16 w-16 opacity-80" />
+  );
+}
 
 export default function PlayerCover(props: PlayerCoverProps) {
   const { cover, duration, isCellular, highQuality } = props;
   const coverSize = getImagePixelDimensions(props.containerWidth, props.containerHeight);
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel="开始播放"
-      className="flex-1"
-      onPress={props.onStart}
-    >
+    <View className="flex-1">
       {cover ? (
         <ImageBackground
           source={{ uri: parseImgUrl(cover, coverSize) }}
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
-          <ExpoImage
-            source={require("../../../../assets/play.png")}
-            className="h-16 w-16 opacity-80"
-          />
-          <View className="absolute bottom-2 left-2 flex-row gap-2">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="开始播放"
+            className="absolute inset-0 items-center justify-center"
+            onPress={props.onStart}
+          >
+            <PlayerPlayIcon />
+          </Pressable>
+          <View pointerEvents="none" className="absolute bottom-2 left-2 flex-row gap-2">
             {duration ? (
               <Text className="rounded bg-gray-900/60 px-2 py-0.5 font-bold text-white">
                 {parseDuration(duration)}
@@ -50,29 +55,39 @@ export default function PlayerCover(props: PlayerCoverProps) {
             ) : null}
           </View>
           {isCellular ? (
-            <View className="absolute bottom-2 right-2">
-              <CheckBox
-                checked={highQuality}
-                title="高清"
-                textClassName="text-white"
-                wrapperClassName="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold"
-                checkedColorClassName={colors.secondary.accent}
-                uncheckedColor={"white"}
-                size={18}
-                containerClassName="bg-transparent p-0 m-0"
-                onPress={props.onToggleHighQuality}
+            <Pressable
+              accessibilityRole="switch"
+              accessibilityLabel="高清播放"
+              accessibilityHint="开启后将使用移动流量播放 1080P 视频"
+              accessibilityState={{ checked: highQuality }}
+              className="absolute bottom-2 right-2 flex-row items-center gap-1 rounded bg-gray-900/60 py-0.5 pl-2 pr-1"
+              onPress={() => {
+                props.onHighQualityChange(!highQuality);
+              }}
+            >
+              <Text className="font-bold text-white">高清</Text>
+              <Switch
+                accessible={false}
+                pointerEvents="none"
+                value={highQuality}
+                colorClassName={colors.secondary.accent}
+                trackColorOnClassName={colors.secondary.accent}
+                trackColorOffClassName={colors.gray4.accent}
+                style={{ transform: [{ scale: 0.72 }] }}
               />
-            </View>
+            </Pressable>
           ) : null}
         </ImageBackground>
       ) : (
-        <View className="flex-1 items-center justify-center bg-black">
-          <ExpoImage
-            source={require("../../../../assets/play.png")}
-            className="h-16 w-16 opacity-80"
-          />
-        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="开始播放"
+          className="flex-1 items-center justify-center bg-black"
+          onPress={props.onStart}
+        >
+          <PlayerPlayIcon />
+        </Pressable>
       )}
-    </Pressable>
+    </View>
   );
 }
