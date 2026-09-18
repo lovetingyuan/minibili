@@ -1,5 +1,4 @@
-import { Image as ExpoImage } from "@/components/styled/expo";
-import { Switch } from "@/components/styled/rneui";
+import { Icon, Switch } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { Pressable, Text, View } from "react-native";
 
@@ -15,7 +14,13 @@ type PlayerCoverProps = {
 
 function PlayerPlayIcon() {
   return (
-    <ExpoImage source={require("../../../../assets/play.png")} className="h-16 w-16 opacity-80" />
+    <Icon
+      name="play"
+      type="material-design"
+      size={64}
+      color="#ffffff"
+      containerClassName="opacity-80"
+    />
   );
 }
 
@@ -45,27 +50,21 @@ export default function PlayerCover(props: PlayerCoverProps) {
         ) : null}
       </View>
       {isCellular ? (
-        <Pressable
-          accessibilityRole="switch"
-          accessibilityLabel="高清播放"
-          accessibilityHint="开启后将使用移动流量播放 1080P 视频"
-          accessibilityState={{ checked: highQuality }}
-          className="absolute bottom-2 right-2 flex-row items-center gap-1 rounded bg-gray-900/60 py-0.5 pl-2 pr-1"
-          onPress={() => {
-            props.onHighQualityChange(!highQuality);
-          }}
-        >
-          <Text className="font-bold text-white">高清</Text>
+        <View className="absolute bottom-2 right-2 flex-row items-center gap-1 rounded bg-gray-900/60 py-0.5 pl-2 pr-1">
+          <Text className="font-bold text-white">1080P</Text>
           <Switch
-            accessible={false}
-            pointerEvents="none"
+            accessibilityRole="switch"
+            accessibilityLabel="1080P 播放"
+            accessibilityHint="开启后将使用移动流量播放 1080P 视频"
+            accessibilityState={{ checked: highQuality }}
             value={highQuality}
+            onValueChange={props.onHighQualityChange}
             colorClassName={colors.secondary.accent}
             trackColorOnClassName={colors.secondary.accent}
             trackColorOffClassName={colors.gray4.accent}
             style={{ transform: [{ scale: 0.72 }] }}
           />
-        </Pressable>
+        </View>
       ) : null}
     </View>
   );

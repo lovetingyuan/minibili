@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import { FlashList } from "@/components/styled/rneui";
 import React from "react";
-import { Alert, Linking, TouchableOpacity } from "react-native";
+import { Alert, TouchableOpacity } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
 import { useBlockUpActions } from "@/hooks/useBlockUpActions";
@@ -9,7 +9,7 @@ import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 import type { MainTabNavigationProp } from "@/types";
-import { getOriginalImgUrl, handleShareVideo, parseNumber } from "@/utils";
+import { handleShareVideo, parseNumber } from "@/utils";
 import type { FlashListRef } from "@/components/styled/rneui";
 
 import Loading from "./Loading";
@@ -26,7 +26,7 @@ function VideoList(props: {
   onTabReselect?: () => void;
   isRefreshing?: boolean;
 }) {
-  const { setOverlayButtons, currentVideosCate } = useStore();
+  const { setOverlayButtons, currentVideosCate, setImagesList, setCurrentImageIndex } = useStore();
   const {
     values: { $blackTags },
     setSetting,
@@ -147,10 +147,14 @@ function VideoList(props: {
       {
         text: "查看封面",
         onPress: () => {
-          if (!currentVideoRef.current) {
-            return;
-          }
-          Linking.openURL(getOriginalImgUrl(currentVideoRef.current.cover));
+          setCurrentImageIndex(0);
+          setImagesList([
+            {
+              src: video.cover,
+              width: video.width,
+              height: video.height,
+            },
+          ]);
         },
       },
     ].filter((v) => v && typeof v === "object");

@@ -1,6 +1,7 @@
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
+import { RELATION_TAG_SPECIAL_ID } from "@/api/relation-tags";
 import { useBilibiliRelationTagMembers } from "@/api/useBilibiliRelationTags";
 import { Button, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
@@ -20,8 +21,12 @@ type Props = {
 export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefreshTags }: Props) {
   const members = useBilibiliRelationTagMembers(tagid);
   const { livingUps } = useStore();
-  const orderedUps = orderFollowedUps(members.items, livingUps, specialMids);
-  const hasItems = members.items.length > 0;
+  const visibleItems =
+    tagid === RELATION_TAG_SPECIAL_ID && specialMids
+      ? members.items.filter((up) => specialMids.has(String(up.mid)))
+      : members.items;
+  const orderedUps = orderFollowedUps(visibleItems, livingUps, specialMids);
+  const hasItems = visibleItems.length > 0;
 
   async function refresh() {
     await Promise.allSettled([members.refresh(), Promise.resolve(onRefreshTags?.())]);

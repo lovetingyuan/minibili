@@ -188,6 +188,7 @@ export default function FavoritesContent() {
           video={editing.video}
           onClose={() => setEditing(null)}
           onLoginRequired={loginRequired}
+          onSaved={resources.refreshAfterChange}
         />
       ) : null}
       {folders.error ? (

@@ -22,7 +22,7 @@ import { normalizeImages } from "./image-viewer-images";
 import { getOriginalImageButtonLabel, updateOriginalImageStatuses } from "./image-viewer-state";
 
 const ViewerId = "images-viewer";
-const LoadingPlaceholder = require("../../assets/loading2.gif");
+const LoadingPlaceholder = require("../../assets/loading.gif");
 
 function ImagesView() {
   const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } = useStore();

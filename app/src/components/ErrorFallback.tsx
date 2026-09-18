@@ -1,8 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 import React from "react";
-import { Button, Image, Linking, Text, View } from "react-native";
+import { Button, Linking, Text, View } from "react-native";
 
+import { Icon } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 
 import { site } from "../constants";
@@ -15,7 +16,18 @@ export default function ErrorFallback(props: { error: Error; resetError: Functio
   return (
     <View className="flex-1 dark:bg-neutral-900">
       <StatusBar style="auto" />
-      <Image source={require("../../assets/error.png")} className="aspect-square w-80" />
+      <View
+        accessible
+        accessibilityLabel="应用发生错误"
+        accessibilityRole="image"
+        className="h-64 items-center justify-center"
+      >
+        <Icon
+          name="error-outline"
+          size={112}
+          colorClassName={colors.error.accent}
+        />
+      </View>
       <Text className="mx-7 text-base text-red-600">
         非常抱歉，应用发生了未知错误
         {"\n\n"}

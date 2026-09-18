@@ -7,6 +7,8 @@ import type { CommentItemProps } from "./comment.types";
 const mocks = vi.hoisted(() => ({
   setRepliesInfo: vi.fn(),
   setOverlayButtons: vi.fn(),
+  clipboardSetStringAsync: vi.fn().mockResolvedValue(undefined),
+  showToast: vi.fn(),
   alert: vi.fn<(title: string, message?: string, actions?: AlertAction[]) => void>(),
 }));
 
@@ -18,6 +20,7 @@ vi.mock("react-native", () => ({
   Pressable: "Pressable",
   View: "View",
 }));
+vi.mock("expo-clipboard", () => ({ setStringAsync: mocks.clipboardSetStringAsync }));
 vi.mock("@/components/styled/rneui", () => ({
   Avatar: "Avatar",
   Text: "Text",
@@ -33,6 +36,7 @@ vi.mock("@/utils", () => ({
   getImagePixelSize: vi.fn(),
   parseImgUrl: (url: string) => url,
   parseNumber: String,
+  showToast: mocks.showToast,
 }));
 vi.mock("./CommentContent", () => ({
   CommentImages: "CommentImages",
@@ -120,7 +124,7 @@ function deleteButtonOf(props: CommentItemProps) {
 describe("Comment long press actions", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  test("long pressing a comment offers like, dislike and reply", () => {
+  test("long pressing a comment offers copy, like, dislike and reply", () => {
     const buttons = openItemActions({
       comment: makeComment({ id: "11" }),
       onAttitude: vi.fn().mockResolvedValue(null),
@@ -128,7 +132,35 @@ describe("Comment long press actions", () => {
       isAttitudePending: () => false,
     });
 
-    expect(buttons.map((button) => button.text)).toEqual(["点赞", "点踩", "回复"]);
+    expect(buttons.map((button) => button.text)).toEqual([
+      "复制评论",
+      "点赞",
+      "点踩",
+      "回复 用户",
+    ]);
+  });
+
+  test("copies the readable comment content and image placeholders", async () => {
+    const buttons = openItemActions({
+      comment: makeComment({
+        message: [
+          { type: "text", text: "你好 " },
+          { type: "at", text: "@用户", mid: 2 },
+          { type: "url", url: "https://example.com" },
+          { type: "emoji", url: "https://example.com/emoji.png" },
+        ],
+        images: [{ src: "https://example.com/image.png", width: 100, height: 100, ratio: 1 }],
+      }),
+      onAttitude: vi.fn().mockResolvedValue(null),
+      onReply: vi.fn(),
+      isAttitudePending: () => false,
+    });
+
+    buttons.find((button) => button.text === "复制评论")?.onPress();
+    expect(mocks.clipboardSetStringAsync).toHaveBeenCalledWith(
+      "你好 @用户https://example.com[表情]\n[图片]",
+    );
+    await vi.waitFor(() => expect(mocks.showToast).toHaveBeenCalledWith("已复制评论"));
   });
 
   test("labels the like and dislike actions as cancellations when already applied", () => {
@@ -138,7 +170,12 @@ describe("Comment long press actions", () => {
       onReply: vi.fn(),
       isAttitudePending: () => false,
     });
-    expect(liked.map((button) => button.text)).toEqual(["取消点赞", "点踩", "回复"]);
+    expect(liked.map((button) => button.text)).toEqual([
+      "复制评论",
+      "取消点赞",
+      "点踩",
+      "回复 用户",
+    ]);
 
     const disliked = openItemActions({
       comment: makeComment({ id: "12", attitude: "dislike" }),
@@ -146,7 +183,12 @@ describe("Comment long press actions", () => {
       onReply: vi.fn(),
       isAttitudePending: () => false,
     });
-    expect(disliked.map((button) => button.text)).toEqual(["点赞", "取消点踩", "回复"]);
+    expect(disliked.map((button) => button.text)).toEqual([
+      "复制评论",
+      "点赞",
+      "取消点踩",
+      "回复 用户",
+    ]);
   });
 
   test("the like and dislike actions report the current comment attitude", () => {
@@ -159,10 +201,10 @@ describe("Comment long press actions", () => {
       isAttitudePending: () => false,
     });
 
-    buttons[0].onPress();
+    buttons[1].onPress();
     expect(onAttitude).toHaveBeenLastCalledWith(comment, "like");
 
-    buttons[1].onPress();
+    buttons[2].onPress();
     expect(onAttitude).toHaveBeenLastCalledWith(comment, "dislike");
   });
 });
@@ -266,7 +308,7 @@ describe("Comment reply entry intent", () => {
     const [rootItem] = children(tree) as ReactElement<CommentItemProps>[];
 
     const buttons = openItemActions(rootItem.props);
-    buttons.find((button) => button.text === "回复")?.onPress();
+    buttons.find((button) => button.text === `回复 ${comment.name}`)?.onPress();
 
     expect(mocks.setRepliesInfo).toHaveBeenCalledWith(
       expect.objectContaining({ replyTarget: comment, focusComposer: true }),
@@ -287,7 +329,7 @@ describe("Comment reply entry intent", () => {
     const [replyItem] = replies;
 
     const buttons = openItemActions(replyItem.props);
-    buttons.find((button) => button.text === "回复")?.onPress();
+    buttons.find((button) => button.text === `回复 ${reply.name}`)?.onPress();
 
     expect(mocks.setRepliesInfo).toHaveBeenCalledWith(
       expect.objectContaining({ replyTarget: reply, focusComposer: true }),

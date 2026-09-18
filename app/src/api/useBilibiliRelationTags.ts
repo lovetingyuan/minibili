@@ -7,6 +7,7 @@ import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import {
   clearRelationTagMemberPages,
+  removeRelationTagMemberFromCaches,
   revalidateRelationTagMembers,
 } from "../features/bilibili-followings/relation-tag-members-cache";
 import {
@@ -57,6 +58,14 @@ const relationTagMutationDependencies: RelationTagRequestDependencies = {
   readCookie: getBilibiliLoginCookie,
   isCurrentAccount: (account: RelationTagAccount) => bilibiliSession.isCurrentAccount(account),
 };
+
+const RELATION_TAG_MEMBERS_REFRESH_DELAY = 1500;
+
+function wait(delay: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, delay);
+  });
+}
 
 function useRelationTagAccount() {
   const { account } = useBilibiliSessionState();
@@ -234,6 +243,50 @@ export function useRelationTagActions() {
     );
   }
 
+  async function updateSpecialFollowUps(
+    current: RelationTagAccount,
+    mid: string | number,
+    tagids: readonly number[],
+  ) {
+    const key = getSpecialFollowUpsKey(current);
+    const members = getCachedData<Set<string>>(cache, key);
+    if (!members) {
+      await revalidateSpecialFollowUps(current);
+      return;
+    }
+    const next = new Set(members);
+    if (tagids.includes(RELATION_TAG_SPECIAL_ID)) {
+      next.add(String(mid));
+    } else {
+      next.delete(String(mid));
+    }
+    await mutateCache(key, next, { revalidate: false }).catch(() => {});
+  }
+
+  function revalidateRemovedGroupsLater(
+    current: RelationTagAccount,
+    mid: string | number,
+    removedTagids: readonly number[],
+  ) {
+    void wait(RELATION_TAG_MEMBERS_REFRESH_DELAY)
+      .then(async () => {
+        if (!bilibiliSession.isCurrentAccount(current)) {
+          return;
+        }
+        const latestTagids = getCachedData<number[]>(cache, getRelationUpTagsKey(current, mid));
+        const stillRemoved = latestTagids
+          ? removedTagids.filter((tagid) => !latestTagids.includes(tagid))
+          : removedTagids;
+        if (!stillRemoved.length) {
+          return;
+        }
+        await revalidateRelationTagMembers(mutateCache, current, stillRemoved);
+        // 服务端仍可能返回短暂的旧数据，已确认移出的成员不能重新出现在列表中。
+        await removeRelationTagMemberFromCaches(mutateCache, current, stillRemoved, mid);
+      })
+      .catch(() => {});
+  }
+
   async function run<T>(key: string, work: (current: RelationTagAccount) => Promise<T>) {
     const current = assertAccount();
     const pendingKey = `${current.mid}:${current.generation}:${key}`;
@@ -315,6 +368,10 @@ export function useRelationTagActions() {
 
   function setUpGroups(mid: string | number, tagids: number[]) {
     return run(`set-up:${mid}`, async (current) => {
+      const previousTagids = getCachedData<number[]>(
+        cache,
+        getRelationUpTagsKey(current, mid),
+      );
       try {
         await setBilibiliUpRelationTags(
           { account: current, mid, tagids },
@@ -339,13 +396,21 @@ export function useRelationTagActions() {
         tagids,
         () => bilibiliSession.isCurrentAccount(current),
       );
-      // 设置分组不会改变分组本身，成员列表按缓存里的分组重新拉取
-      await revalidateRelationTagMembers(
-        mutateCache,
-        current,
-        toGroupTagIds(getCachedData<RelationTag[]>(cache, getRelationTagsKey(current)), tagids),
-      );
-      await revalidateSpecialFollowUps(current);
+      if (previousTagids) {
+        const removedTagids = previousTagids.filter((tagid) => !tagids.includes(tagid));
+        const addedTagids = tagids.filter((tagid) => !previousTagids.includes(tagid));
+        await removeRelationTagMemberFromCaches(mutateCache, current, removedTagids, mid);
+        await revalidateRelationTagMembers(mutateCache, current, addedTagids);
+        revalidateRemovedGroupsLater(current, mid, removedTagids);
+      } else {
+        // 拿不到写入前的分组时无法安全地做本地增量更新，退回全量校验。
+        await revalidateRelationTagMembers(
+          mutateCache,
+          current,
+          toGroupTagIds(getCachedData<RelationTag[]>(cache, getRelationTagsKey(current)), tagids),
+        );
+      }
+      await updateSpecialFollowUps(current, mid, tagids);
     });
   }
 

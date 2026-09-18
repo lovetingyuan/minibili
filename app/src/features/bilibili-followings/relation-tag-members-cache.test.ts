@@ -6,7 +6,10 @@ import { describe, expect, test } from "vitest";
 import { getRelationTagMembersKey } from "../../api/relation-tags";
 import type { RelationTagAccount } from "../../api/relation-tags.types";
 import type { UpInfo } from "../../types";
-import { revalidateRelationTagMembers } from "./relation-tag-members-cache";
+import {
+  removeRelationTagMemberFromCaches,
+  revalidateRelationTagMembers,
+} from "./relation-tag-members-cache";
 
 const account: RelationTagAccount = { mid: "1", generation: 1 };
 const otherAccount: RelationTagAccount = { mid: "2", generation: 1 };
@@ -33,6 +36,21 @@ function createRecordingMutate() {
 }
 
 describe("relation tag members cache", () => {
+  test("移出分组后立即从分页与挂载中列表的缓存删除成员", async () => {
+    const specialPage = getRelationTagMembersKey(account, -10, 0, null)!;
+    const defaultPage = getRelationTagMembersKey(account, 0, 0, null)!;
+    const infiniteKey = unstable_serialize(() => getRelationTagMembersKey(account, -10, 0, null));
+    await seed(specialPage, [specialMembers[0], defaultMembers[0]]);
+    await seed(defaultPage, [specialMembers[0], defaultMembers[0]]);
+    await seed(infiniteKey, [[specialMembers[0], defaultMembers[0]]]);
+
+    await removeRelationTagMemberFromCaches(mutate, account, [-10], specialMembers[0].mid);
+
+    expect(await mutate(specialPage)).toEqual(defaultMembers);
+    expect(await mutate(infiniteKey)).toEqual([defaultMembers]);
+    expect(await mutate(defaultPage)).toEqual([specialMembers[0], defaultMembers[0]]);
+  });
+
   test("写操作后清掉分页缓存，并重新校验挂载中列表的聚合 key", async () => {
     const specialPage = getRelationTagMembersKey(account, -10, 0, null)!;
     const defaultPage = getRelationTagMembersKey(account, 0, 0, null)!;

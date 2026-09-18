@@ -28,6 +28,7 @@ import type {
   FavoriteResourcesKeyLoader,
 } from "./favorites.types";
 import { getBilibiliLoginCookie } from "./get-cookie";
+import type { VideoFavoriteChange } from "./video-favorites.types";
 
 const favoriteOptions = {
   keepPreviousData: false,
@@ -79,7 +80,7 @@ export function useBilibiliFavoriteResources(folderId?: number) {
       }
       return data;
     },
-    { ...favoriteOptions, revalidateFirstPage: false, persistSize: false },
+    { ...favoriteOptions, revalidateFirstPage: true, persistSize: false },
   );
   const { data, size, setSize, mutate, isLoading, isValidating, error } = response;
 
@@ -117,6 +118,35 @@ export function useBilibiliFavoriteResources(folderId?: number) {
     await mutate();
   }
 
+  async function refreshAfterChange(change: VideoFavoriteChange) {
+    const removedFromCurrentFolder = Boolean(
+      account &&
+      folderId &&
+      change.initialIds.includes(folderId) &&
+      !change.selectedIds.includes(folderId),
+    );
+    try {
+      if (account && folderId && removedFromCurrentFolder) {
+        invalidateFavoriteResourceRequests(mutateCache, account, [folderId]);
+        await clearFavoriteResourcePages(account, new Set([folderId]), mutateCache);
+      }
+      await refresh();
+    } finally {
+      if (removedFromCurrentFolder) {
+        await mutate(
+          (current) =>
+            current?.map((page) => ({
+              ...page,
+              medias: page.medias.filter(
+                (media) => media.type !== 2 || String(media.id) !== change.video.aid,
+              ),
+            })),
+          { revalidate: false },
+        );
+      }
+    }
+  }
+
   return {
     ...response,
     items: getFavoriteListItems(pages),
@@ -124,6 +154,7 @@ export function useBilibiliFavoriteResources(folderId?: number) {
     isLoadingMore,
     loadMore,
     refresh,
+    refreshAfterChange,
   };
 }
 

@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 // import { ResizeMode, Video } from 'expo-av'
 import React from "react";
 import {
-  Image,
+  ActivityIndicator,
   RefreshControl,
   ScrollView,
   useColorScheme,
@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import BilibiliWebView from "@/components/BilibiliWebView";
+import { colors } from "@/constants/colors.tw";
 
 // import useLiveUrl from '@/api/get-live-url'
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
@@ -27,10 +28,10 @@ import { INJECTED_JAVASCRIPT } from "./inject-code";
 function Loading() {
   return (
     <View className="absolute h-full w-full items-center justify-center">
-      <Image
-        source={require("../../../assets/video-loading.png")}
-        resizeMode="center"
-        className="w-full"
+      <ActivityIndicator
+        accessibilityLabel="网页加载中"
+        size="large"
+        colorClassName={colors.secondary.accent}
       />
     </View>
   );

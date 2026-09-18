@@ -10,11 +10,8 @@ vi.mock("react-native", () => ({
   View: "View",
 }));
 
-vi.mock("@/components/styled/expo", () => ({
-  Image: "Image",
-}));
-
 vi.mock("@/components/styled/rneui", () => ({
+  Icon: "Icon",
   Switch: "Switch",
 }));
 
@@ -38,6 +35,7 @@ type ElementProps = {
   accessibilityState?: { checked?: boolean };
   children?: ReactNode;
   onPress?: () => void;
+  onValueChange?: (value: boolean) => void;
   value?: boolean;
 };
 
@@ -70,29 +68,41 @@ function renderCover(highQuality: boolean, onHighQualityChange = vi.fn(), onStar
   });
   const qualityControl = findElement(
     root,
-    (element) => element.props.accessibilityLabel === "高清播放",
+    (element) => element.props.accessibilityLabel === "1080P 播放",
   );
   const qualitySwitch = findElement(root, (element) => element.type === "Switch");
+  const qualityLabel = findElement(
+    root,
+    (element) => element.type === "Text" && element.props.children === "1080P",
+  );
   const playButton = findElement(
     root,
     (element) => element.props.accessibilityLabel === "开始播放",
   );
 
-  return { qualityControl, qualitySwitch, playButton, onHighQualityChange, onStart };
+  return {
+    qualityControl,
+    qualitySwitch,
+    qualityLabel,
+    playButton,
+    onHighQualityChange,
+    onStart,
+  };
 }
 
 describe("PlayerCover", () => {
   test("shows an off switch for high quality on cellular by default", () => {
-    const { qualityControl, qualitySwitch } = renderCover(false);
+    const { qualityControl, qualitySwitch, qualityLabel } = renderCover(false);
 
     expect(qualityControl?.props.accessibilityState).toEqual({ checked: false });
     expect(qualitySwitch?.props.value).toBe(false);
+    expect(qualityLabel).not.toBeNull();
   });
 
   test("toggles high quality without starting playback", () => {
-    const { qualityControl, onHighQualityChange, onStart } = renderCover(false);
+    const { qualitySwitch, onHighQualityChange, onStart } = renderCover(false);
 
-    qualityControl?.props.onPress?.();
+    qualitySwitch?.props.onValueChange?.(true);
 
     expect(onHighQualityChange).toHaveBeenCalledWith(true);
     expect(onStart).not.toHaveBeenCalled();

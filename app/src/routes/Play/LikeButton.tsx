@@ -85,7 +85,7 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
 
   return (
     <Pressable
-      className="flex-row items-center gap-1 px-2 py-1"
+      className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1"
       accessibilityRole="button"
       accessibilityLabel={`${mutation.liked ? "已点赞，点击取消点赞" : "点赞视频"}，点赞数 ${count ?? "加载中"}`}
       accessibilityState={{
@@ -108,7 +108,7 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
           colorClassName={mutation.liked ? colors.primary.accent : colors.gray8.accent}
         />
       )}
-      <Text className={`text-sm ${mutation.liked ? colors.primary.text : colors.gray8.text}`}>
+      <Text className={`text-xs ${mutation.liked ? colors.primary.text : colors.gray8.text}`}>
         {parseNumber(count)}
       </Text>
     </Pressable>

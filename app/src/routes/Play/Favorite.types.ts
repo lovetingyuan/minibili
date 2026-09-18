@@ -1,5 +1,9 @@
 import type { FavoriteAccount } from "../../api/favorites.types";
-import type { FavoriteVideo, VideoFavoriteFolder } from "../../api/video-favorites.types";
+import type {
+  FavoriteVideo,
+  VideoFavoriteChange,
+  VideoFavoriteFolder,
+} from "../../api/video-favorites.types";
 
 export type FavoriteButtonProps = { aid?: string | number; bvid: string; count?: number };
 export type FavoriteButtonContentProps = FavoriteButtonProps & {
@@ -11,6 +15,7 @@ export type FavoriteDialogProps = {
   video: FavoriteVideo;
   onClose: () => void;
   onLoginRequired: (error: Error) => void;
+  onSaved?: (change: VideoFavoriteChange) => void | Promise<void>;
 };
 export type FavoriteSelection = {
   folders: VideoFavoriteFolder[];

@@ -2,6 +2,8 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   setOverlayButtons: vi.fn<(buttons: { text: string; onPress: () => void }[]) => void>(),
+  setImagesList: vi.fn(),
+  setCurrentImageIndex: vi.fn(),
   followDisabled: true,
   onSetGroups: vi.fn<(up: { mid: string | number }) => void>(),
 }));
@@ -9,7 +11,6 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@react-navigation/native", () => ({ useNavigation: () => ({ navigate: vi.fn() }) }));
 vi.mock("react-native", () => ({
   Alert: { alert: vi.fn() },
-  Linking: { openURL: vi.fn() },
   Pressable: "Pressable",
   TouchableOpacity: "TouchableOpacity",
   View: "View",
@@ -21,11 +22,15 @@ vi.mock("@/hooks/useFollowActions", () => ({
   useFollowActions: () => ({ disabled: mocks.followDisabled }),
 }));
 vi.mock("../../store", () => ({
-  useStore: () => ({ livingUps: {}, setOverlayButtons: mocks.setOverlayButtons }),
+  useStore: () => ({
+    livingUps: {},
+    setOverlayButtons: mocks.setOverlayButtons,
+    setImagesList: mocks.setImagesList,
+    setCurrentImageIndex: mocks.setCurrentImageIndex,
+  }),
 }));
 vi.mock("../../utils", () => ({
   getImagePixelSize: (size: number) => size,
-  getOriginalImgUrl: () => "",
   parseImgUrl: () => "",
 }));
 
@@ -63,6 +68,16 @@ test("设置分组把当前 UP 交给弹窗", () => {
   const buttons = openMenu(mocks.onSetGroups);
   buttons.find((button) => button.text === "设置分组")!.onPress();
   expect(mocks.onSetGroups).toHaveBeenCalledWith(item);
+});
+
+test("查看头像在图片浮窗中打开当前 UP 头像", () => {
+  const buttons = openMenu();
+  buttons.find((button) => button.text === "查看头像")!.onPress();
+
+  expect(mocks.setCurrentImageIndex).toHaveBeenCalledExactlyOnceWith(0);
+  expect(mocks.setImagesList).toHaveBeenCalledExactlyOnceWith([
+    { src: item.face, width: 0, height: 0, ratio: 1 },
+  ]);
 });
 
 test("没有设置分组入口时只展示关注与头像操作", () => {

@@ -6,7 +6,7 @@ import { bilibiliSession } from "../../features/bilibili-session/session";
 import type { FavoriteDialogProps, FavoriteSelection } from "./Favorite.types";
 import { createFavoriteSelection, toggleFavoriteFolder } from "./favorite-selection";
 
-export function useFavoriteEditor({ account, video }: FavoriteDialogProps) {
+export function useFavoriteEditor({ account, video, onSaved }: FavoriteDialogProps) {
   const { trigger: refresh } = useVideoFavoriteFolders(account, video);
   const mutation = useModifyVideoFavorites(account, video);
   const [selection, setSelection] = useState<FavoriteSelection | null>(null);
@@ -84,7 +84,13 @@ export function useFavoriteEditor({ account, video }: FavoriteDialogProps) {
     setSaving(true);
     setError(null);
     try {
-      await mutation.save(selection.initialIds, selection.selectedIds);
+      const change = {
+        video,
+        initialIds: selection.initialIds,
+        selectedIds: selection.selectedIds,
+      };
+      await mutation.save(change.initialIds, change.selectedIds);
+      await Promise.resolve(onSaved?.(change)).catch(() => {});
       return isActive();
     } catch (cause) {
       if (!isActive()) return false;

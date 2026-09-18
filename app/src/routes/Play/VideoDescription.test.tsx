@@ -9,13 +9,24 @@ vi.mock("react-native", () => ({
 }));
 
 vi.mock("@/components/styled/rneui", () => ({
+  Icon: "Icon",
   Text: "Text",
 }));
 
 vi.mock("@/constants/colors.tw", () => ({
   colors: {
     primary: {
+      accent: "accent-primary",
       text: "text-primary",
+    },
+    gray6: {
+      accent: "accent-gray6",
+    },
+    gray7: {
+      text: "text-gray7",
+    },
+    gray8: {
+      text: "text-gray8",
     },
   },
 }));

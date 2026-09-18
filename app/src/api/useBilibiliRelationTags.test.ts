@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import type { UpInfo } from "../types";
 import {
   getRelationTagsKey,
+  getRelationUpTagsKey,
   getSpecialFollowUpsKey,
   RelationTagResultUnknownError,
 } from "./relation-tags";
@@ -24,7 +25,7 @@ const mocks = vi.hoisted(() => ({
   swr: vi.fn(),
   request: vi.fn(),
   mutateCache: vi.fn(),
-  cache: { get: () => undefined as unknown },
+  cache: { get: vi.fn<(key: string) => unknown>(() => undefined) },
   tags: [] as { tagid: number; name: string; count: number; tip: string }[],
   createTag: vi.fn(),
   renameTag: vi.fn(),
@@ -107,6 +108,7 @@ beforeEach(() => {
   mocks.refs = [];
   mocks.refIndex = 0;
   mocks.effects = [];
+  mocks.cache.get.mockReset().mockReturnValue(undefined);
   mocks.tags = [
     { tagid: -10, name: "特别关注", count: 1, tip: "" },
     { tagid: 0, name: "默认分组", count: 3, tip: "" },
@@ -134,6 +136,10 @@ beforeEach(() => {
   mocks.infinite.mockReturnValue(mocks.response);
   mocks.swr.mockReturnValue({ data: [{ tagid: -10, name: "特别关注", count: 1, tip: "" }] });
   mocks.request.mockResolvedValue([up]);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("relation tag hooks", () => {
@@ -266,6 +272,45 @@ describe("relation tag actions", () => {
     expect(mocks.mutateCache).toHaveBeenCalledWith(getSpecialFollowUpsKey(account), undefined, {
       revalidate: true,
     });
+  });
+
+  test("移出特别关注后立即更新成员列表与高亮缓存", async () => {
+    vi.useFakeTimers();
+    const upTagsKey = getRelationUpTagsKey(account, up.mid);
+    const specialKey = getSpecialFollowUpsKey(account);
+    let currentUpTags = [-10];
+    mocks.cache.get.mockImplementation((key: string) => {
+      if (key === JSON.stringify(upTagsKey)) return { data: currentUpTags };
+      if (key === JSON.stringify(specialKey)) return { data: new Set(["10", "11"]) };
+      return undefined;
+    });
+    mocks.mutateCache.mockImplementation((key: unknown, data?: unknown) => {
+      if (JSON.stringify(key) === JSON.stringify(upTagsKey) && Array.isArray(data)) {
+        currentUpTags = data;
+      }
+      return Promise.resolve(undefined);
+    });
+
+    const actions = useRelationTagActions();
+    await actions.setUpGroups(up.mid, []);
+
+    const memberCall = mocks.mutateCache.mock.calls.find(
+      ([key, data]) =>
+        key === getRelationTagMembersInfiniteKey(account, -10) && typeof data === "function",
+    );
+    expect(memberCall).toBeDefined();
+    expect(memberCall?.[1]([[up, nextUp]])).toEqual([[nextUp]]);
+    expect(mocks.mutateCache).toHaveBeenCalledWith(specialKey, new Set(["11"]), {
+      revalidate: false,
+    });
+    // 已确认移出的分组不立刻请求，避免服务端短暂的旧响应把成员恢复。
+    expect(mocks.mutateCache).not.toHaveBeenCalledWith(
+      getRelationTagMembersInfiniteKey(account, -10),
+    );
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(mocks.mutateCache).toHaveBeenCalledWith(
+      getRelationTagMembersInfiniteKey(account, -10),
+    );
   });
 
   test("结果不确定时先刷新分组再报错", async () => {

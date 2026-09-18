@@ -333,16 +333,14 @@ export async function setBilibiliUpRelationTags(
   if (!/^[1-9]\d*$/.test(fid) || !Number.isSafeInteger(Number(fid))) {
     throw new Error("UP 主 ID 无效");
   }
-  if (!tagids.length) {
-    // B站 网页同样要求至少选择一个分组，否则不提交。
-    throw new Error("请至少选择一个分组");
-  }
+  // B站 不接受空 tagids；弹窗清空可选分组时，将 UP 移回内置的默认分组。
+  const submittedTagids = tagids.length ? tagids : [RELATION_TAG_DEFAULT_ID];
   await runRelationTagMutation({
     account,
     dependencies,
     action: "设置分组",
     url: RELATION_TAG_ADD_USERS_URL,
     body: (csrf) =>
-      new URLSearchParams({ fids: fid, tagids: tagids.join(","), csrf }),
+      new URLSearchParams({ fids: fid, tagids: submittedTagids.join(","), csrf }),
   });
 }

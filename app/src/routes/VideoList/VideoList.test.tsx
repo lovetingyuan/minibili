@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   confirmBlock: vi.fn(),
   toggleWatchLater: vi.fn(),
   setOverlayButtons: vi.fn<(buttons: { text: string; onPress: () => void }[]) => void>(),
+  setImagesList: vi.fn(),
+  setCurrentImageIndex: vi.fn(),
   setBlackTags: vi.fn(),
   alert: vi.fn(),
   navigate: vi.fn(),
@@ -42,7 +44,6 @@ vi.mock("@react-navigation/native", () => ({
 vi.mock("react-native", () => ({
   TouchableOpacity: () => null,
   Alert: { alert: mocks.alert },
-  Linking: { openURL: vi.fn() },
 }));
 vi.mock("@/components/styled/rneui", () => ({
   FlashList: () => null,
@@ -60,6 +61,8 @@ vi.mock("@/hooks/useWatchLaterActions", () => ({
 vi.mock("@/store", () => ({
   useStore: () => ({
     setOverlayButtons: mocks.setOverlayButtons,
+    setImagesList: mocks.setImagesList,
+    setCurrentImageIndex: mocks.setCurrentImageIndex,
     currentVideosCate: {},
   }),
 }));
@@ -70,7 +73,6 @@ vi.mock("@/features/user-data/useUserSettings", () => ({
   }),
 }));
 vi.mock("@/utils", () => ({
-  getOriginalImgUrl: String,
   handleShareVideo: vi.fn(),
   parseNumber: String,
 }));
@@ -156,6 +158,21 @@ describe("video list after replacing local UP blocking", () => {
     expect(mocks.confirmBlock).toHaveBeenCalledExactlyOnceWith({ mid: 456, name: "UP" });
     expect(mocks.setBlackTags).not.toHaveBeenCalled();
     expect(list.data).toEqual([video, other]);
+  });
+
+  test("opens the selected video cover in the image viewer", () => {
+    const list = getList("Hot", [video]);
+    const row = list.renderItem?.({ item: video, index: 0, target: "Cell", extraData: undefined });
+    if (!React.isValidElement<{ onLongPress: () => void }>(row)) throw new Error("Expected row");
+    row.props.onLongPress();
+
+    const buttons = mocks.setOverlayButtons.mock.lastCall![0];
+    buttons.find((button) => button.text === "查看封面")!.onPress();
+
+    expect(mocks.setCurrentImageIndex).toHaveBeenCalledExactlyOnceWith(0);
+    expect(mocks.setImagesList).toHaveBeenCalledExactlyOnceWith([
+      { src: video.cover, width: video.width, height: video.height },
+    ]);
   });
 
   test("reselecting the focused hot tab scrolls to the top and refreshes", () => {

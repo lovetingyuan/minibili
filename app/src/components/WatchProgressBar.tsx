@@ -1,6 +1,6 @@
-import { View } from "react-native";
+import { View } from 'react-native';
 
-import { colors } from "@/constants/colors.tw";
+import { colors } from '@/constants/colors.tw';
 
 /** 看过一点点也要能看见，进度条最小画这么宽（百分比） */
 const MIN_VISIBLE_PERCENT = 2;
@@ -13,7 +13,7 @@ export function WatchProgressBar(props: { ratio: number }) {
   }
   const percent = Math.min(100, Math.max(MIN_VISIBLE_PERCENT, Math.round(ratio * 100)));
   return (
-    <View className="absolute bottom-0 left-0 h-[3px] w-full overflow-hidden rounded-b bg-gray-900/40">
+    <View className="absolute bottom-0 left-0 h-1 w-full overflow-hidden bg-gray-900/40">
       <View className={`h-full ${colors.primary.bg}`} style={{ width: `${percent}%` }} />
     </View>
   );

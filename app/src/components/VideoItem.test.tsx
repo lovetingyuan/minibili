@@ -1,7 +1,6 @@
 import React from "react";
-import { createRequire } from "node:module";
 import type { ReactElement, ReactNode } from "react";
-import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 import type { VideoListItemInfo } from "../types";
 
 vi.mock("./UpName", () => ({ default: "UpName" }));
@@ -14,6 +13,7 @@ vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),
 }));
 vi.mock("react-native", () => ({
+  ActivityIndicator: "ActivityIndicator",
   TouchableOpacity: "TouchableOpacity",
   useWindowDimensions: () => ({ width: 400, height: 800 }),
   View: "View",
@@ -63,18 +63,8 @@ const video: VideoListItemInfo = {
   cover: "",
   duration: 90,
 };
-const assetRequire = createRequire(import.meta.url);
-const originalPngLoader = assetRequire.extensions[".png"];
 beforeEach(() => {
   vi.clearAllMocks();
-  assetRequire.extensions[".png"] = (module) => {
-    module.exports = "video-loading.png";
-  };
-});
-afterEach(() => {
-  if (originalPngLoader) assetRequire.extensions[".png"] = originalPngLoader;
-  else delete assetRequire.extensions[".png"];
-  delete assetRequire.cache[assetRequire.resolve("../../assets/video-loading.png")];
 });
 
 test("history shows the exact watch date without a fabricated publication date and opens Play", () => {
@@ -122,4 +112,27 @@ test("watch later cards show a cover progress bar only when there is progress", 
     (element) => element.type === WatchProgressBar,
   );
   expect(plain?.props).toMatchObject({ ratio: 0 });
+});
+
+test("the title does not stretch while metadata stays bottom-aligned", () => {
+  const row = VideoListItem({ video });
+  const itemElements = elements(row);
+  const details = itemElements.find(
+    (element) => element.props.className === "flex-[4] justify-between",
+  );
+  const title = itemElements.find((element) => element.props.className === "text-base");
+  const metadata = itemElements.find((element) => element.props.className === "gap-1");
+
+  expect(details).toBeDefined();
+  expect(title?.props).toMatchObject({ numberOfLines: 2, ellipsizeMode: "tail" });
+  expect(metadata).toBeDefined();
+  expect(text(row)).not.toContain("UP:");
+  expect(itemElements).toContainEqual(
+    expect.objectContaining({
+      props: expect.objectContaining({
+        name: "account-circle-outline",
+        type: "material-community",
+      }),
+    }),
+  );
 });

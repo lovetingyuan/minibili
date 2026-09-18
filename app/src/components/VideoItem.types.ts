@@ -11,3 +11,7 @@ export type VideoListItemProps<T extends VideoListItemInfo> = {
     onPress: () => void;
   }[];
 };
+
+export type VideoCoverProps = {
+  uri: string;
+};

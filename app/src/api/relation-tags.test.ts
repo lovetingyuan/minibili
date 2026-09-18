@@ -199,7 +199,7 @@ describe("Bilibili relation tag writes", () => {
     expect(request).not.toHaveBeenCalled();
   });
 
-  test("设置分组提交 fids 与 tagids，并要求至少选择一个分组", async () => {
+  test("设置分组提交 fids 与 tagids，清空可选分组时移回默认分组", async () => {
     const { request, dependencies } = setup();
     await setBilibiliUpRelationTags({ account, mid: 456, tagids: [-10, 446542] }, dependencies);
     const [url, options] = request.mock.calls[0];
@@ -210,14 +210,19 @@ describe("Bilibili relation tag writes", () => {
       csrf: "csrf-token",
     });
 
-    const empty = setup();
+    await setBilibiliUpRelationTags({ account, mid: 456, tagids: [] }, dependencies);
+    const [, emptyOptions] = request.mock.calls[1];
+    expect(Object.fromEntries(new URLSearchParams(String(emptyOptions?.body)))).toEqual({
+      fids: "456",
+      tagids: "0",
+      csrf: "csrf-token",
+    });
+
+    const invalid = setup();
     await expect(
-      setBilibiliUpRelationTags({ account, mid: 456, tagids: [] }, empty.dependencies),
-    ).rejects.toThrow("请至少选择一个分组");
-    await expect(
-      setBilibiliUpRelationTags({ account, mid: "abc", tagids: [-10] }, empty.dependencies),
+      setBilibiliUpRelationTags({ account, mid: "abc", tagids: [-10] }, invalid.dependencies),
     ).rejects.toThrow("UP 主 ID 无效");
-    expect(empty.request).not.toHaveBeenCalled();
+    expect(invalid.request).not.toHaveBeenCalled();
   });
 
   test("缺少登录凭据、MID 不匹配或缺少 CSRF 时拒绝写入", async () => {

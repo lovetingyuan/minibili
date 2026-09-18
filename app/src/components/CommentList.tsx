@@ -1,28 +1,28 @@
-import { clsx } from 'clsx'
-import { useEffect, useRef, useState } from 'react'
-import { Keyboard, Pressable, View } from 'react-native'
+import { clsx } from 'clsx';
+import { useEffect, useRef, useState } from 'react';
+import { Keyboard, Pressable, View } from 'react-native';
 
-import type { CommentAttitudeKind } from '@/api/comment-actions.types'
-import type { CommentItemType, ReplyItemType } from '@/api/comments'
-import { useComments } from '@/api/comments'
-import { useCommentActions } from '@/api/useCommentActions'
-import { colors } from '@/constants/colors.tw'
-import useKeyboardHeight from '@/hooks/useKeyboardHeight'
-import { showToast } from '@/utils'
+import type { CommentAttitudeKind } from '@/api/comment-actions.types';
+import type { CommentItemType, ReplyItemType } from '@/api/comments';
+import { useComments } from '@/api/comments';
+import { useCommentActions } from '@/api/useCommentActions';
+import { colors } from '@/constants/colors.tw';
+import useKeyboardHeight from '@/hooks/useKeyboardHeight';
+import { showToast } from '@/utils';
 
-import { Comment } from './Comment'
-import CommentComposer from './CommentComposer'
-import CommentPaginationFooter from './CommentPaginationFooter'
-import type { CommentListProps } from './comment-list.types'
-import ReplyList from './ReplyList'
-import { FlashList, Icon, Skeleton, Text } from './styled/rneui'
+import { Comment } from './Comment';
+import CommentComposer from './CommentComposer';
+import CommentPaginationFooter from './CommentPaginationFooter';
+import type { CommentListProps } from './comment-list.types';
+import ReplyList from './ReplyList';
+import { FlashList, Icon, Skeleton, Text } from './styled/rneui';
 
-export type { CommentListProps } from './comment-list.types'
+export type { CommentListProps } from './comment-list.types';
 
-const LOADING_COMMENT_WIDTHS = [78, 62, 90, 45, 72, 55]
+const LOADING_COMMENT_WIDTHS = [78, 62, 90, 45, 72, 55];
 
 function CommentSeparator() {
-  return <View className="h-3" />
+  return <View className="h-3" />;
 }
 
 function Loading() {
@@ -30,10 +30,7 @@ function Loading() {
     <View className="gap-3">
       {LOADING_COMMENT_WIDTHS.map((width, index) => (
         <View
-          className={clsx(
-            'gap-2.5 bg-white p-3 dark:bg-neutral-900',
-            index === 0 ? 'rounded-b-2xl' : 'rounded-2xl',
-          )}
+          className={clsx('gap-2.5 bg-white p-3 dark:bg-neutral-900', index === 0 ? 'rounded-b-2xl' : 'rounded-2xl')}
           key={width}
         >
           <View className="flex-row items-center gap-2.5">
@@ -48,73 +45,67 @@ function Loading() {
         </View>
       ))}
     </View>
-  )
+  );
 }
 
 export default function CommentList(props: CommentListProps) {
-  const [mode, setMode] = useState(3)
-  const [composing, setComposing] = useState(false)
-  const comments = useComments(props.commentId, props.commentType, mode)
-  const keyboardHeight = useKeyboardHeight()
-  const loadMoreLock = useRef(false)
-  const actions = useCommentActions(
-    props.commentId,
-    props.commentType,
-    props.sourceUrl,
-    comments.refresh,
-  )
+  const [mode, setMode] = useState(3);
+  const [composing, setComposing] = useState(false);
+  const comments = useComments(props.commentId, props.commentType, mode);
+  const keyboardHeight = useKeyboardHeight();
+  const loadMoreLock = useRef(false);
+  const actions = useCommentActions(props.commentId, props.commentType, props.sourceUrl, comments.refresh);
 
   useEffect(() => {
-    if (!comments.isValidating) loadMoreLock.current = false
-  }, [comments.isValidating, comments.data.replies.length])
+    if (!comments.isValidating) loadMoreLock.current = false;
+  }, [comments.isValidating, comments.data.replies.length]);
 
   async function changeAttitude(item: ReplyItemType, kind: CommentAttitudeKind) {
-    const next = await actions.changeAttitude(item, item.attitude, kind)
-    if (next) await comments.patchAttitude(item.id, next)
-    return next
+    const next = await actions.changeAttitude(item, item.attitude, kind);
+    if (next) await comments.patchAttitude(item.id, next);
+    return next;
   }
 
   async function submitReply(target: ReplyItemType, message: string) {
-    const reply = await actions.submitReply(target, message)
-    if (!reply) return null
-    const rootId = String(target.root) === '0' ? target.id : String(target.root)
-    await comments.prependReply(rootId, reply)
-    return reply
+    const reply = await actions.submitReply(target, message);
+    if (!reply) return null;
+    const rootId = String(target.root) === '0' ? target.id : String(target.root);
+    await comments.prependReply(rootId, reply);
+    return reply;
   }
 
   async function submitComment(message: string) {
-    const comment = await actions.submitComment(message)
-    if (!comment) return false
-    await comments.prependComment(comment)
-    Keyboard.dismiss()
-    setComposing(false)
-    showToast('评论成功')
-    return true
+    const comment = await actions.submitComment(message);
+    if (!comment) return false;
+    await comments.prependComment(comment);
+    Keyboard.dismiss();
+    setComposing(false);
+    showToast('评论成功');
+    return true;
   }
 
   async function deleteComment(target: ReplyItemType) {
-    if (!(await actions.removeComment(target))) return false
-    await comments.removeComment(target)
-    return true
+    if (!(await actions.removeComment(target))) return false;
+    await comments.removeComment(target);
+    return true;
   }
 
   function openComposer() {
-    setComposing(true)
+    setComposing(true);
   }
 
   function closeComposer() {
-    Keyboard.dismiss()
-    setComposing(false)
+    Keyboard.dismiss();
+    setComposing(false);
   }
 
   function loadMore() {
-    if (loadMoreLock.current || comments.isValidating || comments.isPageEnd || comments.error)
-      return
-    loadMoreLock.current = true
-    comments.update()
+    if (loadMoreLock.current || comments.isValidating || comments.isPageEnd || comments.error) return;
+    loadMoreLock.current = true;
+    comments.update();
   }
 
-  const allCount = comments.data.allCount
+  const allCount = comments.data.allCount;
   return (
     <View className="flex-1">
       <FlashList
@@ -162,7 +153,7 @@ export default function CommentList(props: CommentListProps) {
                   className="flex-row items-center gap-1 rounded-full bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800"
                   accessibilityRole="button"
                   accessibilityLabel={`当前按${mode === 3 ? '热度' : '时间'}排序，点击切换`}
-                  onPress={() => setMode(current => (current === 3 ? 2 : 3))}
+                  onPress={() => setMode((current) => (current === 3 ? 2 : 3))}
                 >
                   <Icon
                     name="sort-variant"
@@ -186,7 +177,7 @@ export default function CommentList(props: CommentListProps) {
                     size={14}
                     colorClassName={colors.primary.accent}
                   />
-                  <Text className={clsx('text-xs font-medium', colors.primary.text)}>评论</Text>
+                  <Text className={clsx('text-xs font-medium', colors.primary.text)}>写评论</Text>
                 </Pressable>
               </View>
             </View>
@@ -196,9 +187,7 @@ export default function CommentList(props: CommentListProps) {
           comments.isLoading ? (
             <Loading />
           ) : (
-            <Text className="my-12 text-center text-sm">
-              {comments.error ? '评论已关闭或加载失败' : '还没有评论'}
-            </Text>
+            <Text className="my-12 text-center text-sm">{comments.error ? '评论已关闭或加载失败' : '还没有评论'}</Text>
           )
         }
         ListFooterComponent={
@@ -220,11 +209,7 @@ export default function CommentList(props: CommentListProps) {
       />
       {composing ? (
         <View className="absolute left-0 right-0" style={{ bottom: keyboardHeight }}>
-          <CommentComposer
-            pending={actions.isCommentPending}
-            onSubmit={submitComment}
-            onClose={closeComposer}
-          />
+          <CommentComposer pending={actions.isCommentPending} onSubmit={submitComment} onClose={closeComposer} />
         </View>
       ) : null}
       <ReplyList
@@ -237,5 +222,5 @@ export default function CommentList(props: CommentListProps) {
         isDeletePending={actions.isDeletePending}
       />
     </View>
-  )
+  );
 }

@@ -4,12 +4,13 @@ import { Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
-import { Image, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import BilibiliWebView from "@/components/BilibiliWebView";
 import { withUniwind } from "uniwind";
 
 import bilibiliFetch from "@/api/bilibili-fetch";
 import useLiveUrl from "@/api/get-live-url";
+import { colors } from "@/constants/colors.tw";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
@@ -23,10 +24,10 @@ import { INJECTED_JAVASCRIPT, INJECTED_JAVASCRIPT_BEFORE } from "./inject-code";
 function Loading() {
   return (
     <View className="absolute h-full w-full items-center justify-center">
-      <Image
-        source={require("../../../assets/video-loading.png")}
-        resizeMode="center"
-        className="w-full"
+      <ActivityIndicator
+        accessibilityLabel="直播间加载中"
+        size="large"
+        colorClassName={colors.secondary.accent}
       />
     </View>
   );

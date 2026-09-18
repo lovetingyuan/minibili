@@ -1,14 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import { Avatar, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
-import { Alert, Linking, Pressable, TouchableOpacity, View } from "react-native";
+import { Alert, Pressable, TouchableOpacity, View } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
 import { useFollowActions } from "@/hooks/useFollowActions";
 
 import { useStore } from "../../store";
 import type { NavigationProps, UpInfo } from "../../types";
-import { getImagePixelSize, getOriginalImgUrl, parseImgUrl } from "../../utils";
+import { getImagePixelSize, parseImgUrl } from "../../utils";
 
 type FollowItemProps = {
   item: UpInfo;
@@ -19,7 +19,7 @@ type FollowItemProps = {
 
 function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
   const { face, name, sign, mid } = item;
-  const { livingUps, setOverlayButtons } = useStore();
+  const { livingUps, setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore();
   const actions = useFollowActions();
   const navigation = useNavigation<NavigationProps["navigation"]>();
 
@@ -70,7 +70,8 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
       {
         text: "查看头像",
         onPress: () => {
-          Linking.openURL(getOriginalImgUrl(face));
+          setCurrentImageIndex(0);
+          setImagesList([{ src: face, width: 0, height: 0, ratio: 1 }]);
         },
       },
     ].filter((v) => !!v && typeof v === "object");

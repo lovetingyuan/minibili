@@ -88,7 +88,7 @@ function FavoriteButtonContent({
   return (
     <>
       <Pressable
-        className="flex-row items-center gap-1 px-2 py-1"
+        className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1"
         accessibilityRole="button"
         accessibilityLabel={`${favorite ? "已收藏，编辑收藏夹" : "收藏视频"}，收藏数 ${count ?? "加载中"}`}
         accessibilityState={{ selected: favorite, busy: relation.isLoading }}
@@ -100,7 +100,7 @@ function FavoriteButtonContent({
           size={18}
           colorClassName={favorite ? colors.primary.accent : colors.gray8.accent}
         />
-        <Text className={`text-sm ${favorite ? colors.primary.text : colors.gray8.text}`}>
+        <Text className={`text-xs ${favorite ? colors.primary.text : colors.gray8.text}`}>
           {parseNumber(count)}
         </Text>
       </Pressable>

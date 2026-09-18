@@ -30,7 +30,7 @@ export default function SetUpGroupDialog({
   }, [current.data]);
 
   const selectedIds = selected ?? [];
-  const canSubmit = selectedIds.length > 0 && !submitting;
+  const canSubmit = selected !== null && !submitting;
 
   function toggle(tagid: number) {
     setSelected((previous) => {
@@ -109,9 +109,6 @@ export default function SetUpGroupDialog({
           还没有可选分组，请先在关注页新建分组
         </Text>
       )}
-      {selected !== null && selected.length === 0 ? (
-        <Text className={`mt-2 text-xs ${colors.warning.text}`}>请至少选择一个分组</Text>
-      ) : null}
       {error ? (
         <Text accessibilityRole="alert" className={`mt-2 text-sm ${colors.error.text}`}>
           {error.message}

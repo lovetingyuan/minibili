@@ -39,7 +39,7 @@ describe("WatchProgressBar", () => {
     const track = elements(bar).find((element) =>
       element.props.className?.includes("bg-gray-900/40"),
     );
-    expect(track?.props.className).toContain("absolute bottom-0 left-0 h-[3px] w-full");
+    expect(track?.props.className).toContain("absolute bottom-0 left-0 h-2 w-full");
     expect(fillWidth(bar)).toBe("25%");
   });
 

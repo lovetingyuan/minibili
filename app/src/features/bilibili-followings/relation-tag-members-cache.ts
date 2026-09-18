@@ -3,6 +3,7 @@ import { unstable_serialize } from "swr/infinite";
 
 import { getRelationTagMembersKey } from "../../api/relation-tags";
 import type { RelationTagAccount } from "../../api/relation-tags.types";
+import type { UpInfo } from "../../types";
 
 function memberPagesMatcher(account: RelationTagAccount, tagids?: readonly number[]) {
   return (key: unknown) => {
@@ -31,6 +32,31 @@ export function clearRelationTagMemberPages(
   tagids: readonly number[],
 ) {
   return mutate(memberPagesMatcher(account, tagids), undefined, { revalidate: false });
+}
+
+/** 写操作确认成员已移出分组后，同步删除分页缓存与挂载中列表的数据。 */
+export async function removeRelationTagMemberFromCaches(
+  mutate: ScopedMutator,
+  account: RelationTagAccount,
+  tagids: readonly number[],
+  mid: string | number,
+) {
+  if (!tagids.length) {
+    return;
+  }
+  const targetMid = String(mid);
+  const removeMember = (members: UpInfo[] | undefined) =>
+    members?.filter((member) => String(member.mid) !== targetMid);
+  await mutate(memberPagesMatcher(account, tagids), removeMember, { revalidate: false });
+  await Promise.allSettled(
+    tagids.map((tagid) =>
+      mutate<UpInfo[][]>(
+        getRelationTagMembersInfiniteKey(account, tagid),
+        (pages) => pages?.map((page) => removeMember(page) ?? []),
+        { revalidate: false },
+      ),
+    ),
+  );
 }
 
 /**

@@ -162,12 +162,16 @@ test("回显 UP 当前所在的分组", () => {
   expect(confirmButton().props.disabled).toBe(false);
 });
 
-test("取消全部选中后禁止提交，并提示至少选择一个分组", () => {
+test("取消全部选中后允许提交空分组", async () => {
   render();
   runEffects();
   groupCheckBox(-10).props.onPress?.();
   expect(groupCheckBox(-10).props.checked).toBe(false);
-  expect(confirmButton().props.disabled).toBe(true);
+  expect(confirmButton().props.disabled).toBe(false);
+  confirmButton().props.onPress?.();
+  await vi.waitFor(() => {
+    expect(mocks.onSubmit).toHaveBeenCalledWith([]);
+  });
 });
 
 test("提交选中的分组并关闭弹窗", async () => {

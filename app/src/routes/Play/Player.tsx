@@ -1,6 +1,5 @@
 import { type RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { Image as ExpoImage } from "@/components/styled/expo";
-import { CheckBox } from "@/components/styled/rneui";
+import { CheckBox, Icon } from "@/components/styled/rneui";
 import * as KeepAwake from "expo-keep-awake";
 import React from "react";
 import {
@@ -301,9 +300,12 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
-          <ExpoImage
-            source={require("../../../assets/play.png")}
-            className="h-16 w-16 opacity-80"
+          <Icon
+            name="play"
+            type="material-design"
+            size={64}
+            color="#ffffff"
+            containerClassName="opacity-80"
           />
           <View className="absolute bottom-2 left-2 flex-row gap-2">
             {videoInfo?.duration ? (

@@ -13,6 +13,11 @@ const getVideoInfo = (data: VideoInfoResponse) => {
     bvid: data.bvid,
     date: data.pubdate,
     desc: data.desc,
+    descriptionNodes: (data.desc_v2 ?? []).map((node) => ({
+      rawText: node.raw_text,
+      type: node.type,
+      bizId: node.biz_id,
+    })),
     cover: data.pic,
     mid: data.owner.mid,
     name: data.owner.name,
@@ -52,6 +57,7 @@ const getVideoInfo = (data: VideoInfoResponse) => {
 };
 
 export type VideoInfo = ReturnType<typeof getVideoInfo>;
+export type VideoDescriptionNode = VideoInfo["descriptionNodes"][number];
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
 export function useVideoInfo(bvid: string) {
   const { data, error, isLoading } = useSWR<VideoInfoResponse>(

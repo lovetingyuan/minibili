@@ -33,93 +33,72 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
   const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid);
   return (
     <View>
-      <View className="shrink-0 flex-wrap items-center justify-between gap-3">
-        {videoInfo?.argument ? (
-          <View className="self-start p-2">
-            <Text
-              className={`${colors.warning.text}`}
-              onPress={() => {
-                if (videoInfo.argumentLink) {
-                  Linking.openURL(videoInfo.argumentLink);
-                }
-              }}
-            >
-              ⚠️ {videoInfo.argument}
-            </Text>
-          </View>
-        ) : null}
-        <View className="w-full flex-row justify-between">
-          <Pressable
+      {videoInfo?.argument ? (
+        <View className="mb-3 self-start rounded-lg bg-orange-50 px-2.5 py-2 dark:bg-orange-950/30">
+          <Text
+            className={`text-sm ${colors.warning.text}`}
             onPress={() => {
-              if (!mid || !face || !name) {
-                return;
+              if (videoInfo.argumentLink) {
+                Linking.openURL(videoInfo.argumentLink);
               }
-              const user = {
-                mid,
-                face,
-                name,
-                sign: "-",
-              };
-              navigation.push("Dynamic", { user });
             }}
-            className="mr-1 min-w-0 flex-1 flex-row items-center"
           >
+            ⚠️ {videoInfo.argument}
+          </Text>
+        </View>
+      ) : null}
+
+      <View className="mb-3 w-full flex-row justify-between">
+        <Pressable
+          onPress={() => {
+            if (!mid || !face || !name) {
+              return;
+            }
+            const user = {
+              mid,
+              face,
+              name,
+              sign: "-",
+            };
+            navigation.push("Dynamic", { user });
+          }}
+          className="mr-1 min-w-0 flex-1 flex-row items-center"
+        >
+          {face ? (
             <Avatar
               size={36}
               containerClassName="shrink-0"
               rounded
-              source={
-                face
-                  ? {
-                      uri: parseImgUrl(face, getImagePixelSize(36)),
-                    }
-                  : require("../../../assets/loading.png")
-              }
+              source={{ uri: parseImgUrl(face, getImagePixelSize(36)) }}
             />
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              className="ml-3 mr-1 min-w-0 flex-1 text-base font-bold"
-            >
-              {name || ""}
-            </Text>
-          </Pressable>
-          <View className="ml-1 flex-none flex-row items-center gap-1 px-2">
-            <Icon name="date-range" size={16} />
-            <Text className="text-sm">{parseDate(date, true)}</Text>
-            <Text className="ml-1 text-sm">
-              {watchingCount
-                ? `${watchingCount.total === "1" ? "壹" : watchingCount.total}人在看`
-                : " "}
-            </Text>
-          </View>
-        </View>
-        <View className="my-1 w-full flex-row flex-wrap justify-start opacity-80">
-          <View className="flex-row items-center gap-1 py-1 pr-1">
-            <Icon name="play-circle-outline" size={18} />
-            <Text className="text-sm">{parseNumber(videoInfo?.playNum)}</Text>
-          </View>
-          <View className="flex-row items-center gap-1 px-2 py-1">
-            <Icon name="chat-bubble-outline" size={16} />
-            <Text className="text-sm">{parseNumber(videoInfo?.danmuNum)}弹</Text>
-          </View>
-          <LikeButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.likeNum} />
-          <FavoriteButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.collectNum} />
-          <Pressable
-            className="flex-row items-center gap-1 py-1 pl-2"
-            onPress={() => {
-              if (name && title && route.params.bvid) {
-                handleShareVideo(name, title, route.params.bvid, props.currentPage);
-              }
-            }}
+          ) : (
+            <View className={`h-9 w-9 shrink-0 rounded-full ${colors.gray3.bg}`} />
+          )}
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            className="ml-3 mr-1 min-w-0 flex-1 text-base font-bold"
           >
-            <Icon type="material-community" name="share" size={22} />
-            <Text className="text-sm">{parseNumber(videoInfo?.shareNum)}</Text>
-          </Pressable>
+            {name || ""}
+          </Text>
+        </Pressable>
+        <View className="ml-1 flex-none flex-row items-center gap-1 px-2">
+          <Icon name="date-range" size={16} colorClassName={colors.gray6.accent} />
+          <Text className={`text-sm ${colors.gray6.text}`}>{parseDate(date, true)}</Text>
+          <Text className={`ml-1 text-sm ${colors.gray6.text}`}>
+            {watchingCount
+              ? `${watchingCount.total === "1" ? "壹" : watchingCount.total}人在看`
+              : " "}
+          </Text>
         </View>
       </View>
+
+      <Text selectable className={`text-lg font-bold leading-6 ${colors.gray9.text}`}>
+        {title}
+      </Text>
+
       {pages && pages.length > 1 ? (
-        <View className="mt-2">
+        <View className="mt-3">
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="打开分P列表"
@@ -155,8 +134,47 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
           />
         </View>
       ) : null}
-      <Text className="mt-3 text-base">{title}</Text>
-      <VideoDescription text={videoDesc} />
+
+      <VideoDescription text={videoDesc} nodes={videoInfo.descriptionNodes} />
+
+      <View className="mt-3 flex-row items-center rounded-xl bg-neutral-50 px-1 py-2 dark:bg-neutral-900">
+        <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
+          <Icon name="play-circle-outline" size={18} colorClassName={colors.gray8.accent} />
+          <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
+            {parseNumber(videoInfo?.playNum)}
+          </Text>
+        </View>
+        <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
+          <Icon name="chat-bubble-outline" size={17} colorClassName={colors.gray8.accent} />
+          <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
+            {parseNumber(videoInfo?.danmuNum)}
+          </Text>
+        </View>
+        <LikeButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.likeNum} />
+        <FavoriteButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.collectNum} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`分享视频，分享数 ${videoInfo.shareNum ?? "加载中"}`}
+          className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1"
+          hitSlop={6}
+          onPress={() => {
+            if (name && title && route.params.bvid) {
+              handleShareVideo(name, title, route.params.bvid, props.currentPage);
+            }
+          }}
+        >
+          <Icon
+            type="material-community"
+            name="share-variant-outline"
+            size={19}
+            colorClassName={colors.gray8.accent}
+          />
+          <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
+            {parseNumber(videoInfo?.shareNum)}
+          </Text>
+        </Pressable>
+      </View>
+
       {!isLoading && videoInfo?.interactive ? (
         <Text className={`mt-3 italic ${colors.warning.text}`}>【该视频为交互视频，暂不支持】</Text>
       ) : null}

@@ -7,7 +7,14 @@ export const VideoInfoResponseSchema = z.object({
   copyright: z.number(),
   ctime: z.number(),
   desc: z.string(),
-  // desc_v2: [{…}]
+  desc_v2: z
+    .object({
+      raw_text: z.string(),
+      type: z.number(),
+      biz_id: z.number(),
+    })
+    .array()
+    .optional(),
   dimension: z.object({
     width: z.number(),
     height: z.number(),

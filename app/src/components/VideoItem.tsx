@@ -4,9 +4,9 @@ import UpName from "./UpName";
 import { Image } from "@/components/styled/expo";
 import he from "he";
 import React from "react";
-import { TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { ActivityIndicator, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
-import type { VideoListItemProps } from "./VideoItem.types";
+import type { VideoCoverProps, VideoListItemProps } from "./VideoItem.types";
 import { WatchProgressBar } from "./WatchProgressBar";
 import { colors } from "@/constants/colors.tw";
 import { useStore } from "@/store";
@@ -42,6 +42,33 @@ function extractTextWithEmTags(text: string, className?: string) {
   }
 
   return result;
+}
+
+function VideoCover({ uri }: VideoCoverProps) {
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    setIsLoading(true);
+  }, [uri]);
+
+  return (
+    <>
+      {isLoading ? (
+        <View className="absolute inset-0 items-center justify-center">
+          <ActivityIndicator
+            accessibilityLabel="视频封面加载中"
+            colorClassName={colors.secondary.accent}
+          />
+        </View>
+      ) : null}
+      <Image
+        className="h-full w-full rounded"
+        source={{ uri }}
+        onLoadStart={() => setIsLoading(true)}
+        onLoadEnd={() => setIsLoading(false)}
+      />
+    </>
+  );
 }
 
 function VideoListItem<T extends VideoListItemInfo>({
@@ -86,11 +113,7 @@ function VideoListItem<T extends VideoListItemInfo>({
     >
       <View className="mr-3 flex-[3]">
         <View className="relative aspect-8/5 w-full content-center justify-center">
-          <Image
-            className="h-full w-full rounded"
-            source={{ uri: parseImgUrl(video.cover, coverSize) }}
-            placeholder={require("../../assets/video-loading.png")}
-          />
+          <VideoCover uri={parseImgUrl(video.cover, coverSize)} />
           <View className="absolute right-0 top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
             <Text className="text-xs font-thin text-white">
               {typeof video.duration === "string"
@@ -126,19 +149,26 @@ function VideoListItem<T extends VideoListItemInfo>({
         </View>
       </View>
       <View className="flex-[4] justify-between">
-        <Text className="mb-3 flex-1 text-base" numberOfLines={2} ellipsizeMode="tail">
+        <Text className="text-base" numberOfLines={2} ellipsizeMode="tail">
           {extractTextWithEmTags(video.title, colors.secondary.text)}
         </Text>
-        <View className="gap-2">
-          <Text className={isFollowed ? colors.secondary.text : colors.primary.text}>
-            <Text className={colors.gray7.text}>UP: </Text>
+        <View className="gap-1">
+          <View className="min-w-0 flex-row items-center gap-1">
+            <Icon
+              name={isFollowed ? "checkbox-marked-circle-outline" : "account-circle-outline"}
+              type="material-community"
+              size={16}
+              colorClassName={isFollowed ? colors.secondary.accent : colors.gray7.accent}
+            />
             <UpName
               mid={video.mid}
-              className={isFollowed ? colors.secondary.text : colors.primary.text}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              className={`min-w-0 flex-1 ${isFollowed ? colors.secondary.text : colors.primary.text}`}
             >
               {video.name}
             </UpName>
-          </Text>
+          </View>
           {watchedAt !== undefined ? (
             <Text className={`text-xs ${colors.gray6.text}`}>{formatWatchTime(watchedAt)}</Text>
           ) : null}
