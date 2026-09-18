@@ -20,8 +20,9 @@ export default function SortCate() {
   // 远端重新排序或切换账号后，以最新设置派生列表，不保留旧账号的编辑草稿。
   const selected = selection.stamp === stampFor($videoCatesList) ? selection.rids : [];
   const categories = $videoCatesList.slice(1);
-  const sorted = categories.filter((item) => selected.includes(item.rid));
-  const unsorted = categories.filter((item) => !selected.includes(item.rid));
+  const selectedIds = new Set(selected);
+  const sorted = categories.filter((item) => selectedIds.has(item.rid));
+  const unsorted = categories.filter((item) => !selectedIds.has(item.rid));
 
   function move(rid: number, select: boolean) {
     const item = categories.find((category) => category.rid === rid);

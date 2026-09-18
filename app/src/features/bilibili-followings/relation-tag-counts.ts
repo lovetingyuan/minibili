@@ -20,8 +20,10 @@ export function getCachedData<T>(cache: Cache, key: Key) {
 /** 设置分组后各分组的人数变化：移入的分组 +1，移出的分组 -1。 */
 export function getTagCountChanges(previous: readonly number[], next: readonly number[]) {
   const changes = new Map<number, number>();
+  const previousIds = new Set(previous);
+  const nextIds = new Set(next);
   for (const tagid of new Set([...previous, ...next])) {
-    const delta = Number(next.includes(tagid)) - Number(previous.includes(tagid));
+    const delta = Number(nextIds.has(tagid)) - Number(previousIds.has(tagid));
     if (delta) {
       changes.set(tagid, delta);
     }

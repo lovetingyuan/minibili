@@ -7,6 +7,7 @@ import { Button, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { orderFollowedUps } from "@/features/bilibili-followings/order-followings";
 import { useStore } from "@/store";
+import { useUnreadUpMids } from "@/store/derives";
 import type { UpInfo } from "@/types";
 
 import FollowUpsGrid from "./FollowUpsGrid";
@@ -21,11 +22,12 @@ type Props = {
 export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefreshTags }: Props) {
   const members = useBilibiliRelationTagMembers(tagid);
   const { livingUps } = useStore();
+  const unreadMids = useUnreadUpMids();
   const visibleItems =
     tagid === RELATION_TAG_SPECIAL_ID && specialMids
       ? members.items.filter((up) => specialMids.has(String(up.mid)))
       : members.items;
-  const orderedUps = orderFollowedUps(visibleItems, livingUps, specialMids);
+  const orderedUps = orderFollowedUps(visibleItems, livingUps, specialMids, unreadMids);
   const hasItems = visibleItems.length > 0;
 
   async function refresh() {

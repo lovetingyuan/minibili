@@ -29,20 +29,22 @@ export const menuTriggerIconButtonStyles: MenuTriggerCustomStyles = {
 
 export function Menu({ children, opened, onClose, ...props }: PopupMenuProps) {
   const menuThemeStyles = useMenuThemeStyles();
+  // 返回键回调不参与依赖，避免 onClose 每次变化都重新订阅
+  const handleBackPress = React.useEffectEvent(() =>
+    handleControlledMenuBackPress({ opened, onClose }),
+  );
 
   React.useEffect(() => {
     if (!opened) {
       return;
     }
 
-    const subscription = BackHandler.addEventListener("hardwareBackPress", () =>
-      handleControlledMenuBackPress({ opened, onClose }),
-    );
+    const subscription = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
 
     return () => {
       subscription.remove();
     };
-  }, [opened, onClose]);
+  }, [opened]);
 
   return (
     <PopupMenu {...props} opened={opened} onClose={onClose}>

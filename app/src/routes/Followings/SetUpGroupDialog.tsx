@@ -30,6 +30,7 @@ export default function SetUpGroupDialog({
   }, [current.data]);
 
   const selectedIds = selected ?? [];
+  const selectedIdSet = new Set(selectedIds);
   const canSubmit = selected !== null && !submitting;
 
   function toggle(tagid: number) {
@@ -92,7 +93,7 @@ export default function SetUpGroupDialog({
           {groups.map((group) => (
             <CheckBox
               key={group.tagid}
-              checked={selectedIds.includes(group.tagid)}
+              checked={selectedIdSet.has(group.tagid)}
               disabled={submitting}
               title={`${group.name}（${group.count}）`}
               onPress={() => {

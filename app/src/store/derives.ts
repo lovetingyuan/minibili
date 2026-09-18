@@ -32,6 +32,19 @@ export function useUpHasNewDynamic(mid: UpInfo["mid"]) {
   return Boolean($followingDynamicsUnreadMap[current.mid]?.unread[String(mid)]);
 }
 
+/** 当前账号有未读动态的 UP mid 集合，用于把带小红点的 UP 排到关注列表最前面 */
+export function useUnreadUpMids(): ReadonlySet<string> {
+  const control = useSyncExternalStore(bilibiliSession.subscribe, bilibiliSession.getSnapshot);
+  const { account } = useBilibiliSessionState();
+  const { $followingDynamicsUnreadMap } = useStore();
+  const current =
+    control.phase === "ready" && account && bilibiliSession.isCurrentAccount(account)
+      ? account
+      : null;
+  const unread = current ? $followingDynamicsUnreadMap[current.mid]?.unread : undefined;
+  return new Set(unread ? Object.keys(unread) : []);
+}
+
 /** 「关注」tab 角标：当前关注列表里有未读更新的 UP 数量 */
 export function useUnreadFollowedUpCount() {
   const $followedUps = useActiveFollowedUps();

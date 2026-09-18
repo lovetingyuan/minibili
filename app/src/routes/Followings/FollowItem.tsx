@@ -110,7 +110,7 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
         {hasNewDynamic ? (
           <View
             className={clsx(
-              "absolute right-0 top-0 h-2.5 w-2.5 rounded-full border border-white dark:border-neutral-900",
+              "absolute right-0 top-0 h-3.5 w-3.5 rounded-full border-2 border-white dark:border-neutral-900",
               colors.secondary.bg,
             )}
           />

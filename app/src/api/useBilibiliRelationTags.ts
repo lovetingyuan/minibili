@@ -274,8 +274,9 @@ export function useRelationTagActions() {
           return;
         }
         const latestTagids = getCachedData<number[]>(cache, getRelationUpTagsKey(current, mid));
-        const stillRemoved = latestTagids
-          ? removedTagids.filter((tagid) => !latestTagids.includes(tagid))
+        const latestTagidSet = latestTagids ? new Set(latestTagids) : null;
+        const stillRemoved = latestTagidSet
+          ? removedTagids.filter((tagid) => !latestTagidSet.has(tagid))
           : removedTagids;
         if (!stillRemoved.length) {
           return;
@@ -397,8 +398,11 @@ export function useRelationTagActions() {
         () => bilibiliSession.isCurrentAccount(current),
       );
       if (previousTagids) {
-        const removedTagids = previousTagids.filter((tagid) => !tagids.includes(tagid));
-        const addedTagids = tagids.filter((tagid) => !previousTagids.includes(tagid));
+        // 用 Set 做写入前后的分组差异比较，避免在 filter 里反复线性查找
+        const tagidSet = new Set(tagids);
+        const previousTagidSet = new Set(previousTagids);
+        const removedTagids = previousTagids.filter((tagid) => !tagidSet.has(tagid));
+        const addedTagids = tagids.filter((tagid) => !previousTagidSet.has(tagid));
         await removeRelationTagMemberFromCaches(mutateCache, current, removedTagids, mid);
         await revalidateRelationTagMembers(mutateCache, current, addedTagids);
         revalidateRemovedGroupsLater(current, mid, removedTagids);

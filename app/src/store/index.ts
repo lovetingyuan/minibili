@@ -166,6 +166,7 @@ export function InitStoreComp() {
   React.useEffect(() => {
     const methods = getStoreMethods();
     let unsubscribe: (() => void) | undefined;
+    let hideSplashTimer: ReturnType<typeof setTimeout> | undefined;
     let canceled = false;
 
     const finishHydration = (toastMessage?: string) => {
@@ -178,7 +179,7 @@ export function InitStoreComp() {
           void AsyncStorage.setItem(StoragePrefix + key, JSON.stringify(value));
         }
       });
-      setTimeout(() => {
+      hideSplashTimer = setTimeout(() => {
         void SplashScreen.hideAsync().finally(() => {
           if (toastMessage) {
             Toast.show(toastMessage, Toast.SHORT);
@@ -207,6 +208,7 @@ export function InitStoreComp() {
 
     return () => {
       canceled = true;
+      clearTimeout(hideSplashTimer);
       unsubscribe?.();
     };
   }, []);

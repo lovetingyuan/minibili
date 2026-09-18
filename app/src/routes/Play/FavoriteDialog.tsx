@@ -9,6 +9,8 @@ import { useFavoriteEditor } from "./useFavoriteEditor";
 
 export default function FavoriteDialog(props: FavoriteDialogProps) {
   const editor = useFavoriteEditor(props);
+  // 每行收藏夹都要判断是否选中，用 Set 避免列表变长后反复线性查找
+  const selectedFolderIds = new Set(editor.selection?.selectedIds ?? []);
   function close() {
     if (editor.canClose()) props.onClose();
   }
@@ -72,13 +74,13 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
             checkedIcon="check-box"
             uncheckedIcon="check-box-outline-blank"
             title={`${folder.title}（${folder.media_count}）`}
-            checked={editor.selection?.selectedIds.includes(folder.id) ?? false}
+            checked={selectedFolderIds.has(folder.id)}
             onPress={() => editor.toggle(folder.id)}
             disabled={editor.loading || editor.busy || editor.needsReload}
             accessibilityRole="checkbox"
             accessibilityLabel={`${folder.title}，${folder.media_count} 个内容`}
             accessibilityState={{
-              checked: editor.selection?.selectedIds.includes(folder.id),
+              checked: selectedFolderIds.has(folder.id),
               disabled: editor.loading || editor.busy || editor.needsReload,
             }}
             checkedColorClassName={colors.primary.accent}

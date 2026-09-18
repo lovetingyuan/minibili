@@ -118,6 +118,7 @@ test("有未读动态的 UP 头像右上角显示小红点", () => {
   const dot = findDot();
   expect(dot?.props?.className).toContain("absolute");
   expect(dot?.props?.className).toContain("rounded-full");
+  expect(dot?.props?.className).toContain("h-3.5 w-3.5");
   expect(dot?.props?.className).toContain("bg-pink-400");
 });
 

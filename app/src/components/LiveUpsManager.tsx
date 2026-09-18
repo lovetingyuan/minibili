@@ -13,7 +13,7 @@ function LiveUpsManager() {
       livingUps[item.mid] = item.link;
     }
     setLivingUps(livingUps);
-  }, [data]);
+  }, [data, setLivingUps]);
 
   return null;
 }

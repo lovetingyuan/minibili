@@ -2,6 +2,7 @@ import { Text } from "@/components/styled/rneui";
 import { orderFollowedUps } from "@/features/bilibili-followings/order-followings";
 import { useFollowingsState } from "@/features/bilibili-followings/useFollowingsState";
 import { useStore } from "@/store";
+import { useUnreadUpMids } from "@/store/derives";
 import { useActiveFollowedUps } from "@/store/followings";
 import type { UpInfo } from "@/types";
 
@@ -15,8 +16,9 @@ type Props = {
 export default function AllUpList({ specialMids, onSetGroups }: Props) {
   const { livingUps } = useStore();
   const $followedUps = useActiveFollowedUps();
+  const unreadMids = useUnreadUpMids();
   const { isValidating, mutate } = useFollowingsState();
-  const orderedUps = orderFollowedUps($followedUps, livingUps, specialMids);
+  const orderedUps = orderFollowedUps($followedUps, livingUps, specialMids, unreadMids);
 
   return (
     <FollowUpsGrid

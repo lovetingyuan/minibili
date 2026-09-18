@@ -306,6 +306,8 @@ function FollowList() {
     return tags.mutate().catch(() => undefined)
   }
 
+  const visitedKeySet = new Set(visitedKeys)
+
   return (
     <View className="flex-1">
       {searchKeyword ? (
@@ -350,7 +352,7 @@ function FollowList() {
           >
             {tabs.map(tab => (
               <View key={tab.key} collapsable={false} className="flex-1">
-                {visitedKeys.includes(tab.key) ? (
+                {visitedKeySet.has(tab.key) ? (
                   tab.tagid === null ? (
                     <AllUpList specialMids={specialFollowUps.data} onSetGroups={setGroupTarget} />
                   ) : (

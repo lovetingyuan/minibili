@@ -82,6 +82,7 @@ function WebPage({ route }: Props) {
   const { height: screenHeight } = useWindowDimensions();
   const [height, setHeight] = React.useState(screenHeight);
   const [isEnabled, setEnabled] = React.useState(true);
+  const pullToRefreshEnabledRef = React.useRef(true);
   const [pageTitle, setPageTitle] = React.useState(title);
   const { isRefreshing, onRefresh } = useRefresh(() => {
     return new Promise<void>((r) => {
@@ -103,7 +104,15 @@ function WebPage({ route }: Props) {
       style={{ height }}
       source={{ uri: url }}
       key={webViewMode + "-" + webViewKey}
-      onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
+      onScroll={(e) => {
+        // 滚动回调每秒触发几十次，仅在「是否回到顶部」真正翻转时才更新状态，避免整屏重渲染
+        const nextEnabled = e.nativeEvent.contentOffset.y === 0;
+        if (pullToRefreshEnabledRef.current !== nextEnabled) {
+          pullToRefreshEnabledRef.current = nextEnabled;
+          // react-doctor-disable-next-line react-doctor/rn-no-scroll-state
+          setEnabled(nextEnabled);
+        }
+      }}
       originWhitelist={["http://*", "https://*", "bilibili://*"]}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly

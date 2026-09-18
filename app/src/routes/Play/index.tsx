@@ -45,7 +45,10 @@ function Play({ route }: Props) {
   };
   const [currentPage, setCurrentPage] = React.useState(1);
   const currentPageRef = React.useRef(currentPage);
-  currentPageRef.current = currentPage;
+  // 播放结束等异步回调需要读取分P，改在提交后同步，避免渲染阶段写 ref
+  React.useEffect(() => {
+    currentPageRef.current = currentPage;
+  }, [currentPage]);
   const [playbackMode, setPlaybackMode] = React.useState(DEFAULT_PLAYBACK_MODE);
   const pageInfo = videoInfo.pages?.[currentPage - 1];
   // 下载用当前分P 的 cid，没有分P 信息时退回视频自身的 cid

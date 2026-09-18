@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Dimensions, Keyboard } from "react-native";
+import { Keyboard, useWindowDimensions } from "react-native";
 
 import { getKeyboardOverlap } from "./useKeyboardHeight.helpers";
 
@@ -14,10 +14,11 @@ const HIDE_EVENT = process.env.EXPO_OS === "ios" ? "keyboardWillHide" : "keyboar
  */
 export default function useKeyboardHeight() {
   const [height, setHeight] = useState(0);
+  const { height: windowHeight } = useWindowDimensions();
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener(SHOW_EVENT, (event) => {
-      setHeight(getKeyboardOverlap(event.endCoordinates, Dimensions.get("window").height));
+      setHeight(getKeyboardOverlap(event.endCoordinates, windowHeight));
     });
     const hideSubscription = Keyboard.addListener(HIDE_EVENT, () => {
       setHeight(0);
@@ -27,7 +28,7 @@ export default function useKeyboardHeight() {
       showSubscription.remove();
       hideSubscription.remove();
     };
-  }, []);
+  }, [windowHeight]);
 
   return height;
 }

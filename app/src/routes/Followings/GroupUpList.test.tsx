@@ -27,6 +27,7 @@ vi.mock("@/features/bilibili-followings/order-followings", () => ({
   orderFollowedUps: (ups: UpInfo[]) => ups,
 }));
 vi.mock("@/store", () => ({ useStore: () => ({ livingUps: {} }) }));
+vi.mock("@/store/derives", () => ({ useUnreadUpMids: () => new Set() }));
 vi.mock("./FollowUpsGrid", () => ({ default: "FollowUpsGrid" }));
 
 import GroupUpList from "./GroupUpList";

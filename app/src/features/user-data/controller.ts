@@ -109,8 +109,9 @@ export function createUserDataController(dependencies: UserDataDependencies) {
           // 不迁移旧格式；损坏的本地设置恢复默认值。
         }
       }
+      const pendingKeySet = new Set(pendingKeys);
       pending = new Map(
-        next ? settingKeys.filter((key) => pendingKeys.includes(key)).map((key) => [key, 1]) : [],
+        next ? settingKeys.filter((key) => pendingKeySet.has(key)).map((key) => [key, 1]) : [],
       );
       publish({ values, ready: true, revision: 1, error: null });
     })()

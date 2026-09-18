@@ -47,10 +47,6 @@ function extractTextWithEmTags(text: string, className?: string) {
 function VideoCover({ uri }: VideoCoverProps) {
   const [isLoading, setIsLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    setIsLoading(true);
-  }, [uri]);
-
   return (
     <>
       {isLoading ? (
@@ -85,6 +81,7 @@ function VideoListItem<T extends VideoListItemInfo>({
   const coverSize = getImagePixelDimensions(coverLayoutWidth, (coverLayoutWidth * 5) / 8);
   const _followedUpsMap = useFollowedUpsMap();
   const isFollowed = video.mid && video.mid in _followedUpsMap;
+  const coverUri = parseImgUrl(video.cover, coverSize);
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -113,7 +110,8 @@ function VideoListItem<T extends VideoListItemInfo>({
     >
       <View className="mr-3 flex-[3]">
         <View className="relative aspect-8/5 w-full content-center justify-center">
-          <VideoCover uri={parseImgUrl(video.cover, coverSize)} />
+          {/* key 让封面地址变化时重置加载状态，避免在 effect 中回写 state */}
+          <VideoCover key={coverUri} uri={coverUri} />
           <View className="absolute right-0 top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
             <Text className="text-xs font-thin text-white">
               {typeof video.duration === "string"
