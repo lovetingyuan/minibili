@@ -5,6 +5,8 @@ const mocks = vi.hoisted(() => ({
   setImagesList: vi.fn(),
   setCurrentImageIndex: vi.fn(),
   followDisabled: true,
+  hasNewDynamic: false,
+  livingUps: {} as Record<string, string>,
   onSetGroups: vi.fn<(up: { mid: string | number }) => void>(),
 }));
 
@@ -23,11 +25,14 @@ vi.mock("@/hooks/useFollowActions", () => ({
 }));
 vi.mock("../../store", () => ({
   useStore: () => ({
-    livingUps: {},
+    livingUps: mocks.livingUps,
     setOverlayButtons: mocks.setOverlayButtons,
     setImagesList: mocks.setImagesList,
     setCurrentImageIndex: mocks.setCurrentImageIndex,
   }),
+}));
+vi.mock("../../store/derives", () => ({
+  useUpHasNewDynamic: () => mocks.hasNewDynamic,
 }));
 vi.mock("../../utils", () => ({
   getImagePixelSize: (size: number) => size,
@@ -41,6 +46,8 @@ const item = { mid: 456, name: "UP", face: "", sign: "" };
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.followDisabled = true;
+  mocks.hasNewDynamic = false;
+  mocks.livingUps = {};
 });
 
 afterEach(() => vi.unstubAllGlobals());
@@ -90,4 +97,37 @@ test("特别关注的 UP 名称使用主题色并加粗", () => {
   expect(highlighted.props.className).toContain("text-sky-600");
   const plain = FollowItem({ item }).props.children[1];
   expect(plain.props.className).not.toContain("font-bold");
+});
+
+type AvatarChild = { props?: { className?: string } } | null;
+
+function avatarArea() {
+  return FollowItem({ item }).props.children[0];
+}
+
+function findDot() {
+  const children = avatarArea().props.children as AvatarChild[];
+  return children.find((child) => child?.props?.className?.includes("bg-pink-400"));
+}
+
+test("有未读动态的 UP 头像右上角显示小红点", () => {
+  expect(avatarArea().props.className).toBe("relative");
+  expect(findDot()).toBeUndefined();
+
+  mocks.hasNewDynamic = true;
+  const dot = findDot();
+  expect(dot?.props?.className).toContain("absolute");
+  expect(dot?.props?.className).toContain("rounded-full");
+  expect(dot?.props?.className).toContain("bg-pink-400");
+});
+
+test("直播中的 UP 在直播蒙层之上仍然显示小红点", () => {
+  mocks.hasNewDynamic = true;
+  mocks.livingUps = { "456": "https://live.bilibili.com/25334922" };
+
+  const children = avatarArea().props.children as AvatarChild[];
+  expect(children.some((child) => child?.props?.className?.includes("bg-neutral-950/60"))).toBe(
+    true,
+  );
+  expect(findDot()).toBeDefined();
 });

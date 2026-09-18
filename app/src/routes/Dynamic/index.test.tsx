@@ -40,6 +40,7 @@ vi.mock("@/components/styled/rneui", () => ({
 }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/hooks/useUpdateNavigationOptions", () => ({ default: vi.fn() }));
+vi.mock("@/store/actions", () => ({ useMarkFollowingDynamicsRead: vi.fn() }));
 vi.mock("./Header", () => ({ headerRight: vi.fn(), headerTitle: vi.fn() }));
 
 import Dynamic from "./index";

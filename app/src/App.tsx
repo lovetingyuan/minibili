@@ -22,6 +22,7 @@ import CheckAppUpdate from "./components/CheckAppUpdate";
 import LiveUpsManager from "./components/LiveUpsManager";
 import CheckNetState from "./components/CheckNetState";
 import FollowingDynamicsUpdatesManager from "./components/FollowingDynamicsUpdatesManager";
+import FollowingDynamicsUnreadManager from "./components/FollowingDynamicsUnreadManager";
 import ImagesView from "./components/ImagesView";
 import VideoDownloadManager from "./components/VideoDownloadManager";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
@@ -91,6 +92,7 @@ export default function App() {
                 <CheckNetState />
                 <LiveUpsManager />
                 <FollowingDynamicsUpdatesManager />
+                <FollowingDynamicsUnreadManager />
                 <WatchLaterManager />
                 <WatchProgressManager />
                 <VideoDownloadManager />

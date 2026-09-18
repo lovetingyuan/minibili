@@ -5,6 +5,7 @@ import { expect, test, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   livingUps: {} as Record<string, string>,
   followingDynamicsUpdateCount: 0,
+  unreadFollowedUpCount: 0,
 }));
 
 vi.mock("@react-navigation/bottom-tabs", () => ({
@@ -32,6 +33,9 @@ vi.mock("@/store", () => ({
     livingUps: mocks.livingUps,
     followingDynamicsUpdateCount: mocks.followingDynamicsUpdateCount,
   }),
+}));
+vi.mock("@/store/derives", () => ({
+  useUnreadFollowedUpCount: () => mocks.unreadFollowedUpCount,
 }));
 vi.mock("./About", () => ({ default: "About" }));
 vi.mock("./Dynamic", () => ({ default: "Dynamic" }));
@@ -107,7 +111,8 @@ test("main tabs keep the requested order, labels, and default route", () => {
   expect(screens[3].props.component).toBe("About");
 });
 
-test("followings tab shows the live badge only while followed ups are live", () => {
+test("followings tab prefers the live badge over the unread count", () => {
+  mocks.unreadFollowedUpCount = 7;
   mocks.livingUps = { 1625060795: "https://live.bilibili.com/25334922" };
   const withBadge = tabScreens(MainTabs());
   expect(withBadge[2].props.options.tabBarBadge).toBe("𝘭𝘪𝘷𝘦");
@@ -117,7 +122,22 @@ test("followings tab shows the live badge only while followed ups are live", () 
 
   mocks.livingUps = {};
   const withoutBadge = tabScreens(MainTabs());
-  expect(withoutBadge[2].props.options.tabBarBadge).toBeUndefined();
+  expect(withoutBadge[2].props.options.tabBarBadge).toBe(7);
+  expect(withoutBadge[2].props.options.tabBarBadgeStyle).toMatchObject({
+    backgroundColor: "#FF6699",
+  });
+});
+
+test("followings tab shows the unread up count and caps it at 99+", () => {
+  mocks.livingUps = {};
+  mocks.unreadFollowedUpCount = 0;
+  expect(tabScreens(MainTabs())[2].props.options.tabBarBadge).toBeUndefined();
+
+  mocks.unreadFollowedUpCount = 3;
+  expect(tabScreens(MainTabs())[2].props.options.tabBarBadge).toBe(3);
+
+  mocks.unreadFollowedUpCount = 150;
+  expect(tabScreens(MainTabs())[2].props.options.tabBarBadge).toBe("99+");
 });
 
 test("dynamics tab shows the unread count badge and caps it at 99+", () => {

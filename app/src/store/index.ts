@@ -11,7 +11,7 @@ import type { WatchProgressSnapshot } from "../utils/watch-progress";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { PartPlayProgressMap } from "./part-play-progress.types";
 import type { RepliesInfo } from "./replies-info.type";
-import type { FollowingDynamicsUpdateState } from "./types";
+import type { FollowingDynamicsUnreadState, FollowingDynamicsUpdateState } from "./types";
 
 const StoragePrefix = "Store:";
 
@@ -29,6 +29,14 @@ const getAppValue = () => {
      * 动态 tab 的已读基线和未读更新数，按 B站账号 mid 存储
      */
     $followingDynamicsUpdateMap: {} as Record<string, FollowingDynamicsUpdateState>,
+    /**
+     * 关注列表 UP 小红点的已读基线和未读动态，按 B站账号 mid 存储
+     */
+    $followingDynamicsUnreadMap: {} as Record<string, FollowingDynamicsUnreadState>,
+    /**
+     * 本次运行会话里每个 UP 已经读到的动态 id，仅用于丢弃「轮询在已读之后才落地」的响应
+     */
+    followingDynamicsReadIds: {} as Record<string, Record<string, string>>,
     // $ignoredVersions: [] as string[],
     $watchedHotSearch: {} as Record<string, number>,
     $checkAppUpdateTime: 0,

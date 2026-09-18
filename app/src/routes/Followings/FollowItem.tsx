@@ -1,12 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import { Avatar, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
+import { clsx } from "clsx";
 import { Alert, Pressable, TouchableOpacity, View } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
 import { useFollowActions } from "@/hooks/useFollowActions";
 
 import { useStore } from "../../store";
+import { useUpHasNewDynamic } from "../../store/derives";
 import type { NavigationProps, UpInfo } from "../../types";
 import { getImagePixelSize, parseImgUrl } from "../../utils";
 
@@ -20,6 +22,7 @@ type FollowItemProps = {
 function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
   const { face, name, sign, mid } = item;
   const { livingUps, setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore();
+  const hasNewDynamic = useUpHasNewDynamic(mid);
   const actions = useFollowActions();
   const navigation = useNavigation<NavigationProps["navigation"]>();
 
@@ -103,6 +106,14 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
           >
             <Text className={"text-center font-bold text-teal-300"}>直播中</Text>
           </Pressable>
+        ) : null}
+        {hasNewDynamic ? (
+          <View
+            className={clsx(
+              "absolute right-0 top-0 h-2.5 w-2.5 rounded-full border border-white dark:border-neutral-900",
+              colors.secondary.bg,
+            )}
+          />
         ) : null}
       </View>
       <UpName

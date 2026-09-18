@@ -5,6 +5,7 @@ import type { DynamicItem } from "@/api/dynamic-items.type";
 import { DynamicList } from "@/components/dynamic/dynamic-list";
 import { getDynamicDetailTarget, getDynamicVideoTarget } from "@/components/dynamic/dynamic-target";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
+import { useMarkFollowingDynamicsRead } from "@/store/actions";
 import type { RootStackParamList } from "@/types";
 
 import { headerRight, headerTitle } from "./Header";
@@ -16,6 +17,7 @@ function Dynamic({ route, navigation }: Props) {
   const dynamic = useDynamicItems(upId);
 
   useUpdateNavigationOptions({ headerTitle, headerRight });
+  useMarkFollowingDynamicsRead(upId);
 
   function openDynamicItem(item: DynamicItem) {
     const videoParams = getDynamicVideoTarget(item);

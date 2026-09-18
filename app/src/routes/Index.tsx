@@ -9,6 +9,7 @@ import { colors } from '@/constants/colors.tw';
 import useResolvedColor from '@/hooks/useResolvedColor';
 import useRouteTheme from '@/hooks/useRouteTheme';
 import { useStore } from '@/store';
+import { useUnreadFollowedUpCount } from '@/store/derives';
 import type { MainTabParamList, RootStackParamList } from '@/types';
 import { useAppUpdateInfo } from '@/api/check-update';
 
@@ -60,6 +61,7 @@ export function MainTabs() {
   const headerTitleColor = useResolvedColor(colors.gray8.text);
   const { hasUpdate } = useAppUpdateInfo();
   const { livingUps, followingDynamicsUpdateCount } = useStore();
+  const unreadFollowedUpCount = useUnreadFollowedUpCount();
   const hasLiveUps = Object.keys(livingUps).length > 0;
   const followingDynamicsBadge =
     followingDynamicsUpdateCount === 0
@@ -67,6 +69,12 @@ export function MainTabs() {
       : followingDynamicsUpdateCount >= 99
         ? '99+'
         : followingDynamicsUpdateCount;
+  const followingsUnreadBadge =
+    unreadFollowedUpCount === 0
+      ? undefined
+      : unreadFollowedUpCount >= 99
+        ? '99+'
+        : unreadFollowedUpCount;
 
   return (
     <Tab.Navigator
@@ -115,14 +123,15 @@ export function MainTabs() {
         component={FollowingsRoute}
         options={{
           title: '关注',
-          tabBarBadge: hasLiveUps ? '𝘭𝘪𝘷𝘦' : undefined,
+          // 有直播 UP 时优先展示直播角标，否则展示有未读更新的 UP 数量
+          tabBarBadge: hasLiveUps ? '𝘭𝘪𝘷𝘦' : followingsUnreadBadge,
           tabBarBadgeStyle: {
-            backgroundColor: '#00AEEC',
+            backgroundColor: hasLiveUps ? '#00AEEC' : '#FF6699',
             color: '#FFFFFF',
             fontSize: 8,
             lineHeight: 14,
             height: 14,
-            minWidth: 14,
+            minWidth: !hasLiveUps && unreadFollowedUpCount >= 99 ? 22 : 14,
             paddingHorizontal: 3,
             borderRadius: 7,
             end: -8,
