@@ -268,6 +268,16 @@ function prepareAndroidProject(variant, env) {
 function buildApk(variant, env) {
   tuneGradleProperties(variant);
 
+  // RN 的 bundle 任务只会往 generated/res/react/<buildType>/ 里写本次用到的资源，不会清理上一次构建的残留。
+  // assets 里的文件改名（例如 loading.png -> loading.gif）后，旧文件会和新文件一起参与资源合并，
+  // 触发 "Duplicate resources" 构建失败。这份目录每次都由 Gradle 重新生成，删掉不会影响原生增量编译。
+  const buildType = variant === "preview" ? "release" : "debug";
+  const generatedResDir = join(ANDROID_DIR, "app", "build", "generated", "res", "react", buildType);
+  if (existsSync(generatedResDir)) {
+    rmSync(generatedResDir, { force: true, recursive: true });
+    console.log(`[INFO] 已清理上次构建遗留的 RN 资源目录：${generatedResDir}`);
+  }
+
   // prebuild 生成的文件在不同平台/机器上不一定带执行位，这里顺手补一下，避免 EACCES。
   try {
     chmodSync(GRADLEW, 0o755);
