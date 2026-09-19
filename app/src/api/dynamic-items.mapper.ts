@@ -144,12 +144,16 @@ function normalizeAdditional(item: RawDynamicItem): DynamicAdditional | null {
   }
   if (additional.type === HandledAdditionalTypeEnum.ADDITIONAL_TYPE_UPOWER_LOTTERY) {
     const lottery = additional.upower_lottery;
+    const description = typeof lottery?.desc === "string" ? lottery.desc : lottery?.desc?.text;
     return lottery
       ? {
           head: "抽奖",
           title: lottery.title ?? "抽奖活动",
-          description: normalizeText(lottery.desc),
-          url: optionalUrl(lottery.jump_url),
+          description: normalizeText(description),
+          url: optionalUrl(
+            lottery.jump_url ||
+              (typeof lottery.desc === "object" ? lottery.desc?.jump_url : undefined),
+          ),
         }
       : null;
   }

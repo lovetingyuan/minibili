@@ -6,6 +6,17 @@ import type { DynamicItem } from "@/api/dynamic-items.type";
 const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   refresh: vi.fn(),
+  userInfo: undefined as
+    | {
+        face: string;
+        level: number;
+        mid: string;
+        name: string;
+        officialDescription: string;
+        sex: string;
+        sign: string;
+      }
+    | undefined,
 }));
 
 vi.mock("react-native", () => ({
@@ -27,6 +38,9 @@ vi.mock("@/api/dynamic-items", () => ({
     retry: vi.fn(),
   }),
 }));
+vi.mock("@/api/user-info", () => ({
+  useUserInfo: () => ({ data: mocks.userInfo }),
+}));
 vi.mock("@/components/dynamic/dynamic-list", () => ({ DynamicList: "DynamicList" }));
 vi.mock(
   "@/components/dynamic/dynamic-target",
@@ -42,10 +56,15 @@ vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/hooks/useUpdateNavigationOptions", () => ({ default: vi.fn() }));
 vi.mock("@/store/actions", () => ({ useMarkFollowingDynamicsRead: vi.fn() }));
 vi.mock("./Header", () => ({ headerRight: vi.fn(), headerTitle: vi.fn() }));
+vi.mock("./ProfileInfo", () => ({ default: "ProfileInfo" }));
 
 import Dynamic from "./index";
 
 type ListProps = {
+  listHeader: ReactElement<{
+    officialDescription?: string;
+    sign?: string;
+  }>;
   onItemPress: (item: DynamicItem) => void;
 };
 
@@ -69,12 +88,12 @@ const baseItem = {
   original: null,
 } satisfies DynamicItem;
 
-function renderList() {
+function renderList(routeSign = "") {
   const screen = Dynamic({
     route: {
       key: "Dynamic-test",
       name: "Dynamic",
-      params: { user: { mid: 123, name: "UP", face: "", sign: "" } },
+      params: { user: { mid: 123, name: "UP", face: "", sign: routeSign } },
     },
     navigation: { navigate: mocks.navigate },
   } as unknown as ComponentProps<typeof Dynamic>);
@@ -86,7 +105,37 @@ function pressRenderedCard(item: DynamicItem) {
 }
 
 describe("Dynamic list navigation", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.userInfo = undefined;
+  });
+
+  test("passes the latest UP introduction and signature to the list header", () => {
+    mocks.userInfo = {
+      face: "avatar.jpg",
+      level: 6,
+      mid: "123",
+      name: "UP",
+      officialDescription: "认证UP主",
+      sex: "保密",
+      sign: "最新签名",
+    };
+
+    const profile = renderList("缓存签名").props.listHeader;
+
+    expect(profile.type).toBe("ProfileInfo");
+    expect(profile.props).toEqual({
+      officialDescription: "认证UP主",
+      sign: "最新签名",
+    });
+  });
+
+  test("uses the cached signature while the UP profile is unavailable", () => {
+    expect(renderList("缓存签名").props.listHeader.props).toEqual({
+      officialDescription: undefined,
+      sign: "缓存签名",
+    });
+  });
 
   test("ordinary cards open their dynamic detail", () => {
     pressRenderedCard(baseItem);

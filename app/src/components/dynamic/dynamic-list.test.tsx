@@ -141,6 +141,7 @@ function renderFunction(element: ReactElement): ReactElement<TestElementProps> {
 type ListProps = {
   ListEmptyComponent: ReactElement;
   ListFooterComponent: ReactElement<TestElementProps> | null;
+  ListHeaderComponent: ReactNode;
   refreshing: boolean;
   renderItem: (info: { item: DynamicItem }) => ReactElement<{
     children: ReactElement<{ onPress: () => void }>;
@@ -183,6 +184,21 @@ describe("shared dynamic list", () => {
   test("shows the configured initial loading state", () => {
     const loading = renderList({ list: [], isLoading: true });
     expect(text(renderFunction(loading))).toContain("正在加载关注动态");
+  });
+
+  test("keeps the optional header above loading, empty and populated content", () => {
+    const listHeader = React.createElement("ProfileInfo", null, "UP资料");
+
+    const loading = renderList({ list: [], isLoading: true, listHeader });
+    expect(text(renderFunction(loading)).startsWith("UP资料")).toBe(true);
+
+    const empty = renderList({ list: [], listHeader });
+    expect(text(empty.props.ListHeaderComponent)).toBe("UP资料");
+
+    const populated = renderList({ list: [item], listHeader });
+    expect(text(populated.props.ListHeaderComponent)).toBe("UP资料");
+
+    expect(renderList({ list: [] }).props.ListHeaderComponent).toBeNull();
   });
 
   test("uses a larger gap between dynamic cards", () => {

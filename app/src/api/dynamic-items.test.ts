@@ -294,6 +294,32 @@ describe("dynamic item mapping", () => {
     const item = mapDynamicItem(fixture({ additional: { type, ...payload } }));
     expect(item.additional?.title).toBe(title);
   });
+
+  it("accepts the object description returned by charging-exclusive lotteries", () => {
+    const item = mapDynamicItem(
+      fixture({
+        additional: {
+          type: "ADDITIONAL_TYPE_UPOWER_LOTTERY",
+          upower_lottery: {
+            title: "充电专属抽奖",
+            desc: {
+              text: "奖品描述",
+              style: 1,
+              jump_url: "//www.bilibili.com/h5/lottery/result?business_id=1",
+            },
+            hint: { text: "加入包月充电即可参与", style: 0 },
+          },
+        },
+      }),
+    );
+
+    expect(item.additional).toEqual({
+      head: "抽奖",
+      title: "充电专属抽奖",
+      description: "奖品描述",
+      url: "https://www.bilibili.com/h5/lottery/result?business_id=1",
+    });
+  });
 });
 
 describe("dynamic paging schema", () => {

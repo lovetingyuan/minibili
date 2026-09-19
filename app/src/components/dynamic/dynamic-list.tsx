@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
+import type { ReactNode } from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
@@ -11,9 +12,10 @@ import type { MainTabNavigationProp } from "@/types";
 import { DynamicCard } from "./dynamic-card";
 import type { DynamicListProps } from "./dynamic-list.types";
 
-function DynamicListLoading(props: { text: string }) {
+function DynamicListLoading(props: { text: string; listHeader?: ReactNode }) {
   return (
     <View className="flex-1 bg-neutral-100 dark:bg-black">
+      {props.listHeader}
       <Text className={`px-4 py-3 text-center text-xs ${colors.gray6.text}`}>{props.text}</Text>
       <View className="gap-3">
         {[0, 1, 2].map((index) => (
@@ -88,7 +90,7 @@ export function DynamicList(props: DynamicListProps) {
   }, [props.isRefreshing]);
 
   if (props.isLoading && !props.list.length) {
-    return <DynamicListLoading text={props.loadingText} />;
+    return <DynamicListLoading text={props.loadingText} listHeader={props.listHeader} />;
   }
 
   return (
@@ -104,6 +106,7 @@ export function DynamicList(props: DynamicListProps) {
           <DynamicCard item={item} onPress={() => props.onItemPress(item)} />
         </View>
       )}
+      ListHeaderComponent={props.listHeader == null ? null : <>{props.listHeader}</>}
       ListEmptyComponent={
         <DynamicListEmpty
           error={props.error}

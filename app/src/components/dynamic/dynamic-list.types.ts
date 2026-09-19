@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import type { DynamicItem } from "@/api/dynamic-items.type";
 
 export type DynamicListProps = {
@@ -10,6 +12,7 @@ export type DynamicListProps = {
   loadingText: string;
   emptyTitle: string;
   emptyMessage: string;
+  listHeader?: ReactNode;
   refresh: () => void | Promise<unknown>;
   loadMore: () => void | Promise<unknown>;
   retry: () => void | Promise<unknown>;

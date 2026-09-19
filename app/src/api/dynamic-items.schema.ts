@@ -108,7 +108,25 @@ const AdditionalSchema = z
     upower_lottery: z
       .object({
         title: z.string().optional(),
-        desc: z.string().optional(),
+        desc: z
+          .union([
+            z.string(),
+            z
+              .object({
+                text: z.string().optional(),
+                jump_url: z.string().optional(),
+                style: z.number().optional(),
+              })
+              .passthrough(),
+          ])
+          .nullish(),
+        hint: z
+          .object({
+            text: z.string().optional(),
+            style: z.number().optional(),
+          })
+          .passthrough()
+          .nullish(),
         jump_url: z.string().optional(),
       })
       .passthrough()

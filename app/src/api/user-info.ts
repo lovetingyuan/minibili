@@ -1,5 +1,4 @@
 import useSWRImmutable from "swr/immutable";
-import type { z } from "zod";
 
 import { useStore } from "../store";
 // import {
@@ -7,21 +6,11 @@ import { useStore } from "../store";
 //   UserCardInfoResponseSchema,
 //   UserInfoResponseSchema,
 // } from './user-info.schema'
-import type { UpInfo } from "../types";
 import fetcher from "./fetcher";
-import type {
-  UserCardInfoResponseSchema,
-  // UserInfoResponseSchema,
-} from "./user-info.schema";
+import { mapUserCardInfo } from "./user-info.mapper";
+import { UserCardInfoResponseSchema } from "./user-info.schema";
+import type { UserInfo } from "./user-info.types";
 
-// type UserInfoResponse = z.infer<typeof UserInfoResponseSchema>
-type UserInfo = UpInfo & {
-  level: number;
-  sex: string;
-  silence?: 0 | 1;
-};
-
-type UserCardInfoResponse = z.infer<typeof UserCardInfoResponseSchema>;
 // type UserBatchInfoResponse = z.infer<typeof UserBatchInfoResponseSchema>
 
 // const getUserInfo1 = (mid: number | string): Promise<UserInfo> => {
@@ -90,17 +79,9 @@ export function useUserInfo(mid?: number | string) {
   const { data } = useSWRImmutable<UserInfo | undefined>(
     mid ? `/x/web-interface/card?mid=${mid}` : null,
     // null,
-    (url) => {
-      return fetcher<UserCardInfoResponse>(url).then((userInfo) => {
-        return {
-          face: userInfo.card.face,
-          name: userInfo.card.name,
-          sign: userInfo.card.sign,
-          mid: userInfo.card.mid.toString(),
-          level: userInfo.card.level_info.current_level,
-          sex: userInfo.card.sex,
-        };
-      });
+    async (url) => {
+      const response = await fetcher<unknown>(url);
+      return mapUserCardInfo(UserCardInfoResponseSchema.parse(response));
       // return fetcher<UserInfoResponse>(url).catch(() => {
       //   return fetcher<UserCardInfoResponse>(
       //     `/x/web-interface/card?mid=${mid}`,
