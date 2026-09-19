@@ -49,8 +49,9 @@ export function useBilibiliHistory() {
       isLoadingMore ||
       error ||
       !hasMore
-    )
+    ) {
       return;
+    }
     refreshAttempt.current = false;
     const task = setSize((value) => value + 1);
     pending.current = task;
@@ -62,16 +63,22 @@ export function useBilibiliHistory() {
   }
 
   async function refresh() {
-    if (!account || !bilibiliSession.isCurrentAccount(account) || refreshingRef.current) return;
+    if (!account || !bilibiliSession.isCurrentAccount(account) || refreshingRef.current) {
+      return;
+    }
     refreshingRef.current = true;
     refreshAttempt.current = true;
     setRefreshing(true);
     try {
       // 等待正在追加的页面，避免它在刷新后重新扩展列表。
       await pending.current?.catch(() => {});
-      if (!bilibiliSession.isCurrentAccount(account)) return;
+      if (!bilibiliSession.isCurrentAccount(account)) {
+        return;
+      }
       await setSize(1);
-      if (!bilibiliSession.isCurrentAccount(account)) return;
+      if (!bilibiliSession.isCurrentAccount(account)) {
+        return;
+      }
       await mutate();
     } finally {
       refreshingRef.current = false;
@@ -86,9 +93,12 @@ export function useBilibiliHistory() {
       pending.current ||
       refreshingRef.current ||
       isValidating
-    )
+    ) {
       return;
-    if (refreshAttempt.current) return refresh();
+    }
+    if (refreshAttempt.current) {
+      return refresh();
+    }
     // 续页失败只重取缺失页，保留之前已成功获取的游标链。
     const task = mutate(undefined, { revalidate: (page) => !page });
     pending.current = task;

@@ -14,11 +14,15 @@ export default function ReplyComposer(props: ReplyComposerProps) {
   const count = [...draft].length;
 
   useEffect(() => {
-    if (props.focusRequested) inputRef.current?.focus();
+    if (props.focusRequested) {
+      inputRef.current?.focus();
+    }
   }, [props.focusRequested, props.target.id]);
 
   async function submit() {
-    if (!draft.trim() || props.pending) return;
+    if (!draft.trim() || props.pending) {
+      return;
+    }
     if (await props.onSubmit(draft)) {
       setDraft("");
       Keyboard.dismiss();

@@ -12,14 +12,18 @@ export interface ShareParams {
 /** 非法或超出分片数量的索引统一按第 1 个分片处理。 */
 export function normalizePage(value: unknown, pageCount = MAX_PAGE) {
   const page = typeof value === "string" || typeof value === "number" ? Number(value) : Number.NaN;
-  if (!Number.isSafeInteger(page) || page < 1) return 1;
+  if (!Number.isSafeInteger(page) || page < 1) {
+    return 1;
+  }
   return page > pageCount ? 1 : page;
 }
 
 export function parseShareParams(search: string): ShareParams | null {
   const params = new URLSearchParams(search);
   const bvid = params.get("bvid")?.trim() ?? "";
-  if (!BVID_PATTERN.test(bvid)) return null;
+  if (!BVID_PATTERN.test(bvid)) {
+    return null;
+  }
   return { bvid, page: normalizePage(params.get("p")) };
 }
 
@@ -42,20 +46,30 @@ export function upgradeImageUrl(url: string) {
 }
 
 function formatUnit(scaled: number) {
-  if (scaled >= 100) return String(Math.round(scaled));
+  if (scaled >= 100) {
+    return String(Math.round(scaled));
+  }
   const fixed = (Math.round(scaled * 10) / 10).toFixed(1);
   return fixed.endsWith(".0") ? fixed.slice(0, -2) : fixed;
 }
 
 export function formatCount(value: number) {
-  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) return "--";
-  if (value >= 100000000) return `${formatUnit(value / 100000000)}亿`;
-  if (value >= 10000) return `${formatUnit(value / 10000)}万`;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    return "--";
+  }
+  if (value >= 100000000) {
+    return `${formatUnit(value / 100000000)}亿`;
+  }
+  if (value >= 10000) {
+    return `${formatUnit(value / 10000)}万`;
+  }
   return String(Math.trunc(value));
 }
 
 export function formatDuration(seconds: number) {
-  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds < 0) return "--";
+  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds < 0) {
+    return "--";
+  }
   const total = Math.round(seconds);
   const hours = Math.floor(total / 3600);
   const minutes = Math.floor((total % 3600) / 60);
@@ -65,7 +79,9 @@ export function formatDuration(seconds: number) {
 }
 
 export function formatDate(seconds: number) {
-  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds <= 0) return "--";
+  if (typeof seconds !== "number" || !Number.isFinite(seconds) || seconds <= 0) {
+    return "--";
+  }
   const date = new Date(seconds * 1000);
   const pad = (value: number) => String(value).padStart(2, "0");
   return [

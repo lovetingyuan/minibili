@@ -22,7 +22,9 @@ function CreateFavoriteFolderButton() {
   const accountKey = current ? `${current.mid}:${current.generation}` : null;
 
   React.useEffect(() => {
-    if (!current) setVisible(false);
+    if (!current) {
+      setVisible(false);
+    }
   }, [current]);
 
   if (!current) {

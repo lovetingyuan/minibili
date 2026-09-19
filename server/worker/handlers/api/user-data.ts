@@ -8,11 +8,14 @@ export async function handleSyncUserData(c: AppContext) {
   try {
     operations = parseSyncOperations(await readSyncBody(c.req.raw));
   } catch (error) {
-    if (error instanceof SyncPayloadTooLargeError)
+    if (error instanceof SyncPayloadTooLargeError) {
       return c.json({ success: false, error: "请求数据过大" }, 413);
+    }
     throw error;
   }
-  if (!operations) return c.json({ success: false, error: "同步请求格式错误" }, 400);
+  if (!operations) {
+    return c.json({ success: false, error: "同步请求格式错误" }, 400);
+  }
   let uid: string;
   try {
     uid = await verifyBilibiliIdentity(c.env, c.req.header("X-Bilibili-Cookie"));

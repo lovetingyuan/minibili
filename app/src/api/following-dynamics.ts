@@ -53,7 +53,9 @@ export function buildFollowingDynamicsUrl(page = 1, offset = "") {
     features: FOLLOWING_DYNAMIC_FEATURES,
     "x-bili-device-req-json": FOLLOWING_DYNAMIC_DEVICE,
   });
-  if (offset) params.set("offset", offset);
+  if (offset) {
+    params.set("offset", offset);
+  }
   return `/x/polymer/web-dynamic/v1/feed/all?${params}`;
 }
 
@@ -61,14 +63,20 @@ export function buildFollowingDynamicsUpdateUrl(updateBaseline = "") {
   const params = new URLSearchParams({
     type: "all",
   });
-  if (updateBaseline) params.set("update_baseline", updateBaseline);
+  if (updateBaseline) {
+    params.set("update_baseline", updateBaseline);
+  }
   return `/x/polymer/web-dynamic/v1/feed/all/update?${params}`;
 }
 
 export function buildFollowingDynamicsNavUrl(updateBaseline = "", offset = "") {
   const params = new URLSearchParams();
-  if (updateBaseline) params.set("update_baseline", updateBaseline);
-  if (offset) params.set("offset", offset);
+  if (updateBaseline) {
+    params.set("update_baseline", updateBaseline);
+  }
+  if (offset) {
+    params.set("offset", offset);
+  }
   const query = params.toString();
   return query
     ? `/x/polymer/web-dynamic/v1/feed/nav?${query}`
@@ -102,7 +110,9 @@ export async function fetchFollowingDynamicsPage(
   isCurrentAccount: () => boolean,
 ) {
   function assertCurrent() {
-    if (!isCurrentAccount()) throw new BilibiliSessionChangedError();
+    if (!isCurrentAccount()) {
+      throw new BilibiliSessionChangedError();
+    }
   }
 
   assertCurrent();
@@ -122,7 +132,9 @@ export async function fetchFollowingDynamicsUpdateCount(
   isCurrentAccount: () => boolean,
 ) {
   function assertCurrent() {
-    if (!isCurrentAccount()) throw new BilibiliSessionChangedError();
+    if (!isCurrentAccount()) {
+      throw new BilibiliSessionChangedError();
+    }
   }
 
   assertCurrent();
@@ -143,7 +155,9 @@ export async function fetchFollowingDynamicsNavPage(
   isCurrentAccount: () => boolean,
 ) {
   function assertCurrent() {
-    if (!isCurrentAccount()) throw new BilibiliSessionChangedError();
+    if (!isCurrentAccount()) {
+      throw new BilibiliSessionChangedError();
+    }
   }
 
   assertCurrent();
@@ -204,8 +218,12 @@ export async function fetchFollowingDynamicsNavUpdates(
 
 /** 动态 id_str 是超出 Number 安全范围的十进制字符串，只能按「长度 + 字典序」比较 */
 export function isNewerFollowingDynamicId(id: string, than: string) {
-  if (!than) return true;
-  if (id.length !== than.length) return id.length > than.length;
+  if (!than) {
+    return true;
+  }
+  if (id.length !== than.length) {
+    return id.length > than.length;
+  }
   return id > than;
 }
 
@@ -232,11 +250,17 @@ export function mergeFollowingDynamicsNavUnread(options: {
   const baseline = batch.complete ? batch.newestId : batch.oldestId;
   const unread: Record<string, string> = { ...state.unread };
   for (const item of batch.items) {
-    if (!item.mid) continue;
+    if (!item.mid) {
+      continue;
+    }
     const readId = readIds[item.mid];
-    if (readId && !isNewerFollowingDynamicId(item.idStr, readId)) continue;
+    if (readId && !isNewerFollowingDynamicId(item.idStr, readId)) {
+      continue;
+    }
     const existing = unread[item.mid];
-    if (existing && !isNewerFollowingDynamicId(item.idStr, existing)) continue;
+    if (existing && !isNewerFollowingDynamicId(item.idStr, existing)) {
+      continue;
+    }
     unread[item.mid] = item.idStr;
   }
 
@@ -255,10 +279,14 @@ export function countFollowingDynamicsUnreadUps(
   state: FollowingDynamicsNavState | undefined,
   followedMids: ReadonlySet<string>,
 ) {
-  if (!state) return 0;
+  if (!state) {
+    return 0;
+  }
   let count = 0;
   for (const mid of followedMids) {
-    if (state.unread[mid]) count += 1;
+    if (state.unread[mid]) {
+      count += 1;
+    }
   }
   return count;
 }
@@ -296,7 +324,9 @@ export function getFollowingDynamicsListItems(pages: FollowingDynamicsPage[]) {
   for (const page of pages) {
     for (const rawItem of page.items) {
       const item = mapDynamicItem(rawItem);
-      if (seen.has(item.id)) continue;
+      if (seen.has(item.id)) {
+        continue;
+      }
       seen.add(item.id);
       items.push(item);
     }

@@ -12,7 +12,9 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
   // 每行收藏夹都要判断是否选中，用 Set 避免列表变长后反复线性查找
   const selectedFolderIds = new Set(editor.selection?.selectedIds ?? []);
   function close() {
-    if (editor.canClose()) props.onClose();
+    if (editor.canClose()) {
+      props.onClose();
+    }
   }
   async function submit() {
     if (await editor.submit()) {
@@ -39,7 +41,9 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
               title="重新登录"
               type="clear"
               onPress={() => {
-                if (editor.error) props.onLoginRequired(editor.error);
+                if (editor.error) {
+                  props.onLoginRequired(editor.error);
+                }
               }}
             />
           ) : !editor.selection || editor.needsReload ? (

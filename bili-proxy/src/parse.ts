@@ -41,13 +41,17 @@ export function parseProxyPayload(rawBody: string): ParseResult {
   } catch {
     return { error: "invalid_json", ok: false, status: 400 };
   }
-  if (!isRecord(parsed)) return { error: "invalid_payload", ok: false, status: 400 };
+  if (!isRecord(parsed)) {
+    return { error: "invalid_payload", ok: false, status: 400 };
+  }
 
   const { cookie, path, profile } = parsed;
   if (typeof path !== "string" || path.length === 0 || path.length > MAX_PATH_LENGTH) {
     return { error: "invalid_path", ok: false, status: 400 };
   }
-  if (!isProfile(profile)) return { error: "invalid_profile", ok: false, status: 400 };
+  if (!isProfile(profile)) {
+    return { error: "invalid_profile", ok: false, status: 400 };
+  }
   if (cookie !== undefined && !isCookie(cookie)) {
     return { error: "invalid_cookie", ok: false, status: 400 };
   }
@@ -59,7 +63,9 @@ export function parseProxyPayload(rawBody: string): ParseResult {
     return { error: "invalid_path", ok: false, status: 400 };
   }
   // 绝对地址、协议相对地址、其他域名一律拒绝。
-  if (url.origin !== BILI_ORIGIN) return { error: "host_not_allowed", ok: false, status: 403 };
+  if (url.origin !== BILI_ORIGIN) {
+    return { error: "host_not_allowed", ok: false, status: 403 };
+  }
   if (!ALLOWED_PATHNAMES.includes(url.pathname)) {
     return { error: "path_not_allowed", ok: false, status: 403 };
   }

@@ -37,7 +37,9 @@ export function useVideoLike(account: FavoriteAccount | null, video: FavoriteVid
   >(
     key,
     (_key, { arg }) => {
-      if (!account) throw new VideoLikeLoginRequiredError("请先登录 B站");
+      if (!account) {
+        throw new VideoLikeLoginRequiredError("请先登录 B站");
+      }
       return modifyVideoLike(account, arg, {
         readCookie: getBilibiliLoginCookie,
         isCurrentAccount: bilibiliSession.isCurrentAccount,
@@ -53,7 +55,9 @@ export function useVideoLike(account: FavoriteAccount | null, video: FavoriteVid
   );
 
   async function toggle(): Promise<boolean | null> {
-    if (!account || !video || !key) throw new VideoLikeLoginRequiredError("请先登录 B站");
+    if (!account || !video || !key) {
+      throw new VideoLikeLoginRequiredError("请先登录 B站");
+    }
     const currentAccount = account;
     const currentVideo = video;
     const relationKey = key;
@@ -76,7 +80,9 @@ export function useVideoLike(account: FavoriteAccount | null, video: FavoriteVid
     return mutations.run(account, video.aid, async () => {
       if (typeof relation.data?.like !== "boolean" || relation.error) {
         const latest = await refreshRelation();
-        if (typeof latest?.like !== "boolean") throw new Error("无法获取点赞状态，请稍后重试");
+        if (typeof latest?.like !== "boolean") {
+          throw new Error("无法获取点赞状态，请稍后重试");
+        }
         return null;
       }
       const liked = !relation.data.like;
@@ -98,8 +104,9 @@ export function useVideoLike(account: FavoriteAccount | null, video: FavoriteVid
             if (
               refreshError instanceof FavoriteLoginRequiredError ||
               refreshError instanceof BilibiliSessionChangedError
-            )
+            ) {
               throw refreshError;
+            }
           }
         }
         throw error;

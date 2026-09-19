@@ -19,7 +19,9 @@ function toString(value: unknown): string {
 }
 
 function toDimension(value: unknown) {
-  if (!isRecord(value)) return { height: 0, rotate: 0, width: 0 };
+  if (!isRecord(value)) {
+    return { height: 0, rotate: 0, width: 0 };
+  }
   return {
     height: toNumber(value.height),
     rotate: toNumber(value.rotate),
@@ -32,7 +34,9 @@ function isFlag(value: unknown) {
 }
 
 function mapPages(value: unknown): VideoInfoPage[] {
-  if (!Array.isArray(value)) return [];
+  if (!Array.isArray(value)) {
+    return [];
+  }
   return value.filter(isRecord).map((page) => {
     const dimension = toDimension(page.dimension);
     return {
@@ -49,11 +53,15 @@ function mapPages(value: unknown): VideoInfoPage[] {
 
 /** 把上游 view 接口的 data 映射成分享页使用的结构，缺少的字段降级为默认值。 */
 function mapVideoInfo(value: unknown, requestedPage: number): VideoInfoData | null {
-  if (!isRecord(value)) return null;
+  if (!isRecord(value)) {
+    return null;
+  }
   const bvid = toString(value.bvid);
   const title = toString(value.title);
   const pages = mapPages(value.pages);
-  if (!bvid || !title || pages.length === 0) return null;
+  if (!bvid || !title || pages.length === 0) {
+    return null;
+  }
 
   const currentPage =
     Number.isSafeInteger(requestedPage) && requestedPage >= 1 && requestedPage <= pages.length
@@ -121,16 +129,22 @@ async function fetchUpstreamJson(bindings: BilibiliProxyBindings, path: string):
       timeoutMs: VIDEO_INFO_TIMEOUT_MS,
     });
   } catch (error) {
-    if (error instanceof VideoNotFoundError || error instanceof VideoUnavailableError) throw error;
+    if (error instanceof VideoNotFoundError || error instanceof VideoUnavailableError) {
+      throw error;
+    }
     throw new VideoUnavailableError();
   }
 }
 
 async function fetchUpFans(bindings: BilibiliProxyBindings, mid: number): Promise<number | null> {
-  if (!Number.isSafeInteger(mid) || mid <= 0) return null;
+  if (!Number.isSafeInteger(mid) || mid <= 0) {
+    return null;
+  }
   try {
     const payload = await fetchUpstreamJson(bindings, `${BILI_RELATION_STAT_PATH}?vmid=${mid}`);
-    if (!isRecord(payload) || payload.code !== 0 || !isRecord(payload.data)) return null;
+    if (!isRecord(payload) || payload.code !== 0 || !isRecord(payload.data)) {
+      return null;
+    }
     const follower = payload.data.follower;
     return typeof follower === "number" && Number.isFinite(follower) ? follower : null;
   } catch {
@@ -147,11 +161,19 @@ export async function fetchVideoInfo(
     bindings,
     `${BILI_VIEW_PATH}?bvid=${encodeURIComponent(bvid)}`,
   );
-  if (!isRecord(payload)) throw new VideoUnavailableError();
-  if (payload.code === -404) throw new VideoNotFoundError();
-  if (payload.code !== 0) throw new VideoUnavailableError();
+  if (!isRecord(payload)) {
+    throw new VideoUnavailableError();
+  }
+  if (payload.code === -404) {
+    throw new VideoNotFoundError();
+  }
+  if (payload.code !== 0) {
+    throw new VideoUnavailableError();
+  }
   const data = mapVideoInfo(payload.data, requestedPage);
-  if (!data) throw new VideoUnavailableError();
+  if (!data) {
+    throw new VideoUnavailableError();
+  }
   data.owner.fans = await fetchUpFans(bindings, data.owner.mid);
   return data;
 }

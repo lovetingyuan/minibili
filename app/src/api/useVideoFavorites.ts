@@ -93,7 +93,9 @@ export function useModifyVideoFavorites(account: FavoriteAccount, video: Favorit
     // 刷新错误与已经成功的写操作分离，不延迟弹窗关闭。
     void Promise.resolve()
       .then(async () => {
-        if (!bilibiliSession.isCurrentAccount(account)) return;
+        if (!bilibiliSession.isCurrentAccount(account)) {
+          return;
+        }
         await refreshFavoriteCaches(account, change, mutate);
         await syncFavoriteCaches(account, change, mutate, () =>
           bilibiliSession.isCurrentAccount(account),

@@ -26,15 +26,18 @@ export default function SortCate() {
 
   function move(rid: number, select: boolean) {
     const item = categories.find((category) => category.rid === rid);
-    if (!item) return;
+    if (!item) {
+      return;
+    }
     const nextSelected = select ? [...selected, rid] : selected.filter((id) => id !== rid);
     const nextSorted = select ? [...sorted, item] : sorted.filter((entry) => entry.rid !== rid);
     const nextUnsorted = select
       ? unsorted.filter((entry) => entry.rid !== rid)
       : [...unsorted, item];
     const next = [$videoCatesList[0], ...nextSorted, ...nextUnsorted];
-    if (setSetting("$videoCatesList", next))
+    if (setSetting("$videoCatesList", next)) {
       setSelection({ stamp: stampFor(next), rids: nextSelected });
+    }
   }
   return (
     <ListItem.Accordion

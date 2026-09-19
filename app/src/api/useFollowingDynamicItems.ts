@@ -84,14 +84,20 @@ export function useFollowingDynamicItems() {
   }
 
   async function refresh() {
-    if (!account || !bilibiliSession.isCurrentAccount(account) || refreshingRef.current) return;
+    if (!account || !bilibiliSession.isCurrentAccount(account) || refreshingRef.current) {
+      return;
+    }
     refreshingRef.current = true;
     setRefreshing(true);
     try {
       await pending.current?.catch(() => {});
-      if (!bilibiliSession.isCurrentAccount(account)) return;
+      if (!bilibiliSession.isCurrentAccount(account)) {
+        return;
+      }
       await swr.setSize(1);
-      if (!bilibiliSession.isCurrentAccount(account)) return;
+      if (!bilibiliSession.isCurrentAccount(account)) {
+        return;
+      }
       await swr.mutate();
     } finally {
       refreshingRef.current = false;

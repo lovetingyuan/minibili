@@ -29,7 +29,9 @@ export async function requestUpstream(
       status: response.status,
     };
   } catch (error) {
-    if (controller.signal.aborted) throw new UpstreamTimeoutError();
+    if (controller.signal.aborted) {
+      throw new UpstreamTimeoutError();
+    }
     throw error;
   } finally {
     clearTimeout(timeout);

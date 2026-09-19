@@ -9,7 +9,9 @@ export function mergeReplyItems<T extends { id: string }>(
   added.forEach((item) => items.set(item.id, item));
   fetched.forEach((item) => items.set(item.id, item));
   preview.forEach((item) => {
-    if (!items.has(item.id)) items.set(item.id, item);
+    if (!items.has(item.id)) {
+      items.set(item.id, item);
+    }
   });
   return [...items.values()];
 }

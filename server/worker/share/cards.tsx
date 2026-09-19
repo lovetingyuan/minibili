@@ -166,7 +166,9 @@ function MetaRow(props: MetaRowProps) {
       value: `${page}/${data.pages.length}`,
     });
   }
-  if (data.tname) items.push({ icon: 'mdi:tag-outline', label: '分区', value: data.tname });
+  if (data.tname) {
+    items.push({ icon: 'mdi:tag-outline', label: '分区', value: data.tname });
+  }
   // 切换分P 后按当前分片取值，拿不到时退回整部视频的时长
   const duration = data.pages[page - 1]?.duration ?? data.duration;
   items.push({

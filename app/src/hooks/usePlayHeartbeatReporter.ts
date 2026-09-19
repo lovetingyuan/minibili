@@ -88,7 +88,9 @@ function resolveVideo(props: PlayHeartbeatReporterProps): PlayHeartbeatVideo | n
 
 /** 把还在播放的那一段时长计入累计值 */
 function accumulatePlayingTime(state: PlayHeartbeatState, nowMs: number) {
-  if (!state.playing || state.playingSinceMs <= 0) return;
+  if (!state.playing || state.playingSinceMs <= 0) {
+    return;
+  }
   state.accumulatedMs += Math.max(0, nowMs - state.playingSinceMs);
   state.playingSinceMs = nowMs;
 }
@@ -123,7 +125,9 @@ function sendReport(
 ) {
   const { account } = input;
   const { session, video } = state;
-  if (!account || !session || !video) return;
+  if (!account || !session || !video) {
+    return;
+  }
   const ended = type === PLAY_HEARTBEAT_TYPES.end;
   // 播完时以完整时长作为进度，其余情况取当前位置
   const progressSeconds = ended ? state.durationSeconds : state.positionSeconds;
@@ -147,7 +151,9 @@ function sendReport(
 }
 
 function clearTick(tickRef: MutableRef<TickTimer>) {
-  if (tickRef.current === null) return;
+  if (tickRef.current === null) {
+    return;
+  }
   clearTimeout(tickRef.current);
   tickRef.current = null;
 }
@@ -157,11 +163,15 @@ function scheduleTick(
   inputRef: MutableRef<PlayHeartbeatInput>,
   tickRef: MutableRef<TickTimer>,
 ) {
-  if (tickRef.current !== null) return;
+  if (tickRef.current !== null) {
+    return;
+  }
   tickRef.current = setTimeout(function handlePlayHeartbeatTick() {
     tickRef.current = null;
     const input = inputRef.current;
-    if (!state.session || !state.playing || !input.account) return;
+    if (!state.session || !state.playing || !input.account) {
+      return;
+    }
     const nowMs = Date.now();
     sendReport(state, input, PLAY_HEARTBEAT_TYPES.periodic, nowMs);
     scheduleTick(state, inputRef, tickRef);
@@ -172,7 +182,9 @@ function scheduleTick(
 function startSession(state: PlayHeartbeatState, input: PlayHeartbeatInput, nowMs: number) {
   const { account, props } = input;
   const video = resolveVideo(props);
-  if (!account || !video) return;
+  if (!account || !video) {
+    return;
+  }
   const positionSeconds = Math.max(0, Math.round(props.currentTimeMs / 1000));
   state.key = `${props.bvid}:${props.cid}`;
   state.session = createPlayHeartbeatSession(nowMs, positionSeconds);
@@ -199,7 +211,9 @@ function finishSession(
   nowMs: number,
   ended: boolean,
 ) {
-  if (!state.session) return;
+  if (!state.session) {
+    return;
+  }
   accumulatePlayingTime(state, nowMs);
   sendReport(state, input, ended ? PLAY_HEARTBEAT_TYPES.end : PLAY_HEARTBEAT_TYPES.pause, nowMs);
   state.key = "";

@@ -39,7 +39,9 @@ test("reports a failed cleanup without rejecting startup and retries next time",
 
 test("history and play progress cleanup run even if favorites cleanup fails", async () => {
   const remove = vi.fn(async (key: string) => {
-    if (key === "Store:$collectedVideos") throw new Error("storage unavailable");
+    if (key === "Store:$collectedVideos") {
+      throw new Error("storage unavailable");
+    }
   });
   await expect(clearLegacyCollections(remove)).resolves.toBe(false);
   expect(remove).toHaveBeenCalledWith("Store:$watchedVideos");

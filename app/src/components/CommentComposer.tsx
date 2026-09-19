@@ -21,8 +21,12 @@ export default function CommentComposer(props: CommentComposerProps) {
   }, []);
 
   async function submit() {
-    if (!canSubmit) return;
-    if (await props.onSubmit(draft)) setDraft("");
+    if (!canSubmit) {
+      return;
+    }
+    if (await props.onSubmit(draft)) {
+      setDraft("");
+    }
   }
 
   return (

@@ -35,13 +35,19 @@ export function createFavoriteMutations(
       };
     },
     async run<T>(account: FavoriteAccount, aid: string, work: () => Promise<T>) {
-      if (!isCurrent(account)) throw new BilibiliSessionChangedError();
+      if (!isCurrent(account)) {
+        throw new BilibiliSessionChangedError();
+      }
       const key = favoriteMutationKey(account, aid);
-      if (pending.has(key)) throw new Error(pendingMessage);
+      if (pending.has(key)) {
+        throw new Error(pendingMessage);
+      }
       publish(new Set(pending).add(key));
       try {
         const result = await work();
-        if (!isCurrent(account)) throw new BilibiliSessionChangedError();
+        if (!isCurrent(account)) {
+          throw new BilibiliSessionChangedError();
+        }
         return result;
       } finally {
         const next = new Set(pending);

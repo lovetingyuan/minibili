@@ -46,7 +46,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("react", () => ({
   // 分页 hook 用 useRef(false) 作为进行中标记，其余 ref 按调用顺序独立保存
   useRef: (initial: unknown) => {
-    if (initial === false) return mocks.pending;
+    if (initial === false) {
+      return mocks.pending;
+    }
     const index = mocks.refIndex++;
     mocks.refs[index] ??= { current: initial };
     return mocks.refs[index];
@@ -186,10 +188,18 @@ describe("relation tag hooks", () => {
   test.each(["loading", "validating", "error", "end"] as const)(
     "%s 状态下不再加载下一页",
     async (state) => {
-      if (state === "loading") mocks.response.isLoading = true;
-      if (state === "validating") mocks.response.isValidating = true;
-      if (state === "error") mocks.response.error = new Error("page failed");
-      if (state === "end") mocks.response.data = [[]];
+      if (state === "loading") {
+        mocks.response.isLoading = true;
+      }
+      if (state === "validating") {
+        mocks.response.isValidating = true;
+      }
+      if (state === "error") {
+        mocks.response.error = new Error("page failed");
+      }
+      if (state === "end") {
+        mocks.response.data = [[]];
+      }
       await useBilibiliRelationTagMembers(0).loadMore();
       expect(mocks.response.setSize).not.toHaveBeenCalled();
     },
@@ -280,8 +290,12 @@ describe("relation tag actions", () => {
     const specialKey = getSpecialFollowUpsKey(account);
     let currentUpTags = [-10];
     mocks.cache.get.mockImplementation((key: string) => {
-      if (key === JSON.stringify(upTagsKey)) return { data: currentUpTags };
-      if (key === JSON.stringify(specialKey)) return { data: new Set(["10", "11"]) };
+      if (key === JSON.stringify(upTagsKey)) {
+        return { data: currentUpTags };
+      }
+      if (key === JSON.stringify(specialKey)) {
+        return { data: new Set(["10", "11"]) };
+      }
       return undefined;
     });
     mocks.mutateCache.mockImplementation((key: unknown, data?: unknown) => {

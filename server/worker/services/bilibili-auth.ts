@@ -27,8 +27,12 @@ export async function verifyBilibiliIdentity(
       profile: "auth",
       timeoutMs: AUTH_TIMEOUT_MS,
     });
-    if (!isRecord(payload)) throw new BilibiliUnavailableError();
-    if (payload.code === -101) throw new BilibiliUnauthorizedError();
+    if (!isRecord(payload)) {
+      throw new BilibiliUnavailableError();
+    }
+    if (payload.code === -101) {
+      throw new BilibiliUnauthorizedError();
+    }
     if (payload.code !== 0 || !isRecord(payload.data) || !isRecord(payload.data.profile)) {
       throw new BilibiliUnavailableError();
     }
@@ -39,7 +43,9 @@ export async function verifyBilibiliIdentity(
     // 唯一可信的身份来自 B站响应，而非 DedeUserID、URL 或请求体。
     return String(mid);
   } catch (error) {
-    if (error instanceof BilibiliUnauthorizedError) throw error;
+    if (error instanceof BilibiliUnauthorizedError) {
+      throw error;
+    }
     throw new BilibiliUnavailableError();
   }
 }

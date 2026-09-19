@@ -159,7 +159,9 @@ function RichTexts(props: Props) {
             const images = node.pics
               ?.map((pic) => {
                 const src = pic.src || pic.url;
-                if (!src) return null;
+                if (!src) {
+                  return null;
+                }
                 return {
                   src: parseUrl(src),
                   width: Math.max(1, pic.width ?? 1),

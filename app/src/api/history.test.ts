@@ -152,7 +152,9 @@ describe("Bilibili cursor history", () => {
       let current = true;
       request.mockImplementationOnce(async () => {
         current = false;
-        if (fail) throw new Error("network failed");
+        if (fail) {
+          throw new Error("network failed");
+        }
         return { cursor, list: [record] };
       });
       await expect(fetchBilibiliHistory(cursor, request, () => current)).rejects.toBeInstanceOf(

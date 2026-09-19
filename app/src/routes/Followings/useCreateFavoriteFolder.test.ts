@@ -17,7 +17,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("react", () => ({
   useState<T>(initial: T) {
     const index = mocks.stateIndex++;
-    if (!(index in mocks.states)) mocks.states[index] = initial;
+    if (!(index in mocks.states)) {
+      mocks.states[index] = initial;
+    }
     return [
       mocks.states[index] as T,
       (value: T | ((previous: T) => T)) => {

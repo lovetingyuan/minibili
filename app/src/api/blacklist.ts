@@ -20,7 +20,9 @@ export async function fetchBilibiliBlacklist(
   let page = 1;
 
   while (blacklist.size < total) {
-    if (!shouldContinue()) throw new BilibiliSessionChangedError();
+    if (!shouldContinue()) {
+      throw new BilibiliSessionChangedError();
+    }
     const query = new URLSearchParams({
       re_version: String(version ?? 0),
       pn: String(page),
@@ -29,7 +31,9 @@ export async function fetchBilibiliBlacklist(
       "x-bili-redirect": "1",
     });
     const payload = await request(`/x/relation/blacks?${query}`);
-    if (!shouldContinue()) throw new BilibiliSessionChangedError();
+    if (!shouldContinue()) {
+      throw new BilibiliSessionChangedError();
+    }
     const data = BlacklistDataSchema.parse(payload);
     if (version !== undefined && (data.total !== total || data.re_version !== version)) {
       throw new Error("B站黑名单发生变化，请重新同步");
@@ -44,10 +48,14 @@ export async function fetchBilibiliBlacklist(
         sign: item.sign,
       });
     }
-    if (data.list.length === 0 || page * PAGE_SIZE >= total) break;
+    if (data.list.length === 0 || page * PAGE_SIZE >= total) {
+      break;
+    }
     page += 1;
   }
 
-  if (blacklist.size !== total) throw new Error("B站黑名单不完整，请重新同步");
+  if (blacklist.size !== total) {
+    throw new Error("B站黑名单不完整，请重新同步");
+  }
   return blacklist;
 }

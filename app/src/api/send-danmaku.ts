@@ -42,10 +42,15 @@ export const DANMAKU_SEND_STYLE = {
  */
 export function resolveDanmakuText(text: string) {
   const normalized = text.trim();
-  if (!normalized) throw new Error("请输入弹幕内容");
-  if (/[\r\n]/.test(normalized)) throw new Error("弹幕内容不能包含换行");
-  if ([...normalized].length > DANMAKU_MAX_LENGTH)
+  if (!normalized) {
+    throw new Error("请输入弹幕内容");
+  }
+  if (/[\r\n]/.test(normalized)) {
+    throw new Error("弹幕内容不能包含换行");
+  }
+  if ([...normalized].length > DANMAKU_MAX_LENGTH) {
     throw new Error(`弹幕内容不能超过 ${DANMAKU_MAX_LENGTH} 个字符`);
+  }
   return normalized;
 }
 
@@ -71,7 +76,9 @@ export async function sendVideoDanmaku(
   dependencies: DanmakuSendRequestDependencies,
 ): Promise<DanmakuSendResult> {
   function assertCurrent() {
-    if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+    if (!dependencies.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
   }
   assertCurrent();
   assertVideo(request);
@@ -79,11 +86,16 @@ export async function sendVideoDanmaku(
   const progressMs = Math.ceil(request.progressMs);
   const cookie = await dependencies.readCookie();
   assertCurrent();
-  if (!cookie || !hasBilibiliLoginCookie(cookie))
+  if (!cookie || !hasBilibiliLoginCookie(cookie)) {
     throw new DanmakuLoginRequiredError("请先登录 B站");
-  if (getBilibiliUserId(cookie) !== account.mid) throw new BilibiliSessionChangedError();
+  }
+  if (getBilibiliUserId(cookie) !== account.mid) {
+    throw new BilibiliSessionChangedError();
+  }
   const csrf = getBilibiliCsrf(cookie);
-  if (!csrf) throw new DanmakuLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  if (!csrf) {
+    throw new DanmakuLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  }
   const url = "https://api.bilibili.com/x/v2/dm/post";
   const body = new URLSearchParams({
     type: DANMAKU_SEND_STYLE.type,
@@ -126,22 +138,28 @@ export async function sendVideoDanmaku(
       signal: controller.signal,
     });
     assertCurrent();
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
     const parsed = DanmakuSendResponseSchema.safeParse(await response.json());
     assertCurrent();
-    if (!parsed.success) throw new Error("发送弹幕响应格式异常");
+    if (!parsed.success) {
+      throw new Error("发送弹幕响应格式异常");
+    }
     const { code, message, data } = parsed.data;
     receivedResult = true;
     // 登录态不可用：-101 未登录、-111 CSRF 校验失败、-8 禁止游客弹幕
-    if (code === -8 || code === -101 || code === -111)
+    if (code === -8 || code === -101 || code === -111) {
       throw new DanmakuLoginRequiredError("登录凭据失效，请重新登录 B站");
+    }
     if (code !== 0) {
       const known = DANMAKU_SEND_ERROR_MESSAGES[code];
       throw new Error(known ?? `弹幕发送失败（${code}）：${message || "请稍后重试"}`);
     }
     const dmid = data?.dmid_str;
-    if (dmid === undefined || `${dmid}`.length === 0)
+    if (dmid === undefined || `${dmid}`.length === 0) {
       throw new Error(message || "弹幕发送失败，请稍后重试");
+    }
     return { dmid: `${dmid}`, text, progressMs };
   } catch (error) {
     assertCurrent();

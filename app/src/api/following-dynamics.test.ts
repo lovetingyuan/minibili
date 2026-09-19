@@ -164,7 +164,9 @@ describe("following dynamics paging", () => {
       let current = true;
       request.mockImplementationOnce(async () => {
         current = false;
-        if (fail) throw new Error("network failed");
+        if (fail) {
+          throw new Error("network failed");
+        }
         return page(["1"]);
       });
       await expect(

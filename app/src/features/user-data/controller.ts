@@ -62,7 +62,9 @@ export function createUserDataController(dependencies: UserDataDependencies) {
     const data = JSON.stringify({ values: snapshot.values, pendingKeys: [...pending.keys()] });
     writeQueue = writeQueue.catch(() => {}).then(() => dependencies.write(key, data));
     void writeQueue.catch(() => {
-      if (epoch === currentEpoch) publish({ error: new Error("设置未能保存到本机，请重试") });
+      if (epoch === currentEpoch) {
+        publish({ error: new Error("设置未能保存到本机，请重试") });
+      }
     });
     return writeQueue;
   }
@@ -71,7 +73,9 @@ export function createUserDataController(dependencies: UserDataDependencies) {
     if (next && !dependencies.isCurrentAccount(next)) {
       return Promise.reject(new BilibiliSessionChangedError());
     }
-    if (matches(next) && (snapshot.ready || hydration)) return hydration ?? Promise.resolve();
+    if (matches(next) && (snapshot.ready || hydration)) {
+      return hydration ?? Promise.resolve();
+    }
     if (!matches(next)) {
       epoch += 1;
       abortController?.abort();
@@ -122,7 +126,9 @@ export function createUserDataController(dependencies: UserDataDependencies) {
         throw error;
       })
       .finally(() => {
-        if (epoch === currentEpoch) hydration = null;
+        if (epoch === currentEpoch) {
+          hydration = null;
+        }
       });
     hydration = task;
     return task;
@@ -134,26 +140,35 @@ export function createUserDataController(dependencies: UserDataDependencies) {
     value: UserSettings[K] | ((previous: UserSettings[K]) => UserSettings[K]),
   ) {
     assertCurrent(expected);
-    if (!snapshot.ready) throw new Error("本地设置尚未加载，请稍后重试");
+    if (!snapshot.ready) {
+      throw new Error("本地设置尚未加载，请稍后重试");
+    }
     const input = typeof value === "function" ? value(snapshot.values[key]) : value;
     const values = UserSettingsSchema.parse({ ...snapshot.values, [key]: input });
     const revision = snapshot.revision + 1;
-    if (account) pending.set(key, revision);
+    if (account) {
+      pending.set(key, revision);
+    }
     publish({ values, revision, error: null });
     void persist();
   }
 
   function sync(expected: UserDataAccount): Promise<void> {
-    if (!matches(expected) || !dependencies.isCurrentAccount(expected))
+    if (!matches(expected) || !dependencies.isCurrentAccount(expected)) {
       return Promise.reject(new BilibiliSessionChangedError());
-    if (inFlight) return inFlight;
+    }
+    if (inFlight) {
+      return inFlight;
+    }
     const currentEpoch = epoch;
     const controller = new AbortController();
     abortController = controller;
     const task = (async () => {
       await activate(expected);
       assertCurrent(expected, currentEpoch);
-      if (snapshot.authRequired) throw new UserDataUnauthorizedError();
+      if (snapshot.authRequired) {
+        throw new UserDataUnauthorizedError();
+      }
       publish({ syncing: true, error: null });
       await persist();
       assertCurrent(expected, currentEpoch);
@@ -161,17 +176,24 @@ export function createUserDataController(dependencies: UserDataDependencies) {
       do {
         const sent = new Map(pending);
         const set: Record<string, JsonValue> = {};
-        for (const key of sent.keys()) set[key] = snapshot.values[key];
+        for (const key of sent.keys()) {
+          set[key] = snapshot.values[key];
+        }
         const operations: SyncOperations = { get: [...settingKeys] };
-        if (sent.size) operations.set = set;
+        if (sent.size) {
+          operations.set = set;
+        }
         const response = await dependencies.sync(expected, operations, controller.signal);
         assertCurrent(expected, currentEpoch);
-        if (controller.signal.aborted || response.uid !== expected.mid)
+        if (controller.signal.aborted || response.uid !== expected.mid) {
           throw new BilibiliSessionChangedError();
+        }
         const remote = UserSettingsSchema.parse(response.result);
         const values = { ...snapshot.values };
         for (const key of settingKeys) {
-          if (pending.has(key) && pending.get(key) !== sent.get(key)) continue;
+          if (pending.has(key) && pending.get(key) !== sent.get(key)) {
+            continue;
+          }
           pending.delete(key);
           // 用对象合并保留 key 与其值类型的关联，避免 union 索引写入。
           Object.assign(values, { [key]: remote[key] });
@@ -217,7 +239,9 @@ export function createUserDataController(dependencies: UserDataDependencies) {
     async saveLocal() {
       const currentEpoch = epoch;
       await persist();
-      if (epoch === currentEpoch) publish({ error: null });
+      if (epoch === currentEpoch) {
+        publish({ error: null });
+      }
     },
     getSnapshot: () => snapshot,
     subscribe(listener: () => void) {

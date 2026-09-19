@@ -60,13 +60,19 @@ function assertVideo(video: FavoriteVideo) {
 }
 
 async function readForAccount(url: string, request: FavoriteRequest, isCurrent: () => boolean) {
-  if (!isCurrent()) throw new BilibiliSessionChangedError();
+  if (!isCurrent()) {
+    throw new BilibiliSessionChangedError();
+  }
   try {
     const data = await request(url);
-    if (!isCurrent()) throw new BilibiliSessionChangedError();
+    if (!isCurrent()) {
+      throw new BilibiliSessionChangedError();
+    }
     return data;
   } catch (error) {
-    if (!isCurrent()) throw new BilibiliSessionChangedError();
+    if (!isCurrent()) {
+      throw new BilibiliSessionChangedError();
+    }
     if (error instanceof Error && "code" in error && (error.code === -101 || error.code === -111)) {
       throw new FavoriteLoginRequiredError("登录凭据失效，请重新登录 B站");
     }
@@ -109,7 +115,9 @@ export async function modifyVideoFavorites(
   dependencies: VideoFavoriteRequestDependencies,
 ) {
   function assertCurrent() {
-    if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+    if (!dependencies.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
   }
   assertCurrent();
   assertVideo(change.video);
@@ -119,14 +127,21 @@ export async function modifyVideoFavorites(
   ) {
     throw new Error("收藏夹 ID 无效，请刷新后重试");
   }
-  if (!add.length && !remove.length) return change;
+  if (!add.length && !remove.length) {
+    return change;
+  }
   const cookie = await dependencies.readCookie();
   assertCurrent();
-  if (!cookie || !hasBilibiliLoginCookie(cookie))
+  if (!cookie || !hasBilibiliLoginCookie(cookie)) {
     throw new FavoriteLoginRequiredError("请先登录 B站");
-  if (getBilibiliUserId(cookie) !== account.mid) throw new BilibiliSessionChangedError();
+  }
+  if (getBilibiliUserId(cookie) !== account.mid) {
+    throw new BilibiliSessionChangedError();
+  }
   const csrf = getBilibiliCsrf(cookie);
-  if (!csrf) throw new FavoriteLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  if (!csrf) {
+    throw new FavoriteLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  }
   const url = "https://api.bilibili.com/x/v3/fav/resource/deal";
   const body = new URLSearchParams({
     rid: change.video.aid,
@@ -161,17 +176,25 @@ export async function modifyVideoFavorites(
       signal: controller.signal,
     });
     assertCurrent();
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
     const parsed = FavoriteDealResponseSchema.safeParse(await response.json());
     assertCurrent();
-    if (!parsed.success) throw new Error("响应格式异常");
+    if (!parsed.success) {
+      throw new Error("响应格式异常");
+    }
     const { code, message, data } = parsed.data;
-    if (code === 0 && !FavoriteDealDataSchema.safeParse(data).success)
+    if (code === 0 && !FavoriteDealDataSchema.safeParse(data).success) {
       throw new Error("响应缺少有效收藏结果");
+    }
     receivedResult = true;
-    if (code === -101 || code === -111)
+    if (code === -101 || code === -111) {
       throw new FavoriteLoginRequiredError("登录凭据失效，请重新登录 B站");
-    if (code !== 0) throw new Error(`收藏操作失败（${code}）：${message || "请稍后重试"}`);
+    }
+    if (code !== 0) {
+      throw new Error(`收藏操作失败（${code}）：${message || "请稍后重试"}`);
+    }
     return change;
   } catch (error) {
     assertCurrent();

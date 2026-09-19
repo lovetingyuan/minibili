@@ -99,7 +99,9 @@ function openItemActions(props: CommentItemProps) {
   expect(item.type).toBe("Pressable");
   item.props.onLongPress?.();
   const buttons = lastOverlayButtons();
-  if (!buttons) throw new Error("Expected the long press to open the comment actions overlay");
+  if (!buttons) {
+    throw new Error("Expected the long press to open the comment actions overlay");
+  }
   return buttons;
 }
 
@@ -107,12 +109,18 @@ function findElement(
   element: ReactNode,
   match: (props: ElementProps) => boolean,
 ): ReactElement<ElementProps> | null {
-  if (!element || typeof element !== "object" || !("props" in element)) return null;
+  if (!element || typeof element !== "object" || !("props" in element)) {
+    return null;
+  }
   const node = element as ReactElement<ElementProps>;
-  if (match(node.props)) return node;
+  if (match(node.props)) {
+    return node;
+  }
   for (const child of children(node)) {
     const found = findElement(child, match);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
   }
   return null;
 }

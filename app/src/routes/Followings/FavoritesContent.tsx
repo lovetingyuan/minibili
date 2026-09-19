@@ -47,7 +47,9 @@ export default function FavoritesContent() {
   const canEdit = Boolean(editing && focused && bilibiliSession.isCurrentAccount(editing.account));
 
   React.useEffect(() => {
-    if (!canEdit) setEditing(null);
+    if (!canEdit) {
+      setEditing(null);
+    }
   }, [canEdit]);
 
   function buttons(item: FavoriteListItem) {

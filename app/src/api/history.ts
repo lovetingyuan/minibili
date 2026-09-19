@@ -20,7 +20,9 @@ export function getHistoryKey(
   index: number,
   previous: HistoryPage | null,
 ): HistoryKey | null {
-  if (!account || (index > 0 && (!previous || !previous.hasMore))) return null;
+  if (!account || (index > 0 && (!previous || !previous.hasMore))) {
+    return null;
+  }
   const cursor = index === 0 ? INITIAL_HISTORY_CURSOR : previous!.cursor;
   return [
     "bilibili-history",
@@ -41,7 +43,9 @@ export async function fetchBilibiliHistory(
   pageSize = HISTORY_PAGE_SIZE,
 ): Promise<HistoryPage> {
   function assertCurrent() {
-    if (!isCurrentAccount()) throw new BilibiliSessionChangedError();
+    if (!isCurrentAccount()) {
+      throw new BilibiliSessionChangedError();
+    }
   }
   assertCurrent();
   const params = new URLSearchParams({
@@ -77,10 +81,14 @@ export function getHistoryListItems(pages: HistoryPage[]): HistoryListItem[] {
   for (const page of pages) {
     for (const record of page.list) {
       const { history } = record;
-      if (history.business !== "archive") continue;
+      if (history.business !== "archive") {
+        continue;
+      }
       const bvid = history.bvid?.trim();
       const key = `${history.oid || bvid || record.title}:${history.cid || history.page || 0}:${record.view_at}`;
-      if (seen.has(key)) continue;
+      if (seen.has(key)) {
+        continue;
+      }
       seen.add(key);
       items.push({
         key,

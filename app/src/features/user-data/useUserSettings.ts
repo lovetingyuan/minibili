@@ -40,12 +40,15 @@ export function useUserSettings() {
             !validated ||
             validated.mid !== account.mid ||
             !bilibiliSession.isCurrentAccount(account)
-          )
+          ) {
             return;
+          }
           userData.resume(account);
         }
         await mutate(["user-data", account.mid, account.generation]);
-      } else await userData.saveLocal();
+      } else {
+        await userData.saveLocal();
+      }
     } catch {
       showToast("设置尚未同步，请稍后重试");
     }

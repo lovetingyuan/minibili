@@ -19,7 +19,9 @@ export async function modifyDynamicLike(
   dependencies: DynamicLikeRequestDependencies,
 ) {
   function assertCurrent() {
-    if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+    if (!dependencies.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
   }
 
   assertCurrent();
@@ -32,9 +34,13 @@ export async function modifyDynamicLike(
   if (!cookie || !hasBilibiliLoginCookie(cookie)) {
     throw new DynamicLikeLoginRequiredError("请先登录 B站");
   }
-  if (getBilibiliUserId(cookie) !== account.mid) throw new BilibiliSessionChangedError();
+  if (getBilibiliUserId(cookie) !== account.mid) {
+    throw new BilibiliSessionChangedError();
+  }
   const csrf = getBilibiliCsrf(cookie);
-  if (!csrf) throw new DynamicLikeLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  if (!csrf) {
+    throw new DynamicLikeLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  }
 
   const url = `https://api.bilibili.com/x/dynamic/feed/dyn/thumb?csrf=${encodeURIComponent(csrf)}`;
   const controller = new AbortController();
@@ -59,10 +65,14 @@ export async function modifyDynamicLike(
       signal: controller.signal,
     });
     assertCurrent();
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
     const parsed = DynamicLikeResponseSchema.safeParse(await response.json());
     assertCurrent();
-    if (!parsed.success) throw new Error("动态点赞响应格式异常");
+    if (!parsed.success) {
+      throw new Error("动态点赞响应格式异常");
+    }
     const { code, message } = parsed.data;
     receivedResult = true;
     if (code === -101 || code === -111) {

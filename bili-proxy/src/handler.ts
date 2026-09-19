@@ -43,7 +43,9 @@ function relayError(status: number, error: string): ProxyResult {
 function tokensMatch(expected: string, provided: string): boolean {
   const expectedBuffer = Buffer.from(expected, "utf8");
   const providedBuffer = Buffer.from(provided, "utf8");
-  if (expectedBuffer.length !== providedBuffer.length) return false;
+  if (expectedBuffer.length !== providedBuffer.length) {
+    return false;
+  }
   return timingSafeEqual(expectedBuffer, providedBuffer);
 }
 
@@ -54,14 +56,20 @@ export async function handleBiliProxy(
   input: ProxyRequestInput,
   env: ProxyEnv,
 ): Promise<ProxyResult> {
-  if (input.method.toUpperCase() !== "POST") return relayError(405, "method_not_allowed");
-  if (!env.token) return relayError(500, "proxy_misconfigured");
+  if (input.method.toUpperCase() !== "POST") {
+    return relayError(405, "method_not_allowed");
+  }
+  if (!env.token) {
+    return relayError(500, "proxy_misconfigured");
+  }
   if (input.token === null || !tokensMatch(env.token, input.token)) {
     return relayError(401, "invalid_token");
   }
 
   const parsed = parseProxyPayload(input.body);
-  if (!parsed.ok) return relayError(parsed.status, parsed.error);
+  if (!parsed.ok) {
+    return relayError(parsed.status, parsed.error);
+  }
 
   const { cookie, path, profile } = parsed.payload;
   const startedAt = Date.now();

@@ -61,7 +61,9 @@ export function useCommentActions(
   }
 
   function startPending(key: string) {
-    if (pendingRef.current.has(key)) return false;
+    if (pendingRef.current.has(key)) {
+      return false;
+    }
     pendingRef.current.add(key);
     setPending(new Set(pendingRef.current));
     return true;
@@ -74,11 +76,15 @@ export function useCommentActions(
 
   async function handleError(error: unknown, actionName: string) {
     if (error instanceof CommentResultUnknownError) {
-      if (active.current) showToast(error.message);
+      if (active.current) {
+        showToast(error.message);
+      }
       await refreshAfterUnknown().catch(() => {});
       return;
     }
-    if (!active.current) return;
+    if (!active.current) {
+      return;
+    }
     if (error instanceof CommentLoginRequiredError) {
       Alert.alert("请重新登录 B站", error.message, [
         { text: "取消", style: "cancel" },
@@ -105,7 +111,9 @@ export function useCommentActions(
   ): Promise<CommentAttitude | null> {
     const confirmedAccount = requireAccount();
     const key = `attitude:${target.id}`;
-    if (!confirmedAccount || !startPending(key)) return null;
+    if (!confirmedAccount || !startPending(key)) {
+      return null;
+    }
     const next: CommentAttitude = current === kind ? "none" : kind;
     try {
       await modifyCommentAttitude(
@@ -131,7 +139,9 @@ export function useCommentActions(
   ): Promise<ReplyItemType | null> {
     const confirmedAccount = requireAccount();
     const key = `reply:${target.id}`;
-    if (!confirmedAccount || !startPending(key)) return null;
+    if (!confirmedAccount || !startPending(key)) {
+      return null;
+    }
     try {
       return await addCommentReply(
         confirmedAccount,
@@ -152,7 +162,9 @@ export function useCommentActions(
   async function submitComment(message: string): Promise<ReplyItemType | null> {
     const confirmedAccount = requireAccount();
     const key = `comment:${commentId}`;
-    if (!confirmedAccount || !startPending(key)) return null;
+    if (!confirmedAccount || !startPending(key)) {
+      return null;
+    }
     try {
       return await addComment(
         confirmedAccount,
@@ -173,7 +185,9 @@ export function useCommentActions(
   async function removeComment(target: CommentTarget): Promise<boolean> {
     const confirmedAccount = requireAccount();
     const key = `delete:${target.id}`;
-    if (!confirmedAccount || !startPending(key)) return false;
+    if (!confirmedAccount || !startPending(key)) {
+      return false;
+    }
     try {
       await deleteComment(
         confirmedAccount,

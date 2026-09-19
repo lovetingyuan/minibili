@@ -37,21 +37,33 @@ function validatePositiveInteger(value: string | number, label: string) {
 function validateCommentMessage(value: string, actionName: string) {
   const message = value.trim();
   const length = [...message].length;
-  if (!length) throw new Error(`请输入${actionName}内容`);
-  if (length > 1000) throw new Error(`${actionName}不能超过 1000 个字符`);
+  if (!length) {
+    throw new Error(`请输入${actionName}内容`);
+  }
+  if (length > 1000) {
+    throw new Error(`${actionName}不能超过 1000 个字符`);
+  }
   return message;
 }
 
 async function getCredentials(account: BilibiliAccount, dependencies: CommentRequestDependencies) {
-  if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+  if (!dependencies.isCurrentAccount(account)) {
+    throw new BilibiliSessionChangedError();
+  }
   const cookie = await dependencies.readCookie();
-  if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+  if (!dependencies.isCurrentAccount(account)) {
+    throw new BilibiliSessionChangedError();
+  }
   if (!cookie || !hasBilibiliLoginCookie(cookie)) {
     throw new CommentLoginRequiredError("请先登录 B站");
   }
-  if (getBilibiliUserId(cookie) !== account.mid) throw new BilibiliSessionChangedError();
+  if (getBilibiliUserId(cookie) !== account.mid) {
+    throw new BilibiliSessionChangedError();
+  }
   const csrf = getBilibiliCsrf(cookie);
-  if (!csrf) throw new CommentLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  if (!csrf) {
+    throw new CommentLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  }
   return { cookie, csrf };
 }
 
@@ -80,14 +92,22 @@ async function postCommentRequest<T>(options: CommentPostRequestOptions<T>) {
       body: body.toString(),
       signal: controller.signal,
     });
-    if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!dependencies.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
     const parsed = parse(await response.json());
-    if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+    if (!dependencies.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
     receivedResult = true;
     return parsed;
   } catch (error) {
-    if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+    if (!dependencies.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
     if (!receivedResult) {
       throw new CommentResultUnknownError(
         controller.signal.aborted
@@ -118,7 +138,9 @@ export async function modifyCommentAttitude(
   const oid = validatePositiveInteger(change.target.oid, "评论来源 ID");
   const rpid = validatePositiveInteger(change.target.id, "评论 ID");
   const type = validatePositiveInteger(change.target.type, "评论类型");
-  if (!isBilibiliUrl(change.sourceUrl)) throw new Error("评论来源地址无效");
+  if (!isBilibiliUrl(change.sourceUrl)) {
+    throw new Error("评论来源地址无效");
+  }
   const url = `https://api.bilibili.com/x/v2/reply/${change.kind === "like" ? "action" : "hate"}`;
   const result = await postCommentRequest({
     account,
@@ -135,7 +157,9 @@ export async function modifyCommentAttitude(
     actionName: change.kind === "like" ? "点赞" : "点踩",
     parse(payload) {
       const parsed = CommentActionResponseSchema.safeParse(payload);
-      if (!parsed.success) throw new Error("评论操作响应格式异常");
+      if (!parsed.success) {
+        throw new Error("评论操作响应格式异常");
+      }
       return parsed.data;
     },
   });
@@ -155,7 +179,9 @@ export async function deleteComment(
   const oid = validatePositiveInteger(change.target.oid, "评论来源 ID");
   const rpid = validatePositiveInteger(change.target.id, "评论 ID");
   const type = validatePositiveInteger(change.target.type, "评论类型");
-  if (!isBilibiliUrl(change.sourceUrl)) throw new Error("评论来源地址无效");
+  if (!isBilibiliUrl(change.sourceUrl)) {
+    throw new Error("评论来源地址无效");
+  }
   const result = await postCommentRequest({
     account,
     dependencies,
@@ -165,7 +191,9 @@ export async function deleteComment(
     actionName: "删除评论",
     parse(payload) {
       const parsed = CommentActionResponseSchema.safeParse(payload);
-      if (!parsed.success) throw new Error("删除评论响应格式异常");
+      if (!parsed.success) {
+        throw new Error("删除评论响应格式异常");
+      }
       return parsed.data;
     },
   });
@@ -214,7 +242,9 @@ async function postAddedComment(
     actionName,
     parse(response) {
       const parsed = AddCommentReplyResponseSchema.safeParse(response);
-      if (!parsed.success) throw new Error(`${actionName}响应格式异常`);
+      if (!parsed.success) {
+        throw new Error(`${actionName}响应格式异常`);
+      }
       return parsed.data;
     },
   });
@@ -233,7 +263,9 @@ export async function addComment(
   const message = validateCommentMessage(input.message, "评论");
   const oid = validatePositiveInteger(input.oid, "评论来源 ID");
   const type = validatePositiveInteger(input.type, "评论类型");
-  if (!isBilibiliUrl(input.sourceUrl)) throw new Error("评论来源地址无效");
+  if (!isBilibiliUrl(input.sourceUrl)) {
+    throw new Error("评论来源地址无效");
+  }
   return postAddedComment(
     account,
     { oid, type, message, sourceUrl: input.sourceUrl },
@@ -251,7 +283,9 @@ export async function addCommentReply(
   const oid = validatePositiveInteger(input.target.oid, "评论来源 ID");
   const rpid = validatePositiveInteger(input.target.id, "评论 ID");
   const type = validatePositiveInteger(input.target.type, "评论类型");
-  if (!isBilibiliUrl(input.sourceUrl)) throw new Error("评论来源地址无效");
+  if (!isBilibiliUrl(input.sourceUrl)) {
+    throw new Error("评论来源地址无效");
+  }
   const root =
     String(input.target.root) === "0"
       ? rpid

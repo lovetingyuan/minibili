@@ -119,15 +119,21 @@ const refreshedItem = {
 } satisfies DynamicItem;
 
 function text(node: ReactNode): string {
-  if (typeof node === "string" || typeof node === "number") return String(node);
-  if (!React.isValidElement<{ children?: ReactNode }>(node)) return "";
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+  if (!React.isValidElement<{ children?: ReactNode }>(node)) {
+    return "";
+  }
   return React.Children.toArray(node.props.children).map(text).join("");
 }
 
 type TestElementProps = { children?: ReactNode; onPress?: () => void };
 
 function renderFunction(element: ReactElement): ReactElement<TestElementProps> {
-  if (typeof element.type !== "function") throw new Error("Expected a function component");
+  if (typeof element.type !== "function") {
+    throw new Error("Expected a function component");
+  }
   const Component = element.type as (props: typeof element.props) => ReactElement<TestElementProps>;
   return Component(element.props);
 }
@@ -199,7 +205,9 @@ describe("shared dynamic list", () => {
     const button = React.Children.toArray(errorState.props.children).find(
       (child) => React.isValidElement(child) && child.type === "Button",
     );
-    if (!React.isValidElement<{ onPress: () => void }>(button)) throw new Error("Missing retry");
+    if (!React.isValidElement<{ onPress: () => void }>(button)) {
+      throw new Error("Missing retry");
+    }
     button.props.onPress();
     expect(actions.retry).toHaveBeenCalledOnce();
   });

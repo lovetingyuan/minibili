@@ -97,7 +97,9 @@ function mockBlockedUpstream() {
 function mockUpstream(view: unknown, options: { unavailable?: boolean } = {}) {
   upstream.mockImplementation(async (input, init) => {
     const { path, url } = requestInfo(input, init);
-    if (url !== `${PROXY_URL}/api/bili`) throw new Error(`unexpected upstream url: ${url}`);
+    if (url !== `${PROXY_URL}/api/bili`) {
+      throw new Error(`unexpected upstream url: ${url}`);
+    }
     if (path.includes("/x/web-interface/view")) {
       if (options.unavailable) {
         return new Response("upstream down", {

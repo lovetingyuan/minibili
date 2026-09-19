@@ -154,7 +154,9 @@ const binl2rstr = (input) => {
 const rstr2binl = (input) => {
   const output = [];
   output[(input.length >> 2) - 1] = undefined;
-  for (let i = 0; i < output.length; i++) output[i] = 0;
+  for (let i = 0; i < output.length; i++) {
+    output[i] = 0;
+  }
   const length8 = input.length * 8;
   for (let i = 0; i < length8; i += 8) {
     output[i >> 5] |= (input.charCodeAt(i / 8) & 0xff) << (i % 32);
@@ -214,7 +216,9 @@ const hexHMACMD5 = (k, d) => rstr2hex(rawHMACMD5(k, d));
  * Calculates MD5 value for a given string.
  */
 const md5 = (string, key, raw) => {
-  if (!key) return raw ? rawMD5(string) : hexMD5(string);
+  if (!key) {
+    return raw ? rawMD5(string) : hexMD5(string);
+  }
   return raw ? rawHMACMD5(key, string) : hexHMACMD5(key, string);
 };
 

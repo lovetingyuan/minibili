@@ -62,7 +62,9 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
         showToast(liked === null ? "点赞状态已更新，请再次点击" : liked ? "已点赞" : "已取消点赞");
       }
     } catch (error) {
-      if (!active.current || !bilibiliSession.isCurrentAccount(account)) return;
+      if (!active.current || !bilibiliSession.isCurrentAccount(account)) {
+        return;
+      }
       if (
         error instanceof VideoLikeLoginRequiredError ||
         error instanceof FavoriteLoginRequiredError
@@ -72,14 +74,18 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
           {
             text: "重新登录",
             onPress: () => {
-              if (!active.current || !bilibiliSession.isCurrentAccount(account)) return;
+              if (!active.current || !bilibiliSession.isCurrentAccount(account)) {
+                return;
+              }
               void logout()
                 .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
                 .catch(() => showToast("退出登录失败，请在设置页重试"));
             },
           },
         ]);
-      } else showToast(error instanceof Error ? error.message : "点赞失败，请稍后重试");
+      } else {
+        showToast(error instanceof Error ? error.message : "点赞失败，请稍后重试");
+      }
     }
   }
 

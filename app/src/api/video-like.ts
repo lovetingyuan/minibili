@@ -19,7 +19,9 @@ export async function modifyVideoLike(
   dependencies: VideoLikeRequestDependencies,
 ) {
   function assertCurrent() {
-    if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+    if (!dependencies.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
   }
   assertCurrent();
   const { video, liked } = change;
@@ -28,11 +30,16 @@ export async function modifyVideoLike(
   }
   const cookie = await dependencies.readCookie();
   assertCurrent();
-  if (!cookie || !hasBilibiliLoginCookie(cookie))
+  if (!cookie || !hasBilibiliLoginCookie(cookie)) {
     throw new VideoLikeLoginRequiredError("请先登录 B站");
-  if (getBilibiliUserId(cookie) !== account.mid) throw new BilibiliSessionChangedError();
+  }
+  if (getBilibiliUserId(cookie) !== account.mid) {
+    throw new BilibiliSessionChangedError();
+  }
   const csrf = getBilibiliCsrf(cookie);
-  if (!csrf) throw new VideoLikeLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  if (!csrf) {
+    throw new VideoLikeLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  }
   const url = "https://api.bilibili.com/x/web-interface/archive/like";
   const body = new URLSearchParams({
     aid: video.aid,
@@ -68,17 +75,25 @@ export async function modifyVideoLike(
       signal: controller.signal,
     });
     assertCurrent();
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
     const parsed = VideoLikeResponseSchema.safeParse(await response.json());
     assertCurrent();
-    if (!parsed.success) throw new Error("点赞响应格式异常");
+    if (!parsed.success) {
+      throw new Error("点赞响应格式异常");
+    }
     const { code, message } = parsed.data;
     receivedResult = true;
-    if (code === -101 || code === -111)
+    if (code === -101 || code === -111) {
       throw new VideoLikeLoginRequiredError("登录凭据失效，请重新登录 B站");
-    if (code === 65004 || code === 65006)
+    }
+    if (code === 65004 || code === 65006) {
       throw new VideoLikeResultUnknownError("点赞状态已变化，请刷新后再操作");
-    if (code !== 0) throw new Error(`点赞操作失败（${code}）：${message || "请稍后重试"}`);
+    }
+    if (code !== 0) {
+      throw new Error(`点赞操作失败（${code}）：${message || "请稍后重试"}`);
+    }
     return change;
   } catch (error) {
     assertCurrent();

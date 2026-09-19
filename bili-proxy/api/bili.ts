@@ -14,14 +14,20 @@ function tooLargeResult() {
 
 /** Vercel 会把 JSON 请求体解析进 req.body，这里还原成文本再交给核心逻辑统一校验。 */
 function readRawBody(request: VercelRequest): string {
-  if (typeof request.body === "string") return request.body;
-  if (request.body === undefined || request.body === null) return "";
+  if (typeof request.body === "string") {
+    return request.body;
+  }
+  if (request.body === undefined || request.body === null) {
+    return "";
+  }
   return JSON.stringify(request.body);
 }
 
 function readHeader(request: VercelRequest, name: string): string | null {
   const value = request.headers[name];
-  if (Array.isArray(value)) return value[0] ?? null;
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
   return value ?? null;
 }
 
@@ -40,6 +46,8 @@ export default async function handler(request: VercelRequest, response: VercelRe
         );
 
   response.status(result.status);
-  for (const [name, value] of Object.entries(result.headers)) response.setHeader(name, value);
+  for (const [name, value] of Object.entries(result.headers)) {
+    response.setHeader(name, value);
+  }
   response.send(result.body);
 }

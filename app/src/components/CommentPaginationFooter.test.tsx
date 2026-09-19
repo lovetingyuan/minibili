@@ -14,8 +14,12 @@ type ElementProps = {
 };
 
 function text(value: ReactNode): string {
-  if (typeof value === "string" || typeof value === "number") return String(value);
-  if (!value || typeof value !== "object" || !("props" in value)) return "";
+  if (typeof value === "string" || typeof value === "number") {
+    return String(value);
+  }
+  if (!value || typeof value !== "object" || !("props" in value)) {
+    return "";
+  }
   const element = value as ReactElement<ElementProps>;
   const children = Array.isArray(element.props.children)
     ? element.props.children
@@ -24,15 +28,21 @@ function text(value: ReactNode): string {
 }
 
 function findElement(value: ReactNode, type: string): ReactElement<ElementProps> | null {
-  if (!value || typeof value !== "object" || !("props" in value)) return null;
+  if (!value || typeof value !== "object" || !("props" in value)) {
+    return null;
+  }
   const element = value as ReactElement<ElementProps>;
-  if (element.type === type) return element;
+  if (element.type === type) {
+    return element;
+  }
   const children = Array.isArray(element.props.children)
     ? element.props.children
     : [element.props.children];
   for (const child of children) {
     const found = findElement(child, type);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
   }
   return null;
 }

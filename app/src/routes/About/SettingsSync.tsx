@@ -4,7 +4,9 @@ import { colors } from "@/constants/colors.tw";
 
 export default function SettingsSync() {
   const { error } = useUserSettings();
-  if (!error) return null;
+  if (!error) {
+    return null;
+  }
 
   return (
     <Text className={`text-sm ${colors.error.text}`} accessibilityRole="alert">

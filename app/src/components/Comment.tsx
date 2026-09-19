@@ -17,9 +17,15 @@ import UpName from './UpName';
 function getCommentCopyText(comment: CommentItemProps['comment']) {
   const message = comment.message
     .map((node) => {
-      if (node.type === 'url') return node.url;
-      if (node.type === 'emoji') return '[表情]';
-      if (node.type === 'vote') return node.text || '投票';
+      if (node.type === 'url') {
+        return node.url;
+      }
+      if (node.type === 'emoji') {
+        return '[表情]';
+      }
+      if (node.type === 'vote') {
+        return node.text || '投票';
+      }
       return node.text;
     })
     .join('');
@@ -68,7 +74,9 @@ export function CommentItem(props: CommentItemProps) {
   }
 
   function confirmDelete() {
-    if (!onDelete || deletePending) return;
+    if (!onDelete || deletePending) {
+      return;
+    }
     const deletingRoot = String(comment.root) === '0';
     const message = deletingRoot
       ? '删除评论后，评论下所有回复都会被删除，是否继续？'

@@ -28,7 +28,9 @@ const isDeploy = args.includes("deploy") || args.includes("redeploy");
 /** 执行子进程并返回退出码；调用方负责决定何时退出，便于 finally 里清理临时目录。 */
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, { stdio: "inherit", ...options });
-  if (result.error) throw result.error;
+  if (result.error) {
+    throw result.error;
+  }
   return result.status ?? 1;
 }
 
@@ -55,14 +57,20 @@ function installCli() {
       [],
       { shell: true },
     );
-    if (status !== 0) process.exit(status);
+    if (status !== 0) {
+      process.exit(status);
+    }
     return;
   }
   const status = run("npm", args);
-  if (status !== 0) process.exit(status);
+  if (status !== 0) {
+    process.exit(status);
+  }
 }
 
-if (!existsSync(cliEntry)) installCli();
+if (!existsSync(cliEntry)) {
+  installCli();
+}
 
 /**
  * Vercel Hobby 团队要求「commit 作者必须是团队 owner」，否则部署会被

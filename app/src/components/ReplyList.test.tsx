@@ -74,15 +74,21 @@ function findElement(
   value: ReactNode,
   match: (element: ReactElement<ElementProps>) => boolean,
 ): ReactElement<ElementProps> | null {
-  if (!value || typeof value !== "object" || !("props" in value)) return null;
+  if (!value || typeof value !== "object" || !("props" in value)) {
+    return null;
+  }
   const element = value as ReactElement<ElementProps>;
-  if (match(element)) return element;
+  if (match(element)) {
+    return element;
+  }
   const children = Array.isArray(element.props.children)
     ? element.props.children
     : [element.props.children];
   for (const child of children) {
     const found = findElement(child, match);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
   }
   return null;
 }

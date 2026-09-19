@@ -52,10 +52,16 @@ function parseCommentMessage(content: CommentResItem["content"]): CommentMessage
   const tokenReg = /(\uE000\d+\uE001)/;
   return message.split(tokenReg).flatMap((part) => {
     const replacement = replacements.get(part);
-    if (replacement) return [replacement];
+    if (replacement) {
+      return [replacement];
+    }
     return part.split(urlReg).flatMap((text, index): CommentMessageContent => {
-      if (!text) return [];
-      if (index % 2) return [{ type: "url" as const, url: text }];
+      if (!text) {
+        return [];
+      }
+      if (index % 2) {
+        return [{ type: "url" as const, url: text }];
+      }
       return [{ type: "text" as const, text }];
     });
   });
@@ -108,9 +114,13 @@ function getCommentItem(item: CommentResItem, type: number, top: boolean): Comme
 export function getComments(response: CommentResponse, type: number) {
   const replies: CommentItemType[] = [];
   for (const item of response.replies || []) {
-    if (!item.invisible) replies.push(getCommentItem(item, type, false));
+    if (!item.invisible) {
+      replies.push(getCommentItem(item, type, false));
+    }
   }
-  if (response.top?.upper) replies.unshift(getCommentItem(response.top.upper, type, true));
+  if (response.top?.upper) {
+    replies.unshift(getCommentItem(response.top.upper, type, true));
+  }
   return replies;
 }
 
@@ -120,9 +130,13 @@ export function getCommentsPageUrl(
   mode: number,
   previousCursor?: Pick<CommentCursor, "is_end" | "pagination_reply">,
 ) {
-  if (!oid || previousCursor?.is_end) return null;
+  if (!oid || previousCursor?.is_end) {
+    return null;
+  }
   const offset = previousCursor?.pagination_reply?.next_offset;
-  if (previousCursor && !offset) return null;
+  if (previousCursor && !offset) {
+    return null;
+  }
   const pagination = encodeURIComponent(JSON.stringify({ offset: offset || "" }));
   return `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&pagination_str=${pagination}&plat=1&seek_rpid=`;
 }
@@ -140,10 +154,14 @@ export function patchCommentTree(
   id: string,
   update: (comment: ReplyItemType) => ReplyItemType,
 ): CommentItemType {
-  if (item.id === id) return { ...item, ...update(item) };
+  if (item.id === id) {
+    return { ...item, ...update(item) };
+  }
   let changed = false;
   const replies = item.replies.map((reply) => {
-    if (reply.id !== id) return reply;
+    if (reply.id !== id) {
+      return reply;
+    }
     changed = true;
     return update(reply);
   });
@@ -201,11 +219,15 @@ export function removeCommentFromPages(
   pages: readonly CommentsPage[] | undefined,
   target: Pick<ReplyItemType, "id" | "root">,
 ): CommentsPage[] | undefined {
-  if (!pages) return undefined;
+  if (!pages) {
+    return undefined;
+  }
   const deletingRoot = String(target.root) === "0";
   const rootId = deletingRoot ? target.id : String(target.root);
   const rootExists = pages.some((page) => page.replies.some((comment) => comment.id === rootId));
-  if (!rootExists) return [...pages];
+  if (!rootExists) {
+    return [...pages];
+  }
 
   return pages.map((page, pageIndex) => {
     const replies = deletingRoot
@@ -238,7 +260,9 @@ export function useComments(oid: string | number, type: number, mode = 3) {
   const { data, error, size, setSize, mutate, isValidating, isLoading } =
     useSWRInfinite<CommentsPage>(
       (index, previousPageData) => {
-        if (index > 0 && !previousPageData) return null;
+        if (index > 0 && !previousPageData) {
+          return null;
+        }
         return getCommentsPageUrl(
           oid,
           type,
@@ -297,7 +321,9 @@ export function useComments(oid: string | number, type: number, mode = 3) {
     data: { allCount, replies, ownerMid: data?.[0]?.ownerMid },
     isLoading,
     update() {
-      if (isLoading || isValidating || isPageEnd || error) return;
+      if (isLoading || isValidating || isPageEnd || error) {
+        return;
+      }
       void setSize((current) => current + 1);
     },
     async retry() {

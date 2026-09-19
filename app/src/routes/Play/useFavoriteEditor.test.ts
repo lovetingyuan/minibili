@@ -19,7 +19,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("react", () => ({
   useState<T>(initial: T) {
     const index = mocks.stateIndex++;
-    if (!(index in mocks.states)) mocks.states[index] = initial;
+    if (!(index in mocks.states)) {
+      mocks.states[index] = initial;
+    }
     return [
       mocks.states[index] as T,
       (value: T | ((previous: T) => T)) => {
@@ -36,7 +38,9 @@ vi.mock("react", () => ({
     return mocks.refs[index];
   },
   useEffect(effect: () => () => void) {
-    if (mocks.captureEffects) mocks.effects.push(effect);
+    if (mocks.captureEffects) {
+      mocks.effects.push(effect);
+    }
   },
 }));
 vi.mock("../../api/useVideoFavorites", () => ({
@@ -183,8 +187,11 @@ describe("favorite editor workflow", () => {
       const saving = Promise.withResolvers<void>();
       mocks.save.mockReturnValueOnce(saving.promise);
       const result = render().submit();
-      if (reason === "unmount") cleanup();
-      else mocks.current = false;
+      if (reason === "unmount") {
+        cleanup();
+      } else {
+        mocks.current = false;
+      }
       saving.resolve();
       expect(await result).toBe(false);
     },

@@ -35,24 +35,27 @@ export default function UserDataManager() {
           !(error instanceof UserDataUnauthorizedError) ||
           !account ||
           !bilibiliSession.isCurrentAccount(account)
-        )
+        ) {
           return;
+        }
         void revalidate()
           .then((validated) => {
             if (
               validated &&
               validated.mid === account.mid &&
               bilibiliSession.isCurrentAccount(account)
-            )
+            ) {
               userData.resume(account);
+            }
           })
           .catch(() => {});
       },
     },
   );
   useEffect(() => {
-    if (!account || !active || !snapshot.ready || !snapshot.pendingCount || snapshot.authRequired)
+    if (!account || !active || !snapshot.ready || !snapshot.pendingCount || snapshot.authRequired) {
       return;
+    }
     const timer = setTimeout(() => {
       void mutate().catch(() => {});
     }, 400);

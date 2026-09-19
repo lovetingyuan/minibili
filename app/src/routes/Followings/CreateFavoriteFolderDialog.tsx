@@ -9,7 +9,9 @@ import { useCreateFavoriteFolder } from "./useCreateFavoriteFolder";
 export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDialogProps) {
   const editor = useCreateFavoriteFolder(props);
   function close() {
-    if (editor.canClose()) props.onClose();
+    if (editor.canClose()) {
+      props.onClose();
+    }
   }
   return (
     <Dialog

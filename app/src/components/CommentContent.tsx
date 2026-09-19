@@ -77,7 +77,9 @@ export function CommentText(props: CommentTextProps) {
                 const bvid = node.url.split("/").pop();
                 if (bvid?.startsWith("BV")) {
                   navigation.push("Play", { bvid, title: node.text });
-                } else void Linking.openURL(node.url);
+                } else {
+                  void Linking.openURL(node.url);
+                }
               }}
             >
               {`📺 ${node.text}`}
@@ -108,7 +110,9 @@ export function CommentText(props: CommentTextProps) {
 export function CommentImages(props: CommentImageEntryProps) {
   const { setImagesList, setCurrentImageIndex } = useStore();
   const imageCount = props.images.length;
-  if (!imageCount) return null;
+  if (!imageCount) {
+    return null;
+  }
 
   return (
     <Text

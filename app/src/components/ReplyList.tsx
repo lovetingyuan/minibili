@@ -30,11 +30,15 @@ export default function ReplyList(props: ReplyListProps) {
   repliesInfoRef.current = repliesInfo;
 
   useEffect(() => {
-    if (!focused) setRepliesInfo(null);
+    if (!focused) {
+      setRepliesInfo(null);
+    }
   }, [focused, setRepliesInfo]);
 
   useEffect(() => {
-    if (!replies.isValidating) loadMoreLock.current = false;
+    if (!replies.isValidating) {
+      loadMoreLock.current = false;
+    }
   }, [replies.isValidating, replies.data.replies.length]);
 
   function handleClose() {
@@ -49,13 +53,18 @@ export default function ReplyList(props: ReplyListProps) {
 
   async function changeAttitude(item: ReplyItemType, kind: "like" | "dislike") {
     const next = await props.onAttitude(item, kind);
-    if (next) await replies.patchAttitude(item.id, next);
-    else await replies.refresh().catch(() => {});
+    if (next) {
+      await replies.patchAttitude(item.id, next);
+    } else {
+      await replies.refresh().catch(() => {});
+    }
     return next;
   }
 
   async function submitReply(message: string) {
-    if (!repliesInfo) return false;
+    if (!repliesInfo) {
+      return false;
+    }
     const reply = await props.onSubmitReply(repliesInfo.replyTarget, message);
     if (!reply) {
       await replies.refresh().catch(() => {});
@@ -82,7 +91,9 @@ export default function ReplyList(props: ReplyListProps) {
       return false;
     }
     const currentInfo = repliesInfoRef.current;
-    if (!currentInfo || String(currentInfo.root) !== String(repliesInfo?.root)) return true;
+    if (!currentInfo || String(currentInfo.root) !== String(repliesInfo?.root)) {
+      return true;
+    }
     if (target.id === String(currentInfo.root)) {
       setRepliesInfo(null);
       return true;
@@ -96,7 +107,9 @@ export default function ReplyList(props: ReplyListProps) {
   }
 
   function loadMore() {
-    if (loadMoreLock.current || replies.isValidating || replies.isPageEnd || replies.error) return;
+    if (loadMoreLock.current || replies.isValidating || replies.isPageEnd || replies.error) {
+      return;
+    }
     loadMoreLock.current = true;
     replies.update();
   }

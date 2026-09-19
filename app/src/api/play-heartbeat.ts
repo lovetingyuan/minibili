@@ -86,7 +86,9 @@ async function resolveCredentials(
   dependencies: PlayHeartbeatRequestDependencies,
 ) {
   function assertCurrent() {
-    if (!dependencies.isCurrentAccount(account)) throw new BilibiliSessionChangedError();
+    if (!dependencies.isCurrentAccount(account)) {
+      throw new BilibiliSessionChangedError();
+    }
   }
   assertCurrent();
   const cookie = await dependencies.readCookie();
@@ -94,9 +96,13 @@ async function resolveCredentials(
   if (!cookie || !hasBilibiliLoginCookie(cookie)) {
     throw new PlayHeartbeatLoginRequiredError("请先登录 B站");
   }
-  if (getBilibiliUserId(cookie) !== account.mid) throw new BilibiliSessionChangedError();
+  if (getBilibiliUserId(cookie) !== account.mid) {
+    throw new BilibiliSessionChangedError();
+  }
   const csrf = getBilibiliCsrf(cookie);
-  if (!csrf) throw new PlayHeartbeatLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  if (!csrf) {
+    throw new PlayHeartbeatLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
+  }
   return { cookie, csrf, mid: account.mid };
 }
 
@@ -121,14 +127,20 @@ async function postPlayReport(url: string, body: URLSearchParams, cookie: string
       body: body.toString(),
       signal: controller.signal,
     });
-    if (!response.ok) throw new Error(`播放进度上报失败（HTTP ${response.status}）`);
+    if (!response.ok) {
+      throw new Error(`播放进度上报失败（HTTP ${response.status}）`);
+    }
     const parsed = PlayHeartbeatResponseSchema.safeParse(await response.json());
-    if (!parsed.success) throw new Error("播放进度上报响应格式异常");
+    if (!parsed.success) {
+      throw new Error("播放进度上报响应格式异常");
+    }
     const { code, message } = parsed.data;
     if (code === -101 || code === -111) {
       throw new PlayHeartbeatLoginRequiredError("登录凭据失效，请重新登录 B站");
     }
-    if (code !== 0) throw new Error(`播放进度上报失败（${code}）：${message || "请稍后重试"}`);
+    if (code !== 0) {
+      throw new Error(`播放进度上报失败（${code}）：${message || "请稍后重试"}`);
+    }
   } finally {
     clearTimeout(timeout);
   }

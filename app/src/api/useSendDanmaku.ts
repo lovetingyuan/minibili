@@ -32,7 +32,9 @@ export function useSendDanmaku(
   >(
     key,
     (_key, { arg }) => {
-      if (!account || !video) throw new DanmakuLoginRequiredError("请先登录 B站");
+      if (!account || !video) {
+        throw new DanmakuLoginRequiredError("请先登录 B站");
+      }
       return sendVideoDanmaku(
         account,
         { video, cid, text: arg.text, progressMs: arg.progressMs },
@@ -46,7 +48,9 @@ export function useSendDanmaku(
   );
 
   async function send(text: string, progressMs: number) {
-    if (!key) throw new DanmakuLoginRequiredError("请先登录 B站");
+    if (!key) {
+      throw new DanmakuLoginRequiredError("请先登录 B站");
+    }
     return trigger({ text, progressMs });
   }
 

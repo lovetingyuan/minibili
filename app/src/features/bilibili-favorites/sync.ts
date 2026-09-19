@@ -28,32 +28,48 @@ export async function syncFavoriteCaches(
 
   // 写接口成功后，列表接口可能仍返回旧快照。仅重试 GET，绝不重发收藏 POST。
   for (const delay of [1000, 1500, 2500]) {
-    if (!pending.size) return;
+    if (!pending.size) {
+      return;
+    }
     await new Promise<void>((resolve) => setTimeout(resolve, delay));
-    if (!isCurrent()) return;
+    if (!isCurrent()) {
+      return;
+    }
     for (const [id, revision] of pending) {
       // 新的收藏操作拥有后续刷新，旧定时任务不能覆盖用户的新选择。
-      if (getFavoriteResourceRevision(mutate, account, id) !== revision) pending.delete(id);
+      if (getFavoriteResourceRevision(mutate, account, id) !== revision) {
+        pending.delete(id);
+      }
     }
-    if (!pending.size) return;
+    if (!pending.size) {
+      return;
+    }
 
     const ids = new Set(pending.keys());
     invalidateFavoriteResourceRequests(mutate, account, ids);
-    for (const id of ids) pending.set(id, getFavoriteResourceRevision(mutate, account, id));
+    for (const id of ids) {
+      pending.set(id, getFavoriteResourceRevision(mutate, account, id));
+    }
     // 每次都清掉单页缓存，再以单参数 mutate(key) 等待真正的分页 GET 完成。
     // 只刷新聚合 key 会复用 useSWRInfinite 的单页缓存。
     await clearFavoriteResourcePages(account, ids, mutate);
-    if (!isCurrent()) return;
+    if (!isCurrent()) {
+      return;
+    }
     await Promise.allSettled([
       mutate(getFavoriteFoldersKey(account)),
       mutate(getVideoRelationKey(account, change.video)),
       mutate(`/x/web-interface/view?bvid=${change.video.bvid}`),
       ...[...ids].map(async (id) => {
         const revision = pending.get(id);
-        if (getFavoriteResourceRevision(mutate, account, id) !== revision) return;
+        if (getFavoriteResourceRevision(mutate, account, id) !== revision) {
+          return;
+        }
         const key = unstable_serialize(() => getFavoriteResourcesKey(account, id, 0, null));
         const pages = await mutate<FavoriteResources[]>(key);
-        if (!isCurrent() || getFavoriteResourceRevision(mutate, account, id) !== revision) return;
+        if (!isCurrent() || getFavoriteResourceRevision(mutate, account, id) !== revision) {
+          return;
+        }
         const stale =
           removed.has(id) &&
           pages?.some((page) =>

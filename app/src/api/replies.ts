@@ -68,7 +68,9 @@ export function useReplies() {
   async function prependReply(reply: ReplyItemType) {
     await mutate(
       (pages) => {
-        if (!pages?.length) return pages;
+        if (!pages?.length) {
+          return pages;
+        }
         return pages.map((page, index) => ({
           ...page,
           page: { ...page.page, count: page.page.count + 1 },
@@ -92,7 +94,9 @@ export function useReplies() {
     },
     isLoading,
     update() {
-      if (isLoading || isValidating || isPageEnd || error) return;
+      if (isLoading || isValidating || isPageEnd || error) {
+        return;
+      }
       void setSize((current) => current + 1);
     },
     async retry() {

@@ -34,7 +34,9 @@ function elements(
 function text(node: ReactNode): string {
   return React.Children.toArray(node)
     .map((child) => {
-      if (React.isValidElement<{ children?: ReactNode }>(child)) return text(child.props.children);
+      if (React.isValidElement<{ children?: ReactNode }>(child)) {
+        return text(child.props.children);
+      }
       return typeof child === "string" ? child : "";
     })
     .join("");

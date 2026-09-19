@@ -44,7 +44,9 @@ function FavoriteButtonContent({
   const favorite = relation.data?.favorite === true;
 
   useEffect(() => {
-    if (!focused) setVisible(false);
+    if (!focused) {
+      setVisible(false);
+    }
   }, [focused]);
 
   function open() {

@@ -4,7 +4,9 @@ export class MemoryKvStorage implements Pick<DurableObjectStorage, "kv" | "trans
   readonly kv: SyncKvStorage = {
     get: <T>(key: string) => this.data.get(key) as T | undefined,
     put: <T>(key: string, value: T) => {
-      if (key === this.failOnKey) throw new Error("storage unavailable");
+      if (key === this.failOnKey) {
+        throw new Error("storage unavailable");
+      }
       this.data.set(key, structuredClone(value));
     },
     delete: (key) => this.data.delete(key),

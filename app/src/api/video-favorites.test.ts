@@ -236,16 +236,18 @@ describe("video favorite writes", () => {
       const { request, dependencies } = setup();
       let current = true;
       dependencies.isCurrentAccount = () => current;
-      if (phase === "credentials")
+      if (phase === "credentials") {
         dependencies.readCookie = async () => {
           current = false;
           return cookie;
         };
-      if (phase === "response")
+      }
+      if (phase === "response") {
         request.mockImplementation(async () => {
           current = false;
           return Response.json(success);
         });
+      }
       if (phase === "body") {
         const response = Response.json(success);
         vi.spyOn(response, "json").mockImplementation(async () => {
@@ -257,7 +259,9 @@ describe("video favorite writes", () => {
       await expect(modifyVideoFavorites(account, change, dependencies)).rejects.toBeInstanceOf(
         BilibiliSessionChangedError,
       );
-      if (phase === "credentials") expect(request).not.toHaveBeenCalled();
+      if (phase === "credentials") {
+        expect(request).not.toHaveBeenCalled();
+      }
     },
   );
 

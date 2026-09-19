@@ -57,18 +57,24 @@ export default function CommentList(props: CommentListProps) {
   const actions = useCommentActions(props.commentId, props.commentType, props.sourceUrl, comments.refresh);
 
   useEffect(() => {
-    if (!comments.isValidating) loadMoreLock.current = false;
+    if (!comments.isValidating) {
+      loadMoreLock.current = false;
+    }
   }, [comments.isValidating, comments.data.replies.length]);
 
   async function changeAttitude(item: ReplyItemType, kind: CommentAttitudeKind) {
     const next = await actions.changeAttitude(item, item.attitude, kind);
-    if (next) await comments.patchAttitude(item.id, next);
+    if (next) {
+      await comments.patchAttitude(item.id, next);
+    }
     return next;
   }
 
   async function submitReply(target: ReplyItemType, message: string) {
     const reply = await actions.submitReply(target, message);
-    if (!reply) return null;
+    if (!reply) {
+      return null;
+    }
     const rootId = String(target.root) === '0' ? target.id : String(target.root);
     await comments.prependReply(rootId, reply);
     return reply;
@@ -76,7 +82,9 @@ export default function CommentList(props: CommentListProps) {
 
   async function submitComment(message: string) {
     const comment = await actions.submitComment(message);
-    if (!comment) return false;
+    if (!comment) {
+      return false;
+    }
     await comments.prependComment(comment);
     Keyboard.dismiss();
     setComposing(false);
@@ -85,7 +93,9 @@ export default function CommentList(props: CommentListProps) {
   }
 
   async function deleteComment(target: ReplyItemType) {
-    if (!(await actions.removeComment(target))) return false;
+    if (!(await actions.removeComment(target))) {
+      return false;
+    }
     await comments.removeComment(target);
     return true;
   }
@@ -100,7 +110,9 @@ export default function CommentList(props: CommentListProps) {
   }
 
   function loadMore() {
-    if (loadMoreLock.current || comments.isValidating || comments.isPageEnd || comments.error) return;
+    if (loadMoreLock.current || comments.isValidating || comments.isPageEnd || comments.error) {
+      return;
+    }
     loadMoreLock.current = true;
     comments.update();
   }

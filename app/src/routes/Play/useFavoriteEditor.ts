@@ -26,14 +26,22 @@ export function useFavoriteEditor({ account, video, onSaved }: FavoriteDialogPro
     mounted.current = true;
     void refresh()
       .then((data) => {
-        if (!data) throw new Error("收藏夹加载失败，请重试");
-        if (active) setSelection(createFavoriteSelection(data.list));
+        if (!data) {
+          throw new Error("收藏夹加载失败，请重试");
+        }
+        if (active) {
+          setSelection(createFavoriteSelection(data.list));
+        }
       })
       .catch((cause: unknown) => {
-        if (active) setError(cause instanceof Error ? cause : new Error("收藏夹加载失败，请重试"));
+        if (active) {
+          setError(cause instanceof Error ? cause : new Error("收藏夹加载失败，请重试"));
+        }
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       });
     return () => {
       active = false;
@@ -45,25 +53,32 @@ export function useFavoriteEditor({ account, video, onSaved }: FavoriteDialogPro
     setLoading(true);
     try {
       const data = await refresh();
-      if (!data) throw new Error("收藏夹加载失败，请重试");
+      if (!data) {
+        throw new Error("收藏夹加载失败，请重试");
+      }
       if (isActive()) {
         setSelection((current) => createFavoriteSelection(data.list, current?.selectedIds));
         setNeedsReload(false);
       }
     } finally {
-      if (isActive()) setLoading(false);
+      if (isActive()) {
+        setLoading(false);
+      }
     }
   }
 
   async function reload() {
-    if (pending.current || mutation.isMutating || !isActive()) return;
+    if (pending.current || mutation.isMutating || !isActive()) {
+      return;
+    }
     pending.current = true;
     setError(null);
     try {
       await loadSelection();
     } catch (cause) {
-      if (isActive())
+      if (isActive()) {
         setError(cause instanceof Error ? cause : new Error("收藏夹加载失败，请重试"));
+      }
     } finally {
       pending.current = false;
     }
@@ -79,7 +94,9 @@ export function useFavoriteEditor({ account, video, onSaved }: FavoriteDialogPro
   );
 
   async function submit() {
-    if (!selection || !canSubmit || pending.current || !isActive()) return false;
+    if (!selection || !canSubmit || pending.current || !isActive()) {
+      return false;
+    }
     pending.current = true;
     setSaving(true);
     setError(null);
@@ -93,25 +110,31 @@ export function useFavoriteEditor({ account, video, onSaved }: FavoriteDialogPro
       await Promise.resolve(onSaved?.(change)).catch(() => {});
       return isActive();
     } catch (cause) {
-      if (!isActive()) return false;
+      if (!isActive()) {
+        return false;
+      }
       setError(cause instanceof Error ? cause : new Error("收藏操作失败，请稍后重试"));
       if (cause instanceof FavoriteResultUnknownError) {
         setNeedsReload(true);
         try {
           await loadSelection();
-          if (isActive())
+          if (isActive()) {
             setError(new Error("已重新查询收藏结果，请确认选择；如无变化则无需再次提交"));
+          }
         } catch (refreshError) {
-          if (isActive())
+          if (isActive()) {
             setError(
               refreshError instanceof Error ? refreshError : new Error("收藏夹刷新失败，请重试"),
             );
+          }
         }
       }
       return false;
     } finally {
       pending.current = false;
-      if (isActive()) setSaving(false);
+      if (isActive()) {
+        setSaving(false);
+      }
     }
   }
 
@@ -126,7 +149,9 @@ export function useFavoriteEditor({ account, video, onSaved }: FavoriteDialogPro
     submit,
     canClose: () => !pending.current && !busy,
     toggle(folderId: number) {
-      if (pending.current || busy || loading || needsReload) return;
+      if (pending.current || busy || loading || needsReload) {
+        return;
+      }
       setSelection((current) => (current ? toggleFavoriteFolder(current, folderId) : current));
     },
   };

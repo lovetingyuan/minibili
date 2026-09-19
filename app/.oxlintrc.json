@@ -1,6 +1,7 @@
 {
   "ignorePatterns": [".expo/**", "dist/**"],
   "rules": {
-    "no-console": "error"
+    "no-console": "error",
+    "curly": ["error", "all"]
   }
 }

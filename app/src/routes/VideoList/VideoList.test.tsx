@@ -142,7 +142,9 @@ describe("video list after replacing local UP blocking", () => {
     const list = getList("Hot", [video, other]);
     function longPress(item: VideoItemType, index: number) {
       const row = list.renderItem?.({ item, index, target: "Cell", extraData: undefined });
-      if (!React.isValidElement<{ onLongPress: () => void }>(row)) throw new Error("Expected row");
+      if (!React.isValidElement<{ onLongPress: () => void }>(row)) {
+        throw new Error("Expected row");
+      }
       row.props.onLongPress();
     }
     longPress(video, 0);
@@ -163,7 +165,9 @@ describe("video list after replacing local UP blocking", () => {
   test("opens the selected video cover in the image viewer", () => {
     const list = getList("Hot", [video]);
     const row = list.renderItem?.({ item: video, index: 0, target: "Cell", extraData: undefined });
-    if (!React.isValidElement<{ onLongPress: () => void }>(row)) throw new Error("Expected row");
+    if (!React.isValidElement<{ onLongPress: () => void }>(row)) {
+      throw new Error("Expected row");
+    }
     row.props.onLongPress();
 
     const buttons = mocks.setOverlayButtons.mock.lastCall![0];

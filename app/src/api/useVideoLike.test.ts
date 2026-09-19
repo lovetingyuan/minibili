@@ -44,7 +44,9 @@ beforeEach(() => {
   mocks.trigger.mockResolvedValue({ video, liked: true });
   mocks.request.mockResolvedValue({ favorite: true, like: true });
   mocks.mutate.mockImplementation(async (cacheKey, updater) => {
-    if (typeof updater !== "function") return undefined;
+    if (typeof updater !== "function") {
+      return undefined;
+    }
     return updater(Array.isArray(cacheKey) ? mocks.relation.data : { stat: { like: 10 } });
   });
 });

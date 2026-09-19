@@ -151,10 +151,14 @@ export async function modifyWatchLater(
       signal: controller.signal,
     });
     assertCurrent();
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
     const parsed = WatchLaterActionResponseSchema.safeParse(await response.json());
     assertCurrent();
-    if (!parsed.success) throw new Error("响应格式异常");
+    if (!parsed.success) {
+      throw new Error("响应格式异常");
+    }
     receivedResult = true;
     const { code, message } = parsed.data;
     if (code === -101 || code === -111) {

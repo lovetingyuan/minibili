@@ -737,7 +737,9 @@ export default function NativePlayer(props: NativePlayerProps) {
       {
         text: "重新登录",
         onPress: () => {
-          if (!isFocused) return;
+          if (!isFocused) {
+            return;
+          }
           void logout()
             .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
             .catch(() => showToast("退出登录失败，请在设置页重试"));

@@ -115,10 +115,18 @@ describe("history hook", () => {
   test.each(["loading", "validating", "error", "end"])(
     "does not append while %s",
     async (state) => {
-      if (state === "loading") mocks.response.isLoading = true;
-      if (state === "validating") mocks.response.isValidating = true;
-      if (state === "error") mocks.response.error = new Error("offline");
-      if (state === "end") mocks.response.data = [{ ...first, hasMore: false }];
+      if (state === "loading") {
+        mocks.response.isLoading = true;
+      }
+      if (state === "validating") {
+        mocks.response.isValidating = true;
+      }
+      if (state === "error") {
+        mocks.response.error = new Error("offline");
+      }
+      if (state === "end") {
+        mocks.response.data = [{ ...first, hasMore: false }];
+      }
       await render().loadMore();
       expect(mocks.response.setSize).not.toHaveBeenCalled();
     },
@@ -135,8 +143,9 @@ describe("history hook", () => {
     await failed.retry();
     const options = mocks.response.mutate.mock.calls[0][1];
     expect(options).toBeDefined();
-    if (!options || typeof options !== "object" || typeof options.revalidate !== "function")
+    if (!options || typeof options !== "object" || typeof options.revalidate !== "function") {
       throw new Error("Missing predicate");
+    }
     expect(options.revalidate(first, "page-1")).toBe(false);
     // SWR 运行时会向此回调传入尚未缓存页面的 undefined。
     expect(Reflect.apply(options.revalidate, undefined, [undefined, "page-2"])).toBe(true);

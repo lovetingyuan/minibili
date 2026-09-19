@@ -15,17 +15,23 @@ export async function requestUserData(
   dependencies: UserDataRequestDependencies,
 ): Promise<SyncResult> {
   function assertCurrent() {
-    if (signal.aborted || !dependencies.isCurrentAccount(account))
+    if (signal.aborted || !dependencies.isCurrentAccount(account)) {
       throw new BilibiliSessionChangedError();
+    }
   }
   assertCurrent();
   const cookie = await dependencies.readCookie();
   assertCurrent();
-  if (!cookie || !hasBilibiliLoginCookie(cookie)) throw new UserDataUnauthorizedError();
-  if (getBilibiliUserId(cookie) !== account.mid) throw new BilibiliSessionChangedError();
+  if (!cookie || !hasBilibiliLoginCookie(cookie)) {
+    throw new UserDataUnauthorizedError();
+  }
+  if (getBilibiliUserId(cookie) !== account.mid) {
+    throw new BilibiliSessionChangedError();
+  }
   const body = JSON.stringify(operations);
-  if (new TextEncoder().encode(body).byteLength > MAX_SYNC_BYTES)
+  if (new TextEncoder().encode(body).byteLength > MAX_SYNC_BYTES) {
     throw new Error("设置数据过大，无法同步");
+  }
   const controller = new AbortController();
   const abort = () => controller.abort();
   signal.addEventListener("abort", abort);
@@ -41,17 +47,29 @@ export async function requestUserData(
       signal: controller.signal,
     });
     assertCurrent();
-    if (response.status === 401) throw new UserDataUnauthorizedError();
-    if (!response.ok) throw new Error(`设置同步失败（HTTP ${response.status}），本地修改已保留`);
+    if (response.status === 401) {
+      throw new UserDataUnauthorizedError();
+    }
+    if (!response.ok) {
+      throw new Error(`设置同步失败（HTTP ${response.status}），本地修改已保留`);
+    }
     const parsed = UserDataResponseSchema.safeParse(await response.json());
     assertCurrent();
-    if (!parsed.success) throw new Error("设置同步响应异常，本地修改已保留");
-    if (parsed.data.uid !== account.mid) throw new BilibiliSessionChangedError();
+    if (!parsed.success) {
+      throw new Error("设置同步响应异常，本地修改已保留");
+    }
+    if (parsed.data.uid !== account.mid) {
+      throw new BilibiliSessionChangedError();
+    }
     return parsed.data;
   } catch (error) {
     assertCurrent();
-    if (error instanceof UserDataUnauthorizedError || error instanceof BilibiliSessionChangedError)
+    if (
+      error instanceof UserDataUnauthorizedError ||
+      error instanceof BilibiliSessionChangedError
+    ) {
       throw error;
+    }
     throw new Error(
       controller.signal.aborted ? "设置同步超时，本地修改已保留" : "设置同步失败，本地修改已保留",
     );

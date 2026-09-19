@@ -5,13 +5,18 @@ export function syncUserData(
   operations: SyncOperations,
 ) {
   return storage.transactionSync(() => {
-    for (const key of operations.delete ?? []) storage.kv.delete(key);
-    for (const [key, value] of Object.entries(operations.set ?? {})) storage.kv.put(key, value);
+    for (const key of operations.delete ?? []) {
+      storage.kv.delete(key);
+    }
+    for (const [key, value] of Object.entries(operations.set ?? {})) {
+      storage.kv.put(key, value);
+    }
     const result: Record<string, JsonValue> = {};
     for (const key of operations.get ?? []) {
       const value = storage.kv.get<JsonValue>(key);
-      if (value !== undefined)
+      if (value !== undefined) {
         Object.defineProperty(result, key, { value, enumerable: true, configurable: true });
+      }
     }
     return result;
   });

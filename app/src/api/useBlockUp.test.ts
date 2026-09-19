@@ -40,7 +40,9 @@ vi.mock("swr/mutation", () => ({
     state.mutationConfig(key, config);
     return {
       trigger: (arg: RelationChange & { account: RelationAccount }) => {
-        if (!key) throw new Error("Missing mutation key");
+        if (!key) {
+          throw new Error("Missing mutation key");
+        }
         return fetcher(key, { arg });
       },
     };

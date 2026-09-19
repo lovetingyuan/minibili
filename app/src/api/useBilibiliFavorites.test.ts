@@ -37,7 +37,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("react", () => ({
   // 分页 hook 用 useRef(false) 作为进行中标记，其余 ref 按调用顺序独立保存
   useRef: (initial: unknown) => {
-    if (initial === false) return mocks.pending;
+    if (initial === false) {
+      return mocks.pending;
+    }
     const index = mocks.refIndex++;
     mocks.refs[index] ??= { current: initial };
     return mocks.refs[index];
@@ -173,10 +175,18 @@ describe("favorite hooks", () => {
   test.each(["loading", "validating", "error", "end"])(
     "does not queue more pages while %s",
     async (state) => {
-      if (state === "loading") mocks.response.isLoading = true;
-      if (state === "validating") mocks.response.isValidating = true;
-      if (state === "error") mocks.response.error = new Error("page failed");
-      if (state === "end") mocks.response.data = [{ ...page, has_more: false }];
+      if (state === "loading") {
+        mocks.response.isLoading = true;
+      }
+      if (state === "validating") {
+        mocks.response.isValidating = true;
+      }
+      if (state === "error") {
+        mocks.response.error = new Error("page failed");
+      }
+      if (state === "end") {
+        mocks.response.data = [{ ...page, has_more: false }];
+      }
       await useBilibiliFavoriteResources(123).loadMore();
       expect(mocks.response.setSize).not.toHaveBeenCalled();
     },

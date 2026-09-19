@@ -57,9 +57,13 @@ function proxyBase(bindings: BilibiliProxyBindings) {
 
 /** 单测（Node 环境）没有 caches，自动跳过缓存。 */
 function getUpstreamCache(): UpstreamCache | null {
-  if (typeof caches !== "object" || caches === null) return null;
+  if (typeof caches !== "object" || caches === null) {
+    return null;
+  }
   const cache = caches.default;
-  if (!cache) return null;
+  if (!cache) {
+    return null;
+  }
   return {
     match: (key) => cache.match(key),
     put: async (key, response) => {
@@ -81,7 +85,9 @@ async function requestProxy(
   options: CallBilibiliOptions,
 ): Promise<ProxyResponse> {
   const payload: Record<string, string> = { path: options.path, profile: options.profile };
-  if (options.profile === "auth" && options.cookie) payload.cookie = options.cookie;
+  if (options.profile === "auth" && options.cookie) {
+    payload.cookie = options.cookie;
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), options.timeoutMs);
@@ -103,7 +109,9 @@ async function requestProxy(
     };
   } catch (error) {
     // 按 signal 判定，兼容各种 fetch 实现抛出的错误类型差异。
-    if (controller.signal.aborted) throw new ProxyTimeoutError();
+    if (controller.signal.aborted) {
+      throw new ProxyTimeoutError();
+    }
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -111,7 +119,9 @@ async function requestProxy(
 }
 
 function readCacheKey(bindings: BilibiliProxyBindings, options: CallBilibiliOptions) {
-  if (!options.cacheSeconds || options.profile !== "web") return null;
+  if (!options.cacheSeconds || options.profile !== "web") {
+    return null;
+  }
   return `${proxyBase(bindings)}/__cache${options.path}`;
 }
 
@@ -156,7 +166,9 @@ export async function callBilibili(
         profile: options.profile,
       });
       // 超时说明预算已经用尽，重试只会把总耗时翻倍。
-      if (timedOut) throw new BilibiliProxyUnavailableError();
+      if (timedOut) {
+        throw new BilibiliProxyUnavailableError();
+      }
       continue;
     }
 
@@ -172,7 +184,9 @@ export async function callBilibili(
       if (response.source === "upstream" && isBlockedStatus(response.status)) {
         throw new BilibiliBlockedError();
       }
-      if (response.status >= 500 && attempt < ATTEMPTS) continue;
+      if (response.status >= 500 && attempt < ATTEMPTS) {
+        continue;
+      }
       throw new BilibiliProxyUnavailableError();
     }
 

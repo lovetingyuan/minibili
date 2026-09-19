@@ -54,7 +54,9 @@ describe("delayed favorite cache synchronization", () => {
     await result;
     expect(requests()).toBe(1);
     const [filter, data, options] = mutate.mock.calls[0];
-    if (typeof filter !== "function") throw new Error("Expected page cache invalidation");
+    if (typeof filter !== "function") {
+      throw new Error("Expected page cache invalidation");
+    }
     expect(filter(["bilibili-favorite-resources", "123", 1, 11, 2])).toBe(true);
     expect(filter(["bilibili-favorite-resources", "123", 1, 22, 1])).toBe(false);
     expect(data).toBeUndefined();
@@ -96,8 +98,11 @@ describe("delayed favorite cache synchronization", () => {
       const { mutate } = setup();
       let current = true;
       const result = syncFavoriteCaches(account, change, mutate, () => current);
-      if (reason === "account") current = false;
-      else invalidateFavoriteResourceRequests(mutate, account, [11]);
+      if (reason === "account") {
+        current = false;
+      } else {
+        invalidateFavoriteResourceRequests(mutate, account, [11]);
+      }
       await vi.runAllTimersAsync();
       await result;
       expect(mutate).not.toHaveBeenCalled();

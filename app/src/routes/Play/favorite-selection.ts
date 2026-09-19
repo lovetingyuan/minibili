@@ -23,7 +23,9 @@ export function toggleFavoriteFolder(
   selection: FavoriteSelection,
   folderId: number,
 ): FavoriteSelection {
-  if (!selection.folders.some((folder) => folder.id === folderId)) return selection;
+  if (!selection.folders.some((folder) => folder.id === folderId)) {
+    return selection;
+  }
   const selected = selection.selectedIds.includes(folderId);
   return {
     ...selection,
