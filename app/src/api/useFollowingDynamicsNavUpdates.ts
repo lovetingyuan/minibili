@@ -12,16 +12,20 @@ const FOLLOWING_DYNAMICS_NAV_INTERVAL = 10 * 60 * 1000;
 
 /**
  * 轮询 feed/nav 拿最近有更新的 UP 主，未读状态由 FollowingDynamicsUnreadManager 合并进 store。
- * key 带上本地基线，首次同步完成后会自动按新基线再拉一次。
+ * 等本地存储恢复完成后才启动；key 不绑定已读状态，避免状态写入触发重复请求。
  */
 export function useFollowingDynamicsNavUpdates() {
   const session = useBilibiliSessionState();
+  const { initialed } = useStore();
   const account =
-    session.account && bilibiliSession.isCurrentAccount(session.account) ? session.account : null;
-  const { $followingDynamicsUnreadMap } = useStore();
-  const baseline = account ? ($followingDynamicsUnreadMap[account.mid]?.baseline ?? "") : "";
+    initialed &&
+    session.control.phase === "ready" &&
+    session.account &&
+    bilibiliSession.isCurrentAccount(session.account)
+      ? session.account
+      : null;
   const key = account
-    ? ([FOLLOWING_DYNAMICS_NAV_KEY, account.mid, account.generation, baseline] as const)
+    ? ([FOLLOWING_DYNAMICS_NAV_KEY, account.mid, account.generation] as const)
     : null;
 
   return useSWR<FollowingDynamicsNavBatch, Error>(
@@ -30,7 +34,7 @@ export function useFollowingDynamicsNavUpdates() {
       if (!account) {
         throw new Error("关注动态未读轮询缺少当前账号");
       }
-      return fetchFollowingDynamicsNavUpdates(baseline, request, () =>
+      return fetchFollowingDynamicsNavUpdates(request, () =>
         bilibiliSession.isCurrentAccount(account),
       );
     },

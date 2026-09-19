@@ -8,10 +8,11 @@ import { RanksConfig } from "../constants";
 import type { VideoDownloadTask } from "../features/video-download/types";
 import type { UpInfo } from "../types";
 import type { WatchProgressSnapshot } from "../utils/watch-progress";
+import type { FollowingDynamicsReadState } from "../api/following-dynamics.types";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { PartPlayProgressMap } from "./part-play-progress.types";
 import type { RepliesInfo } from "./replies-info.type";
-import type { FollowingDynamicsUnreadState, FollowingDynamicsUpdateState } from "./types";
+import type { FollowingDynamicsUpdateState } from "./types";
 
 const StoragePrefix = "Store:";
 
@@ -30,13 +31,16 @@ const getAppValue = () => {
      */
     $followingDynamicsUpdateMap: {} as Record<string, FollowingDynamicsUpdateState>,
     /**
-     * 关注列表 UP 小红点的已读基线和未读动态，按 B站账号 mid 存储
+     * 关注列表每个 UP 的最新/已读动态 id，按 B站账号 mid 存储
      */
-    $followingDynamicsUnreadMap: {} as Record<string, FollowingDynamicsUnreadState>,
+    $followingDynamicsReadMap: {} as Record<string, FollowingDynamicsReadState>,
     /**
-     * 本次运行会话里每个 UP 已经读到的动态 id，仅用于丢弃「轮询在已读之后才落地」的响应
+     * 当前会话已经成功同步 feed/nav 的账号；同步前不展示本地红点
      */
-    followingDynamicsReadIds: {} as Record<string, Record<string, string>>,
+    followingDynamicsNavReadyAccount: null as {
+      mid: string;
+      generation: number;
+    } | null,
     // $ignoredVersions: [] as string[],
     $watchedHotSearch: {} as Record<string, number>,
     $checkAppUpdateTime: 0,

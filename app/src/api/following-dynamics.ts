@@ -8,8 +8,8 @@ import type {
   FollowingDynamicsKey,
   FollowingDynamicsListItem,
   FollowingDynamicsNavBatch,
-  FollowingDynamicsNavState,
   FollowingDynamicsPage,
+  FollowingDynamicsReadState,
   FollowingDynamicsRequest,
   FollowingDynamicsUpdatePage,
 } from "./following-dynamics.types";
@@ -69,11 +69,8 @@ export function buildFollowingDynamicsUpdateUrl(updateBaseline = "") {
   return `/x/polymer/web-dynamic/v1/feed/all/update?${params}`;
 }
 
-export function buildFollowingDynamicsNavUrl(updateBaseline = "", offset = "") {
+export function buildFollowingDynamicsNavUrl(offset = "") {
   const params = new URLSearchParams();
-  if (updateBaseline) {
-    params.set("update_baseline", updateBaseline);
-  }
   if (offset) {
     params.set("offset", offset);
   }
@@ -149,7 +146,6 @@ export async function fetchFollowingDynamicsUpdateCount(
 }
 
 export async function fetchFollowingDynamicsNavPage(
-  updateBaseline: string,
   offset: string,
   request: FollowingDynamicsRequest,
   isCurrentAccount: () => boolean,
@@ -162,7 +158,7 @@ export async function fetchFollowingDynamicsNavPage(
 
   assertCurrent();
   try {
-    const data = await request(buildFollowingDynamicsNavUrl(updateBaseline, offset));
+    const data = await request(buildFollowingDynamicsNavUrl(offset));
     assertCurrent();
     return FollowingDynamicsNavResponseSchema.parse(data);
   } catch (error) {
@@ -172,31 +168,29 @@ export async function fetchFollowingDynamicsNavPage(
 }
 
 /**
- * 按 offset 翻页拉取更新基线以上的动态，直到 has_more=false 或触到页数上限。
- * 同一 UP 可能出现在多条记录里，这里只保留原样顺序，去重由合并逻辑负责。
+ * 按 offset 翻页拉取最近动态，直到 has_more=false 或触到页数上限。
+ * 同一 UP 只保留最大的可见 id_str，避免旧记录或已隐藏动态触发红点。
  */
 export async function fetchFollowingDynamicsNavUpdates(
-  updateBaseline: string,
   request: FollowingDynamicsRequest,
   isCurrentAccount: () => boolean,
 ): Promise<FollowingDynamicsNavBatch> {
-  const items: FollowingDynamicsNavBatch["items"] = [];
-  let newestId: string | null = null;
+  const latestByMid: Record<string, string> = {};
   let offset = "";
   let complete = false;
 
   for (let page = 0; page < FOLLOWING_DYNAMICS_NAV_MAX_PAGES; page += 1) {
-    const data = await fetchFollowingDynamicsNavPage(
-      updateBaseline,
-      offset,
-      request,
-      isCurrentAccount,
-    );
-    if (page === 0) {
-      newestId = data.update_baseline || (data.items[0] ? String(data.items[0].id_str) : null);
-    }
+    const data = await fetchFollowingDynamicsNavPage(offset, request, isCurrentAccount);
     for (const rawItem of data.items) {
-      items.push({ mid: String(rawItem.author.mid), idStr: String(rawItem.id_str) });
+      if (rawItem.visible === false) {
+        continue;
+      }
+      const mid = String(rawItem.author.mid);
+      const idStr = String(rawItem.id_str);
+      const existing = latestByMid[mid];
+      if (mid && (!existing || isNewerFollowingDynamicId(idStr, existing))) {
+        latestByMid[mid] = idStr;
+      }
     }
 
     const lastItem = data.items.at(-1);
@@ -208,12 +202,7 @@ export async function fetchFollowingDynamicsNavUpdates(
     offset = nextOffset;
   }
 
-  return {
-    items,
-    newestId,
-    oldestId: items.length ? items[items.length - 1].idStr : null,
-    complete,
-  };
+  return { latestByMid, complete };
 }
 
 /** 动态 id_str 是超出 Number 安全范围的十进制字符串，只能按「长度 + 字典序」比较 */
@@ -228,55 +217,46 @@ export function isNewerFollowingDynamicId(id: string, than: string) {
 }
 
 /**
- * 把一次 feed/nav 拉取结果合并进本地未读状态。
- * - 首次（没有本地 baseline）只记录基线，不点亮红点，避免把历史动态算成未读：
- *   此时即使触到页数上限也用最新 id 作基线，把更旧的历史整批跳过；
- * - 翻页完整时基线推进到本批最新 id，触到页数上限时只推进到本批最旧 id，剩余下次继续；
- * - `readIds` 保存本次会话里用户已经读到的 id，用来丢弃「轮询在已读之后才落地」的响应。
+ * 把一次 feed/nav 拉取结果合并进当前账号的已读状态。
+ * - 首次见到某个 UP 时 latestId/readId 同时初始化，不把历史动态算成未读；
+ * - 后续只允许更大的 id 推进 latestId，旧响应不能覆盖已读操作；
+ * - 暂时不在接口结果里的 UP 保持原状态，取消关注后才清理。
  */
-export function mergeFollowingDynamicsNavUnread(options: {
-  state: FollowingDynamicsNavState | undefined;
+export function mergeFollowingDynamicsReadState(options: {
+  state: FollowingDynamicsReadState | undefined;
   batch: FollowingDynamicsNavBatch;
-  readIds?: Record<string, string>;
   followedMids?: ReadonlySet<string>;
-}): FollowingDynamicsNavState {
+}): FollowingDynamicsReadState {
   const { state, batch } = options;
-  const readIds = options.readIds ?? {};
-
-  if (!state?.baseline) {
-    return { baseline: batch.newestId ?? batch.oldestId ?? "", unread: {} };
-  }
-
-  const baseline = batch.complete ? batch.newestId : batch.oldestId;
-  const unread: Record<string, string> = { ...state.unread };
-  for (const item of batch.items) {
-    if (!item.mid) {
-      continue;
-    }
-    const readId = readIds[item.mid];
-    if (readId && !isNewerFollowingDynamicId(item.idStr, readId)) {
-      continue;
-    }
-    const existing = unread[item.mid];
-    if (existing && !isNewerFollowingDynamicId(item.idStr, existing)) {
-      continue;
-    }
-    unread[item.mid] = item.idStr;
-  }
+  const next: FollowingDynamicsReadState = { ...state };
 
   if (options.followedMids) {
-    for (const mid of Object.keys(unread)) {
+    for (const mid of Object.keys(next)) {
       if (!options.followedMids.has(mid)) {
-        delete unread[mid];
+        delete next[mid];
       }
     }
   }
 
-  return { baseline: baseline ?? state.baseline, unread };
+  for (const [mid, idStr] of Object.entries(batch.latestByMid)) {
+    if (!mid || (options.followedMids && !options.followedMids.has(mid))) {
+      continue;
+    }
+    const existing = next[mid];
+    if (!existing) {
+      next[mid] = { latestId: idStr, readId: idStr };
+      continue;
+    }
+    if (isNewerFollowingDynamicId(idStr, existing.latestId)) {
+      next[mid] = { ...existing, latestId: idStr };
+    }
+  }
+
+  return next;
 }
 
 export function countFollowingDynamicsUnreadUps(
-  state: FollowingDynamicsNavState | undefined,
+  state: FollowingDynamicsReadState | undefined,
   followedMids: ReadonlySet<string>,
 ) {
   if (!state) {
@@ -284,26 +264,44 @@ export function countFollowingDynamicsUnreadUps(
   }
   let count = 0;
   for (const mid of followedMids) {
-    if (state.unread[mid]) {
+    const item = state[mid];
+    if (item && isNewerFollowingDynamicId(item.latestId, item.readId)) {
       count += 1;
     }
   }
   return count;
 }
 
-/** 判断合并结果是否与现有状态一致，一致时不必写回 store（避免每次轮询都重渲染关注列表） */
-export function isSameFollowingDynamicsNavState(
-  current: FollowingDynamicsNavState | undefined,
-  next: FollowingDynamicsNavState,
+/** 把某个 UP 当前最新的动态标记为已读；没有未读时保持原引用 */
+export function markFollowingDynamicsUpRead(
+  state: FollowingDynamicsReadState | undefined,
+  mid: string,
 ) {
-  if (!current || current.baseline !== next.baseline) {
+  const item = state?.[mid];
+  if (!state || !item || !isNewerFollowingDynamicId(item.latestId, item.readId)) {
+    return state;
+  }
+  return {
+    ...state,
+    [mid]: { ...item, readId: item.latestId },
+  };
+}
+
+export function isSameFollowingDynamicsReadState(
+  current: FollowingDynamicsReadState | undefined,
+  next: FollowingDynamicsReadState,
+) {
+  if (!current) {
     return false;
   }
-  const currentMids = Object.keys(current.unread);
-  if (currentMids.length !== Object.keys(next.unread).length) {
+  const currentMids = Object.keys(current);
+  if (currentMids.length !== Object.keys(next).length) {
     return false;
   }
-  return currentMids.every((mid) => current.unread[mid] === next.unread[mid]);
+  return currentMids.every(
+    (mid) =>
+      current[mid]?.latestId === next[mid]?.latestId && current[mid]?.readId === next[mid]?.readId,
+  );
 }
 
 export function getFollowingDynamicsUpdateCount(data: FollowingDynamicsUpdatePage) {

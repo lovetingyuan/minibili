@@ -20,27 +20,19 @@ export type FollowingDynamicsKeyLoader = (
 export type FollowingDynamicsListItem = DynamicItem;
 export type FollowingDynamicsUpdatePage = FollowingDynamicsUpdateCount;
 
-/** feed/nav 里一条“有新动态”的记录，已把 mid/id_str 统一成字符串 */
-export type FollowingDynamicsNavItemRef = {
-  mid: string;
-  idStr: string;
-};
-
 /** 一次 feed/nav 拉取（可能翻多页）的结果 */
 export type FollowingDynamicsNavBatch = {
-  items: FollowingDynamicsNavItemRef[];
-  /** 本批最新动态 id，没有新增时为 null */
-  newestId: string | null;
-  /** 本批最旧动态 id，没有新增时为 null */
-  oldestId: string | null;
+  /** 每个 UP 在本批数据里的最新可见动态 id_str */
+  latestByMid: Record<string, string>;
   /** 是否已翻到 has_more=false（false 表示触到页数上限，还剩更旧的没拉） */
   complete: boolean;
 };
 
-/** 「关注」列表 UP 未读小红点的本地状态 */
-export type FollowingDynamicsNavState = {
-  /** feed/nav 的 update_baseline：已经消费到的最新动态 id */
-  baseline: string;
-  /** UP mid -> 该 UP 最新未读动态 id_str */
-  unread: Record<string, string>;
+/** 单个 UP 的动态已读状态；latestId 大于 readId 时表示有未读 */
+export type FollowingDynamicsUpReadState = {
+  latestId: string;
+  readId: string;
 };
+
+/** 当前 B站账号下，每个 UP 的动态已读状态 */
+export type FollowingDynamicsReadState = Record<string, FollowingDynamicsUpReadState>;

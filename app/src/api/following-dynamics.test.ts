@@ -17,9 +17,10 @@ import {
   getFollowingDynamicsLatestId,
   getFollowingDynamicsKey,
   getFollowingDynamicsListItems,
-  isSameFollowingDynamicsNavState,
+  isSameFollowingDynamicsReadState,
   isNewerFollowingDynamicId,
-  mergeFollowingDynamicsNavUnread,
+  markFollowingDynamicsUpRead,
+  mergeFollowingDynamicsReadState,
 } from "./following-dynamics";
 import type {
   FollowingDynamicsNavBatch,
@@ -69,7 +70,7 @@ function updatePage(values: { updateNum?: string | number }) {
 }
 
 function navPage(values: {
-  items?: { mid: string | number; idStr: string }[];
+  items?: { mid: string | number; idStr: string; visible?: boolean }[];
   hasMore?: boolean;
   offset?: string;
   updateBaseline?: string;
@@ -79,6 +80,7 @@ function navPage(values: {
     items: (values.items ?? []).map((item) => ({
       author: { mid: item.mid, name: "测试UP" },
       id_str: item.idStr,
+      visible: item.visible,
     })),
     offset: values.offset,
     update_baseline: values.updateBaseline,
@@ -86,15 +88,11 @@ function navPage(values: {
 }
 
 function navBatch(values: {
-  items?: { mid: string; idStr: string }[];
-  newestId?: string | null;
-  oldestId?: string | null;
+  latestByMid?: Record<string, string>;
   complete?: boolean;
 }): FollowingDynamicsNavBatch {
   return {
-    items: values.items ?? [],
-    newestId: values.newestId ?? null,
-    oldestId: values.oldestId ?? null,
+    latestByMid: values.latestByMid ?? {},
     complete: values.complete ?? true,
   };
 }
@@ -226,22 +224,15 @@ describe("following dynamics update count", () => {
 });
 
 describe("following dynamics nav", () => {
-  test("builds nav requests with optional baseline and offset", () => {
+  test("builds nav requests with an optional paging offset and no update baseline", () => {
     expect(buildFollowingDynamicsNavUrl()).toBe("/x/polymer/web-dynamic/v1/feed/nav");
 
-    const withBaseline = new URL(
-      buildFollowingDynamicsNavUrl("1200000000000000001"),
-      "https://api.bilibili.com",
-    );
-    expect(withBaseline.pathname).toBe("/x/polymer/web-dynamic/v1/feed/nav");
-    expect(withBaseline.searchParams.get("update_baseline")).toBe("1200000000000000001");
-    expect(withBaseline.searchParams.has("offset")).toBe(false);
-
     const withOffset = new URL(
-      buildFollowingDynamicsNavUrl("1200000000000000001", "1200000000000000000"),
+      buildFollowingDynamicsNavUrl("1200000000000000000"),
       "https://api.bilibili.com",
     );
-    expect(withOffset.searchParams.get("update_baseline")).toBe("1200000000000000001");
+    expect(withOffset.pathname).toBe("/x/polymer/web-dynamic/v1/feed/nav");
+    expect(withOffset.searchParams.has("update_baseline")).toBe(false);
     expect(withOffset.searchParams.get("offset")).toBe("1200000000000000000");
   });
 
@@ -250,7 +241,7 @@ describe("following dynamics nav", () => {
       has_more: true,
       items: [
         { author: { mid: 42, name: "UP" }, id_str: "1200000000000000002", future_field: 1 },
-        { author: { mid: "43" }, id_str: "1200000000000000001" },
+        { author: { mid: "43" }, id_str: "1200000000000000001", visible: false },
       ],
       offset: "1200000000000000001",
       update_baseline: "1200000000000000002",
@@ -258,6 +249,7 @@ describe("following dynamics nav", () => {
     });
     expect(parsed.items.map((item) => String(item.author.mid))).toEqual(["42", "43"]);
     expect(String(parsed.items[1].id_str)).toBe("1200000000000000001");
+    expect(parsed.items[1].visible).toBe(false);
     expect(parsed.update_num).toBe("2");
 
     expect(() =>
@@ -269,13 +261,13 @@ describe("following dynamics nav", () => {
   test("pages nav responses through offset until has_more is false", async () => {
     const request = vi.fn<FollowingDynamicsRequest>(async (url) => {
       const { searchParams } = new URL(url, "https://api.bilibili.com");
-      expect(searchParams.get("update_baseline")).toBe("1200000000000000000");
+      expect(searchParams.has("update_baseline")).toBe(false);
       if (!searchParams.get("offset")) {
         return navPage({
           hasMore: true,
           items: [
             { mid: 42, idStr: "1200000000000000005" },
-            { mid: 43, idStr: "1200000000000000004" },
+            { mid: 42, idStr: "1200000000000000004" },
           ],
           offset: "1200000000000000004",
           updateBaseline: "1200000000000000005",
@@ -283,24 +275,20 @@ describe("following dynamics nav", () => {
       }
       expect(searchParams.get("offset")).toBe("1200000000000000004");
       return navPage({
-        items: [{ mid: "44", idStr: "1200000000000000003" }],
+        items: [
+          { mid: "43", idStr: "1200000000000000003" },
+          { mid: "44", idStr: "1200000000000000006", visible: false },
+        ],
         offset: "1200000000000000003",
       });
     });
 
-    const batch = await fetchFollowingDynamicsNavUpdates(
-      "1200000000000000000",
-      request,
-      () => true,
-    );
+    const batch = await fetchFollowingDynamicsNavUpdates(request, () => true);
     expect(request).toHaveBeenCalledTimes(2);
-    expect(batch.items).toEqual([
-      { mid: "42", idStr: "1200000000000000005" },
-      { mid: "43", idStr: "1200000000000000004" },
-      { mid: "44", idStr: "1200000000000000003" },
-    ]);
-    expect(batch.newestId).toBe("1200000000000000005");
-    expect(batch.oldestId).toBe("1200000000000000003");
+    expect(batch.latestByMid).toEqual({
+      "42": "1200000000000000005",
+      "43": "1200000000000000003",
+    });
     expect(batch.complete).toBe(true);
   });
 
@@ -316,18 +304,17 @@ describe("following dynamics nav", () => {
       });
     });
 
-    const batch = await fetchFollowingDynamicsNavUpdates("", request, () => true);
+    const batch = await fetchFollowingDynamicsNavUpdates(request, () => true);
     expect(request).toHaveBeenCalledTimes(FOLLOWING_DYNAMICS_NAV_MAX_PAGES);
     expect(batch.complete).toBe(false);
-    expect(batch.items).toHaveLength(FOLLOWING_DYNAMICS_NAV_MAX_PAGES);
-    expect(batch.oldestId).toBe(`120000000000000000${FOLLOWING_DYNAMICS_NAV_MAX_PAGES}`);
+    expect(Object.keys(batch.latestByMid)).toHaveLength(FOLLOWING_DYNAMICS_NAV_MAX_PAGES);
   });
 
   test("never requests stale sessions and rejects late nav results", async () => {
     const request = vi.fn<FollowingDynamicsRequest>();
-    await expect(
-      fetchFollowingDynamicsNavUpdates("1200000000000000000", request, () => false),
-    ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
+    await expect(fetchFollowingDynamicsNavUpdates(request, () => false)).rejects.toBeInstanceOf(
+      BilibiliSessionChangedError,
+    );
     expect(request).not.toHaveBeenCalled();
 
     let current = true;
@@ -335,9 +322,9 @@ describe("following dynamics nav", () => {
       current = false;
       return navPage({ items: [{ mid: 42, idStr: "1200000000000000001" }] });
     });
-    await expect(
-      fetchFollowingDynamicsNavUpdates("1200000000000000000", request, () => current),
-    ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
+    await expect(fetchFollowingDynamicsNavUpdates(request, () => current)).rejects.toBeInstanceOf(
+      BilibiliSessionChangedError,
+    );
   });
 
   test("compares dynamic ids as decimal strings", () => {
@@ -349,141 +336,136 @@ describe("following dynamics nav", () => {
   });
 });
 
-describe("following dynamics unread merge", () => {
+describe("following dynamics read state", () => {
   const newestId = "1200000000000000005";
   const oldestId = "1200000000000000003";
 
-  test("first sync only stores the baseline", () => {
+  test("first sync seeds latest and read ids without creating unread updates", () => {
     expect(
-      mergeFollowingDynamicsNavUnread({
+      mergeFollowingDynamicsReadState({
         state: undefined,
         batch: navBatch({
-          items: [
-            { mid: "42", idStr: newestId },
-            { mid: "43", idStr: oldestId },
-          ],
-          newestId,
-          oldestId,
+          latestByMid: { "42": newestId, "43": oldestId },
         }),
       }),
-    ).toEqual({ baseline: newestId, unread: {} });
+    ).toEqual({
+      "42": { latestId: newestId, readId: newestId },
+      "43": { latestId: oldestId, readId: oldestId },
+    });
   });
 
-  test("first sync skips the whole backlog and keeps the newest id", () => {
+  test("empty first sync creates no unread state", () => {
     expect(
-      mergeFollowingDynamicsNavUnread({
+      mergeFollowingDynamicsReadState({
         state: undefined,
-        batch: navBatch({
-          items: [{ mid: "42", idStr: oldestId }],
-          newestId,
-          oldestId,
-          complete: false,
-        }),
+        batch: navBatch({ complete: false }),
       }),
-    ).toEqual({ baseline: newestId, unread: {} });
+    ).toEqual({});
   });
 
-  test("keeps the newest id per up and advances the baseline", () => {
-    const merged = mergeFollowingDynamicsNavUnread({
-      state: { baseline: "1200000000000000002", unread: { "42": oldestId } },
+  test("advances only the latest id for known ups", () => {
+    const merged = mergeFollowingDynamicsReadState({
+      state: {
+        "42": { latestId: oldestId, readId: oldestId },
+        "43": { latestId: oldestId, readId: oldestId },
+      },
       batch: navBatch({
-        items: [
-          { mid: "42", idStr: "1200000000000000004" },
-          { mid: "43", idStr: newestId },
-        ],
-        newestId,
-        oldestId: "1200000000000000004",
+        latestByMid: { "42": "1200000000000000004", "43": newestId },
       }),
     });
     expect(merged).toEqual({
-      baseline: newestId,
-      unread: { "42": "1200000000000000004", "43": newestId },
+      "42": { latestId: "1200000000000000004", readId: oldestId },
+      "43": { latestId: newestId, readId: oldestId },
     });
   });
 
-  test("keeps older ids out of the unread map", () => {
-    const merged = mergeFollowingDynamicsNavUnread({
-      state: { baseline: "1200000000000000002", unread: { "42": "1200000000000000004" } },
+  test("ignores equal and older ids, including late responses after a read", () => {
+    const state = {
+      "42": { latestId: "1200000000000000004", readId: "1200000000000000004" },
+    };
+    const merged = mergeFollowingDynamicsReadState({
+      state,
       batch: navBatch({
-        items: [
-          { mid: "42", idStr: oldestId },
-          { mid: "42", idStr: "1200000000000000004" },
-        ],
-        newestId: "1200000000000000004",
-        oldestId,
+        latestByMid: { "42": oldestId },
       }),
     });
-    expect(merged.unread).toEqual({ "42": "1200000000000000004" });
+    expect(merged).toEqual(state);
+    expect(countFollowingDynamicsUnreadUps(merged, new Set(["42"]))).toBe(0);
   });
 
-  test("drops items the user already read in this session", () => {
-    const merged = mergeFollowingDynamicsNavUnread({
-      state: { baseline: "1200000000000000002", unread: {} },
+  test("a genuinely newer id after a read becomes unread", () => {
+    const merged = mergeFollowingDynamicsReadState({
+      state: {
+        "42": { latestId: "1200000000000000004", readId: "1200000000000000004" },
+      },
       batch: navBatch({
-        items: [
-          { mid: "42", idStr: "1200000000000000004" },
-          { mid: "43", idStr: newestId },
-        ],
-        newestId,
-        oldestId: "1200000000000000004",
+        latestByMid: { "42": newestId },
       }),
-      readIds: { "42": "1200000000000000004" },
     });
-    expect(merged.unread).toEqual({ "43": newestId });
+    expect(merged["42"]).toEqual({
+      latestId: newestId,
+      readId: "1200000000000000004",
+    });
+    expect(countFollowingDynamicsUnreadUps(merged, new Set(["42"]))).toBe(1);
   });
 
-  test("prunes ups that are no longer followed", () => {
-    const merged = mergeFollowingDynamicsNavUnread({
-      state: { baseline: "1200000000000000002", unread: { "42": "1200000000000000002" } },
-      batch: navBatch({ items: [], newestId: null, oldestId: null }),
+  test("marks the current latest id as read and keeps no-op references stable", () => {
+    const state = {
+      "42": { latestId: newestId, readId: oldestId },
+      "43": { latestId: oldestId, readId: oldestId },
+    };
+    const marked = markFollowingDynamicsUpRead(state, "42");
+    expect(marked).toEqual({
+      ...state,
+      "42": { latestId: newestId, readId: newestId },
+    });
+    expect(markFollowingDynamicsUpRead(marked, "42")).toBe(marked);
+    expect(markFollowingDynamicsUpRead(marked, "missing")).toBe(marked);
+  });
+
+  test("keeps missing ups but prunes ups that are no longer followed", () => {
+    const state = {
+      "42": { latestId: newestId, readId: oldestId },
+      "43": { latestId: newestId, readId: oldestId },
+    };
+    expect(
+      mergeFollowingDynamicsReadState({ state, batch: navBatch({ latestByMid: {} }) }),
+    ).toEqual(state);
+
+    const merged = mergeFollowingDynamicsReadState({
+      state,
+      batch: navBatch({ latestByMid: {} }),
       followedMids: new Set(["43"]),
     });
-    expect(merged.unread).toEqual({});
-  });
-
-  test("keeps the baseline when a complete batch has no new dynamics", () => {
-    const merged = mergeFollowingDynamicsNavUnread({
-      state: { baseline: "1200000000000000002", unread: { "42": "1200000000000000002" } },
-      batch: navBatch({ items: [], newestId: null, oldestId: null }),
-    });
-    expect(merged).toEqual({
-      baseline: "1200000000000000002",
-      unread: { "42": "1200000000000000002" },
-    });
-  });
-
-  test("only advances to the oldest id when the batch is incomplete", () => {
-    const merged = mergeFollowingDynamicsNavUnread({
-      state: { baseline: "1200000000000000002", unread: {} },
-      batch: navBatch({
-        items: [{ mid: "42", idStr: oldestId }],
-        newestId,
-        oldestId,
-        complete: false,
-      }),
-    });
-    expect(merged.baseline).toBe(oldestId);
+    expect(merged).toEqual({ "43": state["43"] });
   });
 
   test("counts only followed ups with unread dynamics", () => {
     expect(
       countFollowingDynamicsUnreadUps(
-        { baseline: newestId, unread: { "42": "1", "43": "2" } },
-        new Set(["43", "44"]),
+        {
+          "42": { latestId: newestId, readId: oldestId },
+          "43": { latestId: oldestId, readId: oldestId },
+        },
+        new Set(["42", "43", "44"]),
       ),
     ).toBe(1);
     expect(countFollowingDynamicsUnreadUps(undefined, new Set(["43"]))).toBe(0);
   });
 
   test("detects an unchanged unread state", () => {
-    const state = { baseline: newestId, unread: { "42": oldestId } };
+    const state = { "42": { latestId: newestId, readId: oldestId } };
     expect(
-      isSameFollowingDynamicsNavState(state, { baseline: newestId, unread: { "42": oldestId } }),
+      isSameFollowingDynamicsReadState(state, {
+        "42": { latestId: newestId, readId: oldestId },
+      }),
     ).toBe(true);
-    expect(isSameFollowingDynamicsNavState(state, { baseline: newestId, unread: {} })).toBe(false);
     expect(
-      isSameFollowingDynamicsNavState(state, { baseline: oldestId, unread: { "42": oldestId } }),
+      isSameFollowingDynamicsReadState(state, {
+        "42": { latestId: newestId, readId: newestId },
+      }),
     ).toBe(false);
-    expect(isSameFollowingDynamicsNavState(undefined, state)).toBe(false);
+    expect(isSameFollowingDynamicsReadState(state, {})).toBe(false);
+    expect(isSameFollowingDynamicsReadState(undefined, state)).toBe(false);
   });
 });

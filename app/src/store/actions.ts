@@ -1,5 +1,6 @@
 import React from "react";
 
+import { markFollowingDynamicsUpRead } from "../api/following-dynamics";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import { useStore } from ".";
@@ -25,16 +26,11 @@ export function useMarkHotSearchViewed() {
 
 /**
  * 打开某个 UP 的动态页时清除他的未读小红点。
- * 同时把读到的动态 id 记进本次会话的已读表，避免在途的轮询响应把红点又加回来。
+ * 把持久化 readId 推进到当前 latestId，旧的在途响应无法把红点加回来。
  */
 export function useMarkFollowingDynamicsRead(mid: string | number | null | undefined) {
   const { account } = useBilibiliSessionState();
-  const {
-    get$followingDynamicsUnreadMap,
-    set$followingDynamicsUnreadMap,
-    getFollowingDynamicsReadIds,
-    setFollowingDynamicsReadIds,
-  } = useStore();
+  const { set$followingDynamicsReadMap } = useStore();
 
   React.useEffect(() => {
     if (mid == null) {
@@ -50,27 +46,16 @@ export function useMarkFollowingDynamicsRead(mid: string | number | null | undef
       return;
     }
     const upMid = String(mid);
-    const map = get$followingDynamicsUnreadMap();
-    const state = map[current.mid];
-    const idStr = state?.unread[upMid];
-    if (!state || !idStr) {
-      return;
-    }
-    const unread = { ...state.unread };
-    delete unread[upMid];
-    set$followingDynamicsUnreadMap({ ...map, [current.mid]: { baseline: state.baseline, unread } });
-
-    const readIds = getFollowingDynamicsReadIds();
-    setFollowingDynamicsReadIds({
-      ...readIds,
-      [current.mid]: { ...readIds[current.mid], [upMid]: idStr },
+    set$followingDynamicsReadMap((map) => {
+      const state = map[current.mid];
+      const next = markFollowingDynamicsUpRead(state, upMid);
+      if (!next || next === state) {
+        return map;
+      }
+      return {
+        ...map,
+        [current.mid]: next,
+      };
     });
-  }, [
-    account,
-    get$followingDynamicsUnreadMap,
-    getFollowingDynamicsReadIds,
-    mid,
-    set$followingDynamicsUnreadMap,
-    setFollowingDynamicsReadIds,
-  ]);
+  }, [account, mid, set$followingDynamicsReadMap]);
 }

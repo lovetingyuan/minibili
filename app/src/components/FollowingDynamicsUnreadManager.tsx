@@ -1,13 +1,13 @@
 import React from "react";
 
 import {
-  isSameFollowingDynamicsNavState,
-  mergeFollowingDynamicsNavUnread,
+  isSameFollowingDynamicsReadState,
+  mergeFollowingDynamicsReadState,
 } from "@/api/following-dynamics";
 import { useFollowingDynamicsNavUpdates } from "@/api/useFollowingDynamicsNavUpdates";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSessionState } from "@/features/bilibili-session/useBilibiliSession";
-import { getStoreMethods } from "@/store";
+import { getStoreMethods, useStore } from "@/store";
 
 /**
  * 轮询 feed/nav，把「最近有更新的 UP」合并进本地未读表。
@@ -16,30 +16,40 @@ import { getStoreMethods } from "@/store";
 function FollowingDynamicsUnreadManager() {
   const { data } = useFollowingDynamicsNavUpdates();
   const session = useBilibiliSessionState();
+  const { initialed } = useStore();
   const account =
-    session.account && bilibiliSession.isCurrentAccount(session.account) ? session.account : null;
+    initialed &&
+    session.control.phase === "ready" &&
+    session.account &&
+    bilibiliSession.isCurrentAccount(session.account)
+      ? session.account
+      : null;
 
   React.useEffect(() => {
-    if (!account || !data) {
+    const methods = getStoreMethods();
+    if (!account) {
+      methods.setFollowingDynamicsNavReadyAccount(null);
       return;
     }
-    const methods = getStoreMethods();
-    const map = methods.get$followingDynamicsUnreadMap();
+    if (!data || !bilibiliSession.isCurrentAccount(account)) {
+      return;
+    }
     const followedMids =
       methods.getFollowingsGeneration() === account.generation
         ? new Set(methods.get$followedUps().map((up) => String(up.mid)))
         : undefined;
-    const current = map[account.mid];
-    const next = mergeFollowingDynamicsNavUnread({
-      state: current,
-      batch: data,
-      readIds: methods.getFollowingDynamicsReadIds()[account.mid],
-      followedMids,
+    methods.set$followingDynamicsReadMap((map) => {
+      const current = map[account.mid];
+      const next = mergeFollowingDynamicsReadState({ state: current, batch: data, followedMids });
+      if (isSameFollowingDynamicsReadState(current, next)) {
+        return map;
+      }
+      return { ...map, [account.mid]: next };
     });
-    if (isSameFollowingDynamicsNavState(current, next)) {
-      return;
-    }
-    methods.set$followingDynamicsUnreadMap({ ...map, [account.mid]: next });
+    methods.setFollowingDynamicsNavReadyAccount({
+      mid: account.mid,
+      generation: account.generation,
+    });
   }, [account, data]);
 
   return null;

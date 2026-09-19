@@ -2,12 +2,13 @@ import { expect, test, vi } from "vitest";
 
 import { clearLegacyCollections } from "./legacy-collections";
 
-test("removes only local legacy favorites, history and play progress and is safe to repeat", async () => {
+test("removes only retired local state and is safe to repeat", async () => {
   const values = new Map([
     ["Store:$collectedVideos", "old favorites"],
     ["Store:$followedUps", "followings"],
     ["Store:$watchedVideos", "history"],
     ["Store:$localPlayProgress", "play progress"],
+    ["Store:$followingDynamicsUnreadMap", "broken following unread state"],
     ["Store:$watchedHotSearch", "search"],
     ["Store:$blackTags", "settings"],
   ]);
@@ -21,9 +22,11 @@ test("removes only local legacy favorites, history and play progress and is safe
     ["Store:$collectedVideos"],
     ["Store:$watchedVideos"],
     ["Store:$localPlayProgress"],
+    ["Store:$followingDynamicsUnreadMap"],
     ["Store:$collectedVideos"],
     ["Store:$watchedVideos"],
     ["Store:$localPlayProgress"],
+    ["Store:$followingDynamicsUnreadMap"],
   ]);
 });
 
@@ -34,7 +37,7 @@ test("reports a failed cleanup without rejecting startup and retries next time",
     .mockResolvedValueOnce(undefined);
   await expect(clearLegacyCollections(remove)).resolves.toBe(false);
   await expect(clearLegacyCollections(remove)).resolves.toBe(true);
-  expect(remove).toHaveBeenCalledTimes(6);
+  expect(remove).toHaveBeenCalledTimes(8);
 });
 
 test("history and play progress cleanup run even if favorites cleanup fails", async () => {
@@ -46,4 +49,5 @@ test("history and play progress cleanup run even if favorites cleanup fails", as
   await expect(clearLegacyCollections(remove)).resolves.toBe(false);
   expect(remove).toHaveBeenCalledWith("Store:$watchedVideos");
   expect(remove).toHaveBeenCalledWith("Store:$localPlayProgress");
+  expect(remove).toHaveBeenCalledWith("Store:$followingDynamicsUnreadMap");
 });

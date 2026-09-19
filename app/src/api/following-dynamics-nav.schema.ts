@@ -10,6 +10,7 @@ export const FollowingDynamicsNavItemSchema = z
       })
       .passthrough(),
     id_str: StringOrNumberSchema,
+    visible: z.boolean().optional(),
   })
   .passthrough();
 
