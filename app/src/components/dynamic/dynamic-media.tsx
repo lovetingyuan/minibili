@@ -212,7 +212,10 @@ function LinkCard(props: {
   content: Exclude<DynamicContent, { kind: "video" | "images" | "text" }>;
 }) {
   const { content } = props;
-  const coverSize = getImagePixelDimensions(96, 80);
+  // 专栏卡片的摘要已经在卡片上方作为动态正文展示，这里只保留标题和全文入口，
+  // 同时用更宽的 16:9 缩略图，避免卡片又高又重复。
+  const isArticle = content.kind === "article";
+  const coverSize = isArticle ? getImagePixelDimensions(128, 72) : getImagePixelDimensions(96, 80);
   if (content.kind === "unavailable") {
     return (
       <View className="mb-3 rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
@@ -230,7 +233,7 @@ function LinkCard(props: {
         <Image
           source={{ uri: parseImgUrl(content.cover, coverSize) }}
           contentFit="cover"
-          className="mr-3 h-20 w-24 rounded-md"
+          className={isArticle ? "mr-3 aspect-video w-32 rounded-md" : "mr-3 h-20 w-24 rounded-md"}
         />
       ) : null}
       <View className="min-w-0 flex-1 justify-center gap-1">
@@ -240,7 +243,7 @@ function LinkCard(props: {
         <Text className="text-sm font-semibold" numberOfLines={2}>
           {content.title}
         </Text>
-        {content.description ? (
+        {!isArticle && content.description ? (
           <Text className={`text-xs ${colors.gray6.text}`} numberOfLines={3}>
             {content.description}
           </Text>

@@ -2,7 +2,12 @@ import type { ReactElement, ReactNode } from "react";
 import { Children, isValidElement } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import type { DynamicAuthor, DynamicImage, DynamicVideoContent } from "@/api/dynamic-items.type";
+import type {
+  DynamicAuthor,
+  DynamicContent,
+  DynamicImage,
+  DynamicVideoContent,
+} from "@/api/dynamic-items.type";
 
 const mocks = vi.hoisted(() => {
   vi.stubGlobal("__DEV__", false);
@@ -72,6 +77,7 @@ type ElementProps = {
   children?: ReactNode;
   className?: string;
   contentFit?: string;
+  numberOfLines?: number;
   onLongPress?: (event?: { stopPropagation: () => void }) => void;
   onPress?: (event?: { stopPropagation: () => void }) => void;
   source?: { uri: string };
@@ -109,6 +115,16 @@ function renderImages(images: DynamicImage[]) {
   const mediaProps = media.props;
   const ImageGrid = media.type as (props: typeof mediaProps) => ReactElement<ElementProps>;
   return ImageGrid(mediaProps);
+}
+
+function renderLink(content: Extract<DynamicContent, { kind: "article" }>) {
+  const media = DynamicMedia({ content, author });
+  if (!media || typeof media.type !== "function") {
+    throw new Error("Expected DynamicMedia to return the link card component");
+  }
+  const mediaProps = media.props;
+  const Link = media.type as (props: typeof mediaProps) => ReactElement<ElementProps>;
+  return Link(mediaProps);
 }
 
 function children(element: ReactElement<ElementProps>) {
@@ -289,5 +305,54 @@ describe("DynamicMedia image sizing", () => {
 
     expect(croppedImage.props.contentFit).toBe("cover");
     expect(croppedImage.props.style?.aspectRatio).toBe(0.55);
+  });
+});
+
+describe("DynamicMedia article card", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const article: Extract<DynamicContent, { kind: "article" }> = {
+    kind: "article",
+    title: "韩国国歌变成朝鲜国歌，日本降本增笑太魔幻了！| 地球知识局",
+    description: "地球知识局 文字 | 夏虫 校对 | 朝乾 编辑 | 巴拿拿……",
+    cover: "cover.jpg",
+    url: "https://www.bilibili.com/opus/1250152752385884176",
+    hasMore: true,
+  };
+
+  test("uses a wider cover and drops the summary already shown above the card", () => {
+    const card = renderLink(article);
+    const [cover] = children(card) as ReactElement<ElementProps>[];
+    const texts = flatten(card).filter((element) => element.type === "Text");
+    const rendered = texts.map((element) => element.props.children);
+
+    expect(cover.type).toBe("Image");
+    expect(cover.props.className).toContain("w-32");
+    expect(cover.props.className).toContain("aspect-video");
+    expect(rendered).not.toContain(article.description);
+    expect(rendered).toContain(article.title);
+    expect(rendered).toContain("查看全文");
+    expect(
+      texts.find((element) => element.props.children === article.title)?.props.numberOfLines,
+    ).toBe(2);
+  });
+
+  test("keeps the description for other link cards", () => {
+    const media = DynamicMedia({
+      content: {
+        kind: "link",
+        title: "番剧标题",
+        description: "番剧简介",
+        url: "https://www.bilibili.com/bangumi/play/ss1",
+        label: "番剧",
+      },
+      author,
+    });
+    const Link = media.type as (props: typeof media.props) => ReactElement<ElementProps>;
+    const rendered = flatten(Link(media.props))
+      .filter((element) => element.type === "Text")
+      .map((element) => element.props.children);
+
+    expect(rendered).toContain("番剧简介");
   });
 });
