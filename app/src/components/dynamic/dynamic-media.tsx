@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import { clsx } from "clsx";
 import type { ReactNode } from "react";
 import { Linking, Pressable, useWindowDimensions, View } from "react-native";
 import type { GestureResponderEvent } from "react-native";
@@ -15,7 +16,14 @@ import { Image } from "../styled/expo";
 import { Icon, Text } from "../styled/rneui";
 import { WatchProgressBar } from "../WatchProgressBar";
 
-function DynamicImageGrid(props: { images: DynamicImage[]; detail?: boolean }) {
+/**
+ * `natural` 用于专栏正文：单图按原比例完整显示，不做裁剪。
+ */
+export function DynamicImageGrid(props: {
+  images: DynamicImage[];
+  detail?: boolean;
+  natural?: boolean;
+}) {
   const { setImagesList, setCurrentImageIndex } = useStore();
   const { width: windowWidth } = useWindowDimensions();
   const visibleImages = props.detail ? props.images : props.images.slice(0, 9);
@@ -31,13 +39,21 @@ function DynamicImageGrid(props: { images: DynamicImage[]; detail?: boolean }) {
   return (
     <View className="mb-3 flex-row flex-wrap gap-[1%] gap-y-1.5 overflow-hidden rounded-lg">
       {visibleImages.map((image, index) => {
-        const aspectRatio = columns === 1 ? Math.max(0.55, Math.min(image.ratio, 1.8)) : 1;
+        const aspectRatio =
+          columns === 1
+            ? props.natural
+              ? Math.max(image.ratio, 0.05)
+              : Math.max(0.55, Math.min(image.ratio, 1.8))
+            : 1;
         const requestSize = getImagePixelDimensions(
           imageLayoutWidth,
           imageLayoutWidth / aspectRatio,
           image.width,
           image.height,
         );
+        const source = props.natural
+          ? parseImgUrl(image.src, { ...requestSize, crop: false })
+          : parseImgUrl(image.src, requestSize);
 
         return (
           <Pressable
@@ -49,9 +65,12 @@ function DynamicImageGrid(props: { images: DynamicImage[]; detail?: boolean }) {
             }}
           >
             <Image
-              source={{ uri: parseImgUrl(image.src, requestSize) }}
-              contentFit="cover"
-              className={columns === 1 ? "w-full rounded-lg" : "aspect-square w-full"}
+              source={{ uri: source }}
+              contentFit={props.natural ? "contain" : "cover"}
+              className={clsx(
+                columns === 1 ? "w-full rounded-lg" : "aspect-square w-full",
+                props.natural && "bg-neutral-100 dark:bg-neutral-800",
+              )}
               style={columns === 1 ? { aspectRatio } : undefined}
             />
             {!props.detail && index === 8 && props.images.length > 9 ? (

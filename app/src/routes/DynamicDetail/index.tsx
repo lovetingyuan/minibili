@@ -2,6 +2,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-native";
 
 import { useDynamicDetail } from "@/api/dynamic-items";
+import { useOpusDetail } from "@/api/opus-detail";
 import CommentList from "@/components/CommentList";
 import { DynamicCard } from "@/components/dynamic/dynamic-card";
 import { Button, Text } from "@/components/styled/rneui";
@@ -17,10 +18,16 @@ type Props = NativeStackScreenProps<RootStackParamList, "DynamicDetail">;
 function DynamicDetailPage({ route }: Props) {
   const { dynamicId, title, user } = route.params;
   const detail = useDynamicDetail(dynamicId);
+  // 专栏文章的折叠摘要拿不到正文全文，只有专栏才额外请求 opus 详情
+  const isArticle = detail.data?.content.kind === "article";
+  const article = useOpusDetail(isArticle ? dynamicId : null);
   const url = `https://www.bilibili.com/opus/${dynamicId}`;
 
-  function refresh() {
-    void detail.mutate();
+  async function refresh() {
+    await detail.mutate();
+    if (isArticle) {
+      await article.mutate();
+    }
   }
 
   useUpdateNavigationOptions({
@@ -56,7 +63,14 @@ function DynamicDetailPage({ route }: Props) {
     );
   }
 
-  const card = <DynamicCard item={detail.data} detail />;
+  const card = (
+    <DynamicCard
+      item={detail.data}
+      detail
+      article={isArticle ? (article.data ?? undefined) : undefined}
+      articleLoading={isArticle && article.isLoading}
+    />
+  );
   if (detail.data.commentId && detail.data.commentId !== "0" && detail.data.commentType > 0) {
     return (
       <CommentList
@@ -64,9 +78,7 @@ function DynamicDetailPage({ route }: Props) {
         commentType={detail.data.commentType}
         sourceUrl={url}
         refreshing={detail.isValidating}
-        onRefresh={async () => {
-          await detail.mutate();
-        }}
+        onRefresh={refresh}
       >
         <View className="-mx-3 -mt-4">{card}</View>
       </CommentList>

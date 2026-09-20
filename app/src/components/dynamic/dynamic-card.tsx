@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, View } from "react-native";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
+import type { DynamicArticle } from "@/api/opus-detail.type";
 import { colors } from "@/constants/colors.tw";
 import type { NavigationProps } from "@/types";
 import { getImagePixelSize, parseDate, parseImgUrl } from "@/utils";
@@ -10,6 +11,7 @@ import { Additional } from "../Additional";
 import RichTexts from "../RichTexts";
 import { Avatar, Text } from "../styled/rneui";
 import UpName from "../UpName";
+import { DynamicArticleContent, DynamicArticleLoading } from "./dynamic-article";
 import { DynamicActions } from "./dynamic-actions";
 import { DynamicMedia } from "./dynamic-media";
 import { getDynamicUpTarget } from "./dynamic-target";
@@ -73,8 +75,30 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
   );
 }
 
-function DynamicBody(props: { item: DynamicItem; detail?: boolean }) {
-  const { item, detail } = props;
+function DynamicBody(props: {
+  item: DynamicItem;
+  detail?: boolean;
+  article?: DynamicArticle;
+  articleLoading?: boolean;
+}) {
+  const { item, detail, article, articleLoading } = props;
+  // 专栏全文可用时，正文以全文为准，避免再渲染一遍折叠摘要
+  if (article) {
+    return (
+      <>
+        <DynamicArticleContent article={article} selectable={detail} />
+        <Additional additional={item.additional} />
+      </>
+    );
+  }
+  if (articleLoading) {
+    return (
+      <>
+        <DynamicArticleLoading />
+        <Additional additional={item.additional} />
+      </>
+    );
+  }
   return (
     <>
       {item.title ? (
@@ -124,12 +148,18 @@ function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
   );
 }
 
-export function DynamicCard(props: { item: DynamicItem; detail?: boolean; onPress?: () => void }) {
-  const { item, detail, onPress } = props;
+export function DynamicCard(props: {
+  item: DynamicItem;
+  detail?: boolean;
+  onPress?: () => void;
+  article?: DynamicArticle;
+  articleLoading?: boolean;
+}) {
+  const { item, detail, onPress, article, articleLoading } = props;
   const body = (
     <>
       <DynamicAuthorRow item={item} />
-      <DynamicBody item={item} detail={detail} />
+      <DynamicBody item={item} detail={detail} article={article} articleLoading={articleLoading} />
       {item.original ? <ForwardCard item={item.original} detail={detail} /> : null}
     </>
   );

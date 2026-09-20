@@ -65,15 +65,17 @@ vi.mock("@/utils", () => ({
   parseNumber: String,
 }));
 
-import { DynamicMedia } from "./dynamic-media";
+import { DynamicImageGrid, DynamicMedia } from "./dynamic-media";
 import { WatchProgressBar } from "../WatchProgressBar";
 
 type ElementProps = {
   children?: ReactNode;
   className?: string;
+  contentFit?: string;
   onLongPress?: (event?: { stopPropagation: () => void }) => void;
   onPress?: (event?: { stopPropagation: () => void }) => void;
   source?: { uri: string };
+  style?: { aspectRatio?: number };
 };
 
 const author: DynamicAuthor = { mid: 1, name: "UP", face: "face.jpg" };
@@ -265,5 +267,27 @@ describe("DynamicMedia image sizing", () => {
 
     expect(mocks.setImagesList).toHaveBeenCalledWith(images);
     expect(mocks.setCurrentImageIndex).toHaveBeenCalledWith(1);
+  });
+
+  test("keeps article pictures at their natural ratio instead of cropping them", () => {
+    const tall = [{ src: "tall.jpg", width: 800, height: 3000, ratio: 800 / 3000 }];
+    const naturalGrid = DynamicImageGrid({ images: tall, detail: true, natural: true });
+    const [naturalPressable] = children(
+      naturalGrid as ReactElement<ElementProps>,
+    ) as ReactElement<ElementProps>[];
+    const [naturalImage] = children(naturalPressable) as ReactElement<ElementProps>[];
+
+    expect(naturalImage.props.contentFit).toBe("contain");
+    expect(naturalImage.props.style?.aspectRatio).toBe(800 / 3000);
+    expect(naturalImage.props.className).toContain("bg-neutral-100");
+
+    const croppedGrid = DynamicImageGrid({ images: tall, detail: true });
+    const [croppedPressable] = children(
+      croppedGrid as ReactElement<ElementProps>,
+    ) as ReactElement<ElementProps>[];
+    const [croppedImage] = children(croppedPressable) as ReactElement<ElementProps>[];
+
+    expect(croppedImage.props.contentFit).toBe("cover");
+    expect(croppedImage.props.style?.aspectRatio).toBe(0.55);
   });
 });

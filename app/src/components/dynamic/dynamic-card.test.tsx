@@ -3,6 +3,7 @@ import type { ReactElement, ReactNode } from "react";
 import { expect, test, vi } from "vitest";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
+import type { DynamicArticle } from "@/api/opus-detail.type";
 
 const mocks = vi.hoisted(() => ({ navigate: vi.fn() }));
 
@@ -23,6 +24,10 @@ vi.mock("../styled/rneui", () => ({ Avatar: "Avatar", Icon: "Icon", Text: "Text"
 vi.mock("../UpName", () => ({ default: "UpName" }));
 vi.mock("./dynamic-actions", () => ({ DynamicActions: "DynamicActions" }));
 vi.mock("./dynamic-media", () => ({ DynamicMedia: "DynamicMedia" }));
+vi.mock("./dynamic-article", () => ({
+  DynamicArticleContent: "DynamicArticleContent",
+  DynamicArticleLoading: "DynamicArticleLoading",
+}));
 
 import { DynamicCard } from "./dynamic-card";
 
@@ -183,4 +188,37 @@ test("opens the original author space from a forwarded dynamic", () => {
   expect(mocks.navigate).toHaveBeenLastCalledWith("Dynamic", {
     user: { face: "face.jpg", mid: 2, name: "原作者", sign: "" },
   });
+});
+
+test("renders the full article body instead of the folded summary", () => {
+  const article: DynamicArticle = {
+    id: "dynamic-1",
+    title: "专栏标题",
+    paragraphs: [{ kind: "text", nodes: [{ kind: "text", text: "全文第一段" }] }],
+  };
+  const elements = flatten(DynamicCard({ item, detail: true, article }));
+  const body = elements.find((element) => element.type === "DynamicArticleContent");
+
+  expect(body?.props.article).toBe(article);
+  expect(body?.props.selectable).toBe(true);
+  expect(elements.some((element) => element.type === "RichTexts")).toBe(false);
+  expect(elements.some((element) => element.type === "DynamicMedia")).toBe(false);
+});
+
+test("keeps the summary while the full article body is loading", () => {
+  const elements = flatten(DynamicCard({ item, detail: true, articleLoading: true }));
+
+  expect(elements.some((element) => element.type === "DynamicArticleLoading")).toBe(true);
+  expect(elements.some((element) => element.type === "RichTexts")).toBe(false);
+});
+
+test("falls back to the folded summary when the article body is unavailable", () => {
+  const elements = flatten(DynamicCard({ item, detail: true }));
+  const body = elements.find(
+    (element) => element.type === "Text" && element.props.children === item.text,
+  );
+
+  expect(elements.some((element) => element.type === "DynamicArticleContent")).toBe(false);
+  expect(elements.some((element) => element.type === "DynamicArticleLoading")).toBe(false);
+  expect(body).toBeDefined();
 });
