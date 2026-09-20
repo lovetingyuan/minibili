@@ -4,6 +4,7 @@ import { UA } from "../constants";
 // import dm from '../constants/dm'
 import encWbi from "../utils/wbi";
 import bilibiliFetch from "./bilibili-fetch";
+import { stringifyCommentOid } from "./comment-json.helpers";
 import { getWBIInfo } from "./user-nav";
 
 type ResponseType<D = any> = {
@@ -107,11 +108,9 @@ export default async function request<D>(
     data: resText,
   } as ResponseType<D>;
   try {
-    if (url.includes("/x/v2/reply/wbi/main?")) {
+    if (url.includes("/x/v2/reply/")) {
       // oid这个属性是数字但是会溢出，所以这里处理成字符串
-      resText = resText.replaceAll(/"oid":(\d+),"/g, (_, num) => {
-        return `"oid":"${num}","`;
-      });
+      resText = stringifyCommentOid(resText);
     }
     res = JSON.parse(resText) as ResponseType<D>;
   } catch {

@@ -150,7 +150,7 @@ describe("top-level comment", () => {
       statistics: '{"appId":100,"platform":5}',
       csrf: "a+b/==",
     });
-    expect(comment).toMatchObject({ id: "999", oid: 1000, type: 1, root: "456", rcount: 0 });
+    expect(comment).toMatchObject({ id: "999", oid: "1000", type: 1, root: "456", rcount: 0 });
   });
 
   test("validates the message before reading credentials", async () => {
@@ -198,6 +198,98 @@ describe("top-level comment", () => {
       CommentResultUnknownError,
     );
     expect(request).toHaveBeenCalledOnce();
+  });
+});
+
+describe("64-bit comment ids", () => {
+  const dynamicOid = "1249706685708107824";
+  const dynamicSourceUrl = `https://www.bilibili.com/opus/${dynamicOid}`;
+  const dynamicTarget: CommentTarget = {
+    ...target,
+    id: "317945292720",
+    oid: dynamicOid,
+    type: 17,
+  };
+
+  test("posts a top-level comment with the untouched oid", async () => {
+    const { request, dependencies } = setup({
+      code: 0,
+      message: "OK",
+      data: { reply: createReply() },
+    });
+    await addComment(
+      account,
+      { oid: dynamicOid, type: 17, message: "动态评论", sourceUrl: dynamicSourceUrl },
+      dependencies,
+    );
+    expect(Object.fromEntries(new URLSearchParams(String(request.mock.calls[0][1]?.body)))).toEqual(
+      {
+        plat: "1",
+        oid: dynamicOid,
+        type: "17",
+        message: "动态评论",
+        at_name_to_mid: "{}",
+        gaia_source: "main_web",
+        statistics: '{"appId":100,"platform":5}',
+        csrf: "a+b/==",
+      },
+    );
+  });
+
+  test("keeps the oid when liking, replying to and deleting a reply", async () => {
+    const { request, dependencies } = setup({
+      code: 0,
+      message: "OK",
+      data: { reply: createReply() },
+    });
+    await modifyCommentAttitude(
+      account,
+      { target: dynamicTarget, kind: "like", active: true, sourceUrl: dynamicSourceUrl },
+      dependencies,
+    );
+    await addCommentReply(
+      account,
+      { target: dynamicTarget, message: "回复", sourceUrl: dynamicSourceUrl },
+      dependencies,
+    );
+    await deleteComment(
+      account,
+      { target: dynamicTarget, sourceUrl: dynamicSourceUrl },
+      dependencies,
+    );
+
+    const bodies = request.mock.calls.map((call) =>
+      Object.fromEntries(new URLSearchParams(String(call[1]?.body))),
+    );
+    expect(bodies[0]).toMatchObject({ oid: dynamicOid, type: "17", rpid: "317945292720" });
+    expect(bodies[1]).toMatchObject({
+      oid: dynamicOid,
+      type: "17",
+      root: "317945292720",
+      parent: "317945292720",
+    });
+    expect(bodies[2]).toMatchObject({ oid: dynamicOid, type: "17", rpid: "317945292720" });
+  });
+
+  test("keeps a 64-bit oid from the add-comment response", async () => {
+    const replyText = JSON.stringify(createReply()).replace('"oid":1000', `"oid":${dynamicOid}`);
+    const request = vi
+      .fn<typeof fetch>()
+      .mockImplementation(
+        async () => new Response(`{"code":0,"message":"OK","data":{"reply":${replyText}}}`),
+      );
+    vi.stubGlobal("fetch", request);
+    const dependencies: CommentRequestDependencies = {
+      readCookie: vi.fn(async () => cookie),
+      isCurrentAccount: vi.fn(() => true),
+    };
+
+    const comment = await addComment(
+      account,
+      { oid: dynamicOid, type: 17, message: "动态评论", sourceUrl: dynamicSourceUrl },
+      dependencies,
+    );
+    expect(comment.oid).toBe(dynamicOid);
   });
 });
 

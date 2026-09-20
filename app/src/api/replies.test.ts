@@ -119,3 +119,15 @@ test("get-comment-replies-2", async () => {
   );
   ReplyResponseSchema.parse(res);
 });
+
+// 动态 ID 有 19 位，超过 Number.MAX_SAFE_INTEGER，oid 必须原样保留
+test("get-dynamic-comment-replies", async () => {
+  const oid = "1249706685708107824";
+  const res = ReplyResponseSchema.parse(
+    await request(`/x/v2/reply/reply?oid=${oid}&type=17&root=317945292720&pn=1&ps=20`),
+  );
+
+  expect(String(res.root?.oid)).toBe(oid);
+  expect(res.replies?.length).toBeGreaterThan(0);
+  expect((res.replies || []).every((reply) => String(reply.oid) === oid)).toBe(true);
+});

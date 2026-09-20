@@ -13,6 +13,7 @@ import {
   AddCommentReplyResponseSchema,
   CommentActionResponseSchema,
 } from "./comment-actions.schema";
+import { stringifyCommentOid } from "./comment-json.helpers";
 import type {
   AddCommentInput,
   AddCommentReplyInput,
@@ -29,6 +30,22 @@ export class CommentResultUnknownError extends Error {}
 function validatePositiveInteger(value: string | number, label: string) {
   const text = String(value);
   if (!/^[1-9]\d*$/.test(text) || !Number.isSafeInteger(Number(text))) {
+    throw new Error(`${label}无效，请重新打开评论`);
+  }
+  return text;
+}
+
+/**
+ * oid（动态 ID）和 rpid 都是 B 站的 64 位整数，动态 ID 目前有 19 位，
+ * 用 Number.isSafeInteger 校验会把合法 ID 判成无效，所以只按十进制字符串校验。
+ * 传进来的 number 超出安全整数范围时说明上游解析已经丢过精度，只能报错让页面重开。
+ */
+function validateCommentId(value: string | number, label: string) {
+  if (typeof value === "number" && !Number.isSafeInteger(value)) {
+    throw new Error(`${label}无效，请重新打开评论`);
+  }
+  const text = String(value);
+  if (!/^[1-9]\d{0,18}$/.test(text)) {
     throw new Error(`${label}无效，请重新打开评论`);
   }
   return text;
@@ -98,7 +115,7 @@ async function postCommentRequest<T>(options: CommentPostRequestOptions<T>) {
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    const parsed = parse(await response.json());
+    const parsed = parse(JSON.parse(stringifyCommentOid(await response.text())));
     if (!dependencies.isCurrentAccount(account)) {
       throw new BilibiliSessionChangedError();
     }
@@ -135,8 +152,8 @@ export async function modifyCommentAttitude(
   change: CommentAttitudeChange,
   dependencies: CommentRequestDependencies,
 ) {
-  const oid = validatePositiveInteger(change.target.oid, "评论来源 ID");
-  const rpid = validatePositiveInteger(change.target.id, "评论 ID");
+  const oid = validateCommentId(change.target.oid, "评论来源 ID");
+  const rpid = validateCommentId(change.target.id, "评论 ID");
   const type = validatePositiveInteger(change.target.type, "评论类型");
   if (!isBilibiliUrl(change.sourceUrl)) {
     throw new Error("评论来源地址无效");
@@ -176,8 +193,8 @@ export async function deleteComment(
   change: CommentDeleteChange,
   dependencies: CommentRequestDependencies,
 ) {
-  const oid = validatePositiveInteger(change.target.oid, "评论来源 ID");
-  const rpid = validatePositiveInteger(change.target.id, "评论 ID");
+  const oid = validateCommentId(change.target.oid, "评论来源 ID");
+  const rpid = validateCommentId(change.target.id, "评论 ID");
   const type = validatePositiveInteger(change.target.type, "评论类型");
   if (!isBilibiliUrl(change.sourceUrl)) {
     throw new Error("评论来源地址无效");
@@ -261,7 +278,7 @@ export async function addComment(
   dependencies: CommentRequestDependencies,
 ) {
   const message = validateCommentMessage(input.message, "评论");
-  const oid = validatePositiveInteger(input.oid, "评论来源 ID");
+  const oid = validateCommentId(input.oid, "评论来源 ID");
   const type = validatePositiveInteger(input.type, "评论类型");
   if (!isBilibiliUrl(input.sourceUrl)) {
     throw new Error("评论来源地址无效");
@@ -280,16 +297,14 @@ export async function addCommentReply(
   dependencies: CommentRequestDependencies,
 ) {
   const message = validateCommentMessage(input.message, "回复");
-  const oid = validatePositiveInteger(input.target.oid, "评论来源 ID");
-  const rpid = validatePositiveInteger(input.target.id, "评论 ID");
+  const oid = validateCommentId(input.target.oid, "评论来源 ID");
+  const rpid = validateCommentId(input.target.id, "评论 ID");
   const type = validatePositiveInteger(input.target.type, "评论类型");
   if (!isBilibiliUrl(input.sourceUrl)) {
     throw new Error("评论来源地址无效");
   }
   const root =
-    String(input.target.root) === "0"
-      ? rpid
-      : validatePositiveInteger(input.target.root, "根评论 ID");
+    String(input.target.root) === "0" ? rpid : validateCommentId(input.target.root, "根评论 ID");
   return postAddedComment(
     account,
     { oid, type, message, sourceUrl: input.sourceUrl, root, parent: rpid },
