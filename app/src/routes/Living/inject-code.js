@@ -765,12 +765,17 @@ function __$injectBefore() {
     position: fixed;
     left: 0;
     right: 0;
-    bottom: var(--minibili-danmaku-bottom, env(safe-area-inset-bottom, 0px));
-    height: 1.4rem;
+    bottom: 0;
+    /* 内容只占 1.4rem，背景要一直铺到屏幕底边：多出来的一段就是系统手势/导航栏，
+       否则底部会留出一条没有背景的缺口 */
+    height: calc(1.4rem + var(--minibili-danmaku-bottom, env(safe-area-inset-bottom, 0px)));
     display: flex;
     align-items: center;
-    padding: .16rem .266667rem;
+    padding: .16rem .266667rem
+      calc(.16rem + var(--minibili-danmaku-bottom, env(safe-area-inset-bottom, 0px)));
     box-sizing: border-box;
+    /* 让输入条在视频上足够显眼 */
+    background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.6));
     /* 播放器区域是 z-index:1010 的定位元素，必须盖在它上面 */
     z-index: 3000;
   }
@@ -780,32 +785,32 @@ function __$injectBefore() {
   }
   .minibili-danmaku-input {
     flex: 1;
-    height: .746667rem;
-    padding: .133333rem .426667rem;
+    height: .96rem;
+    padding: 0 .32rem;
     box-sizing: border-box;
     border: 0;
-    border-radius: .426667rem;
-    background: rgba(0,0,0,.3);
+    border-radius: .48rem;
+    background: rgba(255,255,255,.16);
     color: #FFFFFF;
     font-family: PingFang SC;
-    font-size: .32rem;
-    line-height: .48rem;
+    font-size: .373333rem;
+    line-height: .96rem;
     outline: none;
     -webkit-appearance: none;
   }
   .minibili-danmaku-input::placeholder {
-    color: hsla(0,0%,100%,.5);
+    color: hsla(0,0%,100%,.7);
   }
   .minibili-danmaku-send {
-    height: .746667rem;
+    height: .96rem;
     margin-left: .266667rem;
-    padding: 0 .32rem;
+    padding: 0 .4rem;
     border: 0;
-    border-radius: .426667rem;
+    border-radius: .48rem;
     background: #23ADE5;
     color: #FFFFFF;
-    font-size: .32rem;
-    line-height: .746667rem;
+    font-size: .373333rem;
+    line-height: .96rem;
   }
   .minibili-danmaku-send:disabled {
     opacity: .6;
