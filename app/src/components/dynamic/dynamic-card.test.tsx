@@ -52,6 +52,29 @@ const item = {
   original: null,
 } satisfies DynamicItem;
 
+const videoContent = {
+  kind: "video",
+  aid: 7,
+  bvid: "BV2TEST",
+  cover: "cover.jpg",
+  title: "原视频",
+  description: "视频简介",
+  duration: "02:00",
+  play: 10,
+  danmaku: 1,
+} as const;
+
+const forwardedVideoItem = {
+  ...item,
+  content: videoContent,
+  original: {
+    ...item,
+    id: "dynamic-2",
+    author: { mid: 2, name: "原作者", face: "face.jpg" },
+    content: videoContent,
+  },
+} satisfies DynamicItem;
+
 function text(node: ReactNode): string {
   return React.Children.toArray(node)
     .map((child) => {
@@ -188,6 +211,77 @@ test("opens the original author space from a forwarded dynamic", () => {
   expect(mocks.navigate).toHaveBeenLastCalledWith("Dynamic", {
     user: { face: "face.jpg", mid: 2, name: "原作者", sign: "" },
   });
+});
+
+test("opens the forwarded dynamic detail when the forwarded card is pressed", () => {
+  mocks.navigate.mockClear();
+  const stopPropagation = vi.fn();
+  const elements = flatten(
+    DynamicCard({
+      item: {
+        ...item,
+        original: {
+          ...item,
+          id: "dynamic-2",
+          text: "被转发的动态正文",
+          author: { mid: 2, name: "原作者", face: "face.jpg" },
+        },
+      },
+      onPress: vi.fn(),
+    }),
+  );
+  const forwarded = elements.find(
+    (element) => element.props.accessibilityLabel === "查看被转发的动态",
+  );
+
+  if (!forwarded) {
+    throw new Error("Missing forwarded card pressable");
+  }
+  expect(forwarded.type).toBe("Pressable");
+  expect(forwarded.props.accessibilityRole).toBe("button");
+
+  (forwarded.props.onPress as (event: { stopPropagation: () => void }) => void)({
+    stopPropagation,
+  });
+
+  // 内层必须拦截点击，否则外层转发动态的整卡跳转也会触发
+  expect(stopPropagation).toHaveBeenCalledOnce();
+  expect(mocks.navigate).toHaveBeenCalledWith("DynamicDetail", {
+    dynamicId: "dynamic-2",
+    title: "被转发的动态正文",
+    user: { mid: 2, name: "原作者" },
+  });
+});
+
+test("opens the player when the forwarded dynamic is a video", () => {
+  mocks.navigate.mockClear();
+  const elements = flatten(DynamicCard({ item: forwardedVideoItem, onPress: vi.fn() }));
+  const forwarded = elements.find(
+    (element) => element.props.accessibilityLabel === "查看被转发的动态",
+  );
+
+  if (!forwarded) {
+    throw new Error("Missing forwarded card pressable");
+  }
+  (forwarded.props.onPress as (event: { stopPropagation: () => void }) => void)({
+    stopPropagation: vi.fn(),
+  });
+
+  expect(mocks.navigate).toHaveBeenCalledWith(
+    "Play",
+    expect.objectContaining({ aid: 7, bvid: "BV2TEST", title: "原视频", mid: 2, name: "原作者" }),
+  );
+  expect(mocks.navigate).not.toHaveBeenCalledWith("DynamicDetail", expect.anything());
+});
+
+test("marks the forwarded media so its bottom padding does not stack", () => {
+  const medias = flatten(DynamicCard({ item: forwardedVideoItem, onPress: vi.fn() })).filter(
+    (element) => element.type === "DynamicMedia",
+  );
+
+  expect(medias).toHaveLength(2);
+  expect(medias[0].props.forward).toBeUndefined();
+  expect(medias[1].props.forward).toBe(true);
 });
 
 test("renders the full article body instead of the folded summary", () => {

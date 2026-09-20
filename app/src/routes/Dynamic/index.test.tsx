@@ -24,6 +24,9 @@ vi.mock("react-native", () => ({
   Pressable: "Pressable",
   View: "View",
 }));
+vi.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ navigate: mocks.navigate }),
+}));
 vi.mock("@/api/dynamic-items", () => ({
   useDynamicItems: () => ({
     error: undefined,
@@ -45,6 +48,10 @@ vi.mock("@/components/dynamic/dynamic-list", () => ({ DynamicList: "DynamicList"
 vi.mock(
   "@/components/dynamic/dynamic-target",
   async () => await vi.importActual("../../components/dynamic/dynamic-target"),
+);
+vi.mock(
+  "@/components/dynamic/use-open-dynamic-item",
+  async () => await vi.importActual("../../components/dynamic/use-open-dynamic-item"),
 );
 vi.mock("@/components/styled/rneui", () => ({
   Button: "Button",

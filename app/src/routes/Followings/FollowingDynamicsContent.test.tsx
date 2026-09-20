@@ -32,6 +32,10 @@ vi.mock(
   "@/components/dynamic/dynamic-target",
   async () => await vi.importActual("../../components/dynamic/dynamic-target"),
 );
+vi.mock(
+  "@/components/dynamic/use-open-dynamic-item",
+  async () => await vi.importActual("../../components/dynamic/use-open-dynamic-item"),
+);
 
 import FollowingDynamicsContent from "./FollowingDynamicsContent";
 

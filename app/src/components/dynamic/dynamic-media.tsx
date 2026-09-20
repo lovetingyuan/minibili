@@ -89,6 +89,8 @@ function VideoCard(props: {
   content: Extract<DynamicContent, { kind: "video" }>;
   author: DynamicAuthor;
   detail?: boolean;
+  /** 被转发的视频卡片外层还有一层带 padding 的卡片，这里去掉自身底部内边距避免叠加 */
+  forward?: boolean;
 }) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const { width: windowWidth } = useWindowDimensions();
@@ -167,7 +169,7 @@ function VideoCard(props: {
     </>
   );
   const description = (
-    <View className="gap-1 p-3">
+    <View className={props.forward ? "gap-1 px-3 pt-3" : "gap-1 p-3"}>
       <Text className="text-base font-semibold" numberOfLines={2}>
         {content.title}
       </Text>
@@ -260,12 +262,20 @@ export function DynamicMedia(props: {
   content: DynamicContent;
   author: DynamicAuthor;
   detail?: boolean;
+  forward?: boolean;
 }) {
   if (props.content.kind === "images") {
     return <DynamicImageGrid images={props.content.images} detail={props.detail} />;
   }
   if (props.content.kind === "video") {
-    return <VideoCard content={props.content} author={props.author} detail={props.detail} />;
+    return (
+      <VideoCard
+        content={props.content}
+        author={props.author}
+        detail={props.detail}
+        forward={props.forward}
+      />
+    );
   }
   if (props.content.kind === "text") {
     return null;

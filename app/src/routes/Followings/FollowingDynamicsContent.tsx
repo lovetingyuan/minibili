@@ -1,23 +1,10 @@
-import { useNavigation } from "@react-navigation/native";
-
-import type { DynamicItem } from "@/api/dynamic-items.type";
 import { useFollowingDynamicItems } from "@/api/useFollowingDynamicItems";
 import { DynamicList } from "@/components/dynamic/dynamic-list";
-import { getDynamicDetailTarget, getDynamicVideoTarget } from "@/components/dynamic/dynamic-target";
-import type { NavigationProps } from "@/types";
+import { useOpenDynamicItem } from "@/components/dynamic/use-open-dynamic-item";
 
 export default function FollowingDynamicsContent() {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
   const dynamics = useFollowingDynamicItems();
-
-  function openDynamicItem(item: DynamicItem) {
-    const videoParams = getDynamicVideoTarget(item);
-    if (videoParams) {
-      navigation.navigate("Play", videoParams);
-      return;
-    }
-    navigation.navigate("DynamicDetail", getDynamicDetailTarget(item));
-  }
+  const openDynamicItem = useOpenDynamicItem();
 
   return (
     <DynamicList

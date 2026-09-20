@@ -15,6 +15,7 @@ import { DynamicArticleContent, DynamicArticleLoading } from "./dynamic-article"
 import { DynamicActions } from "./dynamic-actions";
 import { DynamicMedia } from "./dynamic-media";
 import { getDynamicUpTarget } from "./dynamic-target";
+import { useOpenDynamicItem } from "./use-open-dynamic-item";
 
 function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
   const { item, compact } = props;
@@ -78,10 +79,11 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
 function DynamicBody(props: {
   item: DynamicItem;
   detail?: boolean;
+  forward?: boolean;
   article?: DynamicArticle;
   articleLoading?: boolean;
 }) {
-  const { item, detail, article, articleLoading } = props;
+  const { item, detail, forward, article, articleLoading } = props;
   // 专栏全文可用时，正文以全文为准，避免再渲染一遍折叠摘要
   if (article) {
     return (
@@ -133,18 +135,29 @@ function DynamicBody(props: {
           ) : null}
         </>
       ) : null}
-      <DynamicMedia content={item.content} author={item.author} detail={detail} />
+      <DynamicMedia content={item.content} author={item.author} detail={detail} forward={forward} />
       <Additional additional={item.additional} />
     </>
   );
 }
 
 function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
+  const openDynamicItem = useOpenDynamicItem();
+  const { item, detail } = props;
   return (
-    <View className="mb-3 rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
-      <DynamicAuthorRow item={props.item} compact />
-      <DynamicBody item={props.item} detail={props.detail} />
-    </View>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="查看被转发的动态"
+      className="mb-3 rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800"
+      onPress={(event) => {
+        // 内层卡片拦截点击，避免同时触发外层转发动态的整卡跳转
+        event.stopPropagation();
+        openDynamicItem(item);
+      }}
+    >
+      <DynamicAuthorRow item={item} compact />
+      <DynamicBody item={item} detail={detail} forward />
+    </Pressable>
   );
 }
 

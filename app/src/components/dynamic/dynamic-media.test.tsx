@@ -97,8 +97,8 @@ const video: DynamicVideoContent = {
   danmaku: 20,
 };
 
-function renderVideo(content: DynamicVideoContent, detail?: boolean) {
-  const media = DynamicMedia({ content, author, detail });
+function renderVideo(content: DynamicVideoContent, detail?: boolean, forward?: boolean) {
+  const media = DynamicMedia({ content, author, detail, forward });
   if (!media || typeof media.type !== "function") {
     throw new Error("Expected DynamicMedia to return the video component");
   }
@@ -244,6 +244,22 @@ describe("DynamicMedia video interactions", () => {
     expect(
       flatten(renderVideo(video)).find((child) => child.type === WatchProgressBar)?.props,
     ).toMatchObject({ ratio: 0 });
+  });
+
+  function descriptionBox(forward?: boolean) {
+    return flatten(renderVideo(video, false, forward)).find(
+      (child) =>
+        typeof child.props.className === "string" && child.props.className.startsWith("gap-1"),
+    );
+  }
+
+  test("keeps the video summary bottom padding in a normal dynamic card", () => {
+    expect(descriptionBox()?.props.className).toBe("gap-1 p-3");
+  });
+
+  test("drops the video summary bottom padding inside a forwarded card", () => {
+    // 外层转发卡片自带 padding，视频卡片再去掉一份底部内边距，避免多出 12dp 空白
+    expect(descriptionBox(true)?.props.className).toBe("gap-1 px-3 pt-3");
   });
 });
 
