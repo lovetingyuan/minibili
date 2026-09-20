@@ -90,10 +90,10 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
     >
       <View className="relative">
         <Avatar
-          size={48}
+          size={52}
           rounded
           source={{
-            uri: parseImgUrl(face, getImagePixelSize(48)),
+            uri: parseImgUrl(face, getImagePixelSize(52)),
           }}
         />
         {livingUps[mid] ? (
@@ -102,9 +102,9 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
               e.stopPropagation();
               gotoLivePage();
             }}
-            className="absolute inset-0 h-12 w-12 items-center justify-center rounded-full bg-neutral-950/60"
+            className="absolute inset-0 h-[52px] w-[52px] items-center justify-center rounded-full bg-neutral-950/60"
           >
-            <Text className={"text-center font-bold text-teal-300"}>直播中</Text>
+            <Text className={"text-center text-xs font-bold text-teal-300"}>直播中</Text>
           </Pressable>
         ) : null}
         {hasNewDynamic ? (

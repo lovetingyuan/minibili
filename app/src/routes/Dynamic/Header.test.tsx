@@ -22,6 +22,7 @@ const mocks = vi.hoisted(() => ({
   shareUp: vi.fn(),
   state: { disabled: false, isPreparing: false, pendingMid: '' },
   unfollow: vi.fn(async () => {}),
+  userInfo: undefined as { sex: string } | undefined,
   route: {
     params: {
       user: {
@@ -75,7 +76,7 @@ vi.mock('@/hooks/useFollowActions', () => ({
 vi.mock('@/store/derives', () => ({ useFollowedUpsMap: () => mocks.followedUps }))
 vi.mock('expo-clipboard', () => ({ setStringAsync: mocks.clipboardSetStringAsync }))
 vi.mock('../../api/living-info', () => ({ useLivingInfo: () => ({ livingUrl: mocks.livingUrl }) }))
-vi.mock('../../api/user-info', () => ({ useUserInfo: () => ({ data: undefined }) }))
+vi.mock('../../api/user-info', () => ({ useUserInfo: () => ({ data: mocks.userInfo }) }))
 vi.mock('../../api/user-relation', () => ({ useUserRelation: () => mocks.relation }))
 vi.mock('../../store', () => ({
   useStore: () => ({
@@ -143,6 +144,11 @@ function headerTitleChildren() {
   return childElements(header)
 }
 
+function sexBadge() {
+  const [avatar] = headerTitleChildren()
+  return childElements(avatar).find(child => String(child.props.className).includes('-top-1'))
+}
+
 function user() {
   return mocks.route.params.user
 }
@@ -154,6 +160,7 @@ describe('UP 主动态页头部菜单', () => {
     mocks.followedUps = {}
     mocks.state = { disabled: false, isPreparing: false, pendingMid: '' }
     mocks.livingUrl = ''
+    mocks.userInfo = undefined
   })
 
   test('依次展示关注、拉黑和分享入口', () => {
@@ -250,6 +257,7 @@ describe('UP 主动态页头部标题', () => {
     mocks.followedUps = {}
     mocks.state = { disabled: false, isPreparing: false, pendingMid: '' }
     mocks.livingUrl = ''
+    mocks.userInfo = undefined
   })
 
   test('名称与粉丝数保持单行且名称超长时截断', () => {
@@ -302,5 +310,50 @@ describe('UP 主动态页头部标题', () => {
       user: { mid: user().mid, name: user().name },
       url: mocks.livingUrl,
     })
+  })
+
+  test('男性 UP 的头像右上角展示加粗的男性符号', () => {
+    mocks.userInfo = { sex: '男' }
+    const badge = sexBadge()
+
+    expect(badge).toBeDefined()
+    expect(badge?.props.className).toContain('absolute')
+    expect(badge?.props.className).toContain('-right-1')
+    expect(badge?.props.accessibilityLabel).toBe('男性')
+
+    const [symbol] = childElements(badge as TestElement)
+    expect(symbol.props.className).toContain('font-bold')
+    expect(symbol.props.className).toContain('text-sm')
+    expect(symbol.props.className).toContain('text-sky-600')
+    expect(symbol.props.children).toBe('♂')
+  })
+
+  test('女性 UP 的头像右上角展示加粗的女性符号', () => {
+    mocks.userInfo = { sex: '女' }
+    const badge = sexBadge()
+
+    expect(badge).toBeDefined()
+    expect(badge?.props.accessibilityLabel).toBe('女性')
+
+    const [symbol] = childElements(badge as TestElement)
+    expect(symbol.props.className).toContain('font-bold')
+    expect(symbol.props.className).toContain('text-sm')
+    expect(symbol.props.className).toContain('text-pink-500')
+    expect(symbol.props.children).toBe('♀')
+  })
+
+  test('角标不带底色', () => {
+    mocks.userInfo = { sex: '男' }
+    const badge = sexBadge()
+    const [symbol] = childElements(badge as TestElement)
+
+    expect(badge?.props.className).not.toContain('bg-')
+    expect(symbol.props.className).not.toContain('bg-')
+  })
+
+  test('性别保密时不展示角标', () => {
+    mocks.userInfo = { sex: '保密' }
+
+    expect(sexBadge()).toBeUndefined()
   })
 })

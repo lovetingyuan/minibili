@@ -1,8 +1,8 @@
 /** 简介超过该字数时折叠，并显示“显示更多” */
 export const VIDEO_DESCRIPTION_COLLAPSE_MAX_CHARS = 100;
 
-/** 折叠状态下简介展示的行数 */
-export const VIDEO_DESCRIPTION_COLLAPSED_LINES = 5;
+/** 折叠状态下简介最多展示的行数，“显示更多”会跟在最后一行行尾 */
+export const VIDEO_DESCRIPTION_COLLAPSED_LINES = 4;
 
 /**
  * 清洗接口返回的简介：

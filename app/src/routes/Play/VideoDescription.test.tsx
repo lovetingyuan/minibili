@@ -13,6 +13,14 @@ vi.mock("@/components/styled/rneui", () => ({
   Text: "Text",
 }));
 
+vi.mock("@/components/UpName", () => ({
+  default: "UpName",
+}));
+
+vi.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ push: () => {} }),
+}));
+
 vi.mock("@/constants/colors.tw", () => ({
   colors: {
     primary: {
@@ -60,7 +68,7 @@ function getChildren(element: ReactElement<ElementProps>) {
 }
 
 describe("VideoDescriptionView", () => {
-  test("clamps a long description to five lines with the expand button below the text", () => {
+  test("clamps a long description to four lines with the expand button on the last line", () => {
     const onToggle = vi.fn();
     const root = expectElement(
       VideoDescriptionView({
@@ -71,10 +79,16 @@ describe("VideoDescriptionView", () => {
     );
     const [text, toggle] = getChildren(root);
 
+    expect(VIDEO_DESCRIPTION_COLLAPSED_LINES).toBe(4);
     expect(text.props.numberOfLines).toBe(VIDEO_DESCRIPTION_COLLAPSED_LINES);
     expect(text.props.children).toBe(longDescription);
-    expect(toggle.props.className).toContain("self-end");
-    expect(toggle.props.className).not.toContain("absolute");
+    expect(root.props.className).toContain("relative");
+    // 折叠时按钮绝对定位到最后一行行尾，而不是单独占一行
+    expect(toggle.props.className).toContain("absolute");
+    expect(toggle.props.className).toContain("bottom-2.5");
+    expect(toggle.props.className).not.toContain("self-end");
+    // 盖住底下的文字，避免和“显示更多”重叠
+    expect(toggle.props.className).toContain("bg-neutral-50");
     expect(toggle.props.accessibilityLabel).toBe("展开完整简介");
     expect(getChildren(toggle)[0].props.children).toBe("显示更多");
 
@@ -82,7 +96,7 @@ describe("VideoDescriptionView", () => {
     expect(onToggle).toHaveBeenCalledTimes(1);
   });
 
-  test("shows the full description with a collapse button once expanded", () => {
+  test("shows the full description with a collapse button in its own row once expanded", () => {
     const root = expectElement(
       VideoDescriptionView({
         text: longDescription,
@@ -96,6 +110,7 @@ describe("VideoDescriptionView", () => {
     expect(text.props.children).toBe(longDescription);
     expect(toggle.props.accessibilityLabel).toBe("收起简介");
     expect(toggle.props.className).toContain("self-end");
+    expect(toggle.props.className).not.toContain("absolute");
     expect(getChildren(toggle)[0].props.children).toBe("收起");
   });
 

@@ -79,9 +79,9 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
       </View>
 
       {videoInfo?.argument ? (
-        <View className="mb-3 self-start rounded-lg bg-orange-50 px-2.5 py-2 dark:bg-orange-950/30">
+        <View className="mb-2 self-start rounded-lg bg-orange-50 px-2 py-1 dark:bg-orange-950/30">
           <Text
-            className={`text-sm ${colors.warning.text}`}
+            className={`text-xs leading-4 ${colors.warning.text}`}
             onPress={() => {
               if (videoInfo.argumentLink) {
                 Linking.openURL(videoInfo.argumentLink);

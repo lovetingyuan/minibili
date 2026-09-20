@@ -10,6 +10,14 @@ import type { NavigationProps } from "@/types";
 import { shouldCollapseDescription, VIDEO_DESCRIPTION_COLLAPSED_LINES } from "./description";
 import type { VideoDescriptionProps, VideoDescriptionViewProps } from "./VideoDescription.types";
 
+/**
+ * 折叠时“显示更多”浮在最后一行行尾，用卡片底色盖住压在下方的文字，
+ * 高度与 leading-6 的行高一致，正好对齐最后一行。
+ */
+const COLLAPSED_TOGGLE_CLASS =
+  "absolute bottom-2.5 right-3 bg-neutral-50 pl-1.5 dark:bg-neutral-900";
+const EXPANDED_TOGGLE_CLASS = "mt-1 self-end px-1";
+
 export function VideoDescriptionView(props: VideoDescriptionViewProps) {
   const { text, nodes, collapsed, onToggle, onMentionPress } = props;
   if (!text) {
@@ -19,7 +27,7 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
   const isCollapsed = collapsible && Boolean(collapsed);
 
   return (
-    <View className="mt-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-neutral-900">
+    <View className="relative mt-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-neutral-900">
       <Text
         selectable
         className={`text-sm leading-6 ${colors.gray7.text}`}
@@ -55,7 +63,9 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={isCollapsed ? "展开完整简介" : "收起简介"}
-          className="mt-1 flex-row items-center self-end rounded-full px-1 py-1"
+          className={`flex-row items-center py-1 ${
+            isCollapsed ? COLLAPSED_TOGGLE_CLASS : EXPANDED_TOGGLE_CLASS
+          }`}
           hitSlop={8}
           onPress={onToggle}
         >

@@ -27,6 +27,12 @@ import { useStore } from '../../store'
 import type { NavigationProps, RootStackParamList } from '../../types'
 import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast } from '../../utils'
 
+// 头像右上角的性别角标，只用性别符号本身，不加底色
+const sexBadgeMap: Record<string, { symbol: string; textClassName: string; label: string }> = {
+  男: { symbol: '♂', textClassName: colors.primary.text, label: '男性' },
+  女: { symbol: '♀', textClassName: colors.secondary.text, label: '女性' },
+}
+
 function HeaderLeft() {
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const { data: userInfo } = useUserInfo(route.params?.user.mid)
@@ -35,6 +41,7 @@ function HeaderLeft() {
     ...route.params?.user,
     ...userInfo,
   }
+  const sexBadge = dynamicUser?.sex ? sexBadgeMap[dynamicUser.sex] : undefined
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
   // const gotoWebPage = () => {
@@ -47,8 +54,6 @@ function HeaderLeft() {
   // }
   // const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
   const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
-  // const sex =
-  //   dynamicUser?.sex === '男' ? '♂️' : dynamicUser?.sex === '女' ? '♀️' : ''
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
   const { setImagesList, setCurrentImageIndex } = useStore()
@@ -97,6 +102,18 @@ function HeaderLeft() {
             >
               <Text className={'text-center text-xs font-bold text-teal-300'}>直播中</Text>
             </Pressable>
+          ) : null}
+          {sexBadge ? (
+            <View
+              accessibilityLabel={sexBadge.label}
+              className="absolute -top-1 -right-1 items-center justify-center"
+            >
+              <Text
+                className={clsx('text-center text-sm font-bold leading-none', sexBadge.textClassName)}
+              >
+                {sexBadge.symbol}
+              </Text>
+            </View>
           ) : null}
         </View>
       ) : null}
