@@ -51,6 +51,7 @@ vi.mock("./Followings/HistoryContent", () => ({ default: "HistoryContent" }));
 vi.mock("./Followings/WatchLaterContent", () => ({ default: "WatchLaterContent" }));
 vi.mock("./Living", () => ({ default: "Living" }));
 vi.mock("./Play", () => ({ default: "Play" }));
+vi.mock("./SearchUps", () => ({ default: "SearchUps" }));
 vi.mock("./SearchVideos", () => ({ default: "SearchVideos" }));
 vi.mock("./VideoList", () => ({ default: "VideoList" }));
 vi.mock("./WebPage", () => ({ default: "WebPage" }));
@@ -174,6 +175,7 @@ test("full-screen routes live above the tab navigator", () => {
     "Welcome",
     "MainTabs",
     "SearchVideos",
+    "SearchUps",
     "Dynamic",
     "Play",
     "Living",
@@ -188,6 +190,9 @@ test("full-screen routes live above the tab navigator", () => {
   });
   expect(screens.find((screen) => screen.props.name === "WatchLater")?.props.options).toEqual({
     headerTitle: "稍后再看",
+  });
+  expect(screens.find((screen) => screen.props.name === "SearchUps")?.props.options).toEqual({
+    headerTitle: "搜索UP主",
   });
   expect(screens.find((screen) => screen.props.name === "Favorites")?.props.options).toEqual({
     headerTitle: "我的收藏",

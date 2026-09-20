@@ -11,11 +11,11 @@ import { withUniwind } from "uniwind";
 import bilibiliFetch from "@/api/bilibili-fetch";
 import useLiveUrl from "@/api/get-live-url";
 import { colors } from "@/constants/colors.tw";
+import { useLiveUpsRefresh } from "@/hooks/useLiveUpsRefresh";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import { UA } from "../../constants";
-import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 import HeaderRight from "./HeaderRight";
@@ -116,7 +116,8 @@ function LiveWebPage({ route }: Props) {
     handleRenderProcessGone,
     handleContentProcessDidTerminate,
   } = useRecoverableWebView();
-  const { webViewMode } = useStore();
+  // 返回时直播状态可能已变化，补查一次直播列表
+  useLiveUpsRefresh();
   // const [pageTitle, setPageTitle] = React.useState(title)
 
   useUpdateNavigationOptions({
@@ -216,7 +217,7 @@ function LiveWebPage({ route }: Props) {
       className="flex-1"
       // style={{ height }}
       source={{ uri: url }}
-      key={webViewMode + "-" + webViewKey}
+      key={webViewKey}
       // onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
       originWhitelist={["http://*", "https://*", "bilibili://*"]}
       allowsFullscreenVideo
@@ -231,7 +232,7 @@ function LiveWebPage({ route }: Props) {
       injectedJavaScript={INJECTED_JAVASCRIPT}
       injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT_BEFORE}
       renderLoading={() => <Loading />}
-      userAgent={webViewMode === "MOBILE" ? "" : UA}
+      userAgent=""
       ref={webViewRef}
       onMessage={(evt) => {
         if (handleWebViewMessage(evt.nativeEvent.data)) {

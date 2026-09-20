@@ -11,6 +11,7 @@ const baseItem = {
   time: 0,
   pubAction: "发布了动态",
   top: false,
+  title: "",
   text: "这是一条非常长的动态正文，需要被截断成较短的标题展示",
   richTextNodes: [],
   topic: null,

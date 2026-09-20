@@ -1,94 +1,84 @@
 import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
-import type { HeaderSearchBarOptions, HeaderSearchBarRef } from "@react-navigation/elements";
-import type { RefObject } from "react";
+import React from "react";
+import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, test, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  backHandler: undefined as (() => boolean) | undefined,
+  navigate: vi.fn(),
   options: undefined as Partial<BottomTabNavigationOptions> | undefined,
 }));
 
-vi.mock("@react-native-community/hooks", () => ({
-  useBackHandler: (handler: () => boolean) => {
-    mocks.backHandler = handler;
-  },
+vi.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ navigate: mocks.navigate }),
 }));
-vi.mock("@react-navigation/native", () => ({ useIsFocused: () => true }));
 vi.mock("@/hooks/useUpdateNavigationOptions", () => ({
   default: (options: Partial<BottomTabNavigationOptions>) => {
     mocks.options = options;
   },
 }));
+vi.mock("react-native", () => ({ View: "View" }));
+vi.mock("@/components/styled/rneui", () => ({ Button: "Button", Icon: "Icon" }));
+vi.mock("@/constants/colors.tw", () => ({ colors: { gray7: { accent: "gray7" } } }));
 
 import useFollowListHeader from "./FollowListHeader";
 
+type TestElement = ReactElement<{
+  accessibilityLabel?: string;
+  className?: string;
+  children?: ReactNode;
+  colorClassName?: string;
+  name?: string;
+  onPress?: () => void;
+}>;
+
+function children(element: TestElement): TestElement[] {
+  return React.Children.toArray(element.props.children) as unknown as TestElement[];
+}
+
+/** headerRight 只返回元素，真正的按钮组件在元素内部，这里把它渲染出来 */
+function headerRightTree(): TestElement {
+  const headerRight = mocks.options?.headerRight as (() => TestElement) | undefined;
+  const element = headerRight!();
+  const Component = element.type as (props: unknown) => TestElement;
+  return Component(element.props);
+}
+
 beforeEach(() => {
-  mocks.backHandler = undefined;
   mocks.options = undefined;
+  mocks.navigate.mockClear();
 });
 
-test("places the following summary and native search field in the route header", () => {
-  const onChangeText = vi.fn();
-  const onClose = vi.fn();
-  const onSubmit = vi.fn();
-  const cancelSearch = vi.fn();
-  const searchBarRef: RefObject<HeaderSearchBarRef | null> = {
-    current: { blur: vi.fn(), cancelSearch, clearText: vi.fn(), focus: vi.fn(), setText: vi.fn() },
-  };
-  useFollowListHeader({
-    onChangeText,
-    onClose,
-    onSubmit,
-    searchActive: true,
-    searchBarRef,
-    title: "关注的UP (2/10)",
-  });
+test("关注页头部设置标题，并把搜索按钮放在右侧", () => {
+  useFollowListHeader({ title: "关注的UP" });
 
-  expect(mocks.options?.headerTitle).toBe("关注的UP (2/10)");
-  expect(mocks.options).toHaveProperty("headerRight", undefined);
-  const searchOptions = mocks.options?.headerSearchBarOptions;
-  expect(searchOptions?.ref).toBe(searchBarRef);
-  expect(searchOptions?.placeholder).toBe("搜索UP主");
-  expect(searchOptions?.cancelButtonText).toBe("取消");
+  expect(mocks.options?.headerTitle).toBe("关注的UP");
+  expect(mocks.options?.headerSearchBarOptions).toBeUndefined();
 
-  const changeEvent = {
-    nativeEvent: { text: "新的UP" },
-  } as Parameters<NonNullable<HeaderSearchBarOptions["onChangeText"]>>[0];
-  searchOptions?.onChangeText?.(changeEvent);
-  expect(onChangeText).toHaveBeenCalledWith("新的UP");
+  const headerRight = mocks.options?.headerRight as (() => TestElement) | undefined;
+  expect(headerRight).toBeTypeOf("function");
+  // 导航库会直接调用 headerRight，它必须只返回元素，不能自己调用 hook
+  const element = headerRight!();
+  expect(React.isValidElement(element)).toBe(true);
+  expect(element.type).toBeTypeOf("function");
 
-  const submitEvent = {
-    nativeEvent: { text: "新的UP" },
-  } as Parameters<NonNullable<HeaderSearchBarOptions["onSubmitEditing"]>>[0];
-  searchOptions?.onSubmitEditing?.(submitEvent);
-  expect(onSubmit).toHaveBeenCalledWith("新的UP");
+  const container = headerRightTree();
+  expect(container.props.className).toBe("mr-2");
 
-  searchOptions?.onClose?.();
-  expect(onClose).toHaveBeenCalledOnce();
+  const [button] = children(container);
+  expect(button.type).toBe("Button");
+  expect(button.props.accessibilityLabel).toBe("搜索UP主");
 
-  expect(mocks.backHandler?.()).toBe(true);
-  expect(cancelSearch).toHaveBeenCalledOnce();
+  const [icon] = children(button);
+  expect(icon.type).toBe("Icon");
+  expect(icon.props.name).toBe("search");
+  expect(icon.props.colorClassName).toBe("gray7");
 });
 
-test("lets navigation handle back when search results are not active", () => {
-  const cancelSearch = vi.fn();
-  useFollowListHeader({
-    onChangeText: vi.fn(),
-    onClose: vi.fn(),
-    onSubmit: vi.fn(),
-    searchActive: false,
-    searchBarRef: {
-      current: {
-        blur: vi.fn(),
-        cancelSearch,
-        clearText: vi.fn(),
-        focus: vi.fn(),
-        setText: vi.fn(),
-      },
-    },
-    title: "关注的UP",
-  });
+test("点击头部搜索按钮进入 UP 搜索路由", () => {
+  useFollowListHeader({ title: "关注的UP" });
 
-  expect(mocks.backHandler?.()).toBe(false);
-  expect(cancelSearch).not.toHaveBeenCalled();
+  const [button] = children(headerRightTree());
+  button.props.onPress?.();
+
+  expect(mocks.navigate).toHaveBeenCalledExactlyOnceWith("SearchUps");
 });

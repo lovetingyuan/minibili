@@ -34,6 +34,7 @@ const item = {
   time: 0,
   pubAction: "发布了动态",
   top: false,
+  title: "",
   text: "动态正文",
   richTextNodes: [],
   topic: null,
@@ -96,6 +97,43 @@ test("renders a pinned dynamic as a tag", () => {
   expect(tag?.type).toBe("View");
   expect(tag?.props.className).toContain("rounded");
   expect(tag?.props.className).toContain("bg-pink-50");
+});
+
+test("renders the OPUS title above the body text", () => {
+  const elements = flatten(
+    DynamicCard({
+      item: {
+        ...item,
+        title: "继续建设牛牛快乐屋😋",
+        text: "分享图片",
+        content: { kind: "images", images: [] },
+      },
+    }),
+  );
+  const titleIndex = elements.findIndex(
+    (element) => element.type === "Text" && element.props.children === "继续建设牛牛快乐屋😋",
+  );
+  const bodyIndex = elements.findIndex(
+    (element) => element.type === "Text" && element.props.children === "分享图片",
+  );
+
+  expect(titleIndex).toBeGreaterThanOrEqual(0);
+  expect(titleIndex).toBeLessThan(bodyIndex);
+});
+
+test("renders no title row when the dynamic has no title", () => {
+  const titles = flatten(DynamicCard({ item })).filter(
+    (element) =>
+      element.type === "Text" &&
+      typeof element.props.className === "string" &&
+      element.props.className.includes("font-semibold"),
+  );
+  const body = flatten(DynamicCard({ item })).find(
+    (element) => element.type === "Text" && element.props.children === "动态正文",
+  );
+
+  expect(titles).toHaveLength(0);
+  expect(body).toBeDefined();
 });
 
 test("opens the author space from the avatar and the UP name", () => {

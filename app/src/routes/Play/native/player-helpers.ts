@@ -210,7 +210,10 @@ export function createVideoSource(uri: string, title?: string): VideoSourceObjec
       Referer: PLAY_URL_REFERER,
       "User-Agent": mediaUA,
     },
-    ...(title ? { metadata: { title } } : {}),
+    metadata: {
+      ...(title ? { title } : {}),
+      artist: "MiniBili",
+    },
   };
 }
 
@@ -247,8 +250,9 @@ export function resolveControlsAutoHideMs(isPlaying: boolean): number | null {
 }
 
 /**
- * 中间续播按钮的显示条件：开始播放、首帧已经渲染出来，且当前稳定处于暂停态。
+ * 中间续播按钮的显示条件：开始播放、画面已经可见，且当前稳定处于暂停态。
  *
+ * 画面可见指首帧已经渲染（封面已撤掉），或者播放结束后重新展示了封面；
  * 首帧渲染事件可能比 playingChange 先到，播放真正开始过（playbackStarted）之前不展示；
  * paused 由 usePlayerPausedUi 计算，已经过滤掉起播、seek、缓冲带来的短暂暂停，
  * 避免按钮在视频刚开始播放时闪一下。
@@ -256,15 +260,32 @@ export function resolveControlsAutoHideMs(isPlaying: boolean): number | null {
  */
 export function shouldShowResumeButton(options: {
   started: boolean;
-  firstFrameRendered: boolean;
+  videoVisible: boolean;
   playbackStarted: boolean;
   paused: boolean;
   hasError: boolean;
   overlayVisible: boolean;
 }) {
-  const { started, firstFrameRendered, playbackStarted, paused, hasError, overlayVisible } =
-    options;
-  return started && firstFrameRendered && playbackStarted && paused && !hasError && !overlayVisible;
+  const { started, videoVisible, playbackStarted, paused, hasError, overlayVisible } = options;
+  return started && videoVisible && playbackStarted && paused && !hasError && !overlayVisible;
+}
+
+/**
+ * 控制条上展示的播放进度：拖动中跟随拖动位置；
+ * 播放结束后对齐总时长——最后一次 timeUpdate 通常停在总时长前面不到一秒
+ * （例如 03:31.8/03:32），直接展示会得到比总时长少一秒的读数
+ */
+export function resolvePlaybackDisplayMs(options: {
+  currentMs: number;
+  durationMs: number;
+  ended: boolean;
+  scrubMs?: number | null;
+}) {
+  const { currentMs, durationMs, ended, scrubMs } = options;
+  if (typeof scrubMs === "number") {
+    return scrubMs;
+  }
+  return ended ? durationMs : currentMs;
 }
 
 /**

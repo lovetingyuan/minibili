@@ -45,12 +45,13 @@ import { unlockOrientation } from "@/utils/screen-orientation";
 
 import DanmakuComposer from "./DanmakuComposer";
 import DanmakuOverlay from "./DanmakuOverlay";
+import type { PlaybackRate } from "./playback-rate";
 import PlayerControls from "./PlayerControls";
 import PlayerCover from "./PlayerCover";
 import PlayerError from "./PlayerError";
 import PlayerPoster from "./PlayerPoster";
 import PlayerSeekHint from "./PlayerSeekHint";
-import type { PlaybackMode, PlayEndedEvent } from "../playback-mode";
+import { type PlaybackMode, type PlayEndedEvent, willContinueAfterEnded } from "../playback-mode";
 import {
   createVideoSource,
   isSeekJump,
@@ -112,6 +113,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   const { data } = useVideoInfo(route.params.bvid);
   const videoInfo = { ...route.params, ...data };
   const pageInfo = videoInfo.pages?.[currentPage - 1];
+  const pageCount = videoInfo.pages?.length ?? 1;
   const cid = pageInfo?.cid ?? videoInfo.cid ?? 0;
   const durationSeconds = pageInfo?.duration ?? videoInfo.duration ?? 0;
   // 会话未就绪或已失效时不展示发送弹幕入口，其余播放控件不受影响
@@ -129,8 +131,12 @@ export default function NativePlayer(props: NativePlayerProps) {
   const [posterDismissed, setPosterDismissed] = React.useState(false);
   // 播放是否真正开始过（收到过 playing=true），用于避免首帧渲染早于 playingChange 时续播按钮闪一下
   const [playbackStarted, setPlaybackStarted] = React.useState(false);
+  // 播放结束并且不会自动继续（未开循环、也没有下一个分 P）时为 true，
+  // 此时重新展示封面，控制条上的时间对齐总时长
+  const [playbackEnded, setPlaybackEnded] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [playerStatus, setPlayerStatus] = React.useState<VideoPlayerStatus>("idle");
+  const [playbackRate, setPlaybackRate] = React.useState<PlaybackRate>(1);
   const [fastRate, setFastRate] = React.useState(false);
   const [playerError, setPlayerError] = React.useState<string | null>(null);
   const [isRetrying, setIsRetrying] = React.useState(false);
@@ -175,6 +181,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   const backgroundConfigurationRef = React.useRef<{
     player: VideoPlayer;
     enabled: boolean;
+    showNotification: boolean;
   } | null>(null);
 
   // 真正处于暂停态：起播、seek、缓冲造成的短暂暂停不算，避免暂停态的 UI 闪一下
@@ -194,7 +201,15 @@ export default function NativePlayer(props: NativePlayerProps) {
   const player = useVideoPlayer(source, (instance) => {
     instance.timeUpdateEventInterval = 0.25;
     instance.loop = playbackMode.loop;
+    instance.playbackRate = playbackRate;
   });
+
+  const effectivePlaybackRate = fastRate ? PLAYER_FAST_RATE : playbackRate;
+
+  // 替换播放地址或切换分 P 后仍保持用户选择的倍速；长按期间则使用临时 3×。
+  React.useEffect(() => {
+    player.playbackRate = effectivePlaybackRate;
+  }, [effectivePlaybackRate, player]);
 
   // 本地按分P 记录的位置优先；当前分P 没有本地记录时再回退 B站记录。
   const liveLocalPlayResumePositionMs = usePartPlayProgressPosition(videoInfo.bvid, cid);
@@ -246,6 +261,11 @@ export default function NativePlayer(props: NativePlayerProps) {
   const playEndGuardRef = React.useRef({ player, handled: false });
   const onPlayEndedRef = React.useRef(onPlayEnded);
   onPlayEndedRef.current = onPlayEnded;
+  // 播放结束事件在订阅后触发，回调里需要读到最新的播放模式与分 P 数量
+  const playbackModeRef = React.useRef(playbackMode);
+  playbackModeRef.current = playbackMode;
+  const pageCountRef = React.useRef(pageCount);
+  pageCountRef.current = pageCount;
   const reportHeartbeatEndedRef = React.useRef(reportEnded);
   reportHeartbeatEndedRef.current = reportEnded;
   const reportPartProgressEndedRef = React.useRef(reportPartProgressEnded);
@@ -287,18 +307,29 @@ export default function NativePlayer(props: NativePlayerProps) {
   function configureCurrentPlayerBackgroundPlayback(
     force = false,
   ): BackgroundPlaybackConfigurationResult {
+    const showNotification = $backgroundPlayEnabled && playbackStarted;
     const previous = backgroundConfigurationRef.current;
-    if (!force && previous?.player === player && previous.enabled === $backgroundPlayEnabled) {
+    if (
+      !force &&
+      previous?.player === player &&
+      previous.enabled === $backgroundPlayEnabled &&
+      previous.showNotification === showNotification
+    ) {
       return "applied";
     }
     const result = configureBackgroundPlayback(
       player,
       $backgroundPlayEnabled,
+      showNotification,
       AppState.currentState,
     );
     if (result !== "deferred") {
       // 失败时也避免每次 timeUpdate 重渲染都重试；下一次回到前台会强制重试。
-      backgroundConfigurationRef.current = { player, enabled: $backgroundPlayEnabled };
+      backgroundConfigurationRef.current = {
+        player,
+        enabled: $backgroundPlayEnabled,
+        showNotification,
+      };
     }
     if (__DEV__ && result === "failed") {
       // oxlint-disable-next-line no-console
@@ -477,6 +508,14 @@ export default function NativePlayer(props: NativePlayerProps) {
       reportPartProgressEndedRef.current(videoInfo.bvid, endedCid);
       updatePlayingState(false);
       setPortraitExpanded(false);
+      // 循环或自动连播会继续播放，此时保持最后一帧；否则回到封面
+      setPlaybackEnded(
+        !willContinueAfterEnded({
+          mode: playbackModeRef.current,
+          currentPage: endedPage,
+          pageCount: pageCountRef.current,
+        }),
+      );
       onPlayEndedRef.current({ cid: endedCid, page: endedPage });
     });
     return () => {
@@ -501,6 +540,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     nativePlayingRef.current = false;
     setIsPlaying(false);
     setPlaybackStarted(false);
+    setPlaybackEnded(false);
     setDanmakuComposerOpen(false);
     setLocalDanmaku([]);
     setDanmakuAnchorMs(0);
@@ -517,6 +557,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   React.useEffect(() => {
     setFirstFrameRendered(false);
     setPosterDismissed(false);
+    setPlaybackEnded(false);
   }, [uri, playbackAttempt.token]);
 
   React.useEffect(() => {
@@ -585,7 +626,7 @@ export default function NativePlayer(props: NativePlayerProps) {
       return;
     }
     configureCurrentPlayerBackgroundPlayback();
-  }, [appState, player, $backgroundPlayEnabled]);
+  }, [appState, player, $backgroundPlayEnabled, playbackStarted]);
 
   React.useEffect(() => {
     player.loop = playbackMode.loop;
@@ -644,6 +685,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   }, []);
 
   function handleSeek(timeMs: number) {
+    setPlaybackEnded(false);
     player.currentTime = timeMs / 1000;
     lastTimeRef.current = Math.round(timeMs);
     setCurrentTimeMs(Math.round(timeMs));
@@ -833,8 +875,14 @@ export default function NativePlayer(props: NativePlayerProps) {
   }
 
   function handleLongPressEnd() {
-    player.playbackRate = 1;
+    player.playbackRate = playbackRate;
     setFastRate(false);
+  }
+
+  function handlePlaybackRateChange(rate: PlaybackRate) {
+    player.playbackRate = rate;
+    setFastRate(false);
+    setPlaybackRate(rate);
   }
 
   async function handleRetry() {
@@ -933,21 +981,22 @@ export default function NativePlayer(props: NativePlayerProps) {
           setFirstFrameRendered(true);
         }}
       />
-      {!posterDismissed ? (
+      {/* 首帧渲染前用封面兜底；播放结束后重新展示封面，此时不再叠加载入提示 */}
+      {!posterDismissed || playbackEnded ? (
         <PlayerPoster
           cover={videoInfo.cover}
           containerWidth={width}
-          loading={started && !showError}
+          loading={started && !showError && !playbackEnded}
         />
       ) : null}
-      {started ? (
+      {started && !playbackEnded ? (
         <DanmakuOverlay
           cid={cid}
           enabled={$danmakuEnabled}
           isPlaying={isPlaying}
           currentTimeMs={currentTimeMs}
           anchorTimeMs={danmakuAnchorMs}
-          playbackRate={fastRate ? PLAYER_FAST_RATE : 1}
+          playbackRate={effectivePlaybackRate}
           width={width}
           height={containerHeight}
           fontSize={fullscreen ? 18 : 15}
@@ -965,10 +1014,10 @@ export default function NativePlayer(props: NativePlayerProps) {
       {seekHint ? (
         <PlayerSeekHint targetMs={seekHint.targetMs} deltaSeconds={seekHint.deltaSeconds} />
       ) : null}
-      {/* 封面真正撤掉前不显示播放按钮，避免和封面叠在一起 */}
+      {/* 画面可见（首帧已渲染，或播放结束后重新展示的封面）时才显示按钮 */}
       {shouldShowResumeButton({
         started,
-        firstFrameRendered: posterDismissed,
+        videoVisible: posterDismissed || playbackEnded,
         playbackStarted,
         paused: pausedUiVisible,
         hasError,
@@ -977,7 +1026,7 @@ export default function NativePlayer(props: NativePlayerProps) {
         <View pointerEvents="box-none" className="absolute inset-0 items-center justify-center">
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="继续播放"
+            accessibilityLabel={playbackEnded ? "重新播放" : "继续播放"}
             hitSlop={12}
             className="h-14 w-14 items-center justify-center rounded-full bg-black/40"
             onPress={resumePlayback}
@@ -989,8 +1038,10 @@ export default function NativePlayer(props: NativePlayerProps) {
       {started ? (
         <PlayerControls
           paused={pausedUiVisible}
+          ended={playbackEnded}
           currentTimeMs={currentTimeMs}
           durationMs={durationSeconds * 1000}
+          playbackRate={playbackRate}
           danmakuEnabled={$danmakuEnabled}
           canSendDanmaku={Boolean(danmakuAccount)}
           backgroundPlayEnabled={$backgroundPlayEnabled}
@@ -1000,6 +1051,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           fullscreen={fullscreen}
           visible={controlsVisible}
           onTogglePlay={handleTogglePlay}
+          onPlaybackRateChange={handlePlaybackRateChange}
           onToggleDanmaku={() => {
             set$danmakuEnabled(!$danmakuEnabled);
             setDanmakuAnchorMs(currentTimeMs);

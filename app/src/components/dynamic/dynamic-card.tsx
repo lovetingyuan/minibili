@@ -77,6 +77,15 @@ function DynamicBody(props: { item: DynamicItem; detail?: boolean }) {
   const { item, detail } = props;
   return (
     <>
+      {item.title ? (
+        <Text
+          selectable={detail}
+          numberOfLines={detail ? undefined : 2}
+          className="mb-2 text-base font-semibold leading-6"
+        >
+          {item.title}
+        </Text>
+      ) : null}
       {item.richTextNodes.length ? (
         <RichTexts
           idStr={item.id}

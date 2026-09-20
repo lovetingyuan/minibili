@@ -46,6 +46,7 @@ export type RootStackParamList = {
   Welcome: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   SearchVideos: undefined;
+  SearchUps: undefined;
   WebPage: { url: string; title?: string; type?: "pc" | "mobile" };
   Play: {
     bvid: string;

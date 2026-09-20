@@ -23,6 +23,21 @@ export function toggleAutoNextMode(mode: PlaybackMode): PlaybackMode {
   return { autoNext, loop: autoNext ? false : mode.loop };
 }
 
+/**
+ * 当前分 P 之后要自动播放的分 P：循环播放（重复当前分 P）或不自动连播时为 null
+ */
+function resolveAutoNextPage(input: {
+  mode: PlaybackMode;
+  currentPage: number;
+  pageCount: number;
+}) {
+  const { mode, currentPage, pageCount } = input;
+  if (mode.loop || !mode.autoNext || currentPage >= pageCount) {
+    return null;
+  }
+  return currentPage + 1;
+}
+
 export function resolveNextPageOnEnded(input: {
   currentCid: number;
   currentPage: number;
@@ -30,14 +45,20 @@ export function resolveNextPageOnEnded(input: {
   mode: PlaybackMode;
   pageCount: number;
 }) {
-  if (
-    !input.mode.autoNext ||
-    input.mode.loop ||
-    input.ended.page !== input.currentPage ||
-    input.ended.cid !== input.currentCid ||
-    input.currentPage >= input.pageCount
-  ) {
+  if (input.ended.page !== input.currentPage || input.ended.cid !== input.currentCid) {
     return null;
   }
-  return input.currentPage + 1;
+  return resolveAutoNextPage(input);
+}
+
+/**
+ * 播放结束后是否还会继续播放：循环当前分 P，或者自动连播切到下一个分 P。
+ * 两者都不成立时播放器停在结尾，需要重新展示封面。
+ */
+export function willContinueAfterEnded(input: {
+  mode: PlaybackMode;
+  currentPage: number;
+  pageCount: number;
+}) {
+  return input.mode.loop || resolveAutoNextPage(input) !== null;
 }

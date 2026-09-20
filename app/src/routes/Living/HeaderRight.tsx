@@ -2,7 +2,7 @@ import { type RouteProp, useRoute } from "@react-navigation/native";
 import { Icon } from "@/components/styled/rneui";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
-import { Linking, Share } from "react-native";
+import { Share } from "react-native";
 import {
   Menu,
   MenuOption,
@@ -11,14 +11,12 @@ import {
   menuTriggerIconButtonStyles,
 } from "@/components/Menu";
 
-import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 
 export default HeaderRight;
 
 function HeaderRight(props: { reload: () => void }) {
-  const { webViewMode, setWebViewMode } = useStore();
   const [visible, setVisible] = React.useState(false);
   const route = useRoute<RouteProp<RootStackParamList, "Living">>();
   const { url, title } = route.params;
@@ -36,20 +34,6 @@ function HeaderRight(props: { reload: () => void }) {
         <Icon name="dots-vertical" type="material-community" />
       </MenuTrigger>
       <MenuOptions>
-        <MenuOption
-          text={webViewMode === "MOBILE" ? "电脑模式" : "手机模式"}
-          onSelect={() => {
-            setWebViewMode(webViewMode === "MOBILE" ? "PC" : "MOBILE");
-            hideMenu();
-          }}
-        />
-        <MenuOption
-          text="浏览器打开"
-          onSelect={() => {
-            hideMenu();
-            Linking.openURL(url);
-          }}
-        />
         <MenuOption
           text="刷新页面"
           onSelect={() => {

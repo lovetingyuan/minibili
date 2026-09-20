@@ -119,6 +119,8 @@ export type DynamicItem = {
   time: number;
   pubAction: string;
   top: boolean;
+  /** 图文动态（OPUS）的标题，正文里已经包含标题时为空字符串 */
+  title: string;
   text: string;
   richTextNodes: RichTextNode[];
   topic: { name: string; jump_url: string } | null;

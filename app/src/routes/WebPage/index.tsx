@@ -18,8 +18,6 @@ import { colors } from "@/constants/colors.tw";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
-import { UA } from "../../constants";
-import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 import HeaderRight from "./HeaderRight";
@@ -77,7 +75,6 @@ function WebPage({ route }: Props) {
     handleRenderProcessGone,
     handleContentProcessDidTerminate,
   } = useRecoverableWebView();
-  const { webViewMode } = useStore();
   const isDark = useColorScheme() === "dark";
   const { height: screenHeight } = useWindowDimensions();
   const [height, setHeight] = React.useState(screenHeight);
@@ -103,7 +100,7 @@ function WebPage({ route }: Props) {
       className="flex-1"
       style={{ height }}
       source={{ uri: url }}
-      key={webViewMode + "-" + webViewKey}
+      key={webViewKey}
       onScroll={(e) => {
         // 滚动回调每秒触发几十次，仅在「是否回到顶部」真正翻转时才更新状态，避免整屏重渲染
         const nextEnabled = e.nativeEvent.contentOffset.y === 0;
@@ -125,7 +122,7 @@ function WebPage({ route }: Props) {
       webviewDebuggingEnabled={__DEV__}
       injectedJavaScript={INJECTED_JAVASCRIPT}
       renderLoading={() => <Loading />}
-      userAgent={webViewMode === "MOBILE" ? "" : UA}
+      userAgent=""
       ref={webViewRef}
       onMessage={(evt) => {
         if (handleWebViewMessage(evt.nativeEvent.data)) {

@@ -39,16 +39,26 @@ describe("background playback configuration", () => {
       },
     };
 
-    expect(configureBackgroundPlayback(player, true, "background")).toBe("deferred");
+    expect(configureBackgroundPlayback(player, true, true, "background")).toBe("deferred");
     expect(writes).toBe(0);
   });
 
   test("enables both background properties while active", () => {
     const player = createPlayer();
 
-    expect(configureBackgroundPlayback(player, true, "active")).toBe("applied");
+    expect(configureBackgroundPlayback(player, true, true, "active")).toBe("applied");
     expect(player).toEqual({
       showNowPlayingNotification: true,
+      staysActiveInBackground: true,
+    });
+  });
+
+  test("prepares background playback without publishing an idle media notification", () => {
+    const player = createPlayer();
+
+    expect(configureBackgroundPlayback(player, true, false, "active")).toBe("applied");
+    expect(player).toEqual({
+      showNowPlayingNotification: false,
       staysActiveInBackground: true,
     });
   });
@@ -73,7 +83,7 @@ describe("background playback configuration", () => {
       },
     };
 
-    expect(configureBackgroundPlayback(player, true, "active")).toBe("failed");
+    expect(configureBackgroundPlayback(player, true, true, "active")).toBe("failed");
     expect(values).toEqual({
       showNowPlayingNotification: false,
       staysActiveInBackground: false,
@@ -101,9 +111,9 @@ describe("background playback configuration", () => {
       },
     };
 
-    expect(configureBackgroundPlayback(player, true, "active")).toBe("failed");
+    expect(configureBackgroundPlayback(player, true, true, "active")).toBe("failed");
     reject = false;
-    expect(configureBackgroundPlayback(player, true, "active")).toBe("applied");
+    expect(configureBackgroundPlayback(player, true, true, "active")).toBe("applied");
     expect(values).toEqual({
       showNowPlayingNotification: true,
       staysActiveInBackground: true,

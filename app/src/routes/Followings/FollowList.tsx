@@ -1,4 +1,3 @@
-import type { HeaderSearchBarRef } from '@react-navigation/elements'
 import React from 'react'
 import { Alert, View } from 'react-native'
 import PagerView from 'react-native-pager-view'
@@ -32,7 +31,6 @@ import type { FollowGroupEditorState, FollowGroupTab } from './FollowGroups.type
 import GroupNameDialog from './GroupNameDialog'
 import GroupUpList from './GroupUpList'
 import SetUpGroupDialog from './SetUpGroupDialog'
-import UpList from './UpList'
 import useFollowListHeader from './FollowListHeader'
 
 const ALL_TAB_KEY = 'all'
@@ -43,7 +41,6 @@ function toError(cause: unknown, fallback: string) {
 }
 
 function FollowList() {
-  const [searchKeyword, setSearchKeyword] = React.useState('')
   const [selectedKey, setSelectedKey] = React.useState(ALL_TAB_KEY)
   const [visitedKeys, setVisitedKeys] = React.useState<string[]>([ALL_TAB_KEY])
   const [editor, setEditor] = React.useState<FollowGroupEditorState | null>(null)
@@ -56,7 +53,6 @@ function FollowList() {
   /** PagerView 当前显示的页码，用户滑动与程序化切页都会更新它 */
   const [pagerIndex, setPagerIndex] = React.useState(0)
   const pagerRef = React.useRef<PagerView | null>(null)
-  const searchBarRef = React.useRef<HeaderSearchBarRef | null>(null)
   // 程序化切页的目标页码：ViewPager2 平滑滚动时会依次上报中间页，这里用它忽略这些中间事件
   const pagerTargetRef = React.useRef<number | null>(null)
 
@@ -95,31 +91,8 @@ function FollowList() {
     pagerRef.current?.setPage(activeIndex)
   }, [activeIndex, pagerIndex])
 
-  function changeSearchText(text: string) {
-    if (!text.trim()) {
-      setSearchKeyword('')
-    }
-  }
-
-  function submitSearch(text: string) {
-    const keyword = text.trim()
-    if (!keyword) {
-      return
-    }
-    setSearchKeyword(keyword)
-  }
-
-  function cancelSearch() {
-    setSearchKeyword('')
-  }
-
   useFollowListHeader({
     title: `关注的UP`,
-    onChangeText: changeSearchText,
-    onClose: cancelSearch,
-    onSubmit: submitSearch,
-    searchActive: Boolean(searchKeyword),
-    searchBarRef,
   })
 
   function assertAccount() {
@@ -310,65 +283,59 @@ function FollowList() {
 
   return (
     <View className="flex-1">
-      {searchKeyword ? (
-        <UpList keyword={searchKeyword} />
-      ) : (
-        <>
-          {tags.error ? (
-            <View className="flex-row items-center justify-center gap-2 px-3 py-2">
-              <Text className="shrink text-xs">分组加载失败，正在显示上次数据</Text>
-              <Button
-                title="重试"
-                type="clear"
-                size="sm"
-                loading={tags.isValidating}
-                onPress={() => {
-                  void refreshTags()
-                }}
-              />
-            </View>
-          ) : null}
-          <FollowGroupTabs
-            tabs={tabs}
-            selectedKey={activeTab.key}
-            disabled={false}
-            onSelect={selectTab}
-            onLongPress={handleLongPressTab}
-            onCreate={openCreateDialog}
+      {tags.error ? (
+        <View className="flex-row items-center justify-center gap-2 px-3 py-2">
+          <Text className="shrink text-xs">分组加载失败，正在显示上次数据</Text>
+          <Button
+            title="重试"
+            type="clear"
+            size="sm"
+            loading={tags.isValidating}
+            onPress={() => {
+              void refreshTags()
+            }}
           />
-          <PagerView
-            ref={pagerRef}
-            style={{ flex: 1 }}
-            initialPage={activeIndex}
-            onPageSelected={({ nativeEvent }) => {
-              handlePageSelected(nativeEvent.position)
-            }}
-            onPageScrollStateChanged={({ nativeEvent }) => {
-              // 用户重新接管手势时清掉程序化切页的目标，避免后续页码被误忽略
-              if (nativeEvent.pageScrollState === 'dragging') {
-                pagerTargetRef.current = null
-              }
-            }}
-          >
-            {tabs.map(tab => (
-              <View key={tab.key} collapsable={false} className="flex-1">
-                {visitedKeySet.has(tab.key) ? (
-                  tab.tagid === null ? (
-                    <AllUpList specialMids={specialFollowUps.data} onSetGroups={setGroupTarget} />
-                  ) : (
-                    <GroupUpList
-                      tagid={tab.tagid}
-                      specialMids={specialFollowUps.data}
-                      onSetGroups={setGroupTarget}
-                      onRefreshTags={refreshTags}
-                    />
-                  )
-                ) : null}
-              </View>
-            ))}
-          </PagerView>
-        </>
-      )}
+        </View>
+      ) : null}
+      <FollowGroupTabs
+        tabs={tabs}
+        selectedKey={activeTab.key}
+        disabled={false}
+        onSelect={selectTab}
+        onLongPress={handleLongPressTab}
+        onCreate={openCreateDialog}
+      />
+      <PagerView
+        ref={pagerRef}
+        style={{ flex: 1 }}
+        initialPage={activeIndex}
+        onPageSelected={({ nativeEvent }) => {
+          handlePageSelected(nativeEvent.position)
+        }}
+        onPageScrollStateChanged={({ nativeEvent }) => {
+          // 用户重新接管手势时清掉程序化切页的目标，避免后续页码被误忽略
+          if (nativeEvent.pageScrollState === 'dragging') {
+            pagerTargetRef.current = null
+          }
+        }}
+      >
+        {tabs.map(tab => (
+          <View key={tab.key} collapsable={false} className="flex-1">
+            {visitedKeySet.has(tab.key) ? (
+              tab.tagid === null ? (
+                <AllUpList specialMids={specialFollowUps.data} onSetGroups={setGroupTarget} />
+              ) : (
+                <GroupUpList
+                  tagid={tab.tagid}
+                  specialMids={specialFollowUps.data}
+                  onSetGroups={setGroupTarget}
+                  onRefreshTags={refreshTags}
+                />
+              )
+            ) : null}
+          </View>
+        ))}
+      </PagerView>
       {editor ? (
         <GroupNameDialog
           mode={editor.mode}

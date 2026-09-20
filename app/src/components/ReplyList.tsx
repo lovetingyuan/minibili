@@ -1,7 +1,7 @@
 import { useIsFocused } from "@react-navigation/native";
 import type { FlashListRef } from "@shopify/flash-list";
 import { useEffect, useRef } from "react";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { ActivityIndicator, Easing, Pressable, View } from "react-native";
 import type { Edge } from "react-native-safe-area-context";
 
 import { useReplies } from "@/api/replies";
@@ -18,6 +18,7 @@ import type { ReplyListProps } from "./reply-list.types";
 import ReplyComposer from "./ReplyComposer";
 
 const SHEET_SAFE_AREA_EDGES: Edge[] = ["top"];
+const SHEET_EASING = Easing.out(Easing.cubic);
 
 export default function ReplyList(props: ReplyListProps) {
   const replies = useReplies();
@@ -130,6 +131,7 @@ export default function ReplyList(props: ReplyListProps) {
     <BottomSheet
       backdropClassName="bg-black/50"
       edges={SHEET_SAFE_AREA_EDGES}
+      easing={SHEET_EASING}
       onBackdropPress={handleClose}
       modalProps={{ onRequestClose: handleClose, statusBarTranslucent: true }}
       scrollViewProps={{ keyboardShouldPersistTaps: "handled" }}

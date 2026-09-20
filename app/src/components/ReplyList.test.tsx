@@ -5,6 +5,7 @@ import type { ReplyItemType } from "@/api/comments.types";
 import type { RepliesInfo } from "@/store/replies-info.type";
 
 const mocks = vi.hoisted(() => ({
+  easing: vi.fn(),
   repliesInfo: null as unknown,
   replies: null as unknown,
   setRepliesInfo: vi.fn(),
@@ -18,6 +19,7 @@ vi.mock("react", async () => ({
 vi.mock("@react-navigation/native", () => ({ useIsFocused: () => true }));
 vi.mock("react-native", () => ({
   ActivityIndicator: "ActivityIndicator",
+  Easing: { cubic: "cubic", out: () => mocks.easing },
   Pressable: "Pressable",
   View: "View",
 }));
@@ -41,6 +43,7 @@ import ReplyList from "./ReplyList";
 type ElementProps = {
   children?: ReactNode;
   className?: string;
+  easing?: unknown;
   onDelete?: (target: ReplyItemType) => Promise<boolean>;
   renderItem?: (input: { item: ReplyItemType }) => ReactElement<ElementProps>;
   scrollViewProps?: { keyboardShouldPersistTaps?: string };
@@ -124,7 +127,7 @@ beforeEach(() => {
   };
 });
 
-test("keeps keyboard taps, increases row padding and wires own-reply deletion", async () => {
+test("uses a non-overshooting sheet transition and wires own-reply deletion", async () => {
   const onDelete = vi.fn().mockResolvedValue(true);
   const tree = ReplyList({
     onAttitude: vi.fn().mockResolvedValue(null),
@@ -136,6 +139,7 @@ test("keeps keyboard taps, increases row padding and wires own-reply deletion", 
     isDeletePending: () => false,
   }) as ReactElement<ElementProps>;
 
+  expect(tree.props.easing).toBe(mocks.easing);
   expect(tree.props.scrollViewProps?.keyboardShouldPersistTaps).toBe("handled");
   const list = findElement(tree, (element) => element.type === "FlashList");
   const child = (mocks.repliesInfo as RepliesInfo).previewReplies[0];

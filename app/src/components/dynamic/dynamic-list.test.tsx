@@ -87,6 +87,7 @@ const item = {
   time: 0,
   pubAction: "发布了动态",
   top: false,
+  title: "",
   text: "动态正文",
   richTextNodes: [],
   topic: null,

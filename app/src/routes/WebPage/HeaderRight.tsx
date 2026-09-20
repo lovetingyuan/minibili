@@ -11,14 +11,12 @@ import {
   menuTriggerIconButtonStyles,
 } from "@/components/Menu";
 
-import { useStore } from "../../store";
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 
 export default HeaderRight;
 
 function HeaderRight(props: { reload: () => void }) {
-  const { webViewMode, setWebViewMode } = useStore();
   const [visible, setVisible] = React.useState(false);
   const route = useRoute<RouteProp<RootStackParamList, "WebPage">>();
   const { url, title } = route.params;
@@ -36,13 +34,6 @@ function HeaderRight(props: { reload: () => void }) {
         <Icon name="dots-vertical" type="material-community" />
       </MenuTrigger>
       <MenuOptions>
-        <MenuOption
-          text={webViewMode === "MOBILE" ? "电脑模式" : "手机模式"}
-          onSelect={() => {
-            setWebViewMode(webViewMode === "MOBILE" ? "PC" : "MOBILE");
-            hideMenu();
-          }}
-        />
         <MenuOption
           text="浏览器打开"
           onSelect={() => {

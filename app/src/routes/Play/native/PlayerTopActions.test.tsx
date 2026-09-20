@@ -5,7 +5,15 @@ import type { ReactElement, ReactNode } from "react";
 
 vi.mock("react-native", () => ({
   Pressable: "Pressable",
+  Text: "Text",
   View: "View",
+}));
+
+vi.mock("@/components/Menu", () => ({
+  Menu: "Menu",
+  MenuOption: "MenuOption",
+  MenuOptions: "MenuOptions",
+  MenuTrigger: "MenuTrigger",
 }));
 
 vi.mock("@/components/styled/rneui", () => ({
@@ -13,7 +21,10 @@ vi.mock("@/components/styled/rneui", () => ({
 }));
 
 vi.mock("@/constants/colors.tw", () => ({
-  colors: { secondary: { text: "text-pink-500 dark:text-pink-400" } },
+  colors: {
+    black: { text: "text-zinc-800 dark:text-neutral-200" },
+    secondary: { text: "text-pink-500 dark:text-pink-400" },
+  },
 }));
 
 vi.mock("@/hooks/useResolvedColor", () => ({
@@ -26,12 +37,14 @@ const ACCENT_COLOR = "#ff6699";
 
 type ElementProps = {
   accessibilityLabel?: string;
-  accessibilityState?: { selected?: boolean };
+  accessibilityState?: { expanded?: boolean; selected?: boolean };
   children?: ReactNode;
   className?: string;
   color?: string;
   name?: string;
   onPress?: () => void;
+  onSelect?: () => void;
+  opened?: boolean;
 };
 
 function expectElement(node: ReactNode): ReactElement<ElementProps> {
@@ -48,10 +61,14 @@ function renderActions(
     canSendDanmaku: boolean;
     loopEnabled: boolean;
     showAutoNext: boolean;
+    playbackRateMenuOpen: boolean;
   }> = {},
 ) {
   const handlers = {
+    onClosePlaybackRateMenu: vi.fn(),
+    onPlaybackRateChange: vi.fn(),
     onSendDanmaku: vi.fn(),
+    onTogglePlaybackRateMenu: vi.fn(),
     onToggleAutoNext: vi.fn(),
     onToggleBackgroundPlay: vi.fn(),
     onToggleLoop: vi.fn(),
@@ -62,14 +79,18 @@ function renderActions(
       backgroundPlayEnabled: false,
       canSendDanmaku: false,
       loopEnabled: false,
+      playbackRate: 1,
+      playbackRateMenuOpen: false,
       showAutoNext: true,
       ...options,
       ...handlers,
     }),
   );
-  const buttons = React.Children.toArray(root.props.children).map(expectElement);
+  const children = React.Children.toArray(root.props.children).map(expectElement);
+  const rateMenu = children[0];
+  const buttons = children.slice(1);
 
-  return { handlers, buttons };
+  return { handlers, buttons, rateMenu };
 }
 
 function getIcon(button: ReactElement<ElementProps>) {
@@ -77,6 +98,34 @@ function getIcon(button: ReactElement<ElementProps>) {
 }
 
 describe("PlayerTopActions", () => {
+  test("shows every supported playback rate and marks the current one", () => {
+    const { rateMenu } = renderActions({ playbackRateMenuOpen: true });
+    const [trigger, options] = React.Children.toArray(rateMenu.props.children).map(expectElement);
+    const rateOptions = React.Children.toArray(options.props.children).map(expectElement);
+
+    expect(rateMenu.props.opened).toBe(true);
+    expect(trigger.props.accessibilityLabel).toBe("播放速度，当前 1x，列表已展开");
+    expect(rateOptions.map((option) => option.props.accessibilityLabel)).toEqual([
+      "0.5x",
+      "0.8x",
+      "1x，当前速度",
+      "1.5x",
+      "2x",
+      "3x",
+    ]);
+  });
+
+  test("opens the rate menu and selects a playback rate", () => {
+    const { handlers, rateMenu } = renderActions();
+    const [trigger, options] = React.Children.toArray(rateMenu.props.children).map(expectElement);
+    const rateOptions = React.Children.toArray(options.props.children).map(expectElement);
+
+    trigger.props.onPress?.();
+    expect(handlers.onTogglePlaybackRateMenu).toHaveBeenCalledOnce();
+    rateOptions[4].props.onSelect?.();
+    expect(handlers.onPlaybackRateChange).toHaveBeenCalledWith(2);
+  });
+
   test("shows loop and background play but hides auto next for a single part", () => {
     const { buttons } = renderActions({ showAutoNext: false });
 

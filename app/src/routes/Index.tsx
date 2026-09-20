@@ -25,6 +25,7 @@ import HistoryContent from './Followings/HistoryContent';
 import WatchLaterContent from './Followings/WatchLaterContent';
 import Living from './Living';
 import Play from './Play';
+import SearchUps from './SearchUps';
 import SearchVideos from './SearchVideos';
 import VideoList from './VideoList';
 import WebPage from './WebPage';
@@ -190,6 +191,7 @@ function AppRoute() {
         <Stack.Screen name="Welcome" component={Welcome} options={{ headerTitle: '欢迎使用 MiniBili' }} />
         <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
         <Stack.Screen name="SearchVideos" component={SearchVideos} options={{ headerTitle: '搜索视频' }} />
+        <Stack.Screen name="SearchUps" component={SearchUps} options={{ headerTitle: '搜索UP主' }} />
         <Stack.Screen name="Dynamic" component={Dynamic} options={{ headerTitle: '动态' }} />
         <Stack.Screen name="Play" component={Play} />
         <Stack.Screen name="Living" component={Living} />

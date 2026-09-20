@@ -55,6 +55,9 @@ describe("danmaku movement", () => {
     expect(
       resolveDanmakuAnimation({ currentX: 120, endX: -60, durationMs: 7000, elapsedMs: 3000 }, 2),
     ).toEqual({ startX: 120, endX: -60, durationMs: 2000 });
+    expect(
+      resolveDanmakuAnimation({ currentX: 120, endX: -60, durationMs: 7000, elapsedMs: 3000 }, 0.5),
+    ).toEqual({ startX: 120, endX: -60, durationMs: 8000 });
   });
 
   test("finishes an expired danmaku without restarting an animation", () => {

@@ -141,6 +141,77 @@ describe("dynamic item mapping", () => {
     });
   });
 
+  it("keeps the OPUS title that the summary text does not contain", () => {
+    const item = mapDynamicItem(
+      fixture({
+        type: "DYNAMIC_TYPE_DRAW",
+        desc: null,
+        major: {
+          type: "MAJOR_TYPE_OPUS",
+          opus: {
+            title: "继续建设牛牛快乐屋😋",
+            summary: { text: "分享图片" },
+            pics: [{ url: "//i0.hdslb.com/house.png", width: 1440, height: 1080 }],
+          },
+        },
+      }),
+    );
+
+    expect(item.title).toBe("继续建设牛牛快乐屋😋");
+    expect(item.text).toBe("分享图片");
+    expect(item.content).toMatchObject({ kind: "images" });
+  });
+
+  it("skips the OPUS title when the summary already starts with it", () => {
+    const item = mapDynamicItem(
+      fixture({
+        type: "DYNAMIC_TYPE_DRAW",
+        desc: null,
+        major: {
+          type: "MAJOR_TYPE_OPUS",
+          opus: {
+            title: "继续建设牛牛快乐屋😋",
+            summary: { text: "继续建设牛牛快乐屋😋 今天又添了新家具" },
+            pics: [],
+          },
+        },
+      }),
+    );
+
+    expect(item.title).toBe("");
+    expect(item.text).toBe("继续建设牛牛快乐屋😋 今天又添了新家具");
+  });
+
+  it("keeps the OPUS title out of the card for articles and other major types", () => {
+    const article = mapDynamicItem(
+      fixture({
+        type: "DYNAMIC_TYPE_ARTICLE",
+        desc: null,
+        major: {
+          type: "MAJOR_TYPE_OPUS",
+          opus: {
+            title: "专栏标题",
+            jump_url: "//www.bilibili.com/read/cv1",
+            summary: { text: "专栏摘要" },
+            pics: [],
+          },
+        },
+      }),
+    );
+    const video = mapDynamicItem(
+      fixture({
+        type: "DYNAMIC_TYPE_AV",
+        major: {
+          type: "MAJOR_TYPE_ARCHIVE",
+          archive: { aid: 1, bvid: "BV1title", title: "视频标题", stat: {} },
+        },
+      }),
+    );
+
+    expect(article.title).toBe("");
+    expect(video.title).toBe("");
+  });
+
   it("maps pure text and accepts numeric timestamps", () => {
     const item = mapDynamicItem(
       fixture({
@@ -343,6 +414,72 @@ describe("dynamic paging schema", () => {
     expect(query.get("timezone_offset")).toBe("-480");
     expect(query.get("features")).toContain("itemOpusStyle");
     expect(getDynamicPageKey(1567446009, 1, page)).toContain("offset=next-offset");
+  });
+
+  it("maps a real space feed payload whose OPUS title is separate from the text", () => {
+    const item = mapDynamicItem(
+      DynamicItemResponseSchema.parse({
+        id_str: "1249774997124153364",
+        type: "DYNAMIC_TYPE_DRAW",
+        basic: {
+          comment_id_str: "409710142",
+          comment_type: 11,
+          jump_url: "//www.bilibili.com/opus/1249774997124153364",
+        },
+        modules: {
+          module_author: {
+            face: "https://i2.hdslb.com/bfs/face/0f5c077c743dd4c1e0a8f3089becc6f4acbddc75.jpg",
+            mid: "1625060795",
+            name: "浪仔小牛",
+            pub_action: "",
+            pub_time: "18小时前",
+            pub_ts: "1789824317",
+          },
+          module_dynamic: {
+            desc: null,
+            topic: null,
+            major: {
+              type: "MAJOR_TYPE_OPUS",
+              opus: {
+                jump_url: "//www.bilibili.com/opus/1249774997124153364",
+                title: "继续建设牛牛快乐屋😋",
+                summary: {
+                  text: "分享图片",
+                  rich_text_nodes: [{ type: "RICH_TEXT_NODE_TYPE_TEXT", text: "分享图片" }],
+                  has_more: false,
+                },
+                pics: [
+                  {
+                    url: "http://i0.hdslb.com/bfs/new_dyn/live_40e4ae52cd899b75ed0211590688c2291625060795.png",
+                    width: 1440,
+                    height: 1080,
+                  },
+                ],
+              },
+            },
+            additional: null,
+          },
+          module_tag: null,
+          module_stat: {
+            comment: { count: 36 },
+            forward: { count: 0 },
+            like: { count: 457 },
+          },
+        },
+      }),
+    );
+
+    expect(item.title).toBe("继续建设牛牛快乐屋😋");
+    expect(item.text).toBe("分享图片");
+    expect(item.content).toMatchObject({
+      kind: "images",
+      images: [
+        {
+          src: "https://i0.hdslb.com/bfs/new_dyn/live_40e4ae52cd899b75ed0211590688c2291625060795.png",
+          ratio: 1440 / 1080,
+        },
+      ],
+    });
   });
 
   it("stops paging on no-more and empty pages", () => {

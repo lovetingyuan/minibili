@@ -49,7 +49,6 @@ const getAppValue = () => {
     // 仅当前运行会话的完整 B站同步才激活磁盘缓存。
     followingsGeneration: -1,
     isWiFi: false,
-    webViewMode: "MOBILE" as "PC" | "MOBILE",
     /**
      * 播放器内弹幕开关，默认开启
      */

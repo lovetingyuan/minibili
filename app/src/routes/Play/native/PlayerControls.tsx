@@ -7,7 +7,8 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { withUniwind } from "uniwind";
 
-import { formatPlaybackTime } from "./player-helpers";
+import { formatPlaybackTime, resolvePlaybackDisplayMs } from "./player-helpers";
+import type { PlaybackRate } from "./playback-rate";
 import PlayerTopActions from "./PlayerTopActions";
 
 /**
@@ -25,8 +26,14 @@ type PlayerControlsProps = {
    * 是否稳定处于暂停态（缓冲、seek 造成的短暂暂停不算，见 usePlayerPausedUi）
    */
   paused: boolean;
+  /**
+   * 播放是否已经结束（不会自动继续播放）。结束时进度对齐总时长，
+   * 避免最后一次 timeUpdate 停在总时长前一秒造成 03:31/03:32 的显示
+   */
+  ended: boolean;
   currentTimeMs: number;
   durationMs: number;
+  playbackRate: PlaybackRate;
   danmakuEnabled: boolean;
   /**
    * 未登录 B站 时不展示发送弹幕按钮
@@ -42,6 +49,7 @@ type PlayerControlsProps = {
   fullscreen: boolean;
   visible: boolean;
   onTogglePlay: () => void;
+  onPlaybackRateChange: (rate: PlaybackRate) => void;
   onToggleDanmaku: () => void;
   onSendDanmaku: () => void;
   onToggleBackgroundPlay: () => void;
@@ -109,11 +117,17 @@ export default function PlayerControls(props: PlayerControlsProps) {
   const insets = useSafeAreaInsets();
   const [trackWidth, setTrackWidth] = React.useState(0);
   const [scrubMs, setScrubMs] = React.useState<number | null>(null);
+  const [playbackRateMenuOpen, setPlaybackRateMenuOpen] = React.useState(false);
   const scrubRef = React.useRef<number | null>(null);
   const [opacity] = React.useState(() => new Animated.Value(visible ? 1 : 0));
 
   const durationMs = Math.max(1, props.durationMs);
-  const displayMs = scrubMs ?? props.currentTimeMs;
+  const displayMs = resolvePlaybackDisplayMs({
+    currentMs: props.currentTimeMs,
+    durationMs,
+    ended: props.ended,
+    scrubMs,
+  });
   const progress = Math.min(1, Math.max(0, displayMs / durationMs));
 
   React.useEffect(() => {
@@ -127,6 +141,12 @@ export default function PlayerControls(props: PlayerControlsProps) {
       animation.stop();
     };
   }, [opacity, visible]);
+
+  React.useEffect(() => {
+    if (!visible) {
+      setPlaybackRateMenuOpen(false);
+    }
+  }, [visible]);
 
   // 拖动过程会不断重渲染，手势只创建一次，参数从 ref 读取
   const scrubParamsRef = React.useRef({
@@ -192,11 +212,26 @@ export default function PlayerControls(props: PlayerControlsProps) {
         importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
       >
         <PlayerTopActions
+          playbackRate={props.playbackRate}
+          playbackRateMenuOpen={playbackRateMenuOpen}
           loopEnabled={props.loopEnabled}
           autoNextEnabled={props.autoNextEnabled}
           showAutoNext={props.showAutoNext}
           backgroundPlayEnabled={props.backgroundPlayEnabled}
           canSendDanmaku={props.canSendDanmaku}
+          onTogglePlaybackRateMenu={() => {
+            props.onInteraction();
+            setPlaybackRateMenuOpen((open) => !open);
+          }}
+          onClosePlaybackRateMenu={() => {
+            setPlaybackRateMenuOpen(false);
+          }}
+          onPlaybackRateChange={(rate) => {
+            setPlaybackRateMenuOpen(false);
+            press(() => {
+              props.onPlaybackRateChange(rate);
+            });
+          }}
           onToggleBackgroundPlay={() => {
             press(props.onToggleBackgroundPlay);
           }}

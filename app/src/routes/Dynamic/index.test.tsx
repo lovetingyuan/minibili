@@ -76,6 +76,7 @@ const baseItem = {
   time: 0,
   pubAction: "发布了动态",
   top: false,
+  title: "",
   text: "这是一条测试动态",
   richTextNodes: [],
   topic: null,

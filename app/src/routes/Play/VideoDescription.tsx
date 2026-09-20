@@ -66,8 +66,10 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
             name={isCollapsed ? "expand-more" : "expand-less"}
             size={16}
             colorClassName={colors.primary.accent}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
+            iconProps={{
+              accessibilityElementsHidden: true,
+              importantForAccessibility: "no-hide-descendants",
+            }}
           />
         </Pressable>
       ) : null}

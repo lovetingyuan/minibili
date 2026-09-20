@@ -1,49 +1,40 @@
-import { useBackHandler } from "@react-native-community/hooks";
-import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
-import { useIsFocused } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+import { View } from "react-native";
 
+import { Button, Icon } from "@/components/styled/rneui";
+import { colors } from "@/constants/colors.tw";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
+import type { MainTabNavigationProp } from "@/types";
 
 import type { FollowListHeaderProps } from "./FollowListHeader.types";
 
-export default function useFollowListHeader({
-  onChangeText,
-  onClose,
-  onSubmit,
-  searchActive,
-  searchBarRef,
-  title,
-}: FollowListHeaderProps) {
-  const focused = useIsFocused();
-  useBackHandler(() => {
-    if (!searchActive || !focused) {
-      return false;
-    }
-    if (searchBarRef.current) {
-      searchBarRef.current.cancelSearch();
-    } else {
-      onClose();
-    }
-    return true;
-  });
+/** 关注页头部的搜索入口：点击进入独立的 UP 搜索路由 */
+function SearchUpButton() {
+  const navigation = useNavigation<MainTabNavigationProp>();
+  return (
+    <View className="mr-2">
+      <Button
+        radius="sm"
+        size="sm"
+        type="clear"
+        accessibilityLabel="搜索UP主"
+        onPress={() => {
+          navigation.navigate("SearchUps");
+        }}
+      >
+        <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
+      </Button>
+    </View>
+  );
+}
 
-  const options: Partial<BottomTabNavigationOptions> = {
+// headerRight 会被导航库当普通函数直接调用，这里只返回元素，
+// 让 useNavigation 等 hook 落在 SearchUpButton 组件内部。
+const renderSearchUpButton = () => <SearchUpButton />;
+
+export default function useFollowListHeader({ title }: FollowListHeaderProps) {
+  useUpdateNavigationOptions({
     headerTitle: title,
-    headerRight: undefined,
-    headerSearchBarOptions: {
-      ref: searchBarRef,
-      autoCapitalize: "none",
-      cancelButtonText: "取消",
-      enterKeyHint: "search",
-      placeholder: "搜索UP主",
-      onChangeText: ({ nativeEvent: { text } }) => {
-        onChangeText(text);
-      },
-      onClose,
-      onSubmitEditing: ({ nativeEvent: { text } }) => {
-        onSubmit(text);
-      },
-    },
-  };
-  useUpdateNavigationOptions(options);
+    headerRight: renderSearchUpButton,
+  });
 }

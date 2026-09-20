@@ -1,22 +1,24 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import type { ReactNode } from "react";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import type { ReactNode } from 'react';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 
-import type { DynamicItem } from "@/api/dynamic-items.type";
-import { Button, FlashList, Skeleton, Text } from "@/components/styled/rneui";
-import type { FlashListRef } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
-import type { MainTabNavigationProp } from "@/types";
+import type { DynamicItem } from '@/api/dynamic-items.type';
+import { Button, FlashList, Skeleton, Text } from '@/components/styled/rneui';
+import type { FlashListRef } from '@/components/styled/rneui';
+import { colors } from '@/constants/colors.tw';
+import type { MainTabNavigationProp } from '@/types';
 
-import { DynamicCard } from "./dynamic-card";
-import type { DynamicListProps } from "./dynamic-list.types";
+import { DynamicCard } from './dynamic-card';
+import type { DynamicListProps } from './dynamic-list.types';
 
 function DynamicListLoading(props: { text: string; listHeader?: ReactNode }) {
   return (
     <View className="flex-1 bg-neutral-100 dark:bg-black">
       {props.listHeader}
-      <Text className={`px-4 py-3 text-center text-xs ${colors.gray6.text}`}>{props.text}</Text>
+      <Text className={`px-4 ${props.listHeader ? 'pb-3' : 'py-3'} text-center text-xs ${colors.gray6.text}`}>
+        {props.text}
+      </Text>
       <View className="gap-3">
         {[0, 1, 2].map((index) => (
           <View key={index} className="gap-3 bg-white p-4 dark:bg-neutral-950">
@@ -37,14 +39,10 @@ function DynamicListLoading(props: { text: string; listHeader?: ReactNode }) {
   );
 }
 
-function DynamicListEmpty(
-  props: Pick<DynamicListProps, "error" | "emptyTitle" | "emptyMessage" | "retry">,
-) {
+function DynamicListEmpty(props: Pick<DynamicListProps, 'error' | 'emptyTitle' | 'emptyMessage' | 'retry'>) {
   return (
     <View className="items-center gap-3 px-8 py-24">
-      <Text className="text-lg font-semibold">
-        {props.error ? "动态加载失败" : props.emptyTitle}
-      </Text>
+      <Text className="text-lg font-semibold">{props.error ? '动态加载失败' : props.emptyTitle}</Text>
       <Text selectable className={`text-center text-sm ${colors.gray6.text}`}>
         {props.error?.message || props.emptyMessage}
       </Text>
@@ -71,7 +69,7 @@ export function DynamicList(props: DynamicListProps) {
       return;
     }
 
-    return navigation.addListener("tabPress", () => {
+    return navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
         return;
       }
@@ -132,11 +130,7 @@ export function DynamicList(props: DynamicListProps) {
               <ActivityIndicator colorClassName={colors.secondary.accent} />
             ) : (
               <Text className={`text-xs ${props.error ? colors.error.text : colors.gray6.text}`}>
-                {props.error
-                  ? "加载下一页失败，点击重试"
-                  : props.isReachingEnd
-                    ? "暂无更多"
-                    : "上拉加载更多"}
+                {props.error ? '加载下一页失败，点击重试' : props.isReachingEnd ? '暂无更多' : '上拉加载更多'}
               </Text>
             )}
           </Pressable>

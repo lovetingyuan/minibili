@@ -29,6 +29,9 @@ function getDynamicShareTitle(item: DynamicItem) {
   if (richText) {
     return richText;
   }
+  if (item.title) {
+    return item.title;
+  }
   if (
     item.content.kind === "video" ||
     item.content.kind === "article" ||

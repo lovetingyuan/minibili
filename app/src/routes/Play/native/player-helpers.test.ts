@@ -11,6 +11,7 @@ import {
   resolveInlinePlayerHeight,
   resolveInitialResumeDecision,
   resolveInitialResumeSnapshot,
+  resolvePlaybackDisplayMs,
   resolvePlayerResumeDecision,
   resolvePlaybackFailover,
   resolvePreferredQuality,
@@ -143,7 +144,7 @@ test("toggles controls visibility on tap", () => {
 
 const playingResumeOptions = {
   started: true,
-  firstFrameRendered: true,
+  videoVisible: true,
   playbackStarted: true,
   paused: true,
   hasError: false,
@@ -163,9 +164,7 @@ test("keeps the resume button hidden before the playback really started", () => 
 
 test("hides the resume button before the video is prepared", () => {
   expect(shouldShowResumeButton({ ...playingResumeOptions, started: false })).toBe(false);
-  expect(shouldShowResumeButton({ ...playingResumeOptions, firstFrameRendered: false })).toBe(
-    false,
-  );
+  expect(shouldShowResumeButton({ ...playingResumeOptions, videoVisible: false })).toBe(false);
 });
 
 test("hides the resume button when an overlay covers the video", () => {
@@ -184,6 +183,35 @@ test("formats playback time with and without hours", () => {
   expect(formatPlaybackTime(65)).toBe("01:05");
   expect(formatPlaybackTime(3725)).toBe("1:02:05");
   expect(formatPlaybackTime(Number.NaN)).toBe("00:00");
+});
+
+test("aligns the displayed time with the duration once the playback ended", () => {
+  // 最后一次 timeUpdate 停在 211.8s，展示 03:31/03:32 会和总时长差一秒
+  expect(resolvePlaybackDisplayMs({ currentMs: 211_800, durationMs: 212_000, ended: false })).toBe(
+    211_800,
+  );
+  expect(resolvePlaybackDisplayMs({ currentMs: 211_800, durationMs: 212_000, ended: true })).toBe(
+    212_000,
+  );
+});
+
+test("keeps following the scrub position after the playback ended", () => {
+  expect(
+    resolvePlaybackDisplayMs({
+      currentMs: 211_800,
+      durationMs: 212_000,
+      ended: true,
+      scrubMs: 60_000,
+    }),
+  ).toBe(60_000);
+  expect(
+    resolvePlaybackDisplayMs({
+      currentMs: 211_800,
+      durationMs: 212_000,
+      ended: false,
+      scrubMs: 60_000,
+    }),
+  ).toBe(60_000);
 });
 
 test("computes inline player height for landscape and portrait videos", () => {
@@ -321,14 +349,16 @@ test("builds a media source with a referer and without an android user agent", (
 test("puts the video title into the now playing metadata", () => {
   const source = createVideoSource("https://upos-sz-estghw.bilivideo.com/x.mp4", "【测试】标题");
 
-  expect(source.metadata).toEqual({ title: "【测试】标题" });
+  expect(source.metadata).toEqual({ title: "【测试】标题", artist: "MiniBili" });
 });
 
-test("omits the now playing metadata when there is no title", () => {
-  expect(createVideoSource("https://upos-sz-estghw.bilivideo.com/x.mp4").metadata).toBeUndefined();
-  expect(
-    createVideoSource("https://upos-sz-estghw.bilivideo.com/x.mp4", "").metadata,
-  ).toBeUndefined();
+test("keeps the app name in now playing metadata when there is no title", () => {
+  expect(createVideoSource("https://upos-sz-estghw.bilivideo.com/x.mp4").metadata).toEqual({
+    artist: "MiniBili",
+  });
+  expect(createVideoSource("https://upos-sz-estghw.bilivideo.com/x.mp4", "").metadata).toEqual({
+    artist: "MiniBili",
+  });
 });
 
 test("falls back to the next cdn mirror before refreshing the play url", () => {

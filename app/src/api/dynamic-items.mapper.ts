@@ -297,6 +297,22 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
   return { kind: "unavailable", message: "暂不支持显示此类动态" };
 }
 
+/**
+ * 图文动态（OPUS）的标题和正文是两个独立字段，接口返回的正文不包含标题。
+ * 专栏的标题由专栏卡片自己渲染，这里不重复取；正文已经以标题开头时也不重复渲染。
+ */
+function normalizeTitle(item: RawDynamicItem, text: string) {
+  const major = item.modules.module_dynamic.major;
+  if (major?.type !== MajorTypeEnum.MAJOR_TYPE_OPUS || !major.opus) {
+    return "";
+  }
+  if (item.type === "DYNAMIC_TYPE_ARTICLE") {
+    return "";
+  }
+  const title = normalizeText(major.opus.title);
+  return title && !text.startsWith(title) ? title : "";
+}
+
 export function mapDynamicItem(item: RawDynamicItem): DynamicItem {
   const author = item.modules.module_author;
   const dynamic = item.modules.module_dynamic;
@@ -304,6 +320,7 @@ export function mapDynamicItem(item: RawDynamicItem): DynamicItem {
   const desc = dynamic.desc;
   const summary = desc?.text ? desc : opus?.summary;
   const id = String(item.id_str);
+  const text = normalizeText(summary?.text);
   const original = OriginalDynamicItemSchema.safeParse("orig" in item ? item.orig : undefined);
   return {
     id,
@@ -313,7 +330,8 @@ export function mapDynamicItem(item: RawDynamicItem): DynamicItem {
     time: toNumber(author.pub_ts),
     pubAction: author.pub_action,
     top: item.modules.module_tag?.text === "置顶",
-    text: normalizeText(summary?.text),
+    title: normalizeTitle(item, text),
+    text,
     richTextNodes: summary?.rich_text_nodes ?? [],
     topic: dynamic.topic
       ? { name: dynamic.topic.name, jump_url: optionalUrl(dynamic.topic.jump_url) ?? "" }

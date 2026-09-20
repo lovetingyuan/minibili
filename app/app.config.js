@@ -86,7 +86,14 @@ module.exports = {
         supportsBackgroundPlayback: true,
       },
     ],
-    "expo-notifications",
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/icon/android-icon-monochrome.png",
+        color: "#fb7299",
+      },
+    ],
+    "./plugins/with-media-notification-icon",
   ],
   experiments: {
     reactCompiler: true,

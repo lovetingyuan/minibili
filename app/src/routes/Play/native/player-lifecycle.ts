@@ -27,6 +27,7 @@ type PlayerSnapshotSource = Pick<VideoPlayer, "currentTime" | "playing" | "statu
 export function configureBackgroundPlayback(
   player: BackgroundPlaybackPlayer,
   enabled: boolean,
+  showNotification: boolean,
   appState: AppStateStatus,
 ): BackgroundPlaybackConfigurationResult {
   if (appState !== "active") {
@@ -34,7 +35,9 @@ export function configureBackgroundPlayback(
   }
   try {
     player.staysActiveInBackground = enabled;
-    player.showNowPlayingNotification = enabled;
+    // 部分 Android ROM 会缓存媒体会话最初的 idle 状态，导致通知一直没有按钮和时长。
+    // 后台 service 可以提前准备，但通知要等播放器真正开始过以后再显示。
+    player.showNowPlayingNotification = enabled && showNotification;
     return "applied";
   } catch {
     // HostFunction 可能在系统刚判定 App 进入后台时抛错；尽量收敛到安全状态。

@@ -1,11 +1,16 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 import { Icon } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
+import { formatPlaybackRate, PLAYBACK_RATES, type PlaybackRate } from "./playback-rate";
+
 export type PlayerTopActionsProps = {
+  playbackRate: PlaybackRate;
+  playbackRateMenuOpen: boolean;
   loopEnabled: boolean;
   autoNextEnabled: boolean;
   showAutoNext: boolean;
@@ -17,6 +22,9 @@ export type PlayerTopActionsProps = {
    * 未登录 B站 时不展示发送弹幕按钮
    */
   canSendDanmaku: boolean;
+  onTogglePlaybackRateMenu: () => void;
+  onClosePlaybackRateMenu: () => void;
+  onPlaybackRateChange: (rate: PlaybackRate) => void;
   onToggleLoop: () => void;
   onToggleAutoNext: () => void;
   onToggleBackgroundPlay: () => void;
@@ -24,13 +32,65 @@ export type PlayerTopActionsProps = {
 };
 
 /**
- * 播放器右上角的悬浮按钮：播放模式、后台播放与发送弹幕。
+ * 播放器右上角的悬浮按钮：倍速、播放模式、后台播放与发送弹幕。
  */
 export default function PlayerTopActions(props: PlayerTopActionsProps) {
   const accentColor = useResolvedColor(colors.secondary.text) ?? "#ff6699";
+  const playbackRateLabel = formatPlaybackRate(props.playbackRate);
 
   return (
     <View className="flex-row items-center gap-2">
+      <Menu
+        opened={props.playbackRateMenuOpen}
+        onBackdropPress={props.onClosePlaybackRateMenu}
+        onClose={props.onClosePlaybackRateMenu}
+      >
+        <MenuTrigger
+          accessibilityRole="button"
+          accessibilityLabel={`播放速度，当前 ${playbackRateLabel}${
+            props.playbackRateMenuOpen ? "，列表已展开" : ""
+          }`}
+          onPress={props.onTogglePlaybackRateMenu}
+        >
+          <View className="h-9 min-w-12 flex-row items-center justify-center gap-0.5 rounded-full bg-black/40 px-2">
+            <Text className="text-xs font-semibold text-white">{playbackRateLabel}</Text>
+            <Icon
+              name={props.playbackRateMenuOpen ? "chevron-up" : "chevron-down"}
+              type="material-design"
+              size={16}
+              color="#ffffff"
+            />
+          </View>
+        </MenuTrigger>
+        <MenuOptions>
+          {PLAYBACK_RATES.map((rate) => {
+            const label = formatPlaybackRate(rate);
+            const selected = rate === props.playbackRate;
+            return (
+              <MenuOption
+                key={rate}
+                accessibilityLabel={selected ? `${label}，当前速度` : label}
+                accessibilityRole="menuitem"
+                onSelect={() => {
+                  props.onPlaybackRateChange(rate);
+                }}
+              >
+                <View className="h-12 min-w-[124px] flex-row items-center justify-between px-4">
+                  <Text
+                    className={colors.black.text}
+                    style={selected ? { color: accentColor } : null}
+                  >
+                    {label}
+                  </Text>
+                  {selected ? (
+                    <Icon name="check" type="material-design" size={18} color={accentColor} />
+                  ) : null}
+                </View>
+              </MenuOption>
+            );
+          })}
+        </MenuOptions>
+      </Menu>
       <Pressable
         className="h-9 w-9 items-center justify-center rounded-full bg-black/40"
         android_ripple={{ color: "transparent" }}
