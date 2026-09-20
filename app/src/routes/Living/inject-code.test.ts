@@ -545,3 +545,298 @@ test("renders the room audience top 3 into the anchor popup", async () => {
   expect(rankList?.innerHTML).toContain("粉白酱: 733");
   expect(rankList?.innerHTML).toContain("Wing_小伞: 303");
 });
+
+type DanmakuFetchInit = {
+  body?: unknown;
+  credentials?: string;
+  headers?: unknown;
+  method?: string;
+};
+
+type DanmakuFetchResponse = {
+  json: () => Promise<unknown>;
+  ok: boolean;
+  status: number;
+};
+
+type FakeEvent = {
+  key?: string;
+  keyCode?: number;
+  preventDefault: () => void;
+  stopPropagation: () => void;
+};
+
+type FakeDomElement = {
+  addEventListener: (type: string, listener: (event: FakeEvent) => void) => void;
+  appendChild: (child: FakeDomElement) => void;
+  blur: ReturnType<typeof vi.fn>;
+  children: FakeDomElement[];
+  className: string;
+  disabled: boolean;
+  dispatch: (type: string, event?: Partial<FakeEvent>) => void;
+  findByClassName: (className: string) => FakeDomElement | undefined;
+  findById: (id: string) => FakeDomElement | undefined;
+  id: string;
+  maxLength: number;
+  placeholder: string;
+  setAttribute: ReturnType<typeof vi.fn>;
+  style: { display: string };
+  tagName: string;
+  textContent: string;
+  type: string;
+  value: string;
+};
+
+function findInDomTree(
+  root: FakeDomElement,
+  predicate: (element: FakeDomElement) => boolean,
+): FakeDomElement | undefined {
+  if (predicate(root)) {
+    return root;
+  }
+  for (const child of root.children) {
+    const found = findInDomTree(child, predicate);
+    if (found) {
+      return found;
+    }
+  }
+  return undefined;
+}
+
+function createFakeDomElement(tagName: string): FakeDomElement {
+  const listeners = new Map<string, Array<(event: FakeEvent) => void>>();
+  const element: FakeDomElement = {
+    addEventListener: (type, listener) => {
+      listeners.set(type, [...(listeners.get(type) ?? []), listener]);
+    },
+    appendChild: (child) => {
+      element.children.push(child);
+    },
+    blur: vi.fn(),
+    children: [],
+    className: "",
+    disabled: false,
+    dispatch: (type, event) => {
+      for (const listener of listeners.get(type) ?? []) {
+        listener({ preventDefault: vi.fn(), stopPropagation: vi.fn(), ...event });
+      }
+    },
+    findByClassName: (className) =>
+      findInDomTree(element, (child) => child.className === className),
+    findById: (id) => findInDomTree(element, (child) => child.id === id),
+    id: "",
+    maxLength: 0,
+    placeholder: "",
+    setAttribute: vi.fn(),
+    style: { display: "" },
+    tagName,
+    textContent: "",
+    type: "",
+    value: "",
+  };
+  return element;
+}
+
+function requireDomElement(element: FakeDomElement | undefined, description: string) {
+  if (!element) {
+    throw new Error(`注入脚本没有在网页里渲染${description}`);
+  }
+  return element;
+}
+
+function setupInjectedDanmakuComposer(options?: {
+  cookie?: string;
+  msgSendResponse?: unknown;
+  msgSendStatus?: number;
+  msgSendFails?: boolean;
+}) {
+  const fetchMock = vi.fn<(url: string, init?: DanmakuFetchInit) => Promise<DanmakuFetchResponse>>(
+    (url) => {
+      if (url.includes("/msg/send")) {
+        if (options?.msgSendFails) {
+          return Promise.reject(new Error("network"));
+        }
+        const status = options?.msgSendStatus ?? 200;
+        return Promise.resolve({
+          json: async () => options?.msgSendResponse ?? { code: 0, message: "" },
+          ok: status === 200,
+          status,
+        });
+      }
+      return Promise.resolve({
+        json: async () => ({
+          code: 0,
+          data: { room_info: { live_start_time: 1789832145, uid: 21123591 } },
+        }),
+        ok: true,
+        status: 200,
+      });
+    },
+  );
+  const body = createFakeDomElement("BODY");
+  const document = {
+    body,
+    cookie: options?.cookie ?? "SESSDATA=test-session; bili_jct=csrf-value",
+    createElement: vi.fn((tagName: string) => createFakeDomElement(String(tagName).toUpperCase())),
+    documentElement: createFakeDomElement("HTML"),
+    getElementById: vi.fn((id: string) => body.findById(id) ?? null),
+    head: createFakeDomElement("HEAD"),
+    querySelector: vi.fn(() => null),
+  };
+  const window: {
+    location: { pathname: string };
+    ReactNativeWebView: { postMessage: ReturnType<typeof vi.fn> };
+  } = {
+    location: { pathname: "/22230707" },
+    ReactNativeWebView: { postMessage: vi.fn() },
+  };
+
+  runInNewContext(INJECTED_JAVASCRIPT, {
+    clearInterval: vi.fn(),
+    clearTimeout: vi.fn(),
+    document,
+    fetch: fetchMock,
+    FormData,
+    setInterval: vi.fn(() => 1),
+    setTimeout: vi.fn(() => 1),
+    window,
+  });
+
+  const bar = requireDomElement(body.findByClassName("minibili-danmaku-bar"), "弹幕输入条");
+  const input = requireDomElement(body.findById("minibili-danmaku-input"), "弹幕输入框");
+  const sendButton = requireDomElement(bar.findByClassName("minibili-danmaku-send"), "发送按钮");
+
+  function readToast() {
+    return document.getElementById("minibili-danmaku-toast")?.textContent ?? "";
+  }
+
+  function readMsgSendCall() {
+    return fetchMock.mock.calls.find(([url]) => String(url).includes("/msg/send"));
+  }
+
+  function submit(text: string) {
+    input.value = text;
+    sendButton.dispatch("click");
+  }
+
+  return { bar, fetchMock, input, readMsgSendCall, readToast, sendButton, submit };
+}
+
+test("renders the danmaku composer inside the page", () => {
+  const { bar, input, sendButton } = setupInjectedDanmakuComposer();
+
+  expect(bar.className).toBe("minibili-danmaku-bar");
+  expect(input.placeholder).toBe("发个弹幕呗~");
+  expect(input.maxLength).toBe(40);
+  expect(sendButton.textContent).toBe("发送");
+});
+
+test("sends the danmaku form from the page and clears the input", async () => {
+  const { input, readMsgSendCall, readToast, submit } = setupInjectedDanmakuComposer();
+
+  submit("你好");
+  await flushAsyncWork();
+
+  const call = readMsgSendCall();
+  expect(call?.[0]).toBe("https://api.live.bilibili.com/msg/send");
+  const init = call?.[1];
+  expect(init?.method).toBe("POST");
+  expect(init?.credentials).toBe("include");
+  // 不能带自定义 header，否则会触发 CORS 预检
+  expect(init?.headers).toBeUndefined();
+
+  const body = init?.body;
+  if (!(body instanceof FormData)) {
+    throw new Error("弹幕请求体不是 FormData");
+  }
+  const fields: Record<string, string> = {};
+  body.forEach((value, key) => {
+    fields[key] = String(value);
+  });
+  expect(fields).toMatchObject({
+    color: "16777215",
+    csrf: "csrf-value",
+    csrf_token: "csrf-value",
+    data_extend: "{}",
+    fontsize: "25",
+    mode: "1",
+    msg: "你好",
+    roomid: "22230707",
+  });
+  expect(fields.rnd).toMatch(/^\d{10}$/);
+  expect(input.value).toBe("");
+  expect(readToast()).toBe("弹幕已发送");
+});
+
+test("sends with the enter key", async () => {
+  const { input, readMsgSendCall } = setupInjectedDanmakuComposer();
+
+  input.value = "你好";
+  input.dispatch("keydown", { key: "Enter", keyCode: 13 });
+  await flushAsyncWork();
+
+  expect(readMsgSendCall()).toBeDefined();
+});
+
+test("asks for login when the page has no csrf token", async () => {
+  const { readMsgSendCall, readToast, submit } = setupInjectedDanmakuComposer({
+    cookie: "SESSDATA=test-session",
+  });
+
+  submit("你好");
+  await flushAsyncWork();
+
+  expect(readMsgSendCall()).toBeUndefined();
+  expect(readToast()).toBe("请先登录 B 站后再发送弹幕");
+});
+
+test("refuses empty content without sending", async () => {
+  const { readMsgSendCall, readToast, submit } = setupInjectedDanmakuComposer();
+
+  submit("   ");
+  await flushAsyncWork();
+
+  expect(readMsgSendCall()).toBeUndefined();
+  expect(readToast()).toBe("请输入弹幕内容");
+});
+
+test("keeps the draft and shows the server message when sending fails", async () => {
+  const { input, readToast, submit } = setupInjectedDanmakuComposer({
+    msgSendResponse: { code: 10025, message: "弹幕内容不能为空哟～" },
+  });
+
+  submit("你好");
+  await flushAsyncWork();
+
+  expect(input.value).toBe("你好");
+  expect(readToast()).toBe("弹幕内容不能为空哟～");
+});
+
+test("reports network failures as an unknown result", async () => {
+  const { readToast, submit } = setupInjectedDanmakuComposer({ msgSendFails: true });
+
+  submit("你好");
+  await flushAsyncWork();
+
+  expect(readToast()).toBe("无法确认弹幕是否发送成功，请稍后到直播间确认");
+});
+
+test("reports a non-200 response as an unknown result", async () => {
+  const { readToast, submit } = setupInjectedDanmakuComposer({ msgSendStatus: 412 });
+
+  submit("你好");
+  await flushAsyncWork();
+
+  expect(readToast()).toBe("无法确认弹幕是否发送成功，请稍后到直播间确认");
+});
+
+test("ignores a second submit while the request is in flight", async () => {
+  const { fetchMock, sendButton, submit } = setupInjectedDanmakuComposer();
+
+  submit("你好");
+  submit("再来一条");
+  await flushAsyncWork();
+
+  expect(fetchMock.mock.calls.filter(([url]) => String(url).includes("/msg/send"))).toHaveLength(1);
+  expect(sendButton.disabled).toBe(false);
+});

@@ -11,7 +11,170 @@ function __$hack() {
       }
     }, 100);
   };
+
   const roomId = window.location.pathname.split("/").pop();
+
+  // 发送直播间弹幕：输入条、发送请求与结果提示全部在网页里实现。
+  // 网页自带的 .control-panel 只是个唤起 App 的假输入框，这里自己渲染一个真的，
+  // 请求参数与官方播放器的 /msg/send 调用一致（实测不需要 WBI 签名），
+  // 直接用网页自己的登录 cookie（bili_jct）。
+  const DANMAKU_API_URL = "https://api.live.bilibili.com/msg/send";
+  const DANMAKU_MAX_LENGTH = 40;
+  const DANMAKU_TOAST_MS = 2000;
+  const DANMAKU_INPUT_ID = "minibili-danmaku-input";
+  let danmakuSending = false;
+  let danmakuToastTimer = null;
+
+  const readDanmakuCsrf = () =>
+    (document.cookie.match(/(?:^|;\s*)bili_jct=([^;]+)/) || [])[1] || "";
+
+  const showDanmakuToast = (text) => {
+    let toast = document.getElementById("minibili-danmaku-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "minibili-danmaku-toast";
+      toast.className = "minibili-danmaku-toast";
+      (document.body || document.documentElement)?.appendChild(toast);
+    }
+    toast.textContent = text;
+    toast.style.display = "block";
+    clearTimeout(danmakuToastTimer);
+    danmakuToastTimer = setTimeout(() => {
+      toast.style.display = "none";
+    }, DANMAKU_TOAST_MS);
+  };
+
+  const resolveDanmakuErrorText = (code, message) => {
+    // -101 网页里没有登录态；-111 CSRF 校验失败，通常是登录态已经变化
+    if (code === -101) {
+      return "请先登录 B 站后再发送弹幕";
+    }
+    if (code === -111) {
+      return "登录状态已失效，请重新登录 B 站";
+    }
+    // -1 是网络异常或响应不可解析，无法判断弹幕是否已经发出
+    if (code === -1) {
+      return "无法确认弹幕是否发送成功，请稍后到直播间确认";
+    }
+    return message || "弹幕发送失败，请稍后重试";
+  };
+
+  const requestSendDanmaku = (text) => {
+    const csrf = readDanmakuCsrf();
+    if (!csrf) {
+      return Promise.resolve({ code: -101, message: "" });
+    }
+
+    const form = new FormData();
+    form.append("roomid", String(roomId));
+    form.append("msg", text);
+    form.append("color", "16777215");
+    form.append("fontsize", "25");
+    form.append("mode", "1");
+    form.append("rnd", String(Math.floor(Date.now() / 1000)));
+    form.append("data_extend", "{}");
+    form.append("csrf", csrf);
+    form.append("csrf_token", csrf);
+
+    return fetch(DANMAKU_API_URL, {
+      method: "POST",
+      credentials: "include",
+      body: form,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(String(res.status));
+        }
+        return res.json();
+      })
+      .then((res) => ({
+        code: typeof res?.code === "number" ? res.code : -1,
+        message: typeof res?.message === "string" ? res.message : "",
+      }))
+      .catch(() => ({ code: -1, message: "" }));
+  };
+
+  const mountDanmakuComposer = () => {
+    if (document.getElementById(DANMAKU_INPUT_ID) || danmakuSending) {
+      return true;
+    }
+    const host = document.body || document.documentElement;
+    if (!host) {
+      return false;
+    }
+
+    const bar = document.createElement("div");
+    bar.className = "minibili-danmaku-bar";
+
+    const input = document.createElement("input");
+    input.id = DANMAKU_INPUT_ID;
+    input.className = "minibili-danmaku-input";
+    input.type = "text";
+    input.maxLength = DANMAKU_MAX_LENGTH;
+    input.placeholder = "发个弹幕呗~";
+    input.setAttribute("enterkeyhint", "send");
+
+    const sendButton = document.createElement("button");
+    sendButton.type = "button";
+    sendButton.className = "minibili-danmaku-send";
+    sendButton.textContent = "发送";
+
+    const submit = () => {
+      if (danmakuSending) {
+        return;
+      }
+      const text = input.value.trim();
+      if (!text) {
+        showDanmakuToast("请输入弹幕内容");
+        return;
+      }
+      danmakuSending = true;
+      sendButton.disabled = true;
+      requestSendDanmaku(text).then((result) => {
+        danmakuSending = false;
+        sendButton.disabled = false;
+        if (result.code === 0) {
+          input.value = "";
+          input.blur();
+          showDanmakuToast("弹幕已发送");
+          return;
+        }
+        showDanmakuToast(resolveDanmakuErrorText(result.code, result.message));
+      });
+    };
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.keyCode === 13) {
+        event.preventDefault();
+        submit();
+      }
+    });
+    sendButton.addEventListener("click", submit);
+    // 输入条由自己渲染，别让页面上的"唤起 App"逻辑抢走点击
+    bar.addEventListener("click", (event) => event.stopPropagation());
+
+    bar.appendChild(input);
+    bar.appendChild(sendButton);
+    host.appendChild(bar);
+    return true;
+  };
+
+  mountDanmakuComposer();
+  if (typeof window.MutationObserver === "function") {
+    // 页面重新渲染后输入条可能被移除，这里补回来
+    const danmakuObserver = new window.MutationObserver(() => {
+      if (!document.getElementById(DANMAKU_INPUT_ID)) {
+        mountDanmakuComposer();
+      }
+    });
+    const observerRoot = document.body || document.documentElement;
+    if (observerRoot) {
+      danmakuObserver.observe(observerRoot, { childList: true, subtree: true });
+    }
+  } else {
+    setInterval(mountDanmakuComposer, 1000);
+  }
+
   // 「房间观众(N)」是直播间在线榜（房间观众榜）的人数，与 getInfoByRoom 数据里的
   // room_rank_info.user_rank_entry.user_contribution_rank_entry.count_text 是同一个数
   const AUDIENCE_COUNT_INTERVAL = 60 * 1000;
@@ -563,6 +726,7 @@ function __$injectBefore() {
 
   const style = document.createElement("style");
   style.textContent = `
+  /* 网页自带的输入框只是唤起 App 的入口，弹幕输入条由注入脚本自己渲染 */
   #app .control-panel {
     display: none!important;
   }
@@ -594,8 +758,72 @@ function __$injectBefore() {
     height: auto;
     position: static;
   }
+  /* 自绘的弹幕输入条：占住页面原本留给 .control-panel 的 1.6rem 底部区域。
+     WebView 是 edge-to-edge，底边会被系统导航栏盖住，所以整体再抬一个安全区高度：
+     --minibili-danmaku-bottom 由 RN 侧写入，env() 作为兜底 */
+  .minibili-danmaku-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--minibili-danmaku-bottom, env(safe-area-inset-bottom, 0px));
+    height: 1.4rem;
+    display: flex;
+    align-items: center;
+    padding: .16rem .266667rem;
+    box-sizing: border-box;
+    /* 播放器区域是 z-index:1010 的定位元素，必须盖在它上面 */
+    z-index: 3000;
+  }
+  /* 弹幕列表（.bili-danmaku-brush）跟着输入条一起抬高，避免被盖住 */
   #app #bili-danmaku-wrap {
-    bottom: 12px;
+    bottom: calc(1.4rem + var(--minibili-danmaku-bottom, env(safe-area-inset-bottom, 0px)));
+  }
+  .minibili-danmaku-input {
+    flex: 1;
+    height: .746667rem;
+    padding: .133333rem .426667rem;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: .426667rem;
+    background: rgba(0,0,0,.3);
+    color: #FFFFFF;
+    font-family: PingFang SC;
+    font-size: .32rem;
+    line-height: .48rem;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .minibili-danmaku-input::placeholder {
+    color: hsla(0,0%,100%,.5);
+  }
+  .minibili-danmaku-send {
+    height: .746667rem;
+    margin-left: .266667rem;
+    padding: 0 .32rem;
+    border: 0;
+    border-radius: .426667rem;
+    background: #23ADE5;
+    color: #FFFFFF;
+    font-size: .32rem;
+    line-height: .746667rem;
+  }
+  .minibili-danmaku-send:disabled {
+    opacity: .6;
+  }
+  /* 发送结果提示，浮在输入条上方 */
+  .minibili-danmaku-toast {
+    display: none;
+    position: fixed;
+    left: 50%;
+    bottom: calc(2rem + var(--minibili-danmaku-bottom, env(safe-area-inset-bottom, 0px)));
+    transform: translateX(-50%);
+    max-width: 80%;
+    padding: .16rem .32rem;
+    border-radius: .213333rem;
+    background: rgba(0,0,0,.75);
+    color: #FFFFFF;
+    font-size: .32rem;
+    z-index: 3001;
   }
   [data-background-play="true"] {
     color: #FF6699!important;

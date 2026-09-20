@@ -5,6 +5,7 @@ import UpName from "@/components/UpName";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BilibiliWebView from "@/components/BilibiliWebView";
 import { withUniwind } from "uniwind";
 
@@ -137,6 +138,7 @@ function LiveWebPage({ route }: Props) {
       </Text>
     ),
   });
+  const insets = useSafeAreaInsets();
   const [enableBackgroundPlay, setEnableBackgroundPlay] = React.useState(false);
   const roomId = url.startsWith("https://live.bilibili.com/h5/") ? url.split("/")[4] : "";
   const liveUrls = useLiveUrl(enableBackgroundPlay ? roomId : "");
@@ -190,6 +192,24 @@ function LiveWebPage({ route }: Props) {
     return false;
   });
 
+  /**
+   * 网页是 edge-to-edge 渲染的，底部会被系统导航栏盖住。
+   * 把安全区高度写进页面，让网页里的弹幕输入条与弹幕列表整体抬上去。
+   */
+  function syncDanmakuBottomInset() {
+    try {
+      webViewRef.current?.injectJavaScript(
+        `document.documentElement.style.setProperty("--minibili-danmaku-bottom", "${Math.max(insets.bottom, 0)}px");true;`,
+      );
+    } catch {
+      // 页面还没就绪时忽略，加载完成后 onLoadEnd 会再同步一次
+    }
+  }
+
+  React.useEffect(() => {
+    syncDanmakuBottomInset();
+  }, [insets.bottom, webViewKey]);
+
   if (backPlay) {
     return (
       <View className="relative flex flex-1">
@@ -234,6 +254,7 @@ function LiveWebPage({ route }: Props) {
       renderLoading={() => <Loading />}
       userAgent=""
       ref={webViewRef}
+      onLoadEnd={syncDanmakuBottomInset}
       onMessage={(evt) => {
         if (handleWebViewMessage(evt.nativeEvent.data)) {
           return;
