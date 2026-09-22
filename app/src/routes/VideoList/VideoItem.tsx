@@ -3,7 +3,6 @@ import UpName from "@/components/UpName";
 import { WatchProgressBar } from "@/components/WatchProgressBar";
 import { clsx } from "clsx";
 import { Image } from "@/components/styled/expo";
-import React from "react";
 import { useWindowDimensions, View } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";

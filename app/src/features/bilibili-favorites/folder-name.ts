@@ -2,6 +2,7 @@ export const FAVORITE_FOLDER_NAME_MAX_LENGTH = 20;
 
 // 控制字符、零宽字符与双向控制符等不可见字符；保留 U+200D（ZWJ）以支持组合 emoji。
 const INVISIBLE_CHARACTERS =
+  // eslint-disable-next-line no-control-regex -- 用于拒绝收藏夹名称中的控制字符
   /[\u0000-\u001F\u007F-\u009F\u200B\u200C\u200E\u200F\u2028-\u202E\u2060-\u2064\uFEFF]/u;
 
 export function normalizeFavoriteFolderName(raw: string) {

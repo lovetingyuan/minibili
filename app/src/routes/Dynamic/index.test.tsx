@@ -24,6 +24,16 @@ vi.mock("react-native", () => ({
   Pressable: "Pressable",
   View: "View",
 }));
+vi.mock("react", async () => {
+  const actual = await vi.importActual<typeof import("react")>("react");
+  const mockedReact = {
+    ...actual,
+    useRef: <T,>(initialValue: T) => ({ current: initialValue }),
+    useState: <T,>(initialValue: T) => [initialValue, vi.fn()] as const,
+  };
+  return { ...mockedReact, default: mockedReact };
+});
+vi.mock("react-native-pager-view", () => ({ default: "PagerView" }));
 vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),
 }));
@@ -40,6 +50,11 @@ vi.mock("@/api/dynamic-items", () => ({
     refresh: mocks.refresh,
     retry: vi.fn(),
   }),
+}));
+vi.mock("@/api/space-items", () => ({
+  useSpaceContentCounts: () => ({ videoCount: 513, opusCount: 366 }),
+  useSpaceOpusItems: vi.fn(),
+  useSpaceVideoItems: vi.fn(),
 }));
 vi.mock("@/api/user-info", () => ({
   useUserInfo: () => ({ data: mocks.userInfo }),
@@ -64,6 +79,7 @@ vi.mock("@/hooks/useUpdateNavigationOptions", () => ({ default: vi.fn() }));
 vi.mock("@/store/actions", () => ({ useMarkFollowingDynamicsRead: vi.fn() }));
 vi.mock("./Header", () => ({ headerRight: vi.fn(), headerTitle: vi.fn() }));
 vi.mock("./ProfileInfo", () => ({ default: "ProfileInfo" }));
+vi.mock("./SpaceTabs", () => ({ default: "SpaceTabs" }));
 
 import Dynamic from "./index";
 
@@ -105,7 +121,14 @@ function renderList(routeSign = "") {
     },
     navigation: { navigate: mocks.navigate },
   } as unknown as ComponentProps<typeof Dynamic>);
-  return screen as ReactElement<ListProps>;
+  const root = screen as ReactElement<{
+    children: readonly [ReactElement, ReactElement<{ children: readonly ReactElement[] }>];
+  }>;
+  const pager = root.props.children[1];
+  const dynamicPage = pager.props.children[0] as ReactElement<{ children: ReactElement }>;
+  const feed = dynamicPage.props.children;
+  const renderFeed = feed.type as (props: typeof feed.props) => ReactElement<ListProps>;
+  return renderFeed(feed.props);
 }
 
 function pressRenderedCard(item: DynamicItem) {

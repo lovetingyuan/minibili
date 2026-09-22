@@ -70,7 +70,6 @@ describe("following dynamics content", () => {
     mocks.dynamics.latestId = "dynamic-1";
     const screen = FollowingDynamicsContent() as ReactElement<DynamicListProps>;
     expect(screen.type).toBe("DynamicList");
-    expect(screen.props.loadingText).toBe("正在加载关注动态");
     expect(screen.props.isReachingEnd).toBe(true);
 
     screen.props.onItemPress(item);

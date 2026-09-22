@@ -12,13 +12,10 @@ import type { MainTabNavigationProp } from '@/types';
 import { DynamicCard } from './dynamic-card';
 import type { DynamicListProps } from './dynamic-list.types';
 
-function DynamicListLoading(props: { text: string; listHeader?: ReactNode }) {
+function DynamicListLoading(props: { listHeader?: ReactNode }) {
   return (
     <View className="flex-1 bg-neutral-100 dark:bg-black">
       {props.listHeader}
-      <Text className={`px-4 ${props.listHeader ? 'pb-3' : 'py-3'} text-center text-xs ${colors.gray6.text}`}>
-        {props.text}
-      </Text>
       <View className="gap-3">
         {[0, 1, 2].map((index) => (
           <View key={index} className="gap-3 bg-white p-4 dark:bg-neutral-950">
@@ -39,10 +36,14 @@ function DynamicListLoading(props: { text: string; listHeader?: ReactNode }) {
   );
 }
 
-function DynamicListEmpty(props: Pick<DynamicListProps, 'error' | 'emptyTitle' | 'emptyMessage' | 'retry'>) {
+function DynamicListEmpty(
+  props: Pick<DynamicListProps, 'error' | 'errorTitle' | 'emptyTitle' | 'emptyMessage' | 'retry'>,
+) {
   return (
     <View className="items-center gap-3 px-8 py-24">
-      <Text className="text-lg font-semibold">{props.error ? '动态加载失败' : props.emptyTitle}</Text>
+      <Text className="text-lg font-semibold">
+        {props.error ? (props.errorTitle ?? '动态加载失败') : props.emptyTitle}
+      </Text>
       <Text selectable className={`text-center text-sm ${colors.gray6.text}`}>
         {props.error?.message || props.emptyMessage}
       </Text>
@@ -63,9 +64,10 @@ export function DynamicList(props: DynamicListProps) {
   const navigation = useNavigation<MainTabNavigationProp>();
   const listRef = React.useRef<FlashListRef<DynamicItem> | null>(null);
   const pendingScrollTopRef = React.useRef(false);
+  const { onTabReselect } = props;
 
   React.useEffect(() => {
-    if (!props.onTabReselect) {
+    if (!onTabReselect) {
       return;
     }
 
@@ -75,9 +77,9 @@ export function DynamicList(props: DynamicListProps) {
       }
       // 刷新会替换整个列表，等新列表渲染出来后再滚动，否则滚动位置会被新数据覆盖
       pendingScrollTopRef.current = true;
-      props.onTabReselect?.();
+      onTabReselect();
     });
-  }, [navigation, props.onTabReselect]);
+  }, [navigation, onTabReselect]);
 
   React.useEffect(() => {
     if (!pendingScrollTopRef.current || props.isRefreshing) {
@@ -88,7 +90,7 @@ export function DynamicList(props: DynamicListProps) {
   }, [props.isRefreshing]);
 
   if (props.isLoading && !props.list.length) {
-    return <DynamicListLoading text={props.loadingText} listHeader={props.listHeader} />;
+    return <DynamicListLoading listHeader={props.listHeader} />;
   }
 
   return (
@@ -101,13 +103,18 @@ export function DynamicList(props: DynamicListProps) {
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <View className="mb-3">
-          <DynamicCard item={item} onPress={() => props.onItemPress(item)} />
+          <DynamicCard
+            item={item}
+            showActions={props.showActions}
+            onPress={() => props.onItemPress(item)}
+          />
         </View>
       )}
       ListHeaderComponent={props.listHeader == null ? null : <>{props.listHeader}</>}
       ListEmptyComponent={
         <DynamicListEmpty
           error={props.error}
+          errorTitle={props.errorTitle}
           emptyTitle={props.emptyTitle}
           emptyMessage={props.emptyMessage}
           retry={props.retry}

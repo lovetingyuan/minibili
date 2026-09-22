@@ -58,7 +58,8 @@ vi.mock('@/components/Menu', () => ({
   menuTriggerIconButtonStyles: mocks.menuTriggerIconButtonStyles,
 }))
 vi.mock('@/components/UpName', () => ({ default: 'UpName' }))
-vi.mock('@/components/styled/rneui', () => ({ Avatar: 'Avatar', Icon: 'Icon', Text: 'Text' }))
+vi.mock('@/components/Avatar', () => ({ Avatar: 'Avatar' }))
+vi.mock('@/components/styled/rneui', () => ({ Icon: 'Icon', Text: 'Text' }))
 vi.mock('@/constants/colors.tw', () => import('../../constants/colors.tw'))
 vi.mock('@/api/useBilibiliBlacklist', () => ({
   useBilibiliBlacklist: () => ({ blacklist: mocks.blacklist }),

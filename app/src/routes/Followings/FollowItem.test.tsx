@@ -17,7 +17,8 @@ vi.mock("react-native", () => ({
   TouchableOpacity: "TouchableOpacity",
   View: "View",
 }));
-vi.mock("@/components/styled/rneui", () => ({ Avatar: "Avatar", Text: "Text" }));
+vi.mock("@/components/Avatar", () => ({ Avatar: "Avatar" }));
+vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/hooks/useFollowActions", () => ({

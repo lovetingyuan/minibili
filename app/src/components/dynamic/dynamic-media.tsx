@@ -97,6 +97,7 @@ function VideoCard(props: {
   const { setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore();
   const watchLater = useWatchLaterActions();
   const { content, author } = props;
+  const hasDescription = Boolean(content.description && content.description !== "-");
   const progressRatio = useWatchProgressRatio(content.bvid);
   const coverSize = getImagePixelDimensions(windowWidth * 0.9, (windowWidth * 0.9 * 9) / 16);
 
@@ -173,7 +174,7 @@ function VideoCard(props: {
       <Text className="text-base font-semibold" numberOfLines={2}>
         {content.title}
       </Text>
-      {content.description ? (
+      {hasDescription ? (
         <Text className={`text-xs ${colors.gray6.text}`} numberOfLines={props.detail ? 4 : 2}>
           {content.description}
         </Text>

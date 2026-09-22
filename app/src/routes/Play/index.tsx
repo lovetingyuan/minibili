@@ -11,7 +11,7 @@ import { useWatchProgressRefresh } from "@/hooks/useWatchProgressRefresh";
 import { showToast } from "@/utils";
 
 import { useVideoInfo } from "../../api/video-info";
-import CommentList from "../../components/CommentList";
+import CommentList from "@/components/Comment";
 import type { RootStackParamList } from "../../types";
 import { PlayHeaderRight, PlayHeaderTitle } from "./Header";
 import NativePlayer from "./native/NativePlayer";

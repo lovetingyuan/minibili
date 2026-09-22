@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { Avatar, Text } from "@/components/styled/rneui";
+import { Avatar } from "@/components/Avatar";
+import { Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
 import { clsx } from "clsx";
 import { Alert, Pressable, TouchableOpacity, View } from "react-native";

@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { Avatar, Button, Skeleton, Text } from "@/components/styled/rneui";
+import { Avatar } from "@/components/Avatar";
+import { Button, Skeleton, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
 import { FlashList } from "@/components/styled/rneui";
 import { clsx } from "clsx";

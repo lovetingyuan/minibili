@@ -1,4 +1,3 @@
-import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { RELATION_TAG_SPECIAL_ID } from "@/api/relation-tags";

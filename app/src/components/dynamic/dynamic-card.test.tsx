@@ -18,9 +18,10 @@ vi.mock("@/utils", () => ({
   parseImgUrl: String,
   parseNumber: String,
 }));
-vi.mock("../Additional", () => ({ Additional: "Additional" }));
+vi.mock("./Additional", () => ({ Additional: "Additional" }));
 vi.mock("../RichTexts", () => ({ default: "RichTexts" }));
-vi.mock("../styled/rneui", () => ({ Avatar: "Avatar", Icon: "Icon", Text: "Text" }));
+vi.mock("../Avatar", () => ({ Avatar: "Avatar" }));
+vi.mock("../styled/rneui", () => ({ Icon: "Icon", Text: "Text" }));
 vi.mock("../UpName", () => ({ default: "UpName" }));
 vi.mock("./dynamic-actions", () => ({ DynamicActions: "DynamicActions" }));
 vi.mock("./dynamic-media", () => ({ DynamicMedia: "DynamicMedia" }));

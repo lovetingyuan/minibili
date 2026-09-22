@@ -7,9 +7,10 @@ import { colors } from "@/constants/colors.tw";
 import type { NavigationProps } from "@/types";
 import { getImagePixelSize, parseDate, parseImgUrl } from "@/utils";
 
-import { Additional } from "../Additional";
+import { Additional } from "./Additional";
 import RichTexts from "../RichTexts";
-import { Avatar, Text } from "../styled/rneui";
+import { Avatar } from "../Avatar";
+import { Text } from "../styled/rneui";
 import UpName from "../UpName";
 import { DynamicArticleContent, DynamicArticleLoading } from "./dynamic-article";
 import { DynamicActions } from "./dynamic-actions";
@@ -167,6 +168,7 @@ export function DynamicCard(props: {
   onPress?: () => void;
   article?: DynamicArticle;
   articleLoading?: boolean;
+  showActions?: boolean;
 }) {
   const { item, detail, onPress, article, articleLoading } = props;
   const body = (
@@ -183,7 +185,9 @@ export function DynamicCard(props: {
       }
     >
       {onPress ? <Pressable onPress={onPress}>{body}</Pressable> : <View>{body}</View>}
-      <DynamicActions item={item} onCommentPress={detail ? undefined : onPress} />
+      {props.showActions === false ? null : (
+        <DynamicActions item={item} onCommentPress={detail ? undefined : onPress} />
+      )}
     </View>
   );
 }

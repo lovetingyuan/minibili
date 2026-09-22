@@ -3,7 +3,6 @@ import "../global.css";
 import NetInfo from "@react-native-community/netinfo";
 import { ThemeProvider } from "@/components/styled/rneui";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
 import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -13,24 +12,26 @@ import type { ProviderConfiguration, SWRConfiguration } from "swr/_internal";
 
 import fetcher from "./api/fetcher";
 import ButtonsOverlay from "./components/ButtonsOverlay";
-import BilibiliFollowingsManager from "./components/BilibiliFollowingsManager";
-import BilibiliBlacklistManager from "./components/BilibiliBlacklistManager";
-import UserDataManager from "./components/UserDataManager";
-import WatchLaterManager from "./components/WatchLaterManager";
-import WatchProgressManager from "./components/WatchProgressManager";
-import CheckAppUpdate from "./components/CheckAppUpdate";
-import LiveUpsManager from "./components/LiveUpsManager";
-import CheckNetState from "./components/CheckNetState";
-import FollowingDynamicsUpdatesManager from "./components/FollowingDynamicsUpdatesManager";
-import FollowingDynamicsUnreadManager from "./components/FollowingDynamicsUnreadManager";
-import ImagesView from "./components/ImagesView";
-import VideoDownloadManager from "./components/VideoDownloadManager";
+import ErrorFallback from "./components/ErrorFallback";
+import ImagesView from "./components/ImageViewer";
+import {
+  BilibiliBlacklistManager,
+  BilibiliFollowingsManager,
+  CheckAppUpdate,
+  CheckNetState,
+  FollowingDynamicsUnreadManager,
+  FollowingDynamicsUpdatesManager,
+  LiveUpsManager,
+  UserDataManager,
+  VideoDownloadManager,
+  WatchLaterManager,
+  WatchProgressManager,
+} from "./components/managers";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
 import useAppOrientation from "./hooks/useAppOrientation";
 import useRNETheme from "./hooks/useRNETheme";
 import Route from "./routes/Index";
 import ErrorBoundary from "react-native-error-boundary";
-import ErrorFallback from "./components/ErrorFallback";
 import { InitStoreComp } from "./store";
 
 let online = true;

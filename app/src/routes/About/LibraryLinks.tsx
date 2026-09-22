@@ -1,5 +1,4 @@
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
 import { View } from "react-native";
 
 import { Icon, ListItem } from "@/components/styled/rneui";

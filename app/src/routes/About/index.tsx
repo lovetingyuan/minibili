@@ -1,5 +1,4 @@
-import { Divider } from "@/components/styled/rneui";
-import React from "react";
+import { Divider } from "@/components/Divider";
 import { ScrollView, View } from "react-native";
 
 import Header from "./Banner";

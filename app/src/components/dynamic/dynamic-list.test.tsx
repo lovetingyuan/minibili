@@ -107,7 +107,6 @@ const baseProps = {
   isLoadingMore: false,
   isRefreshing: false,
   isReachingEnd: false,
-  loadingText: "正在加载关注动态",
   emptyTitle: "这里还没有关注动态",
   emptyMessage: "暂时没有新动态",
   ...actions,
@@ -127,6 +126,16 @@ function text(node: ReactNode): string {
     return "";
   }
   return React.Children.toArray(node.props.children).map(text).join("");
+}
+
+function containsType(node: ReactNode, type: string): boolean {
+  if (!React.isValidElement<{ children?: ReactNode }>(node)) {
+    return false;
+  }
+  if (node.type === type) {
+    return true;
+  }
+  return React.Children.toArray(node.props.children).some((child) => containsType(child, type));
 }
 
 type TestElementProps = { children?: ReactNode; onPress?: () => void };
@@ -182,9 +191,11 @@ describe("shared dynamic list", () => {
     });
   });
 
-  test("shows the configured initial loading state", () => {
+  test("shows skeletons without loading text in the initial loading state", () => {
     const loading = renderList({ list: [], isLoading: true });
-    expect(text(renderFunction(loading))).toContain("正在加载关注动态");
+    const loadingState = renderFunction(loading);
+    expect(text(loadingState)).toBe("");
+    expect(containsType(loadingState, "Skeleton")).toBe(true);
   });
 
   test("keeps the optional header above loading, empty and populated content", () => {

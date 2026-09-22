@@ -1,8 +1,8 @@
 import React from "react";
 import { Alert, Linking, Platform } from "react-native";
 
-import { saveImageToLibrary } from "@/components/image-viewer-download";
-import type { SaveImageResult } from "@/components/image-viewer-download";
+import { saveImageToLibrary } from "../components/ImageViewer/image-viewer-download";
+import type { SaveImageResult } from "../components/ImageViewer/image-viewer-download";
 import { showToast } from "@/utils";
 
 async function ensureWritePermission() {

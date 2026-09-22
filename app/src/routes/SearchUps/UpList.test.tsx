@@ -56,8 +56,8 @@ vi.mock("@/hooks/useFollowActions", () => ({
   }),
 }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
+vi.mock("@/components/Avatar", () => ({ Avatar: "Avatar" }));
 vi.mock("@/components/styled/rneui", () => ({
-  Avatar: "Avatar",
   Button: "Button",
   FlashList: "FlashList",
   Skeleton: "Skeleton",
@@ -116,8 +116,8 @@ function listProps(keyword: string): ListProps {
 }
 
 function childElements(node: ReactNode): TestElement[] {
-  return React.Children.toArray(node).filter(
-    (child): child is TestElement => React.isValidElement(child),
+  return React.Children.toArray(node).filter((child): child is TestElement =>
+    React.isValidElement(child),
   );
 }
 
@@ -138,8 +138,7 @@ function renderRow(item: UpSearchItem): TestElement[] {
 /** 骨架屏元素渲染成行元素：EmptyContent 里还包了一层 SkeletonRows */
 function skeletonRows(element: ReactElement): TestElement[] {
   const rendered = renderComponent(element);
-  const container =
-    typeof rendered.type === "function" ? renderComponent(rendered) : rendered;
+  const container = typeof rendered.type === "function" ? renderComponent(rendered) : rendered;
   return childElements(container.props.children);
 }
 

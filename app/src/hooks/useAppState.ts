@@ -19,7 +19,7 @@ export function useAppStateChange(callback?: (s: AppStateStatus) => void) {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [callbackRef]);
 
   return appState;
 }

@@ -1,0 +1,11 @@
+export { default as BilibiliBlacklistManager } from "./BilibiliBlacklistManager";
+export { default as BilibiliFollowingsManager } from "./BilibiliFollowingsManager";
+export { default as CheckAppUpdate } from "./CheckAppUpdate";
+export { default as CheckNetState } from "./CheckNetState";
+export { default as FollowingDynamicsUnreadManager } from "./FollowingDynamicsUnreadManager";
+export { default as FollowingDynamicsUpdatesManager } from "./FollowingDynamicsUpdatesManager";
+export { default as LiveUpsManager } from "./LiveUpsManager";
+export { default as UserDataManager } from "./UserDataManager";
+export { default as VideoDownloadManager } from "./VideoDownloadManager";
+export { default as WatchLaterManager } from "./WatchLaterManager";
+export { default as WatchProgressManager } from "./WatchProgressManager";

@@ -2,7 +2,8 @@ import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { useBilibiliBlacklist } from "@/api/useBilibiliBlacklist";
-import { Chip, Icon, ListItem, Text } from "@/components/styled/rneui";
+import { Chip } from "@/components/Chip";
+import { Icon, ListItem, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 
 export default function Blacklist() {

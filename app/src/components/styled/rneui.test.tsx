@@ -1,8 +1,12 @@
-import { expect, test, vi } from "vitest";
 import type { ReactElement } from "react";
+import { expect, test, vi } from "vitest";
 
 vi.mock("uniwind", () => ({
-  useResolveClassNames: () => ({}),
+  useResolveClassNames: (className: string) =>
+    className === "checked-color" ? { accentColor: "#fb7299" } : {},
+}));
+vi.mock("@react-native-community/checkbox", () => ({
+  default: "NativeCheckBox",
 }));
 vi.mock("@shopify/flash-list", () => ({
   FlashList: "FlashList",
@@ -12,7 +16,6 @@ vi.mock("@rneui/themed", () => {
   const withMembers = (members: Record<string, unknown>) => Object.assign(placeholder, members);
 
   return {
-    Avatar: placeholder,
     Badge: placeholder,
     BottomSheet: placeholder,
     Button: placeholder,
@@ -23,16 +26,11 @@ vi.mock("@rneui/themed", () => {
       Image: placeholder,
       Title: placeholder,
     }),
-    CheckBox: "RNEUICheckBox",
-    Chip: placeholder,
     Dialog: withMembers({ Actions: placeholder, Button: placeholder, Title: placeholder }),
-    Divider: placeholder,
     Icon: placeholder,
     ListItem: withMembers({ Accordion: placeholder }),
     Overlay: placeholder,
     Skeleton: placeholder,
-    Switch: placeholder,
-    Text: placeholder,
     ThemeProvider: placeholder,
     createTheme: (theme: unknown) => theme,
   };
@@ -40,32 +38,22 @@ vi.mock("@rneui/themed", () => {
 
 import { CheckBox } from "./rneui";
 
-type CheckBoxElementProps = {
-  iconType?: string;
-  checkedIcon?: string;
-  uncheckedIcon?: string;
+type NativeCheckBoxElementProps = {
+  value?: boolean;
+  tintColors?: { true?: string; false?: string };
 };
 
-test("默认使用已安装的 material 图标，避免复选框图标渲染不出来", () => {
-  const element = CheckBox({
-    checked: false,
-    title: "特别关注（1）",
-  }) as ReactElement<CheckBoxElementProps>;
-
-  expect(element.props.iconType).toBe("material");
-  expect(element.props.checkedIcon).toBe("check-box");
-  expect(element.props.uncheckedIcon).toBe("check-box-outline-blank");
-});
-
-test("调用方传入的图标配置优先", () => {
-  const element = CheckBox({
+test("将选中状态和颜色传递给原生复选框", () => {
+  const pressable = CheckBox({
     checked: true,
-    iconType: "ionicon",
-    checkedIcon: "heart",
-    uncheckedIcon: "heart-outline",
-  }) as ReactElement<CheckBoxElementProps>;
+    title: "特别关注（1）",
+    checkedColorClassName: "checked-color",
+    uncheckedColor: "#ffffff",
+  }) as ReactElement<{ children: ReactElement<{ children: ReactElement[] }> }>;
+  const nativeCheckBox = pressable.props.children.props
+    .children[0] as ReactElement<NativeCheckBoxElementProps>;
 
-  expect(element.props.iconType).toBe("ionicon");
-  expect(element.props.checkedIcon).toBe("heart");
-  expect(element.props.uncheckedIcon).toBe("heart-outline");
+  expect(nativeCheckBox.type).toBe("NativeCheckBox");
+  expect(nativeCheckBox.props.value).toBe(true);
+  expect(nativeCheckBox.props.tintColors).toEqual({ true: "#fb7299", false: "#ffffff" });
 });

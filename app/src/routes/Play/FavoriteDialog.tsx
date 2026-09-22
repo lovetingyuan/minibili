@@ -74,9 +74,6 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
         {editor.selection?.folders.map((folder) => (
           <CheckBox
             key={folder.id}
-            iconType="material"
-            checkedIcon="check-box"
-            uncheckedIcon="check-box-outline-blank"
             title={`${folder.title}（${folder.media_count}）`}
             checked={selectedFolderIds.has(folder.id)}
             onPress={() => editor.toggle(folder.id)}

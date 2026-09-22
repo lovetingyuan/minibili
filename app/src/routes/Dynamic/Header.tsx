@@ -1,6 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Avatar, Icon, Text } from '@/components/styled/rneui'
+import { Avatar } from '@/components/Avatar'
+import { Icon, Text } from '@/components/styled/rneui'
 import UpName from '@/components/UpName'
 import { clsx } from 'clsx'
 import * as Clipboard from 'expo-clipboard'

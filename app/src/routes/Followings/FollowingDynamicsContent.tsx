@@ -9,7 +9,6 @@ export default function FollowingDynamicsContent() {
   return (
     <DynamicList
       {...dynamics}
-      loadingText="正在加载关注动态"
       emptyTitle="这里还没有关注动态"
       emptyMessage="已关注的 UP 主暂时没有新动态"
       onItemPress={openDynamicItem}

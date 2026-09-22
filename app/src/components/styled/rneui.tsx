@@ -1,48 +1,53 @@
 import React from "react";
 import {
-  Avatar as BaseAvatar,
   Badge as BaseBadge,
   BottomSheet as BaseBottomSheet,
   Button as BaseButton,
   Card as BaseCard,
-  CheckBox as BaseCheckBox,
-  Chip as BaseChip,
   Dialog as BaseDialog,
-  Divider as BaseDivider,
   Icon as BaseIcon,
   ListItem as BaseListItem,
   Overlay as BaseOverlay,
   Skeleton as BaseSkeleton,
-  Switch as BaseSwitch,
-  Text as BaseText,
   ThemeProvider,
   createTheme,
 } from "@rneui/themed";
 import type {
-  AvatarProps as BaseAvatarProps,
   BadgeProps as BaseBadgeProps,
   BottomSheetProps as BaseBottomSheetProps,
   ButtonProps as BaseButtonProps,
   CardProps as BaseCardProps,
-  CheckBoxProps as BaseCheckBoxProps,
-  ChipProps as BaseChipProps,
   DialogButtonProps as BaseDialogButtonProps,
   DialogProps as BaseDialogProps,
   DialogTitleProps as BaseDialogTitleProps,
-  DividerProps as BaseDividerProps,
   IconProps as BaseIconProps,
   ListItemAccordionProps as BaseListItemAccordionProps,
   ListItemProps as BaseListItemProps,
   OverlayProps as BaseOverlayProps,
   SkeletonProps as BaseSkeletonProps,
-  SwitchProps as BaseSwitchProps,
   TextProps as BaseTextProps,
 } from "@rneui/base";
+import NativeCheckBox from "@react-native-community/checkbox";
 import { FlashList as BaseFlashList } from "@shopify/flash-list";
 import type { FlashListProps, FlashListRef } from "@shopify/flash-list";
-import type { StyleProp, TextStyle } from "react-native";
+import {
+  Platform,
+  Pressable,
+  Switch as NativeSwitch,
+  Text as NativeText,
+  View,
+} from "react-native";
+import type {
+  PressableProps,
+  StyleProp,
+  SwitchProps as NativeSwitchProps,
+  TextProps as NativeTextProps,
+  TextStyle,
+} from "react-native";
 import type { Edge } from "react-native-safe-area-context";
 import { useResolveClassNames } from "uniwind";
+
+import { colors } from "@/constants/colors.tw";
 
 function useResolvedStyle(className?: string) {
   return useResolveClassNames(className ?? "");
@@ -59,45 +64,6 @@ function useResolvedColor(className?: string) {
   }
 
   return undefined;
-}
-
-type AvatarProps = BaseAvatarProps & {
-  avatarClassName?: string;
-  containerClassName?: string;
-  iconClassName?: string;
-  overlayContainerClassName?: string;
-  titleClassName?: string;
-};
-
-export function Avatar({
-  avatarClassName,
-  containerClassName,
-  iconClassName,
-  overlayContainerClassName,
-  titleClassName,
-  avatarStyle,
-  containerStyle,
-  iconStyle,
-  overlayContainerStyle,
-  titleStyle,
-  ...props
-}: AvatarProps) {
-  const resolvedAvatarStyle = useResolvedStyle(avatarClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedIconStyle = useResolvedStyle(iconClassName);
-  const resolvedOverlayContainerStyle = useResolvedStyle(overlayContainerClassName);
-  const resolvedTitleStyle = useResolvedStyle(titleClassName);
-
-  return (
-    <BaseAvatar
-      {...props}
-      avatarStyle={{ ...avatarStyle, ...resolvedAvatarStyle }}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      iconStyle={[iconStyle, resolvedIconStyle]}
-      overlayContainerStyle={[overlayContainerStyle, resolvedOverlayContainerStyle]}
-      titleStyle={[titleStyle, resolvedTitleStyle]}
-    />
-  );
 }
 
 type BadgeProps = BaseBadgeProps & {
@@ -236,80 +202,65 @@ export const Card = Object.assign(CardBase, {
   Title: CardTitle,
 });
 
-type CheckBoxProps = BaseCheckBoxProps & {
+type CheckBoxProps = Omit<PressableProps, "children" | "onPress"> & {
+  checked: boolean;
+  title?: React.ReactNode;
+  onPress?: () => void;
+  checkedColor?: string;
+  uncheckedColor?: string;
+  size?: number;
   checkedColorClassName?: string;
   containerClassName?: string;
   textClassName?: string;
   wrapperClassName?: string;
-  children?: React.ReactNode;
 };
 
 export function CheckBox({
+  checked,
+  title,
+  onPress,
+  disabled,
   checkedColorClassName,
   containerClassName,
   textClassName,
   wrapperClassName,
   checkedColor,
-  containerStyle,
-  textStyle,
-  wrapperStyle,
-  // RNEUI 默认使用 font-awesome 图标集，本项目没有安装，图标会渲染成 null（复选框直接看不见）
-  iconType = "material",
-  checkedIcon = "check-box",
-  uncheckedIcon = "check-box-outline-blank",
+  uncheckedColor,
+  size = 24,
   ...props
 }: CheckBoxProps) {
   const resolvedCheckedColor = useResolvedColor(checkedColorClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedTextStyle = useResolvedStyle(textClassName);
-  const resolvedWrapperStyle = useResolvedStyle(wrapperClassName);
+  const activeColor = resolvedCheckedColor ?? checkedColor;
 
   return (
-    <CheckBoxPrimitive
+    <Pressable
       {...props}
-      iconType={iconType}
-      checkedIcon={checkedIcon}
-      uncheckedIcon={uncheckedIcon}
-      checkedColor={resolvedCheckedColor ?? checkedColor}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      textStyle={[textStyle, resolvedTextStyle]}
-      wrapperStyle={[wrapperStyle, resolvedWrapperStyle]}
-    />
-  );
-}
-
-type ChipProps = BaseChipProps & {
-  buttonClassName?: string;
-  containerClassName?: string;
-  iconContainerClassName?: string;
-  titleClassName?: string;
-  children?: React.ReactNode;
-};
-
-export function Chip({
-  buttonClassName,
-  containerClassName,
-  iconContainerClassName,
-  titleClassName,
-  buttonStyle,
-  containerStyle,
-  iconContainerStyle,
-  titleStyle,
-  ...props
-}: ChipProps) {
-  const resolvedButtonStyle = useResolvedStyle(buttonClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedIconContainerStyle = useResolvedStyle(iconContainerClassName);
-  const resolvedTitleStyle = useResolvedStyle(titleClassName);
-
-  return (
-    <ChipPrimitive
-      {...props}
-      buttonStyle={[buttonStyle, resolvedButtonStyle]}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      iconContainerStyle={[iconContainerStyle, resolvedIconContainerStyle]}
-      titleStyle={[titleStyle, resolvedTitleStyle]}
-    />
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked, disabled }}
+      className={containerClassName}
+      disabled={disabled}
+      onPress={onPress}
+    >
+      <View className={`flex-row items-center gap-2 ${wrapperClassName ?? ""}`}>
+        <NativeCheckBox
+          accessible={false}
+          disabled={disabled}
+          value={checked}
+          tintColors={{ true: activeColor, false: uncheckedColor }}
+          tintColor={uncheckedColor}
+          onCheckColor={activeColor ? "#ffffff" : undefined}
+          onFillColor={activeColor}
+          onTintColor={activeColor}
+          pointerEvents="none"
+          style={{ width: size, height: size }}
+        />
+        {typeof title === "string" || typeof title === "number" ? (
+          <Text className={textClassName}>{title}</Text>
+        ) : (
+          title
+        )}
+      </View>
+    </Pressable>
   );
 }
 
@@ -388,16 +339,6 @@ export const Dialog = Object.assign(DialogBase, {
   Loading: BaseDialog.Loading,
   Title: DialogTitle,
 });
-
-type DividerProps = BaseDividerProps & {
-  className?: string;
-};
-
-export function Divider({ className, style, ...props }: DividerProps) {
-  const resolvedStyle = useResolvedStyle(className);
-
-  return <BaseDivider {...props} style={[style, resolvedStyle]} />;
-}
 
 type StyledFlashListProps<T> = FlashListProps<T> & {
   className?: string;
@@ -561,7 +502,7 @@ type SkeletonProps = BaseSkeletonProps & {
   skeletonClassName?: string;
 };
 
-type SwitchProps = BaseSwitchProps & {
+type SwitchProps = NativeSwitchProps & {
   colorClassName?: string;
   iosBackgroundColorClassName?: string;
   trackColorOnClassName?: string;
@@ -573,7 +514,7 @@ export function Switch({
   iosBackgroundColorClassName,
   trackColorOnClassName,
   trackColorOffClassName,
-  color,
+  thumbColor,
   ios_backgroundColor,
   trackColor,
   ...props
@@ -584,9 +525,9 @@ export function Switch({
   const resolvedTrackColorOff = useResolvedColor(trackColorOffClassName);
 
   return (
-    <SwitchPrimitive
+    <NativeSwitch
       {...props}
-      color={resolvedColor ?? color}
+      thumbColor={resolvedColor ?? thumbColor}
       ios_backgroundColor={resolvedIosBackgroundColor ?? ios_backgroundColor}
       trackColor={{
         false: resolvedTrackColorOff ?? trackColor?.false,
@@ -615,28 +556,38 @@ export function Skeleton({
   );
 }
 
-type TextProps = BaseTextProps & {
+type TextProps = NativeTextProps & {
   className?: string;
 };
 
-export function Text({ className, style, ...props }: TextProps) {
+const nativeTextBaseStyle = Platform.select<TextStyle>({
+  android: {
+    fontFamily: "sans-serif",
+    fontWeight: "normal",
+  },
+});
+
+export function Text({ className, style, accessibilityRole = "text", ...props }: TextProps) {
+  const defaultColorStyle = useResolvedStyle(colors.black.text);
   const resolvedStyle = useResolvedStyle(className);
 
-  return <BaseText {...props} style={[style, resolvedStyle]} />;
+  return (
+    <NativeText
+      {...props}
+      accessibilityRole={accessibilityRole}
+      style={[nativeTextBaseStyle, defaultColorStyle, style, resolvedStyle]}
+    />
+  );
 }
 
 const BottomSheetPrimitive = BaseBottomSheet as unknown as React.ComponentType<BottomSheetProps>;
 const ButtonPrimitive = BaseButton as unknown as React.ComponentType<ButtonProps>;
 const CardPrimitive = BaseCard as unknown as React.ComponentType<CardProps>;
-const CheckBoxPrimitive = BaseCheckBox as unknown as React.ComponentType<CheckBoxProps>;
-const ChipPrimitive = BaseChip as unknown as React.ComponentType<ChipProps>;
 const DialogButtonPrimitive =
   BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
 const IconPrimitive = BaseIcon as unknown as React.ComponentType<IconProps>;
 const ListItemAccordionPrimitive =
   BaseListItem.Accordion as unknown as React.ComponentType<ListItemAccordionProps>;
 const OverlayPrimitive = BaseOverlay as unknown as React.ComponentType<OverlayProps>;
-const SwitchPrimitive = BaseSwitch as unknown as React.ComponentType<SwitchProps>;
-
 export { ThemeProvider, createTheme };
 export type { FlashListProps, FlashListRef };

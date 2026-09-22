@@ -1,4 +1,5 @@
-import { Chip, Icon, ListItem, Text } from "@/components/styled/rneui";
+import { Chip } from "@/components/Chip";
+import { Icon, ListItem, Text } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
 import { colors } from "@/constants/colors.tw";

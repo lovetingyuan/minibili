@@ -87,6 +87,7 @@ async function assertReachable(url, label) {
 }
 
 function stripAnsi(text) {
+  // eslint-disable-next-line no-control-regex -- ANSI 转义序列以 ESC 控制字符开头
   return text.replaceAll(/\u001B\[[0-9;?]*[ -/]*[@-~]/g, "");
 }
 

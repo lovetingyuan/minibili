@@ -1,9 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
 import { clsx } from "clsx";
-import React from "react";
 import { Alert, View } from "react-native";
 
-import { Avatar, Button, Text } from "@/components/styled/rneui";
+import { Avatar } from "@/components/Avatar";
+import { Button, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import type { MainTabNavigationProp } from "@/types";

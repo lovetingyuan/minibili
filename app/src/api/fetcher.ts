@@ -28,6 +28,14 @@ class ApiError extends Error {
 
 export type RequestOptions = { withCookie?: boolean };
 
+export function shouldSignWbiRequest(url: string) {
+  return (
+    url.includes("/wbi/") ||
+    url.includes("/x/polymer/web-dynamic/v1/feed/space") ||
+    url.includes("/x/polymer/web-dynamic/v1/opus/feed/space")
+  );
+}
+
 // const root = protobuf.Root.fromJSON(dm as any)
 // const lp = root.lookupType('DmSegMobileReply')
 
@@ -67,7 +75,7 @@ export default async function request<D>(
     mode: "cors",
     credentials: "include",
   } satisfies Parameters<typeof fetch>[1];
-  if (url.includes("/wbi/") || url.includes("v1/feed/space")) {
+  if (shouldSignWbiRequest(url)) {
     const wbiImg = await getWBIInfo(request);
     const [_url, _query] = requestUrl.split("?");
     const params = new URLSearchParams(_query);

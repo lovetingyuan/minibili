@@ -1,10 +1,10 @@
-import React from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import React from 'react';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 
-import { Icon, Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { Icon, Text } from '@/components/styled/rneui';
+import { colors } from '@/constants/colors.tw';
 
-import type { FollowGroupTabsProps } from "./FollowGroups.types";
+import type { FollowGroupTabsProps } from './FollowGroups.types';
 
 export default function FollowGroupTabs({
   tabs,
@@ -63,15 +63,13 @@ export default function FollowGroupTabs({
               accessibilityRole="tab"
               accessibilityLabel={`${tab.name}，${tab.count} 个关注`}
               accessibilityState={{ selected: selectedKey === tab.key, disabled }}
-              accessibilityHint={tab.custom ? "长按打开分组操作菜单" : undefined}
+              accessibilityHint={tab.custom ? '长按打开分组操作菜单' : undefined}
               disabled={disabled}
               delayLongPress={300}
               onLayout={({ nativeEvent }) => {
                 const { x, width } = nativeEvent.layout;
                 tabWidthsRef.current[tab.key] = width;
-                setOffsets((previous) =>
-                  previous[tab.key] === x ? previous : { ...previous, [tab.key]: x },
-                );
+                setOffsets((previous) => (previous[tab.key] === x ? previous : { ...previous, [tab.key]: x }));
               }}
               onLongPress={() => {
                 onLongPress(tab);
@@ -84,16 +82,14 @@ export default function FollowGroupTabs({
                 }
                 onSelect(tab);
               }}
-              className={`rounded-full px-4 py-2 ${
-                selectedKey === tab.key ? colors.gray2.bg : colors.gray1.bg
-              }`}
+              className={`rounded-full px-4 py-2 ${selectedKey === tab.key ? colors.gray2.bg : colors.gray1.bg}`}
             >
               <Text
                 className={`text-sm ${
                   selectedKey === tab.key ? `${colors.primary.text} font-bold` : colors.gray6.text
                 }`}
               >
-                {tab.name}（{tab.count}）
+                {tab.name} {tab.count}
               </Text>
             </TouchableOpacity>
           ))}
@@ -108,12 +104,7 @@ export default function FollowGroupTabs({
             onPress={onCreate}
             className={`h-8 w-8 items-center justify-center rounded-full ${colors.gray1.bg}`}
           >
-            <Icon
-              name="plus"
-              type="material-community"
-              size={18}
-              colorClassName={colors.gray7.accent}
-            />
+            <Icon name="plus" type="material-community" size={18} colorClassName={colors.gray7.accent} />
           </TouchableOpacity>
         </View>
       </View>

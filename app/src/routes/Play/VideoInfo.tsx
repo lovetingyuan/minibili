@@ -1,5 +1,6 @@
 import { type RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { Avatar, Icon, Text } from "@/components/styled/rneui";
+import { Avatar } from "@/components/Avatar";
+import { Icon, Text } from "@/components/styled/rneui";
 import React from "react";
 import { Linking, Pressable, View } from "react-native";
 

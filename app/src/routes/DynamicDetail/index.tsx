@@ -3,7 +3,7 @@ import { ActivityIndicator, RefreshControl, ScrollView, View } from "react-nativ
 
 import { useDynamicDetail } from "@/api/dynamic-items";
 import { useOpusDetail } from "@/api/opus-detail";
-import CommentList from "@/components/CommentList";
+import CommentList from "@/components/Comment";
 import { DynamicCard } from "@/components/dynamic/dynamic-card";
 import { Button, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";

@@ -1,4 +1,3 @@
-import React from "react";
 import { Image, Linking, Pressable, Share, View } from "react-native";
 
 import { Button, Icon, Text } from "@/components/styled/rneui";

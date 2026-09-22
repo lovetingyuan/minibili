@@ -9,10 +9,11 @@ export type DynamicListProps = {
   isLoadingMore: boolean;
   isRefreshing: boolean;
   isReachingEnd: boolean;
-  loadingText: string;
   emptyTitle: string;
   emptyMessage: string;
+  errorTitle?: string;
   listHeader?: ReactNode;
+  showActions?: boolean;
   refresh: () => void | Promise<unknown>;
   loadMore: () => void | Promise<unknown>;
   retry: () => void | Promise<unknown>;

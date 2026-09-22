@@ -246,6 +246,14 @@ describe("DynamicMedia video interactions", () => {
     ).toMatchObject({ ratio: 0 });
   });
 
+  test("does not render the dash placeholder when a video has no description", () => {
+    const renderedText = flatten(renderVideo({ ...video, description: "-" }))
+      .filter((element) => element.type === "Text")
+      .map((element) => element.props.children);
+
+    expect(renderedText).not.toContain("-");
+  });
+
   function descriptionBox(forward?: boolean) {
     return flatten(renderVideo(video, false, forward)).find(
       (child) =>

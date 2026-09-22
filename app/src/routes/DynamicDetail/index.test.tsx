@@ -37,7 +37,7 @@ vi.mock("@/api/opus-detail", () => ({
     return mocks.article;
   },
 }));
-vi.mock("@/components/CommentList", () => ({ default: "CommentList" }));
+vi.mock("@/components/Comment", () => ({ default: "CommentList" }));
 vi.mock("@/components/dynamic/dynamic-card", () => ({ DynamicCard: "DynamicCard" }));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button", Text: "Text" }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));

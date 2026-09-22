@@ -2,7 +2,7 @@ import { Directory, File, Paths } from "expo-file-system";
 import type { DownloadProgress, DownloadTask } from "expo-file-system";
 
 import { getVideoDownloadSource, VideoDownloadUnsupportedError } from "../../api/play-url";
-import { MiniBiliAlbumName } from "../../components/image-viewer-download";
+import { MiniBiliAlbumName } from "../../components/ImageViewer/image-viewer-download";
 import { mediaUA } from "../../constants";
 import { getStoreMethods } from "../../store";
 import { showToast } from "../../utils";

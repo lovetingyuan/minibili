@@ -315,8 +315,9 @@ export function usePlayHeartbeatReporter(props: PlayHeartbeatReporterProps) {
   });
 
   React.useEffect(() => {
+    const state = stateRef.current;
     return () => {
-      flushPlayHeartbeat(stateRef.current, inputRef, tickRef, Date.now());
+      flushPlayHeartbeat(state, inputRef, tickRef, Date.now());
     };
   }, []);
 

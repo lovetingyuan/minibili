@@ -1,4 +1,4 @@
-import { MiniBiliAlbumName } from "../../components/image-viewer-download";
+import { MiniBiliAlbumName } from "../../components/ImageViewer/image-viewer-download";
 
 export type SaveVideoResult = "saved" | "permission-denied" | "failed";
 export type EnsureWritePermission = () => Promise<boolean>;
