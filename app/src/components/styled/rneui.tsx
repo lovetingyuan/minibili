@@ -1,26 +1,19 @@
 import React from "react";
 import {
-  Badge as BaseBadge,
   BottomSheet as BaseBottomSheet,
   Button as BaseButton,
-  Card as BaseCard,
   Dialog as BaseDialog,
-  Overlay as BaseOverlay,
   Skeleton as BaseSkeleton,
   ThemeProvider,
   createTheme,
 } from "@rneui/themed";
 import type {
-  BadgeProps as BaseBadgeProps,
   BottomSheetProps as BaseBottomSheetProps,
   ButtonProps as BaseButtonProps,
-  CardProps as BaseCardProps,
   DialogButtonProps as BaseDialogButtonProps,
   DialogProps as BaseDialogProps,
   DialogTitleProps as BaseDialogTitleProps,
-  OverlayProps as BaseOverlayProps,
   SkeletonProps as BaseSkeletonProps,
-  TextProps as BaseTextProps,
 } from "@rneui/base";
 import { FlashList as BaseFlashList } from "@shopify/flash-list";
 import type { FlashListProps, FlashListRef } from "@shopify/flash-list";
@@ -50,35 +43,6 @@ function useResolvedColor(className?: string) {
   }
 
   return undefined;
-}
-
-type BadgeProps = BaseBadgeProps & {
-  badgeClassName?: string;
-  containerClassName?: string;
-  textClassName?: string;
-};
-
-export function Badge({
-  badgeClassName,
-  containerClassName,
-  textClassName,
-  badgeStyle,
-  containerStyle,
-  textStyle,
-  ...props
-}: BadgeProps) {
-  const resolvedBadgeStyle = useResolvedStyle(badgeClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedTextStyle = useResolvedStyle(textClassName);
-
-  return (
-    <BaseBadge
-      {...props}
-      badgeStyle={[badgeStyle, resolvedBadgeStyle]}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      textStyle={[textStyle, resolvedTextStyle]}
-    />
-  );
 }
 
 type BottomSheetProps = BaseBottomSheetProps & {
@@ -144,49 +108,6 @@ export function Button({
     />
   );
 }
-
-type CardProps = BaseCardProps & {
-  containerClassName?: string;
-  wrapperClassName?: string;
-  children?: React.ReactNode;
-};
-
-function CardBase({
-  containerClassName,
-  wrapperClassName,
-  containerStyle,
-  wrapperStyle,
-  ...props
-}: CardProps) {
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedWrapperStyle = useResolvedStyle(wrapperClassName);
-
-  return (
-    <CardPrimitive
-      {...props}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      wrapperStyle={[wrapperStyle, resolvedWrapperStyle]}
-    />
-  );
-}
-
-type CardTitleProps = BaseTextProps & {
-  className?: string;
-};
-
-function CardTitle({ className, style, ...props }: CardTitleProps) {
-  const resolvedStyle = useResolvedStyle(className);
-
-  return <BaseCard.Title {...props} style={[style, resolvedStyle]} />;
-}
-
-export const Card = Object.assign(CardBase, {
-  Divider: BaseCard.Divider,
-  FeaturedSubtitle: BaseCard.FeaturedSubtitle,
-  FeaturedTitle: BaseCard.FeaturedTitle,
-  Image: BaseCard.Image,
-  Title: CardTitle,
-});
 
 type DialogProps = BaseDialogProps & {
   backdropClassName?: string;
@@ -308,31 +229,6 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
 
 export const FlashList = FlashListBase;
 
-type OverlayProps = BaseOverlayProps & {
-  backdropClassName?: string;
-  overlayClassName?: string;
-  children?: React.ReactNode;
-};
-
-export function Overlay({
-  backdropClassName,
-  overlayClassName,
-  backdropStyle,
-  overlayStyle,
-  ...props
-}: OverlayProps) {
-  const resolvedBackdropStyle = useResolvedStyle(backdropClassName);
-  const resolvedOverlayStyle = useResolvedStyle(overlayClassName);
-
-  return (
-    <OverlayPrimitive
-      {...props}
-      backdropStyle={[backdropStyle, resolvedBackdropStyle]}
-      overlayStyle={[overlayStyle, resolvedOverlayStyle]}
-    />
-  );
-}
-
 type SkeletonProps = BaseSkeletonProps & {
   className?: string;
   skeletonClassName?: string;
@@ -418,9 +314,7 @@ export function Text({ className, style, accessibilityRole = "text", ...props }:
 
 const BottomSheetPrimitive = BaseBottomSheet as unknown as React.ComponentType<BottomSheetProps>;
 const ButtonPrimitive = BaseButton as unknown as React.ComponentType<ButtonProps>;
-const CardPrimitive = BaseCard as unknown as React.ComponentType<CardProps>;
 const DialogButtonPrimitive =
   BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
-const OverlayPrimitive = BaseOverlay as unknown as React.ComponentType<OverlayProps>;
 export { ThemeProvider, createTheme };
 export type { FlashListProps, FlashListRef };
