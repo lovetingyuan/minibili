@@ -7,13 +7,7 @@ const mocks = vi.hoisted(() => ({ navigate: vi.fn() }));
 vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),
 }));
-vi.mock("react-native", () => ({ View: "View" }));
-vi.mock("@/components/styled/rneui", () => ({
-  ListItem: Object.assign("ListItem", {
-    Content: "ListItemContent",
-    Title: "ListItemTitle",
-  }),
-}));
+vi.mock("react-native", () => ({ Pressable: "Pressable", Text: "Text", View: "View" }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({
   ChevronRight: "ChevronRight",
@@ -22,7 +16,11 @@ vi.mock("lucide-react-native", () => ({
   Star: "Star",
 }));
 vi.mock("@/constants/colors.tw", () => ({
-  colors: { gray4: { accent: "gray4" }, primary: { accent: "primary" } },
+  colors: {
+    black: { text: "black" },
+    gray4: { accent: "gray4" },
+    primary: { accent: "primary" },
+  },
 }));
 
 import LibraryLinks from "./LibraryLinks";

@@ -1,9 +1,10 @@
 import { Chip } from "@/components/Chip";
-import { ListItem, Text } from "@/components/styled/rneui";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
+import { Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { ChevronDown, X } from "lucide-react-native";
+import { X } from "lucide-react-native";
 import React from "react";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
@@ -19,20 +20,14 @@ function BlackTags() {
   } = useUserSettings();
   const gray5Color = useResolvedColor(colors.gray5.text);
   return (
-    <ListItem.Accordion
-      icon={<ThemedIcon icon={ChevronDown} />}
-      containerClassName="p-0 mt-1 mb-3 bg-transparent"
-      content={
-        <ListItem.Content>
-          <ListItem.Title>不感兴趣的分类（{Object.keys($blackTags).length}）</ListItem.Title>
-        </ListItem.Content>
-      }
-      isExpanded={expanded}
+    <CollapsibleSection
+      expanded={expanded}
+      title={`不感兴趣的分类（${Object.keys($blackTags).length}）`}
       onPress={() => {
         setExpanded(!expanded);
       }}
     >
-      <ListItem containerClassName="flex-wrap p-0 flex-row px-1 pb-4 bg-transparent">
+      <View className="flex-row flex-wrap items-center bg-transparent px-1 pb-4">
         {Object.values($blackTags).map((tag) => {
           return (
             <Chip
@@ -63,7 +58,7 @@ function BlackTags() {
           );
         })}
         {Object.values($blackTags).length === 0 ? <Text>🈚</Text> : null}
-      </ListItem>
-    </ListItem.Accordion>
+      </View>
+    </CollapsibleSection>
   );
 }

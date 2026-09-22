@@ -5,7 +5,6 @@ import {
   Button as BaseButton,
   Card as BaseCard,
   Dialog as BaseDialog,
-  ListItem as BaseListItem,
   Overlay as BaseOverlay,
   Skeleton as BaseSkeleton,
   ThemeProvider,
@@ -19,8 +18,6 @@ import type {
   DialogButtonProps as BaseDialogButtonProps,
   DialogProps as BaseDialogProps,
   DialogTitleProps as BaseDialogTitleProps,
-  ListItemAccordionProps as BaseListItemAccordionProps,
-  ListItemProps as BaseListItemProps,
   OverlayProps as BaseOverlayProps,
   SkeletonProps as BaseSkeletonProps,
   TextProps as BaseTextProps,
@@ -311,43 +308,6 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
 
 export const FlashList = FlashListBase;
 
-type ListItemProps = BaseListItemProps & {
-  containerClassName?: string;
-};
-
-function ListItemBase({ containerClassName, containerStyle, ...props }: ListItemProps) {
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-
-  return <BaseListItem {...props} containerStyle={[containerStyle, resolvedContainerStyle]} />;
-}
-
-type ListItemAccordionProps = BaseListItemAccordionProps & {
-  containerClassName?: string;
-};
-
-function ListItemAccordion({
-  containerClassName,
-  containerStyle,
-  ...props
-}: ListItemAccordionProps) {
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-
-  return (
-    <ListItemAccordionPrimitive
-      {...props}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-    />
-  );
-}
-
-export const ListItem = Object.assign(ListItemBase, {
-  Accordion: ListItemAccordion,
-  Content: BaseListItem.Content,
-  Input: BaseListItem.Input,
-  Subtitle: BaseListItem.Subtitle,
-  Title: BaseListItem.Title,
-});
-
 type OverlayProps = BaseOverlayProps & {
   backdropClassName?: string;
   overlayClassName?: string;
@@ -461,8 +421,6 @@ const ButtonPrimitive = BaseButton as unknown as React.ComponentType<ButtonProps
 const CardPrimitive = BaseCard as unknown as React.ComponentType<CardProps>;
 const DialogButtonPrimitive =
   BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
-const ListItemAccordionPrimitive =
-  BaseListItem.Accordion as unknown as React.ComponentType<ListItemAccordionProps>;
 const OverlayPrimitive = BaseOverlay as unknown as React.ComponentType<OverlayProps>;
 export { ThemeProvider, createTheme };
 export type { FlashListProps, FlashListRef };

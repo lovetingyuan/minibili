@@ -1,11 +1,10 @@
 import React from "react";
-import { ChevronDown } from "lucide-react-native";
 import { ActivityIndicator, View } from "react-native";
 
 import { useBilibiliBlacklist } from "@/api/useBilibiliBlacklist";
 import { Chip } from "@/components/Chip";
-import { ListItem, Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
+import { Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 
 export default function Blacklist() {
@@ -14,17 +13,9 @@ export default function Blacklist() {
   const loading = isPreparing || Boolean(account && data === undefined && !error);
 
   return (
-    <ListItem.Accordion
-      icon={<ThemedIcon icon={ChevronDown} />}
-      containerClassName="p-0 mt-1 mb-3 bg-transparent"
-      content={
-        <ListItem.Content>
-          <ListItem.Title>
-            黑名单{account && data !== undefined ? `（${blacklist.size}）` : ""}
-          </ListItem.Title>
-        </ListItem.Content>
-      }
-      isExpanded={expanded}
+    <CollapsibleSection
+      expanded={expanded}
+      title={`黑名单${account && data !== undefined ? `（${blacklist.size}）` : ""}`}
       onPress={() => setExpanded(!expanded)}
     >
       {expanded ? (
@@ -61,6 +52,6 @@ export default function Blacklist() {
           )}
         </View>
       ) : null}
-    </ListItem.Accordion>
+    </CollapsibleSection>
   );
 }

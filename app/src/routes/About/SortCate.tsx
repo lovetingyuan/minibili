@@ -1,7 +1,6 @@
 import { Chip } from "@/components/Chip";
-import { ListItem, Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import { ChevronDown } from "lucide-react-native";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
+import { Text } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
 import { colors } from "@/constants/colors.tw";
@@ -43,18 +42,12 @@ export default function SortCate() {
     }
   }
   return (
-    <ListItem.Accordion
-      icon={<ThemedIcon icon={ChevronDown} />}
-      containerClassName="p-0 mt-1 mb-3 bg-transparent"
-      content={
-        <ListItem.Content>
-          <ListItem.Title>调整分区顺序</ListItem.Title>
-        </ListItem.Content>
-      }
-      isExpanded={expanded}
+    <CollapsibleSection
+      expanded={expanded}
+      title="调整分区顺序"
       onPress={() => setExpanded(!expanded)}
     >
-      <ListItem containerClassName="flex-wrap p-0 flex-row px-1 bg-transparent">
+      <View className="flex-row flex-wrap items-center bg-transparent px-1">
         <View className="w-full flex-1 flex-row flex-wrap gap-x-3 border-b-[0.5px] border-b-gray-400">
           {sorted.map((category) => (
             <Chip
@@ -82,7 +75,7 @@ export default function SortCate() {
             />
           ))}
         </View>
-      </ListItem>
-    </ListItem.Accordion>
+      </View>
+    </CollapsibleSection>
   );
 }
