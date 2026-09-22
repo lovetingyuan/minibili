@@ -1,4 +1,5 @@
 import React from "react";
+import { ArrowUp, X } from "lucide-react-native";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -8,7 +9,8 @@ import {
   View,
 } from "react-native";
 
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 
 /**
@@ -72,7 +74,7 @@ export function DanmakuComposerView(props: DanmakuComposerViewProps) {
             {props.pending ? (
               <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <Icon name="arrow-upward" size={18} color="#ffffff" />
+              <ThemedIcon icon={ArrowUp} size={18} color="#ffffff" />
             )}
           </Pressable>
           <Pressable
@@ -82,7 +84,7 @@ export function DanmakuComposerView(props: DanmakuComposerViewProps) {
             hitSlop={6}
             onPress={props.onClose}
           >
-            <Icon name="close" size={20} color="#ffffff" />
+            <ThemedIcon icon={X} size={20} color="#ffffff" />
           </Pressable>
         </View>
       </KeyboardAvoidingView>

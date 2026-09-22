@@ -1,7 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
+import { Search } from "lucide-react-native";
 import { View } from "react-native";
 
-import { Button, Icon } from "@/components/styled/rneui";
+import { Button } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import type { MainTabNavigationProp } from "@/types";
@@ -22,7 +24,7 @@ function SearchUpButton() {
           navigation.navigate("SearchUps");
         }}
       >
-        <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
+        <ThemedIcon icon={Search} colorClassName={colors.gray7.accent} size={24} />
       </Button>
     </View>
   );

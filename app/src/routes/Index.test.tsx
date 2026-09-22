@@ -17,7 +17,13 @@ vi.mock("@react-navigation/native-stack", () => ({
 vi.mock("@react-navigation/elements", () => ({ Assets: [] }));
 vi.mock("@react-navigation/native", () => ({ NavigationContainer: "NavigationContainer" }));
 vi.mock("expo-asset", () => ({ Asset: { loadAsync: vi.fn() } }));
-vi.mock("@/components/styled/rneui", () => ({ Icon: "Icon" }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({
+  Flame: "Flame",
+  Rss: "Rss",
+  User: "User",
+  Users: "Users",
+}));
 vi.mock("@/api/check-update", () => ({
   useAppUpdateInfo: () => ({ hasUpdate: false }),
 }));

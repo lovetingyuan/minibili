@@ -15,12 +15,15 @@ vi.mock("react-native", () => ({
 }));
 
 vi.mock("@/components/styled/rneui", () => ({
-  Icon: function Icon() {
-    return null;
-  },
   Text: function Text() {
     return null;
   },
+}));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({
+  CircleCheck: "CircleCheck",
+  CirclePlay: "CirclePlay",
+  CircleUserRound: "CircleUserRound",
 }));
 
 vi.mock("@/components/styled/expo", () => ({

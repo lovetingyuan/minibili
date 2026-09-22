@@ -18,7 +18,14 @@ vi.mock("react-native", () => ({
   useWindowDimensions: () => ({ width: 400, height: 800 }),
   View: "View",
 }));
-vi.mock("@/components/styled/rneui", () => ({ Icon: "Icon", Text: "Text" }));
+vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({
+  CircleCheck: "CircleCheck",
+  CirclePlay: "CirclePlay",
+  CircleUserRound: "CircleUserRound",
+  ThumbsUp: "ThumbsUp",
+}));
 vi.mock("@/components/styled/expo", () => ({ Image: "Image" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/store", () => ({ useStore: () => ({ setOverlayButtons: vi.fn() }) }));
@@ -132,8 +139,7 @@ test("the title does not stretch while metadata stays bottom-aligned", () => {
   expect(itemElements).toContainEqual(
     expect.objectContaining({
       props: expect.objectContaining({
-        name: "account-circle-outline",
-        type: "material-community",
+        icon: "CircleUserRound",
       }),
     }),
   );

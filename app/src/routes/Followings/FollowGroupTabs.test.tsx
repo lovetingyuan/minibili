@@ -44,7 +44,9 @@ vi.mock("react-native", () => ({
   TouchableOpacity: "TouchableOpacity",
   View: "View",
 }));
-vi.mock("@/components/styled/rneui", () => ({ Icon: "Icon", Text: "Text" }));
+vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({ Plus: "Plus" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 
 import FollowGroupTabs from "./FollowGroupTabs";

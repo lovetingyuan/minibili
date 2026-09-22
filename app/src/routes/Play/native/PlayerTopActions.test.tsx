@@ -16,8 +16,15 @@ vi.mock("@/components/Menu", () => ({
   MenuTrigger: "MenuTrigger",
 }));
 
-vi.mock("@/components/styled/rneui", () => ({
-  Icon: "Icon",
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({
+  Check: "Check",
+  ChevronDown: "ChevronDown",
+  ChevronUp: "ChevronUp",
+  Headphones: "Headphones",
+  ListVideo: "ListVideo",
+  Pencil: "Pencil",
+  Repeat2: "Repeat2",
 }));
 
 vi.mock("@/constants/colors.tw", () => ({
@@ -41,6 +48,7 @@ type ElementProps = {
   children?: ReactNode;
   className?: string;
   color?: string;
+  icon?: string;
   name?: string;
   onPress?: () => void;
   onSelect?: () => void;
@@ -132,19 +140,19 @@ describe("PlayerTopActions", () => {
     expect(buttons).toHaveLength(2);
     expect(buttons[0].props.accessibilityLabel).toBe("开启循环播放");
     expect(buttons[1].props.accessibilityLabel).toBe("开启后台播放");
-    expect(getIcon(buttons[0]).props.name).toBe("repeat");
-    expect(getIcon(buttons[1]).props.name).toBe("headphones");
+    expect(getIcon(buttons[0]).props.icon).toBe("Repeat2");
+    expect(getIcon(buttons[1]).props.icon).toBe("Headphones");
   });
 
   test("places playback modes before background play and danmaku", () => {
     const { buttons } = renderActions({ canSendDanmaku: true });
 
     expect(buttons).toHaveLength(4);
-    expect(buttons.map((button) => getIcon(button).props.name)).toEqual([
-      "repeat",
-      "playlist-play",
-      "headphones",
-      "pencil",
+    expect(buttons.map((button) => getIcon(button).props.icon)).toEqual([
+      "Repeat2",
+      "ListVideo",
+      "Headphones",
+      "Pencil",
     ]);
   });
 

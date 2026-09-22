@@ -1,10 +1,12 @@
 import { type RouteProp, useRoute } from "@react-navigation/native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import UpName from "@/components/UpName";
 import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
 import React from "react";
+import { EllipsisVertical } from "lucide-react-native";
 import { View } from "react-native";
 import {
   Menu,
@@ -106,7 +108,7 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
           customStyles={menuTriggerIconButtonStyles}
           onPress={showMenu}
         >
-          <Icon name="dots-vertical" type="material-community" />
+          <ThemedIcon icon={EllipsisVertical} />
         </MenuTrigger>
         <MenuOptions>
           <MenuOption

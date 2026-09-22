@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Keyboard, Pressable, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ArrowUp } from "lucide-react-native";
 
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 
 import type { ReplyComposerProps } from "./reply-composer.types";
@@ -68,7 +70,7 @@ export default function ReplyComposer(props: ReplyComposerProps) {
           {props.pending ? (
             <ActivityIndicator size="small" colorClassName={colors.coverBadge.accent} />
           ) : (
-            <Icon name="arrow-upward" size={19} colorClassName={colors.coverBadge.accent} />
+            <ThemedIcon icon={ArrowUp} size={19} colorClassName={colors.coverBadge.accent} />
           )}
         </Pressable>
       </View>

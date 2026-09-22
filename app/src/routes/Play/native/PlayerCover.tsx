@@ -1,5 +1,7 @@
-import { Icon, Switch } from "@/components/styled/rneui";
+import { Switch } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
+import { Play } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
 import { parseDuration } from "@/utils";
@@ -13,15 +15,7 @@ type PlayerCoverProps = {
 };
 
 function PlayerPlayIcon() {
-  return (
-    <Icon
-      name="play"
-      type="material-design"
-      size={64}
-      color="#ffffff"
-      containerClassName="opacity-80"
-    />
-  );
+  return <ThemedIcon icon={Play} size={64} color="#ffffff" filled opacity={0.8} />;
 }
 
 export default function PlayerCover(props: PlayerCoverProps) {

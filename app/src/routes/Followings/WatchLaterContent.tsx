@@ -1,9 +1,11 @@
 import React from "react";
+import { Clock } from "lucide-react-native";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import { useBilibiliWatchLater } from "@/api/useWatchLater";
 import type { WatchLaterListItem } from "@/api/watch-later.types";
-import { Button, FlashList, Icon, Text } from "@/components/styled/rneui";
+import { Button, FlashList, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
@@ -87,11 +89,15 @@ export default function WatchLaterContent() {
           ) : watchLater.error ? (
             <>
               <Text className="text-center">稍后再看加载失败，请检查网络或登录状态后重试</Text>
-              <Button title="重试" loading={watchLater.isValidating || refreshing} onPress={retry} />
+              <Button
+                title="重试"
+                loading={watchLater.isValidating || refreshing}
+                onPress={retry}
+              />
             </>
           ) : (
             <>
-              <Icon name="watch-later" size={36} colorClassName={colors.gray5.accent} />
+              <ThemedIcon icon={Clock} size={36} colorClassName={colors.gray5.accent} />
               <Text className={colors.gray6.text}>暂无稍后再看视频</Text>
             </>
           )}

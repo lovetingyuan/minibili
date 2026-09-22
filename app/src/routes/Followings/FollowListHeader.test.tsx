@@ -17,7 +17,9 @@ vi.mock("@/hooks/useUpdateNavigationOptions", () => ({
   },
 }));
 vi.mock("react-native", () => ({ View: "View" }));
-vi.mock("@/components/styled/rneui", () => ({ Button: "Button", Icon: "Icon" }));
+vi.mock("@/components/styled/rneui", () => ({ Button: "Button" }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({ Search: "Search" }));
 vi.mock("@/constants/colors.tw", () => ({ colors: { gray7: { accent: "gray7" } } }));
 
 import useFollowListHeader from "./FollowListHeader";
@@ -27,6 +29,7 @@ type TestElement = ReactElement<{
   className?: string;
   children?: ReactNode;
   colorClassName?: string;
+  icon?: string;
   name?: string;
   onPress?: () => void;
 }>;
@@ -69,8 +72,8 @@ test("关注页头部设置标题，并把搜索按钮放在右侧", () => {
   expect(button.props.accessibilityLabel).toBe("搜索UP主");
 
   const [icon] = children(button);
-  expect(icon.type).toBe("Icon");
-  expect(icon.props.name).toBe("search");
+  expect(icon.type).toBe("ThemedIcon");
+  expect(icon.props.icon).toBe("Search");
   expect(icon.props.colorClassName).toBe("gray7");
 });
 

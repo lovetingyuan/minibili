@@ -9,9 +9,10 @@ vi.mock("react-native", () => ({
 }));
 
 vi.mock("@/components/styled/rneui", () => ({
-  Icon: "Icon",
   Text: "Text",
 }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({ ChevronDown: "ChevronDown", ChevronUp: "ChevronUp" }));
 
 vi.mock("@/components/UpName", () => ({
   default: "UpName",

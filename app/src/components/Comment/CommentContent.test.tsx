@@ -19,7 +19,7 @@ vi.mock("react-native", () => ({
   View: "View",
 }));
 vi.mock("@/components/styled/expo", () => ({ Image: "Image" }));
-vi.mock("@/components/styled/rneui", () => ({ Icon: "Icon", Text: "Text" }));
+vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/store", () => ({
   useStore: () => ({

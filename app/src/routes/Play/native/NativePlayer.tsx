@@ -4,6 +4,7 @@ import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
 import type { VideoPlayer, VideoPlayerStatus } from "expo-video";
+import { Play } from "lucide-react-native";
 import React from "react";
 import {
   Alert,
@@ -27,7 +28,7 @@ import { useVideoPlayUrl } from "@/api/play-url";
 import { DANMAKU_SEND_STYLE, DanmakuLoginRequiredError } from "@/api/send-danmaku";
 import { useSendDanmaku } from "@/api/useSendDanmaku";
 import { useVideoInfo } from "@/api/video-info";
-import { Icon } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
@@ -1031,7 +1032,7 @@ export default function NativePlayer(props: NativePlayerProps) {
             className="h-14 w-14 items-center justify-center rounded-full bg-black/40"
             onPress={resumePlayback}
           >
-            <Icon name="play" type="material-design" size={34} color="#ffffff" />
+            <ThemedIcon icon={Play} size={34} color="#ffffff" filled />
           </Pressable>
         </View>
       ) : null}

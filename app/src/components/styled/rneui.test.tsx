@@ -27,7 +27,6 @@ vi.mock("@rneui/themed", () => {
       Title: placeholder,
     }),
     Dialog: withMembers({ Actions: placeholder, Button: placeholder, Title: placeholder }),
-    Icon: placeholder,
     ListItem: withMembers({ Accordion: placeholder }),
     Overlay: placeholder,
     Skeleton: placeholder,

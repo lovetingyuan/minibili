@@ -1,11 +1,13 @@
 import { useNavigation } from "@react-navigation/native";
 import { clsx } from "clsx";
+import { Play } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { Linking, Pressable, useWindowDimensions, View } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
 import type { DynamicAuthor, DynamicContent, DynamicImage } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
 import { useWatchProgressRatio } from "@/store/watch-progress";
@@ -13,7 +15,7 @@ import type { NavigationProps } from "@/types";
 import { getImagePixelDimensions, parseImgUrl, parseNumber } from "@/utils";
 
 import { Image } from "../styled/expo";
-import { Icon, Text } from "../styled/rneui";
+import { Text } from "../styled/rneui";
 import { WatchProgressBar } from "../WatchProgressBar";
 
 /**
@@ -154,7 +156,7 @@ function VideoCard(props: {
       ) : null}
       <View className="absolute inset-0 items-center justify-center">
         <View className="h-16 w-16 items-center justify-center rounded-full bg-black/55">
-          <Icon name="play-arrow" type="material" size={45} color="white" />
+          <ThemedIcon icon={Play} size={45} color="white" filled />
         </View>
       </View>
       <View className="absolute bottom-1.5 left-2 flex-row gap-3 rounded bg-black/60 px-2 py-1">
@@ -196,11 +198,7 @@ function VideoCard(props: {
   return (
     <View className={containerClassName}>
       {content.bvid ? (
-        <Pressable
-          className={coverClassName}
-          onLongPress={openMenu}
-          onPress={openVideo}
-        >
+        <Pressable className={coverClassName} onLongPress={openMenu} onPress={openVideo}>
           {coverContent}
         </Pressable>
       ) : (

@@ -1,7 +1,9 @@
 import { ActivityIndicator, View } from "react-native";
+import { History } from "lucide-react-native";
 
 import { useBilibiliHistory } from "@/api/useBilibiliHistory";
-import { Button, FlashList, Icon, Text } from "@/components/styled/rneui";
+import { Button, FlashList, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
 import { formatWatchTime } from "@/utils/watch-time";
@@ -62,7 +64,7 @@ export default function HistoryContent() {
             </>
           ) : (
             <>
-              <Icon name="history" size={36} colorClassName={colors.gray5.accent} />
+              <ThemedIcon icon={History} size={36} colorClassName={colors.gray5.accent} />
               <Text className={colors.gray6.text}>
                 {history.hasMore ? "当前已加载记录中暂无视频" : "暂无 B站视频观看历史"}
               </Text>

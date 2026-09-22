@@ -32,7 +32,9 @@ vi.mock("react-native", () => ({
   View: "View",
 }));
 vi.mock("../styled/expo", () => ({ Image: "Image" }));
-vi.mock("../styled/rneui", () => ({ Icon: "Icon", Text: "Text" }));
+vi.mock("../styled/rneui", () => ({ Text: "Text" }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({ Play: "Play" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/store", () => ({
   useStore: () => ({

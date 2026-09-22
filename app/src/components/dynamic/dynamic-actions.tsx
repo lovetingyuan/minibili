@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import { MessageCircle, Share2, ThumbsUp } from "lucide-react-native";
 import { ActivityIndicator, Alert, Pressable, View } from "react-native";
 
 import { useDynamicLike } from "@/api/useDynamicLike";
@@ -12,9 +13,10 @@ import {
   useBilibiliSessionState,
 } from "@/features/bilibili-session/useBilibiliSession";
 import type { NavigationProps } from "@/types";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { handleShareDynamic, parseNumber, showToast } from "@/utils";
 
-import { Icon, Text } from "../styled/rneui";
+import { Text } from "../styled/rneui";
 
 function getDynamicShareTitle(item: DynamicItem) {
   const text = item.text.trim();
@@ -61,12 +63,7 @@ function DynamicShareButton(props: { item: DynamicItem }) {
         void handleShareDynamic(getDynamicShareTitle(props.item), getDynamicShareUrl(props.item));
       }}
     >
-      <Icon
-        name="share-outline"
-        type="material-community"
-        size={24}
-        colorClassName={colors.gray6.accent}
-      />
+      <ThemedIcon icon={Share2} size={24} colorClassName={colors.gray6.accent} />
       <Text className={`text-xs ${colors.gray6.text}`}>
         {parseNumber(props.item.stats.forward)}
       </Text>
@@ -90,12 +87,7 @@ function DynamicCommentButton(props: { item: DynamicItem; onPress?: () => void }
           : undefined
       }
     >
-      <Icon
-        name="comment-outline"
-        type="material-community"
-        size={18}
-        colorClassName={colors.gray6.accent}
-      />
+      <ThemedIcon icon={MessageCircle} size={18} colorClassName={colors.gray6.accent} />
       <Text className={`text-xs ${colors.gray6.text}`}>
         {parseNumber(props.item.stats.comment)}
       </Text>
@@ -166,9 +158,9 @@ function DynamicLikeButton(props: {
       {mutation.isMutating ? (
         <ActivityIndicator size="small" />
       ) : (
-        <Icon
-          name={mutation.liked ? "thumb-up" : "thumb-up-outline"}
-          type="material-community"
+        <ThemedIcon
+          icon={ThumbsUp}
+          filled={mutation.liked}
           size={18}
           colorClassName={mutation.liked ? colors.primary.accent : colors.gray6.accent}
         />

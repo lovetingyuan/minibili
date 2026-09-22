@@ -3,8 +3,9 @@ import { Assets as NavigationAssets } from '@react-navigation/elements';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Asset } from 'expo-asset';
+import { Flame, Rss, User, Users } from 'lucide-react-native';
 
-import { Icon } from '@/components/styled/rneui';
+import { ThemedIcon } from '@/components/ThemedIcon';
 import { colors } from '@/constants/colors.tw';
 import useResolvedColor from '@/hooks/useResolvedColor';
 import useRouteTheme from '@/hooks/useRouteTheme';
@@ -94,7 +95,7 @@ export function MainTabs() {
         component={VideoList}
         options={{
           title: '热门',
-          tabBarIcon: ({ color, size }) => <Icon name="whatshot" type="material" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <ThemedIcon icon={Flame} color={color} size={size} />,
         }}
       />
       <Tab.Screen
@@ -116,7 +117,7 @@ export function MainTabs() {
             end: -8,
             top: 1,
           },
-          tabBarIcon: ({ color, size }) => <Icon name="dynamic-feed" type="material" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <ThemedIcon icon={Rss} color={color} size={size} />,
         }}
       />
       <Tab.Screen
@@ -138,7 +139,7 @@ export function MainTabs() {
             end: -8,
             top: 1,
           },
-          tabBarIcon: ({ color, size }) => <Icon name="people-outline" type="material" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <ThemedIcon icon={Users} color={color} size={size} />,
         }}
       />
       <Tab.Screen
@@ -159,7 +160,7 @@ export function MainTabs() {
             end: -6,
             top: 1,
           },
-          tabBarIcon: ({ color, size }) => <Icon name="person-outline" type="material" color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <ThemedIcon icon={User} color={color} size={size} />,
         }}
       />
     </Tab.Navigator>

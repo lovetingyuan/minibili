@@ -1,5 +1,7 @@
 import { Image } from "@/components/styled/expo";
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { Download, ScanSearch, X } from "lucide-react-native";
 import React from "react";
 import {
   ActivityIndicator,
@@ -114,7 +116,7 @@ function ImagesView() {
               onPress={closeViewer}
               style={styles.closeButton}
             >
-              <Icon color="#fff" name="close" size={24} type="material" />
+              <ThemedIcon color="#fff" icon={X} size={24} />
             </Pressable>
           </View>
           <View
@@ -134,7 +136,7 @@ function ImagesView() {
                 {activeOriginalStatus === "loading" ? (
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
-                  <Icon color="#fff" name="image-search" size={20} type="material" />
+                  <ThemedIcon color="#fff" icon={ScanSearch} size={20} />
                 )}
                 <Text style={styles.originalButtonText}>{originalButtonLabel}</Text>
               </Pressable>
@@ -150,7 +152,7 @@ function ImagesView() {
                 {saving ? (
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
-                  <Icon color="#fff" name="download" size={20} type="material" />
+                  <ThemedIcon color="#fff" icon={Download} size={20} />
                 )}
                 <Text style={styles.originalButtonText}>下载</Text>
               </Pressable>

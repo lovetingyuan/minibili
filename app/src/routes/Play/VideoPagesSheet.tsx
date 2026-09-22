@@ -1,10 +1,12 @@
 import type { FlashListRef } from "@shopify/flash-list";
+import { Check, X } from "lucide-react-native";
 import React from "react";
 import { Pressable, useWindowDimensions, View } from "react-native";
 import type { Edge } from "react-native-safe-area-context";
 
 import type { VideoInfo } from "@/api/video-info";
-import { BottomSheet, FlashList, Icon, Text } from "@/components/styled/rneui";
+import { BottomSheet, FlashList, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import { parseDuration } from "@/utils";
 
@@ -70,7 +72,7 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
             accessibilityLabel="关闭分P列表"
             onPress={props.onClose}
           >
-            <Icon name="close" size={21} colorClassName={colors.gray7.accent} />
+            <ThemedIcon icon={X} size={21} colorClassName={colors.gray7.accent} />
           </Pressable>
         </View>
         <FlashList
@@ -131,7 +133,7 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
                   {parseDuration(item.duration)}
                 </Text>
                 {selected ? (
-                  <Icon name="check" size={19} colorClassName={colors.secondary.accent} />
+                  <ThemedIcon icon={Check} size={19} colorClassName={colors.secondary.accent} />
                 ) : null}
               </Pressable>
             );

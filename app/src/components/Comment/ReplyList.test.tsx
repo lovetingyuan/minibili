@@ -27,9 +27,10 @@ vi.mock("@/api/replies", () => ({ useReplies: () => mocks.replies }));
 vi.mock("@/components/styled/rneui", () => ({
   BottomSheet: "BottomSheet",
   FlashList: "FlashList",
-  Icon: "Icon",
   Text: "Text",
 }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({ X: "X" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/hooks/useKeyboardHeight", () => ({ default: () => 0 }));
 vi.mock("@/store", () => ({

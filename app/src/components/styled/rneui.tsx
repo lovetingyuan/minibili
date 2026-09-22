@@ -5,7 +5,6 @@ import {
   Button as BaseButton,
   Card as BaseCard,
   Dialog as BaseDialog,
-  Icon as BaseIcon,
   ListItem as BaseListItem,
   Overlay as BaseOverlay,
   Skeleton as BaseSkeleton,
@@ -20,7 +19,6 @@ import type {
   DialogButtonProps as BaseDialogButtonProps,
   DialogProps as BaseDialogProps,
   DialogTitleProps as BaseDialogTitleProps,
-  IconProps as BaseIconProps,
   ListItemAccordionProps as BaseListItemAccordionProps,
   ListItemProps as BaseListItemProps,
   OverlayProps as BaseOverlayProps,
@@ -39,7 +37,6 @@ import {
 } from "react-native";
 import type {
   PressableProps,
-  StyleProp,
   SwitchProps as NativeSwitchProps,
   TextProps as NativeTextProps,
   TextStyle,
@@ -384,56 +381,6 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
 
 export const FlashList = FlashListBase;
 
-type IconProps = BaseIconProps & {
-  className?: string;
-  color?: string;
-  colorClassName?: string;
-  containerClassName?: string;
-  iconStyle?: StyleProp<TextStyle>;
-  iconClassName?: string;
-  name?: string;
-  size?: number;
-};
-
-function normalizeIconType(type?: BaseIconProps["type"]) {
-  switch (type) {
-    case "Ionicons":
-    case "ionicons":
-      return "ionicon";
-    case "material-community":
-      return "material-design";
-    default:
-      return type;
-  }
-}
-
-export function Icon({
-  className,
-  colorClassName,
-  containerClassName,
-  iconClassName,
-  color,
-  containerStyle,
-  iconStyle,
-  type,
-  ...props
-}: IconProps) {
-  const resolvedColor = useResolvedColor(colorClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedStyle = useResolvedStyle(className);
-  const resolvedIconStyle = useResolvedStyle(iconClassName);
-
-  return (
-    <IconPrimitive
-      {...props}
-      color={resolvedColor ?? color}
-      containerStyle={[containerStyle, resolvedContainerStyle, resolvedStyle]}
-      iconStyle={[iconStyle, resolvedIconStyle]}
-      type={normalizeIconType(type)}
-    />
-  );
-}
-
 type ListItemProps = BaseListItemProps & {
   containerClassName?: string;
 };
@@ -465,7 +412,6 @@ function ListItemAccordion({
 
 export const ListItem = Object.assign(ListItemBase, {
   Accordion: ListItemAccordion,
-  Chevron: BaseListItem.Chevron,
   Content: BaseListItem.Content,
   Input: BaseListItem.Input,
   Subtitle: BaseListItem.Subtitle,
@@ -585,7 +531,6 @@ const ButtonPrimitive = BaseButton as unknown as React.ComponentType<ButtonProps
 const CardPrimitive = BaseCard as unknown as React.ComponentType<CardProps>;
 const DialogButtonPrimitive =
   BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
-const IconPrimitive = BaseIcon as unknown as React.ComponentType<IconProps>;
 const ListItemAccordionPrimitive =
   BaseListItem.Accordion as unknown as React.ComponentType<ListItemAccordionProps>;
 const OverlayPrimitive = BaseOverlay as unknown as React.ComponentType<OverlayProps>;

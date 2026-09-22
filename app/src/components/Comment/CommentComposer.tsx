@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ArrowUp, X } from "lucide-react-native";
 
-import { Icon } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 
 import type { CommentComposerProps } from "./comment-composer.types";
@@ -56,7 +57,7 @@ export default function CommentComposer(props: CommentComposerProps) {
         {props.pending ? (
           <ActivityIndicator size="small" colorClassName={colors.coverBadge.accent} />
         ) : (
-          <Icon name="arrow-upward" size={18} colorClassName={colors.coverBadge.accent} />
+          <ThemedIcon icon={ArrowUp} size={18} colorClassName={colors.coverBadge.accent} />
         )}
       </Pressable>
       <Pressable
@@ -65,7 +66,7 @@ export default function CommentComposer(props: CommentComposerProps) {
         accessibilityLabel="关闭评论输入框"
         onPress={props.onClose}
       >
-        <Icon name="close" size={20} colorClassName={colors.gray7.accent} />
+        <ThemedIcon icon={X} size={20} colorClassName={colors.gray7.accent} />
       </Pressable>
     </View>
   );

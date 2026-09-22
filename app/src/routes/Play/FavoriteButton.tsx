@@ -1,9 +1,11 @@
 import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { Star } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { Alert, Pressable } from "react-native";
 
 import { useVideoRelation } from "@/api/useVideoFavorites";
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
@@ -97,8 +99,9 @@ function FavoriteButtonContent({
         hitSlop={6}
         onPress={open}
       >
-        <Icon
-          name={favorite ? "star" : "star-border"}
+        <ThemedIcon
+          icon={Star}
+          filled={favorite}
           size={18}
           colorClassName={favorite ? colors.primary.accent : colors.gray8.accent}
         />

@@ -1,5 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
-import { Button, Icon, Text } from "@/components/styled/rneui";
+import { Button, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { ChevronDown, Search } from "lucide-react-native";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuTrigger, menuOptionClassName } from "@/components/Menu";
@@ -65,12 +67,7 @@ function HeaderLeftComp() {
             >
               {currentVideosCate.label + (currentVideosCate.rid === -1 ? "" : "排行")}{" "}
             </Text>
-            <Icon
-              name="triangle-down"
-              type="octicon"
-              size={28}
-              colorClassName={colors.gray6.accent}
-            />
+            <ThemedIcon icon={ChevronDown} size={28} colorClassName={colors.gray6.accent} />
           </View>
         </MenuTrigger>
         <MenuOptions>
@@ -111,7 +108,7 @@ function HeaderRightComp() {
           navigation.navigate("SearchVideos");
         }}
       >
-        <Icon name="search" colorClassName={colors.gray7.accent} size={24} />
+        <ThemedIcon icon={Search} colorClassName={colors.gray7.accent} size={24} />
       </Button>
     </View>
   );

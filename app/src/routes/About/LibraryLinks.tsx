@@ -1,7 +1,9 @@
 import { useNavigation } from "@react-navigation/native";
+import { ChevronRight, Clock, History, Star } from "lucide-react-native";
 import { View } from "react-native";
 
-import { Icon, ListItem } from "@/components/styled/rneui";
+import { ListItem } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import type { MainTabNavigationProp } from "@/types";
 
@@ -16,11 +18,11 @@ export default function LibraryLinks() {
         containerClassName="rounded-lg bg-transparent px-0 py-3"
         onPress={() => navigation.navigate("Favorites")}
       >
-        <Icon name="star-outline" colorClassName={colors.primary.accent} />
+        <ThemedIcon icon={Star} colorClassName={colors.primary.accent} />
         <ListItem.Content>
           <ListItem.Title>我的收藏</ListItem.Title>
         </ListItem.Content>
-        <ListItem.Chevron />
+        <ThemedIcon icon={ChevronRight} size={16} colorClassName={colors.gray4.accent} />
       </ListItem>
       <ListItem
         accessibilityRole="button"
@@ -28,11 +30,11 @@ export default function LibraryLinks() {
         containerClassName="rounded-lg bg-transparent px-0 py-3"
         onPress={() => navigation.navigate("History")}
       >
-        <Icon name="history" colorClassName={colors.primary.accent} />
+        <ThemedIcon icon={History} colorClassName={colors.primary.accent} />
         <ListItem.Content>
           <ListItem.Title>观看历史</ListItem.Title>
         </ListItem.Content>
-        <ListItem.Chevron />
+        <ThemedIcon icon={ChevronRight} size={16} colorClassName={colors.gray4.accent} />
       </ListItem>
       <ListItem
         accessibilityRole="button"
@@ -40,11 +42,11 @@ export default function LibraryLinks() {
         containerClassName="rounded-lg bg-transparent px-0 py-3"
         onPress={() => navigation.navigate("WatchLater")}
       >
-        <Icon name="watch-later" colorClassName={colors.primary.accent} />
+        <ThemedIcon icon={Clock} colorClassName={colors.primary.accent} />
         <ListItem.Content>
           <ListItem.Title>稍后再看</ListItem.Title>
         </ListItem.Content>
-        <ListItem.Chevron />
+        <ThemedIcon icon={ChevronRight} size={16} colorClassName={colors.gray4.accent} />
       </ListItem>
     </View>
   );

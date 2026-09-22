@@ -1,6 +1,9 @@
 import { Chip } from "@/components/Chip";
-import { Icon, ListItem, Text } from "@/components/styled/rneui";
+import { ListItem, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { ChevronDown, X } from "lucide-react-native";
 import React from "react";
+import { Pressable } from "react-native";
 
 import { colors } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
@@ -17,7 +20,7 @@ function BlackTags() {
   const gray5Color = useResolvedColor(colors.gray5.text);
   return (
     <ListItem.Accordion
-      icon={<Icon name={"chevron-down"} type="material-community" />}
+      icon={<ThemedIcon icon={ChevronDown} />}
       containerClassName="p-0 mt-1 mb-3 bg-transparent"
       content={
         <ListItem.Content>
@@ -37,11 +40,10 @@ function BlackTags() {
               key={tag}
               type="outline"
               icon={
-                <Icon
-                  name="close"
-                  type="Ionicons"
-                  size={16}
-                  color={gray5Color}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`移除不感兴趣分类：${tag}`}
+                  hitSlop={8}
                   onPress={() => {
                     setSetting("$blackTags", (previous) => {
                       const blackTags = { ...previous };
@@ -49,7 +51,9 @@ function BlackTags() {
                       return blackTags;
                     });
                   }}
-                />
+                >
+                  <ThemedIcon icon={X} size={16} color={gray5Color} />
+                </Pressable>
               }
               iconRight
               titleClassName="text-left text-sm font-thin"

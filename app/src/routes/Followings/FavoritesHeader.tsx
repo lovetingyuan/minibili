@@ -1,7 +1,8 @@
 import React from "react";
+import { Plus } from "lucide-react-native";
 import { Alert, Pressable } from "react-native";
 
-import { Icon } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
@@ -53,7 +54,7 @@ function CreateFavoriteFolderButton() {
         className="px-2 py-1"
         onPress={() => setVisible(true)}
       >
-        <Icon name="add" type="material" size={24} colorClassName={colors.primary.accent} />
+        <ThemedIcon icon={Plus} size={24} colorClassName={colors.primary.accent} />
       </Pressable>
       {visible ? (
         <CreateFavoriteFolderDialog

@@ -1,8 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
+import { ChevronDown, ChevronUp } from "lucide-react-native";
 import React from "react";
 import { Pressable, View } from "react-native";
 
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import UpName from "@/components/UpName";
 import { colors } from "@/constants/colors.tw";
 import type { NavigationProps } from "@/types";
@@ -72,14 +74,12 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
           <Text className={`text-xs font-medium ${colors.primary.text}`}>
             {isCollapsed ? "显示更多" : "收起"}
           </Text>
-          <Icon
-            name={isCollapsed ? "expand-more" : "expand-less"}
+          <ThemedIcon
+            icon={isCollapsed ? ChevronDown : ChevronUp}
             size={16}
             colorClassName={colors.primary.accent}
-            iconProps={{
-              accessibilityElementsHidden: true,
-              importantForAccessibility: "no-hide-descendants",
-            }}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
           />
         </Pressable>
       ) : null}

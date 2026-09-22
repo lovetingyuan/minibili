@@ -1,7 +1,16 @@
 import { Pressable, Text, View } from "react-native";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Headphones,
+  ListVideo,
+  Pencil,
+  Repeat2,
+} from "lucide-react-native";
 
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
-import { Icon } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
@@ -53,9 +62,8 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
         >
           <View className="h-9 min-w-12 flex-row items-center justify-center gap-0.5 rounded-full bg-black/40 px-2">
             <Text className="text-xs font-semibold text-white">{playbackRateLabel}</Text>
-            <Icon
-              name={props.playbackRateMenuOpen ? "chevron-up" : "chevron-down"}
-              type="material-design"
+            <ThemedIcon
+              icon={props.playbackRateMenuOpen ? ChevronUp : ChevronDown}
               size={16}
               color="#ffffff"
             />
@@ -81,9 +89,7 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
                   >
                     {label}
                   </Text>
-                  {selected ? (
-                    <Icon name="check" type="material-design" size={18} color={accentColor} />
-                  ) : null}
+                  {selected ? <ThemedIcon icon={Check} size={18} color={accentColor} /> : null}
                 </View>
               </MenuOption>
             );
@@ -100,12 +106,7 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
         hitSlop={8}
         onPress={props.onToggleLoop}
       >
-        <Icon
-          name="repeat"
-          type="material-design"
-          size={20}
-          color={props.loopEnabled ? accentColor : "#ffffff"}
-        />
+        <ThemedIcon icon={Repeat2} size={20} color={props.loopEnabled ? accentColor : "#ffffff"} />
       </Pressable>
       {props.showAutoNext ? (
         <Pressable
@@ -118,9 +119,8 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
           hitSlop={8}
           onPress={props.onToggleAutoNext}
         >
-          <Icon
-            name="playlist-play"
-            type="material-design"
+          <ThemedIcon
+            icon={ListVideo}
             size={22}
             color={props.autoNextEnabled ? accentColor : "#ffffff"}
           />
@@ -136,9 +136,8 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
         hitSlop={8}
         onPress={props.onToggleBackgroundPlay}
       >
-        <Icon
-          name="headphones"
-          type="material-design"
+        <ThemedIcon
+          icon={Headphones}
           size={20}
           color={props.backgroundPlayEnabled ? accentColor : "#ffffff"}
         />
@@ -153,7 +152,7 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
           hitSlop={8}
           onPress={props.onSendDanmaku}
         >
-          <Icon name="pencil" type="material-design" size={20} color="#ffffff" />
+          <ThemedIcon icon={Pencil} size={20} color="#ffffff" />
         </Pressable>
       ) : null}
     </View>

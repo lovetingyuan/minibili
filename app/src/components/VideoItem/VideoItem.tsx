@@ -1,8 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import UpName from "../UpName";
 import { Image } from "@/components/styled/expo";
 import he from "he";
+import { CircleCheck, CirclePlay, CircleUserRound, ThumbsUp } from "lucide-react-native";
 import React from "react";
 import { ActivityIndicator, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
@@ -128,11 +130,7 @@ function VideoListItem<T extends VideoListItemInfo>({
             <View
               className={`absolute bottom-0 left-0 m-1 flex-row items-center gap-1 rounded-sm px-1 py-[1px] ${colors.coverBadge.bg}`}
             >
-              <Icon
-                name="play-circle-outline"
-                size={12}
-                colorClassName={colors.coverBadge.accent}
-              />
+              <ThemedIcon icon={CirclePlay} size={12} colorClassName={colors.coverBadge.accent} />
               <Text className={`text-xs font-thin ${colors.coverBadge.text}`}>
                 {parseNumber(video.play)}
               </Text>
@@ -152,9 +150,8 @@ function VideoListItem<T extends VideoListItemInfo>({
         </Text>
         <View className="gap-1">
           <View className="min-w-0 flex-row items-center gap-1">
-            <Icon
-              name={isFollowed ? "checkbox-marked-circle-outline" : "account-circle-outline"}
-              type="material-community"
+            <ThemedIcon
+              icon={isFollowed ? CircleCheck : CircleUserRound}
               size={16}
               colorClassName={isFollowed ? colors.secondary.accent : colors.gray7.accent}
             />
@@ -174,13 +171,13 @@ function VideoListItem<T extends VideoListItemInfo>({
             <View className="min-w-20 shrink-0 flex-row flex-wrap items-center gap-x-3">
               {!playCountOnCover ? (
                 <View className="flex-row items-center gap-1">
-                  <Icon name="play-circle-outline" size={15} colorClassName={colors.gray6.accent} />
+                  <ThemedIcon icon={CirclePlay} size={15} colorClassName={colors.gray6.accent} />
                   <Text className={colors.gray6.text}>{parseNumber(video.play)}</Text>
                 </View>
               ) : null}
               {isDefined(video.like) ? (
                 <View className="flex-row items-center gap-1">
-                  <Icon name="thumb-up-off-alt" colorClassName={colors.gray6.accent} size={15} />
+                  <ThemedIcon icon={ThumbsUp} colorClassName={colors.gray6.accent} size={15} />
                   <Text className={colors.gray6.text}>{parseNumber(video.like)}</Text>
                 </View>
               ) : null}

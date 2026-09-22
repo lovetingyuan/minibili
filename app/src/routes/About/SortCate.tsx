@@ -1,5 +1,7 @@
 import { Chip } from "@/components/Chip";
-import { Icon, ListItem, Text } from "@/components/styled/rneui";
+import { ListItem, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { ChevronDown } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
 import { colors } from "@/constants/colors.tw";
@@ -42,7 +44,7 @@ export default function SortCate() {
   }
   return (
     <ListItem.Accordion
-      icon={<Icon name="chevron-down" type="material-community" />}
+      icon={<ThemedIcon icon={ChevronDown} />}
       containerClassName="p-0 mt-1 mb-3 bg-transparent"
       content={
         <ListItem.Content>

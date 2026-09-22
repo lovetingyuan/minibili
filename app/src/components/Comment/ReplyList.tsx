@@ -3,10 +3,12 @@ import type { FlashListRef } from "@shopify/flash-list";
 import { useEffect, useRef } from "react";
 import { ActivityIndicator, Easing, Pressable, View } from "react-native";
 import type { Edge } from "react-native-safe-area-context";
+import { X } from "lucide-react-native";
 
 import { useReplies } from "@/api/replies";
 import type { ReplyItemType } from "@/api/replies";
-import { BottomSheet, FlashList, Icon, Text } from "@/components/styled/rneui";
+import { BottomSheet, FlashList, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import useKeyboardHeight from "@/hooks/useKeyboardHeight";
 import { useStore } from "@/store";
@@ -154,7 +156,7 @@ export default function ReplyList(props: ReplyListProps) {
             accessibilityLabel="关闭评论详情"
             onPress={handleClose}
           >
-            <Icon name="close" size={21} colorClassName={colors.gray7.accent} />
+            <ThemedIcon icon={X} size={21} colorClassName={colors.gray7.accent} />
           </Pressable>
         </View>
         <FlashList

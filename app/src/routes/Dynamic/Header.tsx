@@ -1,11 +1,13 @@
 import { useNavigation, useRoute } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Avatar } from '@/components/Avatar'
-import { Icon, Text } from '@/components/styled/rneui'
+import { Text } from '@/components/styled/rneui'
+import { ThemedIcon } from '@/components/ThemedIcon'
 import UpName from '@/components/UpName'
 import { clsx } from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
+import { EllipsisVertical } from 'lucide-react-native'
 import { Pressable, View } from 'react-native'
 import {
   Menu,
@@ -110,7 +112,10 @@ function HeaderLeft() {
               className="absolute -top-1 -right-1 items-center justify-center"
             >
               <Text
-                className={clsx('text-center text-sm font-bold leading-none', sexBadge.textClassName)}
+                className={clsx(
+                  'text-center text-sm font-bold leading-none',
+                  sexBadge.textClassName,
+                )}
               >
                 {sexBadge.symbol}
               </Text>
@@ -177,7 +182,7 @@ function HeaderRight() {
           customStyles={menuTriggerIconButtonStyles}
           onPress={showMenu}
         >
-          <Icon name="dots-vertical" type="material-community" />
+          <ThemedIcon icon={EllipsisVertical} />
         </MenuTrigger>
         <MenuOptions>
           <MenuOption

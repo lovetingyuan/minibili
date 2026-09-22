@@ -1,6 +1,8 @@
-import { Icon } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
+import { Maximize, Minimize, Pause, Play } from "lucide-react-native";
+import type { LucideIcon } from "lucide-react-native";
 import React from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -64,7 +66,7 @@ type PlayerControlsProps = {
 };
 
 function ControlButton(props: {
-  name: string;
+  icon: LucideIcon;
   label: string;
   color: string;
   size: number;
@@ -78,7 +80,7 @@ function ControlButton(props: {
       className="px-1 py-1"
       onPress={props.onPress}
     >
-      <Icon name={props.name} type="material-design" size={props.size} color={props.color} />
+      <ThemedIcon icon={props.icon} size={props.size} color={props.color} />
     </Pressable>
   );
 }
@@ -255,7 +257,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
       >
         <View className="flex-row items-center gap-2">
           <ControlButton
-            name={paused ? "play" : "pause"}
+            icon={paused ? Play : Pause}
             label={paused ? "播放" : "暂停"}
             size={26}
             color="#ffffff"
@@ -298,7 +300,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
             }}
           />
           <ControlButton
-            name={fullscreen ? "fullscreen-exit" : "fullscreen"}
+            icon={fullscreen ? Minimize : Maximize}
             label={fullscreen ? "退出全屏" : "全屏"}
             size={24}
             color="#ffffff"

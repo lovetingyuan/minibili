@@ -40,9 +40,10 @@ vi.mock("react-native", () => ({
 vi.mock("@/components/styled/rneui", () => ({
   Button: "Button",
   FlashList: "FlashList",
-  Icon: "Icon",
   Text: "Text",
 }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({ Clock: "Clock" }));
 vi.mock("@/components/VideoItem", () => ({ default: "VideoListItem" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 
@@ -162,7 +163,10 @@ test("keeps unavailable videos visible and removable through the overlay menu", 
   expect(text(row)).toContain("该视频暂不支持播放或已失效");
 
   row.props.onLongPress?.();
-  const [remove] = mocks.setOverlayButtons.mock.calls[0][0] as { text: string; onPress: () => void }[];
+  const [remove] = mocks.setOverlayButtons.mock.calls[0][0] as {
+    text: string;
+    onPress: () => void;
+  }[];
   expect(remove.text).toBe("从稍后再看移除");
   remove.onPress();
   expect(mocks.toggle).toHaveBeenCalledExactlyOnceWith({ aid: "42" });

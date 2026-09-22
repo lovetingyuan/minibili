@@ -1,4 +1,5 @@
 import * as Clipboard from "expo-clipboard";
+import { EllipsisVertical } from "lucide-react-native";
 import React from "react";
 import { Linking, Share } from "react-native";
 
@@ -9,7 +10,7 @@ import {
   MenuTrigger,
   menuTriggerIconButtonStyles,
 } from "@/components/Menu";
-import { Icon } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { showToast } from "@/utils";
 
 export default function HeaderRight(props: { url: string; title: string }) {
@@ -26,7 +27,7 @@ export default function HeaderRight(props: { url: string; title: string }) {
         customStyles={menuTriggerIconButtonStyles}
         onPress={() => setVisible(true)}
       >
-        <Icon name="dots-vertical" type="material-community" />
+        <ThemedIcon icon={EllipsisVertical} />
       </MenuTrigger>
       <MenuOptions>
         <MenuOption

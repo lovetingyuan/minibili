@@ -1,4 +1,5 @@
 import { useIsFocused } from "@react-navigation/native";
+import { Star } from "lucide-react-native";
 import React from "react";
 import {
   ActivityIndicator,
@@ -16,7 +17,8 @@ import {
 } from "@/api/useBilibiliFavorites";
 import type { FavoriteAccount, FavoriteFolder, FavoriteListItem } from "@/api/favorites.types";
 import { FavoriteLoginRequiredError } from "@/api/video-favorites";
-import { Button, FlashList, Icon, Text } from "@/components/styled/rneui";
+import { Button, FlashList, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
 import { colors } from "@/constants/colors.tw";
 import { bilibiliSession } from "@/features/bilibili-session/session";
@@ -267,7 +269,7 @@ export default function FavoritesContent() {
                   </>
                 ) : (
                   <>
-                    <Icon name="star-outline" size={36} colorClassName={colors.gray5.accent} />
+                    <ThemedIcon icon={Star} size={36} colorClassName={colors.gray5.accent} />
                     <Text className={colors.gray6.text}>这个收藏夹暂无内容</Text>
                   </>
                 )}
@@ -306,7 +308,7 @@ export default function FavoritesContent() {
             />
           }
         >
-          <Icon name="star-outline" size={40} colorClassName={colors.gray5.accent} />
+          <ThemedIcon icon={Star} size={40} colorClassName={colors.gray5.accent} />
           <Text className={colors.gray6.text}>暂无 B站收藏夹</Text>
           <Button
             title="刷新"

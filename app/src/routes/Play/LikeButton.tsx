@@ -1,11 +1,13 @@
 import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { ThumbsUp } from "lucide-react-native";
 import { useEffect, useRef } from "react";
 import { ActivityIndicator, Alert, Pressable } from "react-native";
 
 import { useVideoLike } from "@/api/useVideoLike";
 import { FavoriteLoginRequiredError } from "@/api/video-favorites";
 import { VideoLikeLoginRequiredError } from "@/api/video-like";
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
@@ -108,8 +110,9 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
       {mutation.isMutating ? (
         <ActivityIndicator size="small" />
       ) : (
-        <Icon
-          name={mutation.liked ? "thumb-up" : "thumb-up-off-alt"}
+        <ThemedIcon
+          icon={ThumbsUp}
+          filled={mutation.liked}
           size={18}
           colorClassName={mutation.liked ? colors.primary.accent : colors.gray8.accent}
         />

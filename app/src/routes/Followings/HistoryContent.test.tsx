@@ -11,9 +11,10 @@ vi.mock("react-native", () => ({ ActivityIndicator: "ActivityIndicator", View: "
 vi.mock("@/components/styled/rneui", () => ({
   Button: "Button",
   FlashList: "FlashList",
-  Icon: "Icon",
   Text: "Text",
 }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({ History: "History" }));
 vi.mock("@/components/VideoItem", () => ({ default: "VideoListItem" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/utils/watch-time", () => import("../../utils/watch-time"));

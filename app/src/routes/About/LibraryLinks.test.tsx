@@ -9,15 +9,20 @@ vi.mock("@react-navigation/native", () => ({
 }));
 vi.mock("react-native", () => ({ View: "View" }));
 vi.mock("@/components/styled/rneui", () => ({
-  Icon: "Icon",
   ListItem: Object.assign("ListItem", {
     Content: "ListItemContent",
     Title: "ListItemTitle",
-    Chevron: "ListItemChevron",
   }),
 }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("lucide-react-native", () => ({
+  ChevronRight: "ChevronRight",
+  Clock: "Clock",
+  History: "History",
+  Star: "Star",
+}));
 vi.mock("@/constants/colors.tw", () => ({
-  colors: { primary: { accent: "primary" } },
+  colors: { gray4: { accent: "gray4" }, primary: { accent: "primary" } },
 }));
 
 import LibraryLinks from "./LibraryLinks";

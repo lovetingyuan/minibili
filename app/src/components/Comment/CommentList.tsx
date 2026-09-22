@@ -1,12 +1,14 @@
 import { clsx } from 'clsx'
 import { useEffect, useRef, useState } from 'react'
 import { Keyboard, Pressable, View } from 'react-native'
+import { ArrowDownUp, MessageSquarePlus, MessageSquareText } from 'lucide-react-native'
 
 import type { CommentAttitudeKind } from '@/api/comment-actions.types'
 import type { CommentItemType, ReplyItemType } from '@/api/comments'
 import { useComments } from '@/api/comments'
 import { useCommentActions } from '@/api/useCommentActions'
 import { colors } from '@/constants/colors.tw'
+import { ThemedIcon } from '@/components/ThemedIcon'
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { showToast } from '@/utils'
 
@@ -15,7 +17,7 @@ import CommentComposer from './CommentComposer'
 import CommentPaginationFooter from './CommentPaginationFooter'
 import type { CommentListProps } from './comment-list.types'
 import ReplyList from './ReplyList'
-import { FlashList, Icon, Skeleton, Text } from '@/components/styled/rneui'
+import { FlashList, Skeleton, Text } from '@/components/styled/rneui'
 
 export type { CommentListProps } from './comment-list.types'
 
@@ -152,9 +154,8 @@ export default function CommentList(props: CommentListProps) {
             <View className="h-2 bg-neutral-100 dark:bg-black" />
             <View className="flex-row items-center justify-between border-b border-neutral-100 bg-white px-3 pb-2 pt-3 dark:border-neutral-800 dark:bg-neutral-950">
               <View className="flex-row items-center gap-1.5">
-                <Icon
-                  name="comment-text-outline"
-                  type="material-community"
+                <ThemedIcon
+                  icon={MessageSquareText}
                   size={16}
                   colorClassName={colors.gray7.accent}
                 />
@@ -173,14 +174,9 @@ export default function CommentList(props: CommentListProps) {
                   className="flex-row items-center gap-1 rounded-full bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800"
                   accessibilityRole="button"
                   accessibilityLabel={`当前按${mode === 3 ? '热度' : '时间'}排序，点击切换`}
-                  onPress={() => setMode(current => (current === 3 ? 2 : 3))}
+                  onPress={() => setMode((current) => (current === 3 ? 2 : 3))}
                 >
-                  <Icon
-                    name="sort-variant"
-                    type="material-community"
-                    size={14}
-                    colorClassName={colors.primary.accent}
-                  />
+                  <ThemedIcon icon={ArrowDownUp} size={14} colorClassName={colors.primary.accent} />
                   <Text className={clsx('text-xs font-medium', colors.primary.text)}>
                     {mode === 3 ? '按热度' : '按时间'}
                   </Text>
@@ -191,9 +187,8 @@ export default function CommentList(props: CommentListProps) {
                   accessibilityLabel="写评论"
                   onPress={openComposer}
                 >
-                  <Icon
-                    name="comment-plus-outline"
-                    type="material-community"
+                  <ThemedIcon
+                    icon={MessageSquarePlus}
                     size={14}
                     colorClassName={colors.primary.accent}
                   />

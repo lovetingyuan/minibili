@@ -1,6 +1,8 @@
 import { type RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { CheckBox, Icon } from "@/components/styled/rneui";
+import { CheckBox } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import * as KeepAwake from "expo-keep-awake";
+import { Play } from "lucide-react-native";
 import React from "react";
 import {
   ActivityIndicator,
@@ -300,13 +302,7 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
-          <Icon
-            name="play"
-            type="material-design"
-            size={64}
-            color="#ffffff"
-            containerClassName="opacity-80"
-          />
+          <ThemedIcon icon={Play} size={64} color="#ffffff" filled opacity={0.8} />
           <View className="absolute bottom-2 left-2 flex-row gap-2">
             {videoInfo?.duration ? (
               <Text className="rounded bg-gray-900/60 px-2 py-0.5 font-bold text-white">

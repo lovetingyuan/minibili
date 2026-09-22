@@ -1,6 +1,15 @@
 import { type RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { Avatar } from "@/components/Avatar";
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import {
+  CalendarDays,
+  ChevronRight,
+  CirclePlay,
+  ListVideo,
+  MessageCircle,
+  Share2,
+} from "lucide-react-native";
 import React from "react";
 import { Linking, Pressable, View } from "react-native";
 
@@ -69,7 +78,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
           </Text>
         </Pressable>
         <View className="ml-1 flex-none flex-row items-center gap-1 px-2">
-          <Icon name="date-range" size={16} colorClassName={colors.gray6.accent} />
+          <ThemedIcon icon={CalendarDays} size={16} colorClassName={colors.gray6.accent} />
           <Text className={`text-sm ${colors.gray6.text}`}>{parseDate(date, true)}</Text>
           <Text className={`ml-1 text-sm ${colors.gray6.text}`}>
             {watchingCount
@@ -111,7 +120,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             }}
           >
             <View className="h-9 w-9 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-950/50">
-              <Icon name="playlist-play" size={21} colorClassName={colors.primary.accent} />
+              <ThemedIcon icon={ListVideo} size={21} colorClassName={colors.primary.accent} />
             </View>
             <Text className="min-w-0 flex-1 text-base" numberOfLines={1} ellipsizeMode="tail">
               {formatVideoPageTitle(
@@ -122,7 +131,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             <Text className={`shrink-0 text-sm tabular-nums ${colors.gray6.text}`}>
               {`P${props.currentPage}/${pages.length}`}
             </Text>
-            <Icon name="chevron-right" size={22} colorClassName={colors.gray6.accent} />
+            <ThemedIcon icon={ChevronRight} size={22} colorClassName={colors.gray6.accent} />
           </Pressable>
           <VideoPagesSheet
             currentPage={props.currentPage}
@@ -140,13 +149,13 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
 
       <View className="mt-3 flex-row items-center rounded-xl bg-neutral-50 px-1 py-2 dark:bg-neutral-900">
         <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
-          <Icon name="play-circle-outline" size={18} colorClassName={colors.gray8.accent} />
+          <ThemedIcon icon={CirclePlay} size={18} colorClassName={colors.gray8.accent} />
           <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
             {parseNumber(videoInfo?.playNum)}
           </Text>
         </View>
         <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
-          <Icon name="chat-bubble-outline" size={17} colorClassName={colors.gray8.accent} />
+          <ThemedIcon icon={MessageCircle} size={17} colorClassName={colors.gray8.accent} />
           <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
             {parseNumber(videoInfo?.danmuNum)}
           </Text>
@@ -164,12 +173,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             }
           }}
         >
-          <Icon
-            type="material-community"
-            name="share-variant-outline"
-            size={19}
-            colorClassName={colors.gray8.accent}
-          />
+          <ThemedIcon icon={Share2} size={19} colorClassName={colors.gray8.accent} />
           <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
             {parseNumber(videoInfo?.shareNum)}
           </Text>

@@ -1,7 +1,9 @@
 import React from 'react';
+import { Plus } from 'lucide-react-native';
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 
-import { Icon, Text } from '@/components/styled/rneui';
+import { Text } from '@/components/styled/rneui';
+import { ThemedIcon } from '@/components/ThemedIcon';
 import { colors } from '@/constants/colors.tw';
 
 import type { FollowGroupTabsProps } from './FollowGroups.types';
@@ -104,7 +106,7 @@ export default function FollowGroupTabs({
             onPress={onCreate}
             className={`h-8 w-8 items-center justify-center rounded-full ${colors.gray1.bg}`}
           >
-            <Icon name="plus" type="material-community" size={18} colorClassName={colors.gray7.accent} />
+            <ThemedIcon icon={Plus} size={18} colorClassName={colors.gray7.accent} />
           </TouchableOpacity>
         </View>
       </View>

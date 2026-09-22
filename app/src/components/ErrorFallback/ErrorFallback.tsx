@@ -1,8 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
+import { CircleAlert } from "lucide-react-native";
 import { Button, Linking, Text, View } from "react-native";
 
-import { Icon } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 
 import { site } from "@/constants";
@@ -21,11 +22,7 @@ export default function ErrorFallback(props: { error: Error; resetError: Functio
         accessibilityRole="image"
         className="h-64 items-center justify-center"
       >
-        <Icon
-          name="error-outline"
-          size={112}
-          colorClassName={colors.error.accent}
-        />
+        <ThemedIcon icon={CircleAlert} size={112} colorClassName={colors.error.accent} />
       </View>
       <Text className="mx-7 text-base text-red-600">
         非常抱歉，应用发生了未知错误

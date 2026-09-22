@@ -1,18 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
 import { clsx } from "clsx";
+import { Hash } from "lucide-react-native";
 import React from "react";
 import { Linking, type TextProps, View } from "react-native";
 
 import type { RichTextNode } from "@/api/dynamic-items.schema";
 import { HandledRichTextType } from "@/api/dynamic-items.type";
 import { colors } from "@/constants/colors.tw";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
 import { parseUrl } from "@/utils";
 
 import { InlineEmoji } from "../InlineEmoji";
 import { getRichTextsContainerClassName, getRichTextsTextClassName } from "./rich-texts.helpers";
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
 import UpName from "../UpName";
 
 type Props = {
@@ -46,7 +48,7 @@ function RichTexts(props: Props) {
   const hasNodes = (props.nodes?.length ?? 0) > 0;
   const topic = props.topic ? (
     <View className={clsx("flex-row items-center", hasNodes && "mb-2")}>
-      <Icon name="hashtag" type="fontisto" colorClassName={colors.primary.accent} size={14} />
+      <ThemedIcon icon={Hash} colorClassName={colors.primary.accent} size={14} />
       <Text
         onPress={() => {
           if (props.topic?.jump_url) {

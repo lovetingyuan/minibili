@@ -1,9 +1,11 @@
 import React from "react";
+import { ChevronDown } from "lucide-react-native";
 import { ActivityIndicator, View } from "react-native";
 
 import { useBilibiliBlacklist } from "@/api/useBilibiliBlacklist";
 import { Chip } from "@/components/Chip";
-import { Icon, ListItem, Text } from "@/components/styled/rneui";
+import { ListItem, Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 
 export default function Blacklist() {
@@ -13,7 +15,7 @@ export default function Blacklist() {
 
   return (
     <ListItem.Accordion
-      icon={<Icon name="chevron-down" type="material-community" />}
+      icon={<ThemedIcon icon={ChevronDown} />}
       containerClassName="p-0 mt-1 mb-3 bg-transparent"
       content={
         <ListItem.Content>

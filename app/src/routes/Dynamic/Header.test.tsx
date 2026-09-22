@@ -35,7 +35,7 @@ const mocks = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('react', async importOriginal => {
+vi.mock('react', async (importOriginal) => {
   const original = await importOriginal<typeof import('react')>()
   return {
     ...original,
@@ -59,7 +59,9 @@ vi.mock('@/components/Menu', () => ({
 }))
 vi.mock('@/components/UpName', () => ({ default: 'UpName' }))
 vi.mock('@/components/Avatar', () => ({ Avatar: 'Avatar' }))
-vi.mock('@/components/styled/rneui', () => ({ Icon: 'Icon', Text: 'Text' }))
+vi.mock('@/components/styled/rneui', () => ({ Text: 'Text' }))
+vi.mock('@/components/ThemedIcon', () => ({ ThemedIcon: 'ThemedIcon' }))
+vi.mock('lucide-react-native', () => ({ EllipsisVertical: 'EllipsisVertical' }))
 vi.mock('@/constants/colors.tw', () => import('../../constants/colors.tw'))
 vi.mock('@/api/useBilibiliBlacklist', () => ({
   useBilibiliBlacklist: () => ({ blacklist: mocks.blacklist }),
@@ -121,7 +123,7 @@ function renderFunction(element: ReactElement): TestElement {
 }
 
 function childElements(element: TestElement): TestElement[] {
-  return React.Children.toArray(element.props.children).filter(child =>
+  return React.Children.toArray(element.props.children).filter((child) =>
     React.isValidElement(child),
   ) as unknown as TestElement[]
 }
@@ -147,7 +149,7 @@ function headerTitleChildren() {
 
 function sexBadge() {
   const [avatar] = headerTitleChildren()
-  return childElements(avatar).find(child => String(child.props.className).includes('-top-1'))
+  return childElements(avatar).find((child) => String(child.props.className).includes('-top-1'))
 }
 
 function user() {
@@ -167,7 +169,7 @@ describe('UP 主动态页头部菜单', () => {
   test('依次展示关注、拉黑和分享入口', () => {
     const options = menuOptions()
 
-    expect(options.map(option => option.props.text)).toEqual(['关注UP', '拉黑UP', '分享UP'])
+    expect(options.map((option) => option.props.text)).toEqual(['关注UP', '拉黑UP', '分享UP'])
   })
 
   test('右上角三个点渲染成图标按钮', () => {

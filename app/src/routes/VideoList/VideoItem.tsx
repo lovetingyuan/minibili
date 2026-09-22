@@ -1,8 +1,10 @@
-import { Icon, Text } from "@/components/styled/rneui";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import UpName from "@/components/UpName";
 import { WatchProgressBar } from "@/components/WatchProgressBar";
 import { clsx } from "clsx";
 import { Image } from "@/components/styled/expo";
+import { CircleCheck, CirclePlay, CircleUserRound } from "lucide-react-native";
 import { useWindowDimensions, View } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
@@ -73,19 +75,9 @@ function VideoItem({ video }: { video: VideoItemType }) {
         <View className="mt-2 flex-row items-center justify-between">
           <View className="shrink flex-row items-center">
             {isFollowed ? (
-              <Icon
-                size={15}
-                name="checkbox-marked-circle-outline"
-                type="material-community"
-                colorClassName={colors.secondary.accent}
-              />
+              <ThemedIcon size={15} icon={CircleCheck} colorClassName={colors.secondary.accent} />
             ) : (
-              <Icon
-                size={15}
-                name="account-circle-outline"
-                type="material-community"
-                colorClassName={colors.primary.accent}
-              />
+              <ThemedIcon size={15} icon={CircleUserRound} colorClassName={colors.primary.accent} />
             )}
             <UpName
               mid={video.mid}
@@ -100,10 +92,9 @@ function VideoItem({ video }: { video: VideoItemType }) {
             </UpName>
           </View>
           <View className="shrink-0 flex-row items-center">
-            <Icon
+            <ThemedIcon
               size={15}
-              name="play-circle-outline"
-              type="material-community"
+              icon={CirclePlay}
               colorClassName="accent-gray-600 dark:accent-gray-400"
             />
             <Text className="ml-1 text-xs text-gray-600 dark:text-gray-400">{playNum}</Text>

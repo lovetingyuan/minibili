@@ -1,6 +1,7 @@
 import { type RouteProp, useRoute } from "@react-navigation/native";
-import { Icon } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import * as Clipboard from "expo-clipboard";
+import { EllipsisVertical } from "lucide-react-native";
 import React from "react";
 import { Share } from "react-native";
 import {
@@ -31,7 +32,7 @@ function HeaderRight(props: { reload: () => void }) {
         customStyles={menuTriggerIconButtonStyles}
         onPress={showMenu}
       >
-        <Icon name="dots-vertical" type="material-community" />
+        <ThemedIcon icon={EllipsisVertical} />
       </MenuTrigger>
       <MenuOptions>
         <MenuOption
