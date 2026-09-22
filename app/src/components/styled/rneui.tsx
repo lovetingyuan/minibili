@@ -25,18 +25,10 @@ import type {
   SkeletonProps as BaseSkeletonProps,
   TextProps as BaseTextProps,
 } from "@rneui/base";
-import NativeCheckBox from "@react-native-community/checkbox";
 import { FlashList as BaseFlashList } from "@shopify/flash-list";
 import type { FlashListProps, FlashListRef } from "@shopify/flash-list";
-import {
-  Platform,
-  Pressable,
-  Switch as NativeSwitch,
-  Text as NativeText,
-  View,
-} from "react-native";
+import { Platform, Switch as NativeSwitch, Text as NativeText } from "react-native";
 import type {
-  PressableProps,
   SwitchProps as NativeSwitchProps,
   TextProps as NativeTextProps,
   TextStyle,
@@ -198,68 +190,6 @@ export const Card = Object.assign(CardBase, {
   Image: BaseCard.Image,
   Title: CardTitle,
 });
-
-type CheckBoxProps = Omit<PressableProps, "children" | "onPress"> & {
-  checked: boolean;
-  title?: React.ReactNode;
-  onPress?: () => void;
-  checkedColor?: string;
-  uncheckedColor?: string;
-  size?: number;
-  checkedColorClassName?: string;
-  containerClassName?: string;
-  textClassName?: string;
-  wrapperClassName?: string;
-};
-
-export function CheckBox({
-  checked,
-  title,
-  onPress,
-  disabled,
-  checkedColorClassName,
-  containerClassName,
-  textClassName,
-  wrapperClassName,
-  checkedColor,
-  uncheckedColor,
-  size = 24,
-  ...props
-}: CheckBoxProps) {
-  const resolvedCheckedColor = useResolvedColor(checkedColorClassName);
-  const activeColor = resolvedCheckedColor ?? checkedColor;
-
-  return (
-    <Pressable
-      {...props}
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked, disabled }}
-      className={containerClassName}
-      disabled={disabled}
-      onPress={onPress}
-    >
-      <View className={`flex-row items-center gap-2 ${wrapperClassName ?? ""}`}>
-        <NativeCheckBox
-          accessible={false}
-          disabled={disabled}
-          value={checked}
-          tintColors={{ true: activeColor, false: uncheckedColor }}
-          tintColor={uncheckedColor}
-          onCheckColor={activeColor ? "#ffffff" : undefined}
-          onFillColor={activeColor}
-          onTintColor={activeColor}
-          pointerEvents="none"
-          style={{ width: size, height: size }}
-        />
-        {typeof title === "string" || typeof title === "number" ? (
-          <Text className={textClassName}>{title}</Text>
-        ) : (
-          title
-        )}
-      </View>
-    </Pressable>
-  );
-}
 
 type DialogProps = BaseDialogProps & {
   backdropClassName?: string;

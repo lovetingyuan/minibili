@@ -1,7 +1,8 @@
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
 import { FavoriteLoginRequiredError } from "@/api/video-favorites";
-import { Button, CheckBox, Dialog, Text } from "@/components/styled/rneui";
+import { CheckBox } from "@/components/CheckBox";
+import { Button, Dialog, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { showToast } from "@/utils";
 import type { FavoriteDialogProps } from "./Favorite.types";

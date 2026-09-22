@@ -1,5 +1,5 @@
 import { type RouteProp, useFocusEffect, useRoute } from "@react-navigation/native";
-import { CheckBox } from "@/components/styled/rneui";
+import { CheckBox } from "@/components/CheckBox";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import * as KeepAwake from "expo-keep-awake";
 import { Play } from "lucide-react-native";

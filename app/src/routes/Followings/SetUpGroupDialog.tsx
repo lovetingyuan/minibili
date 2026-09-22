@@ -3,7 +3,8 @@ import { ActivityIndicator, ScrollView, View } from "react-native";
 
 import { RelationTagLoginRequiredError } from "@/api/relation-tags";
 import { useBilibiliUpRelationTags } from "@/api/useBilibiliRelationTags";
-import { Button, CheckBox, Dialog, Text } from "@/components/styled/rneui";
+import { CheckBox } from "@/components/CheckBox";
+import { Button, Dialog, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 
 import type { SetUpGroupDialogProps } from "./FollowGroups.types";
@@ -116,9 +117,14 @@ export default function SetUpGroupDialog({
         </Text>
       ) : null}
       <Dialog.Actions>
-        <Dialog.Button title="确定" loading={submitting} disabled={!canSubmit} onPress={() => {
-          void submit();
-        }} />
+        <Dialog.Button
+          title="确定"
+          loading={submitting}
+          disabled={!canSubmit}
+          onPress={() => {
+            void submit();
+          }}
+        />
         <Dialog.Button
           title="取消"
           titleClassName={colors.gray6.text}
