@@ -1,20 +1,17 @@
-import { Button } from "@/components/styled/rneui";
-import React from "react";
-import { Modal, Pressable, View } from "react-native";
-
-import { colors } from "@/constants/colors.tw";
-
-import { useStore } from "@/store";
+import { Button } from '@/components/styled/rneui'
+import { Modal, Pressable, View } from 'react-native'
+import { colors } from '@/constants/colors.tw'
+import { useStore } from '@/store'
 
 function ButtonsOverlay() {
-  const { overlayButtons, setOverlayButtons } = useStore();
+  const { overlayButtons, setOverlayButtons } = useStore()
   const dismiss = () => {
-    setOverlayButtons([]);
-  };
+    setOverlayButtons([])
+  }
   const Buttons = overlayButtons
-    .map((button) => {
+    .map(button => {
       if (!button) {
-        return null;
+        return null
       }
       return (
         <Button
@@ -24,16 +21,16 @@ function ButtonsOverlay() {
           title={button.text}
           key={button.text}
           onPress={() => {
-            dismiss();
-            button.onPress();
+            dismiss()
+            button.onPress()
           }}
         />
-      );
+      )
     })
-    .filter(Boolean);
+    .filter(Boolean)
 
   if (!Buttons.length) {
-    return null;
+    return null
   }
   return (
     <Modal
@@ -57,7 +54,7 @@ function ButtonsOverlay() {
         </View>
       </View>
     </Modal>
-  );
+  )
 }
 
-export default ButtonsOverlay;
+export default ButtonsOverlay
