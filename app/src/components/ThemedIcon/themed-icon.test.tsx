@@ -33,7 +33,7 @@ test("resolves the default icon color in the light theme", () => {
   const icon = ThemedIcon({ icon: TestIcon, size: 20 }) as ReactElement<TestIconProps>;
 
   expect(icon.type).toBe("TestIcon");
-  expect(icon.props).toMatchObject({ color: "#27272a", size: 20 });
+  expect(icon.props).toMatchObject({ color: "#27272a", fill: "none", size: 20 });
   expect(mocks.useResolvedColor).toHaveBeenCalledWith("text-zinc-800 dark:text-neutral-200");
 });
 
@@ -55,6 +55,12 @@ test("prefers an explicit color over the resolved theme color", () => {
   expect(icon.props.color).toBe("#ffffff");
 });
 
+test("preserves an explicit fill color", () => {
+  const icon = ThemedIcon({ icon: TestIcon, fill: "#22c55e" }) as ReactElement<TestIconProps>;
+
+  expect(icon.props.fill).toBe("#22c55e");
+});
+
 test("fills selected icons with their resolved theme color", () => {
   const icon = ThemedIcon({
     icon: TestIcon,
@@ -64,4 +70,15 @@ test("fills selected icons with their resolved theme color", () => {
   }) as ReactElement<TestIconProps>;
 
   expect(icon.props).toMatchObject({ color: "#fb7299", fill: "#fb7299", strokeWidth: 3 });
+});
+
+test("uses an explicit icon color for the selected fill", () => {
+  const icon = ThemedIcon({
+    icon: TestIcon,
+    color: "#ffffff",
+    fill: "#22c55e",
+    filled: true,
+  }) as ReactElement<TestIconProps>;
+
+  expect(icon.props).toMatchObject({ color: "#ffffff", fill: "#ffffff" });
 });

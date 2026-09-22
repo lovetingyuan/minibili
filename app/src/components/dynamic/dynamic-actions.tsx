@@ -18,6 +18,8 @@ import { handleShareDynamic, parseNumber, showToast } from "@/utils";
 
 import { Text } from "../styled/rneui";
 
+const ACTION_ICON_SIZE = 18;
+
 function getDynamicShareTitle(item: DynamicItem) {
   const text = item.text.trim();
   if (text) {
@@ -63,7 +65,7 @@ function DynamicShareButton(props: { item: DynamicItem }) {
         void handleShareDynamic(getDynamicShareTitle(props.item), getDynamicShareUrl(props.item));
       }}
     >
-      <ThemedIcon icon={Share2} size={24} colorClassName={colors.gray6.accent} />
+      <ThemedIcon icon={Share2} size={ACTION_ICON_SIZE} colorClassName={colors.gray6.accent} />
       <Text className={`text-xs ${colors.gray6.text}`}>
         {parseNumber(props.item.stats.forward)}
       </Text>
@@ -87,7 +89,11 @@ function DynamicCommentButton(props: { item: DynamicItem; onPress?: () => void }
           : undefined
       }
     >
-      <ThemedIcon icon={MessageCircle} size={18} colorClassName={colors.gray6.accent} />
+      <ThemedIcon
+        icon={MessageCircle}
+        size={ACTION_ICON_SIZE}
+        colorClassName={colors.gray6.accent}
+      />
       <Text className={`text-xs ${colors.gray6.text}`}>
         {parseNumber(props.item.stats.comment)}
       </Text>
@@ -161,7 +167,7 @@ function DynamicLikeButton(props: {
         <ThemedIcon
           icon={ThumbsUp}
           filled={mutation.liked}
-          size={18}
+          size={ACTION_ICON_SIZE}
           colorClassName={mutation.liked ? colors.primary.accent : colors.gray6.accent}
         />
       )}

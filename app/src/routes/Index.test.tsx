@@ -20,9 +20,9 @@ vi.mock("expo-asset", () => ({ Asset: { loadAsync: vi.fn() } }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({
   Flame: "Flame",
-  Rss: "Rss",
-  User: "User",
-  Users: "Users",
+  GalleryVerticalEnd: "GalleryVerticalEnd",
+  UserRound: "UserRound",
+  UsersRound: "UsersRound",
 }));
 vi.mock("@/api/check-update", () => ({
   useAppUpdateInfo: () => ({ hasUpdate: false }),
@@ -73,6 +73,10 @@ type TabScreenProps = {
     headerTitle?: string;
     tabBarBadge?: string | number;
     tabBarBadgeStyle?: Record<string, unknown>;
+    tabBarIcon?: (props: { color: string; size: number }) => ReactElement<{
+      icon: string;
+      size: number;
+    }>;
   };
 };
 
@@ -116,6 +120,21 @@ test("main tabs keep the requested order, labels, and default route", () => {
   expect(screens[0].props.component).toBe("VideoList");
   expect(screens[1].props.options.headerTitle).toBe("关注的动态");
   expect(screens[3].props.component).toBe("About");
+});
+
+test("main tabs use semantic Lucide icons", () => {
+  const screens = tabScreens(MainTabs());
+  const icons = screens.map((screen) =>
+    screen.props.options.tabBarIcon?.({ color: "#64748b", size: 24 }),
+  );
+
+  expect(icons.map((icon) => icon?.props.icon)).toEqual([
+    "Flame",
+    "GalleryVerticalEnd",
+    "UsersRound",
+    "UserRound",
+  ]);
+  expect(icons.map((icon) => icon?.props.size)).toEqual([22, 22, 22, 22]);
 });
 
 test("followings tab prefers the live badge over the unread count", () => {

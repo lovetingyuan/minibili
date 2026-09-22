@@ -1,6 +1,7 @@
 import { Image, Linking, Pressable, Share, View } from "react-native";
-import { Code2, Share2 } from "lucide-react-native";
+import { Share2 } from "lucide-react-native";
 
+import { GitHubIcon } from "@/components/GitHubIcon";
 import { Button, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 
@@ -35,7 +36,7 @@ function Header() {
               Linking.openURL(githubLink);
             }}
           >
-            <ThemedIcon icon={Code2} size={20} />
+            <GitHubIcon />
           </Button>
           <Button
             radius={"sm"}

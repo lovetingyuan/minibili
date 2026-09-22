@@ -156,7 +156,7 @@ function VideoCard(props: {
       ) : null}
       <View className="absolute inset-0 items-center justify-center">
         <View className="h-16 w-16 items-center justify-center rounded-full bg-black/55">
-          <ThemedIcon icon={Play} size={45} color="white" filled />
+          <ThemedIcon icon={Play} size={40} color="white" filled />
         </View>
       </View>
       <View className="absolute bottom-1.5 left-2 flex-row gap-3 rounded bg-black/60 px-2 py-1">

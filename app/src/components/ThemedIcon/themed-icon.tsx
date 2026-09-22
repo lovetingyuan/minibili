@@ -13,12 +13,7 @@ export function ThemedIcon({
 }: ThemedIconProps) {
   const resolvedColor = useResolvedColor(colorClassName);
   const iconColor = color ?? resolvedColor;
+  const iconFill = filled && iconColor !== undefined ? iconColor : (fill ?? "none");
 
-  return (
-    <IconComponent
-      {...props}
-      color={iconColor}
-      fill={filled && iconColor !== undefined ? iconColor : fill}
-    />
-  );
+  return <IconComponent {...props} color={iconColor} fill={iconFill} />;
 }

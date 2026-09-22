@@ -79,6 +79,8 @@ type ElementProps = {
   children?: ReactNode;
   className?: string;
   contentFit?: string;
+  icon?: string;
+  size?: number;
   numberOfLines?: number;
   onLongPress?: (event?: { stopPropagation: () => void }) => void;
   onPress?: (event?: { stopPropagation: () => void }) => void;
@@ -167,6 +169,14 @@ describe("DynamicMedia video interactions", () => {
       "Play",
       expect.objectContaining({ bvid: "BV1TEST", aid: 2, title: "视频标题" }),
     );
+  });
+
+  test("uses a compact play icon on the video cover", () => {
+    const playIcon = flatten(renderVideo(video)).find(
+      (child) => child.type === "ThemedIcon" && child.props.icon === "Play",
+    );
+
+    expect(playIcon?.props.size).toBe(40);
   });
 
   test("long pressing the cover opens the watch later and cover-preview menu", () => {
