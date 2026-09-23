@@ -45,7 +45,7 @@ vi.mock("@/components/styled/rneui", () => ({
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ Clock: "Clock" }));
 vi.mock("@/components/VideoItem", () => ({ default: "VideoListItem" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 
 import WatchLaterContent from "./WatchLaterContent";
 

@@ -2,7 +2,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button, Text } from "@/components/styled/rneui";
 import { Image, Linking, View } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 import { githubLink } from "../constants";
 import { useStore } from "../store";
@@ -30,7 +30,7 @@ function Welcome({ navigation }: Props) {
         <Text className="text-base">
           🔈本应用为个人兴趣作品并完全开源(
           <Text
-            className={colors.primary.text}
+            className={theme.primary.text}
             onPress={() => {
               Linking.openURL(githubLink);
             }}

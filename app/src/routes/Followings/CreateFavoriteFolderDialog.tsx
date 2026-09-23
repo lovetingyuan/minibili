@@ -2,7 +2,7 @@ import { TextInput, View } from "react-native";
 
 import { Dialog } from "@/components/Dialog";
 import { Switch, Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { FAVORITE_FOLDER_NAME_MAX_LENGTH } from "@/features/bilibili-favorites/folder-name";
 import type { CreateFavoriteFolderDialogProps } from "./Favorites.types";
 import { useCreateFavoriteFolder } from "./useCreateFavoriteFolder";
@@ -24,7 +24,7 @@ export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDi
         placeholder="收藏夹名称"
         returnKeyType="done"
         accessibilityLabel="收藏夹名称"
-        className={`rounded-lg border px-3 py-2 text-base ${colors.gray3.border} ${colors.black.text}`}
+        className={`rounded-lg border px-3 py-2 text-base ${theme.border.outline} ${theme.text.primary}`}
         onChangeText={editor.setTitle}
         onSubmitEditing={() => {
           void editor.submit();
@@ -33,32 +33,32 @@ export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDi
       <View className="mt-1 flex-row items-start justify-between gap-2">
         <Text
           accessibilityRole={editor.nameError ? "alert" : undefined}
-          className={`shrink text-xs ${editor.nameError ? colors.error.text : colors.gray6.text}`}
+          className={`shrink text-xs ${editor.nameError ? theme.error.text : theme.text.muted}`}
         >
           {editor.nameError ?? `名称最长 ${FAVORITE_FOLDER_NAME_MAX_LENGTH} 个字`}
         </Text>
         <Text
-          className={`text-xs tabular-nums ${editor.count > FAVORITE_FOLDER_NAME_MAX_LENGTH ? colors.warning.text : colors.gray6.text}`}
+          className={`text-xs tabular-nums ${editor.count > FAVORITE_FOLDER_NAME_MAX_LENGTH ? theme.warning.text : theme.text.muted}`}
         >
           {editor.count}/{FAVORITE_FOLDER_NAME_MAX_LENGTH}
         </Text>
       </View>
       <View className="mt-4 flex-row items-center justify-between gap-2">
-        <Text className={colors.black.text}>仅自己可见</Text>
+        <Text className={theme.text.primary}>仅自己可见</Text>
         <Switch
           value={editor.isPrivate}
           disabled={editor.saving}
           accessibilityLabel="仅自己可见"
           onValueChange={editor.setIsPrivate}
-          colorClassName={colors.primary.accent}
-          trackColorOnClassName={colors.primary.accent}
-          trackColorOffClassName={colors.gray4.accent}
+          colorClassName={theme.primary.accent}
+          trackColorOnClassName={theme.primary.accent}
+          trackColorOffClassName={theme.background.fillMuted.accent}
         />
       </View>
-      <Text className={`mt-1 text-xs ${colors.gray6.text}`}>关闭时收藏夹会在你的 B站 主页公开</Text>
+      <Text className={`mt-1 text-xs ${theme.text.muted}`}>关闭时收藏夹会在你的 B站 主页公开</Text>
       {editor.error ? (
         <View className="mt-3">
-          <Text accessibilityRole="alert" className={`text-sm ${colors.error.text}`}>
+          <Text accessibilityRole="alert" className={`text-sm ${theme.error.text}`}>
             {editor.error.message}
           </Text>
         </View>
@@ -74,7 +74,7 @@ export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDi
         />
         <Dialog.Button
           title="取消"
-          titleClassName={colors.gray6.text}
+          titleClassName={theme.text.muted}
           disabled={editor.saving}
           onPress={close}
         />

@@ -83,7 +83,7 @@ vi.mock("@/components/styled/rneui", () => ({
 vi.mock("@/components/CheckBox", () => ({
   CheckBox: "CheckBox",
 }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 
 import SetUpGroupDialog from "./SetUpGroupDialog";
 

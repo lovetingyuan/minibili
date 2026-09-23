@@ -63,9 +63,9 @@ vi.mock("@/components/styled/rneui", () => ({
   Skeleton: "Skeleton",
   Text: "Text",
 }));
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
-    gray6: { text: "gray6" },
+vi.mock("@/constants/theme", () => ({
+  theme: {
+    text: { muted: "gray6" },
     primary: { text: "primary" },
     secondary: { text: "secondary" },
   },

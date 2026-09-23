@@ -10,7 +10,7 @@ vi.mock("react-native", () => ({
   Linking: { openURL: mocks.openURL },
   View: "View",
 }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/utils", () => ({
   parseUrl: (url: string) => url,
 }));

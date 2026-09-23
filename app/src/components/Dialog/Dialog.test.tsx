@@ -17,8 +17,8 @@ vi.mock("react-native", () => ({
   View: "View",
 }));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button", Text: "Text" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
-vi.mock("@/hooks/useResolvedColor", () => ({ default: () => "#0ea5e9" }));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
+vi.mock("@/hooks/useResolvedColor", () => ({ default: () => "#008AC5" }));
 
 import { Dialog } from "./Dialog";
 
@@ -161,7 +161,7 @@ test("面板默认样式与自定义样式按顺序合并", () => {
     "rounded-xl",
     "p-5",
     "bg-white",
-    "dark:bg-neutral-900",
+    "dark:bg-slate-900",
   ]) {
     expect(defaultClassName).toContain(token);
   }
@@ -222,6 +222,6 @@ test("操作区反序排列，加载指示器用主题色", () => {
   const loading = elements(Dialog.Loading({})).find(
     (element) => element.type === "ActivityIndicator",
   )!;
-  expect(loading.props.color).toBe("#0ea5e9");
+  expect(loading.props.color).toBe("#008AC5");
   expect(loading.props.size).toBe("large");
 });

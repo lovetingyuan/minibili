@@ -1,6 +1,6 @@
 import { ActivityIndicator, ImageBackground, StyleSheet, View } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { getImagePixelDimensions, parseImgUrl } from "@/utils";
 
 type PlayerPosterProps = {
@@ -34,7 +34,7 @@ export default function PlayerPoster(props: PlayerPosterProps) {
           <ActivityIndicator
             accessibilityLabel="视频加载中"
             size="large"
-            colorClassName={colors.secondary.accent}
+            colorClassName={theme.secondary.accent}
           />
         </View>
       ) : null}

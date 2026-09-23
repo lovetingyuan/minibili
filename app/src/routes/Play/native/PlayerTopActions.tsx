@@ -11,7 +11,7 @@ import {
 
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
 import { formatPlaybackRate, PLAYBACK_RATES, type PlaybackRate } from "./playback-rate";
@@ -43,7 +43,7 @@ export type PlayerTopActionsProps = {
  * 播放器右上角的悬浮按钮：倍速、播放模式、后台播放与发送弹幕。
  */
 export default function PlayerTopActions(props: PlayerTopActionsProps) {
-  const accentColor = useResolvedColor(colors.secondary.text) ?? "#ff6699";
+  const accentColor = useResolvedColor(theme.secondary.text) ?? "#ff6699";
   const playbackRateLabel = formatPlaybackRate(props.playbackRate);
 
   return (
@@ -84,7 +84,7 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
               >
                 <View className="h-12 min-w-[124px] flex-row items-center justify-between px-4">
                   <Text
-                    className={colors.black.text}
+                    className={theme.text.primary}
                     style={selected ? { color: accentColor } : null}
                   >
                     {label}

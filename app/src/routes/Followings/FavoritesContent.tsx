@@ -20,7 +20,7 @@ import { FavoriteLoginRequiredError } from "@/api/video-favorites";
 import { Button, FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
@@ -230,12 +230,12 @@ export default function FavoritesContent() {
                   activeOpacity={0.8}
                   onLongPress={() => setOverlayButtons(buttons(item))}
                   accessibilityHint="长按打开收藏操作菜单"
-                  className={`mx-3 my-2 gap-2 rounded-lg p-4 ${colors.gray1.bg}`}
+                  className={`mx-3 my-2 gap-2 rounded-lg p-4 ${theme.background.fill.bg}`}
                 >
-                  <Text className={colors.gray7.text} numberOfLines={2}>
+                  <Text className={theme.text.secondary} numberOfLines={2}>
                     {item.title || "不可用的收藏内容"}
                   </Text>
-                  <Text className={`text-sm ${colors.gray6.text}`}>
+                  <Text className={`text-sm ${theme.text.muted}`}>
                     该收藏内容暂不支持播放或已失效
                   </Text>
                 </TouchableOpacity>
@@ -269,8 +269,8 @@ export default function FavoritesContent() {
                   </>
                 ) : (
                   <>
-                    <ThemedIcon icon={Star} size={36} colorClassName={colors.gray5.accent} />
-                    <Text className={colors.gray6.text}>这个收藏夹暂无内容</Text>
+                    <ThemedIcon icon={Star} size={36} colorClassName={theme.icon.disabled} />
+                    <Text className={theme.text.muted}>这个收藏夹暂无内容</Text>
                   </>
                 )}
               </View>
@@ -278,7 +278,7 @@ export default function FavoritesContent() {
             ListFooterComponent={
               resources.error && resources.items.length ? (
                 <View className="items-center gap-2 py-4">
-                  <Text className={`text-sm ${colors.gray6.text}`}>加载失败，已保留当前内容</Text>
+                  <Text className={`text-sm ${theme.text.muted}`}>加载失败，已保留当前内容</Text>
                   <Button
                     title="重试"
                     type="clear"
@@ -291,7 +291,7 @@ export default function FavoritesContent() {
               ) : resources.isLoadingMore && resources.items.length ? (
                 <ActivityIndicator className="my-4" />
               ) : resources.items.length && !resources.hasMore ? (
-                <Text className={`py-4 text-center text-xs ${colors.gray6.text}`}>暂无更多</Text>
+                <Text className={`py-4 text-center text-xs ${theme.text.muted}`}>暂无更多</Text>
               ) : null
             }
           />
@@ -308,8 +308,8 @@ export default function FavoritesContent() {
             />
           }
         >
-          <ThemedIcon icon={Star} size={40} colorClassName={colors.gray5.accent} />
-          <Text className={colors.gray6.text}>暂无 B站收藏夹</Text>
+          <ThemedIcon icon={Star} size={40} colorClassName={theme.icon.disabled} />
+          <Text className={theme.text.muted}>暂无 B站收藏夹</Text>
           <Button
             title="刷新"
             type="clear"

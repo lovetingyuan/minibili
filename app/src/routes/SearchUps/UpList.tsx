@@ -9,7 +9,7 @@ import { Keyboard, Platform, TouchableOpacity, View } from "react-native";
 import type { EmitterSubscription } from "react-native";
 
 import { useSearchUps } from "@/api/search-up";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import {
   buildUpSearchItems,
   type UpSearchItem,
@@ -91,8 +91,8 @@ function SearchUpItem(props: { up: UpSearchItem }) {
           mid={props.up.mid}
           numberOfLines={2}
           className={clsx(
-            colors.primary.text,
-            isFollowed && colors.secondary.text,
+            theme.primary.text,
+            isFollowed && theme.secondary.text,
             "flex-1 text-base",
           )}
           ellipsizeMode="tail"
@@ -101,7 +101,7 @@ function SearchUpItem(props: { up: UpSearchItem }) {
         </UpName>
       </TouchableOpacity>
       {typeof props.up.fans === "number" ? (
-        <Text className={`${colors.gray6.text} px-2 text-sm`}>
+        <Text className={`${theme.text.muted} px-2 text-sm`}>
           {parseNumber(props.up.fans)}粉丝
         </Text>
       ) : null}
@@ -194,7 +194,7 @@ function UpList(props: { keyword: string }) {
         items.length && isValidating ? (
           <SkeletonRows count={FOOTER_SKELETON_ROWS} />
         ) : items.length && isReachingEnd ? (
-          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>暂无更多</Text>
+          <Text className={`${theme.text.muted} my-2 text-center text-xs`}>暂无更多</Text>
         ) : null
       }
       contentContainerStyle={{

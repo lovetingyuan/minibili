@@ -6,8 +6,8 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("react-native-svg", () => ({ default: "Svg", Path: "Path" }));
-vi.mock("@/constants/colors.tw", () => ({
-  colors: { black: { text: "text-zinc-800 dark:text-neutral-200" } },
+vi.mock("@/constants/theme", () => ({
+  theme: { text: { primary: "text-slate-800 dark:text-slate-200" } },
 }));
 vi.mock("@/hooks/useResolvedColor", () => ({ default: mocks.useResolvedColor }));
 
@@ -21,7 +21,7 @@ type IconElementProps = {
 };
 
 beforeEach(() => {
-  mocks.useResolvedColor.mockReturnValue("#27272a");
+  mocks.useResolvedColor.mockReturnValue("#262626");
 });
 
 test("renders the GitHub mark with the resolved theme color", () => {
@@ -30,7 +30,7 @@ test("renders the GitHub mark with the resolved theme color", () => {
   expect(icon.type).toBe("Svg");
   expect(icon.props).toMatchObject({ height: 20, viewBox: "0 0 24 24", width: 20 });
   expect(icon.props.children?.type).toBe("Path");
-  expect(icon.props.children?.props.fill).toBe("#27272a");
+  expect(icon.props.children?.props.fill).toBe("#262626");
   expect(icon.props.children?.props.d).toContain("M10.226 17.284");
 });
 

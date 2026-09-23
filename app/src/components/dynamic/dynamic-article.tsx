@@ -2,7 +2,7 @@ import { clsx } from 'clsx'
 import { Linking, View } from 'react-native'
 
 import type { ArticleInlineNode, ArticleParagraph, DynamicArticle } from '@/api/opus-detail.type'
-import { colors } from '@/constants/colors.tw'
+import { theme } from "@/constants/theme";
 import { parseUrl } from '@/utils'
 
 import { InlineEmoji } from '../InlineEmoji'
@@ -52,7 +52,7 @@ function ArticleInlineNodes(props: { nodes: ArticleInlineNode[] }) {
           return (
             <Text
               key={key}
-              className={clsx(colors.primary.text, 'underline')}
+              className={clsx(theme.primary.text, 'underline')}
               onPress={() => {
                 void Linking.openURL(parseUrl(node.url))
               }}
@@ -64,13 +64,13 @@ function ArticleInlineNodes(props: { nodes: ArticleInlineNode[] }) {
         if (node.kind === 'at') {
           if (node.mid === null) {
             return (
-              <Text key={key} className={colors.primary.text}>
+              <Text key={key} className={theme.primary.text}>
                 {node.text}
               </Text>
             )
           }
           return (
-            <UpName key={key} mid={node.mid} className={colors.primary.text}>
+            <UpName key={key} mid={node.mid} className={theme.primary.text}>
               {node.text}
             </UpName>
           )
@@ -104,7 +104,7 @@ function headingClassName(level: number) {
 function ArticleParagraphView(props: { paragraph: ArticleParagraph; selectable?: boolean }) {
   const { paragraph, selectable } = props
   if (paragraph.kind === 'divider') {
-    return <View className="mb-3 h-px bg-neutral-200 dark:bg-neutral-800" />
+    return <View className="mb-3 h-px bg-slate-200 dark:bg-slate-800" />
   }
   if (paragraph.kind === 'images') {
     return <DynamicImageGrid images={paragraph.images} detail natural />
@@ -144,7 +144,7 @@ export function DynamicArticleLoading() {
       <Skeleton animation="wave" width="92%" height={16} />
       <Skeleton animation="wave" width="86%" height={16} />
       <Skeleton animation="wave" width="64%" height={16} />
-      <Text className={`text-xs ${colors.gray6.text} mb-3`}>正在加载全文</Text>
+      <Text className={`text-xs ${theme.text.muted} mb-3`}>正在加载全文</Text>
     </View>
   )
 }

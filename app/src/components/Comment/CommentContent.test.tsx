@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { CommentImage, CommentMessageContent } from "@/api/comments.types";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 const mocks = vi.hoisted(() => ({
   setCurrentImageIndex: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock("react-native", () => ({
 }));
 vi.mock("@/components/styled/expo", () => ({ Image: "Image" }));
 vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
   useStore: () => ({
     setCurrentImageIndex: mocks.setCurrentImageIndex,
@@ -129,7 +129,7 @@ describe("CommentText like count", () => {
     const count = lastChild({ likeText: "👍12" }) as ReactElement<LikeCountProps>;
 
     expect(count.type).toBe("Text");
-    expect(count.props.className).toContain(colors.primary.text);
+    expect(count.props.className).toContain(theme.primary.text);
     expect(count.props.children).toContain("👍12");
   });
 
@@ -139,7 +139,7 @@ describe("CommentText like count", () => {
       likeActive: true,
     }) as ReactElement<LikeCountProps>;
 
-    expect(count.props.className).toContain(colors.commentLike.text);
+    expect(count.props.className).toContain(theme.like.text);
   });
 
   test("dims the like count while the attitude request is pending", () => {
@@ -235,20 +235,20 @@ describe("CommentText creator liked highlight", () => {
   test("paints the comment body with the theme pink when the UP liked it", () => {
     const { bodyClassName, nodes } = renderText(true);
 
-    expect(bodyClassName).toContain(colors.secondary.text);
-    expect(nodes[0].props.className).toContain(colors.secondary.text);
+    expect(bodyClassName).toContain(theme.secondary.text);
+    expect(nodes[0].props.className).toContain(theme.secondary.text);
   });
 
   test("keeps the accent color of mentions inside a highlighted body", () => {
     const { nodes } = renderText(true);
 
-    expect(nodes[1].props.className).toContain(colors.primary.text);
+    expect(nodes[1].props.className).toContain(theme.primary.text);
   });
 
   test("leaves the body color untouched when the UP did not like the comment", () => {
     const { bodyClassName, nodes } = renderText(false);
 
-    expect(bodyClassName).not.toContain(colors.secondary.text);
-    expect(nodes[0].props.className).not.toContain(colors.secondary.text);
+    expect(bodyClassName).not.toContain(theme.secondary.text);
+    expect(nodes[0].props.className).not.toContain(theme.secondary.text);
   });
 });

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, Platform, StyleSheet, View } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import useResolvedStyle from "@/hooks/useResolvedStyle";
 
@@ -24,8 +24,8 @@ export function Skeleton({
   const animationRef = useRef(new Animated.Value(0));
   const animationLoop = useRef<Animated.CompositeAnimation | null>(null);
   const [layoutWidth, setLayoutWidth] = useState(0);
-  const baseColor = useResolvedColor(colors.gray3.accent);
-  const highlightColor = useResolvedColor(colors.gray4.accent);
+  const baseColor = useResolvedColor(theme.slate[2].accent);
+  const highlightColor = useResolvedColor(theme.slate[3].accent);
   const resolvedClassName = useResolvedStyle(className);
   const resolvedSkeletonClassName = useResolvedStyle(skeletonClassName);
 

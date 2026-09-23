@@ -3,7 +3,7 @@ import { TextInput } from "react-native";
 
 import { Dialog } from "@/components/Dialog";
 import { Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 import type { GroupNameDialogProps } from "./FollowGroups.types";
 
@@ -31,7 +31,7 @@ export default function GroupNameDialog({
         placeholder="分组名称"
         returnKeyType="done"
         accessibilityLabel="分组名称"
-        className={`rounded-lg border px-3 py-2 text-base ${colors.gray3.border} ${colors.black.text}`}
+        className={`rounded-lg border px-3 py-2 text-base ${theme.border.outline} ${theme.text.primary}`}
         onChangeText={setName}
         onSubmitEditing={() => {
           if (canSubmit) {
@@ -39,9 +39,9 @@ export default function GroupNameDialog({
           }
         }}
       />
-      <Text className={`mt-1 text-xs ${colors.gray6.text}`}>分组名称不能为空</Text>
+      <Text className={`mt-1 text-xs ${theme.text.muted}`}>分组名称不能为空</Text>
       {error ? (
-        <Text accessibilityRole="alert" className={`mt-2 text-sm ${colors.error.text}`}>
+        <Text accessibilityRole="alert" className={`mt-2 text-sm ${theme.error.text}`}>
           {error.message}
         </Text>
       ) : null}
@@ -56,7 +56,7 @@ export default function GroupNameDialog({
         />
         <Dialog.Button
           title="取消"
-          titleClassName={colors.gray6.text}
+          titleClassName={theme.text.muted}
           disabled={saving}
           onPress={onClose}
         />

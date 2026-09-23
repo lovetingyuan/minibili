@@ -251,7 +251,9 @@ function startMetro(forwardedArgs, shouldUseLocalhost, reversed) {
 
   const child = spawn(process.execPath, [resolveExpoCli(), ...expoArgs], {
     cwd: APP_DIR,
-    env: { ...process.env, NODE_OPTIONS: nodeOptions },
+    // 开发包是用 APP_VARIANT=development 构建的（MiniBili-dev / com.tingyuan.minibili.dev，见 eas.json
+    // 与 scripts/build-android-local.mjs），Metro 这边保持同一个变体，dev-client 里显示的项目名才一致。
+    env: { ...process.env, NODE_OPTIONS: nodeOptions, APP_VARIANT: "development" },
     stdio: "inherit",
   });
 

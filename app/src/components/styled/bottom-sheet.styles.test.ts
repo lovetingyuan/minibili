@@ -12,9 +12,9 @@ import {
 
 test("主题类名同时覆盖浅色与深色", () => {
   expect(sheetBackgroundClassName).toContain("bg-white");
-  expect(sheetBackgroundClassName).toContain("dark:bg-neutral-950");
-  expect(sheetHandleIndicatorClassName).toContain("bg-neutral-300");
-  expect(sheetHandleIndicatorClassName).toContain("dark:bg-neutral-700");
+  expect(sheetBackgroundClassName).toContain("dark:bg-slate-950");
+  expect(sheetHandleIndicatorClassName).toContain("bg-slate-300");
+  expect(sheetHandleIndicatorClassName).toContain("dark:bg-slate-700");
 });
 
 test("解析出的颜色会覆盖默认样式，缺失时保留默认值", () => {

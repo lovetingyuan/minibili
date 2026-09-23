@@ -6,7 +6,7 @@ import { useDynamicLike } from "@/api/useDynamicLike";
 import { DynamicLikeLoginRequiredError } from "@/api/dynamic-like";
 import type { DynamicItem } from "@/api/dynamic-items.type";
 import type { FavoriteAccount } from "@/api/favorites.types";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
@@ -65,8 +65,8 @@ function DynamicShareButton(props: { item: DynamicItem }) {
         void handleShareDynamic(getDynamicShareTitle(props.item), getDynamicShareUrl(props.item));
       }}
     >
-      <ThemedIcon icon={Share2} size={ACTION_ICON_SIZE} colorClassName={colors.gray6.accent} />
-      <Text className={`text-xs ${colors.gray6.text}`}>
+      <ThemedIcon icon={Share2} size={ACTION_ICON_SIZE} colorClassName={theme.icon.muted} />
+      <Text className={`text-xs ${theme.text.muted}`}>
         {parseNumber(props.item.stats.forward)}
       </Text>
     </Pressable>
@@ -92,9 +92,9 @@ function DynamicCommentButton(props: { item: DynamicItem; onPress?: () => void }
       <ThemedIcon
         icon={MessageCircle}
         size={ACTION_ICON_SIZE}
-        colorClassName={colors.gray6.accent}
+        colorClassName={theme.icon.muted}
       />
-      <Text className={`text-xs ${colors.gray6.text}`}>
+      <Text className={`text-xs ${theme.text.muted}`}>
         {parseNumber(props.item.stats.comment)}
       </Text>
     </Pressable>
@@ -168,10 +168,10 @@ function DynamicLikeButton(props: {
           icon={ThumbsUp}
           filled={mutation.liked}
           size={ACTION_ICON_SIZE}
-          colorClassName={mutation.liked ? colors.primary.accent : colors.gray6.accent}
+          colorClassName={mutation.liked ? theme.primary.accent : theme.icon.muted}
         />
       )}
-      <Text className={`text-xs ${mutation.liked ? colors.primary.text : colors.gray6.text}`}>
+      <Text className={`text-xs ${mutation.liked ? theme.primary.text : theme.text.muted}`}>
         {parseNumber(
           props.item.stats.like +
             (mutation.liked === props.item.stats.liked ? 0 : mutation.liked ? 1 : -1),
@@ -188,7 +188,7 @@ export function DynamicActions(props: { item: DynamicItem; onCommentPress?: () =
     account === undefined || control.phase !== "ready" || Boolean(account && !current);
 
   return (
-    <View className="flex-row border-t border-neutral-100 pt-3 dark:border-neutral-800">
+    <View className="flex-row border-t border-slate-100 pt-3 dark:border-slate-800">
       <DynamicShareButton item={props.item} />
       <DynamicCommentButton item={props.item} onPress={props.onCommentPress} />
       <DynamicLikeButton

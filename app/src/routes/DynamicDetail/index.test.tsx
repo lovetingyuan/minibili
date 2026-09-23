@@ -41,7 +41,7 @@ vi.mock("@/components/Comment", () => ({ default: "CommentList" }));
 vi.mock("@/components/dynamic/dynamic-card", () => ({ DynamicCard: "DynamicCard" }));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button", Text: "Text" }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/hooks/useUpdateNavigationOptions", () => ({ default: vi.fn() }));
 vi.mock("./HeaderRight", () => ({ default: "HeaderRight" }));
 

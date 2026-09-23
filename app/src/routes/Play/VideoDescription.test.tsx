@@ -22,20 +22,18 @@ vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ push: () => {} }),
 }));
 
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
+vi.mock("@/constants/theme", () => ({
+  theme: {
     primary: {
       accent: "accent-primary",
       text: "text-primary",
     },
-    gray6: {
-      accent: "accent-gray6",
+    icon: {
+      muted: "accent-gray6",
     },
-    gray7: {
-      text: "text-gray7",
-    },
-    gray8: {
-      text: "text-gray8",
+    text: {
+      secondary: "text-gray7",
+      primary: "text-gray8",
     },
   },
 }));
@@ -89,7 +87,7 @@ describe("VideoDescriptionView", () => {
     expect(toggle.props.className).toContain("bottom-2.5");
     expect(toggle.props.className).not.toContain("self-end");
     // 盖住底下的文字，避免和“显示更多”重叠
-    expect(toggle.props.className).toContain("bg-neutral-50");
+    expect(toggle.props.className).toContain("bg-slate-50");
     expect(toggle.props.accessibilityLabel).toBe("展开完整简介");
     expect(getChildren(toggle)[0].props.children).toBe("显示更多");
 

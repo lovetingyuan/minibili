@@ -6,7 +6,7 @@ import { Alert, Pressable } from 'react-native'
 import { useVideoRelation } from '@/api/useVideoFavorites'
 import { Text } from '@/components/styled/rneui'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { colors } from '@/constants/colors.tw'
+import { theme } from "@/constants/theme";
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import {
   useBilibiliSessionActions,
@@ -103,9 +103,9 @@ function FavoriteButtonContent({
           icon={Star}
           filled={favorite}
           size={16}
-          colorClassName={favorite ? colors.primary.accent : colors.gray8.accent}
+          colorClassName={favorite ? theme.primary.accent : theme.icon.primary}
         />
-        <Text className={`text-xs ${favorite ? colors.primary.text : colors.gray8.text}`}>
+        <Text className={`text-xs ${favorite ? theme.primary.text : theme.text.primary}`}>
           {parseNumber(count)}
         </Text>
       </Pressable>

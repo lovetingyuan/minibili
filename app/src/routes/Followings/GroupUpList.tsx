@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from "react-native";
 import { RELATION_TAG_SPECIAL_ID } from "@/api/relation-tags";
 import { useBilibiliRelationTagMembers } from "@/api/useBilibiliRelationTags";
 import { Button, Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { orderFollowedUps } from "@/features/bilibili-followings/order-followings";
 import { useStore } from "@/store";
 import { useUnreadUpMids } from "@/store/derives";
@@ -62,14 +62,14 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
               />
             </>
           ) : (
-            <Text className={colors.gray6.text}>该分组暂无UP</Text>
+            <Text className={theme.text.muted}>该分组暂无UP</Text>
           )}
         </View>
       }
       footer={
         members.error && hasItems ? (
           <View className="items-center gap-2 py-4">
-            <Text className={`text-sm ${colors.gray6.text}`}>加载失败，已保留当前内容</Text>
+            <Text className={`text-sm ${theme.text.muted}`}>加载失败，已保留当前内容</Text>
             <Button
               title="重试"
               type="clear"
@@ -82,7 +82,7 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
         ) : members.isLoadingMore && hasItems ? (
           <ActivityIndicator className="my-4" />
         ) : hasItems && !members.hasMore ? (
-          <Text className={`py-4 text-center text-xs ${colors.gray6.text}`}>到底了~</Text>
+          <Text className={`py-4 text-center text-xs ${theme.text.muted}`}>到底了~</Text>
         ) : null
       }
     />

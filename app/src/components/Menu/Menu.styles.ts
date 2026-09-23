@@ -3,7 +3,7 @@ import { TouchableHighlight } from "react-native";
 import type { ComponentProps } from "react";
 import type { TextStyle, ViewStyle } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 const SCREEN_INDENT = 8;
 
@@ -50,9 +50,9 @@ export function MenuOptionTouchableComponent(props: ComponentProps<typeof Toucha
   return React.createElement(TouchableHighlight, props);
 }
 
-export const menuSurfaceClassName = `${colors.white.bg} ${colors.gray2.border}`;
+export const menuSurfaceClassName = `${theme.background.overlay} ${theme.border.divider}`;
 
-export const menuOptionTextClassName = colors.black.text;
+export const menuOptionTextClassName = theme.text.primary;
 
 export const menuSurfaceStyle: ViewStyle = {
   backgroundColor: "#fff",

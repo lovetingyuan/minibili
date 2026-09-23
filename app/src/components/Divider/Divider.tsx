@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { clsx } from "clsx";
 
-import { colors } from "../../constants/colors.tw";
+import { theme } from "../../constants/theme";
 
 import type { DividerProps } from "./Divider.types";
 
@@ -49,7 +49,7 @@ export function Divider({
     <>
       <View
         {...viewProps}
-        className={clsx(colors.gray3.border, className)}
+        className={clsx(theme.border.outline, className)}
         style={[lineStyle, insetStyle(inset, insetType), style]}
       />
       {subHeader && !vertical ? (

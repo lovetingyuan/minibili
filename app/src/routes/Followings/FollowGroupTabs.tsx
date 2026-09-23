@@ -4,7 +4,7 @@ import { ScrollView, TouchableOpacity, View } from 'react-native';
 
 import { Text } from '@/components/styled/rneui';
 import { ThemedIcon } from '@/components/ThemedIcon';
-import { colors } from '@/constants/colors.tw';
+import { theme } from "@/constants/theme";
 
 import type { FollowGroupTabsProps } from './FollowGroups.types';
 
@@ -84,11 +84,11 @@ export default function FollowGroupTabs({
                 }
                 onSelect(tab);
               }}
-              className={`rounded-full px-4 py-2 ${selectedKey === tab.key ? colors.gray2.bg : colors.gray1.bg}`}
+              className={`rounded-full px-4 py-2 ${selectedKey === tab.key ? theme.background.fillStrong.bg : theme.background.fill.bg}`}
             >
               <Text
                 className={`text-sm ${
-                  selectedKey === tab.key ? `${colors.primary.text} font-bold` : colors.gray6.text
+                  selectedKey === tab.key ? `${theme.primary.text} font-bold` : theme.text.muted
                 }`}
               >
                 {tab.name} {tab.count}
@@ -104,13 +104,13 @@ export default function FollowGroupTabs({
             accessibilityState={{ disabled }}
             disabled={disabled}
             onPress={onCreate}
-            className={`h-8 w-8 items-center justify-center rounded-full ${colors.gray1.bg}`}
+            className={`h-8 w-8 items-center justify-center rounded-full ${theme.background.fill.bg}`}
           >
-            <ThemedIcon icon={Plus} size={18} colorClassName={colors.gray7.accent} />
+            <ThemedIcon icon={Plus} size={18} colorClassName={theme.icon.secondary} />
           </TouchableOpacity>
         </View>
       </View>
-      <View className={`h-px w-full ${colors.gray2.bg}`} />
+      <View className={`h-px w-full ${theme.background.fillStrong.bg}`} />
     </View>
   );
 }

@@ -4,7 +4,7 @@ import React from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import type { SearchBarCommands } from "react-native-screens";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
@@ -21,7 +21,7 @@ const defaultSearchBarCommands: SearchBarCommands = {
 
 function SearchUps() {
   const searchBarRef = React.useRef<SearchBarCommands>(defaultSearchBarCommands);
-  const blackColor = useResolvedColor(colors.black.text);
+  const blackColor = useResolvedColor(theme.text.primary);
   const [searchKeyWord, setSearchKeyWord] = React.useState("");
   const focused = useIsFocused();
   useBackHandler(() => {

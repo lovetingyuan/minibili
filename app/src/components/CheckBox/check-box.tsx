@@ -4,7 +4,7 @@ import { Pressable, View } from "react-native";
 import type { CheckBoxProps } from "./check-box.types";
 
 import { Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
 // 勾选框的尺寸和颜色都来自运行时 props，静态 tailwind class 表达不了，只能写 style。
@@ -14,7 +14,7 @@ export function CheckBox({
   onPress,
   disabled,
   checkedColorClassName,
-  uncheckedColorClassName = colors.gray4.text,
+  uncheckedColorClassName = theme.icon.placeholder,
   containerClassName,
   textClassName,
   wrapperClassName,

@@ -27,11 +27,18 @@ vi.mock("lucide-react-native", () => ({
 vi.mock("@/api/check-update", () => ({
   useAppUpdateInfo: () => ({ hasUpdate: false }),
 }));
-vi.mock("@/constants/colors.tw", () => ({
-  colors: { primary: { text: "primary" }, gray6: { text: "gray6" }, gray8: { text: "gray8" } },
-}));
 vi.mock("@/hooks/useResolvedColor", () => ({ default: (value: string) => value }));
+vi.mock("@/hooks/useResolvedStyle", () => ({
+  default: (value: string) => ({ backgroundColor: value }),
+}));
 vi.mock("@/hooks/useRouteTheme", () => ({ default: () => ({}) }));
+vi.mock("@/hooks/useTheme", () => ({
+  default: () => ({
+    primary: { text: "text-primary", accent: "accent-primary", bg: "bg-primary" },
+    secondary: { accent: "accent-secondary", bg: "bg-secondary" },
+    text: { muted: "text-muted", primary: "text-title" },
+  }),
+}));
 vi.mock("@/store", () => ({
   useStore: () => ({
     $firstRun: 1,
@@ -143,14 +150,14 @@ test("followings tab prefers the live badge over the unread count", () => {
   const withBadge = tabScreens(MainTabs());
   expect(withBadge[2].props.options.tabBarBadge).toBe("𝘭𝘪𝘷𝘦");
   expect(withBadge[2].props.options.tabBarBadgeStyle).toMatchObject({
-    backgroundColor: "#00AEEC",
+    backgroundColor: "bg-primary",
   });
 
   mocks.livingUps = {};
   const withoutBadge = tabScreens(MainTabs());
   expect(withoutBadge[2].props.options.tabBarBadge).toBe(7);
   expect(withoutBadge[2].props.options.tabBarBadgeStyle).toMatchObject({
-    backgroundColor: "#FF6699",
+    backgroundColor: "bg-secondary",
   });
 });
 

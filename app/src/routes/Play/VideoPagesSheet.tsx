@@ -7,7 +7,7 @@ import type { VideoInfo } from "@/api/video-info";
 import { BottomSheet } from "@/components/styled/bottom-sheet";
 import { FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { parseDuration } from "@/utils";
 
 import { formatVideoPageTitle, getVideoPagesSheetHeight } from "./video-pages-sheet.helpers";
@@ -66,8 +66,8 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
       visible={props.visible}
     >
       {/* flex-1 撑满 sheet 的内容区（sheet 高度已扣除把手），不要再写死高度 */}
-      <View className="flex-1 overflow-hidden rounded-t-[28px] bg-white dark:bg-neutral-950">
-        <View className="relative h-14 flex-row items-center border-b border-neutral-100 px-4 dark:border-neutral-800">
+      <View className={`flex-1 overflow-hidden rounded-t-[28px] ${theme.background.surface}`}>
+        <View className="relative h-14 flex-row items-center border-b border-slate-100 px-4 dark:border-slate-800">
           <Text className="text-base font-semibold tabular-nums">
             {`分 P · ${props.currentPage}/${props.pages.length}`}
           </Text>
@@ -79,7 +79,7 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
             accessibilityLabel="关闭分P列表"
             onPress={props.onClose}
           >
-            <ThemedIcon icon={X} size={21} colorClassName={colors.gray7.accent} />
+            <ThemedIcon icon={X} size={21} colorClassName={theme.icon.secondary} />
           </Pressable>
         </View>
         <FlashList
@@ -100,7 +100,7 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
                 android_ripple={{ color: "transparent" }}
                 className={
                   selected
-                    ? "h-[60px] flex-row items-center gap-3 rounded-2xl bg-pink-50 px-3 dark:bg-pink-950/40"
+                    ? `h-[60px] flex-row items-center gap-3 rounded-2xl px-3 ${theme.secondary.tint}`
                     : "h-[60px] flex-row items-center gap-3 rounded-2xl px-3"
                 }
                 style={({ pressed }) => ({ opacity: pressed ? 0.68 : 1 })}
@@ -112,15 +112,15 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
                 <View
                   className={
                     selected
-                      ? "min-w-12 items-center rounded-full bg-pink-400 px-2 py-1"
-                      : "min-w-12 items-center rounded-full bg-neutral-100 px-2 py-1 dark:bg-neutral-800"
+                      ? `min-w-12 items-center rounded-full px-2 py-1 ${theme.secondary.bg}`
+                      : "min-w-12 items-center rounded-full bg-slate-100 px-2 py-1 dark:bg-slate-800"
                   }
                 >
                   <Text
                     className={
                       selected
                         ? "text-xs font-semibold tabular-nums text-white"
-                        : `text-xs font-semibold tabular-nums ${colors.gray7.text}`
+                        : `text-xs font-semibold tabular-nums ${theme.text.secondary}`
                     }
                   >
                     {`P${item.page}`}
@@ -129,7 +129,7 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
                 <Text
                   className={
                     selected
-                      ? `min-w-0 flex-1 font-semibold ${colors.secondary.text}`
+                      ? `min-w-0 flex-1 font-semibold ${theme.secondary.text}`
                       : "min-w-0 flex-1"
                   }
                   numberOfLines={1}
@@ -137,11 +137,11 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
                 >
                   {formatVideoPageTitle(item.title, item.page)}
                 </Text>
-                <Text className={`text-xs tabular-nums ${colors.gray6.text}`}>
+                <Text className={`text-xs tabular-nums ${theme.text.muted}`}>
                   {parseDuration(item.duration)}
                 </Text>
                 {selected ? (
-                  <ThemedIcon icon={Check} size={19} colorClassName={colors.secondary.accent} />
+                  <ThemedIcon icon={Check} size={19} colorClassName={theme.secondary.accent} />
                 ) : null}
               </Pressable>
             );

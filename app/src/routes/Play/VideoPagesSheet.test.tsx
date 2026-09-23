@@ -21,7 +21,7 @@ vi.mock("@/components/styled/bottom-sheet", () => ({ BottomSheet: "BottomSheet" 
 vi.mock("@/components/styled/rneui", () => ({ FlashList: "FlashList", Text: "Text" }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ Check: "Check", X: "X" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/utils", () => ({ parseDuration: (duration: number) => `${duration}s` }));
 
 import VideoPagesSheet from "./VideoPagesSheet";

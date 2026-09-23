@@ -4,7 +4,7 @@ import { FavoriteLoginRequiredError } from "@/api/video-favorites";
 import { CheckBox } from "@/components/CheckBox";
 import { Dialog } from "@/components/Dialog";
 import { Button, Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { showToast } from "@/utils";
 import type { FavoriteDialogProps } from "./Favorite.types";
 import { useFavoriteEditor } from "./useFavoriteEditor";
@@ -30,7 +30,7 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
       {editor.loading ? <ActivityIndicator accessibilityLabel="正在加载收藏夹" /> : null}
       {editor.error ? (
         <View className="gap-2 py-2">
-          <Text accessibilityRole="alert" className={colors.error.text}>
+          <Text accessibilityRole="alert" className={theme.error.text}>
             {editor.error.message}
           </Text>
           {editor.error instanceof FavoriteLoginRequiredError ? (
@@ -57,7 +57,7 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
       ) : null}
       {!editor.loading && editor.selection?.folders.length === 0 ? (
         <View className="gap-2 py-4">
-          <Text className={colors.gray6.text}>暂无 B站收藏夹，请先到 B站创建收藏夹</Text>
+          <Text className={theme.text.muted}>暂无 B站收藏夹，请先到 B站创建收藏夹</Text>
           <Button
             title="刷新"
             type="clear"
@@ -82,9 +82,9 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
               checked: selectedFolderIds.has(folder.id),
               disabled: editor.loading || editor.busy || editor.needsReload,
             }}
-            checkedColorClassName={colors.primary.accent}
+            checkedColorClassName={theme.primary.accent}
             containerClassName="mx-0 border-0 bg-transparent px-0 py-2"
-            textClassName={`shrink font-normal ${colors.black.text}`}
+            textClassName={`shrink font-normal ${theme.text.primary}`}
           />
         ))}
       </ScrollView>
@@ -99,7 +99,7 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
         />
         <Dialog.Button
           title="取消"
-          titleClassName={colors.gray6.text}
+          titleClassName={theme.text.muted}
           disabled={editor.busy}
           onPress={close}
         />

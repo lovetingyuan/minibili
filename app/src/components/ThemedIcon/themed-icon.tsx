@@ -1,12 +1,12 @@
 import type { ThemedIconProps } from "./themed-icon.types";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
 export function ThemedIcon({
   icon: IconComponent,
   color,
-  colorClassName = colors.black.text,
+  colorClassName = theme.text.primary,
   fill,
   filled = false,
   ...props

@@ -14,7 +14,7 @@ import React from 'react'
 import { Linking, Pressable, View } from 'react-native'
 
 import { useWatchingCount } from '@/api/watching-count'
-import { colors } from '@/constants/colors.tw'
+import { theme } from "@/constants/theme";
 import type { NavigationProps, RootStackParamList } from '@/types'
 import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumber } from '@/utils'
 
@@ -67,7 +67,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
               source={{ uri: parseImgUrl(face, getImagePixelSize(36)) }}
             />
           ) : (
-            <View className={`h-9 w-9 shrink-0 rounded-full ${colors.gray3.bg}`} />
+            <View className={`h-9 w-9 shrink-0 rounded-full ${theme.background.fillDisabled.bg}`} />
           )}
           <Text
             numberOfLines={1}
@@ -78,9 +78,9 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
           </Text>
         </Pressable>
         <View className="ml-1 flex-none flex-row items-center gap-1 px-2">
-          <ThemedIcon icon={CalendarDays} size={16} colorClassName={colors.gray6.accent} />
-          <Text className={`text-sm ${colors.gray6.text}`}>{parseDate(date, true)}</Text>
-          <Text className={`ml-1 text-sm ${colors.gray6.text}`}>
+          <ThemedIcon icon={CalendarDays} size={16} colorClassName={theme.icon.muted} />
+          <Text className={`text-sm ${theme.text.muted}`}>{parseDate(date, true)}</Text>
+          <Text className={`ml-1 text-sm ${theme.text.muted}`}>
             {watchingCount
               ? `${watchingCount.total === '1' ? '壹' : watchingCount.total}人在看`
               : ' '}
@@ -91,7 +91,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
       {videoInfo?.argument ? (
         <View className="mb-2 self-start rounded-lg bg-orange-50 px-2 py-1 dark:bg-orange-950/30">
           <Text
-            className={`text-xs leading-4 ${colors.warning.text}`}
+            className={`text-xs leading-4 ${theme.warning.text}`}
             onPress={() => {
               if (videoInfo.argumentLink) {
                 Linking.openURL(videoInfo.argumentLink)
@@ -103,7 +103,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
         </View>
       ) : null}
 
-      <Text selectable className={`text-lg font-bold leading-6 ${colors.gray9.text}`}>
+      <Text selectable className={`text-lg font-bold leading-6 ${theme.text.heading}`}>
         {title}
       </Text>
 
@@ -113,14 +113,16 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             accessibilityRole="button"
             accessibilityLabel="打开分P列表"
             android_ripple={{ color: 'transparent' }}
-            className="flex-row items-center gap-2.5 rounded-2xl bg-neutral-100 px-3 py-2 dark:bg-neutral-900"
+            className="flex-row items-center gap-2.5 rounded-2xl bg-slate-100 px-3 py-2 dark:bg-slate-900"
             style={({ pressed }) => ({ opacity: pressed ? 0.72 : 1 })}
             onPress={() => {
               setShowPagesModal(true)
             }}
           >
-            <View className="h-9 w-9 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-950/50">
-              <ThemedIcon icon={ListVideo} size={21} colorClassName={colors.primary.accent} />
+            <View
+              className={`h-9 w-9 items-center justify-center rounded-full ${theme.primary.tint}`}
+            >
+              <ThemedIcon icon={ListVideo} size={21} colorClassName={theme.primary.accent} />
             </View>
             <Text className="min-w-0 flex-1 text-base" numberOfLines={1} ellipsizeMode="tail">
               {formatVideoPageTitle(
@@ -128,10 +130,10 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
                 pages[props.currentPage - 1].page,
               )}
             </Text>
-            <Text className={`shrink-0 text-sm tabular-nums ${colors.gray6.text}`}>
+            <Text className={`shrink-0 text-sm tabular-nums ${theme.text.muted}`}>
               {`P${props.currentPage}/${pages.length}`}
             </Text>
-            <ThemedIcon icon={ChevronRight} size={22} colorClassName={colors.gray6.accent} />
+            <ThemedIcon icon={ChevronRight} size={22} colorClassName={theme.icon.muted} />
           </Pressable>
           <VideoPagesSheet
             currentPage={props.currentPage}
@@ -147,16 +149,16 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
 
       <VideoDescription text={videoDesc} nodes={videoInfo.descriptionNodes} />
 
-      <View className="mt-3 flex-row items-center rounded-xl bg-neutral-50 px-1 py-2 dark:bg-neutral-900">
+      <View className="mt-3 flex-row items-center rounded-xl bg-slate-50 px-1 py-2 dark:bg-slate-900">
         <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
-          <ThemedIcon icon={CirclePlay} size={16} colorClassName={colors.gray8.accent} />
-          <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
+          <ThemedIcon icon={CirclePlay} size={16} colorClassName={theme.icon.primary} />
+          <Text selectable className={`text-xs tabular-nums ${theme.text.primary}`}>
             {parseNumber(videoInfo?.playNum)}
           </Text>
         </View>
         <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
-          <ThemedIcon icon={MessageCircle} size={16} colorClassName={colors.gray8.accent} />
-          <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
+          <ThemedIcon icon={MessageCircle} size={16} colorClassName={theme.icon.primary} />
+          <Text selectable className={`text-xs tabular-nums ${theme.text.primary}`}>
             {parseNumber(videoInfo?.danmuNum)}
           </Text>
         </View>
@@ -173,15 +175,15 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             }
           }}
         >
-          <ThemedIcon icon={Share2} size={16} colorClassName={colors.gray8.accent} />
-          <Text selectable className={`text-xs tabular-nums ${colors.gray8.text}`}>
+          <ThemedIcon icon={Share2} size={16} colorClassName={theme.icon.primary} />
+          <Text selectable className={`text-xs tabular-nums ${theme.text.primary}`}>
             {parseNumber(videoInfo?.shareNum)}
           </Text>
         </Pressable>
       </View>
 
       {!isLoading && videoInfo?.interactive ? (
-        <Text className={`mt-3 italic ${colors.warning.text}`}>【该视频为交互视频，暂不支持】</Text>
+        <Text className={`mt-3 italic ${theme.warning.text}`}>【该视频为交互视频，暂不支持】</Text>
       ) : null}
     </View>
   )

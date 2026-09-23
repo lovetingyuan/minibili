@@ -20,7 +20,7 @@ vi.mock("react-native", () => ({ View: "View" }));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button" }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ Search: "Search" }));
-vi.mock("@/constants/colors.tw", () => ({ colors: { gray7: { accent: "gray7" } } }));
+vi.mock("@/constants/theme", () => ({ theme: { icon: { secondary: "gray7" } } }));
 
 import useFollowListHeader from "./FollowListHeader";
 

@@ -8,7 +8,7 @@ import { FavoriteLoginRequiredError } from '@/api/video-favorites'
 import { VideoLikeLoginRequiredError } from '@/api/video-like'
 import { Text } from '@/components/styled/rneui'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { colors } from '@/constants/colors.tw'
+import { theme } from "@/constants/theme";
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import {
   useBilibiliSessionActions,
@@ -114,10 +114,10 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
           icon={ThumbsUp}
           filled={mutation.liked}
           size={16}
-          colorClassName={mutation.liked ? colors.primary.accent : colors.gray8.accent}
+          colorClassName={mutation.liked ? theme.primary.accent : theme.icon.primary}
         />
       )}
-      <Text className={`text-xs ${mutation.liked ? colors.primary.text : colors.gray8.text}`}>
+      <Text className={`text-xs ${mutation.liked ? theme.primary.text : theme.text.primary}`}>
         {parseNumber(count)}
       </Text>
     </Pressable>

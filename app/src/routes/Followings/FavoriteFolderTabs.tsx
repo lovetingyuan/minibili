@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, View } from "react-native";
 
 import { Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import type { FavoriteFolderTabsProps } from "./Favorites.types";
 
 export default function FavoriteFolderTabs({
@@ -12,7 +12,7 @@ export default function FavoriteFolderTabs({
   onLongPress,
 }: FavoriteFolderTabsProps) {
   return (
-    <View className={`border-b ${colors.gray2.border}`}>
+    <View className={`border-b ${theme.border.divider}`}>
       <ScrollView
         horizontal
         nestedScrollEnabled
@@ -29,10 +29,10 @@ export default function FavoriteFolderTabs({
             disabled={disabled}
             onPress={() => onSelect(folder.id)}
             onLongPress={onLongPress ? () => onLongPress(folder) : undefined}
-            className={`rounded-full px-4 py-2 ${selectedId === folder.id ? colors.gray2.bg : colors.gray1.bg}`}
+            className={`rounded-full px-4 py-2 ${selectedId === folder.id ? theme.background.fillStrong.bg : theme.background.fill.bg}`}
           >
             <Text
-              className={`text-sm ${selectedId === folder.id ? `${colors.primary.text} font-bold` : colors.gray6.text}`}
+              className={`text-sm ${selectedId === folder.id ? `${theme.primary.text} font-bold` : theme.text.muted}`}
             >
               {folder.title}（{folder.media_count}）
             </Text>

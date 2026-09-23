@@ -29,7 +29,7 @@ test("默认渲染主题色的水平 hairline", () => {
   const [line] = children(divider);
 
   expect(line.type).toBe("View");
-  expect(line.props.className).toContain("border-gray-300");
+  expect(line.props.className).toContain("border-slate-300");
   expect(line.props.className).toContain("my-4");
   expect(line.props.style).toEqual([{ borderBottomWidth: 0.5 }, undefined, undefined]);
 });

@@ -4,7 +4,7 @@ import { CircleAlert } from "lucide-react-native";
 import { Button, Linking, Text, View } from "react-native";
 
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 import { site } from "@/constants";
 
@@ -14,7 +14,7 @@ export default function ErrorFallback(props: { error: Error; resetError: Functio
     console.error(props.error);
   }
   return (
-    <View className="flex-1 dark:bg-neutral-900">
+    <View className="flex-1 dark:bg-slate-900">
       <StatusBar style="auto" />
       <View
         accessible
@@ -22,7 +22,7 @@ export default function ErrorFallback(props: { error: Error; resetError: Functio
         accessibilityRole="image"
         className="h-64 items-center justify-center"
       >
-        <ThemedIcon icon={CircleAlert} size={112} colorClassName={colors.error.accent} />
+        <ThemedIcon icon={CircleAlert} size={112} colorClassName={theme.error.accent} />
       </View>
       <Text className="mx-7 text-base text-red-600">
         非常抱歉，应用发生了未知错误
@@ -33,7 +33,7 @@ export default function ErrorFallback(props: { error: Error; resetError: Functio
         {"\n\n"}
         您可以
         <Text
-          className={`font-bold ${colors.primary.text}`}
+          className={`font-bold ${theme.primary.text}`}
           onPress={() => {
             Updates.reloadAsync();
           }}

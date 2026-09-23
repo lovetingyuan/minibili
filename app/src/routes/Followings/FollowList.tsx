@@ -14,7 +14,7 @@ import {
 } from '@/api/useBilibiliRelationTags'
 import { Dialog } from '@/components/Dialog'
 import { Button, Text } from '@/components/styled/rneui'
-import { colors } from '@/constants/colors.tw'
+import { theme } from "@/constants/theme";
 import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import {
@@ -367,7 +367,7 @@ function FollowList() {
       {deletingGroup ? (
         <Dialog className="w-[70%] max-w-xs" visible>
           <Dialog.Loading />
-          <Text className={`pb-4 text-center ${colors.gray7.text}`}>
+          <Text className={`pb-4 text-center ${theme.text.secondary}`}>
             正在删除分组「{deletingGroup.name}」…
           </Text>
         </Dialog>

@@ -2,7 +2,7 @@ import { DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { useColorScheme } from "react-native";
 import { useResolveClassNames } from "uniwind";
 
-import { RouteBackgroundColor } from "@/constants/colors.tw";
+import { RouteBackgroundColor } from "@/constants/theme";
 
 export default function useRouteTheme() {
   const isDark = useColorScheme() === "dark";

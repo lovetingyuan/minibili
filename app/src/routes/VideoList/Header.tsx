@@ -6,7 +6,7 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import { Menu, MenuOption, MenuOptions, MenuTrigger, menuOptionClassName } from "@/components/Menu";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 
 import { useStore } from "../../store";
@@ -43,7 +43,7 @@ function HeaderLeftComp() {
         <View className={menuOptionClassName}>
           <Text
             numberOfLines={1}
-            className={`px-4 text-left text-base ${selected ? "font-bold" : ""} ${item.rid === -1 ? colors.secondary.text : selected ? colors.primary.text : colors.black.text}`}
+            className={`px-4 text-left text-base ${selected ? "font-bold" : ""} ${item.rid === -1 ? theme.secondary.text : selected ? theme.primary.text : theme.text.primary}`}
           >
             {item.label}
           </Text>
@@ -60,14 +60,14 @@ function HeaderLeftComp() {
               className={`text-lg font-bold ${
                 currentVideosCate.rid === -1
                   ? __DEV__
-                    ? colors.success.text
-                    : colors.secondary.text
-                  : colors.gray7.text
+                    ? theme.success.text
+                    : theme.secondary.text
+                  : theme.text.secondary
               }`}
             >
               {currentVideosCate.label + (currentVideosCate.rid === -1 ? "" : "排行")}{" "}
             </Text>
-            <ThemedIcon icon={ChevronDown} size={28} colorClassName={colors.gray6.accent} />
+            <ThemedIcon icon={ChevronDown} size={22} colorClassName={theme.icon.muted} />
           </View>
         </MenuTrigger>
         <MenuOptions>
@@ -77,7 +77,7 @@ function HeaderLeftComp() {
                 return (
                   <View key={items[0].rid} className="w-48 flex-1">
                     <View>{getItem(items[0])}</View>
-                    <View className={`flex-1 border-b-[0.5px] ${colors.gray3.border}`} />
+                    <View className={`flex-1 border-b-[0.5px] ${theme.border.outline}`} />
                   </View>
                 );
               }
@@ -108,7 +108,7 @@ function HeaderRightComp() {
           navigation.navigate("SearchVideos");
         }}
       >
-        <ThemedIcon icon={Search} colorClassName={colors.gray7.accent} size={24} />
+        <ThemedIcon icon={Search} colorClassName={theme.icon.secondary} size={20} />
       </Button>
     </View>
   );

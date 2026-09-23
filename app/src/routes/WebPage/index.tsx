@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import BilibiliWebView from "@/components/BilibiliWebView";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 // import useLiveUrl from '@/api/get-live-url'
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
@@ -29,7 +29,7 @@ function Loading() {
       <ActivityIndicator
         accessibilityLabel="网页加载中"
         size="large"
-        colorClassName={colors.secondary.accent}
+        colorClassName={theme.secondary.accent}
       />
     </View>
   );

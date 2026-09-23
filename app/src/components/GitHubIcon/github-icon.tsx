@@ -1,11 +1,11 @@
 import type { SvgProps } from "react-native-svg";
 import Svg, { Path } from "react-native-svg";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
 export function GitHubIcon({ color, height = 20, width = 20, ...props }: SvgProps) {
-  const resolvedColor = useResolvedColor(colors.black.text);
+  const resolvedColor = useResolvedColor(theme.text.primary);
 
   return (
     <Svg {...props} height={height} viewBox="0 0 24 24" width={width}>

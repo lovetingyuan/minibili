@@ -5,7 +5,7 @@ import { useBilibiliHistory } from "@/api/useBilibiliHistory";
 import { Button, FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { formatWatchTime } from "@/utils/watch-time";
 
 export default function HistoryContent() {
@@ -28,12 +28,12 @@ export default function HistoryContent() {
             progressRatio={item.progressRatio}
           />
         ) : (
-          <View className={`mx-3 my-2 gap-2 rounded-lg p-4 ${colors.gray1.bg}`}>
-            <Text className={colors.gray7.text} numberOfLines={2}>
+          <View className={`mx-3 my-2 gap-2 rounded-lg p-4 ${theme.background.fill.bg}`}>
+            <Text className={theme.text.secondary} numberOfLines={2}>
               {item.title}
             </Text>
-            <Text className={`text-sm ${colors.gray6.text}`}>该视频暂不支持播放或已失效</Text>
-            <Text className={`text-xs ${colors.gray6.text}`}>
+            <Text className={`text-sm ${theme.text.muted}`}>该视频暂不支持播放或已失效</Text>
+            <Text className={`text-xs ${theme.text.muted}`}>
               {formatWatchTime(item.watchedAt)}
             </Text>
           </View>
@@ -64,8 +64,8 @@ export default function HistoryContent() {
             </>
           ) : (
             <>
-              <ThemedIcon icon={History} size={36} colorClassName={colors.gray5.accent} />
-              <Text className={colors.gray6.text}>
+              <ThemedIcon icon={History} size={36} colorClassName={theme.icon.disabled} />
+              <Text className={theme.text.muted}>
                 {history.hasMore ? "当前已加载记录中暂无视频" : "暂无 B站视频观看历史"}
               </Text>
               {history.hasMore ? (
@@ -79,7 +79,7 @@ export default function HistoryContent() {
         history.items.length > 0 ? (
           history.error ? (
             <View className="items-center gap-2 py-4">
-              <Text className={`text-sm ${colors.gray6.text}`}>加载失败，已保留当前内容</Text>
+              <Text className={`text-sm ${theme.text.muted}`}>加载失败，已保留当前内容</Text>
               <Button
                 title="重试"
                 type="clear"
@@ -90,7 +90,7 @@ export default function HistoryContent() {
           ) : history.isLoadingMore ? (
             <ActivityIndicator className="my-4" />
           ) : !history.hasMore ? (
-            <Text className={`py-4 text-center text-xs ${colors.gray6.text}`}>暂无更多</Text>
+            <Text className={`py-4 text-center text-xs ${theme.text.muted}`}>暂无更多</Text>
           ) : null
         ) : null
       }

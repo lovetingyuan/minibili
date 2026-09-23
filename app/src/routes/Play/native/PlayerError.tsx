@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 type PlayerErrorProps = {
   retrying: boolean;
@@ -11,7 +11,7 @@ export default function PlayerError(props: PlayerErrorProps) {
   return (
     <View className="absolute inset-0 items-center justify-center bg-black/80 px-8">
       {props.retrying ? (
-        <ActivityIndicator size="large" colorClassName={colors.secondary.accent} />
+        <ActivityIndicator size="large" colorClassName={theme.secondary.accent} />
       ) : (
         <>
           <Text className="text-lg font-bold text-white">视频加载失败</Text>
@@ -20,7 +20,7 @@ export default function PlayerError(props: PlayerErrorProps) {
           </Text>
           <Pressable
             accessibilityRole="button"
-            className="mt-4 rounded-full bg-sky-500 px-6 py-3"
+            className={`mt-4 rounded-full px-6 py-3 ${theme.primary.bg}`}
             onPress={props.onRetry}
           >
             <Text className="font-bold text-white">重试</Text>

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { Button, Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
 import type {
@@ -20,7 +20,7 @@ import type {
   DialogTitleProps,
 } from "./Dialog.types";
 
-const defaultPanelClassName = `w-[90%] max-w-lg rounded-xl p-5 ${colors.white.bg}`;
+const defaultPanelClassName = `w-[90%] max-w-lg rounded-xl p-5 ${theme.background.overlay}`;
 const defaultBackdropClassName = "bg-black/40";
 
 function DialogBase({
@@ -95,7 +95,7 @@ function DialogButton({ titleClassName, ...props }: DialogButtonProps) {
 }
 
 function DialogLoading({ className }: DialogLoadingProps) {
-  const color = useResolvedColor(colors.primary.accent);
+  const color = useResolvedColor(theme.primary.accent);
 
   return (
     <View className={`items-center justify-center py-5 ${className ?? ""}`}>

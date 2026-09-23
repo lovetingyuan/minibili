@@ -62,7 +62,7 @@ vi.mock('@/components/Avatar', () => ({ Avatar: 'Avatar' }))
 vi.mock('@/components/styled/rneui', () => ({ Text: 'Text' }))
 vi.mock('@/components/ThemedIcon', () => ({ ThemedIcon: 'ThemedIcon' }))
 vi.mock('lucide-react-native', () => ({ EllipsisVertical: 'EllipsisVertical' }))
-vi.mock('@/constants/colors.tw', () => import('../../constants/colors.tw'))
+vi.mock('@/constants/theme', () => import('../../constants/theme'))
 vi.mock('@/api/useBilibiliBlacklist', () => ({
   useBilibiliBlacklist: () => ({ blacklist: mocks.blacklist }),
 }))
@@ -327,7 +327,7 @@ describe('UP 主动态页头部标题', () => {
     const [symbol] = childElements(badge as TestElement)
     expect(symbol.props.className).toContain('font-bold')
     expect(symbol.props.className).toContain('text-sm')
-    expect(symbol.props.className).toContain('text-sky-600')
+    expect(symbol.props.className).toContain('text-[#008AC5]')
     expect(symbol.props.children).toBe('♂')
   })
 
@@ -341,7 +341,7 @@ describe('UP 主动态页头部标题', () => {
     const [symbol] = childElements(badge as TestElement)
     expect(symbol.props.className).toContain('font-bold')
     expect(symbol.props.className).toContain('text-sm')
-    expect(symbol.props.className).toContain('text-pink-500')
+    expect(symbol.props.className).toContain('text-[#FF6699]')
     expect(symbol.props.children).toBe('♀')
   })
 

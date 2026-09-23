@@ -2,7 +2,7 @@ import { Children } from "react";
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import useResolvedStyle from "@/hooks/useResolvedStyle";
 import { withAlpha } from "@/utils/color";
@@ -43,10 +43,10 @@ export function Button({
   type = "solid",
   ...pressableProps
 }: ButtonProps) {
-  const primaryColor = useResolvedColor(colors.primary.text);
-  const disabledBackgroundColor = useResolvedColor(colors.gray3.accent);
-  const disabledBorderColor = useResolvedColor(colors.gray4.accent);
-  const disabledTitleColor = useResolvedColor(colors.gray5.text);
+  const primaryColor = useResolvedColor(theme.primary.text);
+  const disabledBackgroundColor = useResolvedColor(theme.background.fillDisabled.accent);
+  const disabledBorderColor = useResolvedColor(theme.background.fillMuted.accent);
+  const disabledTitleColor = useResolvedColor(theme.text.disabled);
   const resolvedButtonClassName = useResolvedStyle(buttonClassName);
   const resolvedContainerClassName = useResolvedStyle(containerClassName);
   const resolvedTitleClassName = useResolvedStyle(titleClassName);

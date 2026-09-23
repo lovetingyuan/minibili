@@ -30,7 +30,7 @@ vi.mock("@/components/styled/rneui", () => ({
 }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ X: "X" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
   useStore: () => ({ repliesInfo: mocks.repliesInfo, setRepliesInfo: mocks.setRepliesInfo }),
 }));

@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { ReplyItemType } from "@/api/comments";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import type { CommentItemProps } from "./comment.types";
 
 const mocks = vi.hoisted(() => ({
@@ -24,7 +24,7 @@ vi.mock("react-native", () => ({
 vi.mock("expo-clipboard", () => ({ setStringAsync: mocks.clipboardSetStringAsync }));
 vi.mock("@/components/Avatar", () => ({ Avatar: "Avatar" }));
 vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
   useStore: () => ({
     setRepliesInfo: mocks.setRepliesInfo,
@@ -166,7 +166,7 @@ describe("Comment username style", () => {
   test("highlights the current account username with the theme color and bold weight", () => {
     const username = usernameOf(makeProps({ viewerMid: "999" }));
 
-    expect(username?.props.className).toContain(colors.primary.text);
+    expect(username?.props.className).toContain(theme.primary.text);
     expect(username?.props.className).toContain("font-bold");
     expect(username?.props.className).not.toContain("font-semibold");
   });
@@ -174,16 +174,16 @@ describe("Comment username style", () => {
   test("keeps the current account highlight when that account is also the UP owner", () => {
     const username = usernameOf(makeProps({ viewerMid: "999", ownerMid: "999" }));
 
-    expect(username?.props.className).toContain(colors.primary.text);
-    expect(username?.props.className).not.toContain(colors.secondary.text);
+    expect(username?.props.className).toContain(theme.primary.text);
+    expect(username?.props.className).not.toContain(theme.secondary.text);
   });
 
   test("keeps existing styles for other accounts", () => {
     const ordinaryUsername = usernameOf(makeProps({ viewerMid: "123" }));
     const ownerUsername = usernameOf(makeProps({ viewerMid: "123", ownerMid: "999" }));
 
-    expect(ordinaryUsername?.props.className).toContain(colors.gray7.text);
-    expect(ownerUsername?.props.className).toContain(colors.secondary.text);
+    expect(ordinaryUsername?.props.className).toContain(theme.text.secondary);
+    expect(ownerUsername?.props.className).toContain(theme.secondary.text);
     expect(ownerUsername?.props.className).toContain("font-semibold");
   });
 });
@@ -289,7 +289,7 @@ test("renders a pinned comment as a tag", () => {
 
   expect(tag?.type).toBe("View");
   expect(tag?.props.className).toContain("rounded");
-  expect(tag?.props.className).toContain("bg-pink-50");
+  expect(tag?.props.className).toContain("bg-[#FF6699]/10");
 });
 
 describe("Comment like count", () => {
@@ -452,7 +452,7 @@ describe("Comment card layout", () => {
     const [, replyGroup] = children(tree) as ReactElement<ElementProps>[];
 
     expect(replyGroup.type).toBe("View");
-    expect(replyGroup.props.className).toContain("bg-neutral-100");
+    expect(replyGroup.props.className).toContain("bg-slate-100");
   });
 
   test("makes the more-replies row full width with left-aligned text", () => {
@@ -464,7 +464,7 @@ describe("Comment card layout", () => {
     ) as ReactElement<ElementProps>;
 
     expect(viewAll.props.className).not.toContain("self-start");
-    expect(viewAll.props.className).toContain("active:bg-neutral-400/20");
+    expect(viewAll.props.className).toContain("active:bg-slate-400/20");
     expect(viewAll.props.className).not.toContain("items-center");
   });
 });

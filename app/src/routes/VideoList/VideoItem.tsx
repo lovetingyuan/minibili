@@ -8,7 +8,7 @@ import { CircleCheck, CirclePlay, CircleUserRound } from "lucide-react-native";
 import { useWindowDimensions, View } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 import { useFollowedUpsMap } from "@/store/derives";
 import { useWatchProgressRatio } from "@/store/watch-progress";
@@ -45,17 +45,23 @@ function VideoItem({ video }: { video: VideoItemType }) {
           contentFit="cover"
           source={{ uri: parseImgUrl(video.cover, coverSize) }}
         />
-        <View className="absolute m-1 items-center rounded-sm bg-gray-900/70 px-1  py-0.5">
+        <View className={`absolute m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}>
           <Text className="text-xs text-white">{parseDuration(video.duration)}</Text>
         </View>
-        <View className="absolute bottom-0 m-1 items-center rounded-sm bg-gray-900/70 px-1 py-0.5">
+        <View
+          className={`absolute bottom-0 m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}
+        >
           <Text className="text-xs text-white">{parseDate(video.date)}</Text>
         </View>
-        <View className="absolute right-0 top-0 m-1 items-center rounded-sm bg-gray-900/70 px-1  py-0.5">
+        <View
+          className={`absolute right-0 top-0 m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}
+        >
           <Text className="text-xs text-white">{parseNumber(video.danmuNum)}弹</Text>
         </View>
         {video.tag ? (
-          <View className="absolute bottom-0 right-0 m-1 items-center rounded-sm bg-gray-900/70 px-1 py-0.5">
+          <View
+            className={`absolute bottom-0 right-0 m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}
+          >
             <Text className={clsx("text-xs text-white", isBlackTag && "line-through opacity-60")}>
               {video.tag}
             </Text>
@@ -66,7 +72,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
       <View className="mt-3 flex-1 justify-between">
         <View className="h-10 justify-start">
           <Text
-            className={clsx("leading-5", isFollowed && ["font-bold", colors.primary.text])}
+            className={clsx("leading-5", isFollowed && ["font-bold", theme.primary.text])}
             numberOfLines={2}
           >
             {video.title}
@@ -75,9 +81,9 @@ function VideoItem({ video }: { video: VideoItemType }) {
         <View className="mt-2 flex-row items-center justify-between">
           <View className="shrink flex-row items-center">
             {isFollowed ? (
-              <ThemedIcon size={15} icon={CircleCheck} colorClassName={colors.secondary.accent} />
+              <ThemedIcon size={15} icon={CircleCheck} colorClassName={theme.secondary.accent} />
             ) : (
-              <ThemedIcon size={15} icon={CircleUserRound} colorClassName={colors.primary.accent} />
+              <ThemedIcon size={15} icon={CircleUserRound} colorClassName={theme.primary.accent} />
             )}
             <UpName
               mid={video.mid}
@@ -85,7 +91,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
               ellipsizeMode="tail"
               className={clsx(
                 "ml-1 shrink grow text-xs",
-                isFollowed ? ["font-bold", colors.secondary.text] : colors.primary.text,
+                isFollowed ? ["font-bold", theme.secondary.text] : theme.primary.text,
               )}
             >
               {video.name}

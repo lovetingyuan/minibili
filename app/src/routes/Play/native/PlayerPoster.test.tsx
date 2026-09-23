@@ -10,8 +10,8 @@ vi.mock("react-native", () => ({
   View: "View",
 }));
 
-vi.mock("@/constants/colors.tw", () => ({
-  colors: { secondary: { accent: "accent-pink-500 dark:accent-pink-400" } },
+vi.mock("@/constants/theme", () => ({
+  theme: { secondary: { accent: "accent-[#FF6699]" } },
 }));
 
 vi.mock("@/utils", () => ({
@@ -21,7 +21,7 @@ vi.mock("@/utils", () => ({
 
 import PlayerPoster from "./PlayerPoster";
 
-const ACCENT_COLOR = "accent-pink-500 dark:accent-pink-400";
+const ACCENT_COLOR = "accent-[#FF6699]";
 
 type ElementProps = {
   accessibilityLabel?: string;

@@ -8,7 +8,7 @@ import type {
   TextStyle,
 } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import useResolvedStyle from "@/hooks/useResolvedStyle";
 
@@ -108,7 +108,7 @@ const nativeTextBaseStyle = Platform.select<TextStyle>({
 });
 
 export function Text({ className, style, accessibilityRole = "text", ...props }: TextProps) {
-  const defaultColorStyle = useResolvedStyle(colors.black.text);
+  const defaultColorStyle = useResolvedStyle(theme.text.primary);
   const resolvedStyle = useResolvedStyle(className);
 
   return (

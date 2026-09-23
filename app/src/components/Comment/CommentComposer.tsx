@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ArrowUp, X } from "lucide-react-native";
 
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 import type { CommentComposerProps } from "./comment-composer.types";
 
@@ -32,7 +32,7 @@ export default function CommentComposer(props: CommentComposerProps) {
 
   return (
     <View
-      className="flex-row items-center gap-2 border-t border-neutral-100 bg-white px-3 pt-2 dark:border-neutral-800 dark:bg-neutral-950"
+      className="flex-row items-center gap-2 border-t border-slate-100 bg-white px-3 pt-2 dark:border-slate-800 dark:bg-slate-950"
       style={{ paddingBottom: Math.max(insets.bottom, 8) }}
     >
       <TextInput
@@ -41,13 +41,13 @@ export default function CommentComposer(props: CommentComposerProps) {
         multiline
         autoFocus
         placeholder="发一条友善的评论"
-        className="max-h-28 min-h-9 flex-1 rounded-3xl bg-neutral-100 px-4 py-2 text-[15px] text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100"
+        className="max-h-28 min-h-9 flex-1 rounded-3xl bg-slate-100 px-4 py-2 text-[15px] text-slate-900 dark:bg-slate-800 dark:text-slate-100"
         accessibilityLabel="评论输入框"
         onChangeText={(value) => setDraft([...value].slice(0, MAX_COMMENT_LENGTH).join(""))}
         onSubmitEditing={() => void submit()}
       />
       <Pressable
-        className={`h-9 w-9 items-center justify-center rounded-full ${canSubmit ? colors.primary.bg : colors.gray3.bg}`}
+        className={`h-9 w-9 items-center justify-center rounded-full ${canSubmit ? theme.primary.bg : theme.background.fillDisabled.bg}`}
         accessibilityRole="button"
         accessibilityLabel="发送评论"
         accessibilityState={{ disabled: !canSubmit, busy: props.pending }}
@@ -55,9 +55,9 @@ export default function CommentComposer(props: CommentComposerProps) {
         onPress={() => void submit()}
       >
         {props.pending ? (
-          <ActivityIndicator size="small" colorClassName={colors.coverBadge.accent} />
+          <ActivityIndicator size="small" colorClassName={theme.mediaBadge.accent} />
         ) : (
-          <ThemedIcon icon={ArrowUp} size={18} colorClassName={colors.coverBadge.accent} />
+          <ThemedIcon icon={ArrowUp} size={18} colorClassName={theme.mediaBadge.accent} />
         )}
       </Pressable>
       <Pressable
@@ -66,7 +66,7 @@ export default function CommentComposer(props: CommentComposerProps) {
         accessibilityLabel="关闭评论输入框"
         onPress={props.onClose}
       >
-        <ThemedIcon icon={X} size={20} colorClassName={colors.gray7.accent} />
+        <ThemedIcon icon={X} size={20} colorClassName={theme.icon.secondary} />
       </Pressable>
     </View>
   );

@@ -74,7 +74,7 @@ vi.mock("@/components/styled/rneui", () => ({
   Skeleton: "Skeleton",
   Text: "Text",
 }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/hooks/useUpdateNavigationOptions", () => ({ default: vi.fn() }));
 vi.mock("@/store/actions", () => ({ useMarkFollowingDynamicsRead: vi.fn() }));
 vi.mock("./Header", () => ({ headerRight: vi.fn(), headerTitle: vi.fn() }));

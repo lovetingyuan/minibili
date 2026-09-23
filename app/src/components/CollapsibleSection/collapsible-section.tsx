@@ -13,7 +13,7 @@ import Animated, {
 import type { CollapsibleSectionProps } from './collapsible-section.types'
 
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { colors } from '@/constants/colors.tw'
+import { theme } from "@/constants/theme";
 
 export function CollapsibleSection({
   children,
@@ -45,10 +45,10 @@ export function CollapsibleSection({
         onPress={onPress}
       >
         <View className="flex-1 items-start justify-center">
-          <Text className={`text-base ios:text-[17px] ${colors.black.text}`}>{title}</Text>
+          <Text className={`text-base ios:text-[17px] ${theme.text.primary}`}>{title}</Text>
         </View>
         <Animated.View style={iconStyle}>
-          <ThemedIcon size={18} icon={ChevronDown} colorClassName={colors.gray6.accent} />
+          <ThemedIcon size={18} icon={ChevronDown} colorClassName={theme.icon.muted} />
         </Animated.View>
       </Pressable>
       {expanded ? (

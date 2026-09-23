@@ -5,7 +5,7 @@ vi.mock("react-native", () => ({
   TouchableHighlight: "TouchableHighlight",
 }));
 
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 
 import {
   createMenuOptionsCustomStyles,

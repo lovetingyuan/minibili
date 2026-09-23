@@ -5,7 +5,7 @@ import { useBilibiliBlacklist } from "@/api/useBilibiliBlacklist";
 import { Chip } from "@/components/Chip";
 import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 export default function Blacklist() {
   const [expanded, setExpanded] = React.useState(false);
@@ -23,10 +23,10 @@ export default function Blacklist() {
           {loading ? (
             <View className="flex-row items-center gap-2 py-2">
               <ActivityIndicator accessibilityLabel="正在加载黑名单" />
-              <Text className={`text-sm ${colors.gray6.text}`}>黑名单加载中</Text>
+              <Text className={`text-sm ${theme.text.muted}`}>黑名单加载中</Text>
             </View>
           ) : !account ? (
-            <Text className={`text-sm ${colors.gray6.text}`}>登录 B站后查看黑名单</Text>
+            <Text className={`text-sm ${theme.text.muted}`}>登录 B站后查看黑名单</Text>
           ) : (
             <>
               <View className="flex-row flex-wrap">
@@ -43,10 +43,10 @@ export default function Blacklist() {
                 ))}
               </View>
               {error ? (
-                <Text className={`text-sm ${colors.error.text}`}>黑名单加载失败</Text>
+                <Text className={`text-sm ${theme.error.text}`}>黑名单加载失败</Text>
               ) : null}
               {!error && blacklist.size === 0 ? (
-                <Text className={`py-2 text-sm ${colors.gray6.text}`}>暂无黑名单用户</Text>
+                <Text className={`py-2 text-sm ${theme.text.muted}`}>暂无黑名单用户</Text>
               ) : null}
             </>
           )}

@@ -20,7 +20,7 @@ vi.mock("react-native", () => ({
 vi.mock("@/components/Avatar", () => ({ Avatar: "Avatar" }));
 vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/hooks/useFollowActions", () => ({
   useFollowActions: () => ({ disabled: mocks.followDisabled }),
 }));
@@ -95,7 +95,7 @@ test("没有设置分组入口时只展示关注与头像操作", () => {
 test("特别关注的 UP 名称使用主题色并加粗", () => {
   const highlighted = FollowItem({ item, highlight: true }).props.children[1];
   expect(highlighted.props.className).toContain("font-bold");
-  expect(highlighted.props.className).toContain("text-sky-600");
+  expect(highlighted.props.className).toContain("text-[#008AC5]");
   const plain = FollowItem({ item }).props.children[1];
   expect(plain.props.className).not.toContain("font-bold");
 });
@@ -108,7 +108,7 @@ function avatarArea() {
 
 function findDot() {
   const children = avatarArea().props.children as AvatarChild[];
-  return children.find((child) => child?.props?.className?.includes("bg-pink-400"));
+  return children.find((child) => child?.props?.className?.includes("bg-[#FF6699]"));
 }
 
 test("有未读动态的 UP 头像右上角显示小红点", () => {
@@ -120,7 +120,7 @@ test("有未读动态的 UP 头像右上角显示小红点", () => {
   expect(dot?.props?.className).toContain("absolute");
   expect(dot?.props?.className).toContain("rounded-full");
   expect(dot?.props?.className).toContain("h-3.5 w-3.5");
-  expect(dot?.props?.className).toContain("bg-pink-400");
+  expect(dot?.props?.className).toContain("bg-[#FF6699]");
 });
 
 test("直播中的 UP 在直播蒙层之上仍然显示小红点", () => {
@@ -128,7 +128,7 @@ test("直播中的 UP 在直播蒙层之上仍然显示小红点", () => {
   mocks.livingUps = { "456": "https://live.bilibili.com/25334922" };
 
   const children = avatarArea().props.children as AvatarChild[];
-  expect(children.some((child) => child?.props?.className?.includes("bg-neutral-950/60"))).toBe(
+  expect(children.some((child) => child?.props?.className?.includes("bg-slate-950/60"))).toBe(
     true,
   );
   expect(findDot()).toBeDefined();

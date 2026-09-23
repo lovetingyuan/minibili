@@ -27,7 +27,7 @@ vi.mock("lucide-react-native", () => ({
   ThumbsUp: "ThumbsUp",
 }));
 vi.mock("@/components/styled/expo", () => ({ Image: "Image" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({ useStore: () => ({ setOverlayButtons: vi.fn() }) }));
 vi.mock("@/store/derives", () => ({ useFollowedUpsMap: () => ({}) }));
 vi.mock("@/utils/watch-time", () => import("../../utils/watch-time"));
@@ -47,7 +47,7 @@ vi.mock("@/utils", async () => {
 
 import VideoListItem from "./VideoItem";
 import { WatchProgressBar } from "../WatchProgressBar";
-import { colors } from "../../constants/colors.tw";
+import { theme } from "../../constants/theme";
 
 function text(node: ReactNode): string {
   return React.Children.toArray(node)
@@ -101,7 +101,7 @@ test("search highlight tags stay in the list but not in the Play params", () => 
   // 列表里高亮词仍按分段渲染，并且普通文本里的实体已解码
   expect(text(row)).toContain("原神攻略&");
   expect(
-    elements(row).some((element) => element.props.className === colors.secondary.text),
+    elements(row).some((element) => element.props.className === theme.secondary.text),
   ).toBe(true);
 
   row.props.onPress();

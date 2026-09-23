@@ -5,7 +5,7 @@ import { Alert, Pressable, View } from 'react-native';
 
 import { Avatar } from '@/components/Avatar';
 import { Text } from '@/components/styled/rneui';
-import { colors } from '@/constants/colors.tw';
+import { theme } from "@/constants/theme";
 import { useStore } from '@/store';
 import type { NavigationProps } from '@/types';
 import { getImagePixelSize, parseImgUrl, parseNumber, showToast } from '@/utils';
@@ -120,7 +120,7 @@ export function CommentItem(props: CommentItemProps) {
             size={compact ? 24 : 28}
             source={comment.face ? { uri: parseImgUrl(comment.face, getImagePixelSize(compact ? 24 : 28)) } : undefined}
             title={comment.name.slice(0, 1)}
-            containerClassName="bg-neutral-200 dark:bg-neutral-700"
+            containerClassName="bg-slate-200 dark:bg-slate-700"
           />
         </Pressable>
         <View className="min-w-0 flex-1">
@@ -131,24 +131,24 @@ export function CommentItem(props: CommentItemProps) {
               className={clsx(
                 'shrink text-sm',
                 isViewer
-                  ? ['font-bold', colors.primary.text]
-                  : ['font-semibold', isOwner ? colors.secondary.text : colors.gray7.text],
+                  ? ['font-bold', theme.primary.text]
+                  : ['font-semibold', isOwner ? theme.secondary.text : theme.text.secondary],
               )}
             >
               {comment.name}
             </UpName>
-            {isOwner ? <Text className={`text-[10px] font-bold ${colors.secondary.text}`}>UP</Text> : null}
+            {isOwner ? <Text className={`text-[10px] font-bold ${theme.secondary.text}`}>UP</Text> : null}
             {comment.top ? (
               <View
                 accessibilityLabel="置顶标签"
-                className="shrink-0 rounded bg-pink-50 px-1.5 py-0.5 dark:bg-pink-950/40"
+                className={`shrink-0 rounded px-1.5 py-0.5 ${theme.secondary.tint}`}
               >
-                <Text className={`text-[10px] font-bold leading-3.5 ${colors.secondary.text}`}>置顶</Text>
+                <Text className={`text-[10px] font-bold leading-3.5 ${theme.secondary.text}`}>置顶</Text>
               </View>
             ) : null}
             <View className="ml-auto shrink-0 flex-row items-center gap-2">
               {meta ? (
-                <Text numberOfLines={1} className={`text-[11px] ${colors.gray6.text}`}>
+                <Text numberOfLines={1} className={`text-[11px] ${theme.text.muted}`}>
                   {meta}
                 </Text>
               ) : null}
@@ -162,7 +162,7 @@ export function CommentItem(props: CommentItemProps) {
                   hitSlop={8}
                   onPress={confirmDelete}
                 >
-                  <Text className={`text-[11px] font-medium ${deletePending ? colors.gray6.text : colors.error.text}`}>
+                  <Text className={`text-[11px] font-medium ${deletePending ? theme.text.muted : theme.error.text}`}>
                     删除
                   </Text>
                 </Pressable>
@@ -211,19 +211,19 @@ export function Comment(props: CommentProps) {
   const moreRepliesButton =
     comment.rcount > 0 ? (
       <Pressable
-        className={clsx('-mx-2 rounded-lg px-2 py-1.5 active:bg-neutral-400/20', !comment.replies.length && 'mt-2')}
+        className={clsx('-mx-2 rounded-lg px-2 py-1.5 active:bg-slate-400/20', !comment.replies.length && 'mt-2')}
         accessibilityRole="button"
         accessibilityLabel={`查看全部 ${comment.rcount} 条回复`}
         onPress={() => openReplies(comment, false)}
       >
-        <Text className={`text-sm font-medium ${colors.primary.text}`}>
+        <Text className={`text-sm font-medium ${theme.primary.text}`}>
           {comment.moreText || `查看全部 ${comment.rcount} 条回复`} ›
         </Text>
       </Pressable>
     ) : null;
 
   return (
-    <View className={clsx('bg-white p-3 dark:bg-neutral-900', props.first ? 'rounded-b-2xl' : 'rounded-2xl')}>
+    <View className={clsx('bg-white p-3 dark:bg-slate-900', props.first ? 'rounded-b-2xl' : 'rounded-2xl')}>
       <CommentItem
         comment={comment}
         ownerMid={props.ownerMid}
@@ -235,7 +235,7 @@ export function Comment(props: CommentProps) {
         isAttitudePending={props.isAttitudePending}
       />
       {comment.replies.length ? (
-        <View className="mt-3 gap-3 rounded-2xl bg-neutral-100 p-3 dark:bg-neutral-800">
+        <View className="mt-3 gap-3 rounded-2xl bg-slate-100 p-3 dark:bg-slate-800">
           {comment.replies.map((reply) => (
             <CommentItem
               key={reply.id}

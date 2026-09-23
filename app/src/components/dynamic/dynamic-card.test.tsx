@@ -11,7 +11,7 @@ vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),
 }));
 vi.mock("react-native", () => ({ Pressable: "Pressable", View: "View" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/utils", () => ({
   getImagePixelSize: (size: number) => size,
   parseDate: String,
@@ -125,7 +125,7 @@ test("renders a pinned dynamic as a tag", () => {
 
   expect(tag?.type).toBe("View");
   expect(tag?.props.className).toContain("rounded");
-  expect(tag?.props.className).toContain("bg-pink-50");
+  expect(tag?.props.className).toContain("bg-[#FF6699]/10");
 });
 
 test("renders the OPUS title above the body text", () => {

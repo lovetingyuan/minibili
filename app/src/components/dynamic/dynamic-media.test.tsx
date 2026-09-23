@@ -35,7 +35,7 @@ vi.mock("../styled/expo", () => ({ Image: "Image" }));
 vi.mock("../styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ Play: "Play" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
   useStore: () => ({
     setCurrentImageIndex: mocks.setCurrentImageIndex,
@@ -331,7 +331,7 @@ describe("DynamicMedia image sizing", () => {
 
     expect(naturalImage.props.contentFit).toBe("contain");
     expect(naturalImage.props.style?.aspectRatio).toBe(800 / 3000);
-    expect(naturalImage.props.className).toContain("bg-neutral-100");
+    expect(naturalImage.props.className).toContain("bg-slate-100");
 
     const croppedGrid = DynamicImageGrid({ images: tall, detail: true });
     const [croppedPressable] = children(

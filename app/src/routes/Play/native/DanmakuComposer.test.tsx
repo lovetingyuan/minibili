@@ -18,8 +18,8 @@ vi.mock("@/components/styled/rneui", () => ({
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ ArrowUp: "ArrowUp", X: "X" }));
 
-vi.mock("@/constants/colors.tw", () => ({
-  colors: { primary: { bg: "bg-primary" } },
+vi.mock("@/constants/theme", () => ({
+  theme: { primary: { bg: "bg-primary" } },
 }));
 
 import {

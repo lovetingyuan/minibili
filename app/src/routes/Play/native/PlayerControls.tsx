@@ -1,5 +1,5 @@
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import { Maximize, Minimize, Pause, Play } from "lucide-react-native";
 import type { LucideIcon } from "lucide-react-native";
@@ -115,7 +115,7 @@ function CharacterButton(props: {
 
 export default function PlayerControls(props: PlayerControlsProps) {
   const { paused, danmakuEnabled, fullscreen, visible } = props;
-  const accentColor = useResolvedColor(colors.secondary.text) ?? "#ff6699";
+  const accentColor = useResolvedColor(theme.secondary.text) ?? "#ff6699";
   const insets = useSafeAreaInsets();
   const [trackWidth, setTrackWidth] = React.useState(0);
   const [scrubMs, setScrubMs] = React.useState<number | null>(null);
@@ -274,12 +274,12 @@ export default function PlayerControls(props: PlayerControlsProps) {
             >
               <View className="h-[3px] w-full rounded bg-white/30">
                 <View
-                  className="h-[3px] rounded bg-pink-400"
+                  className={`h-[3px] rounded ${theme.secondary.bg}`}
                   style={{ width: `${progress * 100}%` }}
                 />
               </View>
               <View
-                className="absolute top-2 h-3 w-3 rounded-full bg-pink-400"
+                className={`absolute top-2 h-3 w-3 rounded-full ${theme.secondary.bg}`}
                 style={{ left: Math.max(0, progress * trackWidth - 6) }}
               />
             </View>

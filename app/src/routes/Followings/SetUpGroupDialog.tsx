@@ -6,7 +6,7 @@ import { useBilibiliUpRelationTags } from "@/api/useBilibiliRelationTags";
 import { CheckBox } from "@/components/CheckBox";
 import { Dialog } from "@/components/Dialog";
 import { Button, Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 import type { SetUpGroupDialogProps } from "./FollowGroups.types";
 
@@ -65,7 +65,7 @@ export default function SetUpGroupDialog({
   return (
     <Dialog visible onClose={submitting ? undefined : onClose}>
       <Dialog.Title title="设置分组" />
-      <Text className={`mb-2 text-sm ${colors.gray6.text}`} numberOfLines={1}>
+      <Text className={`mb-2 text-sm ${theme.text.muted}`} numberOfLines={1}>
         {up.name}
       </Text>
       {current.data === undefined ? (
@@ -97,18 +97,18 @@ export default function SetUpGroupDialog({
                 toggle(group.tagid);
               }}
               containerClassName="bg-transparent py-1 pl-0"
-              textClassName={colors.gray8.text}
-              checkedColorClassName={colors.primary.accent}
+              textClassName={theme.text.primary}
+              checkedColorClassName={theme.primary.accent}
             />
           ))}
         </ScrollView>
       ) : (
-        <Text className={`py-4 text-sm ${colors.gray6.text}`}>
+        <Text className={`py-4 text-sm ${theme.text.muted}`}>
           还没有可选分组，请先在关注页新建分组
         </Text>
       )}
       {error ? (
-        <Text accessibilityRole="alert" className={`mt-2 text-sm ${colors.error.text}`}>
+        <Text accessibilityRole="alert" className={`mt-2 text-sm ${theme.error.text}`}>
           {error.message}
         </Text>
       ) : null}
@@ -123,7 +123,7 @@ export default function SetUpGroupDialog({
         />
         <Dialog.Button
           title="取消"
-          titleClassName={colors.gray6.text}
+          titleClassName={theme.text.muted}
           disabled={submitting}
           onPress={onClose}
         />

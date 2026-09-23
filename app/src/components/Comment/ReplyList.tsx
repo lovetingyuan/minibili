@@ -9,7 +9,7 @@ import type { ReplyItemType } from "@/api/replies";
 import { BottomSheet } from "@/components/styled/bottom-sheet";
 import { FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useStore } from "@/store";
 
 import { CommentItem } from "./Comment";
@@ -136,8 +136,8 @@ export default function ReplyList(props: ReplyListProps) {
       visible={Boolean(repliesInfo)}
     >
       {/* flex-1 撑满 sheet 的内容区（sheet 高度已扣除把手），不要再写死高度 */}
-      <View className="flex-1 overflow-hidden rounded-t-[28px] bg-white dark:bg-neutral-950">
-        <View className="relative h-12 flex-row items-center justify-center border-b border-neutral-100 px-4 dark:border-neutral-800">
+      <View className={`flex-1 overflow-hidden rounded-t-[28px] ${theme.background.surface}`}>
+        <View className="relative h-12 flex-row items-center justify-center border-b border-slate-100 px-4 dark:border-slate-800">
           <Text className="text-base font-semibold tabular-nums">
             {typeof allCount === "number" ? `${allCount} 条回复` : "回复"}
           </Text>
@@ -147,7 +147,7 @@ export default function ReplyList(props: ReplyListProps) {
             accessibilityLabel="关闭评论详情"
             onPress={handleClose}
           >
-            <ThemedIcon icon={X} size={21} colorClassName={colors.gray7.accent} />
+            <ThemedIcon icon={X} size={21} colorClassName={theme.icon.secondary} />
           </Pressable>
         </View>
         <FlashList
@@ -155,20 +155,20 @@ export default function ReplyList(props: ReplyListProps) {
           data={replies.data.replies}
           keyExtractor={(item: ReplyItemType) => item.id}
           renderItem={({ item }: { item: ReplyItemType }) => (
-            <View className="border-b border-neutral-100 px-6 py-4 dark:border-neutral-800">
+            <View className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
               <CommentItem comment={item} {...rowProps} />
             </View>
           )}
           ListHeaderComponent={
             root ? (
               <View className="px-3 pb-2 pt-3">
-                <Text className={`mb-2 px-1 text-xs font-medium ${colors.gray6.text}`}>原评论</Text>
-                <View className="rounded-2xl bg-neutral-50 p-3 dark:bg-neutral-900">
+                <Text className={`mb-2 px-1 text-xs font-medium ${theme.text.muted}`}>原评论</Text>
+                <View className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-900">
                   <CommentItem comment={root} {...rowProps} />
                 </View>
                 <View className="flex-row items-center justify-between px-1 pb-1 pt-4">
                   <Text className="text-sm font-semibold">全部回复</Text>
-                  <Text className={`text-xs tabular-nums ${colors.gray6.text}`}>
+                  <Text className={`text-xs tabular-nums ${theme.text.muted}`}>
                     {typeof allCount === "number" ? allCount : ""}
                   </Text>
                 </View>
@@ -178,7 +178,7 @@ export default function ReplyList(props: ReplyListProps) {
           ListEmptyComponent={
             replies.isLoading ? (
               <View className="h-40 items-center justify-center">
-                <ActivityIndicator size="large" colorClassName={colors.primary.accent} />
+                <ActivityIndicator size="large" colorClassName={theme.primary.accent} />
               </View>
             ) : (
               <Text className="my-10 text-center text-sm">

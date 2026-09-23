@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { Pressable, Text, View } from "react-native";
 
-import { colors } from "../../constants/colors.tw";
+import { theme } from "../../constants/theme";
 
 import type { ChipProps } from "./Chip.types";
 
@@ -31,7 +31,7 @@ export function Chip({
       <Text
         className={clsx(
           "px-0.5 text-sm",
-          type === "outline" ? colors.primary.text : "text-white",
+          type === "outline" ? theme.primary.text : "text-white",
           titleClassName,
         )}
         style={titleStyle}
@@ -55,7 +55,7 @@ export function Chip({
         accessibilityState={{ ...accessibilityState, disabled: isDisabled }}
         className={clsx(
           "flex-row items-center justify-center gap-1 rounded-full px-3 py-1",
-          type === "outline" ? `border bg-transparent ${colors.primary.border}` : colors.primary.bg,
+          type === "outline" ? `border bg-transparent ${theme.primary.border}` : theme.primary.bg,
           onPress && "active:opacity-70",
           isDisabled && "opacity-50",
           buttonClassName,

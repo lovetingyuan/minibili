@@ -10,7 +10,7 @@ import { ActivityIndicator, TouchableOpacity, useWindowDimensions, View } from "
 
 import type { VideoCoverProps, VideoListItemProps } from "./VideoItem.types";
 import { WatchProgressBar } from "../WatchProgressBar";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useStore } from "@/store";
 import { useFollowedUpsMap } from "@/store/derives";
 import type { VideoListItemInfo, NavigationProps } from "@/types";
@@ -56,7 +56,7 @@ function VideoCover({ uri }: VideoCoverProps) {
         <View className="absolute inset-0 items-center justify-center">
           <ActivityIndicator
             accessibilityLabel="视频封面加载中"
-            colorClassName={colors.secondary.accent}
+            colorClassName={theme.secondary.accent}
           />
         </View>
       ) : null}
@@ -116,7 +116,9 @@ function VideoListItem<T extends VideoListItemInfo>({
         <View className="relative aspect-8/5 w-full content-center justify-center">
           {/* key 让封面地址变化时重置加载状态，避免在 effect 中回写 state */}
           <VideoCover key={coverUri} uri={coverUri} />
-          <View className="absolute right-0 top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
+          <View
+            className={`absolute right-0 top-0 m-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}
+          >
             <Text className="text-xs font-thin text-white">
               {typeof video.duration === "string"
                 ? parseDurationStr(video.duration)
@@ -124,22 +126,24 @@ function VideoListItem<T extends VideoListItemInfo>({
             </Text>
           </View>
           {video.date ? (
-            <View className="absolute top-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
+            <View className={`absolute top-0 m-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}>
               <Text className="text-xs font-thin text-white">{parseDate(video.date)}</Text>
             </View>
           ) : null}
           {playCountOnCover && isDefined(video.play) ? (
             <View
-              className={`absolute bottom-0 left-0 m-1 flex-row items-center gap-1 rounded-sm px-1 py-[1px] ${colors.coverBadge.bg}`}
+              className={`absolute bottom-0 left-0 m-1 flex-row items-center gap-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}
             >
-              <ThemedIcon icon={CirclePlay} size={12} colorClassName={colors.coverBadge.accent} />
-              <Text className={`text-xs font-thin ${colors.coverBadge.text}`}>
+              <ThemedIcon icon={CirclePlay} size={12} colorClassName={theme.mediaBadge.accent} />
+              <Text className={`text-xs font-thin ${theme.mediaBadge.text}`}>
                 {parseNumber(video.play)}
               </Text>
             </View>
           ) : null}
           {isDefined(video.danmaku) ? (
-            <View className="absolute bottom-0 right-0 m-1 rounded-sm bg-gray-900/70 px-1 py-[1px]">
+            <View
+              className={`absolute bottom-0 right-0 m-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}
+            >
               <Text className="text-xs font-thin text-white">{parseNumber(video.danmaku)}弹</Text>
             </View>
           ) : null}
@@ -148,39 +152,39 @@ function VideoListItem<T extends VideoListItemInfo>({
       </View>
       <View className="flex-[4] justify-between">
         <Text className="text-base" numberOfLines={2} ellipsizeMode="tail">
-          {extractTextWithEmTags(video.title, colors.secondary.text)}
+          {extractTextWithEmTags(video.title, theme.secondary.text)}
         </Text>
         <View className="gap-1">
           <View className="min-w-0 flex-row items-center gap-1">
             <ThemedIcon
               icon={isFollowed ? CircleCheck : CircleUserRound}
               size={16}
-              colorClassName={isFollowed ? colors.secondary.accent : colors.gray7.accent}
+              colorClassName={isFollowed ? theme.secondary.accent : theme.icon.secondary}
             />
             <UpName
               mid={video.mid}
               numberOfLines={1}
               ellipsizeMode="tail"
-              className={`min-w-0 flex-1 ${isFollowed ? colors.secondary.text : colors.primary.text}`}
+              className={`min-w-0 flex-1 ${isFollowed ? theme.secondary.text : theme.primary.text}`}
             >
               {video.name}
             </UpName>
           </View>
           {watchedAt !== undefined ? (
-            <Text className={`text-xs ${colors.gray6.text}`}>{formatWatchTime(watchedAt)}</Text>
+            <Text className={`text-xs ${theme.text.muted}`}>{formatWatchTime(watchedAt)}</Text>
           ) : null}
           {isDefined(video.play) && (!playCountOnCover || isDefined(video.like)) ? (
             <View className="min-w-20 shrink-0 flex-row flex-wrap items-center gap-x-3">
               {!playCountOnCover ? (
                 <View className="flex-row items-center gap-1">
-                  <ThemedIcon icon={CirclePlay} size={15} colorClassName={colors.gray6.accent} />
-                  <Text className={colors.gray6.text}>{parseNumber(video.play)}</Text>
+                  <ThemedIcon icon={CirclePlay} size={15} colorClassName={theme.icon.muted} />
+                  <Text className={theme.text.muted}>{parseNumber(video.play)}</Text>
                 </View>
               ) : null}
               {isDefined(video.like) ? (
                 <View className="flex-row items-center gap-1">
-                  <ThemedIcon icon={ThumbsUp} colorClassName={colors.gray6.accent} size={15} />
-                  <Text className={colors.gray6.text}>{parseNumber(video.like)}</Text>
+                  <ThemedIcon icon={ThumbsUp} colorClassName={theme.icon.muted} size={15} />
+                  <Text className={theme.text.muted}>{parseNumber(video.like)}</Text>
                 </View>
               ) : null}
             </View>

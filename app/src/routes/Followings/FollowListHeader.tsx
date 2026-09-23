@@ -4,7 +4,7 @@ import { View } from "react-native";
 
 import { Button } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import type { MainTabNavigationProp } from "@/types";
 
@@ -24,7 +24,7 @@ function SearchUpButton() {
           navigation.navigate("SearchUps");
         }}
       >
-        <ThemedIcon icon={Search} colorClassName={colors.gray7.accent} size={24} />
+        <ThemedIcon icon={Search} colorClassName={theme.icon.secondary} size={24} />
       </Button>
     </View>
   );

@@ -16,7 +16,7 @@ vi.mock("@/components/styled/rneui", () => ({
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ History: "History" }));
 vi.mock("@/components/VideoItem", () => ({ default: "VideoListItem" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/utils/watch-time", () => import("../../utils/watch-time"));
 
 import HistoryContent from "./HistoryContent";

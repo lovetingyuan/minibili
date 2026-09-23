@@ -4,12 +4,16 @@ import { Alert } from 'react-native';
 
 import { useAppUpdateInfo } from '@/api/check-update';
 import { serverUrl } from '@/constants';
+import useResolvedColor from '@/hooks/useResolvedColor';
+import useTheme from '@/hooks/useTheme';
 
 import TextAction from './TextAction';
 
 export default Version;
 
 function Version() {
+  const theme = useTheme();
+  const updateHighlightColor = useResolvedColor(theme.secondary.text);
   const updateTime: string = Updates.createdAt
     ? `${Updates.createdAt.toLocaleDateString()} ${Updates.createdAt.toLocaleTimeString()}`
     : Constants.expoConfig?.extra?.buildTime;
@@ -43,7 +47,7 @@ function Version() {
           text: hasUpdate ? 'APP有更新🎉' : '检查更新',
           loading: hasUpdate ? false : checkingUpdate,
           onPress: handleCheckUpdate,
-          color: hasUpdate ? '#FF6699' : undefined,
+          color: hasUpdate ? updateHighlightColor : undefined,
         },
       ]}
     />

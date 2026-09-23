@@ -12,6 +12,7 @@ import {
 import { useUserInfo } from "@/api/user-info";
 import { DynamicList } from "@/components/dynamic/dynamic-list";
 import { useOpenDynamicItem } from "@/components/dynamic/use-open-dynamic-item";
+import { theme } from "@/constants/theme";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import { useMarkFollowingDynamicsRead } from "@/store/actions";
 import type { RootStackParamList, UpInfo } from "@/types";
@@ -94,7 +95,7 @@ function Dynamic({ route }: Props) {
   useMarkFollowingDynamicsRead(upId);
 
   if (!user) {
-    return <View className="flex-1 bg-neutral-100 dark:bg-black" />;
+    return <View className={`flex-1 ${theme.background.page}`} />;
   }
 
   function markVisited(key: SpaceTabKey) {
@@ -134,7 +135,7 @@ function Dynamic({ route }: Props) {
   }));
 
   return (
-    <View className="flex-1 bg-neutral-100 dark:bg-black">
+    <View className={`flex-1 ${theme.background.page}`}>
       <SpaceTabs tabs={tabs} selectedKey={selectedKey} onSelect={selectTab} />
       <PagerView
         ref={pagerRef}

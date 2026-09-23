@@ -6,7 +6,7 @@ import { Pressable, View } from "react-native";
 import { Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import UpName from "@/components/UpName";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import type { NavigationProps } from "@/types";
 
 import { shouldCollapseDescription, VIDEO_DESCRIPTION_COLLAPSED_LINES } from "./description";
@@ -17,7 +17,7 @@ import type { VideoDescriptionProps, VideoDescriptionViewProps } from "./VideoDe
  * 高度与 leading-6 的行高一致，正好对齐最后一行。
  */
 const COLLAPSED_TOGGLE_CLASS =
-  "absolute bottom-2.5 right-3 bg-neutral-50 pl-1.5 dark:bg-neutral-900";
+  "absolute bottom-2.5 right-3 bg-slate-50 pl-1.5 dark:bg-slate-900";
 const EXPANDED_TOGGLE_CLASS = "mt-1 self-end px-1";
 
 export function VideoDescriptionView(props: VideoDescriptionViewProps) {
@@ -29,10 +29,10 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
   const isCollapsed = collapsible && Boolean(collapsed);
 
   return (
-    <View className="relative mt-3 rounded-xl bg-neutral-50 px-3 py-2.5 dark:bg-neutral-900">
+    <View className="relative mt-3 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-slate-900">
       <Text
         selectable
-        className={`text-sm leading-6 ${colors.gray7.text}`}
+        className={`text-sm leading-6 ${theme.text.secondary}`}
         numberOfLines={isCollapsed ? VIDEO_DESCRIPTION_COLLAPSED_LINES : undefined}
       >
         {nodes?.length
@@ -44,7 +44,7 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
                   <UpName
                     accessibilityLabel={`查看UP主 ${node.rawText} 的主页`}
                     accessibilityRole="link"
-                    className={colors.primary.text}
+                    className={theme.primary.text}
                     key={key}
                     mid={node.bizId}
                     onPress={() => onMentionPress(node)}
@@ -54,7 +54,7 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
                 );
               }
               return (
-                <Text className={colors.gray7.text} key={key}>
+                <Text className={theme.text.secondary} key={key}>
                   {nodeText}
                 </Text>
               );
@@ -71,13 +71,13 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
           hitSlop={8}
           onPress={onToggle}
         >
-          <Text className={`text-xs font-medium ${colors.primary.text}`}>
+          <Text className={`text-xs font-medium ${theme.primary.text}`}>
             {isCollapsed ? "显示更多" : "收起"}
           </Text>
           <ThemedIcon
             icon={isCollapsed ? ChevronDown : ChevronUp}
             size={16}
-            colorClassName={colors.primary.accent}
+            colorClassName={theme.primary.accent}
             accessibilityElementsHidden
             importantForAccessibility="no-hide-descendants"
           />

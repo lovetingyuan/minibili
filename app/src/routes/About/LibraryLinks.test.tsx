@@ -15,10 +15,10 @@ vi.mock("lucide-react-native", () => ({
   History: "History",
   Star: "Star",
 }));
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
-    black: { text: "black" },
-    gray4: { accent: "gray4" },
+vi.mock("@/constants/theme", () => ({
+  theme: {
+    text: { primary: "black" },
+    icon: { muted: "gray4" },
     primary: { accent: "primary" },
   },
 }));

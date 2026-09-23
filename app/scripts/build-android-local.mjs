@@ -9,9 +9,10 @@
 // （配置不变时生成的文件内容完全一致，只有 mtime 变了），所以这里始终增量同步原生工程，
 // 只在首次生成或显式指定 BUILD_CLEAN_PREBUILD=1 时重建目录。
 //
-// 两个变体的 applicationId / 应用名不同（preview 是 com.tingyuan.minibili.preview），没法共用一份
-// android/，所以脚本把当前不用的那份改名存到 .native-build/<变体>/android，切回来时再改名回来，
-// 这样两边的 Gradle 增量产物都能长期保留，切换只需毫秒级的目录改名。
+// 两个变体的 applicationId / 应用名不同（dev 是 com.tingyuan.minibili.dev，preview 是
+// com.tingyuan.minibili.preview），没法共用一份 android/，所以脚本把当前不用的那份改名存到
+// .native-build/<变体>/android，切回来时再改名回来，这样两边的 Gradle 增量产物都能长期保留，
+// 切换只需毫秒级的目录改名。
 //
 // 其它优化：
 //   - prebuild 内部还会再装一遍依赖，用 --no-install 跳过，依赖统一由脚本开头安装；
@@ -52,8 +53,8 @@ const NATIVE_CACHE_DIR = join(APP_DIR, ".native-build");
 
 const VARIANTS = {
   dev: {
-    // 不设置 APP_VARIANT 时 app.config.js 走默认分支（MiniBili / com.tingyuan.minibili）
-    appVariant: null,
+    // APP_VARIANT=development 让 app.config.js 走开发变体（MiniBili-dev / com.tingyuan.minibili.dev）
+    appVariant: "development",
     apkSource: join(ANDROID_DIR, "app", "build", "outputs", "apk", "debug", "app-debug.apk"),
     apkSuffix: "dev",
     gradleTask: ":app:assembleDebug",
@@ -131,16 +132,10 @@ function resolveVariant() {
 }
 
 // APP_VARIANT 是 app.config.js 判断包名/应用名的开关，prebuild 与 Gradle（打包时会重新读 app.config）
-// 必须用同一份值。dev 变体要显式剔除，避免从外部环境继承了 APP_VARIANT。
+// 必须用同一份值。这里显式覆盖而不是沿用外部环境，避免外部设的 APP_VARIANT 漏进来。
 // Gradle 会把环境变量纳入 daemon 匹配，所以这里的值一定能传到打包进程。
 function buildVariantEnv(appVariant) {
-  const env = { ...process.env };
-  if (appVariant === null) {
-    delete env.APP_VARIANT;
-  } else {
-    env.APP_VARIANT = appVariant;
-  }
-  return env;
+  return { ...process.env, APP_VARIANT: appVariant };
 }
 
 function androidProjectExists() {
@@ -151,7 +146,8 @@ function nativeCachePath(variant) {
   return join(NATIVE_CACHE_DIR, variant, "android");
 }
 
-// 变体判断只看生成的 applicationId：app.config.js 里 preview 一律以 .preview 结尾。
+// 变体判断只看生成的 applicationId：app.config.js 给非生产变体分别加了 .dev / .preview 后缀，
+// 生产变体（com.tingyuan.minibili）不属于任何一个本地构建变体，返回 null 交给调用方重建。
 function detectActiveVariant() {
   const buildGradle = join(ANDROID_DIR, "app", "build.gradle");
   if (!existsSync(buildGradle)) {
@@ -162,7 +158,10 @@ function detectActiveVariant() {
   if (!matched) {
     return null;
   }
-  return matched[1].endsWith(".preview") ? "preview" : "dev";
+  if (matched[1].endsWith(".dev")) {
+    return "dev";
+  }
+  return matched[1].endsWith(".preview") ? "preview" : null;
 }
 
 function stowAndroidDir(variant) {
@@ -196,7 +195,7 @@ function activateVariant(variant) {
     return "active";
   }
   if (activeVariant === null) {
-    console.warn(`[WARN] 无法识别 ${ANDROID_DIR} 的 applicationId，本次直接重建原生工程`);
+    console.warn(`[WARN] ${ANDROID_DIR} 的原生工程不属于 dev / preview 变体，本次直接重建`);
     return "unknown";
   }
 
@@ -331,7 +330,7 @@ function main() {
   const env = buildVariantEnv(appVariant);
 
   console.log(
-    `[INFO] 构建 ${name}（APP_VARIANT=${appVariant ?? "未设置"}）；本机 ${os.cpus().length} 线程 / ` +
+    `[INFO] 构建 ${name}（APP_VARIANT=${appVariant}）；本机 ${os.cpus().length} 线程 / ` +
       `${TOTAL_MEMORY_GIB.toFixed(1)}G 内存 => workers=${MAX_WORKERS}，并行=${PARALLEL ? "on" : "off"}，` +
       `Gradle 堆=${HEAP_MB}m，ABI=${ARCHITECTURES}`,
   );

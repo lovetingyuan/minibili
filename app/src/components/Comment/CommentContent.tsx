@@ -3,7 +3,7 @@ import * as Clipboard from "expo-clipboard";
 import { Linking } from "react-native";
 
 import { Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
 import { showToast } from "@/utils";
@@ -18,8 +18,8 @@ export function CommentText(props: CommentTextProps) {
   // 嵌套节点不会继承父级字重，所以加粗必须下发到每个节点。
   const boldClassName = props.bold ? "font-bold" : "";
   // 同理，UP 主觉得很赞的主题粉色也要下发到每个节点，避免原生端嵌套节点回落到默认文字色。
-  const bodyTextClassName = `${props.creatorLiked ? colors.secondary.text : ""} ${boldClassName}`;
-  const accentTextClassName = `${colors.primary.text} ${boldClassName}`;
+  const bodyTextClassName = `${props.creatorLiked ? theme.secondary.text : ""} ${boldClassName}`;
+  const accentTextClassName = `${theme.primary.text} ${boldClassName}`;
   return (
     <Text className={`text-[15px] leading-6 ${bodyTextClassName}`}>
       {props.nodes.map((node, index) => {
@@ -96,7 +96,7 @@ export function CommentText(props: CommentTextProps) {
       {props.likeText ? (
         <Text
           className={`text-[13px] font-normal ${
-            props.likeActive ? colors.commentLike.text : colors.primary.text
+            props.likeActive ? theme.like.text : theme.primary.text
           } ${props.likePending ? "opacity-60" : ""}`}
         >
           {/* 嵌套 Text 在原生端不支持 margin/padding，用全角空格拉开与正文的间距 */}
@@ -116,7 +116,7 @@ export function CommentImages(props: CommentImageEntryProps) {
 
   return (
     <Text
-      className={colors.primary.text}
+      className={theme.primary.text}
       accessibilityLabel={`查看评论中的 ${imageCount} 张图片`}
       onPress={() => {
         setCurrentImageIndex(0);

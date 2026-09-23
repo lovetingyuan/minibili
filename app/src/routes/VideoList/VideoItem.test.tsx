@@ -32,8 +32,8 @@ vi.mock("@/components/styled/expo", () => ({
   },
 }));
 
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
+vi.mock("@/constants/theme", () => ({
+  theme: {
     primary: {
       accent: "accent-primary",
       text: "text-primary",
@@ -41,6 +41,11 @@ vi.mock("@/constants/colors.tw", () => ({
     secondary: {
       accent: "accent-secondary",
       text: "text-secondary",
+    },
+    mediaBadge: {
+      bg: "bg-media-badge",
+      text: "text-media-badge",
+      accent: "accent-media-badge",
     },
   },
 }));

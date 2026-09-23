@@ -6,7 +6,7 @@ import { ActivityIndicator, Pressable, View } from 'react-native';
 import type { DynamicItem } from '@/api/dynamic-items.type';
 import { Button, FlashList, Skeleton, Text } from '@/components/styled/rneui';
 import type { FlashListRef } from '@/components/styled/rneui';
-import { colors } from '@/constants/colors.tw';
+import { theme } from "@/constants/theme";
 import type { MainTabNavigationProp } from '@/types';
 
 import { DynamicCard } from './dynamic-card';
@@ -14,11 +14,11 @@ import type { DynamicListProps } from './dynamic-list.types';
 
 function DynamicListLoading(props: { listHeader?: ReactNode }) {
   return (
-    <View className="flex-1 bg-neutral-100 dark:bg-black">
+    <View className={`flex-1 ${theme.background.page}`}>
       {props.listHeader}
       <View className="gap-3">
         {[0, 1, 2].map((index) => (
-          <View key={index} className="gap-3 bg-white p-4 dark:bg-neutral-950">
+          <View key={index} className="gap-3 bg-white p-4 dark:bg-slate-950">
             <View className="flex-row items-center gap-3">
               <Skeleton animation="pulse" circle width={36} height={36} />
               <View className="flex-1 flex-row items-center justify-between gap-3">
@@ -44,7 +44,7 @@ function DynamicListEmpty(
       <Text className="text-lg font-semibold">
         {props.error ? (props.errorTitle ?? '动态加载失败') : props.emptyTitle}
       </Text>
-      <Text selectable className={`text-center text-sm ${colors.gray6.text}`}>
+      <Text selectable className={`text-center text-sm ${theme.text.muted}`}>
         {props.error?.message || props.emptyMessage}
       </Text>
       {props.error ? (
@@ -96,7 +96,7 @@ export function DynamicList(props: DynamicListProps) {
   return (
     <FlashList
       ref={listRef}
-      className="flex-1 bg-neutral-100 dark:bg-black"
+      className={`flex-1 ${theme.background.page}`}
       contentInsetAdjustmentBehavior="automatic"
       contentContainerClassName="pb-6"
       data={props.list}
@@ -134,9 +134,9 @@ export function DynamicList(props: DynamicListProps) {
             className="items-center py-5"
           >
             {props.isLoadingMore ? (
-              <ActivityIndicator colorClassName={colors.secondary.accent} />
+              <ActivityIndicator colorClassName={theme.secondary.accent} />
             ) : (
-              <Text className={`text-xs ${props.error ? colors.error.text : colors.gray6.text}`}>
+              <Text className={`text-xs ${props.error ? theme.error.text : theme.text.muted}`}>
                 {props.error ? '加载下一页失败，点击重试' : props.isReachingEnd ? '暂无更多' : '上拉加载更多'}
               </Text>
             )}

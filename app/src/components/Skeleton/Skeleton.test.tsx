@@ -53,10 +53,12 @@ vi.mock("react-native", () => {
     View: "View",
   };
 });
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
-    gray3: { accent: "accent-gray-300 dark:accent-gray-700" },
-    gray4: { accent: "accent-gray-400 dark:accent-gray-600" },
+vi.mock("@/constants/theme", () => ({
+  theme: {
+    slate: {
+      2: { accent: "accent-slate-200 dark:accent-slate-800" },
+      3: { accent: "accent-slate-300 dark:accent-slate-700" },
+    },
   },
 }));
 vi.mock("@/hooks/useResolvedColor", () => ({ default: mocks.useResolvedColor }));
@@ -64,8 +66,8 @@ vi.mock("@/hooks/useResolvedStyle", () => ({ default: mocks.useResolvedStyle }))
 
 import { Skeleton } from "./Skeleton";
 
-const BASE = "#d1d5db";
-const HIGHLIGHT = "#9ca3af";
+const BASE = "#d4d4d4";
+const HIGHLIGHT = "#a3a3a3";
 
 type ElementProps = {
   accessibilityLabel?: string;
@@ -117,7 +119,7 @@ beforeEach(() => {
   mocks.useResolvedStyle.mockReset();
   mocks.interpolate.mockImplementation((config) => ({ interpolation: config }));
   mocks.useResolvedColor.mockImplementation((className) =>
-    className === "accent-gray-300 dark:accent-gray-700" ? BASE : HIGHLIGHT,
+    className === "accent-slate-200 dark:accent-slate-800" ? BASE : HIGHLIGHT,
   );
   mocks.useResolvedStyle.mockReturnValue({});
 });

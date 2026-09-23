@@ -11,7 +11,7 @@ import { withUniwind } from "uniwind";
 
 import bilibiliFetch from "@/api/bilibili-fetch";
 import useLiveUrl from "@/api/get-live-url";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useLiveUpsRefresh } from "@/hooks/useLiveUpsRefresh";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
@@ -28,7 +28,7 @@ function Loading() {
       <ActivityIndicator
         accessibilityLabel="直播间加载中"
         size="large"
-        colorClassName={colors.secondary.accent}
+        colorClassName={theme.secondary.accent}
       />
     </View>
   );

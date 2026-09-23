@@ -3,7 +3,7 @@ import { Image } from "@/components/styled/expo";
 import { Linking, Pressable, View } from "react-native";
 
 import type { DynamicAdditional } from "@/api/dynamic-items.type";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { getImagePixelDimensions, parseImgUrl } from "@/utils";
 
 export function Additional(props: { additional: DynamicAdditional | null }) {
@@ -24,7 +24,7 @@ export function Additional(props: { additional: DynamicAdditional | null }) {
     <Pressable
       disabled={!additional.url}
       onPress={open}
-      className="mb-3 flex-row overflow-hidden rounded-lg bg-neutral-100 p-2 dark:bg-neutral-800"
+      className="mb-3 flex-row overflow-hidden rounded-lg bg-slate-100 p-2 dark:bg-slate-800"
     >
       {additional.cover ? (
         <Image
@@ -34,18 +34,18 @@ export function Additional(props: { additional: DynamicAdditional | null }) {
         />
       ) : null}
       <View className="min-w-0 flex-1 justify-center gap-0.5">
-        <Text className={`text-xs ${colors.secondary.text}`}>{additional.head}</Text>
+        <Text className={`text-xs ${theme.secondary.text}`}>{additional.head}</Text>
         <Text className="text-sm font-semibold" numberOfLines={2}>
           {additional.title}
         </Text>
         {additional.description ? (
-          <Text className={`text-xs ${colors.gray6.text}`} numberOfLines={2}>
+          <Text className={`text-xs ${theme.text.muted}`} numberOfLines={2}>
             {additional.description}
           </Text>
         ) : null}
       </View>
       {additional.url ? (
-        <Text className={`self-center pl-2 text-xs ${colors.primary.text}`}>
+        <Text className={`self-center pl-2 text-xs ${theme.primary.text}`}>
           {additional.actionLabel || "查看"}
         </Text>
       ) : null}

@@ -6,7 +6,7 @@ import { Linking, type TextProps, View } from "react-native";
 
 import type { RichTextNode } from "@/api/dynamic-items.schema";
 import { HandledRichTextType } from "@/api/dynamic-items.type";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
@@ -48,7 +48,7 @@ function RichTexts(props: Props) {
   const hasNodes = (props.nodes?.length ?? 0) > 0;
   const topic = props.topic ? (
     <View className={clsx("flex-row items-center", hasNodes && "mb-2")}>
-      <ThemedIcon icon={Hash} colorClassName={colors.primary.accent} size={14} />
+      <ThemedIcon icon={Hash} colorClassName={theme.primary.accent} size={14} />
       <Text
         onPress={() => {
           if (props.topic?.jump_url) {
@@ -58,7 +58,7 @@ function RichTexts(props: Props) {
             });
           }
         }}
-        className={clsx(colors.primary.text, textSizeClassName)}
+        className={clsx(theme.primary.text, textSizeClassName)}
       >
         {` ${props.topic.name}`}
       </Text>
@@ -82,7 +82,7 @@ function RichTexts(props: Props) {
               },
             });
           }}
-          className={clsx(colors.primary.text, textSizeClassName)}
+          className={clsx(theme.primary.text, textSizeClassName)}
         >
           {node.text}
         </UpName>
@@ -99,7 +99,7 @@ function RichTexts(props: Props) {
       return (
         <Text
           key={key}
-          className={clsx(colors.primary.text, textSizeClassName)}
+          className={clsx(theme.primary.text, textSizeClassName)}
           onPress={() => {
             const rid = String(node.rid ?? "");
             if (rid.startsWith("BV")) {
@@ -117,7 +117,7 @@ function RichTexts(props: Props) {
       return (
         <Text
           key={key}
-          className={clsx(colors.primary.text, textSizeClassName)}
+          className={clsx(theme.primary.text, textSizeClassName)}
           onPress={() => openUrl(`mailto:${node.text}`)}
         >
           {`📧 ${node.text}`}
@@ -128,7 +128,7 @@ function RichTexts(props: Props) {
       return (
         <Text
           key={key}
-          className={clsx(colors.primary.text, textSizeClassName)}
+          className={clsx(theme.primary.text, textSizeClassName)}
           onPress={() =>
             openUrl(`https://t.bilibili.com/vote/h5/index/#/result?vote_id=${node.rid ?? ""}`)
           }
@@ -141,7 +141,7 @@ function RichTexts(props: Props) {
       return (
         <Text
           key={key}
-          className={clsx(colors.primary.text, textSizeClassName)}
+          className={clsx(theme.primary.text, textSizeClassName)}
           onPress={() =>
             openUrl(
               `https://t.bilibili.com/lottery/h5/index/#/result?business_type=1&business_id=${props.idStr ?? ""}&isWeb=1`,
@@ -156,7 +156,7 @@ function RichTexts(props: Props) {
       return (
         <Text
           key={key}
-          className={clsx(colors.primary.text, textSizeClassName)}
+          className={clsx(theme.primary.text, textSizeClassName)}
           onPress={() => {
             const images = node.pics
               ?.map((pic) => {
@@ -187,7 +187,7 @@ function RichTexts(props: Props) {
     return (
       <Text
         key={key}
-        className={clsx(isLink && colors.primary.text, textLineClassName)}
+        className={clsx(isLink && theme.primary.text, textLineClassName)}
         onPress={isLink ? () => openUrl(node.jump_url) : undefined}
       >
         {isLink ? `🔗 ${node.text}` : node.text}

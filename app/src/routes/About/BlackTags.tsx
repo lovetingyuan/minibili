@@ -6,7 +6,7 @@ import { X } from "lucide-react-native";
 import React from "react";
 import { Pressable, View } from "react-native";
 
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 
@@ -18,7 +18,7 @@ function BlackTags() {
     values: { $blackTags },
     setSetting,
   } = useUserSettings();
-  const gray5Color = useResolvedColor(colors.gray5.text);
+  const gray5Color = useResolvedColor(theme.text.disabled);
   return (
     <CollapsibleSection
       expanded={expanded}

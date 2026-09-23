@@ -25,12 +25,14 @@ vi.mock("react-native", () => ({
   Text: "Text",
   View: "View",
 }));
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
-    gray3: { accent: "accent-gray-300 dark:accent-gray-700" },
-    gray4: { accent: "accent-gray-400 dark:accent-gray-600" },
-    gray5: { text: "text-gray-500" },
-    primary: { text: "text-sky-600 dark:text-sky-500" },
+vi.mock("@/constants/theme", () => ({
+  theme: {
+    background: {
+      fillDisabled: { accent: "accent-slate-300 dark:accent-slate-700" },
+      fillMuted: { accent: "accent-slate-400 dark:accent-slate-600" },
+    },
+    text: { disabled: "text-slate-500" },
+    primary: { text: "text-[#008AC5] dark:text-[#00AEEC]" },
   },
 }));
 vi.mock("@/hooks/useResolvedColor", () => ({ default: mocks.useResolvedColor }));
@@ -40,10 +42,10 @@ vi.mock("@/utils/color", () => import("../../utils/color"));
 
 import { Button } from "./Button";
 
-const PRIMARY = "#0284c7";
-const DISABLED_BACKGROUND = "#d1d5db";
-const DISABLED_BORDER = "#9ca3af";
-const DISABLED_TITLE = "#6b7280";
+const PRIMARY = "#008AC5";
+const DISABLED_BACKGROUND = "#d4d4d4";
+const DISABLED_BORDER = "#a3a3a3";
+const DISABLED_TITLE = "#737373";
 
 type PressableStyle =
   | StyleProp<ViewStyle>
@@ -106,16 +108,16 @@ beforeEach(() => {
   mocks.useResolvedColor.mockReset();
   mocks.useResolvedStyle.mockReset();
   mocks.useResolvedColor.mockImplementation((className) => {
-    if (className === "text-sky-600 dark:text-sky-500") {
+    if (className === "text-[#008AC5] dark:text-[#00AEEC]") {
       return PRIMARY;
     }
-    if (className === "accent-gray-300 dark:accent-gray-700") {
+    if (className === "accent-slate-300 dark:accent-slate-700") {
       return DISABLED_BACKGROUND;
     }
-    if (className === "accent-gray-400 dark:accent-gray-600") {
+    if (className === "accent-slate-400 dark:accent-slate-600") {
       return DISABLED_BORDER;
     }
-    if (className === "text-gray-500") {
+    if (className === "text-slate-500") {
       return DISABLED_TITLE;
     }
     return undefined;
@@ -140,7 +142,7 @@ test("默认 solid + md + xs 时沿用 RNE 的主色与 spacing", () => {
     fontSize: 16,
     textAlign: "center",
   });
-  expect(mocks.useResolvedColor).toHaveBeenCalledWith("text-sky-600 dark:text-sky-500");
+  expect(mocks.useResolvedColor).toHaveBeenCalledWith("text-[#008AC5] dark:text-[#00AEEC]");
 });
 
 test("children 优先于 title", () => {
@@ -225,7 +227,7 @@ test("Android 未禁用时使用标题色 32% 透明度的水波纹", () => {
   });
 
   const clear = render({ title: "重试", type: "clear" });
-  expect(clear.pressable.props.android_ripple).toMatchObject({ color: "rgba(2, 132, 199, 0.32)" });
+  expect(clear.pressable.props.android_ripple).toMatchObject({ color: "rgba(0, 138, 197, 0.32)" });
 
   const disabled = render({ disabled: true, title: "关注" });
   expect(disabled.pressable.props.android_ripple).toBeNull();

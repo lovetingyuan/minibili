@@ -22,7 +22,7 @@ vi.mock("@/api/useBilibiliRelationTags", () => ({
   }),
 }));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button", Text: "Text" }));
-vi.mock("@/constants/colors.tw", () => ({ colors: { gray6: { text: "text-gray" } } }));
+vi.mock("@/constants/theme", () => ({ theme: { text: { muted: "text-gray" } } }));
 vi.mock("@/features/bilibili-followings/order-followings", () => ({
   orderFollowedUps: (ups: UpInfo[]) => ups,
 }));

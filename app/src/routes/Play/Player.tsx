@@ -17,7 +17,7 @@ import BilibiliWebView from "@/components/BilibiliWebView";
 
 import { useVideoMp4Url } from "@/api/play-url";
 import { UA } from "@/constants";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import type { RootStackParamList } from "@/types";
 
@@ -245,7 +245,7 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
         playerErrorType ? null : (
           <ActivityIndicator
             size={"large"}
-            colorClassName={colors.secondary.accent}
+            colorClassName={theme.secondary.accent}
             className="scale-150"
           />
         ),
@@ -323,7 +323,7 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
               title="高清"
               textClassName="text-white"
               wrapperClassName="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold"
-              checkedColorClassName={colors.secondary.accent}
+              checkedColorClassName={theme.secondary.accent}
               uncheckedColor={"white"}
               size={18}
               containerClassName="bg-transparent p-0 m-0"
@@ -394,7 +394,7 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
       playerErrorType ? null : (
         <ActivityIndicator
           size={"large"}
-          colorClassName={colors.secondary.accent}
+          colorClassName={theme.secondary.accent}
           className="scale-150"
         />
       ),
@@ -416,11 +416,7 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
                 {errorInfo.description}
               </Text>
               <Pressable
-                className={
-                  isRetrying
-                    ? "mt-2 rounded-full bg-sky-400/60 px-6 py-3"
-                    : "mt-2 rounded-full bg-sky-500 px-6 py-3"
-                }
+                className={`mt-2 rounded-full px-6 py-3 ${theme.primary.bg} ${isRetrying ? "opacity-60" : ""}`}
                 disabled={isRetrying}
                 onPress={() => {
                   void handleRetry();

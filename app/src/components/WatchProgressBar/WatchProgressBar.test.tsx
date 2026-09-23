@@ -3,7 +3,7 @@ import type { ReactElement, ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
 
 vi.mock("react-native", () => ({ View: "View" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 
 import { WatchProgressBar } from "./WatchProgressBar";
 
@@ -23,7 +23,7 @@ function fillWidth(bar: ReactNode) {
   const track = elements(bar).find((element) =>
     element.props.className?.includes("bg-gray-900/40"),
   );
-  return elements(track).find((element) => element.props.className?.includes("bg-sky-500"))?.props
+  return elements(track).find((element) => element.props.className?.includes("bg-[#00AEEC]"))?.props
     .style?.width;
 }
 

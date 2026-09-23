@@ -66,7 +66,7 @@ vi.mock("@/components/styled/rneui", () => ({
   Skeleton: "Skeleton",
   Text: "Text",
 }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("./dynamic-card", () => ({ DynamicCard: "DynamicCard" }));
 
 import { DynamicList } from "./dynamic-list";

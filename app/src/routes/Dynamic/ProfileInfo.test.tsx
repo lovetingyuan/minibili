@@ -16,7 +16,7 @@ vi.mock("react", async (importOriginal) => {
 });
 vi.mock("react-native", () => ({ Pressable: "Pressable", View: "View" }));
 vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 
 import ProfileInfo from "./ProfileInfo";
 

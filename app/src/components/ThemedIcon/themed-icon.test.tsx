@@ -6,8 +6,8 @@ const mocks = vi.hoisted(() => ({
   useResolvedColor: vi.fn<(className: string) => string | undefined>(),
 }));
 
-vi.mock("@/constants/colors.tw", () => ({
-  colors: { black: { text: "text-zinc-800 dark:text-neutral-200" } },
+vi.mock("@/constants/theme", () => ({
+  theme: { text: { primary: "text-slate-800 dark:text-slate-200" } },
 }));
 vi.mock("@/hooks/useResolvedColor", () => ({
   default: mocks.useResolvedColor,
@@ -25,7 +25,7 @@ type TestIconProps = {
 
 beforeEach(() => {
   mocks.useResolvedColor.mockImplementation((className) =>
-    className === "text-zinc-800 dark:text-neutral-200" ? "#27272a" : "#fb7299",
+    className === "text-slate-800 dark:text-slate-200" ? "#262626" : "#fb7299",
   );
 });
 
@@ -33,8 +33,8 @@ test("resolves the default icon color in the light theme", () => {
   const icon = ThemedIcon({ icon: TestIcon, size: 20 }) as ReactElement<TestIconProps>;
 
   expect(icon.type).toBe("TestIcon");
-  expect(icon.props).toMatchObject({ color: "#27272a", fill: "none", size: 20 });
-  expect(mocks.useResolvedColor).toHaveBeenCalledWith("text-zinc-800 dark:text-neutral-200");
+  expect(icon.props).toMatchObject({ color: "#262626", fill: "none", size: 20 });
+  expect(mocks.useResolvedColor).toHaveBeenCalledWith("text-slate-800 dark:text-slate-200");
 });
 
 test("uses the color resolved for the dark theme", () => {
@@ -49,7 +49,7 @@ test("prefers an explicit color over the resolved theme color", () => {
   const icon = ThemedIcon({
     icon: TestIcon,
     color: "#ffffff",
-    colorClassName: "accent-pink-500 dark:accent-pink-400",
+    colorClassName: "accent-[#FF6699]",
   }) as ReactElement<TestIconProps>;
 
   expect(icon.props.color).toBe("#ffffff");
@@ -64,7 +64,7 @@ test("preserves an explicit fill color", () => {
 test("fills selected icons with their resolved theme color", () => {
   const icon = ThemedIcon({
     icon: TestIcon,
-    colorClassName: "accent-pink-500 dark:accent-pink-400",
+    colorClassName: "accent-[#FF6699]",
     filled: true,
     strokeWidth: 3,
   }) as ReactElement<TestIconProps>;

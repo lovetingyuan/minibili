@@ -16,10 +16,10 @@ vi.mock("lucide-react-native", () => ({
 vi.mock("@/components/styled/rneui", () => ({
   Text: "Text",
 }));
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
-    gray4: { text: "text-gray-400 dark:text-gray-600" },
-    primary: { accent: "accent-sky-600 dark:accent-sky-500" },
+vi.mock("@/constants/theme", () => ({
+  theme: {
+    icon: { placeholder: "accent-slate-400 dark:accent-slate-600" },
+    primary: { accent: "accent-[#008AC5] dark:accent-[#00AEEC]" },
   },
 }));
 vi.mock("@/hooks/useResolvedColor", () => ({
@@ -47,14 +47,14 @@ function childrenOf(element: TestElement) {
 }
 
 mocks.useResolvedColor.mockImplementation((className) =>
-  className === "accent-sky-600 dark:accent-sky-500" ? "#0ea5e9" : undefined,
+  className === "accent-[#008AC5] dark:accent-[#00AEEC]" ? "#008AC5" : undefined,
 );
 
 test("选中时用主题色填充方块并显示白色对勾", () => {
   const pressable = CheckBox({
     checked: true,
     title: "特别关注（1）",
-    checkedColorClassName: "accent-sky-600 dark:accent-sky-500",
+    checkedColorClassName: "accent-[#008AC5] dark:accent-[#00AEEC]",
   }) as TestElement;
   const [wrapper] = childrenOf(pressable);
   const [box, label] = childrenOf(wrapper);
@@ -64,8 +64,8 @@ test("选中时用主题色填充方块并显示白色对勾", () => {
   expect(pressable.props.accessibilityRole).toBe("checkbox");
   expect(pressable.props.accessibilityState).toEqual({ checked: true, disabled: false });
   expect(box.props.style).toMatchObject({
-    backgroundColor: "#0ea5e9",
-    borderColor: "#0ea5e9",
+    backgroundColor: "#008AC5",
+    borderColor: "#008AC5",
     height: 20,
     width: 20,
   });
@@ -78,7 +78,7 @@ test("选中时用主题色填充方块并显示白色对勾", () => {
 test("未选中时只画边框，不显示对勾，并支持自定义尺寸", () => {
   const pressable = CheckBox({
     checked: false,
-    checkedColorClassName: "accent-sky-600 dark:accent-sky-500",
+    checkedColorClassName: "accent-[#008AC5] dark:accent-[#00AEEC]",
     uncheckedColor: "white",
     size: 18,
   }) as TestElement;
@@ -97,7 +97,7 @@ test("未选中时只画边框，不显示对勾，并支持自定义尺寸", ()
 test("未选中且未指定颜色时回落到默认边框色", () => {
   CheckBox({ checked: false });
 
-  expect(mocks.useResolvedColor).toHaveBeenCalledWith("text-gray-400 dark:text-gray-600");
+  expect(mocks.useResolvedColor).toHaveBeenCalledWith("accent-slate-400 dark:accent-slate-600");
 });
 
 test("ReactNode 标题原样渲染，点击交给外层 Pressable", () => {

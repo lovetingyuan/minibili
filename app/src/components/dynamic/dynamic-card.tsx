@@ -3,7 +3,7 @@ import { Pressable, View } from "react-native";
 
 import type { DynamicItem } from "@/api/dynamic-items.type";
 import type { DynamicArticle } from "@/api/opus-detail.type";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import type { NavigationProps } from "@/types";
 import { getImagePixelSize, parseDate, parseImgUrl } from "@/utils";
 
@@ -45,7 +45,7 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
               ? { uri: parseImgUrl(item.author.face, getImagePixelSize(avatarSize)) }
               : undefined
           }
-          containerClassName="bg-neutral-200 dark:bg-neutral-700"
+          containerClassName="bg-slate-200 dark:bg-slate-700"
         />
       </Pressable>
       <View className="ml-3 min-w-0 flex-1 flex-row items-center gap-2">
@@ -60,15 +60,15 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
         {item.top ? (
           <View
             accessibilityLabel="置顶标签"
-            className="shrink-0 rounded bg-pink-50 px-1.5 py-0.5 dark:bg-pink-950/40"
+            className={`shrink-0 rounded px-1.5 py-0.5 ${theme.secondary.tint}`}
           >
-            <Text className={`text-[10px] font-bold leading-3.5 ${colors.secondary.text}`}>
+            <Text className={`text-[10px] font-bold leading-3.5 ${theme.secondary.text}`}>
               置顶
             </Text>
           </View>
         ) : null}
         {meta ? (
-          <Text numberOfLines={1} className={`ml-auto shrink-0 text-xs ${colors.gray6.text}`}>
+          <Text numberOfLines={1} className={`ml-auto shrink-0 text-xs ${theme.text.muted}`}>
             {meta}
           </Text>
         ) : null}
@@ -149,8 +149,8 @@ function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
   // 既没有可跳转的详情页，也没有作者信息，这里直接展示提示文案。
   if (!item.id) {
     return (
-      <View className="mb-3 rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
-        <Text className={`text-sm ${colors.gray6.text}`}>
+      <View className="mb-3 rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
+        <Text className={`text-sm ${theme.text.muted}`}>
           {item.content.kind === "unavailable" ? item.content.message : "原动态不可见"}
         </Text>
       </View>
@@ -160,7 +160,7 @@ function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="查看被转发的动态"
-      className="mb-3 rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800"
+      className="mb-3 rounded-lg bg-slate-100 p-3 dark:bg-slate-800"
       onPress={(event) => {
         // 内层卡片拦截点击，避免同时触发外层转发动态的整卡跳转
         event.stopPropagation();
@@ -192,7 +192,7 @@ export function DynamicCard(props: {
   return (
     <View
       className={
-        detail ? "bg-white px-3 py-4 dark:bg-neutral-950" : "bg-white p-4 dark:bg-neutral-950"
+        detail ? "bg-white px-3 py-4 dark:bg-slate-950" : "bg-white p-4 dark:bg-slate-950"
       }
     >
       {onPress ? <Pressable onPress={onPress}>{body}</Pressable> : <View>{body}</View>}

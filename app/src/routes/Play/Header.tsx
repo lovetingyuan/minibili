@@ -18,7 +18,7 @@ import {
 
 import { useUserRelation } from "@/api/user-relation";
 import { useVideoInfo } from "@/api/video-info";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { isDownloadingVideo } from "@/features/video-download/controller";
 import { useVideoDownload } from "@/features/video-download/useVideoDownload";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
@@ -37,7 +37,7 @@ export function PlayHeaderTitle() {
     <View className="relative left-[-10px] flex-row items-center">
       <UpName
         mid={route.params?.mid || vi?.mid}
-        className={clsx("text-lg font-semibold", followed && colors.secondary.text)}
+        className={clsx("text-lg font-semibold", followed && theme.secondary.text)}
       >
         {route.params?.name || vi?.name}
       </UpName>

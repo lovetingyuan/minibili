@@ -11,7 +11,7 @@ import {
 
 import { Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 /**
  * 弹幕内容上限，与接口限制保持一致
@@ -64,7 +64,7 @@ export function DanmakuComposerView(props: DanmakuComposerViewProps) {
             className={`text-[11px] tabular-nums ${reachedLimit ? "text-orange-400" : "text-white/60"}`}
           >{`${count}/${DANMAKU_COMPOSER_MAX_LENGTH}`}</Text>
           <Pressable
-            className={`h-9 w-9 items-center justify-center rounded-full ${canSubmit ? colors.primary.bg : "bg-white/20"}`}
+            className={`h-9 w-9 items-center justify-center rounded-full ${canSubmit ? theme.primary.bg : "bg-white/20"}`}
             accessibilityRole="button"
             accessibilityLabel="发送弹幕"
             accessibilityState={{ disabled: !canSubmit, busy: props.pending }}

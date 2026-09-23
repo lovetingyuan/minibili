@@ -1,6 +1,6 @@
 import { Switch } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { Play } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
@@ -54,9 +54,9 @@ export default function PlayerCover(props: PlayerCoverProps) {
             accessibilityState={{ checked: highQuality }}
             value={highQuality}
             onValueChange={props.onHighQualityChange}
-            colorClassName={colors.secondary.accent}
-            trackColorOnClassName={colors.secondary.accent}
-            trackColorOffClassName={colors.gray4.accent}
+            colorClassName={theme.secondary.accent}
+            trackColorOnClassName={theme.secondary.accent}
+            trackColorOffClassName={theme.background.fillMuted.accent}
             style={{ transform: [{ scale: 0.72 }] }}
           />
         </View>

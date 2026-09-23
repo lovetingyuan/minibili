@@ -1,9 +1,11 @@
 import type { ViewStyle } from "react-native";
 
-/** sheet 面板背景，与两处 sheet 内容区原本的配色保持一致 */
-export const sheetBackgroundClassName = "bg-white dark:bg-neutral-950";
+import { theme } from "../../constants/theme";
+
+/** sheet 面板背景，与两处 sheet 内容区保持一致 */
+export const sheetBackgroundClassName = theme.background.surface;
 /** 内置把手的指示条，与原本自绘把手配色保持一致 */
-export const sheetHandleIndicatorClassName = "bg-neutral-300 dark:bg-neutral-700";
+export const sheetHandleIndicatorClassName = "bg-slate-300 dark:bg-slate-700";
 
 const SHEET_RADIUS = 28;
 const HANDLE_INDICATOR_WIDTH = 40;
@@ -51,14 +53,14 @@ export function createBottomSheetHandleIndicatorStyle(indicatorColor?: string): 
   };
 }
 
-export function createBottomSheetThemeStyles(theme: {
+export function createBottomSheetThemeStyles(resolved: {
   backgroundColor?: string;
   indicatorColor?: string;
 }): BottomSheetThemeStyles {
   return {
-    background: createBottomSheetBackgroundStyle(theme.backgroundColor),
+    background: createBottomSheetBackgroundStyle(resolved.backgroundColor),
     handle: sheetHandleStyle,
-    handleIndicator: createBottomSheetHandleIndicatorStyle(theme.indicatorColor),
+    handleIndicator: createBottomSheetHandleIndicatorStyle(resolved.indicatorColor),
   };
 }
 

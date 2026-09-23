@@ -7,7 +7,7 @@ import type { PressableProps } from "react-native";
  * 路由头部等位置的图标入口统一用它，避免裸图标没有可点击的观感。
  */
 const iconButtonClassName =
-  "h-9 w-9 items-center justify-center rounded-full active:bg-neutral-400/30";
+  "h-9 w-9 items-center justify-center rounded-full active:bg-slate-400/30";
 
 export function IconButton({ className, ...props }: PressableProps) {
   return <Pressable {...props} className={clsx(iconButtonClassName, className)} />;

@@ -6,9 +6,10 @@ import { Asset } from 'expo-asset';
 import { Flame, GalleryVerticalEnd, UserRound, UsersRound } from 'lucide-react-native';
 
 import { ThemedIcon } from '@/components/ThemedIcon';
-import { colors } from '@/constants/colors.tw';
 import useResolvedColor from '@/hooks/useResolvedColor';
+import useResolvedStyle from '@/hooks/useResolvedStyle';
 import useRouteTheme from '@/hooks/useRouteTheme';
+import useTheme from '@/hooks/useTheme';
 import { useStore } from '@/store';
 import { useUnreadFollowedUpCount } from '@/store/derives';
 import type { MainTabParamList, RootStackParamList } from '@/types';
@@ -58,9 +59,13 @@ function WatchLaterRoute() {
 }
 
 export function MainTabs() {
-  const activeTintColor = useResolvedColor(colors.primary.text);
-  const inactiveTintColor = useResolvedColor(colors.gray6.text);
-  const headerTitleColor = useResolvedColor(colors.gray8.text);
+  const theme = useTheme();
+  const activeTintColor = useResolvedColor(theme.primary.text);
+  const inactiveTintColor = useResolvedColor(theme.text.muted);
+  const headerTitleColor = useResolvedColor(theme.text.primary);
+  // 角标是纯色底：直接取主题里的品牌底色，直播角标固定用主色蓝
+  const badgeColor = useResolvedStyle(theme.secondary.bg).backgroundColor;
+  const liveBadgeColor = useResolvedStyle(theme.primary.bg).backgroundColor;
   const { hasUpdate } = useAppUpdateInfo();
   const { livingUps, followingDynamicsUpdateCount } = useStore();
   const unreadFollowedUpCount = useUnreadFollowedUpCount();
@@ -106,7 +111,7 @@ export function MainTabs() {
           headerTitle: '关注的动态',
           tabBarBadge: followingDynamicsBadge,
           tabBarBadgeStyle: {
-            backgroundColor: '#FF6699',
+            backgroundColor: badgeColor,
             color: '#FFFFFF',
             fontSize: 8,
             lineHeight: 14,
@@ -130,7 +135,7 @@ export function MainTabs() {
           // 有直播 UP 时优先展示直播角标，否则展示有未读更新的 UP 数量
           tabBarBadge: hasLiveUps ? '𝘭𝘪𝘷𝘦' : followingsUnreadBadge,
           tabBarBadgeStyle: {
-            backgroundColor: hasLiveUps ? '#00AEEC' : '#FF6699',
+            backgroundColor: hasLiveUps ? liveBadgeColor : badgeColor,
             color: '#FFFFFF',
             fontSize: 8,
             lineHeight: 14,
@@ -151,7 +156,7 @@ export function MainTabs() {
           title: '我的',
           tabBarBadge: hasUpdate ? '新' : undefined,
           tabBarBadgeStyle: {
-            backgroundColor: '#FF6699',
+            backgroundColor: badgeColor,
             color: '#FFFFFF',
             fontSize: 8,
             lineHeight: 14,
@@ -170,10 +175,11 @@ export function MainTabs() {
 }
 
 function AppRoute() {
+  const theme = useTheme();
   const routeTheme = useRouteTheme();
   const { $firstRun, initialed } = useStore();
   const isFirstRun = $firstRun === -1;
-  const headerTitleColor = useResolvedColor(colors.gray8.text);
+  const headerTitleColor = useResolvedColor(theme.text.primary);
 
   if (!initialed) {
     return null;

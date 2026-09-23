@@ -4,7 +4,7 @@ import { Alert, View } from "react-native";
 
 import { Avatar } from "@/components/Avatar";
 import { Button, Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import type { MainTabNavigationProp } from "@/types";
 import { getImagePixelSize, parseImgUrl, parseNumber, showToast } from "@/utils";
@@ -69,7 +69,7 @@ function MineHeaderTitle() {
 
   if (!account) {
     return (
-      <Text className={clsx(colors.gray8.text, "text-lg")} numberOfLines={1}>
+      <Text className={clsx(theme.text.primary, "text-lg")} numberOfLines={1}>
         我的
       </Text>
     );
@@ -86,11 +86,11 @@ function MineHeaderTitle() {
         }}
       />
       <View className="ml-2 shrink">
-        <Text className={clsx(colors.gray8.text, "text-base")} numberOfLines={1}>
+        <Text className={clsx(theme.text.primary, "text-base")} numberOfLines={1}>
           {name}
         </Text>
         {follower != null ? (
-          <Text className={clsx(colors.gray6.text, "text-xs")} numberOfLines={1}>
+          <Text className={clsx(theme.text.muted, "text-xs")} numberOfLines={1}>
             {parseNumber(follower)}粉丝
           </Text>
         ) : null}

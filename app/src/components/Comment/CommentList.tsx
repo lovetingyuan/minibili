@@ -7,7 +7,7 @@ import type { CommentAttitudeKind } from '@/api/comment-actions.types'
 import type { CommentItemType, ReplyItemType } from '@/api/comments'
 import { useComments } from '@/api/comments'
 import { useCommentActions } from '@/api/useCommentActions'
-import { colors } from '@/constants/colors.tw'
+import { theme } from "@/constants/theme";
 import { ThemedIcon } from '@/components/ThemedIcon'
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { showToast } from '@/utils'
@@ -33,7 +33,7 @@ function Loading() {
       {LOADING_COMMENT_WIDTHS.map((width, index) => (
         <View
           className={clsx(
-            'gap-2.5 bg-white p-3 dark:bg-neutral-900',
+            'gap-2.5 bg-white p-3 dark:bg-slate-900',
             index === 0 ? 'rounded-b-2xl' : 'rounded-2xl',
           )}
           key={width}
@@ -131,7 +131,7 @@ export default function CommentList(props: CommentListProps) {
   return (
     <View className="flex-1">
       <FlashList
-        className="flex-1 bg-neutral-100 dark:bg-black"
+        className={`flex-1 ${theme.background.page}`}
         data={comments.data.replies}
         keyExtractor={(item: CommentItemType) => item.id}
         renderItem={({ item, index }: { item: CommentItemType; index: number }) => (
@@ -150,39 +150,39 @@ export default function CommentList(props: CommentListProps) {
         ItemSeparatorComponent={CommentSeparator}
         ListHeaderComponent={
           <View>
-            <View className="bg-white px-3 pt-4 pb-3 dark:bg-neutral-950">{props.children}</View>
-            <View className="h-2 bg-neutral-100 dark:bg-black" />
-            <View className="flex-row items-center justify-between border-b border-neutral-100 bg-white px-3 pb-2 pt-3 dark:border-neutral-800 dark:bg-neutral-950">
+            <View className="bg-white px-3 pt-4 pb-3 dark:bg-slate-950">{props.children}</View>
+            <View className={`h-2 ${theme.background.page}`} />
+            <View className="flex-row items-center justify-between border-b border-slate-100 bg-white px-3 pb-2 pt-3 dark:border-slate-800 dark:bg-slate-950">
               <View className="flex-row items-center gap-1.5">
                 <ThemedIcon
                   icon={MessageSquareText}
                   size={16}
-                  colorClassName={colors.gray7.accent}
+                  colorClassName={theme.icon.secondary}
                 />
                 <View className="flex-row items-center gap-1">
                   <Text className="text-sm font-semibold">评论</Text>
                   {typeof allCount === 'number' ? (
-                    <Text className={`text-xs font-normal ${colors.gray6.text}`}>{allCount}条</Text>
+                    <Text className={`text-xs font-normal ${theme.text.muted}`}>{allCount}条</Text>
                   ) : comments.isLoading ? (
-                    <Text className={`text-xs font-normal ${colors.gray6.text}`}>加载中</Text>
+                    <Text className={`text-xs font-normal ${theme.text.muted}`}>加载中</Text>
                   ) : null}
                 </View>
               </View>
               <View className="flex-row items-center gap-3">
                 {props.dividerRight}
                 <Pressable
-                  className="flex-row items-center gap-1 rounded-full bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800"
+                  className="flex-row items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 dark:bg-slate-800"
                   accessibilityRole="button"
                   accessibilityLabel={`当前按${mode === 3 ? '热度' : '时间'}排序，点击切换`}
                   onPress={() => setMode((current) => (current === 3 ? 2 : 3))}
                 >
-                  <ThemedIcon icon={ArrowDownUp} size={14} colorClassName={colors.primary.accent} />
-                  <Text className={clsx('text-xs font-medium', colors.primary.text)}>
+                  <ThemedIcon icon={ArrowDownUp} size={14} colorClassName={theme.primary.accent} />
+                  <Text className={clsx('text-xs font-medium', theme.primary.text)}>
                     {mode === 3 ? '按热度' : '按时间'}
                   </Text>
                 </Pressable>
                 <Pressable
-                  className="flex-row items-center gap-1 rounded-full bg-neutral-100 px-3 py-1.5 dark:bg-neutral-800"
+                  className="flex-row items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 dark:bg-slate-800"
                   accessibilityRole="button"
                   accessibilityLabel="写评论"
                   onPress={openComposer}
@@ -190,9 +190,9 @@ export default function CommentList(props: CommentListProps) {
                   <ThemedIcon
                     icon={MessageSquarePlus}
                     size={14}
-                    colorClassName={colors.primary.accent}
+                    colorClassName={theme.primary.accent}
                   />
-                  <Text className={clsx('text-xs font-medium', colors.primary.text)}>写评论</Text>
+                  <Text className={clsx('text-xs font-medium', theme.primary.text)}>写评论</Text>
                 </Pressable>
               </View>
             </View>

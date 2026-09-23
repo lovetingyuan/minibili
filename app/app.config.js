@@ -7,13 +7,33 @@ const versionCode = pkg.config.versionCode;
 
 const dev = process.argv.includes("start");
 const gitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH?.substring(0, 7) || "-";
-const isPreview = process.env.APP_VARIANT === "preview";
 
-const appId = isPreview ? "com.tingyuan.minibili.preview" : "com.tingyuan.minibili";
+// 三个变体的 applicationId 与应用名都不同，所以能同时装在一台手机上，开发包也不会覆盖正式包。
+// 变体由 APP_VARIANT 选择：EAS 里写在 eas.json 的 env，本地构建脚本见 scripts/build-android-local.mjs，
+// 不设置时是生产变体。
+const VARIANTS = {
+  development: { appId: "com.tingyuan.minibili.dev", name: "MiniBili-dev" },
+  preview: { appId: "com.tingyuan.minibili.preview", name: "MiniBili-pre" },
+  production: { appId: "com.tingyuan.minibili", name: "MiniBili" },
+};
+const VARIANT_ALIASES = { dev: "development", pre: "preview", prod: "production" };
+
+function resolveVariant() {
+  const value = process.env.APP_VARIANT?.trim() || "production";
+  const resolved = VARIANT_ALIASES[value] ?? value;
+
+  if (!Object.hasOwn(VARIANTS, resolved)) {
+    throw new Error(`未知的 APP_VARIANT：${value}（可选：${Object.keys(VARIANTS).join(" / ")}）`);
+  }
+
+  return resolved;
+}
+
+const variant = resolveVariant();
+const isPreview = variant === "preview";
+const { appId, name } = VARIANTS[variant];
 
 const release = `${appId}@${version}+${versionCode}`;
-
-const name = isPreview ? "MiniBili-pre" : "MiniBili";
 
 module.exports = {
   name,

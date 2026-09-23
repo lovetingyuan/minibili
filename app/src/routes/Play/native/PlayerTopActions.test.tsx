@@ -27,10 +27,10 @@ vi.mock("lucide-react-native", () => ({
   Repeat2: "Repeat2",
 }));
 
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
-    black: { text: "text-zinc-800 dark:text-neutral-200" },
-    secondary: { text: "text-pink-500 dark:text-pink-400" },
+vi.mock("@/constants/theme", () => ({
+  theme: {
+    text: { primary: "text-slate-800 dark:text-slate-200" },
+    secondary: { text: "text-[#FF6699]" },
   },
 }));
 

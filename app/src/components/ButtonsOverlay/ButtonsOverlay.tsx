@@ -1,6 +1,6 @@
 import { Button } from '@/components/styled/rneui'
 import { Modal, Pressable, View } from 'react-native'
-import { colors } from '@/constants/colors.tw'
+import { theme } from "@/constants/theme";
 import { useStore } from '@/store'
 
 function ButtonsOverlay() {
@@ -48,7 +48,7 @@ function ButtonsOverlay() {
           onPress={dismiss}
         />
         <View
-          className={`w-[80%] max-w-[500px] overflow-hidden rounded-lg px-0 py-3 shadow-sm ${colors.gray2.bg}`}
+          className={`w-[80%] max-w-[500px] overflow-hidden rounded-lg px-0 py-3 shadow-sm ${theme.background.fillStrong.bg}`}
         >
           {Buttons}
         </View>

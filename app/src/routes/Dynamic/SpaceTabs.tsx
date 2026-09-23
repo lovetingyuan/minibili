@@ -1,13 +1,13 @@
 import { Pressable, View } from "react-native";
 
 import { Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 import type { SpaceTabsProps } from "./SpaceTabs.types";
 
 export default function SpaceTabs(props: SpaceTabsProps) {
   return (
-    <View className={`flex-row border-b bg-white dark:bg-neutral-950 ${colors.gray2.border}`}>
+    <View className={`flex-row border-b ${theme.background.surface} ${theme.border.divider}`}>
       {props.tabs.map((tab) => {
         const selected = props.selectedKey === tab.key;
         const label = tab.count === undefined ? tab.label : `${tab.label} ${tab.count}`;
@@ -21,12 +21,12 @@ export default function SpaceTabs(props: SpaceTabsProps) {
             onPress={() => props.onSelect(tab.key)}
           >
             <Text
-              className={`text-sm ${selected ? `${colors.primary.text} font-semibold` : colors.gray6.text}`}
+              className={`text-sm ${selected ? `${theme.primary.text} font-semibold` : theme.text.muted}`}
             >
               {label}
             </Text>
             {selected ? (
-              <View className={`absolute bottom-0 h-0.5 w-8 rounded-full ${colors.primary.bg}`} />
+              <View className={`absolute bottom-0 h-0.5 w-8 rounded-full ${theme.primary.bg}`} />
             ) : null}
           </Pressable>
         );

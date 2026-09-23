@@ -36,8 +36,8 @@ test("outline Chip 使用主题描边与文字色", () => {
   const button = buttonOf(chip);
   const [title] = children(button);
 
-  expect(button.props.className).toContain("border-sky-500");
-  expect(title.props.className).toContain("text-sky-600");
+  expect(button.props.className).toContain("border-[#00AEEC]");
+  expect(title.props.className).toContain("text-[#008AC5]");
   expect(title.props.children).toBe("动画");
 });
 

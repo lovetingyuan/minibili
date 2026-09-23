@@ -18,7 +18,7 @@ import {
 } from '@/components/Menu'
 
 import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
-import { colors } from '@/constants/colors.tw'
+import { theme } from '@/constants/theme'
 import { useBlockUpActions } from '@/hooks/useBlockUpActions'
 import { useFollowActions } from '@/hooks/useFollowActions'
 import { useFollowedUpsMap } from '@/store/derives'
@@ -32,8 +32,8 @@ import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast }
 
 // 头像右上角的性别角标，只用性别符号本身，不加底色
 const sexBadgeMap: Record<string, { symbol: string; textClassName: string; label: string }> = {
-  男: { symbol: '♂', textClassName: colors.primary.text, label: '男性' },
-  女: { symbol: '♀', textClassName: colors.secondary.text, label: '女性' },
+  男: { symbol: '♂', textClassName: theme.primary.text, label: '男性' },
+  女: { symbol: '♀', textClassName: theme.secondary.text, label: '女性' },
 }
 
 function HeaderLeft() {
@@ -101,9 +101,9 @@ function HeaderLeft() {
                   })
                 }
               }}
-              className="absolute inset-0 h-10 w-10 items-center justify-center rounded-full bg-neutral-950/60"
+              className="absolute inset-0 h-10 w-10 items-center justify-center rounded-full bg-slate-950/60"
             >
-              <Text className={'text-center text-xs font-bold text-teal-300'}>直播中</Text>
+              <Text className={`text-center text-xs font-bold text-[#80DAF6]`}>直播中</Text>
             </Pressable>
           ) : null}
           {sexBadge ? (
@@ -127,7 +127,7 @@ function HeaderLeft() {
       <View className="ml-3 flex-1 flex-row items-center">
         <UpName
           mid={dynamicUser.mid}
-          className={clsx('shrink text-lg', followed && [colors.secondary.text, 'font-bold'])}
+          className={clsx('shrink text-lg', followed && [theme.secondary.text, 'font-bold'])}
           // adjustsFontSizeToFit
           onPress={copyUserName}
           numberOfLines={1}

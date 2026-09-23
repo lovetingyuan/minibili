@@ -6,7 +6,7 @@ import { Linking, Pressable, useWindowDimensions, View } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
 import type { DynamicAuthor, DynamicContent, DynamicImage } from "@/api/dynamic-items.type";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
@@ -71,7 +71,7 @@ export function DynamicImageGrid(props: {
               contentFit={props.natural ? "contain" : "cover"}
               className={clsx(
                 columns === 1 ? "w-full rounded-lg" : "aspect-square w-full",
-                props.natural && "bg-neutral-100 dark:bg-neutral-800",
+                props.natural && "bg-slate-100 dark:bg-slate-800",
               )}
               style={columns === 1 ? { aspectRatio } : undefined}
             />
@@ -177,14 +177,14 @@ function VideoCard(props: {
         {content.title}
       </Text>
       {hasDescription ? (
-        <Text className={`text-xs ${colors.gray6.text}`} numberOfLines={props.detail ? 4 : 2}>
+        <Text className={`text-xs ${theme.text.muted}`} numberOfLines={props.detail ? 4 : 2}>
           {content.description}
         </Text>
       ) : null}
     </View>
   );
-  const containerClassName = "mb-3 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800";
-  const coverClassName = "relative aspect-video w-full bg-neutral-200 dark:bg-neutral-700";
+  const containerClassName = "mb-3 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800";
+  const coverClassName = "relative aspect-video w-full bg-slate-200 dark:bg-slate-700";
 
   if (props.detail) {
     return (
@@ -219,8 +219,8 @@ function LinkCard(props: {
   const coverSize = isArticle ? getImagePixelDimensions(128, 72) : getImagePixelDimensions(96, 80);
   if (content.kind === "unavailable") {
     return (
-      <View className="mb-3 rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
-        <Text className={colors.gray6.text}>{content.message}</Text>
+      <View className="mb-3 rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
+        <Text className={theme.text.muted}>{content.message}</Text>
       </View>
     );
   }
@@ -228,7 +228,7 @@ function LinkCard(props: {
     <Pressable
       disabled={!content.url}
       onPress={() => content.url && void Linking.openURL(content.url)}
-      className="mb-3 flex-row overflow-hidden rounded-lg bg-neutral-100 p-2 dark:bg-neutral-800"
+      className="mb-3 flex-row overflow-hidden rounded-lg bg-slate-100 p-2 dark:bg-slate-800"
     >
       {content.cover ? (
         <Image
@@ -239,18 +239,18 @@ function LinkCard(props: {
       ) : null}
       <View className="min-w-0 flex-1 justify-center gap-1">
         {"label" in content && content.label ? (
-          <Text className={`text-xs ${colors.secondary.text}`}>{content.label}</Text>
+          <Text className={`text-xs ${theme.secondary.text}`}>{content.label}</Text>
         ) : null}
         <Text className="text-sm font-semibold" numberOfLines={2}>
           {content.title}
         </Text>
         {!isArticle && content.description ? (
-          <Text className={`text-xs ${colors.gray6.text}`} numberOfLines={3}>
+          <Text className={`text-xs ${theme.text.muted}`} numberOfLines={3}>
             {content.description}
           </Text>
         ) : null}
         {content.kind === "article" && content.hasMore ? (
-          <Text className={`text-xs ${colors.primary.text}`}>查看全文</Text>
+          <Text className={`text-xs ${theme.primary.text}`}>查看全文</Text>
         ) : null}
       </View>
     </Pressable>

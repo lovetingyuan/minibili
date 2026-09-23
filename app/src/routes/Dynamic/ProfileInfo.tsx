@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, View } from "react-native";
 
 import { Text } from "@/components/styled/rneui";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 
 import type { ProfileInfoProps, ProfileInfoRowProps } from "./ProfileInfo.types";
 
@@ -15,7 +15,7 @@ function ProfileInfoRow(props: ProfileInfoRowProps) {
         ellipsizeMode="tail"
         className="min-w-0 flex-1 text-sm leading-5"
       >
-        <Text className={`text-xs font-medium ${colors.gray6.text}`}>{props.label}　</Text>
+        <Text className={`text-xs font-medium ${theme.text.muted}`}>{props.label}　</Text>
         {props.value}
       </Text>
       {props.action}
@@ -40,14 +40,14 @@ export default function ProfileInfo(props: ProfileInfoProps) {
       className="shrink-0 self-end px-1 py-0.5"
       onPress={() => setExpanded((current) => !current)}
     >
-      <Text className={`text-xs font-medium leading-5 ${colors.primary.text}`}>
+      <Text className={`text-xs font-medium leading-5 ${theme.primary.text}`}>
         {expanded ? "收起" : "详情"}
       </Text>
     </Pressable>
   );
 
   return (
-    <View className="mb-3 gap-2 bg-white px-4 py-3 dark:bg-neutral-950">
+    <View className="mb-3 gap-2 bg-white px-4 py-3 dark:bg-slate-950">
       {officialDescription ? (
         <ProfileInfoRow
           action={sign ? undefined : action}

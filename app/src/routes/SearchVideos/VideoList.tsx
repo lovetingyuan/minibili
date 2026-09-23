@@ -9,7 +9,7 @@ import type { EmitterSubscription } from "react-native";
 import { useHotSearch } from "@/api/hot-search";
 import { type SearchedVideoType, useSearchVideos } from "@/api/search-video";
 import VideoListItem from "@/components/VideoItem";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useStore } from "@/store";
 import { getImagePixelSize, parseImgUrl } from "@/utils";
 import type { FlashListRef } from "@/components/styled/rneui";
@@ -163,9 +163,9 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
       ListEmptyComponent={<EmptyContent loading={isLoading} onSearch={props.onSearch} />}
       ListFooterComponent={
         isValidating ? (
-          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>加载中~</Text>
+          <Text className={`${theme.text.muted} my-2 text-center text-xs`}>加载中~</Text>
         ) : searchedVideos?.length && isReachingEnd ? (
-          <Text className={`${colors.gray6.text} my-2 text-center text-xs`}>暂无更多</Text>
+          <Text className={`${theme.text.muted} my-2 text-center text-xs`}>暂无更多</Text>
         ) : null
       }
       contentContainerStyle={{

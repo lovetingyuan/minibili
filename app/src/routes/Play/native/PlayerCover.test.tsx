@@ -16,10 +16,10 @@ vi.mock("@/components/styled/rneui", () => ({
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ Play: "Play" }));
 
-vi.mock("@/constants/colors.tw", () => ({
-  colors: {
-    gray4: { accent: "accent-gray-400 dark:accent-gray-600" },
-    secondary: { accent: "accent-pink-500 dark:accent-pink-400" },
+vi.mock("@/constants/theme", () => ({
+  theme: {
+    background: { fillMuted: { accent: "accent-slate-400 dark:accent-slate-600" } },
+    secondary: { accent: "accent-[#FF6699]" },
   },
 }));
 

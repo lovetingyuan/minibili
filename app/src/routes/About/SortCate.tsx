@@ -3,7 +3,7 @@ import { CollapsibleSection } from "@/components/CollapsibleSection";
 import { Text } from "@/components/styled/rneui";
 import React from "react";
 import { View } from "react-native";
-import { colors } from "@/constants/colors.tw";
+import { theme } from "@/constants/theme";
 import { useUserSettings } from "@/features/user-data/useUserSettings";
 import type { UserSettings } from "@/features/user-data/types";
 import type { CategorySelection } from "./SortCate.types";
@@ -60,7 +60,7 @@ export default function SortCate() {
             />
           ))}
           {!sorted.length && (
-            <Text className={`mb-1 flex-1 ${colors.gray6.text}`}>点击名称调整顺序</Text>
+            <Text className={`mb-1 flex-1 ${theme.text.muted}`}>点击名称调整顺序</Text>
           )}
         </View>
         <View className="mt-5 flex-row flex-wrap gap-x-3">

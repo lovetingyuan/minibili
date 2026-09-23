@@ -15,7 +15,7 @@ vi.mock("react-native", () => ({
   View: "View",
 }));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button" }));
-vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
   useStore: () => ({
     overlayButtons: mocks.overlayButtons,
@@ -87,7 +87,7 @@ test("点击遮罩关闭菜单并保留菜单容器样式", () => {
   expect(menu.props.className).toContain("w-[80%]");
   expect(menu.props.className).toContain("overflow-hidden rounded-lg");
   expect(menu.props.className).toContain("px-0 py-3 shadow-sm");
-  expect(menu.props.className).toContain("bg-gray-200 dark:bg-gray-800");
+  expect(menu.props.className).toContain("bg-slate-200 dark:bg-slate-800");
 });
 
 test("点击菜单项时先关闭菜单再执行业务回调", () => {
