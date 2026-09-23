@@ -31,18 +31,23 @@ vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
 vi.mock("@/store", () => ({ useStore: () => ({ setOverlayButtons: vi.fn() }) }));
 vi.mock("@/store/derives", () => ({ useFollowedUpsMap: () => ({}) }));
 vi.mock("@/utils/watch-time", () => import("../../utils/watch-time"));
-vi.mock("@/utils", () => ({
-  getImagePixelDimensions: (width: number, height: number) => ({ width, height }),
-  isDefined: (value: unknown) => value !== undefined && value !== null,
-  parseDate: mocks.parseDate,
-  parseDuration: String,
-  parseDurationStr: String,
-  parseImgUrl: String,
-  parseNumber: String,
-}));
+vi.mock("@/utils", async () => {
+  const { stripEmTags } = await import("../../utils/html");
+  return {
+    getImagePixelDimensions: (width: number, height: number) => ({ width, height }),
+    isDefined: (value: unknown) => value !== undefined && value !== null,
+    parseDate: mocks.parseDate,
+    parseDuration: String,
+    parseDurationStr: String,
+    parseImgUrl: String,
+    parseNumber: String,
+    stripEmTags,
+  };
+});
 
 import VideoListItem from "./VideoItem";
 import { WatchProgressBar } from "../WatchProgressBar";
+import { colors } from "../../constants/colors.tw";
 
 function text(node: ReactNode): string {
   return React.Children.toArray(node)
@@ -87,6 +92,23 @@ test("history shows the exact watch date without a fabricated publication date a
     expect.objectContaining({ bvid: "BV1", aid: 1, title: "video" }),
   );
   expect(mocks.navigate.mock.calls[0][1].date).toBeUndefined();
+});
+
+test("search highlight tags stay in the list but not in the Play params", () => {
+  const row = VideoListItem({
+    video: { ...video, title: '<em class="keyword">原神</em>攻略&amp;' },
+  });
+  // 列表里高亮词仍按分段渲染，并且普通文本里的实体已解码
+  expect(text(row)).toContain("原神攻略&");
+  expect(
+    elements(row).some((element) => element.props.className === colors.secondary.text),
+  ).toBe(true);
+
+  row.props.onPress();
+  expect(mocks.navigate).toHaveBeenCalledWith(
+    "Play",
+    expect.objectContaining({ title: "原神攻略&" }),
+  );
 });
 
 test("ordinary cards retain publication dates and the existing cover play-count layout", () => {

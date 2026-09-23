@@ -3,7 +3,7 @@ import { expect, test } from "vitest";
 import type { ReplyItemType } from "@/api/comments.types";
 import type { RepliesInfo } from "@/store/replies-info.type";
 
-import { removeReplyFromInfo } from "./reply-list.helpers";
+import { getReplySheetHeight, removeReplyFromInfo } from "./reply-list.helpers";
 
 function createReply(id: string, root: string | number, rcount = 0): ReplyItemType {
   return {
@@ -54,4 +54,10 @@ test("removes a reply from previews and local additions while retargeting the co
   expect(next.previewReplies).toEqual([kept]);
   expect(next.addedReplies).toEqual([]);
   expect(next.replyTarget.id).toBe(rootComment.id);
+});
+
+test("keeps the reply sheet short enough for the keyboard to push it up", () => {
+  // 853dp 屏幕：sheet 占 512dp，键盘弹出时可上移 341dp，足够放下约 271dp 的键盘
+  expect(getReplySheetHeight(853.33)).toBe(512);
+  expect(853 - getReplySheetHeight(853)).toBeGreaterThan(271);
 });

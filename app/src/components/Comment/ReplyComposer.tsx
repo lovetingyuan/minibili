@@ -1,6 +1,9 @@
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Keyboard, Pressable, TextInput, View } from "react-native";
+import type { ComponentRef } from "react";
+import { ActivityIndicator, Keyboard, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useResolveClassNames } from "uniwind";
 import { ArrowUp } from "lucide-react-native";
 
 import { Text } from "@/components/styled/rneui";
@@ -9,10 +12,15 @@ import { colors } from "@/constants/colors.tw";
 
 import type { ReplyComposerProps } from "./reply-composer.types";
 
+// BottomSheetTextInput 内部包了一层手势库的 TextInput，className 透传不可靠，改由类名解析成 style
+const INPUT_CLASS_NAME =
+  "max-h-28 min-h-11 flex-1 rounded-3xl bg-neutral-100 px-4 py-2.5 text-[15px] text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100";
+
 export default function ReplyComposer(props: ReplyComposerProps) {
   const [draft, setDraft] = useState("");
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<ComponentRef<typeof BottomSheetTextInput>>(null);
   const insets = useSafeAreaInsets();
+  const inputStyle = useResolveClassNames(INPUT_CLASS_NAME);
   const count = [...draft].length;
 
   useEffect(() => {
@@ -49,12 +57,12 @@ export default function ReplyComposer(props: ReplyComposerProps) {
         </View>
       ) : null}
       <View className="flex-row items-end gap-2">
-        <TextInput
+        <BottomSheetTextInput
           ref={inputRef}
           value={draft}
           multiline
           placeholder={`回复 @${props.target.name}`}
-          className="max-h-28 min-h-11 flex-1 rounded-3xl bg-neutral-100 px-4 py-2.5 text-[15px] text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100"
+          style={inputStyle}
           accessibilityLabel={`回复 ${props.target.name}`}
           onChangeText={(value) => setDraft([...value].slice(0, 1000).join(""))}
           onSubmitEditing={() => void submit()}

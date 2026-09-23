@@ -17,6 +17,7 @@ export {
   parseUrl,
 } from "./image";
 export type { BilibiliImageOptions } from "./image.types";
+export { stripEmTags } from "./html";
 export { resolveNetworkUsage } from "./network";
 export type { NetworkStateSnapshot, NetworkUsage } from "./network";
 

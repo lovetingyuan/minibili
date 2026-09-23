@@ -5,7 +5,6 @@ import type { ReplyItemType } from "@/api/comments.types";
 import type { RepliesInfo } from "@/store/replies-info.type";
 
 const mocks = vi.hoisted(() => ({
-  easing: vi.fn(),
   repliesInfo: null as unknown,
   replies: null as unknown,
   setRepliesInfo: vi.fn(),
@@ -19,20 +18,19 @@ vi.mock("react", async () => ({
 vi.mock("@react-navigation/native", () => ({ useIsFocused: () => true }));
 vi.mock("react-native", () => ({
   ActivityIndicator: "ActivityIndicator",
-  Easing: { cubic: "cubic", out: () => mocks.easing },
   Pressable: "Pressable",
+  useWindowDimensions: () => ({ height: 800, width: 400 }),
   View: "View",
 }));
 vi.mock("@/api/replies", () => ({ useReplies: () => mocks.replies }));
+vi.mock("@/components/styled/bottom-sheet", () => ({ BottomSheet: "BottomSheet" }));
 vi.mock("@/components/styled/rneui", () => ({
-  BottomSheet: "BottomSheet",
   FlashList: "FlashList",
   Text: "Text",
 }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({ X: "X" }));
 vi.mock("@/constants/colors.tw", () => import("../../constants/colors.tw"));
-vi.mock("@/hooks/useKeyboardHeight", () => ({ default: () => 0 }));
 vi.mock("@/store", () => ({
   useStore: () => ({ repliesInfo: mocks.repliesInfo, setRepliesInfo: mocks.setRepliesInfo }),
 }));
@@ -42,12 +40,14 @@ vi.mock("./ReplyComposer", () => ({ default: "ReplyComposer" }));
 import ReplyList from "./ReplyList";
 
 type ElementProps = {
+  backdropOpacity?: number;
   children?: ReactNode;
   className?: string;
-  easing?: unknown;
+  onClose?: () => void;
   onDelete?: (target: ReplyItemType) => Promise<boolean>;
   renderItem?: (input: { item: ReplyItemType }) => ReactElement<ElementProps>;
-  scrollViewProps?: { keyboardShouldPersistTaps?: string };
+  snapPoints?: number[];
+  visible?: boolean;
   viewerMid?: string;
 };
 
@@ -128,7 +128,7 @@ beforeEach(() => {
   };
 });
 
-test("uses a non-overshooting sheet transition and wires own-reply deletion", async () => {
+test("renders a themed reply sheet and wires own-reply deletion", async () => {
   const onDelete = vi.fn().mockResolvedValue(true);
   const tree = ReplyList({
     onAttitude: vi.fn().mockResolvedValue(null),
@@ -140,8 +140,12 @@ test("uses a non-overshooting sheet transition and wires own-reply deletion", as
     isDeletePending: () => false,
   }) as ReactElement<ElementProps>;
 
-  expect(tree.props.easing).toBe(mocks.easing);
-  expect(tree.props.scrollViewProps?.keyboardShouldPersistTaps).toBe("handled");
+  // 800dp 窗口按六成算，留出足够的空间让键盘把 sheet 顶上去
+  expect(tree.props.snapPoints).toEqual([480]);
+  expect(tree.props.visible).toBe(true);
+  expect(tree.props.backdropOpacity).toBe(0.5);
+  tree.props.onClose?.();
+  expect(mocks.setRepliesInfo).toHaveBeenCalledWith(null);
   const list = findElement(tree, (element) => element.type === "FlashList");
   const child = (mocks.repliesInfo as RepliesInfo).previewReplies[0];
   const row = list?.props.renderItem?.({ item: child });

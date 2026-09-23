@@ -1,13 +1,6 @@
 import React from "react";
-import {
-  BottomSheet as BaseBottomSheet,
-  Button as BaseButton,
-  Skeleton as BaseSkeleton,
-  ThemeProvider,
-  createTheme,
-} from "@rneui/themed";
+import { Button as BaseButton, Skeleton as BaseSkeleton, ThemeProvider, createTheme } from "@rneui/themed";
 import type {
-  BottomSheetProps as BaseBottomSheetProps,
   ButtonProps as BaseButtonProps,
   SkeletonProps as BaseSkeletonProps,
 } from "@rneui/base";
@@ -19,7 +12,6 @@ import type {
   TextProps as NativeTextProps,
   TextStyle,
 } from "react-native";
-import type { Edge } from "react-native-safe-area-context";
 import { useResolveClassNames } from "uniwind";
 
 import { colors } from "@/constants/colors.tw";
@@ -39,35 +31,6 @@ function useResolvedColor(className?: string) {
   }
 
   return undefined;
-}
-
-type BottomSheetProps = BaseBottomSheetProps & {
-  backdropClassName?: string;
-  containerClassName?: string;
-  /** 内部通过 SafeAreaView 包裹内容，默认四边都加安全区内边距，贴底场景可只保留 top */
-  edges?: Edge[];
-  children?: React.ReactNode;
-};
-
-export function BottomSheet({
-  backdropClassName,
-  containerClassName,
-  backdropStyle,
-  containerStyle,
-  edges,
-  ...props
-}: BottomSheetProps) {
-  const resolvedBackdropStyle = useResolvedStyle(backdropClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-
-  return (
-    <BottomSheetPrimitive
-      {...props}
-      edges={edges}
-      backdropStyle={[backdropStyle, resolvedBackdropStyle]}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-    />
-  );
 }
 
 type ButtonProps = BaseButtonProps & {
@@ -232,7 +195,6 @@ export function Text({ className, style, accessibilityRole = "text", ...props }:
   );
 }
 
-const BottomSheetPrimitive = BaseBottomSheet as unknown as React.ComponentType<BottomSheetProps>;
 const ButtonPrimitive = BaseButton as unknown as React.ComponentType<ButtonProps>;
 export { ThemeProvider, createTheme };
 export type { FlashListProps, FlashListRef };

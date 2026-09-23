@@ -23,6 +23,7 @@ import {
   parseDurationStr,
   parseImgUrl,
   parseNumber,
+  stripEmTags,
 } from "@/utils";
 
 function extractTextWithEmTags(text: string, className?: string) {
@@ -98,7 +99,8 @@ function VideoListItem<T extends VideoListItemInfo>({
         navigation.navigate("Play", {
           aid: video.aid,
           bvid: video.bvid,
-          title: video.title,
+          // 搜索结果标题带 <em class="keyword"> 高亮标记，列表渲染需要它，传参给播放页前去掉
+          title: stripEmTags(video.title),
           desc: video.desc,
           mid: video.mid,
           face: video.face,

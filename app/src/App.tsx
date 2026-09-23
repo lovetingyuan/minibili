@@ -1,5 +1,6 @@
 import "../global.css";
 
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import NetInfo from "@react-native-community/netinfo";
 import { ThemeProvider } from "@/components/styled/rneui";
 import { StatusBar } from "expo-status-bar";
@@ -85,21 +86,24 @@ export default function App() {
           <ThemeProvider theme={rneTheme}>
             <MenuProvider backHandler customStyles={menuProviderCustomStyles}>
               <ErrorBoundary FallbackComponent={ErrorFallback}>
-                <InitStoreComp />
-                <BilibiliFollowingsManager />
-                <BilibiliBlacklistManager />
-                <UserDataManager />
-                <CheckAppUpdate />
-                <CheckNetState />
-                <LiveUpsManager />
-                <FollowingDynamicsUpdatesManager />
-                <FollowingDynamicsUnreadManager />
-                <WatchLaterManager />
-                <WatchProgressManager />
-                <VideoDownloadManager />
-                <ButtonsOverlay />
-                <ImagesView />
-                <Route />
+                {/* sheet 内容通过 portal 渲染，放在 MenuProvider/ErrorBoundary 里面才能继承它们的 context */}
+                <BottomSheetModalProvider>
+                  <InitStoreComp />
+                  <BilibiliFollowingsManager />
+                  <BilibiliBlacklistManager />
+                  <UserDataManager />
+                  <CheckAppUpdate />
+                  <CheckNetState />
+                  <LiveUpsManager />
+                  <FollowingDynamicsUpdatesManager />
+                  <FollowingDynamicsUnreadManager />
+                  <WatchLaterManager />
+                  <WatchProgressManager />
+                  <VideoDownloadManager />
+                  <ButtonsOverlay />
+                  <ImagesView />
+                  <Route />
+                </BottomSheetModalProvider>
               </ErrorBoundary>
             </MenuProvider>
           </ThemeProvider>

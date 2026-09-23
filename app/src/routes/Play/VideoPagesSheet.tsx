@@ -2,10 +2,10 @@ import type { FlashListRef } from "@shopify/flash-list";
 import { Check, X } from "lucide-react-native";
 import React from "react";
 import { Pressable, useWindowDimensions, View } from "react-native";
-import type { Edge } from "react-native-safe-area-context";
 
 import type { VideoInfo } from "@/api/video-info";
-import { BottomSheet, FlashList, Text } from "@/components/styled/rneui";
+import { BottomSheet } from "@/components/styled/bottom-sheet";
+import { FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { colors } from "@/constants/colors.tw";
 import { parseDuration } from "@/utils";
@@ -22,24 +22,37 @@ type VideoPagesSheetProps = {
   onSelectPage: (page: number) => void;
 };
 
-const SHEET_SAFE_AREA_EDGES: Edge[] = ["top"];
+const SHEET_BACKDROP_OPACITY = 0.35;
 
 export default function VideoPagesSheet(props: VideoPagesSheetProps) {
   const { height } = useWindowDimensions();
   const listRef = React.useRef<FlashListRef<VideoPage>>(null);
+  const loadedRef = React.useRef(false);
   const sheetHeight = getVideoPagesSheetHeight(height, props.pages.length);
 
+  function scrollToCurrentPage() {
+    listRef.current?.scrollToIndex({
+      index: Math.max(0, props.currentPage - 1),
+      animated: false,
+      viewPosition: 0.5,
+    });
+  }
+
+  // sheet 内容每次打开都会重新挂载，onLoad 之后 ref 才可用，首次居中只能在这里做
+  function handlePagesLoad() {
+    loadedRef.current = true;
+    scrollToCurrentPage();
+  }
+
   React.useEffect(() => {
-    if (!props.visible || !props.pages.length) {
+    if (!props.visible) {
+      loadedRef.current = false;
       return;
     }
-    const frame = requestAnimationFrame(() => {
-      listRef.current?.scrollToIndex({
-        index: Math.max(0, props.currentPage - 1),
-        animated: false,
-        viewPosition: 0.5,
-      });
-    });
+    if (!loadedRef.current || !props.pages.length) {
+      return;
+    }
+    const frame = requestAnimationFrame(scrollToCurrentPage);
     return () => {
       cancelAnimationFrame(frame);
     };
@@ -47,19 +60,13 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
 
   return (
     <BottomSheet
-      backdropClassName="bg-black/35"
-      edges={SHEET_SAFE_AREA_EDGES}
-      onBackdropPress={props.onClose}
-      modalProps={{ onRequestClose: props.onClose, statusBarTranslucent: true }}
-      isVisible={props.visible}
+      backdropOpacity={SHEET_BACKDROP_OPACITY}
+      onClose={props.onClose}
+      snapPoints={[sheetHeight]}
+      visible={props.visible}
     >
-      <View
-        className="overflow-hidden rounded-t-[28px] bg-white dark:bg-neutral-950"
-        style={{ height: sheetHeight }}
-      >
-        <View className="items-center pb-1 pt-2.5">
-          <View className="h-1 w-10 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-        </View>
+      {/* flex-1 撑满 sheet 的内容区（sheet 高度已扣除把手），不要再写死高度 */}
+      <View className="flex-1 overflow-hidden rounded-t-[28px] bg-white dark:bg-neutral-950">
         <View className="relative h-14 flex-row items-center border-b border-neutral-100 px-4 dark:border-neutral-800">
           <Text className="text-base font-semibold tabular-nums">
             {`分 P · ${props.currentPage}/${props.pages.length}`}
@@ -82,6 +89,7 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
           keyExtractor={(item) => String(item.cid)}
           contentContainerClassName="px-3 py-2"
           maintainVisibleContentPosition={{ disabled: true }}
+          onLoad={handlePagesLoad}
           renderItem={({ item }) => {
             const selected = item.page === props.currentPage;
             return (

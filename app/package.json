@@ -29,6 +29,7 @@
     "bundle-analyze": "npx --yes react-native-bundle-visualizer --platform android --entry-file index.js --expo true"
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^5.2.14",
     "@preeternal/react-native-cookie-manager": "^6.4.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/hooks": "^100.1.0",
