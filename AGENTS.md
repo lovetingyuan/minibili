@@ -8,7 +8,7 @@ minibili - 使用 Expo + React Native + TailwindCSS 开发的精简版B站APP。
 
 本仓库是一个monorepo仓库，基于npm的workspace。
 
-- app，expo主项目，主要采用的框架和库有 expo + typescript + uniwind + swr + rneui组件库 + react-navigation
+- app，expo主项目，主要采用的框架和库有 expo + typescript + uniwind + swr + react-navigation，基础组件（Button/Skeleton 等）为项目内自维护
 - server，app项目的服务端，采用 cloudflare + hono 开发。
 
 ## 代码规范

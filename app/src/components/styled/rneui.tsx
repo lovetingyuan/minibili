@@ -1,9 +1,4 @@
 import React from "react";
-import { Button as BaseButton, Skeleton as BaseSkeleton, ThemeProvider, createTheme } from "@rneui/themed";
-import type {
-  ButtonProps as BaseButtonProps,
-  SkeletonProps as BaseSkeletonProps,
-} from "@rneui/base";
 import { FlashList as BaseFlashList } from "@shopify/flash-list";
 import type { FlashListProps, FlashListRef } from "@shopify/flash-list";
 import { Platform, Switch as NativeSwitch, Text as NativeText } from "react-native";
@@ -12,61 +7,15 @@ import type {
   TextProps as NativeTextProps,
   TextStyle,
 } from "react-native";
-import { useResolveClassNames } from "uniwind";
 
 import { colors } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
+import useResolvedStyle from "@/hooks/useResolvedStyle";
 
-function useResolvedStyle(className?: string) {
-  return useResolveClassNames(className ?? "");
-}
-
-function useResolvedColor(className?: string) {
-  const styles = useResolveClassNames(className ?? "");
-
-  if (typeof styles.accentColor === "string") {
-    return styles.accentColor;
-  }
-  if (typeof styles.color === "string") {
-    return styles.color;
-  }
-
-  return undefined;
-}
-
-type ButtonProps = BaseButtonProps & {
-  buttonClassName?: string;
-  containerClassName?: string;
-  iconContainerClassName?: string;
-  titleClassName?: string;
-  children?: React.ReactNode;
-};
-
-export function Button({
-  buttonClassName,
-  containerClassName,
-  iconContainerClassName,
-  titleClassName,
-  buttonStyle,
-  containerStyle,
-  iconContainerStyle,
-  titleStyle,
-  ...props
-}: ButtonProps) {
-  const resolvedButtonStyle = useResolvedStyle(buttonClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedIconContainerStyle = useResolvedStyle(iconContainerClassName);
-  const resolvedTitleStyle = useResolvedStyle(titleClassName);
-
-  return (
-    <ButtonPrimitive
-      {...props}
-      buttonStyle={[buttonStyle, resolvedButtonStyle]}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      iconContainerStyle={[iconContainerStyle, resolvedIconContainerStyle]}
-      titleStyle={[titleStyle, resolvedTitleStyle]}
-    />
-  );
-}
+export { Button } from "@/components/Button";
+export type { ButtonProps } from "@/components/Button";
+export { Skeleton } from "@/components/Skeleton";
+export type { SkeletonProps } from "@/components/Skeleton";
 
 type StyledFlashListProps<T> = FlashListProps<T> & {
   className?: string;
@@ -112,11 +61,6 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
 
 export const FlashList = FlashListBase;
 
-type SkeletonProps = BaseSkeletonProps & {
-  className?: string;
-  skeletonClassName?: string;
-};
-
 type SwitchProps = NativeSwitchProps & {
   colorClassName?: string;
   iosBackgroundColorClassName?: string;
@@ -152,25 +96,6 @@ export function Switch({
   );
 }
 
-export function Skeleton({
-  className,
-  skeletonClassName,
-  style,
-  skeletonStyle,
-  ...props
-}: SkeletonProps) {
-  const resolvedClassStyle = useResolvedStyle(className);
-  const resolvedSkeletonStyle = useResolvedStyle(skeletonClassName);
-
-  return (
-    <BaseSkeleton
-      {...props}
-      style={[style, resolvedClassStyle]}
-      skeletonStyle={[skeletonStyle, resolvedSkeletonStyle]}
-    />
-  );
-}
-
 type TextProps = NativeTextProps & {
   className?: string;
 };
@@ -195,6 +120,4 @@ export function Text({ className, style, accessibilityRole = "text", ...props }:
   );
 }
 
-const ButtonPrimitive = BaseButton as unknown as React.ComponentType<ButtonProps>;
-export { ThemeProvider, createTheme };
 export type { FlashListProps, FlashListRef };

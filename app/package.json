@@ -38,8 +38,6 @@
     "@react-navigation/elements": "^2.5.2",
     "@react-navigation/native": "^7.1.14",
     "@react-navigation/native-stack": "^7.3.21",
-    "@rneui/base": "^5.0.0",
-    "@rneui/themed": "^5.0.0",
     "@shopify/flash-list": "2.0.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "clsx": "^2.1.0",

@@ -7,13 +7,13 @@ function VideoLoading({ index }: { index: number }) {
   const width = SKELETON_WIDTHS[index % SKELETON_WIDTHS.length];
   return (
     <View className="flex-1 gap-3">
-      <Skeleton animation="pulse" width={"100%" as any} height={110} />
+      <Skeleton animation="pulse" width="100%" height={110} />
       <View className="gap-2">
-        <Skeleton animation="wave" width={`${width}%` as any} height={15} />
+        <Skeleton animation="wave" width={`${width}%`} height={15} />
         {index % 2 === 0 ? (
           <Skeleton
             animation="wave"
-            width={`${SKELETON_WIDTHS[(index + 7) % SKELETON_WIDTHS.length]}%` as any}
+            width={`${SKELETON_WIDTHS[(index + 7) % SKELETON_WIDTHS.length]}%`}
             height={15}
           />
         ) : (
