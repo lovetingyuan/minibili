@@ -7,6 +7,7 @@ import Toast from "react-native-simple-toast";
 import { RanksConfig } from "../constants";
 import type { VideoDownloadTask } from "../features/video-download/types";
 import type { UpInfo } from "../types";
+import type { NetworkUsage } from "../utils/network";
 import type { WatchProgressSnapshot } from "../utils/watch-progress";
 import type { FollowingDynamicsReadState } from "../api/following-dynamics.types";
 import { clearLegacyCollections } from "./legacy-collections";
@@ -48,7 +49,11 @@ const getAppValue = () => {
     initialed: false,
     // 仅当前运行会话的完整 B站同步才激活磁盘缓存。
     followingsGeneration: -1,
-    isWiFi: false,
+    /**
+     * 当前网络类型，决定要不要按流量播放：
+     * 只有确认处于 WiFi（且系统未标记为计费网络）时才认为不消耗流量
+     */
+    networkUsage: "unknown" as NetworkUsage,
     /**
      * 播放器内弹幕开关，默认开启
      */

@@ -38,12 +38,13 @@ type PlayerMessage = {
 type PlayerErrorType = "play-url" | "webview";
 
 function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEvent) => void }) {
-  const { getIsWiFi, imagesList } = useStore();
+  const { getNetworkUsage, imagesList } = useStore();
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
   const { width, height } = useWindowDimensions();
   const [verticalExpand, setVerticalExpand] = React.useState(false);
   const { data } = useVideoInfo(route.params.bvid);
-  const isWifi = getIsWiFi();
+  // 只有确认在 WiFi 下才自动播放并默认高清，其余情况（含状态未知）按省流处理
+  const isWifi = getNetworkUsage() === "wifi";
 
   const [loadPlayer, setLoadPlayer] = React.useState(isWifi);
   const [highQuality, setHighQuality] = React.useState(isWifi);

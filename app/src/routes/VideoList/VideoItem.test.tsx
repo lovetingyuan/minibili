@@ -47,7 +47,7 @@ vi.mock("@/constants/colors.tw", () => ({
 
 vi.mock("@/store", () => ({
   useStore: () => ({
-    isWiFi: true,
+    networkUsage: "wifi",
   }),
 }));
 vi.mock("@/features/user-data/useUserSettings", () => ({

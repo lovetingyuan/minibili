@@ -8,7 +8,8 @@ import { parseDuration } from "@/utils";
 
 type PlayerCoverProps = {
   duration?: number;
-  isCellular: boolean;
+  /** 当前网络会消耗移动流量 */
+  isMetered: boolean;
   highQuality: boolean;
   onHighQualityChange: (enabled: boolean) => void;
   onStart: () => void;
@@ -19,7 +20,7 @@ function PlayerPlayIcon() {
 }
 
 export default function PlayerCover(props: PlayerCoverProps) {
-  const { duration, isCellular, highQuality } = props;
+  const { duration, isMetered, highQuality } = props;
 
   return (
     <View className="flex-1">
@@ -37,13 +38,13 @@ export default function PlayerCover(props: PlayerCoverProps) {
             {parseDuration(duration)}
           </Text>
         ) : null}
-        {isCellular ? (
+        {isMetered ? (
           <Text className="rounded bg-gray-900/60 px-2 py-[2px] font-bold text-white">
             播放将消耗流量
           </Text>
         ) : null}
       </View>
-      {isCellular ? (
+      {isMetered ? (
         <View className="absolute bottom-2 right-2 flex-row items-center gap-1 rounded bg-gray-900/60 py-0.5 pl-2 pr-1">
           <Text className="font-bold text-white">1080P</Text>
           <Switch

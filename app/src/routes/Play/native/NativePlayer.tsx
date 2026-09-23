@@ -1,4 +1,3 @@
-import { NetInfoStateType, useNetInfo } from "@react-native-community/netinfo";
 import { type RouteProp, useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
 import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
@@ -66,6 +65,9 @@ import {
   resolvePlaybackFailover,
   resolvePreferredQuality,
   resolveSeekTargetMs,
+  shouldAutoStartPlayback,
+  shouldLoadVideoStream,
+  shouldPausePlaybackOnNetworkChange,
   shouldShowResumeButton,
   shouldRestartPlayback,
   type InitialResumeSnapshot,
@@ -100,10 +102,10 @@ export default function NativePlayer(props: NativePlayerProps) {
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
   const navigation = useNavigation<NavigationProps["navigation"]>();
   const isFocused = useIsFocused();
-  const netInfo = useNetInfo();
   const { width, height } = useWindowDimensions();
   const {
     imagesList,
+    networkUsage,
     $danmakuEnabled,
     set$danmakuEnabled,
     $backgroundPlayEnabled,
@@ -122,9 +124,12 @@ export default function NativePlayer(props: NativePlayerProps) {
   const danmakuVideo = videoInfo.aid ? { aid: String(videoInfo.aid), bvid: videoInfo.bvid } : null;
   const { send: sendDanmaku, isSending } = useSendDanmaku(danmakuAccount, danmakuVideo, cid);
 
-  const isCellular = netInfo.type === NetInfoStateType.cellular;
-  const networkReady = netInfo.type !== null && netInfo.type !== undefined;
+  // 只有确认在 WiFi 下才认为不消耗流量：流量、断网与状态未知都按省流处理
+  const isMeteredNetwork = networkUsage === "metered";
   const [highQuality, setHighQuality] = React.useState(false);
+  // 决定默认清晰度的网络条件：未开播时跟随网络，开播后固定。
+  // 播放中改清晰度会换播放地址并重建播放器，视频会从头开始
+  const [qualityNetworkUsage, setQualityNetworkUsage] = React.useState(networkUsage);
   const [started, setStarted] = React.useState(false);
   // 原生播放器是否已经上报首帧；Android 上该事件可能早于首帧真正稳定显示
   const [firstFrameRendered, setFirstFrameRendered] = React.useState(false);
@@ -184,6 +189,8 @@ export default function NativePlayer(props: NativePlayerProps) {
     enabled: boolean;
     showNotification: boolean;
   } | null>(null);
+  // 上一次的网络类型，只有"切到流量"这一次变化才需要暂停播放
+  const previousNetworkUsageRef = React.useRef(networkUsage);
 
   // 真正处于暂停态：起播、seek、缓冲造成的短暂暂停不算，避免暂停态的 UI 闪一下
   const pausedUiVisible = usePlayerPausedUi(isPlaying, playerStatus === "loading");
@@ -192,12 +199,15 @@ export default function NativePlayer(props: NativePlayerProps) {
   const { controlsVisible, toggleControls, keepControlsVisible, hideControls } =
     usePlayerControlsVisibility(controlsPlaying);
 
-  const qn = resolvePreferredQuality(isCellular, highQuality);
+  const qn = resolvePreferredQuality(qualityNetworkUsage, highQuality);
   const { urls, error: playUrlError, retry } = useVideoPlayUrl(videoInfo.bvid, cid, qn);
   const uri = urls[Math.min(playbackAttempt.index, urls.length - 1)];
   // 后台播放的系统通知标题。取路由参数里的标题，保证渲染期稳定，避免重建播放器
   const notificationTitle = route.params.title || videoInfo.bvid;
-  const source = uri ? createVideoSource(uri, notificationTitle) : null;
+  // 地址不是"拿到就挂"：source 非空会让原生播放器立刻开始拉流，
+  // 因此非 WiFi 网络下必须等用户点击封面，在此之前播放器停在 idle，只展示封面
+  const canLoadStream = shouldLoadVideoStream({ networkUsage, started });
+  const source = canLoadStream && uri ? createVideoSource(uri, notificationTitle) : null;
 
   const player = useVideoPlayer(source, (instance) => {
     instance.timeUpdateEventInterval = 0.25;
@@ -267,6 +277,13 @@ export default function NativePlayer(props: NativePlayerProps) {
   playbackModeRef.current = playbackMode;
   const pageCountRef = React.useRef(pageCount);
   pageCountRef.current = pageCount;
+  // 播放结束回调里要读最新的全屏状态与回调，订阅不能跟着全屏切换重建
+  const exitFullscreenOnEndedRef = React.useRef(() => {});
+  exitFullscreenOnEndedRef.current = () => {
+    if (fullscreen) {
+      onFullscreenChange(false);
+    }
+  };
   const reportHeartbeatEndedRef = React.useRef(reportEnded);
   reportHeartbeatEndedRef.current = reportEnded;
   const reportPartProgressEndedRef = React.useRef(reportPartProgressEnded);
@@ -509,14 +526,17 @@ export default function NativePlayer(props: NativePlayerProps) {
       reportPartProgressEndedRef.current(videoInfo.bvid, endedCid);
       updatePlayingState(false);
       setPortraitExpanded(false);
+      const continues = willContinueAfterEnded({
+        mode: playbackModeRef.current,
+        currentPage: endedPage,
+        pageCount: pageCountRef.current,
+      });
       // 循环或自动连播会继续播放，此时保持最后一帧；否则回到封面
-      setPlaybackEnded(
-        !willContinueAfterEnded({
-          mode: playbackModeRef.current,
-          currentPage: endedPage,
-          pageCount: pageCountRef.current,
-        }),
-      );
+      setPlaybackEnded(!continues);
+      // 播放真正结束（不会继续播下一 P 或循环）时退出全屏，避免停在最后一帧的全屏画面
+      if (!continues) {
+        exitFullscreenOnEndedRef.current();
+      }
       onPlayEndedRef.current({ cid: endedCid, page: endedPage });
     });
     return () => {
@@ -597,13 +617,33 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
   }, [playbackAttempt.token, player, source]);
 
-  // 非流量环境下自动开播；流量环境需要点击封面
+  // 只有确认在 WiFi 下、且拿到播放地址后才自动开播；流量、断网与状态未知都交给用户点击封面。
+  // 这些网络下播放器也还没挂上地址，不会在后台偷偷拉流
   React.useEffect(() => {
-    if (!networkReady || isCellular || !uri) {
+    if (!shouldAutoStartPlayback(networkUsage, Boolean(uri))) {
       return;
     }
     setStarted(true);
-  }, [networkReady, isCellular, uri]);
+  }, [networkUsage, uri]);
+
+  // 默认清晰度只在未开播时跟随网络，开播后固定，避免切网换地址把视频从头开始播
+  React.useEffect(() => {
+    if (started || networkUsage === "unknown") {
+      return;
+    }
+    setQualityNetworkUsage(networkUsage);
+  }, [networkUsage, started]);
+
+  // 切到流量时暂停播放，避免用户在不知情的情况下继续消耗移动流量
+  React.useEffect(() => {
+    const previousUsage = previousNetworkUsageRef.current;
+    previousNetworkUsageRef.current = networkUsage;
+    if (!shouldPausePlaybackOnNetworkChange(previousUsage, networkUsage) || !player.playing) {
+      return;
+    }
+    player.pause();
+    showToast("已切换到移动流量，播放已暂停");
+  }, [networkUsage, player]);
 
   React.useEffect(() => {
     if (!started || !uri) {
@@ -1075,10 +1115,13 @@ export default function NativePlayer(props: NativePlayerProps) {
       ) : (
         <PlayerCover
           duration={videoInfo.duration}
-          isCellular={isCellular}
+          isMetered={isMeteredNetwork}
           highQuality={highQuality}
           onHighQualityChange={setHighQuality}
           onStart={() => {
+            if (isMeteredNetwork) {
+              showToast("正在使用移动流量播放");
+            }
             setStarted(true);
           }}
         />

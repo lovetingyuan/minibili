@@ -20,7 +20,7 @@ export function CheckBox({
   wrapperClassName,
   checkedColor,
   uncheckedColor,
-  size = 24,
+  size = 20,
   ...props
 }: CheckBoxProps) {
   const resolvedCheckedColor = useResolvedColor(checkedColorClassName ?? "");

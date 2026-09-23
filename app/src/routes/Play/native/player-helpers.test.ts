@@ -18,6 +18,9 @@ import {
   resolveSeekSwipeSeconds,
   resolveSeekTargetMs,
   resolveVerticalSwipe,
+  shouldAutoStartPlayback,
+  shouldLoadVideoStream,
+  shouldPausePlaybackOnNetworkChange,
   shouldShowResumeButton,
   shouldRestartPlayback,
   toggleControlsVisible,
@@ -125,11 +128,44 @@ describe("initial resume", () => {
   });
 });
 
-test("uses 1080P except on cellular without the high quality option", () => {
-  expect(resolvePreferredQuality(false, false)).toBe(80);
-  expect(resolvePreferredQuality(false, true)).toBe(80);
-  expect(resolvePreferredQuality(true, true)).toBe(80);
-  expect(resolvePreferredQuality(true, false)).toBe(64);
+test("uses 1080P only on WiFi unless the high quality option was turned on", () => {
+  expect(resolvePreferredQuality("wifi", false)).toBe(80);
+  expect(resolvePreferredQuality("wifi", true)).toBe(80);
+  expect(resolvePreferredQuality("metered", false)).toBe(64);
+  expect(resolvePreferredQuality("metered", true)).toBe(80);
+  // 断网或网络状态未知时不能默认高清晰度
+  expect(resolvePreferredQuality("offline", false)).toBe(64);
+  expect(resolvePreferredQuality("unknown", false)).toBe(64);
+});
+
+test("auto starts playback only on WiFi with a play url", () => {
+  expect(shouldAutoStartPlayback("wifi", true)).toBe(true);
+  expect(shouldAutoStartPlayback("wifi", false)).toBe(false);
+  expect(shouldAutoStartPlayback("metered", true)).toBe(false);
+  expect(shouldAutoStartPlayback("offline", true)).toBe(false);
+  expect(shouldAutoStartPlayback("unknown", true)).toBe(false);
+});
+
+test("loads the video stream only on WiFi or after the user started playback", () => {
+  // WiFi 下保持进页面即预加载
+  expect(shouldLoadVideoStream({ networkUsage: "wifi", started: false })).toBe(true);
+  expect(shouldLoadVideoStream({ networkUsage: "wifi", started: true })).toBe(true);
+  // 流量下不能预加载，只有用户点击封面后才开始拉流
+  expect(shouldLoadVideoStream({ networkUsage: "metered", started: false })).toBe(false);
+  expect(shouldLoadVideoStream({ networkUsage: "metered", started: true })).toBe(true);
+  // 断网与网络状态未知同样按省流处理
+  expect(shouldLoadVideoStream({ networkUsage: "offline", started: false })).toBe(false);
+  expect(shouldLoadVideoStream({ networkUsage: "offline", started: true })).toBe(true);
+  expect(shouldLoadVideoStream({ networkUsage: "unknown", started: false })).toBe(false);
+  expect(shouldLoadVideoStream({ networkUsage: "unknown", started: true })).toBe(true);
+});
+
+test("pauses playback only when the network switches to metered", () => {
+  expect(shouldPausePlaybackOnNetworkChange("wifi", "metered")).toBe(true);
+  expect(shouldPausePlaybackOnNetworkChange("metered", "metered")).toBe(false);
+  // 切回 WiFi 或断网都不打断播放，避免重建播放器导致视频从头开始
+  expect(shouldPausePlaybackOnNetworkChange("metered", "wifi")).toBe(false);
+  expect(shouldPausePlaybackOnNetworkChange("wifi", "offline")).toBe(false);
 });
 
 test("auto hides controls only while playing", () => {

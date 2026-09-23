@@ -59,10 +59,15 @@ function findElement(
   return null;
 }
 
-function renderCover(highQuality: boolean, onHighQualityChange = vi.fn(), onStart = vi.fn()) {
+function renderCover(
+  highQuality: boolean,
+  onHighQualityChange = vi.fn(),
+  onStart = vi.fn(),
+  isMetered = true,
+) {
   const root = PlayerCover({
     duration: 90,
-    isCellular: true,
+    isMetered,
     highQuality,
     onHighQualityChange,
     onStart,
@@ -76,12 +81,17 @@ function renderCover(highQuality: boolean, onHighQualityChange = vi.fn(), onStar
     root,
     (element) => element.type === "Text" && element.props.children === "1080P",
   );
+  const meteredWarning = findElement(
+    root,
+    (element) => element.type === "Text" && element.props.children === "播放将消耗流量",
+  );
   const playButton = findElement(
     root,
     (element) => element.props.accessibilityLabel === "开始播放",
   );
 
   return {
+    meteredWarning,
     qualityControl,
     qualitySwitch,
     qualityLabel,
@@ -92,12 +102,22 @@ function renderCover(highQuality: boolean, onHighQualityChange = vi.fn(), onStar
 }
 
 describe("PlayerCover", () => {
-  test("shows an off switch for high quality on cellular by default", () => {
+  test("shows an off switch for high quality on metered network by default", () => {
     const { qualityControl, qualitySwitch, qualityLabel } = renderCover(false);
 
     expect(qualityControl?.props.accessibilityState).toEqual({ checked: false });
     expect(qualitySwitch?.props.value).toBe(false);
     expect(qualityLabel).not.toBeNull();
+  });
+
+  test("warns about mobile data and offers 1080P only on metered network", () => {
+    const metered = renderCover(false);
+    expect(metered.meteredWarning).not.toBeNull();
+    expect(metered.qualityLabel).not.toBeNull();
+
+    const wifi = renderCover(false, vi.fn(), vi.fn(), false);
+    expect(wifi.meteredWarning).toBeNull();
+    expect(wifi.qualityLabel).toBeNull();
   });
 
   test("toggles high quality without starting playback", () => {

@@ -3,6 +3,7 @@ import type { VideoSourceObject } from "expo-video";
 import type { VideoQuality } from "@/api/play-url";
 // 使用相对路径，保证 vitest 下无需别名配置即可解析
 import { mediaUA } from "../../../constants";
+import type { NetworkUsage } from "../../../utils/network";
 
 /**
  * 长按加速的倍速
@@ -296,13 +297,51 @@ export function toggleControlsVisible(visible: boolean) {
 }
 
 /**
- * 流量环境下未勾选高清用 720P，其余情况用 1080P
+ * 默认清晰度：只有确认在 WiFi 下才用 1080P；流量、断网与状态未知都先用 720P，
+ * 用户在流量下手动打开高清开关后才用 1080P
  */
-export function resolvePreferredQuality(isCellular: boolean, highQuality: boolean): VideoQuality {
-  if (isCellular && !highQuality) {
+export function resolvePreferredQuality(
+  networkUsage: NetworkUsage,
+  highQuality: boolean,
+): VideoQuality {
+  if (networkUsage !== "wifi" && !highQuality) {
     return 64;
   }
   return 80;
+}
+
+/**
+ * 只有确认在 WiFi 下、且已经拿到播放地址时才自动开播；
+ * 流量、断网与网络状态未知都交给用户点击封面
+ */
+export function shouldAutoStartPlayback(networkUsage: NetworkUsage, hasSource: boolean) {
+  return networkUsage === "wifi" && hasSource;
+}
+
+/**
+ * 是否把播放地址交给播放器：source 非空会让原生播放器构造后立刻加载视频流，
+ * 所以只有确认在 WiFi 下才提前加载；流量、断网与网络状态未知都必须等用户
+ * 主动点击封面，避免在用户不知情时消耗移动流量。
+ *
+ * WiFi 下尚未开播也返回 true，保持"进页面即预加载"的既有行为，
+ * 不会因为先挂地址再开播而多重建一次播放器。
+ */
+export function shouldLoadVideoStream(options: {
+  networkUsage: NetworkUsage;
+  started: boolean;
+}) {
+  return options.started || options.networkUsage === "wifi";
+}
+
+/**
+ * 从免费网络切到流量时暂停播放，避免用户不知情地继续消耗流量。
+ * 其余网络变化都不打断播放：换清晰度会重建播放器，视频会从头开始
+ */
+export function shouldPausePlaybackOnNetworkChange(
+  previousUsage: NetworkUsage,
+  usage: NetworkUsage,
+) {
+  return previousUsage !== "metered" && usage === "metered";
 }
 
 export function isSeekJump(

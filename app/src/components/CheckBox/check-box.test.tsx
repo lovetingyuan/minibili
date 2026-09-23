@@ -66,8 +66,8 @@ test("选中时用主题色填充方块并显示白色对勾", () => {
   expect(box.props.style).toMatchObject({
     backgroundColor: "#0ea5e9",
     borderColor: "#0ea5e9",
-    height: 24,
-    width: 24,
+    height: 20,
+    width: 20,
   });
   expect(icon.type).toBe("Check");
   expect(icon.props.color).toBe("#ffffff");
