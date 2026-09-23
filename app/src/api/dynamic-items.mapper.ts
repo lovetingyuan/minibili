@@ -49,6 +49,20 @@ function optionalUrl(value: string | null | undefined) {
   return value ? normalizeUrl(value) : undefined;
 }
 
+/** 失效的被转发动态会返回 `id_str: null`，这里统一按空 id 处理 */
+function getDynamicId(item: RawDynamicItem) {
+  return item.id_str == null ? "" : String(item.id_str);
+}
+
+/** 详情页地址；没有 id 时（已失效的原动态）不编造链接 */
+function getDynamicUrl(item: RawDynamicItem, id: string) {
+  const jumpUrl = optionalUrl(item.basic.jump_url);
+  if (jumpUrl) {
+    return jumpUrl;
+  }
+  return id ? `https://www.bilibili.com/opus/${id}` : "";
+}
+
 function normalizeImage(value: {
   url?: string;
   src?: string;
@@ -221,7 +235,7 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
         title: major.opus.title ?? "专栏",
         description: normalizeText(major.opus.summary.text),
         cover: images[0]?.src,
-        url: optionalUrl(major.opus.jump_url) ?? `https://www.bilibili.com/opus/${item.id_str}`,
+        url: optionalUrl(major.opus.jump_url) ?? getDynamicUrl(item, getDynamicId(item)),
         hasMore: major.opus.summary.has_more === true,
       };
     }
@@ -236,7 +250,7 @@ function normalizeContent(item: RawDynamicItem): DynamicContent {
       title: major.article.title ?? "专栏",
       description: normalizeText(major.article.desc),
       cover: optionalUrl(major.article.covers?.[0]),
-      url: optionalUrl(major.article.jump_url) ?? `https://www.bilibili.com/opus/${item.id_str}`,
+      url: optionalUrl(major.article.jump_url) ?? getDynamicUrl(item, getDynamicId(item)),
       hasMore: true,
     };
   }
@@ -319,7 +333,7 @@ export function mapDynamicItem(item: RawDynamicItem): DynamicItem {
   const opus = dynamic.major?.opus;
   const desc = dynamic.desc;
   const summary = desc?.text ? desc : opus?.summary;
-  const id = String(item.id_str);
+  const id = getDynamicId(item);
   const text = normalizeText(summary?.text);
   const original = OriginalDynamicItemSchema.safeParse("orig" in item ? item.orig : undefined);
   return {
@@ -346,7 +360,7 @@ export function mapDynamicItem(item: RawDynamicItem): DynamicItem {
       forward: toNumber(item.modules.module_stat?.forward.count),
       liked: item.modules.module_stat?.like.status === true,
     },
-    url: optionalUrl(item.basic.jump_url) ?? `https://www.bilibili.com/opus/${id}`,
+    url: getDynamicUrl(item, id),
     original: original.success ? mapDynamicItem(original.data) : null,
   };
 }

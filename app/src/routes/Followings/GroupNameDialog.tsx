@@ -1,7 +1,8 @@
 import React from "react";
-import { KeyboardAvoidingView, Platform, TextInput } from "react-native";
+import { TextInput } from "react-native";
 
-import { Dialog, Text } from "@/components/styled/rneui";
+import { Dialog } from "@/components/Dialog";
+import { Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 
 import type { GroupNameDialogProps } from "./FollowGroups.types";
@@ -21,36 +22,29 @@ export default function GroupNameDialog({
   const title = mode === "create" ? "新建分组" : "修改分组名称";
 
   return (
-    <Dialog
-      isVisible
-      overlayClassName={`w-[90%] max-w-lg rounded-xl ${colors.white.bg}`}
-      onBackdropPress={saving ? undefined : onClose}
-      onRequestClose={saving ? undefined : onClose}
-    >
-      <Dialog.Title title={title} titleClassName={colors.black.text} />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <TextInput
-          value={name}
-          autoFocus
-          editable={!saving}
-          placeholder="分组名称"
-          returnKeyType="done"
-          accessibilityLabel="分组名称"
-          className={`rounded-lg border px-3 py-2 text-base ${colors.gray3.border} ${colors.black.text}`}
-          onChangeText={setName}
-          onSubmitEditing={() => {
-            if (canSubmit) {
-              onSubmit(trimmed);
-            }
-          }}
-        />
-        <Text className={`mt-1 text-xs ${colors.gray6.text}`}>分组名称不能为空</Text>
-        {error ? (
-          <Text accessibilityRole="alert" className={`mt-2 text-sm ${colors.error.text}`}>
-            {error.message}
-          </Text>
-        ) : null}
-      </KeyboardAvoidingView>
+    <Dialog visible onClose={saving ? undefined : onClose}>
+      <Dialog.Title title={title} />
+      <TextInput
+        value={name}
+        autoFocus
+        editable={!saving}
+        placeholder="分组名称"
+        returnKeyType="done"
+        accessibilityLabel="分组名称"
+        className={`rounded-lg border px-3 py-2 text-base ${colors.gray3.border} ${colors.black.text}`}
+        onChangeText={setName}
+        onSubmitEditing={() => {
+          if (canSubmit) {
+            onSubmit(trimmed);
+          }
+        }}
+      />
+      <Text className={`mt-1 text-xs ${colors.gray6.text}`}>分组名称不能为空</Text>
+      {error ? (
+        <Text accessibilityRole="alert" className={`mt-2 text-sm ${colors.error.text}`}>
+          {error.message}
+        </Text>
+      ) : null}
       <Dialog.Actions>
         <Dialog.Button
           title="保存"

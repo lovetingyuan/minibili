@@ -4,7 +4,8 @@ import { ActivityIndicator, ScrollView, View } from "react-native";
 import { RelationTagLoginRequiredError } from "@/api/relation-tags";
 import { useBilibiliUpRelationTags } from "@/api/useBilibiliRelationTags";
 import { CheckBox } from "@/components/CheckBox";
-import { Button, Dialog, Text } from "@/components/styled/rneui";
+import { Dialog } from "@/components/Dialog";
+import { Button, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 
 import type { SetUpGroupDialogProps } from "./FollowGroups.types";
@@ -62,13 +63,8 @@ export default function SetUpGroupDialog({
   }
 
   return (
-    <Dialog
-      isVisible
-      overlayClassName={`w-[90%] max-w-lg rounded-xl ${colors.white.bg}`}
-      onBackdropPress={submitting ? undefined : onClose}
-      onRequestClose={submitting ? undefined : onClose}
-    >
-      <Dialog.Title title="设置分组" titleClassName={colors.black.text} />
+    <Dialog visible onClose={submitting ? undefined : onClose}>
+      <Dialog.Title title="设置分组" />
       <Text className={`mb-2 text-sm ${colors.gray6.text}`} numberOfLines={1}>
         {up.name}
       </Text>

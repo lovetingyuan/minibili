@@ -77,6 +77,107 @@ function createCommentResponse(replies: CommentResItem[] | null): CommentRespons
   };
 }
 
+/**
+ * 抓包得到的原始响应格式：比 schema 多出不少字段，图片也可能缺尺寸。
+ * 用来确保解析时不会因为可选字段缺失而让整个评论区加载失败。
+ */
+type RawCommentContent = {
+  message?: string;
+  emote?: Record<string, { url: string; text?: string; id?: number }>;
+  jump_url?: Record<string, { title?: string; state?: number }>;
+  vote?: { id: number; cnt?: number; deleted?: boolean; title?: string; url?: string };
+  pictures?: {
+    img_src: string;
+    img_width?: number;
+    img_height?: number;
+    img_size?: number;
+    item_id?: string;
+  }[];
+  picture_scale?: number;
+};
+
+function createRawComment(id: string, content: RawCommentContent = {}) {
+  return {
+    rpid: Number(id),
+    oid: 117300422251725,
+    type: 1,
+    mid: 263294389,
+    root: 0,
+    parent: 0,
+    dialog: 0,
+    count: 0,
+    rcount: 0,
+    state: 0,
+    fansgrade: 0,
+    attr: 134217728,
+    ctime: 1789918389,
+    mid_str: "263294389",
+    oid_str: "117300422251725",
+    rpid_str: id,
+    root_str: "0",
+    parent_str: "0",
+    dialog_str: "0",
+    like: 382,
+    action: 0,
+    member: {
+      mid: "263294389",
+      uname: "laysia期许",
+      handle: "",
+      sex: "保密",
+      sign: "",
+      avatar: "https://example.com/avatar.jpg",
+      rank: "10000",
+      face_nft_new: 0,
+      is_senior_member: 0,
+      senior: {},
+      level_info: { current_level: 6, current_min: 0, current_exp: 0, next_exp: 0 },
+    },
+    content: { message: `comment-${id}`, ...content },
+    replies: null,
+    assist: 0,
+    up_action: { like: false, reply: false },
+    invisible: false,
+    reply_control: {
+      max_line: 6,
+      sub_reply_entry_text: "共48条回复",
+      sub_reply_title_text: "相关回复共48条",
+      time_desc: "2天前发布",
+      location: "IP属地：青海",
+    },
+  };
+}
+
+function createRawResponse(overrides: {
+  replies?: unknown[];
+  top?: unknown;
+  topReplies?: unknown[] | null;
+}) {
+  return {
+    assist: 0,
+    blacklist: 0,
+    note: 1,
+    cursor: {
+      is_begin: true,
+      prev: 0,
+      next: 0,
+      is_end: false,
+      mode: 3,
+      mode_text: "",
+      all_count: 3686,
+      support_mode: [2, 3],
+      name: "热门评论",
+      pagination_reply: { next_offset: "CAESEDE4MzMxMjk0NDcyNzU1NDUaCAoGwYL22pQJIgIIAQ==" },
+      session_id: "1833129447275545",
+    },
+    replies: overrides.replies ?? [],
+    top: overrides.top ?? null,
+    top_replies: overrides.topReplies ?? null,
+    effects: { preloading: "" },
+    config: { showtopic: 1, show_up_flag: true, read_only: false },
+    upper: { mid: 347441270 },
+  };
+}
+
 describe("reply-list", () => {
   test("keeps all three comments from a limited anonymous response", () => {
     const response = createCommentResponse([
@@ -163,6 +264,83 @@ describe("reply-list", () => {
     ]);
     expect(first.attitude).toBe("dislike");
     expect(first.creatorLiked).toBe(true);
+  });
+
+  test("keeps the whole list when the top comment has sized-less goods pictures", () => {
+    const goodsComment = createRawComment("318018213968", {
+      message: "https://b23.tv/mall-goods-collection ",
+      picture_scale: 1,
+      jump_url: {
+        "https://b23.tv/mall-goods-collection": { title: "好物清单 | 2件UP主推荐好物", state: 0 },
+      },
+      pictures: [
+        {
+          img_src: "https://i0.hdslb.com/bfs/mall/mall/1d/d0/a05aede9dd26aa50a2e094b76dbe6f9c.png",
+          img_width: 800,
+          img_height: 800,
+          item_id: "42142288",
+        },
+        {
+          img_src: "https://i0.hdslb.com/bfs/mall/mall/3f/06/07d77da1e000e9998a09dd9835ec294b.png",
+          item_id: "42142267",
+        },
+      ],
+    });
+    const response = CommentResponseSchema.parse(
+      createRawResponse({
+        replies: [createRawComment("1"), createRawComment("2")],
+        top: { admin: null, upper: goodsComment },
+        topReplies: [goodsComment],
+      }),
+    );
+
+    const comments = getComments(response, 1);
+    expect(comments.map((comment) => comment.id)).toEqual(["318018213968", "1", "2"]);
+    expect(comments[0].top).toBe(true);
+    expect(comments[0].time).toBe("2天前发布");
+    expect(comments[0].moreText).toBe("共48条回复");
+    expect(comments[0].images).toEqual([
+      {
+        src: "https://i0.hdslb.com/bfs/mall/mall/1d/d0/a05aede9dd26aa50a2e094b76dbe6f9c.png",
+        width: 800,
+        height: 800,
+        ratio: 1,
+      },
+      {
+        src: "https://i0.hdslb.com/bfs/mall/mall/3f/06/07d77da1e000e9998a09dd9835ec294b.png",
+        width: 0,
+        height: 0,
+        ratio: 1,
+      },
+    ]);
+  });
+
+  test("falls back for rich-content fields the server omits", () => {
+    const response = CommentResponseSchema.parse(
+      createRawResponse({
+        replies: [
+          createRawComment("8", {
+            message: "看这个[doge] BV1abc {vote:7}",
+            emote: { "[doge]": { url: "https://example.com/doge.png" } },
+            jump_url: { BV1abc: { state: 0 } },
+            vote: { id: 7, cnt: 1, deleted: false },
+          }),
+        ],
+      }),
+    );
+
+    const [comment] = getComments(response, 1);
+    expect(comment.message.map((node) => node.type)).toEqual([
+      "text",
+      "emoji",
+      "text",
+      "av",
+      "text",
+      "vote",
+    ]);
+    expect(comment.message[1]).toEqual({ type: "emoji", url: "https://example.com/doge.png" });
+    expect(comment.message[3]).toEqual({ type: "av", text: "BV1abc", url: "https://b23.tv/BV1abc" });
+    expect(comment.message[5]).toEqual({ type: "vote", text: undefined, url: undefined });
   });
 
   test.each([

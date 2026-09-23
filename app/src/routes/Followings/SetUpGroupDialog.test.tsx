@@ -69,14 +69,16 @@ vi.mock("react-native", () => ({
   ScrollView: "ScrollView",
   View: "View",
 }));
-vi.mock("@/components/styled/rneui", () => ({
-  Button: "Button",
-  Text: "Text",
+vi.mock("@/components/Dialog", () => ({
   Dialog: Object.assign((props: { children?: ReactNode }) => props.children, {
     Title: "DialogTitle",
     Actions: "DialogActions",
     Button: "DialogButton",
   }),
+}));
+vi.mock("@/components/styled/rneui", () => ({
+  Button: "Button",
+  Text: "Text",
 }));
 vi.mock("@/components/CheckBox", () => ({
   CheckBox: "CheckBox",

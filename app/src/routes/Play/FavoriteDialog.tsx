@@ -2,7 +2,8 @@ import { ActivityIndicator, ScrollView, View } from "react-native";
 
 import { FavoriteLoginRequiredError } from "@/api/video-favorites";
 import { CheckBox } from "@/components/CheckBox";
-import { Button, Dialog, Text } from "@/components/styled/rneui";
+import { Dialog } from "@/components/Dialog";
+import { Button, Text } from "@/components/styled/rneui";
 import { colors } from "@/constants/colors.tw";
 import { showToast } from "@/utils";
 import type { FavoriteDialogProps } from "./Favorite.types";
@@ -24,13 +25,8 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
     }
   }
   return (
-    <Dialog
-      isVisible
-      overlayClassName={`w-[90%] max-w-lg rounded-xl ${colors.white.bg}`}
-      onBackdropPress={close}
-      onRequestClose={close}
-    >
-      <Dialog.Title title="选择收藏夹" titleClassName={colors.black.text} />
+    <Dialog visible onClose={close}>
+      <Dialog.Title title="选择收藏夹" />
       {editor.loading ? <ActivityIndicator accessibilityLabel="正在加载收藏夹" /> : null}
       {editor.error ? (
         <View className="gap-2 py-2">
@@ -71,6 +67,7 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
           />
         </View>
       ) : null}
+      {/* 弹窗里没有分隔线，靠每行自己的纵向内边距撑开间距，避免列表挤在一起 */}
       <ScrollView className="max-h-[50vh]" keyboardShouldPersistTaps="handled">
         {editor.selection?.folders.map((folder) => (
           <CheckBox
@@ -86,12 +83,12 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
               disabled: editor.loading || editor.busy || editor.needsReload,
             }}
             checkedColorClassName={colors.primary.accent}
-            containerClassName="mx-0 border-0 bg-transparent px-0"
+            containerClassName="mx-0 border-0 bg-transparent px-0 py-2"
             textClassName={`shrink font-normal ${colors.black.text}`}
           />
         ))}
       </ScrollView>
-      <Dialog.Actions>
+      <Dialog.Actions className="mt-3">
         <Dialog.Button
           title="确定"
           loading={editor.busy}

@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { buildDynamicListUrl, getDynamicPageKey, mapDynamicItem } from "./dynamic-items.mapper";
-import { DynamicItemResponseSchema, DynamicListResponseSchema } from "./dynamic-items.schema";
+import {
+  DynamicDetailResponseSchema,
+  DynamicItemResponseSchema,
+  DynamicListResponseSchema,
+} from "./dynamic-items.schema";
 
 type FixtureOptions = {
   id?: string;
@@ -311,6 +315,136 @@ describe("dynamic item mapping", () => {
       title: "原动态投票",
       description: "1742 人参与",
     });
+  });
+
+  it("accepts the placeholder original returned when the forwarded dynamic is gone", () => {
+    // https://t.bilibili.com/1124985452502188053 的真实详情响应：
+    // 被转发的原动态已失效，接口用 id_str: null 的占位对象代替（头像挂件字段已省略）
+    const item = mapDynamicItem(
+      DynamicDetailResponseSchema.parse({
+        item: {
+          id_str: "1124985452502188053",
+          type: "DYNAMIC_TYPE_FORWARD",
+          basic: {
+            comment_id_str: "1124985452502188053",
+            comment_type: 17,
+            like_icon: { action_url: "", end_url: "", id: 0, start_url: "" },
+            rid_str: "1124985452502188053",
+          },
+          modules: {
+            module_author: {
+              face: "https://i0.hdslb.com/bfs/face/b4e08d394ace1dda4fa731f105bf7efe5a3b6ec3.jpg",
+              face_nft: false,
+              following: null,
+              jump_url: "//space.bilibili.com/485256303/dynamic",
+              label: "",
+              mid: 485256303,
+              name: "茂的模",
+              pub_action: "",
+              pub_time: "2025年10月18日 14:38",
+              pub_ts: 1760769487,
+              type: "AUTHOR_TYPE_NORMAL",
+            },
+            module_dynamic: {
+              additional: null,
+              desc: {
+                rich_text_nodes: [
+                  {
+                    orig_text: "“世界的结构不是偶然的。”",
+                    text: "“世界的结构不是偶然的。”",
+                    type: "RICH_TEXT_NODE_TYPE_TEXT",
+                  },
+                ],
+                text: "“世界的结构不是偶然的。”",
+              },
+              major: null,
+              topic: null,
+            },
+            module_stat: {
+              comment: { count: 7, forbidden: false },
+              forward: { count: 3, forbidden: false },
+              like: { count: 453, forbidden: false, status: false },
+            },
+          },
+          orig: {
+            id_str: null,
+            type: "DYNAMIC_TYPE_NONE",
+            basic: {
+              comment_id_str: "",
+              comment_type: 0,
+              like_icon: { action_url: "", end_url: "", id: 0, start_url: "" },
+              rid_str: "",
+            },
+            modules: {
+              module_author: {
+                face: "",
+                face_nft: false,
+                following: false,
+                jump_url: "",
+                label: "",
+                mid: 0,
+                name: "",
+                pub_action: "",
+                pub_time: "",
+                pub_ts: 0,
+                type: "AUTHOR_TYPE_NORMAL",
+              },
+              module_dynamic: {
+                additional: null,
+                desc: null,
+                major: { none: { tips: "源动态不可见" }, type: "MAJOR_TYPE_NONE" },
+                topic: null,
+              },
+            },
+            visible: true,
+          },
+          visible: true,
+        },
+      }).item,
+    );
+
+    expect(item.id).toBe("1124985452502188053");
+    expect(item.text).toBe("“世界的结构不是偶然的。”");
+    expect(item.author.name).toBe("茂的模");
+    expect(item.content).toEqual({ kind: "text" });
+    expect(item.original).toMatchObject({
+      id: "",
+      url: "",
+      commentId: "",
+      commentType: 0,
+      author: { mid: 0, name: "" },
+      content: { kind: "unavailable", message: "源动态不可见" },
+    });
+  });
+
+  it("keeps parsing pages that contain a gone forwarded original", () => {
+    const page = DynamicListResponseSchema.parse({
+      has_more: false,
+      items: [
+        fixture({
+          id: "1124985452502188053",
+          type: "DYNAMIC_TYPE_FORWARD",
+          orig: {
+            id_str: null,
+            type: "DYNAMIC_TYPE_NONE",
+            basic: { comment_id_str: "", comment_type: 0 },
+            modules: {
+              module_author: { mid: 0, name: "", face: "", pub_action: "", pub_time: "", pub_ts: 0 },
+              module_dynamic: {
+                desc: null,
+                topic: null,
+                major: { type: "MAJOR_TYPE_NONE", none: { tips: "源动态不可见" } },
+                additional: null,
+              },
+            },
+          },
+        }),
+      ],
+      offset: "",
+    });
+
+    expect(page.items).toHaveLength(1);
+    expect(mapDynamicItem(page.items[0]).original?.id).toBe("");
   });
 
   it("maps article summaries, additional cards and unknown types safely", () => {

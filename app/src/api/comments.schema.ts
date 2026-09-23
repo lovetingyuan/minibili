@@ -22,9 +22,9 @@ const ContentSchema = z.object({
     .record(
       z.string(),
       z.object({
-        text: z.string(),
+        text: z.string().nullish(),
         url: z.string(),
-        id: z.number(),
+        id: z.number().nullish(),
       }),
     )
     .nullish(),
@@ -40,17 +40,19 @@ const ContentSchema = z.object({
     .record(
       z.string(),
       z.object({
-        title: z.string(),
+        title: z.string().nullish(),
       }),
     )
     .nullish(),
   picture_scale: z.number().nullish(),
+  // 图片的尺寸字段并非必有：商品卡片（好物清单）只带 img_src/item_id，
+  // 缺字段时在 comments.ts 里按正方形兜底，不能让整个评论区解析失败。
   pictures: z
     .object({
       img_src: z.string(),
-      img_width: z.number(),
-      img_height: z.number(),
-      img_size: z.number(),
+      img_width: z.number().nullish(),
+      img_height: z.number().nullish(),
+      img_size: z.number().nullish(),
       // play_gif_thumbnail: true,
     })
     .array()
@@ -58,11 +60,11 @@ const ContentSchema = z.object({
   vote: z
     .object({
       id: z.number(),
-      title: z.string(),
-      cnt: z.number(),
-      desc: z.string(),
-      deleted: z.boolean(),
-      url: z.string(),
+      title: z.string().nullish(),
+      cnt: z.number().nullish(),
+      desc: z.string().nullish(),
+      deleted: z.boolean().nullish(),
+      url: z.string().nullish(),
     })
     .nullish(),
 });

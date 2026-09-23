@@ -275,6 +275,42 @@ test("opens the player when the forwarded dynamic is a video", () => {
   expect(mocks.navigate).not.toHaveBeenCalledWith("DynamicDetail", expect.anything());
 });
 
+test("renders a read-only hint when the forwarded dynamic is gone", () => {
+  mocks.navigate.mockClear();
+  const elements = flatten(
+    DynamicCard({
+      item: {
+        ...item,
+        original: {
+          ...item,
+          id: "",
+          url: "",
+          text: "",
+          richTextNodes: [],
+          topic: null,
+          author: { mid: 0, name: "", face: "" },
+          content: { kind: "unavailable", message: "源动态不可见" },
+        },
+      },
+      onPress: vi.fn(),
+    }),
+  );
+
+  // 没有 id 的原动态既不能跳转详情页，也没有作者可展示
+  expect(elements.some((element) => element.props.accessibilityLabel === "查看被转发的动态")).toBe(
+    false,
+  );
+  expect(elements.filter((element) => element.type === "UpName")).toHaveLength(1);
+  expect(elements.filter((element) => element.type === "Avatar")).toHaveLength(1);
+  expect(elements.filter((element) => element.type === "DynamicActions")).toHaveLength(1);
+  const hint = elements.find(
+    (element) => element.type === "Text" && element.props.children === "源动态不可见",
+  );
+
+  expect(hint).toBeDefined();
+  expect(mocks.navigate).not.toHaveBeenCalled();
+});
+
 test("marks the forwarded media so its bottom padding does not stack", () => {
   const medias = flatten(DynamicCard({ item: forwardedVideoItem, onPress: vi.fn() })).filter(
     (element) => element.type === "DynamicMedia",

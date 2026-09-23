@@ -2,7 +2,6 @@ import React from "react";
 import {
   BottomSheet as BaseBottomSheet,
   Button as BaseButton,
-  Dialog as BaseDialog,
   Skeleton as BaseSkeleton,
   ThemeProvider,
   createTheme,
@@ -10,9 +9,6 @@ import {
 import type {
   BottomSheetProps as BaseBottomSheetProps,
   ButtonProps as BaseButtonProps,
-  DialogButtonProps as BaseDialogButtonProps,
-  DialogProps as BaseDialogProps,
-  DialogTitleProps as BaseDialogTitleProps,
   SkeletonProps as BaseSkeletonProps,
 } from "@rneui/base";
 import { FlashList as BaseFlashList } from "@shopify/flash-list";
@@ -108,82 +104,6 @@ export function Button({
     />
   );
 }
-
-type DialogProps = BaseDialogProps & {
-  backdropClassName?: string;
-  overlayClassName?: string;
-};
-
-function DialogBase({
-  backdropClassName,
-  overlayClassName,
-  backdropStyle,
-  overlayStyle,
-  ...props
-}: DialogProps) {
-  const resolvedBackdropStyle = useResolvedStyle(backdropClassName);
-  const resolvedOverlayStyle = useResolvedStyle(overlayClassName);
-
-  return (
-    <BaseDialog
-      {...props}
-      backdropStyle={[backdropStyle, resolvedBackdropStyle]}
-      overlayStyle={[overlayStyle, resolvedOverlayStyle]}
-    />
-  );
-}
-
-type DialogButtonProps = BaseDialogButtonProps & {
-  buttonClassName?: string;
-  containerClassName?: string;
-  iconContainerClassName?: string;
-  titleClassName?: string;
-  children?: React.ReactNode;
-};
-
-function DialogButton({
-  buttonClassName,
-  containerClassName,
-  iconContainerClassName,
-  titleClassName,
-  buttonStyle,
-  containerStyle,
-  iconContainerStyle,
-  titleStyle,
-  ...props
-}: DialogButtonProps) {
-  const resolvedButtonStyle = useResolvedStyle(buttonClassName);
-  const resolvedContainerStyle = useResolvedStyle(containerClassName);
-  const resolvedIconContainerStyle = useResolvedStyle(iconContainerClassName);
-  const resolvedTitleStyle = useResolvedStyle(titleClassName);
-
-  return (
-    <DialogButtonPrimitive
-      {...props}
-      buttonStyle={[buttonStyle, resolvedButtonStyle]}
-      containerStyle={[containerStyle, resolvedContainerStyle]}
-      iconContainerStyle={[iconContainerStyle, resolvedIconContainerStyle]}
-      titleStyle={[titleStyle, resolvedTitleStyle]}
-    />
-  );
-}
-
-type DialogTitleProps = BaseDialogTitleProps & {
-  titleClassName?: string;
-};
-
-function DialogTitle({ titleClassName, titleStyle, ...props }: DialogTitleProps) {
-  const resolvedTitleStyle = useResolvedStyle(titleClassName);
-
-  return <BaseDialog.Title {...props} titleStyle={[titleStyle, resolvedTitleStyle]} />;
-}
-
-export const Dialog = Object.assign(DialogBase, {
-  Actions: BaseDialog.Actions,
-  Button: DialogButton,
-  Loading: BaseDialog.Loading,
-  Title: DialogTitle,
-});
 
 type StyledFlashListProps<T> = FlashListProps<T> & {
   className?: string;
@@ -314,7 +234,5 @@ export function Text({ className, style, accessibilityRole = "text", ...props }:
 
 const BottomSheetPrimitive = BaseBottomSheet as unknown as React.ComponentType<BottomSheetProps>;
 const ButtonPrimitive = BaseButton as unknown as React.ComponentType<ButtonProps>;
-const DialogButtonPrimitive =
-  BaseDialog.Button as unknown as React.ComponentType<DialogButtonProps>;
 export { ThemeProvider, createTheme };
 export type { FlashListProps, FlashListRef };

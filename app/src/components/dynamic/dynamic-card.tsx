@@ -145,6 +145,17 @@ function DynamicBody(props: {
 function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
   const openDynamicItem = useOpenDynamicItem();
   const { item, detail } = props;
+  // 被转发的原动态失效时接口只会给出一个没有 id 的占位数据：
+  // 既没有可跳转的详情页，也没有作者信息，这里直接展示提示文案。
+  if (!item.id) {
+    return (
+      <View className="mb-3 rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
+        <Text className={`text-sm ${colors.gray6.text}`}>
+          {item.content.kind === "unavailable" ? item.content.message : "原动态不可见"}
+        </Text>
+      </View>
+    );
+  }
   return (
     <Pressable
       accessibilityRole="button"

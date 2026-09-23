@@ -38,14 +38,14 @@ function parseCommentMessage(content: CommentResItem["content"]): CommentMessage
   });
   Object.entries(content.jump_url || {}).forEach(([bvid, jump]) => {
     if (bvid.startsWith("BV")) {
-      replace(bvid, { type: "av", text: jump.title, url: `https://b23.tv/${bvid}` });
+      replace(bvid, { type: "av", text: jump.title || bvid, url: `https://b23.tv/${bvid}` });
     }
   });
   if (content.vote) {
     replace(`{vote:${content.vote.id}}`, {
       type: "vote",
-      text: content.vote.title,
-      url: content.vote.url,
+      text: content.vote.title ?? undefined,
+      url: content.vote.url ?? undefined,
     });
   }
 
@@ -75,12 +75,17 @@ export function getReplyItem(item: BaseCommentResItem, type = item.type): ReplyI
   return {
     message: parseCommentMessage(item.content),
     images:
-      item.content.pictures?.map((image) => ({
-        src: image.img_src,
-        width: image.img_width,
-        height: image.img_height,
-        ratio: image.img_width / image.img_height,
-      })) || [],
+      item.content.pictures?.map((image) => {
+        // 商品卡片之类的图片没有宽高，按正方形兜底，避免算出 NaN/Infinity。
+        const width = image.img_width ?? 0;
+        const height = image.img_height ?? width;
+        return {
+          src: image.img_src,
+          width,
+          height,
+          ratio: width > 0 && height > 0 ? width / height : 1,
+        };
+      }) || [],
     name: item.member.uname,
     mid: item.member.mid,
     face: item.member.avatar,

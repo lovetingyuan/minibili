@@ -12,7 +12,8 @@ import {
   useBilibiliSpecialFollowUps,
   useRelationTagActions,
 } from '@/api/useBilibiliRelationTags'
-import { Button, Dialog, Text } from '@/components/styled/rneui'
+import { Dialog } from '@/components/Dialog'
+import { Button, Text } from '@/components/styled/rneui'
 import { colors } from '@/constants/colors.tw'
 import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
 import { bilibiliSession } from '@/features/bilibili-session/session'
@@ -364,11 +365,7 @@ function FollowList() {
         />
       ) : null}
       {deletingGroup ? (
-        <Dialog
-          isVisible
-          overlayClassName={`w-[70%] max-w-xs rounded-xl ${colors.white.bg}`}
-          onRequestClose={() => {}}
-        >
+        <Dialog className="w-[70%] max-w-xs" visible>
           <Dialog.Loading />
           <Text className={`pb-4 text-center ${colors.gray7.text}`}>
             正在删除分组「{deletingGroup.name}」…

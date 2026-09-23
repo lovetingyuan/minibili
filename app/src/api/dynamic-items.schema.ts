@@ -278,7 +278,7 @@ const BasicSchema = z
   })
   .passthrough();
 
-export const OriginalDynamicItemSchema = z
+const DynamicItemBaseSchema = z
   .object({
     id_str: StringOrNumberSchema,
     type: z.string(),
@@ -288,7 +288,16 @@ export const OriginalDynamicItemSchema = z
   })
   .passthrough();
 
-export const DynamicItemResponseSchema = OriginalDynamicItemSchema.extend({
+/**
+ * 被转发的原动态失效时，接口会返回一个占位对象：`id_str: null`、`type: DYNAMIC_TYPE_NONE`、
+ * 作者信息全为空、`major.type` 为 `MAJOR_TYPE_NONE`（tips 一般是「源动态不可见」）。
+ * 所以这里的 id 必须允许为空，否则整条转发动态都会解析失败。
+ */
+export const OriginalDynamicItemSchema = DynamicItemBaseSchema.extend({
+  id_str: StringOrNumberSchema.nullable(),
+}).passthrough();
+
+export const DynamicItemResponseSchema = DynamicItemBaseSchema.extend({
   orig: OriginalDynamicItemSchema.nullish(),
 }).passthrough();
 
