@@ -10,6 +10,8 @@ import {
   getSpaceVideoPageKey,
   mapSpaceOpusItem,
   mapSpaceVideoItem,
+  parseOpusPubTs,
+  splitEmoteRichTextNodes,
   SPACE_VIDEO_PAGE_SIZE,
 } from "./space-items.mapper";
 import {
@@ -172,6 +174,7 @@ describe("space opus API", () => {
     expect(image).toMatchObject({
       id: "1248956735001985107",
       sourceType: "DYNAMIC_TYPE_DRAW",
+      time: 1789633800,
       text: "今天讲一个每天都会刷到的东西。",
       content: {
         kind: "images",
@@ -187,13 +190,33 @@ describe("space opus API", () => {
       stats: { like: 752 },
       url: "https://www.bilibili.com/opus/1248956735001985107",
     });
+    // 只显示到「日」，不带小时分钟；同年省略年份。
+    expect(image.date).toMatch(/^(2026-)?09-17$/);
+    expect(image.date).not.toMatch(/\d{2}:\d{2}/);
     expect(text).toMatchObject({
       id: "2",
       sourceType: "DYNAMIC_TYPE_WORD",
+      time: 0,
+      date: "",
       content: { kind: "text" },
       stats: { like: 12 },
       url: "https://www.bilibili.com/opus/2",
     });
+  });
+
+  test("derives the publish time from the opus snowflake id", () => {
+    // 期望值取自 https://www.bilibili.com/opus/<id> 页面显示的发布时间（+08:00）。
+    expect(parseOpusPubTs("1248956735001985107")).toBe(1789633800);
+    expect(parseOpusPubTs("1139879385483968513")).toBe(1764237251);
+    expect(parseOpusPubTs("1169976373095170050")).toBe(1771244752);
+
+    // 接口若返回数字会先丢精度，但高 32 位不受影响，仍然解得出同一时间。
+    expect(parseOpusPubTs(Number("1248956735001985107"))).toBe(1789633800);
+
+    // 非雪花 ID 或空值不做猜测，避免显示错误的时间。
+    expect(parseOpusPubTs("")).toBe(0);
+    expect(parseOpusPubTs("2")).toBe(0);
+    expect(parseOpusPubTs("abc")).toBe(0);
   });
 
   test("deduplicates overlapping pages and signs the opus endpoint", () => {
@@ -205,5 +228,58 @@ describe("space opus API", () => {
       "2",
     ]);
     expect(shouldSignWbiRequest(buildSpaceOpusUrl(owner.mid, 1))).toBe(true);
+  });
+
+  test("splits the plain text emoji tags of the opus feed into rich text nodes", () => {
+    // 图文接口只给纯文本，[大哭] 这类标签要按表情包的名字映射补上图片地址。
+    const emoteMap = new Map([
+      ["[大哭]", "https://i0.hdslb.com/bfs/emote/daku.png"],
+      ["[保卫萝卜_哇]", "https://i0.hdslb.com/bfs/emote/luobo.png"],
+    ]);
+    const nodes = splitEmoteRichTextNodes("彪哥[大哭][大哭]，不行[未知表情]了", emoteMap);
+
+    expect(nodes).toEqual([
+      { type: "RICH_TEXT_NODE_TYPE_TEXT", text: "彪哥" },
+      {
+        type: "RICH_TEXT_NODE_TYPE_EMOJI",
+        text: "[大哭]",
+        orig_text: "[大哭]",
+        emoji: { icon_url: "https://i0.hdslb.com/bfs/emote/daku.png", text: "[大哭]" },
+      },
+      {
+        type: "RICH_TEXT_NODE_TYPE_EMOJI",
+        text: "[大哭]",
+        orig_text: "[大哭]",
+        emoji: { icon_url: "https://i0.hdslb.com/bfs/emote/daku.png", text: "[大哭]" },
+      },
+      // 表情包里没有的标签保持原样，渲染层会按普通文本显示。
+      { type: "RICH_TEXT_NODE_TYPE_TEXT", text: "，不行[未知表情]了" },
+    ]);
+  });
+
+  test("keeps the raw emoji tags when the emote map is unavailable", () => {
+    expect(splitEmoteRichTextNodes("彪哥[大哭]")).toEqual([
+      { type: "RICH_TEXT_NODE_TYPE_TEXT", text: "彪哥[大哭]" },
+    ]);
+    expect(splitEmoteRichTextNodes("")).toEqual([]);
+  });
+
+  test("maps opus content with the emote map into renderable emoji nodes", () => {
+    const item = mapSpaceOpusItem(
+      opusFixture({ content: "彪哥[大哭]" }),
+      owner,
+      new Map([["[大哭]", "https://i0.hdslb.com/bfs/emote/daku.png"]]),
+    );
+
+    expect(item.text).toBe("彪哥[大哭]");
+    expect(item.richTextNodes).toEqual([
+      { type: "RICH_TEXT_NODE_TYPE_TEXT", text: "彪哥" },
+      {
+        type: "RICH_TEXT_NODE_TYPE_EMOJI",
+        text: "[大哭]",
+        orig_text: "[大哭]",
+        emoji: { icon_url: "https://i0.hdslb.com/bfs/emote/daku.png", text: "[大哭]" },
+      },
+    ]);
   });
 });

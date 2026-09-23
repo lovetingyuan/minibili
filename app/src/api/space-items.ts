@@ -17,6 +17,7 @@ import {
 } from "./space-items.schema";
 import type { SpaceOpusPage, SpaceVideoPage } from "./space-items.schema";
 import type { SpaceOwner } from "./space-items.types";
+import { useEmoteMap } from "./emotes";
 import request from "./fetcher";
 
 async function fetchSpaceVideoPage(url: string) {
@@ -82,13 +83,17 @@ export function useSpaceVideoItems(owner: SpaceOwner) {
 }
 
 export function useSpaceOpusItems(owner: SpaceOwner) {
+  // 正文里的表情是纯文本标签，拿到名字到图片的映射后才能渲染成图片。
+  const emoteMap = useEmoteMap();
   const swr = useSWRInfinite<SpaceOpusPage, Error>(
     (pageIndex, previousPage) => getSpaceOpusPageKey(owner.mid, pageIndex, previousPage),
     fetchSpaceOpusPage,
     { revalidateFirstPage: true, shouldRetryOnError: false, dedupingInterval: 5 * 60 * 1000 },
   );
   const list = dedupeSpaceItems(
-    (swr.data ?? []).flatMap((page) => page.items.map((item) => mapSpaceOpusItem(item, owner))),
+    (swr.data ?? []).flatMap((page) =>
+      page.items.map((item) => mapSpaceOpusItem(item, owner, emoteMap)),
+    ),
   );
   const lastPage = swr.data?.[swr.data.length - 1];
   const isReachingEnd = lastPage ? !lastPage.has_more || !lastPage.items.length : false;

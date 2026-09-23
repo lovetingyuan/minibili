@@ -1,3 +1,5 @@
+import type { RichTextNode } from "./dynamic-items.schema";
+import { HandledRichTextType } from "./dynamic-items.type";
 import type { DynamicItem } from "./dynamic-items.type";
 import type {
   SpaceOpusItemResponse,
@@ -139,8 +141,85 @@ export function getSpaceOpusPageKey(
   return buildSpaceOpusUrl(mid, pageIndex + 1, pageIndex ? (previousPage?.offset ?? "") : "");
 }
 
-export function mapSpaceOpusItem(item: SpaceOpusItemResponse, owner: SpaceOwner): DynamicItem {
+/** opus_id 雪花 ID 的起始时间：2017-07-01 00:00 (+08:00)，单位秒。 */
+const OPUS_ID_EPOCH_SECONDS = 1498838400;
+
+/**
+ * 图文接口 (/x/polymer/web-dynamic/v1/opus/feed/space) 的 pub_time 恒为空字符串，
+ * 只能从 opus_id 的高 32 位反推发布时间。
+ */
+export function parseOpusPubTs(opusId: string | number) {
+  const value = String(opusId);
+  if (!/^\d+$/.test(value)) {
+    return 0;
+  }
+  // 高 32 位为 0 说明这不是真实 opus_id（真实 id 都是 19 位），宁可不显示时间。
+  const seconds = BigInt(value) >> 32n;
+  return seconds > 0n ? Number(seconds) + OPUS_ID_EPOCH_SECONDS : 0;
+}
+
+/** 正文里的表情是 `[名字]`，名字最长不会超过这个长度，用来避免把普通方括号文本吃进去。 */
+const EMOJI_TOKEN_PATTERN = /(\[[^[\]]{1,40}\])/g;
+
+/**
+ * 图文接口 (`/x/polymer/web-dynamic/v1/opus/feed/space`) 只返回纯文本正文，
+ * 表情混在文字里是 `[大哭]` 这样的标签，图片地址只能靠表情包的名字映射补齐。
+ * 映射里没有的标签（UP 主专属、收藏集表情）保持原样，交给渲染层按普通文本显示。
+ */
+export function splitEmoteRichTextNodes(
+  text: string,
+  emoteMap?: Map<string, string>,
+): RichTextNode[] {
+  const nodes: RichTextNode[] = [];
+  // 连续的普通文字合并回一个节点，没有表情时结果与原来的纯文本一致。
+  let pending = "";
+
+  function flushPending() {
+    if (!pending) {
+      return;
+    }
+    nodes.push({ type: HandledRichTextType.RICH_TEXT_NODE_TYPE_TEXT, text: pending });
+    pending = "";
+  }
+
+  for (const part of text.split(EMOJI_TOKEN_PATTERN)) {
+    const iconUrl = part ? emoteMap?.get(part) : undefined;
+    if (iconUrl) {
+      flushPending();
+      nodes.push({
+        type: HandledRichTextType.RICH_TEXT_NODE_TYPE_EMOJI,
+        text: part,
+        orig_text: part,
+        emoji: { icon_url: iconUrl, text: part },
+      });
+      continue;
+    }
+    pending += part;
+  }
+  flushPending();
+  return nodes;
+}
+
+/** 与 parseDate 的日期部分一致，但只到「日」，跨年时才补年份。 */
+function formatOpusDate(timestamp: number) {
+  if (!timestamp) {
+    return "";
+  }
+  const date = new Date(timestamp * 1000);
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  const year = date.getFullYear();
+  return year === new Date().getFullYear() ? `${month}-${day}` : `${year}-${month}-${day}`;
+}
+
+export function mapSpaceOpusItem(
+  item: SpaceOpusItemResponse,
+  owner: SpaceOwner,
+  emoteMap?: Map<string, string>,
+): DynamicItem {
   const id = String(item.opus_id);
+  const pubTs = parseOpusPubTs(item.opus_id);
+  const text = item.content.trim();
   const cover = item.cover
     ? {
         src: parseUrl(item.cover.url),
@@ -153,13 +232,14 @@ export function mapSpaceOpusItem(item: SpaceOpusItemResponse, owner: SpaceOwner)
     id,
     sourceType: cover ? "DYNAMIC_TYPE_DRAW" : "DYNAMIC_TYPE_WORD",
     author: owner,
-    date: item.pub_time,
-    time: 0,
+    // 图文接口的 pub_time 恒为空，发布时间只能从 opus_id 推算，且只显示到「日」。
+    date: formatOpusDate(pubTs),
+    time: pubTs,
     pubAction: "发布了图文",
     top: false,
     title: "",
-    text: item.content.trim(),
-    richTextNodes: [],
+    text,
+    richTextNodes: splitEmoteRichTextNodes(text, emoteMap),
     topic: null,
     content: cover ? { kind: "images", images: [cover] } : { kind: "text" },
     additional: null,
