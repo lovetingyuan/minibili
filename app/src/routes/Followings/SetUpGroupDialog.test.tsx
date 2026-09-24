@@ -61,6 +61,9 @@ vi.mock("react", async (importOriginal) => {
 vi.mock("@/api/relation-tags", () => ({
   RelationTagLoginRequiredError: mocks.RelationTagLoginRequiredError,
 }));
+vi.mock("@/features/bilibili-session/login-required", () => ({
+  isLoginRequiredError: (error: unknown) => error instanceof mocks.RelationTagLoginRequiredError,
+}));
 vi.mock("@/api/useBilibiliRelationTags", () => ({
   useBilibiliUpRelationTags: () => mocks.current,
 }));

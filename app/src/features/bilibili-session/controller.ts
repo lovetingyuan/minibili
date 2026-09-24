@@ -50,6 +50,7 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
       });
       assertCurrent(generation);
       publish({ ...control, generation: generation + 1 });
+      dependencies.onStoredCredentialsExpired?.();
       return null;
     }
     return { mid: profile.mid.toString(), generation, profile };
@@ -73,6 +74,7 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
       // 写入开始后允许页面离开；退出操作会排队清理，不能被这次保存覆盖。
       assertCurrent(generation);
       publish({ ...control, generation: generation + 1 });
+      dependencies.onLoginSuccess?.();
       return { mid: profile.mid.toString(), generation: control.generation, profile };
     });
   }

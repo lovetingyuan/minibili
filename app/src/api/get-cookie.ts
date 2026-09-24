@@ -1,17 +1,14 @@
-// 获取正确的cookie
-// https://github.com/SocialSisterYi/bilibili-API-collect/issues/686
-
-import encHex from "crypto-js/enc-hex";
-import hmacSHA256 from "crypto-js/hmac-sha256";
-
-import { UA } from "../constants";
+// 旧匿名 Cookie 生成依赖，暂时停用以验证是否仍有接口依赖该链路。
+// import encHex from "crypto-js/enc-hex";
+// import hmacSHA256 from "crypto-js/hmac-sha256";
+// import { UA } from "../constants";
 import {
   clearStoredBilibiliCookie,
   getStoredBilibiliCookie,
   setStoredBilibiliCookie,
 } from "../utils/secure-store";
-import { resolveBilibiliCookie } from "./bilibili-cookie.helpers";
 
+/* 旧匿名 Cookie 生成逻辑，暂时停用。
 function getuuid(time: number) {
   const randString8 = randomString(8);
   const randString4_1 = randomString(4);
@@ -49,7 +46,9 @@ function getbuvid3(mid = 5201314) {
   return fetch(`https://space.bilibili.com/${mid}/dynamic`, {
     headers: {
       accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+*/
+        // "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+/*
       "accept-language": "zh-CN,zh;q=0.9",
       "cache-control": "no-cache",
       pragma: "no-cache",
@@ -71,7 +70,9 @@ function getbuvid3(mid = 5201314) {
 function getbuvid4(buvid3: string, uuid: string) {
   return fetch("https://api.bilibili.com/x/frontend/finger/spi", {
     headers: {
-      accept: "*/*",
+*/
+      // accept: "*/*",
+/*
       "accept-language": "zh-CN,zh;q=0.9",
       "cache-control": "no-cache",
       pragma: "no-cache",
@@ -287,7 +288,9 @@ function wuzhi(now: number, buvid3: string, uuid: string) {
 
   return fetch("https://api.bilibili.com/x/internal/gaia-gateway/ExClimbWuzhi", {
     headers: {
-      accept: "*/*",
+*/
+      // accept: "*/*",
+/*
       "accept-language": "zh-CN,zh;q=0.9",
       "cache-control": "no-cache",
       "content-type": "application/json;charset=UTF-8",
@@ -303,11 +306,15 @@ function wuzhi(now: number, buvid3: string, uuid: string) {
     credentials: "include",
   });
 }
+*/
 
 let storedCookie: string | null | undefined;
 let storedCookieVersion = 0;
+/* 旧匿名 Cookie 缓存，暂时停用。
 let anonymousCookie = "";
 let anonymousCookiePromise: Promise<string> | null = null;
+const ENABLE_ANONYMOUS_COOKIE = false;
+*/
 
 export async function getBilibiliLoginCookie() {
   if (storedCookie === undefined) {
@@ -322,7 +329,7 @@ export async function getBilibiliLoginCookie() {
 
 export async function getCookie() {
   const cookie = await getBilibiliLoginCookie().catch(() => null);
-  return resolveBilibiliCookie(cookie, getAnonymousCookie);
+  return cookie?.trim() ? cookie : "";
 }
 
 export async function saveBilibiliLoginCookie(cookie: string) {
@@ -337,6 +344,7 @@ export async function clearBilibiliLoginCookie() {
   await clearStoredBilibiliCookie();
 }
 
+/* 旧匿名 Cookie 创建和定时刷新逻辑，暂时停用。
 async function createAnonymousCookie() {
   const now = Date.now();
   const uuid = getuuid(now);
@@ -374,12 +382,14 @@ setInterval(
   },
   60 * 60 * 1000,
 );
+*/
 
 /**
  * Get Bilibili web ticket
  * @param {string} csrf    CSRF token, can be empty or null
  * @returns {Promise<any>} Promise of the ticket response in JSON format
  */
+/* 旧 bili_ticket 签名逻辑，暂时停用。
 async function getBiliTicket(csrf: string) {
   const ts = Math.floor(Date.now() / 1000).toString();
   const hexSign = hmacSHA256(`ts${ts}`, "XgwSnGZ1p").toString(encHex);
@@ -413,3 +423,4 @@ async function getBiliTicket(csrf: string) {
     return data.data.ticket;
   }
 }
+*/

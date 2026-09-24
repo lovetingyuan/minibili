@@ -4,13 +4,18 @@ import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import type { DynamicItem } from '@/api/dynamic-items.type';
+import { LoginRequired } from '@/components/LoginRequired';
 import { Button, FlashList, Skeleton, Text } from '@/components/styled/rneui';
 import type { FlashListRef } from '@/components/styled/rneui';
-import { theme } from "@/constants/theme";
+import { theme } from '@/constants/theme';
+import { isLoginRequiredError } from '@/features/bilibili-session/login-required';
 import type { MainTabNavigationProp } from '@/types';
 
 import { DynamicCard } from './dynamic-card';
 import type { DynamicListProps } from './dynamic-list.types';
+
+/** 加载失败时只给用户一句话，接口返回的错误码和路径对他没有意义 */
+const ERROR_MESSAGE = '请稍后重试';
 
 function DynamicListLoading(props: { listHeader?: ReactNode }) {
   return (
@@ -39,13 +44,18 @@ function DynamicListLoading(props: { listHeader?: ReactNode }) {
 function DynamicListEmpty(
   props: Pick<DynamicListProps, 'error' | 'errorTitle' | 'emptyTitle' | 'emptyMessage' | 'retry'>,
 ) {
+  // 登录后才能看到的列表（关注动态、空间内容等）失败时不显示通用错误
+  if (isLoginRequiredError(props.error)) {
+    return <LoginRequired description="登录后即可查看该内容" />;
+  }
+
   return (
     <View className="items-center gap-3 px-8 py-24">
       <Text className="text-lg font-semibold">
         {props.error ? (props.errorTitle ?? '动态加载失败') : props.emptyTitle}
       </Text>
       <Text selectable className={`text-center text-sm ${theme.text.muted}`}>
-        {props.error?.message || props.emptyMessage}
+        {props.error ? ERROR_MESSAGE : props.emptyMessage}
       </Text>
       {props.error ? (
         <Button
@@ -103,11 +113,7 @@ export function DynamicList(props: DynamicListProps) {
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <View className="mb-3">
-          <DynamicCard
-            item={item}
-            showActions={props.showActions}
-            onPress={() => props.onItemPress(item)}
-          />
+          <DynamicCard item={item} showActions={props.showActions} onPress={() => props.onItemPress(item)} />
         </View>
       )}
       ListHeaderComponent={props.listHeader == null ? null : <>{props.listHeader}</>}

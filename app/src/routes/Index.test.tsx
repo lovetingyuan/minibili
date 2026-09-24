@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   livingUps: {} as Record<string, string>,
   followingDynamicsUpdateCount: 0,
   unreadFollowedUpCount: 0,
+  navigationRef: { isReady: vi.fn(() => true), navigate: vi.fn() },
 }));
 
 vi.mock("@react-navigation/bottom-tabs", () => ({
@@ -15,7 +16,10 @@ vi.mock("@react-navigation/native-stack", () => ({
   createNativeStackNavigator: () => ({ Navigator: "StackNavigator", Screen: "StackScreen" }),
 }));
 vi.mock("@react-navigation/elements", () => ({ Assets: [] }));
-vi.mock("@react-navigation/native", () => ({ NavigationContainer: "NavigationContainer" }));
+vi.mock("@react-navigation/native", () => ({
+  NavigationContainer: "NavigationContainer",
+  createNavigationContainerRef: () => mocks.navigationRef,
+}));
 vi.mock("expo-asset", () => ({ Asset: { loadAsync: vi.fn() } }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("lucide-react-native", () => ({
@@ -51,6 +55,7 @@ vi.mock("@/store/derives", () => ({
   useUnreadFollowedUpCount: () => mocks.unreadFollowedUpCount,
 }));
 vi.mock("./About", () => ({ default: "About" }));
+vi.mock("./BilibiliLogin", () => ({ default: "BilibiliLogin" }));
 vi.mock("./Dynamic", () => ({ default: "Dynamic" }));
 vi.mock("./DynamicDetail", () => ({ default: "DynamicDetail" }));
 vi.mock("./Followings/BilibiliAccountGate", () => ({ default: "BilibiliAccountGate" }));
@@ -216,6 +221,7 @@ test("full-screen routes live above the tab navigator", () => {
     "Favorites",
     "History",
     "WatchLater",
+    "BilibiliLogin",
   ]);
   expect(screens.find((screen) => screen.props.name === "MainTabs")?.props.options).toEqual({
     headerShown: false,

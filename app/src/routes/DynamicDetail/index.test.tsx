@@ -39,6 +39,10 @@ vi.mock("@/api/opus-detail", () => ({
 }));
 vi.mock("@/components/Comment", () => ({ default: "CommentList" }));
 vi.mock("@/components/dynamic/dynamic-card", () => ({ DynamicCard: "DynamicCard" }));
+vi.mock("@/components/LoginRequired", () => ({ LoginRequired: "LoginRequired" }));
+vi.mock("@/features/bilibili-session/login-required", () => ({
+  isLoginRequiredError: () => false,
+}));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button", Text: "Text" }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));

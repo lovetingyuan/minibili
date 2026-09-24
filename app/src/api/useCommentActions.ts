@@ -1,20 +1,21 @@
-import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import { useEffect, useRef, useState } from "react";
-import { Alert } from "react-native";
 
 import { BilibiliSessionChangedError } from "@/features/bilibili-session/controller";
+import {
+  handleLoginRequiredError,
+  showLoginRequiredAlert,
+} from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
   useBilibiliSessionState,
 } from "@/features/bilibili-session/useBilibiliSession";
-import type { NavigationProps } from "@/types";
 import { showToast } from "@/utils";
 
 import {
   addComment,
   addCommentReply,
-  CommentLoginRequiredError,
   CommentResultUnknownError,
   deleteComment,
   modifyCommentAttitude,
@@ -29,7 +30,6 @@ export function useCommentActions(
   sourceUrl: string,
   refreshAfterUnknown: () => Promise<unknown>,
 ) {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
   const { account, control } = useBilibiliSessionState();
   const { logout } = useBilibiliSessionActions();
   const currentAccount = account && bilibiliSession.isCurrentAccount(account) ? account : null;
@@ -53,8 +53,7 @@ export function useCommentActions(
       return null;
     }
     if (!currentAccount) {
-      showToast("请先登录 B站，登录后即可参与评论互动");
-      navigation.navigate("MainTabs", { screen: "Followings" });
+      showLoginRequiredAlert("请先登录 B站，登录后即可参与评论互动");
       return null;
     }
     return currentAccount;
@@ -85,18 +84,11 @@ export function useCommentActions(
     if (!active.current) {
       return;
     }
-    if (error instanceof CommentLoginRequiredError) {
-      Alert.alert("请重新登录 B站", error.message, [
-        { text: "取消", style: "cancel" },
-        {
-          text: "重新登录",
-          onPress: () => {
-            void logout()
-              .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
-              .catch(() => showToast("退出登录失败，请在设置页重试"));
-          },
-        },
-      ]);
+    if (
+      handleLoginRequiredError(error, "请先登录 B站后重新操作", {
+        session: { account: currentAccount, logout },
+      })
+    ) {
       return;
     }
     if (!(error instanceof BilibiliSessionChangedError)) {

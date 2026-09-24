@@ -14,6 +14,10 @@ vi.mock("@/components/styled/rneui", () => ({
   Text: "Text",
 }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("@/components/LoginRequired", () => ({ LoginRequired: "LoginRequired" }));
+vi.mock("@/features/bilibili-session/login-required", () => ({
+  isLoginRequiredError: () => false,
+}));
 vi.mock("lucide-react-native", () => ({ History: "History" }));
 vi.mock("@/components/VideoItem", () => ({ default: "VideoListItem" }));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));

@@ -1,5 +1,10 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
 import type { UpInfo } from "../types";
 import {
   createBilibiliRequestHeaders,
@@ -48,7 +53,7 @@ const RELATION_TAG_UPDATE_URL = "https://api.bilibili.com/x/relation/tag/update"
 const RELATION_TAG_DELETE_URL = "https://api.bilibili.com/x/relation/tag/del";
 const RELATION_TAG_ADD_USERS_URL = "https://api.bilibili.com/x/relation/tags/addUsers";
 
-export class RelationTagLoginRequiredError extends Error {}
+export class RelationTagLoginRequiredError extends LoginRequiredError {}
 export class RelationTagResultUnknownError extends Error {}
 
 export function getRelationTagsKey(account: RelationTagAccount): RelationTagsKey {
@@ -257,8 +262,8 @@ async function runRelationTagMutation({
     }
     receivedResult = true;
     const { code, message, data } = parsed.data;
-    if (code === -101 || code === -111) {
-      throw new RelationTagLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
     }
     if (code !== 0) {
       throw new Error(`${action}失败（${code}）：${message || "请稍后重试"}`);

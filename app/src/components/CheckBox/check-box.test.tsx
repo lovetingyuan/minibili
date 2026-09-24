@@ -11,15 +11,21 @@ vi.mock("react-native", () => ({
   View: "View",
 }));
 vi.mock("lucide-react-native", () => ({
-  Check: "Check",
+  Square: "Square",
+  SquareCheck: "SquareCheck",
 }));
 vi.mock("@/components/styled/rneui", () => ({
   Text: "Text",
 }));
 vi.mock("@/constants/theme", () => ({
   theme: {
+    background: { surface: "bg-white dark:bg-slate-950" },
     icon: { placeholder: "accent-slate-400 dark:accent-slate-600" },
     primary: { accent: "accent-[#008AC5] dark:accent-[#00AEEC]" },
+    text: {
+      disabled: "text-slate-500",
+      secondary: "text-slate-700 dark:text-slate-300",
+    },
   },
 }));
 vi.mock("@/hooks/useResolvedColor", () => ({
@@ -27,6 +33,8 @@ vi.mock("@/hooks/useResolvedColor", () => ({
 }));
 
 import { CheckBox } from "./check-box";
+import { CheckBoxIcon } from "./check-box-icon";
+import type { CheckBoxIconProps } from "./check-box.types";
 
 type ElementProps = {
   accessibilityRole?: string;
@@ -35,7 +43,9 @@ type ElementProps = {
   className?: string;
   color?: string;
   onPress?: () => void;
-  style?: { backgroundColor?: string; borderColor?: string; height?: number; width?: number };
+  size?: number;
+  style?: unknown;
+  testID?: string;
 };
 
 type TestElement = ReactElement<ElementProps>;
@@ -50,32 +60,29 @@ mocks.useResolvedColor.mockImplementation((className) =>
   className === "accent-[#008AC5] dark:accent-[#00AEEC]" ? "#008AC5" : undefined,
 );
 
-test("选中时用主题色填充方块并显示白色对勾", () => {
+test("选中时使用 RNE 容器语义并显示主题色图标", () => {
   const pressable = CheckBox({
     checked: true,
     title: "特别关注（1）",
     checkedColorClassName: "accent-[#008AC5] dark:accent-[#00AEEC]",
   }) as TestElement;
   const [wrapper] = childrenOf(pressable);
-  const [box, label] = childrenOf(wrapper);
-  const [icon] = childrenOf(box);
+  const [icon, label] = childrenOf(wrapper);
+  const renderedIcon = CheckBoxIcon(icon.props as CheckBoxIconProps) as TestElement;
 
   expect(pressable.type).toBe("Pressable");
+  expect(pressable.props.testID).toBe("RNE__CheckBox__Wrapper");
   expect(pressable.props.accessibilityRole).toBe("checkbox");
   expect(pressable.props.accessibilityState).toEqual({ checked: true, disabled: false });
-  expect(box.props.style).toMatchObject({
-    backgroundColor: "#008AC5",
-    borderColor: "#008AC5",
-    height: 20,
-    width: 20,
-  });
-  expect(icon.type).toBe("Check");
-  expect(icon.props.color).toBe("#ffffff");
+  expect(icon.type).toBe(CheckBoxIcon);
+  expect(renderedIcon.type).toBe("SquareCheck");
+  expect(renderedIcon.props.color).toBe("#008AC5");
+  expect(renderedIcon.props.size).toBe(24);
   expect(label.type).toBe("Text");
   expect(label.props.children).toBe("特别关注（1）");
 });
 
-test("未选中时只画边框，不显示对勾，并支持自定义尺寸", () => {
+test("未选中时显示空方框，并支持自定义尺寸", () => {
   const pressable = CheckBox({
     checked: false,
     checkedColorClassName: "accent-[#008AC5] dark:accent-[#00AEEC]",
@@ -83,15 +90,12 @@ test("未选中时只画边框，不显示对勾，并支持自定义尺寸", ()
     size: 18,
   }) as TestElement;
   const [wrapper] = childrenOf(pressable);
-  const [box] = childrenOf(wrapper);
+  const [icon] = childrenOf(wrapper);
+  const renderedIcon = CheckBoxIcon(icon.props as CheckBoxIconProps) as TestElement;
 
-  expect(box.props.style).toMatchObject({
-    backgroundColor: "transparent",
-    borderColor: "white",
-    height: 18,
-    width: 18,
-  });
-  expect(childrenOf(box)).toHaveLength(0);
+  expect(renderedIcon.type).toBe("Square");
+  expect(renderedIcon.props.color).toBe("white");
+  expect(renderedIcon.props.size).toBe(18);
 });
 
 test("未选中且未指定颜色时回落到默认边框色", () => {
@@ -111,4 +115,21 @@ test("ReactNode 标题原样渲染，点击交给外层 Pressable", () => {
   expect(title.props.children).toBe("自定义标题");
   pressable.props.onPress?.();
   expect(onPress).toHaveBeenCalledTimes(1);
+});
+
+test("支持 RNE 的 checkedTitle、iconRight 和自定义图标", () => {
+  const customIcon = <React.Fragment>已选择</React.Fragment>;
+  const pressable = CheckBox({
+    checked: true,
+    checkedIcon: customIcon,
+    checkedTitle: "已关注",
+    iconRight: true,
+    title: "关注",
+  }) as TestElement;
+  const [wrapper] = childrenOf(pressable);
+  const [label, icon] = childrenOf(wrapper);
+
+  expect(label.props.children).toBe("已关注");
+  expect(icon.type).toBe(CheckBoxIcon);
+  expect(CheckBoxIcon(icon.props as CheckBoxIconProps)).toBe(customIcon);
 });

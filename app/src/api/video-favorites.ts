@@ -1,4 +1,10 @@
 import { UA } from "../constants";
+import {
+  BilibiliAuthExpiredError,
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import {
   createBilibiliRequestHeaders,
@@ -21,7 +27,7 @@ import type {
   VideoRelationKey,
 } from "./video-favorites.types";
 
-export class FavoriteLoginRequiredError extends Error {}
+export class FavoriteLoginRequiredError extends LoginRequiredError {}
 export class FavoriteResultUnknownError extends Error {}
 
 export function getVideoRelationKey(
@@ -73,8 +79,16 @@ async function readForAccount(url: string, request: FavoriteRequest, isCurrent: 
     if (!isCurrent()) {
       throw new BilibiliSessionChangedError();
     }
-    if (error instanceof Error && "code" in error && (error.code === -101 || error.code === -111)) {
-      throw new FavoriteLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (error instanceof BilibiliAuthExpiredError) {
+      throw error;
+    }
+    if (
+      error instanceof Error &&
+      "code" in error &&
+      typeof error.code === "number" &&
+      isBilibiliAuthExpiredCode(error.code)
+    ) {
+      throw reportBilibiliAuthExpired(error.code, error.message, url);
     }
     throw error;
   }
@@ -189,8 +203,8 @@ export async function modifyVideoFavorites(
       throw new Error("响应缺少有效收藏结果");
     }
     receivedResult = true;
-    if (code === -101 || code === -111) {
-      throw new FavoriteLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
     }
     if (code !== 0) {
       throw new Error(`收藏操作失败（${code}）：${message || "请稍后重试"}`);

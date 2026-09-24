@@ -67,6 +67,10 @@ vi.mock("@/components/styled/rneui", () => ({
   Text: "Text",
 }));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));
+vi.mock("@/components/LoginRequired", () => ({ LoginRequired: "LoginRequired" }));
+vi.mock("@/features/bilibili-session/login-required", () => ({
+  isLoginRequiredError: () => false,
+}));
 vi.mock("./dynamic-card", () => ({ DynamicCard: "DynamicCard" }));
 
 import { DynamicList } from "./dynamic-list";
@@ -229,7 +233,10 @@ describe("shared dynamic list", () => {
       error: new Error("登录已失效"),
     });
     const errorState = renderFunction(failed.props.ListEmptyComponent);
-    expect(text(errorState)).toContain("登录已失效");
+    expect(text(errorState)).toContain("动态加载失败");
+    expect(text(errorState)).toContain("请检查网络后重试");
+    // 接口返回的错误码和请求路径不给用户看
+    expect(text(errorState)).not.toContain("登录已失效");
     const button = React.Children.toArray(errorState.props.children).find(
       (child) => React.isValidElement(child) && child.type === "Button",
     );

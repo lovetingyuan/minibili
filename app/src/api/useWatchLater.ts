@@ -4,6 +4,7 @@ import useSWR, { useSWRConfig } from "swr";
 import { favoriteMutationKey } from "../features/bilibili-favorites/mutations";
 import { watchLaterMutations } from "../features/bilibili-watch-later/mutations";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { BilibiliAuthExpiredError } from "../features/bilibili-session/auth-expiration";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import { markWatchLaterAdded, markWatchLaterRemoved } from "../store/watch-later";
@@ -29,7 +30,11 @@ const watchLaterOptions = {
   revalidateOnFocus: false,
   revalidateOnReconnect: false,
   shouldRetryOnError: (error: Error) =>
-    !(error instanceof BilibiliSessionChangedError || error instanceof WatchLaterLoginRequiredError),
+    !(
+      error instanceof BilibiliAuthExpiredError ||
+      error instanceof BilibiliSessionChangedError ||
+      error instanceof WatchLaterLoginRequiredError
+    ),
   errorRetryCount: 2,
 };
 

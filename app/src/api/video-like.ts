@@ -1,6 +1,11 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
+import {
   createBilibiliRequestHeaders,
   getBilibiliCsrf,
   getBilibiliUserId,
@@ -10,7 +15,7 @@ import type { FavoriteAccount } from "./favorites.types";
 import { VideoLikeResponseSchema } from "./video-like.schema";
 import type { VideoLikeChange, VideoLikeRequestDependencies } from "./video-like.types";
 
-export class VideoLikeLoginRequiredError extends Error {}
+export class VideoLikeLoginRequiredError extends LoginRequiredError {}
 export class VideoLikeResultUnknownError extends Error {}
 
 export async function modifyVideoLike(
@@ -85,8 +90,8 @@ export async function modifyVideoLike(
     }
     const { code, message } = parsed.data;
     receivedResult = true;
-    if (code === -101 || code === -111) {
-      throw new VideoLikeLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
     }
     if (code === 65004 || code === 65006) {
       throw new VideoLikeResultUnknownError("点赞状态已变化，请刷新后再操作");

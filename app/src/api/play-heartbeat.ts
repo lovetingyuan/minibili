@@ -1,5 +1,10 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import encWbi from "../utils/wbi";
 import {
@@ -42,7 +47,7 @@ export const PLAY_HEARTBEAT_TYPES = {
   end: 4,
 } as const satisfies Record<string, PlayHeartbeatType>;
 
-export class PlayHeartbeatLoginRequiredError extends Error {}
+export class PlayHeartbeatLoginRequiredError extends LoginRequiredError {}
 
 function randomHex(length: number) {
   let result = "";
@@ -135,8 +140,8 @@ async function postPlayReport(url: string, body: URLSearchParams, cookie: string
       throw new Error("播放进度上报响应格式异常");
     }
     const { code, message } = parsed.data;
-    if (code === -101 || code === -111) {
-      throw new PlayHeartbeatLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
     }
     if (code !== 0) {
       throw new Error(`播放进度上报失败（${code}）：${message || "请稍后重试"}`);
@@ -155,7 +160,7 @@ export async function reportPlayStart(
 ) {
   const { cookie, csrf, mid } = await resolveCredentials(account, dependencies);
   const keys = await dependencies.getWbiKeys();
-  const query = encWbi(
+  const query = await encWbi(
     {
       w_aid: video.aid,
       w_part: video.page,
@@ -212,7 +217,7 @@ export async function reportPlayHeartbeat(
   const progressTime = playedTime < 0 ? videoDuration : playedTime;
   const maxPlayedTime = Math.max(session.maxPlayedTime, progressTime);
   const realPlayedTime = Math.max(0, Math.round(report.realPlayedTime));
-  const query = encWbi(
+  const query = await encWbi(
     {
       w_start_ts: session.startTs,
       w_mid: mid,

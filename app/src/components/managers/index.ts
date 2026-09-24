@@ -1,4 +1,5 @@
 export { default as BilibiliBlacklistManager } from "./BilibiliBlacklistManager";
+export { default as BilibiliAuthExpirationManager } from "./BilibiliAuthExpirationManager";
 export { default as BilibiliFollowingsManager } from "./BilibiliFollowingsManager";
 export { default as CheckAppUpdate } from "./CheckAppUpdate";
 export { default as CheckNetState } from "./CheckNetState";

@@ -5,9 +5,11 @@ import { useDynamicDetail } from "@/api/dynamic-items";
 import { useOpusDetail } from "@/api/opus-detail";
 import CommentList from "@/components/Comment";
 import { DynamicCard } from "@/components/dynamic/dynamic-card";
+import { LoginRequired } from "@/components/LoginRequired";
 import { Button, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
 import { theme } from "@/constants/theme";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import type { RootStackParamList } from "@/types";
 
@@ -52,11 +54,14 @@ function DynamicDetailPage({ route }: Props) {
   }
 
   if (!detail.data) {
+    if (isLoginRequiredError(detail.error)) {
+      return <LoginRequired description="登录后即可查看这条动态" />;
+    }
     return (
       <View className="flex-1 items-center justify-center gap-3 px-8">
         <Text className="text-lg font-semibold">动态加载失败</Text>
         <Text selectable className={`text-center text-sm ${theme.text.muted}`}>
-          {detail.error?.message || "动态可能已被删除或不可见"}
+          动态可能已被删除或不可见，请检查网络后重试
         </Text>
         <Button title="重新加载" type="outline" onPress={refresh} />
       </View>
@@ -75,6 +80,7 @@ function DynamicDetailPage({ route }: Props) {
     return (
       <CommentList
         commentId={detail.data.commentId}
+        commentCount={detail.data.stats.comment}
         commentType={detail.data.commentType}
         sourceUrl={url}
         refreshing={detail.isValidating}

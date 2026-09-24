@@ -1,5 +1,10 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
 import type { BilibiliAccount } from "../features/bilibili-session/types";
 
 import {
@@ -24,7 +29,7 @@ import type {
 } from "./comment-actions.types";
 import { getReplyItem } from "./comments";
 
-export class CommentLoginRequiredError extends Error {}
+export class CommentLoginRequiredError extends LoginRequiredError {}
 export class CommentResultUnknownError extends Error {}
 
 function validatePositiveInteger(value: string | number, label: string) {
@@ -139,8 +144,8 @@ async function postCommentRequest<T>(options: CommentPostRequestOptions<T>) {
 }
 
 function assertBusinessResult(result: { code: number; message?: string }, actionName: string) {
-  if (result.code === -101 || result.code === -111) {
-    throw new CommentLoginRequiredError("登录凭据失效，请重新登录 B站");
+  if (isBilibiliAuthExpiredCode(result.code)) {
+    throw reportBilibiliAuthExpired(result.code, result.message);
   }
   if (result.code !== 0) {
     throw new Error(`${actionName}失败（${result.code}）：${result.message || "请稍后重试"}`);

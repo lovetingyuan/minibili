@@ -17,7 +17,7 @@ const querys = [
 
 test("wbi-generate", async () => {
   const data: any = await getWBIInfo(request);
-  const query = encWbi(
+  const query = await encWbi(
     querys.reduce((a, b) => {
       // @ts-ignore
       a[b[0]] = b[1];

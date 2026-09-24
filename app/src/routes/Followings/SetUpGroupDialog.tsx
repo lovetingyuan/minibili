@@ -1,12 +1,12 @@
 import React from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
-import { RelationTagLoginRequiredError } from "@/api/relation-tags";
 import { useBilibiliUpRelationTags } from "@/api/useBilibiliRelationTags";
 import { CheckBox } from "@/components/CheckBox";
 import { Dialog } from "@/components/Dialog";
 import { Button, Text } from "@/components/styled/rneui";
 import { theme } from "@/constants/theme";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 
 import type { SetUpGroupDialogProps } from "./FollowGroups.types";
 
@@ -52,7 +52,7 @@ export default function SetUpGroupDialog({
       await onSubmit(selectedIds);
     } catch (cause) {
       const failure = cause instanceof Error ? cause : new Error("设置分组失败，请稍后重试");
-      if (failure instanceof RelationTagLoginRequiredError) {
+      if (isLoginRequiredError(failure)) {
         onLoginRequired(failure);
         return;
       }

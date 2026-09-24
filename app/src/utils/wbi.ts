@@ -1,5 +1,4 @@
-// import md5 from 'spark-md5'
-import MD5 from "./md5";
+import { CryptoDigestAlgorithm, digestStringAsync } from "expo-crypto";
 
 const mixinKeyEncTab = [
   46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49, 33, 9, 42, 19, 29, 28,
@@ -15,7 +14,11 @@ const getMixinKey = (orig: string) =>
     .slice(0, 32);
 
 // 为请求参数进行 wbi 签名
-export default function encWbi(params: Record<string, any>, img_url: string, sub_url: string) {
+export default async function encWbi(
+  params: Record<string, any>,
+  img_url: string,
+  sub_url: string,
+) {
   const { img_key, sub_key } = {
     img_key: img_url.slice(img_url.lastIndexOf("/") + 1, img_url.lastIndexOf(".")),
     sub_key: sub_url.slice(sub_url.lastIndexOf("/") + 1, sub_url.lastIndexOf(".")),
@@ -34,7 +37,7 @@ export default function encWbi(params: Record<string, any>, img_url: string, sub
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
     })
     .join("&");
-  const wbi_sign = MD5(query + mixin_key).toString(); // 计算 w_rid
+  const wbi_sign = await digestStringAsync(CryptoDigestAlgorithm.MD5, query + mixin_key); // 计算 w_rid
 
   return `${query}&w_rid=${wbi_sign}`;
 }

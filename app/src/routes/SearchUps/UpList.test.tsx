@@ -65,6 +65,7 @@ vi.mock("@/components/styled/rneui", () => ({
 }));
 vi.mock("@/constants/theme", () => ({
   theme: {
+    background: { fillStrong: { bg: "fill-strong" } },
     text: { muted: "gray6" },
     primary: { text: "primary" },
     secondary: { text: "secondary" },
@@ -169,6 +170,20 @@ test("本地命中项不显示粉丝数，接口结果保留粉丝数", () => {
   const apiRow = renderRow(listProps("up").data[1]);
   expect(apiRow.map((child) => child.type)).toEqual(["TouchableOpacity", "Text", "Button"]);
   expect(apiRow[1].props.children).toEqual(["20", "粉丝"]);
+});
+
+test("没有头像时仍展示固定尺寸的空头像", () => {
+  const item = { ...apiOther, face: "" };
+  const [profile] = renderRow(item);
+  const [avatar] = childElements(profile.props.children);
+
+  expect(avatar.type).toBe("Avatar");
+  expect(avatar.props).toMatchObject({
+    containerClassName: "shrink-0 fill-strong",
+    rounded: true,
+    size: 40,
+    source: undefined,
+  });
 });
 
 test("关键词为空时没有数据并提示输入", () => {

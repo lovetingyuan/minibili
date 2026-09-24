@@ -56,6 +56,7 @@ const AdditionalSchema = z
       .nullish(),
     ugc: z
       .object({
+        id_str: z.string().optional(),
         title: z.string().optional(),
         desc_second: z.string().optional(),
         cover: z.string().optional(),
@@ -289,7 +290,7 @@ const DynamicItemBaseSchema = z
   .passthrough();
 
 /**
- * 被转发的原动态失效时，接口会返回一个占位对象：`id_str: null`、`type: DYNAMIC_TYPE_NONE`、
+ * 被转发的原动态失效时，接口会返回一个占位对象：`id_str: null | 0`、`type: DYNAMIC_TYPE_NONE`、
  * 作者信息全为空、`major.type` 为 `MAJOR_TYPE_NONE`（tips 一般是「源动态不可见」）。
  * 所以这里的 id 必须允许为空，否则整条转发动态都会解析失败。
  */

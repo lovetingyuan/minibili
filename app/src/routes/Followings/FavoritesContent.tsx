@@ -16,11 +16,13 @@ import {
   useBilibiliFavoriteResources,
 } from "@/api/useBilibiliFavorites";
 import type { FavoriteAccount, FavoriteFolder, FavoriteListItem } from "@/api/favorites.types";
-import { FavoriteLoginRequiredError } from "@/api/video-favorites";
+import { LoginRequired } from "@/components/LoginRequired";
 import { Button, FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
 import { theme } from "@/constants/theme";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
+import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
@@ -77,20 +79,8 @@ export default function FavoritesContent() {
   }
 
   function requestRelogin(error: Error, target: FavoriteAccount) {
-    Alert.alert("请重新登录 B站", error.message, [
-      { text: "取消", style: "cancel" },
-      {
-        text: "重新登录",
-        onPress: () => {
-          if (!bilibiliSession.isCurrentAccount(target)) {
-            showToast("登录状态已改变，请重新操作");
-            return;
-          }
-          setEditing(null);
-          void logout().catch(() => showToast("退出登录失败，请在设置页重试"));
-        },
-      },
-    ]);
+    setEditing(null);
+    showLoginRequiredAlert(error.message, { session: { account: target, logout } });
   }
 
   function loginRequired(error: Error) {
@@ -133,7 +123,7 @@ export default function FavoritesContent() {
       showToast(`已删除收藏夹「${folder.title}」`);
     } catch (cause) {
       const error = cause instanceof Error ? cause : new Error("删除收藏夹失败，请稍后重试");
-      if (error instanceof FavoriteLoginRequiredError) {
+      if (isLoginRequiredError(error)) {
         requestRelogin(error, account);
         return;
       }
@@ -160,6 +150,9 @@ export default function FavoritesContent() {
   }
 
   if (!folders.data) {
+    if (isLoginRequiredError(folders.error)) {
+      return <LoginRequired description="登录后即可查看你的收藏夹" />;
+    }
     return (
       <View className="flex-1 items-center justify-center gap-4 px-8">
         {folders.error ? (
@@ -254,6 +247,8 @@ export default function FavoritesContent() {
               <View className="items-center justify-center gap-4 px-6 py-16">
                 {resources.isLoading ? (
                   <ActivityIndicator />
+                ) : isLoginRequiredError(resources.error) ? (
+                  <LoginRequired description="登录后即可查看该收藏夹" />
                 ) : resources.error ? (
                   <>
                     <Text className="text-center">

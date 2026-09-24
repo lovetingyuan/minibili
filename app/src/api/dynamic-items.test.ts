@@ -99,6 +99,45 @@ describe("dynamic item mapping", () => {
     expect(item.commentType).toBe(1);
   });
 
+  it("keeps the bvid for an additional video", () => {
+    const item = mapDynamicItem(
+      fixture({
+        additional: {
+          type: "ADDITIONAL_TYPE_UGC",
+          ugc: {
+            id_str: "BV1XctB6PEuZ",
+            title: "关联视频",
+            desc_second: "1.2万观看 88弹幕",
+            cover: "//i0.hdslb.com/video.jpg",
+            jump_url: "//www.bilibili.com/video/BV1XctB6PEuZ",
+          },
+        },
+      }),
+    );
+
+    expect(item.additional).toMatchObject({
+      bvid: "BV1XctB6PEuZ",
+      title: "关联视频",
+      url: "https://www.bilibili.com/video/BV1XctB6PEuZ",
+    });
+  });
+
+  it("gets an additional video's bvid from its jump URL when id_str is absent", () => {
+    const item = mapDynamicItem(
+      fixture({
+        additional: {
+          type: "ADDITIONAL_TYPE_UGC",
+          ugc: {
+            title: "关联视频",
+            jump_url: "//www.bilibili.com/video/BV1Av421r7Ur/",
+          },
+        },
+      }),
+    );
+
+    expect(item.additional?.bvid).toBe("BV1Av421r7Ur");
+  });
+
   it("uses OPUS summary and preserves long pictures, GIFs and rich text", () => {
     const item = mapDynamicItem(
       fixture({
@@ -425,7 +464,8 @@ describe("dynamic item mapping", () => {
           id: "1124985452502188053",
           type: "DYNAMIC_TYPE_FORWARD",
           orig: {
-            id_str: null,
+            // 空间动态列表接口会用 0 表示失效的原动态，详情接口则返回 null
+            id_str: 0,
             type: "DYNAMIC_TYPE_NONE",
             basic: { comment_id_str: "", comment_type: 0 },
             modules: {

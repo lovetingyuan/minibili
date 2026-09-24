@@ -91,7 +91,7 @@ function VideoCard(props: {
   content: Extract<DynamicContent, { kind: "video" }>;
   author: DynamicAuthor;
   detail?: boolean;
-  /** 被转发的视频卡片外层还有一层带 padding 的卡片，这里去掉自身底部内边距避免叠加 */
+  /** 被转发的视频卡片外层还有一层带 padding 的卡片，这里去掉自身底部间距避免叠加 */
   forward?: boolean;
 }) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
@@ -183,7 +183,10 @@ function VideoCard(props: {
       ) : null}
     </View>
   );
-  const containerClassName = "mb-3 overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800";
+  const containerClassName = clsx(
+    !props.forward && "mb-3",
+    "overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800",
+  );
   const coverClassName = "relative aspect-video w-full bg-slate-200 dark:bg-slate-700";
 
   if (props.detail) {

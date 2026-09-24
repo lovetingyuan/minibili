@@ -135,6 +135,7 @@ function Play({ route }: Props) {
       )}
       <CommentList
         commentId={videoInfo?.aid || ""}
+        commentCount={videoInfo.replyNum}
         commentType={1}
         sourceUrl={`https://www.bilibili.com/video/${bvid}/`}
         dividerRight={

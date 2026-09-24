@@ -83,9 +83,14 @@ function SearchUpItem(props: { up: UpSearchItem }) {
         className="flex-1 flex-row items-center gap-4"
       >
         <Avatar
+          containerClassName={`shrink-0 ${theme.background.fillStrong.bg}`}
           rounded
-          source={{ uri: parseImgUrl(props.up.face, getImagePixelSize(40)) }}
           size={40}
+          source={
+            props.up.face
+              ? { uri: parseImgUrl(props.up.face, getImagePixelSize(40)) }
+              : undefined
+          }
         />
         <UpName
           mid={props.up.mid}

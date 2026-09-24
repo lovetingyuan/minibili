@@ -1,6 +1,7 @@
 import useSWR from "swr";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { BilibiliAuthExpiredError } from "../features/bilibili-session/auth-expiration";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import { fetchBilibiliBlacklist, getBlacklistKey } from "./blacklist";
@@ -28,7 +29,8 @@ export function useBilibiliBlacklist(sync = false) {
       revalidateOnFocus: sync,
       revalidateOnReconnect: sync,
       keepPreviousData: false,
-      shouldRetryOnError: (error) => !(error instanceof BilibiliSessionChangedError),
+      shouldRetryOnError: (error) =>
+        !(error instanceof BilibiliSessionChangedError || error instanceof BilibiliAuthExpiredError),
     },
   );
 

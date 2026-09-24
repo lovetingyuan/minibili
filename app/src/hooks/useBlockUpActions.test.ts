@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),
+  createNavigationContainerRef: () => ({ isReady: () => true, navigate: mocks.navigate }),
 }));
 vi.mock("react-native", () => ({ Alert: { alert: mocks.alert } }));
 vi.mock("../api/useBlockUp", () => ({
@@ -89,13 +90,18 @@ describe("block UP confirmation", () => {
     await vi.waitFor(() => expect(mocks.showToast).toHaveBeenCalledExactlyOnceWith("已拉黑"));
   });
 
-  test("routes logged-out users to login without automatically resuming the block", () => {
+  test("guides logged-out users to login without automatically resuming the block", () => {
     mocks.account = null;
     useBlockUpActions().confirmBlock({ mid: 456, name: "UP" });
-    expect(mocks.navigate).toHaveBeenCalledWith("MainTabs", { screen: "Followings" });
-    expect(mocks.showToast).toHaveBeenCalledWith("请先登录 B站，登录后重新点击拉黑");
+    expect(mocks.alert).toHaveBeenCalledWith(
+      "请先登录 B站",
+      "请先登录 B站，登录后重新点击拉黑",
+      expect.any(Array),
+    );
+    pressButton("去登录");
+    expect(mocks.navigate).toHaveBeenCalledWith("BilibiliLogin");
+    expect(mocks.logout).not.toHaveBeenCalled();
     mocks.account = { mid: "123", generation: 2 };
-    expect(mocks.alert).not.toHaveBeenCalled();
     expect(mocks.block).not.toHaveBeenCalled();
   });
 
@@ -135,10 +141,9 @@ describe("block UP confirmation", () => {
     pressButton("拉黑");
     await vi.waitFor(() => expect(mocks.alert).toHaveBeenCalledTimes(2));
     expect(mocks.logout).not.toHaveBeenCalled();
-    expect(mocks.showToast).not.toHaveBeenCalled();
-    pressButton("重新登录");
+    pressButton("去登录");
     await vi.waitFor(() =>
-      expect(mocks.navigate).toHaveBeenCalledWith("MainTabs", { screen: "Followings" }),
+      expect(mocks.navigate).toHaveBeenCalledWith("BilibiliLogin"),
     );
     expect(mocks.logout).toHaveBeenCalledOnce();
     expect(mocks.block).toHaveBeenCalledOnce();

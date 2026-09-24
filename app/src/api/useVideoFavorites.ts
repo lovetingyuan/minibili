@@ -9,6 +9,7 @@ import {
 import { syncFavoriteCaches } from "../features/bilibili-favorites/sync";
 import { videoRelationMutations as mutations } from "../features/bilibili-favorites/video-relation-mutations";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { BilibiliAuthExpiredError } from "../features/bilibili-session/auth-expiration";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import type { FavoriteAccount } from "./favorites.types";
 import fetcher from "./fetcher";
@@ -32,7 +33,11 @@ const options = {
   keepPreviousData: false,
   revalidateOnFocus: false,
   shouldRetryOnError: (error: Error) =>
-    !(error instanceof BilibiliSessionChangedError || error instanceof FavoriteLoginRequiredError),
+    !(
+      error instanceof BilibiliAuthExpiredError ||
+      error instanceof BilibiliSessionChangedError ||
+      error instanceof FavoriteLoginRequiredError
+    ),
   errorRetryCount: 2,
 };
 

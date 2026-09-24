@@ -1,19 +1,39 @@
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React from "react";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { WebView } from "react-native-webview";
+import { useSWRConfig } from "swr";
 
 import { BILIBILI_API_COOKIE_URL, hasBilibiliLoginCookie } from "@/api/bilibili-cookie.helpers";
 import { Button, Text } from "@/components/styled/rneui";
+import { theme } from "@/constants/theme";
 import { BilibiliSessionChangedError } from "@/features/bilibili-session/controller";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import { useAppStateChange } from "@/hooks/useAppState";
 import useLatest from "@/hooks/useLatest";
+import type { RootStackParamList } from "@/types";
 import { showToast } from "@/utils";
 
 const BILIBILI_LOGIN_URL = "https://passport.bilibili.com/h5-app/passport/login";
 
-export default function BilibiliLoginWebView() {
+type Props = NativeStackScreenProps<RootStackParamList, "BilibiliLogin">;
+
+// 登录页首帧之前盖一层整页 loading，不用 webview 自带的那个小圈
+function LoginPageLoading() {
+  return (
+    <View className="absolute h-full w-full items-center justify-center">
+      <ActivityIndicator
+        size="large"
+        colorClassName={theme.secondary.accent}
+        className="scale-150"
+      />
+    </View>
+  );
+}
+
+export default function BilibiliLogin({ navigation }: Props) {
   const { login } = useBilibiliSession();
+  const { mutate } = useSWRConfig();
   const loginRef = useLatest(login);
   const pageUrlRef = React.useRef(BILIBILI_LOGIN_URL);
   const appState = useAppStateChange();
@@ -33,6 +53,15 @@ export default function BilibiliLoginWebView() {
     let busy = false;
     let stopped = false;
     let rejectedCookie = "";
+
+    // 登录成功后返回上一页，栈底没有上一页时回到主页面
+    function leaveLoginPage() {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return;
+      }
+      navigation.navigate("MainTabs");
+    }
 
     async function captureCookie() {
       if (busy || stopped || controller.signal.aborted) {
@@ -66,6 +95,9 @@ export default function BilibiliLoginWebView() {
           stopped = true;
           if (!controller.signal.aborted) {
             showToast("登录成功");
+            // 上一页缓存的「需要登录」错误要一起失效，否则返回后仍然看不到内容
+            void mutate(() => true, undefined, { revalidate: true });
+            leaveLoginPage();
           }
         } else {
           rejectedCookie = cookie;
@@ -88,7 +120,7 @@ export default function BilibiliLoginWebView() {
       controller.abort();
       clearInterval(timer);
     };
-  }, [active, captureVersion, loginRef]);
+  }, [active, captureVersion, loginRef, mutate, navigation]);
 
   function reloadPage() {
     pageUrlRef.current = BILIBILI_LOGIN_URL;
@@ -141,6 +173,7 @@ export default function BilibiliLoginWebView() {
         sharedCookiesEnabled
         thirdPartyCookiesEnabled
         startInLoadingState
+        renderLoading={() => <LoginPageLoading />}
         onLoadStart={(event) => {
           pageUrlRef.current = event.nativeEvent.url;
         }}

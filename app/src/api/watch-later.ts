@@ -1,4 +1,10 @@
 import { UA } from "../constants";
+import {
+  BilibiliAuthExpiredError,
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { getProgressRatio } from "../utils/watch-progress";
 import {
@@ -18,7 +24,7 @@ import type {
   WatchLaterResponse,
 } from "./watch-later.types";
 
-export class WatchLaterLoginRequiredError extends Error {}
+export class WatchLaterLoginRequiredError extends LoginRequiredError {}
 export class WatchLaterResultUnknownError extends Error {}
 
 const WATCH_LATER_LIST_URL = "/x/v2/history/toview/web?web_location=333.1007";
@@ -28,9 +34,14 @@ export function getWatchLaterKey(account: WatchLaterAccount): WatchLaterKey {
   return ["bilibili-watch-later", account.mid, account.generation];
 }
 
-function isLoginRequiredError(error: unknown) {
+function getLoginRequiredCode(error: unknown) {
   return (
-    error instanceof Error && "code" in error && (error.code === -101 || error.code === -111)
+    error instanceof Error &&
+    "code" in error &&
+    typeof error.code === "number" &&
+    isBilibiliAuthExpiredCode(error.code)
+      ? error.code
+      : null
   );
 }
 
@@ -97,8 +108,12 @@ export async function fetchBilibiliWatchLater(
     return WatchLaterResponseSchema.parse(data);
   } catch (error) {
     assertCurrentAccount(isCurrentAccount);
-    if (isLoginRequiredError(error)) {
-      throw new WatchLaterLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (error instanceof BilibiliAuthExpiredError) {
+      throw error;
+    }
+    const code = getLoginRequiredCode(error);
+    if (code) {
+      throw reportBilibiliAuthExpired(code, error instanceof Error ? error.message : undefined, WATCH_LATER_LIST_URL);
     }
     throw error;
   }
@@ -161,8 +176,8 @@ export async function modifyWatchLater(
     }
     receivedResult = true;
     const { code, message } = parsed.data;
-    if (code === -101 || code === -111) {
-      throw new WatchLaterLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
     }
     if (code !== 0) {
       throw new Error(`${actionName}失败（${code}）：${message || "请稍后重试"}`);

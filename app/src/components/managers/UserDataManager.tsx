@@ -2,6 +2,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import useSWR from "swr";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { BilibiliSessionChangedError } from "@/features/bilibili-session/controller";
+import { BilibiliAuthExpiredError } from "@/features/bilibili-session/auth-expiration";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import { UserDataUnauthorizedError } from "@/features/user-data/errors";
 import { userData } from "@/features/user-data/store";
@@ -28,7 +29,9 @@ export default function UserDataManager() {
       errorRetryCount: 2,
       shouldRetryOnError: (error: Error) =>
         !(
-          error instanceof UserDataUnauthorizedError || error instanceof BilibiliSessionChangedError
+          error instanceof UserDataUnauthorizedError ||
+          error instanceof BilibiliAuthExpiredError ||
+          error instanceof BilibiliSessionChangedError
         ),
       onError(error: Error) {
         if (

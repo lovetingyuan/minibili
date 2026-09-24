@@ -275,7 +275,7 @@ test("opens the player when the forwarded dynamic is a video", () => {
   expect(mocks.navigate).not.toHaveBeenCalledWith("DynamicDetail", expect.anything());
 });
 
-test("renders a read-only hint when the forwarded dynamic is gone", () => {
+test("renders a gone forwarded dynamic as an inert placeholder", () => {
   mocks.navigate.mockClear();
   const elements = flatten(
     DynamicCard({
@@ -296,13 +296,22 @@ test("renders a read-only hint when the forwarded dynamic is gone", () => {
     }),
   );
 
-  // 没有 id 的原动态既不能跳转详情页，也没有作者可展示
-  expect(elements.some((element) => element.props.accessibilityLabel === "查看被转发的动态")).toBe(
-    false,
+  // 没有 id 的原动态只展示静态提示，不应渲染作者或任何点击交互
+  const unavailableCard = elements.find(
+    (element) =>
+      element.type === "View" &&
+      element.props.className === "mb-3 rounded-lg bg-slate-100 p-3 dark:bg-slate-800",
   );
+  if (!unavailableCard) {
+    throw new Error("Missing unavailable forwarded card");
+  }
+  expect(unavailableCard.props.onPress).toBeUndefined();
   expect(elements.filter((element) => element.type === "UpName")).toHaveLength(1);
   expect(elements.filter((element) => element.type === "Avatar")).toHaveLength(1);
   expect(elements.filter((element) => element.type === "DynamicActions")).toHaveLength(1);
+  expect(
+    elements.some((element) => element.props.accessibilityLabel === "查看被转发的动态"),
+  ).toBe(false);
   const hint = elements.find(
     (element) => element.type === "Text" && element.props.children === "源动态不可见",
   );

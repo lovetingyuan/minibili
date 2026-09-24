@@ -1,6 +1,11 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
+import {
   createBilibiliRequestHeaders,
   getBilibiliCsrf,
   getBilibiliUserId,
@@ -10,7 +15,7 @@ import { DynamicLikeResponseSchema } from "./dynamic-like.schema";
 import type { DynamicLikeChange, DynamicLikeRequestDependencies } from "./dynamic-like.types";
 import type { FavoriteAccount } from "./favorites.types";
 
-export class DynamicLikeLoginRequiredError extends Error {}
+export class DynamicLikeLoginRequiredError extends LoginRequiredError {}
 export class DynamicLikeResultUnknownError extends Error {}
 
 export async function modifyDynamicLike(
@@ -75,8 +80,8 @@ export async function modifyDynamicLike(
     }
     const { code, message } = parsed.data;
     receivedResult = true;
-    if (code === -101 || code === -111) {
-      throw new DynamicLikeLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
     }
     if (code !== 0) {
       throw new Error(`动态点赞操作失败（${code}）：${message || "请稍后重试"}`);

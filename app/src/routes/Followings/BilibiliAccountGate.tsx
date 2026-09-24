@@ -3,11 +3,11 @@ import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { useBilibiliFollowings } from "@/api/followings";
+import { LoginRequired } from "@/components/LoginRequired";
 import { Button, Text } from "@/components/styled/rneui";
+import { theme } from "@/constants/theme";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
-
-import BilibiliLoginWebView from "./BilibiliLoginWebView";
 
 type Props = {
   Content: React.ComponentType;
@@ -34,7 +34,9 @@ export default function BilibiliAccountGate({ Content, syncFollowings }: Props) 
   if (control.phase !== "ready") {
     content = (
       <View className="flex-1 items-center justify-center gap-4 px-8">
-        {control.phase === "logging-out" ? <ActivityIndicator /> : null}
+        {control.phase === "logging-out" ? (
+          <ActivityIndicator size="large" colorClassName={theme.secondary.accent} />
+        ) : null}
         <Text>
           {control.phase === "logging-out" ? "正在退出登录" : "退出尚未完成，请在设置页重试"}
         </Text>
@@ -55,7 +57,7 @@ export default function BilibiliAccountGate({ Content, syncFollowings }: Props) 
             />
           </>
         ) : (
-          <ActivityIndicator />
+          <ActivityIndicator size="large" colorClassName={theme.secondary.accent} />
         )}
       </View>
     );
@@ -80,10 +82,10 @@ export default function BilibiliAccountGate({ Content, syncFollowings }: Props) 
           <Content key={`${account.mid}:${account.generation}`} />
         ) : account ? (
           <View className="flex-1 items-center justify-center">
-            <ActivityIndicator />
+            <ActivityIndicator size="large" colorClassName={theme.secondary.accent} />
           </View>
         ) : focused ? (
-          <BilibiliLoginWebView />
+          <LoginRequired description="登录后即可查看 B站账号内容" />
         ) : null}
       </>
     );

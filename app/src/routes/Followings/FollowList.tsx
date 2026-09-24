@@ -5,7 +5,6 @@ import PagerView from 'react-native-pager-view'
 import {
   getFollowGroupTags,
   getSelectableRelationTags,
-  RelationTagLoginRequiredError,
 } from '@/api/relation-tags'
 import {
   useBilibiliRelationTags,
@@ -16,6 +15,10 @@ import { Dialog } from '@/components/Dialog'
 import { Button, Text } from '@/components/styled/rneui'
 import { theme } from "@/constants/theme";
 import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
+import {
+  handleLoginRequiredError,
+  showLoginRequiredAlert,
+} from '@/features/bilibili-session/login-required-alert'
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import {
   useBilibiliSessionActions,
@@ -105,19 +108,9 @@ function FollowList() {
   }
 
   function requestRelogin(error: Error) {
-    Alert.alert('请重新登录 B站', error.message, [
-      { text: '取消', style: 'cancel' },
-      {
-        text: '重新登录',
-        onPress: () => {
-          if (!account || !bilibiliSession.isCurrentAccount(account)) {
-            showToast('登录状态已改变，请重新操作')
-            return
-          }
-          void sessionActions.logout().catch(() => showToast('退出登录失败，请在设置页重试'))
-        },
-      },
-    ])
+    showLoginRequiredAlert(error.message, {
+      session: { account, logout: sessionActions.logout },
+    })
   }
 
   function markVisited(key: string) {
@@ -219,8 +212,11 @@ function FollowList() {
       showToast(`已删除分组「${name}」`)
     } catch (cause) {
       const error = toError(cause, '删除分组失败，请稍后重试')
-      if (error instanceof RelationTagLoginRequiredError) {
-        requestRelogin(error)
+      if (
+        handleLoginRequiredError(error, '请先登录 B站后重新操作', {
+          session: { account, logout: sessionActions.logout },
+        })
+      ) {
         return
       }
       showToast(
@@ -250,9 +246,12 @@ function FollowList() {
       setEditor(null)
     } catch (cause) {
       const error = toError(cause, '分组操作失败，请稍后重试')
-      if (error instanceof RelationTagLoginRequiredError) {
+      if (
+        handleLoginRequiredError(error, '请先登录 B站后重新操作', {
+          session: { account, logout: sessionActions.logout },
+        })
+      ) {
         setEditor(null)
-        requestRelogin(error)
         return
       }
       if (error instanceof BilibiliSessionChangedError) {

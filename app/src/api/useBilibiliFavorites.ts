@@ -9,6 +9,7 @@ import {
   invalidateFavoriteResourceRequests,
 } from "../features/bilibili-favorites/resource-revisions";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { BilibiliAuthExpiredError } from "../features/bilibili-session/auth-expiration";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import fetcher from "./fetcher";
@@ -36,7 +37,9 @@ const favoriteOptions = {
   revalidateOnReconnect: true,
   shouldRetryOnError: (error: Error) =>
     !(
-      error instanceof BilibiliSessionChangedError || error instanceof FavoriteResourcesChangedError
+      error instanceof BilibiliAuthExpiredError ||
+      error instanceof BilibiliSessionChangedError ||
+      error instanceof FavoriteResourcesChangedError
     ),
   errorRetryCount: 2,
 };

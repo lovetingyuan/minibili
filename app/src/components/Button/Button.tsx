@@ -25,6 +25,8 @@ function resolveRadius(radius: ButtonProps["radius"]) {
 }
 
 export function Button({
+  accessibilityRole = "button",
+  accessibilityState,
   buttonClassName,
   buttonStyle,
   children,
@@ -84,8 +86,8 @@ export function Button({
     >
       <Pressable
         {...pressableProps}
-        accessibilityRole="button"
-        accessibilityState={{ busy: loading, disabled }}
+        accessibilityRole={accessibilityRole}
+        accessibilityState={{ ...accessibilityState, busy: loading, disabled }}
         android_ripple={androidRipple}
         delayLongPress={0}
         disabled={disabled}

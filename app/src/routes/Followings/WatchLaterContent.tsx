@@ -4,10 +4,12 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 
 import { useBilibiliWatchLater } from "@/api/useWatchLater";
 import type { WatchLaterListItem } from "@/api/watch-later.types";
+import { LoginRequired } from "@/components/LoginRequired";
 import { Button, FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
 import { theme } from "@/constants/theme";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
 
@@ -45,6 +47,10 @@ export default function WatchLaterContent() {
       refreshingRef.current = false;
       setRefreshing(false);
     }
+  }
+
+  if (!watchLater.items.length && !watchLater.isLoading && isLoginRequiredError(watchLater.error)) {
+    return <LoginRequired description="登录后即可查看稍后再看" />;
   }
 
   return (

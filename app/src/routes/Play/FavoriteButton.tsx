@@ -1,18 +1,18 @@
-import { useIsFocused, useNavigation } from '@react-navigation/native'
+import { useIsFocused } from '@react-navigation/native'
 import { Star } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
-import { Alert, Pressable } from 'react-native'
+import { Pressable } from 'react-native'
 
 import { useVideoRelation } from '@/api/useVideoFavorites'
 import { Text } from '@/components/styled/rneui'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from "@/constants/theme";
+import { showLoginRequiredAlert } from '@/features/bilibili-session/login-required-alert'
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import {
   useBilibiliSessionActions,
   useBilibiliSessionState,
 } from '@/features/bilibili-session/useBilibiliSession'
-import type { NavigationProps } from '@/types'
 import { parseNumber, showToast } from '@/utils'
 import type { FavoriteButtonContentProps, FavoriteButtonProps } from './Favorite.types'
 import FavoriteDialog from './FavoriteDialog'
@@ -39,7 +39,6 @@ function FavoriteButtonContent({
 }: FavoriteButtonContentProps) {
   const [visible, setVisible] = useState(false)
   const focused = useIsFocused()
-  const navigation = useNavigation<NavigationProps['navigation']>()
   const { logout } = useBilibiliSessionActions()
   const video = aid ? { aid: String(aid), bvid } : null
   const relation = useVideoRelation(account, video)
@@ -57,8 +56,7 @@ function FavoriteButtonContent({
       return
     }
     if (!account) {
-      showToast('请先登录 B站，登录后重新点击收藏')
-      navigation.navigate('MainTabs', { screen: 'Followings' })
+      showLoginRequiredAlert('请先登录 B站，登录后重新点击收藏')
       return
     }
     if (!video) {
@@ -69,24 +67,8 @@ function FavoriteButtonContent({
   }
 
   function loginRequired(error: Error) {
-    Alert.alert('请重新登录 B站', error.message, [
-      { text: '取消', style: 'cancel' },
-      {
-        text: '重新登录',
-        onPress: () => {
-          if (!account || !bilibiliSession.isCurrentAccount(account)) {
-            showToast('登录状态已改变，请重新操作')
-            return
-          }
-          setVisible(false)
-          void logout()
-            .then(() => navigation.navigate('MainTabs', { screen: 'Followings' }))
-            .catch(() => {
-              showToast('退出登录失败，请在设置页重试')
-            })
-        },
-      },
-    ])
+    setVisible(false)
+    showLoginRequiredAlert(error.message, { session: { account, logout } })
   }
 
   return (

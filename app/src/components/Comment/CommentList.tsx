@@ -14,6 +14,7 @@ import { showToast } from '@/utils'
 
 import { Comment } from './Comment'
 import CommentComposer from './CommentComposer'
+import { getCommentListEmptyText } from './comment-list.helpers'
 import CommentPaginationFooter from './CommentPaginationFooter'
 import type { CommentListProps } from './comment-list.types'
 import ReplyList from './ReplyList'
@@ -127,7 +128,7 @@ export default function CommentList(props: CommentListProps) {
     comments.update()
   }
 
-  const allCount = comments.data.allCount
+  const allCount = comments.data.allCount ?? props.commentCount
   return (
     <View className="flex-1">
       <FlashList
@@ -203,7 +204,7 @@ export default function CommentList(props: CommentListProps) {
             <Loading />
           ) : (
             <Text className="my-12 text-center text-sm">
-              {comments.error ? '评论已关闭或加载失败' : '还没有评论'}
+              {getCommentListEmptyText(allCount, comments.error)}
             </Text>
           )
         }

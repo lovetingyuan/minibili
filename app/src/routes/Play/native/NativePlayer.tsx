@@ -1,4 +1,4 @@
-import { type RouteProp, useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
+import { type RouteProp, useIsFocused, useRoute } from "@react-navigation/native";
 import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -6,7 +6,6 @@ import type { VideoPlayer, VideoPlayerStatus } from "expo-video";
 import { Play } from "lucide-react-native";
 import React from "react";
 import {
-  Alert,
   Animated,
   AppState,
   Keyboard,
@@ -24,10 +23,12 @@ import { getDanmakuSegmentIndex, invalidateDanmakuSegment } from "@/api/danmaku"
 import type { DanmakuItem } from "@/api/danmaku.types";
 import { usePlayResumePosition } from "@/api/play-resume";
 import { useVideoPlayUrl } from "@/api/play-url";
-import { DANMAKU_SEND_STYLE, DanmakuLoginRequiredError } from "@/api/send-danmaku";
+import { DANMAKU_SEND_STYLE } from "@/api/send-danmaku";
 import { useSendDanmaku } from "@/api/useSendDanmaku";
 import { useVideoInfo } from "@/api/video-info";
 import { ThemedIcon } from "@/components/ThemedIcon";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
+import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
@@ -39,7 +40,7 @@ import { usePartPlayProgressRecorder } from "@/hooks/usePartPlayProgressRecorder
 import { usePlayHeartbeatReporter } from "@/hooks/usePlayHeartbeatReporter";
 import { useStore } from "@/store";
 import { usePartPlayProgressPosition } from "@/store/part-play-progress";
-import type { NavigationProps, RootStackParamList } from "@/types";
+import type { RootStackParamList } from "@/types";
 import { showToast } from "@/utils";
 import { unlockOrientation } from "@/utils/screen-orientation";
 
@@ -100,7 +101,6 @@ type NativePlayerProps = {
 export default function NativePlayer(props: NativePlayerProps) {
   const { currentPage, onPlayEnded, playbackMode, fullscreen, onFullscreenChange } = props;
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
-  const navigation = useNavigation<NavigationProps["navigation"]>();
   const isFocused = useIsFocused();
   const { width, height } = useWindowDimensions();
   const {
@@ -814,21 +814,12 @@ export default function NativePlayer(props: NativePlayerProps) {
     resumeDanmakuPlayback();
   }
 
-  function handleDanmakuLoginRequired(error: Error) {
-    Alert.alert("请重新登录 B站", error.message, [
-      { text: "取消", style: "cancel" },
-      {
-        text: "重新登录",
-        onPress: () => {
-          if (!isFocused) {
-            return;
-          }
-          void logout()
-            .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
-            .catch(() => showToast("退出登录失败，请在设置页重试"));
-        },
-      },
-    ]);
+  function handleDanmakuLoginRequired(message?: string) {
+    // 弹窗挂在当前播放页上，用户已经离开时不再提示
+    if (!isFocused) {
+      return;
+    }
+    showLoginRequiredAlert(message, { session: { account: danmakuAccount, logout } });
   }
 
   /**
@@ -855,8 +846,8 @@ export default function NativePlayer(props: NativePlayerProps) {
       showToast("弹幕已发送");
       return true;
     } catch (error) {
-      if (error instanceof DanmakuLoginRequiredError) {
-        handleDanmakuLoginRequired(error);
+      if (isLoginRequiredError(error)) {
+        handleDanmakuLoginRequired(error instanceof Error ? error.message : undefined);
         return false;
       }
       showToast(error instanceof Error ? error.message : "弹幕发送失败，请稍后重试");

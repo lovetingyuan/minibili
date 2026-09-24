@@ -108,6 +108,7 @@ export type DynamicAdditional = {
   description: string;
   cover?: string;
   url?: string;
+  bvid?: string;
   actionLabel?: string;
 };
 

@@ -16,6 +16,7 @@ import type { MainTabParamList, RootStackParamList } from '@/types';
 import { useAppUpdateInfo } from '@/api/check-update';
 
 import About from './About';
+import BilibiliLogin from './BilibiliLogin';
 import Dynamic from './Dynamic';
 import DynamicDetail from './DynamicDetail';
 import BilibiliAccountGate from './Followings/BilibiliAccountGate';
@@ -32,6 +33,7 @@ import SearchVideos from './SearchVideos';
 import VideoList from './VideoList';
 import WebPage from './WebPage';
 import Welcome from './Welcome';
+import { flushPendingBilibiliLogin, rootNavigationRef } from './navigation';
 
 Asset.loadAsync([...NavigationAssets]);
 
@@ -77,11 +79,7 @@ export function MainTabs() {
         ? '99+'
         : followingDynamicsUpdateCount;
   const followingsUnreadBadge =
-    unreadFollowedUpCount === 0
-      ? undefined
-      : unreadFollowedUpCount >= 99
-        ? '99+'
-        : unreadFollowedUpCount;
+    unreadFollowedUpCount === 0 ? undefined : unreadFollowedUpCount >= 99 ? '99+' : unreadFollowedUpCount;
 
   return (
     <Tab.Navigator
@@ -122,16 +120,14 @@ export function MainTabs() {
             end: -8,
             top: 1,
           },
-          tabBarIcon: ({ color, size }) => (
-            <ThemedIcon icon={GalleryVerticalEnd} color={color} size={size - 2} />
-          ),
+          tabBarIcon: ({ color, size }) => <ThemedIcon icon={GalleryVerticalEnd} color={color} size={size - 2} />,
         }}
       />
       <Tab.Screen
         name="Followings"
         component={FollowingsRoute}
         options={{
-          title: '关注',
+          title: '我的关注',
           // 有直播 UP 时优先展示直播角标，否则展示有未读更新的 UP 数量
           tabBarBadge: hasLiveUps ? '𝘭𝘪𝘷𝘦' : followingsUnreadBadge,
           tabBarBadgeStyle: {
@@ -186,7 +182,7 @@ function AppRoute() {
   }
 
   return (
-    <NavigationContainer theme={routeTheme}>
+    <NavigationContainer ref={rootNavigationRef} theme={routeTheme} onReady={flushPendingBilibiliLogin}>
       <Stack.Navigator
         initialRouteName={isFirstRun ? 'Welcome' : 'MainTabs'}
         screenOptions={{
@@ -217,6 +213,7 @@ function AppRoute() {
         />
         <Stack.Screen name="History" component={HistoryRoute} options={{ headerTitle: '观看历史' }} />
         <Stack.Screen name="WatchLater" component={WatchLaterRoute} options={{ headerTitle: '稍后再看' }} />
+        <Stack.Screen name="BilibiliLogin" component={BilibiliLogin} options={{ headerTitle: '登录 B站' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

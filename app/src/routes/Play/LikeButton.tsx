@@ -1,20 +1,21 @@
-import { useIsFocused, useNavigation } from '@react-navigation/native'
+import { useIsFocused } from '@react-navigation/native'
 import { ThumbsUp } from 'lucide-react-native'
 import { useEffect, useRef } from 'react'
-import { ActivityIndicator, Alert, Pressable } from 'react-native'
+import { ActivityIndicator, Pressable } from 'react-native'
 
 import { useVideoLike } from '@/api/useVideoLike'
-import { FavoriteLoginRequiredError } from '@/api/video-favorites'
-import { VideoLikeLoginRequiredError } from '@/api/video-like'
 import { Text } from '@/components/styled/rneui'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from "@/constants/theme";
+import {
+  handleLoginRequiredError,
+  showLoginRequiredAlert,
+} from '@/features/bilibili-session/login-required-alert'
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import {
   useBilibiliSessionActions,
   useBilibiliSessionState,
 } from '@/features/bilibili-session/useBilibiliSession'
-import type { NavigationProps } from '@/types'
 import { parseNumber, showToast } from '@/utils'
 import type { LikeButtonContentProps, LikeButtonProps } from './Like.types'
 
@@ -32,7 +33,6 @@ export default function LikeButton(props: LikeButtonProps) {
 }
 
 function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonContentProps) {
-  const navigation = useNavigation<NavigationProps['navigation']>()
   const { logout } = useBilibiliSessionActions()
   const mutation = useVideoLike(account, aid ? { aid: String(aid), bvid } : null)
   const focused = useIsFocused()
@@ -50,8 +50,7 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
       return
     }
     if (!account) {
-      showToast('请先登录 B站，登录后重新点击点赞')
-      navigation.navigate('MainTabs', { screen: 'Followings' })
+      showLoginRequiredAlert('请先登录 B站，登录后重新点击点赞')
       return
     }
     if (!aid) {
@@ -64,30 +63,20 @@ function LikeButtonContent({ aid, bvid, count, account, preparing }: LikeButtonC
         showToast(liked === null ? '点赞状态已更新，请再次点击' : liked ? '已点赞' : '已取消点赞')
       }
     } catch (error) {
-      if (!active.current || !bilibiliSession.isCurrentAccount(account)) {
+      if (!active.current) {
         return
       }
       if (
-        error instanceof VideoLikeLoginRequiredError ||
-        error instanceof FavoriteLoginRequiredError
+        handleLoginRequiredError(error, '请先登录 B站后重新操作', {
+          session: { account, logout },
+        })
       ) {
-        Alert.alert('请重新登录 B站', error.message, [
-          { text: '取消', style: 'cancel' },
-          {
-            text: '重新登录',
-            onPress: () => {
-              if (!active.current || !bilibiliSession.isCurrentAccount(account)) {
-                return
-              }
-              void logout()
-                .then(() => navigation.navigate('MainTabs', { screen: 'Followings' }))
-                .catch(() => showToast('退出登录失败，请在设置页重试'))
-            },
-          },
-        ])
-      } else {
-        showToast(error instanceof Error ? error.message : '点赞失败，请稍后重试')
+        return
       }
+      if (!bilibiliSession.isCurrentAccount(account)) {
+        return
+      }
+      showToast(error instanceof Error ? error.message : '点赞失败，请稍后重试')
     }
   }
 

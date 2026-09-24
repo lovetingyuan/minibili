@@ -1,6 +1,11 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
+import {
   createBilibiliRequestHeaders,
   getBilibiliCsrf,
   getBilibiliUserId,
@@ -13,7 +18,7 @@ import type {
   RelationRequestDependencies,
 } from "./modify-relation.types";
 
-export class RelationLoginRequiredError extends Error {}
+export class RelationLoginRequiredError extends LoginRequiredError {}
 
 export async function modifyBilibiliRelation<T extends RelationChange>(
   account: RelationAccount,
@@ -97,8 +102,8 @@ export async function modifyBilibiliRelation<T extends RelationChange>(
       throw new Error(operation + "操作响应格式异常，" + confirmResult);
     }
     const { code, message } = parsed.data;
-    if (code === -101 || code === -111) {
-      throw new RelationLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
     }
     if (code !== 0) {
       throw new Error(operation + "操作失败（" + code + "）：" + (message || "请稍后重试"));

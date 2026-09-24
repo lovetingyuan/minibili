@@ -96,7 +96,7 @@ describe("create favorite folder dialog", () => {
     expect(render().error).toBeNull();
   });
 
-  test("keeps the dialog open and asks for a new login when credentials expire", async () => {
+  test("closes the dialog and asks for a new login when credentials expire", async () => {
     mocks.create.mockRejectedValueOnce(
       new FavoriteLoginRequiredError("登录凭据失效，请重新登录 B站"),
     );
@@ -106,7 +106,8 @@ describe("create favorite folder dialog", () => {
     expect(mocks.onCreated).not.toHaveBeenCalled();
     expect(mocks.onLoginRequired).toHaveBeenCalledOnce();
     const failed = render();
-    expect(failed.error?.message).toBe("登录凭据失效，请重新登录 B站");
+    // 登录类错误交给统一的登录弹窗，弹窗内不再重复展示错误
+    expect(failed.error).toBeNull();
     expect(failed.canSubmit).toBe(true);
     expect(failed.canClose()).toBe(true);
   });

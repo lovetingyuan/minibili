@@ -1,8 +1,8 @@
-import useSWRInfinite from "swr/infinite";
-import type { z } from "zod";
+import useSWRInfinite from 'swr/infinite';
+import type { z } from 'zod';
 
-import type { VideoItemResponseSchema } from "./hot-videos.schema";
-import request from "./fetcher";
+import type { VideoItemResponseSchema } from './hot-videos.schema';
+import request from './fetcher';
 
 export type HotVideoResponse = z.infer<typeof VideoItemResponseSchema>;
 
@@ -43,7 +43,7 @@ export function useHotVideos(t: number) {
     (index) => {
       return `/x/web-interface/popular?ps=30&pn=${index + 1}&_t=${t}`;
     },
-    (key) => request(key, { withCookie: true }),
+    request,
     {
       revalidateFirstPage: false,
       // revalidateAll: true,
@@ -57,7 +57,7 @@ export function useHotVideos(t: number) {
       return a.concat(b.list);
     }, [] as HotVideoResponse[]) || [];
 
-  const isLoadingMore = isLoading || (size > 0 && !!data && typeof data[size - 1] === "undefined");
+  const isLoadingMore = isLoading || (size > 0 && !!data && typeof data[size - 1] === 'undefined');
   const isReachingEnd = !!data && !!data[data.length - 1]?.no_more;
   const isRefreshing = isValidating && !!data && data.length === size;
   const list = hotVideos.map(getVideo);

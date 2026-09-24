@@ -51,9 +51,9 @@ function BlackTags() {
                 </Pressable>
               }
               iconRight
-              titleClassName="text-left text-sm font-thin"
-              containerClassName="mb-2 self-start"
-              buttonClassName="pl-1 py-[2px]"
+              titleClassName="text-left text-sm font-normal"
+              containerClassName="mb-2 mr-2 self-start"
+              buttonClassName="px-2 py-[2px]"
             />
           );
         })}

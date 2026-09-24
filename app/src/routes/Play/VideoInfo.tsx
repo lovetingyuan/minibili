@@ -2,6 +2,7 @@ import { type RouteProp, useNavigation, useRoute } from '@react-navigation/nativ
 import { Avatar } from '@/components/Avatar'
 import { Text } from '@/components/styled/rneui'
 import { ThemedIcon } from '@/components/ThemedIcon'
+import UpName from '@/components/UpName'
 import {
   CalendarDays,
   ChevronRight,
@@ -14,7 +15,7 @@ import React from 'react'
 import { Linking, Pressable, View } from 'react-native'
 
 import { useWatchingCount } from '@/api/watching-count'
-import { theme } from "@/constants/theme";
+import { theme } from '@/constants/theme'
 import type { NavigationProps, RootStackParamList } from '@/types'
 import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumber } from '@/utils'
 
@@ -41,42 +42,46 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
 
   const navigation = useNavigation<NavigationProps['navigation']>()
   const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid)
+
+  function openUpSpace() {
+    if (mid === undefined || !name) {
+      return
+    }
+    navigation.push('Dynamic', {
+      user: {
+        mid,
+        face: face ?? '',
+        name,
+        sign: '-',
+      },
+    })
+  }
+
   return (
     <View>
       <View className="mb-3 w-full flex-row justify-between">
-        <Pressable
-          onPress={() => {
-            if (!mid || !face || !name) {
-              return
-            }
-            const user = {
-              mid,
-              face,
-              name,
-              sign: '-',
-            }
-            navigation.push('Dynamic', { user })
-          }}
-          className="mr-1 min-w-0 flex-1 flex-row items-center"
-        >
-          {face ? (
-            <Avatar
-              size={36}
-              containerClassName="shrink-0"
-              rounded
-              source={{ uri: parseImgUrl(face, getImagePixelSize(36)) }}
-            />
-          ) : (
-            <View className={`h-9 w-9 shrink-0 rounded-full ${theme.background.fillDisabled.bg}`} />
-          )}
-          <Text
+        <View className="mr-1 min-w-0 flex-1 flex-row items-center">
+          <Avatar
+            accessibilityLabel={`查看 ${name || 'UP主'} 的主页`}
+            containerClassName={`shrink-0 ${theme.background.fillDisabled.bg}`}
+            onPress={openUpSpace}
+            rounded
+            size={36}
+            source={face ? { uri: parseImgUrl(face, getImagePixelSize(36)) } : undefined}
+            title={name?.slice(0, 1)}
+          />
+          <UpName
+            accessibilityLabel={`查看 ${name || 'UP主'} 的主页`}
+            accessibilityRole="button"
             numberOfLines={1}
             ellipsizeMode="tail"
+            mid={mid}
+            onPress={openUpSpace}
             className="ml-3 mr-1 min-w-0 flex-1 text-base font-bold"
           >
             {name || ''}
-          </Text>
-        </Pressable>
+          </UpName>
+        </View>
         <View className="ml-1 flex-none flex-row items-center gap-1 px-2">
           <ThemedIcon icon={CalendarDays} size={16} colorClassName={theme.icon.muted} />
           <Text className={`text-sm ${theme.text.muted}`}>{parseDate(date, true)}</Text>

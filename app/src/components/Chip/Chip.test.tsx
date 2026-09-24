@@ -3,8 +3,8 @@ import type { ReactElement } from "react";
 import { View } from "react-native";
 import { expect, test, vi } from "vitest";
 
+vi.mock("@/components/Button", () => ({ Button: "Button" }));
 vi.mock("react-native", () => ({
-  Pressable: "Pressable",
   Text: "Text",
   View: "View",
 }));
@@ -13,10 +13,14 @@ import { Chip } from "./Chip";
 
 type ElementProps = {
   accessibilityRole?: string;
-  accessibilityState?: { disabled?: boolean };
+  buttonClassName?: string;
   children?: React.ReactNode;
   className?: string;
+  disabled?: boolean;
+  onPress?: () => void;
+  radius?: number;
   testID?: string;
+  type?: string;
 };
 
 type TestElement = ReactElement<ElementProps>;
@@ -27,41 +31,44 @@ function children(element: TestElement) {
   ) as TestElement[];
 }
 
-function buttonOf(chip: TestElement) {
-  return children(chip)[0];
-}
-
-test("outline Chip 使用主题描边与文字色", () => {
+test("使用本地 Button，并沿用 RNE 的圆角和标题字号", () => {
   const chip = Chip({ title: "动画", type: "outline" }) as TestElement;
-  const button = buttonOf(chip);
-  const [title] = children(button);
+  const [title] = children(chip);
 
-  expect(button.props.className).toContain("border-[#00AEEC]");
+  expect(chip.type).toBe("Button");
+  expect(chip.props.radius).toBe(30);
+  expect(chip.props.type).toBe("outline");
+  expect(title.props.className).toContain("text-sm");
   expect(title.props.className).toContain("text-[#008AC5]");
   expect(title.props.children).toBe("动画");
 });
 
-test("可点击 Chip 提供按钮语义和按压反馈", () => {
-  const chip = Chip({ onPress: vi.fn(), title: "番剧" }) as TestElement;
-  const button = buttonOf(chip);
+test("可点击 Chip 把交互交给本地 Button", () => {
+  const onPress = vi.fn();
+  const chip = Chip({ onPress, title: "番剧" }) as TestElement;
 
-  expect(button.props.accessibilityRole).toBe("button");
-  expect(button.props.className).toContain("active:opacity-70");
+  expect(chip.props.onPress).toBe(onPress);
+  expect(chip.props.buttonClassName).toContain("gap-1");
 });
 
 test("iconRight 把图标放在标题右侧", () => {
   const icon = <View testID="remove" />;
   const chip = Chip({ icon, iconRight: true, title: "移除" }) as TestElement;
-  const [title, iconContainer] = children(buttonOf(chip));
+  const [title, iconContainer] = children(chip);
 
   expect(title.type).toBe("Text");
   expect(children(iconContainer)[0].props.testID).toBe("remove");
 });
 
-test("禁用状态同步到交互与无障碍状态", () => {
+test("禁用状态透传给本地 Button", () => {
   const chip = Chip({ disabled: true, onPress: vi.fn(), title: "禁用" }) as TestElement;
-  const button = buttonOf(chip);
 
-  expect(button.props.accessibilityState).toEqual({ disabled: true });
-  expect(button.props.className).toContain("opacity-50");
+  expect(chip.props.disabled).toBe(true);
+  expect(chip.props.buttonClassName).toContain("opacity-50");
+});
+
+test("静态 Chip 保留调用方指定的文本语义", () => {
+  const chip = Chip({ accessibilityRole: "text", title: "黑名单" }) as TestElement;
+
+  expect(chip.props.accessibilityRole).toBe("text");
 });

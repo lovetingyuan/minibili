@@ -15,6 +15,7 @@ import ButtonsOverlay from "./components/ButtonsOverlay";
 import ErrorFallback from "./components/ErrorFallback";
 import ImagesView from "./components/ImageViewer";
 import {
+  BilibiliAuthExpirationManager,
   BilibiliBlacklistManager,
   BilibiliFollowingsManager,
   CheckAppUpdate,
@@ -30,6 +31,7 @@ import {
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
 import useAppOrientation from "./hooks/useAppOrientation";
 import { ThemeProvider } from "./hooks/useTheme";
+import { isLoginRequiredError } from "./features/bilibili-session/login-required";
 import Route from "./routes/Index";
 import ErrorBoundary from "react-native-error-boundary";
 import { InitStoreComp } from "./store";
@@ -41,6 +43,9 @@ const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
   fetcher,
   errorRetryCount: 2,
   errorRetryInterval: 1000,
+  shouldRetryOnError(error) {
+    return !isLoginRequiredError(error);
+  },
   dedupingInterval: 5000,
   isVisible() {
     return focus;
@@ -87,6 +92,7 @@ export default function App() {
                 {/* sheet 内容通过 portal 渲染，放在 MenuProvider/ErrorBoundary 里面才能继承它们的 context */}
                 <BottomSheetModalProvider>
                   <InitStoreComp />
+                  <BilibiliAuthExpirationManager />
                   <BilibiliFollowingsManager />
                   <BilibiliBlacklistManager />
                   <UserDataManager />

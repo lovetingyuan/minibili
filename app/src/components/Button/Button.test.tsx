@@ -53,6 +53,7 @@ type PressableStyle =
 
 type ElementProps = {
   accessibilityLabel?: string;
+  accessibilityRole?: string;
   accessibilityState?: { busy?: boolean; disabled?: boolean };
   android_ripple?: { borderless?: boolean; color?: string; foreground?: boolean } | null;
   children?: ReactNode;
@@ -285,6 +286,12 @@ test("透传 Pressable 的其余 props", () => {
   expect(pressable.props.accessibilityLabel).toBe("搜索视频");
   expect(pressable.props.testID).toBe("RNE_BUTTON_PRESSABLE");
   expect(pressable.props.disabled).toBe(false);
+});
+
+test("显式传入的无障碍角色会覆盖默认按钮语义", () => {
+  const { pressable } = render({ accessibilityRole: "text", title: "静态标签" });
+
+  expect(pressable.props.accessibilityRole).toBe("text");
 });
 
 test("style 作用在按压区域，且仍能被 buttonClassName 覆盖", () => {

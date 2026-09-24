@@ -1,6 +1,10 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import {
   createBilibiliRequestHeaders,
   getBilibiliCsrf,
   getBilibiliUserId,
@@ -201,8 +205,8 @@ async function runFavoriteFolderMutation({
     }
     const { code, message, data } = parsed.data;
     receivedResult = true;
-    if (code === -101 || code === -111) {
-      throw new FavoriteLoginRequiredError("登录凭据失效，请重新登录 B站");
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
     }
     if (code !== 0) {
       throw new Error(`${action}失败（${code}）：${message || "请稍后重试"}`);

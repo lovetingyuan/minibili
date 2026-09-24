@@ -2,10 +2,12 @@ import { ActivityIndicator, View } from "react-native";
 import { History } from "lucide-react-native";
 
 import { useBilibiliHistory } from "@/api/useBilibiliHistory";
+import { LoginRequired } from "@/components/LoginRequired";
 import { Button, FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
 import { theme } from "@/constants/theme";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { formatWatchTime } from "@/utils/watch-time";
 
 export default function HistoryContent() {
@@ -16,6 +18,9 @@ export default function HistoryContent() {
   const loadMore = () => {
     void history.loadMore().catch(() => {});
   };
+  if (!history.items.length && !history.isLoading && isLoginRequiredError(history.error)) {
+    return <LoginRequired description="登录后即可查看观看历史" />;
+  }
   return (
     <FlashList
       data={history.items}

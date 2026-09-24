@@ -1,18 +1,19 @@
-import { useNavigation } from "@react-navigation/native";
 import { MessageCircle, Share2, ThumbsUp } from "lucide-react-native";
-import { ActivityIndicator, Alert, Pressable, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 
 import { useDynamicLike } from "@/api/useDynamicLike";
-import { DynamicLikeLoginRequiredError } from "@/api/dynamic-like";
 import type { DynamicItem } from "@/api/dynamic-items.type";
 import type { FavoriteAccount } from "@/api/favorites.types";
 import { theme } from "@/constants/theme";
+import {
+  handleLoginRequiredError,
+  showLoginRequiredAlert,
+} from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
   useBilibiliSessionState,
 } from "@/features/bilibili-session/useBilibiliSession";
-import type { NavigationProps } from "@/types";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { handleShareDynamic, parseNumber, showToast } from "@/utils";
 
@@ -106,7 +107,6 @@ function DynamicLikeButton(props: {
   account: FavoriteAccount | null;
   preparing: boolean;
 }) {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
   const { logout } = useBilibiliSessionActions();
   const mutation = useDynamicLike(props.account, props.item.id, props.item.stats.liked === true);
 
@@ -116,29 +116,21 @@ function DynamicLikeButton(props: {
       return;
     }
     if (!props.account) {
-      showToast("请先登录 B站，登录后重新点击点赞");
-      navigation.navigate("MainTabs", { screen: "Followings" });
+      showLoginRequiredAlert("请先登录 B站，登录后重新点击点赞");
       return;
     }
     try {
       const liked = await mutation.toggle();
       showToast(liked ? "已点赞" : "已取消点赞");
     } catch (error) {
-      if (error instanceof DynamicLikeLoginRequiredError) {
-        Alert.alert("请重新登录 B站", error.message, [
-          { text: "取消", style: "cancel" },
-          {
-            text: "重新登录",
-            onPress: () => {
-              void logout()
-                .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
-                .catch(() => showToast("退出登录失败，请在设置页重试"));
-            },
-          },
-        ]);
-      } else {
-        showToast(error instanceof Error ? error.message : "点赞失败，请稍后重试");
+      if (
+        handleLoginRequiredError(error, "请先登录 B站后重新操作", {
+          session: { account: props.account, logout },
+        })
+      ) {
+        return;
       }
+      showToast(error instanceof Error ? error.message : "点赞失败，请稍后重试");
     }
   }
 

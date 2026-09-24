@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import { clsx } from "clsx";
 import { Alert, View } from "react-native";
 
@@ -6,14 +5,13 @@ import { Avatar } from "@/components/Avatar";
 import { Button, Text } from "@/components/styled/rneui";
 import { theme } from "@/constants/theme";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
-import type { MainTabNavigationProp } from "@/types";
+import { openBilibiliLogin } from "@/routes/navigation";
 import { getImagePixelSize, parseImgUrl, parseNumber, showToast } from "@/utils";
 
 export const headerRight = () => <AuthButton />;
 export const headerTitle = () => <MineHeaderTitle />;
 
 function AuthButton() {
-  const navigation = useNavigation<MainTabNavigationProp>();
   const { account, control, isChecking, logout } = useBilibiliSession();
   const loggingOut = control.phase === "logging-out";
 
@@ -32,7 +30,7 @@ function AuthButton() {
       return;
     }
     if (!account) {
-      navigation.navigate("Followings");
+      openBilibiliLogin();
       return;
     }
     Alert.alert(

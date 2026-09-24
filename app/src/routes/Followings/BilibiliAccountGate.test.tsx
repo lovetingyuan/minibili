@@ -15,7 +15,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@react-navigation/native", () => ({ useIsFocused: () => mocks.focused }));
 vi.mock("react-native", () => ({ ActivityIndicator: "ActivityIndicator", View: "View" }));
+vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/api/followings", () => ({ useBilibiliFollowings: vi.fn() }));
+vi.mock("@/components/LoginRequired", () => ({ LoginRequired: "LoginRequired" }));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button", Text: "Text" }));
 vi.mock("@/features/bilibili-session/session", () => ({
   bilibiliSession: {
@@ -26,8 +28,6 @@ vi.mock("@/features/bilibili-session/session", () => ({
 vi.mock("@/features/bilibili-session/useBilibiliSession", () => ({
   useBilibiliSession: () => ({ ...mocks.session, revalidate: mocks.revalidate }),
 }));
-vi.mock("./BilibiliLoginWebView", () => ({ default: "BilibiliLoginWebView" }));
-
 import BilibiliAccountGate from "./BilibiliAccountGate";
 
 function Content() {
@@ -55,13 +55,13 @@ beforeEach(() => {
   mocks.session.control = { phase: "ready", generation: 1 };
 });
 
-test("shows the login web view only while a logged-out route is focused", () => {
+test("shows the login entry only while a logged-out route is focused", () => {
   const focused = elements(BilibiliAccountGate({ Content }));
-  expect(focused.some((element) => element.type === "BilibiliLoginWebView")).toBe(true);
+  expect(focused.some((element) => element.type === "LoginRequired")).toBe(true);
 
   mocks.focused = false;
   const inactive = elements(BilibiliAccountGate({ Content }));
-  expect(inactive.some((element) => element.type === "BilibiliLoginWebView")).toBe(false);
+  expect(inactive.some((element) => element.type === "LoginRequired")).toBe(false);
 });
 
 test("renders account content only for the current generation", () => {
@@ -72,7 +72,11 @@ test("renders account content only for the current generation", () => {
   mocks.session.account = { mid: "123", generation: 2 };
   const stale = elements(BilibiliAccountGate({ Content }));
   expect(stale.some((element) => element.type === Content)).toBe(false);
-  expect(stale.some((element) => element.type === "ActivityIndicator")).toBe(true);
+  const loading = stale.find((element) => element.type === "ActivityIndicator");
+  expect(loading).toBeDefined();
+  // 整页等待的图标要和动态详情、直播间一致：大号 + 主题辅助色
+  expect(loading?.props.size).toBe("large");
+  expect(loading?.props.colorClassName).toBe("accent-[#FF6699]");
 });
 
 test("offers a retry when the initial session check fails", () => {

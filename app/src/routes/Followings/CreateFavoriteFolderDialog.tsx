@@ -55,7 +55,6 @@ export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDi
           trackColorOffClassName={theme.background.fillMuted.accent}
         />
       </View>
-      <Text className={`mt-1 text-xs ${theme.text.muted}`}>关闭时收藏夹会在你的 B站 主页公开</Text>
       {editor.error ? (
         <View className="mt-3">
           <Text accessibilityRole="alert" className={`text-sm ${theme.error.text}`}>

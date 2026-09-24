@@ -47,8 +47,8 @@ export default function SortCate() {
       title="调整分区顺序"
       onPress={() => setExpanded(!expanded)}
     >
-      <View className="flex-row flex-wrap items-center bg-transparent px-1">
-        <View className="w-full flex-1 flex-row flex-wrap gap-x-3 border-b-[0.5px] border-b-gray-400">
+      <View className="bg-transparent px-1">
+        <View className="w-full flex-row flex-wrap gap-x-3 border-b-[0.5px] border-b-gray-400">
           {sorted.map((category) => (
             <Chip
               key={category.rid}
@@ -63,7 +63,7 @@ export default function SortCate() {
             <Text className={`mb-1 flex-1 ${theme.text.muted}`}>点击名称调整顺序</Text>
           )}
         </View>
-        <View className="mt-5 flex-row flex-wrap gap-x-3">
+        <View className="mt-5 w-full flex-row flex-wrap gap-x-3">
           {unsorted.map((category) => (
             <Chip
               key={category.rid}

@@ -49,9 +49,14 @@ function optionalUrl(value: string | null | undefined) {
   return value ? normalizeUrl(value) : undefined;
 }
 
-/** 失效的被转发动态会返回 `id_str: null`，这里统一按空 id 处理 */
+function getBvid(value: string | null | undefined) {
+  return value?.match(/BV[0-9A-Za-z]+/i)?.[0];
+}
+
+/** 失效的被转发动态会返回 `id_str: null` 或 `0`，这里统一按空 id 处理 */
 function getDynamicId(item: RawDynamicItem) {
-  return item.id_str == null ? "" : String(item.id_str);
+  const id = item.id_str == null ? "" : String(item.id_str);
+  return id === "0" ? "" : id;
 }
 
 /** 详情页地址；没有 id 时（已失效的原动态）不编造链接 */
@@ -113,6 +118,7 @@ function normalizeAdditional(item: RawDynamicItem): DynamicAdditional | null {
           description: normalizeText(ugc.desc_second),
           cover: optionalUrl(ugc.cover),
           url: optionalUrl(ugc.jump_url),
+          bvid: getBvid(ugc.id_str) ?? getBvid(ugc.jump_url),
         }
       : null;
   }

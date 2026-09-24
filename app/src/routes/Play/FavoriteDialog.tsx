@@ -1,10 +1,10 @@
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
-import { FavoriteLoginRequiredError } from "@/api/video-favorites";
 import { CheckBox } from "@/components/CheckBox";
 import { Dialog } from "@/components/Dialog";
 import { Button, Text } from "@/components/styled/rneui";
 import { theme } from "@/constants/theme";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { showToast } from "@/utils";
 import type { FavoriteDialogProps } from "./Favorite.types";
 import { useFavoriteEditor } from "./useFavoriteEditor";
@@ -33,9 +33,9 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
           <Text accessibilityRole="alert" className={theme.error.text}>
             {editor.error.message}
           </Text>
-          {editor.error instanceof FavoriteLoginRequiredError ? (
+          {isLoginRequiredError(editor.error) ? (
             <Button
-              title="重新登录"
+              title="去登录"
               type="clear"
               onPress={() => {
                 if (editor.error) {
@@ -92,7 +92,7 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
         <Dialog.Button
           title="确定"
           loading={editor.busy}
-          disabled={!editor.canSubmit || editor.error instanceof FavoriteLoginRequiredError}
+          disabled={!editor.canSubmit || isLoginRequiredError(editor.error)}
           onPress={() => {
             void submit();
           }}

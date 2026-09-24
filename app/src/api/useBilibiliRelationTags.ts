@@ -3,6 +3,7 @@ import useSWR, { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { BilibiliAuthExpiredError } from "../features/bilibili-session/auth-expiration";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import {
@@ -50,7 +51,11 @@ const relationTagOptions = {
   revalidateOnFocus: false,
   revalidateOnReconnect: true,
   shouldRetryOnError: (error: Error) =>
-    !(error instanceof BilibiliSessionChangedError || error instanceof RelationTagLoginRequiredError),
+    !(
+      error instanceof BilibiliAuthExpiredError ||
+      error instanceof BilibiliSessionChangedError ||
+      error instanceof RelationTagLoginRequiredError
+    ),
   errorRetryCount: 2,
 };
 

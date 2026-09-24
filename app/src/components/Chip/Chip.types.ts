@@ -1,18 +1,17 @@
 import type { ReactNode } from "react";
-import type { PressableProps, StyleProp, TextStyle, ViewStyle } from "react-native";
+import type { StyleProp, ViewStyle } from "react-native";
 
-export type ChipProps = Omit<PressableProps, "children" | "style"> & {
-  buttonClassName?: string;
-  buttonStyle?: StyleProp<ViewStyle>;
+import type { ButtonProps } from "@/components/Button";
+
+export type ChipProps = Omit<
+  ButtonProps,
+  "children" | "loading" | "loadingStyle" | "radius" | "size" | "title" | "type"
+> & {
   children?: ReactNode;
-  containerClassName?: string;
-  containerStyle?: StyleProp<ViewStyle>;
   icon?: ReactNode;
   iconContainerClassName?: string;
   iconContainerStyle?: StyleProp<ViewStyle>;
   iconRight?: boolean;
   title?: ReactNode;
-  titleClassName?: string;
-  titleStyle?: StyleProp<TextStyle>;
   type?: "solid" | "outline";
 };

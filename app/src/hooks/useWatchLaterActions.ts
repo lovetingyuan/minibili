@@ -1,22 +1,20 @@
-import { useNavigation } from "@react-navigation/native";
-import { Alert } from "react-native";
-
 import { useModifyWatchLater } from "../api/useWatchLater";
-import { WatchLaterLoginRequiredError } from "../api/watch-later";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import {
+  handleLoginRequiredError,
+  showLoginRequiredAlert,
+} from "../features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
   useBilibiliSessionState,
 } from "../features/bilibili-session/useBilibiliSession";
 import { useWatchLaterAids } from "../store/watch-later";
-import type { NavigationProps } from "../types";
 import { showToast } from "../utils";
 
 export type WatchLaterTarget = { aid?: string | number };
 
 export function useWatchLaterActions() {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
   const { account, control, error } = useBilibiliSessionState();
   const watchLaterAids = useWatchLaterAids();
   const mutation = useModifyWatchLater();
@@ -37,8 +35,7 @@ export function useWatchLaterActions() {
       return;
     }
     if (!account || !bilibiliSession.isCurrentAccount(account)) {
-      showToast("请先登录 B站，登录后再试");
-      navigation.navigate("MainTabs", { screen: "Followings" });
+      showLoginRequiredAlert("请先登录 B站，登录后再试");
       return;
     }
     if (!/^[1-9]\d*$/.test(aid)) {
@@ -56,26 +53,15 @@ export function useWatchLaterActions() {
         showToast(added ? "已添加到稍后再看" : "已从稍后再看移除");
       }
     } catch (cause) {
-      if (!bilibiliSession.isCurrentAccount(account)) {
-        showToast("登录状态已改变，请重新操作");
+      if (
+        handleLoginRequiredError(cause, "请先登录 B站后重新操作", {
+          session: { account, logout },
+        })
+      ) {
         return;
       }
-      if (cause instanceof WatchLaterLoginRequiredError) {
-        Alert.alert("请重新登录 B站", cause.message, [
-          { text: "取消", style: "cancel" },
-          {
-            text: "重新登录",
-            onPress: () => {
-              if (!bilibiliSession.isCurrentAccount(account)) {
-                showToast("登录状态已改变，请重新操作");
-                return;
-              }
-              void logout()
-                .then(() => navigation.navigate("MainTabs", { screen: "Followings" }))
-                .catch(() => showToast("退出登录失败，请在设置页重试"));
-            },
-          },
-        ]);
+      if (!bilibiliSession.isCurrentAccount(account)) {
+        showToast("登录状态已改变，请重新操作");
         return;
       }
       showToast(

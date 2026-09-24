@@ -1,13 +1,18 @@
 import { ActivityIndicator, View } from "react-native";
 
+import { LoginRequired } from "@/components/LoginRequired";
 import { Button, Text } from "@/components/styled/rneui";
 import { useFollowingsState } from "@/features/bilibili-followings/useFollowingsState";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import FollowList from "./FollowList";
 
 export default function FollowingsContent() {
   const { isReady, error, isValidating, mutate } = useFollowingsState();
   function retry() {
     void mutate().catch(() => {});
+  }
+  if (!isReady && isLoginRequiredError(error)) {
+    return <LoginRequired description="登录后即可同步 B站关注列表" />;
   }
   if (!isReady) {
     return (

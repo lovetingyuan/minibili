@@ -1,9 +1,9 @@
 import { clsx } from "clsx";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { AvatarProps, AvatarSize } from "./Avatar.types";
 
-const avatarSizes = {
+export const avatarSizes = {
   small: 34,
   medium: 50,
   large: 75,
@@ -15,12 +15,15 @@ function resolveSize(size: AvatarSize) {
 }
 
 export function Avatar({
+  Component,
+  ImageComponent = Image,
   accessibilityRole,
   avatarClassName,
   avatarStyle,
   children,
   containerClassName,
   containerStyle,
+  icon,
   imageProps,
   onLongPress,
   onPress,
@@ -28,6 +31,7 @@ export function Avatar({
   onPressOut,
   overlayContainerClassName,
   overlayContainerStyle,
+  pressableProps,
   renderCustomContent,
   rounded = false,
   size = "small",
@@ -38,59 +42,110 @@ export function Avatar({
   ...viewProps
 }: AvatarProps) {
   const dimension = resolveSize(size);
-  const interactive = Boolean(onPress || onLongPress || onPressIn || onPressOut);
-  const content = (
-    <View
-      className={clsx("h-full w-full justify-center", overlayContainerClassName)}
-      style={overlayContainerStyle}
+  const {
+    containerStyle: imageContainerStyle,
+    placeholderStyle,
+    style: imageStyle,
+    ...nativeImageProps
+  } = imageProps ?? {};
+  const resolvedOnPress = pressableProps?.onPress ?? onPress;
+  const resolvedOnLongPress = pressableProps?.onLongPress ?? onLongPress;
+  const resolvedOnPressIn = pressableProps?.onPressIn ?? onPressIn;
+  const resolvedOnPressOut = pressableProps?.onPressOut ?? onPressOut;
+  const interactive = Boolean(
+    resolvedOnPress || resolvedOnLongPress || resolvedOnPressIn || resolvedOnPressOut,
+  );
+  const RootComponent = Component ?? (interactive ? Pressable : View);
+  const placeholderContent = title ? (
+    <Text
+      className={clsx("text-center text-white", titleClassName)}
+      style={[styles.title, { fontSize: dimension / 2 }, titleStyle]}
     >
-      {source ? (
-        <Image
-          {...imageProps}
-          className={clsx("h-full w-full", avatarClassName)}
-          source={source}
-          style={avatarStyle}
-        />
-      ) : title ? (
-        <Text
-          className={clsx("text-center text-white", titleClassName)}
-          style={[{ fontSize: dimension / 2 }, titleStyle]}
-        >
-          {title}
-        </Text>
-      ) : (
-        renderCustomContent
+      {title}
+    </Text>
+  ) : (
+    (icon ?? renderCustomContent)
+  );
+  const content = source ? (
+    <View
+      className={clsx(
+        "h-full w-full justify-center",
+        rounded && "overflow-hidden rounded-full",
+        overlayContainerClassName,
       )}
-      {children}
+      style={[
+        styles.overlayContainer,
+        rounded && { borderRadius: dimension / 2 },
+        overlayContainerStyle,
+        imageContainerStyle,
+      ]}
+      testID="RNE__Avatar__Image"
+    >
+      {placeholderContent ? (
+        <View
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFill, styles.placeholder, placeholderStyle]}
+        >
+          {placeholderContent}
+        </View>
+      ) : null}
+      <ImageComponent
+        {...nativeImageProps}
+        className={clsx("h-full w-full", avatarClassName)}
+        source={source}
+        style={[styles.avatar, imageStyle, avatarStyle]}
+      />
     </View>
+  ) : (
+    placeholderContent
   );
-  const className = clsx(
-    "justify-center",
-    rounded && "overflow-hidden rounded-full",
-    containerClassName,
-  );
-  const style = [{ height: dimension, width: dimension }, containerStyle];
-
-  if (interactive) {
-    return (
-      <Pressable
-        {...viewProps}
-        accessibilityRole={accessibilityRole ?? "button"}
-        className={className}
-        onLongPress={onLongPress}
-        onPress={onPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        style={style}
-      >
-        {content}
-      </Pressable>
-    );
-  }
+  const className = clsx("justify-center", rounded && "rounded-full", containerClassName);
+  const style = [
+    styles.container,
+    { height: dimension, width: dimension },
+    rounded && { borderRadius: dimension / 2 },
+    containerStyle,
+  ];
 
   return (
-    <View {...viewProps} accessibilityRole={accessibilityRole} className={className} style={style}>
+    <RootComponent
+      {...viewProps}
+      {...pressableProps}
+      accessibilityRole={accessibilityRole ?? (interactive ? "button" : undefined)}
+      className={className}
+      onLongPress={resolvedOnLongPress}
+      onPress={resolvedOnPress}
+      onPressIn={resolvedOnPressIn}
+      onPressOut={resolvedOnPressOut}
+      style={style}
+    >
       {content}
-    </View>
+      {children}
+    </RootComponent>
   );
 }
+
+const styles = StyleSheet.create({
+  avatar: {
+    height: "100%",
+    width: "100%",
+  },
+  container: {
+    justifyContent: "center",
+  },
+  overlayContainer: {
+    flex: 1,
+  },
+  placeholder: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    backgroundColor: "transparent",
+    color: "#ffffff",
+    textAlign: "center",
+    zIndex: 1,
+  },
+});
+
+Avatar.displayName = "Avatar";

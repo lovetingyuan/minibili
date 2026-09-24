@@ -1,24 +1,14 @@
-import useSWRInfinite from "swr/infinite";
+import useSWRInfinite from 'swr/infinite';
 
-import type { CommentAttitude } from "./comment-actions.types";
-import { CommentResponseSchema } from "./comments.schema";
-import type {
-  BaseCommentResItem,
-  CommentCursor,
-  CommentResItem,
-  CommentResponse,
-} from "./comments.schema";
-import type {
-  CommentItemType,
-  CommentMessageContent,
-  CommentsPage,
-  ReplyItemType,
-} from "./comments.types";
-import fetcher from "./fetcher";
+import type { CommentAttitude } from './comment-actions.types';
+import { CommentResponseSchema } from './comments.schema';
+import type { BaseCommentResItem, CommentCursor, CommentResItem, CommentResponse } from './comments.schema';
+import type { CommentItemType, CommentMessageContent, CommentsPage, ReplyItemType } from './comments.types';
+import fetcher from './fetcher';
 
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/;
 
-function parseCommentMessage(content: CommentResItem["content"]): CommentMessageContent {
+function parseCommentMessage(content: CommentResItem['content']): CommentMessageContent {
   const replacements = new Map<string, CommentMessageContent[number]>();
   let message = content.message;
   let tokenIndex = 0;
@@ -31,19 +21,19 @@ function parseCommentMessage(content: CommentResItem["content"]): CommentMessage
   }
 
   Object.entries(content.emote || {}).forEach(([emoji, value]) => {
-    replace(emoji, { type: "emoji", url: value.url });
+    replace(emoji, { type: 'emoji', url: value.url });
   });
   Object.entries(content.at_name_to_mid || {}).forEach(([name, mid]) => {
-    replace(`@${name}`, { type: "at", text: `@${name}`, mid });
+    replace(`@${name}`, { type: 'at', text: `@${name}`, mid });
   });
   Object.entries(content.jump_url || {}).forEach(([bvid, jump]) => {
-    if (bvid.startsWith("BV")) {
-      replace(bvid, { type: "av", text: jump.title || bvid, url: `https://b23.tv/${bvid}` });
+    if (bvid.startsWith('BV')) {
+      replace(bvid, { type: 'av', text: jump.title || bvid, url: `https://b23.tv/${bvid}` });
     }
   });
   if (content.vote) {
     replace(`{vote:${content.vote.id}}`, {
-      type: "vote",
+      type: 'vote',
       text: content.vote.title ?? undefined,
       url: content.vote.url ?? undefined,
     });
@@ -60,15 +50,15 @@ function parseCommentMessage(content: CommentResItem["content"]): CommentMessage
         return [];
       }
       if (index % 2) {
-        return [{ type: "url" as const, url: text }];
+        return [{ type: 'url' as const, url: text }];
       }
-      return [{ type: "text" as const, text }];
+      return [{ type: 'text' as const, text }];
     });
   });
 }
 
-function getAttitude(action: BaseCommentResItem["action"]): CommentAttitude {
-  return action === 1 ? "like" : action === 2 ? "dislike" : "none";
+function getAttitude(action: BaseCommentResItem['action']): CommentAttitude {
+  return action === 1 ? 'like' : action === 2 ? 'dislike' : 'none';
 }
 
 export function getReplyItem(item: BaseCommentResItem, type = item.type): ReplyItemType {
@@ -133,7 +123,7 @@ export function getCommentsPageUrl(
   oid: string | number,
   type: number,
   mode: number,
-  previousCursor?: Pick<CommentCursor, "is_end" | "pagination_reply">,
+  previousCursor?: Pick<CommentCursor, 'is_end' | 'pagination_reply'>,
 ) {
   if (!oid || previousCursor?.is_end) {
     return null;
@@ -142,15 +132,12 @@ export function getCommentsPageUrl(
   if (previousCursor && !offset) {
     return null;
   }
-  const pagination = encodeURIComponent(JSON.stringify({ offset: offset || "" }));
+  const pagination = encodeURIComponent(JSON.stringify({ offset: offset || '' }));
   return `/x/v2/reply/wbi/main?oid=${oid}&type=${type}&mode=${mode}&pagination_str=${pagination}&plat=1&seek_rpid=`;
 }
 
-export function transitionCommentAttitude(
-  item: ReplyItemType,
-  nextAttitude: CommentAttitude,
-): ReplyItemType {
-  const likeDelta = (nextAttitude === "like" ? 1 : 0) - (item.attitude === "like" ? 1 : 0);
+export function transitionCommentAttitude(item: ReplyItemType, nextAttitude: CommentAttitude): ReplyItemType {
+  const likeDelta = (nextAttitude === 'like' ? 1 : 0) - (item.attitude === 'like' ? 1 : 0);
   return { ...item, attitude: nextAttitude, like: Math.max(0, item.like + likeDelta) };
 }
 
@@ -174,6 +161,7 @@ export function patchCommentTree(
 }
 
 async function fetchCommentsPage(url: string, type: number): Promise<CommentsPage> {
+  console.log(9999, 'fetch comments', url);
   const payload = await fetcher<unknown>(url);
   const response = CommentResponseSchema.parse(payload);
   return {
@@ -183,9 +171,7 @@ async function fetchCommentsPage(url: string, type: number): Promise<CommentsPag
   };
 }
 
-export function mergeCommentPages(
-  pages?: readonly Pick<CommentsPage, "replies">[],
-): CommentItemType[] {
+export function mergeCommentPages(pages?: readonly Pick<CommentsPage, 'replies'>[]): CommentItemType[] {
   const ids = new Set<string>();
   const replies: CommentItemType[] = [];
   pages?.forEach((page) => {
@@ -222,12 +208,12 @@ export function prependCommentToPages(
  */
 export function removeCommentFromPages(
   pages: readonly CommentsPage[] | undefined,
-  target: Pick<ReplyItemType, "id" | "root">,
+  target: Pick<ReplyItemType, 'id' | 'root'>,
 ): CommentsPage[] | undefined {
   if (!pages) {
     return undefined;
   }
-  const deletingRoot = String(target.root) === "0";
+  const deletingRoot = String(target.root) === '0';
   const rootId = deletingRoot ? target.id : String(target.root);
   const rootExists = pages.some((page) => page.replies.some((comment) => comment.id === rootId));
   if (!rootExists) {
@@ -262,27 +248,20 @@ export function removeCommentFromPages(
 }
 
 export function useComments(oid: string | number, type: number, mode = 3) {
-  const { data, error, size, setSize, mutate, isValidating, isLoading } =
-    useSWRInfinite<CommentsPage>(
-      (index, previousPageData) => {
-        if (index > 0 && !previousPageData) {
-          return null;
-        }
-        return getCommentsPageUrl(
-          oid,
-          type,
-          mode,
-          index === 0 ? undefined : previousPageData?.cursor,
-        );
-      },
-      (url: string) => fetchCommentsPage(url, type),
-      { revalidateFirstPage: false },
-    );
+  const { data, error, size, setSize, mutate, isValidating, isLoading } = useSWRInfinite<CommentsPage>(
+    (index, previousPageData) => {
+      if (index > 0 && !previousPageData) {
+        return null;
+      }
+      return getCommentsPageUrl(oid, type, mode, index === 0 ? undefined : previousPageData?.cursor);
+    },
+    (url: string) => fetchCommentsPage(url, type),
+    { revalidateFirstPage: false },
+  );
 
   const replies = mergeCommentPages(data);
   const lastPage = data?.[data.length - 1];
-  const isPageEnd =
-    !!lastPage && (lastPage.cursor.is_end || !lastPage.cursor.pagination_reply?.next_offset);
+  const isPageEnd = !!lastPage && (lastPage.cursor.is_end || !lastPage.cursor.pagination_reply?.next_offset);
   const allCount = data?.[0]?.cursor.all_count;
   const isLoadingMore = Boolean(data && size > data.length);
 
@@ -318,7 +297,7 @@ export function useComments(oid: string | number, type: number, mode = 3) {
     await mutate((pages) => prependCommentToPages(pages, comment), { revalidate: false });
   }
 
-  async function removeComment(target: Pick<ReplyItemType, "id" | "root">) {
+  async function removeComment(target: Pick<ReplyItemType, 'id' | 'root'>) {
     await mutate((pages) => removeCommentFromPages(pages, target), { revalidate: false });
   }
 
@@ -349,9 +328,4 @@ export function useComments(oid: string | number, type: number, mode = 3) {
   };
 }
 
-export type {
-  CommentImage,
-  CommentItemType,
-  CommentMessageContent,
-  ReplyItemType,
-} from "./comments.types";
+export type { CommentImage, CommentItemType, CommentMessageContent, ReplyItemType } from './comments.types';

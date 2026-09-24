@@ -1,6 +1,11 @@
 import { UA } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { LoginRequiredError } from "../features/bilibili-session/login-required";
+import {
   createBilibiliRequestHeaders,
   getBilibiliCsrf,
   getBilibiliUserId,
@@ -15,7 +20,7 @@ import type {
   DanmakuSendResult,
 } from "./send-danmaku.types";
 
-export class DanmakuLoginRequiredError extends Error {}
+export class DanmakuLoginRequiredError extends LoginRequiredError {}
 export class DanmakuSendResultUnknownError extends Error {}
 
 /**
@@ -149,7 +154,10 @@ export async function sendVideoDanmaku(
     const { code, message, data } = parsed.data;
     receivedResult = true;
     // 登录态不可用：-101 未登录、-111 CSRF 校验失败、-8 禁止游客弹幕
-    if (code === -8 || code === -101 || code === -111) {
+    if (isBilibiliAuthExpiredCode(code)) {
+      throw reportBilibiliAuthExpired(code, message, url);
+    }
+    if (code === -8) {
       throw new DanmakuLoginRequiredError("登录凭据失效，请重新登录 B站");
     }
     if (code !== 0) {

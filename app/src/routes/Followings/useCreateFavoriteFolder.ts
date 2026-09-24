@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
 
 import { useBilibiliFavoriteFolderActions } from "../../api/useBilibiliFavorites";
-import { FavoriteLoginRequiredError } from "../../api/video-favorites";
 import {
   countFavoriteFolderNameLength,
   getFavoriteFolderNameError,
   normalizeFavoriteFolderName,
 } from "../../features/bilibili-favorites/folder-name";
+import { isLoginRequiredError } from "../../features/bilibili-session/login-required";
 import { bilibiliSession } from "../../features/bilibili-session/session";
 
 import type { CreateFavoriteFolderDialogProps } from "./Favorites.types";
@@ -44,10 +44,11 @@ export function useCreateFavoriteFolder({ account, onCreated, onLoginRequired }:
       return true;
     } catch (cause) {
       const failure = cause instanceof Error ? cause : new Error("收藏夹创建失败，请稍后重试");
-      setError(failure);
-      if (failure instanceof FavoriteLoginRequiredError) {
+      if (isLoginRequiredError(failure)) {
         onLoginRequired(failure);
+        return false;
       }
+      setError(failure);
       return false;
     } finally {
       pending.current = false;

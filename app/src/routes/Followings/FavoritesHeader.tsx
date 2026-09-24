@@ -1,9 +1,10 @@
 import React from "react";
 import { Plus } from "lucide-react-native";
-import { Alert, Pressable } from "react-native";
+import { Pressable } from "react-native";
 
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { theme } from "@/constants/theme";
+import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
@@ -33,16 +34,8 @@ function CreateFavoriteFolderButton() {
   }
 
   function loginRequired(error: Error) {
-    Alert.alert("请重新登录 B站", error.message, [
-      { text: "取消", style: "cancel" },
-      {
-        text: "重新登录",
-        onPress: () => {
-          setVisible(false);
-          void logout().catch(() => showToast("退出登录失败，请在设置页重试"));
-        },
-      },
-    ]);
+    setVisible(false);
+    showLoginRequiredAlert(error.message, { session: { account: current, logout } });
   }
 
   return (

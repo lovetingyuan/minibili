@@ -146,7 +146,7 @@ function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
   const openDynamicItem = useOpenDynamicItem();
   const { item, detail } = props;
   // 被转发的原动态失效时接口只会给出一个没有 id 的占位数据：
-  // 既没有可跳转的详情页，也没有作者信息，这里直接展示提示文案。
+  // 既没有可跳转的详情页，也没有作者信息，因此只展示不可交互的失效提示。
   if (!item.id) {
     return (
       <View className="mb-3 rounded-lg bg-slate-100 p-3 dark:bg-slate-800">

@@ -32,6 +32,8 @@ function setup(initialCookie: string | null = COOKIE) {
     }),
     clearNativeCookies: vi.fn(async () => {}),
     writeWebViewCookies: vi.fn<BilibiliSessionDependencies["writeWebViewCookies"]>(async () => {}),
+    onStoredCredentialsExpired: vi.fn(),
+    onLoginSuccess: vi.fn(),
     validateCookie: vi
       .fn<BilibiliSessionDependencies["validateCookie"]>()
       .mockResolvedValue(PROFILE),
@@ -78,6 +80,7 @@ describe("Bilibili session lifecycle", () => {
     expect(readStored()).toBeNull();
     expect(account && session.isCurrentAccount(account)).toBe(false);
     expect(dependencies.clearNativeCookies).not.toHaveBeenCalled();
+    expect(dependencies.onStoredCredentialsExpired).toHaveBeenCalledOnce();
   });
 
   test("does not claim authentication when deleting an expired cookie fails", async () => {
@@ -107,6 +110,7 @@ describe("Bilibili session lifecycle", () => {
     validation.resolve(PROFILE);
     await expect(pending).resolves.toEqual({ mid: "123", generation: 1, profile: PROFILE });
     expect(readStored()).toBe(COOKIE);
+    expect(dependencies.onLoginSuccess).toHaveBeenCalledOnce();
   });
 
   test("rejects expired candidates even when both required cookie fields exist", async () => {
@@ -114,6 +118,8 @@ describe("Bilibili session lifecycle", () => {
     dependencies.validateCookie.mockResolvedValue(null);
     await expect(session.login(COOKIE, new AbortController().signal)).resolves.toBeNull();
     expect(dependencies.saveCookie).not.toHaveBeenCalled();
+    expect(dependencies.onStoredCredentialsExpired).not.toHaveBeenCalled();
+    expect(dependencies.onLoginSuccess).not.toHaveBeenCalled();
   });
 
   test("does not publish successful login after storage failure", async () => {

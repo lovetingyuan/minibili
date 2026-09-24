@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mocks.navigate }),
+  createNavigationContainerRef: () => ({ isReady: () => true, navigate: mocks.navigate }),
 }));
 vi.mock("react-native", () => ({ Alert: { alert: mocks.alert } }));
 vi.mock("../api/useWatchLater", () => ({
@@ -27,9 +28,12 @@ vi.mock("../api/useWatchLater", () => ({
     toggle: mocks.toggle,
   }),
 }));
-vi.mock("../api/watch-later", () => ({
-  WatchLaterLoginRequiredError: class WatchLaterLoginRequiredError extends Error {},
-}));
+vi.mock("../api/watch-later", async () => {
+  const { LoginRequiredError } = await import("../features/bilibili-session/login-required");
+  return {
+    WatchLaterLoginRequiredError: class WatchLaterLoginRequiredError extends LoginRequiredError {},
+  };
+});
 vi.mock("../features/bilibili-session/session", () => ({
   bilibiliSession: { isCurrentAccount: () => mocks.current },
 }));
@@ -66,11 +70,16 @@ beforeEach(() => {
 });
 
 describe("watch later toggle", () => {
-  test("routes logged-out users to login without sending a request", async () => {
+  test("guides logged-out users to login without sending a request", async () => {
     mocks.account = null;
     await useWatchLaterActions().toggle({ aid: 42 });
-    expect(mocks.navigate).toHaveBeenCalledWith("MainTabs", { screen: "Followings" });
-    expect(mocks.showToast).toHaveBeenCalledWith("请先登录 B站，登录后再试");
+    expect(mocks.alert).toHaveBeenCalledWith(
+      "请先登录 B站",
+      "请先登录 B站，登录后再试",
+      expect.any(Array),
+    );
+    pressButton("去登录");
+    expect(mocks.navigate).toHaveBeenCalledWith("BilibiliLogin");
     expect(mocks.toggle).not.toHaveBeenCalled();
   });
 
@@ -137,7 +146,7 @@ describe("watch later toggle", () => {
     mocks.toggle.mockRejectedValueOnce(new WatchLaterLoginRequiredError("登录凭据失效，请重新登录 B站"));
     await useWatchLaterActions().toggle({ aid: 42 });
     expect(mocks.alert).toHaveBeenCalledExactlyOnceWith(
-      "请重新登录 B站",
+      "请先登录 B站",
       "登录凭据失效，请重新登录 B站",
       expect.any(Array),
     );
@@ -146,9 +155,9 @@ describe("watch later toggle", () => {
     pressButton("取消");
     expect(mocks.logout).not.toHaveBeenCalled();
 
-    pressButton("重新登录");
+    pressButton("去登录");
     await vi.waitFor(() =>
-      expect(mocks.navigate).toHaveBeenCalledWith("MainTabs", { screen: "Followings" }),
+      expect(mocks.navigate).toHaveBeenCalledWith("BilibiliLogin"),
     );
     expect(mocks.logout).toHaveBeenCalledOnce();
   });
