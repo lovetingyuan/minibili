@@ -32,12 +32,29 @@ export type CommentProps = Omit<CommentInteractionProps, "onReply"> & {
 };
 
 export type CommentImageEntryProps = { images: CommentImage[] };
+
+/** 正文末尾的内联点赞入口 */
+export type CommentLikeEntryProps = {
+  /** 评论 ID，用于区分列表复用后的不同评论 */
+  idStr: string;
+  /** 点赞数 */
+  count: number;
+  /** 当前账号是否已点赞 */
+  active: boolean;
+  /** 点赞请求进行中 */
+  pending: boolean;
+  /** UP 主也点了赞，数字后追加 +UP */
+  creatorLiked: boolean;
+  onPress: () => void;
+};
+
 export type CommentTextProps = CommentImageEntryProps & {
   nodes: CommentMessageContent;
   idStr: string;
-  likeText?: string;
-  likeActive?: boolean;
-  likePending?: boolean;
+  /** 内联点赞入口；没有点赞数且未点赞时调用方不传，正文末尾就不出现入口 */
+  like?: CommentLikeEntryProps;
+  /** 当前评论被点踩：正文末尾追加不可点击的 👎 */
+  disliked?: boolean;
   bold?: boolean;
   /** UP 主觉得很赞：正文使用主题粉色高亮 */
   creatorLiked?: boolean;

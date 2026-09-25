@@ -8,7 +8,7 @@ import { Text } from '@/components/styled/rneui';
 import { theme } from "@/constants/theme";
 import { useStore } from '@/store';
 import type { NavigationProps } from '@/types';
-import { getImagePixelSize, parseImgUrl, parseNumber, showToast } from '@/utils';
+import { getImagePixelSize, parseImgUrl, showToast } from '@/utils';
 
 import { shouldShowReplySection } from '../../api/replies.helpers';
 import type { CommentItemProps, CommentProps } from './comment.types';
@@ -47,10 +47,8 @@ export function CommentItem(props: CommentItemProps) {
     .filter(Boolean)
     .join(' · ');
   const liked = comment.attitude === 'like';
-  const likeText = [
-    comment.like ? `👍${parseNumber(comment.like)}${comment.creatorLiked ? '+UP' : ''}` : '',
-    comment.attitude === 'dislike' ? '👎' : '',
-  ].join('');
+  const attitudePending = props.isAttitudePending(comment.id);
+  const showLikeEntry = comment.like > 0 || liked;
 
   function openActions() {
     setOverlayButtons([
@@ -176,11 +174,21 @@ export function CommentItem(props: CommentItemProps) {
           nodes={comment.message}
           idStr={comment.id}
           images={comment.images}
-          likeText={likeText}
-          likeActive={liked}
-          likePending={props.isAttitudePending(comment.id)}
           bold={liked}
           creatorLiked={comment.creatorLiked}
+          disliked={comment.attitude === 'dislike'}
+          like={
+            showLikeEntry
+              ? {
+                  idStr: comment.id,
+                  count: comment.like,
+                  active: liked,
+                  pending: attitudePending,
+                  creatorLiked: comment.creatorLiked,
+                  onPress: () => void props.onAttitude(comment, 'like'),
+                }
+              : undefined
+          }
         />
       </View>
     </Pressable>

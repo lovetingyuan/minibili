@@ -9,6 +9,7 @@ import type { NavigationProps } from "@/types";
 import { showToast } from "@/utils";
 
 import type { CommentImageEntryProps, CommentTextProps } from "./comment.types";
+import { CommentLikeEntry } from "./CommentLikeEntry";
 import { InlineEmoji } from "../InlineEmoji";
 import UpName from "../UpName";
 
@@ -93,15 +94,21 @@ export function CommentText(props: CommentTextProps) {
         );
       })}
       <CommentImages images={props.images} />
-      {props.likeText ? (
-        <Text
-          className={`text-[13px] font-normal ${
-            props.likeActive ? theme.like.text : theme.primary.text
-          } ${props.likePending ? "opacity-60" : ""}`}
-        >
+      {props.like || props.disliked ? (
+        <>
           {/* 嵌套 Text 在原生端不支持 margin/padding，用全角空格拉开与正文的间距 */}
-          {`\u2003${props.likeText}`}
-        </Text>
+          <Text>{"\u2003"}</Text>
+          {props.like ? <CommentLikeEntry {...props.like} /> : null}
+          {props.disliked ? (
+            <Text
+              className={`text-[13px] font-normal ${theme.primary.text} ${
+                props.like?.pending ? "opacity-60" : ""
+              }`}
+            >
+              👎
+            </Text>
+          ) : null}
+        </>
       ) : null}
     </Text>
   );
