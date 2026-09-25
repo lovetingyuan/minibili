@@ -31,7 +31,11 @@ export type CommentProps = Omit<CommentInteractionProps, "onReply"> & {
   first?: boolean;
 };
 
-export type CommentImageEntryProps = { images: CommentImage[] };
+/** 评论图片缩略图行；compact 用于评论卡片内的回复预览，尺寸更小 */
+export type CommentImageEntryProps = {
+  images: CommentImage[];
+  compact?: boolean;
+};
 
 /** 正文末尾的内联点赞入口 */
 export type CommentLikeEntryProps = {
@@ -48,7 +52,7 @@ export type CommentLikeEntryProps = {
   onPress: () => void;
 };
 
-export type CommentTextProps = CommentImageEntryProps & {
+export type CommentTextProps = {
   nodes: CommentMessageContent;
   idStr: string;
   /** 内联点赞入口；没有点赞数且未点赞时调用方不传，正文末尾就不出现入口 */

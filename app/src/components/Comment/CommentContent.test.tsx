@@ -80,7 +80,6 @@ describe("CommentText emoji alignment", () => {
   test("aligns comment emoji with the 15px comment text", () => {
     const text = CommentText({
       idStr: "1",
-      images: [],
       nodes: [{ type: "emoji", url: "//i0.hdslb.com/emoji.png" }],
     }) as ReactElement<{ children: ReactElement<{ fontSize: number; size: number }>[][] }>;
     const [emoji] = text.props.children[0];
@@ -106,7 +105,6 @@ describe("CommentText like count", () => {
   }) {
     const text = CommentText({
       idStr: "1",
-      images: [],
       nodes: [{ type: "text", text: "评论" }],
       ...likeProps,
     }) as ReactElement<{ children: ReactNode[] }>;
@@ -118,7 +116,6 @@ describe("CommentText like count", () => {
   function bodyClassName(likeProps: { bold?: boolean }) {
     const text = CommentText({
       idStr: "1",
-      images: [],
       nodes: [{ type: "text", text: "评论" }],
       ...likeProps,
     }) as ReactElement<BodyProps>;
@@ -179,7 +176,6 @@ describe("CommentText like count", () => {
   function renderedNodes(nodes: CommentMessageContent, bold: boolean) {
     const text = CommentText({
       idStr: "1",
-      images: [],
       nodes,
       bold,
     }) as ReactElement<{ children: [ReactElement<{ className?: string }>[], ...unknown[]] }>;
@@ -222,7 +218,6 @@ describe("CommentText creator liked highlight", () => {
   function renderText(creatorLiked: boolean) {
     const text = CommentText({
       idStr: "1",
-      images: [],
       nodes: NODES,
       creatorLiked,
     }) as ReactElement<{

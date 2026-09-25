@@ -1,17 +1,26 @@
 import { useNavigation } from "@react-navigation/native";
+import { clsx } from "clsx";
 import * as Clipboard from "expo-clipboard";
-import { Linking } from "react-native";
+import { Linking, Pressable, View } from "react-native";
 
+import { Image } from "@/components/styled/expo";
 import { Text } from "@/components/styled/rneui";
 import { theme } from "@/constants/theme";
 import { useStore } from "@/store";
 import type { NavigationProps } from "@/types";
-import { showToast } from "@/utils";
+import { getImagePixelSize, parseImgUrl, showToast } from "@/utils";
 
 import type { CommentImageEntryProps, CommentTextProps } from "./comment.types";
 import { CommentLikeEntry } from "./CommentLikeEntry";
 import { InlineEmoji } from "../InlineEmoji";
 import UpName from "../UpName";
+
+/** 评论最多直接展示的缩略图张数，超出部分在第 3 张上叠加 +N */
+const MAX_THUMBNAILS = 3;
+
+/** 缩略图边长（dp）：一级评论 64，卡片内的回复预览 56 */
+const THUMBNAIL_SIZE = 64;
+const COMPACT_THUMBNAIL_SIZE = 56;
 
 export function CommentText(props: CommentTextProps) {
   const navigation = useNavigation<NavigationProps["navigation"]>();
@@ -93,7 +102,6 @@ export function CommentText(props: CommentTextProps) {
           </Text>
         );
       })}
-      <CommentImages images={props.images} />
       {props.like || props.disliked ? (
         <>
           {/* 嵌套 Text 在原生端不支持 margin/padding，用全角空格拉开与正文的间距 */}
@@ -120,17 +128,36 @@ export function CommentImages(props: CommentImageEntryProps) {
   if (!imageCount) {
     return null;
   }
+  const size = props.compact ? COMPACT_THUMBNAIL_SIZE : THUMBNAIL_SIZE;
+  const visibleImages = props.images.slice(0, MAX_THUMBNAILS);
+  const sizeClassName = props.compact ? "h-14 w-14" : "h-16 w-16";
 
   return (
-    <Text
-      className={theme.primary.text}
-      accessibilityLabel={`查看评论中的 ${imageCount} 张图片`}
-      onPress={() => {
-        setCurrentImageIndex(0);
-        setImagesList(props.images);
-      }}
-    >
-      {` 🖼️ ${imageCount} 张图片`}
-    </Text>
+    <View className="mt-2 flex-row gap-2">
+      {visibleImages.map((image, index) => (
+        <Pressable
+          key={`${image.src}:${index}`}
+          accessibilityRole="button"
+          accessibilityLabel={`查看第 ${index + 1} 张图片（共 ${imageCount} 张）`}
+          onPress={() => {
+            setImagesList(props.images);
+            setCurrentImageIndex(index);
+          }}
+        >
+          <Image
+            contentFit="cover"
+            source={{ uri: parseImgUrl(image.src, getImagePixelSize(size)) }}
+            className={clsx(sizeClassName, "rounded-lg bg-slate-100 dark:bg-slate-800")}
+          />
+          {index === MAX_THUMBNAILS - 1 && imageCount > MAX_THUMBNAILS ? (
+            <View className="absolute inset-0 items-center justify-center rounded-lg bg-black/50">
+              <Text className="text-sm font-semibold text-white">
+                {`+${imageCount - MAX_THUMBNAILS}`}
+              </Text>
+            </View>
+          ) : null}
+        </Pressable>
+      ))}
+    </View>
   );
 }

@@ -12,7 +12,7 @@ import { getImagePixelSize, parseImgUrl, showToast } from '@/utils';
 
 import { shouldShowReplySection } from '../../api/replies.helpers';
 import type { CommentItemProps, CommentProps } from './comment.types';
-import { CommentText } from './CommentContent';
+import { CommentImages, CommentText } from './CommentContent';
 import UpName from '../UpName';
 
 function getCommentCopyText(comment: CommentItemProps['comment']) {
@@ -173,7 +173,6 @@ export function CommentItem(props: CommentItemProps) {
         <CommentText
           nodes={comment.message}
           idStr={comment.id}
-          images={comment.images}
           bold={liked}
           creatorLiked={comment.creatorLiked}
           disliked={comment.attitude === 'dislike'}
@@ -190,6 +189,9 @@ export function CommentItem(props: CommentItemProps) {
               : undefined
           }
         />
+        {comment.images.length ? (
+          <CommentImages images={comment.images} compact={compact} />
+        ) : null}
       </View>
     </Pressable>
   );
