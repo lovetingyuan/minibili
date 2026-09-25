@@ -18,7 +18,7 @@ import {
   bilibiliAuthExpiration,
   clearBilibiliAuthExpiration,
 } from "../features/bilibili-session/auth-expiration";
-import request from "./fetcher";
+import request, { getApiErrorCode } from "./fetcher";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -31,7 +31,10 @@ describe("统一 B站请求", () => {
       new Response(JSON.stringify({ code, message: "expired", data: null })),
     );
 
-    await expect(request("/x/test")).rejects.toMatchObject({ code } satisfies Pick<BilibiliAuthExpiredError, "code">);
+    await expect(request("/x/test")).rejects.toMatchObject({ code } satisfies Pick<
+      BilibiliAuthExpiredError,
+      "code"
+    >);
     expect(bilibiliAuthExpiration.getSnapshot().error?.code).toBe(code);
   });
 
@@ -65,5 +68,19 @@ describe("统一 B站请求", () => {
     await expect(request("/x/web-interface/nav")).resolves.toEqual({ isLogin: false, wbi_img });
     expect(mocks.showLoginRequiredAlert).toHaveBeenCalledOnce();
     expect(bilibiliAuthExpiration.getSnapshot().error?.code).toBe(-101);
+  });
+});
+
+describe("getApiErrorCode", () => {
+  test("取出接口错误的数字 code", () => {
+    expect(getApiErrorCode({ code: -404 })).toBe(-404);
+    expect(getApiErrorCode({ code: 87008 })).toBe(87008);
+  });
+
+  test("网络异常与非数字 code 都返回 null", () => {
+    expect(getApiErrorCode({ code: "404" })).toBe(null);
+    expect(getApiErrorCode(new Error("network"))).toBe(null);
+    expect(getApiErrorCode(null)).toBe(null);
+    expect(getApiErrorCode(undefined)).toBe(null);
   });
 });

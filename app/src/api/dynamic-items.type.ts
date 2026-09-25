@@ -78,6 +78,8 @@ export type DynamicVideoContent = {
   duration: string;
   play: number;
   danmaku: number;
+  /** 内容角标，目前只有投稿列表的「充电专属」会用到 */
+  badge?: string;
 };
 
 export type DynamicContent =

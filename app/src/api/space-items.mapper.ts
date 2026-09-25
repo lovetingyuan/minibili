@@ -75,6 +75,19 @@ export function getSpaceVideoPageKey(
   return buildSpaceVideoUrl(mid, pageIndex + 1);
 }
 
+/**
+ * 投稿列表里的充电专属标记：B站 用 is_charging_arc 表示是不是充电专属，
+ * elec_arc_badge 是角标文案（实测为「充电专属」）。标记形态可能是布尔/数字/字符串。
+ */
+export function getChargeBadge(item: SpaceVideoItemResponse) {
+  const charging =
+    item.is_charging_arc === true || item.is_charging_arc === 1 || item.is_charging_arc === "1";
+  if (!charging) {
+    return undefined;
+  }
+  return item.elec_arc_badge || "充电专属";
+}
+
 export function mapSpaceVideoItem(item: SpaceVideoItemResponse, owner: SpaceOwner): DynamicItem {
   const id = String(item.aid);
   const authorIsOwner = sameMid(item.mid, owner.mid);
@@ -104,6 +117,7 @@ export function mapSpaceVideoItem(item: SpaceVideoItemResponse, owner: SpaceOwne
       duration: item.length,
       play: toNumber(item.play),
       danmaku: toNumber(item.video_review),
+      badge: getChargeBadge(item),
     },
     additional: null,
     commentId: id,

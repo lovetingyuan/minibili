@@ -9,6 +9,7 @@ import {
   Animated,
   AppState,
   Keyboard,
+  Linking,
   Platform,
   Pressable,
   StyleSheet,
@@ -27,6 +28,7 @@ import { DANMAKU_SEND_STYLE } from "@/api/send-danmaku";
 import { useSendDanmaku } from "@/api/useSendDanmaku";
 import { useVideoInfo } from "@/api/video-info";
 import { ThemedIcon } from "@/components/ThemedIcon";
+import { VideoBadge } from "@/components/VideoBadge";
 import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
@@ -53,6 +55,7 @@ import PlayerError from "./PlayerError";
 import PlayerPoster from "./PlayerPoster";
 import PlayerSeekHint from "./PlayerSeekHint";
 import { type PlaybackMode, type PlayEndedEvent, willContinueAfterEnded } from "../playback-mode";
+import { resolveVideoAccess } from "../video-access";
 import {
   createVideoSource,
   isSeekJump,
@@ -115,6 +118,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   const { logout } = useBilibiliSessionActions();
   const { data } = useVideoInfo(route.params.bvid);
   const videoInfo = { ...route.params, ...data };
+  // 视频信息到位前 cid 还是 0，播放地址请求根本不会发出，不能据此判定不可播放
+  const videoInfoLoaded = Boolean(data);
   const pageInfo = videoInfo.pages?.[currentPage - 1];
   const pageCount = videoInfo.pages?.length ?? 1;
   const cid = pageInfo?.cid ?? videoInfo.cid ?? 0;
@@ -140,6 +145,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 播放结束并且不会自动继续（未开循环、也没有下一个分 P）时为 true，
   // 此时重新展示封面，控制条上的时间对齐总时长
   const [playbackEnded, setPlaybackEnded] = React.useState(false);
+  // 试看片段 / 互动片段播完：展示受限说明浮层，不触发自动连播与循环
+  const [limitedEnded, setLimitedEnded] = React.useState(false);
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [playerStatus, setPlayerStatus] = React.useState<VideoPlayerStatus>("idle");
   const [playbackRate, setPlaybackRate] = React.useState<PlaybackRate>(1);
@@ -200,8 +207,45 @@ export default function NativePlayer(props: NativePlayerProps) {
     usePlayerControlsVisibility(controlsPlaying);
 
   const qn = resolvePreferredQuality(qualityNetworkUsage, highQuality);
-  const { urls, error: playUrlError, retry } = useVideoPlayUrl(videoInfo.bvid, cid, qn);
+  const {
+    urls,
+    servedDurationMs,
+    hasResult: playUrlHasResult,
+    error: playUrlError,
+    errorCode: playUrlErrorCode,
+    retry,
+  } = useVideoPlayUrl(videoInfo.bvid, cid, qn);
   const uri = urls[Math.min(playbackAttempt.index, urls.length - 1)];
+  // 能不能完整播放以实际拿到的播放地址为准，view 的付费标记只用来解释原因
+  const videoAccess = resolveVideoAccess({
+    bvid: videoInfo.bvid,
+    redirectUrl: videoInfo.redirectUrl ?? "",
+    isUpowerExclusive: videoInfo.isUpowerExclusive ?? false,
+    isSteinGate: videoInfo.interactive ?? false,
+    payRights: videoInfo.payRights ?? { arcPay: 0, pay: 0, ugcPay: 0 },
+    durationSeconds,
+    servedDurationMs,
+    hasPlayableUrl: urls.length > 0,
+    errorCode: playUrlErrorCode,
+    // 只要还有请求没有结果就先当作「还不知道」，避免请求期间闪一次加载失败
+    isPending: !videoInfoLoaded || !playUrlHasResult,
+  });
+  const accessBlocked = videoAccess.kind === "blocked";
+  const accessBlockedAction = videoAccess.kind === "blocked" ? videoAccess.notice.action : null;
+  const limitedAccess = videoAccess.kind === "limited" ? videoAccess : null;
+  // 试看/互动片段播完后的说明浮层
+  const limitedNoticeVisible = Boolean(limitedAccess) && limitedEnded;
+  // 控制条按实际可播时长显示，避免 30 秒试看配 30 分钟进度条
+  const playbackDurationMs =
+    limitedAccess && limitedAccess.servedDurationMs > 0
+      ? limitedAccess.servedDurationMs
+      : durationSeconds * 1000;
+  // 开播前的封面角标：试看内容提前说明只有片段，交互视频说明类型
+  const coverBadgeLabel = limitedAccess
+    ? limitedAccess.reason === "interactive"
+      ? limitedAccess.badge.label
+      : `${limitedAccess.badge.label} · 可试看`
+    : null;
   // 后台播放的系统通知标题。取路由参数里的标题，保证渲染期稳定，避免重建播放器
   const notificationTitle = route.params.title || videoInfo.bvid;
   // 地址不是"拿到就挂"：source 非空会让原生播放器立刻开始拉流，
@@ -277,6 +321,11 @@ export default function NativePlayer(props: NativePlayerProps) {
   playbackModeRef.current = playbackMode;
   const pageCountRef = React.useRef(pageCount);
   pageCountRef.current = pageCount;
+  // 播放结束回调里要判断当前是不是试看/互动片段，用 ref 读取避免重新订阅事件
+  const limitedAccessRef = React.useRef(false);
+  React.useEffect(() => {
+    limitedAccessRef.current = videoAccess.kind === "limited";
+  }, [videoAccess.kind]);
   // 播放结束回调里要读最新的全屏状态与回调，订阅不能跟着全屏切换重建
   const exitFullscreenOnEndedRef = React.useRef(() => {});
   exitFullscreenOnEndedRef.current = () => {
@@ -521,6 +570,16 @@ export default function NativePlayer(props: NativePlayerProps) {
         return;
       }
       playEndGuardRef.current.handled = true;
+      // 试看片段 / 互动片段播完：不按“播完”上报，避免把视频记成已看完，
+      // 也不触发自动连播与循环，只展示受限说明
+      if (limitedAccessRef.current) {
+        updatePlayingState(false);
+        setPortraitExpanded(false);
+        setPlaybackEnded(false);
+        setLimitedEnded(true);
+        exitFullscreenOnEndedRef.current();
+        return;
+      }
       // 部分设备播放结束后不会再派发 playingChange，这里主动收敛播放状态。
       reportHeartbeatEndedRef.current({ bvid: videoInfo.bvid, cid: endedCid });
       reportPartProgressEndedRef.current(videoInfo.bvid, endedCid);
@@ -562,6 +621,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     setIsPlaying(false);
     setPlaybackStarted(false);
     setPlaybackEnded(false);
+    setLimitedEnded(false);
     setDanmakuComposerOpen(false);
     setLocalDanmaku([]);
     setDanmakuAnchorMs(0);
@@ -579,6 +639,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     setFirstFrameRendered(false);
     setPosterDismissed(false);
     setPlaybackEnded(false);
+    setLimitedEnded(false);
   }, [uri, playbackAttempt.token]);
 
   React.useEffect(() => {
@@ -727,6 +788,7 @@ export default function NativePlayer(props: NativePlayerProps) {
 
   function handleSeek(timeMs: number) {
     setPlaybackEnded(false);
+    setLimitedEnded(false);
     player.currentTime = timeMs / 1000;
     lastTimeRef.current = Math.round(timeMs);
     setCurrentTimeMs(Math.round(timeMs));
@@ -964,8 +1026,32 @@ export default function NativePlayer(props: NativePlayerProps) {
     expanded: portraitExpanded,
   });
   const containerHeight = fullscreen ? height : inlineHeight;
-  const hasError = Boolean(playerError) || (Boolean(playUrlError) && !uri);
+  // 拿不到地址时如果已经判定出受限原因（会员/付费/充电），错误态换成对应的说明
+  const hasError = Boolean(playerError) || (Boolean(playUrlError) && !uri) || accessBlocked;
   const showError = hasError || isRetrying;
+
+  /** 受限内容的主操作：跳回 B站 观看/充电 */
+  function openBilibiliAction() {
+    if (accessBlockedAction) {
+      void Linking.openURL(accessBlockedAction.url);
+    }
+  }
+
+  /** 受限内容的主操作：跳回 B站 观看（试看结束、互动视频） */
+  function openLimitedAction() {
+    if (limitedAccess) {
+      void Linking.openURL(limitedAccess.notice.action.url);
+    }
+  }
+
+  /** 试看片段重新播放：不触发自动连播，只把当前片段从头再放一遍 */
+  function replayLimitedAccess() {
+    if (playEndGuardRef.current.player === player) {
+      playEndGuardRef.current.handled = false;
+    }
+    handleSeek(0);
+    player.play();
+  }
 
   // 高度切换用动画过渡，全屏分支不使用该值
   const [inlineHeightAnim] = React.useState(() => new Animated.Value(inlineHeight));
@@ -1038,8 +1124,19 @@ export default function NativePlayer(props: NativePlayerProps) {
       <GestureDetector gesture={gesture}>
         <View style={StyleSheet.absoluteFill} />
       </GestureDetector>
+      {limitedAccess ? (
+        <View className="absolute left-3 top-3">
+          <VideoBadge
+            label={limitedAccess.playerLabel}
+            tone={limitedAccess.badge.tone}
+            variant="overlay"
+          />
+        </View>
+      ) : null}
       {fastRate ? (
-        <View className="absolute left-3 top-3 rounded bg-black/60 px-2 py-1">
+        <View
+          className={`absolute left-3 ${limitedAccess ? "top-9" : "top-3"} rounded bg-black/60 px-2 py-1`}
+        >
           <Text className="text-xs font-bold text-white">{`${PLAYER_FAST_RATE}x`}</Text>
         </View>
       ) : null}
@@ -1052,7 +1149,7 @@ export default function NativePlayer(props: NativePlayerProps) {
         videoVisible: posterDismissed || playbackEnded,
         playbackStarted,
         paused: pausedUiVisible,
-        hasError,
+        hasError: hasError || limitedNoticeVisible,
         overlayVisible: seekHint !== null || danmakuComposerOpen,
       }) ? (
         <View pointerEvents="box-none" className="absolute inset-0 items-center justify-center">
@@ -1072,7 +1169,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           paused={pausedUiVisible}
           ended={playbackEnded}
           currentTimeMs={currentTimeMs}
-          durationMs={durationSeconds * 1000}
+          durationMs={playbackDurationMs}
           playbackRate={playbackRate}
           danmakuEnabled={$danmakuEnabled}
           canSendDanmaku={Boolean(danmakuAccount)}
@@ -1108,6 +1205,8 @@ export default function NativePlayer(props: NativePlayerProps) {
           duration={videoInfo.duration}
           isMetered={isMeteredNetwork}
           highQuality={highQuality}
+          badgeLabel={coverBadgeLabel}
+          badgeTone={limitedAccess?.badge.tone}
           onHighQualityChange={setHighQuality}
           onStart={() => {
             if (isMeteredNetwork) {
@@ -1120,9 +1219,24 @@ export default function NativePlayer(props: NativePlayerProps) {
       {showError ? (
         <PlayerError
           retrying={isRetrying}
+          title={accessBlocked ? videoAccess.notice.title : undefined}
+          description={accessBlocked ? videoAccess.notice.message : undefined}
+          actionLabel={accessBlockedAction?.label}
+          onAction={accessBlockedAction ? openBilibiliAction : undefined}
           onRetry={() => {
             void handleRetry();
           }}
+        />
+      ) : null}
+      {limitedNoticeVisible && !showError && limitedAccess ? (
+        <PlayerError
+          retrying={false}
+          title={limitedAccess.notice.title}
+          description={limitedAccess.notice.message}
+          actionLabel={limitedAccess.notice.action.label}
+          onAction={openLimitedAction}
+          retryLabel={limitedAccess.notice.replayLabel}
+          onRetry={replayLimitedAccess}
         />
       ) : null}
       {danmakuComposerOpen ? (

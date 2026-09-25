@@ -14,6 +14,7 @@ vi.mock("@/components/styled/rneui", () => ({
   Switch: "Switch",
 }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("@/components/VideoBadge", () => ({ VideoBadge: "VideoBadge" }));
 vi.mock("lucide-react-native", () => ({ Play: "Play" }));
 
 vi.mock("@/constants/theme", () => ({

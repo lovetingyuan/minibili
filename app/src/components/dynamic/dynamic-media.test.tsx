@@ -34,6 +34,7 @@ vi.mock("react-native", () => ({
 vi.mock("../styled/expo", () => ({ Image: "Image" }));
 vi.mock("../styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("@/components/VideoBadge", () => ({ VideoBadge: "VideoBadge" }));
 vi.mock("lucide-react-native", () => ({ Play: "Play" }));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
@@ -80,7 +81,9 @@ type ElementProps = {
   className?: string;
   contentFit?: string;
   icon?: string;
+  label?: string;
   size?: number;
+  tone?: string;
   numberOfLines?: number;
   onLongPress?: (event?: { stopPropagation: () => void }) => void;
   onPress?: (event?: { stopPropagation: () => void }) => void;
@@ -147,6 +150,11 @@ function flatten(node: ReactNode): ReactElement<ElementProps>[] {
   return result;
 }
 
+/** 九宫格按行排布，图片外面套了一层行容器，这里把图片（Pressable）都取出来。 */
+function gridTiles(grid: ReactElement<ElementProps>) {
+  return flatten(children(grid)).filter((element) => element.type === "Pressable");
+}
+
 describe("DynamicMedia video interactions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -177,6 +185,21 @@ describe("DynamicMedia video interactions", () => {
     );
 
     expect(playIcon?.props.size).toBe(40);
+  });
+
+  test("shows the charge-exclusive badge on the cover", () => {
+    const badge = flatten(renderVideo({ ...video, badge: "充电专属" })).find(
+      (child) => child.type === "VideoBadge",
+    );
+
+    expect(badge?.props.label).toBe("充电专属");
+    expect(badge?.props.tone).toBe("charge");
+  });
+
+  test("keeps the cover clean when the video has no badge", () => {
+    const badge = flatten(renderVideo(video)).find((child) => child.type === "VideoBadge");
+
+    expect(badge).toBeUndefined();
   });
 
   test("long pressing the cover opens the watch later and cover-preview menu", () => {
@@ -289,7 +312,7 @@ describe("DynamicMedia image sizing", () => {
   test("uses 90% of the viewport for one image and column width for a grid", () => {
     const oneImage = [{ src: "one.jpg", width: 1000, height: 500, ratio: 2 }];
     const oneImageGrid = renderImages(oneImage);
-    const [singlePressable] = children(oneImageGrid) as ReactElement<ElementProps>[];
+    const [singlePressable] = gridTiles(oneImageGrid);
     const [singleImage] = children(singlePressable) as ReactElement<ElementProps>[];
     expect(singleImage.props.source?.uri).toBe("one.jpg?360x200");
 
@@ -300,9 +323,9 @@ describe("DynamicMedia image sizing", () => {
       ratio: 1,
     }));
     const threeImageGrid = renderImages(threeImages);
-    const [firstPressable] = children(threeImageGrid) as ReactElement<ElementProps>[];
+    const [firstPressable] = gridTiles(threeImageGrid);
     const [firstImage] = children(firstPressable) as ReactElement<ElementProps>[];
-    expect(firstImage.props.source?.uri).toBe("0.jpg?120x120");
+    expect(firstImage.props.source?.uri).toBe("0.jpg?116x116");
   });
 
   test("opens the complete image list at the tapped index", () => {
@@ -313,7 +336,7 @@ describe("DynamicMedia image sizing", () => {
       ratio: 1,
     }));
     const grid = renderImages(images);
-    const pressables = children(grid) as ReactElement<ElementProps>[];
+    const pressables = gridTiles(grid);
 
     pressables[1].props.onPress?.();
 
@@ -324,9 +347,7 @@ describe("DynamicMedia image sizing", () => {
   test("keeps article pictures at their natural ratio instead of cropping them", () => {
     const tall = [{ src: "tall.jpg", width: 800, height: 3000, ratio: 800 / 3000 }];
     const naturalGrid = DynamicImageGrid({ images: tall, detail: true, natural: true });
-    const [naturalPressable] = children(
-      naturalGrid as ReactElement<ElementProps>,
-    ) as ReactElement<ElementProps>[];
+    const [naturalPressable] = gridTiles(naturalGrid as ReactElement<ElementProps>);
     const [naturalImage] = children(naturalPressable) as ReactElement<ElementProps>[];
 
     expect(naturalImage.props.contentFit).toBe("contain");
@@ -334,9 +355,7 @@ describe("DynamicMedia image sizing", () => {
     expect(naturalImage.props.className).toContain("bg-slate-100");
 
     const croppedGrid = DynamicImageGrid({ images: tall, detail: true });
-    const [croppedPressable] = children(
-      croppedGrid as ReactElement<ElementProps>,
-    ) as ReactElement<ElementProps>[];
+    const [croppedPressable] = gridTiles(croppedGrid as ReactElement<ElementProps>);
     const [croppedImage] = children(croppedPressable) as ReactElement<ElementProps>[];
 
     expect(croppedImage.props.contentFit).toBe("cover");

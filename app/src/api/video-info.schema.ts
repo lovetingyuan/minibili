@@ -25,6 +25,8 @@ export const VideoInfoResponseSchema = z.object({
   is_chargeable_season: z.boolean(),
   is_season_display: z.boolean(),
   is_story: z.boolean(),
+  /** UP 主充电专属视频（试看/需充电后观看） */
+  is_upower_exclusive: z.boolean().optional(),
   like_icon: z.string(),
   mission_id: z.number(),
   no_cache: z.boolean(),
@@ -34,11 +36,15 @@ export const VideoInfoResponseSchema = z.object({
     // elec: z.number(),
     // download: z.number(),
     // movie: z.number(),
-    // pay: z.number(),
     // hd5: z.number(),
     // no_reprint: z.number(),
     // autoplay: z.number(),
-    // ugc_pay: z.number(),
+    /** 付费稿件（UP 主单独收费的稿件） */
+    arc_pay: z.number().optional(),
+    /** UGC 付费 */
+    ugc_pay: z.number().optional(),
+    /** 大会员专享（番剧/影视等 PGC 内容为 1） */
+    pay: z.number().optional(),
     is_cooperation: z.union([z.literal(0), z.literal(1)]),
     // ugc_pay_preview: z.number(),
     // no_background: z.number(),
@@ -74,6 +80,11 @@ export const VideoInfoResponseSchema = z.object({
   pic: z.string(),
   pubdate: z.number(),
   // pub_location: z.string().nullable(),
+  /**
+   * 番剧/影视/纪录片等 PGC 内容的跳转地址（指向 B站 番剧播放页）。
+   * 这类内容不能通过 UGC 的 playurl 接口播放。
+   */
+  redirect_url: z.string().optional(),
   season_id: z.number(),
   stat: z.object({
     aid: z.number(),

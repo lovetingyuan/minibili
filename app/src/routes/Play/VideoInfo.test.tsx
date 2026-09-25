@@ -45,6 +45,7 @@ vi.mock("lucide-react-native", () => ({
 vi.mock("@/components/Avatar", () => ({ Avatar: "Avatar" }));
 vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
+vi.mock("@/components/VideoBadge", () => ({ VideoBadge: "VideoBadge" }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/api/watching-count", () => ({ useWatchingCount: () => undefined }));

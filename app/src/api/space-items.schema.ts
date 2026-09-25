@@ -20,6 +20,10 @@ export const SpaceVideoItemSchema = z
     comment: StringOrNumberSchema.default(0),
     created: StringOrNumberSchema.default(0),
     description: z.string().default(""),
+    /** 充电专属角标文案，普通投稿为空字符串 */
+    elec_arc_badge: z.string().default(""),
+    /** 充电专属标记。B站 历史上给过布尔、数字与字符串三种形态，这里全部兼容 */
+    is_charging_arc: z.union([z.boolean(), StringOrNumberSchema]).default(false),
     length: z.string().default(""),
     mid: StringOrNumberSchema,
     pic: z.string().default(""),

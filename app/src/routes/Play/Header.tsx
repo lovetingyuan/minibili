@@ -27,6 +27,8 @@ import { useFollowedUpsMap } from "@/store/derives";
 import type { RootStackParamList } from "@/types";
 import { parseNumber, showToast } from "@/utils";
 
+import { isDownloadRestricted } from "./video-access";
+
 export function PlayHeaderTitle() {
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
   const { data: vi } = useVideoInfo(route.params.bvid);
@@ -69,6 +71,13 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
     ...data,
   };
   const downloading = isDownloadingVideo(downloadTask, videoInfo.bvid ?? "", props.cid ?? 0);
+  // 受限内容（充电专属、付费、会员番剧）取不到可下载的地址，隐藏入口避免二次误导
+  const downloadRestricted = isDownloadRestricted({
+    redirectUrl: videoInfo.redirectUrl ?? "",
+    isUpowerExclusive: videoInfo.isUpowerExclusive ?? false,
+    isSteinGate: videoInfo.interactive ?? false,
+    payRights: videoInfo.payRights ?? { arcPay: 0, pay: 0, ugcPay: 0 },
+  });
 
   /**
    * 下载当前分P：地址解析阶段的失败原因即时用 toast 反馈，
@@ -118,17 +127,19 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
               void watchLater.toggle({ aid: videoInfo.aid });
             }}
           />
-          <MenuOption
-            text={downloading ? "取消下载" : "下载视频"}
-            onSelect={() => {
-              hideMenu();
-              if (downloading) {
-                cancelDownload();
-                return;
-              }
-              void handleDownloadVideo();
-            }}
-          />
+          {downloadRestricted ? null : (
+            <MenuOption
+              text={downloading ? "取消下载" : "下载视频"}
+              onSelect={() => {
+                hideMenu();
+                if (downloading) {
+                  cancelDownload();
+                  return;
+                }
+                void handleDownloadVideo();
+              }}
+            />
+          )}
           <MenuOption
             text="查看封面"
             onSelect={() => {

@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import type { z } from "zod";
 
-import request from "./fetcher";
+import request, { getApiErrorCode } from "./fetcher";
 import type { PlayUrlResponseSchema } from "./play-url.schema";
 
 type Res = z.infer<typeof PlayUrlResponseSchema>;
@@ -41,6 +41,30 @@ export function collectPlayUrls(url?: string | null, backupUrls?: string[] | nul
 }
 
 /**
+ * 服务端实际给到的可播时长（毫秒）。
+ * 分段视频会拆成多个 durl，必须累加：只看 durl[0] 会把长视频误判成试看。
+ */
+export function sumPlayUrlDurationMs(durl?: readonly { length: number }[] | null) {
+  if (!durl?.length) {
+    return 0;
+  }
+  return durl.reduce(
+    (total, item) => (Number.isFinite(item.length) ? total + item.length : total),
+    0,
+  );
+}
+
+/**
+ * 重试也不会变好的错误码：稿件不可见、PGC 内容（番剧/影视不走 UGC 播放接口）、
+ * 充电专属但 UP 主没有开放试看（87008）。这些直接展示提示，不再自动重试。
+ */
+const UNPLAYABLE_PLAY_URL_CODES = [-403, -404, 87008];
+
+export function isUnplayablePlayUrlCode(code: number | null | undefined) {
+  return typeof code === "number" && UNPLAYABLE_PLAY_URL_CODES.includes(code);
+}
+
+/**
  * 原生播放器使用的播放地址，返回渐进式 mp4（单文件带音轨）。
  * 未登录时 B站最高只返回 720P，此时 quality 会是 64，调用方按返回的清晰度静默播放。
  * 返回主地址与各 CDN 备用镜像，播放失败时由调用方按顺序回退。
@@ -48,7 +72,11 @@ export function collectPlayUrls(url?: string | null, backupUrls?: string[] | nul
 export function useVideoPlayUrl(bvid: string, cid: number | undefined, qn: VideoQuality) {
   const search = bvid && cid ? createPlayUrlQuery(bvid, cid, qn) : null;
 
-  const { data, error, mutate } = useSWR<Res>(
+  const {
+    data,
+    error: playUrlError,
+    mutate,
+  } = useSWR<Res>(
     search ? `/x/player/wbi/playurl?${search}` : null,
     (url) => request<Res>(url + "&_t=" + Date.now()),
     {
@@ -58,6 +86,8 @@ export function useVideoPlayUrl(bvid: string, cid: number | undefined, qn: Video
       revalidateIfStale: false,
       errorRetryCount: 2,
       errorRetryInterval: 1000,
+      // 权限类错误重试不会变好，只会让受限视频多等两秒
+      shouldRetryOnError: (error) => !isUnplayablePlayUrlCode(getApiErrorCode(error)),
     },
   );
 
@@ -65,7 +95,15 @@ export function useVideoPlayUrl(bvid: string, cid: number | undefined, qn: Video
   return {
     urls: collectPlayUrls(durl?.url, durl?.backup_url),
     quality: data?.quality,
-    error,
+    /** 实际可播时长（毫秒），明显短于视频总时长时说明只拿到了试看片段 */
+    servedDurationMs: sumPlayUrlDurationMs(data?.durl),
+    /**
+     * 播放地址请求是否已经有结果（成功或失败）。
+     * 没有结果时不能判定「不可播放」，否则请求期间每个视频都会闪一次加载失败。
+     */
+    hasResult: data !== undefined || Boolean(playUrlError),
+    error: playUrlError,
+    errorCode: getApiErrorCode(playUrlError),
     retry: () => mutate(),
   };
 }

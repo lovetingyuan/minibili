@@ -40,6 +40,17 @@ const getVideoInfo = (data: VideoInfoResponse) => {
     cooperation: data.rights.is_cooperation === 1,
     argument: data.argue_info.argue_msg,
     argumentLink: data.argue_info.argue_link,
+    // 番剧/影视等 PGC 内容只能跳回 B站 观看，这里保留跳转地址
+    redirectUrl: data.redirect_url ?? "",
+    // 充电专属视频：拿不到完整播放地址时只有试看片段，或者直接不给地址（code 87008）
+    isUpowerExclusive: data.is_upower_exclusive === true,
+    // 付费标记只用来解释受限原因，能不能播仍然以播放地址为准
+    payRights: {
+      arcPay: data.rights.arc_pay ?? 0,
+      pay: data.rights.pay ?? 0,
+      ugcPay: data.rights.ugc_pay ?? 0,
+    },
+    state: data.state,
     // location: data.pub_location,
     pages: data.pages.map((v) => {
       // 如果是分片视频，那么length会是分片数量，否则是1

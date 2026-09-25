@@ -15,12 +15,14 @@ import React from 'react'
 import { Linking, Pressable, View } from 'react-native'
 
 import { useWatchingCount } from '@/api/watching-count'
+import { VideoBadge } from '@/components/VideoBadge'
 import { theme } from '@/constants/theme'
 import type { NavigationProps, RootStackParamList } from '@/types'
 import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumber } from '@/utils'
 
 import { useVideoInfo } from '../../api/video-info'
 import { getVideoDescription } from './description'
+import { resolveVideoBadges } from './video-access'
 import FavoriteButton from './FavoriteButton'
 import LikeButton from './LikeButton'
 import VideoDescription from './VideoDescription'
@@ -38,6 +40,13 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
   }
   const { name, face, mid, date, title, desc, pages } = videoInfo
   const videoDesc = getVideoDescription(desc, title)
+  // 只用 view 接口就能确定的标识：番剧/影视的 pay=1 也可能是限时免费，不作为角标
+  const accessBadges = resolveVideoBadges({
+    redirectUrl: videoInfo.redirectUrl ?? '',
+    isUpowerExclusive: videoInfo.isUpowerExclusive ?? false,
+    isSteinGate: videoInfo.interactive ?? false,
+    payRights: videoInfo.payRights ?? { arcPay: 0, pay: 0, ugcPay: 0 },
+  })
   const [showPagesModal, setShowPagesModal] = React.useState(false)
 
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -105,6 +114,14 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
           >
             ⚠️ {videoInfo.argument}
           </Text>
+        </View>
+      ) : null}
+
+      {accessBadges.length ? (
+        <View className="mb-1.5 flex-row flex-wrap gap-1.5">
+          {accessBadges.map((badge) => (
+            <VideoBadge key={badge.label} label={badge.label} tone={badge.tone} />
+          ))}
         </View>
       ) : null}
 

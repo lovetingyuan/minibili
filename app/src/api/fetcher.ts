@@ -30,6 +30,18 @@ class ApiError extends Error {
 
 export type RequestOptions = { withCookie?: boolean };
 
+/**
+ * 从接口错误里取出 B站 的业务错误码（ApiError.code），
+ * 网络异常等非接口错误返回 null。取值用鸭子类型，避免调用方依赖具体错误类。
+ */
+export function getApiErrorCode(error: unknown): number | null {
+  if (typeof error !== 'object' || error === null || !('code' in error)) {
+    return null;
+  }
+  const code = error.code;
+  return typeof code === 'number' && Number.isFinite(code) ? code : null;
+}
+
 /** nav 是 wbi 签名的前置请求，登录态对它不构成错误，见下方错误码分支 */
 const NAV_URL = '/x/web-interface/nav';
 

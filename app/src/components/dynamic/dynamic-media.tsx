@@ -6,6 +6,7 @@ import { Linking, Pressable, useWindowDimensions, View } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
 import type { DynamicAuthor, DynamicContent, DynamicImage } from "@/api/dynamic-items.type";
+import { VideoBadge } from "@/components/VideoBadge";
 import { theme } from "@/constants/theme";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
@@ -17,6 +18,9 @@ import { getImagePixelDimensions, parseImgUrl, parseNumber } from "@/utils";
 import { Image } from "../styled/expo";
 import { Text } from "../styled/rneui";
 import { WatchProgressBar } from "../WatchProgressBar";
+
+/** 九宫格的行列间距（dp），与容器上的 `gap-1.5` 保持一致，用于估算请求图片的尺寸。 */
+const GRID_GAP = 6;
 
 /**
  * `natural` 用于专栏正文：单图按原比例完整显示，不做裁剪。
@@ -35,54 +39,73 @@ export function DynamicImageGrid(props: {
       : visibleImages.length === 2 || visibleImages.length === 4
         ? 2
         : 3;
-  const widthClass = columns === 1 ? "w-full" : columns === 2 ? "w-[49%]" : "w-[32%]";
-  const imageLayoutWidth = (windowWidth * 0.9) / columns;
+  // 逐行排布并让每行平分整行宽度，而不是用 `flex-wrap` + 百分比宽度：
+  // 否则百分比宽度与小间距凑不满整行，尾部会多出空隙，首尾图片也就贴不住圆角容器。
+  const rows: DynamicImage[][] = [];
+  visibleImages.forEach((image, index) => {
+    if (index % columns === 0) {
+      rows.push([]);
+    }
+    rows[rows.length - 1].push(image);
+  });
+  const imageLayoutWidth = (windowWidth * 0.9 - GRID_GAP * (columns - 1)) / columns;
 
   return (
-    <View className="mb-3 flex-row flex-wrap gap-[1%] gap-y-1.5 overflow-hidden rounded-lg">
-      {visibleImages.map((image, index) => {
-        const aspectRatio =
-          columns === 1
-            ? props.natural
-              ? Math.max(image.ratio, 0.05)
-              : Math.max(0.55, Math.min(image.ratio, 1.8))
-            : 1;
-        const requestSize = getImagePixelDimensions(
-          imageLayoutWidth,
-          imageLayoutWidth / aspectRatio,
-          image.width,
-          image.height,
-        );
-        const source = props.natural
-          ? parseImgUrl(image.src, { ...requestSize, crop: false })
-          : parseImgUrl(image.src, requestSize);
+    <View className="mb-3 gap-1.5 overflow-hidden rounded-lg">
+      {rows.map((row, rowIndex) => (
+        <View key={`${row[0].src}-${rowIndex}`} className="flex-row gap-1.5">
+          {row.map((image, columnIndex) => {
+            const index = rowIndex * columns + columnIndex;
+            const aspectRatio =
+              columns === 1
+                ? props.natural
+                  ? Math.max(image.ratio, 0.05)
+                  : Math.max(0.55, Math.min(image.ratio, 1.8))
+                : 1;
+            const requestSize = getImagePixelDimensions(
+              imageLayoutWidth,
+              imageLayoutWidth / aspectRatio,
+              image.width,
+              image.height,
+            );
+            const source = props.natural
+              ? parseImgUrl(image.src, { ...requestSize, crop: false })
+              : parseImgUrl(image.src, requestSize);
 
-        return (
-          <Pressable
-            key={`${image.src}-${index}`}
-            className={widthClass}
-            onPress={() => {
-              setImagesList(props.images);
-              setCurrentImageIndex(index);
-            }}
-          >
-            <Image
-              source={{ uri: source }}
-              contentFit={props.natural ? "contain" : "cover"}
-              className={clsx(
-                columns === 1 ? "w-full rounded-lg" : "aspect-square w-full",
-                props.natural && "bg-slate-100 dark:bg-slate-800",
-              )}
-              style={columns === 1 ? { aspectRatio } : undefined}
-            />
-            {!props.detail && index === 8 && props.images.length > 9 ? (
-              <View className="absolute inset-0 items-center justify-center bg-black/50">
-                <Text className="text-lg font-semibold text-white">+{props.images.length - 9}</Text>
-              </View>
-            ) : null}
-          </Pressable>
-        );
-      })}
+            return (
+              <Pressable
+                key={`${image.src}-${index}`}
+                className="flex-1"
+                onPress={() => {
+                  setImagesList(props.images);
+                  setCurrentImageIndex(index);
+                }}
+              >
+                <Image
+                  source={{ uri: source }}
+                  contentFit={props.natural ? "contain" : "cover"}
+                  className={clsx(
+                    columns === 1 ? "w-full rounded-lg" : "aspect-square w-full",
+                    props.natural && "bg-slate-100 dark:bg-slate-800",
+                  )}
+                  style={columns === 1 ? { aspectRatio } : undefined}
+                />
+                {!props.detail && index === 8 && props.images.length > 9 ? (
+                  <View className="absolute inset-0 items-center justify-center bg-black/50">
+                    <Text className="text-lg font-semibold text-white">
+                      +{props.images.length - 9}
+                    </Text>
+                  </View>
+                ) : null}
+              </Pressable>
+            );
+          })}
+          {/* 末行不足一整行时补占位，保证图片仍与上方列对齐 */}
+          {Array.from({ length: columns - row.length }, (_, fillerIndex) => (
+            <View key={`filler-${fillerIndex}`} className="flex-1" />
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
@@ -159,6 +182,14 @@ function VideoCard(props: {
           <ThemedIcon icon={Play} size={40} color="white" filled />
         </View>
       </View>
+      {content.badge ? (
+        <VideoBadge
+          className="absolute left-2 top-2"
+          label={content.badge}
+          tone="charge"
+          variant="overlay"
+        />
+      ) : null}
       <View className="absolute bottom-1.5 left-2 flex-row gap-3 rounded bg-black/60 px-2 py-1">
         <Text className="text-xs text-white">{parseNumber(content.play)} 播放</Text>
         <Text className="text-xs text-white">{parseNumber(content.danmaku)} 弹幕</Text>
