@@ -18,7 +18,8 @@
 //   - prebuild 内部还会再装一遍依赖，用 --no-install 跳过，依赖统一由脚本开头安装；
 //   - Gradle 开启 build cache，并发与堆内存按本机 CPU / 内存自动取值（8G 级别的小机器仍走保守设置）；
 //   - preview 是 release 构建，额外关掉只在 release 跑的 PNG 重压缩；
-//   - 这些 Gradle 参数写进 android/gradle.properties（prebuild 会重新生成该文件，所以每次构建前重写）。
+//   - 这些 Gradle 参数写进 android/gradle.properties（prebuild 会重新生成该文件，所以每次构建前重写）；
+//   - 额外生成一个 init script，把 Expo 本地 AAR 仓库调到最前面，详见下面 GRADLE_INIT_SCRIPT 的注释。
 //
 // 环境变量：
 //   BUILD_ARCHITECTURES=x86_64  只编译指定 ABI（默认 arm64-v8a，模拟器用 x86_64）
@@ -50,6 +51,36 @@ const GRADLE_PROPERTIES = join(ANDROID_DIR, "gradle.properties");
 const GRADLEW = join(ANDROID_DIR, "gradlew");
 const APK_DIR = join(APP_DIR, "apk");
 const NATIVE_CACHE_DIR = join(APP_DIR, ".native-build");
+
+// Expo SDK 57 把每个模块预编译好的 AAR 放进 node_modules/<pkg>/local-maven-repo，由 expo 的 autolinking
+// 插件注册成 file:// 仓库，但这些仓库排在所有远程仓库之后。解析 host.exp.exponent:* 这类坐标时 Gradle
+// 会先去阿里云镜像、dl.google.com、Maven Central 挨个试一遍（那几个仓库里根本没有这些包），只要其中
+// 任何一个请求超时，整个构建就会以 "Could not resolve host.exp.exponent:expo.modules.xxx" 失败：
+//
+//   > Could not resolve host.exp.exponent:expo.modules.crypto:57.0.3.
+//     > Could not GET '.../expo.modules.crypto-57.0.3.pom'.
+//       > Connect to dl.google.com:443 failed: Read timed out
+//
+// 这些 .pom「404」结果会被 Gradle 缓存 24 小时，缓存过期后要重新问一遍远端，所以同样的构建时好时坏。
+// 这里生成一个 init script，在仓库列表定型后把所有 file:// 形式的 Maven 仓库挪到最前面（Expo 的
+// local-maven-repo、react-native 自己的 android 仓库都属于这类），让这些包直接本地命中，不再依赖网络。
+const GRADLE_INIT_SCRIPT_NAME = "init-local-maven-repos.gradle";
+const GRADLE_INIT_SCRIPT = join(ANDROID_DIR, GRADLE_INIT_SCRIPT_NAME);
+const GRADLE_INIT_SCRIPT_CONTENT = `// 由 app/scripts/build-android-local.mjs 生成，请勿手动修改（每次构建都会重写）。
+// 作用：把 file:// 形式的 Maven 仓库（Expo/RN 随 npm 包发布的预编译 AAR）提到所有远程仓库之前。
+gradle.projectsEvaluated {
+  gradle.rootProject.allprojects { project ->
+    def repositories = project.repositories
+    def localRepositories = repositories.findAll {
+      it instanceof org.gradle.api.artifacts.repositories.MavenArtifactRepository && it.url?.scheme == 'file'
+    }
+    localRepositories.reverse().each { repository ->
+      repositories.remove(repository)
+      repositories.add(0, repository)
+    }
+  }
+}
+`;
 
 const VARIANTS = {
   dev: {
@@ -233,10 +264,19 @@ function tuneGradleProperties(variant) {
   upsertGradleProperty("org.gradle.caching", "true");
   upsertGradleProperty("org.gradle.workers.max", String(MAX_WORKERS));
   upsertGradleProperty("reactNativeArchitectures", ARCHITECTURES);
+  // dl.google.com / repo.maven.apache.org 在国内经常只是慢：Gradle 默认 30s 就报 "Read timed out"，
+  // 而一次超时足以让整次依赖解析失败。放宽到 60s 连接 / 120s 读，把「慢」和「断」区分开。
+  upsertGradleProperty("systemProp.org.gradle.internal.http.connectionTimeout", "60000");
+  upsertGradleProperty("systemProp.org.gradle.internal.http.socketTimeout", "120000");
   if (variant === "preview") {
     // release 独有的 PNG 重压缩，本地预览包不需要，省一段构建时间（EAS 的生产构建不受影响）
     upsertGradleProperty("android.enablePngCrunchInReleaseBuilds", "false");
   }
+}
+
+// prebuild 重建 android/ 时会把这个文件一起丢掉，所以每次构建前重新生成。
+function writeGradleInitScript() {
+  writeFileSync(GRADLE_INIT_SCRIPT, GRADLE_INIT_SCRIPT_CONTENT);
 }
 
 function installDependencies() {
@@ -266,6 +306,7 @@ function prepareAndroidProject(variant, env) {
 
 function buildApk(variant, env) {
   tuneGradleProperties(variant);
+  writeGradleInitScript();
 
   // RN 的 bundle 任务只会往 generated/res/react/<buildType>/ 里写本次用到的资源，不会清理上一次构建的残留。
   // assets 里的文件改名（例如 loading.png -> loading.gif）后，旧文件会和新文件一起参与资源合并，
@@ -285,6 +326,8 @@ function buildApk(variant, env) {
   }
 
   const args = [
+    "-I",
+    GRADLE_INIT_SCRIPT_NAME,
     VARIANTS[variant].gradleTask,
     `-PreactNativeArchitectures=${ARCHITECTURES}`,
     `--max-workers=${MAX_WORKERS}`,
