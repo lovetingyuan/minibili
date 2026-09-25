@@ -1,6 +1,9 @@
 import React from "react";
 
-import { markFollowingDynamicsUpRead } from "../api/following-dynamics";
+import {
+  markFollowingDynamicsUpRead,
+  markFollowingDynamicsUpUnread,
+} from "../api/following-dynamics";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
 import { useStore } from ".";
@@ -58,4 +61,37 @@ export function useMarkFollowingDynamicsRead(mid: string | number | null | undef
       };
     });
   }, [account, mid, set$followingDynamicsReadMap]);
+}
+
+/**
+ * 关注列表长按头像「标记未读」：让某个 UP 的小红点重新出现。
+ * 状态写入持久化的 readMap，打开他的动态页会被 markFollowingDynamicsUpRead 清掉。
+ */
+export function useMarkFollowingDynamicsUnread() {
+  const { account } = useBilibiliSessionState();
+  const { set$followingDynamicsReadMap } = useStore();
+
+  return (mid: string | number) => {
+    const current =
+      account &&
+      bilibiliSession.isCurrentAccount(account) &&
+      bilibiliSession.getSnapshot().phase === "ready"
+        ? account
+        : null;
+    if (!current) {
+      return;
+    }
+    const upMid = String(mid);
+    set$followingDynamicsReadMap((map) => {
+      const state = map[current.mid];
+      const next = markFollowingDynamicsUpUnread(state, upMid);
+      if (!next || next === state) {
+        return map;
+      }
+      return {
+        ...map,
+        [current.mid]: next,
+      };
+    });
+  };
 }

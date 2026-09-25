@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 
 import {
   countFollowingDynamicsUnreadUps,
-  isNewerFollowingDynamicId,
+  isFollowingDynamicsUpUnread,
 } from "@/api/following-dynamics";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSessionState } from "@/features/bilibili-session/useBilibiliSession";
@@ -37,7 +37,7 @@ export function useUpHasNewDynamic(mid: UpInfo["mid"]) {
     return false;
   }
   const item = $followingDynamicsReadMap[current.mid]?.[String(mid)];
-  return Boolean(item && isNewerFollowingDynamicId(item.latestId, item.readId));
+  return isFollowingDynamicsUpUnread(item);
 }
 
 /** 当前账号有未读动态的 UP mid 集合，用于把带小红点的 UP 排到关注列表最前面 */
@@ -60,7 +60,7 @@ export function useUnreadUpMids(): ReadonlySet<string> {
   return new Set(
     state
       ? Object.entries(state)
-          .filter(([, item]) => isNewerFollowingDynamicId(item.latestId, item.readId))
+          .filter(([, item]) => isFollowingDynamicsUpUnread(item))
           .map(([mid]) => mid)
       : [],
   );

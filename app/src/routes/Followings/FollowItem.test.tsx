@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   setOverlayButtons: vi.fn<(buttons: { text: string; onPress: () => void }[]) => void>(),
   setImagesList: vi.fn(),
   setCurrentImageIndex: vi.fn(),
+  markFollowingDynamicsUnread: vi.fn<(mid: string | number) => void>(),
   followDisabled: true,
   hasNewDynamic: false,
   livingUps: {} as Record<string, string>,
@@ -35,6 +36,9 @@ vi.mock("../../store", () => ({
 vi.mock("../../store/derives", () => ({
   useUpHasNewDynamic: () => mocks.hasNewDynamic,
 }));
+vi.mock("../../store/actions", () => ({
+  useMarkFollowingDynamicsUnread: () => mocks.markFollowingDynamicsUnread,
+}));
 vi.mock("../../utils", () => ({
   getImagePixelSize: (size: number) => size,
   parseImgUrl: () => "",
@@ -59,15 +63,17 @@ function openMenu(onSetGroups?: (up: { mid: string | number }) => void) {
   return mocks.setOverlayButtons.mock.lastCall![0];
 }
 
-test("长按菜单提供设置分组与查看头像，关注同步完成后才提供取消关注", () => {
+test("长按菜单提供设置分组、标记未读与查看头像，关注同步完成后才提供取消关注", () => {
   expect(openMenu(mocks.onSetGroups).map((button) => button.text)).toEqual([
     "设置分组",
+    "标记未读",
     "查看头像",
   ]);
   mocks.followDisabled = false;
   expect(openMenu(mocks.onSetGroups).map((button) => button.text)).toEqual([
     "设置分组",
     "取消关注",
+    "标记未读",
     "查看头像",
   ]);
 });
@@ -88,8 +94,8 @@ test("查看头像在图片浮窗中打开当前 UP 头像", () => {
   ]);
 });
 
-test("没有设置分组入口时只展示关注与头像操作", () => {
-  expect(openMenu().map((button) => button.text)).toEqual(["查看头像"]);
+test("没有设置分组入口时只展示标记未读与查看头像", () => {
+  expect(openMenu().map((button) => button.text)).toEqual(["标记未读", "查看头像"]);
 });
 
 test("特别关注的 UP 名称使用主题色并加粗", () => {

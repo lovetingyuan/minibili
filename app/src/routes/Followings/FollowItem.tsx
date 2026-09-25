@@ -9,6 +9,7 @@ import { theme } from '@/constants/theme'
 import { useFollowActions } from '@/hooks/useFollowActions'
 
 import { useStore } from '../../store'
+import { useMarkFollowingDynamicsUnread } from '../../store/actions'
 import { useUpHasNewDynamic } from '../../store/derives'
 import type { NavigationProps, UpInfo } from '../../types'
 import { getImagePixelSize, parseImgUrl } from '../../utils'
@@ -25,6 +26,7 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
   const { livingUps, setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore()
   const hasNewDynamic = useUpHasNewDynamic(mid)
   const actions = useFollowActions()
+  const markUnread = useMarkFollowingDynamicsUnread()
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   const gotoDynamic = () => {
@@ -69,6 +71,12 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
               },
             },
           ])
+        },
+      },
+      !hasNewDynamic && {
+        text: '标记未读',
+        onPress: () => {
+          markUnread(mid)
         },
       },
       {
