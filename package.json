@@ -25,6 +25,8 @@
     "build": "npm run build:android -w=@minibili/app"
   },
   "devDependencies": {
+    "@emnapi/core": "1.11.3",
+    "@emnapi/runtime": "1.11.3",
     "knip": "^6.34.0",
     "oxfmt": "^0.68.0",
     "oxlint": "^1.83.0",
@@ -33,6 +35,5 @@
   },
   "engines": {
     "npm": ">=10"
-  },
-  "packageManager": "npm@10.9.8"
+  }
 }
