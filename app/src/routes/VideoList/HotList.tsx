@@ -10,9 +10,8 @@ let refreshTime = Date.now();
 export default Hot;
 
 function Hot() {
-  const [reload, setReload] = React.useState(0);
-  const { list, update, isRefreshing, loading, mutate, isReachingEnd, error } =
-    useHotVideos(reload);
+  const { list, update, isRefreshing, loading, mutate, isReachingEnd, error, refresh } =
+    useHotVideos();
   React.useEffect(() => {
     if (Date.now() - refreshTime > 5 * 60 * 1000) {
       mutate();
@@ -35,9 +34,7 @@ function Hot() {
       videos={list || []}
       isRefreshing={isRefreshing}
       onReachEnd={update}
-      onRefresh={() => {
-        setReload((current) => current + 1);
-      }}
+      onRefresh={refresh}
       onTabReselect={() => {
         void mutate();
       }}

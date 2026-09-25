@@ -39,6 +39,8 @@ export const useSearchVideos = (name: string) => {
     );
   const isReachingEnd = !!data && (data[data.length - 1]?.result?.length ?? 0) < 50;
   // const isRefreshing = isValidating && !!data && data.length === size
+  // 只有真的在追加分页时才提示加载中，避免后台重新校验时冒出来
+  const isLoadingMore = isValidating && !!data && size > data.length;
   const bvidMap: Record<string, boolean> = {};
   const list = data?.reduce((a, b) => {
     if (b.result) {
@@ -63,6 +65,7 @@ export const useSearchVideos = (name: string) => {
     error,
     isLoading,
     isValidating,
+    isLoadingMore,
     isReachingEnd,
     update: () => {
       if (isReachingEnd) {

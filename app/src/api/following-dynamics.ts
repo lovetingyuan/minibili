@@ -11,6 +11,7 @@ import type {
   FollowingDynamicsPage,
   FollowingDynamicsReadState,
   FollowingDynamicsRequest,
+  FollowingDynamicsUpReadState,
   FollowingDynamicsUpdatePage,
 } from "./following-dynamics.types";
 

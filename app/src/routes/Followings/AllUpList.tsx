@@ -1,6 +1,7 @@
 import { Text } from "@/components/styled/rneui";
 import { orderFollowedUps } from "@/features/bilibili-followings/order-followings";
 import { useFollowingsState } from "@/features/bilibili-followings/useFollowingsState";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useStore } from "@/store";
 import { useUnreadUpMids } from "@/store/derives";
 import { useActiveFollowedUps } from "@/store/followings";
@@ -17,18 +18,18 @@ export default function AllUpList({ specialMids, onSetGroups }: Props) {
   const { livingUps } = useStore();
   const $followedUps = useActiveFollowedUps();
   const unreadMids = useUnreadUpMids();
-  const { isValidating, mutate } = useFollowingsState();
+  const { mutate } = useFollowingsState();
   const orderedUps = orderFollowedUps($followedUps, livingUps, specialMids, unreadMids);
+  // 关注列表会被后台同步、拉黑等操作重新校验，只有用户下拉时才显示刷新图标
+  const pullToRefresh = usePullToRefresh(() => mutate());
 
   return (
     <FollowUpsGrid
       ups={orderedUps}
       specialMids={specialMids}
       onSetGroups={onSetGroups}
-      refreshing={isValidating}
-      onRefresh={() => {
-        void mutate().catch(() => {});
-      }}
+      refreshing={pullToRefresh.refreshing}
+      onRefresh={pullToRefresh.onRefresh}
       emptyContent={
         <Text className="my-10 text-center text-base">暂无关注，请搜索你感兴趣的UP主添加</Text>
       }

@@ -28,10 +28,15 @@ export type FollowingDynamicsNavBatch = {
   complete: boolean;
 };
 
-/** 单个 UP 的动态已读状态；latestId 大于 readId 时表示有未读 */
+/**
+ * 单个 UP 的动态已读状态。
+ * latestId 大于 readId 时表示有未读；unread 是用户在关注列表长按手动标记的未读，
+ * 没有该 UP 的动态数据时也能单独撑起一个小红点。
+ */
 export type FollowingDynamicsUpReadState = {
   latestId: string;
   readId: string;
+  unread?: boolean;
 };
 
 /** 当前 B站账号下，每个 UP 的动态已读状态 */

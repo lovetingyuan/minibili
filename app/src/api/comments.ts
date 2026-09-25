@@ -263,7 +263,6 @@ export function useComments(oid: string | number, type: number, mode = 3) {
   const lastPage = data?.[data.length - 1];
   const isPageEnd = !!lastPage && (lastPage.cursor.is_end || !lastPage.cursor.pagination_reply?.next_offset);
   const allCount = data?.[0]?.cursor.all_count;
-  const isLoadingMore = Boolean(data && size > data.length);
 
   async function patchAttitude(id: string, next: CommentAttitude) {
     await mutate(
@@ -314,7 +313,6 @@ export function useComments(oid: string | number, type: number, mode = 3) {
       await setSize(size);
     },
     isValidating,
-    isRefreshing: isValidating && Boolean(data) && !isLoadingMore,
     async refresh() {
       await setSize(1);
       await mutate();

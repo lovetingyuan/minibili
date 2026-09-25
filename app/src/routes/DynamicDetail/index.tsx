@@ -10,6 +10,7 @@ import { Button, Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
 import { theme } from "@/constants/theme";
 import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 import type { RootStackParamList } from "@/types";
 
@@ -31,6 +32,8 @@ function DynamicDetailPage({ route }: Props) {
       await article.mutate();
     }
   }
+  // 动态详情（以及评论）会跟着后台重新校验变化，只有用户下拉时才显示刷新图标
+  const pullToRefresh = usePullToRefresh(refresh);
 
   useUpdateNavigationOptions({
     headerRight: () => <HeaderRight url={url} title={title} />,
@@ -83,8 +86,8 @@ function DynamicDetailPage({ route }: Props) {
         commentCount={detail.data.stats.comment}
         commentType={detail.data.commentType}
         sourceUrl={url}
-        refreshing={detail.isValidating}
-        onRefresh={refresh}
+        refreshing={pullToRefresh.refreshing}
+        onRefresh={pullToRefresh.onRefresh}
       >
         <View className="-mx-3 -mt-4">{card}</View>
       </CommentList>
@@ -95,7 +98,9 @@ function DynamicDetailPage({ route }: Props) {
     <ScrollView
       className={`flex-1 ${theme.background.page}`}
       contentInsetAdjustmentBehavior="automatic"
-      refreshControl={<RefreshControl refreshing={detail.isValidating} onRefresh={refresh} />}
+      refreshControl={
+        <RefreshControl refreshing={pullToRefresh.refreshing} onRefresh={pullToRefresh.onRefresh} />
+      }
     >
       {card}
       <Text className={`py-8 text-center text-sm ${theme.text.muted}`}>

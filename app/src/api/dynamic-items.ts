@@ -1,6 +1,7 @@
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 
+import { usePullToRefresh } from "../hooks/usePullToRefresh";
 import { getDynamicPageKey, mapDynamicItem } from "./dynamic-items.mapper";
 import { DynamicDetailResponseSchema, DynamicListResponseSchema } from "./dynamic-items.schema";
 import type { DynamicListResponse } from "./dynamic-items.schema";
@@ -36,10 +37,11 @@ export function useDynamicItems(mid?: string | number) {
   const isReachingEnd = lastPage ? !lastPage.has_more || !lastPage.items.length : false;
   const isLoadingMore = Boolean(swr.data && swr.size > swr.data.length);
 
-  async function refresh() {
+  // 列表会被后台自动重新校验，刷新图标只在用户下拉时出现
+  const pullToRefresh = usePullToRefresh(async () => {
     await swr.setSize(1);
     await swr.mutate();
-  }
+  });
 
   function loadMore() {
     if (swr.error) {
@@ -58,12 +60,12 @@ export function useDynamicItems(mid?: string | number) {
   return {
     list,
     error: swr.error,
-    isRefreshing: swr.isValidating && Boolean(swr.data) && !isLoadingMore,
+    isRefreshing: pullToRefresh.refreshing,
     isReachingEnd,
     isLoadingMore,
     isLoading: swr.isLoading,
     isValidating: swr.isValidating,
-    refresh,
+    refresh: pullToRefresh.onRefresh,
     loadMore,
     retry,
   };

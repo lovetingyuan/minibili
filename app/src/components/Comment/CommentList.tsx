@@ -9,6 +9,7 @@ import { useComments } from '@/api/comments'
 import { useCommentActions } from '@/api/useCommentActions'
 import { theme } from "@/constants/theme";
 import { ThemedIcon } from '@/components/ThemedIcon'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
 import { showToast } from '@/utils'
 
@@ -65,6 +66,10 @@ export default function CommentList(props: CommentListProps) {
     props.commentType,
     props.sourceUrl,
     comments.refresh,
+  )
+  // 评论列表会跟着后台重新校验变化，只有用户下拉时才显示刷新图标
+  const pullToRefresh = usePullToRefresh(() =>
+    Promise.all([comments.refresh(), props.onRefresh?.()]),
   )
 
   useEffect(() => {
@@ -220,8 +225,8 @@ export default function CommentList(props: CommentListProps) {
         }
         contentInsetAdjustmentBehavior="automatic"
         maintainVisibleContentPosition={{ disabled: true }}
-        refreshing={comments.isRefreshing || props.refreshing}
-        onRefresh={() => void Promise.all([comments.refresh(), props.onRefresh?.()])}
+        refreshing={pullToRefresh.refreshing || Boolean(props.refreshing)}
+        onRefresh={pullToRefresh.onRefresh}
         onEndReached={loadMore}
         onEndReachedThreshold={0.3}
       />

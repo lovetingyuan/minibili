@@ -170,7 +170,7 @@ function UpList(props: { keyword: string }) {
     isLoading,
     update,
     isReachingEnd,
-    isValidating,
+    isLoadingMore,
   } = useSearchUps(keyword);
   const followedUps = useActiveFollowedUps();
   const items = buildUpSearchItems(keyword, followedUps, searchedUps);
@@ -196,7 +196,7 @@ function UpList(props: { keyword: string }) {
       automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
       ListEmptyComponent={<EmptyContent loading={isLoading} keyword={keyword} />}
       ListFooterComponent={
-        items.length && isValidating ? (
+        items.length && isLoadingMore ? (
           <SkeletonRows count={FOOTER_SKELETON_ROWS} />
         ) : items.length && isReachingEnd ? (
           <Text className={`${theme.text.muted} my-2 text-center text-xs`}>暂无更多</Text>

@@ -9,8 +9,8 @@ import type { UpInfo } from "@/types";
 const mocks = vi.hoisted(() => ({
   followedUps: [] as UpInfo[],
   isLoading: false,
+  isLoadingMore: false,
   isReachingEnd: false,
-  isValidating: false,
   searchedUps: [] as SearchedUpType[],
 }));
 
@@ -41,7 +41,7 @@ vi.mock("@/api/search-up", () => ({
     isLoading: mocks.isLoading,
     update: vi.fn(),
     isReachingEnd: mocks.isReachingEnd,
-    isValidating: mocks.isValidating,
+    isLoadingMore: mocks.isLoadingMore,
   }),
 }));
 vi.mock("@/store/followings", () => ({ useActiveFollowedUps: () => mocks.followedUps }));
@@ -150,8 +150,8 @@ function descendantTypes(element: TestElement): unknown[] {
 beforeEach(() => {
   mocks.followedUps = [localHit, localMiss];
   mocks.isLoading = false;
+  mocks.isLoadingMore = false;
   mocks.isReachingEnd = false;
-  mocks.isValidating = false;
   mocks.searchedUps = [apiDuplicate, apiOther];
 });
 
@@ -196,7 +196,6 @@ test("关键词为空时没有数据并提示输入", () => {
 test("首次搜索时展示骨架屏而不是空态文案", () => {
   mocks.followedUps = [];
   mocks.isLoading = true;
-  mocks.isValidating = true;
   mocks.searchedUps = [];
   const { ListEmptyComponent } = listProps("up");
 
@@ -208,7 +207,7 @@ test("首次搜索时展示骨架屏而不是空态文案", () => {
 });
 
 test("已有关注命中项时，接口结果加载中在列表底部补骨架屏", () => {
-  mocks.isValidating = true;
+  mocks.isLoadingMore = true;
   const { data, ListFooterComponent } = listProps("up");
 
   expect(data).toHaveLength(2);

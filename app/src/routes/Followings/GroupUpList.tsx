@@ -5,6 +5,7 @@ import { useBilibiliRelationTagMembers } from "@/api/useBilibiliRelationTags";
 import { Button, Text } from "@/components/styled/rneui";
 import { theme } from "@/constants/theme";
 import { orderFollowedUps } from "@/features/bilibili-followings/order-followings";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useStore } from "@/store";
 import { useUnreadUpMids } from "@/store/derives";
 import type { UpInfo } from "@/types";
@@ -32,16 +33,16 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
   async function refresh() {
     await Promise.allSettled([members.refresh(), Promise.resolve(onRefreshTags?.())]);
   }
+  // 分组成员会在设置分组后自动重新校验，只有用户下拉时才显示刷新图标
+  const pullToRefresh = usePullToRefresh(refresh);
 
   return (
     <FollowUpsGrid
       ups={orderedUps}
       specialMids={specialMids}
       onSetGroups={onSetGroups}
-      refreshing={hasItems && members.isValidating && !members.isLoadingMore}
-      onRefresh={() => {
-        void refresh();
-      }}
+      refreshing={pullToRefresh.refreshing}
+      onRefresh={pullToRefresh.onRefresh}
       onEndReached={() => {
         void members.loadMore();
       }}

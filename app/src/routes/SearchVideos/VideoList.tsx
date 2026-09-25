@@ -138,7 +138,7 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
     isLoading,
     update,
     isReachingEnd,
-    isValidating,
+    isLoadingMore,
   } = useSearchVideos(props.keyword);
   const listRef = React.useRef<FlashListRef<SearchedVideoType> | null>(null);
   const keyboardInset = useKeyboardInset();
@@ -162,7 +162,7 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
       automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
       ListEmptyComponent={<EmptyContent loading={isLoading} onSearch={props.onSearch} />}
       ListFooterComponent={
-        isValidating ? (
+        isLoadingMore ? (
           <Text className={`${theme.text.muted} my-2 text-center text-xs`}>加载中~</Text>
         ) : searchedVideos?.length && isReachingEnd ? (
           <Text className={`${theme.text.muted} my-2 text-center text-xs`}>暂无更多</Text>

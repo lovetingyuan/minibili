@@ -1,6 +1,8 @@
+import React from 'react';
 import useSWRInfinite from 'swr/infinite';
 import type { z } from 'zod';
 
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
 import type { VideoItemResponseSchema } from './hot-videos.schema';
 import request from './fetcher';
 
@@ -35,13 +37,15 @@ export type VideoItem = ReturnType<typeof getVideo>;
 
 // https://api.bilibili.com/x/web-interface/popular?ps=20&pn=1
 
-export function useHotVideos(t: number) {
-  const { data, mutate, size, setSize, isValidating, isLoading, error } = useSWRInfinite<{
+export function useHotVideos() {
+  // 热门接口按请求顺序返回分页，换一个 _t 等于从头重新拉一遍列表
+  const [revision, setRevision] = React.useState(0);
+  const { data, mutate, size, setSize, isLoading, error } = useSWRInfinite<{
     list: HotVideoResponse[];
     no_more: boolean;
   }>(
     (index) => {
-      return `/x/web-interface/popular?ps=30&pn=${index + 1}&_t=${t}`;
+      return `/x/web-interface/popular?ps=30&pn=${index + 1}&_t=${revision}`;
     },
     request,
     {
@@ -59,12 +63,15 @@ export function useHotVideos(t: number) {
 
   const isLoadingMore = isLoading || (size > 0 && !!data && typeof data[size - 1] === 'undefined');
   const isReachingEnd = !!data && !!data[data.length - 1]?.no_more;
-  const isRefreshing = isValidating && !!data && data.length === size;
   const list = hotVideos.map(getVideo);
+  // 列表会被后台自动重新校验，刷新图标只在用户下拉时出现
+  const pullToRefresh = usePullToRefresh(() => {
+    setRevision((current) => current + 1);
+  });
 
   return {
     list,
-    isRefreshing,
+    isRefreshing: pullToRefresh.refreshing,
     isReachingEnd,
     loading: isLoadingMore,
     mutate,
@@ -74,9 +81,7 @@ export function useHotVideos(t: number) {
       }
       setSize((current) => current + 1);
     },
-    refresh: () => {
-      mutate();
-    },
+    refresh: pullToRefresh.onRefresh,
     error,
   };
 }

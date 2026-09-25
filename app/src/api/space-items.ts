@@ -1,6 +1,7 @@
 import useSWRImmutable from "swr/immutable";
 import useSWRInfinite from "swr/infinite";
 
+import { usePullToRefresh } from "../hooks/usePullToRefresh";
 import {
   buildSpaceContentCountsUrl,
   dedupeSpaceItems,
@@ -55,10 +56,11 @@ export function useSpaceVideoItems(owner: SpaceOwner) {
   const isReachingEnd = lastPage ? lastPage.list.vlist.length < SPACE_VIDEO_PAGE_SIZE : false;
   const isLoadingMore = Boolean(swr.data && swr.size > swr.data.length);
 
-  async function refresh() {
+  // 列表会被后台自动重新校验，刷新图标只在用户下拉时出现
+  const pullToRefresh = usePullToRefresh(async () => {
     await swr.setSize(1);
     await swr.mutate();
-  }
+  });
 
   function loadMore() {
     if (swr.error) {
@@ -71,12 +73,12 @@ export function useSpaceVideoItems(owner: SpaceOwner) {
   return {
     list,
     error: swr.error,
-    isRefreshing: swr.isValidating && Boolean(swr.data) && !isLoadingMore,
+    isRefreshing: pullToRefresh.refreshing,
     isReachingEnd,
     isLoadingMore,
     isLoading: swr.isLoading,
     isValidating: swr.isValidating,
-    refresh,
+    refresh: pullToRefresh.onRefresh,
     loadMore,
     retry: swr.mutate,
   };
@@ -99,10 +101,11 @@ export function useSpaceOpusItems(owner: SpaceOwner) {
   const isReachingEnd = lastPage ? !lastPage.has_more || !lastPage.items.length : false;
   const isLoadingMore = Boolean(swr.data && swr.size > swr.data.length);
 
-  async function refresh() {
+  // 列表会被后台自动重新校验，刷新图标只在用户下拉时出现
+  const pullToRefresh = usePullToRefresh(async () => {
     await swr.setSize(1);
     await swr.mutate();
-  }
+  });
 
   function loadMore() {
     if (swr.error) {
@@ -115,12 +118,12 @@ export function useSpaceOpusItems(owner: SpaceOwner) {
   return {
     list,
     error: swr.error,
-    isRefreshing: swr.isValidating && Boolean(swr.data) && !isLoadingMore,
+    isRefreshing: pullToRefresh.refreshing,
     isReachingEnd,
     isLoadingMore,
     isLoading: swr.isLoading,
     isValidating: swr.isValidating,
-    refresh,
+    refresh: pullToRefresh.onRefresh,
     loadMore,
     retry: swr.mutate,
   };

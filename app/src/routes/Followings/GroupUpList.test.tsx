@@ -6,7 +6,22 @@ const mocks = vi.hoisted(() => ({
   items: [] as UpInfo[],
 }));
 
+// 组件里用到了 usePullToRefresh，这里把 react 的 hook 换成同步实现
+vi.mock("react", async () => {
+  const actual = await vi.importActual<typeof import("react")>("react");
+  const mockedReact = {
+    ...actual,
+    useRef: (initial: unknown) => ({ current: initial }),
+    useState: () => [false, vi.fn()] as const,
+  };
+  return { ...mockedReact, default: mockedReact };
+});
 vi.mock("react-native", () => ({ ActivityIndicator: "ActivityIndicator", View: "View" }));
+// app 工作区的 vitest 没有配置 @ 别名，这里用相对路径加载真实的 hook
+vi.mock(
+  "@/hooks/usePullToRefresh",
+  async () => await vi.importActual("../../hooks/usePullToRefresh"),
+);
 vi.mock("@/api/relation-tags", () => ({ RELATION_TAG_SPECIAL_ID: -10 }));
 vi.mock("@/api/useBilibiliRelationTags", () => ({
   useBilibiliRelationTagMembers: () => ({
