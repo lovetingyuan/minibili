@@ -18,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   setCurrentImageIndex: vi.fn(),
   setImagesList: vi.fn(),
   setMenuVisible: vi.fn(),
+  sessionAccount: { mid: '9001' } as { mid: string } | null,
   showToast: vi.fn(),
   shareUp: vi.fn(),
   state: { disabled: false, isPreparing: false, pendingMid: '' },
@@ -75,6 +76,9 @@ vi.mock('@/hooks/useFollowActions', () => ({
     follow: mocks.follow,
     unfollow: mocks.unfollow,
   }),
+}))
+vi.mock('@/features/bilibili-session/useBilibiliSession', () => ({
+  useBilibiliSessionState: () => ({ account: mocks.sessionAccount, control: { phase: 'ready' } }),
 }))
 vi.mock('@/store/derives', () => ({ useFollowedUpsMap: () => mocks.followedUps }))
 vi.mock('expo-clipboard', () => ({ setStringAsync: mocks.clipboardSetStringAsync }))

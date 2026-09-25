@@ -19,6 +19,7 @@ import {
 
 import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
 import { theme } from '@/constants/theme'
+import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'
 import { useBlockUpActions } from '@/hooks/useBlockUpActions'
 import { useFollowActions } from '@/hooks/useFollowActions'
 import { useFollowedUpsMap } from '@/store/derives'
@@ -27,13 +28,19 @@ import { useLivingInfo } from '../../api/living-info'
 import { useUserRelation } from '../../api/user-relation'
 import { useUserInfo } from '../../api/user-info'
 import { useStore } from '../../store'
-import type { NavigationProps, RootStackParamList } from '../../types'
+import type { NavigationProps, RootStackParamList, UpInfo } from '../../types'
 import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast } from '../../utils'
 
 // 头像右上角的性别角标，只用性别符号本身，不加底色
 const sexBadgeMap: Record<string, { symbol: string; textClassName: string; label: string }> = {
   男: { symbol: '♂', textClassName: theme.primary.text, label: '男性' },
   女: { symbol: '♀', textClassName: theme.secondary.text, label: '女性' },
+}
+
+/** 当前空间是否就是登录用户自己 */
+function useIsSelfSpace(mid: UpInfo['mid'] | undefined) {
+  const { account } = useBilibiliSessionState()
+  return account != null && String(account.mid) === String(mid)
 }
 
 function HeaderLeft() {
@@ -44,6 +51,7 @@ function HeaderLeft() {
     ...route.params?.user,
     ...userInfo,
   }
+  const isSelf = useIsSelfSpace(dynamicUser?.mid)
   const sexBadge = dynamicUser?.sex ? sexBadgeMap[dynamicUser.sex] : undefined
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -127,7 +135,11 @@ function HeaderLeft() {
       <View className="ml-3 flex-1 flex-row items-center">
         <UpName
           mid={dynamicUser.mid}
-          className={clsx('shrink text-lg', followed && [theme.secondary.text, 'font-bold'])}
+          className={clsx(
+            'shrink text-lg',
+            isSelf && theme.primary.text,
+            followed && [theme.secondary.text, 'font-bold'],
+          )}
           // adjustsFontSizeToFit
           onPress={copyUserName}
           numberOfLines={1}
@@ -156,6 +168,7 @@ export const headerTitle = () => <HeaderLeft />
 function HeaderRight() {
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const dynamicUser = route.params?.user
+  const isSelf = useIsSelfSpace(dynamicUser?.mid)
   const [visible, setVisible] = React.useState(false)
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
@@ -172,6 +185,11 @@ function HeaderRight() {
       : followed
         ? '取消关注'
         : '关注UP'
+
+  // 自己的空间没有关注、拉黑等操作，整块菜单不展示
+  if (isSelf) {
+    return null
+  }
 
   return (
     <View className="flex-row items-center gap-2">

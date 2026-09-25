@@ -1,11 +1,14 @@
+import { useNavigation } from "@react-navigation/native";
 import { clsx } from "clsx";
 import { Alert, View } from "react-native";
 
 import { Avatar } from "@/components/Avatar";
+import { getDynamicUpTarget } from "@/components/dynamic/dynamic-target";
 import { Button, Text } from "@/components/styled/rneui";
 import { theme } from "@/constants/theme";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import { openBilibiliLogin } from "@/routes/navigation";
+import type { MainTabNavigationProp } from "@/types";
 import { getImagePixelSize, parseImgUrl, parseNumber, showToast } from "@/utils";
 
 export const headerRight = () => <AuthButton />;
@@ -64,6 +67,7 @@ function AuthButton() {
 
 function MineHeaderTitle() {
   const { account } = useBilibiliSession();
+  const navigation = useNavigation<MainTabNavigationProp>();
 
   if (!account) {
     return (
@@ -73,22 +77,36 @@ function MineHeaderTitle() {
     );
   }
 
-  const { face, follower, name } = account.profile;
+  const { face, follower, mid, name } = account.profile;
+  const spaceLabel = `查看 ${name} 的主页`;
+
+  function openUpSpace() {
+    navigation.navigate("Dynamic", getDynamicUpTarget({ mid, name, face }));
+  }
+
   return (
     <View className="flex-row items-center">
       <Avatar
+        accessibilityLabel={spaceLabel}
+        onPress={openUpSpace}
         rounded
         size={36}
         source={{
           uri: parseImgUrl(face, getImagePixelSize(36)),
         }}
       />
-      <View className="ml-2 shrink">
-        <Text className={clsx(theme.text.primary, "text-base")} numberOfLines={1}>
+      <View className="ml-2 shrink flex-row items-baseline">
+        <Text
+          accessibilityLabel={spaceLabel}
+          accessibilityRole="button"
+          className={clsx(theme.primary.text, "shrink text-lg")}
+          numberOfLines={1}
+          onPress={openUpSpace}
+        >
           {name}
         </Text>
         {follower != null ? (
-          <Text className={clsx(theme.text.muted, "text-xs")} numberOfLines={1}>
+          <Text className={clsx(theme.text.muted, "ml-2 shrink-0 text-xs")} numberOfLines={1}>
             {parseNumber(follower)}粉丝
           </Text>
         ) : null}
