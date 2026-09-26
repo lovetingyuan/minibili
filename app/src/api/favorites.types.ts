@@ -5,14 +5,12 @@ import type { VideoListItemInfo } from "../types";
 import type {
   FavoriteFolderSchema,
   FavoriteFoldersSchema,
-  FavoriteResourceSchema,
   FavoriteResourcesSchema,
 } from "./favorites.schema";
 
 export type FavoriteAccount = Pick<BilibiliAccount, "mid" | "generation">;
 export type FavoriteFolder = z.infer<typeof FavoriteFolderSchema>;
 export type FavoriteFolders = z.infer<typeof FavoriteFoldersSchema>;
-export type FavoriteResource = z.infer<typeof FavoriteResourceSchema>;
 export type FavoriteResources = z.infer<typeof FavoriteResourcesSchema>;
 export type FavoriteRequest = (url: string) => Promise<unknown>;
 export type FavoriteRequestDependencies = {

@@ -87,7 +87,6 @@
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/generator": "^7.29.1",
-    "@tailwindcss/cli": "^4.1.18",
     "@types/he": "^1.2.3",
     "@types/node": "^25.9.5",
     "@types/react": "~19.2.10",

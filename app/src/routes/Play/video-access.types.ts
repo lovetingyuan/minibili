@@ -1,5 +1,5 @@
 /** 角标色调：充电橙、会员粉、交互蓝 */
-export type VideoAccessTone = "charge" | "vip" | "info";
+type VideoAccessTone = "charge" | "vip" | "info";
 
 export type VideoAccessBadge = {
   label: string;

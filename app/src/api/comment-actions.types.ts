@@ -1,10 +1,4 @@
 import type { BilibiliAccount } from "../features/bilibili-session/types";
-import type { z } from "zod";
-
-import type {
-  AddCommentReplyResponseSchema,
-  CommentActionResponseSchema,
-} from "./comment-actions.schema";
 
 export type CommentAttitude = "none" | "like" | "dislike";
 export type CommentAttitudeKind = Exclude<CommentAttitude, "none">;
@@ -57,6 +51,3 @@ export type CommentPostRequestOptions<T> = {
   parse: (payload: unknown) => T;
   actionName: string;
 };
-
-export type CommentActionResponse = z.infer<typeof CommentActionResponseSchema>;
-export type AddCommentReplyResponse = z.infer<typeof AddCommentReplyResponseSchema>;

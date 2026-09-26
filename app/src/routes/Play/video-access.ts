@@ -16,19 +16,19 @@ import type {
  * 正常视频的两者基本一致（实测 29:47 的视频差值在 1 秒内），
  * 实测的试看片段差值从十几秒到几十分钟不等。
  */
-export const PREVIEW_GAP_MS = 10_000;
+const PREVIEW_GAP_MS = 10_000;
 
 /** 充电专属没有开放试看时 B站 返回的错误码 */
-export const UPOWER_EXCLUSIVE_ERROR_CODE = 87008;
+const UPOWER_EXCLUSIVE_ERROR_CODE = 87008;
 
 const BILIBILI_VIDEO_URL = "https://www.bilibili.com/video/";
 const OPEN_IN_BILIBILI_LABEL = "在 B站 打开";
 
-export const CHARGE_BADGE: VideoAccessBadge = { label: "充电专属", tone: "charge" };
-export const PAID_BADGE: VideoAccessBadge = { label: "付费视频", tone: "vip" };
-export const VIP_BADGE: VideoAccessBadge = { label: "大会员", tone: "vip" };
-export const PGC_BADGE: VideoAccessBadge = { label: "番剧/影视", tone: "vip" };
-export const INTERACTIVE_BADGE: VideoAccessBadge = { label: "交互视频", tone: "info" };
+const CHARGE_BADGE: VideoAccessBadge = { label: "充电专属", tone: "charge" };
+const PAID_BADGE: VideoAccessBadge = { label: "付费视频", tone: "vip" };
+const VIP_BADGE: VideoAccessBadge = { label: "大会员", tone: "vip" };
+const PGC_BADGE: VideoAccessBadge = { label: "番剧/影视", tone: "vip" };
+const INTERACTIVE_BADGE: VideoAccessBadge = { label: "交互视频", tone: "info" };
 
 /**
  * 试看内容在视频信息区的说明文案。

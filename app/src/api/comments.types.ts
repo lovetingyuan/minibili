@@ -1,7 +1,7 @@
 import type { CommentAttitude } from "./comment-actions.types";
 import type { CommentCursor } from "./comments.schema";
 
-export type CommentMessageNode =
+type CommentMessageNode =
   | { type: "text"; text: string }
   | { type: "url"; url: string }
   | { type: "emoji"; url: string }

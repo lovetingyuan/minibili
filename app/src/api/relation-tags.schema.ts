@@ -43,5 +43,3 @@ export const RelationTagMutationResponseSchema = z.object({
 export const RelationTagCreateDataSchema = z.object({
   tagid: z.number().int(),
 });
-
-export type RelationTagMemberData = z.infer<typeof RelationTagMemberSchema>;

@@ -1,5 +1,5 @@
 export const DEV_SERVER_PORT = 8787;
-export const DEFAULT_DEV_SERVER_HOST = "127.0.0.1";
+const DEFAULT_DEV_SERVER_HOST = "127.0.0.1";
 
 /**
  * 开发期的接口地址跟着 Metro 走，而不是靠猜电脑的局域网 IP。

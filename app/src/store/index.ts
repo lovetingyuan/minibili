@@ -106,7 +106,7 @@ const { getStoreMethods, useStore, subscribeStore } = createStore("AppStore", in
 export { getStoreMethods, useStore };
 const storedKeys = Object.keys(initValue).filter((key): key is StoredKeys => key.startsWith("$"));
 
-export type AppContextValueType = ReturnType<typeof getAppValue>;
+type AppContextValueType = ReturnType<typeof getAppValue>;
 
 export type AppContextMethodsType = AtomicStoreMethodsType<AppContextValueType>;
 

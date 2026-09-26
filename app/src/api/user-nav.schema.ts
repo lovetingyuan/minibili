@@ -8,6 +8,4 @@ const Schema = z.object({
   }),
 });
 
-export default Schema;
-
 export type UserNavType = z.infer<typeof Schema>;

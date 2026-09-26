@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const StringOrNumberSchema = z.union([z.string(), z.number()]);
 
-export const FollowingDynamicsNavItemSchema = z
+const FollowingDynamicsNavItemSchema = z
   .object({
     author: z
       .object({
@@ -23,5 +23,3 @@ export const FollowingDynamicsNavResponseSchema = z
     update_num: StringOrNumberSchema.optional(),
   })
   .passthrough();
-
-export type FollowingDynamicsNavResponse = z.infer<typeof FollowingDynamicsNavResponseSchema>;

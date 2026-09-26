@@ -11,7 +11,7 @@ import type {
 export type HistoryAccount = Pick<BilibiliAccount, "mid" | "generation">;
 export type HistoryCursor = z.infer<typeof HistoryCursorSchema>;
 export type HistoryRecord = z.infer<typeof HistoryRecordSchema>;
-export type HistoryResponse = z.infer<typeof HistoryResponseSchema>;
+type HistoryResponse = z.infer<typeof HistoryResponseSchema>;
 export type HistoryPage = HistoryResponse & { hasMore: boolean; chainId: number };
 export type HistoryRequest = (url: string) => Promise<unknown>;
 export type HistoryKey = readonly [

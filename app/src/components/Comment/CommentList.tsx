@@ -21,8 +21,6 @@ import type { CommentListProps } from './comment-list.types'
 import ReplyList from './ReplyList'
 import { FlashList, Skeleton, Text } from '@/components/styled/rneui'
 
-export type { CommentListProps } from './comment-list.types'
-
 const LOADING_COMMENT_WIDTHS = [78, 62, 90, 45, 72, 55]
 
 function CommentSeparator() {

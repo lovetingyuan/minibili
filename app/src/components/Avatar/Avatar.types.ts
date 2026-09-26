@@ -11,7 +11,7 @@ import type {
 
 export type AvatarSize = "small" | "medium" | "large" | "xlarge" | number;
 
-export type AvatarImageProps = Omit<ImageProps, "source"> & {
+type AvatarImageProps = Omit<ImageProps, "source"> & {
   containerStyle?: StyleProp<ViewStyle>;
   placeholderStyle?: StyleProp<ViewStyle>;
 };

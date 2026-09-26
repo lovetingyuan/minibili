@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { AvatarProps, AvatarSize } from "./Avatar.types";
 
-export const avatarSizes = {
+const avatarSizes = {
   small: 34,
   medium: 50,
   large: 75,

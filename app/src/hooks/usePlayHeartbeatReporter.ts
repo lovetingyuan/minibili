@@ -225,7 +225,7 @@ function finishSession(
 }
 
 /** 每次渲染后同步一次：只在播放状态真正变化时上报，可重复调用 */
-export function syncPlayHeartbeat(
+function syncPlayHeartbeat(
   state: PlayHeartbeatState,
   inputRef: MutableRef<PlayHeartbeatInput>,
   tickRef: MutableRef<TickTimer>,
@@ -277,7 +277,7 @@ export function syncPlayHeartbeat(
 }
 
 /** 播放结束时上报“已看完”，随后清空会话，重新播放会开启新会话 */
-export function endPlayHeartbeat(
+function endPlayHeartbeat(
   state: PlayHeartbeatState,
   inputRef: MutableRef<PlayHeartbeatInput>,
   tickRef: MutableRef<TickTimer>,
@@ -288,7 +288,7 @@ export function endPlayHeartbeat(
 }
 
 /** 离开播放页时补报一次暂停，保证最后的位置被记录 */
-export function flushPlayHeartbeat(
+function flushPlayHeartbeat(
   state: PlayHeartbeatState,
   inputRef: MutableRef<PlayHeartbeatInput>,
   tickRef: MutableRef<TickTimer>,

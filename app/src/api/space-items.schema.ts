@@ -43,7 +43,7 @@ export const SpaceVideoPageSchema = z
   })
   .passthrough();
 
-export const SpaceOpusCoverSchema = z
+const SpaceOpusCoverSchema = z
   .object({
     url: z.string(),
     width: z.number().default(1),
@@ -79,4 +79,3 @@ export type SpaceVideoItemResponse = z.infer<typeof SpaceVideoItemSchema>;
 export type SpaceVideoPage = z.infer<typeof SpaceVideoPageSchema>;
 export type SpaceOpusItemResponse = z.infer<typeof SpaceOpusItemSchema>;
 export type SpaceOpusPage = z.infer<typeof SpaceOpusPageSchema>;
-export type SpaceContentCounts = z.infer<typeof SpaceContentCountsSchema>;

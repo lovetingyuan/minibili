@@ -151,5 +151,3 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
     </BottomSheet>
   );
 }
-
-export { formatVideoPageTitle, getVideoPagesSheetHeight };

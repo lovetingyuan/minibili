@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { BaseCommentSchema } from "./comments.schema";
 
-export type ReplyResItem = z.infer<typeof BaseCommentSchema>;
+type ReplyResItem = z.infer<typeof BaseCommentSchema>;
 
 const RepliesSchema: z.ZodType<ReplyResItem> = BaseCommentSchema;
 

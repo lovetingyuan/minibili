@@ -22,7 +22,7 @@ export const FavoriteFolderMutationResponseSchema = z.object({
   data: z.unknown().optional(),
 });
 
-export const FavoriteResourceSchema = z.object({
+const FavoriteResourceSchema = z.object({
   id: z.number().int(),
   type: z.number().int(),
   title: z.string(),

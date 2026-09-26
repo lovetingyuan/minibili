@@ -14,7 +14,7 @@ export const PLAYER_FAST_RATE = 3;
 /**
  * 视频 CDN 防盗链要求的 Referer
  */
-export const PLAY_URL_REFERER = "https://www.bilibili.com";
+const PLAY_URL_REFERER = "https://www.bilibili.com";
 
 /**
  * 播放地址自动刷新的次数上限，超过后展示错误态交给用户重试
@@ -29,17 +29,17 @@ const PLAYER_SEEK_TOLERANCE_MS = 1500;
 /**
  * 横向视频内联播放时上下各留出的黑边高度
  */
-export const PLAYER_LANDSCAPE_VERTICAL_PADDING = 12;
+const PLAYER_LANDSCAPE_VERTICAL_PADDING = 12;
 
 /**
  * 竖屏视频内联播放时占屏幕高度的比例
  */
-export const PLAYER_PORTRAIT_HEIGHT_RATIO = 0.33;
+const PLAYER_PORTRAIT_HEIGHT_RATIO = 0.33;
 
 /**
  * 竖屏视频下滑展开后占屏幕高度的比例
  */
-export const PLAYER_PORTRAIT_EXPANDED_HEIGHT_RATIO = 0.7;
+const PLAYER_PORTRAIT_EXPANDED_HEIGHT_RATIO = 0.7;
 
 /**
  * 播放中控件无操作后自动隐藏的时间
@@ -57,7 +57,7 @@ export const PLAYER_PAUSED_UI_DELAY_MS = 300;
  * 初始续播只允许发生在播放器仍停留在起点附近时。
  * 即使 playingChange 丢失，进度已经向前推进后也不能再被迟到的续播数据拉回去。
  */
-export const PLAYER_INITIAL_RESUME_MAX_CURRENT_MS = 1000;
+const PLAYER_INITIAL_RESUME_MAX_CURRENT_MS = 1000;
 
 /**
  * 播放器高度切换的过渡时长
@@ -67,7 +67,7 @@ export const PLAYER_HEIGHT_ANIMATION_MS = 200;
 /**
  * 竖向滑动切换播放器高度所需的最小滑动距离
  */
-export const PLAYER_SWIPE_MIN_DISTANCE = 60;
+const PLAYER_SWIPE_MIN_DISTANCE = 60;
 
 /**
  * 竖向滑动的手势激活距离（超过即认为是滑动而不是点击）
@@ -87,7 +87,7 @@ export const PLAYER_SEEK_STEP_SECONDS = 10;
 /**
  * 左右滑动调整进度所需的最小滑动距离
  */
-export const PLAYER_SEEK_SWIPE_MIN_DISTANCE = 40;
+const PLAYER_SEEK_SWIPE_MIN_DISTANCE = 40;
 
 /**
  * 左右滑动的手势激活距离（超过即认为是滑动而不是点击）
@@ -107,7 +107,7 @@ export const PLAYER_SEEK_HINT_HOLD_MS = 400;
 /**
  * 判定播放进度是否停在结尾的容差（播放结束后的进度就等于总时长）
  */
-export const PLAYER_REPLAY_END_TOLERANCE_MS = 300;
+const PLAYER_REPLAY_END_TOLERANCE_MS = 300;
 
 /**
  * 竖向滑动的方向，与网页播放器 change-video-height 的取值保持一致

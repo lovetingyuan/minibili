@@ -36,14 +36,10 @@ import type {
 } from "./relation-tags.types";
 
 export const RELATION_TAG_MEMBERS_PAGE_SIZE = 50;
-/** 「全部关注」只在客户端存在，B站 接口没有对应的 tagid。 */
-export const RELATION_TAG_ALL_ID = -1;
 /** 特别关注（内置分组）。 */
 export const RELATION_TAG_SPECIAL_ID = -10;
 /** 默认分组（内置分组）。 */
 export const RELATION_TAG_DEFAULT_ID = 0;
-/** 悄悄关注（内置分组，本项目不展示）。 */
-export const RELATION_TAG_QUIET_ID = -2;
 
 const RELATION_TAG_MUTATION_TIMEOUT = 15000;
 /** 特别关注的分组人数上限很小，这里只做防御性限制，避免异常响应导致无限翻页。 */
@@ -108,7 +104,7 @@ export function getSelectableRelationTags(tags: RelationTag[]) {
   return tags.filter((tag) => tag.tagid === RELATION_TAG_SPECIAL_ID || tag.tagid > 0);
 }
 
-export function toUpInfo(member: {
+function toUpInfo(member: {
   mid: number;
   uname: string;
   face: string;

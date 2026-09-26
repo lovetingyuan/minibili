@@ -9,8 +9,6 @@ import type {
 // import { VideoInfo } from './api/video-info'
 // import { getInitVideoInfoValue } from './store/play'
 
-export type PromiseResult<T extends Promise<any>> = T extends Promise<infer R> ? R : never;
-
 export interface UpInfo {
   mid: number | string;
   name: string;
@@ -88,7 +86,7 @@ export type RootStackParamList = {
   Living: { url: string; title: string; user?: Pick<UpInfo, "mid" | "name"> };
 };
 
-export type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export type MainTabNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList>,

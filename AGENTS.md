@@ -30,15 +30,12 @@ minibili - 使用 Expo + React Native + TailwindCSS 开发的精简版B站APP。
 
 ### 样式
 
-- 使用 TailwindCSS 语法 + `tw()` 辅助函数，基于 uniwind
+- 使用 TailwindCSS 语法 + `tw()` 辅助函数，基于 `uniwind`
 - 颜色定义在 `src/constants/colors.tw.ts`
 - 尽量不要使用 `style`属性，而是采用 tailwindcss 语法。
 
-### Git
-
-- **[CRITICAL]**严禁自动提交
-- **[CRITICAL]**每次任务完毕后必须输出一条遵循 Conventional Commits 规范的commit信息。
-
 ### 其他规范
 
+- **[CRITICAL]**严禁自动提交，每次任务完毕后必须输出一条遵循 Conventional Commits 规范的commit信息。
 - **[CRITICAL]**你在执行任务的过程中产生的临时文件都只能放在`tmp`文件夹下
+- **[CRITICAL]**除非用户的明确要求，否则不要写测试用例。

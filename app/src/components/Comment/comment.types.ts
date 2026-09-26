@@ -3,7 +3,7 @@ import type { CommentAttitude } from "@/api/comment-actions.types";
 import type { CommentImage, CommentItemType, ReplyItemType } from "@/api/comments";
 import type { CommentMessageContent } from "@/api/comments";
 
-export type CommentInteractionProps = {
+type CommentInteractionProps = {
   onAttitude: (
     comment: ReplyItemType,
     kind: CommentAttitudeKind,

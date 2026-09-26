@@ -13,7 +13,6 @@
     "vercel:env": "node scripts/vercel.mjs env add BILI_PROXY_TOKEN production",
     "vercel:install": "npm install --prefix ../tmp/vercel-cli --no-save --no-package-lock --no-audit --no-fund vercel@59.20.0",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run",
     "lint": "oxlint ."
   },
   "devDependencies": {

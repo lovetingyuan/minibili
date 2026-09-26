@@ -6,7 +6,7 @@ import {
   recordPartPlayProgress,
 } from "@/store/part-play-progress";
 
-export const PART_PLAY_PROGRESS_INTERVAL_MS = 15000;
+const PART_PLAY_PROGRESS_INTERVAL_MS = 15000;
 
 export type PartPlayProgressInput = {
   bvid: string;

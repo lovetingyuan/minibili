@@ -13,9 +13,7 @@ import useResolvedColor from "@/hooks/useResolvedColor";
 import useResolvedStyle from "@/hooks/useResolvedStyle";
 
 export { Button } from "@/components/Button";
-export type { ButtonProps } from "@/components/Button";
 export { Skeleton } from "@/components/Skeleton";
-export type { SkeletonProps } from "@/components/Skeleton";
 
 type StyledFlashListProps<T> = FlashListProps<T> & {
   className?: string;
@@ -120,4 +118,4 @@ export function Text({ className, style, accessibilityRole = "text", ...props }:
   );
 }
 
-export type { FlashListProps, FlashListRef };
+export type { FlashListRef };

@@ -13,5 +13,4 @@ export const LiveUpsDataSchema = z.object({
   items: LiveUpItemSchema.array(),
 });
 
-export type LiveUpItem = z.infer<typeof LiveUpItemSchema>;
 export type LiveUpsData = z.infer<typeof LiveUpsDataSchema>;

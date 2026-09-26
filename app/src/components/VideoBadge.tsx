@@ -5,7 +5,7 @@ import { theme } from "@/constants/theme";
 
 import type { VideoBadgeProps, VideoBadgeTone } from "./VideoBadge.types";
 
-export type { VideoBadgeProps, VideoBadgeTone, VideoBadgeVariant } from "./VideoBadge.types";
+export type { VideoBadgeProps, VideoBadgeTone } from "./VideoBadge.types";
 
 /** 每种色调只取一个底色，保证任意封面上白字都能看清 */
 const toneBackground: Record<VideoBadgeTone, string> = {

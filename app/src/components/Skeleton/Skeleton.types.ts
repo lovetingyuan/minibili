@@ -1,6 +1,6 @@
 import type { DimensionValue, ViewProps } from "react-native";
 
-export type SkeletonAnimation = "none" | "pulse" | "wave";
+type SkeletonAnimation = "none" | "pulse" | "wave";
 
 export type SkeletonProps = ViewProps & {
   /** 动画类型，默认 pulse */

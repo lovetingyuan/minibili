@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { PressableProps, StyleProp, TextStyle, ViewStyle } from "react-native";
 
-export type ButtonType = "solid" | "clear" | "outline";
+type ButtonType = "solid" | "clear" | "outline";
 
 export type ButtonSize = "sm" | "md" | "lg";
 

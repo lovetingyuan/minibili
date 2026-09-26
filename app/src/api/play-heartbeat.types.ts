@@ -38,7 +38,7 @@ export type PlayHeartbeatVideo = {
 };
 
 /** wbi 签名用的 img/sub key，取自 nav 接口 */
-export type PlayHeartbeatWbiKeys = { img_url: string; sub_url: string };
+type PlayHeartbeatWbiKeys = { img_url: string; sub_url: string };
 
 export type PlayHeartbeatRequestDependencies = {
   readCookie: () => Promise<string | null>;

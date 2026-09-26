@@ -6,7 +6,6 @@
     "build": "tsc -b && vite build",
     "preview": "npm run build && vite preview",
     "deploy": "npm run build && wrangler deploy",
-    "test": "vitest run",
     "cf-typegen": "wrangler types",
     "lint": "oxlint"
   },
