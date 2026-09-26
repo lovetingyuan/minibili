@@ -207,10 +207,15 @@ function HeaderRight() {
             text={followOptionText}
             disabled={actions.disabled}
             onSelect={() => {
-              if (dynamicUser) {
-                void (followed ? actions.unfollow(dynamicUser) : actions.follow(dynamicUser))
-              }
               hideMenu()
+              if (!dynamicUser) {
+                return
+              }
+              if (followed) {
+                actions.confirmUnfollow(dynamicUser)
+                return
+              }
+              void actions.follow(dynamicUser)
             }}
           />
           <MenuOption

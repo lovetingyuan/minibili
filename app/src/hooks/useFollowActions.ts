@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import { Alert } from "react-native";
 
 import { useModifyRelation } from "../api/useModifyRelation";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
@@ -46,9 +47,27 @@ export function useFollowActions() {
     }
   }
 
+  /**
+   * 取消关注先弹窗确认，确认后才真正提交请求；
+   * 弹窗里带上 UP 名称，避免误触把刚关注的 UP 直接取关。
+   */
+  function confirmUnfollow(up: UpInfo) {
+    Alert.alert(`确定取消关注「${up.name}」吗？`, "", [
+      { text: "关闭", style: "cancel" },
+      {
+        text: "确定",
+        style: "destructive",
+        onPress() {
+          void act(up, false);
+        },
+      },
+    ]);
+  }
+
   return {
     follow: (up: UpInfo) => act(up, true),
     unfollow: (up: UpInfo) => act(up, false),
+    confirmUnfollow,
     disabled: mutation.isMutating || mutation.isPreparing,
     pendingMid: mutation.pendingMid,
     isPreparing: mutation.isPreparing,

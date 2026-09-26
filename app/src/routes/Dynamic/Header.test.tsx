@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   blacklist: new Map<string, { mid: number; name: string }>(),
   clipboardSetStringAsync: vi.fn(async () => {}),
   confirmBlock: vi.fn(),
+  confirmUnfollow: vi.fn(),
   follow: vi.fn(async () => {}),
   followedUps: {} as Record<string, { mid: number; name: string; face: string; sign: string }>,
   livingUrl: '',
@@ -73,6 +74,7 @@ vi.mock('@/hooks/useBlockUpActions', () => ({
 vi.mock('@/hooks/useFollowActions', () => ({
   useFollowActions: () => ({
     ...mocks.state,
+    confirmUnfollow: mocks.confirmUnfollow,
     follow: mocks.follow,
     unfollow: mocks.unfollow,
   }),
@@ -170,10 +172,15 @@ describe('UP 主动态页头部菜单', () => {
     mocks.userInfo = undefined
   })
 
-  test('依次展示关注、拉黑和分享入口', () => {
+  test('依次展示关注、拉黑、分享和复制入口', () => {
     const options = menuOptions()
 
-    expect(options.map((option) => option.props.text)).toEqual(['关注UP', '拉黑UP', '分享UP'])
+    expect(options.map((option) => option.props.text)).toEqual([
+      '关注UP',
+      '拉黑UP',
+      '分享UP',
+      '复制ID',
+    ])
   })
 
   test('右上角三个点渲染成图标按钮', () => {
@@ -196,14 +203,16 @@ describe('UP 主动态页头部菜单', () => {
     expect(mocks.unfollow).not.toHaveBeenCalled()
   })
 
-  test('已关注时第一项变为取消关注并直接取消', () => {
+  test('已关注时第一项变为取消关注，确认后才取消', () => {
     mocks.followedUps = { '100': user() }
     const [followOption] = menuOptions()
 
     expect(followOption.props.text).toBe('取消关注')
     followOption.props.onSelect?.()
 
-    expect(mocks.unfollow).toHaveBeenCalledWith(user())
+    expect(mocks.setMenuVisible).toHaveBeenCalledWith(false)
+    expect(mocks.confirmUnfollow).toHaveBeenCalledExactlyOnceWith(user())
+    expect(mocks.unfollow).not.toHaveBeenCalled()
     expect(mocks.follow).not.toHaveBeenCalled()
   })
 
