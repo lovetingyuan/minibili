@@ -13,6 +13,10 @@
         "name": "USER_STORAGE",
         "class_name": "UserStorage",
       },
+      {
+        "name": "USER_DIRECTORY",
+        "class_name": "UserDirectory",
+      },
     ],
   },
   "migrations": [
@@ -20,10 +24,14 @@
       "tag": "v1",
       "new_sqlite_classes": ["UserStorage"],
     },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["UserDirectory"],
+    },
   ],
   "assets": {
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/health", "/share", "/share.html"],
+    "run_worker_first": ["/api/*", "/health", "/share", "/share.html", "/users"],
   },
   "observability": {
     "enabled": true,

@@ -1,5 +1,6 @@
 import { isRecord } from "../utils/request";
 import { BILI_MYINFO_PATH, callBilibili } from "./bilibili-proxy";
+import type { BilibiliIdentity } from "./bilibili-auth.types";
 import type { BilibiliProxyBindings } from "./bilibili-proxy";
 
 export const AUTH_TIMEOUT_MS = 15000;
@@ -10,7 +11,7 @@ export class BilibiliUnavailableError extends Error {}
 export async function verifyBilibiliIdentity(
   bindings: BilibiliProxyBindings,
   cookie: string | undefined,
-): Promise<string> {
+): Promise<BilibiliIdentity> {
   if (
     !cookie ||
     cookie.length > 16384 ||
@@ -37,11 +38,19 @@ export async function verifyBilibiliIdentity(
       throw new BilibiliUnavailableError();
     }
     const mid = payload.data.profile.mid;
-    if (typeof mid !== "number" || !Number.isSafeInteger(mid) || mid <= 0) {
+    const nickname = payload.data.profile.name;
+    if (
+      typeof mid !== "number" ||
+      !Number.isSafeInteger(mid) ||
+      mid <= 0 ||
+      typeof nickname !== "string" ||
+      !nickname.trim() ||
+      nickname.length > 128
+    ) {
       throw new BilibiliUnavailableError();
     }
     // 唯一可信的身份来自 B站响应，而非 DedeUserID、URL 或请求体。
-    return String(mid);
+    return { uid: String(mid), nickname };
   } catch (error) {
     if (error instanceof BilibiliUnauthorizedError) {
       throw error;

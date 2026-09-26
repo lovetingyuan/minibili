@@ -1,15 +1,15 @@
-import { View } from "react-native";
+import { View } from 'react-native'
 
-import { Button, Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
-import { openBilibiliLogin } from "@/routes/navigation";
+import { Button, Text } from '@/components/styled/rneui'
+import { theme } from '@/constants/theme'
+import { openBilibiliLogin } from '@/routes/navigation'
 
-import type { LoginRequiredProps } from "./LoginRequired.types";
+import type { LoginRequiredProps } from './LoginRequired.types'
 
 export function LoginRequired({
-  actionText = "登录 B站",
+  actionText = '登录 B站',
   description,
-  message = "需要登录 B站",
+  message = '需要登录B站查看',
 }: LoginRequiredProps) {
   return (
     <View className="flex-1 items-center justify-center gap-4 px-8 py-16">
@@ -19,5 +19,5 @@ export function LoginRequired({
       ) : null}
       <Button title={actionText} onPress={openBilibiliLogin} />
     </View>
-  );
+  )
 }

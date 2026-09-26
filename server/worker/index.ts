@@ -16,4 +16,5 @@ const app = createApp();
 
 export default app;
 export { createApp };
+export { UserDirectory } from "./UserDirectory";
 export { UserStorage } from "./UserStorage";
