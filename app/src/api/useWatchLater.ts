@@ -109,7 +109,6 @@ export function useModifyWatchLater() {
 
   return {
     toggle,
-    isPending: (aid: string) =>
-      Boolean(account && pending.has(favoriteMutationKey(account, aid))),
+    isPending: (aid: string) => Boolean(account && pending.has(favoriteMutationKey(account, aid))),
   };
 }

@@ -9,10 +9,7 @@ import {
   RelationTagResultUnknownError,
 } from "./relation-tags";
 import { getRelationTagMembersInfiniteKey } from "../features/bilibili-followings/relation-tag-members-cache";
-import type {
-  RelationTagAccount,
-  RelationTagMembersKeyLoader,
-} from "./relation-tags.types";
+import type { RelationTagAccount, RelationTagMembersKeyLoader } from "./relation-tags.types";
 
 const mocks = vi.hoisted(() => ({
   account: { mid: "1", generation: 1 } as RelationTagAccount | null,
@@ -322,17 +319,15 @@ describe("relation tag actions", () => {
       getRelationTagMembersInfiniteKey(account, -10),
     );
     await vi.advanceTimersByTimeAsync(1500);
-    expect(mocks.mutateCache).toHaveBeenCalledWith(
-      getRelationTagMembersInfiniteKey(account, -10),
-    );
+    expect(mocks.mutateCache).toHaveBeenCalledWith(getRelationTagMembersInfiniteKey(account, -10));
   });
 
   test("结果不确定时先刷新分组再报错", async () => {
-    mocks.createTag.mockRejectedValueOnce(new RelationTagResultUnknownError("无法确认创建分组结果"));
-    const actions = useRelationTagActions();
-    await expect(actions.createTag("考研")).rejects.toThrow(
-      "无法确认创建分组结果，已刷新分组列表",
+    mocks.createTag.mockRejectedValueOnce(
+      new RelationTagResultUnknownError("无法确认创建分组结果"),
     );
+    const actions = useRelationTagActions();
+    await expect(actions.createTag("考研")).rejects.toThrow("无法确认创建分组结果，已刷新分组列表");
     expect(mocks.mutateCache).toHaveBeenCalledWith(getRelationTagsKey(account));
   });
 

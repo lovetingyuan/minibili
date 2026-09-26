@@ -89,12 +89,7 @@ export function parseDurationStr(duration: string) {
     .join(":");
 }
 
-export async function handleShareVideo(
-  name: string,
-  title: string,
-  bvid: string | number,
-  p = 1,
-) {
+export async function handleShareVideo(name: string, title: string, bvid: string | number, p = 1) {
   try {
     await Share.share({
       message: buildVideoShareMessage(name, title, buildVideoShareUrl(bvid, p)),

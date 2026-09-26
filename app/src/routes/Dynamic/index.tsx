@@ -4,11 +4,7 @@ import { View } from "react-native";
 import PagerView from "react-native-pager-view";
 
 import { useDynamicItems } from "@/api/dynamic-items";
-import {
-  useSpaceContentCounts,
-  useSpaceOpusItems,
-  useSpaceVideoItems,
-} from "@/api/space-items";
+import { useSpaceContentCounts, useSpaceOpusItems, useSpaceVideoItems } from "@/api/space-items";
 import { useUserInfo } from "@/api/user-info";
 import { DynamicList } from "@/components/dynamic/dynamic-list";
 import { useOpenDynamicItem } from "@/components/dynamic/use-open-dynamic-item";

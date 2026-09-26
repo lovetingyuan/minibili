@@ -339,7 +339,11 @@ describe("reply-list", () => {
       "vote",
     ]);
     expect(comment.message[1]).toEqual({ type: "emoji", url: "https://example.com/doge.png" });
-    expect(comment.message[3]).toEqual({ type: "av", text: "BV1abc", url: "https://b23.tv/BV1abc" });
+    expect(comment.message[3]).toEqual({
+      type: "av",
+      text: "BV1abc",
+      url: "https://b23.tv/BV1abc",
+    });
     expect(comment.message[5]).toEqual({ type: "vote", text: undefined, url: undefined });
   });
 

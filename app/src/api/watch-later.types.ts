@@ -2,10 +2,7 @@ import type { z } from "zod";
 
 import type { BilibiliAccount } from "../features/bilibili-session/types";
 import type { VideoListItemInfo } from "../types";
-import type {
-  WatchLaterItemSchema,
-  WatchLaterResponseSchema,
-} from "./watch-later.schema";
+import type { WatchLaterItemSchema, WatchLaterResponseSchema } from "./watch-later.schema";
 
 export type WatchLaterAccount = Pick<BilibiliAccount, "mid" | "generation">;
 export type WatchLaterItem = z.infer<typeof WatchLaterItemSchema>;

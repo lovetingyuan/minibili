@@ -42,9 +42,7 @@ export default function Blacklist() {
                   />
                 ))}
               </View>
-              {error ? (
-                <Text className={`text-sm ${theme.error.text}`}>黑名单加载失败</Text>
-              ) : null}
+              {error ? <Text className={`text-sm ${theme.error.text}`}>黑名单加载失败</Text> : null}
               {!error && blacklist.size === 0 ? (
                 <Text className={`py-2 text-sm ${theme.text.muted}`}>暂无黑名单用户</Text>
               ) : null}

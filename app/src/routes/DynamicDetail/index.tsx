@@ -103,9 +103,7 @@ function DynamicDetailPage({ route }: Props) {
       }
     >
       {card}
-      <Text className={`py-8 text-center text-sm ${theme.text.muted}`}>
-        此动态暂无可用评论参数
-      </Text>
+      <Text className={`py-8 text-center text-sm ${theme.text.muted}`}>此动态暂无可用评论参数</Text>
     </ScrollView>
   );
 }

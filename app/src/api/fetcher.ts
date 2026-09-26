@@ -1,13 +1,16 @@
 // import * as protobuf from 'protobufjs'
 
-import { UA } from '../constants';
-import { isBilibiliAuthExpiredCode, reportBilibiliAuthExpired } from '../features/bilibili-session/auth-expiration';
-import { showLoginRequiredAlert } from '../features/bilibili-session/login-required-alert';
+import { UA } from "../constants";
+import {
+  isBilibiliAuthExpiredCode,
+  reportBilibiliAuthExpired,
+} from "../features/bilibili-session/auth-expiration";
+import { showLoginRequiredAlert } from "../features/bilibili-session/login-required-alert";
 // import dm from '../constants/dm'
-import encWbi from '../utils/wbi';
-import bilibiliFetch from './bilibili-fetch';
-import { stringifyCommentOid } from './comment-json.helpers';
-import { getWBIInfo } from './user-nav';
+import encWbi from "../utils/wbi";
+import bilibiliFetch from "./bilibili-fetch";
+import { stringifyCommentOid } from "./comment-json.helpers";
+import { getWBIInfo } from "./user-nav";
 
 type ResponseType<D = any> = {
   code: number;
@@ -21,7 +24,7 @@ class ApiError extends Error {
   code: number;
   constructor(message: string, url: string, res: ResponseType) {
     super(message);
-    this.name = 'API Error';
+    this.name = "API Error";
     this.response = res;
     this.url = url;
     this.code = res.code;
@@ -35,63 +38,66 @@ export type RequestOptions = { withCookie?: boolean };
  * 网络异常等非接口错误返回 null。取值用鸭子类型，避免调用方依赖具体错误类。
  */
 export function getApiErrorCode(error: unknown): number | null {
-  if (typeof error !== 'object' || error === null || !('code' in error)) {
+  if (typeof error !== "object" || error === null || !("code" in error)) {
     return null;
   }
   const code = error.code;
-  return typeof code === 'number' && Number.isFinite(code) ? code : null;
+  return typeof code === "number" && Number.isFinite(code) ? code : null;
 }
 
 /** nav 是 wbi 签名的前置请求，登录态对它不构成错误，见下方错误码分支 */
-const NAV_URL = '/x/web-interface/nav';
+const NAV_URL = "/x/web-interface/nav";
 
 export function shouldSignWbiRequest(url: string) {
   return (
-    url.includes('/wbi/') ||
-    url.includes('/x/polymer/web-dynamic/v1/feed/space') ||
-    url.includes('/x/polymer/web-dynamic/v1/opus/feed/space')
+    url.includes("/wbi/") ||
+    url.includes("/x/polymer/web-dynamic/v1/feed/space") ||
+    url.includes("/x/polymer/web-dynamic/v1/opus/feed/space")
   );
 }
 
 // const root = protobuf.Root.fromJSON(dm as any)
 // const lp = root.lookupType('DmSegMobileReply')
 
-if (typeof __DEV__ === 'undefined') {
+if (typeof __DEV__ === "undefined") {
   try {
     // @ts-ignore
     globalThis.__DEV__ = false;
   } catch {}
 }
 
-export default async function request<D>(url: string, requestOptions: RequestOptions = {}): Promise<D> {
-  let requestUrl = url.startsWith('http') ? url : `https://api.bilibili.com${url}`;
+export default async function request<D>(
+  url: string,
+  requestOptions: RequestOptions = {},
+): Promise<D> {
+  let requestUrl = url.startsWith("http") ? url : `https://api.bilibili.com${url}`;
   if (__DEV__) {
     // oxlint-disable-next-line no-console
-    console.log('request url: ', url.slice(0, 150));
+    console.log("request url: ", url.slice(0, 150));
   }
   const headers = {
-    accept: 'application/json, text/plain, */*',
-    'accept-language': 'zh-CN,zh;q=0.9',
-    'cache-control': 'no-cache',
+    accept: "application/json, text/plain, */*",
+    "accept-language": "zh-CN,zh;q=0.9",
+    "cache-control": "no-cache",
     // 'sec-fetch-dest': 'empty',
     // 'sec-fetch-mode': 'cors',
     // 'sec-fetch-site': 'same-site',
-    origin: 'https://www.bilibili.com',
-    referer: 'https://space.bilibili.com',
-    'user-agent': UA, // 'user-agent': 'Mozilla/5.0',
+    origin: "https://www.bilibili.com",
+    referer: "https://space.bilibili.com",
+    "user-agent": UA, // 'user-agent': 'Mozilla/5.0',
   };
   const options = {
     headers,
     // referrerPolicy: 'no-referrer-when-downgrade',
-    referrerPolicy: 'strict-origin-when-cross-origin',
+    referrerPolicy: "strict-origin-when-cross-origin",
     body: null,
-    method: 'GET',
-    mode: 'cors',
-    credentials: 'include',
+    method: "GET",
+    mode: "cors",
+    credentials: "include",
   } satisfies Parameters<typeof fetch>[1];
   if (shouldSignWbiRequest(url)) {
     const wbiImg = await getWBIInfo(request);
-    const [_url, _query] = requestUrl.split('?');
+    const [_url, _query] = requestUrl.split("?");
     const params = new URLSearchParams(_query);
     const queryParams: Record<string, string> = {};
 
@@ -117,7 +123,9 @@ export default async function request<D>(url: string, requestOptions: RequestOpt
   //   })
   //   return objects.elems
   // }
-  let resText = await bilibiliFetch(requestUrl, options, requestOptions.withCookie !== false).then((r) => r.text());
+  let resText = await bilibiliFetch(requestUrl, options, requestOptions.withCookie !== false).then(
+    (r) => r.text(),
+  );
   const index = resText.indexOf('}{"code":');
   if (index > -1) {
     resText = resText.substring(index + 1);
@@ -128,7 +136,7 @@ export default async function request<D>(url: string, requestOptions: RequestOpt
     data: resText,
   } as ResponseType<D>;
   try {
-    if (url.includes('/x/v2/reply/')) {
+    if (url.includes("/x/v2/reply/")) {
       // oid这个属性是数字但是会溢出，所以这里处理成字符串
       resText = stringifyCommentOid(resText);
     }
@@ -141,7 +149,7 @@ export default async function request<D>(url: string, requestOptions: RequestOpt
     if (url === NAV_URL) {
       // nav 无论登没登录都会返回 wbi_img，-101 只表示「没登录」而不是请求失败：
       // 抛错会让所有 wbi 请求一起失败，所以这里只引导登录，data 继续往下返回。
-      showLoginRequiredAlert('登录 B站 后即可使用完整功能');
+      showLoginRequiredAlert("登录 B站 后即可使用完整功能");
     } else {
       throw expired;
     }
@@ -154,7 +162,7 @@ export default async function request<D>(url: string, requestOptions: RequestOpt
     if (__DEV__) {
       // 用 log 而不是 error：接口失败已经有页面提示，error 会再弹一层 LogBox 挡住界面
       // oxlint-disable-next-line no-console
-      console.log('api error', res.code, res.message, url.slice(0, 150));
+      console.log("api error", res.code, res.message, url.slice(0, 150));
     }
     return Promise.reject(new ApiError(`${res.code}:${res.message} ${url}`, url, res));
   }

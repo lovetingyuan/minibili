@@ -1,6 +1,6 @@
-import type { Child } from 'hono/jsx';
+import type { Child } from "hono/jsx";
 
-import type { VideoInfoArgue, VideoInfoData, VideoInfoOwner } from '../../../shared/video-info';
+import type { VideoInfoArgue, VideoInfoData, VideoInfoOwner } from "../../../shared/video-info";
 import {
   buildPlayerUrl,
   buildShareSearch,
@@ -9,7 +9,7 @@ import {
   formatDate,
   formatDuration,
   upgradeImageUrl,
-} from './format';
+} from "./format";
 
 const DESC_MAX_LENGTH = 160;
 
@@ -19,15 +19,15 @@ const DESC_MAX_LENGTH = 160;
  * 让会并排比较的图标视觉高度对齐（数值 ≈ 19.8 ÷ 图标实际墨迹高度）。
  */
 const ICON_SIZES: Record<string, string> = {
-  'mdi:account-group-outline': '1.2em',
-  'mdi:calendar-clock-outline': '0.9em',
-  'mdi:circle-multiple-outline': '1.2em',
-  'mdi:comment-text-multiple-outline': '0.9em',
-  'mdi:content-copy': '0.9em',
-  'mdi:open-in-new': '1.1em',
-  'mdi:playlist-play': '1.3em',
-  'mdi:share-outline': '1.3em',
-  'mdi:star-outline': '1.05em',
+  "mdi:account-group-outline": "1.2em",
+  "mdi:calendar-clock-outline": "0.9em",
+  "mdi:circle-multiple-outline": "1.2em",
+  "mdi:comment-text-multiple-outline": "0.9em",
+  "mdi:content-copy": "0.9em",
+  "mdi:open-in-new": "1.1em",
+  "mdi:playlist-play": "1.3em",
+  "mdi:share-outline": "1.3em",
+  "mdi:star-outline": "1.05em",
 };
 
 interface IconProps {
@@ -35,7 +35,7 @@ interface IconProps {
 }
 
 function Icon(props: IconProps) {
-  const size = ICON_SIZES[props.name] ?? '1em';
+  const size = ICON_SIZES[props.name] ?? "1em";
   return (
     <iconify-icon
       icon={props.name}
@@ -130,14 +130,14 @@ function OwnerRow(props: OwnerRowProps) {
         alt={`${owner.name} 的头像`}
         loading="lazy"
         referrerpolicy="no-referrer"
-        src={owner.face ? upgradeImageUrl(owner.face) : '/favicon.svg'}
+        src={owner.face ? upgradeImageUrl(owner.face) : "/favicon.svg"}
       />
       <div class="owner-info">
         <ExternalLink class="owner-name" href={`https://space.bilibili.com/${owner.mid}`}>
           {owner.name}
         </ExternalLink>
         <span class="owner-fans">
-          <span>{owner.fans === null ? '粉丝数未知' : `${formatCount(owner.fans)}粉丝`}</span>
+          <span>{owner.fans === null ? "粉丝数未知" : `${formatCount(owner.fans)}粉丝`}</span>
         </span>
       </div>
     </div>
@@ -154,26 +154,26 @@ function MetaRow(props: MetaRowProps) {
   const items: { icon: string; label: string; value: string }[] = [];
   if (data.pubdate) {
     items.push({
-      icon: 'mdi:calendar-clock-outline',
-      label: '投稿',
+      icon: "mdi:calendar-clock-outline",
+      label: "投稿",
       value: formatDate(data.pubdate),
     });
   }
   if (data.pages.length > 1) {
     items.push({
-      icon: 'mdi:playlist-play',
-      label: '分P',
+      icon: "mdi:playlist-play",
+      label: "分P",
       value: `${page}/${data.pages.length}`,
     });
   }
   if (data.tname) {
-    items.push({ icon: 'mdi:tag-outline', label: '分区', value: data.tname });
+    items.push({ icon: "mdi:tag-outline", label: "分区", value: data.tname });
   }
   // 切换分P 后按当前分片取值，拿不到时退回整部视频的时长
   const duration = data.pages[page - 1]?.duration ?? data.duration;
   items.push({
-    icon: 'mdi:clock-outline',
-    label: '时长',
+    icon: "mdi:clock-outline",
+    label: "时长",
     value: formatDuration(duration || data.duration),
   });
 
@@ -197,13 +197,13 @@ interface StatsRowProps {
 function StatsRow(props: StatsRowProps) {
   const { stat } = props.data;
   const items: { icon: string; label: string; value: number }[] = [
-    { icon: 'mdi:play-circle-outline', label: '播放', value: stat.view },
-    { icon: 'mdi:comment-text-multiple-outline', label: '弹幕', value: stat.danmaku },
-    { icon: 'mdi:thumb-up-outline', label: '点赞', value: stat.like },
-    { icon: 'mdi:circle-multiple-outline', label: '投币', value: stat.coin },
-    { icon: 'mdi:star-outline', label: '收藏', value: stat.favorite },
-    { icon: 'mdi:share-outline', label: '转发', value: stat.share },
-    { icon: 'mdi:comment-outline', label: '评论', value: stat.reply },
+    { icon: "mdi:play-circle-outline", label: "播放", value: stat.view },
+    { icon: "mdi:comment-text-multiple-outline", label: "弹幕", value: stat.danmaku },
+    { icon: "mdi:thumb-up-outline", label: "点赞", value: stat.like },
+    { icon: "mdi:circle-multiple-outline", label: "投币", value: stat.coin },
+    { icon: "mdi:star-outline", label: "收藏", value: stat.favorite },
+    { icon: "mdi:share-outline", label: "转发", value: stat.share },
+    { icon: "mdi:comment-outline", label: "评论", value: stat.reply },
   ];
 
   return (
@@ -314,9 +314,9 @@ export function PagesCard(props: PagesCardProps) {
         {data.pages.map((part) => (
           <a
             key={part.page}
-            class={part.page === page ? 'page-item is-active' : 'page-item'}
+            class={part.page === page ? "page-item is-active" : "page-item"}
             href={`/share${buildShareSearch(data.bvid, part.page)}`}
-            aria-current={part.page === page ? 'page' : undefined}
+            aria-current={part.page === page ? "page" : undefined}
           >
             <span class="page-index">{`P${part.page}`}</span>
             <span class="page-title">{part.part || `第 ${part.page} P`}</span>

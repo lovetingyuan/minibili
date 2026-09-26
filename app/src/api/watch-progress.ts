@@ -29,11 +29,7 @@ export function collectWatchProgress(records: HistoryRecord[]): WatchProgressMap
       continue;
     }
     map[bvid] = {
-      ratio: getProgressRatio(
-        record.progress ?? 0,
-        record.duration ?? 0,
-        record.is_finish === 1,
-      ),
+      ratio: getProgressRatio(record.progress ?? 0, record.duration ?? 0, record.is_finish === 1),
       // 接口的观看时间是秒，换算成毫秒便于与本地记录的更新时间比较
       updatedAt: record.view_at * 1000,
     };
@@ -54,13 +50,7 @@ export async function fetchWatchProgressMap(
   for (let page = 0; page < WATCH_PROGRESS_MAX_PAGES; page += 1) {
     let result: HistoryPage;
     try {
-      result = await fetchBilibiliHistory(
-        cursor,
-        request,
-        isCurrentAccount,
-        0,
-        HISTORY_PAGE_SIZE,
-      );
+      result = await fetchBilibiliHistory(cursor, request, isCurrentAccount, 0, HISTORY_PAGE_SIZE);
     } catch (error) {
       if (page === 0) {
         throw error;

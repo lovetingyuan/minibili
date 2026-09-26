@@ -30,7 +30,9 @@ export function useBilibiliBlacklist(sync = false) {
       revalidateOnReconnect: sync,
       keepPreviousData: false,
       shouldRetryOnError: (error) =>
-        !(error instanceof BilibiliSessionChangedError || error instanceof BilibiliAuthExpiredError),
+        !(
+          error instanceof BilibiliSessionChangedError || error instanceof BilibiliAuthExpiredError
+        ),
     },
   );
 

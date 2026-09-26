@@ -67,9 +67,7 @@ function DynamicShareButton(props: { item: DynamicItem }) {
       }}
     >
       <ThemedIcon icon={Share2} size={ACTION_ICON_SIZE} colorClassName={theme.icon.muted} />
-      <Text className={`text-xs ${theme.text.muted}`}>
-        {parseNumber(props.item.stats.forward)}
-      </Text>
+      <Text className={`text-xs ${theme.text.muted}`}>{parseNumber(props.item.stats.forward)}</Text>
     </Pressable>
   );
 }
@@ -90,14 +88,8 @@ function DynamicCommentButton(props: { item: DynamicItem; onPress?: () => void }
           : undefined
       }
     >
-      <ThemedIcon
-        icon={MessageCircle}
-        size={ACTION_ICON_SIZE}
-        colorClassName={theme.icon.muted}
-      />
-      <Text className={`text-xs ${theme.text.muted}`}>
-        {parseNumber(props.item.stats.comment)}
-      </Text>
+      <ThemedIcon icon={MessageCircle} size={ACTION_ICON_SIZE} colorClassName={theme.icon.muted} />
+      <Text className={`text-xs ${theme.text.muted}`}>{parseNumber(props.item.stats.comment)}</Text>
     </Pressable>
   );
 }

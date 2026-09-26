@@ -69,13 +69,7 @@ export function getRelationTagMembersKey(
   if (previousPage && previousPage.length < RELATION_TAG_MEMBERS_PAGE_SIZE) {
     return null;
   }
-  return [
-    "bilibili-relation-tag-members",
-    account.mid,
-    account.generation,
-    tagid,
-    pageIndex + 1,
-  ];
+  return ["bilibili-relation-tag-members", account.mid, account.generation, tagid, pageIndex + 1];
 }
 
 export function getRelationUpTagsKey(account: RelationTagAccount, mid: string | number) {
@@ -104,12 +98,7 @@ export function getSelectableRelationTags(tags: RelationTag[]) {
   return tags.filter((tag) => tag.tagid === RELATION_TAG_SPECIAL_ID || tag.tagid > 0);
 }
 
-function toUpInfo(member: {
-  mid: number;
-  uname: string;
-  face: string;
-  sign: string;
-}): UpInfo {
+function toUpInfo(member: { mid: number; uname: string; face: string; sign: string }): UpInfo {
   return {
     mid: member.mid,
     name: member.uname,
@@ -341,7 +330,6 @@ export async function setBilibiliUpRelationTags(
     dependencies,
     action: "设置分组",
     url: RELATION_TAG_ADD_USERS_URL,
-    body: (csrf) =>
-      new URLSearchParams({ fids: fid, tagids: submittedTagids.join(","), csrf }),
+    body: (csrf) => new URLSearchParams({ fids: fid, tagids: submittedTagids.join(","), csrf }),
   });
 }

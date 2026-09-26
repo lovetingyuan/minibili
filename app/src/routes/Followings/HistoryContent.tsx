@@ -38,9 +38,7 @@ export default function HistoryContent() {
               {item.title}
             </Text>
             <Text className={`text-sm ${theme.text.muted}`}>该视频暂不支持播放或已失效</Text>
-            <Text className={`text-xs ${theme.text.muted}`}>
-              {formatWatchTime(item.watchedAt)}
-            </Text>
+            <Text className={`text-xs ${theme.text.muted}`}>{formatWatchTime(item.watchedAt)}</Text>
           </View>
         )
       }

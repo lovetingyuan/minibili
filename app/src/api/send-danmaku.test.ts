@@ -33,8 +33,8 @@ function setup(
     .mockResolvedValue(Response.json(options.response ?? success));
   vi.stubGlobal("fetch", fetchMock);
   const dependencies: DanmakuSendRequestDependencies = {
-    readCookie: vi.fn(
-      async (): Promise<string | null> => ("cookie" in options ? (options.cookie ?? null) : cookie),
+    readCookie: vi.fn(async (): Promise<string | null> =>
+      "cookie" in options ? (options.cookie ?? null) : cookie,
     ),
     isCurrentAccount: vi.fn(options.current ?? (() => true)),
   };

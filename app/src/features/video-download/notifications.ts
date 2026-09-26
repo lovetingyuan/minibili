@@ -129,9 +129,7 @@ export async function showVideoDownloadNotification(content: VideoDownloadNotifi
 /**
  * 展示下载终态通知（完成/失败），允许用户划掉。
  */
-export async function finishVideoDownloadNotification(
-  content: VideoDownloadNotificationContent,
-) {
+export async function finishVideoDownloadNotification(content: VideoDownloadNotificationContent) {
   if (!isNotificationSupported()) {
     return;
   }

@@ -1,18 +1,18 @@
-import { Button } from '@/components/styled/rneui'
-import { ThemedIcon } from '@/components/ThemedIcon'
-import { Modal, Pressable, View } from 'react-native'
+import { Button } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { Modal, Pressable, View } from "react-native";
 import { theme } from "@/constants/theme";
-import { useStore } from '@/store'
+import { useStore } from "@/store";
 
 function ButtonsOverlay() {
-  const { overlayButtons, setOverlayButtons } = useStore()
+  const { overlayButtons, setOverlayButtons } = useStore();
   const dismiss = () => {
-    setOverlayButtons([])
-  }
+    setOverlayButtons([]);
+  };
   const Buttons = overlayButtons
-    .map(button => {
+    .map((button) => {
       if (!button) {
-        return null
+        return null;
       }
       return (
         <Button
@@ -21,8 +21,8 @@ function ButtonsOverlay() {
           titleClassName="flex-1 text-left"
           key={button.text}
           onPress={() => {
-            dismiss()
-            button.onPress()
+            dismiss();
+            button.onPress();
           }}
         >
           {button.icon ? (
@@ -35,12 +35,12 @@ function ButtonsOverlay() {
           ) : null}
           {button.text}
         </Button>
-      )
+      );
     })
-    .filter(Boolean)
+    .filter(Boolean);
 
   if (!Buttons.length) {
-    return null
+    return null;
   }
   return (
     <Modal
@@ -64,7 +64,7 @@ function ButtonsOverlay() {
         </View>
       </View>
     </Modal>
-  )
+  );
 }
 
-export default ButtonsOverlay
+export default ButtonsOverlay;

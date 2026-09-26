@@ -43,11 +43,7 @@ export function formatDownloadProgress(progress: {
   const sizeText = sizeKnown
     ? `${formatBytes(bytesWritten)} / ${formatBytes(totalBytes)}`
     : formatBytes(bytesWritten);
-  return [
-    sizeKnown ? `${percent}%` : "",
-    sizeText,
-    percent >= 100 ? "" : formatSpeed(speed),
-  ]
+  return [sizeKnown ? `${percent}%` : "", sizeText, percent >= 100 ? "" : formatSpeed(speed)]
     .filter(Boolean)
     .join(" · ");
 }

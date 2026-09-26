@@ -1,8 +1,8 @@
-import { type RouteProp, useNavigation, useRoute } from '@react-navigation/native'
-import { Avatar } from '@/components/Avatar'
-import { Text } from '@/components/styled/rneui'
-import { ThemedIcon } from '@/components/ThemedIcon'
-import UpName from '@/components/UpName'
+import { type RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { Avatar } from "@/components/Avatar";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import UpName from "@/components/UpName";
 import {
   CalendarDays,
   ChevronRight,
@@ -10,67 +10,67 @@ import {
   ListVideo,
   MessageCircle,
   Share2,
-} from 'lucide-react-native'
-import React from 'react'
-import { Linking, Pressable, View } from 'react-native'
+} from "lucide-react-native";
+import React from "react";
+import { Linking, Pressable, View } from "react-native";
 
-import { useWatchingCount } from '@/api/watching-count'
-import { VideoBadge } from '@/components/VideoBadge'
-import { theme } from '@/constants/theme'
-import type { NavigationProps, RootStackParamList } from '@/types'
-import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumber } from '@/utils'
+import { useWatchingCount } from "@/api/watching-count";
+import { VideoBadge } from "@/components/VideoBadge";
+import { theme } from "@/constants/theme";
+import type { NavigationProps, RootStackParamList } from "@/types";
+import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumber } from "@/utils";
 
-import { useVideoInfo } from '../../api/video-info'
-import { getVideoDescription } from './description'
-import { resolvePreviewNote, resolveVideoBadges } from './video-access'
-import type { VideoPreviewReason } from './video-access.types'
-import FavoriteButton from './FavoriteButton'
-import LikeButton from './LikeButton'
-import VideoDescription from './VideoDescription'
-import VideoPagesSheet from './VideoPagesSheet'
-import { formatVideoPageTitle } from './video-pages-sheet.helpers'
+import { useVideoInfo } from "../../api/video-info";
+import { getVideoDescription } from "./description";
+import { resolvePreviewNote, resolveVideoBadges } from "./video-access";
+import type { VideoPreviewReason } from "./video-access.types";
+import FavoriteButton from "./FavoriteButton";
+import LikeButton from "./LikeButton";
+import VideoDescription from "./VideoDescription";
+import VideoPagesSheet from "./VideoPagesSheet";
+import { formatVideoPageTitle } from "./video-pages-sheet.helpers";
 
-export default VideoInfo
+export default VideoInfo;
 
 function VideoInfo(props: {
-  currentPage: number
-  setCurrentPage: (p: number) => void
+  currentPage: number;
+  setCurrentPage: (p: number) => void;
   /** 试看类型，由播放器判定后上报；播放器里不再提示试看，说明放在这里 */
-  previewReason?: VideoPreviewReason | null
+  previewReason?: VideoPreviewReason | null;
 }) {
-  const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
-  const { data, isLoading } = useVideoInfo(route.params.bvid)
+  const route = useRoute<RouteProp<RootStackParamList, "Play">>();
+  const { data, isLoading } = useVideoInfo(route.params.bvid);
   const videoInfo = {
     ...route.params,
     ...data,
-  }
-  const { name, face, mid, date, title, desc, pages } = videoInfo
-  const videoDesc = getVideoDescription(desc, title)
+  };
+  const { name, face, mid, date, title, desc, pages } = videoInfo;
+  const videoDesc = getVideoDescription(desc, title);
   // 只用 view 接口就能确定的标识：番剧/影视的 pay=1 也可能是限时免费，不作为角标
   const accessBadges = resolveVideoBadges({
-    redirectUrl: videoInfo.redirectUrl ?? '',
+    redirectUrl: videoInfo.redirectUrl ?? "",
     isUpowerExclusive: videoInfo.isUpowerExclusive ?? false,
     isSteinGate: videoInfo.interactive ?? false,
     payRights: videoInfo.payRights ?? { arcPay: 0, pay: 0, ugcPay: 0 },
-  })
-  const previewNote = props.previewReason ? resolvePreviewNote(props.previewReason) : null
-  const [showPagesModal, setShowPagesModal] = React.useState(false)
+  });
+  const previewNote = props.previewReason ? resolvePreviewNote(props.previewReason) : null;
+  const [showPagesModal, setShowPagesModal] = React.useState(false);
 
-  const navigation = useNavigation<NavigationProps['navigation']>()
-  const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid)
+  const navigation = useNavigation<NavigationProps["navigation"]>();
+  const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid);
 
   function openUpSpace() {
     if (mid === undefined || !name) {
-      return
+      return;
     }
-    navigation.push('Dynamic', {
+    navigation.push("Dynamic", {
       user: {
         mid,
-        face: face ?? '',
+        face: face ?? "",
         name,
-        sign: '-',
+        sign: "-",
       },
-    })
+    });
   }
 
   return (
@@ -78,7 +78,7 @@ function VideoInfo(props: {
       <View className="mb-3 w-full flex-row justify-between">
         <View className="mr-1 min-w-0 flex-1 flex-row items-center">
           <Avatar
-            accessibilityLabel={`查看 ${name || 'UP主'} 的主页`}
+            accessibilityLabel={`查看 ${name || "UP主"} 的主页`}
             containerClassName={`shrink-0 ${theme.background.fillDisabled.bg}`}
             onPress={openUpSpace}
             rounded
@@ -87,7 +87,7 @@ function VideoInfo(props: {
             title={name?.slice(0, 1)}
           />
           <UpName
-            accessibilityLabel={`查看 ${name || 'UP主'} 的主页`}
+            accessibilityLabel={`查看 ${name || "UP主"} 的主页`}
             accessibilityRole="button"
             numberOfLines={1}
             ellipsizeMode="tail"
@@ -95,7 +95,7 @@ function VideoInfo(props: {
             onPress={openUpSpace}
             className="ml-3 mr-1 min-w-0 flex-1 text-base font-bold"
           >
-            {name || ''}
+            {name || ""}
           </UpName>
         </View>
         <View className="ml-1 flex-none flex-row items-center gap-1 px-2">
@@ -103,8 +103,8 @@ function VideoInfo(props: {
           <Text className={`text-sm ${theme.text.muted}`}>{parseDate(date, true)}</Text>
           <Text className={`ml-1 text-sm ${theme.text.muted}`}>
             {watchingCount
-              ? `${watchingCount.total === '1' ? '壹' : watchingCount.total}人在看`
-              : ' '}
+              ? `${watchingCount.total === "1" ? "壹" : watchingCount.total}人在看`
+              : " "}
           </Text>
         </View>
       </View>
@@ -115,7 +115,7 @@ function VideoInfo(props: {
             className={`text-xs leading-4 ${theme.warning.text}`}
             onPress={() => {
               if (videoInfo.argumentLink) {
-                Linking.openURL(videoInfo.argumentLink)
+                Linking.openURL(videoInfo.argumentLink);
               }
             }}
           >
@@ -133,7 +133,9 @@ function VideoInfo(props: {
       ) : null}
 
       {previewNote ? (
-        <Text className={`mb-1.5 text-xs italic ${theme.warning.text}`}>{`【${previewNote}】`}</Text>
+        <Text
+          className={`mb-1.5 text-xs italic ${theme.warning.text}`}
+        >{`【${previewNote}】`}</Text>
       ) : null}
 
       <Text selectable className={`text-lg font-bold leading-6 ${theme.text.heading}`}>
@@ -145,11 +147,11 @@ function VideoInfo(props: {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="打开分P列表"
-            android_ripple={{ color: 'transparent' }}
+            android_ripple={{ color: "transparent" }}
             className="flex-row items-center gap-2.5 rounded-2xl bg-slate-100 px-3 py-2 dark:bg-slate-900"
             style={({ pressed }) => ({ opacity: pressed ? 0.72 : 1 })}
             onPress={() => {
-              setShowPagesModal(true)
+              setShowPagesModal(true);
             }}
           >
             <View
@@ -173,7 +175,7 @@ function VideoInfo(props: {
             pages={pages}
             visible={showPagesModal}
             onClose={() => {
-              setShowPagesModal(false)
+              setShowPagesModal(false);
             }}
             onSelectPage={props.setCurrentPage}
           />
@@ -199,12 +201,12 @@ function VideoInfo(props: {
         <FavoriteButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.collectNum} />
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`分享视频，分享数 ${videoInfo.shareNum ?? '加载中'}`}
+          accessibilityLabel={`分享视频，分享数 ${videoInfo.shareNum ?? "加载中"}`}
           className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1"
           hitSlop={6}
           onPress={() => {
             if (name && title && route.params.bvid) {
-              handleShareVideo(name, title, route.params.bvid, props.currentPage)
+              handleShareVideo(name, title, route.params.bvid, props.currentPage);
             }
           }}
         >
@@ -219,5 +221,5 @@ function VideoInfo(props: {
         <Text className={`mt-3 italic ${theme.warning.text}`}>【该视频为交互视频，暂不支持】</Text>
       ) : null}
     </View>
-  )
+  );
 }

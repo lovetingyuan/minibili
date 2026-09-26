@@ -125,7 +125,9 @@ function VideoList(props: {
     [
       {
         text: watchLater.isAdded(video.aid) ? "从稍后再看移除" : "添加到稍后再看",
-        icon: watchLater.isAdded(video.aid) ? overlayIcons.removeWatchLater : overlayIcons.addWatchLater,
+        icon: watchLater.isAdded(video.aid)
+          ? overlayIcons.removeWatchLater
+          : overlayIcons.addWatchLater,
         onPress: () => {
           void watchLater.toggle({ aid: video.aid });
         },

@@ -263,9 +263,7 @@ export function mergeFollowingDynamicsReadState(options: {
  * latestId 为空表示还没拿到该 UP 的动态数据（`isNewer("", "")` 恒为 true），
  * 这种情况只能靠手动标记撑红点，否则已读状态永远消不掉。
  */
-export function isFollowingDynamicsUpUnread(
-  item: FollowingDynamicsUpReadState | undefined,
-) {
+export function isFollowingDynamicsUpUnread(item: FollowingDynamicsUpReadState | undefined) {
   if (!item) {
     return false;
   }

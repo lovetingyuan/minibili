@@ -18,10 +18,7 @@ export function getImageFileName(uri: string) {
 
   try {
     const rawPathname = new URL(uri).pathname;
-    const pathname = rawPathname.replace(
-      /^(.*\.(?:avif|gif|jpe?g|png|webp))@[^/?#]*$/i,
-      "$1",
-    );
+    const pathname = rawPathname.replace(/^(.*\.(?:avif|gif|jpe?g|png|webp))@[^/?#]*$/i, "$1");
     const basename = decodeURIComponent(pathname.split("/").filter(Boolean).pop() ?? "");
     const match = basename.match(SupportedImageExtension);
 

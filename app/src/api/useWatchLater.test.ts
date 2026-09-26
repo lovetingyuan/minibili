@@ -42,11 +42,7 @@ vi.mock("../features/bilibili-watch-later/mutations", () => ({
   watchLaterMutations: {
     subscribe: vi.fn(),
     getSnapshot: () => mocks.pending,
-    run: async (
-      _account: WatchLaterAccount,
-      _aid: string,
-      work: () => Promise<unknown>,
-    ) => work(),
+    run: async (_account: WatchLaterAccount, _aid: string, work: () => Promise<unknown>) => work(),
   },
 }));
 vi.mock("../features/bilibili-session/session", () => ({
@@ -154,7 +150,9 @@ describe("useModifyWatchLater", () => {
   });
 
   test("refreshes the list when the server result is unknown", async () => {
-    mocks.modify.mockRejectedValueOnce(new WatchLaterResultUnknownError("无法确认添加稍后再看结果"));
+    mocks.modify.mockRejectedValueOnce(
+      new WatchLaterResultUnknownError("无法确认添加稍后再看结果"),
+    );
     await expect(useModifyWatchLater().toggle(account, "42", true)).rejects.toBeInstanceOf(
       WatchLaterResultUnknownError,
     );

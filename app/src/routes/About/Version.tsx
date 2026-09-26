@@ -1,13 +1,13 @@
-import Constants from 'expo-constants';
-import * as Updates from 'expo-updates';
-import { Alert } from 'react-native';
+import Constants from "expo-constants";
+import * as Updates from "expo-updates";
+import { Alert } from "react-native";
 
-import { useAppUpdateInfo } from '@/api/check-update';
-import { serverUrl } from '@/constants';
-import useResolvedColor from '@/hooks/useResolvedColor';
-import useTheme from '@/hooks/useTheme';
+import { useAppUpdateInfo } from "@/api/check-update";
+import { serverUrl } from "@/constants";
+import useResolvedColor from "@/hooks/useResolvedColor";
+import useTheme from "@/hooks/useTheme";
 
-import TextAction from './TextAction';
+import TextAction from "./TextAction";
 
 export default Version;
 
@@ -17,7 +17,13 @@ function Version() {
   const updateTime: string = Updates.createdAt
     ? `${Updates.createdAt.toLocaleDateString()} ${Updates.createdAt.toLocaleTimeString()}`
     : Constants.expoConfig?.extra?.buildTime;
-  const { currentVersion, checkUpdate, loading: checkingUpdate, hasUpdate, showAlert } = useAppUpdateInfo();
+  const {
+    currentVersion,
+    checkUpdate,
+    loading: checkingUpdate,
+    hasUpdate,
+    showAlert,
+  } = useAppUpdateInfo();
   const handleCheckUpdate = () => {
     if (hasUpdate) {
       showAlert();
@@ -30,21 +36,21 @@ function Version() {
       text={`当前版本：${currentVersion}`}
       onTextLongPress={() => {
         Alert.alert(
-          '版本信息',
+          "版本信息",
           [
-            `当前版本：${currentVersion} (${Constants.expoConfig?.extra?.gitHash || '-'})`,
-            `更新时间：${updateTime || '-'}`,
+            `当前版本：${currentVersion} (${Constants.expoConfig?.extra?.gitHash || "-"})`,
+            `更新时间：${updateTime || "-"}`,
             `版本频道：${Updates.channel} - ${Updates.runtimeVersion}`,
             Updates.updateId && `更新ID：${Updates.updateId}`,
             __DEV__ && `本地接口地址：${serverUrl}`,
           ]
             .filter(Boolean)
-            .join('\n'),
+            .join("\n"),
         );
       }}
       buttons={[
         {
-          text: hasUpdate ? 'APP有更新🎉' : '检查更新',
+          text: hasUpdate ? "APP有更新🎉" : "检查更新",
           loading: hasUpdate ? false : checkingUpdate,
           onPress: handleCheckUpdate,
           color: hasUpdate ? updateHighlightColor : undefined,

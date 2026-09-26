@@ -27,7 +27,11 @@ export function buildVideoFileName(input: { title?: string; page?: number; bvid?
 /**
  * 通知标题：多P 视频带上分P 信息，方便在通知栏区分。
  */
-export function buildVideoDownloadTitle(input: { title?: string; page?: number; pageTitle?: string }) {
+export function buildVideoDownloadTitle(input: {
+  title?: string;
+  page?: number;
+  pageTitle?: string;
+}) {
   const { title, page = 1, pageTitle } = input;
   const base = sanitizeFileName(title ?? "") || "视频";
   if (page <= 1) {

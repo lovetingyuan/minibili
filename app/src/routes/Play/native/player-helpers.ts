@@ -327,10 +327,7 @@ export function shouldAutoStartPlayback(networkUsage: NetworkUsage, hasSource: b
  * WiFi 下尚未开播也返回 true，保持"进页面即预加载"的既有行为，
  * 不会因为先挂地址再开播而多重建一次播放器。
  */
-export function shouldLoadVideoStream(options: {
-  networkUsage: NetworkUsage;
-  started: boolean;
-}) {
+export function shouldLoadVideoStream(options: { networkUsage: NetworkUsage; started: boolean }) {
   return options.started || options.networkUsage === "wifi";
 }
 

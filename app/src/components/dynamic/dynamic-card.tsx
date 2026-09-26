@@ -191,9 +191,7 @@ export function DynamicCard(props: {
   );
   return (
     <View
-      className={
-        detail ? "bg-white px-3 py-4 dark:bg-slate-950" : "bg-white p-4 dark:bg-slate-950"
-      }
+      className={detail ? "bg-white px-3 py-4 dark:bg-slate-950" : "bg-white p-4 dark:bg-slate-950"}
     >
       {onPress ? <Pressable onPress={onPress}>{body}</Pressable> : <View>{body}</View>}
       {props.showActions === false ? null : (

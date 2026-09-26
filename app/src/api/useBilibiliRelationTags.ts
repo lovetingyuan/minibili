@@ -129,20 +129,11 @@ export function useBilibiliRelationTagMembers(tagid?: number, enabled = true) {
     }
   }
   const lastPage = pages.at(-1);
-  const hasMore = lastPage
-    ? lastPage.length === RELATION_TAG_MEMBERS_PAGE_SIZE
-    : false;
+  const hasMore = lastPage ? lastPage.length === RELATION_TAG_MEMBERS_PAGE_SIZE : false;
   const isLoadingMore = isLoading || (!error && size > pages.length && hasMore);
 
   async function loadMore() {
-    if (
-      !active ||
-      pending.current ||
-      isValidating ||
-      isLoadingMore ||
-      error ||
-      !hasMore
-    ) {
+    if (!active || pending.current || isValidating || isLoadingMore || error || !hasMore) {
       return;
     }
     pending.current = true;
@@ -374,10 +365,7 @@ export function useRelationTagActions() {
 
   function setUpGroups(mid: string | number, tagids: number[]) {
     return run(`set-up:${mid}`, async (current) => {
-      const previousTagids = getCachedData<number[]>(
-        cache,
-        getRelationUpTagsKey(current, mid),
-      );
+      const previousTagids = getCachedData<number[]>(cache, getRelationUpTagsKey(current, mid));
       try {
         await setBilibiliUpRelationTags(
           { account: current, mid, tagids },
@@ -389,18 +377,11 @@ export function useRelationTagActions() {
         }
         await refreshChangedGroups(current, tagids);
         await revalidateSpecialFollowUps(current);
-        throw new RelationTagResultUnknownError(
-          `${cause.message}，已刷新分组，请确认结果后再操作`,
-        );
+        throw new RelationTagResultUnknownError(`${cause.message}，已刷新分组，请确认结果后再操作`);
       }
       // 分组人数由 B站 异步统计，写成功后立刻拉取往往还是旧值，这里先本地更新再重试
-      void syncRelationTagCounts(
-        mutateCache,
-        cache,
-        current,
-        mid,
-        tagids,
-        () => bilibiliSession.isCurrentAccount(current),
+      void syncRelationTagCounts(mutateCache, cache, current, mid, tagids, () =>
+        bilibiliSession.isCurrentAccount(current),
       );
       if (previousTagids) {
         // 用 Set 做写入前后的分组差异比较，避免在 filter 里反复线性查找

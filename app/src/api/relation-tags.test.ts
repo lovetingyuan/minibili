@@ -126,9 +126,9 @@ describe("Bilibili relation tags", () => {
       current = false;
       return tags;
     });
-    await expect(
-      fetchBilibiliRelationTags(account, request, () => current),
-    ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
+    await expect(fetchBilibiliRelationTags(account, request, () => current)).rejects.toBeInstanceOf(
+      BilibiliSessionChangedError,
+    );
   });
 });
 
@@ -192,9 +192,9 @@ describe("Bilibili relation tag writes", () => {
   test("拒绝内置分组 ID", async () => {
     const { request, dependencies } = setup();
     for (const tagid of [0, -10, 1.5, Number.NaN]) {
-      await expect(
-        deleteBilibiliRelationTag({ account, tagid }, dependencies),
-      ).rejects.toThrow("分组 ID 无效");
+      await expect(deleteBilibiliRelationTag({ account, tagid }, dependencies)).rejects.toThrow(
+        "分组 ID 无效",
+      );
     }
     expect(request).not.toHaveBeenCalled();
   });
@@ -258,7 +258,9 @@ describe("Bilibili relation tag writes", () => {
   });
 
   test("无法确认结果时提示用户先刷新分组", async () => {
-    const request = vi.fn<typeof fetch>().mockRejectedValue(new TypeError("Network request failed"));
+    const request = vi
+      .fn<typeof fetch>()
+      .mockRejectedValue(new TypeError("Network request failed"));
     vi.stubGlobal("fetch", request);
     const dependencies: RelationTagRequestDependencies = {
       readCookie: vi.fn(async () => cookie),

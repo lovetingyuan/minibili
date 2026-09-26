@@ -155,9 +155,9 @@ describe("top-level comment", () => {
 
   test("validates the message before reading credentials", async () => {
     const { request, dependencies } = setup();
-    await expect(
-      addComment(account, { ...input, message: "   " }, dependencies),
-    ).rejects.toThrow("请输入评论内容");
+    await expect(addComment(account, { ...input, message: "   " }, dependencies)).rejects.toThrow(
+      "请输入评论内容",
+    );
     await expect(
       addComment(account, { ...input, message: "😀".repeat(1001) }, dependencies),
     ).rejects.toThrow("1000");
@@ -332,9 +332,9 @@ describe("delete comment", () => {
   test("requires a login before deleting", async () => {
     const { request, dependencies } = setup();
     dependencies.readCookie = vi.fn(async () => null);
-    await expect(deleteComment(account, { target, sourceUrl }, dependencies)).rejects.toBeInstanceOf(
-      CommentLoginRequiredError,
-    );
+    await expect(
+      deleteComment(account, { target, sourceUrl }, dependencies),
+    ).rejects.toBeInstanceOf(CommentLoginRequiredError);
     expect(request).not.toHaveBeenCalled();
   });
 
@@ -349,9 +349,9 @@ describe("delete comment", () => {
   test("marks a network failure as uncertain without retrying", async () => {
     const { request, dependencies } = setup();
     request.mockRejectedValue(new Error("offline"));
-    await expect(deleteComment(account, { target, sourceUrl }, dependencies)).rejects.toBeInstanceOf(
-      CommentResultUnknownError,
-    );
+    await expect(
+      deleteComment(account, { target, sourceUrl }, dependencies),
+    ).rejects.toBeInstanceOf(CommentResultUnknownError);
     expect(request).toHaveBeenCalledOnce();
   });
 });

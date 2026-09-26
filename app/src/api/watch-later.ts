@@ -35,14 +35,12 @@ export function getWatchLaterKey(account: WatchLaterAccount): WatchLaterKey {
 }
 
 function getLoginRequiredCode(error: unknown) {
-  return (
-    error instanceof Error &&
+  return error instanceof Error &&
     "code" in error &&
     typeof error.code === "number" &&
     isBilibiliAuthExpiredCode(error.code)
-      ? error.code
-      : null
-  );
+    ? error.code
+    : null;
 }
 
 function assertCurrentAccount(isCurrentAccount: () => boolean) {
@@ -113,7 +111,11 @@ export async function fetchBilibiliWatchLater(
     }
     const code = getLoginRequiredCode(error);
     if (code) {
-      throw reportBilibiliAuthExpired(code, error instanceof Error ? error.message : undefined, WATCH_LATER_LIST_URL);
+      throw reportBilibiliAuthExpired(
+        code,
+        error instanceof Error ? error.message : undefined,
+        WATCH_LATER_LIST_URL,
+      );
     }
     throw error;
   }

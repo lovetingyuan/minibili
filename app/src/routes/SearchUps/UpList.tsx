@@ -87,9 +87,7 @@ function SearchUpItem(props: { up: UpSearchItem }) {
           rounded
           size={40}
           source={
-            props.up.face
-              ? { uri: parseImgUrl(props.up.face, getImagePixelSize(40)) }
-              : undefined
+            props.up.face ? { uri: parseImgUrl(props.up.face, getImagePixelSize(40)) } : undefined
           }
         />
         <UpName
@@ -106,9 +104,7 @@ function SearchUpItem(props: { up: UpSearchItem }) {
         </UpName>
       </TouchableOpacity>
       {typeof props.up.fans === "number" ? (
-        <Text className={`${theme.text.muted} px-2 text-sm`}>
-          {parseNumber(props.up.fans)}粉丝
-        </Text>
+        <Text className={`${theme.text.muted} px-2 text-sm`}>{parseNumber(props.up.fans)}粉丝</Text>
       ) : null}
       <Button
         size="sm"

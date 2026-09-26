@@ -75,9 +75,9 @@ module.exports = {
     [
       "expo-media-library",
       {
-        "photosPermission": "允许 MiniBili 访问你的照片。",
-        "savePhotosPermission": "允许 MiniBili 保存图片到你的相册。",
-        "granularPermissions": ["photo"],
+        photosPermission: "允许 MiniBili 访问你的照片。",
+        savePhotosPermission: "允许 MiniBili 保存图片到你的相册。",
+        granularPermissions: ["photo"],
       },
     ],
     [

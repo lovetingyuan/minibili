@@ -1,13 +1,13 @@
-import { useNavigation } from '@react-navigation/native'
-import { ChevronRight, Clock, History, Star } from 'lucide-react-native'
-import { Pressable, Text, View } from 'react-native'
+import { useNavigation } from "@react-navigation/native";
+import { ChevronRight, Clock, History, Star } from "lucide-react-native";
+import { Pressable, Text, View } from "react-native";
 
-import { ThemedIcon } from '@/components/ThemedIcon'
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { theme } from "@/constants/theme";
-import type { MainTabNavigationProp } from '@/types'
+import type { MainTabNavigationProp } from "@/types";
 
 export default function LibraryLinks() {
-  const navigation = useNavigation<MainTabNavigationProp>()
+  const navigation = useNavigation<MainTabNavigationProp>();
 
   return (
     <View className="gap-1">
@@ -15,7 +15,7 @@ export default function LibraryLinks() {
         accessibilityRole="button"
         accessibilityLabel="我的收藏"
         className="flex-row items-center gap-4 rounded-lg bg-transparent px-0 py-3"
-        onPress={() => navigation.navigate('Favorites')}
+        onPress={() => navigation.navigate("Favorites")}
       >
         <ThemedIcon size={20} icon={Star} colorClassName={theme.primary.accent} />
         <View className="flex-1 items-start justify-center">
@@ -27,7 +27,7 @@ export default function LibraryLinks() {
         accessibilityRole="button"
         accessibilityLabel="观看历史"
         className="flex-row items-center gap-4 rounded-lg bg-transparent px-0 py-3"
-        onPress={() => navigation.navigate('History')}
+        onPress={() => navigation.navigate("History")}
       >
         <ThemedIcon size={20} icon={History} colorClassName={theme.primary.accent} />
         <View className="flex-1 items-start justify-center">
@@ -39,7 +39,7 @@ export default function LibraryLinks() {
         accessibilityRole="button"
         accessibilityLabel="稍后再看"
         className="flex-row items-center gap-4 rounded-lg bg-transparent px-0 py-3"
-        onPress={() => navigation.navigate('WatchLater')}
+        onPress={() => navigation.navigate("WatchLater")}
       >
         <ThemedIcon size={20} icon={Clock} colorClassName={theme.primary.accent} />
         <View className="flex-1 items-start justify-center">
@@ -48,5 +48,5 @@ export default function LibraryLinks() {
         <ThemedIcon icon={ChevronRight} size={18} colorClassName={theme.icon.muted} />
       </Pressable>
     </View>
-  )
+  );
 }

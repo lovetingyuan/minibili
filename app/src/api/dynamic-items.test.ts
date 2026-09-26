@@ -469,7 +469,14 @@ describe("dynamic item mapping", () => {
             type: "DYNAMIC_TYPE_NONE",
             basic: { comment_id_str: "", comment_type: 0 },
             modules: {
-              module_author: { mid: 0, name: "", face: "", pub_action: "", pub_time: "", pub_ts: 0 },
+              module_author: {
+                mid: 0,
+                name: "",
+                face: "",
+                pub_action: "",
+                pub_time: "",
+                pub_ts: 0,
+              },
               module_dynamic: {
                 desc: null,
                 topic: null,

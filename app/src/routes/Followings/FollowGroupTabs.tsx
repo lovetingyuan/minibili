@@ -1,12 +1,12 @@
-import React from 'react';
-import { Plus } from 'lucide-react-native';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import React from "react";
+import { Plus } from "lucide-react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 
-import { Text } from '@/components/styled/rneui';
-import { ThemedIcon } from '@/components/ThemedIcon';
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { theme } from "@/constants/theme";
 
-import type { FollowGroupTabsProps } from './FollowGroups.types';
+import type { FollowGroupTabsProps } from "./FollowGroups.types";
 
 export default function FollowGroupTabs({
   tabs,
@@ -65,13 +65,15 @@ export default function FollowGroupTabs({
               accessibilityRole="tab"
               accessibilityLabel={`${tab.name}，${tab.count} 个关注`}
               accessibilityState={{ selected: selectedKey === tab.key, disabled }}
-              accessibilityHint={tab.custom ? '长按打开分组操作菜单' : undefined}
+              accessibilityHint={tab.custom ? "长按打开分组操作菜单" : undefined}
               disabled={disabled}
               delayLongPress={300}
               onLayout={({ nativeEvent }) => {
                 const { x, width } = nativeEvent.layout;
                 tabWidthsRef.current[tab.key] = width;
-                setOffsets((previous) => (previous[tab.key] === x ? previous : { ...previous, [tab.key]: x }));
+                setOffsets((previous) =>
+                  previous[tab.key] === x ? previous : { ...previous, [tab.key]: x },
+                );
               }}
               onLongPress={() => {
                 onLongPress(tab);

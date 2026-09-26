@@ -30,9 +30,7 @@ export function lockPortraitOrientation() {
   if (!screenOrientation) {
     return;
   }
-  void screenOrientation
-    .lockAsync(screenOrientation.OrientationLock.PORTRAIT_UP)
-    .catch(() => {});
+  void screenOrientation.lockAsync(screenOrientation.OrientationLock.PORTRAIT_UP).catch(() => {});
 }
 
 /**

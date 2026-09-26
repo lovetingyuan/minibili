@@ -47,7 +47,7 @@ function getbuvid3(mid = 5201314) {
     headers: {
       accept:
 */
-        // "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+// "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 /*
       "accept-language": "zh-CN,zh;q=0.9",
       "cache-control": "no-cache",
@@ -71,7 +71,7 @@ function getbuvid4(buvid3: string, uuid: string) {
   return fetch("https://api.bilibili.com/x/frontend/finger/spi", {
     headers: {
 */
-      // accept: "*/*",
+// accept: "*/*",
 /*
       "accept-language": "zh-CN,zh;q=0.9",
       "cache-control": "no-cache",
@@ -289,7 +289,7 @@ function wuzhi(now: number, buvid3: string, uuid: string) {
   return fetch("https://api.bilibili.com/x/internal/gaia-gateway/ExClimbWuzhi", {
     headers: {
 */
-      // accept: "*/*",
+// accept: "*/*",
 /*
       "accept-language": "zh-CN,zh;q=0.9",
       "cache-control": "no-cache",

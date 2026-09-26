@@ -16,8 +16,7 @@ import type { VideoDescriptionProps, VideoDescriptionViewProps } from "./VideoDe
  * 折叠时“显示更多”浮在最后一行行尾，用卡片底色盖住压在下方的文字，
  * 高度与 leading-6 的行高一致，正好对齐最后一行。
  */
-const COLLAPSED_TOGGLE_CLASS =
-  "absolute bottom-2.5 right-3 bg-slate-50 pl-1.5 dark:bg-slate-900";
+const COLLAPSED_TOGGLE_CLASS = "absolute bottom-2.5 right-3 bg-slate-50 pl-1.5 dark:bg-slate-900";
 const EXPANDED_TOGGLE_CLASS = "mt-1 self-end px-1";
 
 export function VideoDescriptionView(props: VideoDescriptionViewProps) {

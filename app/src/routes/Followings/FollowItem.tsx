@@ -1,103 +1,103 @@
-import { useNavigation } from '@react-navigation/native'
-import { Avatar } from '@/components/Avatar'
-import { Text } from '@/components/styled/rneui'
-import UpName from '@/components/UpName'
-import { clsx } from 'clsx'
-import { Alert, Pressable, TouchableOpacity, View } from 'react-native'
+import { useNavigation } from "@react-navigation/native";
+import { Avatar } from "@/components/Avatar";
+import { Text } from "@/components/styled/rneui";
+import UpName from "@/components/UpName";
+import { clsx } from "clsx";
+import { Alert, Pressable, TouchableOpacity, View } from "react-native";
 
-import { theme } from '@/constants/theme'
-import { overlayIcons } from '@/constants/overlay-icons'
-import { useFollowActions } from '@/hooks/useFollowActions'
+import { theme } from "@/constants/theme";
+import { overlayIcons } from "@/constants/overlay-icons";
+import { useFollowActions } from "@/hooks/useFollowActions";
 
-import { useStore } from '../../store'
-import { useMarkFollowingDynamicsUnread } from '../../store/actions'
-import { useUpHasNewDynamic } from '../../store/derives'
-import type { NavigationProps, UpInfo } from '../../types'
-import { getImagePixelSize, parseImgUrl } from '../../utils'
+import { useStore } from "../../store";
+import { useMarkFollowingDynamicsUnread } from "../../store/actions";
+import { useUpHasNewDynamic } from "../../store/derives";
+import type { NavigationProps, UpInfo } from "../../types";
+import { getImagePixelSize, parseImgUrl } from "../../utils";
 
 type FollowItemProps = {
-  item: UpInfo
+  item: UpInfo;
   /** 特别关注的 UP：名称使用主题色并加粗 */
-  highlight?: boolean
-  onSetGroups?: (up: UpInfo) => void
-}
+  highlight?: boolean;
+  onSetGroups?: (up: UpInfo) => void;
+};
 
 function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
-  const { face, name, sign, mid } = item
-  const { livingUps, setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore()
-  const hasNewDynamic = useUpHasNewDynamic(mid)
-  const actions = useFollowActions()
-  const markUnread = useMarkFollowingDynamicsUnread()
-  const navigation = useNavigation<NavigationProps['navigation']>()
+  const { face, name, sign, mid } = item;
+  const { livingUps, setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore();
+  const hasNewDynamic = useUpHasNewDynamic(mid);
+  const actions = useFollowActions();
+  const markUnread = useMarkFollowingDynamicsUnread();
+  const navigation = useNavigation<NavigationProps["navigation"]>();
 
   const gotoDynamic = () => {
-    navigation.navigate('Dynamic', {
+    navigation.navigate("Dynamic", {
       user: {
         mid,
         face,
         name,
         sign,
       },
-    })
-  }
+    });
+  };
 
   const gotoLivePage = () => {
-    const liveUrl = livingUps[mid]
+    const liveUrl = livingUps[mid];
     if (liveUrl) {
-      navigation.navigate('Living', {
+      navigation.navigate("Living", {
         url: liveUrl,
         title: `${name}的直播间`,
         user: { mid, name },
-      })
+      });
     }
-  }
+  };
 
   const buttons = () =>
     [
       onSetGroups && {
-        text: '设置分组',
+        text: "设置分组",
         icon: overlayIcons.setGroup,
         onPress: () => {
-          onSetGroups(item)
+          onSetGroups(item);
         },
       },
       !actions.disabled && {
-        text: '取消关注',
+        text: "取消关注",
         icon: overlayIcons.unfollow,
         onPress: () => {
-          Alert.alert(`确定取消关注「${name}」吗？`, '', [
-            { text: '关闭' },
+          Alert.alert(`确定取消关注「${name}」吗？`, "", [
+            { text: "关闭" },
             {
-              text: '确定',
+              text: "确定",
               onPress() {
-                void actions.unfollow(item)
+                void actions.unfollow(item);
               },
             },
-          ])
+          ]);
         },
       },
       !hasNewDynamic && {
-        text: '标记未读',
+        text: "标记未读",
         icon: overlayIcons.markUnread,
         onPress: () => {
-          markUnread(mid)
+          markUnread(mid);
         },
       },
       {
-        text: '查看头像',
+        text: "查看头像",
         icon: overlayIcons.viewAvatar,
         onPress: () => {
-          setCurrentImageIndex(0)
-          setImagesList([{ src: face, width: 0, height: 0, ratio: 1 }])
+          setCurrentImageIndex(0);
+          setImagesList([{ src: face, width: 0, height: 0, ratio: 1 }]);
         },
       },
-    ].filter(v => !!v && typeof v === 'object')
+    ].filter((v) => !!v && typeof v === "object");
 
   return (
     <TouchableOpacity
       activeOpacity={0.6}
       onLongPress={() => {
-        setOverlayButtons(buttons())
+        setOverlayButtons(buttons());
       }}
       className="mx-1 mb-6 flex-1 items-center"
       onPress={gotoDynamic}
@@ -112,9 +112,9 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
         />
         {livingUps[mid] ? (
           <Pressable
-            onPress={e => {
-              e.stopPropagation()
-              gotoLivePage()
+            onPress={(e) => {
+              e.stopPropagation();
+              gotoLivePage();
             }}
             className="absolute inset-0 h-[52px] w-[52px] items-center justify-center rounded-full bg-slate-950/60"
           >
@@ -124,7 +124,7 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
         {hasNewDynamic ? (
           <View
             className={clsx(
-              'absolute right-0 top-0 h-3.5 w-3.5 rounded-full border-2 border-white dark:border-slate-900',
+              "absolute right-0 top-0 h-3.5 w-3.5 rounded-full border-2 border-white dark:border-slate-900",
               theme.secondary.bg,
             )}
           />
@@ -133,7 +133,7 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
       <UpName
         mid={mid}
         className={`flex-1 shrink-0 py-2 text-center text-sm ${
-          highlight ? `font-bold ${theme.primary.text}` : ''
+          highlight ? `font-bold ${theme.primary.text}` : ""
         }`}
         numberOfLines={2}
         ellipsizeMode="tail"
@@ -141,7 +141,7 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
         {name}
       </UpName>
     </TouchableOpacity>
-  )
+  );
 }
 
-export default FollowItem
+export default FollowItem;

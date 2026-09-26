@@ -90,11 +90,7 @@ describe("Bilibili watch later list", () => {
         },
       ]),
     );
-    expect(items.map((item) => item.aid)).toEqual([
-      "117171959238719",
-      "42",
-      "43",
-    ]);
+    expect(items.map((item) => item.aid)).toEqual(["117171959238719", "42", "43"]);
     expect(items[1]).toMatchObject({ title: "不可用的视频", video: null });
     expect(items[1].progressRatio).toBeCloseTo(15 / 734);
     expect(items[2]).toMatchObject({ title: "不可用的视频", video: null, progressRatio: 0 });
@@ -124,7 +120,10 @@ describe("Bilibili watch later mutations", () => {
     const fetchMock = mockFetch({ code: 0, message: "OK", ttl: 1 });
     const change = { aid: "117171959238719", added: true };
     await expect(
-      modifyWatchLater(account, change, { readCookie: async () => cookie, isCurrentAccount: () => true }),
+      modifyWatchLater(account, change, {
+        readCookie: async () => cookie,
+        isCurrentAccount: () => true,
+      }),
     ).resolves.toEqual(change);
 
     const [url, init] = fetchMock.mock.calls[0];
@@ -210,7 +209,10 @@ describe("Bilibili watch later mutations", () => {
       modifyWatchLater(
         account,
         { aid: "42", added: true },
-        { readCookie: async () => "SESSDATA=abc; DedeUserID=999; bili_jct=token", isCurrentAccount: () => true },
+        {
+          readCookie: async () => "SESSDATA=abc; DedeUserID=999; bili_jct=token",
+          isCurrentAccount: () => true,
+        },
       ),
     ).rejects.toBeInstanceOf(BilibiliSessionChangedError);
 

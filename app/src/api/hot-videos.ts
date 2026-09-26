@@ -1,10 +1,10 @@
-import React from 'react';
-import useSWRInfinite from 'swr/infinite';
-import type { z } from 'zod';
+import React from "react";
+import useSWRInfinite from "swr/infinite";
+import type { z } from "zod";
 
-import { usePullToRefresh } from '../hooks/usePullToRefresh';
-import type { VideoItemResponseSchema } from './hot-videos.schema';
-import request from './fetcher';
+import { usePullToRefresh } from "../hooks/usePullToRefresh";
+import type { VideoItemResponseSchema } from "./hot-videos.schema";
+import request from "./fetcher";
 
 export type HotVideoResponse = z.infer<typeof VideoItemResponseSchema>;
 
@@ -61,7 +61,7 @@ export function useHotVideos() {
       return a.concat(b.list);
     }, [] as HotVideoResponse[]) || [];
 
-  const isLoadingMore = isLoading || (size > 0 && !!data && typeof data[size - 1] === 'undefined');
+  const isLoadingMore = isLoading || (size > 0 && !!data && typeof data[size - 1] === "undefined");
   const isReachingEnd = !!data && !!data[data.length - 1]?.no_more;
   const list = hotVideos.map(getVideo);
   // 列表会被后台自动重新校验，刷新图标只在用户下拉时出现
