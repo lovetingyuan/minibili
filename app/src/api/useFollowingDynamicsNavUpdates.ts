@@ -2,7 +2,7 @@ import useSWR, { useSWRConfig } from "swr";
 
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
-import { useStore } from "../store";
+import { getStoreMethods, useStore } from "../store";
 import request from "./fetcher";
 import { fetchFollowingDynamicsNavUpdates } from "./following-dynamics";
 import type {
@@ -29,7 +29,8 @@ function useFollowingDynamicsNavAccount() {
   return account;
 }
 
-function getFollowingDynamicsNavKey(
+/** nav 轮询的 SWR key：手动刷新与「动态更新轮询」触发复用同一份构造逻辑 */
+export function getFollowingDynamicsNavKey(
   account: FollowingDynamicsAccount | null,
 ): FollowingDynamicsNavKey | null {
   return account ? [FOLLOWING_DYNAMICS_NAV_KEY, account.mid, account.generation] : null;
@@ -49,8 +50,13 @@ export function useFollowingDynamicsNavUpdates() {
       if (!account) {
         throw new Error("关注动态未读轮询缺少当前账号");
       }
-      return fetchFollowingDynamicsNavUpdates(request, () =>
-        bilibiliSession.isCurrentAccount(account),
+      // 基线不进 key（状态写入不该额外触发请求），这里按调用时的最新值决定翻页深度
+      const readBaseline =
+        getStoreMethods().get$followingDynamicsUpdateMap()[account.mid]?.baseline ?? "";
+      return fetchFollowingDynamicsNavUpdates(
+        request,
+        () => bilibiliSession.isCurrentAccount(account),
+        { readBaseline },
       );
     },
     {
@@ -64,7 +70,8 @@ export function useFollowingDynamicsNavUpdates() {
 }
 
 /**
- * 关注页用户主动下拉时重新查询 feed/nav，让小红点与「关注」tab 角标拿到最新的未读数据。
+ * 关注页用户主动下拉、「动态」更新轮询发现新动态时，重新查询 feed/nav，
+ * 让小红点与「关注」tab 角标拿到最新的未读数据。
  * 复用轮询的同一个 SWR key，数据回来后仍由 FollowingDynamicsUnreadManager 合并进 store；
  * 这里只是命令式地触发一次重新校验，不额外订阅轮询，所以挂载时不会多发请求。
  */

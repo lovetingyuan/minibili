@@ -42,8 +42,14 @@ const FOLLOWING_DYNAMIC_DEVICE = JSON.stringify({
   spmid: "333.1365",
 });
 
-/** feed/nav 一次拉取最多翻多少页，避免长时间未打开时把请求打爆 */
-export const FOLLOWING_DYNAMICS_NAV_MAX_PAGES = 5;
+/**
+ * feed/nav 一次拉取最多翻多少页。
+ * 未读积压多时要一直翻到基线之前，这里只作为兜底上限，避免把请求打爆。
+ */
+export const FOLLOWING_DYNAMICS_NAV_MAX_PAGES = 10;
+
+/** feed/nav 翻页之间的间隔：连续请求同一个接口容易触发 B站 风控限流 */
+export const FOLLOWING_DYNAMICS_NAV_PAGE_DELAY = 300;
 
 export function buildFollowingDynamicsUrl(page = 1, offset = "") {
   const params = new URLSearchParams({
@@ -171,16 +177,23 @@ export async function fetchFollowingDynamicsNavPage(
 /**
  * 按 offset 翻页拉取最近动态，直到 has_more=false 或触到页数上限。
  * 同一 UP 只保留最大的可见 id_str，避免旧记录或已隐藏动态触发红点。
+ * 传入 readBaseline（上次看「动态」列表时的最新动态 id）时会一直翻到基线之前，
+ * 保证被 update_num 计入的新动态都能落到红点上；翻页之间加延时，避免触发风控。
  */
 export async function fetchFollowingDynamicsNavUpdates(
   request: FollowingDynamicsRequest,
   isCurrentAccount: () => boolean,
+  options: { readBaseline?: string } = {},
 ): Promise<FollowingDynamicsNavBatch> {
+  const readBaseline = options.readBaseline ?? "";
   const latestByMid: Record<string, string> = {};
   let offset = "";
   let complete = false;
 
   for (let page = 0; page < FOLLOWING_DYNAMICS_NAV_MAX_PAGES; page += 1) {
+    if (page > 0) {
+      await waitBeforeNextNavPage();
+    }
     const data = await fetchFollowingDynamicsNavPage(offset, request, isCurrentAccount);
     for (const rawItem of data.items) {
       if (rawItem.visible === false) {
@@ -197,6 +210,14 @@ export async function fetchFollowingDynamicsNavUpdates(
     const lastItem = data.items.at(-1);
     const nextOffset = data.offset || (lastItem ? String(lastItem.id_str) : "");
     if (!data.has_more || !data.items.length || !nextOffset || nextOffset === offset) {
+      complete = true;
+      break;
+    }
+    // 这一页已经没有比基线更新的动态了，再往前翻都是「看动态列表时已经见过」的历史
+    if (
+      readBaseline &&
+      !data.items.some((item) => isNewerFollowingDynamicId(String(item.id_str), readBaseline))
+    ) {
       complete = true;
       break;
     }
@@ -217,9 +238,17 @@ export function isNewerFollowingDynamicId(id: string, than: string) {
   return id > than;
 }
 
+function waitBeforeNextNavPage() {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, FOLLOWING_DYNAMICS_NAV_PAGE_DELAY);
+  });
+}
+
 /**
  * 把一次 feed/nav 拉取结果合并进当前账号的已读状态。
  * - 首次见到某个 UP 时 latestId/readId 同时初始化，不把历史动态算成未读；
+ *   传入 readBaseline 时改用「比基线更新才算未读」：基线是上次看「动态」列表时的最新动态，
+ *   比它更新的说明用户还没在动态列表里见过，此时把基线当作已读水位，让红点跟「动态」角标一致；
  * - 后续只允许更大的 id 推进 latestId，旧响应不能覆盖已读操作；
  * - 手动标记的 unread 不会被合并覆盖，只有打开动态页或取消关注才清除；
  * - 暂时不在接口结果里的 UP 保持原状态，取消关注后才清理。
@@ -228,8 +257,11 @@ export function mergeFollowingDynamicsReadState(options: {
   state: FollowingDynamicsReadState | undefined;
   batch: FollowingDynamicsNavBatch;
   followedMids?: ReadonlySet<string>;
+  /** 上次加载「动态」列表首屏时的最新动态 id，空字符串表示还没看过动态列表 */
+  readBaseline?: string;
 }): FollowingDynamicsReadState {
   const { state, batch } = options;
+  const readBaseline = options.readBaseline ?? "";
   const next: FollowingDynamicsReadState = { ...state };
 
   if (options.followedMids) {
@@ -246,7 +278,10 @@ export function mergeFollowingDynamicsReadState(options: {
     }
     const existing = next[mid];
     if (!existing) {
-      next[mid] = { latestId: idStr, readId: idStr };
+      next[mid] =
+        readBaseline && isNewerFollowingDynamicId(idStr, readBaseline)
+          ? { latestId: idStr, readId: readBaseline }
+          : { latestId: idStr, readId: idStr };
       continue;
     }
     if (isNewerFollowingDynamicId(idStr, existing.latestId)) {

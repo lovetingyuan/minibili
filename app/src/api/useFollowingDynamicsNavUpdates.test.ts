@@ -16,7 +16,12 @@ vi.mock("../features/bilibili-session/session", () => ({
 vi.mock("../features/bilibili-session/useBilibiliSession", () => ({
   useBilibiliSessionState: () => ({ account: mocks.account, control: mocks.control }),
 }));
-vi.mock("../store", () => ({ useStore: () => ({ initialed: mocks.initialed }) }));
+vi.mock("../store", () => ({
+  useStore: () => ({ initialed: mocks.initialed }),
+  getStoreMethods: () => ({
+    get$followingDynamicsUpdateMap: () => ({}),
+  }),
+}));
 vi.mock("./fetcher", () => ({ default: vi.fn() }));
 vi.mock("./following-dynamics", () => ({
   fetchFollowingDynamicsNavUpdates: mocks.fetchUpdates,
