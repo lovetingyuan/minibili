@@ -233,6 +233,18 @@ function HeaderRight() {
               hideMenu()
             }}
           />
+          <MenuOption
+            text="复制ID"
+            onSelect={() => {
+              if (dynamicUser?.mid) {
+                const mid = String(dynamicUser.mid)
+                void Clipboard.setStringAsync(mid).then(() => {
+                  showToast(`已复制：${mid}`)
+                })
+              }
+              hideMenu()
+            }}
+          />
         </MenuOptions>
       </Menu>
     </View>
