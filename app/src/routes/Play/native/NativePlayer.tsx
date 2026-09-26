@@ -268,6 +268,9 @@ export default function NativePlayer(props: NativePlayerProps) {
   const player = useVideoPlayer(source, (instance) => {
     instance.timeUpdateEventInterval = 0.25;
     instance.loop = playbackMode.loop;
+    // Android 上 expo-video 默认把音调跟着倍速一起拉伸（iOS 默认保音调），
+    // 这里对齐 B 站：倍速只改播放速度，音调保持不变
+    instance.preservesPitch = true;
     instance.playbackRate = playbackRate;
   });
 
