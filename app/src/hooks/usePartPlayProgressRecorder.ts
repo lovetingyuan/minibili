@@ -82,9 +82,8 @@ export function createPartPlayProgressRecorder(
  * 本地分P 进度记录与 B站账号无关：播放中定时记录，暂停、切P、离页时立即落盘。
  */
 export function usePartPlayProgressRecorder(input: PartPlayProgressInput) {
-  const recorderRef = React.useRef<ReturnType<typeof createPartPlayProgressRecorder> | null>(null);
-  recorderRef.current ??= createPartPlayProgressRecorder();
-  const recorder = recorderRef.current;
+  // 记录器实例在组件生命周期内保持同一个，用 state 承载可以在渲染期安全读取
+  const [recorder] = React.useState(createPartPlayProgressRecorder);
   const key = recorder.update(input);
   const playingRef = React.useRef({ key, value: input.isPlaying });
 

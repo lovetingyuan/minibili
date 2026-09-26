@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Animated, Platform, StyleSheet, View } from "react-native";
 
 import { theme } from "@/constants/theme";
@@ -21,8 +21,8 @@ export function Skeleton({
   width = "100%",
   ...viewProps
 }: SkeletonProps) {
-  const animationRef = useRef(new Animated.Value(0));
-  const animationLoop = useRef<Animated.CompositeAnimation | null>(null);
+  // Animated.Value 实例在组件生命周期内保持同一个，用 state 承载可以在渲染期安全读取
+  const [animationValue] = useState(() => new Animated.Value(0));
   const [layoutWidth, setLayoutWidth] = useState(0);
   const baseColor = useResolvedColor(theme.slate[2].accent);
   const highlightColor = useResolvedColor(theme.slate[3].accent);
@@ -30,20 +30,19 @@ export function Skeleton({
   const resolvedSkeletonClassName = useResolvedStyle(skeletonClassName);
 
   useEffect(() => {
-    animationLoop.current = Animated.timing(animationRef.current, {
-      delay: 400,
-      duration: 1500,
-      toValue: 2,
-      useNativeDriver: !!Platform.select({
-        native: true,
-        web: false,
+    animationValue.setValue(0);
+    Animated.loop(
+      Animated.timing(animationValue, {
+        delay: 400,
+        duration: 1500,
+        toValue: 2,
+        useNativeDriver: !!Platform.select({
+          native: true,
+          web: false,
+        }),
       }),
-    });
-    animationRef.current.setValue(0);
-    if (animationLoop.current) {
-      Animated.loop(animationLoop.current).start();
-    }
-  }, []);
+    ).start();
+  }, [animationValue]);
 
   return (
     <View
@@ -77,7 +76,7 @@ export function Skeleton({
             styles.skeleton,
             { backgroundColor: highlightColor },
             animation === "pulse" && {
-              opacity: animationRef.current.interpolate({
+              opacity: animationValue.interpolate({
                 inputRange: [0, 1, 2],
                 outputRange: [1, 0, 1],
               }),
@@ -86,7 +85,7 @@ export function Skeleton({
             animation === "wave" && {
               transform: [
                 {
-                  translateX: animationRef.current.interpolate({
+                  translateX: animationValue.interpolate({
                     inputRange: [0, 2],
                     outputRange: [-layoutWidth * 2, layoutWidth * 2],
                   }),

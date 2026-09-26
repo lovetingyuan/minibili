@@ -161,7 +161,7 @@ export function patchCommentTree(
 }
 
 async function fetchCommentsPage(url: string, type: number): Promise<CommentsPage> {
-  console.log(9999, 'fetch comments', url);
+  
   const payload = await fetcher<unknown>(url);
   const response = CommentResponseSchema.parse(payload);
   return {

@@ -284,18 +284,21 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 本地按分P 记录的位置优先；当前分P 没有本地记录时再回退 B站记录。
   const liveLocalPlayResumePositionMs = usePartPlayProgressPosition(videoInfo.bvid, cid);
   const initialResumeKey = `${videoInfo.bvid}:${cid}`;
-  const initialLocalResumeRef = React.useRef<InitialResumeSnapshot>({
+  const [initialLocalResume, setInitialLocalResume] = React.useState<InitialResumeSnapshot>({
     key: "",
     positionMs: null,
   });
-  initialLocalResumeRef.current = resolveInitialResumeSnapshot(
-    initialLocalResumeRef.current,
+  // 同一个分 P 只在首次拿到本地进度时冻结一次，之后本地进度再变化也不再改写
+  const resolvedInitialLocalResume = resolveInitialResumeSnapshot(
+    initialLocalResume,
     initialResumeKey,
     liveLocalPlayResumePositionMs,
   );
+  if (resolvedInitialLocalResume !== initialLocalResume) {
+    setInitialLocalResume(resolvedInitialLocalResume);
+  }
   const serverPlayResumePositionMs = usePlayResumePosition(videoInfo.aid, cid);
-  const playResumePositionMs =
-    initialLocalResumeRef.current.positionMs ?? serverPlayResumePositionMs;
+  const playResumePositionMs = resolvedInitialLocalResume.positionMs ?? serverPlayResumePositionMs;
 
   // 登录后按 B站网页播放器的方式上报播放进度，写入观看历史
   const { reportEnded } = usePlayHeartbeatReporter({
@@ -330,12 +333,9 @@ export default function NativePlayer(props: NativePlayerProps) {
   };
   const playEndGuardRef = React.useRef({ player, handled: false });
   const onPlayEndedRef = React.useRef(onPlayEnded);
-  onPlayEndedRef.current = onPlayEnded;
   // 播放结束事件在订阅后触发，回调里需要读到最新的播放模式与分 P 数量
   const playbackModeRef = React.useRef(playbackMode);
-  playbackModeRef.current = playbackMode;
   const pageCountRef = React.useRef(pageCount);
-  pageCountRef.current = pageCount;
   // 播放结束回调里要判断当前是不是试看/互动片段，用 ref 读取避免重新订阅事件
   const limitedReasonRef = React.useRef<typeof limitedReason>(null);
   React.useEffect(() => {
@@ -347,15 +347,22 @@ export default function NativePlayer(props: NativePlayerProps) {
   }, [onPreviewReasonChange, previewReason]);
   // 播放结束回调里要读最新的全屏状态与回调，订阅不能跟着全屏切换重建
   const exitFullscreenOnEndedRef = React.useRef(() => {});
-  exitFullscreenOnEndedRef.current = () => {
-    if (fullscreen) {
-      onFullscreenChange(false);
-    }
-  };
   const reportHeartbeatEndedRef = React.useRef(reportEnded);
-  reportHeartbeatEndedRef.current = reportEnded;
   const reportPartProgressEndedRef = React.useRef(reportPartProgressEnded);
-  reportPartProgressEndedRef.current = reportPartProgressEnded;
+  // 这些 ref 都只在播放结束事件里读取（事件在提交之后才可能触发），
+  // 放在提交后统一同步最新实现，避免在渲染期写 ref
+  React.useEffect(() => {
+    onPlayEndedRef.current = onPlayEnded;
+    playbackModeRef.current = playbackMode;
+    pageCountRef.current = pageCount;
+    exitFullscreenOnEndedRef.current = () => {
+      if (fullscreen) {
+        onFullscreenChange(false);
+      }
+    };
+    reportHeartbeatEndedRef.current = reportEnded;
+    reportPartProgressEndedRef.current = reportPartProgressEnded;
+  });
 
   function updatePlayingState(playing: boolean, synchronizeKeepAwake = false) {
     const changed = nativePlayingRef.current !== playing;

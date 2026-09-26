@@ -10,7 +10,7 @@ import { BottomSheet } from "@/components/styled/bottom-sheet";
 import { FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { theme } from "@/constants/theme";
-import { useStore } from "@/store";
+import { getStoreMethods, useStore } from "@/store";
 
 import { CommentItem } from "./Comment";
 import CommentPaginationFooter from "./CommentPaginationFooter";
@@ -28,8 +28,6 @@ export default function ReplyList(props: ReplyListProps) {
   const { height: windowHeight } = useWindowDimensions();
   const sheetHeight = getReplySheetHeight(windowHeight);
   const loadMoreLock = useRef(false);
-  const repliesInfoRef = useRef(repliesInfo);
-  repliesInfoRef.current = repliesInfo;
 
   useEffect(() => {
     if (!focused) {
@@ -73,7 +71,8 @@ export default function ReplyList(props: ReplyListProps) {
       return false;
     }
     await replies.prependReply(reply);
-    const currentInfo = repliesInfoRef.current;
+    // 异步返回后取 store 里的最新快照，避免闭包里的 repliesInfo 过期
+    const currentInfo = getStoreMethods().getRepliesInfo();
     if (currentInfo && String(currentInfo.root) === String(repliesInfo.root)) {
       setRepliesInfo({
         ...currentInfo,
@@ -92,7 +91,7 @@ export default function ReplyList(props: ReplyListProps) {
       await replies.refresh().catch(() => {});
       return false;
     }
-    const currentInfo = repliesInfoRef.current;
+    const currentInfo = getStoreMethods().getRepliesInfo();
     if (!currentInfo || String(currentInfo.root) !== String(repliesInfo?.root)) {
       return true;
     }
@@ -101,7 +100,7 @@ export default function ReplyList(props: ReplyListProps) {
       return true;
     }
     await replies.removeReply(target.id);
-    const latestInfo = repliesInfoRef.current;
+    const latestInfo = getStoreMethods().getRepliesInfo();
     if (latestInfo && String(latestInfo.root) === String(currentInfo.root)) {
       setRepliesInfo(removeReplyFromInfo(latestInfo, target.id));
     }

@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "workspaces": {
     "app": {
-      "entry": ["plugins/*.js"],
+      "entry": ["index.js", "plugins/*.js"],
       "ignoreBinaries": ["adb"],
       "ignoreDependencies": ["babel-plugin-react-compiler"]
     }
