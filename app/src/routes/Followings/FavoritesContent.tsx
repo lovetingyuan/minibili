@@ -171,7 +171,7 @@ export default function FavoritesContent() {
           </>
         ) : (
           <>
-            <ActivityIndicator />
+            <ActivityIndicator size="large" />
             <Text>正在加载 B站收藏夹</Text>
           </>
         )}
@@ -249,7 +249,10 @@ export default function FavoritesContent() {
             ListEmptyComponent={
               <View className="items-center justify-center gap-4 px-6 py-16">
                 {resources.isLoading ? (
-                  <ActivityIndicator />
+                  <>
+                    <ActivityIndicator size="large" />
+                    <Text>正在加载 B站收藏内容</Text>
+                  </>
                 ) : isLoginRequiredError(resources.error) ? (
                   <LoginRequired description="登录后即可查看该收藏夹" />
                 ) : resources.error ? (

@@ -53,7 +53,7 @@ export default function HistoryContent() {
         <View className="items-center justify-center gap-4 px-6 py-16">
           {history.isLoading ? (
             <>
-              <ActivityIndicator />
+              <ActivityIndicator size="large" />
               <Text>正在加载 B站观看历史</Text>
             </>
           ) : history.error ? (
