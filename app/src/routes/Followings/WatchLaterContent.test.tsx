@@ -1,6 +1,7 @@
 import React from "react";
 import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, test, vi } from "vitest";
+import { overlayIcons } from "@/constants/overlay-icons";
 import type { VideoListItemInfo } from "@/types";
 import type { useBilibiliWatchLater } from "@/api/useWatchLater";
 import type { WatchLaterListItem } from "@/api/watch-later.types";
@@ -48,6 +49,9 @@ vi.mock("@/features/bilibili-session/login-required", () => ({
   isLoginRequiredError: () => false,
 }));
 vi.mock("lucide-react-native", () => ({ Clock: "Clock" }));
+vi.mock("@/constants/overlay-icons", () => ({
+  overlayIcons: { removeWatchLater: "AlarmClockMinus" },
+}));
 vi.mock("@/components/VideoItem", () => ({ default: "VideoListItem" }));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));
 
@@ -58,7 +62,7 @@ type ElementProps = {
   title?: string;
   onPress?: () => void;
   onLongPress?: () => void;
-  buttons?: () => { text: string; onPress: () => void }[];
+  buttons?: () => { text: string; icon?: unknown; onPress: () => void }[];
   progressRatio?: number;
   video?: VideoListItemInfo;
   type?: unknown;
@@ -155,6 +159,7 @@ test("renders playable videos with their progress and long-press removal", () =>
 
   const [remove] = row.props.buttons?.() ?? [];
   expect(remove.text).toBe("从稍后再看移除");
+  expect(remove.icon).toBe(overlayIcons.removeWatchLater);
   remove.onPress();
   expect(mocks.toggle).toHaveBeenCalledExactlyOnceWith({ aid: "42" });
 });
@@ -169,9 +174,11 @@ test("keeps unavailable videos visible and removable through the overlay menu", 
   row.props.onLongPress?.();
   const [remove] = mocks.setOverlayButtons.mock.calls[0][0] as {
     text: string;
+    icon?: unknown;
     onPress: () => void;
   }[];
   expect(remove.text).toBe("从稍后再看移除");
+  expect(remove.icon).toBe(overlayIcons.removeWatchLater);
   remove.onPress();
   expect(mocks.toggle).toHaveBeenCalledExactlyOnceWith({ aid: "42" });
 });

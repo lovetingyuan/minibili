@@ -20,6 +20,7 @@ import { LoginRequired } from "@/components/LoginRequired";
 import { Button, FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
+import { overlayIcons } from "@/constants/overlay-icons";
 import { theme } from "@/constants/theme";
 import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
@@ -60,6 +61,7 @@ export default function FavoritesContent() {
     return [
       {
         text: "取消收藏",
+        icon: overlayIcons.unfavorite,
         onPress: () => {
           if (!account || !bilibiliSession.isCurrentAccount(account)) {
             showToast("登录状态已改变，请重新登录后操作");
@@ -93,6 +95,7 @@ export default function FavoritesContent() {
     return [
       {
         text: "删除收藏夹",
+        icon: overlayIcons.remove,
         onPress: () => {
           Alert.alert(
             "删除收藏夹",

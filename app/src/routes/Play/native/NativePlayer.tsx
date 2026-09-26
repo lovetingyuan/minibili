@@ -56,6 +56,7 @@ import PlayerPoster from "./PlayerPoster";
 import PlayerSeekHint from "./PlayerSeekHint";
 import { type PlaybackMode, type PlayEndedEvent, willContinueAfterEnded } from "../playback-mode";
 import { resolveVideoAccess } from "../video-access";
+import type { VideoPreviewReason } from "../video-access.types";
 import {
   createVideoSource,
   isSeekJump,
@@ -65,6 +66,7 @@ import {
   type PlayerSwipeDirection,
   resolveInlinePlayerHeight,
   resolveInitialResumeSnapshot,
+  resolveLimitedEndedUi,
   resolvePlayerResumeDecision,
   resolvePlaybackFailover,
   resolvePreferredQuality,
@@ -93,6 +95,8 @@ const StyledAnimatedView = withUniwind(Animated.View) as unknown as React.Compon
 type NativePlayerProps = {
   currentPage: number;
   onPlayEnded: (event: PlayEndedEvent) => void;
+  /** 试看内容在播放器下方的视频信息区里的说明类型；其余情况上报 null */
+  onPreviewReasonChange: (reason: VideoPreviewReason | null) => void;
   playbackMode: PlaybackMode;
   showAutoNext: boolean;
   onToggleAutoNext: () => void;
@@ -102,7 +106,14 @@ type NativePlayerProps = {
 };
 
 export default function NativePlayer(props: NativePlayerProps) {
-  const { currentPage, onPlayEnded, playbackMode, fullscreen, onFullscreenChange } = props;
+  const {
+    currentPage,
+    onPlayEnded,
+    onPreviewReasonChange,
+    playbackMode,
+    fullscreen,
+    onFullscreenChange,
+  } = props;
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
   const isFocused = useIsFocused();
   const { width, height } = useWindowDimensions();
@@ -231,21 +242,22 @@ export default function NativePlayer(props: NativePlayerProps) {
     isPending: !videoInfoLoaded || !playUrlHasResult,
   });
   const accessBlocked = videoAccess.kind === "blocked";
-  const accessBlockedAction = videoAccess.kind === "blocked" ? videoAccess.notice.action : null;
+  // 受限原因已经明确时只在封面上说明，不再提供跳转或重试；
+  // 只有「既不是付费也没有已知原因」的加载失败还留着重试
+  const blockedNoticeOnly = accessBlocked && videoAccess.reason !== "unknown";
   const limitedAccess = videoAccess.kind === "limited" ? videoAccess : null;
-  // 试看/互动片段播完后的说明浮层
-  const limitedNoticeVisible = Boolean(limitedAccess) && limitedEnded;
+  // 只有交互视频还在播放器里提示，试看内容改到视频信息区说明
+  const interactiveAccess = limitedAccess?.notice ? limitedAccess : null;
+  const limitedReason = limitedAccess?.reason ?? null;
+  // 交互视频片段播完后的说明浮层
+  const limitedNoticeVisible = Boolean(interactiveAccess) && limitedEnded;
   // 控制条按实际可播时长显示，避免 30 秒试看配 30 分钟进度条
   const playbackDurationMs =
     limitedAccess && limitedAccess.servedDurationMs > 0
       ? limitedAccess.servedDurationMs
       : durationSeconds * 1000;
-  // 开播前的封面角标：试看内容提前说明只有片段，交互视频说明类型
-  const coverBadgeLabel = limitedAccess
-    ? limitedAccess.reason === "interactive"
-      ? limitedAccess.badge.label
-      : `${limitedAccess.badge.label} · 可试看`
-    : null;
+  // 试看内容在视频信息区里的说明类型，交给播放页展示
+  const previewReason = limitedAccess?.previewReason ?? null;
   // 后台播放的系统通知标题。取路由参数里的标题，保证渲染期稳定，避免重建播放器
   const notificationTitle = route.params.title || videoInfo.bvid;
   // 地址不是"拿到就挂"：source 非空会让原生播放器立刻开始拉流，
@@ -322,10 +334,14 @@ export default function NativePlayer(props: NativePlayerProps) {
   const pageCountRef = React.useRef(pageCount);
   pageCountRef.current = pageCount;
   // 播放结束回调里要判断当前是不是试看/互动片段，用 ref 读取避免重新订阅事件
-  const limitedAccessRef = React.useRef(false);
+  const limitedReasonRef = React.useRef<typeof limitedReason>(null);
   React.useEffect(() => {
-    limitedAccessRef.current = videoAccess.kind === "limited";
-  }, [videoAccess.kind]);
+    limitedReasonRef.current = limitedReason;
+  }, [limitedReason]);
+  // 试看类型上报给播放页，由播放器下方的视频信息区展示说明
+  React.useEffect(() => {
+    onPreviewReasonChange(previewReason);
+  }, [onPreviewReasonChange, previewReason]);
   // 播放结束回调里要读最新的全屏状态与回调，订阅不能跟着全屏切换重建
   const exitFullscreenOnEndedRef = React.useRef(() => {});
   exitFullscreenOnEndedRef.current = () => {
@@ -571,12 +587,15 @@ export default function NativePlayer(props: NativePlayerProps) {
       }
       playEndGuardRef.current.handled = true;
       // 试看片段 / 互动片段播完：不按“播完”上报，避免把视频记成已看完，
-      // 也不触发自动连播与循环，只展示受限说明
-      if (limitedAccessRef.current) {
+      // 也不触发自动连播与循环
+      if (limitedReasonRef.current) {
+        const endedUi = resolveLimitedEndedUi(limitedReasonRef.current);
         updatePlayingState(false);
         setPortraitExpanded(false);
-        setPlaybackEnded(false);
-        setLimitedEnded(true);
+        // 交互视频片段看不完整，用浮层说明；试看片段按普通播放结束收尾，
+        // 说明在播放器下方的视频信息区
+        setPlaybackEnded(endedUi.ended);
+        setLimitedEnded(endedUi.showNotice);
         exitFullscreenOnEndedRef.current();
         return;
       }
@@ -1030,16 +1049,9 @@ export default function NativePlayer(props: NativePlayerProps) {
   const hasError = Boolean(playerError) || (Boolean(playUrlError) && !uri) || accessBlocked;
   const showError = hasError || isRetrying;
 
-  /** 受限内容的主操作：跳回 B站 观看/充电 */
-  function openBilibiliAction() {
-    if (accessBlockedAction) {
-      void Linking.openURL(accessBlockedAction.url);
-    }
-  }
-
-  /** 受限内容的主操作：跳回 B站 观看（试看结束、互动视频） */
+  /** 互动视频片段的主操作：跳回 B站 观看完整互动内容 */
   function openLimitedAction() {
-    if (limitedAccess) {
+    if (limitedAccess?.notice) {
       void Linking.openURL(limitedAccess.notice.action.url);
     }
   }
@@ -1124,18 +1136,18 @@ export default function NativePlayer(props: NativePlayerProps) {
       <GestureDetector gesture={gesture}>
         <View style={StyleSheet.absoluteFill} />
       </GestureDetector>
-      {limitedAccess ? (
+      {interactiveAccess ? (
         <View className="absolute left-3 top-3">
           <VideoBadge
-            label={limitedAccess.playerLabel}
-            tone={limitedAccess.badge.tone}
+            label={interactiveAccess.badge.label}
+            tone={interactiveAccess.badge.tone}
             variant="overlay"
           />
         </View>
       ) : null}
       {fastRate ? (
         <View
-          className={`absolute left-3 ${limitedAccess ? "top-9" : "top-3"} rounded bg-black/60 px-2 py-1`}
+          className={`absolute left-3 ${interactiveAccess ? "top-9" : "top-3"} rounded bg-black/60 px-2 py-1`}
         >
           <Text className="text-xs font-bold text-white">{`${PLAYER_FAST_RATE}x`}</Text>
         </View>
@@ -1205,8 +1217,8 @@ export default function NativePlayer(props: NativePlayerProps) {
           duration={videoInfo.duration}
           isMetered={isMeteredNetwork}
           highQuality={highQuality}
-          badgeLabel={coverBadgeLabel}
-          badgeTone={limitedAccess?.badge.tone}
+          badgeLabel={interactiveAccess?.badge.label}
+          badgeTone={interactiveAccess?.badge.tone}
           onHighQualityChange={setHighQuality}
           onStart={() => {
             if (isMeteredNetwork) {
@@ -1221,14 +1233,13 @@ export default function NativePlayer(props: NativePlayerProps) {
           retrying={isRetrying}
           title={accessBlocked ? videoAccess.notice.title : undefined}
           description={accessBlocked ? videoAccess.notice.message : undefined}
-          actionLabel={accessBlockedAction?.label}
-          onAction={accessBlockedAction ? openBilibiliAction : undefined}
+          showRetry={!blockedNoticeOnly}
           onRetry={() => {
             void handleRetry();
           }}
         />
       ) : null}
-      {limitedNoticeVisible && !showError && limitedAccess ? (
+      {limitedNoticeVisible && !showError && limitedAccess?.notice ? (
         <PlayerError
           retrying={false}
           title={limitedAccess.notice.title}

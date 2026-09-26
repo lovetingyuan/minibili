@@ -11,6 +11,7 @@ import {
   resolveInlinePlayerHeight,
   resolveInitialResumeDecision,
   resolveInitialResumeSnapshot,
+  resolveLimitedEndedUi,
   resolvePlaybackDisplayMs,
   resolvePlayerResumeDecision,
   resolvePlaybackFailover,
@@ -424,4 +425,15 @@ test("gives up only after the refresh limit is reached", () => {
   expect(
     resolvePlaybackFailover({ index: 0, total: 0, refreshCount: PLAY_URL_MAX_REFRESH }),
   ).toEqual({ type: "give-up" });
+});
+
+test("keeps the in-player notice only for interactive videos", () => {
+  // 交互视频片段本身看不完整，继续在播放器里弹「暂不支持」
+  expect(resolveLimitedEndedUi("interactive")).toEqual({ showNotice: true, ended: false });
+});
+
+test("treats preview segments as a normal playback end", () => {
+  // 试看说明改到播放器下方的视频信息区，播放器只回到封面
+  expect(resolveLimitedEndedUi("charge")).toEqual({ showNotice: false, ended: true });
+  expect(resolveLimitedEndedUi("paid")).toEqual({ showNotice: false, ended: true });
 });

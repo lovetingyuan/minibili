@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { Children, isValidElement } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { overlayIcons } from "@/constants/overlay-icons";
 import type {
   DynamicAuthor,
   DynamicContent,
@@ -36,6 +37,13 @@ vi.mock("../styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("@/components/VideoBadge", () => ({ VideoBadge: "VideoBadge" }));
 vi.mock("lucide-react-native", () => ({ Play: "Play" }));
+vi.mock("@/constants/overlay-icons", () => ({
+  overlayIcons: {
+    addWatchLater: "ClockPlus",
+    removeWatchLater: "AlarmClockMinus",
+    viewCover: "ImageIcon",
+  },
+}));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
   useStore: () => ({
@@ -213,20 +221,25 @@ describe("DynamicMedia video interactions", () => {
     expect(mocks.setOverlayButtons).toHaveBeenCalledWith([
       {
         text: "添加到稍后再看",
+        icon: overlayIcons.addWatchLater,
         onPress: expect.any(Function),
       },
       {
         text: "查看封面",
+        icon: overlayIcons.viewCover,
         onPress: expect.any(Function),
       },
     ]);
 
     const buttons = mocks.setOverlayButtons.mock.calls[0][0] as {
       text: string;
+      icon?: unknown;
       onPress: () => void;
     }[];
     buttons[0].onPress();
     expect(mocks.toggleWatchLater).toHaveBeenCalledExactlyOnceWith({ aid: 2 });
+    expect(buttons[0].icon).toBe(overlayIcons.addWatchLater);
+    expect(buttons[1].icon).toBe(overlayIcons.viewCover);
 
     buttons[1].onPress();
 
@@ -244,8 +257,8 @@ describe("DynamicMedia video interactions", () => {
     cover.props.onLongPress?.({ stopPropagation: vi.fn() });
 
     expect(mocks.setOverlayButtons.mock.calls[0][0]).toEqual([
-      { text: "从稍后再看移除", onPress: expect.any(Function) },
-      { text: "查看封面", onPress: expect.any(Function) },
+      { text: "从稍后再看移除", icon: overlayIcons.removeWatchLater, onPress: expect.any(Function) },
+      { text: "查看封面", icon: overlayIcons.viewCover, onPress: expect.any(Function) },
     ]);
   });
 
@@ -403,8 +416,12 @@ describe("DynamicMedia article card", () => {
       },
       author,
     });
-    const Link = media.type as (props: typeof media.props) => ReactElement<ElementProps>;
-    const rendered = flatten(Link(media.props))
+    if (!media) {
+      throw new Error("Expected the bangumi link card to render");
+    }
+    const { props, type } = media;
+    const Link = type as (linkProps: typeof props) => ReactElement<ElementProps>;
+    const rendered = flatten(Link(props))
       .filter((element) => element.type === "Text")
       .map((element) => element.props.children);
 

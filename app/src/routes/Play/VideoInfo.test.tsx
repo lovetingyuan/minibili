@@ -113,3 +113,26 @@ test("点击 UP 头像和名称都会进入同一个主页", () => {
   expect(avatar.props.source).toBeUndefined();
   expect(avatar.props.title).toBe("测");
 });
+
+test("试看内容在信息区说明，普通视频不显示", () => {
+  const previewed = elements(
+    VideoInfo({ currentPage: 1, previewReason: "paid", setCurrentPage: vi.fn() }),
+  );
+  expect(
+    previewed.some((element) => element.props.children === "【该视频为付费内容，仅能试看】"),
+  ).toBe(true);
+
+  // 播放器没有判定出试看时（普通视频、请求还没返回）不出现这行说明
+  const playable = elements(VideoInfo({ currentPage: 1, setCurrentPage: vi.fn() }));
+  const pending = elements(
+    VideoInfo({ currentPage: 1, previewReason: null, setCurrentPage: vi.fn() }),
+  );
+  for (const rendered of [playable, pending]) {
+    expect(
+      rendered.some(
+        (element) =>
+          typeof element.props.children === "string" && element.props.children.includes("仅能试看"),
+      ),
+    ).toBe(false);
+  }
+});

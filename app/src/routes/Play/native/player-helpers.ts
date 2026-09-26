@@ -4,6 +4,7 @@ import type { VideoQuality } from "@/api/play-url";
 // 使用相对路径，保证 vitest 下无需别名配置即可解析
 import { mediaUA } from "../../../constants";
 import type { NetworkUsage } from "../../../utils/network";
+import type { VideoAccessLimitedReason } from "../video-access.types";
 
 /**
  * 长按加速的倍速
@@ -476,4 +477,16 @@ export function shouldRestartPlayback(options: {
     return false;
   }
   return currentMs >= durationMs - toleranceMs;
+}
+
+/**
+ * 片段播完后的收尾方式：
+ * 交互视频片段本身看不懂，继续在播放器里弹「暂不支持交互视频」浮层；
+ * 试看片段按普通播放结束处理（回到封面 + 重新播放按钮），
+ * 试看说明改由播放器下方的视频信息区展示，播放器不再提示
+ */
+export function resolveLimitedEndedUi(reason: VideoAccessLimitedReason) {
+  return reason === "interactive"
+    ? { showNotice: true, ended: false }
+    : { showNotice: false, ended: true };
 }

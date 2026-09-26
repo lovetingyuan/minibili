@@ -6,9 +6,9 @@ import type {
   VideoAccessBlockedNotice,
   VideoAccessInput,
   VideoAccessLimitedNotice,
-  VideoAccessLimitedReason,
   VideoAccessSummaryInput,
   VideoPayRights,
+  VideoPreviewReason,
 } from "./video-access.types";
 
 /**
@@ -30,6 +30,19 @@ export const VIP_BADGE: VideoAccessBadge = { label: "大会员", tone: "vip" };
 export const PGC_BADGE: VideoAccessBadge = { label: "番剧/影视", tone: "vip" };
 export const INTERACTIVE_BADGE: VideoAccessBadge = { label: "交互视频", tone: "info" };
 
+/**
+ * 试看内容在视频信息区的说明文案。
+ * 播放器里不再提示试看，只在这里说明，所以文案保持简短。
+ */
+const PREVIEW_NOTES: Record<VideoPreviewReason, string> = {
+  charge: "该视频为充电专属内容，仅能试看",
+  paid: "该视频为付费内容，仅能试看",
+};
+
+export function resolvePreviewNote(reason: VideoPreviewReason) {
+  return PREVIEW_NOTES[reason];
+}
+
 function isPaidRights(rights: VideoPayRights) {
   return rights.pay === 1 || rights.ugcPay === 1 || rights.arcPay === 1;
 }
@@ -38,7 +51,7 @@ function isUgcPaid(rights: VideoPayRights) {
   return rights.ugcPay === 1 || rights.arcPay === 1;
 }
 
-/** 受限视频优先跳回 B站：PGC 用接口给的番剧地址，其余用视频页地址 */
+/** 交互视频优先跳回 B站：PGC 用接口给的番剧地址，其余用视频页地址 */
 function resolveBilibiliAction(input: VideoAccessInput): VideoAccessAction {
   return {
     label: OPEN_IN_BILIBILI_LABEL,
@@ -46,76 +59,53 @@ function resolveBilibiliAction(input: VideoAccessInput): VideoAccessAction {
   };
 }
 
-function buildLimitedNotice(
-  input: VideoAccessInput,
-  reason: VideoAccessLimitedReason,
-): VideoAccessLimitedNotice {
-  if (reason === "interactive") {
-    return {
-      title: "暂不支持交互视频",
-      message: "该视频为交互视频，MiniBili 暂不支持互动分支，可在 B站 体验完整互动内容",
-      action: resolveBilibiliAction(input),
-      replayLabel: "重新播放",
-    };
-  }
+/** 交互视频片段播完后的浮层：试看内容已经不在播放器里提示了 */
+function buildInteractiveNotice(input: VideoAccessInput): VideoAccessLimitedNotice {
   return {
-    title: "试看结束",
-    message:
-      reason === "charge"
-        ? "该视频为 UP主 充电专属内容，MiniBili 仅能试看，完整版可在 B站 充电后观看"
-        : "该视频为付费内容，MiniBili 仅能试看，完整版可在 B站 购买后观看",
+    title: "暂不支持交互视频",
+    message: "该视频为交互视频，MiniBili 暂不支持互动分支，可在 B站 体验完整互动内容",
     action: resolveBilibiliAction(input),
-    replayLabel: "重新试看",
+    replayLabel: "重新播放",
   };
 }
 
-function buildBlockedNotice(
-  input: VideoAccessInput,
-  reason: VideoAccessBlockedReason,
-): VideoAccessBlockedNotice {
-  const action = resolveBilibiliAction(input);
+/** 受限内容拿不到地址时的说明：只保留类型与原因，播放器上不再给跳转按钮 */
+function buildBlockedNotice(reason: VideoAccessBlockedReason): VideoAccessBlockedNotice {
   switch (reason) {
     case "charge":
       return {
         title: "需要充电后观看",
         message: "该视频为 UP主 充电专属内容，MiniBili 无法播放，可在 B站 充电后观看",
-        action,
       };
     case "paid":
       return {
         title: "需要付费观看",
         message: "该视频为付费内容，购买后可在 B站 观看",
-        action,
       };
     case "pgc":
       return {
         title: "暂时无法播放",
         message: "该视频为番剧/影视内容，MiniBili 暂不支持播放，可在 B站 观看",
-        action,
       };
     case "vip":
       return {
         title: "需要大会员观看",
         message: "该视频为番剧/影视等会员内容，MiniBili 暂不支持播放，可在 B站 观看",
-        action,
       };
     case "region":
       return {
         title: "当前地区无法观看",
         message: "该视频受地区或版权限制，请在 B站 客户端再试",
-        action,
       };
     case "unavailable":
       return {
         title: "视频不可用",
         message: "视频不存在、已被删除或没有访问权限",
-        action,
       };
     default:
       return {
         title: "视频加载失败",
         message: "播放地址获取失败或播放器出错，请稍后重试",
-        action: null,
       };
   }
 }
@@ -140,9 +130,9 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
         kind: "limited",
         reason: "interactive",
         badge: INTERACTIVE_BADGE,
-        playerLabel: INTERACTIVE_BADGE.label,
-        notice: buildLimitedNotice(input, "interactive"),
         servedDurationMs: input.servedDurationMs,
+        notice: buildInteractiveNotice(input),
+        previewReason: null,
       };
     }
 
@@ -155,9 +145,10 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
         kind: "limited",
         reason,
         badge,
-        playerLabel: `${badge.label} · 试看`,
-        notice: buildLimitedNotice(input, reason),
         servedDurationMs: input.servedDurationMs,
+        // 试看不在播放器里提示，只在播放器下方的视频信息区说明
+        notice: null,
+        previewReason: reason,
       };
     }
 
@@ -176,7 +167,7 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
       kind: "blocked",
       reason: "charge",
       badge: CHARGE_BADGE,
-      notice: buildBlockedNotice(input, "charge"),
+      notice: buildBlockedNotice("charge"),
     };
   }
   if (input.redirectUrl && input.payRights.pay === 1) {
@@ -184,7 +175,7 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
       kind: "blocked",
       reason: "vip",
       badge: VIP_BADGE,
-      notice: buildBlockedNotice(input, "vip"),
+      notice: buildBlockedNotice("vip"),
     };
   }
   if (isUgcPaid(input.payRights)) {
@@ -192,7 +183,7 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
       kind: "blocked",
       reason: "paid",
       badge: PAID_BADGE,
-      notice: buildBlockedNotice(input, "paid"),
+      notice: buildBlockedNotice("paid"),
     };
   }
   if (input.redirectUrl) {
@@ -200,7 +191,7 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
       kind: "blocked",
       reason: "pgc",
       badge: PGC_BADGE,
-      notice: buildBlockedNotice(input, "pgc"),
+      notice: buildBlockedNotice("pgc"),
     };
   }
   if (input.payRights.pay === 1) {
@@ -208,7 +199,7 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
       kind: "blocked",
       reason: "vip",
       badge: VIP_BADGE,
-      notice: buildBlockedNotice(input, "vip"),
+      notice: buildBlockedNotice("vip"),
     };
   }
   if (input.errorCode === -10403) {
@@ -216,7 +207,7 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
       kind: "blocked",
       reason: "region",
       badge: null,
-      notice: buildBlockedNotice(input, "region"),
+      notice: buildBlockedNotice("region"),
     };
   }
   if (input.errorCode === -404 || input.errorCode === -403) {
@@ -224,14 +215,14 @@ export function resolveVideoAccess(input: VideoAccessInput): VideoAccess {
       kind: "blocked",
       reason: "unavailable",
       badge: null,
-      notice: buildBlockedNotice(input, "unavailable"),
+      notice: buildBlockedNotice("unavailable"),
     };
   }
   return {
     kind: "blocked",
     reason: "unknown",
     badge: null,
-    notice: buildBlockedNotice(input, "unknown"),
+    notice: buildBlockedNotice("unknown"),
   };
 }
 

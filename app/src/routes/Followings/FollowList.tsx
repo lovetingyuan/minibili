@@ -13,6 +13,7 @@ import {
 } from '@/api/useBilibiliRelationTags'
 import { Dialog } from '@/components/Dialog'
 import { Button, Text } from '@/components/styled/rneui'
+import { overlayIcons } from "@/constants/overlay-icons";
 import { theme } from "@/constants/theme";
 import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
 import {
@@ -169,12 +170,14 @@ function FollowList() {
     setOverlayButtons([
       {
         text: '修改名称',
+        icon: overlayIcons.rename,
         onPress: () => {
           openRenameDialog(tab)
         },
       },
       {
         text: '删除分组',
+        icon: overlayIcons.remove,
         onPress: () => {
           confirmDeleteTab(tab)
         },

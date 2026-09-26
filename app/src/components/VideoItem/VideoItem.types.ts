@@ -1,4 +1,4 @@
-import type { VideoListItemInfo } from "@/types";
+import type { OverlayButton, VideoListItemInfo } from "@/types";
 
 export type VideoListItemProps<T extends VideoListItemInfo> = {
   video: T;
@@ -6,10 +6,7 @@ export type VideoListItemProps<T extends VideoListItemInfo> = {
   watchedAt?: number;
   /** 观看进度比例（0~1），大于 0 时在封面底部展示进度条 */
   progressRatio?: number;
-  buttons?: (vi: T) => {
-    text: string;
-    onPress: () => void;
-  }[];
+  buttons?: (vi: T) => OverlayButton[];
 };
 
 export type VideoCoverProps = {

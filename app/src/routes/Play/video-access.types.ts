@@ -9,6 +9,9 @@ export type VideoAccessBadge = {
 /** 只能看片段的原因：充电专属试看、付费试看、互动视频 */
 export type VideoAccessLimitedReason = "charge" | "paid" | "interactive";
 
+/** 试看内容在视频信息区的说明类型 */
+export type VideoPreviewReason = "charge" | "paid";
+
 /**
  * 拿不到完整播放地址的原因。`unknown` 表示既不是付费也不是已知受限，按普通加载失败处理。
  */
@@ -21,7 +24,7 @@ export type VideoAccessBlockedReason =
   | "region"
   | "unknown";
 
-/** 只能试看或互动片段时，片段播完后的提示 */
+/** 只能看互动片段时，片段播完后的浮层提示 */
 export type VideoAccessLimitedNotice = {
   title: string;
   message: string;
@@ -34,8 +37,6 @@ export type VideoAccessLimitedNotice = {
 export type VideoAccessBlockedNotice = {
   title: string;
   message: string;
-  /** 能给出对应 B站 地址时提供跳转，否则只保留重试 */
-  action: VideoAccessAction | null;
 };
 
 export type VideoAccessAction = {
@@ -56,13 +57,17 @@ export type VideoAccess =
       kind: "limited";
       reason: VideoAccessLimitedReason;
       badge: VideoAccessBadge;
-      /** 播放器左上角角标，例如「充电专属 · 试看」 */
-      playerLabel: string;
-      notice: VideoAccessLimitedNotice;
       /** 实际可播时长（毫秒），控制条按它显示进度 */
       servedDurationMs: number;
+      /**
+       * 片段播完后的浮层说明。只有交互视频还在播放器里提示，
+       * 试看内容改到视频信息区说明，这里为 null
+       */
+      notice: VideoAccessLimitedNotice | null;
+      /** 试看内容在信息区的说明类型；交互视频为 null */
+      previewReason: VideoPreviewReason | null;
     }
-  /** 没有可用地址，只能提示并跳转 B站 */
+  /** 没有可用地址，只在播放器封面上说明受限类型 */
   | {
       kind: "blocked";
       reason: VideoAccessBlockedReason;

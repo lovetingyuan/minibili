@@ -2,13 +2,15 @@ import React from "react";
 import type { ComponentProps } from "react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import { overlayIcons } from "@/constants/overlay-icons";
 import type { VideoItem as VideoItemType } from "../../api/hot-videos";
 import type { FlashList } from "../../components/styled/rneui";
+import type { OverlayButton } from "../../types";
 
 const mocks = vi.hoisted(() => ({
   confirmBlock: vi.fn(),
   toggleWatchLater: vi.fn(),
-  setOverlayButtons: vi.fn<(buttons: { text: string; onPress: () => void }[]) => void>(),
+  setOverlayButtons: vi.fn<(buttons: OverlayButton[]) => void>(),
   setImagesList: vi.fn(),
   setCurrentImageIndex: vi.fn(),
   setBlackTags: vi.fn(),
@@ -47,6 +49,16 @@ vi.mock("react-native", () => ({
 }));
 vi.mock("@/components/styled/rneui", () => ({
   FlashList: () => null,
+}));
+vi.mock("@/constants/overlay-icons", () => ({
+  overlayIcons: {
+    addWatchLater: "ClockPlus",
+    removeWatchLater: "AlarmClockMinus",
+    blockUp: "Ban",
+    hideTagType: "EyeOff",
+    share: "Share2",
+    viewCover: "ImageIcon",
+  },
 }));
 vi.mock("@/hooks/useBlockUpActions", () => ({
   useBlockUpActions: () => ({ confirmBlock: mocks.confirmBlock }),
@@ -151,8 +163,12 @@ describe("video list after replacing local UP blocking", () => {
     const buttons = mocks.setOverlayButtons.mock.calls[0][0];
     expect(buttons.some((button) => button.text === "标记观看完成")).toBe(false);
     expect(buttons[0].text).toBe("添加到稍后再看");
+    expect(buttons[0].icon).toBe(overlayIcons.addWatchLater);
     expect(buttons[1].text).toBe("拉黑 UP 主「UP」");
+    expect(buttons[1].icon).toBe(overlayIcons.blockUp);
     expect(buttons[2].text).toBe("不再看「音乐」类型的视频");
+    expect(buttons[2].icon).toBe(overlayIcons.hideTagType);
+    expect(buttons[3].icon).toBe(overlayIcons.share);
     buttons[0].onPress();
     expect(mocks.toggleWatchLater).toHaveBeenCalledExactlyOnceWith({ aid: video.aid });
     longPress(other, 1);

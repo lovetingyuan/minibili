@@ -4,6 +4,7 @@ import React from "react";
 import { Alert, TouchableOpacity } from "react-native";
 
 import type { VideoItem as VideoItemType } from "@/api/hot-videos";
+import { overlayIcons } from "@/constants/overlay-icons";
 import { useBlockUpActions } from "@/hooks/useBlockUpActions";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
@@ -124,20 +125,24 @@ function VideoList(props: {
     [
       {
         text: watchLater.isAdded(video.aid) ? "从稍后再看移除" : "添加到稍后再看",
+        icon: watchLater.isAdded(video.aid) ? overlayIcons.removeWatchLater : overlayIcons.addWatchLater,
         onPress: () => {
           void watchLater.toggle({ aid: video.aid });
         },
       },
       {
         text: `拉黑 UP 主「${video.name}」`,
+        icon: overlayIcons.blockUp,
         onPress: () => confirmBlock({ mid: video.mid, name: video.name }),
       },
       props.type === "Hot" && {
         text: `不再看「${currentVideoRef.current?.tag}」类型的视频`,
+        icon: overlayIcons.hideTagType,
         onPress: addBlackTagName,
       },
       {
         text: `分享(${parseNumber(currentVideoRef.current?.shareNum)})`,
+        icon: overlayIcons.share,
         onPress: () => {
           if (currentVideoRef.current) {
             const { name, title, bvid } = currentVideoRef.current;
@@ -147,6 +152,7 @@ function VideoList(props: {
       },
       {
         text: "查看封面",
+        icon: overlayIcons.viewCover,
         onPress: () => {
           setCurrentImageIndex(0);
           setImagesList([

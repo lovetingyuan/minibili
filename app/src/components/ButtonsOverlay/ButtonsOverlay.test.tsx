@@ -1,8 +1,19 @@
+import type { LucideIcon } from "lucide-react-native";
 import React from "react";
 import type { ReactElement, ReactNode } from "react";
 import { beforeEach, expect, test, vi } from "vitest";
 
-type OverlayButton = { text: string; onPress: () => void };
+import { theme } from "../../constants/theme";
+
+// vitest 下没有 `@/` 别名，真实实现要通过相对路径引入
+const TestIcon = "TestIcon" as unknown as LucideIcon;
+
+type OverlayButton = {
+  text: string;
+  onPress: () => void;
+  icon?: LucideIcon;
+  filled?: boolean;
+};
 
 const mocks = vi.hoisted(() => ({
   overlayButtons: [] as OverlayButton[],
@@ -15,6 +26,7 @@ vi.mock("react-native", () => ({
   View: "View",
 }));
 vi.mock("@/components/styled/rneui", () => ({ Button: "Button" }));
+vi.mock("@/components/ThemedIcon", () => ({ ThemedIcon: "ThemedIcon" }));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
   useStore: () => ({
@@ -34,8 +46,11 @@ type ElementProps = {
   onRequestClose?: () => void;
   onPress?: () => void;
   className?: string;
-  title?: string;
   accessibilityLabel?: string;
+  colorClassName?: string;
+  filled?: boolean;
+  icon?: LucideIcon;
+  size?: number;
 };
 
 function elements(node: ReactNode): ReactElement<ElementProps>[] {
@@ -50,6 +65,16 @@ function elements(node: ReactNode): ReactElement<ElementProps>[] {
 
 function render() {
   return elements(ButtonsOverlay());
+}
+
+/** 按文案找到菜单项按钮（文案现在作为 children 传入） */
+function menuItem(text: string) {
+  const button = render().find(
+    (element) =>
+      element.type === "Button" && React.Children.toArray(element.props.children).includes(text),
+  );
+  expect(button).toBeDefined();
+  return button!;
 }
 
 beforeEach(() => {
@@ -100,9 +125,29 @@ test("点击菜单项时先关闭菜单再执行业务回调", () => {
     },
   ];
 
-  const button = render().find((element) => element.props.title === "收藏")!;
-  button.props.onPress?.();
+  menuItem("收藏").props.onPress?.();
 
   expect(calls).toEqual(["dismiss", "action"]);
   expect(mocks.setOverlayButtons).toHaveBeenCalledWith([]);
+});
+
+test("图标排在文案之前，并按按钮配置渲染", () => {
+  mocks.overlayButtons = [{ text: "收藏", onPress: vi.fn(), icon: TestIcon, filled: true }];
+
+  const children = React.Children.toArray(menuItem("收藏").props.children);
+  const [icon, text] = children as [ReactElement<ElementProps>, string];
+
+  expect(children).toHaveLength(2);
+  expect(icon.type).toBe("ThemedIcon");
+  expect(icon.props.icon).toBe(TestIcon);
+  expect(icon.props.filled).toBe(true);
+  expect(icon.props.size).toBe(18);
+  expect(icon.props.colorClassName).toBe(theme.primary.accent);
+  expect(text).toBe("收藏");
+});
+
+test("未配置图标的按钮只渲染文案", () => {
+  mocks.overlayButtons = [{ text: "收藏", onPress: vi.fn() }];
+
+  expect(React.Children.toArray(menuItem("收藏").props.children)).toEqual(["收藏"]);
 });

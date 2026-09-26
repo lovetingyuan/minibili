@@ -1,5 +1,6 @@
 import type { CompositeNavigationProp, NavigatorScreenParams } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { LucideIcon } from "lucide-react-native";
 import type {
   NativeStackNavigationProp,
   NativeStackScreenProps,
@@ -34,6 +35,16 @@ export interface VideoListItemInfo {
   play?: number;
   like?: number;
 }
+
+/** 长按菜单（ButtonsOverlay）里的一个按钮 */
+export type OverlayButton = {
+  text: string;
+  onPress: () => void;
+  /** 文案前的图标；不传则只显示文案 */
+  icon?: LucideIcon;
+  /** 图标是否用实心填充，用于「已点赞」这类选中态 */
+  filled?: boolean;
+};
 
 export type MainTabParamList = {
   Hot: undefined;

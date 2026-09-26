@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
 
-import { isDownloadRestricted, resolveVideoAccess, resolveVideoBadges } from "./video-access";
+import {
+  isDownloadRestricted,
+  resolvePreviewNote,
+  resolveVideoAccess,
+  resolveVideoBadges,
+} from "./video-access";
 import type { VideoAccessInput, VideoPayRights } from "./video-access.types";
 
 const FREE_RIGHTS: VideoPayRights = { arcPay: 0, pay: 0, ugcPay: 0 };
@@ -100,9 +105,11 @@ describe("resolveVideoAccess", () => {
     expect(access).toMatchObject({
       kind: "limited",
       reason: "charge",
-      playerLabel: "充电专属 · 试看",
       servedDurationMs: 29_978,
       badge: { label: "充电专属", tone: "charge" },
+      // 试看不在播放器里提示，只在视频信息区说明
+      notice: null,
+      previewReason: "charge",
     });
   });
 
@@ -149,12 +156,11 @@ describe("resolveVideoAccess", () => {
       badge: { label: "充电专属", tone: "charge" },
       notice: { title: "需要充电后观看" },
     });
-    expect(access.kind === "blocked" && access.notice.action?.url).toBe(
-      "https://www.bilibili.com/video/BV1RLYi6CERM",
-    );
+    // 受限提示只在封面上说明，不再提供跳转
+    expect(access.kind === "blocked" && "action" in access.notice).toBe(false);
   });
 
-  test("番剧会员集（-404 + redirect_url）提示需要大会员并跳回番剧页", () => {
+  test("番剧会员集（-404 + redirect_url）提示需要大会员", () => {
     const access = resolveVideoAccess(
       createInput({
         bvid: "BV1Xx4y1b7Nf",
@@ -173,9 +179,6 @@ describe("resolveVideoAccess", () => {
       badge: { label: "大会员", tone: "vip" },
       notice: { title: "需要大会员观看" },
     });
-    expect(access.kind === "blocked" && access.notice.action?.url).toBe(
-      "https://www.bilibili.com/bangumi/play/ep826498",
-    );
   });
 
   test("免费番剧集拿到完整地址时照常播放", () => {
@@ -218,9 +221,13 @@ describe("resolveVideoAccess", () => {
     expect(access).toMatchObject({
       kind: "limited",
       reason: "interactive",
-      playerLabel: "交互视频",
       notice: { title: "暂不支持交互视频", replayLabel: "重新播放" },
+      // 交互视频仍然在播放器里提示，说明行用的是它自己那条
+      previewReason: null,
     });
+    expect(access.kind === "limited" && access.notice?.action?.url).toBe(
+      "https://www.bilibili.com/video/BV1vb4y1r7cg",
+    );
   });
 
   test("付费稿件拿不到地址时提示需要付费", () => {
@@ -252,7 +259,8 @@ describe("resolveVideoAccess", () => {
     expect(access).toMatchObject({
       kind: "limited",
       reason: "paid",
-      playerLabel: "付费视频 · 试看",
+      notice: null,
+      previewReason: "paid",
     });
   });
 
@@ -288,7 +296,6 @@ describe("resolveVideoAccess", () => {
       notice: {
         title: "视频加载失败",
         message: "播放地址获取失败或播放器出错，请稍后重试",
-        action: null,
       },
     });
   });
@@ -314,6 +321,13 @@ describe("resolveVideoAccess", () => {
     );
 
     expect(access).toEqual({ kind: "playable", badge: { label: "充电专属", tone: "charge" } });
+  });
+});
+
+describe("resolvePreviewNote", () => {
+  test("充电专属与付费试看各自给出信息区文案", () => {
+    expect(resolvePreviewNote("charge")).toBe("该视频为充电专属内容，仅能试看");
+    expect(resolvePreviewNote("paid")).toBe("该视频为付费内容，仅能试看");
   });
 });
 

@@ -24,6 +24,7 @@ import {
   type PlayEndedEvent,
 } from "./playback-mode";
 import { PLAYER_MODE } from "./player-mode";
+import type { VideoPreviewReason } from "./video-access.types";
 import VideoInfo from "./VideoInfo";
 
 // https://www.bilibili.com/blackboard/webplayer/mbplayer.html?aid=1501398719&bvid=BV1HS421w7wG&cid=1458260037&p=1
@@ -50,6 +51,8 @@ function Play({ route }: Props) {
     currentPageRef.current = currentPage;
   }, [currentPage]);
   const [playbackMode, setPlaybackMode] = React.useState(DEFAULT_PLAYBACK_MODE);
+  // 试看类型由播放器判定后上报，交给播放器下方的视频信息区展示说明
+  const [previewReason, setPreviewReason] = React.useState<VideoPreviewReason | null>(null);
   const pageInfo = videoInfo.pages?.[currentPage - 1];
   // 下载用当前分P 的 cid，没有分P 信息时退回视频自身的 cid
   const downloadCid = pageInfo?.cid ?? videoInfo.cid ?? 0;
@@ -117,6 +120,7 @@ function Play({ route }: Props) {
         <NativePlayer
           currentPage={currentPage}
           onPlayEnded={handlePlayEnd}
+          onPreviewReasonChange={setPreviewReason}
           playbackMode={playbackMode}
           showAutoNext={(videoInfo.pages?.length ?? 0) > 1}
           onToggleAutoNext={() => {
@@ -144,7 +148,11 @@ function Play({ route }: Props) {
           </View>
         }
       >
-        <VideoInfo currentPage={currentPage} setCurrentPage={handleSelectPage} />
+        <VideoInfo
+          currentPage={currentPage}
+          previewReason={previewReason}
+          setCurrentPage={handleSelectPage}
+        />
       </CommentList>
     </View>
   );

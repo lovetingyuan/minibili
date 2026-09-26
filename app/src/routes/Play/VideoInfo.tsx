@@ -22,7 +22,8 @@ import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumbe
 
 import { useVideoInfo } from '../../api/video-info'
 import { getVideoDescription } from './description'
-import { resolveVideoBadges } from './video-access'
+import { resolvePreviewNote, resolveVideoBadges } from './video-access'
+import type { VideoPreviewReason } from './video-access.types'
 import FavoriteButton from './FavoriteButton'
 import LikeButton from './LikeButton'
 import VideoDescription from './VideoDescription'
@@ -31,7 +32,12 @@ import { formatVideoPageTitle } from './video-pages-sheet.helpers'
 
 export default VideoInfo
 
-function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => void }) {
+function VideoInfo(props: {
+  currentPage: number
+  setCurrentPage: (p: number) => void
+  /** 试看类型，由播放器判定后上报；播放器里不再提示试看，说明放在这里 */
+  previewReason?: VideoPreviewReason | null
+}) {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data, isLoading } = useVideoInfo(route.params.bvid)
   const videoInfo = {
@@ -47,6 +53,7 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
     isSteinGate: videoInfo.interactive ?? false,
     payRights: videoInfo.payRights ?? { arcPay: 0, pay: 0, ugcPay: 0 },
   })
+  const previewNote = props.previewReason ? resolvePreviewNote(props.previewReason) : null
   const [showPagesModal, setShowPagesModal] = React.useState(false)
 
   const navigation = useNavigation<NavigationProps['navigation']>()
@@ -123,6 +130,10 @@ function VideoInfo(props: { currentPage: number; setCurrentPage: (p: number) => 
             <VideoBadge key={badge.label} label={badge.label} tone={badge.tone} />
           ))}
         </View>
+      ) : null}
+
+      {previewNote ? (
+        <Text className={`mb-1.5 text-xs italic ${theme.warning.text}`}>{`【${previewNote}】`}</Text>
       ) : null}
 
       <Text selectable className={`text-lg font-bold leading-6 ${theme.text.heading}`}>

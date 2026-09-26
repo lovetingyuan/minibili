@@ -5,6 +5,7 @@ import { Alert, Pressable, View } from 'react-native';
 
 import { Avatar } from '@/components/Avatar';
 import { Text } from '@/components/styled/rneui';
+import { overlayIcons } from '@/constants/overlay-icons';
 import { theme } from "@/constants/theme";
 import { useStore } from '@/store';
 import type { NavigationProps } from '@/types';
@@ -54,20 +55,26 @@ export function CommentItem(props: CommentItemProps) {
     setOverlayButtons([
       {
         text: '复制评论',
+        icon: overlayIcons.copyComment,
         onPress: () => {
           void Clipboard.setStringAsync(getCommentCopyText(comment)).then(() => showToast('已复制评论'));
         },
       },
       {
         text: comment.attitude === 'like' ? '取消点赞' : '点赞',
+        icon: overlayIcons.like,
+        filled: comment.attitude === 'like',
         onPress: () => void props.onAttitude(comment, 'like'),
       },
       {
         text: comment.attitude === 'dislike' ? '取消点踩' : '点踩',
+        icon: overlayIcons.dislike,
+        filled: comment.attitude === 'dislike',
         onPress: () => void props.onAttitude(comment, 'dislike'),
       },
       {
         text: `回复「${comment.name}」`,
+        icon: overlayIcons.reply,
         onPress: () => props.onReply(comment),
       },
     ]);

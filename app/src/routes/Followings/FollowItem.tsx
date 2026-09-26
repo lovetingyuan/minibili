@@ -6,6 +6,7 @@ import { clsx } from 'clsx'
 import { Alert, Pressable, TouchableOpacity, View } from 'react-native'
 
 import { theme } from '@/constants/theme'
+import { overlayIcons } from '@/constants/overlay-icons'
 import { useFollowActions } from '@/hooks/useFollowActions'
 
 import { useStore } from '../../store'
@@ -55,12 +56,14 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
     [
       onSetGroups && {
         text: '设置分组',
+        icon: overlayIcons.setGroup,
         onPress: () => {
           onSetGroups(item)
         },
       },
       !actions.disabled && {
         text: '取消关注',
+        icon: overlayIcons.unfollow,
         onPress: () => {
           Alert.alert(`确定取消关注「${name}」吗？`, '', [
             { text: '关闭' },
@@ -75,12 +78,14 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
       },
       !hasNewDynamic && {
         text: '标记未读',
+        icon: overlayIcons.markUnread,
         onPress: () => {
           markUnread(mid)
         },
       },
       {
         text: '查看头像',
+        icon: overlayIcons.viewAvatar,
         onPress: () => {
           setCurrentImageIndex(0)
           setImagesList([{ src: face, width: 0, height: 0, ratio: 1 }])

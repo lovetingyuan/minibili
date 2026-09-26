@@ -7,12 +7,13 @@ import type { GestureResponderEvent } from "react-native";
 
 import type { DynamicAuthor, DynamicContent, DynamicImage } from "@/api/dynamic-items.type";
 import { VideoBadge } from "@/components/VideoBadge";
+import { overlayIcons } from "@/constants/overlay-icons";
 import { theme } from "@/constants/theme";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
 import { useStore } from "@/store";
 import { useWatchProgressRatio } from "@/store/watch-progress";
-import type { NavigationProps } from "@/types";
+import type { NavigationProps, OverlayButton } from "@/types";
 import { getImagePixelDimensions, parseImgUrl, parseNumber } from "@/utils";
 
 import { Image } from "../styled/expo";
@@ -145,10 +146,12 @@ function VideoCard(props: {
 
   function openMenu(event?: GestureResponderEvent) {
     event?.stopPropagation();
-    const buttons: { text: string; onPress: () => void }[] = [];
+    const buttons: OverlayButton[] = [];
     if (content.bvid) {
+      const added = watchLater.isAdded(content.aid);
       buttons.push({
-        text: watchLater.isAdded(content.aid) ? "从稍后再看移除" : "添加到稍后再看",
+        text: added ? "从稍后再看移除" : "添加到稍后再看",
+        icon: added ? overlayIcons.removeWatchLater : overlayIcons.addWatchLater,
         onPress: () => {
           void watchLater.toggle({ aid: content.aid });
         },
@@ -157,6 +160,7 @@ function VideoCard(props: {
     if (content.cover) {
       buttons.push({
         text: "查看封面",
+        icon: overlayIcons.viewCover,
         onPress: () => {
           setImagesList([{ src: content.cover, width: 0, height: 0, ratio: 16 / 9 }]);
           setCurrentImageIndex(0);

@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
+import { overlayIcons } from "@/constants/overlay-icons";
+import type { OverlayButton } from "../../types";
+
 const mocks = vi.hoisted(() => ({
-  setOverlayButtons: vi.fn<(buttons: { text: string; onPress: () => void }[]) => void>(),
+  setOverlayButtons: vi.fn<(buttons: OverlayButton[]) => void>(),
   setImagesList: vi.fn(),
   setCurrentImageIndex: vi.fn(),
   markFollowingDynamicsUnread: vi.fn<(mid: string | number) => void>(),
@@ -21,6 +24,14 @@ vi.mock("react-native", () => ({
 vi.mock("@/components/Avatar", () => ({ Avatar: "Avatar" }));
 vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
 vi.mock("@/components/UpName", () => ({ default: "UpName" }));
+vi.mock("@/constants/overlay-icons", () => ({
+  overlayIcons: {
+    setGroup: "FolderCog",
+    unfollow: "UserMinus",
+    markUnread: "Mail",
+    viewAvatar: "CircleUserRound",
+  },
+}));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/hooks/useFollowActions", () => ({
   useFollowActions: () => ({ disabled: mocks.followDisabled }),
@@ -69,12 +80,23 @@ test("长按菜单提供设置分组、标记未读与查看头像，关注同�
     "标记未读",
     "查看头像",
   ]);
+  expect(openMenu(mocks.onSetGroups).map((button) => button.icon)).toEqual([
+    overlayIcons.setGroup,
+    overlayIcons.markUnread,
+    overlayIcons.viewAvatar,
+  ]);
   mocks.followDisabled = false;
   expect(openMenu(mocks.onSetGroups).map((button) => button.text)).toEqual([
     "设置分组",
     "取消关注",
     "标记未读",
     "查看头像",
+  ]);
+  expect(openMenu(mocks.onSetGroups).map((button) => button.icon)).toEqual([
+    overlayIcons.setGroup,
+    overlayIcons.unfollow,
+    overlayIcons.markUnread,
+    overlayIcons.viewAvatar,
   ]);
 });
 

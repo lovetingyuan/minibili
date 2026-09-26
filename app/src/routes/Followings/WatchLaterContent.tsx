@@ -8,6 +8,7 @@ import { LoginRequired } from "@/components/LoginRequired";
 import { Button, FlashList, Text } from "@/components/styled/rneui";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import VideoListItem from "@/components/VideoItem";
+import { overlayIcons } from "@/constants/overlay-icons";
 import { theme } from "@/constants/theme";
 import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
@@ -24,6 +25,7 @@ export default function WatchLaterContent() {
     return [
       {
         text: "从稍后再看移除",
+        icon: overlayIcons.removeWatchLater,
         onPress: () => {
           void watchLaterActions.toggle({ aid: item.aid });
         },

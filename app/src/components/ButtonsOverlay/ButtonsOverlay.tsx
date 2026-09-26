@@ -1,4 +1,5 @@
 import { Button } from '@/components/styled/rneui'
+import { ThemedIcon } from '@/components/ThemedIcon'
 import { Modal, Pressable, View } from 'react-native'
 import { theme } from "@/constants/theme";
 import { useStore } from '@/store'
@@ -16,15 +17,24 @@ function ButtonsOverlay() {
       return (
         <Button
           type="clear"
-          buttonClassName="w-full justify-start px-5 py-2.5"
-          titleClassName="w-full text-left"
-          title={button.text}
+          buttonClassName="w-full justify-start gap-2.5 px-5 py-2.5"
+          titleClassName="flex-1 text-left"
           key={button.text}
           onPress={() => {
             dismiss()
             button.onPress()
           }}
-        />
+        >
+          {button.icon ? (
+            <ThemedIcon
+              icon={button.icon}
+              filled={button.filled}
+              size={18}
+              colorClassName={theme.primary.accent}
+            />
+          ) : null}
+          {button.text}
+        </Button>
       )
     })
     .filter(Boolean)

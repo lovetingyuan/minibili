@@ -1,7 +1,9 @@
 import type { ReactElement, ReactNode } from "react";
+import type { LucideIcon } from "lucide-react-native";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { ReplyItemType } from "@/api/comments";
+import { overlayIcons } from "@/constants/overlay-icons";
 import { theme } from "@/constants/theme";
 import type { CommentItemProps } from "./comment.types";
 
@@ -24,6 +26,14 @@ vi.mock("react-native", () => ({
 vi.mock("expo-clipboard", () => ({ setStringAsync: mocks.clipboardSetStringAsync }));
 vi.mock("@/components/Avatar", () => ({ Avatar: "Avatar" }));
 vi.mock("@/components/styled/rneui", () => ({ Text: "Text" }));
+vi.mock("@/constants/overlay-icons", () => ({
+  overlayIcons: {
+    copyComment: "Copy",
+    like: "ThumbsUp",
+    dislike: "ThumbsDown",
+    reply: "Reply",
+  },
+}));
 vi.mock("@/constants/theme", () => import("../../constants/theme"));
 vi.mock("@/store", () => ({
   useStore: () => ({
@@ -54,7 +64,7 @@ type ElementProps = {
   onPress?: () => void;
 };
 
-type OverlayButton = { text: string; onPress: () => void };
+type OverlayButton = { text: string; onPress: () => void; icon?: LucideIcon; filled?: boolean };
 type AlertAction = { text: string; onPress?: () => void };
 
 function makeComment(overrides: Partial<ReplyItemType> = {}): ReplyItemType {
@@ -205,6 +215,13 @@ describe("Comment long press actions", () => {
       "点踩",
       "回复 用户",
     ]);
+    expect(buttons.map((button) => button.icon)).toEqual([
+      overlayIcons.copyComment,
+      overlayIcons.like,
+      overlayIcons.dislike,
+      overlayIcons.reply,
+    ]);
+    expect(buttons.map((button) => button.filled)).toEqual([undefined, false, false, undefined]);
   });
 
   test("copies the readable comment content and image placeholders", async () => {
@@ -243,6 +260,7 @@ describe("Comment long press actions", () => {
       "点踩",
       "回复 用户",
     ]);
+    expect(liked.map((button) => button.filled)).toEqual([undefined, true, false, undefined]);
 
     const disliked = openItemActions({
       comment: makeComment({ id: "12", attitude: "dislike" }),
@@ -256,6 +274,7 @@ describe("Comment long press actions", () => {
       "取消点踩",
       "回复 用户",
     ]);
+    expect(disliked.map((button) => button.filled)).toEqual([undefined, false, true, undefined]);
   });
 
   test("the like and dislike actions report the current comment attitude", () => {

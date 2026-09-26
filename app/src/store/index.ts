@@ -6,7 +6,7 @@ import Toast from "react-native-simple-toast";
 
 import { RanksConfig } from "../constants";
 import type { VideoDownloadTask } from "../features/video-download/types";
-import type { UpInfo } from "../types";
+import type { OverlayButton, UpInfo } from "../types";
 import type { NetworkUsage } from "../utils/network";
 import type { WatchProgressSnapshot } from "../utils/watch-progress";
 import type { FollowingDynamicsReadState } from "../api/following-dynamics.types";
@@ -76,7 +76,7 @@ const getAppValue = () => {
       ratio?: number;
     }[],
     currentImageIndex: 0,
-    overlayButtons: [] as { text: string; onPress: () => void }[],
+    overlayButtons: [] as OverlayButton[],
     /**
      * 稍后再看视频 aid 集合，仅当前运行会话有效，不做持久化
      */
