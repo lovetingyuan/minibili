@@ -121,6 +121,7 @@ export function UsersPage(props: UsersPageProps) {
               <tr>
                 <th scope="col">B站昵称</th>
                 <th scope="col">B站 UID</th>
+                <th scope="col">App 版本</th>
                 <th scope="col">首次登录时间</th>
                 <th scope="col">最近使用时间</th>
               </tr>
@@ -140,6 +141,9 @@ export function UsersPage(props: UsersPageProps) {
                     >
                       {user.uid}
                     </a>
+                  </td>
+                  <td data-label="App 版本" class="app-version">
+                    {user.appVersion ?? "未知"}
                   </td>
                   <td data-label="首次登录时间">
                     <UserTime timestamp={user.firstLoginAt} />

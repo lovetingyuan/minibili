@@ -49,7 +49,7 @@ const app = new Hono<{ Bindings: Env }>();
 
 ## 用户管理页
 
-`GET /users` 是由 Worker 直出的用户管理页，展示成功同步过设置的用户昵称、B站 UID、首次登录时间和最近使用时间。UID 可直接跳转到对应的 B站空间；`?q=<关键词>` 可按 UID 或昵称搜索。时间来自服务端并按 `Asia/Shanghai` 显示，页面及认证失败响应均不缓存。
+`GET /users` 是由 Worker 直出的用户管理页，展示成功同步过设置的用户昵称、B站 UID、当前 App 版本、首次登录时间和最近使用时间。UID 可直接跳转到对应的 B站空间；`?q=<关键词>` 可按 UID 或昵称搜索。旧版客户端未上报版本时显示“未知”。时间来自服务端并按 `Asia/Shanghai` 显示，页面及认证失败响应均不缓存。
 
 页面使用 HTTP Basic Auth，用户名固定为 `admin`。密码通过 `MINIBILI_MANAGEMENT_PASSWD` secret 注入，不能写入 `wrangler.jsonc`：
 

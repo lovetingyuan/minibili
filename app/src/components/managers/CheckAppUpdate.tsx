@@ -1,28 +1,53 @@
 import React from "react";
 
 import { useAppUpdateInfo } from "@/api/check-update";
+import { AppUpdateDialog } from "@/features/app-update/app-update-dialog";
 import { useStore } from "@/store";
 
 /** 两次自动检查更新的最小间隔 */
-const CHECK_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 3;
+const CHECK_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 7;
 
 function CheckAppUpdate() {
-  const appUpdateInfo = useAppUpdateInfo();
-  const { $checkAppUpdateTime } = useStore();
-  const { hasUpdate, showAlert } = appUpdateInfo;
+  const { availableUpdate, hideUpdateDialog, hasUpdate } = useAppUpdateInfo();
+  const {
+    $checkAppUpdateTime,
+    appUpdateDialogVisible,
+    initialed,
+    set$checkAppUpdateTime,
+    setAppUpdateDialogVisible,
+  } = useStore();
 
-  // 弹窗属于副作用，放在 effect 中执行，避免渲染阶段调用 Date.now() 与弹窗 API
   React.useEffect(() => {
-    if (__DEV__ || !hasUpdate) {
+    if (
+      __DEV__ ||
+      process.env.EXPO_OS !== "android" ||
+      !initialed ||
+      !hasUpdate ||
+      appUpdateDialogVisible
+    ) {
       return;
     }
     if ($checkAppUpdateTime + CHECK_UPDATE_INTERVAL >= Date.now()) {
       return;
     }
-    showAlert();
-  });
+    set$checkAppUpdateTime(Date.now());
+    setAppUpdateDialogVisible(true);
+  }, [
+    $checkAppUpdateTime,
+    appUpdateDialogVisible,
+    hasUpdate,
+    initialed,
+    set$checkAppUpdateTime,
+    setAppUpdateDialogVisible,
+  ]);
 
-  return null;
+  return (
+    <AppUpdateDialog
+      update={availableUpdate}
+      visible={appUpdateDialogVisible}
+      onClose={hideUpdateDialog}
+    />
+  );
 }
 
 export default CheckAppUpdate;

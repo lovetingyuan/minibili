@@ -22,13 +22,13 @@ function Version() {
     checkUpdate,
     loading: checkingUpdate,
     hasUpdate,
-    showAlert,
+    showUpdateDialog,
   } = useAppUpdateInfo();
   const handleCheckUpdate = () => {
     if (hasUpdate) {
-      showAlert();
+      showUpdateDialog();
     } else if (!checkingUpdate) {
-      checkUpdate();
+      void checkUpdate();
     }
   };
   return (
@@ -48,14 +48,18 @@ function Version() {
             .join("\n"),
         );
       }}
-      buttons={[
-        {
-          text: hasUpdate ? "APP有更新🎉" : "检查更新",
-          loading: hasUpdate ? false : checkingUpdate,
-          onPress: handleCheckUpdate,
-          color: hasUpdate ? updateHighlightColor : undefined,
-        },
-      ]}
+      buttons={
+        process.env.EXPO_OS === "android"
+          ? [
+              {
+                text: hasUpdate ? "APP有更新🎉" : "检查更新",
+                loading: hasUpdate ? false : checkingUpdate,
+                onPress: handleCheckUpdate,
+                color: hasUpdate ? updateHighlightColor : undefined,
+              },
+            ]
+          : []
+      }
     />
   );
 }

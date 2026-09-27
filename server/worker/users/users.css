@@ -227,6 +227,7 @@ tbody tr:hover {
 }
 
 .uid-link,
+.app-version,
 time {
   font-variant-numeric: tabular-nums;
 }

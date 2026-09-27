@@ -1,6 +1,7 @@
 export type UserActivity = {
   uid: string;
   nickname: string;
+  appVersion: string | null;
   firstLoginAt: number;
   lastUsedAt: number;
 };
@@ -8,6 +9,7 @@ export type UserActivity = {
 export type RecordUserActivityInput = {
   uid: string;
   nickname: string;
+  appVersion: string | null;
   usedAt: number;
 };
 

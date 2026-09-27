@@ -1,6 +1,11 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
+import {
+  ensureDownloadNotificationPermission,
+  initDownloadNotifications,
+} from "@/features/notifications/download-notifications";
+
 /**
  * 通知标识固定：用同一个 identifier 重新展示通知会在系统里原地替换，
  * 下载进度就是靠这一点持续更新同一条通知。
@@ -29,14 +34,7 @@ function isNotificationSupported() {
 }
 
 async function setupVideoDownloadNotifications() {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
+  await initDownloadNotifications();
 
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync(VIDEO_DOWNLOAD_CHANNEL_ID, {
@@ -73,24 +71,7 @@ export function initVideoDownloadNotifications(): Promise<void> {
  * 申请通知权限。被拒绝时下载照常进行，只是看不到进度通知。
  */
 export async function ensureVideoDownloadNotificationPermission() {
-  if (!isNotificationSupported()) {
-    return false;
-  }
-  try {
-    const current = await Notifications.getPermissionsAsync();
-    if (current.granted) {
-      return true;
-    }
-    if (!current.canAskAgain) {
-      return false;
-    }
-    const requested = await Notifications.requestPermissionsAsync({
-      ios: { allowAlert: true, allowBadge: false, allowSound: false },
-    });
-    return requested.granted;
-  } catch {
-    return false;
-  }
+  return ensureDownloadNotificationPermission();
 }
 
 async function presentVideoDownloadNotification(

@@ -10,6 +10,7 @@ const account = { mid: "123", generation: 1 };
 const cookie = "SESSDATA=session%2F==; DedeUserID=123; bili_jct=csrf";
 function setup() {
   const dependencies: UserDataRequestDependencies = {
+    appVersion: null,
     readCookie: vi.fn(async () => cookie),
     isCurrentAccount: vi.fn(() => true),
     request: vi.fn(async () =>

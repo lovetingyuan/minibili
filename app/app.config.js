@@ -60,7 +60,7 @@ module.exports = {
       monochromeImage: "./assets/icon/android-icon-monochrome.png",
     },
     package: appId,
-    permissions: ["WAKE_LOCK"],
+    permissions: ["WAKE_LOCK", "REQUEST_INSTALL_PACKAGES"],
     versionCode: Number(versionCode),
   },
   web: {

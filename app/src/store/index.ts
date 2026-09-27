@@ -89,6 +89,8 @@ const getAppValue = () => {
      * 当前的视频下载任务，仅当前运行会话有效，不做持久化
      */
     videoDownloadTask: null as VideoDownloadTask | null,
+    /** 应用更新弹窗由根部 manager 单实例渲染，关于页只负责触发。 */
+    appUpdateDialogVisible: false,
     moreRepliesUrl: "",
     repliesInfo: null as RepliesInfo | null,
     releaseList: [] as {

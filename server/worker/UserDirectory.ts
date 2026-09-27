@@ -12,9 +12,14 @@ const CREATE_USERS_TABLE = `
   CREATE TABLE IF NOT EXISTS users (
     uid TEXT PRIMARY KEY,
     nickname TEXT NOT NULL,
+    app_version TEXT,
     first_login_at INTEGER NOT NULL,
     last_used_at INTEGER NOT NULL
   )
+`;
+
+const ADD_APP_VERSION_COLUMN = `
+  ALTER TABLE users ADD COLUMN app_version TEXT
 `;
 
 const CREATE_LAST_USED_INDEX = `
@@ -46,6 +51,12 @@ export class UserDirectory extends DurableObject<ServerBindings> {
     super(ctx, env);
     ctx.blockConcurrencyWhile(async () => {
       this.ctx.storage.sql.exec(CREATE_USERS_TABLE);
+      const userColumns = this.ctx.storage.sql
+        .exec<{ name: string }>("PRAGMA table_info(users)")
+        .toArray();
+      if (!userColumns.some((column) => column.name === "app_version")) {
+        this.ctx.storage.sql.exec(ADD_APP_VERSION_COLUMN);
+      }
       this.ctx.storage.sql.exec(CREATE_LAST_USED_INDEX);
       this.ctx.storage.sql.exec(CREATE_FEEDBACK_RATE_LIMITS_TABLE);
     });
@@ -56,6 +67,7 @@ export class UserDirectory extends DurableObject<ServerBindings> {
       !/^[1-9]\d*$/.test(input.uid) ||
       !input.nickname.trim() ||
       input.nickname.length > 128 ||
+      (input.appVersion !== null && (!input.appVersion.trim() || input.appVersion.length > 64)) ||
       !Number.isSafeInteger(input.usedAt) ||
       input.usedAt <= 0
     ) {
@@ -64,17 +76,22 @@ export class UserDirectory extends DurableObject<ServerBindings> {
 
     this.ctx.storage.sql.exec(
       `
-        INSERT INTO users (uid, nickname, first_login_at, last_used_at)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO users (uid, nickname, app_version, first_login_at, last_used_at)
+        VALUES (?, ?, ?, ?, ?)
         ON CONFLICT(uid) DO UPDATE SET
           nickname = CASE
             WHEN excluded.last_used_at >= users.last_used_at THEN excluded.nickname
             ELSE users.nickname
           END,
+          app_version = CASE
+            WHEN excluded.last_used_at >= users.last_used_at THEN excluded.app_version
+            ELSE users.app_version
+          END,
           last_used_at = MAX(users.last_used_at, excluded.last_used_at)
       `,
       input.uid,
       input.nickname,
+      input.appVersion,
       input.usedAt,
       input.usedAt,
     );
@@ -88,6 +105,7 @@ export class UserDirectory extends DurableObject<ServerBindings> {
           SELECT
             uid,
             nickname,
+            app_version AS appVersion,
             first_login_at AS firstLoginAt,
             last_used_at AS lastUsedAt
           FROM users

@@ -41,7 +41,11 @@ export async function requestUserData(
     const response = await dependencies.request(`${serverUrl}/api/user-data/sync`, {
       method: "POST",
       body,
-      headers: { "Content-Type": "application/json", "X-Bilibili-Cookie": cookie },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Bilibili-Cookie": cookie,
+        ...(dependencies.appVersion ? { "X-MiniBili-App-Version": dependencies.appVersion } : {}),
+      },
       credentials: "omit",
       redirect: "error",
       signal: controller.signal,

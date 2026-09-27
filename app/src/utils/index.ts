@@ -1,10 +1,10 @@
 import * as Application from "expo-application";
 import * as Updates from "expo-updates";
-import { Alert, Linking, Share } from "react-native";
+import { Alert, Share } from "react-native";
 import { throttle } from "throttle-debounce";
 
-import { fetchVersion } from "@/api/check-update";
-import { site } from "@/constants";
+import { fetchVersion, resolveAvailableAppUpdate } from "@/api/check-update";
+import { startAppUpdateDownload } from "@/features/app-update/controller";
 import { enqueueToast } from "@/features/toast";
 
 import { buildVideoShareMessage, buildVideoShareUrl } from "./share";
@@ -149,20 +149,26 @@ export async function showFatalError(error: any) {
   // if (__DEV__) {
   //   return
   // }
-  const hasUpdate =
-    updateInfo?.[0] && updateInfo[0].version !== Application.nativeApplicationVersion;
+  const availableUpdate =
+    process.env.EXPO_OS === "android"
+      ? resolveAvailableAppUpdate(updateInfo ?? undefined, Application.nativeApplicationVersion ?? "0.0.0")
+      : null;
 
   Alert.alert(
     "抱歉，应用发生了错误😅",
     `我们会处理这个错误\n${error?.message || error}${
-      hasUpdate ? "\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误" : ""
+      availableUpdate ? "\n您当前使用的是旧版应用，推荐您下载新版应用来避免错误" : ""
     }`,
     [
-      hasUpdate
+      availableUpdate
         ? {
             text: "下载新版",
             onPress: () => {
-              Linking.openURL(site);
+              startAppUpdateDownload({
+                downloadUrl: availableUpdate.downloadLink,
+                releaseName: availableUpdate.release.version,
+                version: availableUpdate.latestVersion,
+              });
             },
           }
         : null,

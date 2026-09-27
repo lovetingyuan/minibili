@@ -1,14 +1,16 @@
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 import { CircleAlert } from "lucide-react-native";
-import { Button, Linking, Text, View } from "react-native";
+import { Button, Text, View } from "react-native";
 
+import { useAppUpdateInfo } from "@/api/check-update";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { theme } from "@/constants/theme";
-
-import { site } from "@/constants";
+import { startAppUpdateDownload } from "@/features/app-update/controller";
 
 export default function ErrorFallback(props: { error: Error; resetError: Function }) {
+  const { availableUpdate, loading } = useAppUpdateInfo();
+
   if (__DEV__) {
     // oxlint-disable-next-line no-console
     console.error(props.error);
@@ -40,16 +42,28 @@ export default function ErrorFallback(props: { error: Error; resetError: Functio
         >
           {" 重启应用 "}
         </Text>
-        ，我们推荐您安装新版
+        {availableUpdate ? "，我们推荐您安装新版" : "。"}
       </Text>
-      <View className="my-8 px-8">
-        <Button
-          title="下载最新版本"
-          onPress={() => {
-            Linking.openURL(site);
-          }}
-        />
-      </View>
+      {process.env.EXPO_OS === "android" ? (
+        <View className="my-8 px-8">
+          <Button
+            disabled={!availableUpdate}
+            title={
+              loading ? "正在检查新版本…" : availableUpdate ? "下载最新版本" : "暂无可下载新版本"
+            }
+            onPress={() => {
+              if (!availableUpdate) {
+                return;
+              }
+              startAppUpdateDownload({
+                downloadUrl: availableUpdate.downloadLink,
+                releaseName: availableUpdate.release.version,
+                version: availableUpdate.latestVersion,
+              });
+            }}
+          />
+        </View>
+      ) : null}
     </View>
   );
 }

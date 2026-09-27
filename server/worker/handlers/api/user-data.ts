@@ -6,6 +6,12 @@ import { parseSyncOperations, readSyncBody, SyncPayloadTooLargeError } from "../
 
 const USER_DIRECTORY_NAME = "global";
 const RATE_LIMITED_MESSAGE = "请求过于频繁，请稍后再试";
+const MAX_APP_VERSION_LENGTH = 64;
+
+function getAppVersion(value: string | undefined) {
+  const appVersion = value?.trim();
+  return appVersion && appVersion.length <= MAX_APP_VERSION_LENGTH ? appVersion : null;
+}
 
 export async function handleSyncUserData(c: AppContext) {
   c.header("Cache-Control", "no-store");
@@ -47,6 +53,7 @@ export async function handleSyncUserData(c: AppContext) {
     await c.env.USER_DIRECTORY.getByName(USER_DIRECTORY_NAME).recordActivity({
       uid: identity.uid,
       nickname: identity.nickname,
+      appVersion: getAppVersion(c.req.header("X-MiniBili-App-Version")),
       usedAt: Date.now(),
     });
     return c.json({ success: true, uid: identity.uid, result });
