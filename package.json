@@ -13,6 +13,7 @@
     "knip:app": "knip --workspace @minibili/app",
     "android": "npm run android -w=@minibili/app",
     "dev": "npm run dev -w=@minibili/app",
+    "doctor": "npm run doctor -w=@minibili/app",
     "build:preview": "npm run build:android:preview -w=@minibili/app",
     "build:preview:eas": "npm run build:android:preview:eas -w=@minibili/app",
     "build:dev": "npm run build:android:dev -w=@minibili/app",
