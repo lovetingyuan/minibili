@@ -6,6 +6,13 @@ import {
 import { buildShareSearch, normalizePage, parseShareParams } from "../share/format";
 import { ShareErrorPage, SharePage } from "../share/page";
 import type { AppContext } from "../types";
+import { getClientIp, isRateLimited, RATE_LIMIT_RETRY_AFTER } from "../utils/rate-limit";
+
+/**
+ * canonical 与 og:url 使用固定站点，不用请求 Host：Host 头可被伪造，
+ * 不该出现在直出的元信息里。
+ */
+const SITE_ORIGIN = "https://minibili.tingyuan.in";
 
 /** 分享页整页直出：视频信息在服务端取好，失败时只返回精简错误页。 */
 export async function handleSharePage(c: AppContext) {
@@ -25,11 +32,25 @@ export async function handleSharePage(c: AppContext) {
     );
   }
 
+  // 随机 bvid 会绕过 300 秒缓存直接打上游，这里按 IP 挡掉抓取式流量。
+  if (await isRateLimited(c.env.RATE_LIMIT_SHARE, "share", getClientIp(c))) {
+    c.header("Cache-Control", "no-store");
+    c.header("Retry-After", RATE_LIMIT_RETRY_AFTER);
+    return c.html(
+      <ShareErrorPage
+        title="访问过于频繁"
+        message="短时间内打开的分享页过多，请稍后再试。"
+        retryHref={`/share${buildShareSearch(params.bvid, params.page)}`}
+      />,
+      429,
+    );
+  }
+
   try {
     const data = await fetchVideoInfo(c.env, params.bvid, params.page);
     const page = normalizePage(data.currentPage, data.pages.length);
     c.header("Cache-Control", `public, max-age=${VIDEO_INFO_CACHE_SECONDS}`);
-    return c.html(<SharePage data={data} page={page} origin={url.origin} />, 200);
+    return c.html(<SharePage data={data} page={page} origin={SITE_ORIGIN} />, 200);
   } catch (error) {
     c.header("Cache-Control", "no-store");
     const retryHref = `/share${buildShareSearch(params.bvid, params.page)}`;

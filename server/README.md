@@ -26,9 +26,10 @@ const app = new Hono<{ Bindings: Env }>();
 
 `GET /share?bvid=<BV号>&p=<分片>` 是分享链接使用的页面，由 Worker 用 Hono JSX 直出（`worker/share/`）：上方是 B站 iframe 播放器，下方展示标题、简介、UP 主、投稿时间、播放/点赞/投币/收藏/转发/弹幕/评论数以及分P 列表。视频信息在服务端进程内取好后再渲染，因此 HTML 带真实的 `title`、`description` 与 OG 标签，样式也内联在页面里；客户端只有一段内联脚本负责复制链接与简介展开，分P 切换是真实链接。字段定义见 `shared/video-info.ts`。`/share.html` 会 307 跳转到 `/share` 并保留查询串。
 
-- `bvid` 缺失或非法返回 `400`；B站返回视频不存在（`-404`）时返回 `404`；上游超时、风控或结构异常时返回 `502`。三种失败都只输出精简错误页（站头站尾 + 错误卡片 + 重新加载链接），不嵌播放器，且响应不缓存。
+- `bvid` 缺失或非法返回 `400`；B站返回视频不存在（`-404`）时返回 `404`；上游超时、风控或结构异常时返回 `502`；同一 IP 每分钟超过 60 次返回 `429`。失败都只输出精简错误页（站头站尾 + 错误卡片 + 重新加载链接），不嵌播放器，且响应不缓存。
 - `p` 非正整数或超出分片数量时按第 1 个分片处理，`cid` 与时长也跟随实际生效的分片。
 - 取数只读、匿名可用，不携带任何 Cookie；上游请求经 `bili-proxy` 中转（见下节），业务码为 `0` 的结果缓存 300 秒，页面响应头为 `Cache-Control: public, max-age=300`。UP 主粉丝数来自 `/x/relation/stat`，取不到时为 `null`。
+- `canonical` 与 `og:url` 使用固定站点域名，不取请求 `Host`。
 
 ## 用户设置同步
 
@@ -40,7 +41,9 @@ const app = new Hono<{ Bindings: Env }>();
 
 `$pinnedUpIds` 是去重后的 UP 主 MID 字符串数组，按置顶顺序排列，首项最靠前，默认值为 `[]`。置顶将 ID 移至首位，取消置顶移除 ID；全部取消时写入空数组。不在当前关注列表中的 ID 暂不展示，保留其置顶记录供再次关注后恢复。旧关注缓存中的置顶数据不迁移。
 
-状态码：格式错误 `400`，登录缺失/失效 `401`，请求过大 `413`，B站暂不可验证或存储失败 `503`。所有同步响应均禁止缓存。邮箱接口已移除，旧版数据不迁移。
+状态码：格式错误 `400`，登录缺失/失效 `401`，请求过大 `413`，触发限流 `429`，B站暂不可验证或存储失败 `503`。`Content-Type` 必须是 `application/json`。所有同步响应均禁止缓存。邮箱接口已移除，旧版数据不迁移。
+
+限流分两道：请求体解析后先按来源 IP 计数（每分钟 60 次，未登录请求同样会触发一次 B站身份校验，必须挡在上游之前），身份校验通过后再按 UID 计数（每分钟 60 次）。两道都用 `wrangler.jsonc` 的 `ratelimits` binding，按 Cloudflare 节点本地计数，属于滥用防护而非全局配额；`limit()` 自身出错时放行并记日志。
 
 游客、本地账号缓存和待同步修改分别隔离存储。有效登录时自动同步，失败保留修改；切换账号不会上传游客或其他账号的数据。同一 key 采用最后成功写入的值。
 
@@ -54,7 +57,11 @@ const app = new Hono<{ Bindings: Env }>();
 npx wrangler secret put MINIBILI_MANAGEMENT_PASSWD
 ```
 
-本地开发将同名变量写入 `.env.local`（格式见 `.env.example`）。未配置密码时页面返回 `503`，无凭据或密码错误时返回 `401`。
+本地开发将同名变量写入 `.env.local`（格式见 `.env.example`）。未配置密码时页面返回 `503`，无凭据或密码错误时返回 `401`，同一 IP 一分钟内认证失败超过 10 次返回 `429`（只有失败才计数，正常浏览与搜索不消耗配额）。`?q` 超过 64 字符的部分会被截断。
+
+## 安全响应头
+
+Worker 直出的所有响应（分享页、管理页、API、404）由 `worker/index.ts` 的中间件补齐 `X-Content-Type-Options`、`Referrer-Policy`、`Permissions-Policy`、`Strict-Transport-Security`、`X-Frame-Options`（仅 HTML）与只含 `frame-ancestors`/`base-uri`/`object-src`/`form-action` 的 CSP；已由 handler 设置的同名头优先。静态资源由 `public/_headers` 下发同一套头，只作用于静态资源响应。
 
 ## B 站请求中转（bili-proxy）
 

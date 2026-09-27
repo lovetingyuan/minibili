@@ -27,6 +27,10 @@ export interface ServerBindings {
   MINIBILI_MANAGEMENT_PASSWD: string;
   /** Resend 发信密钥，用 `wrangler secret put RESEND_API_KEY` 注入。 */
   RESEND_API_KEY: string;
+  /** 见 wrangler.jsonc 的 ratelimits；按 Cloudflare 节点本地计数。 */
+  RATE_LIMIT_ADMIN: RateLimit;
+  RATE_LIMIT_SHARE: RateLimit;
+  RATE_LIMIT_SYNC: RateLimit;
   USER_DIRECTORY: { getByName(name: string): UserDirectoryStub };
   USER_STORAGE: { getByName(name: string): UserStorageStub };
 }
