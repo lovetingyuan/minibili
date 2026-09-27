@@ -1,69 +1,33 @@
 # MiniBili
 
-The minimum bilibili app.
-(Android 6 or above)
-简单的B站浏览APP，欢迎下载使用
+一款简洁、免费开源的第三方 B 站 Android App。没有推荐、广告和推送，只有好看的视频和你喜爱的 UP 主。
 
-<img src="./docs/minibili.png" alt="minibili" width="280" >
+<img src="./app/assets/minibili.png" alt="MiniBili" width="280">
 
-<img src="./docs/video-list.jpg" alt="video list" width="320" style="margin-right: 20px"> <img src="./docs/player.jpg" alt="player" width="320" style="margin-right: 20px">
+<img src="./server/public/screenshots/hot.webp" alt="热门" width="200" style="margin-right: 16px"> <img src="./server/public/screenshots/player.webp" alt="播放" width="200" style="margin-right: 16px"> <img src="./server/public/screenshots/dynamic.webp" alt="动态" width="200" style="margin-right: 16px"> <img src="./server/public/screenshots/mine.webp" alt="我的" width="200">
 
----
+下载安装：https://minibili.tingyuan.in/ （Android 6.0 及以上）
 
-<img src="./docs/up-list.jpg" alt="up list" width="320" style="margin-right: 20px"> <img src="./docs/up-detail.jpg" alt="up detail" width="320" style="margin-right: 20px">
+## 主要功能
 
-下载: https://minibili.tingyuan.in/
+- 热门、动态、关注、我的四个页面，浏览与搜索视频、UP 主
+- 播放器支持弹幕、倍速、后台播放，直播与分 P 视频也能看
+- 收藏、历史、稍后再看，UP 主主页与关注动态
+- B 站账号登录，支持多账号与设置同步
+- 视频分享页，支持深色模式
 
-Developed with Expo, React-Native and TailwindCSS.
+## 本地运行
 
-Thanks https://socialsisteryi.github.io/bilibili-API-collect/
-
-## Hot Update
-
-Use EAS Update directly from the `app` workspace.
-
-In `app`:
+需要 Node.js 与 npm，安装依赖后分别启动接口服务和客户端：
 
 ```bash
-npm run update -- --message "your update message"
+npm install
+npm run server   # 本地接口服务
+npm run dev      # 客户端开发服务（另开一个终端）
 ```
 
-From the repo root:
+## 反馈与致谢
 
-```bash
-npm run update -w=@minibili/app -- --message "your update message"
-```
+问题与建议欢迎通过 App 内的「意见反馈」或 GitHub Issue 提出。
 
-This publishes to the `production` channel for `android` with the `production` EAS environment.
-
-## 本地开发（USB 调试 / 无线调试）
-
-接口调试依赖本地 server，先在一个终端启动它：
-
-```bash
-npm run server
-```
-
-再在另一个终端启动 app 的开发服务（USB 与无线调试在 adb 层等价，这里用同一条命令）：
-
-```bash
-npm run dev
-```
-
-- 需要已安装 Android platform-tools（`adb` 在 PATH 中），并且已在「开发者选项」里打开 USB 调试（数据线连接，手机弹窗点允许）或无线调试（`adb pair <ip>:<port>` 配对后再 `adb connect <ip>:<port>`）；`adb devices` 中状态为 `device` 才算就绪。
-- 命令会把手机的 `127.0.0.1:8081`（Metro）与 `127.0.0.1:8787`（本地 server）反代到电脑，再以 `--localhost` 模式启动 dev-client 的 Metro；手机上打开已安装的开发包即可，不要求电脑与手机处于同一网段。
-- app 的接口地址由 Metro 的 host 在运行时推导（见 `app/src/constants/dev-server-url.ts`），不需要配置电脑的局域网 IP，也没有 `.env.local`。
-- 没有可用的 adb 设备时不会报错：命令会跳过反代，改用 expo 默认的 LAN 模式启动，此时手机需要与电脑处于同一网段。
-- 本机 8081 已被占用时（例如还开着另一个 Metro）命令会直接报错，先停掉旧 Metro，或用 `-p` 指定别的端口。
-- 参数会原样透传给 `expo start`：`npm run dev -- --android`（自动拉起手机上的开发包）、`npm run dev -- --clear`（清缓存）、`npm run dev -- -p 8082`（自定义 Metro 端口，反代端口同步）、`npm run dev -- --lan`（不使用 localhost 模式）。
-- 实际使用的接口地址可以在 app 的「关于 → 版本信息」弹窗里看到（仅开发构建）。
-
-## 仓库结构
-
-本仓库是 npm workspaces monorepo：
-
-- `app`：Expo / React Native 客户端。
-- `server`：Cloudflare Worker（分享页 SSR、设置同步接口与静态资源）。
-- `bili-proxy`：部署在 Vercel（Node 运行时）的 B 站接口转发层。Cloudflare 的出站 IP 会被 B 站风控直接拒绝，所以 `server` 里没有直连 B 站的代码，`/share` 与设置同步都经它转发。
-
-本地调试 `server` 时需要把 Vercel 上的 `BILI_PROXY_TOKEN` 填进 `server/.dev.vars`（参考 `server/.dev.vars.example`），否则 `/share` 与 `/api/user-data/sync` 会返回 502/503。`bili-proxy` 的部署与冒烟步骤见 [bili-proxy/README.md](./bili-proxy/README.md)。
+接口文档来自 [bilibili-API-collect](https://socialsisteryi.github.io/bilibili-API-collect/)，感谢原作者。
