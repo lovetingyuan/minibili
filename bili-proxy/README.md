@@ -11,7 +11,7 @@ POST /api/bili
 x-proxy-token: <BILI_PROXY_TOKEN>
 content-type: application/json
 
-{ "path": "/x/web-interface/view?bvid=BV1XctB6PEuZ", "profile": "web" }
+{ "path": "/x/web-interface/view?bvid=BV1GJ411x7h7", "profile": "web" }
 { "path": "/x/space/v2/myinfo", "profile": "auth", "cookie": "SESSDATA=..." }
 ```
 
@@ -58,7 +58,7 @@ npm run deploy
 curl -sS -i https://bili-proxy-iota.vercel.app/api/bili \
   -H "content-type: application/json" \
   -H "x-proxy-token: $BILI_PROXY_TOKEN" \
-  -d '{"path":"/x/web-interface/view?bvid=BV1XctB6PEuZ","profile":"web"}'
+  -d '{"path":"/x/web-interface/view?bvid=BV1GJ411x7h7","profile":"web"}'
 ```
 
 期望：HTTP 200、`x-proxy-source: upstream`、body 里业务 `code` 为 `0`。
