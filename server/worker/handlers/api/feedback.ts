@@ -17,6 +17,7 @@ const USER_DIRECTORY_NAME = "global";
 const FEEDBACK_FROM = "MiniBili <minibili_feedback@tingyuan.in>";
 const FEEDBACK_TO = "minibili@tingyuan.in";
 const BASE64_PATTERN = /^[A-Za-z0-9+/]*={0,2}$/;
+const MAX_APP_VERSION_LENGTH = 100;
 
 const MIME_EXTENSION: Record<FeedbackImageMimeType, string> = {
   "image/jpeg": "jpg",
@@ -85,8 +86,20 @@ function parseFeedbackRequest(value: unknown): FeedbackRequest | null {
     return null;
   }
 
+  const rawAppVersion = value.appVersion;
+  if (
+    rawAppVersion !== undefined &&
+    rawAppVersion !== null &&
+    (typeof rawAppVersion !== "string" ||
+      !rawAppVersion.trim() ||
+      rawAppVersion.length > MAX_APP_VERSION_LENGTH)
+  ) {
+    return null;
+  }
+  const appVersion = typeof rawAppVersion === "string" ? rawAppVersion.trim() : null;
+
   if (value.image === undefined) {
-    return { feedback, biliId };
+    return { feedback, biliId, appVersion };
   }
   if (
     !isRecord(value.image) ||
@@ -113,6 +126,7 @@ function parseFeedbackRequest(value: unknown): FeedbackRequest | null {
   return {
     feedback,
     biliId,
+    appVersion,
     image: {
       filename: value.image.filename,
       mimeType: value.image.mimeType,
@@ -164,13 +178,20 @@ export async function handleSubmitFeedback(c: AppContext) {
   }
 
   const displayBiliId = feedback.biliId ?? "未登录";
+  const displayAppVersion = feedback.appVersion ?? "未知";
   const resend = new Resend(c.env.RESEND_API_KEY);
   try {
     const { error } = await resend.emails.send({
       from: FEEDBACK_FROM,
       to: FEEDBACK_TO,
       subject: `[MiniBili 反馈] B站ID：${displayBiliId}`,
-      text: [`B站ID：${displayBiliId}`, "", "反馈内容：", feedback.feedback].join("\n"),
+      text: [
+        `B站ID：${displayBiliId}`,
+        `应用版本：${displayAppVersion}`,
+        "",
+        "反馈内容：",
+        feedback.feedback,
+      ].join("\n"),
       attachments: feedback.image
         ? [
             {

@@ -1,3 +1,5 @@
+import * as Application from "expo-application";
+import Constants from "expo-constants";
 import useSWRMutation from "swr/mutation";
 
 import type { FeedbackRequest } from "../../../shared/feedback";
@@ -17,6 +19,7 @@ async function submitFeedback(input: SubmitFeedbackInput) {
   const body: FeedbackRequest = {
     feedback: input.feedback,
     biliId: input.biliId,
+    appVersion: Application.nativeApplicationVersion ?? Constants.expoConfig?.version ?? null,
     image: input.image
       ? {
           filename: input.image.file.name,

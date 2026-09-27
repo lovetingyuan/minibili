@@ -20,6 +20,7 @@ export type FeedbackImagePayload = {
 export type FeedbackRequest = {
   feedback: string;
   biliId: string | null;
+  appVersion: string | null;
   image?: FeedbackImagePayload;
 };
 
