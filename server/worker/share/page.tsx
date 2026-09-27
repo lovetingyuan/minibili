@@ -7,6 +7,8 @@ import shareStyles from "./share.css?inline";
 
 const SITE_URL = "https://minibili.tingyuan.in/";
 const SITE_NAME = "MiniBili";
+/** 站头小图标与站点图标都用 public 下已有的品牌图，不再引用已删除的 favicon.svg */
+const BRAND_LOGO_URL = "/icon-192.png";
 const SHARE_TITLE = "B站视频分享 - MiniBili";
 const SHARE_DESCRIPTION = "由 MiniBili 提供的轻量 B 站视频分享页";
 const ICONIFY_SCRIPT_URL = "https://code.iconify.design/iconify-icon/3.0.2/iconify-icon.min.js";
@@ -60,7 +62,7 @@ function SiteHeader(props: SiteHeaderProps) {
   return (
     <header class="site-header">
       <a class="brand" href={SITE_URL}>
-        <img class="brand-logo" src="/favicon.svg" alt="" width={28} height={28} />
+        <img class="brand-logo" src={BRAND_LOGO_URL} alt="" width={28} height={28} />
         <span>{SITE_NAME}</span>
       </a>
       <span class="brand-tagline">{props.tagline}</span>
@@ -87,7 +89,8 @@ function ShareHead(props: { meta: ShareMeta }) {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="icon" href="/favicon.ico" sizes="any" />
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
       <title>{meta.title}</title>
       <meta name="description" content={meta.description} />
       <meta name="theme-color" content="#fb7299" />

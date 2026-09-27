@@ -31,7 +31,8 @@ function UsersHead() {
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta name="robots" content="noindex,nofollow" />
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="icon" href="/favicon.ico" sizes="any" />
+      <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
       <title>用户列表 - MiniBili</title>
       <meta name="theme-color" content="#fb7299" />
       <style dangerouslySetInnerHTML={{ __html: usersStyles }}></style>
@@ -43,7 +44,7 @@ function SiteHeader() {
   return (
     <header class="site-header">
       <a class="brand" href={SITE_URL} rel="noreferrer" target="_blank">
-        <img class="brand-logo" src="/favicon.svg" alt="" width={28} height={28} />
+        <img class="brand-logo" src="/icon-192.png" alt="" width={28} height={28} />
         <span>MiniBili</span>
       </a>
       <span class="brand-tagline">用户管理</span>

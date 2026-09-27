@@ -130,7 +130,7 @@ function OwnerRow(props: OwnerRowProps) {
         alt={`${owner.name} 的头像`}
         loading="lazy"
         referrerpolicy="no-referrer"
-        src={owner.face ? upgradeImageUrl(owner.face) : "/favicon.svg"}
+        src={owner.face ? upgradeImageUrl(owner.face) : "/icon-192.png"}
       />
       <div class="owner-info">
         <ExternalLink class="owner-name" href={`https://space.bilibili.com/${owner.mid}`}>
