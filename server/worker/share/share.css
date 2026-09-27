@@ -45,7 +45,7 @@ body {
   color: var(--text);
   font-size: 14px;
   line-height: 1.6;
-  /* 页面本身不滚动，只有内容区滚动 */
+  /* 页面本身不滚动，只有站头下方的 .layout 滚动 */
   overflow: hidden;
 }
 
@@ -123,7 +123,8 @@ iconify-icon:defined + .icon-fallback {
   font-size: 13px;
 }
 
-/* 单列布局，仅限制最大展示宽度 */
+/* 站头下方唯一的滚动容器：视频与信息一起滚动，滚动条留在窗口边缘，
+   展示宽度由内部的播放器与信息列各自限制 */
 .layout {
   display: flex;
   flex: 1;
@@ -131,20 +132,19 @@ iconify-icon:defined + .icon-fallback {
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 0;
-}
-
-.scroll-area {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  flex-direction: column;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
+}
+
+.scroll-area {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
 }
 
 .content {
@@ -164,6 +164,9 @@ iconify-icon:defined + .icon-fallback {
 /* 移动端播放器贴边满宽 */
 .player-card {
   flex: none;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
   border-radius: 0;
   border-right-width: 0;
   border-left-width: 0;
@@ -197,14 +200,6 @@ iconify-icon:defined + .icon-fallback {
     border-radius: 12px;
     border-right-width: 1px;
     border-left-width: 1px;
-  }
-}
-
-/* 视口过矮（例如手机横屏）时限制播放器高度，保证下方信息仍可滚动 */
-@media (max-height: 560px) {
-  .player-frame {
-    height: 45dvh;
-    aspect-ratio: auto;
   }
 }
 
