@@ -132,6 +132,8 @@ export default function CommentList(props: CommentListProps) {
   }
 
   const allCount = comments.data.allCount ?? props.commentCount;
+  const header =
+    typeof props.children === "function" ? props.children({ openComposer }) : props.children;
   return (
     <View className="flex-1">
       <FlashList
@@ -154,7 +156,7 @@ export default function CommentList(props: CommentListProps) {
         ItemSeparatorComponent={CommentSeparator}
         ListHeaderComponent={
           <View>
-            <View className="bg-white px-3 pt-4 pb-3 dark:bg-slate-950">{props.children}</View>
+            <View className="bg-white px-3 pt-4 pb-3 dark:bg-slate-950">{header}</View>
             <View className={`h-2 ${theme.background.page}`} />
             <View className="flex-row items-center justify-between border-b border-slate-100 bg-white px-3 pb-2 pt-3 dark:border-slate-800 dark:bg-slate-950">
               <View className="flex-row items-center gap-1.5">

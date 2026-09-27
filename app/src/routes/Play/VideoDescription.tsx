@@ -29,7 +29,9 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
 
   return (
     <View className="relative mt-3 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-slate-900">
+      {/* Android 会缓存 Text/Pressable 的原生布局；切换折叠模式时重建节点，避免复用错误的位置。 */}
       <Text
+        key={isCollapsed ? "description-collapsed" : "description-expanded"}
         selectable
         className={`text-sm leading-6 ${theme.text.secondary}`}
         numberOfLines={isCollapsed ? VIDEO_DESCRIPTION_COLLAPSED_LINES : undefined}
@@ -62,6 +64,7 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
       </Text>
       {collapsible ? (
         <Pressable
+          key={isCollapsed ? "toggle-collapsed" : "toggle-expanded"}
           accessibilityRole="button"
           accessibilityLabel={isCollapsed ? "展开完整简介" : "收起简介"}
           className={`flex-row items-center py-1 ${

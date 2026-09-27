@@ -45,6 +45,9 @@
   "vars": {
     "BILIBILI_PROXY_URL": "https://bili-proxy-iota.vercel.app",
   },
+  "secrets": {
+    "required": ["BILIBILI_PROXY_TOKEN", "MINIBILI_MANAGEMENT_PASSWD"],
+  },
   /**
    * Smart Placement
    * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

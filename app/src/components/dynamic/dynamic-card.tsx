@@ -177,6 +177,7 @@ export function DynamicCard(props: {
   item: DynamicItem;
   detail?: boolean;
   onPress?: () => void;
+  onCommentPress?: () => void;
   article?: DynamicArticle;
   articleLoading?: boolean;
   showActions?: boolean;
@@ -195,7 +196,11 @@ export function DynamicCard(props: {
     >
       {onPress ? <Pressable onPress={onPress}>{body}</Pressable> : <View>{body}</View>}
       {props.showActions === false ? null : (
-        <DynamicActions item={item} onCommentPress={detail ? undefined : onPress} />
+        <DynamicActions
+          item={item}
+          onCommentPress={props.onCommentPress ?? (detail ? undefined : onPress)}
+          commentAccessibilityLabel={detail ? "写评论" : "查看评论"}
+        />
       )}
     </View>
   );

@@ -146,6 +146,8 @@ export type Theme = {
   like: Tone;
   /** 封面角标：深色半透明底 + 白字，保证任意缩略图上都能看清 */
   mediaBadge: Tone;
+  /** 全局 Toast：与页面主题反向配色，保证浅色和深色页面上都有清晰边界 */
+  toast: Tone;
   success: Tone;
   warning: Tone;
   error: Tone;
@@ -220,6 +222,12 @@ export const defaultTheme: Theme = {
     accent: "accent-white",
     bg: "bg-slate-950/70",
     border: "border-slate-950/70",
+  },
+  toast: {
+    text: "text-white dark:text-slate-950",
+    accent: "accent-white dark:accent-slate-950",
+    bg: "bg-slate-950/85 dark:bg-slate-100/95",
+    border: "border-white/15 dark:border-slate-950/15",
   },
   success: {
     text: "text-emerald-600 dark:text-emerald-400",

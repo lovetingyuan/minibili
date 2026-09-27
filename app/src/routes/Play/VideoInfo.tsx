@@ -35,6 +35,7 @@ export default VideoInfo;
 function VideoInfo(props: {
   currentPage: number;
   setCurrentPage: (p: number) => void;
+  onCommentPress: () => void;
   /** 试看类型，由播放器判定后上报；播放器里不再提示试看，说明放在这里 */
   previewReason?: VideoPreviewReason | null;
 }) {
@@ -191,12 +192,19 @@ function VideoInfo(props: {
             {parseNumber(videoInfo?.playNum)}
           </Text>
         </View>
-        <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="写评论"
+          accessibilityHint="打开评论输入框"
+          className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1"
+          hitSlop={6}
+          onPress={props.onCommentPress}
+        >
           <ThemedIcon icon={MessageCircle} size={16} colorClassName={theme.icon.primary} />
           <Text selectable className={`text-xs tabular-nums ${theme.text.primary}`}>
             {parseNumber(videoInfo?.danmuNum)}
           </Text>
-        </View>
+        </Pressable>
         <LikeButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.likeNum} />
         <FavoriteButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.collectNum} />
         <Pressable

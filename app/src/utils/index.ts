@@ -1,11 +1,11 @@
 import * as Application from "expo-application";
 import * as Updates from "expo-updates";
 import { Alert, Linking, Share } from "react-native";
-import Toast from "react-native-simple-toast";
 import { throttle } from "throttle-debounce";
 
 import { fetchVersion } from "@/api/check-update";
 import { site } from "@/constants";
+import { enqueueToast } from "@/features/toast";
 
 import { buildVideoShareMessage, buildVideoShareUrl } from "./share";
 
@@ -122,28 +122,20 @@ export async function handleShareDynamic(title: string, url: string) {
   }
 }
 
-const toastFuncMap: Record<string, () => void> = {};
+const toastFuncMap: Record<string, (long: boolean) => void> = {};
 export function showToast(message: string, long = false) {
   if (!(message in toastFuncMap)) {
     toastFuncMap[message] = throttle(
       5000,
-      () => {
-        Toast.show(message, long ? Toast.LONG : Toast.SHORT);
-        // Platform.OS === 'android'
-        //   ? ToastAndroid.show(
-        //       message,
-        //       long ? ToastAndroid.LONG : ToastAndroid.SHORT,
-        //     )
-        //   : Toast.show(message, {
-        //       duration: long ? Toast.durations.LONG : Toast.durations.SHORT,
-        //     })
+      (showLong: boolean) => {
+        enqueueToast(message, showLong);
       },
       {
         noLeading: false,
       },
     );
   }
-  toastFuncMap[message]();
+  toastFuncMap[message](long);
 }
 
 let showedFatalError = false;

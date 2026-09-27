@@ -35,6 +35,7 @@ import { isLoginRequiredError } from "./features/bilibili-session/login-required
 import Route from "./routes/Index";
 import ErrorBoundary from "react-native-error-boundary";
 import { InitStoreComp } from "./store";
+import { ToastHost } from "./features/toast";
 
 let online = true;
 const focus = true;
@@ -109,6 +110,7 @@ export default function App() {
                   <Route />
                 </BottomSheetModalProvider>
               </ErrorBoundary>
+              <ToastHost />
             </MenuProvider>
             <StatusBar style="auto" />
           </GestureHandlerRootView>

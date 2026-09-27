@@ -72,12 +72,16 @@ function DynamicShareButton(props: { item: DynamicItem }) {
   );
 }
 
-function DynamicCommentButton(props: { item: DynamicItem; onPress?: () => void }) {
+function DynamicCommentButton(props: {
+  item: DynamicItem;
+  onPress?: () => void;
+  accessibilityLabel: string;
+}) {
   return (
     <Pressable
       className="flex-1 flex-row items-center justify-center gap-1"
       accessibilityRole="button"
-      accessibilityLabel="查看评论"
+      accessibilityLabel={props.accessibilityLabel}
       hitSlop={6}
       onPress={
         props.onPress
@@ -165,7 +169,11 @@ function DynamicLikeButton(props: {
   );
 }
 
-export function DynamicActions(props: { item: DynamicItem; onCommentPress?: () => void }) {
+export function DynamicActions(props: {
+  item: DynamicItem;
+  onCommentPress?: () => void;
+  commentAccessibilityLabel?: string;
+}) {
   const { account, control } = useBilibiliSessionState();
   const current = account && bilibiliSession.isCurrentAccount(account) ? account : null;
   const preparing =
@@ -174,7 +182,11 @@ export function DynamicActions(props: { item: DynamicItem; onCommentPress?: () =
   return (
     <View className="flex-row border-t border-slate-100 pt-3 dark:border-slate-800">
       <DynamicShareButton item={props.item} />
-      <DynamicCommentButton item={props.item} onPress={props.onCommentPress} />
+      <DynamicCommentButton
+        item={props.item}
+        onPress={props.onCommentPress}
+        accessibilityLabel={props.commentAccessibilityLabel ?? "查看评论"}
+      />
       <DynamicLikeButton
         key={`${current?.mid ?? "guest"}:${current?.generation ?? 0}:${props.item.id}`}
         item={props.item}

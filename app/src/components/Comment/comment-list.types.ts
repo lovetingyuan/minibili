@@ -1,6 +1,11 @@
 import type React from "react";
 
-export type CommentListProps = React.PropsWithChildren<{
+export type CommentListHeaderRenderProps = {
+  openComposer: () => void;
+};
+
+export type CommentListProps = {
+  children?: React.ReactNode | ((props: CommentListHeaderRenderProps) => React.ReactNode);
   commentId: string | number;
   commentCount?: number;
   commentType: number;
@@ -8,4 +13,4 @@ export type CommentListProps = React.PropsWithChildren<{
   refreshing?: boolean;
   onRefresh?: () => void | Promise<void>;
   dividerRight?: React.ReactNode;
-}>;
+};

@@ -71,14 +71,19 @@ function DynamicDetailPage({ route }: Props) {
     );
   }
 
-  const card = (
-    <DynamicCard
-      item={detail.data}
-      detail
-      article={isArticle ? (article.data ?? undefined) : undefined}
-      articleLoading={isArticle && article.isLoading}
-    />
-  );
+  const item = detail.data;
+
+  function renderCard(onCommentPress?: () => void) {
+    return (
+      <DynamicCard
+        item={item}
+        detail
+        article={isArticle ? (article.data ?? undefined) : undefined}
+        articleLoading={isArticle && article.isLoading}
+        onCommentPress={onCommentPress}
+      />
+    );
+  }
   if (detail.data.commentId && detail.data.commentId !== "0" && detail.data.commentType > 0) {
     return (
       <CommentList
@@ -89,7 +94,9 @@ function DynamicDetailPage({ route }: Props) {
         refreshing={pullToRefresh.refreshing}
         onRefresh={pullToRefresh.onRefresh}
       >
-        <View className="-mx-3 -mt-4">{card}</View>
+        {({ openComposer }) => (
+          <View className="-mx-3 -mt-4">{renderCard(openComposer)}</View>
+        )}
       </CommentList>
     );
   }
@@ -102,7 +109,7 @@ function DynamicDetailPage({ route }: Props) {
         <RefreshControl refreshing={pullToRefresh.refreshing} onRefresh={pullToRefresh.onRefresh} />
       }
     >
-      {card}
+      {renderCard()}
       <Text className={`py-8 text-center text-sm ${theme.text.muted}`}>此动态暂无可用评论参数</Text>
     </ScrollView>
   );

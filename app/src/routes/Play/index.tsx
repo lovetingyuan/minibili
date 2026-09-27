@@ -100,6 +100,10 @@ function Play({ route }: Props) {
       pageCount: videoInfo.pages?.length ?? 1,
     });
     if (nextPage !== null) {
+      const nextPageTitle = videoInfo.pages?.[nextPage - 1]?.title?.trim();
+      showToast(
+        nextPageTitle ? `正在播放 P${nextPage}：${nextPageTitle}` : `正在播放 P${nextPage}`,
+      );
       currentPageRef.current = nextPage;
       setCurrentPage(nextPage);
     }
@@ -148,11 +152,14 @@ function Play({ route }: Props) {
           </View>
         }
       >
-        <VideoInfo
-          currentPage={currentPage}
-          previewReason={previewReason}
-          setCurrentPage={handleSelectPage}
-        />
+        {({ openComposer }) => (
+          <VideoInfo
+            currentPage={currentPage}
+            previewReason={previewReason}
+            setCurrentPage={handleSelectPage}
+            onCommentPress={openComposer}
+          />
+        )}
       </CommentList>
     </View>
   );

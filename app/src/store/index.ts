@@ -2,9 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import React from "react";
 import { createStore, type AtomicStoreMethodsType } from "react-atomic-store";
-import Toast from "react-native-simple-toast";
 
 import { RanksConfig } from "../constants";
+import { enqueueToast } from "../features/toast";
 import type { VideoDownloadTask } from "../features/video-download/types";
 import type { OverlayButton, UpInfo } from "../types";
 import type { NetworkUsage } from "../utils/network";
@@ -190,7 +190,7 @@ export function InitStoreComp() {
       hideSplashTimer = setTimeout(() => {
         void SplashScreen.hideAsync().finally(() => {
           if (toastMessage) {
-            Toast.show(toastMessage, Toast.SHORT);
+            enqueueToast(toastMessage, false);
           }
         });
       }, 100);
