@@ -4,6 +4,7 @@ import { ScrollView, View } from "react-native";
 import Header from "./Banner";
 import BlackTags from "./BlackTags";
 import Blacklist from "./Blacklist";
+import Feedback from "./Feedback";
 import LibraryLinks from "./LibraryLinks";
 import SettingsSync from "./SettingsSync";
 import SortCate from "./SortCate";
@@ -22,6 +23,7 @@ function About() {
       <Header />
       <View className="gap-2">
         <Version />
+        <Feedback />
         <SettingsSync />
       </View>
       <Divider className="my-4" />

@@ -10,3 +10,12 @@ export type RecordUserActivityInput = {
   nickname: string;
   usedAt: number;
 };
+
+export type ConsumeFeedbackQuotaInput = {
+  ipHash: string;
+  usedAt: number;
+};
+
+export type FeedbackQuotaResult =
+  | { allowed: true }
+  | { allowed: false; scope: "global" | "ip" };

@@ -1,5 +1,6 @@
 import { handleHealth } from "./handlers/app";
 import { handleGetReleases } from "./handlers/api/releases";
+import { handleSubmitFeedback } from "./handlers/api/feedback";
 import { handleSyncUserData } from "./handlers/api/user-data";
 import { handleShareHtmlRedirect, handleSharePage } from "./handlers/share";
 import { handleUsersPage } from "./handlers/users";
@@ -13,6 +14,7 @@ function registerRoutes(app: AppType) {
   app.get("/users", handleUsersPage);
 
   app.get("/api/releases", handleGetReleases);
+  app.post("/api/feedback", handleSubmitFeedback);
   app.post("/api/user-data/sync", handleSyncUserData);
 }
 

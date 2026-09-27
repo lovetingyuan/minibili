@@ -58,7 +58,7 @@ function DialogBase({
         onPress={dismissible && dismissOnBackdrop ? handleBackdropPress : undefined}
       />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1 items-center justify-center"
         pointerEvents="box-none"
       >

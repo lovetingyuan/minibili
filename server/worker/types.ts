@@ -1,6 +1,11 @@
 import type { Context, Hono } from "hono";
 import type { JsonValue, SyncOperations } from "../../shared/user-data";
-import type { RecordUserActivityInput, UserActivity } from "./users/types";
+import type {
+  ConsumeFeedbackQuotaInput,
+  FeedbackQuotaResult,
+  RecordUserActivityInput,
+  UserActivity,
+} from "./users/types";
 
 // 仅依赖实际使用的 RPC，生产绑定仍由 Wrangler 生成完整类型。
 export interface UserStorageStub {
@@ -10,6 +15,7 @@ export interface UserStorageStub {
 export interface UserDirectoryStub {
   recordActivity(input: RecordUserActivityInput): Promise<void>;
   listUsers(query: string): Promise<UserActivity[]>;
+  consumeFeedbackQuota(input: ConsumeFeedbackQuotaInput): Promise<FeedbackQuotaResult>;
 }
 
 export interface ServerBindings {
@@ -19,6 +25,8 @@ export interface ServerBindings {
   BILIBILI_PROXY_TOKEN: string;
   /** `/users` 管理页密码，用 `wrangler secret put` 注入。 */
   MINIBILI_MANAGEMENT_PASSWD: string;
+  /** Resend 发信密钥，用 `wrangler secret put RESEND_API_KEY` 注入。 */
+  RESEND_API_KEY: string;
   USER_DIRECTORY: { getByName(name: string): UserDirectoryStub };
   USER_STORAGE: { getByName(name: string): UserStorageStub };
 }

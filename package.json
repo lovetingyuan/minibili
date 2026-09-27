@@ -7,6 +7,7 @@
     "bili-proxy"
   ],
   "scripts": {
+    "postinstall": "patch-package",
     "format": "oxfmt .",
     "lint": "npm run lint --workspaces --if-present",
     "knip:app": "knip --workspace @minibili/app",
@@ -30,6 +31,7 @@
     "knip": "^6.34.0",
     "oxfmt": "^0.68.0",
     "oxlint": "^1.83.0",
+    "patch-package": "8.0.1",
     "typescript": "~6.0.3",
     "vitest": "^4.1.0"
   },

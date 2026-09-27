@@ -13,6 +13,15 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
+  "expo": {
+    "autolinking": {
+      "android": {
+        "buildFromSource": [
+          "expo-video"
+        ]
+      }
+    }
+  },
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "android": "npm run dev -- --android",
@@ -61,7 +70,7 @@
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.3",
     "expo-updates": "~57.0.21",
-    "expo-video": "~57.0.3",
+    "expo-video": "57.0.5",
     "he": "^1.2.0",
     "lucide-react-native": "^1.47.0",
     "react": "19.2.3",

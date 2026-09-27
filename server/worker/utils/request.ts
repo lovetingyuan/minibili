@@ -68,8 +68,9 @@ export function parseSyncOperations(value: unknown): SyncOperations | null {
 
 export class SyncPayloadTooLargeError extends Error {}
 
-// 读取流时计数，不信任 Content-Length，也不先将无限请求体加载到内存。
-export async function readSyncBody(request: Request): Promise<unknown> {
+export class RequestPayloadTooLargeError extends Error {}
+
+export async function readJsonBody(request: Request, maxBytes: number): Promise<unknown> {
   const reader = request.body?.getReader();
   if (!reader) {
     return null;
@@ -84,20 +85,32 @@ export async function readSyncBody(request: Request): Promise<unknown> {
         break;
       }
       size += value.byteLength;
-      if (size > MAX_SYNC_BYTES) {
+      if (size > maxBytes) {
         await reader.cancel();
-        throw new SyncPayloadTooLargeError();
+        throw new RequestPayloadTooLargeError();
       }
       text += decoder.decode(value, { stream: true });
     }
     text += decoder.decode();
     return JSON.parse(text) as unknown;
   } catch (error) {
-    if (error instanceof SyncPayloadTooLargeError) {
+    if (error instanceof RequestPayloadTooLargeError) {
       throw error;
     }
     return null;
   } finally {
     reader.releaseLock();
+  }
+}
+
+// 读取流时计数，不信任 Content-Length，也不先将无限请求体加载到内存。
+export async function readSyncBody(request: Request): Promise<unknown> {
+  try {
+    return await readJsonBody(request, MAX_SYNC_BYTES);
+  } catch (error) {
+    if (error instanceof RequestPayloadTooLargeError) {
+      throw new SyncPayloadTooLargeError();
+    }
+    throw error;
   }
 }
