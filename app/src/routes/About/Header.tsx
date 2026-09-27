@@ -1,12 +1,16 @@
 import { useNavigation } from "@react-navigation/native";
 import { clsx } from "clsx";
-import { Alert, View } from "react-native";
+import { LogIn, LogOut } from "lucide-react-native";
+import { ActivityIndicator, Alert, View } from "react-native";
 
 import { Avatar } from "@/components/Avatar";
 import { getDynamicUpTarget } from "@/components/dynamic/dynamic-target";
-import { Button, Text } from "@/components/styled/rneui";
+import { IconButton } from "@/components/IconButton";
+import { Text } from "@/components/styled/rneui";
+import { ThemedIcon } from "@/components/ThemedIcon";
 import { theme } from "@/constants/theme";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
+import useResolvedColor from "@/hooks/useResolvedColor";
 import { openBilibiliLogin } from "@/routes/navigation";
 import type { MainTabNavigationProp } from "@/types";
 import { getImagePixelSize, parseImgUrl, parseNumber, showToast } from "@/utils";
@@ -17,6 +21,8 @@ export const headerTitle = () => <MineHeaderTitle />;
 function AuthButton() {
   const { account, control, isChecking, logout } = useBilibiliSession();
   const loggingOut = control.phase === "logging-out";
+  const busy = isChecking || loggingOut;
+  const busyColor = useResolvedColor(theme.primary.accent);
 
   async function handleLogout() {
     try {
@@ -28,7 +34,7 @@ function AuthButton() {
   }
 
   function onPress() {
-    if (isChecking || loggingOut) {
+    if (busy) {
       showToast("正在确认登录状态，请稍候重试");
       return;
     }
@@ -49,15 +55,23 @@ function AuthButton() {
   }
 
   return (
-    <Button
-      type="clear"
-      size="sm"
-      containerClassName="mr-2"
-      loading={isChecking || loggingOut}
+    <IconButton
+      accessibilityRole="button"
+      accessibilityLabel={account ? "退出登录" : "登录"}
+      accessibilityState={{ busy }}
+      className="mr-2"
       onPress={onPress}
     >
-      {account ? "退出" : "登录"}
-    </Button>
+      {busy ? (
+        <ActivityIndicator color={busyColor} size="small" />
+      ) : (
+        <ThemedIcon
+          icon={account ? LogOut : LogIn}
+          size={22}
+          colorClassName={theme.primary.accent}
+        />
+      )}
+    </IconButton>
   );
 }
 

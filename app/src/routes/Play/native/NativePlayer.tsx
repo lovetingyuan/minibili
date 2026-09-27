@@ -44,7 +44,7 @@ import { useStore } from "@/store";
 import { usePartPlayProgressPosition } from "@/store/part-play-progress";
 import type { RootStackParamList } from "@/types";
 import { showToast } from "@/utils";
-import { unlockOrientation } from "@/utils/screen-orientation";
+import { lockLandscapeOrientation, lockPortraitOrientation } from "@/utils/screen-orientation";
 
 import DanmakuComposer from "./DanmakuComposer";
 import DanmakuOverlay from "./DanmakuOverlay";
@@ -790,6 +790,17 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
   }, [imagesList.length, player]);
 
+  let videoWidth = pageInfo?.width ?? videoInfo.width;
+  let videoHeight = pageInfo?.height ?? videoInfo.height;
+  if (!pageInfo && videoInfo.rotate && videoWidth && videoHeight) {
+    const swap = videoWidth;
+    videoWidth = videoHeight;
+    videoHeight = swap;
+  }
+  const isPortraitVideo = Boolean(videoWidth && videoHeight && videoHeight > videoWidth);
+  const isLandscapeVideo = Boolean(videoWidth && videoHeight && videoWidth >= videoHeight);
+
+  // 全屏期间接管方向控制权，退出全屏或离开播放页时恢复全局竖屏
   React.useEffect(() => {
     if (Platform.OS === "web") {
       return;
@@ -799,12 +810,24 @@ export default function NativePlayer(props: NativePlayerProps) {
       return;
     }
     setFullscreenOrientationOwner(true);
-    unlockOrientation();
     return () => {
       setFullscreenOrientationOwner(false);
       lockAppPortrait();
     };
   }, [fullscreen]);
+
+  // 全屏时的方向按视频比例决定：横屏视频强制转成横向，竖屏视频与拿不到宽高的视频保持竖屏。
+  // 与上面的控制权 effect 分开，避免切换分 P 导致比例变化时先锁竖屏、再锁横向的闪动
+  React.useEffect(() => {
+    if (Platform.OS === "web" || !fullscreen) {
+      return;
+    }
+    if (isLandscapeVideo) {
+      lockLandscapeOrientation();
+      return;
+    }
+    lockPortraitOrientation();
+  }, [fullscreen, isLandscapeVideo]);
 
   React.useEffect(() => {
     return () => {
@@ -1039,14 +1062,6 @@ export default function NativePlayer(props: NativePlayerProps) {
     onSeekSwipeCancel: clearSeekHint,
   });
 
-  let videoWidth = pageInfo?.width ?? videoInfo.width;
-  let videoHeight = pageInfo?.height ?? videoInfo.height;
-  if (!pageInfo && videoInfo.rotate && videoWidth && videoHeight) {
-    const swap = videoWidth;
-    videoWidth = videoHeight;
-    videoHeight = swap;
-  }
-  const isPortraitVideo = Boolean(videoWidth && videoHeight && videoHeight > videoWidth);
   const inlineHeight = resolveInlinePlayerHeight({
     screenWidth: width,
     screenHeight: height,
