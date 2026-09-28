@@ -18,14 +18,14 @@
     "build:preview:eas": "npm run build:android:preview:eas -w=@minibili/app",
     "build:dev": "npm run build:android:dev -w=@minibili/app",
     "build:dev:eas": "npm run build:android:dev:eas -w=@minibili/app",
-    "build:app": "npm run build:android:production:eas -w=@minibili/app",
     "update": "npm run update -w=@minibili/app",
     "upgrade": "npm run update-expo -w=@minibili/app",
     "server": "npm run dev -w=@minibili/server",
     "proxy:dev": "npm run dev -w=@minibili/bili-proxy",
     "proxy:deploy": "npm run deploy -w=@minibili/bili-proxy",
     "deploy": "npm run deploy -w=@minibili/server",
-    "build": "npm run build:android -w=@minibili/app"
+    "build": "npm run release -w=@minibili/app --",
+    "release": "npm run release -w=@minibili/app --"
   },
   "devDependencies": {
     "@emnapi/core": "1.11.3",

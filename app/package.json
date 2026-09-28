@@ -17,12 +17,11 @@
     "dev": "node scripts/dev.mjs",
     "android": "npm run dev -- --android",
     "ios": "npm run dev -- --ios",
-    "build:android": "zx scripts/build.mjs",
+    "release": "node scripts/build.mjs",
     "build:android:preview": "node scripts/build-android-local.mjs preview",
     "build:android:preview:eas": "cross-env APP_VARIANT=preview npx --yes eas-cli@latest build --platform android --profile preview --non-interactive",
     "build:android:dev": "node scripts/build-android-local.mjs",
     "build:android:dev:eas": "cross-env APP_VARIANT=development npx --yes eas-cli@latest build --platform android --profile development --non-interactive",
-    "build:android:production:eas": "cross-env APP_VARIANT=production npx --yes eas-cli@latest build --platform android --profile production --non-interactive",
     "update": "cross-env APP_VARIANT=production npx --yes eas-cli@latest update --channel production --platform android --environment production && cross-env APP_VARIANT=production npx --yes eas-cli@latest env:exec production \"node scripts/upload-posthog-sourcemaps.mjs\" --non-interactive",
     "doctor": "npx -y expo-doctor@latest",
     "test": "npx vitest run",
@@ -105,7 +104,6 @@
     "zx": "^8.4.1"
   },
   "config": {
-    "changelog": "修复已知问题",
     "versionCode": 76
   },
   "expo": {

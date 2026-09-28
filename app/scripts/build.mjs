@@ -1,9 +1,38 @@
 #!/usr/bin/env zx
 // oxlint-disable no-console
 
-import { createWriteStream, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { pipeline } from "node:stream/promises";
+/**
+ * 生产发版脚本（仅 Windows）。
+ *
+ * 流程：检查环境 → 输入版本号/更新日志 → 提交并推送版本号 → EAS 生产构建
+ *       → 下载 APK → 打 tag 并推送 → 打开 GitHub Release 页面
+ *
+ * 版本号在构建之前就落库提交，所以整个流程里工作区始终是干净的；
+ * 每个阶段的进度都会写入 tmp/release-state.json，任意阶段中断后都能续跑，
+ * 失败时脚本会打印可直接复制的续跑命令。
+ *
+ * 用法：
+ *   npm run build                                        // 交互式发布
+ *   npm run build -- --version 0.7.4 --changelog "A  B"  // 跳过输入
+ *   npm run build -- --resume                            // 从上次中断处继续
+ *   npm run build -- --resume --build-id <buildId>       // 复用指定的 EAS 构建
+ *   npm run build -- --resume --apk <path>               // 复用已下载的 APK
+ *   npm run build -- --reset                             // 丢弃未完成的发布记录
+ */
+
+import {
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
 import open from "open";
@@ -15,11 +44,21 @@ usePowerShell();
 
 $.verbose = false;
 
+/** 不抛异常的 shell：命令失败时返回 exitCode，而不是直接抛错。 */
+const nothrow = $({ nothrow: true });
+
 const APP_DIR = fileURLToPath(new URL("../", import.meta.url));
-const PACKAGE_JSON_PATH = fileURLToPath(new URL("../package.json", import.meta.url));
-const APK_DIR = fileURLToPath(new URL("../apk", import.meta.url));
+const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
+const PACKAGE_JSON_PATH = join(APP_DIR, "package.json");
+const APK_DIR = join(APP_DIR, "apk");
+const STATE_PATH = join(REPO_ROOT, "tmp", "release-state.json");
+
 const MAIN_BRANCH = "main";
 const REPO_URL = "https://github.com/lovetingyuan/minibili";
+const BUILDS_PAGE_URL = "https://expo.dev/accounts/tingyuan/projects/minibili/builds";
+const HTTP_TIMEOUT_MS = 15_000;
+const APK_TIMEOUT_MS = 15 * 60_000;
+const RESUME_COMMAND = "npm run build -- --resume";
 
 process.chdir(APP_DIR);
 
@@ -36,7 +75,108 @@ const log = {
   error(message) {
     console.log(chalk.red("[ERR]"), message);
   },
+  hint(message) {
+    console.log(chalk.yellow("[HINT]"), message);
+  },
 };
+
+class ReleaseError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ReleaseError";
+  }
+}
+
+/** 当前发布记录，仅用于失败/中断时打印续跑提示。 */
+let activeState = null;
+
+// ---------------------------------------------------------------- 通用工具
+
+function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function printUsage() {
+  console.log(`
+生产发版（仅 Windows）
+
+  npm run build                                        交互式发布：依次输入版本号与更新日志
+  npm run build -- --version 0.7.4 --changelog "A  B"  跳过输入
+  npm run build -- --resume                            从上次中断处继续
+  npm run build -- --resume --build-id <buildId>       复用指定的 EAS 构建
+  npm run build -- --resume --apk <path>               复用已下载的 APK
+  npm run build -- --reset                             丢弃未完成的发布记录
+
+流程：检查环境 → 提交版本号 → EAS 生产构建 → 下载 APK → 打 tag → 打开 GitHub Release 页面
+进度记录在 tmp/release-state.json，失败时脚本会打印可直接复制的续跑命令。
+
+发布产物约定：tag v<版本>、Release 标题 minibili-<版本>、附件 minibili-<版本>.apk，
+必须点 Publish release 发布为正式 release（不能存草稿、不能勾 pre-release），
+否则 worker /api/releases 拉不到，App 内不会提示更新。
+`);
+}
+
+function parseArgs(argv) {
+  const options = {
+    apkPath: null,
+    buildId: null,
+    changelog: null,
+    help: false,
+    reset: false,
+    resume: false,
+    version: null,
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+
+    function readValue() {
+      const value = argv[index + 1];
+      if (value === undefined || value.startsWith("--")) {
+        throw new ReleaseError(`${arg} 缺少参数值（用 --help 查看用法）`);
+      }
+      index += 1;
+      return value.trim();
+    }
+
+    switch (arg) {
+      case "-h":
+      case "--help": {
+        options.help = true;
+        break;
+      }
+      case "--resume": {
+        options.resume = true;
+        break;
+      }
+      case "--reset": {
+        options.reset = true;
+        break;
+      }
+      case "--version": {
+        options.version = readValue();
+        break;
+      }
+      case "--changelog": {
+        options.changelog = readValue();
+        break;
+      }
+      case "--build-id": {
+        options.buildId = readValue();
+        break;
+      }
+      case "--apk": {
+        options.apkPath = resolve(readValue());
+        break;
+      }
+      default: {
+        throw new ReleaseError(`未知参数：${arg}（用 --help 查看用法）`);
+      }
+    }
+  }
+
+  return options;
+}
 
 function readPackageJson() {
   return JSON.parse(readFileSync(PACKAGE_JSON_PATH, "utf8"));
@@ -55,6 +195,10 @@ function getReleaseNotes(changelog) {
     .join("\n");
 }
 
+function formatSize(bytes) {
+  return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
+}
+
 async function withRetry(attempts, task, label) {
   let lastError;
 
@@ -64,8 +208,8 @@ async function withRetry(attempts, task, label) {
     } catch (error) {
       lastError = error;
       if (attempt < attempts) {
-        log.warn(`${label} failed (${attempt}/${attempts}), retrying...`);
-        await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+        log.warn(`${label} 失败（${attempt}/${attempts}），正在重试...`);
+        await new Promise((resolveDelay) => setTimeout(resolveDelay, attempt * 1000));
       }
     }
   }
@@ -73,21 +217,25 @@ async function withRetry(attempts, task, label) {
   throw lastError;
 }
 
+async function fetchWithTimeout(url, timeoutMs) {
+  return fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+}
+
 async function assertReachable(url, label) {
   await withRetry(
     3,
     async () => {
-      const response = await fetch(url);
+      const response = await fetchWithTimeout(url, HTTP_TIMEOUT_MS);
       if (!response.ok) {
-        throw new Error(`${label} responded with ${response.status}`);
+        throw new Error(`${label} 返回 ${response.status}`);
       }
     },
-    `${label} check`,
+    `${label} 检查`,
   );
 }
 
 function stripAnsi(text) {
-  // eslint-disable-next-line no-control-regex -- ANSI 转义序列以 ESC 控制字符开头
+  // oxlint-disable-next-line no-control-regex -- ANSI 转义序列以 ESC 控制字符开头
   return text.replaceAll(/\u001B\[[0-9;?]*[ -/]*[@-~]/g, "");
 }
 
@@ -147,42 +295,201 @@ function extractJsonSegments(text, openChar, closeChar) {
   return segments;
 }
 
-function parseBuildResult(stdout, stderr) {
-  const combined = stripAnsi(`${stdout ?? ""}\n${stderr ?? ""}`.trim());
+/** EAS 命令的输出里混着进度日志，这里把其中所有能解析的 JSON 片段都取出来。 */
+function parseJsonCandidates(...texts) {
+  const combined = stripAnsi(
+    texts
+      .filter((text) => typeof text === "string" && text.trim() !== "")
+      .join("\n")
+      .trim(),
+  );
+
   if (!combined) {
-    throw new Error("EAS build output is empty");
+    return [];
   }
 
-  const candidates = [
+  const results = [];
+
+  for (const candidate of [
     ...extractJsonSegments(combined, "[", "]"),
     ...extractJsonSegments(combined, "{", "}"),
-  ];
-
-  for (const candidate of candidates) {
+  ]) {
     try {
-      const parsed = JSON.parse(candidate);
-      const build = Array.isArray(parsed) ? parsed[0] : parsed;
-      if (build && typeof build === "object" && typeof build.status === "string") {
-        return build;
-      }
+      results.push(JSON.parse(candidate));
     } catch {
-      continue;
+      // 片段不是合法 JSON，继续尝试下一个
     }
   }
 
-  throw new Error("Unable to parse EAS build JSON output");
+  return results;
 }
 
+/** 从任意解析结果里挑出一个 EAS 构建对象。 */
+function pickBuild(parsedValues) {
+  for (const value of parsedValues) {
+    const list = Array.isArray(value) ? value : [value];
+    for (const item of list) {
+      if (item !== null && typeof item === "object" && typeof item.status === "string") {
+        return item;
+      }
+    }
+  }
+
+  return null;
+}
+
+function buildLink(build) {
+  if (build !== null && typeof build.url === "string" && build.url !== "") {
+    return build.url;
+  }
+  if (build !== null && typeof build.id === "string" && build.id !== "") {
+    return `${BUILDS_PAGE_URL}/${build.id}`;
+  }
+  return BUILDS_PAGE_URL;
+}
+
+// ---------------------------------------------------------------- 发布记录
+
+function loadState() {
+  if (!existsSync(STATE_PATH)) {
+    return null;
+  }
+
+  let parsed;
+
+  try {
+    parsed = JSON.parse(readFileSync(STATE_PATH, "utf8"));
+  } catch (error) {
+    throw new ReleaseError(
+      `无法解析发布记录 ${STATE_PATH}：${errorMessage(error)}（可以加 --reset 丢弃它）`,
+    );
+  }
+
+  if (parsed === null || typeof parsed !== "object" || typeof parsed.version !== "string") {
+    throw new ReleaseError(`发布记录 ${STATE_PATH} 内容异常（可以加 --reset 丢弃它）`);
+  }
+
+  return {
+    apkPath: typeof parsed.apkPath === "string" ? parsed.apkPath : null,
+    buildId: typeof parsed.buildId === "string" ? parsed.buildId : null,
+    buildStatus: typeof parsed.buildStatus === "string" ? parsed.buildStatus : null,
+    buildUrl: typeof parsed.buildUrl === "string" ? parsed.buildUrl : null,
+    bumpCommit: typeof parsed.bumpCommit === "string" ? parsed.bumpCommit : null,
+    changelog: typeof parsed.changelog === "string" ? parsed.changelog : "",
+    releaseOpened: parsed.releaseOpened === true,
+    tagPushed: parsed.tagPushed === true,
+    updatedAt: typeof parsed.updatedAt === "string" ? parsed.updatedAt : null,
+    version: parsed.version,
+  };
+}
+
+function saveState(state) {
+  state.updatedAt = new Date().toISOString();
+  mkdirSync(dirname(STATE_PATH), { recursive: true });
+  writeFileSync(STATE_PATH, `${JSON.stringify(state, null, 2)}\n`);
+  activeState = state;
+}
+
+function clearState() {
+  if (!existsSync(STATE_PATH)) {
+    return;
+  }
+  rmSync(STATE_PATH, { force: true });
+  log.warn(`已丢弃未完成的发布记录：${STATE_PATH}`);
+}
+
+function createState(version, changelog) {
+  return {
+    apkPath: null,
+    buildId: null,
+    buildStatus: null,
+    buildUrl: null,
+    bumpCommit: null,
+    changelog,
+    releaseOpened: false,
+    tagPushed: false,
+    updatedAt: null,
+    version,
+  };
+}
+
+function describeProgress(state) {
+  if (state.tagPushed) {
+    return "tag 已推送，只差打开 Release 页面";
+  }
+  if (state.apkPath !== null && existsSync(state.apkPath)) {
+    return "APK 已就绪，接下来打 tag";
+  }
+  if (state.buildId !== null) {
+    return state.buildStatus === "FINISHED"
+      ? "EAS 构建已完成，接下来下载 APK"
+      : `上次构建状态是 ${state.buildStatus ?? "未知"}，接下来重新构建`;
+  }
+  if (state.bumpCommit !== null) {
+    return "版本号已提交，接下来 EAS 构建";
+  }
+  return "从写入版本号开始";
+}
+
+function printResumeInstructions(state) {
+  log.hint(`发布进度记录：${STATE_PATH}`);
+
+  if (state === null) {
+    log.hint(`续跑：${RESUME_COMMAND}`);
+    return;
+  }
+
+  if (state.tagPushed) {
+    log.hint(`tag 已推送，续跑只会重新打开 Release 页面：${RESUME_COMMAND}`);
+  } else if (state.apkPath !== null && existsSync(state.apkPath)) {
+    log.hint(`APK 已就绪（${state.apkPath}），续跑会继续打 tag：${RESUME_COMMAND}`);
+  } else if (state.buildId !== null) {
+    if (state.buildStatus === "FINISHED") {
+      log.hint(`构建已完成（buildId=${state.buildId}），续跑只会重新下载 APK：${RESUME_COMMAND}`);
+      log.hint(`也可以手动下载后指定文件：${RESUME_COMMAND} --apk <path>`);
+    } else {
+      log.hint(
+        `上次构建状态是 ${state.buildStatus ?? "未知"}（buildId=${state.buildId}），续跑会重新构建：${RESUME_COMMAND}`,
+      );
+      log.hint(`如果那次构建其实成功了：${RESUME_COMMAND} --build-id <buildId>`);
+    }
+  } else if (state.bumpCommit !== null) {
+    log.hint(`版本号已提交推送，续跑会重新发起构建：${RESUME_COMMAND}`);
+    log.hint(`如果构建其实已经成功：${RESUME_COMMAND} --build-id <buildId>`);
+  } else {
+    log.hint(`续跑：${RESUME_COMMAND}`);
+    log.hint(`如果已经发起过构建：${RESUME_COMMAND} --build-id <buildId>`);
+  }
+
+  log.hint(`EAS 构建列表：${BUILDS_PAGE_URL}`);
+}
+
+// ---------------------------------------------------------------- 各阶段
+
 async function checkEnvironment() {
-  await spinner("Checking environment...", async () => {
+  await spinner("检查环境...", async () => {
     const gitStatus = await $`git status --porcelain`;
-    if (gitStatus.stdout.trim() !== "") {
-      throw new Error("Git workspace is not clean");
+    const dirtyPaths = gitStatus.stdout
+      .split(/\r?\n/)
+      // porcelain v1 每行是 "XY PATH"，路径始终相对仓库根目录
+      .filter((line) => line.trim() !== "")
+      .map((line) => line.slice(3).trim())
+      .filter(Boolean);
+    const unexpected = dirtyPaths.filter((path) => path !== "app/package.json");
+
+    if (unexpected.length > 0) {
+      throw new ReleaseError(
+        `Git 工作区不干净，请先提交或撤销这些改动：\n${unexpected.join("\n")}`,
+      );
+    }
+
+    if (dirtyPaths.length > 0) {
+      log.warn("检测到 app/package.json 有未提交改动，将按上次中断的发布继续处理");
     }
 
     const branch = await $`git rev-parse --abbrev-ref HEAD`;
     if (branch.stdout.trim() !== MAIN_BRANCH) {
-      throw new Error(`Current branch is ${branch.stdout.trim()}, expected ${MAIN_BRANCH}`);
+      throw new ReleaseError(`当前分支是 ${branch.stdout.trim()}，请切到 ${MAIN_BRANCH} 再发版`);
     }
 
     await $`git fetch origin`;
@@ -190,207 +497,498 @@ async function checkEnvironment() {
     const branchSummary = summary.stdout.split("\n")[0]?.trim() ?? "";
 
     if (!branchSummary.includes("...")) {
-      throw new Error("Current branch does not track a remote branch");
+      throw new ReleaseError("当前分支没有跟踪远端分支，无法发版");
     }
 
     if (branchSummary.includes("behind")) {
-      throw new Error("Current branch is behind origin/main, please pull first");
+      throw new ReleaseError(`当前分支落后于 origin/${MAIN_BRANCH}，请先 git pull`);
     }
 
     await assertReachable("https://github.com", "GitHub");
     await assertReachable("https://api.expo.dev", "Expo API");
 
-    await withRetry(2, () => $`npx --yes eas-cli@latest --version`, "EAS CLI version");
-    const easUser = await withRetry(2, () => $`npx --yes eas-cli@latest whoami`, "EAS login");
-    if (!easUser.stdout.trim()) {
-      throw new Error("EAS CLI is not logged in");
+    await withRetry(2, () => $`npx --yes eas-cli@latest --version`, "EAS CLI");
+    const easUser = await withRetry(2, () => $`npx --yes eas-cli@latest whoami`, "EAS 登录状态");
+
+    if (easUser.stdout.trim() === "") {
+      throw new ReleaseError("EAS CLI 未登录，请先执行 npx eas-cli login");
     }
   });
 
-  log.success("Environment check passed");
+  log.success("环境检查通过");
 }
 
-async function promptReleaseInfo(currentVersion) {
-  const newVersion = (await question(`版本号（${currentVersion} -> ?）`)).trim();
+async function resolveReleaseInfo(currentVersion, options) {
+  const newVersion = options.version ?? (await question(`版本号（${currentVersion} -> ?）`)).trim();
+
   if (!semver.valid(newVersion) || !semver.gt(newVersion, currentVersion)) {
-    throw new Error("版本号必须是大于当前版本的合法 semver");
+    throw new ReleaseError(`版本号必须是大于当前版本 ${currentVersion} 的合法 semver`);
+  }
+  if (!/^\d+\.\d+\.\d+$/.test(newVersion)) {
+    throw new ReleaseError("版本号必须是 x.y.z 三段纯数字，否则 Release 名称不会被 App 识别");
   }
 
-  const changelog = (await question("更新日志（双空格分隔）")).trim();
-  if (!changelog) {
-    throw new Error("更新日志不能为空");
+  const changelog = options.changelog ?? (await question("更新日志（双空格分隔）")).trim();
+
+  if (changelog === "") {
+    throw new ReleaseError("更新日志不能为空");
   }
 
-  return {
-    changelog,
-    newVersion,
-  };
+  return { changelog, newVersion };
 }
 
-async function updatePackageJson(newVersion, changelog) {
-  const originalText = readFileSync(PACKAGE_JSON_PATH, "utf8");
-  const pkg = JSON.parse(originalText);
-  const commitHash = (await $`git rev-parse --short HEAD`).stdout.trim();
+function assertVersionCode(pkg) {
+  const versionCode = pkg.config?.versionCode;
 
-  pkg.version = newVersion;
-  pkg.gitHead = commitHash;
-  pkg.config = {
-    ...pkg.config,
-    changelog,
-    versionCode: Number(pkg.config?.versionCode ?? 0) + 1,
-  };
+  if (typeof versionCode !== "number" || !Number.isInteger(versionCode) || versionCode <= 0) {
+    throw new ReleaseError("app/package.json 的 config.versionCode 缺失或不是正整数");
+  }
 
-  writePackageJson(pkg);
-
-  return {
-    originalText,
-    packageJson: pkg,
-  };
+  return versionCode;
 }
 
-async function restorePackageJson(originalText) {
-  writeFileSync(PACKAGE_JSON_PATH, originalText);
-  log.warn("Restored app/package.json");
+async function assertVersionAvailable(version) {
+  const tagName = `v${version}`;
+  const existing = await nothrow`git tag --list ${tagName}`;
+
+  if (existing.stdout.trim() !== "") {
+    throw new ReleaseError(
+      `tag ${tagName} 已存在，请换一个版本号；如果上次发布没跑完，请用 ${RESUME_COMMAND}`,
+    );
+  }
 }
 
-async function runEasBuild(newVersion, changelog) {
-  log.info("Starting EAS Android production build");
+async function packageVersionAtCommit(commit) {
+  const result = await nothrow`git show ${commit}:app/package.json`;
 
-  const result = await spinner("Running EAS build...", async () => {
-    return $`npx --yes eas-cli@latest build --platform android --profile production --message ${changelog} --json --non-interactive --wait`;
+  if (result.exitCode !== 0) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(result.stdout);
+    return typeof parsed.version === "string" ? parsed.version : null;
+  } catch {
+    return null;
+  }
+}
+
+async function ensureCommitPushed(commit) {
+  const pushed = await nothrow`git merge-base --is-ancestor ${commit} origin/main`;
+
+  if (pushed.exitCode === 0) {
+    return;
+  }
+
+  await withRetry(3, () => $`git push origin ${MAIN_BRANCH}`, "git push");
+}
+
+async function isPackageJsonDirty() {
+  const result = await $`git status --porcelain -- package.json`;
+  return result.stdout.trim() !== "";
+}
+
+async function ensureVersionCommitted(state) {
+  if (state.bumpCommit !== null) {
+    const committedVersion = await packageVersionAtCommit(state.bumpCommit);
+
+    if (committedVersion === state.version) {
+      await ensureCommitPushed(state.bumpCommit);
+      log.success(`版本号已在提交 ${state.bumpCommit} 中，跳过写入`);
+      return state.bumpCommit;
+    }
+
+    log.warn(`提交 ${state.bumpCommit} 里找不到版本 ${state.version}，将重新写入`);
+    state.bumpCommit = null;
+  }
+
+  // 发布记录丢失但 HEAD 已经是目标版本时，直接复用 HEAD，避免 git commit 因无改动而失败
+  if ((await packageVersionAtCommit("HEAD")) === state.version && !(await isPackageJsonDirty())) {
+    state.bumpCommit = (await $`git rev-parse --short HEAD`).stdout.trim();
+    saveState(state);
+    await ensureCommitPushed(state.bumpCommit);
+    log.success(`HEAD（${state.bumpCommit}）已经是 ${state.version}，跳过写入与提交`);
+    return state.bumpCommit;
+  }
+
+  await spinner("写入并提交版本号...", async () => {
+    const pkg = readPackageJson();
+    const previousVersionCode = assertVersionCode(pkg);
+
+    if (pkg.version === state.version) {
+      log.info(`app/package.json 已经是 ${state.version}，沿用 versionCode ${previousVersionCode}`);
+    } else {
+      const shortHead = (await $`git rev-parse --short HEAD`).stdout.trim();
+
+      pkg.version = state.version;
+      pkg.gitHead = shortHead;
+      pkg.config = { ...pkg.config, versionCode: previousVersionCode + 1 };
+      writePackageJson(pkg);
+
+      log.success(
+        `app/package.json 更新为 ${state.version}（versionCode ${previousVersionCode} -> ${previousVersionCode + 1}）`,
+      );
+    }
+
+    const commitMessage = `chore(release): v${state.version}`;
+
+    await $`git add package.json`;
+    await $`git commit -m ${commitMessage}`;
+    state.bumpCommit = (await $`git rev-parse --short HEAD`).stdout.trim();
+    saveState(state);
+
+    await ensureCommitPushed(state.bumpCommit);
+    log.success(`已提交并推送：${commitMessage}（${state.bumpCommit}）`);
   });
 
-  const build = parseBuildResult(result.stdout, result.stderr);
+  return state.bumpCommit;
+}
+
+async function fetchBuildDetails(buildId) {
+  const result =
+    await nothrow`npx --yes eas-cli@latest build:view ${buildId} --json --non-interactive`;
+
+  if (result.exitCode !== 0) {
+    return null;
+  }
+
+  return pickBuild(parseJsonCandidates(result.stdout, result.stderr));
+}
+
+async function findFinishedBuild(version) {
+  const result =
+    await nothrow`npx --yes eas-cli@latest build:list --platform android --limit 10 --json --non-interactive`;
+
+  if (result.exitCode !== 0) {
+    return null;
+  }
+
+  for (const value of parseJsonCandidates(result.stdout, result.stderr)) {
+    if (!Array.isArray(value)) {
+      continue;
+    }
+
+    const match = value.find(
+      (item) =>
+        item !== null &&
+        typeof item === "object" &&
+        item.status === "FINISHED" &&
+        String(item.appVersion ?? "") === version,
+    );
+
+    if (match !== undefined) {
+      return match;
+    }
+  }
+
+  return null;
+}
+
+async function runEasBuild(state) {
+  log.info("开始 EAS 生产构建，这一步通常要十几分钟");
+
+  const result = await spinner(
+    "EAS 构建中...",
+    () =>
+      nothrow`npx --yes eas-cli@latest build --platform android --profile production --message ${state.changelog} --json --non-interactive --wait`,
+  );
+
+  const build = pickBuild(parseJsonCandidates(result.stdout, result.stderr));
+
+  if (build === null) {
+    throw new ReleaseError(
+      "无法从 EAS 输出里解析出构建结果，请打开构建列表确认状态后手动指定：\n" +
+        `  ${RESUME_COMMAND} --build-id <buildId>\n  ${BUILDS_PAGE_URL}`,
+    );
+  }
+
+  if (typeof build.id === "string" && build.id !== "") {
+    state.buildId = build.id;
+    state.buildStatus = build.status;
+    state.buildUrl = buildLink(build);
+    saveState(state);
+  }
 
   if (build.status !== "FINISHED") {
-    throw new Error(`Unexpected EAS build status: ${build.status}`);
+    throw new ReleaseError(`EAS 构建未成功，状态是 ${build.status}，日志见 ${buildLink(build)}`);
   }
 
-  if (build.appVersion && build.appVersion !== newVersion) {
-    throw new Error(`Built version ${build.appVersion} does not match ${newVersion}`);
+  if (typeof build.appVersion === "string" && build.appVersion !== state.version) {
+    // 版本对不上的构建对本次发布没有意义，清掉记录，续跑会重新构建
+    state.buildId = null;
+    state.buildStatus = null;
+    state.buildUrl = null;
+    saveState(state);
+    throw new ReleaseError(
+      `构建出来的版本是 ${build.appVersion}，与目标版本 ${state.version} 不一致，请检查 app/package.json`,
+    );
   }
 
-  if (build.platform && build.platform !== "ANDROID") {
-    throw new Error(`Unexpected build platform: ${build.platform}`);
-  }
-
-  log.success("EAS build finished");
+  log.success(`EAS 构建完成：${buildLink(build)}`);
   return build;
 }
 
-async function downloadApk(newVersion, build) {
-  const apkUrl = build?.artifacts?.buildUrl;
-  if (!apkUrl) {
-    throw new Error("EAS build result does not contain artifacts.buildUrl");
+async function ensureBuild(state) {
+  if (state.buildId !== null) {
+    const existing = await fetchBuildDetails(state.buildId);
+
+    if (existing !== null && existing.status === "FINISHED") {
+      log.success(`复用已完成的构建 ${state.buildId}`);
+      state.buildStatus = existing.status;
+      state.buildUrl = buildLink(existing);
+      saveState(state);
+      return existing;
+    }
+
+    log.warn(
+      `已记录的构建 ${state.buildId} 状态是 ${existing?.status ?? "未知"}，将重新查找或构建`,
+    );
+    state.buildId = null;
+    state.buildStatus = null;
+    saveState(state);
   }
 
-  const apkPath = `${APK_DIR}\\minibili-${newVersion}.apk`;
-  log.info(`Downloading APK from ${apkUrl}`);
+  const reused = await findFinishedBuild(state.version);
 
-  await spinner("Downloading APK...", async () => {
-    rmSync(APK_DIR, { force: true, recursive: true });
-    mkdirSync(APK_DIR, { recursive: true });
+  if (reused !== null) {
+    state.buildId = typeof reused.id === "string" ? reused.id : null;
+    state.buildStatus = reused.status;
+    state.buildUrl = buildLink(reused);
+    saveState(state);
+    log.success(`找到 ${state.version} 已完成的构建，复用它而不重新构建：${state.buildUrl}`);
+    return reused;
+  }
 
-    const response = await withRetry(
+  return runEasBuild(state);
+}
+
+async function downloadApk(state, build) {
+  const apkUrl = build?.artifacts?.buildUrl;
+
+  if (typeof apkUrl !== "string" || apkUrl === "") {
+    throw new ReleaseError("EAS 构建结果里没有 artifacts.buildUrl，无法下载 APK");
+  }
+
+  const apkPath = join(APK_DIR, `minibili-${state.version}.apk`);
+  const tempPath = `${apkPath}.part`;
+
+  mkdirSync(APK_DIR, { recursive: true });
+  rmSync(tempPath, { force: true });
+
+  log.info(`从 ${apkUrl} 下载 APK`);
+
+  await spinner("下载 APK...", async () => {
+    await withRetry(
       3,
       async () => {
-        const res = await fetch(apkUrl);
-        if (!res.ok || !res.body) {
-          throw new Error(`Download failed with status ${res.status}`);
+        // 每次重试都清掉半截文件，成功后先写 .part 再改名，避免留下看起来完整的残缺文件
+        rmSync(tempPath, { force: true });
+
+        const response = await fetchWithTimeout(apkUrl, APK_TIMEOUT_MS);
+        if (!response.ok || !response.body) {
+          throw new Error(`下载失败：HTTP ${response.status}`);
         }
-        return res;
+
+        await pipeline(Readable.fromWeb(response.body), createWriteStream(tempPath));
       },
-      "APK download",
+      "APK 下载",
     );
 
-    await pipeline(Readable.fromWeb(response.body), createWriteStream(apkPath));
+    rmSync(apkPath, { force: true });
+    renameSync(tempPath, apkPath);
   });
 
-  log.success(`APK saved to ${apkPath}`);
+  state.apkPath = apkPath;
+  saveState(state);
+  log.success(`APK 已保存：${apkPath}（${formatSize(statSync(apkPath).size)}）`);
   return apkPath;
 }
 
-async function commitAndPushRelease(newVersion, onCommitted) {
-  const commitMessage = `chore(release): v${newVersion}`;
+async function ensureApkReady(state, build) {
+  if (state.apkPath !== null && existsSync(state.apkPath)) {
+    log.success(`复用已下载的 APK：${state.apkPath}`);
+    return state.apkPath;
+  }
 
-  await spinner("Committing release changes...", async () => {
-    await $`git add package.json`;
-    await $`git commit -m ${commitMessage}`;
-  });
-  onCommitted();
+  if (state.apkPath !== null) {
+    log.warn(`发布记录里的 APK 不存在：${state.apkPath}，将重新下载`);
+    state.apkPath = null;
+  }
 
-  await spinner("Pushing release commit...", async () => {
-    await withRetry(3, () => $`git push origin ${MAIN_BRANCH}`, "git push");
-  });
-
-  log.success(`Release commit pushed: ${commitMessage}`);
-  return commitMessage;
+  return downloadApk(state, build);
 }
 
-async function createAndPushTag(newVersion, changelog) {
-  const tagName = `v${newVersion}`;
+async function ensureTagPushed(state) {
+  const tagName = `v${state.version}`;
 
-  await spinner("Creating release tag...", async () => {
-    await $`git tag -a ${tagName} -m ${changelog}`;
-  });
+  if (state.tagPushed) {
+    log.success(`tag ${tagName} 已推送`);
+    return tagName;
+  }
 
-  await spinner("Pushing release tag...", async () => {
+  await spinner("打 tag 并推送...", async () => {
+    const existing = await nothrow`git tag --list ${tagName}`;
+
+    if (existing.stdout.trim() === "") {
+      // 固定打在发布提交上，避免中途有别的提交时 tag 指错地方
+      await $`git tag -a ${tagName} -m ${state.changelog} ${state.bumpCommit}`;
+    } else {
+      const target = (await $`git rev-list -n 1 ${tagName}`).stdout.trim();
+
+      if (state.bumpCommit !== null && target !== state.bumpCommit) {
+        throw new ReleaseError(
+          `tag ${tagName} 已存在且指向 ${target}，与本次发布提交 ${state.bumpCommit} 不一致，` +
+            "请确认后删除该 tag 或换一个版本号",
+        );
+      }
+
+      log.warn(`tag ${tagName} 已存在，直接复用它`);
+    }
+
     await withRetry(3, () => $`git push origin ${tagName}`, "git push tag");
   });
 
-  log.success(`Release tag pushed: ${tagName}`);
+  state.tagPushed = true;
+  saveState(state);
+  log.success(`tag 已推送：${tagName}`);
   return tagName;
 }
 
-async function openGitHubRelease(newVersion, changelog) {
+async function openGitHubRelease(state, apkPath) {
   const releaseUrl = new URL(`${REPO_URL}/releases/new`);
-  releaseUrl.searchParams.set("tag", `v${newVersion}`);
-  releaseUrl.searchParams.set("title", `minibili-${newVersion}`);
-  releaseUrl.searchParams.set("body", getReleaseNotes(changelog));
+  releaseUrl.searchParams.set("tag", `v${state.version}`);
+  releaseUrl.searchParams.set("title", `minibili-${state.version}`);
+  releaseUrl.searchParams.set("body", getReleaseNotes(state.changelog));
 
   await open(releaseUrl.toString());
-  log.success("Opened GitHub release page");
+
+  state.releaseOpened = true;
+  saveState(state);
+
+  log.success("已打开 GitHub Release 页面");
+  log.info(`请上传附件：${apkPath}`);
+  log.warn("附件名不能改，必须是 minibili-<版本>.apk，改了 App 内更新会 404");
+  log.warn("必须点 Publish release 发布为正式 release（不能存草稿、不能勾 pre-release）");
 }
+
+// ---------------------------------------------------------------- 入口
 
 async function main() {
-  let originalPackageText = null;
-  let releaseCommitted = false;
+  const options = parseArgs(process.argv.slice(2));
 
-  try {
-    await checkEnvironment();
-
-    const currentPackage = readPackageJson();
-    const currentVersion = currentPackage.version;
-    if (!currentVersion) {
-      throw new Error("app/package.json is missing version");
-    }
-
-    log.info(`Current version: ${currentVersion}`);
-
-    const { newVersion, changelog } = await promptReleaseInfo(currentVersion);
-    const updated = await updatePackageJson(newVersion, changelog);
-    originalPackageText = updated.originalText;
-    log.success(`Updated app/package.json to ${newVersion}`);
-
-    const build = await runEasBuild(newVersion, changelog);
-    await downloadApk(newVersion, build);
-
-    await commitAndPushRelease(newVersion, () => {
-      releaseCommitted = true;
-    });
-
-    await createAndPushTag(newVersion, changelog);
-    await openGitHubRelease(newVersion, changelog);
-
-    log.success("Release flow completed");
-  } catch (error) {
-    if (originalPackageText !== null && !releaseCommitted) {
-      await restorePackageJson(originalPackageText);
-    }
-
-    log.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
+  if (options.help) {
+    printUsage();
+    return;
   }
+
+  if (options.reset) {
+    clearState();
+  }
+
+  let recorded = loadState();
+
+  if (options.resume && recorded === null) {
+    throw new ReleaseError(`没有找到可续跑的发布记录（${STATE_PATH}）`);
+  }
+
+  // 上一次已经跑完（tag 都推了）的记录不拦着发新版本，直接丢弃
+  if (!options.resume && recorded !== null && recorded.tagPushed) {
+    log.info(`上次发布 v${recorded.version} 已完成，忽略它的发布记录`);
+    clearState();
+    recorded = null;
+  }
+
+  await checkEnvironment();
+
+  let state;
+
+  if (options.resume) {
+    state = recorded;
+
+    if (options.version !== null && options.version !== state.version) {
+      throw new ReleaseError(
+        `--version ${options.version} 与发布记录里的 ${state.version} 不一致，` +
+          "如需放弃请先执行 npm run build -- --reset",
+      );
+    }
+    if (options.changelog !== null && options.changelog !== state.changelog) {
+      throw new ReleaseError(
+        "--changelog 与发布记录里的更新日志不一致，如需放弃请先执行 npm run build -- --reset",
+      );
+    }
+
+    log.info(`续跑发布 v${state.version}：${describeProgress(state)}`);
+  } else {
+    const pkg = readPackageJson();
+
+    if (typeof pkg.version !== "string" || pkg.version === "") {
+      throw new ReleaseError("app/package.json 缺少 version");
+    }
+
+    log.info(`当前版本：${pkg.version}`);
+
+    const { changelog, newVersion } = await resolveReleaseInfo(pkg.version, options);
+
+    assertVersionCode(pkg);
+
+    if (recorded !== null && recorded.version !== newVersion) {
+      throw new ReleaseError(
+        `存在未完成的发布 v${recorded.version}（${describeProgress(recorded)}），` +
+          `请先用 ${RESUME_COMMAND} 续跑，或 npm run build -- --reset 丢弃`,
+      );
+    }
+
+    await assertVersionAvailable(newVersion);
+
+    state =
+      recorded !== null && recorded.version === newVersion
+        ? { ...recorded, changelog }
+        : createState(newVersion, changelog);
+    saveState(state);
+  }
+
+  if (options.buildId !== null) {
+    state.buildId = options.buildId;
+    state.buildStatus = null;
+    state.buildUrl = null;
+    saveState(state);
+    log.info(`使用指定的构建：${options.buildId}`);
+  }
+
+  if (options.apkPath !== null) {
+    if (!existsSync(options.apkPath)) {
+      throw new ReleaseError(`--apk 指定的文件不存在：${options.apkPath}`);
+    }
+    state.apkPath = options.apkPath;
+    saveState(state);
+    log.info(`使用指定的 APK：${options.apkPath}`);
+  }
+
+  activeState = state;
+
+  await ensureVersionCommitted(state);
+  const build = await ensureBuild(state);
+  const apkPath = await ensureApkReady(state, build);
+  await ensureTagPushed(state);
+  await openGitHubRelease(state, apkPath);
+
+  log.success(`发布流程完成：v${state.version}`);
 }
 
-await main();
+process.on("SIGINT", () => {
+  log.warn("已中断");
+  if (activeState !== null) {
+    printResumeInstructions(activeState);
+  }
+  process.exit(130);
+});
+
+try {
+  await main();
+} catch (error) {
+  log.error(errorMessage(error));
+  if (activeState !== null) {
+    printResumeInstructions(activeState);
+  }
+  process.exit(1);
+}
