@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Asset } from "expo-asset";
 import { Flame, GalleryVerticalEnd, UserRound, UsersRound } from "lucide-react-native";
+import { useRef } from "react";
 
 import { ThemedIcon } from "@/components/ThemedIcon";
 import useResolvedColor from "@/hooks/useResolvedColor";
@@ -14,6 +15,7 @@ import { useStore } from "@/store";
 import { useUnreadFollowedUpCount } from "@/store/derives";
 import type { MainTabParamList, RootStackParamList } from "@/types";
 import { useAppUpdateInfo } from "@/api/check-update";
+import { posthog, PostHogNavigationProvider } from "@/config/posthog";
 
 import About from "./About";
 import BilibiliLogin from "./BilibiliLogin";
@@ -183,6 +185,7 @@ export function MainTabs() {
 }
 
 function AppRoute() {
+  const routeNameRef = useRef<string | undefined>(undefined);
   const theme = useTheme();
   const routeTheme = useRouteTheme();
   const { $firstRun, initialed } = useStore();
@@ -193,72 +196,86 @@ function AppRoute() {
     return null;
   }
 
+  const trackCurrentScreen = () => {
+    const currentRouteName = rootNavigationRef.getCurrentRoute()?.name;
+    if (currentRouteName && currentRouteName !== routeNameRef.current) {
+      posthog?.screen(currentRouteName);
+    }
+    routeNameRef.current = currentRouteName;
+  };
+
   return (
     <NavigationContainer
       ref={rootNavigationRef}
       theme={routeTheme}
-      onReady={flushPendingBilibiliLogin}
+      onReady={() => {
+        flushPendingBilibiliLogin();
+        trackCurrentScreen();
+      }}
+      onStateChange={trackCurrentScreen}
     >
-      <Stack.Navigator
-        initialRouteName={isFirstRun ? "Welcome" : "MainTabs"}
-        screenOptions={{
-          headerTransparent: false,
-          headerTitleStyle: {
-            fontSize: 18,
-            color: headerTitleColor,
-          },
-        }}
-      >
-        <Stack.Screen
-          name="Welcome"
-          component={Welcome}
-          options={{ headerTitle: "欢迎使用 MiniBili" }}
-        />
-        <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="SearchVideos"
-          component={SearchVideos}
-          options={{ headerTitle: "搜索视频" }}
-        />
-        <Stack.Screen
-          name="SearchUps"
-          component={SearchUps}
-          options={{ headerTitle: "搜索UP主" }}
-        />
-        <Stack.Screen name="Dynamic" component={Dynamic} options={{ headerTitle: "动态" }} />
-        <Stack.Screen name="Play" component={Play} />
-        <Stack.Screen name="Living" component={Living} />
-        <Stack.Screen
-          name="DynamicDetail"
-          component={DynamicDetail}
-          options={{ headerTitle: "动态详情" }}
-        />
-        <Stack.Screen
-          name="WebPage"
-          component={WebPage}
-          options={({ route }) => ({ headerTitle: route.params.title || "-" })}
-        />
-        <Stack.Screen
-          name="Favorites"
-          component={FavoritesRoute}
-          options={{ headerTitle: "我的收藏", headerRight: favoritesHeaderRight }}
-        />
-        <Stack.Screen
-          name="History"
-          component={HistoryRoute}
-          options={{ headerTitle: "观看历史" }}
-        />
-        <Stack.Screen
-          name="WatchLater"
-          component={WatchLaterRoute}
-          options={{ headerTitle: "稍后再看" }}
-        />
-        <Stack.Screen
-          name="BilibiliLogin"
-          component={BilibiliLogin}
-          options={{ headerTitle: "登录 B站" }}
-        />
-      </Stack.Navigator>
+      <PostHogNavigationProvider>
+        <Stack.Navigator
+          initialRouteName={isFirstRun ? "Welcome" : "MainTabs"}
+          screenOptions={{
+            headerTransparent: false,
+            headerTitleStyle: {
+              fontSize: 18,
+              color: headerTitleColor,
+            },
+          }}
+        >
+          <Stack.Screen
+            name="Welcome"
+            component={Welcome}
+            options={{ headerTitle: "欢迎使用 MiniBili" }}
+          />
+          <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+          <Stack.Screen
+            name="SearchVideos"
+            component={SearchVideos}
+            options={{ headerTitle: "搜索视频" }}
+          />
+          <Stack.Screen
+            name="SearchUps"
+            component={SearchUps}
+            options={{ headerTitle: "搜索UP主" }}
+          />
+          <Stack.Screen name="Dynamic" component={Dynamic} options={{ headerTitle: "动态" }} />
+          <Stack.Screen name="Play" component={Play} />
+          <Stack.Screen name="Living" component={Living} />
+          <Stack.Screen
+            name="DynamicDetail"
+            component={DynamicDetail}
+            options={{ headerTitle: "动态详情" }}
+          />
+          <Stack.Screen
+            name="WebPage"
+            component={WebPage}
+            options={({ route }) => ({ headerTitle: route.params.title || "-" })}
+          />
+          <Stack.Screen
+            name="Favorites"
+            component={FavoritesRoute}
+            options={{ headerTitle: "我的收藏", headerRight: favoritesHeaderRight }}
+          />
+          <Stack.Screen
+            name="History"
+            component={HistoryRoute}
+            options={{ headerTitle: "观看历史" }}
+          />
+          <Stack.Screen
+            name="WatchLater"
+            component={WatchLaterRoute}
+            options={{ headerTitle: "稍后再看" }}
+          />
+          <Stack.Screen
+            name="BilibiliLogin"
+            component={BilibiliLogin}
+            options={{ headerTitle: "登录 B站" }}
+          />
+        </Stack.Navigator>
+      </PostHogNavigationProvider>
     </NavigationContainer>
   );
 }

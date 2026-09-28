@@ -31,6 +31,7 @@ function resolveVariant() {
 
 const variant = resolveVariant();
 const isPreview = variant === "preview";
+const isProduction = variant === "production";
 const { appId, name } = VARIANTS[variant];
 
 const release = `${appId}@${version}+${versionCode}`;
@@ -70,6 +71,18 @@ module.exports = {
   plugins: [
     "expo-asset",
     "expo-image",
+    "expo-localization",
+    ...(isProduction
+      ? [
+          [
+            "posthog-react-native/expo",
+            {
+              skipOnConflict: true,
+              uploadNativeSymbols: true,
+            },
+          ],
+        ]
+      : []),
     "expo-status-bar",
     "expo-secure-store",
     [
@@ -133,6 +146,13 @@ module.exports = {
     }).format(new Date()),
     gitHash,
     // dsn: process.env.SENTRY_DSN,
+    posthogEnabled: isProduction,
+    ...(isProduction
+      ? {
+          posthogProjectToken: process.env.POSTHOG_PROJECT_TOKEN,
+          posthogHost: process.env.POSTHOG_HOST,
+        }
+      : {}),
     releaseName: release,
   },
   // hooks: {

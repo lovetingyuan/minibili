@@ -29,6 +29,7 @@ import {
   WatchProgressManager,
 } from "./components/managers";
 import { MenuProvider, menuProviderCustomStyles } from "./components/Menu";
+import { posthog } from "./config/posthog";
 import useAppOrientation from "./hooks/useAppOrientation";
 import { ThemeProvider } from "./hooks/useTheme";
 import { isLoginRequiredError } from "./features/bilibili-session/login-required";
@@ -39,6 +40,12 @@ import { ToastHost } from "./features/toast";
 
 let online = true;
 const focus = true;
+
+function captureRenderError(error: Error, componentStack: string) {
+  if (!__DEV__) {
+    posthog?.captureException(error, { component_stack: componentStack });
+  }
+}
 
 const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
   fetcher,
@@ -89,7 +96,7 @@ export default function App() {
         <SWRConfig value={SWRConfigValue}>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <MenuProvider backHandler customStyles={menuProviderCustomStyles}>
-              <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <ErrorBoundary FallbackComponent={ErrorFallback} onError={captureRenderError}>
                 {/* sheet 内容通过 portal 渲染，放在 MenuProvider/ErrorBoundary 里面才能继承它们的 context */}
                 <BottomSheetModalProvider>
                   <InitStoreComp />

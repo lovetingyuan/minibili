@@ -1,5 +1,6 @@
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import useSWR from "swr";
+import { posthog } from "@/config/posthog";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { BilibiliSessionChangedError } from "@/features/bilibili-session/controller";
 import { BilibiliAuthExpiredError } from "@/features/bilibili-session/auth-expiration";
@@ -9,9 +10,25 @@ import { userData } from "@/features/user-data/store";
 import { userDataScope } from "@/features/user-data/controller";
 
 export default function UserDataManager() {
-  const { account: session, revalidate } = useBilibiliSession();
+  const { account: session, isChecking, revalidate } = useBilibiliSession();
   const account = session && bilibiliSession.isCurrentAccount(session) ? session : null;
+  const identifiedMidRef = useRef<string | null | undefined>(undefined);
   const snapshot = useSyncExternalStore(userData.subscribe, userData.getSnapshot);
+
+  useEffect(() => {
+    if (isChecking) {
+      return;
+    }
+    if (account) {
+      if (identifiedMidRef.current !== account.mid) {
+        posthog?.identify(account.mid);
+      }
+      identifiedMidRef.current = account.mid;
+    } else if (identifiedMidRef.current !== null) {
+      posthog?.reset();
+      identifiedMidRef.current = null;
+    }
+  }, [account, isChecking]);
 
   useEffect(() => {
     void userData.activate(account).catch(() => {});

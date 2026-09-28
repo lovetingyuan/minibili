@@ -13,15 +13,6 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "expo": {
-    "autolinking": {
-      "android": {
-        "buildFromSource": [
-          "expo-video"
-        ]
-      }
-    }
-  },
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "android": "npm run dev -- --android",
@@ -31,7 +22,8 @@
     "build:android:preview:eas": "cross-env APP_VARIANT=preview npx --yes eas-cli@latest build --platform android --profile preview --non-interactive",
     "build:android:dev": "node scripts/build-android-local.mjs",
     "build:android:dev:eas": "cross-env APP_VARIANT=development npx --yes eas-cli@latest build --platform android --profile development --non-interactive",
-    "update": "npx --yes eas-cli@latest update --channel production --platform android --environment production",
+    "build:android:production:eas": "cross-env APP_VARIANT=production npx --yes eas-cli@latest build --platform android --profile production --non-interactive",
+    "update": "cross-env APP_VARIANT=production npx --yes eas-cli@latest update --channel production --platform android --environment production && cross-env APP_VARIANT=production npx --yes eas-cli@latest env:exec production \"node scripts/upload-posthog-sourcemaps.mjs\" --non-interactive",
     "doctor": "npx -y expo-doctor@latest",
     "test": "npx vitest run",
     "lint": "oxlint . --react-plugin --fix --fix-suggestions",
@@ -40,6 +32,7 @@
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.2.14",
+    "@posthog/react-native-plugin": "^2.12.0",
     "@preeternal/react-native-cookie-manager": "^6.4.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/hooks": "^100.1.0",
@@ -58,11 +51,13 @@
     "expo-constants": "~57.0.17",
     "expo-crypto": "~57.0.3",
     "expo-dev-client": "~57.0.18",
+    "expo-device": "~57.0.2",
     "expo-file-system": "~57.0.6",
     "expo-font": "~57.0.3",
     "expo-image": "~57.0.4",
     "expo-intent-launcher": "~57.0.1",
     "expo-keep-awake": "~57.0.1",
+    "expo-localization": "~57.0.2",
     "expo-media-library": "~57.0.4",
     "expo-notifications": "~57.0.18",
     "expo-screen-orientation": "~57.0.2",
@@ -74,6 +69,7 @@
     "expo-video": "57.0.5",
     "he": "^1.2.0",
     "lucide-react-native": "^1.47.0",
+    "posthog-react-native": "^4.44.0",
     "react": "19.2.3",
     "react-atomic-store": "^0.0.9",
     "react-native": "0.86.3",
@@ -111,5 +107,14 @@
   "config": {
     "changelog": "修复已知问题",
     "versionCode": 76
+  },
+  "expo": {
+    "autolinking": {
+      "android": {
+        "buildFromSource": [
+          "expo-video"
+        ]
+      }
+    }
   }
 }
