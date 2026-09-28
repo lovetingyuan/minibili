@@ -10,7 +10,7 @@
     "postinstall": "patch-package",
     "format": "oxfmt .",
     "lint": "npm run lint --workspaces --if-present",
-    "knip:app": "knip --workspace @minibili/app",
+    "knip": "knip --workspace @minibili/app",
     "android": "npm run android -w=@minibili/app",
     "dev": "npm run dev -w=@minibili/app",
     "doctor": "npm run doctor -w=@minibili/app",
