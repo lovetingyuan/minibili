@@ -24,7 +24,7 @@ function SearchUpButton() {
           navigation.navigate("SearchUps");
         }}
       >
-        <ThemedIcon icon={Search} colorClassName={theme.icon.secondary} size={24} />
+        <ThemedIcon icon={Search} colorClassName={theme.icon.secondary} size={20} />
       </Button>
     </View>
   );
