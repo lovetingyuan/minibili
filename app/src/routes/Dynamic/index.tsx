@@ -19,6 +19,7 @@ import { useMarkFollowingDynamicsRead } from "@/store/actions";
 import type { RootStackParamList, UpInfo } from "@/types";
 
 import { headerRight, headerTitle } from "./Header";
+import LiveBanner from "./LiveBanner";
 import ProfileInfo from "./ProfileInfo";
 import SpaceTabs from "./SpaceTabs";
 import type { SpaceTab, SpaceTabKey } from "./SpaceTabs.types";
@@ -231,6 +232,7 @@ function Dynamic({ route }: Props) {
 
   return (
     <View className={`flex-1 ${theme.background.page}`}>
+      <LiveBanner />
       {searching ? (
         <SpaceTabs
           mode="search"

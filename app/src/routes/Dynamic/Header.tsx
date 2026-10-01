@@ -8,7 +8,7 @@ import { clsx } from 'clsx'
 import * as Clipboard from 'expo-clipboard'
 import React from 'react'
 import { EllipsisVertical } from 'lucide-react-native'
-import { Pressable, View } from 'react-native'
+import { View } from 'react-native'
 import {
   Menu,
   MenuOption,
@@ -46,7 +46,6 @@ function useIsSelfSpace(mid: UpInfo['mid'] | undefined) {
 function HeaderLeft() {
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
   const { data: userInfo } = useUserInfo(route.params?.user.mid)
-  const { livingUrl } = useLivingInfo(route.params?.user.mid)
   const dynamicUser = {
     ...route.params?.user,
     ...userInfo,
@@ -54,7 +53,6 @@ function HeaderLeft() {
   const isSelf = useIsSelfSpace(dynamicUser?.mid)
   const sexBadge = dynamicUser?.sex ? sexBadgeMap[dynamicUser.sex] : undefined
   const { data: fans } = useUserRelation(dynamicUser?.mid)
-  const navigation = useNavigation<NavigationProps['navigation']>()
   // const gotoWebPage = () => {
   //   if (dynamicUser) {
   //     navigation.navigate('WebPage', {
@@ -98,22 +96,6 @@ function HeaderLeft() {
               uri: parseImgUrl(dynamicUser.face, getImagePixelSize(45)),
             }}
           />
-          {dynamicUser.mid && livingUrl ? (
-            <Pressable
-              onPress={() => {
-                if (dynamicUser.mid) {
-                  navigation.navigate('Living', {
-                    title: `${dynamicUser.name}的直播间`,
-                    user: { mid: dynamicUser.mid, name: userName },
-                    url: livingUrl,
-                  })
-                }
-              }}
-              className="absolute inset-0 h-11 w-11 items-center justify-center rounded-full bg-slate-950/60"
-            >
-              <Text className={`text-center text-xs font-bold text-[#80DAF6]`}>直播中</Text>
-            </Pressable>
-          ) : null}
           {sexBadge ? (
             <View
               accessibilityLabel={sexBadge.label}
@@ -176,7 +158,7 @@ function HeaderRight() {
   const actions = useFollowActions()
   const { confirmBlock } = useBlockUpActions()
   const { blacklist } = useBilibiliBlacklist()
-  // 与 HeaderLeft 用同一个 SWR key，命中缓存即可拿到直播间 id
+  // 与主页直播入口用同一个 SWR key，命中缓存即可拿到直播间 id
   const { roomId } = useLivingInfo(dynamicUser?.mid)
   const _followedUpsMap = useFollowedUpsMap()
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
