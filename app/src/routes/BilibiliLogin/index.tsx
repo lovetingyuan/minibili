@@ -1,7 +1,7 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
-import { WebView } from "react-native-webview";
+import NavigableWebView from "@/components/NavigableWebView";
 import { useSWRConfig } from "swr";
 
 import { BILIBILI_API_COOKIE_URL, hasBilibiliLoginCookie } from "@/api/bilibili-cookie.helpers";
@@ -43,7 +43,20 @@ export default function BilibiliLogin({ navigation }: Props) {
   const [pageFailed, setPageFailed] = React.useState(false);
   const [nativeModuleUnavailable, setNativeModuleUnavailable] = React.useState(false);
   const [captureFailed, setCaptureFailed] = React.useState(false);
+  const [loginCompleted, setLoginCompleted] = React.useState(false);
   const active = appState === "active" && pageReady && !pageFailed;
+
+  React.useEffect(() => {
+    if (!loginCompleted) {
+      return;
+    }
+    // 先卸载 WebView 的返回拦截，再执行登录成功后的原生导航。
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate("MainTabs");
+    }
+  }, [loginCompleted, navigation]);
 
   React.useEffect(() => {
     if (!active) {
@@ -53,15 +66,6 @@ export default function BilibiliLogin({ navigation }: Props) {
     let busy = false;
     let stopped = false;
     let rejectedCookie = "";
-
-    // 登录成功后返回上一页，栈底没有上一页时回到主页面
-    function leaveLoginPage() {
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-        return;
-      }
-      navigation.navigate("MainTabs");
-    }
 
     async function captureCookie() {
       if (busy || stopped || controller.signal.aborted) {
@@ -97,7 +101,7 @@ export default function BilibiliLogin({ navigation }: Props) {
             showToast("登录成功");
             // 上一页缓存的「需要登录」错误要一起失效，否则返回后仍然看不到内容
             void mutate(() => true, undefined, { revalidate: true });
-            leaveLoginPage();
+            setLoginCompleted(true);
           }
         } else {
           rejectedCookie = cookie;
@@ -128,6 +132,10 @@ export default function BilibiliLogin({ navigation }: Props) {
     setPageFailed(false);
     setCaptureFailed(false);
     setWebViewKey((key) => key + 1);
+  }
+
+  if (loginCompleted) {
+    return <LoginPageLoading />;
   }
 
   if (nativeModuleUnavailable) {
@@ -165,7 +173,7 @@ export default function BilibiliLogin({ navigation }: Props) {
           />
         </View>
       ) : null}
-      <WebView
+      <NavigableWebView
         key={webViewKey}
         className="flex-1"
         source={{ uri: BILIBILI_LOGIN_URL }}

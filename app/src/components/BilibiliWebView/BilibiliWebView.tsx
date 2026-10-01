@@ -1,6 +1,6 @@
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
-import { WebView } from "react-native-webview";
+import NavigableWebView from "@/components/NavigableWebView";
 
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { BilibiliCookieModuleUnavailableError } from "@/features/bilibili-session/webview-cookies";
@@ -74,7 +74,7 @@ function PreparedWebView(props: BilibiliWebViewProps) {
     );
   }
 
-  return <WebView {...props} sharedCookiesEnabled thirdPartyCookiesEnabled />;
+  return <NavigableWebView {...props} sharedCookiesEnabled thirdPartyCookiesEnabled />;
 }
 
 export default function BilibiliWebView(props: BilibiliWebViewProps) {
