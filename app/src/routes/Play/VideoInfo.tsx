@@ -55,6 +55,7 @@ function VideoInfo(props: {
     payRights: videoInfo.payRights ?? { arcPay: 0, pay: 0, ugcPay: 0 },
   });
   const previewNote = props.previewReason ? resolvePreviewNote(props.previewReason) : null;
+  const showInteractiveNote = !isLoading && videoInfo?.interactive;
   const [showPagesModal, setShowPagesModal] = React.useState(false);
 
   const navigation = useNavigation<NavigationProps["navigation"]>();
@@ -125,18 +126,30 @@ function VideoInfo(props: {
         </View>
       ) : null}
 
-      {accessBadges.length ? (
-        <View className="mb-1.5 flex-row flex-wrap gap-1.5">
-          {accessBadges.map((badge) => (
-            <VideoBadge key={badge.label} label={badge.label} tone={badge.tone} />
-          ))}
+      {accessBadges.length || previewNote || showInteractiveNote ? (
+        <View className="mb-1.5 flex-row flex-wrap items-center justify-between gap-x-2 gap-y-1.5">
+          {accessBadges.length ? (
+            <View className="max-w-full flex-row flex-wrap gap-1.5">
+              {accessBadges.map((badge) => (
+                <VideoBadge key={badge.label} label={badge.label} tone={badge.tone} />
+              ))}
+            </View>
+          ) : null}
+          {previewNote || showInteractiveNote ? (
+            <View className="ml-auto max-w-full gap-1">
+              {previewNote ? (
+                <Text className={`text-right text-xs italic ${theme.warning.text}`}>
+                  {`【${previewNote}】`}
+                </Text>
+              ) : null}
+              {showInteractiveNote ? (
+                <Text className={`text-right text-xs italic ${theme.warning.text}`}>
+                  【该视频为交互视频，暂不支持】
+                </Text>
+              ) : null}
+            </View>
+          ) : null}
         </View>
-      ) : null}
-
-      {previewNote ? (
-        <Text
-          className={`mb-1.5 text-xs italic ${theme.warning.text}`}
-        >{`【${previewNote}】`}</Text>
       ) : null}
 
       <Text selectable className={`text-lg font-bold leading-6 ${theme.text.heading}`}>
@@ -224,10 +237,6 @@ function VideoInfo(props: {
           </Text>
         </Pressable>
       </View>
-
-      {!isLoading && videoInfo?.interactive ? (
-        <Text className={`mt-3 italic ${theme.warning.text}`}>【该视频为交互视频，暂不支持】</Text>
-      ) : null}
     </View>
   );
 }

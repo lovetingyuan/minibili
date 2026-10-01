@@ -81,6 +81,7 @@ module.exports = {
               uploadNativeSymbols: true,
             },
           ],
+          "./plugins/with-posthog-cli",
         ]
       : []),
     "expo-status-bar",
