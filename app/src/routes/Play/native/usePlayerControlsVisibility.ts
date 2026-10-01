@@ -8,12 +8,14 @@ import { resolveControlsAutoHideMs, toggleControlsVisible } from "./player-helpe
  * 点击视频切换显隐，控件操作会重置自动隐藏计时。
  * 暂停时点击继续播放会主动隐藏控件，此时暂停态不再强制显示控件，
  * 直到真正开始播放（或用户再次点击视频）。
+ * 暂停态下点击视频同样可以隐藏控件：暂停只负责「默认显示」，
+ * 用户主动点击隐藏后保持隐藏，直到再次点击或真正开始播放。
  */
 export function usePlayerControlsVisibility(isPlaying: boolean) {
   const [controlsVisible, setControlsVisible] = React.useState(true);
   // 每次操作自增，用于重启自动隐藏计时
   const [interactionToken, setInteractionToken] = React.useState(0);
-  // 暂停态会强制显示控件，用该标记跳过强制显示，避免隐藏后立刻又被显示出来
+  // 暂停态会默认显示控件，用该标记跳过强制显示，避免隐藏后立刻又被显示出来
   const hideUntilPlayingRef = React.useRef(false);
 
   React.useEffect(() => {
@@ -46,8 +48,9 @@ export function usePlayerControlsVisibility(isPlaying: boolean) {
   }
 
   function toggleControls() {
-    hideUntilPlayingRef.current = false;
     const nextVisible = toggleControlsVisible(controlsVisible);
+    // 暂停态下隐藏必须同步标记，否则暂停态的强制显示会立刻把控件弹回来
+    hideUntilPlayingRef.current = !nextVisible;
     setControlsVisible(nextVisible);
     if (nextVisible) {
       // 重新显示后重新开始倒计时

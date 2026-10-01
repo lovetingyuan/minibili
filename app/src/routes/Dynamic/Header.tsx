@@ -169,12 +169,15 @@ function HeaderRight() {
   const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
   const dynamicUser = route.params?.user;
   const isSelf = useIsSelfSpace(dynamicUser?.mid);
+  const navigation = useNavigation<NavigationProps["navigation"]>();
   const [visible, setVisible] = React.useState(false);
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
   const actions = useFollowActions();
   const { confirmBlock } = useBlockUpActions();
   const { blacklist } = useBilibiliBlacklist();
+  // 与 HeaderLeft 用同一个 SWR key，命中缓存即可拿到直播间 id
+  const { roomId } = useLivingInfo(dynamicUser?.mid);
   const _followedUpsMap = useFollowedUpsMap();
   const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
   const blocked = dynamicUser?.mid !== undefined && blacklist.has(String(dynamicUser.mid));
@@ -218,6 +221,22 @@ function HeaderRight() {
               void actions.follow(dynamicUser);
             }}
           />
+          {roomId ? (
+            <MenuOption
+              text="打开直播间"
+              onSelect={() => {
+                hideMenu();
+                if (!dynamicUser) {
+                  return;
+                }
+                navigation.navigate("Living", {
+                  title: `${dynamicUser.name}的直播间`,
+                  user: { mid: dynamicUser.mid, name: dynamicUser.name },
+                  url: `https://live.bilibili.com/h5/${roomId}`,
+                });
+              }}
+            />
+          ) : null}
           <MenuOption
             text={blocked ? "已拉黑" : "拉黑UP"}
             disabled={blocked}

@@ -21,9 +21,12 @@ export const useLivingInfo = (mid?: string | number) => {
     const { live_status, room_id } = data?.[mid] || {};
     return {
       livingUrl: live_status === 1 ? `https://live.bilibili.com/h5/${room_id}` : "",
+      // 未开播时接口也会返回 room_id，可以据此进入（未开播状态的）直播间
+      roomId: room_id && room_id > 0 ? room_id : undefined,
     };
   }
   return {
     livingUrl: "",
+    roomId: undefined,
   };
 };

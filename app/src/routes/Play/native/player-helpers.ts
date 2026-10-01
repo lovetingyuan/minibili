@@ -258,6 +258,8 @@ export function resolveControlsAutoHideMs(isPlaying: boolean): number | null {
  * 首帧渲染事件可能比 playingChange 先到，播放真正开始过（playbackStarted）之前不展示；
  * paused 由 usePlayerPausedUi 计算，已经过滤掉起播、seek、缓冲带来的短暂暂停，
  * 避免按钮在视频刚开始播放时闪一下。
+ * 控件层被用户点击收起时（controlsVisible 为 false）按钮一起隐藏，
+ * 避免底部控件消失后画面中间还留着一个孤立的播放按钮。
  * 错误态、滑动进度提示、弹幕输入条这些浮层会盖住画面，此时也不展示。
  */
 export function shouldShowResumeButton(options: {
@@ -265,11 +267,28 @@ export function shouldShowResumeButton(options: {
   videoVisible: boolean;
   playbackStarted: boolean;
   paused: boolean;
+  controlsVisible: boolean;
   hasError: boolean;
   overlayVisible: boolean;
 }) {
-  const { started, videoVisible, playbackStarted, paused, hasError, overlayVisible } = options;
-  return started && videoVisible && playbackStarted && paused && !hasError && !overlayVisible;
+  const {
+    started,
+    videoVisible,
+    playbackStarted,
+    paused,
+    controlsVisible,
+    hasError,
+    overlayVisible,
+  } = options;
+  return (
+    started &&
+    videoVisible &&
+    playbackStarted &&
+    paused &&
+    controlsVisible &&
+    !hasError &&
+    !overlayVisible
+  );
 }
 
 /**

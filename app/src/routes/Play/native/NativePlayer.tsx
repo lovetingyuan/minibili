@@ -1186,6 +1186,7 @@ export default function NativePlayer(props: NativePlayerProps) {
         videoVisible: posterDismissed || playbackEnded,
         playbackStarted,
         paused: pausedUiVisible,
+        controlsVisible,
         hasError: hasError || limitedNoticeVisible,
         overlayVisible: seekHint !== null || danmakuComposerOpen,
       }) ? (
