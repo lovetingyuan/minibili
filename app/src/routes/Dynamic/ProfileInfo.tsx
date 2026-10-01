@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { useState } from 'react'
+import { Pressable, View } from 'react-native'
 
-import { Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
+import { Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
 
 import {
   hasProfileInfoOverflow,
   PROFILE_INFO_COLLAPSED_LINES,
   withProfileInfoLines,
-} from "./profile-info.helpers";
-import type { ProfileInfoLines, ProfileInfoLinesField } from "./profile-info.helpers";
-import type { ProfileInfoProps, ProfileInfoRowProps } from "./ProfileInfo.types";
+} from './profile-info.helpers'
+import type { ProfileInfoLines, ProfileInfoLinesField } from './profile-info.helpers'
+import type { ProfileInfoProps, ProfileInfoRowProps } from './ProfileInfo.types'
 
 function ProfileInfoRow(props: ProfileInfoRowProps) {
   const content = (
@@ -18,7 +18,7 @@ function ProfileInfoRow(props: ProfileInfoRowProps) {
       <Text className={`text-xs font-medium ${theme.text.muted}`}>{props.label}　</Text>
       {props.value}
     </>
-  );
+  )
 
   return (
     <View className="relative flex-row items-start gap-1">
@@ -41,45 +41,45 @@ function ProfileInfoRow(props: ProfileInfoRowProps) {
         importantForAccessibility="no-hide-descendants"
         pointerEvents="none"
         className="absolute left-0 right-0 top-0 text-sm leading-5 opacity-0"
-        onTextLayout={(event) => props.onLinesChange(props.field, event.nativeEvent.lines.length)}
+        onTextLayout={event => props.onLinesChange(props.field, event.nativeEvent.lines.length)}
       >
         {content}
       </Text>
       {props.action}
     </View>
-  );
+  )
 }
 
 export default function ProfileInfo(props: ProfileInfoProps) {
-  const [expanded, setExpanded] = useState(false);
-  const [lines, setLines] = useState<ProfileInfoLines>({ official: 0, sign: 0 });
-  const officialDescription = props.officialDescription?.trim() ?? "";
-  const sign = props.sign?.trim() ?? "";
+  const [expanded, setExpanded] = useState(false)
+  const [lines, setLines] = useState<ProfileInfoLines>({ official: 0, sign: 0 })
+  const officialDescription = props.officialDescription?.trim() ?? ''
+  const sign = props.sign?.trim() ?? ''
 
   if (!officialDescription && !sign) {
-    return null;
+    return null
   }
 
-  const canExpand = hasProfileInfoOverflow(lines);
-  const isExpanded = canExpand && expanded;
+  const canExpand = hasProfileInfoOverflow(lines)
+  const isExpanded = canExpand && expanded
 
   function handleLinesChange(field: ProfileInfoLinesField, value: number) {
-    setLines((current) => withProfileInfoLines(current, field, value));
+    setLines(current => withProfileInfoLines(current, field, value))
   }
 
   const action = (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={isExpanded ? "收起UP主资料" : "查看UP主资料详情"}
+      accessibilityLabel={isExpanded ? '收起UP主资料' : '查看UP主资料详情'}
       hitSlop={8}
       className="shrink-0 self-end px-1 py-0.5"
-      onPress={() => setExpanded((current) => !current)}
+      onPress={() => setExpanded(current => !current)}
     >
       <Text className={`text-xs font-medium leading-5 ${theme.primary.text}`}>
-        {isExpanded ? "收起" : "详情"}
+        {isExpanded ? '收起' : '详情'}
       </Text>
     </Pressable>
-  );
+  )
 
   return (
     <View className="mb-3 gap-2 bg-white px-4 py-3 dark:bg-slate-950">
@@ -104,5 +104,5 @@ export default function ProfileInfo(props: ProfileInfoProps) {
         />
       ) : null}
     </View>
-  );
+  )
 }

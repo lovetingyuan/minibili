@@ -1,10 +1,10 @@
-import { Skeleton } from "@/components/styled/rneui";
-import { View } from "react-native";
+import { Skeleton } from '@/components/styled/native'
+import { View } from 'react-native'
 
-const SKELETON_WIDTHS = [85, 62, 92, 45, 76, 30, 55, 95, 70, 40, 88, 35, 66, 52, 78, 25];
+const SKELETON_WIDTHS = [85, 62, 92, 45, 76, 30, 55, 95, 70, 40, 88, 35, 66, 52, 78, 25]
 
 function VideoLoading({ index }: { index: number }) {
-  const width = SKELETON_WIDTHS[index % SKELETON_WIDTHS.length];
+  const width = SKELETON_WIDTHS[index % SKELETON_WIDTHS.length]
   return (
     <View className="flex-1 gap-3">
       <Skeleton animation="pulse" width="100%" height={110} />
@@ -25,10 +25,10 @@ function VideoLoading({ index }: { index: number }) {
         <Skeleton animation="wave" width={50} height={12} />
       </View>
     </View>
-  );
+  )
 }
 
-export default VLoading;
+export default VLoading
 
 function VLoading() {
   return (
@@ -41,8 +41,8 @@ function VLoading() {
               <VideoLoading index={i * 2} />
               <VideoLoading index={i * 2 + 1} />
             </View>
-          );
+          )
         })}
     </View>
-  );
+  )
 }

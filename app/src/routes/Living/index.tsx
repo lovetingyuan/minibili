@@ -1,23 +1,23 @@
-import { Text } from "@/components/styled/rneui";
-import UpName from "@/components/UpName";
-import React from "react";
-import { ActivityIndicator, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import BilibiliWebView from "@/components/BilibiliWebView";
+import { Text } from '@/components/styled/native'
+import UpName from '@/components/UpName'
+import React from 'react'
+import { ActivityIndicator, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import BilibiliWebView from '@/components/BilibiliWebView'
 
-import bilibiliFetch from "@/api/bilibili-fetch";
-import { theme } from "@/constants/theme";
-import { useLiveUpsRefresh } from "@/hooks/useLiveUpsRefresh";
-import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
-import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
+import bilibiliFetch from '@/api/bilibili-fetch'
+import { theme } from '@/constants/theme'
+import { useLiveUpsRefresh } from '@/hooks/useLiveUpsRefresh'
+import { useRecoverableWebView } from '@/hooks/useRecoverableWebView'
+import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
-import { UA } from "../../constants";
-import { showToast } from "../../utils";
-import HeaderRight from "./HeaderRight";
-import { INJECTED_JAVASCRIPT, INJECTED_JAVASCRIPT_BEFORE } from "./inject-code";
-import { getLiveRoomId, parseLiveWebViewMessage } from "./live-playback-message";
-import type { LivePageProps } from "./live-playback.types";
-import { useLiveBackgroundPlayback } from "./useLiveBackgroundPlayback";
+import { UA } from '../../constants'
+import { showToast } from '../../utils'
+import HeaderRight from './HeaderRight'
+import { INJECTED_JAVASCRIPT, INJECTED_JAVASCRIPT_BEFORE } from './inject-code'
+import { getLiveRoomId, parseLiveWebViewMessage } from './live-playback-message'
+import type { LivePageProps } from './live-playback.types'
+import { useLiveBackgroundPlayback } from './useLiveBackgroundPlayback'
 
 function Loading() {
   return (
@@ -28,11 +28,11 @@ function Loading() {
         colorClassName={theme.secondary.accent}
       />
     </View>
-  );
+  )
 }
 
 function LiveWebPage({ route }: LivePageProps) {
-  const { url, title: pageTitle } = route.params;
+  const { url, title: pageTitle } = route.params
 
   const {
     webViewRef,
@@ -41,16 +41,16 @@ function LiveWebPage({ route }: LivePageProps) {
     handleWebViewMessage,
     handleRenderProcessGone,
     handleContentProcessDidTerminate,
-  } = useRecoverableWebView();
+  } = useRecoverableWebView()
   // 返回时直播状态可能已变化，补查一次直播列表
-  useLiveUpsRefresh();
+  useLiveUpsRefresh()
   // const [pageTitle, setPageTitle] = React.useState(title)
 
   useUpdateNavigationOptions({
     headerRight: () => (
       <HeaderRight
         reload={() => {
-          remountWebView();
+          remountWebView()
         }}
       />
     ),
@@ -59,17 +59,17 @@ function LiveWebPage({ route }: LivePageProps) {
         <UpName mid={route.params.user?.mid} className="text-lg font-semibold">
           {route.params.user?.name || pageTitle}
         </UpName>
-        {route.params.user ? "的直播间" : ""}
+        {route.params.user ? '的直播间' : ''}
       </Text>
     ),
-  });
-  const insets = useSafeAreaInsets();
-  const roomId = getLiveRoomId(url);
+  })
+  const insets = useSafeAreaInsets()
+  const roomId = getLiveRoomId(url)
   const { handlePlaybackMessage } = useLiveBackgroundPlayback({
     roomId,
     title: route.params.user?.name || pageTitle,
     webViewRef,
-  });
+  })
 
   /**
    * 网页是 edge-to-edge 渲染的，底部会被系统导航栏盖住。
@@ -79,15 +79,15 @@ function LiveWebPage({ route }: LivePageProps) {
     try {
       webViewRef.current?.injectJavaScript(
         `document.documentElement.style.setProperty("--minibili-danmaku-bottom", "${Math.max(insets.bottom, 0)}px");true;`,
-      );
+      )
     } catch {
       // 页面还没就绪时忽略，加载完成后 onLoadEnd 会再同步一次
     }
   }
 
   React.useEffect(() => {
-    syncDanmakuBottomInset();
-  }, [insets.bottom, webViewKey]);
+    syncDanmakuBottomInset()
+  }, [insets.bottom, webViewKey])
 
   return (
     <BilibiliWebView
@@ -96,13 +96,13 @@ function LiveWebPage({ route }: LivePageProps) {
       source={{ uri: url }}
       key={webViewKey}
       // onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
-      originWhitelist={["http://*", "https://*", "bilibili://*"]}
+      originWhitelist={['http://*', 'https://*', 'bilibili://*']}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback
       startInLoadingState
       pullToRefreshEnabled
-      applicationNameForUserAgent={"BILIBILI/8.0.0"}
+      applicationNameForUserAgent={'BILIBILI/8.0.0'}
       // allowsBackForwardNavigationGestures
       mediaPlaybackRequiresUserAction={false}
       webviewDebuggingEnabled={__DEV__}
@@ -112,58 +112,58 @@ function LiveWebPage({ route }: LivePageProps) {
       userAgent=""
       ref={webViewRef}
       onLoadEnd={syncDanmakuBottomInset}
-      onMessage={(evt) => {
+      onMessage={evt => {
         if (handleWebViewMessage(evt.nativeEvent.data)) {
-          return;
+          return
         }
 
-        const data = parseLiveWebViewMessage(evt.nativeEvent.data);
+        const data = parseLiveWebViewMessage(evt.nativeEvent.data)
         if (!data) {
-          return;
+          return
         }
 
         if (handlePlaybackMessage(data)) {
-          return;
+          return
         }
 
-        if (data.action === "update-live-info") {
-          const { url, callback } = data.payload;
+        if (data.action === 'update-live-info') {
+          const { url, callback } = data.payload
           if (getLiveRoomId(url) !== roomId) {
-            return;
+            return
           }
           bilibiliFetch(url, {
-            headers: { "user-agent": UA },
+            headers: { 'user-agent': UA },
           })
-            .then((r) => r.text())
-            .then((html) => {
-              const index = html.indexOf("__NEPTUNE_IS_MY_WAIFU__=");
-              const html2 = html.substring(index);
-              const index2 = html2.indexOf("</script>");
-              const html3 = html2.substring(0, index2);
-              webViewRef.current?.injectJavaScript(`window.${callback}(${html3});`);
+            .then(r => r.text())
+            .then(html => {
+              const index = html.indexOf('__NEPTUNE_IS_MY_WAIFU__=')
+              const html2 = html.substring(index)
+              const index2 = html2.indexOf('</script>')
+              const html3 = html2.substring(0, index2)
+              webViewRef.current?.injectJavaScript(`window.${callback}(${html3});`)
             })
-            .catch(() => {});
+            .catch(() => {})
         }
       }}
       onError={() => {
-        showToast("加载失败");
+        showToast('加载失败')
       }}
-      onShouldStartLoadWithRequest={(request) => {
-        if (request.url.startsWith("bilibili://")) {
+      onShouldStartLoadWithRequest={request => {
+        if (request.url.startsWith('bilibili://')) {
           // Linking.openURL(request.url).catch(err => {
           //   __DEV__ && console.error(err)
           // })
-          return false;
+          return false
         }
-        if (request.url.includes(".apk")) {
-          return false;
+        if (request.url.includes('.apk')) {
+          return false
         }
-        return true;
+        return true
       }}
       onRenderProcessGone={handleRenderProcessGone}
       onContentProcessDidTerminate={handleContentProcessDidTerminate}
     />
-  );
+  )
 }
 
-export default LiveWebPage;
+export default LiveWebPage

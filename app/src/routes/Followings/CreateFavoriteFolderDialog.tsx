@@ -1,17 +1,17 @@
-import { TextInput, View } from "react-native";
+import { TextInput, View } from 'react-native'
 
-import { Dialog } from "@/components/Dialog";
-import { Switch, Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
-import { FAVORITE_FOLDER_NAME_MAX_LENGTH } from "@/features/bilibili-favorites/folder-name";
-import type { CreateFavoriteFolderDialogProps } from "./Favorites.types";
-import { useCreateFavoriteFolder } from "./useCreateFavoriteFolder";
+import { Dialog } from '@/components/Dialog'
+import { Switch, Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
+import { FAVORITE_FOLDER_NAME_MAX_LENGTH } from '@/features/bilibili-favorites/folder-name'
+import type { CreateFavoriteFolderDialogProps } from './Favorites.types'
+import { useCreateFavoriteFolder } from './useCreateFavoriteFolder'
 
 export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDialogProps) {
-  const editor = useCreateFavoriteFolder(props);
+  const editor = useCreateFavoriteFolder(props)
   function close() {
     if (editor.canClose()) {
-      props.onClose();
+      props.onClose()
     }
   }
   return (
@@ -27,12 +27,12 @@ export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDi
         className={`rounded-lg border px-3 py-2 text-base ${theme.border.outline} ${theme.text.primary}`}
         onChangeText={editor.setTitle}
         onSubmitEditing={() => {
-          void editor.submit();
+          void editor.submit()
         }}
       />
       <View className="mt-1 flex-row items-start justify-between gap-2">
         <Text
-          accessibilityRole={editor.nameError ? "alert" : undefined}
+          accessibilityRole={editor.nameError ? 'alert' : undefined}
           className={`shrink text-xs ${editor.nameError ? theme.error.text : theme.text.muted}`}
         >
           {editor.nameError ?? `名称最长 ${FAVORITE_FOLDER_NAME_MAX_LENGTH} 个字`}
@@ -68,7 +68,7 @@ export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDi
           loading={editor.saving}
           disabled={!editor.canSubmit}
           onPress={() => {
-            void editor.submit();
+            void editor.submit()
           }}
         />
         <Dialog.Button
@@ -79,5 +79,5 @@ export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDi
         />
       </Dialog.Actions>
     </Dialog>
-  );
+  )
 }

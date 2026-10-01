@@ -1,8 +1,8 @@
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from 'react-native'
 
-import { Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
-import type { FavoriteFolderTabsProps } from "./Favorites.types";
+import { Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
+import type { FavoriteFolderTabsProps } from './Favorites.types'
 
 export default function FavoriteFolderTabs({
   folders,
@@ -19,13 +19,13 @@ export default function FavoriteFolderTabs({
         showsHorizontalScrollIndicator={false}
         contentContainerClassName="gap-2 px-3 py-3"
       >
-        {folders.map((folder) => (
+        {folders.map(folder => (
           <Pressable
             key={folder.id}
             accessibilityRole="tab"
             accessibilityLabel={`${folder.title}，${folder.media_count} 个收藏`}
             accessibilityState={{ selected: selectedId === folder.id, disabled }}
-            accessibilityHint={onLongPress ? "长按打开收藏夹操作菜单" : undefined}
+            accessibilityHint={onLongPress ? '长按打开收藏夹操作菜单' : undefined}
             disabled={disabled}
             onPress={() => onSelect(folder.id)}
             onLongPress={onLongPress ? () => onLongPress(folder) : undefined}
@@ -40,5 +40,5 @@ export default function FavoriteFolderTabs({
         ))}
       </ScrollView>
     </View>
-  );
+  )
 }

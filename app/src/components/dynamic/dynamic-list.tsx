@@ -1,28 +1,28 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import type { ReactNode } from "react";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { useNavigation } from '@react-navigation/native'
+import React from 'react'
+import type { ReactNode } from 'react'
+import { ActivityIndicator, Pressable, View } from 'react-native'
 
-import type { DynamicItem } from "@/api/dynamic-items.type";
-import { LoginRequired } from "@/components/LoginRequired";
-import { Button, FlashList, Skeleton, Text } from "@/components/styled/rneui";
-import type { FlashListRef } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
-import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
-import type { MainTabNavigationProp } from "@/types";
+import type { DynamicItem } from '@/api/dynamic-items.type'
+import { LoginRequired } from '@/components/LoginRequired'
+import { Button, FlashList, Skeleton, Text } from '@/components/styled/native'
+import type { FlashListRef } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
+import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
+import type { MainTabNavigationProp } from '@/types'
 
-import { DynamicCard } from "./dynamic-card";
-import type { DynamicListProps } from "./dynamic-list.types";
+import { DynamicCard } from './dynamic-card'
+import type { DynamicListProps } from './dynamic-list.types'
 
 /** 加载失败时只给用户一句话，接口返回的错误码和路径对他没有意义 */
-const ERROR_MESSAGE = "请稍后重试";
+const ERROR_MESSAGE = '请稍后重试'
 
 function DynamicListLoading(props: { listHeader?: ReactNode }) {
   return (
     <View className={`flex-1 ${theme.background.page}`}>
       {props.listHeader}
       <View className="gap-3">
-        {[0, 1, 2].map((index) => (
+        {[0, 1, 2].map(index => (
           <View key={index} className="gap-3 bg-white p-4 dark:bg-slate-950">
             <View className="flex-row items-center gap-3">
               <Skeleton animation="pulse" circle width={36} height={36} />
@@ -38,21 +38,21 @@ function DynamicListLoading(props: { listHeader?: ReactNode }) {
         ))}
       </View>
     </View>
-  );
+  )
 }
 
 function DynamicListEmpty(
-  props: Pick<DynamicListProps, "error" | "errorTitle" | "emptyTitle" | "emptyMessage" | "retry">,
+  props: Pick<DynamicListProps, 'error' | 'errorTitle' | 'emptyTitle' | 'emptyMessage' | 'retry'>,
 ) {
   // 登录后才能看到的列表（关注动态、空间内容等）失败时不显示通用错误
   if (isLoginRequiredError(props.error)) {
-    return <LoginRequired description="登录后即可查看该内容" />;
+    return <LoginRequired description="登录后即可查看该内容" />
   }
 
   return (
     <View className="items-center gap-3 px-8 py-24">
       <Text className="text-lg font-semibold">
-        {props.error ? (props.errorTitle ?? "动态加载失败") : props.emptyTitle}
+        {props.error ? (props.errorTitle ?? '动态加载失败') : props.emptyTitle}
       </Text>
       <Text selectable className={`text-center text-sm ${theme.text.muted}`}>
         {props.error ? ERROR_MESSAGE : props.emptyMessage}
@@ -62,45 +62,45 @@ function DynamicListEmpty(
           title="重新加载"
           type="outline"
           onPress={() => {
-            void props.retry();
+            void props.retry()
           }}
         />
       ) : null}
     </View>
-  );
+  )
 }
 
 export function DynamicList(props: DynamicListProps) {
-  const navigation = useNavigation<MainTabNavigationProp>();
-  const listRef = React.useRef<FlashListRef<DynamicItem> | null>(null);
-  const pendingScrollTopRef = React.useRef(false);
-  const { onTabReselect } = props;
+  const navigation = useNavigation<MainTabNavigationProp>()
+  const listRef = React.useRef<FlashListRef<DynamicItem> | null>(null)
+  const pendingScrollTopRef = React.useRef(false)
+  const { onTabReselect } = props
 
   React.useEffect(() => {
     if (!onTabReselect) {
-      return;
+      return
     }
 
-    return navigation.addListener("tabPress", () => {
+    return navigation.addListener('tabPress', () => {
       if (!navigation.isFocused()) {
-        return;
+        return
       }
       // 刷新会替换整个列表，等新列表渲染出来后再滚动，否则滚动位置会被新数据覆盖
-      pendingScrollTopRef.current = true;
-      onTabReselect();
-    });
-  }, [navigation, onTabReselect]);
+      pendingScrollTopRef.current = true
+      onTabReselect()
+    })
+  }, [navigation, onTabReselect])
 
   React.useEffect(() => {
     if (!pendingScrollTopRef.current || props.isRefreshing) {
-      return;
+      return
     }
-    pendingScrollTopRef.current = false;
-    listRef.current?.scrollToOffset({ offset: 0, animated: true });
-  }, [props.isRefreshing]);
+    pendingScrollTopRef.current = false
+    listRef.current?.scrollToOffset({ offset: 0, animated: true })
+  }, [props.isRefreshing])
 
   if (props.isLoading && !props.list.length) {
-    return <DynamicListLoading listHeader={props.listHeader} />;
+    return <DynamicListLoading listHeader={props.listHeader} />
   }
 
   return (
@@ -110,7 +110,7 @@ export function DynamicList(props: DynamicListProps) {
       contentInsetAdjustmentBehavior="automatic"
       contentContainerClassName="pb-6"
       data={props.list}
-      keyExtractor={(item) => item.id}
+      keyExtractor={item => item.id}
       renderItem={({ item }) => (
         <View className="mb-3">
           <DynamicCard
@@ -137,7 +137,7 @@ export function DynamicList(props: DynamicListProps) {
             onPress={
               props.error
                 ? () => {
-                    void props.retry();
+                    void props.retry()
                   }
                 : undefined
             }
@@ -148,10 +148,10 @@ export function DynamicList(props: DynamicListProps) {
             ) : (
               <Text className={`text-xs ${props.error ? theme.error.text : theme.text.muted}`}>
                 {props.error
-                  ? "加载下一页失败，点击重试"
+                  ? '加载下一页失败，点击重试'
                   : props.isReachingEnd
-                    ? "暂无更多"
-                    : "上拉加载更多"}
+                    ? '暂无更多'
+                    : '上拉加载更多'}
               </Text>
             )}
           </Pressable>
@@ -159,12 +159,12 @@ export function DynamicList(props: DynamicListProps) {
       }
       refreshing={props.isRefreshing}
       onRefresh={() => {
-        void props.refresh();
+        void props.refresh()
       }}
       onEndReached={() => {
-        void props.loadMore();
+        void props.loadMore()
       }}
       onEndReachedThreshold={0.7}
     />
-  );
+  )
 }

@@ -1,31 +1,31 @@
-import { Switch } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import { VideoBadge } from "@/components/VideoBadge";
-import type { VideoBadgeTone } from "@/components/VideoBadge";
-import { theme } from "@/constants/theme";
-import { Play } from "lucide-react-native";
-import { Pressable, Text, View } from "react-native";
+import { Switch } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import { VideoBadge } from '@/components/VideoBadge'
+import type { VideoBadgeTone } from '@/components/VideoBadge'
+import { theme } from '@/constants/theme'
+import { Play } from 'lucide-react-native'
+import { Pressable, Text, View } from 'react-native'
 
-import { parseDuration } from "@/utils";
+import { parseDuration } from '@/utils'
 
 type PlayerCoverProps = {
-  duration?: number;
+  duration?: number
   /** 当前网络会消耗移动流量 */
-  isMetered: boolean;
-  highQuality: boolean;
-  onHighQualityChange: (enabled: boolean) => void;
-  onStart: () => void;
+  isMetered: boolean
+  highQuality: boolean
+  onHighQualityChange: (enabled: boolean) => void
+  onStart: () => void
   /** 受限内容的角标，例如「充电专属 · 可试看」 */
-  badgeLabel?: string | null;
-  badgeTone?: VideoBadgeTone;
-};
+  badgeLabel?: string | null
+  badgeTone?: VideoBadgeTone
+}
 
 function PlayerPlayIcon() {
-  return <ThemedIcon icon={Play} size={64} color="#ffffff" filled opacity={0.8} />;
+  return <ThemedIcon icon={Play} size={64} color="#ffffff" filled opacity={0.8} />
 }
 
 export default function PlayerCover(props: PlayerCoverProps) {
-  const { duration, isMetered, highQuality, badgeLabel } = props;
+  const { duration, isMetered, highQuality, badgeLabel } = props
 
   return (
     <View className="flex-1">
@@ -39,7 +39,7 @@ export default function PlayerCover(props: PlayerCoverProps) {
       </Pressable>
       {badgeLabel ? (
         <View pointerEvents="none" className="absolute left-2 top-2">
-          <VideoBadge label={badgeLabel} tone={props.badgeTone ?? "charge"} variant="overlay" />
+          <VideoBadge label={badgeLabel} tone={props.badgeTone ?? 'charge'} variant="overlay" />
         </View>
       ) : null}
       <View pointerEvents="none" className="absolute bottom-2 left-2 flex-row gap-2">
@@ -72,5 +72,5 @@ export default function PlayerCover(props: PlayerCoverProps) {
         </View>
       ) : null}
     </View>
-  );
+  )
 }

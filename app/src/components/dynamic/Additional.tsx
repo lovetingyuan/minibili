@@ -1,45 +1,45 @@
-import { useNavigation } from "@react-navigation/native";
-import { ChevronRight, CirclePlay } from "lucide-react-native";
-import { Text } from "@/components/styled/rneui";
-import { Image } from "@/components/styled/expo";
-import { Linking, Pressable, View } from "react-native";
-import type { GestureResponderEvent } from "react-native";
+import { useNavigation } from '@react-navigation/native'
+import { ChevronRight, CirclePlay } from 'lucide-react-native'
+import { Text } from '@/components/styled/native'
+import { Image } from '@/components/styled/expo'
+import { Linking, Pressable, View } from 'react-native'
+import type { GestureResponderEvent } from 'react-native'
 
-import type { DynamicAdditional } from "@/api/dynamic-items.type";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
-import type { NavigationProps } from "@/types";
-import { getImagePixelDimensions, parseImgUrl } from "@/utils";
+import type { DynamicAdditional } from '@/api/dynamic-items.type'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import { theme } from '@/constants/theme'
+import type { NavigationProps } from '@/types'
+import { getImagePixelDimensions, parseImgUrl } from '@/utils'
 
 export function Additional(props: { additional: DynamicAdditional | null }) {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  const { additional } = props;
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const { additional } = props
   if (!additional) {
-    return null;
+    return null
   }
-  const value = additional;
-  const coverSize = getImagePixelDimensions(96, 54);
-  const interactive = Boolean(value.bvid || value.url);
+  const value = additional
+  const coverSize = getImagePixelDimensions(96, 54)
+  const interactive = Boolean(value.bvid || value.url)
 
   function open(event: GestureResponderEvent) {
-    event.stopPropagation();
+    event.stopPropagation()
     if (value.bvid) {
-      navigation.navigate("Play", {
+      navigation.navigate('Play', {
         bvid: value.bvid,
         title: value.title,
         cover: value.cover,
         desc: value.description,
-      });
-      return;
+      })
+      return
     }
     if (value.url) {
-      void Linking.openURL(value.url);
+      void Linking.openURL(value.url)
     }
   }
 
   return (
     <Pressable
-      accessibilityRole={interactive ? "button" : undefined}
+      accessibilityRole={interactive ? 'button' : undefined}
       accessibilityLabel={
         interactive
           ? value.bvid
@@ -85,5 +85,5 @@ export function Additional(props: { additional: DynamicAdditional | null }) {
         </View>
       ) : null}
     </Pressable>
-  );
+  )
 }

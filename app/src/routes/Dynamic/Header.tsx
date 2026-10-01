@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Avatar } from '@/components/Avatar'
-import { Text } from '@/components/styled/rneui'
+import { Text } from '@/components/styled/native'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import UpName from '@/components/UpName'
 import { clsx } from 'clsx'

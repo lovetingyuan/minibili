@@ -1,45 +1,45 @@
-import { type RouteProp, useRoute } from "@react-navigation/native";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import UpName from "@/components/UpName";
-import { clsx } from "clsx";
-import * as Clipboard from "expo-clipboard";
-import React from "react";
-import { EllipsisVertical } from "lucide-react-native";
-import { View } from "react-native";
+import { type RouteProp, useRoute } from '@react-navigation/native'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import UpName from '@/components/UpName'
+import { clsx } from 'clsx'
+import * as Clipboard from 'expo-clipboard'
+import React from 'react'
+import { EllipsisVertical } from 'lucide-react-native'
+import { View } from 'react-native'
 import {
   Menu,
   MenuOption,
   MenuOptions,
   MenuTrigger,
   menuTriggerIconButtonStyles,
-} from "@/components/Menu";
+} from '@/components/Menu'
 
-import { useUserRelation } from "@/api/user-relation";
-import { useVideoInfo } from "@/api/video-info";
-import { theme } from "@/constants/theme";
-import { isDownloadingVideo } from "@/features/video-download/controller";
-import { useVideoDownload } from "@/features/video-download/useVideoDownload";
-import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
-import { useStore } from "@/store";
-import { useFollowedUpsMap } from "@/store/derives";
-import type { RootStackParamList } from "@/types";
-import { parseNumber, showToast } from "@/utils";
+import { useUserRelation } from '@/api/user-relation'
+import { useVideoInfo } from '@/api/video-info'
+import { theme } from '@/constants/theme'
+import { isDownloadingVideo } from '@/features/video-download/controller'
+import { useVideoDownload } from '@/features/video-download/useVideoDownload'
+import { useWatchLaterActions } from '@/hooks/useWatchLaterActions'
+import { useStore } from '@/store'
+import { useFollowedUpsMap } from '@/store/derives'
+import type { RootStackParamList } from '@/types'
+import { parseNumber, showToast } from '@/utils'
 
-import { isDownloadRestricted } from "./video-access";
+import { isDownloadRestricted } from './video-access'
 
 export function PlayHeaderTitle() {
-  const route = useRoute<RouteProp<RootStackParamList, "Play">>();
-  const { data: vi } = useVideoInfo(route.params.bvid);
-  const { data: fans } = useUserRelation(route.params?.mid || vi?.mid);
-  const _followedUpsMap = useFollowedUpsMap();
-  const followed = route.params?.mid && route.params.mid in _followedUpsMap;
+  const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
+  const { data: vi } = useVideoInfo(route.params.bvid)
+  const { data: fans } = useUserRelation(route.params?.mid || vi?.mid)
+  const _followedUpsMap = useFollowedUpsMap()
+  const followed = route.params?.mid && route.params.mid in _followedUpsMap
   return (
     <View className="relative left-[-10px] flex-row items-center">
       <UpName
         mid={route.params?.mid || vi?.mid}
-        className={clsx("text-lg font-semibold", followed && theme.secondary.text)}
+        className={clsx('text-lg font-semibold', followed && theme.secondary.text)}
       >
         {route.params?.name || vi?.name}
       </UpName>
@@ -47,37 +47,37 @@ export function PlayHeaderTitle() {
         className="ml-3 text-gray-500 dark:text-gray-400"
         onPress={() => {
           if (fans) {
-            showToast(`粉丝：${fans.follower}`);
+            showToast(`粉丝：${fans.follower}`)
           }
         }}
       >
-        {` ${fans?.follower ? parseNumber(fans.follower) : ""}粉丝`}
+        {` ${fans?.follower ? parseNumber(fans.follower) : ''}粉丝`}
       </Text>
     </View>
-  );
+  )
 }
 
 export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?: string }) {
-  const [visible, setVisible] = React.useState(false);
-  const hideMenu = () => setVisible(false);
-  const showMenu = () => setVisible(true);
-  const route = useRoute<NativeStackScreenProps<RootStackParamList, "Play">["route"]>();
-  const { data } = useVideoInfo(route.params.bvid);
-  const watchLater = useWatchLaterActions();
-  const { setImagesList, setCurrentImageIndex } = useStore();
-  const { task: downloadTask, start: startDownload, cancel: cancelDownload } = useVideoDownload();
+  const [visible, setVisible] = React.useState(false)
+  const hideMenu = () => setVisible(false)
+  const showMenu = () => setVisible(true)
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Play'>['route']>()
+  const { data } = useVideoInfo(route.params.bvid)
+  const watchLater = useWatchLaterActions()
+  const { setImagesList, setCurrentImageIndex } = useStore()
+  const { task: downloadTask, start: startDownload, cancel: cancelDownload } = useVideoDownload()
   const videoInfo = {
     ...route.params,
     ...data,
-  };
-  const downloading = isDownloadingVideo(downloadTask, videoInfo.bvid ?? "", props.cid ?? 0);
+  }
+  const downloading = isDownloadingVideo(downloadTask, videoInfo.bvid ?? '', props.cid ?? 0)
   // 受限内容（充电专属、付费、会员番剧）取不到可下载的地址，隐藏入口避免二次误导
   const downloadRestricted = isDownloadRestricted({
-    redirectUrl: videoInfo.redirectUrl ?? "",
+    redirectUrl: videoInfo.redirectUrl ?? '',
     isUpowerExclusive: videoInfo.isUpowerExclusive ?? false,
     isSteinGate: videoInfo.interactive ?? false,
     payRights: videoInfo.payRights ?? { arcPay: 0, pay: 0, ugcPay: 0 },
-  });
+  })
 
   /**
    * 下载当前分P：地址解析阶段的失败原因即时用 toast 反馈，
@@ -85,26 +85,26 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
    */
   async function handleDownloadVideo() {
     if (!props.cid) {
-      showToast("稍后再试");
-      return;
+      showToast('稍后再试')
+      return
     }
     const result = await startDownload({
-      bvid: videoInfo.bvid ?? "",
+      bvid: videoInfo.bvid ?? '',
       cid: props.cid,
       title: videoInfo.title,
       page: props.page,
       pageTitle: props.pageTitle,
-    });
-    if (result === "busy") {
-      showToast("已有下载任务进行中");
-      return;
+    })
+    if (result === 'busy') {
+      showToast('已有下载任务进行中')
+      return
     }
-    if (result === "unsupported") {
-      showToast("暂不支持下载");
-      return;
+    if (result === 'unsupported') {
+      showToast('暂不支持下载')
+      return
     }
-    if (result === "failed") {
-      showToast("下载失败，请稍后重试");
+    if (result === 'failed') {
+      showToast('下载失败，请稍后重试')
     }
   }
 
@@ -121,49 +121,49 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
         </MenuTrigger>
         <MenuOptions>
           <MenuOption
-            text={watchLater.isAdded(videoInfo.aid) ? "从稍后再看移除" : "添加到稍后再看"}
+            text={watchLater.isAdded(videoInfo.aid) ? '从稍后再看移除' : '添加到稍后再看'}
             onSelect={() => {
-              hideMenu();
-              void watchLater.toggle({ aid: videoInfo.aid });
+              hideMenu()
+              void watchLater.toggle({ aid: videoInfo.aid })
             }}
           />
           {downloadRestricted ? null : (
             <MenuOption
-              text={downloading ? "取消下载" : "下载视频"}
+              text={downloading ? '取消下载' : '下载视频'}
               onSelect={() => {
-                hideMenu();
+                hideMenu()
                 if (downloading) {
-                  cancelDownload();
-                  return;
+                  cancelDownload()
+                  return
                 }
-                void handleDownloadVideo();
+                void handleDownloadVideo()
               }}
             />
           )}
           <MenuOption
             text="查看封面"
             onSelect={() => {
-              hideMenu();
+              hideMenu()
               if (!videoInfo.cover) {
-                showToast("暂时无法获取封面");
-                return;
+                showToast('暂时无法获取封面')
+                return
               }
 
-              setImagesList([{ src: videoInfo.cover, width: 0, height: 0, ratio: 16 / 9 }]);
-              setCurrentImageIndex(0);
+              setImagesList([{ src: videoInfo.cover, width: 0, height: 0, ratio: 16 / 9 }])
+              setCurrentImageIndex(0)
             }}
           />
           <MenuOption
             text="复制视频ID"
             onSelect={() => {
               Clipboard.setStringAsync(videoInfo.bvid).then(() => {
-                showToast(`已复制视频ID：${videoInfo.bvid}`);
-                hideMenu();
-              });
+                showToast(`已复制视频ID：${videoInfo.bvid}`)
+                hideMenu()
+              })
             }}
           />
         </MenuOptions>
       </Menu>
     </View>
-  );
+  )
 }

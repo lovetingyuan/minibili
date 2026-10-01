@@ -1,40 +1,40 @@
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View } from 'react-native'
 
-import { RELATION_TAG_SPECIAL_ID } from "@/api/relation-tags";
-import { useBilibiliRelationTagMembers } from "@/api/useBilibiliRelationTags";
-import { Button, Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
-import { orderFollowedUps } from "@/features/bilibili-followings/order-followings";
-import { usePullToRefresh } from "@/hooks/usePullToRefresh";
-import { useStore } from "@/store";
-import { useUnreadUpMids } from "@/store/derives";
-import type { UpInfo } from "@/types";
+import { RELATION_TAG_SPECIAL_ID } from '@/api/relation-tags'
+import { useBilibiliRelationTagMembers } from '@/api/useBilibiliRelationTags'
+import { Button, Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
+import { orderFollowedUps } from '@/features/bilibili-followings/order-followings'
+import { usePullToRefresh } from '@/hooks/usePullToRefresh'
+import { useStore } from '@/store'
+import { useUnreadUpMids } from '@/store/derives'
+import type { UpInfo } from '@/types'
 
-import FollowUpsGrid from "./FollowUpsGrid";
+import FollowUpsGrid from './FollowUpsGrid'
 
 type Props = {
-  tagid: number;
-  specialMids?: ReadonlySet<string>;
-  onSetGroups?: (up: UpInfo) => void;
-  onRefreshTags?: () => void;
-};
+  tagid: number
+  specialMids?: ReadonlySet<string>
+  onSetGroups?: (up: UpInfo) => void
+  onRefreshTags?: () => void
+}
 
 export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefreshTags }: Props) {
-  const members = useBilibiliRelationTagMembers(tagid);
-  const { livingUps } = useStore();
-  const unreadMids = useUnreadUpMids();
+  const members = useBilibiliRelationTagMembers(tagid)
+  const { livingUps } = useStore()
+  const unreadMids = useUnreadUpMids()
   const visibleItems =
     tagid === RELATION_TAG_SPECIAL_ID && specialMids
-      ? members.items.filter((up) => specialMids.has(String(up.mid)))
-      : members.items;
-  const orderedUps = orderFollowedUps(visibleItems, livingUps, specialMids, unreadMids);
-  const hasItems = visibleItems.length > 0;
+      ? members.items.filter(up => specialMids.has(String(up.mid)))
+      : members.items
+  const orderedUps = orderFollowedUps(visibleItems, livingUps, specialMids, unreadMids)
+  const hasItems = visibleItems.length > 0
 
   async function refresh() {
-    await Promise.allSettled([members.refresh(), Promise.resolve(onRefreshTags?.())]);
+    await Promise.allSettled([members.refresh(), Promise.resolve(onRefreshTags?.())])
   }
   // 分组成员会在设置分组后自动重新校验，只有用户下拉时才显示刷新图标
-  const pullToRefresh = usePullToRefresh(refresh);
+  const pullToRefresh = usePullToRefresh(refresh)
 
   return (
     <FollowUpsGrid
@@ -44,7 +44,7 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
       refreshing={pullToRefresh.refreshing}
       onRefresh={pullToRefresh.onRefresh}
       onEndReached={() => {
-        void members.loadMore();
+        void members.loadMore()
       }}
       onEndReachedThreshold={0.5}
       emptyContent={
@@ -58,7 +58,7 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
                 title="重试"
                 loading={members.isValidating}
                 onPress={() => {
-                  void members.mutate().catch(() => {});
+                  void members.mutate().catch(() => {})
                 }}
               />
             </>
@@ -76,7 +76,7 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
               type="clear"
               loading={members.isValidating}
               onPress={() => {
-                void members.mutate().catch(() => {});
+                void members.mutate().catch(() => {})
               }}
             />
           </View>
@@ -87,5 +87,5 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
         ) : null
       }
     />
-  );
+  )
 }

@@ -1,30 +1,30 @@
-import { ActivityIndicator, View } from "react-native";
-import { History } from "lucide-react-native";
+import { ActivityIndicator, View } from 'react-native'
+import { History } from 'lucide-react-native'
 
-import { useBilibiliHistory } from "@/api/useBilibiliHistory";
-import { LoginRequired } from "@/components/LoginRequired";
-import { Button, FlashList, Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import VideoListItem from "@/components/VideoItem";
-import { theme } from "@/constants/theme";
-import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
-import { formatWatchTime } from "@/utils/watch-time";
+import { useBilibiliHistory } from '@/api/useBilibiliHistory'
+import { LoginRequired } from '@/components/LoginRequired'
+import { Button, FlashList, Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import VideoListItem from '@/components/VideoItem'
+import { theme } from '@/constants/theme'
+import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
+import { formatWatchTime } from '@/utils/watch-time'
 
 export default function HistoryContent() {
-  const history = useBilibiliHistory();
+  const history = useBilibiliHistory()
   const retry = () => {
-    void history.retry().catch(() => {});
-  };
+    void history.retry().catch(() => {})
+  }
   const loadMore = () => {
-    void history.loadMore().catch(() => {});
-  };
+    void history.loadMore().catch(() => {})
+  }
   if (!history.items.length && !history.isLoading && isLoginRequiredError(history.error)) {
-    return <LoginRequired description="登录后即可查看观看历史" />;
+    return <LoginRequired description="登录后即可查看观看历史" />
   }
   return (
     <FlashList
       data={history.items}
-      keyExtractor={(item) => item.key}
+      keyExtractor={item => item.key}
       renderItem={({ item }) =>
         item.video ? (
           <VideoListItem
@@ -44,11 +44,11 @@ export default function HistoryContent() {
       }
       refreshing={history.refreshing}
       onRefresh={() => {
-        void history.refresh().catch(() => {});
+        void history.refresh().catch(() => {})
       }}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}
-      contentContainerClassName={history.items.length ? "pt-2 pb-4" : "grow px-4 py-4"}
+      contentContainerClassName={history.items.length ? 'pt-2 pb-4' : 'grow px-4 py-4'}
       ListEmptyComponent={
         <View className="items-center justify-center gap-4 px-6 py-16">
           {history.isLoading ? (
@@ -69,7 +69,7 @@ export default function HistoryContent() {
             <>
               <ThemedIcon icon={History} size={36} colorClassName={theme.icon.disabled} />
               <Text className={theme.text.muted}>
-                {history.hasMore ? "当前已加载记录中暂无视频" : "暂无 B站视频观看历史"}
+                {history.hasMore ? '当前已加载记录中暂无视频' : '暂无 B站视频观看历史'}
               </Text>
               {history.hasMore ? (
                 <Button title="继续加载" loading={history.isLoadingMore} onPress={loadMore} />
@@ -98,5 +98,5 @@ export default function HistoryContent() {
         ) : null
       }
     />
-  );
+  )
 }

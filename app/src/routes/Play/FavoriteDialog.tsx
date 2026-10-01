@@ -1,27 +1,27 @@
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, View } from 'react-native'
 
-import { CheckBox } from "@/components/CheckBox";
-import { Dialog } from "@/components/Dialog";
-import { Button, Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
-import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
-import { showToast } from "@/utils";
-import type { FavoriteDialogProps } from "./Favorite.types";
-import { useFavoriteEditor } from "./useFavoriteEditor";
+import { CheckBox } from '@/components/CheckBox'
+import { Dialog } from '@/components/Dialog'
+import { Button, Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
+import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
+import { showToast } from '@/utils'
+import type { FavoriteDialogProps } from './Favorite.types'
+import { useFavoriteEditor } from './useFavoriteEditor'
 
 export default function FavoriteDialog(props: FavoriteDialogProps) {
-  const editor = useFavoriteEditor(props);
+  const editor = useFavoriteEditor(props)
   // 每行收藏夹都要判断是否选中，用 Set 避免列表变长后反复线性查找
-  const selectedFolderIds = new Set(editor.selection?.selectedIds ?? []);
+  const selectedFolderIds = new Set(editor.selection?.selectedIds ?? [])
   function close() {
     if (editor.canClose()) {
-      props.onClose();
+      props.onClose()
     }
   }
   async function submit() {
     if (await editor.submit()) {
-      showToast(editor.selection?.selectedIds.length ? "收藏已更新" : "已取消收藏");
-      props.onClose();
+      showToast(editor.selection?.selectedIds.length ? '收藏已更新' : '已取消收藏')
+      props.onClose()
     }
   }
   return (
@@ -39,7 +39,7 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
               type="clear"
               onPress={() => {
                 if (editor.error) {
-                  props.onLoginRequired(editor.error);
+                  props.onLoginRequired(editor.error)
                 }
               }}
             />
@@ -49,7 +49,7 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
               type="clear"
               disabled={editor.loading || editor.busy}
               onPress={() => {
-                void editor.reload();
+                void editor.reload()
               }}
             />
           ) : null}
@@ -62,14 +62,14 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
             title="刷新"
             type="clear"
             onPress={() => {
-              void editor.reload();
+              void editor.reload()
             }}
           />
         </View>
       ) : null}
       {/* 弹窗里没有分隔线，靠每行自己的纵向内边距撑开间距，避免列表挤在一起 */}
       <ScrollView className="max-h-[50vh]" keyboardShouldPersistTaps="handled">
-        {editor.selection?.folders.map((folder) => (
+        {editor.selection?.folders.map(folder => (
           <CheckBox
             key={folder.id}
             title={`${folder.title}（${folder.media_count}）`}
@@ -94,7 +94,7 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
           loading={editor.busy}
           disabled={!editor.canSubmit || isLoginRequiredError(editor.error)}
           onPress={() => {
-            void submit();
+            void submit()
           }}
         />
         <Dialog.Button
@@ -105,5 +105,5 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
         />
       </Dialog.Actions>
     </Dialog>
-  );
+  )
 }

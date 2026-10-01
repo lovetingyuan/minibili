@@ -1,41 +1,41 @@
-import { Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import UpName from "@/components/UpName";
-import { WatchProgressBar } from "@/components/WatchProgressBar";
-import { clsx } from "clsx";
-import { Image } from "@/components/styled/expo";
-import { CircleCheck, CirclePlay, CircleUserRound } from "lucide-react-native";
-import { useWindowDimensions, View } from "react-native";
+import { Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import UpName from '@/components/UpName'
+import { WatchProgressBar } from '@/components/WatchProgressBar'
+import { clsx } from 'clsx'
+import { Image } from '@/components/styled/expo'
+import { CircleCheck, CirclePlay, CircleUserRound } from 'lucide-react-native'
+import { useWindowDimensions, View } from 'react-native'
 
-import type { VideoItem as VideoItemType } from "@/api/hot-videos";
-import { theme } from "@/constants/theme";
-import { useUserSettings } from "@/features/user-data/useUserSettings";
-import { useFollowedUpsMap } from "@/store/derives";
-import { useWatchProgressRatio } from "@/store/watch-progress";
+import type { VideoItem as VideoItemType } from '@/api/hot-videos'
+import { theme } from '@/constants/theme'
+import { useUserSettings } from '@/features/user-data/useUserSettings'
+import { useFollowedUpsMap } from '@/store/derives'
+import { useWatchProgressRatio } from '@/store/watch-progress'
 import {
   getImagePixelDimensions,
   parseDate,
   parseDuration,
   parseImgUrl,
   parseNumber,
-} from "@/utils";
+} from '@/utils'
 
-export default VideoItem;
+export default VideoItem
 
 function VideoItem({ video }: { video: VideoItemType }) {
   // __DEV__ && console.log('hot video', video.title);
-  const playNum = parseNumber(video.playNum);
-  const { width: windowWidth } = useWindowDimensions();
+  const playNum = parseNumber(video.playNum)
+  const { width: windowWidth } = useWindowDimensions()
   const {
     values: { $blackTags },
-  } = useUserSettings();
-  const _followedUpsMap = useFollowedUpsMap();
-  const progressRatio = useWatchProgressRatio(video.bvid);
+  } = useUserSettings()
+  const _followedUpsMap = useFollowedUpsMap()
+  const progressRatio = useWatchProgressRatio(video.bvid)
 
-  const isFollowed = video.mid in _followedUpsMap;
-  const isBlackTag = Object.hasOwn($blackTags, video.tag);
-  const coverLayoutWidth = windowWidth / 2 - 10;
-  const coverSize = getImagePixelDimensions(coverLayoutWidth, (coverLayoutWidth * 5) / 8);
+  const isFollowed = video.mid in _followedUpsMap
+  const isBlackTag = Object.hasOwn($blackTags, video.tag)
+  const coverLayoutWidth = windowWidth / 2 - 10
+  const coverSize = getImagePixelDimensions(coverLayoutWidth, (coverLayoutWidth * 5) / 8)
   // console.log(parseImgUrl(video.cover, 480, 300))
   return (
     <View className="flex-1">
@@ -62,7 +62,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
           <View
             className={`absolute bottom-0 right-0 m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}
           >
-            <Text className={clsx("text-xs text-white", isBlackTag && "line-through opacity-60")}>
+            <Text className={clsx('text-xs text-white', isBlackTag && 'line-through opacity-60')}>
               {video.tag}
             </Text>
           </View>
@@ -72,7 +72,7 @@ function VideoItem({ video }: { video: VideoItemType }) {
       <View className="mt-3 flex-1 justify-between">
         <View className="h-10 justify-start">
           <Text
-            className={clsx("leading-5", isFollowed && ["font-bold", theme.primary.text])}
+            className={clsx('leading-5', isFollowed && ['font-bold', theme.primary.text])}
             numberOfLines={2}
           >
             {video.title}
@@ -90,8 +90,8 @@ function VideoItem({ video }: { video: VideoItemType }) {
               numberOfLines={1}
               ellipsizeMode="tail"
               className={clsx(
-                "ml-1 shrink grow text-xs",
-                isFollowed ? ["font-bold", theme.secondary.text] : theme.primary.text,
+                'ml-1 shrink grow text-xs',
+                isFollowed ? ['font-bold', theme.secondary.text] : theme.primary.text,
               )}
             >
               {video.name}
@@ -108,5 +108,5 @@ function VideoItem({ video }: { video: VideoItemType }) {
         </View>
       </View>
     </View>
-  );
+  )
 }

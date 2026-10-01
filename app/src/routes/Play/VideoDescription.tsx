@@ -1,45 +1,45 @@
-import { useNavigation } from "@react-navigation/native";
-import { ChevronDown, ChevronUp } from "lucide-react-native";
-import React from "react";
-import { Pressable, View } from "react-native";
+import { useNavigation } from '@react-navigation/native'
+import { ChevronDown, ChevronUp } from 'lucide-react-native'
+import React from 'react'
+import { Pressable, View } from 'react-native'
 
-import { Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import UpName from "@/components/UpName";
-import { theme } from "@/constants/theme";
-import type { NavigationProps } from "@/types";
+import { Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import UpName from '@/components/UpName'
+import { theme } from '@/constants/theme'
+import type { NavigationProps } from '@/types'
 
-import { shouldCollapseDescription, VIDEO_DESCRIPTION_COLLAPSED_LINES } from "./description";
-import type { VideoDescriptionProps, VideoDescriptionViewProps } from "./VideoDescription.types";
+import { shouldCollapseDescription, VIDEO_DESCRIPTION_COLLAPSED_LINES } from './description'
+import type { VideoDescriptionProps, VideoDescriptionViewProps } from './VideoDescription.types'
 
 /**
  * 折叠时“显示更多”浮在最后一行行尾，用卡片底色盖住压在下方的文字，
  * 高度与 leading-6 的行高一致，正好对齐最后一行。
  */
-const COLLAPSED_TOGGLE_CLASS = "absolute bottom-2.5 right-3 bg-slate-50 pl-1.5 dark:bg-slate-900";
-const EXPANDED_TOGGLE_CLASS = "mt-1 self-end px-1";
+const COLLAPSED_TOGGLE_CLASS = 'absolute bottom-2.5 right-3 bg-slate-50 pl-1.5 dark:bg-slate-900'
+const EXPANDED_TOGGLE_CLASS = 'mt-1 self-end px-1'
 
 export function VideoDescriptionView(props: VideoDescriptionViewProps) {
-  const { text, nodes, collapsed, onToggle, onMentionPress } = props;
+  const { text, nodes, collapsed, onToggle, onMentionPress } = props
   if (!text) {
-    return null;
+    return null
   }
-  const collapsible = shouldCollapseDescription(text);
-  const isCollapsed = collapsible && Boolean(collapsed);
+  const collapsible = shouldCollapseDescription(text)
+  const isCollapsed = collapsible && Boolean(collapsed)
 
   return (
     <View className="relative mt-3 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-slate-900">
       {/* Android 会缓存 Text/Pressable 的原生布局；切换折叠模式时重建节点，避免复用错误的位置。 */}
       <Text
-        key={isCollapsed ? "description-collapsed" : "description-expanded"}
+        key={isCollapsed ? 'description-collapsed' : 'description-expanded'}
         selectable
         className={`text-sm leading-6 ${theme.text.secondary}`}
         numberOfLines={isCollapsed ? VIDEO_DESCRIPTION_COLLAPSED_LINES : undefined}
       >
         {nodes?.length
           ? nodes.map((node, index) => {
-              const nodeText = node.type === 2 ? `@${node.rawText} ` : node.rawText;
-              const key = `${node.type}-${node.bizId}-${index}`;
+              const nodeText = node.type === 2 ? `@${node.rawText} ` : node.rawText
+              const key = `${node.type}-${node.bizId}-${index}`
               if (node.type === 2 && node.bizId && onMentionPress) {
                 return (
                   <UpName
@@ -52,21 +52,21 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
                   >
                     {nodeText}
                   </UpName>
-                );
+                )
               }
               return (
                 <Text className={theme.text.secondary} key={key}>
                   {nodeText}
                 </Text>
-              );
+              )
             })
           : text}
       </Text>
       {collapsible ? (
         <Pressable
-          key={isCollapsed ? "toggle-collapsed" : "toggle-expanded"}
+          key={isCollapsed ? 'toggle-collapsed' : 'toggle-expanded'}
           accessibilityRole="button"
-          accessibilityLabel={isCollapsed ? "展开完整简介" : "收起简介"}
+          accessibilityLabel={isCollapsed ? '展开完整简介' : '收起简介'}
           className={`flex-row items-center py-1 ${
             isCollapsed ? COLLAPSED_TOGGLE_CLASS : EXPANDED_TOGGLE_CLASS
           }`}
@@ -74,7 +74,7 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
           onPress={onToggle}
         >
           <Text className={`text-xs font-medium ${theme.primary.text}`}>
-            {isCollapsed ? "显示更多" : "收起"}
+            {isCollapsed ? '显示更多' : '收起'}
           </Text>
           <ThemedIcon
             icon={isCollapsed ? ChevronDown : ChevronUp}
@@ -86,30 +86,30 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
         </Pressable>
       ) : null}
     </View>
-  );
+  )
 }
 
 function VideoDescription(props: VideoDescriptionProps) {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  const [collapsed, setCollapsed] = React.useState(true);
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const [collapsed, setCollapsed] = React.useState(true)
   return (
     <VideoDescriptionView
       text={props.text}
       nodes={props.nodes}
       collapsed={collapsed}
-      onToggle={() => setCollapsed((current) => !current)}
-      onMentionPress={(node) => {
-        navigation.push("Dynamic", {
+      onToggle={() => setCollapsed(current => !current)}
+      onMentionPress={node => {
+        navigation.push('Dynamic', {
           user: {
-            face: "",
+            face: '',
             mid: node.bizId,
             name: node.rawText,
-            sign: "-",
+            sign: '-',
           },
-        });
+        })
       }}
     />
-  );
+  )
 }
 
-export default VideoDescription;
+export default VideoDescription

@@ -1,64 +1,64 @@
-import React from "react";
-import { Clock } from "lucide-react-native";
-import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import React from 'react'
+import { Clock } from 'lucide-react-native'
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native'
 
-import { useBilibiliWatchLater } from "@/api/useWatchLater";
-import type { WatchLaterListItem } from "@/api/watch-later.types";
-import { LoginRequired } from "@/components/LoginRequired";
-import { Button, FlashList, Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import VideoListItem from "@/components/VideoItem";
-import { overlayIcons } from "@/constants/overlay-icons";
-import { theme } from "@/constants/theme";
-import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
-import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
-import { useStore } from "@/store";
+import { useBilibiliWatchLater } from '@/api/useWatchLater'
+import type { WatchLaterListItem } from '@/api/watch-later.types'
+import { LoginRequired } from '@/components/LoginRequired'
+import { Button, FlashList, Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import VideoListItem from '@/components/VideoItem'
+import { overlayIcons } from '@/constants/overlay-icons'
+import { theme } from '@/constants/theme'
+import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
+import { useWatchLaterActions } from '@/hooks/useWatchLaterActions'
+import { useStore } from '@/store'
 
 export default function WatchLaterContent() {
-  const watchLater = useBilibiliWatchLater();
-  const watchLaterActions = useWatchLaterActions();
-  const { setOverlayButtons } = useStore();
-  const [refreshing, setRefreshing] = React.useState(false);
-  const refreshingRef = React.useRef(false);
+  const watchLater = useBilibiliWatchLater()
+  const watchLaterActions = useWatchLaterActions()
+  const { setOverlayButtons } = useStore()
+  const [refreshing, setRefreshing] = React.useState(false)
+  const refreshingRef = React.useRef(false)
 
   function buttons(item: WatchLaterListItem) {
     return [
       {
-        text: "从稍后再看移除",
+        text: '从稍后再看移除',
         icon: overlayIcons.removeWatchLater,
         onPress: () => {
-          void watchLaterActions.toggle({ aid: item.aid });
+          void watchLaterActions.toggle({ aid: item.aid })
         },
       },
-    ];
+    ]
   }
 
   function retry() {
-    void watchLater.mutate().catch(() => {});
+    void watchLater.mutate().catch(() => {})
   }
 
   async function refresh() {
     if (refreshingRef.current) {
-      return;
+      return
     }
-    refreshingRef.current = true;
-    setRefreshing(true);
+    refreshingRef.current = true
+    setRefreshing(true)
     try {
-      await watchLater.mutate();
+      await watchLater.mutate()
     } finally {
-      refreshingRef.current = false;
-      setRefreshing(false);
+      refreshingRef.current = false
+      setRefreshing(false)
     }
   }
 
   if (!watchLater.items.length && !watchLater.isLoading && isLoginRequiredError(watchLater.error)) {
-    return <LoginRequired description="登录后即可查看稍后再看" />;
+    return <LoginRequired description="登录后即可查看稍后再看" />
   }
 
   return (
     <FlashList
       data={watchLater.items}
-      keyExtractor={(item) => item.key}
+      keyExtractor={item => item.key}
       renderItem={({ item }) =>
         item.video ? (
           <VideoListItem
@@ -84,9 +84,9 @@ export default function WatchLaterContent() {
       }
       refreshing={refreshing}
       onRefresh={() => {
-        void refresh();
+        void refresh()
       }}
-      contentContainerClassName={watchLater.items.length ? "pt-2 pb-4" : "grow px-4 py-4"}
+      contentContainerClassName={watchLater.items.length ? 'pt-2 pb-4' : 'grow px-4 py-4'}
       ListEmptyComponent={
         <View className="items-center justify-center gap-4 px-6 py-16">
           {watchLater.isLoading ? (
@@ -129,5 +129,5 @@ export default function WatchLaterContent() {
         ) : null
       }
     />
-  );
+  )
 }

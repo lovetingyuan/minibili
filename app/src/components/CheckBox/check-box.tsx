@@ -1,13 +1,13 @@
-import { clsx } from "clsx";
-import React from "react";
-import { Pressable, View } from "react-native";
+import { clsx } from 'clsx'
+import React from 'react'
+import { Pressable, View } from 'react-native'
 
-import { Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
-import useResolvedColor from "@/hooks/useResolvedColor";
+import { Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
+import useResolvedColor from '@/hooks/useResolvedColor'
 
-import { CheckBoxIcon } from "./check-box-icon";
-import type { CheckBoxProps } from "./check-box.types";
+import { CheckBoxIcon } from './check-box-icon'
+import type { CheckBoxProps } from './check-box.types'
 
 /**
  * Adapted from React Native Elements' CheckBox (MIT).
@@ -47,10 +47,10 @@ export function CheckBox({
   accessibilityState,
   ...props
 }: CheckBoxProps) {
-  const resolvedCheckedColor = useResolvedColor(checkedColorClassName ?? theme.primary.accent);
-  const resolvedUncheckedColor = useResolvedColor(uncheckedColorClassName);
-  const activeColor = checkedColor ?? resolvedCheckedColor;
-  const inactiveColor = uncheckedColor ?? resolvedUncheckedColor;
+  const resolvedCheckedColor = useResolvedColor(checkedColorClassName ?? theme.primary.accent)
+  const resolvedUncheckedColor = useResolvedColor(uncheckedColorClassName)
+  const activeColor = checkedColor ?? resolvedCheckedColor
+  const inactiveColor = uncheckedColor ?? resolvedUncheckedColor
   const iconProps = {
     checked,
     checkedColor: activeColor,
@@ -60,15 +60,15 @@ export function CheckBox({
     size,
     uncheckedColor: inactiveColor,
     uncheckedIcon,
-  };
+  }
   const titleNode = React.isValidElement(title) ? (
     title
-  ) : title !== "" && title !== undefined && title !== null ? (
+  ) : title !== '' && title !== undefined && title !== null ? (
     <Text
       {...titleProps}
       testID="RNE__CheckBox__Title"
       className={clsx(
-        "mx-2.5 font-bold",
+        'mx-2.5 font-bold',
         theme.text.secondary,
         disabled && theme.text.disabled,
         textClassName,
@@ -81,29 +81,29 @@ export function CheckBox({
     >
       {checked ? checkedTitle || title : title}
     </Text>
-  ) : null;
+  ) : null
 
   return (
     <Component
       {...props}
-      accessibilityRole={accessibilityRole ?? "checkbox"}
+      accessibilityRole={accessibilityRole ?? 'checkbox'}
       accessibilityState={{
         ...accessibilityState,
         checked: !!checked,
         disabled: !!disabled,
       }}
-      className={clsx("m-[5px] mx-2.5 p-2.5", theme.background.surface, containerClassName)}
+      className={clsx('m-[5px] mx-2.5 p-2.5', theme.background.surface, containerClassName)}
       disabled={disabled}
       onLongPress={onLongPress}
       onPress={onPress}
       style={[containerStyle, disabled ? disabledStyle : undefined]}
-      testID={props.testID ?? "RNE__CheckBox__Wrapper"}
+      testID={props.testID ?? 'RNE__CheckBox__Wrapper'}
     >
       <View
         className={clsx(
-          "flex-row items-center",
-          right && "justify-end",
-          center && "justify-center",
+          'flex-row items-center',
+          right && 'justify-end',
+          center && 'justify-center',
           wrapperClassName,
         )}
         style={wrapperStyle}
@@ -113,5 +113,5 @@ export function CheckBox({
         {iconRight ? <CheckBoxIcon {...iconProps} /> : null}
       </View>
     </Component>
-  );
+  )
 }

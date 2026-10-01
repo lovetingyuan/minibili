@@ -1,21 +1,21 @@
-import React from "react";
-import { ActivityIndicator, View } from "react-native";
+import React from 'react'
+import { ActivityIndicator, View } from 'react-native'
 
-import { useBilibiliBlacklist } from "@/api/useBilibiliBlacklist";
-import { Chip } from "@/components/Chip";
-import { CollapsibleSection } from "@/components/CollapsibleSection";
-import { Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
+import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
+import { Chip } from '@/components/Chip'
+import { CollapsibleSection } from '@/components/CollapsibleSection'
+import { Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
 
 export default function Blacklist() {
-  const [expanded, setExpanded] = React.useState(false);
-  const { blacklist, account, isPreparing, data, error } = useBilibiliBlacklist();
-  const loading = isPreparing || Boolean(account && data === undefined && !error);
+  const [expanded, setExpanded] = React.useState(false)
+  const { blacklist, account, isPreparing, data, error } = useBilibiliBlacklist()
+  const loading = isPreparing || Boolean(account && data === undefined && !error)
 
   return (
     <CollapsibleSection
       expanded={expanded}
-      title={`黑名单${account && data !== undefined ? `（${blacklist.size}）` : ""}`}
+      title={`黑名单${account && data !== undefined ? `（${blacklist.size}）` : ''}`}
       onPress={() => setExpanded(!expanded)}
     >
       {expanded ? (
@@ -30,7 +30,7 @@ export default function Blacklist() {
           ) : (
             <>
               <View className="flex-row flex-wrap">
-                {Array.from(blacklist.values()).map((up) => (
+                {Array.from(blacklist.values()).map(up => (
                   <Chip
                     key={up.mid}
                     title={up.name}
@@ -51,5 +51,5 @@ export default function Blacklist() {
         </View>
       ) : null}
     </CollapsibleSection>
-  );
+  )
 }

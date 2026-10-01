@@ -1,25 +1,25 @@
-import React from "react";
-import { TextInput } from "react-native";
+import React from 'react'
+import { TextInput } from 'react-native'
 
-import { Dialog } from "@/components/Dialog";
-import { Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
+import { Dialog } from '@/components/Dialog'
+import { Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
 
-import type { GroupNameDialogProps } from "./FollowGroups.types";
+import type { GroupNameDialogProps } from './FollowGroups.types'
 
 export default function GroupNameDialog({
   mode,
-  initialName = "",
+  initialName = '',
   saving,
   error,
   onClose,
   onSubmit,
 }: GroupNameDialogProps) {
-  const [name, setName] = React.useState(initialName);
-  const trimmed = name.trim();
-  const unchanged = mode === "rename" && trimmed === initialName.trim();
-  const canSubmit = Boolean(trimmed) && !unchanged && !saving;
-  const title = mode === "create" ? "新建分组" : "修改分组名称";
+  const [name, setName] = React.useState(initialName)
+  const trimmed = name.trim()
+  const unchanged = mode === 'rename' && trimmed === initialName.trim()
+  const canSubmit = Boolean(trimmed) && !unchanged && !saving
+  const title = mode === 'create' ? '新建分组' : '修改分组名称'
 
   return (
     <Dialog visible onClose={saving ? undefined : onClose}>
@@ -35,7 +35,7 @@ export default function GroupNameDialog({
         onChangeText={setName}
         onSubmitEditing={() => {
           if (canSubmit) {
-            onSubmit(trimmed);
+            onSubmit(trimmed)
           }
         }}
       />
@@ -51,7 +51,7 @@ export default function GroupNameDialog({
           loading={saving}
           disabled={!canSubmit}
           onPress={() => {
-            onSubmit(trimmed);
+            onSubmit(trimmed)
           }}
         />
         <Dialog.Button
@@ -62,5 +62,5 @@ export default function GroupNameDialog({
         />
       </Dialog.Actions>
     </Dialog>
-  );
+  )
 }

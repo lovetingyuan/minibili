@@ -1,20 +1,20 @@
-import { useNavigation } from "@react-navigation/native";
-import { Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import UpName from "../UpName";
-import { Image } from "@/components/styled/expo";
-import he from "he";
-import { CircleCheck, CirclePlay, CircleUserRound, ThumbsUp } from "lucide-react-native";
-import React from "react";
-import { ActivityIndicator, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { useNavigation } from '@react-navigation/native'
+import { Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import UpName from '../UpName'
+import { Image } from '@/components/styled/expo'
+import he from 'he'
+import { CircleCheck, CirclePlay, CircleUserRound, ThumbsUp } from 'lucide-react-native'
+import React from 'react'
+import { ActivityIndicator, TouchableOpacity, useWindowDimensions, View } from 'react-native'
 
-import type { VideoCoverProps, VideoListItemProps } from "./VideoItem.types";
-import { WatchProgressBar } from "../WatchProgressBar";
-import { theme } from "@/constants/theme";
-import { useStore } from "@/store";
-import { useFollowedUpsMap } from "@/store/derives";
-import type { VideoListItemInfo, NavigationProps } from "@/types";
-import { formatWatchTime } from "@/utils/watch-time";
+import type { VideoCoverProps, VideoListItemProps } from './VideoItem.types'
+import { WatchProgressBar } from '../WatchProgressBar'
+import { theme } from '@/constants/theme'
+import { useStore } from '@/store'
+import { useFollowedUpsMap } from '@/store/derives'
+import type { VideoListItemInfo, NavigationProps } from '@/types'
+import { formatWatchTime } from '@/utils/watch-time'
 import {
   getImagePixelDimensions,
   isDefined,
@@ -24,31 +24,31 @@ import {
   parseImgUrl,
   parseNumber,
   stripEmTags,
-} from "@/utils";
+} from '@/utils'
 
 function extractTextWithEmTags(text: string, className?: string) {
-  const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g;
-  const matches = text.matchAll(regex);
-  const result: (React.ReactElement | string)[] = [];
-  let i = 0;
+  const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g
+  const matches = text.matchAll(regex)
+  const result: (React.ReactElement | string)[] = []
+  let i = 0
   for (const match of matches) {
-    const [, emContent, nonEmContent] = match;
+    const [, emContent, nonEmContent] = match
     if (emContent) {
       result.push(
         <Text className={className} key={i++}>
           {he.decode(emContent)}
         </Text>,
-      );
-    } else if (nonEmContent.trim() !== "") {
-      result.push(he.decode(nonEmContent));
+      )
+    } else if (nonEmContent.trim() !== '') {
+      result.push(he.decode(nonEmContent))
     }
   }
 
-  return result;
+  return result
 }
 
 function VideoCover({ uri }: VideoCoverProps) {
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(true)
 
   return (
     <>
@@ -67,7 +67,7 @@ function VideoCover({ uri }: VideoCoverProps) {
         onLoadEnd={() => setIsLoading(false)}
       />
     </>
-  );
+  )
 }
 
 function VideoListItem<T extends VideoListItemInfo>({
@@ -77,26 +77,26 @@ function VideoListItem<T extends VideoListItemInfo>({
   watchedAt,
   progressRatio = 0,
 }: VideoListItemProps<T>) {
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  const { width: windowWidth } = useWindowDimensions();
-  const { setOverlayButtons } = useStore();
-  const coverLayoutWidth = ((windowWidth - 28) * 3) / 7;
-  const coverSize = getImagePixelDimensions(coverLayoutWidth, (coverLayoutWidth * 5) / 8);
-  const _followedUpsMap = useFollowedUpsMap();
-  const isFollowed = video.mid && video.mid in _followedUpsMap;
-  const coverUri = parseImgUrl(video.cover, coverSize);
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const { width: windowWidth } = useWindowDimensions()
+  const { setOverlayButtons } = useStore()
+  const coverLayoutWidth = ((windowWidth - 28) * 3) / 7
+  const coverSize = getImagePixelDimensions(coverLayoutWidth, (coverLayoutWidth * 5) / 8)
+  const _followedUpsMap = useFollowedUpsMap()
+  const isFollowed = video.mid && video.mid in _followedUpsMap
+  const coverUri = parseImgUrl(video.cover, coverSize)
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onLongPress={
         buttons
           ? () => {
-              setOverlayButtons(buttons(video));
+              setOverlayButtons(buttons(video))
             }
           : undefined
       }
       onPress={() => {
-        navigation.navigate("Play", {
+        navigation.navigate('Play', {
           aid: video.aid,
           bvid: video.bvid,
           // 搜索结果标题带 <em class="keyword"> 高亮标记，列表渲染需要它，传参给播放页前去掉
@@ -108,7 +108,7 @@ function VideoListItem<T extends VideoListItemInfo>({
           cover: video.cover,
           date: video.date,
           tag: video.tag,
-        });
+        })
       }}
       className="mb-1 min-h-28 flex-row px-2 py-2"
     >
@@ -120,7 +120,7 @@ function VideoListItem<T extends VideoListItemInfo>({
             className={`absolute right-0 top-0 m-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}
           >
             <Text className="text-xs font-thin text-white">
-              {typeof video.duration === "string"
+              {typeof video.duration === 'string'
                 ? parseDurationStr(video.duration)
                 : parseDuration(video.duration)}
             </Text>
@@ -192,7 +192,7 @@ function VideoListItem<T extends VideoListItemInfo>({
         </View>
       </View>
     </TouchableOpacity>
-  );
+  )
 }
 
-export default VideoListItem;
+export default VideoListItem

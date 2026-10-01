@@ -1,22 +1,22 @@
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React from "react";
-import { ActivityIndicator, View } from "react-native";
-import NavigableWebView from "@/components/NavigableWebView";
-import { useSWRConfig } from "swr";
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import React from 'react'
+import { ActivityIndicator, View } from 'react-native'
+import NavigableWebView from '@/components/NavigableWebView'
+import { useSWRConfig } from 'swr'
 
-import { BILIBILI_API_COOKIE_URL, hasBilibiliLoginCookie } from "@/api/bilibili-cookie.helpers";
-import { Button, Text } from "@/components/styled/rneui";
-import { theme } from "@/constants/theme";
-import { BilibiliSessionChangedError } from "@/features/bilibili-session/controller";
-import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
-import { useAppStateChange } from "@/hooks/useAppState";
-import useLatest from "@/hooks/useLatest";
-import type { RootStackParamList } from "@/types";
-import { showToast } from "@/utils";
+import { BILIBILI_API_COOKIE_URL, hasBilibiliLoginCookie } from '@/api/bilibili-cookie.helpers'
+import { Button, Text } from '@/components/styled/native'
+import { theme } from '@/constants/theme'
+import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
+import { useBilibiliSession } from '@/features/bilibili-session/useBilibiliSession'
+import { useAppStateChange } from '@/hooks/useAppState'
+import useLatest from '@/hooks/useLatest'
+import type { RootStackParamList } from '@/types'
+import { showToast } from '@/utils'
 
-const BILIBILI_LOGIN_URL = "https://passport.bilibili.com/h5-app/passport/login";
+const BILIBILI_LOGIN_URL = 'https://passport.bilibili.com/h5-app/passport/login'
 
-type Props = NativeStackScreenProps<RootStackParamList, "BilibiliLogin">;
+type Props = NativeStackScreenProps<RootStackParamList, 'BilibiliLogin'>
 
 // 登录页首帧之前盖一层整页 loading，不用 webview 自带的那个小圈
 function LoginPageLoading() {
@@ -28,114 +28,114 @@ function LoginPageLoading() {
         className="scale-150"
       />
     </View>
-  );
+  )
 }
 
 export default function BilibiliLogin({ navigation }: Props) {
-  const { login } = useBilibiliSession();
-  const { mutate } = useSWRConfig();
-  const loginRef = useLatest(login);
-  const pageUrlRef = React.useRef(BILIBILI_LOGIN_URL);
-  const appState = useAppStateChange();
-  const [webViewKey, setWebViewKey] = React.useState(0);
-  const [captureVersion, setCaptureVersion] = React.useState(0);
-  const [pageReady, setPageReady] = React.useState(false);
-  const [pageFailed, setPageFailed] = React.useState(false);
-  const [nativeModuleUnavailable, setNativeModuleUnavailable] = React.useState(false);
-  const [captureFailed, setCaptureFailed] = React.useState(false);
-  const [loginCompleted, setLoginCompleted] = React.useState(false);
-  const active = appState === "active" && pageReady && !pageFailed;
+  const { login } = useBilibiliSession()
+  const { mutate } = useSWRConfig()
+  const loginRef = useLatest(login)
+  const pageUrlRef = React.useRef(BILIBILI_LOGIN_URL)
+  const appState = useAppStateChange()
+  const [webViewKey, setWebViewKey] = React.useState(0)
+  const [captureVersion, setCaptureVersion] = React.useState(0)
+  const [pageReady, setPageReady] = React.useState(false)
+  const [pageFailed, setPageFailed] = React.useState(false)
+  const [nativeModuleUnavailable, setNativeModuleUnavailable] = React.useState(false)
+  const [captureFailed, setCaptureFailed] = React.useState(false)
+  const [loginCompleted, setLoginCompleted] = React.useState(false)
+  const active = appState === 'active' && pageReady && !pageFailed
 
   React.useEffect(() => {
     if (!loginCompleted) {
-      return;
+      return
     }
     // 先卸载 WebView 的返回拦截，再执行登录成功后的原生导航。
     if (navigation.canGoBack()) {
-      navigation.goBack();
+      navigation.goBack()
     } else {
-      navigation.navigate("MainTabs");
+      navigation.navigate('MainTabs')
     }
-  }, [loginCompleted, navigation]);
+  }, [loginCompleted, navigation])
 
   React.useEffect(() => {
     if (!active) {
-      return;
+      return
     }
-    const controller = new AbortController();
-    let busy = false;
-    let stopped = false;
-    let rejectedCookie = "";
+    const controller = new AbortController()
+    let busy = false
+    let stopped = false
+    let rejectedCookie = ''
 
     async function captureCookie() {
       if (busy || stopped || controller.signal.aborted) {
-        return;
+        return
       }
-      busy = true;
+      busy = true
       try {
-        let CookieManager: (typeof import("@preeternal/react-native-cookie-manager"))["default"];
+        let CookieManager: (typeof import('@preeternal/react-native-cookie-manager'))['default']
         try {
-          CookieManager = (await import("@preeternal/react-native-cookie-manager")).default;
+          CookieManager = (await import('@preeternal/react-native-cookie-manager')).default
         } catch {
-          stopped = true;
+          stopped = true
           if (!controller.signal.aborted) {
-            setNativeModuleUnavailable(true);
+            setNativeModuleUnavailable(true)
           }
-          return;
+          return
         }
         const cookie = await CookieManager.getCookieHeader(
           BILIBILI_API_COOKIE_URL,
-          process.env.EXPO_OS === "ios",
-        );
+          process.env.EXPO_OS === 'ios',
+        )
         if (
           controller.signal.aborted ||
           cookie === rejectedCookie ||
           !hasBilibiliLoginCookie(cookie)
         ) {
-          return;
+          return
         }
-        const accepted = await loginRef.current(cookie, controller.signal);
+        const accepted = await loginRef.current(cookie, controller.signal)
         if (accepted) {
-          stopped = true;
+          stopped = true
           if (!controller.signal.aborted) {
-            showToast("登录成功");
+            showToast('登录成功')
             // 上一页缓存的「需要登录」错误要一起失效，否则返回后仍然看不到内容
-            void mutate(() => true, undefined, { revalidate: true });
-            setLoginCompleted(true);
+            void mutate(() => true, undefined, { revalidate: true })
+            setLoginCompleted(true)
           }
         } else {
-          rejectedCookie = cookie;
+          rejectedCookie = cookie
         }
       } catch (error) {
         if (!controller.signal.aborted && !(error instanceof BilibiliSessionChangedError)) {
-          stopped = true;
-          setCaptureFailed(true);
+          stopped = true
+          setCaptureFailed(true)
         }
       } finally {
-        busy = false;
+        busy = false
       }
     }
 
     const timer = setInterval(() => {
-      void captureCookie();
-    }, 1000);
-    void captureCookie();
+      void captureCookie()
+    }, 1000)
+    void captureCookie()
     return () => {
-      controller.abort();
-      clearInterval(timer);
-    };
-  }, [active, captureVersion, loginRef, mutate, navigation]);
+      controller.abort()
+      clearInterval(timer)
+    }
+  }, [active, captureVersion, loginRef, mutate, navigation])
 
   function reloadPage() {
-    pageUrlRef.current = BILIBILI_LOGIN_URL;
-    setPageReady(false);
-    setPageFailed(false);
-    setCaptureFailed(false);
-    setWebViewKey((key) => key + 1);
+    pageUrlRef.current = BILIBILI_LOGIN_URL
+    setPageReady(false)
+    setPageFailed(false)
+    setCaptureFailed(false)
+    setWebViewKey(key => key + 1)
   }
 
   if (loginCompleted) {
-    return <LoginPageLoading />;
+    return <LoginPageLoading />
   }
 
   if (nativeModuleUnavailable) {
@@ -146,7 +146,7 @@ export default function BilibiliLogin({ navigation }: Props) {
           Expo Go 或旧版 APK 无法使用此登录功能，请重新构建并安装最新版开发包或 APK。
         </Text>
       </View>
-    );
+    )
   }
 
   if (pageFailed) {
@@ -155,7 +155,7 @@ export default function BilibiliLogin({ navigation }: Props) {
         <Text>登录页面加载失败，请检查网络后重试</Text>
         <Button title="重新加载" onPress={reloadPage} />
       </View>
-    );
+    )
   }
 
   return (
@@ -167,8 +167,8 @@ export default function BilibiliLogin({ navigation }: Props) {
             title="重试"
             size="sm"
             onPress={() => {
-              setCaptureFailed(false);
-              setCaptureVersion((version) => version + 1);
+              setCaptureFailed(false)
+              setCaptureVersion(version => version + 1)
             }}
           />
         </View>
@@ -177,32 +177,32 @@ export default function BilibiliLogin({ navigation }: Props) {
         key={webViewKey}
         className="flex-1"
         source={{ uri: BILIBILI_LOGIN_URL }}
-        originWhitelist={["https://*"]}
+        originWhitelist={['https://*']}
         sharedCookiesEnabled
         thirdPartyCookiesEnabled
         startInLoadingState
         renderLoading={() => <LoginPageLoading />}
-        onLoadStart={(event) => {
-          pageUrlRef.current = event.nativeEvent.url;
+        onLoadStart={event => {
+          pageUrlRef.current = event.nativeEvent.url
         }}
         onLoadEnd={() => {
-          setPageReady(true);
+          setPageReady(true)
         }}
         onError={() => {
-          setPageFailed(true);
+          setPageFailed(true)
         }}
-        onHttpError={(event) => {
+        onHttpError={event => {
           if (event.nativeEvent.url === pageUrlRef.current) {
-            setPageFailed(true);
+            setPageFailed(true)
           }
         }}
         onRenderProcessGone={() => {
-          setPageFailed(true);
+          setPageFailed(true)
         }}
         onContentProcessDidTerminate={() => {
-          setPageFailed(true);
+          setPageFailed(true)
         }}
       />
     </View>
-  );
+  )
 }

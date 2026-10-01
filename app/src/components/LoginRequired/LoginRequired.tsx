@@ -1,6 +1,6 @@
 import { View } from 'react-native'
 
-import { Button, Text } from '@/components/styled/rneui'
+import { Button, Text } from '@/components/styled/native'
 import { theme } from '@/constants/theme'
 import { openBilibiliLogin } from '@/routes/navigation'
 

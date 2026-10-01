@@ -1,18 +1,18 @@
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View } from 'react-native'
 
-import { LoginRequired } from "@/components/LoginRequired";
-import { Button, Text } from "@/components/styled/rneui";
-import { useFollowingsState } from "@/features/bilibili-followings/useFollowingsState";
-import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
-import FollowList from "./FollowList";
+import { LoginRequired } from '@/components/LoginRequired'
+import { Button, Text } from '@/components/styled/native'
+import { useFollowingsState } from '@/features/bilibili-followings/useFollowingsState'
+import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
+import FollowList from './FollowList'
 
 export default function FollowingsContent() {
-  const { isReady, error, isValidating, mutate } = useFollowingsState();
+  const { isReady, error, isValidating, mutate } = useFollowingsState()
   function retry() {
-    void mutate().catch(() => {});
+    void mutate().catch(() => {})
   }
   if (!isReady && isLoginRequiredError(error)) {
-    return <LoginRequired description="登录后即可同步 B站关注列表" />;
+    return <LoginRequired description="登录后即可同步 B站关注列表" />
   }
   if (!isReady) {
     return (
@@ -29,7 +29,7 @@ export default function FollowingsContent() {
           </>
         )}
       </View>
-    );
+    )
   }
   return (
     <View className="flex-1">
@@ -41,5 +41,5 @@ export default function FollowingsContent() {
       ) : null}
       <FollowList />
     </View>
-  );
+  )
 }

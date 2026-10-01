@@ -1,44 +1,42 @@
-import { Chip } from "@/components/Chip";
-import { CollapsibleSection } from "@/components/CollapsibleSection";
-import { Text } from "@/components/styled/rneui";
-import React from "react";
-import { View } from "react-native";
-import { theme } from "@/constants/theme";
-import { useUserSettings } from "@/features/user-data/useUserSettings";
-import type { UserSettings } from "@/features/user-data/types";
-import type { CategorySelection } from "./SortCate.types";
+import { Chip } from '@/components/Chip'
+import { CollapsibleSection } from '@/components/CollapsibleSection'
+import { Text } from '@/components/styled/native'
+import React from 'react'
+import { View } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useUserSettings } from '@/features/user-data/useUserSettings'
+import type { UserSettings } from '@/features/user-data/types'
+import type { CategorySelection } from './SortCate.types'
 
 export default function SortCate() {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(false)
   const {
     values: { $videoCatesList },
     scope,
     generation,
     setSetting,
-  } = useUserSettings();
-  const [selection, setSelection] = React.useState<CategorySelection>({ stamp: "", rids: [] });
-  const stampFor = (list: UserSettings["$videoCatesList"]) =>
-    `${scope}:${generation}:${list.map((item) => item.rid).join(",")}`;
+  } = useUserSettings()
+  const [selection, setSelection] = React.useState<CategorySelection>({ stamp: '', rids: [] })
+  const stampFor = (list: UserSettings['$videoCatesList']) =>
+    `${scope}:${generation}:${list.map(item => item.rid).join(',')}`
   // 远端重新排序或切换账号后，以最新设置派生列表，不保留旧账号的编辑草稿。
-  const selected = selection.stamp === stampFor($videoCatesList) ? selection.rids : [];
-  const categories = $videoCatesList.slice(1);
-  const selectedIds = new Set(selected);
-  const sorted = categories.filter((item) => selectedIds.has(item.rid));
-  const unsorted = categories.filter((item) => !selectedIds.has(item.rid));
+  const selected = selection.stamp === stampFor($videoCatesList) ? selection.rids : []
+  const categories = $videoCatesList.slice(1)
+  const selectedIds = new Set(selected)
+  const sorted = categories.filter(item => selectedIds.has(item.rid))
+  const unsorted = categories.filter(item => !selectedIds.has(item.rid))
 
   function move(rid: number, select: boolean) {
-    const item = categories.find((category) => category.rid === rid);
+    const item = categories.find(category => category.rid === rid)
     if (!item) {
-      return;
+      return
     }
-    const nextSelected = select ? [...selected, rid] : selected.filter((id) => id !== rid);
-    const nextSorted = select ? [...sorted, item] : sorted.filter((entry) => entry.rid !== rid);
-    const nextUnsorted = select
-      ? unsorted.filter((entry) => entry.rid !== rid)
-      : [...unsorted, item];
-    const next = [$videoCatesList[0], ...nextSorted, ...nextUnsorted];
-    if (setSetting("$videoCatesList", next)) {
-      setSelection({ stamp: stampFor(next), rids: nextSelected });
+    const nextSelected = select ? [...selected, rid] : selected.filter(id => id !== rid)
+    const nextSorted = select ? [...sorted, item] : sorted.filter(entry => entry.rid !== rid)
+    const nextUnsorted = select ? unsorted.filter(entry => entry.rid !== rid) : [...unsorted, item]
+    const next = [$videoCatesList[0], ...nextSorted, ...nextUnsorted]
+    if (setSetting('$videoCatesList', next)) {
+      setSelection({ stamp: stampFor(next), rids: nextSelected })
     }
   }
   return (
@@ -49,7 +47,7 @@ export default function SortCate() {
     >
       <View className="bg-transparent px-1">
         <View className="w-full flex-row flex-wrap gap-x-3 border-b-[0.5px] border-b-gray-400">
-          {sorted.map((category) => (
+          {sorted.map(category => (
             <Chip
               key={category.rid}
               title={category.label}
@@ -64,7 +62,7 @@ export default function SortCate() {
           )}
         </View>
         <View className="mt-5 w-full flex-row flex-wrap gap-x-3">
-          {unsorted.map((category) => (
+          {unsorted.map(category => (
             <Chip
               key={category.rid}
               title={category.label}
@@ -77,5 +75,5 @@ export default function SortCate() {
         </View>
       </View>
     </CollapsibleSection>
-  );
+  )
 }

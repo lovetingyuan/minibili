@@ -1,5 +1,5 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Button, Text } from '@/components/styled/rneui'
+import { Button, Text } from '@/components/styled/native'
 import { Image, Linking, View } from 'react-native'
 
 import { theme } from '@/constants/theme'

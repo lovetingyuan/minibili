@@ -1,5 +1,5 @@
-import React from "react";
-import { ArrowUp, X } from "lucide-react-native";
+import React from 'react'
+import { ArrowUp, X } from 'lucide-react-native'
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -7,46 +7,46 @@ import {
   Pressable,
   TextInput,
   View,
-} from "react-native";
+} from 'react-native'
 
-import { Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
+import { Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import { theme } from '@/constants/theme'
 
 /**
  * 弹幕内容上限，与接口限制保持一致
  */
-export const DANMAKU_COMPOSER_MAX_LENGTH = 100;
-export const DANMAKU_COMPOSER_PLACEHOLDER = "发个友善的弹幕见证当下";
+export const DANMAKU_COMPOSER_MAX_LENGTH = 100
+export const DANMAKU_COMPOSER_PLACEHOLDER = '发个友善的弹幕见证当下'
 
 /**
  * 归一化输入内容：弹幕不能包含换行，超出上限按码点截断
  */
 export function clampDanmakuDraft(value: string) {
-  const singleLine = value.replace(/[\r\n]+/g, " ");
-  return [...singleLine].slice(0, DANMAKU_COMPOSER_MAX_LENGTH).join("");
+  const singleLine = value.replace(/[\r\n]+/g, ' ')
+  return [...singleLine].slice(0, DANMAKU_COMPOSER_MAX_LENGTH).join('')
 }
 
 export type DanmakuComposerViewProps = {
-  draft: string;
-  pending: boolean;
-  placeholder?: string;
-  onChangeText: (value: string) => void;
-  onSubmit: () => void;
-  onClose: () => void;
-};
+  draft: string
+  pending: boolean
+  placeholder?: string
+  onChangeText: (value: string) => void
+  onSubmit: () => void
+  onClose: () => void
+}
 
 /**
  * 播放器底部的弹幕输入条，贴键盘上方浮出
  */
 export function DanmakuComposerView(props: DanmakuComposerViewProps) {
-  const count = [...props.draft].length;
-  const canSubmit = Boolean(props.draft.trim()) && !props.pending;
-  const reachedLimit = count >= DANMAKU_COMPOSER_MAX_LENGTH;
+  const count = [...props.draft].length
+  const canSubmit = Boolean(props.draft.trim()) && !props.pending
+  const reachedLimit = count >= DANMAKU_COMPOSER_MAX_LENGTH
 
   return (
     <View className="absolute bottom-0 left-0 right-0" pointerEvents="box-none">
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View className="flex-row items-center gap-2 bg-black/80 px-3 pb-2 pt-2">
           <TextInput
             value={props.draft}
@@ -61,10 +61,10 @@ export function DanmakuComposerView(props: DanmakuComposerViewProps) {
             onSubmitEditing={props.onSubmit}
           />
           <Text
-            className={`text-[11px] tabular-nums ${reachedLimit ? "text-orange-400" : "text-white/60"}`}
+            className={`text-[11px] tabular-nums ${reachedLimit ? 'text-orange-400' : 'text-white/60'}`}
           >{`${count}/${DANMAKU_COMPOSER_MAX_LENGTH}`}</Text>
           <Pressable
-            className={`h-9 w-9 items-center justify-center rounded-full ${canSubmit ? theme.primary.bg : "bg-white/20"}`}
+            className={`h-9 w-9 items-center justify-center rounded-full ${canSubmit ? theme.primary.bg : 'bg-white/20'}`}
             accessibilityRole="button"
             accessibilityLabel="发送弹幕"
             accessibilityState={{ disabled: !canSubmit, busy: props.pending }}
@@ -89,46 +89,46 @@ export function DanmakuComposerView(props: DanmakuComposerViewProps) {
         </View>
       </KeyboardAvoidingView>
     </View>
-  );
+  )
 }
 
 type DanmakuComposerProps = {
-  pending: boolean;
+  pending: boolean
   /**
    * 返回 true 表示发送成功，可以清空草稿
    */
-  onSubmit: (text: string) => Promise<boolean>;
-  onClose: () => void;
-};
+  onSubmit: (text: string) => Promise<boolean>
+  onClose: () => void
+}
 
 export default function DanmakuComposer(props: DanmakuComposerProps) {
-  const [draft, setDraft] = React.useState("");
+  const [draft, setDraft] = React.useState('')
 
   function submit() {
     if (!draft.trim() || props.pending) {
-      return;
+      return
     }
     void props.onSubmit(draft).then(
-      (sent) => {
+      sent => {
         if (sent) {
-          setDraft("");
+          setDraft('')
         }
       },
       () => {
         // 发送失败时保留草稿，错误提示由调用方负责
       },
-    );
+    )
   }
 
   return (
     <DanmakuComposerView
       draft={draft}
       pending={props.pending}
-      onChangeText={(value) => {
-        setDraft(clampDanmakuDraft(value));
+      onChangeText={value => {
+        setDraft(clampDanmakuDraft(value))
       }}
       onSubmit={submit}
       onClose={props.onClose}
     />
-  );
+  )
 }

@@ -11,10 +11,14 @@ export function updateOriginalImageStatuses(
   if (action.type === "reset") {
     return {};
   }
+  const nextStatus: OriginalImageStatus =
+    action.type === "request" ? "loading" : action.type === "loaded" ? "loaded" : "idle";
+  if ((statuses[action.uri] ?? "idle") === nextStatus) {
+    return statuses;
+  }
   return {
     ...statuses,
-    [action.uri]:
-      action.type === "request" ? "loading" : action.type === "loaded" ? "loaded" : "idle",
+    [action.uri]: nextStatus,
   };
 }
 

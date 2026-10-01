@@ -1,9 +1,9 @@
-import { Pressable, View } from "react-native";
+import { Pressable, View } from 'react-native'
 
-import { theme } from "@/constants/theme";
-import { Text } from "@/components/styled/rneui";
+import { theme } from '@/constants/theme'
+import { Text } from '@/components/styled/native'
 
-import type { CommentPaginationFooterProps } from "./comment-pagination-footer.types";
+import type { CommentPaginationFooterProps } from './comment-pagination-footer.types'
 
 export default function CommentPaginationFooter(props: CommentPaginationFooterProps) {
   return (
@@ -22,10 +22,10 @@ export default function CommentPaginationFooter(props: CommentPaginationFooterPr
           </Pressable>
         ) : (
           <Text className={`text-xs ${theme.text.muted}`}>
-            {props.isPageEnd ? `没有更多${props.noun}了` : "上拉加载更多"}
+            {props.isPageEnd ? `没有更多${props.noun}了` : '上拉加载更多'}
           </Text>
         )
       ) : null}
     </View>
-  );
+  )
 }

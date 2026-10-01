@@ -1,107 +1,107 @@
-import { useNavigation } from "@react-navigation/native";
-import { clsx } from "clsx";
-import * as Clipboard from "expo-clipboard";
-import { Alert, Pressable, View } from "react-native";
+import { useNavigation } from '@react-navigation/native'
+import { clsx } from 'clsx'
+import * as Clipboard from 'expo-clipboard'
+import { Alert, Pressable, View } from 'react-native'
 
-import { Avatar } from "@/components/Avatar";
-import { Text } from "@/components/styled/rneui";
-import { overlayIcons } from "@/constants/overlay-icons";
-import { theme } from "@/constants/theme";
-import { useStore } from "@/store";
-import type { NavigationProps } from "@/types";
-import { getImagePixelSize, parseImgUrl, showToast } from "@/utils";
+import { Avatar } from '@/components/Avatar'
+import { Text } from '@/components/styled/native'
+import { overlayIcons } from '@/constants/overlay-icons'
+import { theme } from '@/constants/theme'
+import { useStore } from '@/store'
+import type { NavigationProps } from '@/types'
+import { getImagePixelSize, parseImgUrl, showToast } from '@/utils'
 
-import { shouldShowReplySection } from "../../api/replies.helpers";
-import type { CommentItemProps, CommentProps } from "./comment.types";
-import { CommentImages, CommentText } from "./CommentContent";
-import UpName from "../UpName";
+import { shouldShowReplySection } from '../../api/replies.helpers'
+import type { CommentItemProps, CommentProps } from './comment.types'
+import { CommentImages, CommentText } from './CommentContent'
+import UpName from '../UpName'
 
-function getCommentCopyText(comment: CommentItemProps["comment"]) {
+function getCommentCopyText(comment: CommentItemProps['comment']) {
   const message = comment.message
-    .map((node) => {
-      if (node.type === "url") {
-        return node.url;
+    .map(node => {
+      if (node.type === 'url') {
+        return node.url
       }
-      if (node.type === "emoji") {
-        return "[表情]";
+      if (node.type === 'emoji') {
+        return '[表情]'
       }
-      if (node.type === "vote") {
-        return node.text || "投票";
+      if (node.type === 'vote') {
+        return node.text || '投票'
       }
-      return node.text;
+      return node.text
     })
-    .join("");
-  const images = Array.from({ length: comment.images.length }, () => "[图片]").join("");
-  return [message, images].filter(Boolean).join("\n");
+    .join('')
+  const images = Array.from({ length: comment.images.length }, () => '[图片]').join('')
+  return [message, images].filter(Boolean).join('\n')
 }
 
 export function CommentItem(props: CommentItemProps) {
-  const { comment, compact } = props;
-  const navigation = useNavigation<NavigationProps["navigation"]>();
-  const { setOverlayButtons } = useStore();
-  const isOwner = Boolean(props.ownerMid && String(comment.mid) === props.ownerMid);
-  const isViewer = Boolean(props.viewerMid && String(comment.mid) === props.viewerMid);
-  const onDelete = props.onDelete;
-  const canDelete = Boolean(onDelete && isViewer);
-  const deletePending = props.isDeletePending?.(comment.id) ?? false;
-  const meta = [comment.time?.replace("发布", ""), comment.location?.replace("IP属地：", "")]
+  const { comment, compact } = props
+  const navigation = useNavigation<NavigationProps['navigation']>()
+  const { setOverlayButtons } = useStore()
+  const isOwner = Boolean(props.ownerMid && String(comment.mid) === props.ownerMid)
+  const isViewer = Boolean(props.viewerMid && String(comment.mid) === props.viewerMid)
+  const onDelete = props.onDelete
+  const canDelete = Boolean(onDelete && isViewer)
+  const deletePending = props.isDeletePending?.(comment.id) ?? false
+  const meta = [comment.time?.replace('发布', ''), comment.location?.replace('IP属地：', '')]
     .filter(Boolean)
-    .join(" · ");
-  const liked = comment.attitude === "like";
-  const attitudePending = props.isAttitudePending(comment.id);
+    .join(' · ')
+  const liked = comment.attitude === 'like'
+  const attitudePending = props.isAttitudePending(comment.id)
 
   function openActions() {
     setOverlayButtons([
       {
-        text: "复制评论",
+        text: '复制评论',
         icon: overlayIcons.copyComment,
         onPress: () => {
           void Clipboard.setStringAsync(getCommentCopyText(comment)).then(() =>
-            showToast("已复制评论"),
-          );
+            showToast('已复制评论'),
+          )
         },
       },
       {
-        text: comment.attitude === "like" ? "取消点赞" : "点赞",
+        text: comment.attitude === 'like' ? '取消点赞' : '点赞',
         icon: overlayIcons.like,
-        filled: comment.attitude === "like",
-        onPress: () => void props.onAttitude(comment, "like"),
+        filled: comment.attitude === 'like',
+        onPress: () => void props.onAttitude(comment, 'like'),
       },
       {
-        text: comment.attitude === "dislike" ? "取消点踩" : "点踩",
+        text: comment.attitude === 'dislike' ? '取消点踩' : '点踩',
         icon: overlayIcons.dislike,
-        filled: comment.attitude === "dislike",
-        onPress: () => void props.onAttitude(comment, "dislike"),
+        filled: comment.attitude === 'dislike',
+        onPress: () => void props.onAttitude(comment, 'dislike'),
       },
       {
         text: `回复「${comment.name}」`,
         icon: overlayIcons.reply,
         onPress: () => props.onReply(comment),
       },
-    ]);
+    ])
   }
 
   function confirmDelete() {
     if (!onDelete || deletePending) {
-      return;
+      return
     }
-    const deletingRoot = String(comment.root) === "0";
+    const deletingRoot = String(comment.root) === '0'
     const message = deletingRoot
-      ? "删除评论后，评论下所有回复都会被删除，是否继续？"
-      : "删除回复后无法恢复，是否继续？";
-    Alert.alert("删除评论", message, [
-      { text: "取消", style: "cancel" },
+      ? '删除评论后，评论下所有回复都会被删除，是否继续？'
+      : '删除回复后无法恢复，是否继续？'
+    Alert.alert('删除评论', message, [
+      { text: '取消', style: 'cancel' },
       {
-        text: "确定",
-        style: "destructive",
+        text: '确定',
+        style: 'destructive',
         onPress: () => void onDelete(comment),
       },
-    ]);
+    ])
   }
 
   return (
     <Pressable
-      className={compact ? "gap-1.5" : "gap-2"}
+      className={compact ? 'gap-1.5' : 'gap-2'}
       accessibilityHint="长按可复制、点赞、点踩或回复"
       onLongPress={openActions}
     >
@@ -111,12 +111,12 @@ export function CommentItem(props: CommentItemProps) {
           accessibilityLabel={`查看 ${comment.name} 的主页`}
           hitSlop={4}
           onPress={() =>
-            navigation.push("Dynamic", {
+            navigation.push('Dynamic', {
               user: {
                 face: comment.face,
                 name: comment.name,
                 mid: comment.mid,
-                sign: comment.sign || "-",
+                sign: comment.sign || '-',
               },
             })
           }
@@ -139,10 +139,10 @@ export function CommentItem(props: CommentItemProps) {
               mid={comment.mid}
               numberOfLines={1}
               className={clsx(
-                "shrink text-sm",
+                'shrink text-sm',
                 isViewer
-                  ? ["font-bold", theme.primary.text]
-                  : ["font-semibold", isOwner ? theme.secondary.text : theme.text.secondary],
+                  ? ['font-bold', theme.primary.text]
+                  : ['font-semibold', isOwner ? theme.secondary.text : theme.text.secondary],
               )}
             >
               {comment.name}
@@ -193,28 +193,28 @@ export function CommentItem(props: CommentItemProps) {
           idStr={comment.id}
           bold={liked}
           creatorLiked={comment.creatorLiked}
-          disliked={comment.attitude === "dislike"}
+          disliked={comment.attitude === 'dislike'}
           like={{
             idStr: comment.id,
             count: comment.like,
             active: liked,
             pending: attitudePending,
             creatorLiked: comment.creatorLiked,
-            onPress: () => void props.onAttitude(comment, "like"),
+            onPress: () => void props.onAttitude(comment, 'like'),
           }}
         />
         {comment.images.length ? <CommentImages images={comment.images} compact={compact} /> : null}
       </View>
     </Pressable>
-  );
+  )
 }
 
 export function Comment(props: CommentProps) {
-  const { setRepliesInfo } = useStore();
-  const comment = props.comment;
-  const hasReplies = shouldShowReplySection(comment.rcount, comment.replies.length);
+  const { setRepliesInfo } = useStore()
+  const comment = props.comment
+  const hasReplies = shouldShowReplySection(comment.rcount, comment.replies.length)
 
-  function openReplies(target: CommentItemProps["comment"], focusComposer: boolean) {
+  function openReplies(target: CommentItemProps['comment'], focusComposer: boolean) {
     setRepliesInfo({
       oid: comment.oid,
       type: comment.type,
@@ -227,15 +227,15 @@ export function Comment(props: CommentProps) {
       sourceUrl: props.sourceUrl,
       replyTarget: target,
       focusComposer,
-    });
+    })
   }
 
   const moreRepliesButton =
     comment.rcount > 0 ? (
       <Pressable
         className={clsx(
-          "-mx-2 rounded-lg px-2 py-1.5 active:bg-slate-400/20",
-          !comment.replies.length && "mt-2",
+          '-mx-2 rounded-lg px-2 py-1.5 active:bg-slate-400/20',
+          !comment.replies.length && 'mt-2',
         )}
         accessibilityRole="button"
         accessibilityLabel={`查看全部 ${comment.rcount} 条回复`}
@@ -245,20 +245,20 @@ export function Comment(props: CommentProps) {
           {comment.moreText || `查看全部 ${comment.rcount} 条回复`} ›
         </Text>
       </Pressable>
-    ) : null;
+    ) : null
 
   return (
     <View
       className={clsx(
-        "bg-white p-3 dark:bg-slate-900",
-        props.first ? "rounded-b-2xl" : "rounded-2xl",
+        'bg-white p-3 dark:bg-slate-900',
+        props.first ? 'rounded-b-2xl' : 'rounded-2xl',
       )}
     >
       <CommentItem
         comment={comment}
         ownerMid={props.ownerMid}
         onAttitude={props.onAttitude}
-        onReply={(target) => openReplies(target, true)}
+        onReply={target => openReplies(target, true)}
         onDelete={props.onDelete}
         viewerMid={props.viewerMid}
         isDeletePending={props.isDeletePending}
@@ -266,14 +266,14 @@ export function Comment(props: CommentProps) {
       />
       {comment.replies.length ? (
         <View className="mt-3 gap-3 rounded-2xl bg-slate-100 p-3 dark:bg-slate-800">
-          {comment.replies.map((reply) => (
+          {comment.replies.map(reply => (
             <CommentItem
               key={reply.id}
               comment={reply}
               ownerMid={props.ownerMid}
               compact
               onAttitude={props.onAttitude}
-              onReply={(target) => openReplies(target, true)}
+              onReply={target => openReplies(target, true)}
               onDelete={props.onDelete}
               viewerMid={props.viewerMid}
               isDeletePending={props.isDeletePending}
@@ -286,5 +286,5 @@ export function Comment(props: CommentProps) {
         moreRepliesButton
       ) : null}
     </View>
-  );
+  )
 }

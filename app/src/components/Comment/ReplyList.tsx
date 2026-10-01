@@ -1,122 +1,122 @@
-import { useIsFocused } from "@react-navigation/native";
-import type { FlashListRef } from "@shopify/flash-list";
-import { useEffect, useRef } from "react";
-import { ActivityIndicator, Pressable, useWindowDimensions, View } from "react-native";
-import { X } from "lucide-react-native";
+import { useIsFocused } from '@react-navigation/native'
+import type { FlashListRef } from '@shopify/flash-list'
+import { useEffect, useRef } from 'react'
+import { ActivityIndicator, Pressable, useWindowDimensions, View } from 'react-native'
+import { X } from 'lucide-react-native'
 
-import { useReplies } from "@/api/replies";
-import type { ReplyItemType } from "@/api/replies";
-import { BottomSheet } from "@/components/styled/bottom-sheet";
-import { FlashList, Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
-import { getStoreMethods, useStore } from "@/store";
+import { useReplies } from '@/api/replies'
+import type { ReplyItemType } from '@/api/replies'
+import { BottomSheet } from '@/components/styled/bottom-sheet'
+import { FlashList, Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
+import { theme } from '@/constants/theme'
+import { getStoreMethods, useStore } from '@/store'
 
-import { CommentItem } from "./Comment";
-import CommentPaginationFooter from "./CommentPaginationFooter";
-import { getReplySheetHeight, removeReplyFromInfo } from "./reply-list.helpers";
-import type { ReplyListProps } from "./reply-list.types";
-import ReplyComposer from "./ReplyComposer";
+import { CommentItem } from './Comment'
+import CommentPaginationFooter from './CommentPaginationFooter'
+import { getReplySheetHeight, removeReplyFromInfo } from './reply-list.helpers'
+import type { ReplyListProps } from './reply-list.types'
+import ReplyComposer from './ReplyComposer'
 
-const SHEET_BACKDROP_OPACITY = 0.5;
+const SHEET_BACKDROP_OPACITY = 0.5
 
 export default function ReplyList(props: ReplyListProps) {
-  const replies = useReplies();
-  const { setRepliesInfo, repliesInfo } = useStore();
-  const focused = useIsFocused();
-  const listRef = useRef<FlashListRef<ReplyItemType>>(null);
-  const { height: windowHeight } = useWindowDimensions();
-  const sheetHeight = getReplySheetHeight(windowHeight);
-  const loadMoreLock = useRef(false);
+  const replies = useReplies()
+  const { setRepliesInfo, repliesInfo } = useStore()
+  const focused = useIsFocused()
+  const listRef = useRef<FlashListRef<ReplyItemType>>(null)
+  const { height: windowHeight } = useWindowDimensions()
+  const sheetHeight = getReplySheetHeight(windowHeight)
+  const loadMoreLock = useRef(false)
 
   useEffect(() => {
     if (!focused) {
-      setRepliesInfo(null);
+      setRepliesInfo(null)
     }
-  }, [focused, setRepliesInfo]);
+  }, [focused, setRepliesInfo])
 
   useEffect(() => {
     if (!replies.isValidating) {
-      loadMoreLock.current = false;
+      loadMoreLock.current = false
     }
-  }, [replies.isValidating, replies.data.replies.length]);
+  }, [replies.isValidating, replies.data.replies.length])
 
   function handleClose() {
-    setRepliesInfo(null);
+    setRepliesInfo(null)
   }
 
   function selectTarget(target: ReplyItemType) {
     if (repliesInfo) {
-      setRepliesInfo({ ...repliesInfo, replyTarget: target, focusComposer: true });
+      setRepliesInfo({ ...repliesInfo, replyTarget: target, focusComposer: true })
     }
   }
 
-  async function changeAttitude(item: ReplyItemType, kind: "like" | "dislike") {
-    const next = await props.onAttitude(item, kind);
+  async function changeAttitude(item: ReplyItemType, kind: 'like' | 'dislike') {
+    const next = await props.onAttitude(item, kind)
     if (next) {
-      await replies.patchAttitude(item.id, next);
+      await replies.patchAttitude(item.id, next)
     } else {
-      await replies.refresh().catch(() => {});
+      await replies.refresh().catch(() => {})
     }
-    return next;
+    return next
   }
 
   async function submitReply(message: string) {
     if (!repliesInfo) {
-      return false;
+      return false
     }
-    const reply = await props.onSubmitReply(repliesInfo.replyTarget, message);
+    const reply = await props.onSubmitReply(repliesInfo.replyTarget, message)
     if (!reply) {
-      await replies.refresh().catch(() => {});
-      return false;
+      await replies.refresh().catch(() => {})
+      return false
     }
-    await replies.prependReply(reply);
+    await replies.prependReply(reply)
     // 异步返回后取 store 里的最新快照，避免闭包里的 repliesInfo 过期
-    const currentInfo = getStoreMethods().getRepliesInfo();
+    const currentInfo = getStoreMethods().getRepliesInfo()
     if (currentInfo && String(currentInfo.root) === String(repliesInfo.root)) {
       setRepliesInfo({
         ...currentInfo,
         allCount: currentInfo.allCount + 1,
         previewReplies: [reply, ...currentInfo.previewReplies],
         addedReplies: [reply, ...currentInfo.addedReplies],
-      });
+      })
     }
-    listRef.current?.scrollToOffset({ offset: 0, animated: true });
-    return true;
+    listRef.current?.scrollToOffset({ offset: 0, animated: true })
+    return true
   }
 
   async function deleteReply(target: ReplyItemType) {
-    const deleted = await props.onDelete(target);
+    const deleted = await props.onDelete(target)
     if (!deleted) {
-      await replies.refresh().catch(() => {});
-      return false;
+      await replies.refresh().catch(() => {})
+      return false
     }
-    const currentInfo = getStoreMethods().getRepliesInfo();
+    const currentInfo = getStoreMethods().getRepliesInfo()
     if (!currentInfo || String(currentInfo.root) !== String(repliesInfo?.root)) {
-      return true;
+      return true
     }
     if (target.id === String(currentInfo.root)) {
-      setRepliesInfo(null);
-      return true;
+      setRepliesInfo(null)
+      return true
     }
-    await replies.removeReply(target.id);
-    const latestInfo = getStoreMethods().getRepliesInfo();
+    await replies.removeReply(target.id)
+    const latestInfo = getStoreMethods().getRepliesInfo()
     if (latestInfo && String(latestInfo.root) === String(currentInfo.root)) {
-      setRepliesInfo(removeReplyFromInfo(latestInfo, target.id));
+      setRepliesInfo(removeReplyFromInfo(latestInfo, target.id))
     }
-    return true;
+    return true
   }
 
   function loadMore() {
     if (loadMoreLock.current || replies.isValidating || replies.isPageEnd || replies.error) {
-      return;
+      return
     }
-    loadMoreLock.current = true;
-    replies.update();
+    loadMoreLock.current = true
+    replies.update()
   }
 
-  const { allCount, root } = replies.data;
-  const ownerMid = repliesInfo?.ownerMid;
+  const { allCount, root } = replies.data
+  const ownerMid = repliesInfo?.ownerMid
   const rowProps = {
     ownerMid,
     onAttitude: changeAttitude,
@@ -125,7 +125,7 @@ export default function ReplyList(props: ReplyListProps) {
     viewerMid: props.viewerMid,
     isDeletePending: props.isDeletePending,
     isAttitudePending: props.isAttitudePending,
-  };
+  }
 
   return (
     <BottomSheet
@@ -138,7 +138,7 @@ export default function ReplyList(props: ReplyListProps) {
       <View className={`flex-1 overflow-hidden rounded-t-[28px] ${theme.background.surface}`}>
         <View className="relative h-12 flex-row items-center justify-center border-b border-slate-100 px-4 dark:border-slate-800">
           <Text className="text-base font-semibold tabular-nums">
-            {typeof allCount === "number" ? `${allCount} 条回复` : "回复"}
+            {typeof allCount === 'number' ? `${allCount} 条回复` : '回复'}
           </Text>
           <Pressable
             className="absolute right-2 h-11 w-11 items-center justify-center rounded-full"
@@ -168,7 +168,7 @@ export default function ReplyList(props: ReplyListProps) {
                 <View className="flex-row items-center justify-between px-1 pb-1 pt-4">
                   <Text className="text-sm font-semibold">全部回复</Text>
                   <Text className={`text-xs tabular-nums ${theme.text.muted}`}>
-                    {typeof allCount === "number" ? allCount : ""}
+                    {typeof allCount === 'number' ? allCount : ''}
                   </Text>
                 </View>
               </View>
@@ -181,7 +181,7 @@ export default function ReplyList(props: ReplyListProps) {
               </View>
             ) : (
               <Text className="my-10 text-center text-sm">
-                {replies.error ? "回复加载失败" : "还没有回复，来说两句吧"}
+                {replies.error ? '回复加载失败' : '还没有回复，来说两句吧'}
               </Text>
             )
           }
@@ -211,5 +211,5 @@ export default function ReplyList(props: ReplyListProps) {
         ) : null}
       </View>
     </BottomSheet>
-  );
+  )
 }

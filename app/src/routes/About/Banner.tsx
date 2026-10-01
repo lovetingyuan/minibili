@@ -1,13 +1,13 @@
-import { Image, Linking, Pressable, Share, View } from "react-native";
-import { Share2 } from "lucide-react-native";
+import { Image, Linking, Pressable, Share, View } from 'react-native'
+import { Share2 } from 'lucide-react-native'
 
-import { GitHubIcon } from "@/components/GitHubIcon";
-import { Button, Text } from "@/components/styled/rneui";
-import { ThemedIcon } from "@/components/ThemedIcon";
+import { GitHubIcon } from '@/components/GitHubIcon'
+import { Button, Text } from '@/components/styled/native'
+import { ThemedIcon } from '@/components/ThemedIcon'
 
-import { githubLink, site } from "../../constants";
+import { githubLink, site } from '../../constants'
 
-export default Header;
+export default Header
 
 function Header() {
   return (
@@ -15,11 +15,11 @@ function Header() {
       <Pressable
         className="mb-5 mt-1 flex-1 items-center"
         onPress={() => {
-          Linking.openURL(site);
+          Linking.openURL(site)
         }}
       >
         <Image
-          source={require("../../../assets/minibili.png")}
+          source={require('../../../assets/minibili.png')}
           className="aspect-[33/10] h-auto w-[85%]"
         />
       </Pressable>
@@ -29,23 +29,23 @@ function Header() {
         </Text>
         <View className="flex-row items-center gap-2">
           <Button
-            radius={"sm"}
+            radius={'sm'}
             type="clear"
             size="sm"
             onPress={() => {
-              Linking.openURL(githubLink);
+              Linking.openURL(githubLink)
             }}
           >
             <GitHubIcon />
           </Button>
           <Button
-            radius={"sm"}
+            radius={'sm'}
             type="clear"
             size="sm"
             onPress={() => {
               Share.share({
                 message: `MiniBili - 简单的B站浏览\n点击下载：${site}`,
-              });
+              })
             }}
           >
             <ThemedIcon icon={Share2} size={20} />
@@ -53,5 +53,5 @@ function Header() {
         </View>
       </View>
     </>
-  );
+  )
 }
