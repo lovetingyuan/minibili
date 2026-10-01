@@ -60,7 +60,7 @@ export function CommentLikeEntry(props: CommentLikeEntryProps) {
     transform: [{ rotate: `${rotation.value}deg` }, { scale: scale.value }],
   }));
 
-  // 已点赞但服务端返回 0 赞时只显示图标，不显示「0」
+  // 没有点赞时只显示图标，不显示点赞数
   const countText =
     props.count > 0 ? `${parseNumber(props.count)}${props.creatorLiked ? "+UP" : ""}` : "";
 

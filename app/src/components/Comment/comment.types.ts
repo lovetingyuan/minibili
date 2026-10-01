@@ -55,7 +55,7 @@ export type CommentLikeEntryProps = {
 export type CommentTextProps = {
   nodes: CommentMessageContent;
   idStr: string;
-  /** 内联点赞入口；没有点赞数且未点赞时调用方不传，正文末尾就不出现入口 */
+  /** 内联点赞入口；传入后始终显示图标，点赞数大于 0 时显示数字 */
   like?: CommentLikeEntryProps;
   /** 当前评论被点踩：正文末尾追加不可点击的 👎 */
   disliked?: boolean;

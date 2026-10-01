@@ -49,7 +49,6 @@ export function CommentItem(props: CommentItemProps) {
     .join(" · ");
   const liked = comment.attitude === "like";
   const attitudePending = props.isAttitudePending(comment.id);
-  const showLikeEntry = comment.like > 0 || liked;
 
   function openActions() {
     setOverlayButtons([
@@ -195,18 +194,14 @@ export function CommentItem(props: CommentItemProps) {
           bold={liked}
           creatorLiked={comment.creatorLiked}
           disliked={comment.attitude === "dislike"}
-          like={
-            showLikeEntry
-              ? {
-                  idStr: comment.id,
-                  count: comment.like,
-                  active: liked,
-                  pending: attitudePending,
-                  creatorLiked: comment.creatorLiked,
-                  onPress: () => void props.onAttitude(comment, "like"),
-                }
-              : undefined
-          }
+          like={{
+            idStr: comment.id,
+            count: comment.like,
+            active: liked,
+            pending: attitudePending,
+            creatorLiked: comment.creatorLiked,
+            onPress: () => void props.onAttitude(comment, "like"),
+          }}
         />
         {comment.images.length ? <CommentImages images={comment.images} compact={compact} /> : null}
       </View>
