@@ -86,6 +86,7 @@ module.exports = {
       : []),
     "expo-status-bar",
     "expo-secure-store",
+    "expo-background-task",
     [
       "expo-media-library",
       {

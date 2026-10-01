@@ -52,12 +52,16 @@ export function useMarkFollowingDynamicsRead(mid: string | number | null | undef
     set$followingDynamicsReadMap((map) => {
       const state = map[current.mid];
       const next = markFollowingDynamicsUpRead(state, upMid);
-      if (!next || next === state) {
-        return map;
-      }
       return {
         ...map,
-        [current.mid]: next,
+        [current.mid]: {
+          ...next,
+          [upMid]: {
+            latestId: next?.[upMid]?.latestId ?? "",
+            readId: next?.[upMid]?.readId ?? "",
+            readAt: Date.now(),
+          },
+        },
       };
     });
   }, [account, mid, set$followingDynamicsReadMap]);

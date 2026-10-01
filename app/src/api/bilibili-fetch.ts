@@ -5,12 +5,13 @@ export default async function bilibiliFetch(
   url: string,
   options: RequestInit = {},
   withCookie = true,
+  explicitCookie?: string,
 ) {
   if (!isBilibiliUrl(url)) {
     return fetch(url, options);
   }
 
-  const cookie = withCookie ? await getCookie() : "";
+  const cookie = withCookie ? (explicitCookie ?? (await getCookie())) : "";
 
   return fetch(url, {
     ...options,

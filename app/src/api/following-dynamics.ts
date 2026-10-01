@@ -3,6 +3,7 @@ import { mapDynamicItem } from "./dynamic-items.mapper";
 import { DynamicListResponseSchema } from "./dynamic-items.schema";
 import { FollowingDynamicsNavResponseSchema } from "./following-dynamics-nav.schema";
 import { FollowingDynamicsUpdateCountSchema } from "./following-dynamics-update.schema";
+import { timestampPollResult } from "./poll-result-time";
 import type {
   FollowingDynamicsAccount,
   FollowingDynamicsKey,
@@ -10,6 +11,7 @@ import type {
   FollowingDynamicsNavBatch,
   FollowingDynamicsPage,
   FollowingDynamicsReadState,
+  FollowingDynamicsReadMergeOptions,
   FollowingDynamicsRequest,
   FollowingDynamicsUpReadState,
   FollowingDynamicsUpdatePage,
@@ -135,6 +137,7 @@ export async function fetchFollowingDynamicsUpdateCount(
   request: FollowingDynamicsRequest,
   isCurrentAccount: () => boolean,
 ) {
+  const startedAt = Date.now();
   function assertCurrent() {
     if (!isCurrentAccount()) {
       throw new BilibiliSessionChangedError();
@@ -145,7 +148,7 @@ export async function fetchFollowingDynamicsUpdateCount(
   try {
     const data = await request(buildFollowingDynamicsUpdateUrl(updateBaseline));
     assertCurrent();
-    return FollowingDynamicsUpdateCountSchema.parse(data);
+    return timestampPollResult(FollowingDynamicsUpdateCountSchema.parse(data), startedAt);
   } catch (error) {
     assertCurrent();
     throw error;
@@ -185,6 +188,7 @@ export async function fetchFollowingDynamicsNavUpdates(
   isCurrentAccount: () => boolean,
   options: { readBaseline?: string } = {},
 ): Promise<FollowingDynamicsNavBatch> {
+  const startedAt = Date.now();
   const readBaseline = options.readBaseline ?? "";
   const latestByMid: Record<string, string> = {};
   let offset = "";
@@ -224,7 +228,7 @@ export async function fetchFollowingDynamicsNavUpdates(
     offset = nextOffset;
   }
 
-  return { latestByMid, complete };
+  return timestampPollResult({ latestByMid, complete }, startedAt);
 }
 
 /** 动态 id_str 是超出 Number 安全范围的十进制字符串，只能按「长度 + 字典序」比较 */
@@ -253,13 +257,9 @@ function waitBeforeNextNavPage() {
  * - 手动标记的 unread 不会被合并覆盖，只有打开动态页或取消关注才清除；
  * - 暂时不在接口结果里的 UP 保持原状态，取消关注后才清理。
  */
-export function mergeFollowingDynamicsReadState(options: {
-  state: FollowingDynamicsReadState | undefined;
-  batch: FollowingDynamicsNavBatch;
-  followedMids?: ReadonlySet<string>;
-  /** 上次加载「动态」列表首屏时的最新动态 id，空字符串表示还没看过动态列表 */
-  readBaseline?: string;
-}): FollowingDynamicsReadState {
+export function mergeFollowingDynamicsReadState(
+  options: FollowingDynamicsReadMergeOptions,
+): FollowingDynamicsReadState {
   const { state, batch } = options;
   const readBaseline = options.readBaseline ?? "";
   const next: FollowingDynamicsReadState = { ...state };
@@ -277,15 +277,31 @@ export function mergeFollowingDynamicsReadState(options: {
       continue;
     }
     const existing = next[mid];
-    if (!existing) {
-      next[mid] =
-        readBaseline && isNewerFollowingDynamicId(idStr, readBaseline)
-          ? { latestId: idStr, readId: readBaseline }
-          : { latestId: idStr, readId: idStr };
+    if (!existing || (existing.latestId === "" && existing.unread !== true)) {
+      // 打开 UP 页时可能先写入只有 readAt 的标记，首次拿到动态仍按基线播种。
+      next[mid] = {
+        ...existing,
+        latestId: idStr,
+        readId:
+          readBaseline && isNewerFollowingDynamicId(idStr, readBaseline) ? readBaseline : idStr,
+      };
+      const observedAt = batch.observedAtByMid?.[mid] ?? options.observedAt;
+      if (observedAt != null && existing?.readAt != null && observedAt <= existing.readAt) {
+        next[mid] = { ...next[mid], readId: idStr };
+      }
       continue;
     }
     if (isNewerFollowingDynamicId(idStr, existing.latestId)) {
       next[mid] = { ...existing, latestId: idStr };
+    }
+    const observedAt = batch.observedAtByMid?.[mid] ?? options.observedAt;
+    if (
+      observedAt != null &&
+      existing.readAt != null &&
+      observedAt <= existing.readAt &&
+      isNewerFollowingDynamicId(idStr, existing.readId)
+    ) {
+      next[mid] = { ...next[mid], readId: idStr };
     }
   }
 
@@ -381,6 +397,7 @@ export function isSameFollowingDynamicsReadState(
     (mid) =>
       current[mid]?.latestId === next[mid]?.latestId &&
       current[mid]?.readId === next[mid]?.readId &&
+      current[mid]?.readAt === next[mid]?.readAt &&
       Boolean(current[mid]?.unread) === Boolean(next[mid]?.unread),
   );
 }

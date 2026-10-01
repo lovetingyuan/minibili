@@ -50,6 +50,7 @@ export function useFollowingDynamicItems() {
       [account.mid]: {
         baseline: latestId,
         count: 0,
+        readAt: Date.now(),
       },
     });
     methods.setFollowingDynamicsUpdateCount(0);

@@ -2,6 +2,7 @@
 
 import { UA } from "../constants";
 import {
+  BilibiliAuthExpiredError,
   isBilibiliAuthExpiredCode,
   reportBilibiliAuthExpired,
 } from "../features/bilibili-session/auth-expiration";
@@ -11,8 +12,10 @@ import encWbi from "../utils/wbi";
 import bilibiliFetch from "./bilibili-fetch";
 import { stringifyCommentOid } from "./comment-json.helpers";
 import { getWBIInfo } from "./user-nav";
+import type { RequestOptions } from "./request.types";
+export type { RequestOptions } from "./request.types";
 
-type ResponseType<D = any> = {
+type ResponseType<D = unknown> = {
   code: number;
   message: string;
   data: D;
@@ -30,8 +33,6 @@ class ApiError extends Error {
     this.code = res.code;
   }
 }
-
-export type RequestOptions = { withCookie?: boolean };
 
 /**
  * 从接口错误里取出 B站 的业务错误码（ApiError.code），
@@ -66,10 +67,7 @@ if (typeof __DEV__ === "undefined") {
   } catch {}
 }
 
-export default async function request<D>(
-  url: string,
-  requestOptions: RequestOptions = {},
-): Promise<D> {
+async function performRequest<D>(url: string, requestOptions: RequestOptions = {}): Promise<D> {
   let requestUrl = url.startsWith("http") ? url : `https://api.bilibili.com${url}`;
   if (__DEV__) {
     // oxlint-disable-next-line no-console
@@ -94,9 +92,10 @@ export default async function request<D>(
     method: "GET",
     mode: "cors",
     credentials: "include",
+    signal: requestOptions.signal,
   } satisfies Parameters<typeof fetch>[1];
   if (shouldSignWbiRequest(url)) {
-    const wbiImg = await getWBIInfo(request);
+    const wbiImg = await getWBIInfo((wbiUrl) => request(wbiUrl, requestOptions));
     const [_url, _query] = requestUrl.split("?");
     const params = new URLSearchParams(_query);
     const queryParams: Record<string, string> = {};
@@ -123,9 +122,16 @@ export default async function request<D>(
   //   })
   //   return objects.elems
   // }
-  let resText = await bilibiliFetch(requestUrl, options, requestOptions.withCookie !== false).then(
-    (r) => r.text(),
+  const response = await bilibiliFetch(
+    requestUrl,
+    options,
+    requestOptions.withCookie !== false,
+    requestOptions.cookie,
   );
+  if (!response.ok) {
+    throw new Error(`接口请求失败（HTTP ${response.status}）`);
+  }
+  let resText = await response.text();
   const index = resText.indexOf('}{"code":');
   if (index > -1) {
     resText = resText.substring(index + 1);
@@ -145,6 +151,9 @@ export default async function request<D>(
     // ignore
   }
   if (isBilibiliAuthExpiredCode(res.code)) {
+    if (requestOptions.silentAuthErrors) {
+      throw new BilibiliAuthExpiredError(res.code, res.message, url);
+    }
     const expired = reportBilibiliAuthExpired(res.code, res.message, url);
     if (url === NAV_URL) {
       // nav 无论登没登录都会返回 wbi_img，-101 只表示「没登录」而不是请求失败：
@@ -167,4 +176,23 @@ export default async function request<D>(
     return Promise.reject(new ApiError(`${res.code}:${res.message} ${url}`, url, res));
   }
   return res.data;
+}
+
+export default async function request<D>(
+  url: string,
+  requestOptions: RequestOptions = {},
+): Promise<D> {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  requestOptions.signal?.addEventListener("abort", abort);
+  if (requestOptions.signal?.aborted) {
+    abort();
+  }
+  const timeout = setTimeout(abort, 15000);
+  try {
+    return await performRequest<D>(url, { ...requestOptions, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+    requestOptions.signal?.removeEventListener("abort", abort);
+  }
 }

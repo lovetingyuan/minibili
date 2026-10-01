@@ -22,7 +22,7 @@ export function useFollowingDynamicsUpdates() {
       : null
     : null;
 
-  return useSWR<FollowingDynamicsUpdateCount, Error>(
+  const result = useSWR<FollowingDynamicsUpdateCount, Error>(
     key,
     () => {
       if (!account || !baseline) {
@@ -40,4 +40,5 @@ export function useFollowingDynamicsUpdates() {
       shouldRetryOnError: false,
     },
   );
+  return { ...result, baseline };
 }

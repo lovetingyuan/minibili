@@ -26,6 +26,8 @@ export type FollowingDynamicsNavBatch = {
   latestByMid: Record<string, string>;
   /** 是否已翻到 has_more=false（false 表示触到页数上限，还剩更旧的没拉） */
   complete: boolean;
+  /** 后台累计批次保留每个最新 id 首次被观察到的请求时间。 */
+  observedAtByMid?: Record<string, number>;
 };
 
 /**
@@ -37,7 +39,19 @@ export type FollowingDynamicsUpReadState = {
   latestId: string;
   readId: string;
   unread?: boolean;
+  /** 最近一次打开该 UP 动态页的时间。 */
+  readAt?: number;
 };
 
 /** 当前 B站账号下，每个 UP 的动态已读状态 */
 export type FollowingDynamicsReadState = Record<string, FollowingDynamicsUpReadState>;
+
+export type FollowingDynamicsReadMergeOptions = {
+  state: FollowingDynamicsReadState | undefined;
+  batch: FollowingDynamicsNavBatch;
+  followedMids?: ReadonlySet<string>;
+  /** 上次查看动态列表的最新动态 id，空字符串表示尚未查看。 */
+  readBaseline?: string;
+  /** 本轮请求开始时间，用于保护后续的已读操作。 */
+  observedAt?: number;
+};

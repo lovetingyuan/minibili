@@ -1,9 +1,12 @@
 import React from "react";
 
+import { getPollResultTime } from "@/api/poll-result-time";
 import {
-  isSameFollowingDynamicsReadState,
-  mergeFollowingDynamicsReadState,
-} from "@/api/following-dynamics";
+  applyNavResult,
+  getForegroundPollOwner,
+  isForegroundAccountCurrent,
+} from "@/features/background-updates/results";
+import { saveNavResult } from "@/features/background-updates/storage";
 import { useFollowingDynamicsNavUpdates } from "@/api/useFollowingDynamicsNavUpdates";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSessionState } from "@/features/bilibili-session/useBilibiliSession";
@@ -17,7 +20,7 @@ import { getStoreMethods, useStore } from "@/store";
 function FollowingDynamicsUnreadManager() {
   const { data } = useFollowingDynamicsNavUpdates();
   const session = useBilibiliSessionState();
-  const { initialed } = useStore();
+  const { initialed, followingsGeneration } = useStore();
   const account =
     initialed &&
     session.control.phase === "ready" &&
@@ -35,30 +38,17 @@ function FollowingDynamicsUnreadManager() {
     if (!data || !bilibiliSession.isCurrentAccount(account)) {
       return;
     }
-    const followedMids =
-      methods.getFollowingsGeneration() === account.generation
-        ? new Set(methods.get$followedUps().map((up) => String(up.mid)))
-        : undefined;
-    // 上次看「动态」列表时的最新动态：比它更新的动态说明用户还没在列表里见过，算未读
-    const readBaseline = methods.get$followingDynamicsUpdateMap()[account.mid]?.baseline ?? "";
-    methods.set$followingDynamicsReadMap((map) => {
-      const current = map[account.mid];
-      const next = mergeFollowingDynamicsReadState({
-        state: current,
-        batch: data,
-        followedMids,
-        readBaseline,
-      });
-      if (isSameFollowingDynamicsReadState(current, next)) {
-        return map;
-      }
-      return { ...map, [account.mid]: next };
-    });
-    methods.setFollowingDynamicsNavReadyAccount({
-      mid: account.mid,
-      generation: account.generation,
-    });
-  }, [account, data]);
+    if (!isForegroundAccountCurrent(account)) {
+      return;
+    }
+    void saveNavResult(getForegroundPollOwner(account), data, getPollResultTime(data))
+      .then((result) => {
+        if (result) {
+          applyNavResult(account, result.data, result.at);
+        }
+      })
+      .catch(() => applyNavResult(account, data, getPollResultTime(data)));
+  }, [account, data, followingsGeneration]);
 
   return null;
 }

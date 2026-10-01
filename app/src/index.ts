@@ -1,4 +1,5 @@
 import { registerRootComponent } from "expo";
+import "./features/background-updates/task";
 
 import App from "./App";
 import { showFatalError, showToast } from "./utils";

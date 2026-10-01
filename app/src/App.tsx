@@ -39,7 +39,6 @@ import { InitStoreComp } from "./store";
 import { ToastHost } from "./features/toast";
 
 let online = true;
-const focus = true;
 
 function captureRenderError(error: Error, componentStack: string) {
   if (!__DEV__) {
@@ -56,7 +55,7 @@ const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
   },
   dedupingInterval: 5000,
   isVisible() {
-    return focus;
+    return AppState.currentState === "active";
   },
   isOnline() {
     return online;
@@ -65,8 +64,7 @@ const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
     let appState = AppState.currentState;
 
     const subscription = AppState.addEventListener("change", (nextAppState) => {
-      online = nextAppState === "active";
-      if (appState.match(/inactive|background/) && online) {
+      if (appState.match(/inactive|background/) && nextAppState === "active") {
         callback();
       }
       appState = nextAppState;

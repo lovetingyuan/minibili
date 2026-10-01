@@ -1,29 +1,11 @@
 import * as Notifications from "expo-notifications";
-
-let initialization: Promise<void> | null = null;
-
-async function setupDownloadNotifications() {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
-}
+import { initNotifications } from "./handler";
 
 /**
  * 下载类通知共用同一个前台处理器，避免多个下载功能互相覆盖配置。
  */
 export function initDownloadNotifications() {
-  if (process.env.EXPO_OS !== "android" && process.env.EXPO_OS !== "ios") {
-    return Promise.resolve();
-  }
-  if (!initialization) {
-    initialization = setupDownloadNotifications().catch(() => undefined);
-  }
-  return initialization;
+  return initNotifications();
 }
 
 /**

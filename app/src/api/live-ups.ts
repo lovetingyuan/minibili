@@ -5,12 +5,15 @@ import { useBilibiliSessionState } from "../features/bilibili-session/useBilibil
 import fetcher from "./fetcher";
 import { LiveUpsDataSchema } from "./live-ups.schema";
 import type { LiveUpsData } from "./live-ups.schema";
+import type { FollowingDynamicsRequest } from "./following-dynamics.types";
+import { timestampPollResult } from "./poll-result-time";
 
 const LIVE_UPS_URL = "/x/polymer/web-dynamic/v1/live-up";
 
-export async function fetchLiveUps() {
-  const payload = await fetcher(LIVE_UPS_URL);
-  return LiveUpsDataSchema.parse(payload);
+export async function fetchLiveUps(request: FollowingDynamicsRequest = fetcher) {
+  const startedAt = Date.now();
+  const payload = await request(LIVE_UPS_URL);
+  return timestampPollResult(LiveUpsDataSchema.parse(payload), startedAt);
 }
 
 export function useLiveUps() {
