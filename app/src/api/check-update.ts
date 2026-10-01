@@ -1,11 +1,12 @@
 import * as Application from "expo-application";
+import he from "he";
 import useSWR from "swr";
 
 import { GhProxy, githubLink } from "@/constants";
 import { enqueueToast } from "@/features/toast";
 import { useStore } from "@/store";
 
-import { appReleaseResponseSchema } from "./check-update.schema";
+import { appReleaseSchema } from "./check-update.schema";
 import type { AppRelease, AvailableAppUpdate } from "./check-update.types";
 
 const RELEASE_NAME_PATTERN = /^minibili-(\d+(?:\.\d+)*)$/;
@@ -41,24 +42,15 @@ function getReleaseVersion(release: AppRelease) {
 }
 
 export function resolveAvailableAppUpdate(
-  releases: AppRelease[] | undefined,
+  latestRelease: AppRelease | null | undefined,
   currentVersion: string,
 ): AvailableAppUpdate | null {
-  let latestRelease: AppRelease | null = null;
-  let latestVersion: string | null = null;
-
-  for (const release of releases ?? []) {
-    const releaseVersion = getReleaseVersion(release);
-    if (!releaseVersion) {
-      continue;
-    }
-    if (!latestVersion || isVersionNewer(releaseVersion, latestVersion)) {
-      latestRelease = release;
-      latestVersion = releaseVersion;
-    }
+  if (!latestRelease) {
+    return null;
   }
+  const latestVersion = getReleaseVersion(latestRelease);
 
-  if (!latestRelease || !latestVersion || !isVersionNewer(latestVersion, currentVersion)) {
+  if (!latestVersion || !isVersionNewer(latestVersion, currentVersion)) {
     return null;
   }
 
@@ -66,23 +58,52 @@ export function resolveAvailableAppUpdate(
     release: latestRelease,
     currentVersion,
     latestVersion,
-    downloadLink: `${GhProxy}/${githubLink}/releases/download/v${latestVersion}/${latestRelease.version}.apk`,
+    downloadLink: `${GhProxy}/${latestRelease.downloadUrl}`,
   };
 }
 
-export async function fetchVersion() {
-  const response = await fetch(
-    "https://tingyuan.in/api/github/releases?user=lovetingyuan&repo=minibili&_t=" + Date.now(),
-  );
+export async function fetchVersion(): Promise<AppRelease | null> {
+  // latest 网页只跳转到正式的 Latest release，避免 REST API 限流。
+  const response = await fetch(`${githubLink}/releases/latest`);
+  if (response.status === 404) {
+    return null;
+  }
   if (!response.ok) {
     throw new Error("检查更新失败：" + response.status);
   }
 
-  const payload = appReleaseResponseSchema.parse(await response.json());
-  if (payload.code !== 0) {
-    throw new Error(payload.code + ":" + payload.message);
+  const tagPath = response.url.startsWith(`${githubLink}/releases/tag/`)
+    ? response.url.slice(`${githubLink}/releases/tag/`.length)
+    : "";
+  const version = /^v(\d+(?:\.\d+)*)$/.exec(tagPath)?.[1];
+  if (!version) {
+    throw new Error("最新正式版本的 tag 格式无效");
   }
-  return payload.data;
+  const releaseName = `minibili-${version}`;
+  const html = await response.text();
+  const assetsResponse = await fetch(`${githubLink}/releases/expanded_assets/v${version}`);
+  if (!assetsResponse.ok) {
+    throw new Error("检查更新失败：" + assetsResponse.status);
+  }
+  const assetsHtml = await assetsResponse.text();
+  const downloadPath = `/lovetingyuan/minibili/releases/download/v${version}/${releaseName}.apk`;
+  if (!assetsHtml.includes(`href="${downloadPath}"`)) {
+    throw new Error("最新正式版本缺少 APK 附件");
+  }
+  const body =
+    /<div\b[^>]*data-test-selector="body-content"[^>]*>([\s\S]*?)<\/div>/i.exec(html)?.[1] ?? "";
+  const changelog = he
+    .decode(
+      body
+        .replace(/<br\s*\/?>|<\/(?:p|li|h[1-6]|div|pre|blockquote)>/gi, "\n")
+        .replace(/<[^>]+>/g, ""),
+    )
+    .trim();
+  return appReleaseSchema.parse({
+    version: releaseName,
+    changelog,
+    downloadUrl: `https://github.com${downloadPath}`,
+  });
 }
 
 export function useAppUpdateInfo() {
@@ -90,12 +111,12 @@ export function useAppUpdateInfo() {
   const currentVersion = Application.nativeApplicationVersion ?? "0.0.0";
   const android = process.env.EXPO_OS === "android";
   const {
-    data: list,
+    data: latestRelease,
     isValidating,
     error,
     mutate,
-  } = useSWR(android ? "$check-app-update" : null, fetchVersion);
-  const availableUpdate = android ? resolveAvailableAppUpdate(list, currentVersion) : null;
+  } = useSWR(android ? "$check-app-update-latest-release" : null, fetchVersion);
+  const availableUpdate = android ? resolveAvailableAppUpdate(latestRelease, currentVersion) : null;
 
   function showUpdateDialog() {
     if (!availableUpdate) {
@@ -115,8 +136,8 @@ export function useAppUpdateInfo() {
       return;
     }
     try {
-      const releases = await mutate();
-      const refreshedUpdate = resolveAvailableAppUpdate(releases, currentVersion);
+      const release = await mutate();
+      const refreshedUpdate = resolveAvailableAppUpdate(release, currentVersion);
       if (refreshedUpdate) {
         set$checkAppUpdateTime(Date.now());
         setAppUpdateDialogVisible(true);
@@ -132,7 +153,7 @@ export function useAppUpdateInfo() {
     currentVersion,
     availableUpdate,
     hasUpdate: availableUpdate !== null,
-    changeList: list,
+    changeList: latestRelease ? [latestRelease] : [],
     loading: isValidating,
     error,
     showUpdateDialog,
