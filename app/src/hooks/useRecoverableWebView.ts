@@ -134,6 +134,8 @@ export function useRecoverableWebView(
       return;
     }
 
+    // 检测只用于恢复前台页面。再次切后台后不能超时重建并触发网页自动播放。
+    clearPendingHealthCheck();
     if (backgroundStartAtRef.current === null) {
       backgroundStartAtRef.current = Date.now();
     }

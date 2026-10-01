@@ -1,3 +1,5 @@
+import { LIVE_PLAYBACK_BRIDGE_SCRIPT } from './playback-bridge'
+
 function __$hack() {
   if (window.__minibiliLiveHackInitialized) {
     return
@@ -383,13 +385,19 @@ function __$hack() {
           backplay.id = 'live-background-button'
           backplay.addEventListener('click', evt => {
             evt.stopPropagation()
-            const controller = window.__minibiliLiveBackgroundPlayback
-            if (!controller) {
-              return
-            }
-            backplay.dataset.backgroundPlay = controller.toggle() ? 'true' : 'false'
+            window.__minibiliLivePlayback?.request()
           })
           liveInfo.appendChild(backplay)
+
+          const mute = document.createElement('span')
+          mute.id = 'live-mute-button'
+          mute.textContent = '静音'
+          mute.style.cssText = 'font-size: 12px; color: white; margin: 0 8px;'
+          mute.addEventListener('click', evt => {
+            evt.stopPropagation()
+            window.__minibiliLivePlayback?.requestMute()
+          })
+          liveInfo.appendChild(mute)
         })
       }
     })
@@ -436,282 +444,6 @@ function __$hack() {
 }
 
 function __$injectBefore() {
-  const createBackgroundPlaybackController = () => {
-    let enabled = false
-    let worker = null
-    let watchdogTimer = null
-    let videoObserver = null
-    let observedVideo = null
-    let audioContext = null
-    let audioOscillator = null
-    let audioGain = null
-    let restoreMuteTimer = null
-    const playbackInterruptionEvents = ['pause', 'stalled', 'suspend', 'waiting', 'emptied']
-
-    const scheduleMuteRestore = (video, muted) => {
-      if (restoreMuteTimer !== null) {
-        window.clearTimeout(restoreMuteTimer)
-      }
-      restoreMuteTimer = window.setTimeout(() => {
-        video.muted = muted
-        restoreMuteTimer = null
-      }, 100)
-    }
-
-    const retryMuted = (video, muted) => {
-      video.muted = true
-      try {
-        const retry = video.play()
-        if (retry && typeof retry.then === 'function') {
-          retry.then(
-            () => scheduleMuteRestore(video, muted),
-            () => scheduleMuteRestore(video, muted),
-          )
-          return
-        }
-      } catch {}
-      scheduleMuteRestore(video, muted)
-    }
-
-    const handlePlaybackInterruption = () => {
-      if (enabled) {
-        resumeVideo()
-      }
-    }
-
-    const getVideo = () => {
-      const video = document.querySelector('video')
-      if (video === observedVideo) {
-        return video
-      }
-      if (observedVideo) {
-        playbackInterruptionEvents.forEach(event => {
-          observedVideo.removeEventListener(event, handlePlaybackInterruption)
-        })
-      }
-      observedVideo = video
-      if (observedVideo) {
-        playbackInterruptionEvents.forEach(event => {
-          observedVideo.addEventListener(event, handlePlaybackInterruption)
-        })
-      }
-      return observedVideo
-    }
-
-    function resumeVideo() {
-      if (!enabled) {
-        return
-      }
-      const video = getVideo()
-      if (!video || !video.paused || video.ended) {
-        return
-      }
-
-      const muted = video.muted
-      try {
-        const play = video.play()
-        if (play && typeof play.catch === 'function') {
-          play.catch(() => retryMuted(video, muted))
-        }
-      } catch {
-        retryMuted(video, muted)
-      }
-    }
-
-    const startVideoObserver = () => {
-      getVideo()
-      if (videoObserver || typeof window.MutationObserver !== 'function') {
-        return
-      }
-      const root = document.documentElement || document.body
-      if (!root) {
-        return
-      }
-      videoObserver = new window.MutationObserver(() => {
-        getVideo()
-        if (enabled && document.hidden) {
-          resumeVideo()
-        }
-      })
-      videoObserver.observe(root, { childList: true, subtree: true })
-    }
-
-    const stopVideoObserver = () => {
-      videoObserver?.disconnect()
-      videoObserver = null
-      if (observedVideo) {
-        playbackInterruptionEvents.forEach(event => {
-          observedVideo.removeEventListener(event, handlePlaybackInterruption)
-        })
-      }
-      observedVideo = null
-    }
-
-    const startAudioKeepAlive = () => {
-      const AudioContext = window.AudioContext || window.webkitAudioContext
-      if (typeof AudioContext !== 'function') {
-        return
-      }
-      try {
-        if (!audioContext) {
-          audioContext = new AudioContext()
-          audioOscillator = audioContext.createOscillator()
-          audioGain = audioContext.createGain()
-          audioOscillator.frequency.value = 20
-          audioGain.gain.value = 0.0001
-          audioOscillator.connect(audioGain)
-          audioGain.connect(audioContext.destination)
-          audioOscillator.start()
-        }
-        if (audioContext.state === 'suspended') {
-          audioContext.resume().catch(() => {})
-        }
-      } catch {}
-    }
-
-    const stopAudioKeepAlive = () => {
-      try {
-        audioOscillator?.stop()
-      } catch {}
-      try {
-        audioContext?.close().catch(() => {})
-      } catch {}
-      audioOscillator = null
-      audioGain = null
-      audioContext = null
-    }
-
-    const updateMediaSession = () => {
-      try {
-        if (window.navigator?.mediaSession) {
-          window.navigator.mediaSession.playbackState = enabled ? 'playing' : 'none'
-        }
-      } catch {}
-    }
-
-    const getWorker = () => {
-      if (worker) {
-        return worker
-      }
-      if (
-        typeof window.Worker !== 'function' ||
-        typeof window.Blob !== 'function' ||
-        typeof window.URL?.createObjectURL !== 'function'
-      ) {
-        return null
-      }
-
-      let workerUrl = ''
-      try {
-        const source = `
-          let timer = null;
-          self.onmessage = (event) => {
-            if (event.data === "start") {
-              self.clearInterval(timer);
-              timer = self.setInterval(() => self.postMessage("tick"), 1000);
-            }
-            if (event.data === "stop") {
-              self.clearInterval(timer);
-              timer = null;
-            }
-          };
-        `
-        workerUrl = window.URL.createObjectURL(
-          new window.Blob([source], { type: 'text/javascript' }),
-        )
-        worker = new window.Worker(workerUrl)
-        worker.onmessage = resumeVideo
-      } catch {
-        worker = null
-      } finally {
-        if (workerUrl && typeof window.URL.revokeObjectURL === 'function') {
-          window.URL.revokeObjectURL(workerUrl)
-        }
-      }
-      return worker
-    }
-
-    const startWorker = () => {
-      resumeVideo()
-      getWorker()?.postMessage('start')
-    }
-
-    const stopWorker = () => {
-      worker?.postMessage('stop')
-    }
-
-    const startWatchdog = () => {
-      if (watchdogTimer === null) {
-        watchdogTimer = window.setInterval(resumeVideo, 1000)
-      }
-    }
-
-    const stopWatchdog = () => {
-      if (watchdogTimer !== null) {
-        window.clearInterval(watchdogTimer)
-        watchdogTimer = null
-      }
-    }
-
-    const startKeepAlive = () => {
-      startWorker()
-      startWatchdog()
-      startAudioKeepAlive()
-    }
-
-    const stopKeepAlive = () => {
-      stopWorker()
-      stopWatchdog()
-    }
-
-    const setEnabled = nextEnabled => {
-      enabled = Boolean(nextEnabled)
-      updateMediaSession()
-      if (enabled) {
-        startVideoObserver()
-        startAudioKeepAlive()
-      }
-      if (enabled && document.hidden) {
-        startKeepAlive()
-      } else {
-        stopKeepAlive()
-        if (enabled) {
-          resumeVideo()
-        } else {
-          stopVideoObserver()
-          stopAudioKeepAlive()
-        }
-      }
-      return enabled
-    }
-
-    window.addEventListener(
-      'visibilitychange',
-      event => {
-        if (!enabled) {
-          return
-        }
-        event.stopImmediatePropagation()
-        if (document.hidden) {
-          startKeepAlive()
-        } else {
-          stopKeepAlive()
-          startAudioKeepAlive()
-          resumeVideo()
-        }
-      },
-      true,
-    )
-
-    return {
-      isEnabled: () => enabled,
-      setEnabled,
-      toggle: () => setEnabled(!enabled),
-    }
-  }
-
-  window.__minibiliLiveBackgroundPlayback ??= createBackgroundPlaybackController()
-
   // 直播间网页里部分图片（大表情、点赞图标等）的地址是 http://，
   // 而 WebView 会拦截 https 页面里的 http 子资源（混合内容），这些图片就一直加载失败。
   // 这里在图片发起请求前把地址换成 https，已经失败的再用 https 兜底重试一次。
@@ -911,5 +643,5 @@ function __$injectBefore() {
   }
 }
 
-export const INJECTED_JAVASCRIPT = `(${__$hack})(${__DEV__});true;`
-export const INJECTED_JAVASCRIPT_BEFORE = `(${__$injectBefore})(${__DEV__});true;`
+export const INJECTED_JAVASCRIPT = `${LIVE_PLAYBACK_BRIDGE_SCRIPT}(${__$hack})(${__DEV__});true;`
+export const INJECTED_JAVASCRIPT_BEFORE = `${LIVE_PLAYBACK_BRIDGE_SCRIPT}(${__$injectBefore})(${__DEV__});true;`

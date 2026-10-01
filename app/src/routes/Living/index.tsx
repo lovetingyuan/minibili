@@ -1,26 +1,23 @@
-import { useBackHandler } from "@react-native-community/hooks";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Text } from "@/components/styled/rneui";
 import UpName from "@/components/UpName";
-import { useVideoPlayer, VideoView } from "expo-video";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BilibiliWebView from "@/components/BilibiliWebView";
-import { withUniwind } from "uniwind";
 
 import bilibiliFetch from "@/api/bilibili-fetch";
-import useLiveUrl from "@/api/get-live-url";
 import { theme } from "@/constants/theme";
 import { useLiveUpsRefresh } from "@/hooks/useLiveUpsRefresh";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
 
 import { UA } from "../../constants";
-import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
 import HeaderRight from "./HeaderRight";
 import { INJECTED_JAVASCRIPT, INJECTED_JAVASCRIPT_BEFORE } from "./inject-code";
+import { getLiveRoomId, parseLiveWebViewMessage } from "./live-playback-message";
+import type { LivePageProps } from "./live-playback.types";
+import { useLiveBackgroundPlayback } from "./useLiveBackgroundPlayback";
 
 function Loading() {
   return (
@@ -34,79 +31,7 @@ function Loading() {
   );
 }
 
-type Props = NativeStackScreenProps<RootStackParamList, "Living">;
-const StyledVideoView = withUniwind(VideoView) as unknown as React.ComponentType<
-  React.ComponentProps<typeof VideoView> & { className?: string }
->;
-
-type LiveWebViewMessage =
-  | {
-      action: "enable-background-play";
-    }
-  | {
-      action: "update-live-info";
-      payload: {
-        url: string;
-        callback: string;
-      };
-    };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function parseUpdateLiveInfoPayload(data: string) {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(data);
-  } catch {
-    return null;
-  }
-
-  if (isRecord(parsed) && typeof parsed.url === "string" && typeof parsed.callback === "string") {
-    return {
-      url: parsed.url,
-      callback: parsed.callback,
-    };
-  }
-
-  return null;
-}
-
-function parseLiveWebViewMessage(data: string): LiveWebViewMessage | null {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(data);
-  } catch {
-    return null;
-  }
-
-  if (!isRecord(parsed) || typeof parsed.action !== "string") {
-    return null;
-  }
-
-  if (parsed.action === "enable-background-play") {
-    return {
-      action: parsed.action,
-    };
-  }
-
-  if (parsed.action === "update-live-info" && typeof parsed.payload === "string") {
-    const payload = parseUpdateLiveInfoPayload(parsed.payload);
-    if (!payload) {
-      return null;
-    }
-
-    return {
-      action: parsed.action,
-      payload,
-    };
-  }
-
-  return null;
-}
-
-function LiveWebPage({ route }: Props) {
+function LiveWebPage({ route }: LivePageProps) {
   const { url, title: pageTitle } = route.params;
 
   const {
@@ -139,57 +64,11 @@ function LiveWebPage({ route }: Props) {
     ),
   });
   const insets = useSafeAreaInsets();
-  const [enableBackgroundPlay, setEnableBackgroundPlay] = React.useState(false);
-  const roomId = url.startsWith("https://live.bilibili.com/h5/") ? url.split("/")[4] : "";
-  const liveUrls = useLiveUrl(enableBackgroundPlay ? roomId : "");
-  const resolvedLiveUrls = liveUrls ?? [];
-  const [validIndex, setValidIndex] = React.useState(1);
-  const backPlay = enableBackgroundPlay && roomId && liveUrls?.length;
-  const liveUrl = backPlay ? resolvedLiveUrls[validIndex] : "";
-  const player = useVideoPlayer(
-    liveUrl
-      ? {
-          uri: liveUrl,
-          headers: {
-            "user-agent": UA,
-            origin: "https://live.bilibili.com",
-            referer: "https://live.bilibili.com",
-          },
-        }
-      : null,
-    (currentPlayer) => {
-      currentPlayer.audioMixingMode = "doNotMix";
-      currentPlayer.staysActiveInBackground = true;
-      currentPlayer.showNowPlayingNotification = true;
-      currentPlayer.play();
-    },
-  );
-
-  React.useEffect(() => {
-    const subscription = player.addListener("statusChange", ({ error, status }) => {
-      if (status !== "error" || !liveUrl) {
-        return;
-      }
-
-      showToast(`抱歉出错了${error?.message ?? ""}`);
-      if (validIndex < resolvedLiveUrls.length - 1) {
-        setValidIndex((index) => index + 1);
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [liveUrl, player, resolvedLiveUrls.length, validIndex]);
-
-  useBackHandler(() => {
-    if (backPlay) {
-      // handle it
-      setEnableBackgroundPlay(false);
-      return true;
-    }
-    // let the default thing happen
-    return false;
+  const roomId = getLiveRoomId(url);
+  const { handlePlaybackMessage } = useLiveBackgroundPlayback({
+    roomId,
+    title: route.params.user?.name || pageTitle,
+    webViewRef,
   });
 
   /**
@@ -210,28 +89,6 @@ function LiveWebPage({ route }: Props) {
     syncDanmakuBottomInset();
   }, [insets.bottom, webViewKey]);
 
-  if (backPlay) {
-    return (
-      <View className="relative flex flex-1">
-        <StyledVideoView
-          player={player}
-          nativeControls
-          contentFit="contain"
-          className="min-h-96 h-full w-full"
-        />
-        <View className="absolute left-2 top-2 flex-row items-center gap-4">
-          {/* <Button
-            title={' 返回 '}
-            size="sm"
-            onPress={() => {
-              setEnableBackgroundPlay(false)
-            }}
-          /> */}
-          <Text>当前支持后台播放</Text>
-        </View>
-      </View>
-    );
-  }
   return (
     <BilibiliWebView
       className="flex-1"
@@ -265,12 +122,15 @@ function LiveWebPage({ route }: Props) {
           return;
         }
 
-        if (data.action === "enable-background-play") {
-          setEnableBackgroundPlay(true);
+        if (handlePlaybackMessage(data)) {
+          return;
         }
 
         if (data.action === "update-live-info") {
           const { url, callback } = data.payload;
+          if (getLiveRoomId(url) !== roomId) {
+            return;
+          }
           bilibiliFetch(url, {
             headers: { "user-agent": UA },
           })
@@ -281,7 +141,8 @@ function LiveWebPage({ route }: Props) {
               const index2 = html2.indexOf("</script>");
               const html3 = html2.substring(0, index2);
               webViewRef.current?.injectJavaScript(`window.${callback}(${html3});`);
-            });
+            })
+            .catch(() => {});
         }
       }}
       onError={() => {
