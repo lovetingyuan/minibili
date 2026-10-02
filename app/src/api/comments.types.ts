@@ -49,3 +49,15 @@ export type CommentsPage = {
   replies: CommentItemType[];
   ownerMid: string;
 };
+
+/**
+ * 评论分页的 SWR key：`[url, page]`。
+ * 服务端翻页时经常连续返回同一个 next_offset（要再请求一次才向后推进），
+ * 只拿 url 当 key 会把新的一页当成上一页的缓存，页码用于区分每一页。
+ */
+export type CommentsKey = readonly [url: string, page: number];
+
+export type CommentsKeyLoader = (
+  index: number,
+  previous: CommentsPage | null,
+) => CommentsKey | null;

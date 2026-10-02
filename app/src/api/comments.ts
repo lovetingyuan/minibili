@@ -11,6 +11,7 @@ import type {
 import type {
   CommentItemType,
   CommentMessageContent,
+  CommentsKeyLoader,
   CommentsPage,
   ReplyItemType,
 } from "./comments.types";
@@ -263,19 +264,20 @@ export function removeCommentFromPages(
 
 export function useComments(oid: string | number, type: number, mode = 3) {
   const { data, error, size, setSize, mutate, isValidating, isLoading } =
-    useSWRInfinite<CommentsPage>(
+    useSWRInfinite<CommentsPage, Error, CommentsKeyLoader>(
       (index, previousPageData) => {
         if (index > 0 && !previousPageData) {
           return null;
         }
-        return getCommentsPageUrl(
+        const url = getCommentsPageUrl(
           oid,
           type,
           mode,
           index === 0 ? undefined : previousPageData?.cursor,
         );
+        return url ? [url, index] : null;
       },
-      (url: string) => fetchCommentsPage(url, type),
+      ([url]) => fetchCommentsPage(url, type),
       { revalidateFirstPage: false },
     );
 
