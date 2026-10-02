@@ -80,10 +80,12 @@ export function useReplies() {
       },
       { revalidate: false },
     );
+    await mutate();
   }
 
   async function removeReply(id: string) {
     await mutate((pages) => removeReplyFromPages(pages, id), { revalidate: false });
+    await mutate();
   }
 
   return {

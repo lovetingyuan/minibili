@@ -311,14 +311,17 @@ export function useComments(oid: string | number, type: number, mode = 3) {
         })),
       { revalidate: false },
     );
+    await mutate();
   }
 
   async function prependComment(comment: ReplyItemType) {
     await mutate((pages) => prependCommentToPages(pages, comment), { revalidate: false });
+    await mutate();
   }
 
   async function removeComment(target: Pick<ReplyItemType, "id" | "root">) {
     await mutate((pages) => removeCommentFromPages(pages, target), { revalidate: false });
+    await mutate();
   }
 
   return {
