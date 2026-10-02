@@ -28,7 +28,8 @@ export function invalidateDanmakuSegment(cid: number, index: number) {
 }
 
 async function requestDanmakuSegment(cid: number, index: number) {
-  const url = `https://api.bilibili.com/x/v2/dm/web/seg.so?type=1&oid=${cid}&segment_index=${index}`;
+  // 本地缓存下标从 0 开始，B站接口的 segment_index 从 1 开始。
+  const url = `https://api.bilibili.com/x/v2/dm/web/seg.so?type=1&oid=${cid}&segment_index=${index + 1}`;
   const headers = createBilibiliRequestHeaders(
     url,
     {
@@ -38,16 +39,26 @@ async function requestDanmakuSegment(cid: number, index: number) {
     },
     await getCookie(),
   );
-  const response = await expoFetch(url, { headers });
-  // 越界的分段会返回 304，按空分段处理
-  if (response.status === 304 || response.status === 404) {
-    return [] as DanmakuItem[];
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await expoFetch(url, { headers, signal: controller.signal });
+    // 越界的分段会返回 304，按空分段处理
+    if (response.status === 304 || response.status === 404) {
+      return [] as DanmakuItem[];
+    }
+    if (response.status !== 200) {
+      throw new Error(`弹幕分段请求失败：${response.status}`);
+    }
+    const buffer = await response.arrayBuffer();
+    // 业务错误可能以 HTTP 200 + JSON 返回，不能永久缓存成空弹幕。
+    if (new Uint8Array(buffer)[0] === 0x7b) {
+      throw new Error("弹幕分段返回异常数据");
+    }
+    return decodeDanmakuSegment(new Uint8Array(buffer), [1, 2, 3, 4, 5]);
+  } finally {
+    clearTimeout(timeout);
   }
-  if (response.status !== 200) {
-    throw new Error(`弹幕分段请求失败：${response.status}`);
-  }
-  const buffer = await response.arrayBuffer();
-  return decodeDanmakuSegment(new Uint8Array(buffer));
 }
 
 /**
@@ -61,7 +72,9 @@ export function fetchDanmakuSegment(cid: number, index: number): Promise<Danmaku
   }
 
   const task = requestDanmakuSegment(cid, index).catch((error: unknown) => {
-    segmentCache.delete(key);
+    if (segmentCache.get(key) === task) {
+      segmentCache.delete(key);
+    }
     throw error;
   });
   segmentCache.set(key, task);

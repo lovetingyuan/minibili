@@ -85,7 +85,7 @@ function HeaderLeft() {
   }
 
   return (
-    <View className="left-[-12px] mr-4 flex-none flex-row items-center">
+    <View className="-left-3 mr-4 flex-none flex-row items-center">
       {dynamicUser?.face ? (
         <View className="relative">
           <Avatar

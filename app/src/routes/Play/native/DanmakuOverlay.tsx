@@ -11,32 +11,10 @@ import {
   resolveDanmakuAnimation,
   resolveDanmakuLayout,
   selectVisibleDanmaku,
-  type DanmakuLayout,
-  type DanmakuRenderItem,
 } from "./danmaku-track";
+import type { DanmakuLayout, DanmakuRenderItem } from "./danmaku-track.types";
+import type { DanmakuItemViewProps, DanmakuOverlayProps } from "./danmaku-overlay.types";
 import { useDanmakuFeed } from "./use-danmaku-feed";
-
-type DanmakuOverlayProps = {
-  cid: number;
-  enabled: boolean;
-  isPlaying: boolean;
-  currentTimeMs: number;
-  /**
-   * 弹幕从这一刻开始渲染，更早的弹幕不再补画（跳转、续播、开关弹幕时更新）
-   */
-  anchorTimeMs: number;
-  /**
-   * 播放倍速，弹幕位移跟随倍速
-   */
-  playbackRate: number;
-  width: number;
-  height: number;
-  fontSize?: number;
-  /**
-   * 本地回显的弹幕（自己刚发送的那条），与网络弹幕共用轨道避免重叠
-   */
-  localItems?: DanmakuItem[];
-};
 
 // 默认值保持同一引用，避免每次渲染都重算轨道表
 const EMPTY_LOCAL_ITEMS: DanmakuItem[] = [];
@@ -77,11 +55,7 @@ function getDanmakuItems(items: DanmakuItem[], localItems: DanmakuItem[]) {
   return merged;
 }
 
-function DanmakuItemView(props: {
-  item: DanmakuRenderItem;
-  isPlaying: boolean;
-  playbackRate: number;
-}) {
+function DanmakuItemView(props: DanmakuItemViewProps) {
   const { item, isPlaying, playbackRate } = props;
   // 挂载时按当前播放进度定位，暂停状态下进入的弹幕也能停在正确位置
   const [translateX] = React.useState(() => new Animated.Value(item.currentX));
@@ -90,6 +64,7 @@ function DanmakuItemView(props: {
   React.useEffect(() => {
     if (!isPlaying) {
       translateX.stopAnimation();
+      translateX.setValue(itemRef.current.currentX);
       return;
     }
 
@@ -122,10 +97,13 @@ function DanmakuItemView(props: {
         position: "absolute",
         left: 0,
         top: item.top,
+        // 屏外挂载时也保留单行文本宽度，避免受父容器剩余宽度影响而折行。
+        width: item.textWidth + item.fontSize,
         transform: [{ translateX }],
       }}
     >
       <Text
+        numberOfLines={1}
         style={{
           color: item.color,
           fontSize: item.fontSize,
@@ -141,28 +119,37 @@ function DanmakuItemView(props: {
 }
 
 export default function DanmakuOverlay(props: DanmakuOverlayProps) {
-  const { cid, enabled, isPlaying, currentTimeMs, anchorTimeMs, playbackRate, width, height } =
-    props;
+  const {
+    cid,
+    enabled,
+    isPlaying,
+    currentTimeMs,
+    durationMs,
+    anchorTimeMs,
+    playbackRate,
+    width,
+    height,
+  } = props;
   const fontSize = props.fontSize ?? DANMAKU_DEFAULT_FONTSIZE;
   const localItems = props.localItems ?? EMPTY_LOCAL_ITEMS;
-  const { items } = useDanmakuFeed({ cid, enabled, currentTimeMs });
+  const { items } = useDanmakuFeed({ cid, enabled, currentTimeMs, durationMs });
 
   const mergedItems = getDanmakuItems(items, localItems);
   const layout = getDanmakuLayout(mergedItems, width, height, fontSize);
   const visibleItems =
     enabled && width > 0 && height > 0
-      ? selectVisibleDanmaku(mergedItems, layout, { currentTimeMs, anchorTimeMs })
+      ? selectVisibleDanmaku(mergedItems, layout, { currentTimeMs })
       : EMPTY_VISIBLE_ITEMS;
 
   if (!enabled) {
     return null;
   }
 
-  // 容器尺寸变化（切全屏、旋转）后重建弹幕视图，避免残留旧坐标
-  const geometryKey = `${width}x${height}x${fontSize}`;
+  // 跳转、切换分P或容器尺寸变化后重建视图，避免复用已走到屏外的动画。
+  const geometryKey = `${cid}#${anchorTimeMs}#${width}x${height}x${fontSize}`;
 
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+    <View pointerEvents="none" className="overflow-hidden" style={StyleSheet.absoluteFill}>
       {visibleItems.map((item) => (
         <DanmakuItemView
           key={`${item.key}#${geometryKey}`}

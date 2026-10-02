@@ -20,7 +20,7 @@ function Header() {
       >
         <Image
           source={require('../../../assets/minibili.png')}
-          className="aspect-[33/10] h-auto w-[85%]"
+          className="aspect-33/10 h-auto w-[85%]"
         />
       </Pressable>
       <View className="mb-2 flex-row items-center justify-between">

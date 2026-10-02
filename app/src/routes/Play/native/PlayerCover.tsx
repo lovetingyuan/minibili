@@ -49,7 +49,7 @@ export default function PlayerCover(props: PlayerCoverProps) {
           </Text>
         ) : null}
         {isMetered ? (
-          <Text className="rounded bg-gray-900/60 px-2 py-[2px] font-bold text-white">
+          <Text className="rounded bg-gray-900/60 px-2 py-0.5 font-bold text-white">
             播放将消耗流量
           </Text>
         ) : null}

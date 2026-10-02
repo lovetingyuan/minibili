@@ -1,27 +1,26 @@
-import { useRefresh } from "@react-native-community/hooks";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useRefresh } from '@react-native-community/hooks'
+import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 // import { Text } from '@/components/styled/rneui'
 // import { ResizeMode, Video } from 'expo-av'
-import React from "react";
+import React from 'react'
 import {
   ActivityIndicator,
   RefreshControl,
   ScrollView,
-  useColorScheme,
   useWindowDimensions,
   View,
-} from "react-native";
-import BilibiliWebView from "@/components/BilibiliWebView";
-import { theme } from "@/constants/theme";
+} from 'react-native'
+import BilibiliWebView from '@/components/BilibiliWebView'
+import { theme } from '@/constants/theme'
 
 // import useLiveUrl from '@/api/get-live-url'
-import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
-import useUpdateNavigationOptions from "@/hooks/useUpdateNavigationOptions";
+import { useRecoverableWebView } from '@/hooks/useRecoverableWebView'
+import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
-import type { RootStackParamList } from "../../types";
-import { showToast } from "../../utils";
-import HeaderRight from "./HeaderRight";
-import { INJECTED_JAVASCRIPT } from "./inject-code";
+import type { RootStackParamList } from '../../types'
+import { showToast } from '../../utils'
+import HeaderRight from './HeaderRight'
+import { INJECTED_JAVASCRIPT } from './inject-code'
 
 function Loading() {
   return (
@@ -32,40 +31,40 @@ function Loading() {
         colorClassName={theme.secondary.accent}
       />
     </View>
-  );
+  )
 }
 
-type Props = NativeStackScreenProps<RootStackParamList, "WebPage">;
+type Props = NativeStackScreenProps<RootStackParamList, 'WebPage'>
 
 type WebPageMessage = {
-  action: "set-title";
-  payload: string;
-};
+  action: 'set-title'
+  payload: string
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+  return typeof value === 'object' && value !== null
 }
 
 function parseWebPageMessage(data: string): WebPageMessage | null {
-  let parsed: unknown;
+  let parsed: unknown
   try {
-    parsed = JSON.parse(data);
+    parsed = JSON.parse(data)
   } catch {
-    return null;
+    return null
   }
 
-  if (isRecord(parsed) && parsed.action === "set-title" && typeof parsed.payload === "string") {
+  if (isRecord(parsed) && parsed.action === 'set-title' && typeof parsed.payload === 'string') {
     return {
       action: parsed.action,
       payload: parsed.payload,
-    };
+    }
   }
 
-  return null;
+  return null
 }
 
 function WebPage({ route }: Props) {
-  const { url, title } = route.params;
+  const { url, title } = route.params
 
   const {
     webViewRef,
@@ -74,26 +73,25 @@ function WebPage({ route }: Props) {
     handleWebViewMessage,
     handleRenderProcessGone,
     handleContentProcessDidTerminate,
-  } = useRecoverableWebView();
-  const isDark = useColorScheme() === "dark";
-  const { height: screenHeight } = useWindowDimensions();
-  const [height, setHeight] = React.useState(screenHeight);
-  const [isEnabled, setEnabled] = React.useState(true);
-  const pullToRefreshEnabledRef = React.useRef(true);
-  const [pageTitle, setPageTitle] = React.useState(title);
+  } = useRecoverableWebView()
+  const { height: screenHeight } = useWindowDimensions()
+  const [height, setHeight] = React.useState(screenHeight)
+  const [isEnabled, setEnabled] = React.useState(true)
+  const pullToRefreshEnabledRef = React.useRef(true)
+  const [pageTitle, setPageTitle] = React.useState(title)
   const { isRefreshing, onRefresh } = useRefresh(() => {
-    return new Promise<void>((r) => {
-      remountWebView();
-      setTimeout(r, 1000);
-    });
-  });
+    return new Promise<void>(r => {
+      remountWebView()
+      setTimeout(r, 1000)
+    })
+  })
 
   useUpdateNavigationOptions({
     headerRight: () => {
-      return <HeaderRight reload={onRefresh} />;
+      return <HeaderRight reload={onRefresh} />
     },
     headerTitle: pageTitle,
-  });
+  })
 
   const webview = (
     <BilibiliWebView
@@ -101,22 +99,21 @@ function WebPage({ route }: Props) {
       style={{ height }}
       source={{ uri: url }}
       key={webViewKey}
-      onScroll={(e) => {
+      onScroll={e => {
         // 滚动回调每秒触发几十次，仅在「是否回到顶部」真正翻转时才更新状态，避免整屏重渲染
-        const nextEnabled = e.nativeEvent.contentOffset.y === 0;
+        const nextEnabled = e.nativeEvent.contentOffset.y === 0
         if (pullToRefreshEnabledRef.current !== nextEnabled) {
-          pullToRefreshEnabledRef.current = nextEnabled;
+          pullToRefreshEnabledRef.current = nextEnabled
           // react-doctor-disable-next-line react-doctor/rn-no-scroll-state
-          setEnabled(nextEnabled);
+          setEnabled(nextEnabled)
         }
       }}
-      originWhitelist={["http://*", "https://*", "bilibili://*"]}
+      originWhitelist={['http://*', 'https://*', 'bilibili://*']}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
       allowsInlineMediaPlayback
       startInLoadingState
       pullToRefreshEnabled
-      applicationNameForUserAgent={"BILIBILI/8.0.0"}
       // allowsBackForwardNavigationGestures
       mediaPlaybackRequiresUserAction={false}
       webviewDebuggingEnabled={__DEV__}
@@ -124,63 +121,42 @@ function WebPage({ route }: Props) {
       renderLoading={() => <Loading />}
       userAgent=""
       ref={webViewRef}
-      onMessage={(evt) => {
+      onMessage={evt => {
         if (handleWebViewMessage(evt.nativeEvent.data)) {
-          return;
+          return
         }
 
-        const data = parseWebPageMessage(evt.nativeEvent.data);
+        const data = parseWebPageMessage(evt.nativeEvent.data)
         if (!data) {
-          return;
+          return
         }
 
-        if (data.action === "set-title" && !title) {
-          setPageTitle(data.payload);
-        }
-      }}
-      onLoad={() => {
-        if (isDark) {
-          webViewRef.current?.injectJavaScript(`
-        const style = document.createElement('style');
-        style.textContent = \`
-        body {background-color: #222; color: #ccc; }
-        .reply-item {
-            border-color: black;
-        }
-        .reply-item .info .content {
-          color: #ccc;
-        }
-        .reply-item .info .name .left .uname {
-            color: #ddd;
-        }
-        \`;
-        document.head.appendChild(style);
-      true;
-   `);
+        if (data.action === 'set-title' && !title) {
+          setPageTitle(data.payload)
         }
       }}
       onError={() => {
-        showToast("加载失败");
+        showToast('加载失败')
       }}
-      onShouldStartLoadWithRequest={(request) => {
-        if (request.url.startsWith("bilibili://")) {
+      onShouldStartLoadWithRequest={request => {
+        if (request.url.startsWith('bilibili://')) {
           // Linking.openURL(request.url).catch(err => {
           //   __DEV__ && console.error(err)
           // })
-          return false;
+          return false
         }
-        if (request.url.includes(".apk")) {
-          return false;
+        if (request.url.includes('.apk')) {
+          return false
         }
-        return true;
+        return true
       }}
       onRenderProcessGone={handleRenderProcessGone}
       onContentProcessDidTerminate={handleContentProcessDidTerminate}
     />
-  );
+  )
   return (
     <ScrollView
-      onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
+      onLayout={e => setHeight(e.nativeEvent.layout.height)}
       refreshControl={
         <RefreshControl onRefresh={onRefresh} refreshing={isRefreshing} enabled={isEnabled} />
       }
@@ -188,7 +164,7 @@ function WebPage({ route }: Props) {
     >
       {webview}
     </ScrollView>
-  );
+  )
 }
 
-export default WebPage;
+export default WebPage

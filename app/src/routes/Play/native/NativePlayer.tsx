@@ -1195,6 +1195,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           enabled={$danmakuEnabled}
           isPlaying={isPlaying}
           currentTimeMs={currentTimeMs}
+          durationMs={playbackDurationMs}
           anchorTimeMs={danmakuAnchorMs}
           playbackRate={effectivePlaybackRate}
           width={width}

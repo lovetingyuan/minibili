@@ -131,7 +131,12 @@ function skipField(
   return null;
 }
 
-function decodeDanmakuElem(bytes: Uint8Array, start: number, end: number): DanmakuItem | null {
+function decodeDanmakuElem(
+  bytes: Uint8Array,
+  start: number,
+  end: number,
+  modes: readonly number[],
+): DanmakuItem | null {
   let progressMs = 0;
   let mode = -1;
   let fontsize = DEFAULT_FONTSIZE;
@@ -191,17 +196,20 @@ function decodeDanmakuElem(bytes: Uint8Array, start: number, end: number): Danma
     position = next;
   }
 
-  if (!content || !DANMAKU_SCROLL_MODES.includes(mode)) {
+  if (!content || !modes.includes(mode)) {
     return null;
   }
 
-  return { progressMs, content, color, fontsize };
+  return { progressMs, content, color, fontsize, ...(mode === 4 || mode === 5 ? { mode } : {}) };
 }
 
 /**
- * 解码一个弹幕分段，只返回滚动弹幕；数据非法时返回已成功解析的部分
+ * 解码指定模式的弹幕，默认只返回滚动弹幕；数据非法时返回已成功解析的部分
  */
-export function decodeDanmakuSegment(input: Uint8Array): DanmakuItem[] {
+export function decodeDanmakuSegment(
+  input: Uint8Array,
+  modes: readonly number[] = DANMAKU_SCROLL_MODES,
+): DanmakuItem[] {
   const items: DanmakuItem[] = [];
   let position = 0;
 
@@ -226,7 +234,7 @@ export function decodeDanmakuSegment(input: Uint8Array): DanmakuItem[] {
         break;
       }
       if (field === FIELD_ELEMS) {
-        const item = decodeDanmakuElem(input, start, end);
+        const item = decodeDanmakuElem(input, start, end, modes);
         if (item) {
           items.push(item);
         }
