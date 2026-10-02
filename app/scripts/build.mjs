@@ -97,6 +97,31 @@ function errorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
+/**
+ * Node 的 fetch 不认 HTTP(S)_PROXY，eas-cli 认。
+ * 两条网络路径不一样，报网络错误时必须把代理带上，否则根本查不出问题在哪一端。
+ */
+function proxyHint() {
+  const proxy =
+    process.env.HTTPS_PROXY ||
+    process.env.https_proxy ||
+    process.env.HTTP_PROXY ||
+    process.env.http_proxy;
+
+  return proxy === undefined || proxy === "" ? null : proxy;
+}
+
+/** 取命令输出的最后一行非空内容，把 eas-cli 的整段报错压成一句话。 */
+function lastOutputLine(text) {
+  return (
+    stripVTControlCharacters(text ?? "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .at(-1) ?? ""
+  );
+}
+
 function printUsage() {
   console.log(`
 生产发版（仅 Windows）
@@ -192,12 +217,21 @@ async function fetchWithTimeout(url, timeoutMs) {
 }
 
 async function assertReachable(url, label) {
+  const proxy = proxyHint();
+
   await withRetry(
     3,
     async () => {
-      const response = await fetchWithTimeout(url, HTTP_TIMEOUT_MS);
-      if (!response.ok) {
-        throw new Error(`${label} 返回 ${response.status}`);
+      try {
+        const response = await fetchWithTimeout(url, HTTP_TIMEOUT_MS);
+        if (!response.ok) {
+          throw new Error(`返回 ${response.status}`);
+        }
+      } catch (error) {
+        throw new Error(
+          `${label} 无法访问：${errorMessage(error)}` +
+            (proxy === null ? "" : `（已设置代理 ${proxy}，但这一步是直连不走代理）`),
+        );
       }
     },
     `${label} 检查`,
@@ -431,6 +465,28 @@ function printResumeInstructions(state) {
 
 // ---------------------------------------------------------------- 各阶段
 
+/**
+ * eas-cli 走系统代理，它才是发版真正用的网络路径。
+ * 探活和 --version 都验证不了这条路径，必须真的打一次接口（whoami）。
+ */
+async function checkEasLogin() {
+  const result = await nothrow`npx --yes eas-cli@latest whoami`;
+
+  if (result.exitCode !== 0) {
+    const proxy = proxyHint();
+    const reason = lastOutputLine(result.stderr) || lastOutputLine(result.stdout) || "无输出";
+
+    throw new ReleaseError(
+      `EAS 接口请求失败：${reason}` +
+        (proxy === null
+          ? ""
+          : `（eas-cli 走代理 ${proxy}，先确认代理可用，或临时清掉 HTTP(S)_PROXY 再试）`),
+    );
+  }
+
+  return result.stdout.trim();
+}
+
 async function checkEnvironment() {
   await spinner("检查环境...", async () => {
     const gitStatus = await $`git status --porcelain`;
@@ -473,10 +529,10 @@ async function checkEnvironment() {
     await assertReachable("https://api.expo.dev", "Expo API");
 
     await withRetry(2, () => $`npx --yes eas-cli@latest --version`, "EAS CLI");
-    const easUser = await withRetry(2, () => $`npx --yes eas-cli@latest whoami`, "EAS 登录状态");
+    const easUser = await withRetry(3, checkEasLogin, "EAS 接口");
 
-    if (easUser.stdout.trim() === "") {
-      throw new ReleaseError("EAS CLI 未登录，请先执行 npx eas-cli login");
+    if (easUser === "") {
+      throw new ReleaseError("EAS CLI 未登录，请先执行 npx eas-cli@latest login");
     }
   });
 
