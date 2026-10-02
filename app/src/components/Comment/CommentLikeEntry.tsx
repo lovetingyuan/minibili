@@ -1,4 +1,4 @@
-import { ThumbsUp } from 'lucide-react-native'
+import { CircleUserRound, ThumbsUp } from 'lucide-react-native'
 import { useEffect, useRef } from 'react'
 import { Pressable } from 'react-native'
 import Animated, {
@@ -61,8 +61,7 @@ export function CommentLikeEntry(props: CommentLikeEntryProps) {
   }))
 
   // 没有点赞时只显示图标，不显示点赞数
-  const countText =
-    props.count > 0 ? `${parseNumber(props.count)}${props.creatorLiked ? '+UP' : ''}` : ''
+  const countText = props.count > 0 ? parseNumber(props.count) : ''
 
   return (
     <Pressable
@@ -70,7 +69,7 @@ export function CommentLikeEntry(props: CommentLikeEntryProps) {
       style={{ transform: [{ translateY: BASELINE_OFFSET }] }}
       accessibilityRole="button"
       accessibilityLabel={
-        props.active ? `已点赞，点击取消点赞，点赞数 ${props.count}` : `点赞，点赞数 ${props.count}`
+        `${props.active ? `已点赞，点击取消点赞，点赞数 ${props.count}` : `点赞，点赞数 ${props.count}`}${props.creatorLiked ? '，UP 主已点赞' : ''}`
       }
       accessibilityState={{ selected: props.active, busy: props.pending, disabled: props.pending }}
       disabled={props.pending}
@@ -94,6 +93,13 @@ export function CommentLikeEntry(props: CommentLikeEntryProps) {
         >
           {countText}
         </Text>
+      ) : null}
+      {countText && props.creatorLiked ? (
+        <>
+          <Text className={`text-[13px] leading-4 font-normal ${theme.secondary.text}`}>+</Text>
+          <ThemedIcon icon={CircleUserRound} size={13} colorClassName={theme.secondary.accent} />
+          <Text className={`text-[13px] leading-4 font-semibold ${theme.secondary.text}`}>UP</Text>
+        </>
       ) : null}
     </Pressable>
   )

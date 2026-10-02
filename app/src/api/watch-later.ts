@@ -27,7 +27,7 @@ import type {
 export class WatchLaterLoginRequiredError extends LoginRequiredError {}
 export class WatchLaterResultUnknownError extends Error {}
 
-const WATCH_LATER_LIST_URL = "/x/v2/history/toview/web?web_location=333.1007";
+const WATCH_LATER_LIST_URL = "/x/v2/history/toview/web";
 const WATCH_LATER_REQUEST_TIMEOUT = 15000;
 
 export function getWatchLaterKey(account: WatchLaterAccount): WatchLaterKey {

@@ -117,7 +117,7 @@ describe("useBilibiliWatchLater", () => {
     const load = mocks.fetcher as (key: unknown) => Promise<unknown>;
     await expect(load(["bilibili-watch-later", "123", 2])).resolves.toMatchObject({ count: 1 });
     expect(mocks.request).toHaveBeenCalledExactlyOnceWith(
-      "/x/v2/history/toview/web?web_location=333.1007",
+      "/x/v2/history/toview/web",
     );
   });
 });

@@ -86,8 +86,8 @@ describe("play heartbeat request", () => {
     expect(url).toBe(
       `${HEARTBEAT_URL}?w_aid=1501398719&w_dt=2&w_last_play_progress_time=120&w_mid=123` +
         `&w_played_time=120&w_real_played_time=45&w_realtime=45&w_start_ts=1789486330` +
-        `&w_video_duration=568&web_location=1315873&wts=1789486400` +
-        `&w_rid=c7039ca47b1a7fcfa662739e1bc2b992`,
+        `&w_video_duration=568&wts=1789486400` +
+        `&w_rid=c5f76e44fa9e5bdd133e25bf5a5f9c3d`,
     );
     expect(options?.method).toBe("POST");
     expect(options?.credentials).toBe("omit");
@@ -136,7 +136,7 @@ describe("play heartbeat request", () => {
     const { url, headers, body } = readRequest(request);
     expect(url).toBe(
       `${PLAY_START_URL}?w_aid=1501398719&w_ftime=1789486330&w_part=1&w_stime=1789486330` +
-        `&w_type=3&web_location=1315873&wts=1789486400&w_rid=bf6b25080cca7be0677a0634f83ad64a`,
+        `&w_type=3&wts=1789486400&w_rid=f7b4f62e276700632444f07230184099`,
     );
     expect(headers.get("cookie")).toBe(cookie);
     expect(body).toEqual({

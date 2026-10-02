@@ -47,7 +47,7 @@ export type CommentLikeEntryProps = {
   active: boolean;
   /** 点赞请求进行中 */
   pending: boolean;
-  /** UP 主也点了赞，数字后追加 +UP */
+  /** UP 主也点了赞，数字后追加 +UP 主图标和 UP 标记 */
   creatorLiked: boolean;
   onPress: () => void;
 };

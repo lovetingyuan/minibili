@@ -28,8 +28,6 @@ import { getWBIInfo } from "./user-nav";
 
 const PLAY_START_URL = "https://api.bilibili.com/x/click-interface/click/web/h5";
 const HEARTBEAT_URL = "https://api.bilibili.com/x/click-interface/web/heartbeat";
-/** 网页端上报使用的页面标识，B站按固定值校验播放来源 */
-const WEB_LOCATION = "1315873";
 const SPMID = "333.788.0.0";
 /** dt：设备类型，网页端固定 2 */
 const DEVICE_TYPE = 2;
@@ -167,7 +165,6 @@ export async function reportPlayStart(
       w_ftime: session.startTs,
       w_stime: session.startTs,
       w_type: VIDEO_TYPE,
-      web_location: WEB_LOCATION,
     },
     keys.img_url,
     keys.sub_url,
@@ -228,7 +225,6 @@ export async function reportPlayHeartbeat(
       w_real_played_time: realPlayedTime,
       w_video_duration: videoDuration,
       w_last_play_progress_time: progressTime,
-      web_location: WEB_LOCATION,
     },
     keys.img_url,
     keys.sub_url,

@@ -47,7 +47,7 @@ describe("Bilibili watch later list", () => {
     const request = vi.fn<WatchLaterRequest>().mockResolvedValue(response());
     const data = await fetchBilibiliWatchLater(account, request, () => true);
     expect(request).toHaveBeenCalledExactlyOnceWith(
-      "/x/v2/history/toview/web?web_location=333.1007",
+      "/x/v2/history/toview/web",
     );
     expect(data.count).toBe(1);
     expect(getWatchLaterKey(account)).toEqual(["bilibili-watch-later", "123", 4]);
