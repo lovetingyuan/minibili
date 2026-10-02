@@ -1,0 +1,15 @@
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/playbackService/ExpoVideoPlaybackService.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/playbackService/ExpoVideoPlaybackService.kt
+index 54c0ad0..3393a22 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/playbackService/ExpoVideoPlaybackService.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/playbackService/ExpoVideoPlaybackService.kt
+@@ -217,10 +217,6 @@ class ExpoVideoPlaybackService : MediaSessionService() {
+         session.release()
+       }
+ 
+-      val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+-        notificationManager.deleteNotificationChannel(CHANNEL_ID)
+-      }
+     }
+   }
+ 
