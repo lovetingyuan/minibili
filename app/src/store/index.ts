@@ -3,6 +3,9 @@ import * as SplashScreen from "expo-splash-screen";
 import React from "react";
 import { createStore, type AtomicStoreMethodsType } from "react-atomic-store";
 
+import { isBackgroundPlayDuration } from "@/constants/background-playback";
+import type { BackgroundPlayDurationMinutes } from "@/types/background-playback";
+
 import { RanksConfig } from "../constants";
 import { enqueueToast } from "../features/toast";
 import type { VideoDownloadTask } from "../features/video-download/types";
@@ -62,6 +65,8 @@ const getAppValue = () => {
      * 是否允许 App 退到后台继续播放
      */
     $backgroundPlayEnabled: false,
+    /** 每次退到后台的播放时长，0 表示不限时间。 */
+    $backgroundPlayDurationMinutes: 0 as BackgroundPlayDurationMinutes,
     /**
      * 每个分P 的本地续播位置，按 `bvid:cid` 持久化。
      */
@@ -134,9 +139,13 @@ function getDefaultStoredValue<K extends StoredKeys>(key: K): AppContextValueTyp
 }
 
 function isCompatibleStoredValue<K extends StoredKeys>(
+  key: K,
   value: unknown,
   defaultValue: AppContextValueType[K],
 ): value is AppContextValueType[K] {
+  if (key === "$backgroundPlayDurationMinutes") {
+    return isBackgroundPlayDuration(value);
+  }
   if (defaultValue === null) {
     return value === null;
   }
@@ -159,7 +168,7 @@ async function hydrateStoredValue<K extends StoredKeys>(methods: AppContextMetho
     const defaultValue = getDefaultStoredValue(key);
     const setKey = `set${key}` as StoreSetterKey<K>;
     const setValue = methods[setKey] as (value: StoreSetterValue<K>) => void;
-    if (isCompatibleStoredValue(parsed, defaultValue)) {
+    if (isCompatibleStoredValue(key, parsed, defaultValue)) {
       setValue(parsed);
       return false;
     }

@@ -1,3 +1,92 @@
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/VideoModule.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/VideoModule.kt
+index 71b8501..d238f5d 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/VideoModule.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/VideoModule.kt
+@@ -220,6 +220,25 @@ class VideoModule : Module() {
+           ref.staysActiveInBackground = staysActive
+         }
+ 
++      Property("backgroundPlaybackTimeout")
++        .get { ref: VideoPlayer ->
++          runBlocking(appContext.mainQueue.coroutineContext) {
++            ref.backgroundPlaybackTimer.timeoutSeconds
++          }
++        }
++        .set { ref: VideoPlayer, seconds: Double ->
++          runBlocking(appContext.mainQueue.coroutineContext) {
++            ref.backgroundPlaybackTimer.timeoutSeconds = seconds
++          }
++        }
++
++      Property("backgroundPlaybackTimedOut")
++        .get { ref: VideoPlayer ->
++          runBlocking(appContext.mainQueue.coroutineContext) {
++            ref.backgroundPlaybackTimer.hasTimedOut
++          }
++        }
++
+       Property("loop")
+         .get { ref: VideoPlayer ->
+           runBlocking(appContext.mainQueue.coroutineContext) {
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/VideoManager.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/VideoManager.kt
+index 5f9ad2a..c1ede38 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/VideoManager.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/VideoManager.kt
+@@ -1,5 +1,7 @@
+ package expo.modules.video.managers
+ 
++import android.os.SystemClock
++
+ import androidx.annotation.OptIn
+ import androidx.media3.common.util.UnstableApi
+ import expo.modules.kotlin.AppContext
+@@ -34,6 +36,10 @@ object VideoManager {
+ 
+   private var listeners = mutableListOf<WeakReference<VideoManagerListener>>()
+ 
++  // A replacement player inherits the same background session instead of extending it.
++  var backgroundStartedAtMs: Long? = null
++    private set
++
+   fun onModuleCreated(appContext: AppContext) = synchronized(this) {
+     val context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
+ 
+@@ -51,6 +57,8 @@ object VideoManager {
+   }
+ 
+   fun onModuleDestroyed(appContext: AppContext) {
++    backgroundStartedAtMs = null
++    videoPlayersToVideoViews.keys.toList().forEach { it.backgroundPlaybackTimer.release() }
+     pictureInPicture.release()
+     listeners.clear()
+   }
+@@ -147,12 +155,16 @@ object VideoManager {
+   }
+ 
+   fun onAppForegrounded() {
+-    listeners.forEach {
++    listeners.toList().forEach {
+       it.get()?.onAppForegrounded()
+     }
++    backgroundStartedAtMs = null
+   }
+ 
+   fun onAppBackgrounded() {
++    if (backgroundStartedAtMs == null) {
++      backgroundStartedAtMs = SystemClock.elapsedRealtime()
++    }
+     for (videoView in videoViews.values) {
+       if (shouldPauseVideo(videoView)) {
+         handleVideoPause(videoView)
+@@ -161,7 +173,7 @@ object VideoManager {
+       }
+     }
+ 
+-    listeners.forEach {
++    listeners.toList().forEach {
+       it.get()?.onAppBackgrounded()
+     }
+   }
 diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/playbackService/ExpoVideoPlaybackService.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/playbackService/ExpoVideoPlaybackService.kt
 index 54c0ad0..3393a22 100644
 --- a/node_modules/expo-video/android/src/main/java/expo/modules/video/playbackService/ExpoVideoPlaybackService.kt
@@ -13,3 +102,206 @@ index 54c0ad0..3393a22 100644
      }
    }
  
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/player/BackgroundPlaybackTimer.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/player/BackgroundPlaybackTimer.kt
+new file mode 100644
+index 0000000..d2c93fb
+--- /dev/null
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/player/BackgroundPlaybackTimer.kt
+@@ -0,0 +1,124 @@
++package expo.modules.video.player
++
++import android.app.AlarmManager
++import android.content.Context
++import android.os.Handler
++import android.os.Looper
++import android.os.SystemClock
++import android.util.Log
++import androidx.annotation.OptIn
++import androidx.media3.common.util.UnstableApi
++import expo.modules.video.listeners.VideoManagerListener
++import expo.modules.video.managers.VideoManager
++import java.lang.ref.WeakReference
++
++/** A sleep timer owned by a player, independent of React Native's suspended JS timers. */
++@OptIn(UnstableApi::class)
++class BackgroundPlaybackTimer(videoPlayer: VideoPlayer) : VideoManagerListener {
++  private val videoPlayer = WeakReference(videoPlayer)
++  private val handler = Handler(Looper.getMainLooper())
++  private val alarmManager = videoPlayer.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
++  private var alarm: AlarmManager.OnAlarmListener? = null
++  private var fallback: Runnable? = null
++  private var deadlineMs: Long? = null
++  private var generation = 0L
++  @Volatile private var released = false
++  private var expired = false
++
++  var timeoutSeconds = 0.0
++    set(value) {
++      require(value.isFinite() && value >= 0) { "backgroundPlaybackTimeout must be finite and non-negative" }
++      if (field == value || released) return
++      field = value
++      expired = false
++      schedule()
++    }
++
++  val hasTimedOut: Boolean
++    get() {
++      checkDeadline()
++      return expired
++    }
++
++  init {
++    VideoManager.registerListener(this)
++  }
++
++  override fun onAppBackgrounded() = onMain {
++    expired = false
++    schedule()
++  }
++
++  override fun onAppForegrounded() = onMain {
++    // Returning after the deadline must remain paused, even if the alarm was delayed.
++    checkDeadline()
++    cancel()
++  }
++
++  fun onPlaybackRequested() {
++    if (released) return
++    if (VideoManager.backgroundStartedAtMs == null) {
++      expired = false
++      return
++    }
++    checkDeadline()
++    // A queued autoplay or a media notification must not bypass this session's cutoff.
++    if (expired) videoPlayer.get()?.player?.pause()
++  }
++
++  fun release() {
++    released = true
++    onMain {
++      cancel()
++      VideoManager.unregisterListener(this)
++    }
++  }
++
++  private fun schedule() {
++    cancel()
++    val startedAt = VideoManager.backgroundStartedAtMs ?: return
++    if (released || timeoutSeconds <= 0) return
++    val deadline = startedAt + (timeoutSeconds * 1000).toLong()
++    deadlineMs = deadline
++    if (checkDeadline()) return
++
++    val token = generation
++    val callback = Runnable {
++      if (!released && token == generation) checkDeadline()
++    }
++    val listener = AlarmManager.OnAlarmListener { callback.run() }
++    alarm = listener
++    try {
++      // The listener overload needs no SCHEDULE_EXACT_ALARM permission. The existing
++      // media playback service keeps the process alive for the listener's lifetime.
++      alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, deadline, "expo-video-background-playback", listener, handler)
++    } catch (error: SecurityException) {
++      // Some OEMs may reject listener alarms; retain a native timer and the resume check.
++      Log.w("ExpoVideo", "Background playback alarm was rejected", error)
++      fallback = callback
++      handler.postDelayed(callback, (deadline - SystemClock.elapsedRealtime()).coerceAtLeast(0))
++    }
++  }
++
++  private fun checkDeadline(): Boolean {
++    val deadline = deadlineMs ?: return expired
++    if (released || SystemClock.elapsedRealtime() < deadline) return expired
++    expired = true
++    cancel()
++    videoPlayer.get()?.player?.pause()
++    return true
++  }
++
++  private fun cancel() {
++    generation += 1
++    alarm?.let { alarmManager.cancel(it) }
++    alarm = null
++    fallback?.let { handler.removeCallbacks(it) }
++    fallback = null
++    deadlineMs = null
++  }
++
++  private fun onMain(action: () -> Unit) {
++    if (Looper.myLooper() == Looper.getMainLooper()) action() else handler.post { action() }
++  }
++}
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/player/VideoPlayer.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/player/VideoPlayer.kt
+index 8bae522..6662d69 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/player/VideoPlayer.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/player/VideoPlayer.kt
+@@ -90,6 +90,7 @@ class VideoPlayer(val context: Context, appContext: AppContext, source: VideoSou
+   val serviceConnection = PlaybackServiceConnection(WeakReference(this), appContext)
+   var mediaSession: MediaSession = buildBasicMediaSession(context, player)
+   val intervalUpdateClock = IntervalUpdateClock(this)
++  val backgroundPlaybackTimer = BackgroundPlaybackTimer(this)
+ 
+   var playing by IgnoreSameSet(false) { new, old ->
+     sendEvent(PlayerEvent.IsPlayingChanged(new, old))
+@@ -233,6 +234,10 @@ class VideoPlayer(val context: Context, appContext: AppContext, source: VideoSou
+   var keepScreenOnWhilePlaying by VideoPlayerKeepAwake(this, appContext)
+ 
+   private val playerListener = object : Player.Listener {
++    override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
++      if (playWhenReady) backgroundPlaybackTimer.onPlaybackRequested()
++    }
++
+     override fun onIsPlayingChanged(isPlaying: Boolean) {
+       this@VideoPlayer.playing = isPlaying
+     }
+@@ -361,6 +366,7 @@ class VideoPlayer(val context: Context, appContext: AppContext, source: VideoSou
+ 
+   @kotlin.OptIn(DelicateCoroutinesApi::class)
+   override fun close() {
++    backgroundPlaybackTimer.release()
+     // Releases the listeners from VideoPlayerKeepAwake
+     keepScreenOnWhilePlaying = false
+ 
+diff --git a/node_modules/expo-video/build/VideoPlayer.types.d.ts b/node_modules/expo-video/build/VideoPlayer.types.d.ts
+index 8acf5e5..3872290 100644
+--- a/node_modules/expo-video/build/VideoPlayer.types.d.ts
++++ b/node_modules/expo-video/build/VideoPlayer.types.d.ts
+@@ -131,6 +131,15 @@ export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
+      * @platform android
+      */
+     staysActiveInBackground: boolean;
++    /**
++     * Background session timeout in seconds; 0 disables the timer. minibili Android extension.
++     * The timer restarts on each background entry and survives source replacement.
++     * @default 0
++     * @platform android
++     */
++    backgroundPlaybackTimeout: number;
++    /** Whether this player was paused by the background timeout. @platform android */
++    readonly backgroundPlaybackTimedOut: boolean;
+     /**
+      * Float value indicating how far the player has buffered the video in seconds.
+      *
+diff --git a/node_modules/expo-video/src/VideoPlayer.types.ts b/node_modules/expo-video/src/VideoPlayer.types.ts
+index 76436a4..de1057e 100644
+--- a/node_modules/expo-video/src/VideoPlayer.types.ts
++++ b/node_modules/expo-video/src/VideoPlayer.types.ts
+@@ -152,6 +152,17 @@ export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
+    */
+   staysActiveInBackground: boolean;
+ 
++  /**
++   * Background session timeout in seconds; 0 disables the timer. minibili Android extension.
++   * The timer restarts on each background entry and survives source replacement.
++   * @default 0
++   * @platform android
++   */
++  backgroundPlaybackTimeout: number;
++
++  /** Whether this player was paused by the background timeout. @platform android */
++  readonly backgroundPlaybackTimedOut: boolean;
++
+   /**
+    * Float value indicating how far the player has buffered the video in seconds.
+    *

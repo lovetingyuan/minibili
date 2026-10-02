@@ -29,6 +29,7 @@ import { useSendDanmaku } from "@/api/useSendDanmaku";
 import { useVideoInfo } from "@/api/video-info";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { VideoBadge } from "@/components/VideoBadge";
+import { formatBackgroundPlayDuration } from "@/constants/background-playback";
 import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
@@ -124,6 +125,8 @@ export default function NativePlayer(props: NativePlayerProps) {
     set$danmakuEnabled,
     $backgroundPlayEnabled,
     set$backgroundPlayEnabled,
+    $backgroundPlayDurationMinutes,
+    set$backgroundPlayDurationMinutes,
   } = useStore();
   const { account } = useBilibiliSessionState();
   const { logout } = useBilibiliSessionActions();
@@ -201,6 +204,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   const initialResumeHandledRef = React.useRef("");
   // App 在后台时不创建新的播放 service；需要自动播放或 CDN 兜底时等回到前台处理
   const pendingAutoplayRef = React.useRef(false);
+  // 到时暂停跨播放源保留，避免回到前台后的地址兜底重新自动播放。
+  const pausedByBackgroundTimeoutRef = React.useRef(false);
   const pendingPlaybackErrorRef = React.useRef<{ token: number; message: string } | null>(null);
   const backgroundConfigurationRef = React.useRef<{
     player: VideoPlayer;
@@ -272,7 +277,29 @@ export default function NativePlayer(props: NativePlayerProps) {
     // 这里对齐 B 站：倍速只改播放速度，音调保持不变
     instance.preservesPitch = true;
     instance.playbackRate = playbackRate;
+    if (Platform.OS === "android" && typeof instance.backgroundPlaybackTimeout === "number") {
+      instance.backgroundPlaybackTimeout = $backgroundPlayEnabled
+        ? $backgroundPlayDurationMinutes * 60
+        : 0;
+    }
   });
+
+  // 旧安装包和其他平台没有这个补丁接口，选择定时时提示更新，避免假装已经生效。
+  const backgroundPlayTimerSupported =
+    Platform.OS === "android" && typeof player.backgroundPlaybackTimeout === "number";
+
+  React.useEffect(() => {
+    if (backgroundPlayTimerSupported) {
+      player.backgroundPlaybackTimeout = $backgroundPlayEnabled
+        ? $backgroundPlayDurationMinutes * 60
+        : 0;
+    }
+  }, [
+    player,
+    backgroundPlayTimerSupported,
+    $backgroundPlayEnabled,
+    $backgroundPlayDurationMinutes,
+  ]);
 
   const effectivePlaybackRate = fastRate ? PLAYER_FAST_RATE : playbackRate;
 
@@ -369,6 +396,9 @@ export default function NativePlayer(props: NativePlayerProps) {
     nativePlayingRef.current = playing;
     setIsPlaying(playing);
     if (playing) {
+      if (AppState.currentState === "active" && player.playing) {
+        pausedByBackgroundTimeoutRef.current = false;
+      }
       if (activePlayerRef.current.player === player) {
         activePlayerRef.current.hasPlayed = true;
       }
@@ -554,6 +584,12 @@ export default function NativePlayer(props: NativePlayerProps) {
 
     // service 只能在前台创建；已在后台持续播放的同一播放器会复用现有 service。
     configureCurrentPlayerBackgroundPlayback(true);
+    if (backgroundPlayTimerSupported && player.backgroundPlaybackTimedOut) {
+      pausedByBackgroundTimeoutRef.current = true;
+      pendingAutoplayRef.current = false;
+      pausedByImagesRef.current = false;
+      resumeAfterDanmakuRef.current = false;
+    }
     synchronizePlayerFromNative(true);
 
     const pendingError = pendingPlaybackErrorRef.current;
@@ -749,6 +785,9 @@ export default function NativePlayer(props: NativePlayerProps) {
       pendingAutoplayRef.current = true;
       return;
     }
+    if (pausedByBackgroundTimeoutRef.current) {
+      return;
+    }
     player.play();
   }, [started, uri, player]);
 
@@ -782,6 +821,9 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
     if (pausedByImagesRef.current) {
       pausedByImagesRef.current = false;
+      if (pausedByBackgroundTimeoutRef.current) {
+        return;
+      }
       if (AppState.currentState !== "active") {
         pendingAutoplayRef.current = true;
         return;
@@ -875,6 +917,7 @@ export default function NativePlayer(props: NativePlayerProps) {
    * 播放到结尾后 expo-video 的 play() 不会有任何反应，需要先回到开头
    */
   function resumePlayback() {
+    pausedByBackgroundTimeoutRef.current = false;
     hideControls();
     if (
       shouldRestartPlayback({
@@ -915,7 +958,7 @@ export default function NativePlayer(props: NativePlayerProps) {
    * 关闭输入条后恢复打开前的播放状态，避免用户手动再点一次播放
    */
   function resumeDanmakuPlayback() {
-    if (!resumeAfterDanmakuRef.current) {
+    if (!resumeAfterDanmakuRef.current || pausedByBackgroundTimeoutRef.current) {
       return;
     }
     resumeAfterDanmakuRef.current = false;
@@ -1032,6 +1075,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   }
 
   async function handleRetry() {
+    pausedByBackgroundTimeoutRef.current = false;
     if (isRetrying) {
       return;
     }
@@ -1083,6 +1127,7 @@ export default function NativePlayer(props: NativePlayerProps) {
 
   /** 试看片段重新播放：不触发自动连播，只把当前片段从头再放一遍 */
   function replayLimitedAccess() {
+    pausedByBackgroundTimeoutRef.current = false;
     if (playEndGuardRef.current.player === player) {
       playEndGuardRef.current.handled = false;
     }
@@ -1212,6 +1257,9 @@ export default function NativePlayer(props: NativePlayerProps) {
           danmakuEnabled={$danmakuEnabled}
           canSendDanmaku={Boolean(danmakuAccount)}
           backgroundPlayEnabled={$backgroundPlayEnabled}
+          backgroundPlayDurationMinutes={
+            backgroundPlayTimerSupported ? $backgroundPlayDurationMinutes : 0
+          }
           loopEnabled={playbackMode.loop}
           autoNextEnabled={playbackMode.autoNext}
           showAutoNext={props.showAutoNext}
@@ -1224,10 +1272,25 @@ export default function NativePlayer(props: NativePlayerProps) {
             setDanmakuAnchorMs(currentTimeMs);
           }}
           onSendDanmaku={openDanmakuComposer}
-          onToggleBackgroundPlay={() => {
-            const next = !$backgroundPlayEnabled;
-            set$backgroundPlayEnabled(next);
-            showToast(next ? "后台播放已开启" : "后台播放已关闭");
+          onBackgroundPlaySelect={(selection) => {
+            if (selection !== null && selection > 0 && !backgroundPlayTimerSupported) {
+              showToast("请更新应用以使用定时后台播放");
+              return;
+            }
+            if (selection === null) {
+              if (backgroundPlayTimerSupported) {
+                player.backgroundPlaybackTimeout = 0;
+              }
+              set$backgroundPlayEnabled(false);
+              showToast("后台播放已关闭");
+              return;
+            }
+            if (backgroundPlayTimerSupported) {
+              player.backgroundPlaybackTimeout = selection * 60;
+            }
+            set$backgroundPlayDurationMinutes(selection);
+            set$backgroundPlayEnabled(true);
+            showToast(`后台播放：${formatBackgroundPlayDuration(selection)}`);
           }}
           onToggleLoop={props.onToggleLoop}
           onToggleAutoNext={props.onToggleAutoNext}

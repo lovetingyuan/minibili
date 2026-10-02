@@ -1,43 +1,14 @@
 import { Pressable, Text, View } from "react-native";
-import {
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Headphones,
-  ListVideo,
-  Pencil,
-  Repeat2,
-} from "lucide-react-native";
+import { Check, ChevronDown, ChevronUp, ListVideo, Pencil, Repeat2 } from "lucide-react-native";
 
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { theme } from "@/constants/theme";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
-import { formatPlaybackRate, PLAYBACK_RATES, type PlaybackRate } from "./playback-rate";
-
-export type PlayerTopActionsProps = {
-  playbackRate: PlaybackRate;
-  playbackRateMenuOpen: boolean;
-  loopEnabled: boolean;
-  autoNextEnabled: boolean;
-  showAutoNext: boolean;
-  /**
-   * 是否允许后台播放，开启时按钮高亮
-   */
-  backgroundPlayEnabled: boolean;
-  /**
-   * 未登录 B站 时不展示发送弹幕按钮
-   */
-  canSendDanmaku: boolean;
-  onTogglePlaybackRateMenu: () => void;
-  onClosePlaybackRateMenu: () => void;
-  onPlaybackRateChange: (rate: PlaybackRate) => void;
-  onToggleLoop: () => void;
-  onToggleAutoNext: () => void;
-  onToggleBackgroundPlay: () => void;
-  onSendDanmaku: () => void;
-};
+import { formatPlaybackRate, PLAYBACK_RATES } from "./playback-rate";
+import BackgroundPlayMenu from "./BackgroundPlayMenu";
+import type { PlayerTopActionsProps } from "./player-top-actions.types";
 
 /**
  * 播放器右上角的悬浮按钮：倍速、播放模式、后台播放与发送弹幕。
@@ -126,22 +97,14 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
           />
         </Pressable>
       ) : null}
-      <Pressable
-        className="h-9 w-9 items-center justify-center rounded-full bg-black/40"
-        android_ripple={{ color: "transparent" }}
-        style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-        accessibilityRole="button"
-        accessibilityLabel={props.backgroundPlayEnabled ? "关闭后台播放" : "开启后台播放"}
-        accessibilityState={{ selected: props.backgroundPlayEnabled }}
-        hitSlop={8}
-        onPress={props.onToggleBackgroundPlay}
-      >
-        <ThemedIcon
-          icon={Headphones}
-          size={20}
-          color={props.backgroundPlayEnabled ? accentColor : "#ffffff"}
-        />
-      </Pressable>
+      <BackgroundPlayMenu
+        enabled={props.backgroundPlayEnabled}
+        durationMinutes={props.backgroundPlayDurationMinutes}
+        opened={props.backgroundPlayMenuOpen}
+        onToggle={props.onToggleBackgroundPlayMenu}
+        onClose={props.onCloseBackgroundPlayMenu}
+        onSelect={props.onBackgroundPlaySelect}
+      />
       {props.canSendDanmaku ? (
         <Pressable
           className="h-9 w-9 items-center justify-center rounded-full bg-black/40"

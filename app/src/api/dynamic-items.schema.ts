@@ -101,6 +101,7 @@ const AdditionalSchema = z
       .nullish(),
     vote: z
       .object({
+        title: z.string().optional(),
         desc: z.string().optional(),
         join_num: StringOrNumberSchema.optional(),
       })

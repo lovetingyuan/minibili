@@ -157,7 +157,8 @@ function normalizeAdditional(item: RawDynamicItem): DynamicAdditional | null {
     return vote
       ? {
           head: "投票",
-          title: vote.desc ?? "参与投票",
+          // 列表返回 title 和参与人数 desc，详情则可能只有作为标题的 desc。
+          title: normalizeText(vote.title) || normalizeText(vote.desc) || "参与投票",
           description: vote.join_num ? `${vote.join_num} 人参与` : "",
         }
       : null;
