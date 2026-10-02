@@ -41,11 +41,6 @@ interface ProxyResponse {
   status: number;
 }
 
-interface UpstreamCache {
-  match(key: string): Promise<Response | undefined>;
-  put(key: string, response: Response): Promise<void>;
-}
-
 const ATTEMPTS = 2;
 
 /** 本次调用的时间预算已耗尽（AbortController 触发）。 */
@@ -56,20 +51,11 @@ function proxyBase(bindings: BilibiliProxyBindings) {
 }
 
 /** 单测（Node 环境）没有 caches，自动跳过缓存。 */
-function getUpstreamCache(): UpstreamCache | null {
+function getUpstreamCache() {
   if (typeof caches !== "object" || caches === null) {
     return null;
   }
-  const cache = caches.default;
-  if (!cache) {
-    return null;
-  }
-  return {
-    match: (key) => cache.match(key),
-    put: async (key, response) => {
-      await cache.put(key, response);
-    },
-  };
+  return caches.default ?? null;
 }
 
 function isBlockedStatus(status: number) {

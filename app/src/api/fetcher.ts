@@ -1,5 +1,3 @@
-// import * as protobuf from 'protobufjs'
-
 import { UA } from "../constants";
 import {
   BilibiliAuthExpiredError,
@@ -7,7 +5,6 @@ import {
   reportBilibiliAuthExpired,
 } from "../features/bilibili-session/auth-expiration";
 import { showLoginRequiredAlert } from "../features/bilibili-session/login-required-alert";
-// import dm from '../constants/dm'
 import encWbi from "../utils/wbi";
 import bilibiliFetch from "./bilibili-fetch";
 import { stringifyCommentOid } from "./comment-json.helpers";
@@ -57,9 +54,6 @@ export function shouldSignWbiRequest(url: string) {
   );
 }
 
-// const root = protobuf.Root.fromJSON(dm as any)
-// const lp = root.lookupType('DmSegMobileReply')
-
 if (typeof __DEV__ === "undefined") {
   try {
     // @ts-ignore
@@ -77,16 +71,12 @@ async function performRequest<D>(url: string, requestOptions: RequestOptions = {
     accept: "application/json, text/plain, */*",
     "accept-language": "zh-CN,zh;q=0.9",
     "cache-control": "no-cache",
-    // 'sec-fetch-dest': 'empty',
-    // 'sec-fetch-mode': 'cors',
-    // 'sec-fetch-site': 'same-site',
     origin: "https://www.bilibili.com",
     referer: "https://space.bilibili.com",
-    "user-agent": UA, // 'user-agent': 'Mozilla/5.0',
+    "user-agent": UA,
   };
   const options = {
     headers,
-    // referrerPolicy: 'no-referrer-when-downgrade',
     referrerPolicy: "strict-origin-when-cross-origin",
     body: null,
     method: "GET",
@@ -106,22 +96,6 @@ async function performRequest<D>(url: string, requestOptions: RequestOptions = {
     const query = await encWbi(queryParams, wbiImg?.img_url, wbiImg?.sub_url);
     requestUrl = `${_url}?${query}`;
   }
-  // if (url.includes('/dm/web/seg.so')) {
-  //   const arrayBuffer = await fetch(requestUrl, options).then(r =>
-  //     r.arrayBuffer(),
-  //   )
-  //   const bytes = new Uint8Array(arrayBuffer)
-
-  //   const message = lp.decode(bytes)
-  //   const objects = lp.toObject(message, {
-  //     // bool: Boolean,
-  //     longs: Number,
-  //     enums: Number,
-  //     bytes: String,
-  //     // Object: String,
-  //   })
-  //   return objects.elems
-  // }
   const response = await bilibiliFetch(
     requestUrl,
     options,
@@ -163,11 +137,7 @@ async function performRequest<D>(url: string, requestOptions: RequestOptions = {
       throw expired;
     }
   }
-  // if (url === '/x/web-interface/nav') {
-  //   return res.data
-  // }
   if (res.code && url !== NAV_URL) {
-    // reportApiError(url, res)
     if (__DEV__) {
       // 用 log 而不是 error：接口失败已经有页面提示，error 会再弹一层 LogBox 挡住界面
       // oxlint-disable-next-line no-console

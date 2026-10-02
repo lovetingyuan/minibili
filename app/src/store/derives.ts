@@ -1,5 +1,3 @@
-import { useSyncExternalStore } from "react";
-
 import {
   countFollowingDynamicsUnreadUps,
   isFollowingDynamicsUpUnread,
@@ -20,10 +18,8 @@ export const useFollowedUpsMap = () => {
   return ups;
 };
 
-/** 当前账号是否有一条该 UP 的未读动态，用于关注列表头像右上角的小红点 */
-export function useUpHasNewDynamic(mid: UpInfo["mid"]) {
-  const control = useSyncExternalStore(bilibiliSession.subscribe, bilibiliSession.getSnapshot);
-  const { account } = useBilibiliSessionState();
+function useFollowingDynamicsUnreadState() {
+  const { account, control } = useBilibiliSessionState();
   const { $followingDynamicsReadMap, followingDynamicsNavReadyAccount } = useStore();
   const current =
     control.phase === "ready" && account && bilibiliSession.isCurrentAccount(account)
@@ -33,30 +29,18 @@ export function useUpHasNewDynamic(mid: UpInfo["mid"]) {
     current &&
     followingDynamicsNavReadyAccount?.mid === current.mid &&
     followingDynamicsNavReadyAccount.generation === current.generation;
-  if (!ready) {
-    return false;
-  }
-  const item = $followingDynamicsReadMap[current.mid]?.[String(mid)];
-  return isFollowingDynamicsUpUnread(item);
+  return ready ? $followingDynamicsReadMap[current.mid] : undefined;
+}
+
+/** 当前账号是否有一条该 UP 的未读动态，用于关注列表头像右上角的小红点 */
+export function useUpHasNewDynamic(mid: UpInfo["mid"]) {
+  const state = useFollowingDynamicsUnreadState();
+  return isFollowingDynamicsUpUnread(state?.[String(mid)]);
 }
 
 /** 当前账号有未读动态的 UP mid 集合，用于把带小红点的 UP 排到关注列表最前面 */
 export function useUnreadUpMids(): ReadonlySet<string> {
-  const control = useSyncExternalStore(bilibiliSession.subscribe, bilibiliSession.getSnapshot);
-  const { account } = useBilibiliSessionState();
-  const { $followingDynamicsReadMap, followingDynamicsNavReadyAccount } = useStore();
-  const current =
-    control.phase === "ready" && account && bilibiliSession.isCurrentAccount(account)
-      ? account
-      : null;
-  const ready =
-    current &&
-    followingDynamicsNavReadyAccount?.mid === current.mid &&
-    followingDynamicsNavReadyAccount.generation === current.generation;
-  if (!ready) {
-    return new Set();
-  }
-  const state = $followingDynamicsReadMap[current.mid];
+  const state = useFollowingDynamicsUnreadState();
   return new Set(
     state
       ? Object.entries(state)
@@ -69,20 +53,6 @@ export function useUnreadUpMids(): ReadonlySet<string> {
 /** 「关注」tab 角标：当前关注列表里有未读更新的 UP 数量 */
 export function useUnreadFollowedUpCount() {
   const $followedUps = useActiveFollowedUps();
-  const control = useSyncExternalStore(bilibiliSession.subscribe, bilibiliSession.getSnapshot);
-  const { account } = useBilibiliSessionState();
-  const { $followingDynamicsReadMap, followingDynamicsNavReadyAccount } = useStore();
-  const current =
-    control.phase === "ready" && account && bilibiliSession.isCurrentAccount(account)
-      ? account
-      : null;
-  const ready =
-    current &&
-    followingDynamicsNavReadyAccount?.mid === current.mid &&
-    followingDynamicsNavReadyAccount.generation === current.generation;
-  if (!ready) {
-    return 0;
-  }
-  const state = $followingDynamicsReadMap[current.mid];
+  const state = useFollowingDynamicsUnreadState();
   return countFollowingDynamicsUnreadUps(state, new Set($followedUps.map((up) => String(up.mid))));
 }

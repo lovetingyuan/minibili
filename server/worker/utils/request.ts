@@ -1,4 +1,4 @@
-import { MAX_SYNC_BYTES, MAX_SYNC_KEYS } from "../../../shared/user-data";
+import { MAX_SYNC_KEYS } from "../../../shared/user-data";
 import type { JsonValue, SyncOperations } from "../../../shared/user-data";
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
@@ -66,8 +66,6 @@ export function parseSyncOperations(value: unknown): SyncOperations | null {
   return keys.size > 0 && keys.size <= MAX_SYNC_KEYS ? operations : null;
 }
 
-export class SyncPayloadTooLargeError extends Error {}
-
 export class RequestPayloadTooLargeError extends Error {}
 
 export async function readJsonBody(request: Request, maxBytes: number): Promise<unknown> {
@@ -100,17 +98,5 @@ export async function readJsonBody(request: Request, maxBytes: number): Promise<
     return null;
   } finally {
     reader.releaseLock();
-  }
-}
-
-// 读取流时计数，不信任 Content-Length，也不先将无限请求体加载到内存。
-export async function readSyncBody(request: Request): Promise<unknown> {
-  try {
-    return await readJsonBody(request, MAX_SYNC_BYTES);
-  } catch (error) {
-    if (error instanceof RequestPayloadTooLargeError) {
-      throw new SyncPayloadTooLargeError();
-    }
-    throw error;
   }
 }

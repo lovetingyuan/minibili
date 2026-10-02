@@ -34,6 +34,7 @@ import { dirname, join, resolve } from "node:path";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
+import { parseArgs as parseNodeArgs, stripVTControlCharacters } from "node:util";
 
 import open from "open";
 import semver from "semver";
@@ -117,65 +118,34 @@ function printUsage() {
 }
 
 function parseArgs(argv) {
-  const options = {
-    apkPath: null,
-    buildId: null,
-    changelog: null,
-    help: false,
-    reset: false,
-    resume: false,
-    version: null,
-  };
-
-  for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-
-    function readValue() {
-      const value = argv[index + 1];
-      if (value === undefined || value.startsWith("--")) {
-        throw new ReleaseError(`${arg} 缺少参数值（用 --help 查看用法）`);
-      }
-      index += 1;
-      return value.trim();
-    }
-
-    switch (arg) {
-      case "-h":
-      case "--help": {
-        options.help = true;
-        break;
-      }
-      case "--resume": {
-        options.resume = true;
-        break;
-      }
-      case "--reset": {
-        options.reset = true;
-        break;
-      }
-      case "--version": {
-        options.version = readValue();
-        break;
-      }
-      case "--changelog": {
-        options.changelog = readValue();
-        break;
-      }
-      case "--build-id": {
-        options.buildId = readValue();
-        break;
-      }
-      case "--apk": {
-        options.apkPath = resolve(readValue());
-        break;
-      }
-      default: {
-        throw new ReleaseError(`未知参数：${arg}（用 --help 查看用法）`);
-      }
-    }
+  let values;
+  try {
+    ({ values } = parseNodeArgs({
+      args: argv,
+      options: {
+        apk: { type: "string" },
+        "build-id": { type: "string" },
+        changelog: { type: "string" },
+        help: { type: "boolean", short: "h", default: false },
+        reset: { type: "boolean", default: false },
+        resume: { type: "boolean", default: false },
+        version: { type: "string" },
+      },
+    }));
+  } catch (error) {
+    const reason =
+      error.code === "ERR_PARSE_ARGS_INVALID_OPTION_VALUE" ? "参数值缺失或格式错误" : "未知参数";
+    throw new ReleaseError(`${reason}：${error.message}（用 --help 查看用法）`);
   }
-
-  return options;
+  return {
+    apkPath: values.apk === undefined ? null : resolve(values.apk.trim()),
+    buildId: values["build-id"]?.trim() ?? null,
+    changelog: values.changelog?.trim() ?? null,
+    help: values.help,
+    reset: values.reset,
+    resume: values.resume,
+    version: values.version?.trim() ?? null,
+  };
 }
 
 function readPackageJson() {
@@ -232,11 +202,6 @@ async function assertReachable(url, label) {
     },
     `${label} 检查`,
   );
-}
-
-function stripAnsi(text) {
-  // oxlint-disable-next-line no-control-regex -- ANSI 转义序列以 ESC 控制字符开头
-  return text.replaceAll(/\u001B\[[0-9;?]*[ -/]*[@-~]/g, "");
 }
 
 function extractJsonSegments(text, openChar, closeChar) {
@@ -297,7 +262,7 @@ function extractJsonSegments(text, openChar, closeChar) {
 
 /** EAS 命令的输出里混着进度日志，这里把其中所有能解析的 JSON 片段都取出来。 */
 function parseJsonCandidates(...texts) {
-  const combined = stripAnsi(
+  const combined = stripVTControlCharacters(
     texts
       .filter((text) => typeof text === "string" && text.trim() !== "")
       .join("\n")

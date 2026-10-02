@@ -1,8 +1,13 @@
+import { MAX_SYNC_BYTES } from "../../../../shared/user-data";
 import type { AppContext } from "../../types";
 import { BilibiliUnauthorizedError, verifyBilibiliIdentity } from "../../services/bilibili-auth";
 import type { BilibiliIdentity } from "../../services/bilibili-auth.types";
 import { getClientIp, isRateLimited, RATE_LIMIT_RETRY_AFTER } from "../../utils/rate-limit";
-import { parseSyncOperations, readSyncBody, SyncPayloadTooLargeError } from "../../utils/request";
+import {
+  parseSyncOperations,
+  readJsonBody,
+  RequestPayloadTooLargeError,
+} from "../../utils/request";
 
 const USER_DIRECTORY_NAME = "global";
 const RATE_LIMITED_MESSAGE = "请求过于频繁，请稍后再试";
@@ -20,9 +25,9 @@ export async function handleSyncUserData(c: AppContext) {
   }
   let operations;
   try {
-    operations = parseSyncOperations(await readSyncBody(c.req.raw));
+    operations = parseSyncOperations(await readJsonBody(c.req.raw, MAX_SYNC_BYTES));
   } catch (error) {
-    if (error instanceof SyncPayloadTooLargeError) {
+    if (error instanceof RequestPayloadTooLargeError) {
       return c.json({ success: false, error: "请求数据过大" }, 413);
     }
     throw error;
