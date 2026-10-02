@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import {
   createBilibiliFavoriteFolder,
   deleteBilibiliFavoriteFolder,
@@ -343,7 +344,7 @@ describe("Bilibili favorite folder writes", () => {
         { account: writeAccount, title: "test", privacy: 0 },
         expired.dependencies,
       ),
-    ).rejects.toBeInstanceOf(FavoriteLoginRequiredError);
+    ).rejects.toSatisfy(isLoginRequiredError);
 
     const rejected = setup();
     rejected.request.mockResolvedValue(Response.json({ code: 22001, message: "收藏夹名称已存在" }));

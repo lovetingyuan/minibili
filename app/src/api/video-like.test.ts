@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import {
   modifyVideoLike,
   VideoLikeLoginRequiredError,
@@ -90,9 +91,9 @@ describe("video like safety", () => {
   test.each([-101, -111])("requires login for code %s", async (code) => {
     const { request, dependencies } = setup();
     request.mockResolvedValue(Response.json({ code }));
-    await expect(
-      modifyVideoLike(account, { video, liked: true }, dependencies),
-    ).rejects.toBeInstanceOf(VideoLikeLoginRequiredError);
+    await expect(modifyVideoLike(account, { video, liked: true }, dependencies)).rejects.toSatisfy(
+      isLoginRequiredError,
+    );
   });
 
   test.each([65004, 65006])(

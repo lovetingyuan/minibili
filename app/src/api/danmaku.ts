@@ -11,7 +11,19 @@ import { getCookie } from "./get-cookie";
  */
 export const DANMAKU_SEGMENT_SECONDS = 360;
 
+/** 分段缓存上限：Map 迭代顺序即插入顺序，超出时淘汰最旧的分段。 */
+const DANMAKU_SEGMENT_CACHE_LIMIT = 200;
 const segmentCache = new Map<string, Promise<DanmakuItem[]>>();
+
+function trimDanmakuSegmentCache() {
+  while (segmentCache.size > DANMAKU_SEGMENT_CACHE_LIMIT) {
+    const oldest = segmentCache.keys().next().value;
+    if (oldest === undefined) {
+      return;
+    }
+    segmentCache.delete(oldest);
+  }
+}
 
 /**
  * 播放进度所在的分段下标，用于发送弹幕后定位需要失效的分段
@@ -78,5 +90,6 @@ export function fetchDanmakuSegment(cid: number, index: number): Promise<Danmaku
     throw error;
   });
   segmentCache.set(key, task);
+  trimDanmakuSegmentCache();
   return task;
 }

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import { modifyBilibiliRelation, RelationLoginRequiredError } from "./modify-relation";
 import type { RelationChange, RelationRequestDependencies } from "./modify-relation.types";
 
@@ -129,8 +130,8 @@ describe.each([1, 2, 5] as const)("Bilibili relationship modification act=%s", (
   test.each([-101, -111])("requires login on business code %s", async (code) => {
     const { request, dependencies } = setup();
     request.mockResolvedValue(Response.json({ code }));
-    await expect(modifyBilibiliRelation(account, follow, dependencies)).rejects.toBeInstanceOf(
-      RelationLoginRequiredError,
+    await expect(modifyBilibiliRelation(account, follow, dependencies)).rejects.toSatisfy(
+      isLoginRequiredError,
     );
   });
 

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import {
   createBilibiliRelationTag,
   deleteBilibiliRelationTag,
@@ -249,7 +250,7 @@ describe("Bilibili relation tag writes", () => {
     const expired = setup(undefined, { code: -101, message: "账号未登录" });
     await expect(
       createBilibiliRelationTag({ account, name: "考研" }, expired.dependencies),
-    ).rejects.toBeInstanceOf(RelationTagLoginRequiredError);
+    ).rejects.toSatisfy(isLoginRequiredError);
 
     const failed = setup(undefined, { code: -400, message: "分组名过长" });
     await expect(

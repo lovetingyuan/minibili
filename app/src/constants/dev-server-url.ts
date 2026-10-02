@@ -27,7 +27,12 @@ type ExpoConstantsModule = ExpoConstantsLike & { default?: ExpoConstantsLike | n
  * 实际运行时（Metro / Expo CLI）require 可正常使用。
  */
 export function readMetroHostUri(): string | undefined {
+  // 用 typeof 守卫包住 require，打包器不会把它当成顶层静态依赖：
+  // 纯逻辑单测里不执行 dev 分支，也就不会去解析 react-native。
   try {
+    if (typeof require !== "function") {
+      return undefined;
+    }
     const module = require("expo-constants") as ExpoConstantsModule | undefined;
     return (module?.default ?? module)?.expoConfig?.hostUri ?? undefined;
   } catch {

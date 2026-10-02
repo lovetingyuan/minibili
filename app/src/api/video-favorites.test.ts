@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import {
   FavoriteLoginRequiredError,
   FavoriteResultUnknownError,
@@ -97,8 +98,8 @@ describe("video favorite reads", () => {
       BilibiliSessionChangedError,
     );
     request.mockRejectedValue(Object.assign(new Error("expired"), { code: -101 }));
-    await expect(fetchVideoRelation(video, request, () => true)).rejects.toBeInstanceOf(
-      FavoriteLoginRequiredError,
+    await expect(fetchVideoRelation(video, request, () => true)).rejects.toSatisfy(
+      isLoginRequiredError,
     );
   });
 });
@@ -195,8 +196,8 @@ describe("video favorite writes", () => {
   test.each([-101, -111])("recognizes login failures %s", async (code) => {
     const { request, dependencies } = setup();
     request.mockResolvedValue(Response.json({ code }));
-    await expect(modifyVideoFavorites(account, change, dependencies)).rejects.toBeInstanceOf(
-      FavoriteLoginRequiredError,
+    await expect(modifyVideoFavorites(account, change, dependencies)).rejects.toSatisfy(
+      isLoginRequiredError,
     );
   });
 

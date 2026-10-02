@@ -2,7 +2,7 @@ import { type RouteProp, useIsFocused, useRoute } from "@react-navigation/native
 import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
-import type { VideoPlayer, VideoPlayerStatus } from "expo-video";
+import type { VideoPlayerStatus } from "expo-video";
 import { Play } from "lucide-react-native";
 import React from "react";
 import {
@@ -66,7 +66,6 @@ import {
   PLAYER_SEEK_HINT_HOLD_MS,
   type PlayerSwipeDirection,
   resolveInlinePlayerHeight,
-  resolveInitialResumeSnapshot,
   resolveLimitedEndedUi,
   resolvePlayerResumeDecision,
   resolvePlaybackFailover,
@@ -77,16 +76,13 @@ import {
   shouldPausePlaybackOnNetworkChange,
   shouldShowResumeButton,
   shouldRestartPlayback,
-  type InitialResumeSnapshot,
 } from "./player-helpers";
-import {
-  configureBackgroundPlayback,
-  resolvePlayerSynchronization,
-  type BackgroundPlaybackConfigurationResult,
-} from "./player-lifecycle";
+import { resolvePlayerSynchronization } from "./player-lifecycle";
+import { useBackgroundPlaybackConfiguration } from "./useBackgroundPlaybackConfiguration";
 import { usePlayerControlsVisibility } from "./usePlayerControlsVisibility";
 import { usePlayerGestures } from "./usePlayerGestures";
 import { usePlayerPausedUi } from "./usePlayerPausedUi";
+import { usePlaybackResumeState } from "./usePlaybackResumeState";
 
 // Animated.View 需要额外包一层才能识别 className
 const StyledAnimatedView = withUniwind(Animated.View) as unknown as React.ComponentType<
@@ -207,11 +203,6 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 到时暂停跨播放源保留，避免回到前台后的地址兜底重新自动播放。
   const pausedByBackgroundTimeoutRef = React.useRef(false);
   const pendingPlaybackErrorRef = React.useRef<{ token: number; message: string } | null>(null);
-  const backgroundConfigurationRef = React.useRef<{
-    player: VideoPlayer;
-    enabled: boolean;
-    showNotification: boolean;
-  } | null>(null);
   // 上一次的网络类型，只有"切到流量"这一次变化才需要暂停播放
   const previousNetworkUsageRef = React.useRef(networkUsage);
 
@@ -277,29 +268,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     // 这里对齐 B 站：倍速只改播放速度，音调保持不变
     instance.preservesPitch = true;
     instance.playbackRate = playbackRate;
-    if (Platform.OS === "android" && typeof instance.backgroundPlaybackTimeout === "number") {
-      instance.backgroundPlaybackTimeout = $backgroundPlayEnabled
-        ? $backgroundPlayDurationMinutes * 60
-        : 0;
-    }
   });
-
-  // 旧安装包和其他平台没有这个补丁接口，选择定时时提示更新，避免假装已经生效。
-  const backgroundPlayTimerSupported =
-    Platform.OS === "android" && typeof player.backgroundPlaybackTimeout === "number";
-
-  React.useEffect(() => {
-    if (backgroundPlayTimerSupported) {
-      player.backgroundPlaybackTimeout = $backgroundPlayEnabled
-        ? $backgroundPlayDurationMinutes * 60
-        : 0;
-    }
-  }, [
-    player,
-    backgroundPlayTimerSupported,
-    $backgroundPlayEnabled,
-    $backgroundPlayDurationMinutes,
-  ]);
 
   const effectivePlaybackRate = fastRate ? PLAYER_FAST_RATE : playbackRate;
 
@@ -311,21 +280,16 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 本地按分P 记录的位置优先；当前分P 没有本地记录时再回退 B站记录。
   const liveLocalPlayResumePositionMs = usePartPlayProgressPosition(videoInfo.bvid, cid);
   const initialResumeKey = `${videoInfo.bvid}:${cid}`;
-  const [initialLocalResume, setInitialLocalResume] = React.useState<InitialResumeSnapshot>({
-    key: "",
-    positionMs: null,
-  });
   // 同一个分 P 只在首次拿到本地进度时冻结一次，之后本地进度再变化也不再改写
-  const resolvedInitialLocalResume = resolveInitialResumeSnapshot(
-    initialLocalResume,
+  const localResumePositionMs = usePlaybackResumeState(
     initialResumeKey,
     liveLocalPlayResumePositionMs,
   );
-  if (resolvedInitialLocalResume !== initialLocalResume) {
-    setInitialLocalResume(resolvedInitialLocalResume);
-  }
   const serverPlayResumePositionMs = usePlayResumePosition(videoInfo.aid, cid);
-  const playResumePositionMs = resolvedInitialLocalResume.positionMs ?? serverPlayResumePositionMs;
+  const playResumePositionMs = localResumePositionMs ?? serverPlayResumePositionMs;
+  // 后台播放（Android 播放 service + 通知）的配置与定时，从播放器组件里抽成独立 hook。
+  const { configure: configureBackgroundPlayback, backgroundPlayTimerSupported } =
+    useBackgroundPlaybackConfiguration(player, playbackStarted);
 
   // 登录后按 B站网页播放器的方式上报播放进度，写入观看历史
   const { reportEnded } = usePlayHeartbeatReporter({
@@ -425,40 +389,6 @@ export default function NativePlayer(props: NativePlayerProps) {
       setDanmakuAnchorMs(snapshot.danmakuAnchorMs);
     }
     updatePlayingState(snapshot.isPlaying, true);
-  }
-
-  function configureCurrentPlayerBackgroundPlayback(
-    force = false,
-  ): BackgroundPlaybackConfigurationResult {
-    const showNotification = $backgroundPlayEnabled && playbackStarted;
-    const previous = backgroundConfigurationRef.current;
-    if (
-      !force &&
-      previous?.player === player &&
-      previous.enabled === $backgroundPlayEnabled &&
-      previous.showNotification === showNotification
-    ) {
-      return "applied";
-    }
-    const result = configureBackgroundPlayback(
-      player,
-      $backgroundPlayEnabled,
-      showNotification,
-      AppState.currentState,
-    );
-    if (result !== "deferred") {
-      // 失败时也避免每次 timeUpdate 重渲染都重试；下一次回到前台会强制重试。
-      backgroundConfigurationRef.current = {
-        player,
-        enabled: $backgroundPlayEnabled,
-        showNotification,
-      };
-    }
-    if (__DEV__ && result === "failed") {
-      // oxlint-disable-next-line no-console
-      console.warn("background playback service configuration was rejected");
-    }
-    return result;
   }
 
   /**
@@ -583,7 +513,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
 
     // service 只能在前台创建；已在后台持续播放的同一播放器会复用现有 service。
-    configureCurrentPlayerBackgroundPlayback(true);
+    configureBackgroundPlayback(true);
     if (backgroundPlayTimerSupported && player.backgroundPlaybackTimedOut) {
       pausedByBackgroundTimeoutRef.current = true;
       pendingAutoplayRef.current = false;
@@ -780,7 +710,7 @@ export default function NativePlayer(props: NativePlayerProps) {
       return;
     }
     pendingAutoplayRef.current = false;
-    const configuration = configureCurrentPlayerBackgroundPlayback();
+    const configuration = configureBackgroundPlayback();
     if (configuration === "deferred" || AppState.currentState !== "active") {
       pendingAutoplayRef.current = true;
       return;
@@ -795,7 +725,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     if (appState !== "active" || AppState.currentState !== "active") {
       return;
     }
-    configureCurrentPlayerBackgroundPlayback();
+    configureBackgroundPlayback();
   }, [appState, player, $backgroundPlayEnabled, playbackStarted]);
 
   React.useEffect(() => {

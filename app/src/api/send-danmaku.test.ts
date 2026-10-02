@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import {
   DANMAKU_MAX_LENGTH,
   DanmakuLoginRequiredError,
@@ -169,8 +170,8 @@ describe("sendVideoDanmaku safety", () => {
 describe("sendVideoDanmaku response", () => {
   test.each([-8, -101, -111])("treats code %i as a login problem", async (code) => {
     const { dependencies } = setup({ response: { code, message: "invalid" } });
-    await expect(sendVideoDanmaku(account, request, dependencies)).rejects.toBeInstanceOf(
-      DanmakuLoginRequiredError,
+    await expect(sendVideoDanmaku(account, request, dependencies)).rejects.toSatisfy(
+      isLoginRequiredError,
     );
   });
 

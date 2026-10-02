@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import {
   DynamicLikeLoginRequiredError,
   DynamicLikeResultUnknownError,
@@ -82,8 +83,8 @@ describe("dynamic like safety", () => {
   test.each([-101, -111])("requires login for code %s", async (code) => {
     const { request, dependencies } = setup();
     request.mockResolvedValue(Response.json({ code }));
-    await expect(modifyDynamicLike(account, change, dependencies)).rejects.toBeInstanceOf(
-      DynamicLikeLoginRequiredError,
+    await expect(modifyDynamicLike(account, change, dependencies)).rejects.toSatisfy(
+      isLoginRequiredError,
     );
   });
 

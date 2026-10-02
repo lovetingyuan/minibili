@@ -2,12 +2,15 @@ import React from "react";
 
 import { useAppUpdateInfo } from "@/api/check-update";
 import { AppUpdateDialog } from "@/features/app-update/app-update-dialog";
+import { cleanupAppUpdateCache } from "@/features/app-update/controller";
 import { useStore } from "@/store";
 
 /** 两次自动检查更新的最小间隔 */
 const CHECK_UPDATE_INTERVAL = 1000 * 60 * 60 * 24 * 7;
 
 function CheckAppUpdate() {
+  // 安装包只在启动时清理：下发安装意图后立刻删会让系统安装器读不到文件。
+  React.useEffect(cleanupAppUpdateCache, []);
   const { availableUpdate, hideUpdateDialog, hasUpdate } = useAppUpdateInfo();
   const {
     $checkAppUpdateTime,

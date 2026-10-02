@@ -246,6 +246,8 @@ function __$hack() {
   const RANK_LIST_ID = 'minibili-live-rank-list'
   let audienceCountText = ''
   let audienceRanks = []
+  // 榜单昵称/头像来自接口，绝不能拼进 innerHTML；一律用 DOM API 按文本写入。
+  const HTTPS_IMAGE_URL = /^https:\/\//i
   const renderAudienceCount = () => {
     const dom = document.getElementById('live-audience-count')
     if (dom && audienceCountText) {
@@ -266,15 +268,31 @@ function __$hack() {
         'list-style: none; font-size: 14px; text-align: left; padding-left: 24px; margin-top: 20px;'
       container.appendChild(list)
     }
-    list.innerHTML = audienceRanks
-      .map(
-        (rank, index) => `<li style="margin: 10px 0;">
-                    <span style="color: #F85A54; font-weight: bold">榜${index + 1}</span>
-                  <img src="${rank.face}" style="vertical-align: middle;margin: 0 8px;border-radius: 100px;" width="24" height="24">
-                  <span style="vertical-align: middle;">${rank.name}: ${rank.score}</span>
-                  </li>`,
-      )
-      .join('')
+    list.textContent = ''
+    audienceRanks.forEach((rank, index) => {
+      const item = document.createElement('li')
+      item.style.cssText = 'margin: 10px 0;'
+
+      const rankLabel = document.createElement('span')
+      rankLabel.textContent = `榜${index + 1}`
+      rankLabel.style.cssText = 'color: #F85A54; font-weight: bold;'
+
+      const avatar = document.createElement('img')
+      // 只接受 https 地址，避免混合内容拦截与异常 scheme。
+      avatar.src = HTTPS_IMAGE_URL.test(String(rank.face)) ? rank.face : ''
+      avatar.width = 24
+      avatar.height = 24
+      avatar.style.cssText = 'vertical-align: middle;margin: 0 8px;border-radius: 100px;'
+
+      const text = document.createElement('span')
+      text.textContent = `${rank.name}: ${rank.score}`
+      text.style.cssText = 'vertical-align: middle;'
+
+      item.appendChild(rankLabel)
+      item.appendChild(avatar)
+      item.appendChild(text)
+      list.appendChild(item)
+    })
     return true
   }
   const startAudienceCountPolling = anchorUid => {

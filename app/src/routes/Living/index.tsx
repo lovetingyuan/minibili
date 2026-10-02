@@ -13,6 +13,7 @@ import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
 import { UA } from '../../constants'
 import { showToast } from '../../utils'
+import { shouldAllowWebViewRequest } from '../../utils/webview-url'
 import HeaderRight from './HeaderRight'
 import { INJECTED_JAVASCRIPT, INJECTED_JAVASCRIPT_BEFORE } from './inject-code'
 import { getLiveRoomId, parseLiveWebViewMessage } from './live-playback-message'
@@ -149,16 +150,10 @@ function LiveWebPage({ route }: LivePageProps) {
         showToast('加载失败')
       }}
       onShouldStartLoadWithRequest={request => {
-        if (request.url.startsWith('bilibili://')) {
-          // Linking.openURL(request.url).catch(err => {
-          //   __DEV__ && console.error(err)
-          // })
-          return false
-        }
         if (request.url.includes('.apk')) {
           return false
         }
-        return true
+        return shouldAllowWebViewRequest(request)
       }}
       onRenderProcessGone={handleRenderProcessGone}
       onContentProcessDidTerminate={handleContentProcessDidTerminate}

@@ -35,3 +35,5 @@ app/ios/
 
 # dev / preview 两个变体各自的原生工程缓存（构建脚本自动切换）
 app/.native-build/
+
+.posthog/

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import {
   fetchBilibiliWatchLater,
   getWatchLaterKey,
@@ -109,8 +110,8 @@ describe("Bilibili watch later list", () => {
     const request = vi
       .fn<WatchLaterRequest>()
       .mockRejectedValue(Object.assign(new Error("账号未登录"), { code: -101 }));
-    await expect(fetchBilibiliWatchLater(account, request, () => true)).rejects.toBeInstanceOf(
-      WatchLaterLoginRequiredError,
+    await expect(fetchBilibiliWatchLater(account, request, () => true)).rejects.toSatisfy(
+      isLoginRequiredError,
     );
   });
 });
@@ -155,7 +156,7 @@ describe("Bilibili watch later mutations", () => {
         { aid: "42", added: true },
         { readCookie: async () => cookie, isCurrentAccount: () => true },
       ),
-    ).rejects.toBeInstanceOf(WatchLaterLoginRequiredError);
+    ).rejects.toSatisfy(isLoginRequiredError);
 
     mockFetch({ code: -400, message: "请求错误" });
     await expect(

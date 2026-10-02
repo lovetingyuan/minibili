@@ -19,6 +19,7 @@ import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
 import type { RootStackParamList } from '../../types'
 import { showToast } from '../../utils'
+import { shouldAllowWebViewRequest } from '../../utils/webview-url'
 import HeaderRight from './HeaderRight'
 import { INJECTED_JAVASCRIPT } from './inject-code'
 
@@ -139,16 +140,10 @@ function WebPage({ route }: Props) {
         showToast('加载失败')
       }}
       onShouldStartLoadWithRequest={request => {
-        if (request.url.startsWith('bilibili://')) {
-          // Linking.openURL(request.url).catch(err => {
-          //   __DEV__ && console.error(err)
-          // })
-          return false
-        }
         if (request.url.includes('.apk')) {
           return false
         }
-        return true
+        return shouldAllowWebViewRequest(request)
       }}
       onRenderProcessGone={handleRenderProcessGone}
       onContentProcessDidTerminate={handleContentProcessDidTerminate}

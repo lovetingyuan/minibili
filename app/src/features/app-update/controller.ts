@@ -16,6 +16,7 @@ const APP_UPDATE_DIRECTORY_NAME = "app-updates";
 const APP_UPDATE_PROGRESS_INTERVAL_MS = 500;
 const APK_MIME_TYPE = "application/vnd.android.package-archive";
 const FLAG_GRANT_READ_URI_PERMISSION = 1;
+const SHA256_HEX_PATTERN = /^[a-f0-9]{64}$/i;
 
 type ActiveAppUpdateDownload = {
   task: DownloadTask | null;
@@ -40,8 +41,53 @@ function prepareDownloadDirectory() {
   return directory;
 }
 
+/**
+ * 应用启动时清掉上次安装留下的 APK。
+ * 不能在下发安装意图后立刻删除：系统安装器是异步读文件的，删早了会解析失败。
+ */
+export function cleanupAppUpdateCache() {
+  if (process.env.EXPO_OS !== "android") {
+    return;
+  }
+  prepareDownloadDirectory();
+}
+
 function buildApkFileName(releaseName: string) {
   return `${releaseName.replace(/[^a-zA-Z0-9._-]/g, "-")}.apk`;
+}
+
+/**
+ * 下载完成后校验发布方提供的 `<apk>.sha256`（与 APK 同目录命名的附件）。
+ * 拿不到校验文件时不阻止安装，只跳过校验；校验失败则必须删除安装包。
+ */
+async function verifyApkChecksum(file: File, downloadUrl: string) {
+  const fallbackMessage = "安装包校验失败，请稍后重试";
+  try {
+    const response = await fetch(`${downloadUrl}.sha256`, { cache: "no-store" });
+    if (!response.ok) {
+      return;
+    }
+    const expected = (await response.text()).trim().split(/\s+/)[0]?.toLowerCase() ?? "";
+    if (!SHA256_HEX_PATTERN.test(expected)) {
+      throw new Error(fallbackMessage);
+    }
+    const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+    const actual = Array.from(new Uint8Array(digest), (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join("");
+    if (actual !== expected) {
+      throw new Error(fallbackMessage);
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message === fallbackMessage) {
+      throw error;
+    }
+    // 网络异常读不到校验文件：按「发布未提供校验」处理，不阻止安装。
+    if (__DEV__) {
+      // oxlint-disable-next-line no-console
+      console.log("跳过安装包校验：", error);
+    }
+  }
 }
 
 async function runAppUpdateDownload(
@@ -102,6 +148,7 @@ async function runAppUpdateDownload(
     if (!file.exists || file.size <= 0) {
       throw new Error("下载文件为空");
     }
+    await verifyApkChecksum(file, input.downloadUrl);
 
     if (notifyEnabled) {
       await finishAppUpdateNotification({
@@ -126,9 +173,6 @@ async function runAppUpdateDownload(
   } finally {
     request.task?.release();
     request.task = null;
-    if (file) {
-      deleteQuietly(file);
-    }
     if (activeDownload === request) {
       activeDownload = null;
     }

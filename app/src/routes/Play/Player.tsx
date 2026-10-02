@@ -20,6 +20,7 @@ import { UA } from "@/constants";
 import { theme } from "@/constants/theme";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import type { RootStackParamList } from "@/types";
+import { shouldAllowWebViewRequest } from "@/utils/webview-url";
 
 import { useVideoInfo } from "../../api/video-info";
 import { useAppStateChange } from "../../hooks/useAppState";
@@ -383,10 +384,10 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
         if (request.url.endsWith("/log-reporter.js")) {
           return false;
         }
-        if (request.url.startsWith("http") && !request.url.includes(".apk")) {
-          return true;
+        if (request.url.includes(".apk")) {
+          return false;
         }
-        return false;
+        return shouldAllowWebViewRequest(request);
       }}
     />
   ) : (

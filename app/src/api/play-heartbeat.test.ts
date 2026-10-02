@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
+import { isLoginRequiredError } from "../features/bilibili-session/login-required";
 import {
   createPlayHeartbeatSession,
   PlayHeartbeatLoginRequiredError,
@@ -259,7 +260,7 @@ describe("play heartbeat safety", () => {
     request.mockResolvedValue(Response.json({ code }));
     await expect(
       reportPlayHeartbeat(account, video, session, report, dependencies),
-    ).rejects.toBeInstanceOf(PlayHeartbeatLoginRequiredError);
+    ).rejects.toSatisfy(isLoginRequiredError);
   });
 
   test("reports a business rejection without retrying", async () => {
