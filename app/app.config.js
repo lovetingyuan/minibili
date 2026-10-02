@@ -74,11 +74,14 @@ module.exports = {
     "expo-localization",
     ...(isProduction
       ? [
+          // source map / native 符号上传要用个人 API key（POSTHOG_CLI_API_KEY、POSTHOG_CLI_PROJECT_ID、
+          // EU Cloud 再加 POSTHOG_CLI_HOST）：本地生产构建从 .env 读，EAS 构建从 production 环境变量读
           [
             "posthog-react-native/expo",
             {
+              dotenvFile: ".env",
               skipOnConflict: true,
-              uploadNativeSymbols: true,
+              uploadNativeSymbols: { includeSource: true },
             },
           ],
           "./plugins/with-posthog-cli",

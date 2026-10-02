@@ -33,7 +33,7 @@ import {
 } from '@/features/bilibili-session/useBilibiliSession'
 import { useStore } from '@/store'
 import { showToast } from '@/utils'
-import FavoriteDialog from '../Play/FavoriteDialog'
+import FavoriteDialog from '../Player/FavoriteDialog'
 import FavoriteFolderTabs from './FavoriteFolderTabs'
 import type { FavoriteEditorTarget } from './Favorites.types'
 
