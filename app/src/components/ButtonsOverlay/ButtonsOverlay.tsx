@@ -1,4 +1,4 @@
-import { Button } from '@/components/styled/native'
+import { Button } from '@/components/Button'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { Modal, Pressable, View } from 'react-native'
 import { theme } from '@/constants/theme'

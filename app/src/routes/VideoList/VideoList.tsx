@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { FlashList } from '@/components/styled/native'
+import { FlashList } from '@/components/FlashList'
 import React from 'react'
 import { Alert, TouchableOpacity } from 'react-native'
 
@@ -11,7 +11,7 @@ import { useStore } from '@/store'
 import { useUserSettings } from '@/features/user-data/useUserSettings'
 import type { MainTabNavigationProp } from '@/types'
 import { handleShareVideo, parseNumber } from '@/utils'
-import type { FlashListRef } from '@/components/styled/native'
+import type { FlashListRef } from '@/components/FlashList'
 
 import Loading from './Loading'
 import VideoItem from './VideoItem'

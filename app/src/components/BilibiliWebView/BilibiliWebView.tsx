@@ -6,7 +6,8 @@ import { bilibiliSession } from '@/features/bilibili-session/session'
 import { BilibiliCookieModuleUnavailableError } from '@/features/bilibili-session/webview-cookies'
 
 import type { BilibiliWebViewPreparation, BilibiliWebViewProps } from './BilibiliWebView.types'
-import { Button, Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 
 function PreparedWebView(props: BilibiliWebViewProps) {
   const [attempt, setAttempt] = React.useState(0)

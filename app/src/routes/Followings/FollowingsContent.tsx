@@ -1,7 +1,8 @@
 import { ActivityIndicator, View } from 'react-native'
 
 import { LoginRequired } from '@/components/LoginRequired'
-import { Button, Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 import { useFollowingsState } from '@/features/bilibili-followings/useFollowingsState'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
 import FollowList from './FollowList'

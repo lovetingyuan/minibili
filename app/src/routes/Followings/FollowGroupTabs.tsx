@@ -2,7 +2,7 @@ import React from 'react'
 import { Plus } from 'lucide-react-native'
 import { ScrollView, TouchableOpacity, View } from 'react-native'
 
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/theme'
 

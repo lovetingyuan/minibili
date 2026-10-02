@@ -1,6 +1,7 @@
-import { Image } from '@/components/styled/expo'
-import { Skeleton, Text } from '@/components/styled/native'
-import { FlashList } from '@/components/styled/native'
+import { Image } from '@/components/Image'
+import { Skeleton } from '@/components/Skeleton'
+import { Text } from '@/components/Text'
+import { FlashList } from '@/components/FlashList'
 import type { ImageLoadEventData } from 'expo-image'
 import React from 'react'
 import { Keyboard, Platform, TouchableOpacity, View } from 'react-native'
@@ -12,7 +13,7 @@ import VideoListItem from '@/components/VideoItem'
 import { theme } from '@/constants/theme'
 import { useStore } from '@/store'
 import { getImagePixelSize, parseImgUrl } from '@/utils'
-import type { FlashListRef } from '@/components/styled/native'
+import type { FlashListRef } from '@/components/FlashList'
 
 const EMPTY_LIST_BOTTOM_SPACING = 16
 

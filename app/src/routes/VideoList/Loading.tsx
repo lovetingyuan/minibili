@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/styled/native'
+import { Skeleton } from '@/components/Skeleton'
 import { View } from 'react-native'
 
 const SKELETON_WIDTHS = [85, 62, 92, 45, 76, 30, 55, 95, 70, 40, 88, 35, 66, 52, 78, 25]

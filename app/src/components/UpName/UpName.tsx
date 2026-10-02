@@ -2,7 +2,7 @@ import { clsx } from 'clsx'
 
 import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
 
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import type { UpNameProps } from './UpName.types'
 
 export default function UpName({ mid, className, ...props }: UpNameProps) {

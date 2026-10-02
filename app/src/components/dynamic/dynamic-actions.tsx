@@ -17,7 +17,7 @@ import {
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { handleShareDynamic, parseNumber, showToast } from '@/utils'
 
-import { Text } from '../styled/native'
+import { Text } from '@/components/Text'
 
 const ACTION_ICON_SIZE = 18
 

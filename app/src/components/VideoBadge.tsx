@@ -1,6 +1,6 @@
 import { clsx } from 'clsx'
 
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 
 import type { VideoBadgeProps, VideoBadgeTone } from './VideoBadge.types'

@@ -12,7 +12,7 @@ import { useSpaceContentCounts, useSpaceOpusItems, useSpaceVideoItems } from '@/
 import { useUserInfo } from '@/api/user-info'
 import { DynamicList } from '@/components/dynamic/dynamic-list'
 import { useOpenDynamicItem } from '@/components/dynamic/use-open-dynamic-item'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { useMarkFollowingDynamicsRead } from '@/store/actions'

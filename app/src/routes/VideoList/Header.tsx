@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
-import { Button, Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { ChevronDown, Search } from 'lucide-react-native'
 import React from 'react'

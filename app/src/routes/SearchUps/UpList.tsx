@@ -1,8 +1,10 @@
 import { useNavigation } from '@react-navigation/native'
 import { Avatar } from '@/components/Avatar'
-import { Button, Skeleton, Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Skeleton } from '@/components/Skeleton'
+import { Text } from '@/components/Text'
 import UpName from '@/components/UpName'
-import { FlashList } from '@/components/styled/native'
+import { FlashList } from '@/components/FlashList'
 import { clsx } from 'clsx'
 import React from 'react'
 import { Keyboard, Platform, TouchableOpacity, View } from 'react-native'
@@ -19,7 +21,7 @@ import { useFollowedUpsMap } from '@/store/derives'
 import { useActiveFollowedUps } from '@/store/followings'
 import type { NavigationProps } from '@/types'
 import { getImagePixelSize, parseImgUrl, parseNumber } from '@/utils'
-import type { FlashListRef } from '@/components/styled/native'
+import type { FlashListRef } from '@/components/FlashList'
 
 const EMPTY_LIST_BOTTOM_SPACING = 16
 /** 首次搜索时的骨架屏行数 */

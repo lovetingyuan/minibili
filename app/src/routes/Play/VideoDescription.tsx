@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react-native'
 import React from 'react'
 import { Pressable, View } from 'react-native'
 
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import UpName from '@/components/UpName'
 import { theme } from '@/constants/theme'

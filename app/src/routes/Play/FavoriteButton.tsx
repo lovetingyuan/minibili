@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Pressable } from 'react-native'
 
 import { useVideoRelation } from '@/api/useVideoFavorites'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/theme'
 import { showLoginRequiredAlert } from '@/features/bilibili-session/login-required-alert'

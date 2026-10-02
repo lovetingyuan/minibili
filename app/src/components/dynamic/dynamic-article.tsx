@@ -6,8 +6,9 @@ import { theme } from '@/constants/theme'
 import { parseUrl } from '@/utils'
 
 import { InlineEmoji } from '../InlineEmoji'
-import { Image } from '../styled/expo'
-import { Skeleton, Text } from '../styled/native'
+import { Image } from '@/components/Image'
+import { Skeleton } from '@/components/Skeleton'
+import { Text } from '@/components/Text'
 import UpName from '../UpName'
 import { DynamicImageGrid } from './dynamic-media'
 

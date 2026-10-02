@@ -1,6 +1,6 @@
 import { type RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import { Avatar } from '@/components/Avatar'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import UpName from '@/components/UpName'
 import {

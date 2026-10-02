@@ -1,6 +1,6 @@
 import { Chip } from '@/components/Chip'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { X } from 'lucide-react-native'
 import React from 'react'

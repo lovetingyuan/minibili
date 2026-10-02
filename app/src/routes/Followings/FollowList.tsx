@@ -9,7 +9,8 @@ import {
   useRelationTagActions,
 } from '@/api/useBilibiliRelationTags'
 import { Dialog } from '@/components/Dialog'
-import { Button, Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 import { overlayIcons } from '@/constants/overlay-icons'
 import { theme } from '@/constants/theme'
 import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'

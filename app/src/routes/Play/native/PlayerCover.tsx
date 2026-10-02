@@ -1,4 +1,4 @@
-import { Switch } from '@/components/styled/native'
+import { Switch } from '@/components/Switch'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { VideoBadge } from '@/components/VideoBadge'
 import type { VideoBadgeTone } from '@/components/VideoBadge'

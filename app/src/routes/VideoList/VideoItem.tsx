@@ -1,9 +1,9 @@
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import UpName from '@/components/UpName'
 import { WatchProgressBar } from '@/components/WatchProgressBar'
 import { clsx } from 'clsx'
-import { Image } from '@/components/styled/expo'
+import { Image } from '@/components/Image'
 import { CircleCheck, CirclePlay, CircleUserRound } from 'lucide-react-native'
 import { useWindowDimensions, View } from 'react-native'
 

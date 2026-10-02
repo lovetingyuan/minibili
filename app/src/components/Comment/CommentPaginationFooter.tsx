@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native'
 
 import { theme } from '@/constants/theme'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 
 import type { CommentPaginationFooterProps } from './comment-pagination-footer.types'
 

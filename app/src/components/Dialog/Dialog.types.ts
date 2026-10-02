@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from 'react'
 import type { ModalProps } from 'react-native'
 
-import type { Button } from '@/components/styled/native'
+import type { Button } from '@/components/Button'
 
 export type DialogProps = {
   visible: boolean

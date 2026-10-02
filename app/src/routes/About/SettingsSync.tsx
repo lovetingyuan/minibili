@@ -1,5 +1,5 @@
 import { useUserSettings } from '@/features/user-data/useUserSettings'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 
 export default function SettingsSync() {

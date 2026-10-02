@@ -4,7 +4,7 @@ import { ActivityIndicator, View } from 'react-native'
 import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
 import { Chip } from '@/components/Chip'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 
 export default function Blacklist() {

@@ -2,7 +2,7 @@ import React from 'react'
 import { TextInput } from 'react-native'
 
 import { Dialog } from '@/components/Dialog'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 
 import type { GroupNameDialogProps } from './FollowGroups.types'

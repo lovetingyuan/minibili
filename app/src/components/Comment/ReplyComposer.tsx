@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useResolveClassNames } from 'uniwind'
 import { ArrowUp } from 'lucide-react-native'
 
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/theme'
 

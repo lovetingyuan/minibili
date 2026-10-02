@@ -14,7 +14,7 @@ import { parseUrl } from '@/utils'
 
 import { InlineEmoji } from '../InlineEmoji'
 import { getRichTextsContainerClassName, getRichTextsTextClassName } from './rich-texts.helpers'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import UpName from '../UpName'
 
 type Props = {

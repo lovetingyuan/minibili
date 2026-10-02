@@ -11,7 +11,7 @@ import Animated, {
 
 import { getInlineEmojiOffset } from '@/components/InlineEmoji'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 import { parseNumber } from '@/utils'
 

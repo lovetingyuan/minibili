@@ -4,7 +4,7 @@ import * as Clipboard from 'expo-clipboard'
 import { Alert, Pressable, View } from 'react-native'
 
 import { Avatar } from '@/components/Avatar'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { overlayIcons } from '@/constants/overlay-icons'
 import { theme } from '@/constants/theme'
 import { useStore } from '@/store'

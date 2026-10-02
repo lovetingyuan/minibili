@@ -1,7 +1,8 @@
 import { TextInput, View } from 'react-native'
 
 import { Dialog } from '@/components/Dialog'
-import { Switch, Text } from '@/components/styled/native'
+import { Switch } from '@/components/Switch'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 import { FAVORITE_FOLDER_NAME_MAX_LENGTH } from '@/features/bilibili-favorites/folder-name'
 import type { CreateFavoriteFolderDialogProps } from './Favorites.types'

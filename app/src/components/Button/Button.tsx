@@ -87,7 +87,7 @@ export function Button({
       <Pressable
         {...pressableProps}
         accessibilityRole={accessibilityRole}
-        accessibilityState={{ ...accessibilityState, busy: loading, disabled }}
+        accessibilityState={{ ...accessibilityState, busy: loading || !!accessibilityState?.busy, disabled }}
         android_ripple={androidRipple}
         delayLongPress={0}
         disabled={disabled}

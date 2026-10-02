@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 
 import {

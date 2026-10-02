@@ -8,7 +8,8 @@ import {
   View,
 } from 'react-native'
 
-import { Button, Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 import useResolvedColor from '@/hooks/useResolvedColor'
 

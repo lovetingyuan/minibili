@@ -1,4 +1,4 @@
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import UpName from '@/components/UpName'
 import React from 'react'
 import { ActivityIndicator, View } from 'react-native'

@@ -1,8 +1,8 @@
 import { Search, X } from 'lucide-react-native'
 import { Pressable, TextInput, View } from 'react-native'
 
-import { IconButton } from '@/components/IconButton'
-import { Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/theme'
 import useResolvedColor from '@/hooks/useResolvedColor'
@@ -60,13 +60,16 @@ export default function SpaceTabs(props: SpaceTabsProps) {
           />
         </View>
         <View className="w-12 items-center justify-center">
-          <IconButton
+          <Button
+            type="clear"
+            radius={18}
+            buttonClassName="h-9 w-9 p-0"
             accessibilityRole="button"
             accessibilityLabel="退出搜索"
             onPress={props.onClose}
           >
             <ThemedIcon icon={X} size={20} colorClassName={theme.icon.secondary} />
-          </IconButton>
+          </Button>
         </View>
       </View>
     )
@@ -101,13 +104,16 @@ export default function SpaceTabs(props: SpaceTabsProps) {
         )
       })}
       <View className="w-12 items-center justify-center">
-        <IconButton
+        <Button
+          type="clear"
+          radius={18}
+          buttonClassName="h-9 w-9 p-0"
           accessibilityRole="button"
           accessibilityLabel="搜索 UP 内容"
           onPress={props.onOpenSearch}
         >
           <ThemedIcon icon={Search} size={20} colorClassName={theme.icon.secondary} />
-        </IconButton>
+        </Button>
       </View>
     </View>
   )

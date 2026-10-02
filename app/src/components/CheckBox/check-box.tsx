@@ -2,7 +2,7 @@ import { clsx } from 'clsx'
 import React from 'react'
 import { Pressable, View } from 'react-native'
 
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { theme } from '@/constants/theme'
 import useResolvedColor from '@/hooks/useResolvedColor'
 

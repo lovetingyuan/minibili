@@ -16,8 +16,8 @@ import { useWatchProgressRatio } from '@/store/watch-progress'
 import type { NavigationProps, OverlayButton } from '@/types'
 import { getImagePixelDimensions, parseImgUrl, parseNumber } from '@/utils'
 
-import { Image } from '../styled/expo'
-import { Text } from '../styled/native'
+import { Image } from '@/components/Image'
+import { Text } from '@/components/Text'
 import { WatchProgressBar } from '../WatchProgressBar'
 
 /** 九宫格的行列间距（dp），与容器上的 `gap-1.5` 保持一致，用于估算请求图片的尺寸。 */

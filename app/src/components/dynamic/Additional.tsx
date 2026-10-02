@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { ChevronRight, CirclePlay } from 'lucide-react-native'
-import { Text } from '@/components/styled/native'
-import { Image } from '@/components/styled/expo'
+import { Text } from '@/components/Text'
+import { Image } from '@/components/Image'
 import { Linking, Pressable, View } from 'react-native'
 import type { GestureResponderEvent } from 'react-native'
 

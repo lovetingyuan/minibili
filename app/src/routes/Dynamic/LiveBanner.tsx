@@ -15,7 +15,7 @@ import Animated, {
 
 import { useLivingInfo } from '@/api/living-info'
 import { useUserInfo } from '@/api/user-info'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/theme'
 import type { NavigationProps, RootStackParamList } from '@/types'

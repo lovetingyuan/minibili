@@ -19,7 +19,9 @@ import { getCommentListEmptyText } from './comment-list.helpers'
 import CommentPaginationFooter from './CommentPaginationFooter'
 import type { CommentListProps } from './comment-list.types'
 import ReplyList from './ReplyList'
-import { FlashList, Skeleton, Text } from '@/components/styled/native'
+import { FlashList } from '@/components/FlashList'
+import { Skeleton } from '@/components/Skeleton'
+import { Text } from '@/components/Text'
 
 const LOADING_COMMENT_WIDTHS = [78, 62, 90, 45, 72, 55]
 

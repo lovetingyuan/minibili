@@ -1,4 +1,5 @@
-import { Button, Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 import React from 'react'
 import { View } from 'react-native'
 

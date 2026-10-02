@@ -5,8 +5,8 @@ import { ActivityIndicator, Alert, View } from 'react-native'
 
 import { Avatar } from '@/components/Avatar'
 import { getDynamicUpTarget } from '@/components/dynamic/dynamic-target'
-import { IconButton } from '@/components/IconButton'
-import { Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/theme'
 import { useBilibiliSession } from '@/features/bilibili-session/useBilibiliSession'
@@ -55,11 +55,14 @@ function AuthButton() {
   }
 
   return (
-    <IconButton
+    <Button
+      type="clear"
+      radius={18}
+      buttonClassName="h-9 w-9 p-0"
+      containerClassName="mr-2"
       accessibilityRole="button"
       accessibilityLabel={account ? '退出登录' : '登录'}
       accessibilityState={{ busy }}
-      className="mr-2"
       onPress={onPress}
     >
       {busy ? (
@@ -71,7 +74,7 @@ function AuthButton() {
           colorClassName={theme.primary.accent}
         />
       )}
-    </IconButton>
+    </Button>
   )
 }
 

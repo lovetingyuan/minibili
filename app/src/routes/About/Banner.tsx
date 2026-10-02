@@ -2,7 +2,8 @@ import { Image, Linking, Pressable, Share, View } from 'react-native'
 import { Share2 } from 'lucide-react-native'
 
 import { GitHubIcon } from '@/components/GitHubIcon'
-import { Button, Text } from '@/components/styled/native'
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 
 import { githubLink, site } from '../../constants'

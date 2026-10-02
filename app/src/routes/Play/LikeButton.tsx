@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { ActivityIndicator, Pressable } from 'react-native'
 
 import { useVideoLike } from '@/api/useVideoLike'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/theme'
 import {

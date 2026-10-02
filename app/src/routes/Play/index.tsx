@@ -1,7 +1,7 @@
 import { useBackHandler } from '@react-native-community/hooks'
 import { useIsFocused } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 import { Alert, View } from 'react-native'

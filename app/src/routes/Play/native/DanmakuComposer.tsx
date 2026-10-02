@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native'
 
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/theme'
 

@@ -1,5 +1,5 @@
 import { useFollowingDynamicsNavRefresh } from '@/api/useFollowingDynamicsNavUpdates'
-import { Text } from '@/components/styled/native'
+import { Text } from '@/components/Text'
 import { orderFollowedUps } from '@/features/bilibili-followings/order-followings'
 import { useFollowingsState } from '@/features/bilibili-followings/useFollowingsState'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
