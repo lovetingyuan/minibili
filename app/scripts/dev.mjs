@@ -34,6 +34,9 @@ const DEFAULT_METRO_PORT = 8081;
 const API_PORT = 8787;
 const LOCAL_IP = "127.0.0.1";
 const HOST_FLAGS = ["--localhost", "--lan", "--tunnel"];
+// adb 偶尔会僵死（端口在 listen 但不回话），无超时的同步调用会让本脚本在打印任何
+// 日志之前就静默卡住。给所有 adb 调用兜个上限，超时按“没有设备”处理。
+const ADB_TIMEOUT_MS = 10_000;
 
 const log = {
   info: (message) => console.log(`[INFO] ${message}`),
@@ -45,7 +48,7 @@ const log = {
 //   List of devices attached
 //   ZLXG6XCYOVGINBON	device product:... transport_id:1
 function listDevices() {
-  return execFileSync("adb", ["devices"], { encoding: "utf8" })
+  return execFileSync("adb", ["devices"], { encoding: "utf8", timeout: ADB_TIMEOUT_MS })
     .split(/\r?\n/)
     .slice(1)
     .map((line) => line.trim())
@@ -80,6 +83,7 @@ function reversePort(serial, port) {
     execFileSync("adb", ["-s", serial, "reverse", `tcp:${port}`, `tcp:${port}`], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
+      timeout: ADB_TIMEOUT_MS,
     });
     return null;
   } catch (error) {
@@ -88,14 +92,20 @@ function reversePort(serial, port) {
 }
 
 function removeReversePort(serial, port) {
-  spawnSync("adb", ["-s", serial, "reverse", "--remove", `tcp:${port}`], { stdio: "ignore" });
+  spawnSync("adb", ["-s", serial, "reverse", "--remove", `tcp:${port}`], {
+    stdio: "ignore",
+    timeout: ADB_TIMEOUT_MS,
+  });
 }
 
 // `adb reverse --list` 每行形如 `UsbFfs tcp:8081 tcp:8081`（设备侧端口在前）。
 // 记下来是为了退出时只回滚本次新增的反代，不动这个设备上原有的反代。
 function listReversedPorts(serial) {
   try {
-    const output = execFileSync("adb", ["-s", serial, "reverse", "--list"], { encoding: "utf8" });
+    const output = execFileSync("adb", ["-s", serial, "reverse", "--list"], {
+      encoding: "utf8",
+      timeout: ADB_TIMEOUT_MS,
+    });
     return new Set(
       output
         .split(/\r?\n/)
@@ -135,6 +145,14 @@ function listReadyDevices() {
       return {
         ready: [],
         reason: "未找到 adb 命令，请安装 Android platform-tools 并把它加入 PATH",
+      };
+    }
+    if (error.code === "ETIMEDOUT") {
+      return {
+        ready: [],
+        reason:
+          `adb 超过 ${ADB_TIMEOUT_MS / 1000}s 无响应，server 已僵死（adb kill-server 也会卡住，` +
+          "需直接结束进程：Windows 用 taskkill /F /IM adb.exe，macOS/Linux 用 pkill adb）",
       };
     }
     return { ready: [], reason: `执行 adb devices 失败：${error.stderr?.trim() || error.message}` };
@@ -270,7 +288,7 @@ function startMetro(forwardedArgs, shouldUseLocalhost, reversed) {
 async function main() {
   const forwardedArgs = process.argv.slice(2);
   const metroPort = parseMetroPort(forwardedArgs);
-  const shouldUseLocalhost = !forwardedArgs.some((arg) => HOST_FLAGS.includes(arg));
+  const hostFlagGiven = forwardedArgs.some((arg) => HOST_FLAGS.includes(arg));
 
   const { ready, reason, showTips } = listReadyDevices();
   let reversed = [];
@@ -290,9 +308,13 @@ async function main() {
     );
   }
 
+  // --localhost 只对走 adb 反代的手机有意义：没有反代时它会让 Metro 只绑回环，
+  // 手机反而连不上，与上面“按 expo 默认的 LAN 模式启动”的提示也不一致。
+  const shouldUseLocalhost = !hostFlagGiven && reversed.length > 0;
+
   if (shouldUseLocalhost) {
     log.info(`Metro 将以 localhost 模式启动，dev client 请打开 http://${LOCAL_IP}:${metroPort}`);
-  } else {
+  } else if (hostFlagGiven) {
     log.info("Metro 将以 LAN 模式启动（你已显式指定 host 参数）");
   }
   log.info("接口调试依赖本地 server，请另开终端执行 npm run server");
