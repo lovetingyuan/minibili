@@ -4,11 +4,13 @@ import { BackHandler } from "react-native";
 import { WebView } from "react-native-webview";
 import type { WebViewNavigation } from "react-native-webview";
 
+import WebViewError from "./WebViewError";
 import type { NavigableWebViewProps } from "./NavigableWebView.types";
 
 export default function NavigableWebView({
   ref,
   onNavigationStateChange,
+  renderError,
   ...props
 }: NavigableWebViewProps) {
   const webViewRef = React.useRef<WebView | null>(null);
@@ -75,7 +77,16 @@ export default function NavigableWebView({
     onNavigationStateChange?.(state);
   }
 
+  function renderWebViewError() {
+    return <WebViewError onRefresh={() => webViewRef.current?.reload()} />;
+  }
+
   return (
-    <WebView {...props} ref={handleRef} onNavigationStateChange={handleNavigationStateChange} />
+    <WebView
+      {...props}
+      ref={handleRef}
+      onNavigationStateChange={handleNavigationStateChange}
+      renderError={renderError ?? renderWebViewError}
+    />
   );
 }

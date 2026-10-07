@@ -6,6 +6,8 @@ import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 import { Alert, View } from 'react-native'
 
+import { getApiErrorCode } from '@/api/fetcher'
+import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { useWatchProgressRefresh } from '@/hooks/useWatchProgressRefresh'
 import { showToast } from '@/utils'
@@ -57,17 +59,33 @@ function Play({ route }: Props) {
   // 下载用当前分P 的 cid，没有分P 信息时退回视频自身的 cid
   const downloadCid = pageInfo?.cid ?? videoInfo.cid ?? 0
 
-  const errorShowedRef = React.useRef(false)
+  const hasVideoInfo = Boolean(data)
+  const errorShowedRef = React.useRef<string | null>(null)
 
   React.useEffect(() => {
-    if (!errorShowedRef.current && error) {
-      errorShowedRef.current = true
-      Alert.alert(
-        '抱歉，出错了',
-        '\n获取当前视频信息失败，无法播放\n可能是由于UP删除、设为私密或者涉及违规等',
-      )
+    if (!error || hasVideoInfo) {
+      errorShowedRef.current = null
+      return
     }
-  }, [error])
+    if (isLoginRequiredError(error)) {
+      return
+    }
+
+    const code = getApiErrorCode(error)
+    const unavailable = code === -403 || code === -404
+    const notificationKey = `${bvid}:${unavailable ? 'unavailable' : 'request'}`
+    // 自动重试不重复提示；网络失败后若确认视频不可用，仍需展示对应说明。
+    if (errorShowedRef.current === notificationKey) {
+      return
+    }
+    errorShowedRef.current = notificationKey
+
+    if (unavailable) {
+      Alert.alert('视频不可用', '视频不存在、已被删除或没有访问权限')
+    } else {
+      showToast('视频信息加载失败，请检查网络后重试')
+    }
+  }, [bvid, error, hasVideoInfo])
 
   const [fullscreen, setFullscreen] = React.useState(false)
 
