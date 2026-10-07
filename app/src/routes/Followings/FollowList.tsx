@@ -1,3 +1,4 @@
+import { useIsFocused } from '@react-navigation/native'
 import React from 'react'
 import { Alert, View } from 'react-native'
 import PagerView from 'react-native-pager-view'
@@ -9,11 +10,11 @@ import {
   useRelationTagActions,
 } from '@/api/useBilibiliRelationTags'
 import { Dialog } from '@/components/Dialog'
-import { Button } from '@/components/Button'
 import { Text } from '@/components/Text'
 import { overlayIcons } from '@/constants/overlay-icons'
 import { theme } from '@/constants/theme'
 import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
+import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
 import {
   handleLoginRequiredError,
   showLoginRequiredAlert,
@@ -66,6 +67,27 @@ function FollowList() {
   const { setOverlayButtons } = useStore()
   const { account } = useBilibiliSessionState()
   const sessionActions = useBilibiliSessionActions()
+  const focused = useIsFocused()
+  const notifiedTagsErrorRef = React.useRef(false)
+
+  React.useEffect(() => {
+    if (!tags.error) {
+      notifiedTagsErrorRef.current = false
+      return
+    }
+    if (
+      !focused ||
+      !account ||
+      !bilibiliSession.isCurrentAccount(account) ||
+      tags.error instanceof BilibiliSessionChangedError ||
+      isLoginRequiredError(tags.error) ||
+      notifiedTagsErrorRef.current
+    ) {
+      return
+    }
+    notifiedTagsErrorRef.current = true
+    showToast('分组加载失败，请稍后重试', true)
+  }, [account, focused, tags.error])
 
   const tabs: FollowGroupTab[] = [
     { key: ALL_TAB_KEY, tagid: null, name: '全部', count: $followedUps.length, custom: false },
@@ -284,20 +306,6 @@ function FollowList() {
 
   return (
     <View className="flex-1">
-      {tags.error ? (
-        <View className="flex-row items-center justify-center gap-2 px-3 py-2">
-          <Text className="shrink text-xs">分组加载失败，正在显示上次数据</Text>
-          <Button
-            title="重试"
-            type="clear"
-            size="sm"
-            loading={tags.isValidating}
-            onPress={() => {
-              void refreshTags()
-            }}
-          />
-        </View>
-      ) : null}
       <FollowGroupTabs
         tabs={tabs}
         selectedKey={activeTab.key}

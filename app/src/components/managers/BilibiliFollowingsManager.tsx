@@ -1,6 +1,8 @@
 import React from "react";
 
 import { mergeFollowedUps, useBilibiliFollowings } from "@/api/followings";
+import { BilibiliSessionChangedError } from "@/features/bilibili-session/controller";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSession";
 import { getStoreMethods, useStore } from "@/store";
@@ -36,14 +38,21 @@ function BilibiliFollowingsManager() {
     if (!error) {
       notifiedErrorKeyRef.current = "";
     }
-    if (!enabled || !account || !error || !bilibiliSession.isCurrentAccount(account)) {
+    if (
+      !enabled ||
+      !account ||
+      !error ||
+      !bilibiliSession.isCurrentAccount(account) ||
+      error instanceof BilibiliSessionChangedError ||
+      isLoginRequiredError(error)
+    ) {
       return;
     }
 
     const errorKey = `${account.mid}:${account.generation}`;
     if (notifiedErrorKeyRef.current !== errorKey) {
       notifiedErrorKeyRef.current = errorKey;
-      showToast("B站关注列表同步失败，请在关注页重试；未覆盖上次数据");
+      showToast("关注列表刷新失败，请稍后重试", true);
     }
   }, [account, enabled, error]);
 

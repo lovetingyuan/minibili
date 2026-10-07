@@ -65,20 +65,6 @@ export default function BilibiliAccountGate({ Content, syncFollowings }: Props) 
   } else {
     content = (
       <>
-        {error ? (
-          <View className="flex-row items-center justify-center gap-2 px-3 py-2">
-            <Text className="shrink text-xs">登录状态校验失败，已保留上次状态</Text>
-            <Button
-              title="重试"
-              type="clear"
-              size="sm"
-              loading={isChecking}
-              onPress={() => {
-                void revalidate()
-              }}
-            />
-          </View>
-        ) : null}
         {account && bilibiliSession.isCurrentAccount(account) ? (
           <Content key={`${account.mid}:${account.generation}`} />
         ) : account ? (

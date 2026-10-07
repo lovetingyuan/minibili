@@ -24,6 +24,7 @@ import { ThemedIcon } from '@/components/ThemedIcon'
 import VideoListItem from '@/components/VideoItem'
 import { overlayIcons } from '@/constants/overlay-icons'
 import { theme } from '@/constants/theme'
+import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
 import { showLoginRequiredAlert } from '@/features/bilibili-session/login-required-alert'
 import { bilibiliSession } from '@/features/bilibili-session/session'
@@ -50,8 +51,29 @@ export default function FavoritesContent() {
   const { account } = useBilibiliSessionState()
   const { logout } = useBilibiliSessionActions()
   const focused = useIsFocused()
+  const notifiedFoldersErrorRef = React.useRef(false)
   const [editing, setEditing] = React.useState<FavoriteEditorTarget | null>(null)
   const canEdit = Boolean(editing && focused && bilibiliSession.isCurrentAccount(editing.account))
+
+  React.useEffect(() => {
+    if (!folders.error) {
+      notifiedFoldersErrorRef.current = false
+      return
+    }
+    if (
+      !focused ||
+      !folders.data ||
+      !account ||
+      !bilibiliSession.isCurrentAccount(account) ||
+      folders.error instanceof BilibiliSessionChangedError ||
+      isLoginRequiredError(folders.error) ||
+      notifiedFoldersErrorRef.current
+    ) {
+      return
+    }
+    notifiedFoldersErrorRef.current = true
+    showToast('收藏夹刷新失败，请稍后重试', true)
+  }, [account, focused, folders.data, folders.error])
 
   React.useEffect(() => {
     if (!canEdit) {
@@ -192,20 +214,6 @@ export default function FavoritesContent() {
           onLoginRequired={loginRequired}
           onSaved={resources.refreshAfterChange}
         />
-      ) : null}
-      {folders.error ? (
-        <View className="flex-row items-center justify-center gap-2 px-3 py-2">
-          <Text className="shrink text-xs">收藏夹刷新失败，正在显示上次数据</Text>
-          <Button
-            title="重试"
-            type="clear"
-            size="sm"
-            loading={folders.isValidating}
-            onPress={() => {
-              void folders.mutate().catch(() => {})
-            }}
-          />
-        </View>
       ) : null}
       {folder ? (
         <>

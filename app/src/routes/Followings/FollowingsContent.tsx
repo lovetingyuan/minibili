@@ -32,15 +32,5 @@ export default function FollowingsContent() {
       </View>
     )
   }
-  return (
-    <View className="flex-1">
-      {error ? (
-        <View className="flex-row items-center justify-center gap-2 px-3 py-2">
-          <Text className="shrink text-xs">同步失败，正在显示上次数据</Text>
-          <Button title="重试" type="clear" size="sm" loading={isValidating} onPress={retry} />
-        </View>
-      ) : null}
-      <FollowList />
-    </View>
-  )
+  return <FollowList />
 }
