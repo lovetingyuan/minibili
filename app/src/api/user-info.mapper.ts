@@ -14,5 +14,6 @@ export function mapUserCardInfo(userInfo: UserCardInfoResponse): UserInfo {
     level: userInfo.card.level_info.current_level,
     sex: userInfo.card.sex,
     officialDescription: userInfo.card.official_verify?.desc ?? "",
+    spacesta: userInfo.card.spacesta,
   };
 }

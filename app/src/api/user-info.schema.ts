@@ -13,6 +13,7 @@ export const UserCardInfoResponseSchema = z.object({
     friend: z.number(),
     attention: z.number(),
     sign: z.string(),
+    spacesta: z.number().optional(),
     official_verify: z
       .object({
         type: z.number(),

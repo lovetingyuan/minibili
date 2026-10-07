@@ -232,6 +232,15 @@ function Dynamic({ route }: Props) {
 
   return (
     <View className={`flex-1 ${theme.background.page}`}>
+      {userInfo?.spacesta === -2 ? (
+        <View className="items-start px-4 py-1.5">
+          <Text
+            className={`rounded px-2 py-0.5 text-xs font-medium ${theme.error.text} ${theme.background.fill.bg}`}
+          >
+            封禁中
+          </Text>
+        </View>
+      ) : null}
       <LiveBanner />
       {searching ? (
         <SpaceTabs
