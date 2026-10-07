@@ -11,10 +11,11 @@ import { useLiveUpsRefresh } from '@/hooks/useLiveUpsRefresh'
 import { useRecoverableWebView } from '@/hooks/useRecoverableWebView'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 
-import { UA } from '../../constants'
+import { mediaUA, UA } from '../../constants'
 import { showToast } from '../../utils'
 import { shouldAllowWebViewRequest } from '../../utils/webview-url'
 import HeaderRight from './HeaderRight'
+import { DESKTOP_INJECTED_JAVASCRIPT } from './desktop-inject-code'
 import { INJECTED_JAVASCRIPT, INJECTED_JAVASCRIPT_BEFORE } from './inject-code'
 import { getLiveRoomId, parseLiveWebViewMessage } from './live-playback-message'
 import type { LivePageProps } from './live-playback.types'
@@ -34,6 +35,9 @@ function Loading() {
 
 function LiveWebPage({ route }: LivePageProps) {
   const { url, title: pageTitle } = route.params
+  // 只在当前直播间生效，不写入设置；进入另一个直播间时恢复手机版。
+  const [desktopRoomUrl, setDesktopRoomUrl] = React.useState<string | null>(null)
+  const desktopMode = desktopRoomUrl === url
 
   const {
     webViewRef,
@@ -50,6 +54,11 @@ function LiveWebPage({ route }: LivePageProps) {
   useUpdateNavigationOptions({
     headerRight: () => (
       <HeaderRight
+        desktopMode={desktopMode}
+        toggleDesktopMode={() => {
+          setDesktopRoomUrl(desktopMode ? null : url)
+          remountWebView()
+        }}
         reload={() => {
           remountWebView()
         }}
@@ -94,7 +103,7 @@ function LiveWebPage({ route }: LivePageProps) {
     <BilibiliWebView
       className="flex-1"
       // style={{ height }}
-      source={{ uri: url }}
+      source={{ uri: desktopMode && roomId ? `https://live.bilibili.com/${roomId}` : url }}
       key={webViewKey}
       // onScroll={(e) => setEnabled(e.nativeEvent.contentOffset.y === 0)}
       originWhitelist={['http://*', 'https://*', 'bilibili://*']}
@@ -103,14 +112,20 @@ function LiveWebPage({ route }: LivePageProps) {
       allowsInlineMediaPlayback
       startInLoadingState
       pullToRefreshEnabled
+      scalesPageToFit
+      setBuiltInZoomControls
+      setDisplayZoomControls={false}
+      contentMode={desktopMode ? 'desktop' : 'mobile'}
       applicationNameForUserAgent={'BILIBILI/8.0.0'}
       // allowsBackForwardNavigationGestures
       mediaPlaybackRequiresUserAction={false}
       webviewDebuggingEnabled={__DEV__}
-      injectedJavaScript={INJECTED_JAVASCRIPT}
-      injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT_BEFORE}
+      injectedJavaScript={desktopMode ? DESKTOP_INJECTED_JAVASCRIPT : INJECTED_JAVASCRIPT}
+      injectedJavaScriptBeforeContentLoaded={
+        desktopMode ? DESKTOP_INJECTED_JAVASCRIPT : INJECTED_JAVASCRIPT_BEFORE
+      }
       renderLoading={() => <Loading />}
-      userAgent=""
+      userAgent={desktopMode ? mediaUA : ''}
       ref={webViewRef}
       onLoadEnd={syncDanmakuBottomInset}
       onMessage={evt => {

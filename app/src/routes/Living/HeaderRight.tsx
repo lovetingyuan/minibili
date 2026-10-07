@@ -14,10 +14,11 @@ import {
 
 import type { RootStackParamList } from "../../types";
 import { showToast } from "../../utils";
+import type { LiveHeaderRightProps } from "./live-playback.types";
 
 export default HeaderRight;
 
-function HeaderRight(props: { reload: () => void }) {
+function HeaderRight(props: LiveHeaderRightProps) {
   const [visible, setVisible] = React.useState(false);
   const route = useRoute<RouteProp<RootStackParamList, "Living">>();
   const { url, title } = route.params;
@@ -35,6 +36,13 @@ function HeaderRight(props: { reload: () => void }) {
         <ThemedIcon icon={EllipsisVertical} />
       </MenuTrigger>
       <MenuOptions>
+        <MenuOption
+          text={props.desktopMode ? "切换到手机版" : "切换到电脑版"}
+          onSelect={() => {
+            hideMenu();
+            props.toggleDesktopMode();
+          }}
+        />
         <MenuOption
           text="刷新页面"
           onSelect={() => {

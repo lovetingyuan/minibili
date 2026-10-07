@@ -8,6 +8,12 @@ import type { RootStackParamList } from "@/types";
 
 export type LivePageProps = NativeStackScreenProps<RootStackParamList, "Living">;
 
+export type LiveHeaderRightProps = {
+  reload: () => void;
+  desktopMode: boolean;
+  toggleDesktopMode: () => void;
+};
+
 export type WebPlaybackSnapshot = {
   playing: boolean;
   muted: boolean;
