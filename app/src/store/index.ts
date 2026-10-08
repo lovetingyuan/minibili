@@ -13,6 +13,7 @@ import type { OverlayButton, UpInfo } from "../types";
 import type { NetworkUsage } from "../utils/network";
 import type { WatchProgressSnapshot } from "../utils/watch-progress";
 import type { FollowingDynamicsReadState } from "../api/following-dynamics.types";
+import type { FollowingDynamicsUnreadRestore } from "./following-dynamics-unread-restore.types";
 import { clearLegacyCollections } from "./legacy-collections";
 import type { PartPlayProgressMap } from "./part-play-progress.types";
 import type { RepliesInfo } from "./replies-info.type";
@@ -38,6 +39,8 @@ const getAppValue = () => {
      * 关注列表每个 UP 的最新/已读动态 id，按 B站账号 mid 存储
      */
     $followingDynamicsReadMap: {} as Record<string, FollowingDynamicsReadState>,
+    /** 关注页最近查看的未读 UP，仅当前运行会话有效。 */
+    followingDynamicsUnreadRestore: null as FollowingDynamicsUnreadRestore | null,
     /**
      * 当前会话已经成功同步 feed/nav 的账号；同步前不展示本地红点
      */

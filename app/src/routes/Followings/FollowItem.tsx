@@ -8,6 +8,8 @@ import { Alert, Pressable, TouchableOpacity, View } from 'react-native'
 import { theme } from '@/constants/theme'
 import { overlayIcons } from '@/constants/overlay-icons'
 import { useFollowActions } from '@/hooks/useFollowActions'
+import { bilibiliSession } from '@/features/bilibili-session/session'
+import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'
 
 import { useStore } from '../../store'
 import { useMarkFollowingDynamicsUnread } from '../../store/actions'
@@ -24,13 +26,31 @@ type FollowItemProps = {
 
 function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
   const { face, name, sign, mid } = item
-  const { livingUps, setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore()
+  const {
+    livingUps,
+    setOverlayButtons,
+    setImagesList,
+    setCurrentImageIndex,
+    setFollowingDynamicsUnreadRestore,
+  } = useStore()
+  const { account } = useBilibiliSessionState()
   const hasNewDynamic = useUpHasNewDynamic(mid)
   const actions = useFollowActions()
   const markUnread = useMarkFollowingDynamicsUnread()
   const navigation = useNavigation<NavigationProps['navigation']>()
 
   const gotoDynamic = () => {
+    setFollowingDynamicsUnreadRestore(
+      hasNewDynamic && account && bilibiliSession.isCurrentAccount(account)
+        ? {
+            accountMid: account.mid,
+            generation: account.generation,
+            upMid: String(mid),
+            name,
+            expiresAt: null,
+          }
+        : null,
+    )
     navigation.navigate('Dynamic', {
       user: {
         mid,
