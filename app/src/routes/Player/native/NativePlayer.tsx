@@ -1251,7 +1251,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           className={`absolute bottom-12 left-3 rounded px-3 py-2 ${theme.mediaBadge.bg}`}
           onPress={restartPlayback}
         >
-          <Text className={`text-xs font-medium ${theme.mediaBadge.text}`}>从头播放</Text>
+          <Text className={`text-xs font-medium ${theme.secondary.text}`}>从头播放</Text>
         </Pressable>
       ) : null}
       {/* 画面可见（首帧已渲染，或播放结束后重新展示的封面）时才显示按钮 */}
