@@ -14,7 +14,6 @@ import {
 import React from 'react'
 import { Linking, Pressable, View } from 'react-native'
 
-import { useWatchingCount } from '@/api/watching-count'
 import { VideoBadge } from '@/components/VideoBadge'
 import { theme } from '@/constants/theme'
 import type { NavigationProps, RootStackParamList } from '@/types'
@@ -23,7 +22,7 @@ import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumbe
 import { useVideoInfo } from '../../api/video-info'
 import { getVideoDescription } from './description'
 import { resolvePreviewNote, resolveVideoBadges } from './video-access'
-import type { VideoPreviewReason } from './video-access.types'
+import type { VideoInfoProps } from './VideoInfo.types'
 import FavoriteButton from './FavoriteButton'
 import LikeButton from './LikeButton'
 import VideoDescription from './VideoDescription'
@@ -32,13 +31,7 @@ import { formatVideoPageTitle } from './video-pages-sheet.helpers'
 
 export default VideoInfo
 
-function VideoInfo(props: {
-  currentPage: number
-  setCurrentPage: (p: number) => void
-  onCommentPress: () => void
-  /** 试看类型，由播放器判定后上报；播放器里不再提示试看，说明放在这里 */
-  previewReason?: VideoPreviewReason | null
-}) {
+function VideoInfo(props: VideoInfoProps) {
   const route = useRoute<RouteProp<RootStackParamList, 'Play'>>()
   const { data, isLoading } = useVideoInfo(route.params.bvid)
   const videoInfo = {
@@ -59,7 +52,7 @@ function VideoInfo(props: {
   const [showPagesModal, setShowPagesModal] = React.useState(false)
 
   const navigation = useNavigation<NavigationProps['navigation']>()
-  const watchingCount = useWatchingCount(videoInfo.bvid, videoInfo.cid)
+  const { watchingCount } = props
 
   function openUpSpace() {
     if (mid === undefined || !name) {

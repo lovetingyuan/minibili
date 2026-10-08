@@ -7,7 +7,11 @@ import React from 'react'
 import { Alert, View } from 'react-native'
 
 import { getApiErrorCode } from '@/api/fetcher'
+import { useVideoRelation } from '@/api/useVideoFavorites'
+import { useWatchingCount } from '@/api/watching-count'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
+import { bilibiliSession } from '@/features/bilibili-session/session'
+import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import { useWatchProgressRefresh } from '@/hooks/useWatchProgressRefresh'
 import { showToast } from '@/utils'
@@ -39,7 +43,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Play'>
 function Play({ route }: Props) {
   const { bvid } = route.params
 
-  const { data, error } = useVideoInfo(bvid)
+  const { data, error, mutate: refreshVideoInfo } = useVideoInfo(bvid)
   // 离开播放页时把刚看完的进度同步到封面进度条
   useWatchProgressRefresh()
   const videoInfo = {
@@ -56,8 +60,25 @@ function Play({ route }: Props) {
   // 试看类型由播放器判定后上报，交给播放器下方的视频信息区展示说明
   const [previewReason, setPreviewReason] = React.useState<VideoPreviewReason | null>(null)
   const pageInfo = videoInfo.pages?.[currentPage - 1]
-  // 下载用当前分P 的 cid，没有分P 信息时退回视频自身的 cid
-  const downloadCid = pageInfo?.cid ?? videoInfo.cid ?? 0
+  // 观看人数和下载用当前分P 的 cid，没有分P 信息时退回视频自身的 cid
+  const currentCid = pageInfo?.cid ?? videoInfo.cid ?? 0
+  const { data: watchingCount, mutate: refreshWatchingCount } = useWatchingCount(bvid, currentCid)
+  const { account } = useBilibiliSessionState()
+  const currentAccount = account && bilibiliSession.isCurrentAccount(account) ? account : null
+  const relation = useVideoRelation(
+    currentAccount,
+    videoInfo.aid ? { aid: String(videoInfo.aid), bvid } : null,
+  )
+
+  async function refresh() {
+    await Promise.allSettled([
+      refreshVideoInfo(),
+      refreshWatchingCount(),
+      currentAccount && videoInfo.aid && bilibiliSession.isCurrentAccount(currentAccount)
+        ? relation.mutate()
+        : undefined,
+    ])
+  }
 
   const hasVideoInfo = Boolean(data)
   const errorShowedRef = React.useRef<string | null>(null)
@@ -103,7 +124,7 @@ function Play({ route }: Props) {
     headerTitle: () => <PlayHeaderTitle />,
     headerShown: !fullscreen,
     headerRight: () => (
-      <PlayHeaderRight cid={downloadCid} page={currentPage} pageTitle={pageInfo?.title} />
+      <PlayHeaderRight cid={currentCid} page={currentPage} pageTitle={pageInfo?.title} />
     ),
   })
 
@@ -162,6 +183,7 @@ function Play({ route }: Props) {
         commentCount={videoInfo.replyNum}
         commentType={1}
         sourceUrl={`https://www.bilibili.com/video/${bvid}/`}
+        onRefresh={refresh}
         dividerRight={
           <View className="flex-row items-center">
             <Text className="text-xs text-gray-500 dark:text-gray-400">{videoInfo?.tag}</Text>
@@ -174,6 +196,7 @@ function Play({ route }: Props) {
             previewReason={previewReason}
             setCurrentPage={handleSelectPage}
             onCommentPress={openComposer}
+            watchingCount={watchingCount}
           />
         )}
       </CommentList>

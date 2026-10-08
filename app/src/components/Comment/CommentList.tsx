@@ -69,7 +69,7 @@ export default function CommentList(props: CommentListProps) {
   )
   // 评论列表会跟着后台重新校验变化，只有用户下拉时才显示刷新图标
   const pullToRefresh = usePullToRefresh(() =>
-    Promise.all([comments.refresh(), props.onRefresh?.()]),
+    Promise.allSettled([comments.refresh(), props.onRefresh?.()]),
   )
 
   useEffect(() => {

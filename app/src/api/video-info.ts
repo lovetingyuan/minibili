@@ -71,7 +71,7 @@ export type VideoInfo = ReturnType<typeof getVideoInfo>;
 export type VideoDescriptionNode = VideoInfo["descriptionNodes"][number];
 // https://api.bilibili.com/x/web-interface/view?aid=336141511
 export function useVideoInfo(bvid: string) {
-  const { data, error, isLoading } = useSWR<VideoInfoResponse>(
+  const { data, error, isLoading, mutate } = useSWR<VideoInfoResponse>(
     bvid ? `/x/web-interface/view?bvid=${bvid}` : null,
     request,
   );
@@ -79,5 +79,6 @@ export function useVideoInfo(bvid: string) {
     data: data ? getVideoInfo(data) : null,
     error,
     isLoading,
+    mutate,
   };
 }
