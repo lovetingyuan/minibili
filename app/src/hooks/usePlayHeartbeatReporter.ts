@@ -8,59 +8,26 @@ import {
   reportPlayStart,
 } from "@/api/play-heartbeat";
 import type {
-  PlayHeartbeatAccount,
   PlayHeartbeatReport,
-  PlayHeartbeatSession,
   PlayHeartbeatType,
   PlayHeartbeatVideo,
 } from "@/api/play-heartbeat.types";
-import type { VideoQuality } from "@/api/play-url";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import { useBilibiliSessionState } from "@/features/bilibili-session/useBilibiliSession";
 import { recordLocalWatchProgress } from "@/store/watch-progress";
 
+import type {
+  PlayHeartbeatCompletedSession,
+  PlayHeartbeatEndTarget,
+  PlayHeartbeatInput,
+  PlayHeartbeatLeaveTarget,
+  PlayHeartbeatReporterProps,
+  PlayHeartbeatState,
+  PlayHeartbeatTickTimer,
+} from "./usePlayHeartbeatReporter.types";
+
 /** 播放中的上报间隔，与 B站网页播放器一致 */
 export const PLAY_HEARTBEAT_INTERVAL_MS = 15000;
-
-export type PlayHeartbeatReporterProps = {
-  bvid: string;
-  aid?: string | number;
-  cid: number;
-  page: number;
-  /** 当前分P 时长（秒），拿不到时不上报 */
-  durationSeconds: number;
-  quality: VideoQuality;
-  isPlaying: boolean;
-  currentTimeMs: number;
-};
-
-export type PlayHeartbeatEndTarget = Pick<PlayHeartbeatReporterProps, "bvid" | "cid">;
-
-type MutableRef<T> = { current: T };
-
-type PlayHeartbeatInput = {
-  account: PlayHeartbeatAccount | null;
-  props: PlayHeartbeatReporterProps;
-};
-
-/** 一次播放会话的完整状态；全部放在 ref 里，状态机按真实状态变化上报 */
-type PlayHeartbeatState = {
-  /** 会话对应的 `bvid:cid`，变化时重建 */
-  key: string;
-  session: PlayHeartbeatSession | null;
-  /** 会话的报送信息快照，切换分P 后仍能按旧分P 收尾 */
-  video: PlayHeartbeatVideo | null;
-  quality: VideoQuality;
-  durationSeconds: number;
-  positionSeconds: number;
-  playing: boolean;
-  /** 本段开始播放的时间戳（毫秒），未播放时为 0 */
-  playingSinceMs: number;
-  /** 会话内累计播放时长（毫秒） */
-  accumulatedMs: number;
-};
-
-type TickTimer = ReturnType<typeof setTimeout> | null;
 
 function createIdleState(): PlayHeartbeatState {
   return {
@@ -150,7 +117,7 @@ function sendReport(
   );
 }
 
-function clearTick(tickRef: MutableRef<TickTimer>) {
+function clearTick(tickRef: React.RefObject<PlayHeartbeatTickTimer>) {
   if (tickRef.current === null) {
     return;
   }
@@ -160,8 +127,8 @@ function clearTick(tickRef: MutableRef<TickTimer>) {
 
 function scheduleTick(
   state: PlayHeartbeatState,
-  inputRef: MutableRef<PlayHeartbeatInput>,
-  tickRef: MutableRef<TickTimer>,
+  inputRef: React.RefObject<PlayHeartbeatInput>,
+  tickRef: React.RefObject<PlayHeartbeatTickTimer>,
 ) {
   if (tickRef.current !== null) {
     return;
@@ -169,7 +136,7 @@ function scheduleTick(
   tickRef.current = setTimeout(function handlePlayHeartbeatTick() {
     tickRef.current = null;
     const input = inputRef.current;
-    if (!state.session || !state.playing || !input.account) {
+    if (!state.session || !state.playing || !input.account || !input.props.isFocused) {
       return;
     }
     const nowMs = Date.now();
@@ -203,7 +170,7 @@ function startSession(state: PlayHeartbeatState, input: PlayHeartbeatInput, nowM
 
 /**
  * 结束当前会话：`ended` 为 true 时上报“播放结束”（played_time=-1），
- * 否则按暂停上报，保证离开播放页时进度已经写入。
+ * 否则按暂停上报，补报离开播放页时的进度。
  */
 function finishSession(
   state: PlayHeartbeatState,
@@ -227,8 +194,9 @@ function finishSession(
 /** 每次渲染后同步一次：只在播放状态真正变化时上报，可重复调用 */
 function syncPlayHeartbeat(
   state: PlayHeartbeatState,
-  inputRef: MutableRef<PlayHeartbeatInput>,
-  tickRef: MutableRef<TickTimer>,
+  inputRef: React.RefObject<PlayHeartbeatInput>,
+  tickRef: React.RefObject<PlayHeartbeatTickTimer>,
+  completedRef: React.RefObject<PlayHeartbeatCompletedSession | null>,
   nowMs: number,
 ) {
   const input = inputRef.current;
@@ -247,6 +215,7 @@ function syncPlayHeartbeat(
       clearTick(tickRef);
       return;
     }
+    completedRef.current = null;
     startSession(state, input, nowMs);
     scheduleTick(state, inputRef, tickRef);
     return;
@@ -276,26 +245,47 @@ function syncPlayHeartbeat(
   }
 }
 
-/** 播放结束时上报“已看完”，随后清空会话，重新播放会开启新会话 */
+/** 播放结束时保留完成快照供离页补报，重新播放会开启新会话 */
 function endPlayHeartbeat(
   state: PlayHeartbeatState,
-  inputRef: MutableRef<PlayHeartbeatInput>,
-  tickRef: MutableRef<TickTimer>,
+  inputRef: React.RefObject<PlayHeartbeatInput>,
+  tickRef: React.RefObject<PlayHeartbeatTickTimer>,
+  completedRef: React.RefObject<PlayHeartbeatCompletedSession | null>,
   nowMs: number,
 ) {
   clearTick(tickRef);
+  if (!state.session) {
+    return;
+  }
+  accumulatePlayingTime(state, nowMs);
+  completedRef.current = {
+    state: { ...state, playing: false, playingSinceMs: 0 },
+    account: inputRef.current.account,
+  };
   finishSession(state, inputRef.current, nowMs, true);
 }
 
-/** 离开播放页时补报一次暂停，保证最后的位置被记录 */
+/** 离页补报后清空活动会话与完成快照，多个离页事件只补报一次 */
 function flushPlayHeartbeat(
   state: PlayHeartbeatState,
-  inputRef: MutableRef<PlayHeartbeatInput>,
-  tickRef: MutableRef<TickTimer>,
+  inputRef: React.RefObject<PlayHeartbeatInput>,
+  tickRef: React.RefObject<PlayHeartbeatTickTimer>,
+  completedRef: React.RefObject<PlayHeartbeatCompletedSession | null>,
   nowMs: number,
 ) {
   clearTick(tickRef);
-  finishSession(state, inputRef.current, nowMs, false);
+  const completed = completedRef.current;
+  completedRef.current = null;
+  if (state.session) {
+    finishSession(state, inputRef.current, nowMs, false);
+  } else if (completed) {
+    sendReport(
+      completed.state,
+      { ...inputRef.current, account: completed.account },
+      PLAY_HEARTBEAT_TYPES.end,
+      nowMs,
+    );
+  }
 }
 
 /**
@@ -306,18 +296,31 @@ export function usePlayHeartbeatReporter(props: PlayHeartbeatReporterProps) {
   const { account } = useBilibiliSessionState();
   const activeAccount = account && bilibiliSession.isCurrentAccount(account) ? account : null;
   const stateRef = React.useRef<PlayHeartbeatState>(createIdleState());
+  const completedRef = React.useRef<PlayHeartbeatCompletedSession | null>(null);
   const inputRef = React.useRef<PlayHeartbeatInput>({ account: activeAccount, props });
-  const tickRef = React.useRef<TickTimer>(null);
+  const tickRef = React.useRef<PlayHeartbeatTickTimer>(null);
+  const leavingRef = React.useRef(false);
 
   React.useEffect(() => {
+    const wasFocused = inputRef.current.props.isFocused;
     inputRef.current = { account: activeAccount, props };
-    syncPlayHeartbeat(stateRef.current, inputRef, tickRef, Date.now());
+    if (completedRef.current?.state.key !== `${props.bvid}:${props.cid}`) {
+      completedRef.current = null;
+    }
+    if (props.isFocused && !wasFocused) {
+      leavingRef.current = false;
+    }
+    if (!props.isFocused || leavingRef.current) {
+      clearTick(tickRef);
+      return;
+    }
+    syncPlayHeartbeat(stateRef.current, inputRef, tickRef, completedRef, Date.now());
   });
 
   React.useEffect(() => {
     const state = stateRef.current;
     return () => {
-      flushPlayHeartbeat(state, inputRef, tickRef, Date.now());
+      flushPlayHeartbeat(state, inputRef, tickRef, completedRef, Date.now());
     };
   }, []);
 
@@ -325,8 +328,22 @@ export function usePlayHeartbeatReporter(props: PlayHeartbeatReporterProps) {
     if (target && stateRef.current.key !== `${target.bvid}:${target.cid}`) {
       return;
     }
-    endPlayHeartbeat(stateRef.current, inputRef, tickRef, Date.now());
+    endPlayHeartbeat(stateRef.current, inputRef, tickRef, completedRef, Date.now());
   }
 
-  return { reportEnded };
+  function reportLeaving(target: PlayHeartbeatLeaveTarget) {
+    const state = stateRef.current;
+    const key = `${target.bvid}:${target.cid}`;
+    if (state.key !== key && completedRef.current?.state.key !== key) {
+      return;
+    }
+    // beforeRemove 早于焦点变化，先阻止迟到的播放事件重建会话。
+    leavingRef.current = true;
+    if (state.key === key && Number.isFinite(target.currentTimeMs)) {
+      state.positionSeconds = Math.max(0, Math.round(target.currentTimeMs / 1000));
+    }
+    flushPlayHeartbeat(state, inputRef, tickRef, completedRef, Date.now());
+  }
+
+  return { reportEnded, reportLeaving };
 }

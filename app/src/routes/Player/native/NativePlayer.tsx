@@ -1,4 +1,4 @@
-import { type RouteProp, useIsFocused, useRoute } from "@react-navigation/native";
+import { type RouteProp, useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
 import { useEventListener } from "expo";
 import * as KeepAwake from "expo-keep-awake";
 import { useVideoPlayer, VideoView } from "expo-video";
@@ -6,6 +6,7 @@ import type { VideoPlayerStatus } from "expo-video";
 import { Play } from "lucide-react-native";
 import React from "react";
 import {
+  ActivityIndicator,
   Animated,
   AppState,
   Keyboard,
@@ -30,6 +31,7 @@ import { useVideoInfo } from "@/api/video-info";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { VideoBadge } from "@/components/VideoBadge";
 import { formatBackgroundPlayDuration } from "@/constants/background-playback";
+import { theme } from "@/constants/theme";
 import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
@@ -112,6 +114,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     onFullscreenChange,
   } = props;
   const route = useRoute<RouteProp<RootStackParamList, "Play">>();
+  const navigation = useNavigation();
   const isFocused = useIsFocused();
   const { width, height } = useWindowDimensions();
   const {
@@ -292,13 +295,14 @@ export default function NativePlayer(props: NativePlayerProps) {
     useBackgroundPlaybackConfiguration(player, playbackStarted);
 
   // 登录后按 B站网页播放器的方式上报播放进度，写入观看历史
-  const { reportEnded } = usePlayHeartbeatReporter({
+  const { reportEnded, reportLeaving } = usePlayHeartbeatReporter({
     bvid: videoInfo.bvid,
     aid: videoInfo.aid,
     cid,
     page: currentPage,
     durationSeconds,
     quality: qn,
+    isFocused,
     isPlaying,
     currentTimeMs,
   });
@@ -339,8 +343,9 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 播放结束回调里要读最新的全屏状态与回调，订阅不能跟着全屏切换重建
   const exitFullscreenOnEndedRef = React.useRef(() => {});
   const reportHeartbeatEndedRef = React.useRef(reportEnded);
+  const reportHeartbeatLeavingRef = React.useRef(() => {});
   const reportPartProgressEndedRef = React.useRef(reportPartProgressEnded);
-  // 这些 ref 都只在播放结束事件里读取（事件在提交之后才可能触发），
+  // 这些 ref 都只在异步事件和 effect 里读取，
   // 放在提交后统一同步最新实现，避免在渲染期写 ref
   React.useEffect(() => {
     onPlayEndedRef.current = onPlayEnded;
@@ -352,8 +357,32 @@ export default function NativePlayer(props: NativePlayerProps) {
       }
     };
     reportHeartbeatEndedRef.current = reportEnded;
+    reportHeartbeatLeavingRef.current = () => {
+      let positionMs = lastTimeRef.current;
+      try {
+        const nativePositionMs = player.currentTime * 1000;
+        if (Number.isFinite(nativePositionMs)) {
+          positionMs = Math.max(0, Math.round(nativePositionMs));
+        }
+      } catch {
+        // 原生实例已释放时退回最后一次记录的位置。
+      }
+      reportLeaving({ bvid: videoInfo.bvid, cid, currentTimeMs: positionMs });
+    };
     reportPartProgressEndedRef.current = reportPartProgressEnded;
   });
+
+  React.useEffect(() => {
+    function handleLeaving() {
+      reportHeartbeatLeavingRef.current();
+    }
+    const unsubscribeBeforeRemove = navigation.addListener("beforeRemove", handleLeaving);
+    const unsubscribeBlur = navigation.addListener("blur", handleLeaving);
+    return () => {
+      unsubscribeBeforeRemove();
+      unsubscribeBlur();
+    };
+  }, [navigation]);
 
   function updatePlayingState(playing: boolean, synchronizeKeepAwake = false) {
     const changed = nativePlayingRef.current !== playing;
@@ -736,6 +765,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   React.useEffect(() => {
     if (!isFocused) {
       pendingAutoplayRef.current = false;
+      // 导航事件未触发时，仍在暂停前补报原生播放器的最新位置。
+      reportHeartbeatLeavingRef.current();
       player.pause();
     }
   }, [isFocused, player]);
@@ -1137,22 +1168,36 @@ export default function NativePlayer(props: NativePlayerProps) {
       <GestureDetector gesture={gesture}>
         <View style={StyleSheet.absoluteFill} />
       </GestureDetector>
-      {interactiveAccess ? (
-        <View className="absolute left-3 top-3">
+      <View pointerEvents="none" className="absolute left-3 top-3 items-start gap-2">
+        {started &&
+        posterDismissed &&
+        playerStatus === "loading" &&
+        !showError &&
+        !playbackEnded &&
+        !limitedNoticeVisible ? (
+          <View
+            className={`h-7 w-7 items-center justify-center rounded-full ${theme.mediaBadge.bg}`}
+          >
+            <ActivityIndicator
+              accessibilityLabel="视频缓冲中"
+              size="small"
+              colorClassName={theme.mediaBadge.accent}
+            />
+          </View>
+        ) : null}
+        {interactiveAccess ? (
           <VideoBadge
             label={interactiveAccess.badge.label}
             tone={interactiveAccess.badge.tone}
             variant="overlay"
           />
-        </View>
-      ) : null}
-      {fastRate ? (
-        <View
-          className={`absolute left-3 ${interactiveAccess ? "top-9" : "top-3"} rounded bg-black/60 px-2 py-1`}
-        >
-          <Text className="text-xs font-bold text-white">{`${PLAYER_FAST_RATE}x`}</Text>
-        </View>
-      ) : null}
+        ) : null}
+        {fastRate ? (
+          <View className="rounded bg-black/60 px-2 py-1">
+            <Text className="text-xs font-bold text-white">{`${PLAYER_FAST_RATE}x`}</Text>
+          </View>
+        ) : null}
+      </View>
       {seekHint ? (
         <PlayerSeekHint targetMs={seekHint.targetMs} deltaSeconds={seekHint.deltaSeconds} />
       ) : null}
