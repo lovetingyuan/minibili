@@ -283,6 +283,17 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 本地按分P 记录的位置优先；当前分P 没有本地记录时再回退 B站记录。
   const liveLocalPlayResumePositionMs = usePartPlayProgressPosition(videoInfo.bvid, cid);
   const initialResumeKey = `${videoInfo.bvid}:${cid}`;
+  const [restartHint, setRestartHint] = React.useState({
+    key: initialResumeKey,
+    pending: false,
+    visible: false,
+  });
+  if (
+    restartHint.key !== initialResumeKey ||
+    (!isFocused && (restartHint.pending || restartHint.visible))
+  ) {
+    setRestartHint({ key: initialResumeKey, pending: false, visible: false });
+  }
   // 同一个分 P 只在首次拿到本地进度时冻结一次，之后本地进度再变化也不再改写
   const localResumePositionMs = usePlaybackResumeState(
     initialResumeKey,
@@ -442,6 +453,9 @@ export default function NativePlayer(props: NativePlayerProps) {
         resumePositionMsRef.current = 0;
       }
       applyResumePosition(decision.positionMs);
+      if (decision.origin === "initial") {
+        setRestartHint({ key: initialResumeKey, pending: true, visible: false });
+      }
     }
   }
 
@@ -1078,6 +1092,33 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 拿不到地址时如果已经判定出受限原因（会员/付费/充电），错误态换成对应的说明
   const hasError = Boolean(playerError) || (Boolean(playUrlError) && !uri) || accessBlocked;
   const showError = hasError || isRetrying;
+  const restartHintCanShow =
+    started &&
+    posterDismissed &&
+    playbackStarted &&
+    isFocused &&
+    appState === "active" &&
+    !showError &&
+    !playbackEnded &&
+    !limitedEnded &&
+    !danmakuComposerOpen;
+
+  if (restartHint.key === initialResumeKey && restartHint.pending && restartHintCanShow) {
+    setRestartHint({ key: initialResumeKey, pending: false, visible: true });
+  }
+
+  // 计时只跟随提示自身的显示状态，暂停、控件显隐和全屏切换都不会重置。
+  React.useEffect(() => {
+    if (!isFocused || !restartHint.visible) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      setRestartHint({ key: initialResumeKey, pending: false, visible: false });
+    }, 5000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [initialResumeKey, isFocused, restartHint.visible]);
 
   /** 互动视频片段的主操作：跳回 B站 观看完整互动内容 */
   function openLimitedAction() {
@@ -1086,8 +1127,9 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
   }
 
-  /** 试看片段重新播放：不触发自动连播，只把当前片段从头再放一遍 */
-  function replayLimitedAccess() {
+  /** 从头播放当前视频或试看片段，并同步控件与弹幕状态 */
+  function restartPlayback() {
+    setRestartHint({ key: initialResumeKey, pending: false, visible: false });
     pausedByBackgroundTimeoutRef.current = false;
     if (playEndGuardRef.current.player === player) {
       playEndGuardRef.current.handled = false;
@@ -1201,6 +1243,17 @@ export default function NativePlayer(props: NativePlayerProps) {
       {seekHint ? (
         <PlayerSeekHint targetMs={seekHint.targetMs} deltaSeconds={seekHint.deltaSeconds} />
       ) : null}
+      {restartHint.visible && restartHint.key === initialResumeKey && restartHintCanShow ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="从头播放"
+          hitSlop={8}
+          className={`absolute bottom-12 left-3 rounded px-3 py-2 ${theme.mediaBadge.bg}`}
+          onPress={restartPlayback}
+        >
+          <Text className={`text-xs font-medium ${theme.mediaBadge.text}`}>从头播放</Text>
+        </Pressable>
+      ) : null}
       {/* 画面可见（首帧已渲染，或播放结束后重新展示的封面）时才显示按钮 */}
       {shouldShowResumeButton({
         started,
@@ -1312,7 +1365,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           actionLabel={limitedAccess.notice.action.label}
           onAction={openLimitedAction}
           retryLabel={limitedAccess.notice.replayLabel}
-          onRetry={replayLimitedAccess}
+          onRetry={restartPlayback}
         />
       ) : null}
       {danmakuComposerOpen ? (
