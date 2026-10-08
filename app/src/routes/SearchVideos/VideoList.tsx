@@ -143,6 +143,7 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   } = useSearchVideos(props.keyword)
   const listRef = React.useRef<FlashListRef<SearchedVideoType> | null>(null)
   const keyboardInset = useKeyboardInset()
+  const { watchProgressMap } = useStore()
 
   React.useEffect(() => {
     if (listRef.current) {
@@ -153,10 +154,11 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   return (
     <FlashList
       data={searchedVideos}
+      extraData={watchProgressMap}
       keyExtractor={(v: SearchedVideoType) => v.bvid}
       ref={listRef}
       renderItem={({ item }: { item: SearchedVideoType }) => {
-        return <VideoListItem video={item} />
+        return <VideoListItem video={item} progressRatio={watchProgressMap[item.bvid]?.ratio ?? 0} />
       }}
       persistentScrollbar
       keyboardShouldPersistTaps="handled"
