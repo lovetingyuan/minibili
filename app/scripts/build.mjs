@@ -489,7 +489,7 @@ async function checkEasLogin() {
 
 async function checkEnvironment() {
   await spinner("检查环境...", async () => {
-    const gitStatus = await $`git status --porcelain`;
+    const gitStatus = await withRetry(3, () => $`git status --porcelain`, "检查 Git 工作区");
     const dirtyPaths = gitStatus.stdout
       .split(/\r?\n/)
       // porcelain v1 每行是 "XY PATH"，路径始终相对仓库根目录
@@ -508,13 +508,13 @@ async function checkEnvironment() {
       log.warn("检测到 app/package.json 有未提交改动，将按上次中断的发布继续处理");
     }
 
-    const branch = await $`git rev-parse --abbrev-ref HEAD`;
+    const branch = await withRetry(3, () => $`git rev-parse --abbrev-ref HEAD`, "查询 Git 分支");
     if (branch.stdout.trim() !== MAIN_BRANCH) {
       throw new ReleaseError(`当前分支是 ${branch.stdout.trim()}，请切到 ${MAIN_BRANCH} 再发版`);
     }
 
-    await $`git fetch origin`;
-    const summary = await $`git status --short --branch`;
+    await withRetry(3, () => $`git fetch origin`, "git fetch");
+    const summary = await withRetry(3, () => $`git status --short --branch`, "检查 Git 分支状态");
     const branchSummary = summary.stdout.split("\n")[0]?.trim() ?? "";
 
     if (!branchSummary.includes("...")) {
@@ -528,7 +528,7 @@ async function checkEnvironment() {
     await assertReachable("https://github.com", "GitHub");
     await assertReachable("https://api.expo.dev", "Expo API");
 
-    await withRetry(2, () => $`npx --yes eas-cli@latest --version`, "EAS CLI");
+    await withRetry(3, () => $`npx --yes eas-cli@latest --version`, "EAS CLI");
     const easUser = await withRetry(3, checkEasLogin, "EAS 接口");
 
     if (easUser === "") {
@@ -570,7 +570,7 @@ function assertVersionCode(pkg) {
 
 async function assertVersionAvailable(version) {
   const tagName = `v${version}`;
-  const existing = await nothrow`git tag --list ${tagName}`;
+  const existing = await withRetry(3, () => $`git tag --list ${tagName}`, "查询版本 tag");
 
   if (existing.stdout.trim() !== "") {
     throw new ReleaseError(
@@ -580,22 +580,30 @@ async function assertVersionAvailable(version) {
 }
 
 async function packageVersionAtCommit(commit) {
-  const result = await nothrow`git show ${commit}:app/package.json`;
-
-  if (result.exitCode !== 0) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(result.stdout);
-    return typeof parsed.version === "string" ? parsed.version : null;
-  } catch {
-    return null;
-  }
+  return withRetry(
+    3,
+    async () => {
+      const result = await $`git show ${commit}:app/package.json`;
+      const parsed = JSON.parse(result.stdout);
+      return typeof parsed.version === "string" ? parsed.version : null;
+    },
+    "查询提交版本",
+  ).catch(() => null);
 }
 
 async function ensureCommitPushed(commit) {
-  const pushed = await nothrow`git merge-base --is-ancestor ${commit} origin/main`;
+  const pushed = await withRetry(
+    3,
+    async () => {
+      const result = await nothrow`git merge-base --is-ancestor ${commit} origin/main`;
+      // exitCode 1 表示尚未推送，是正常查询结果。
+      if (result.exitCode !== 0 && result.exitCode !== 1) {
+        throw new ReleaseError(`检查提交推送状态失败：${lastOutputLine(result.stderr)}`);
+      }
+      return result;
+    },
+    "检查提交推送状态",
+  );
 
   if (pushed.exitCode === 0) {
     return;
@@ -605,7 +613,11 @@ async function ensureCommitPushed(commit) {
 }
 
 async function isPackageJsonDirty() {
-  const result = await $`git status --porcelain -- package.json`;
+  const result = await withRetry(
+    3,
+    () => $`git status --porcelain -- package.json`,
+    "检查版本文件状态",
+  );
   return result.stdout.trim() !== "";
 }
 
@@ -625,7 +637,9 @@ async function ensureVersionCommitted(state) {
 
   // 发布记录丢失但 HEAD 已经是目标版本时，直接复用 HEAD，避免 git commit 因无改动而失败
   if ((await packageVersionAtCommit("HEAD")) === state.version && !(await isPackageJsonDirty())) {
-    state.bumpCommit = (await $`git rev-parse --short HEAD`).stdout.trim();
+    state.bumpCommit = (
+      await withRetry(3, () => $`git rev-parse --short HEAD`, "查询发布提交")
+    ).stdout.trim();
     saveState(state);
     await ensureCommitPushed(state.bumpCommit);
     log.success(`HEAD（${state.bumpCommit}）已经是 ${state.version}，跳过写入与提交`);
@@ -639,7 +653,9 @@ async function ensureVersionCommitted(state) {
     if (pkg.version === state.version) {
       log.info(`app/package.json 已经是 ${state.version}，沿用 versionCode ${previousVersionCode}`);
     } else {
-      const shortHead = (await $`git rev-parse --short HEAD`).stdout.trim();
+      const shortHead = (
+        await withRetry(3, () => $`git rev-parse --short HEAD`, "查询当前提交")
+      ).stdout.trim();
 
       pkg.version = state.version;
       pkg.gitHead = shortHead;
@@ -653,9 +669,11 @@ async function ensureVersionCommitted(state) {
 
     const commitMessage = `chore(release): v${state.version}`;
 
-    await $`git add package.json`;
+    await withRetry(3, () => $`git add package.json`, "暂存版本文件");
     await $`git commit -m ${commitMessage}`;
-    state.bumpCommit = (await $`git rev-parse --short HEAD`).stdout.trim();
+    state.bumpCommit = (
+      await withRetry(3, () => $`git rev-parse --short HEAD`, "查询发布提交")
+    ).stdout.trim();
     saveState(state);
 
     await ensureCommitPushed(state.bumpCommit);
@@ -666,43 +684,45 @@ async function ensureVersionCommitted(state) {
 }
 
 async function fetchBuildDetails(buildId) {
-  const result =
-    await nothrow`npx --yes eas-cli@latest build:view ${buildId} --json --non-interactive`;
-
-  if (result.exitCode !== 0) {
-    return null;
-  }
-
-  return pickBuild(parseJsonCandidates(result.stdout, result.stderr));
+  return withRetry(
+    3,
+    async () => {
+      const result =
+        await $`npx --yes eas-cli@latest build:view ${buildId} --json --non-interactive`;
+      const build = pickBuild(parseJsonCandidates(result.stdout, result.stderr));
+      if (build === null) {
+        throw new ReleaseError(`无法解析构建 ${buildId} 的详情`);
+      }
+      return build;
+    },
+    "查询 EAS 构建详情",
+  );
 }
 
 async function findFinishedBuild(version) {
-  const result =
-    await nothrow`npx --yes eas-cli@latest build:list --platform android --limit 10 --json --non-interactive`;
+  const builds = await withRetry(
+    3,
+    async () => {
+      const result =
+        await $`npx --yes eas-cli@latest build:list --platform android --limit 10 --json --non-interactive`;
+      const lists = parseJsonCandidates(result.stdout, result.stderr).filter(Array.isArray);
+      if (lists.length === 0) {
+        throw new ReleaseError("无法解析 EAS 构建列表");
+      }
+      return lists.flat();
+    },
+    "查询 EAS 构建列表",
+  );
 
-  if (result.exitCode !== 0) {
-    return null;
-  }
-
-  for (const value of parseJsonCandidates(result.stdout, result.stderr)) {
-    if (!Array.isArray(value)) {
-      continue;
-    }
-
-    const match = value.find(
+  return (
+    builds.find(
       (item) =>
         item !== null &&
         typeof item === "object" &&
         item.status === "FINISHED" &&
         String(item.appVersion ?? "") === version,
-    );
-
-    if (match !== undefined) {
-      return match;
-    }
-  }
-
-  return null;
+    ) ?? null
+  );
 }
 
 async function runEasBuild(state) {
@@ -888,13 +908,15 @@ async function ensureTagPushed(state) {
   }
 
   await spinner("打 tag 并推送...", async () => {
-    const existing = await nothrow`git tag --list ${tagName}`;
+    const existing = await withRetry(3, () => $`git tag --list ${tagName}`, "查询发布 tag");
 
     if (existing.stdout.trim() === "") {
       // 固定打在发布提交上，避免中途有别的提交时 tag 指错地方
       await $`git tag -a ${tagName} -m ${state.changelog} ${state.bumpCommit}`;
     } else {
-      const target = (await $`git rev-list -n 1 ${tagName}`).stdout.trim();
+      const target = (
+        await withRetry(3, () => $`git rev-list -n 1 ${tagName}`, "查询 tag 提交")
+      ).stdout.trim();
 
       if (state.bumpCommit !== null && target !== state.bumpCommit) {
         throw new ReleaseError(
