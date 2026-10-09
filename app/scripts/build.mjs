@@ -708,15 +708,55 @@ async function findFinishedBuild(version) {
 async function runEasBuild(state) {
   log.info("开始 EAS 生产构建，这一步通常要十几分钟");
 
-  const result = await spinner(
-    "EAS 构建中...",
-    () =>
-      nothrow`npx --yes eas-cli@latest build --platform android --profile production --message ${state.changelog} --json --non-interactive --wait`,
-  );
+  let build = null;
 
-  const build = pickBuild(parseJsonCandidates(result.stdout, result.stderr));
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const result = await spinner(
+      "EAS 构建中...",
+      () =>
+        nothrow`npx --yes eas-cli@latest build --platform android --profile production --message ${state.changelog} --json --non-interactive --wait`,
+    );
 
-  if (build === null) {
+    build = pickBuild(parseJsonCandidates(result.stdout, result.stderr));
+    if (build !== null) {
+      break;
+    }
+
+    const output = stripVTControlCharacters(`${result.stdout}\n${result.stderr}`);
+    const uploadErrorIndex = output.indexOf("Failed to upload the project tarball to EAS Build");
+    const uploadFailed = uploadErrorIndex !== -1;
+    const failureOutput = uploadFailed ? output.slice(uploadErrorIndex) : output;
+    const networkError = failureOutput.match(
+      /\b(?:ECONNRESET|ETIMEDOUT|ESOCKETTIMEDOUT|ECONNREFUSED|EPIPE|ENOTFOUND|EAI_AGAIN)\b|socket hang up/i,
+    )?.[0];
+
+    // 源码包上传失败时尚未创建云端构建，只有这个阶段可以安全重试。
+    if (result.exitCode !== 0 && uploadFailed) {
+      if (networkError !== undefined && attempt < 3) {
+        log.warn(`源码包上传失败（${networkError}，${attempt}/3），正在重试...`);
+        await new Promise((resolveDelay) => setTimeout(resolveDelay, attempt * 2000));
+        continue;
+      }
+
+      const proxy = proxyHint();
+      const reason =
+        networkError ?? failureOutput.match(/^Reason:\s*(.+)$/m)?.[1]?.trim() ?? "详情见 EAS 输出";
+      throw new ReleaseError(
+        `源码包上传失败：${reason}，尚未创建云端构建。\n` +
+          (proxy === null
+            ? "请配置能访问 storage.googleapis.com 的 HTTPS_PROXY 后重试。\n"
+            : `当前代理：${proxy}，请确认代理节点能稳定上传到 storage.googleapis.com，必要时更换节点。\n`) +
+          `续跑：${RESUME_COMMAND}`,
+      );
+    }
+
+    if (result.exitCode !== 0) {
+      throw new ReleaseError(
+        `EAS 构建命令失败：${networkError ?? (lastOutputLine(result.stderr) || lastOutputLine(result.stdout) || "无输出")}\n` +
+          `请先在构建列表确认状态，已有构建可指定：\n  ${RESUME_COMMAND} --build-id <buildId>\n  ${BUILDS_PAGE_URL}`,
+      );
+    }
+
     throw new ReleaseError(
       "无法从 EAS 输出里解析出构建结果，请打开构建列表确认状态后手动指定：\n" +
         `  ${RESUME_COMMAND} --build-id <buildId>\n  ${BUILDS_PAGE_URL}`,
