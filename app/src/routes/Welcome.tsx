@@ -20,7 +20,8 @@ function Welcome({ navigation }: Props) {
       <View className="flex-row justify-center">
         <Image
           source={require('../../assets/minibili.png')}
-          className="aspect-33/10 h-auto w-[80%]"
+          className="size-36"
+          resizeMode="contain"
         />
       </View>
       <View className="flex-1 p-8">

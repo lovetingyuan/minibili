@@ -110,7 +110,6 @@ function VideoList(props: {
       <TouchableOpacity
         activeOpacity={0.8}
         className={`mb-6 flex-1 self-stretch ${blank}`}
-        key={item.bvid}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
           currentVideoRef.current = item
@@ -181,11 +180,10 @@ function VideoList(props: {
     : null
   return (
     <FlashList
-      ref={v => {
-        listRef.current = v
-      }}
+      ref={listRef}
       numColumns={2}
       data={videoList}
+      keyExtractor={item => item.bvid}
       renderItem={renderItem}
       persistentScrollbar
       ListEmptyComponent={<Loading />}

@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
+import { useMappingHelper } from '@shopify/flash-list'
 import { clsx } from 'clsx'
 import { Play } from 'lucide-react-native'
 import type { ReactNode } from 'react'
@@ -31,6 +32,7 @@ export function DynamicImageGrid(props: {
   detail?: boolean
   natural?: boolean
 }) {
+  const { getMappingKey } = useMappingHelper()
   const { setImagesList, setCurrentImageIndex } = useStore()
   const { width: windowWidth } = useWindowDimensions()
   const visibleImages = props.detail ? props.images : props.images.slice(0, 9)
@@ -54,7 +56,7 @@ export function DynamicImageGrid(props: {
   return (
     <View className="mb-3 gap-1.5 overflow-hidden rounded-lg">
       {rows.map((row, rowIndex) => (
-        <View key={`${row[0].src}-${rowIndex}`} className="flex-row gap-1.5">
+        <View key={getMappingKey(`${row[0].src}-${rowIndex}`, rowIndex)} className="flex-row gap-1.5">
           {row.map((image, columnIndex) => {
             const index = rowIndex * columns + columnIndex
             const aspectRatio =
@@ -75,7 +77,7 @@ export function DynamicImageGrid(props: {
 
             return (
               <Pressable
-                key={`${image.src}-${index}`}
+                key={getMappingKey(`${image.src}-${index}`, columnIndex)}
                 className="flex-1"
                 onPress={() => {
                   setImagesList(props.images)
@@ -84,6 +86,7 @@ export function DynamicImageGrid(props: {
               >
                 <Image
                   source={{ uri: source }}
+                  recyclingKey={source}
                   contentFit={props.natural ? 'contain' : 'cover'}
                   className={clsx(
                     columns === 1 ? 'w-full rounded-lg' : 'aspect-square w-full',

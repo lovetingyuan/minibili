@@ -50,7 +50,7 @@ export function useUserSettings() {
         await userData.saveLocal();
       }
     } catch {
-      showToast("设置尚未同步，请稍后重试");
+      showToast("设置保存暂时失败");
     }
   }
   return {

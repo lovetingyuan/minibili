@@ -12,6 +12,7 @@ import { type SearchedVideoType, useSearchVideos } from '@/api/search-video'
 import VideoListItem from '@/components/VideoItem'
 import { theme } from '@/constants/theme'
 import { useStore } from '@/store'
+import { useWatchProgressRatio } from '@/store/watch-progress'
 import { getImagePixelSize, parseImgUrl } from '@/utils'
 import type { FlashListRef } from '@/components/FlashList'
 
@@ -133,6 +134,11 @@ function EmptyContent(props: { loading: boolean; onSearch: (k: string) => void }
   return <Text className="my-20 text-center text-base">暂无结果</Text>
 }
 
+function SearchVideoItem(props: { video: SearchedVideoType }) {
+  const progressRatio = useWatchProgressRatio(props.video.bvid)
+  return <VideoListItem video={props.video} progressRatio={progressRatio} />
+}
+
 function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   const {
     data: searchedVideos,
@@ -143,7 +149,6 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   } = useSearchVideos(props.keyword)
   const listRef = React.useRef<FlashListRef<SearchedVideoType> | null>(null)
   const keyboardInset = useKeyboardInset()
-  const { watchProgressMap } = useStore()
 
   React.useEffect(() => {
     if (listRef.current) {
@@ -154,11 +159,10 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
   return (
     <FlashList
       data={searchedVideos}
-      extraData={watchProgressMap}
       keyExtractor={(v: SearchedVideoType) => v.bvid}
       ref={listRef}
       renderItem={({ item }: { item: SearchedVideoType }) => {
-        return <VideoListItem video={item} progressRatio={watchProgressMap[item.bvid]?.ratio ?? 0} />
+        return <SearchVideoItem video={item} />
       }}
       persistentScrollbar
       keyboardShouldPersistTaps="handled"

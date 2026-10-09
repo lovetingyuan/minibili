@@ -43,7 +43,7 @@ export default function UserDataManager() {
     {
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
-      errorRetryCount: 2,
+      errorRetryCount: Infinity,
       shouldRetryOnError: (error: Error) =>
         !(
           error instanceof UserDataUnauthorizedError ||

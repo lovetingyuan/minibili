@@ -10,7 +10,7 @@ export default function SettingsSync() {
 
   return (
     <Text className={`text-sm ${theme.error.text}`} accessibilityRole="alert">
-      设置同步失败：{error.message}
+      设置保存暂时失败
     </Text>
   )
 }

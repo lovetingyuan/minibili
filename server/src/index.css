@@ -59,7 +59,7 @@ img {
 }
 
 .topbar-logo {
-  width: 92px;
+  width: 48px;
 }
 
 .topbar-link {
@@ -88,7 +88,7 @@ img {
 }
 
 .hero-title {
-  width: min(300px, 66vw);
+  width: min(180px, 66vw);
   margin: 0 auto;
 }
 

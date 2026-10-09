@@ -2,7 +2,7 @@
 
 一款简洁、免费开源的第三方 B 站 Android App。没有推荐、广告和推送，只有好看的视频和你喜爱的 UP 主。
 
-<img src="./app/assets/minibili.png" alt="MiniBili" width="280">
+<img src="./app/assets/minibili.png" alt="MiniBili" width="180">
 
 <img src="./server/public/screenshots/hot.webp" alt="热门" width="200" style="margin-right: 16px"> <img src="./server/public/screenshots/player.webp" alt="播放" width="200" style="margin-right: 16px"> <img src="./server/public/screenshots/dynamic.webp" alt="动态" width="200" style="margin-right: 16px"> <img src="./server/public/screenshots/mine.webp" alt="我的" width="200">
 

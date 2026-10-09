@@ -56,14 +56,9 @@ export function useHotVideos() {
       // 所以此处不再验证首页，否则后续请求又是第二页了，而是直接按顺序请求下一页
     },
   );
-  const hotVideos =
-    data?.reduce((a, b) => {
-      return a.concat(b.list);
-    }, [] as HotVideoResponse[]) || [];
-
   const isLoadingMore = isLoading || (size > 0 && !!data && typeof data[size - 1] === "undefined");
   const isReachingEnd = !!data && !!data[data.length - 1]?.no_more;
-  const list = hotVideos.map(getVideo);
+  const list = data?.flatMap((page) => page.list.map(getVideo)) ?? [];
   // 列表会被后台自动重新校验，刷新图标只在用户下拉时出现
   const pullToRefresh = usePullToRefresh(() => {
     setRevision((current) => current + 1);

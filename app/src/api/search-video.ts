@@ -44,7 +44,6 @@ export const useSearchVideos = (name: string) => {
   const bvidMap: Record<string, boolean> = {};
   const list = data?.reduce((a, b) => {
     if (b.result) {
-      const pageList: SearchedVideoType[] = [];
       for (const v of b.result) {
         if (v.type !== "video") {
           continue;
@@ -53,9 +52,8 @@ export const useSearchVideos = (name: string) => {
           continue;
         }
         bvidMap[v.bvid] = true;
-        pageList.push(getVideoInfo(v));
+        a.push(getVideoInfo(v));
       }
-      return a.concat(pageList);
     }
     return a;
   }, [] as SearchedVideoType[]);

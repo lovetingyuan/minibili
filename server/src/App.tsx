@@ -101,7 +101,7 @@ function App() {
       <header className="topbar">
         <div className="container topbar-inner">
           <a className="topbar-logo" href="/" aria-label="MiniBili 首页">
-            <img src="/minibili-logo.png" alt="MiniBili" width="1150" height="348" />
+            <img src="/minibili-logo.png" alt="MiniBili" width="512" height="512" />
           </a>
           <a className="topbar-link" href={GITHUB_URL} target="_blank" rel="noreferrer">
             <GitHubIcon />
@@ -113,7 +113,7 @@ function App() {
       <main className="container">
         <section className="hero" aria-labelledby="hero-title">
           <h1 className="hero-title" id="hero-title">
-            <img src="/minibili-logo.png" alt="MiniBili" width="1150" height="348" />
+            <img src="/minibili-logo.png" alt="MiniBili" width="512" height="512" />
           </h1>
           <p className="hero-tagline">一款简洁的 B 站 App</p>
           <p className="hero-intro">

@@ -247,6 +247,14 @@ export default function PlayerControls(props: PlayerControlsProps) {
                 />
               </View>
               <View
+                pointerEvents="none"
+                className={`absolute -left-[3px] top-[11px] h-[6px] w-[6px] rounded-full ${theme.secondary.bg}`}
+              />
+              <View
+                pointerEvents="none"
+                className={`absolute -right-[3px] top-[11px] h-[6px] w-[6px] rounded-full ${theme.secondary.bg}`}
+              />
+              <View
                 className={`absolute top-2 h-3 w-3 rounded-full ${theme.secondary.bg}`}
                 style={{ left: Math.max(0, progress * trackWidth - 6) }}
               />

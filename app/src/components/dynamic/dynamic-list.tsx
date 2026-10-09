@@ -114,6 +114,7 @@ export function DynamicList(props: DynamicListProps) {
       contentContainerClassName="pb-6"
       data={props.list}
       keyExtractor={item => item.id}
+      getItemType={item => `${item.content.kind}:${item.original?.content.kind ?? 'none'}`}
       renderItem={({ item }) => (
         <View className="mb-3">
           <DynamicCard

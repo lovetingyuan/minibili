@@ -1,11 +1,12 @@
 import { useNavigation } from '@react-navigation/native'
+import { useRecyclingState } from '@shopify/flash-list'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import UpName from '../UpName'
 import { Image } from '@/components/Image'
 import he from 'he'
 import { CircleCheck, CirclePlay, CircleUserRound, ThumbsUp } from 'lucide-react-native'
-import React from 'react'
+import type { ReactElement } from 'react'
 import { ActivityIndicator, TouchableOpacity, useWindowDimensions, View } from 'react-native'
 
 import type { VideoCoverProps, VideoListItemProps } from './VideoItem.types'
@@ -29,7 +30,7 @@ import {
 function extractTextWithEmTags(text: string, className?: string) {
   const regex = /<em class="keyword">(.*?)<\/em>|([^<]*)/g
   const matches = text.matchAll(regex)
-  const result: (React.ReactElement | string)[] = []
+  const result: (ReactElement | string)[] = []
   let i = 0
   for (const match of matches) {
     const [, emContent, nonEmContent] = match
@@ -48,7 +49,7 @@ function extractTextWithEmTags(text: string, className?: string) {
 }
 
 function VideoCover({ uri }: VideoCoverProps) {
-  const [isLoading, setIsLoading] = React.useState(true)
+  const [isLoading, setIsLoading] = useRecyclingState(true, [uri])
 
   return (
     <>
@@ -63,6 +64,7 @@ function VideoCover({ uri }: VideoCoverProps) {
       <Image
         className="h-full w-full rounded"
         source={{ uri }}
+        recyclingKey={uri}
         onLoadStart={() => setIsLoading(true)}
         onLoadEnd={() => setIsLoading(false)}
       />
@@ -114,8 +116,7 @@ function VideoListItem<T extends VideoListItemInfo>({
     >
       <View className="mr-3 flex-[3]">
         <View className="relative aspect-8/5 w-full content-center justify-center">
-          {/* key 让封面地址变化时重置加载状态，避免在 effect 中回写 state */}
-          <VideoCover key={coverUri} uri={coverUri} />
+          <VideoCover uri={coverUri} />
           <View
             className={`absolute right-0 top-0 m-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}
           >

@@ -5,8 +5,7 @@ import type { WatchProgressSnapshot } from "../utils/watch-progress";
 
 /** 观看历史接口里的进度比例，供各视频封面展示 */
 export function useWatchProgressRatio(bvid: string) {
-  const { watchProgressMap } = useStore();
-  return watchProgressMap[bvid]?.ratio ?? 0;
+  return useStore((state) => state.watchProgressMap[bvid]?.ratio ?? 0);
 }
 
 function normalizeWatchProgress(map: WatchProgressMap) {
