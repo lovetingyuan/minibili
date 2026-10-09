@@ -1,7 +1,7 @@
 {
   "name": "@minibili/app",
-  "version": "0.8.2",
-  "gitHead": "3e36c38",
+  "version": "0.8.3",
+  "gitHead": "5eeac86",
   "description": "minimum bilibili apk",
   "homepage": "https://lovetingyuan.github.io/minibili/",
   "repository": "github:lovetingyuan/minibili",
@@ -107,7 +107,7 @@
     "zx": "^8.4.1"
   },
   "config": {
-    "versionCode": 79
+    "versionCode": 80
   },
   "expo": {
     "autolinking": {
