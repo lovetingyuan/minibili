@@ -6,7 +6,7 @@ import { X } from 'lucide-react-native'
 import React from 'react'
 import { Pressable, View } from 'react-native'
 
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import useResolvedColor from '@/hooks/useResolvedColor'
 import { useUserSettings } from '@/features/user-data/useUserSettings'
 

@@ -1,6 +1,6 @@
 import { useUserSettings } from '@/features/user-data/useUserSettings'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 
 export default function SettingsSync() {
   const { error } = useUserSettings()

@@ -3,7 +3,7 @@ import { Plus } from "lucide-react-native";
 import { Pressable } from "react-native";
 
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
 import {

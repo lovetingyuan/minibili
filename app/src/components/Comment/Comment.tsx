@@ -6,7 +6,7 @@ import { Alert, Pressable, View } from 'react-native'
 import { Avatar } from '@/components/Avatar'
 import { Text } from '@/components/Text'
 import { overlayIcons } from '@/constants/overlay-icons'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import type { NavigationProps } from '@/types'
 import { getImagePixelSize, parseImgUrl, showToast } from '@/utils'
@@ -130,7 +130,7 @@ export function CommentItem(props: CommentItemProps) {
                 : undefined
             }
             title={comment.name.slice(0, 1)}
-            containerClassName="bg-slate-200 dark:bg-slate-700"
+            containerClassName="bg-placeholder"
           />
         </Pressable>
         <View className="min-w-0 flex-1">
@@ -234,7 +234,7 @@ export function Comment(props: CommentProps) {
     comment.rcount > 0 ? (
       <Pressable
         className={clsx(
-          '-mx-2 rounded-lg px-2 py-1.5 active:bg-slate-400/20',
+          '-mx-2 rounded-lg px-2 py-1.5 active:bg-pressed',
           !comment.replies.length && 'mt-2',
         )}
         accessibilityRole="button"
@@ -250,7 +250,7 @@ export function Comment(props: CommentProps) {
   return (
     <View
       className={clsx(
-        'bg-white p-3 dark:bg-slate-900',
+        'bg-overlay p-3',
         props.first ? 'rounded-b-2xl' : 'rounded-2xl',
       )}
     >
@@ -265,7 +265,7 @@ export function Comment(props: CommentProps) {
         isAttitudePending={props.isAttitudePending}
       />
       {comment.replies.length ? (
-        <View className="mt-3 gap-3 rounded-2xl bg-slate-100 p-3 dark:bg-slate-800">
+        <View className="mt-3 gap-3 rounded-2xl bg-fill-raised p-3">
           {comment.replies.map(reply => (
             <CommentItem
               key={reply.id}

@@ -6,7 +6,7 @@ import { ActivityIndicator, Pressable } from 'react-native'
 import { useVideoLike } from '@/api/useVideoLike'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import {
   handleLoginRequiredError,
   showLoginRequiredAlert,

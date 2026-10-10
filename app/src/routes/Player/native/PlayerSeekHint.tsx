@@ -21,11 +21,11 @@ export default function PlayerSeekHint(props: PlayerSeekHintProps) {
 
   return (
     <View pointerEvents="none" className="absolute inset-0 items-center justify-center">
-      <View className="items-center rounded bg-black/60 px-3 py-2">
-        <Text className="text-base font-bold tabular-nums text-white">
+      <View className="items-center rounded bg-media-background/60 px-3 py-2">
+        <Text className="text-base font-bold tabular-nums text-media-content">
           {formatPlaybackTime(targetMs / 1000)}
         </Text>
-        <Text className="text-xs text-white/80">
+        <Text className="text-xs text-media-content/80">
           {deltaSeconds >= 0 ? `快进 ${deltaSeconds} 秒` : `后退 ${-deltaSeconds} 秒`}
         </Text>
       </View>

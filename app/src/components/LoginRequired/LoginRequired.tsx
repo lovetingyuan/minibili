@@ -2,7 +2,7 @@ import { View } from 'react-native'
 
 import { Button } from '@/components/Button'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { openBilibiliLogin } from '@/routes/navigation'
 
 import type { LoginRequiredProps } from './LoginRequired.types'

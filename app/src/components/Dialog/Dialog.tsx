@@ -10,7 +10,7 @@ import {
 
 import { Button } from '@/components/Button'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import useResolvedColor from '@/hooks/useResolvedColor'
 
 import type {
@@ -22,7 +22,7 @@ import type {
 } from './Dialog.types'
 
 const defaultPanelClassName = `w-[90%] max-w-lg rounded-xl p-5 ${theme.background.overlay}`
-const defaultBackdropClassName = 'bg-black/40'
+const defaultBackdropClassName = 'bg-backdrop/40'
 
 function DialogBase({
   animationType = 'fade',

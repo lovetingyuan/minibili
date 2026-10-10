@@ -1,7 +1,7 @@
 import type { SvgProps } from "react-native-svg";
 import Svg, { Path } from "react-native-svg";
 
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
 export function GitHubIcon({ color, height = 20, width = 20, ...props }: SvgProps) {

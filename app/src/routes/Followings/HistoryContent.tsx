@@ -8,7 +8,7 @@ import { FlashList } from '@/components/FlashList'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import VideoListItem from '@/components/VideoItem'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
 import { formatWatchTime } from '@/utils/watch-time'
 

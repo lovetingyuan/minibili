@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 
 import {
   hasProfileInfoOverflow,
@@ -82,7 +82,7 @@ export default function ProfileInfo(props: ProfileInfoProps) {
   )
 
   return (
-    <View className="mb-3 gap-2 bg-white px-4 py-3 dark:bg-slate-950">
+    <View className="mb-3 gap-2 bg-surface px-4 py-3">
       {officialDescription ? (
         <ProfileInfoRow
           action={sign || !canExpand ? undefined : action}

@@ -11,7 +11,7 @@ import { ActivityIndicator, TouchableOpacity, useWindowDimensions, View } from '
 
 import type { VideoCoverProps, VideoListItemProps } from './VideoItem.types'
 import { WatchProgressBar } from '../WatchProgressBar'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { useFollowedUpsMap } from '@/store/derives'
 import type { VideoListItemInfo, NavigationProps } from '@/types'
@@ -120,7 +120,7 @@ function VideoListItem<T extends VideoListItemInfo>({
           <View
             className={`absolute right-0 top-0 m-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}
           >
-            <Text className="text-xs font-thin text-white">
+            <Text className="text-xs font-thin text-media-content">
               {typeof video.duration === 'string'
                 ? parseDurationStr(video.duration)
                 : parseDuration(video.duration)}
@@ -128,7 +128,7 @@ function VideoListItem<T extends VideoListItemInfo>({
           </View>
           {video.date ? (
             <View className={`absolute top-0 m-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}>
-              <Text className="text-xs font-thin text-white">{parseDate(video.date)}</Text>
+              <Text className="text-xs font-thin text-media-content">{parseDate(video.date)}</Text>
             </View>
           ) : null}
           {playCountOnCover && isDefined(video.play) ? (
@@ -145,7 +145,7 @@ function VideoListItem<T extends VideoListItemInfo>({
             <View
               className={`absolute bottom-0 right-0 m-1 rounded-sm px-1 py-[1px] ${theme.mediaBadge.bg}`}
             >
-              <Text className="text-xs font-thin text-white">{parseNumber(video.danmaku)}弹</Text>
+              <Text className="text-xs font-thin text-media-content">{parseNumber(video.danmaku)}弹</Text>
             </View>
           ) : null}
           <WatchProgressBar ratio={progressRatio} />

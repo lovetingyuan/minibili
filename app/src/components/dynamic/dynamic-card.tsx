@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native'
 
 import type { DynamicItem } from '@/api/dynamic-items.type'
 import type { DynamicArticle } from '@/api/opus-detail.type'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import type { NavigationProps } from '@/types'
 import { getImagePixelSize, parseDate, parseImgUrl } from '@/utils'
 
@@ -43,7 +43,7 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
               ? { uri: parseImgUrl(item.author.face, getImagePixelSize(avatarSize)) }
               : undefined
           }
-          containerClassName="bg-slate-200 dark:bg-slate-700"
+          containerClassName="bg-placeholder"
         />
       </Pressable>
       <View className="ml-3 min-w-0 flex-1 flex-row items-center gap-2">
@@ -147,7 +147,7 @@ function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
   // 既没有可跳转的详情页，也没有作者信息，因此只展示不可交互的失效提示。
   if (!item.id) {
     return (
-      <View className="mb-3 rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
+      <View className="mb-3 rounded-lg bg-fill-raised p-3">
         <Text className={`text-sm ${theme.text.muted}`}>
           {item.content.kind === 'unavailable' ? item.content.message : '原动态不可见'}
         </Text>
@@ -158,7 +158,7 @@ function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="查看被转发的动态"
-      className="mb-3 rounded-lg bg-slate-100 p-3 dark:bg-slate-800"
+      className="mb-3 rounded-lg bg-fill-raised p-3"
       onPress={event => {
         // 内层卡片拦截点击，避免同时触发外层转发动态的整卡跳转
         event.stopPropagation()
@@ -190,7 +190,7 @@ export function DynamicCard(props: {
   )
   return (
     <View
-      className={detail ? 'bg-white px-3 py-4 dark:bg-slate-950' : 'bg-white p-4 dark:bg-slate-950'}
+      className={detail ? 'bg-surface px-3 py-4' : 'bg-surface p-4'}
     >
       {onPress ? <Pressable onPress={onPress}>{body}</Pressable> : <View>{body}</View>}
       {props.showActions === false ? null : (

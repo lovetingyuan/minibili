@@ -3,7 +3,7 @@ import React from 'react'
 import { Pressable, View } from 'react-native'
 
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import useResolvedColor from '@/hooks/useResolvedColor'
 
 import { CheckBoxIcon } from './check-box-icon'

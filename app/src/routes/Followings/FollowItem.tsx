@@ -5,7 +5,7 @@ import UpName from '@/components/UpName'
 import { clsx } from 'clsx'
 import { Alert, Pressable, TouchableOpacity, View } from 'react-native'
 
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { overlayIcons } from '@/constants/overlay-icons'
 import { useFollowActions } from '@/hooks/useFollowActions'
 import { bilibiliSession } from '@/features/bilibili-session/session'
@@ -136,15 +136,15 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
               e.stopPropagation()
               gotoLivePage()
             }}
-            className="absolute inset-0 h-[52px] w-[52px] items-center justify-center rounded-full bg-slate-950/60"
+            className="absolute inset-0 h-[52px] w-[52px] items-center justify-center rounded-full bg-media-background/60"
           >
-            <Text className={`text-center text-xs font-bold text-[#80DAF6]`}>直播中</Text>
+            <Text className={`text-center text-xs font-bold ${theme.primary.onDark}`}>直播中</Text>
           </Pressable>
         ) : null}
         {hasNewDynamic ? (
           <View
             className={clsx(
-              'absolute right-0 top-0 h-3.5 w-3.5 rounded-full border-2 border-white dark:border-slate-900',
+              'absolute right-0 top-0 h-3.5 w-3.5 rounded-full border-2 border-overlay',
               theme.secondary.bg,
             )}
           />

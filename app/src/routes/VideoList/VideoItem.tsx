@@ -8,7 +8,7 @@ import { CircleCheck, CirclePlay, CircleUserRound } from 'lucide-react-native'
 import { useWindowDimensions, View } from 'react-native'
 
 import type { VideoItem as VideoItemType } from '@/api/hot-videos'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { useUserSettings } from '@/features/user-data/useUserSettings'
 import { useFollowedUpsMap } from '@/store/derives'
 import { useWatchProgressRatio } from '@/store/watch-progress'
@@ -46,23 +46,23 @@ function VideoItem({ video }: { video: VideoItemType }) {
           source={{ uri: parseImgUrl(video.cover, coverSize) }}
         />
         <View className={`absolute m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}>
-          <Text className="text-xs text-white">{parseDuration(video.duration)}</Text>
+          <Text className="text-xs text-media-content">{parseDuration(video.duration)}</Text>
         </View>
         <View
           className={`absolute bottom-0 m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}
         >
-          <Text className="text-xs text-white">{parseDate(video.date)}</Text>
+          <Text className="text-xs text-media-content">{parseDate(video.date)}</Text>
         </View>
         <View
           className={`absolute right-0 top-0 m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}
         >
-          <Text className="text-xs text-white">{parseNumber(video.danmuNum)}弹</Text>
+          <Text className="text-xs text-media-content">{parseNumber(video.danmuNum)}弹</Text>
         </View>
         {video.tag ? (
           <View
             className={`absolute bottom-0 right-0 m-1 items-center rounded-sm px-1 py-0.5 ${theme.mediaBadge.bg}`}
           >
-            <Text className={clsx('text-xs text-white', isBlackTag && 'line-through opacity-60')}>
+            <Text className={clsx('text-xs text-media-content', isBlackTag && 'line-through opacity-60')}>
               {video.tag}
             </Text>
           </View>
@@ -101,9 +101,9 @@ function VideoItem({ video }: { video: VideoItemType }) {
             <ThemedIcon
               size={15}
               icon={CirclePlay}
-              colorClassName="accent-gray-600 dark:accent-gray-400"
+              colorClassName="accent-muted"
             />
-            <Text className="ml-1 text-xs text-gray-600 dark:text-gray-400">{playNum}</Text>
+            <Text className="ml-1 text-xs text-muted">{playNum}</Text>
           </View>
         </View>
       </View>

@@ -11,7 +11,8 @@ import {
 
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import useResolvedColor from '@/hooks/useResolvedColor'
+import { theme } from '@/constants/colors.tw'
 
 /**
  * 弹幕内容上限，与接口限制保持一致
@@ -40,6 +41,8 @@ export type DanmakuComposerViewProps = {
  * 播放器底部的弹幕输入条，贴键盘上方浮出
  */
 export function DanmakuComposerView(props: DanmakuComposerViewProps) {
+  const contentColor = useResolvedColor(theme.media.content)
+  const placeholderColor = useResolvedColor(theme.media.muted)
   const count = [...props.draft].length
   const canSubmit = Boolean(props.draft.trim()) && !props.pending
   const reachedLimit = count >= DANMAKU_COMPOSER_MAX_LENGTH
@@ -47,24 +50,24 @@ export function DanmakuComposerView(props: DanmakuComposerViewProps) {
   return (
     <View className="absolute bottom-0 left-0 right-0" pointerEvents="box-none">
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View className="flex-row items-center gap-2 bg-black/80 px-3 pb-2 pt-2">
+        <View className="flex-row items-center gap-2 bg-media-background/80 px-3 pb-2 pt-2">
           <TextInput
             value={props.draft}
             autoFocus
             placeholder={props.placeholder ?? DANMAKU_COMPOSER_PLACEHOLDER}
-            placeholderTextColor="rgba(255, 255, 255, 0.5)"
-            selectionColor="#ffffff"
+            placeholderTextColor={placeholderColor}
+            selectionColor={contentColor}
             maxLength={DANMAKU_COMPOSER_MAX_LENGTH}
-            className="min-h-9 flex-1 rounded-3xl bg-white/15 px-4 py-2 text-[15px] text-white"
+            className="min-h-9 flex-1 rounded-3xl bg-media-content/15 px-4 py-2 text-[15px] text-media-content"
             accessibilityLabel="弹幕输入框"
             onChangeText={props.onChangeText}
             onSubmitEditing={props.onSubmit}
           />
           <Text
-            className={`text-[11px] tabular-nums ${reachedLimit ? 'text-orange-400' : 'text-white/60'}`}
+            className={`text-[11px] tabular-nums ${reachedLimit ? 'text-warning-on-media' : 'text-media-content/60'}`}
           >{`${count}/${DANMAKU_COMPOSER_MAX_LENGTH}`}</Text>
           <Pressable
-            className={`h-9 w-9 items-center justify-center rounded-full ${canSubmit ? theme.primary.bg : 'bg-white/20'}`}
+            className={`h-9 w-9 items-center justify-center rounded-full ${canSubmit ? theme.primary.bg : 'bg-media-content/20'}`}
             accessibilityRole="button"
             accessibilityLabel="发送弹幕"
             accessibilityState={{ disabled: !canSubmit, busy: props.pending }}
@@ -72,9 +75,9 @@ export function DanmakuComposerView(props: DanmakuComposerViewProps) {
             onPress={props.onSubmit}
           >
             {props.pending ? (
-              <ActivityIndicator size="small" color="#ffffff" />
+              <ActivityIndicator size="small" color={contentColor} />
             ) : (
-              <ThemedIcon icon={ArrowUp} size={18} color="#ffffff" />
+              <ThemedIcon icon={ArrowUp} size={18} colorClassName="text-media-content" />
             )}
           </Pressable>
           <Pressable
@@ -84,7 +87,7 @@ export function DanmakuComposerView(props: DanmakuComposerViewProps) {
             hitSlop={6}
             onPress={props.onClose}
           >
-            <ThemedIcon icon={X} size={20} color="#ffffff" />
+            <ThemedIcon icon={X} size={20} colorClassName="text-media-content" />
           </Pressable>
         </View>
       </KeyboardAvoidingView>

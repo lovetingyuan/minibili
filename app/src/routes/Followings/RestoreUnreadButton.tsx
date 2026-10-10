@@ -4,7 +4,7 @@ import React from 'react'
 
 import { FAB } from '@/components/FAB'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import type { BilibiliAccount } from '@/features/bilibili-session/types'
 import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'

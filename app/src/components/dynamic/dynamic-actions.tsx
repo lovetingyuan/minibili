@@ -4,7 +4,7 @@ import { ActivityIndicator, Pressable, View } from 'react-native'
 import { useDynamicLike } from '@/api/useDynamicLike'
 import type { DynamicItem } from '@/api/dynamic-items.type'
 import type { FavoriteAccount } from '@/api/favorites.types'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import {
   handleLoginRequiredError,
   showLoginRequiredAlert,
@@ -180,7 +180,7 @@ export function DynamicActions(props: {
     account === undefined || control.phase !== 'ready' || Boolean(account && !current)
 
   return (
-    <View className="flex-row border-t border-slate-100 pt-3 dark:border-slate-800">
+    <View className="flex-row border-t border-divider-subtle pt-3">
       <DynamicShareButton item={props.item} />
       <DynamicCommentButton
         item={props.item}

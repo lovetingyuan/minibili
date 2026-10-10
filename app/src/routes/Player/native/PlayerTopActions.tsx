@@ -12,8 +12,7 @@ import {
 
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
-import useResolvedColor from "@/hooks/useResolvedColor";
+import { theme } from "@/constants/colors.tw";
 
 import { formatPlaybackRate, PLAYBACK_RATES } from "./playback-rate";
 import BackgroundPlayMenu from "./BackgroundPlayMenu";
@@ -23,7 +22,6 @@ import type { PlayerTopActionsProps } from "./player-top-actions.types";
  * 播放器右上角的悬浮按钮：倍速、静音、播放模式、后台播放与发送弹幕。
  */
 export default function PlayerTopActions(props: PlayerTopActionsProps) {
-  const accentColor = useResolvedColor(theme.secondary.text) ?? "#ff6699";
   const playbackRateLabel = formatPlaybackRate(props.playbackRate);
 
   return (
@@ -40,12 +38,12 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
           }`}
           onPress={props.onTogglePlaybackRateMenu}
         >
-          <View className="h-9 min-w-12 flex-row items-center justify-center gap-0.5 rounded-full bg-black/40 px-2">
-            <Text className="text-xs font-semibold text-white">{playbackRateLabel}</Text>
+          <View className="h-9 min-w-12 flex-row items-center justify-center gap-0.5 rounded-full bg-media-background/40 px-2">
+            <Text className="text-xs font-semibold text-media-content">{playbackRateLabel}</Text>
             <ThemedIcon
               icon={props.playbackRateMenuOpen ? ChevronUp : ChevronDown}
               size={16}
-              color="#ffffff"
+              colorClassName="text-media-content"
             />
           </View>
         </MenuTrigger>
@@ -63,13 +61,12 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
                 }}
               >
                 <View className="h-12 min-w-[124px] flex-row items-center justify-between px-4">
-                  <Text
-                    className={theme.text.primary}
-                    style={selected ? { color: accentColor } : null}
-                  >
+                  <Text className={selected ? theme.secondary.text : theme.text.primary}>
                     {label}
                   </Text>
-                  {selected ? <ThemedIcon icon={Check} size={18} color={accentColor} /> : null}
+                  {selected ? (
+                    <ThemedIcon icon={Check} size={18} colorClassName={theme.secondary.text} />
+                  ) : null}
                 </View>
               </MenuOption>
             );
@@ -77,7 +74,7 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
         </MenuOptions>
       </Menu>
       <Pressable
-        className="h-9 w-9 items-center justify-center rounded-full bg-black/40 active:opacity-70"
+        className="h-9 w-9 items-center justify-center rounded-full bg-media-background/40 active:opacity-70"
         android_ripple={{ color: "transparent" }}
         accessibilityRole="button"
         accessibilityLabel={props.muted ? "取消静音" : "静音"}
@@ -88,11 +85,11 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
         <ThemedIcon
           icon={props.muted ? VolumeX : Volume2}
           size={20}
-          color={props.muted ? accentColor : "#ffffff"}
+          colorClassName={props.muted ? theme.secondary.onDark : theme.media.content}
         />
       </Pressable>
       <Pressable
-        className="h-9 w-9 items-center justify-center rounded-full bg-black/40"
+        className="h-9 w-9 items-center justify-center rounded-full bg-media-background/40"
         android_ripple={{ color: "transparent" }}
         style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
         accessibilityRole="button"
@@ -101,11 +98,15 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
         hitSlop={8}
         onPress={props.onToggleLoop}
       >
-        <ThemedIcon icon={Repeat2} size={20} color={props.loopEnabled ? accentColor : "#ffffff"} />
+        <ThemedIcon
+          icon={Repeat2}
+          size={20}
+          colorClassName={props.loopEnabled ? theme.secondary.onDark : theme.media.content}
+        />
       </Pressable>
       {props.showAutoNext ? (
         <Pressable
-          className="h-9 w-9 items-center justify-center rounded-full bg-black/40"
+          className="h-9 w-9 items-center justify-center rounded-full bg-media-background/40"
           android_ripple={{ color: "transparent" }}
           style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
           accessibilityRole="button"
@@ -117,7 +118,7 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
           <ThemedIcon
             icon={ListVideo}
             size={22}
-            color={props.autoNextEnabled ? accentColor : "#ffffff"}
+            colorClassName={props.autoNextEnabled ? theme.secondary.onDark : theme.media.content}
           />
         </Pressable>
       ) : null}
@@ -131,7 +132,7 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
       />
       {props.canSendDanmaku ? (
         <Pressable
-          className="h-9 w-9 items-center justify-center rounded-full bg-black/40"
+          className="h-9 w-9 items-center justify-center rounded-full bg-media-background/40"
           android_ripple={{ color: "transparent" }}
           style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
           accessibilityRole="button"
@@ -139,7 +140,7 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
           hitSlop={8}
           onPress={props.onSendDanmaku}
         >
-          <ThemedIcon icon={Pencil} size={20} color="#ffffff" />
+          <ThemedIcon icon={Pencil} size={20} colorClassName="text-media-content" />
         </Pressable>
       ) : null}
     </View>

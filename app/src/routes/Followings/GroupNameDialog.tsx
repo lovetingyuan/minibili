@@ -3,7 +3,7 @@ import { TextInput } from 'react-native'
 
 import { Dialog } from '@/components/Dialog'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 
 import type { GroupNameDialogProps } from './FollowGroups.types'
 
@@ -29,6 +29,8 @@ export default function GroupNameDialog({
         autoFocus
         editable={!saving}
         placeholder="分组名称"
+        placeholderTextColorClassName={theme.icon.muted}
+        selectionColorClassName={theme.primary.accent}
         returnKeyType="done"
         accessibilityLabel="分组名称"
         className={`rounded-lg border px-3 py-2 text-base ${theme.border.outline} ${theme.text.primary}`}

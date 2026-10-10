@@ -4,7 +4,7 @@ import { Pressable, TextInput, View } from 'react-native'
 import { Button } from '@/components/Button'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import useResolvedColor from '@/hooks/useResolvedColor'
 
 import type { SpaceTabsProps } from './SpaceTabs.types'

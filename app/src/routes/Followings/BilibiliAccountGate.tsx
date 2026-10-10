@@ -6,7 +6,7 @@ import { useBilibiliFollowings } from '@/api/followings'
 import { LoginRequired } from '@/components/LoginRequired'
 import { Button } from '@/components/Button'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import { useBilibiliSession } from '@/features/bilibili-session/useBilibiliSession'
 

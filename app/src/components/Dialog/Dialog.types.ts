@@ -11,7 +11,7 @@ export type DialogProps = {
   dismissOnBackdrop?: boolean
   /** 面板样式，默认 `w-[90%] max-w-lg rounded-xl p-5` 加白色底 */
   className?: string
-  /** 遮罩样式，默认 `bg-black/40` */
+  /** 遮罩样式，默认 `bg-backdrop/40` */
   backdropClassName?: string
   /** 弹出动画，默认 "fade" */
   animationType?: ModalProps['animationType']

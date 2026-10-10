@@ -1,6 +1,6 @@
 import { ActivityIndicator, ImageBackground, StyleSheet, View } from "react-native";
 
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import { getImagePixelDimensions, parseImgUrl } from "@/utils";
 
 type PlayerPosterProps = {

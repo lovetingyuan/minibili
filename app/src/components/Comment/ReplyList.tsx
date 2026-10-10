@@ -10,7 +10,7 @@ import { BottomSheet } from '@/components/BottomSheet'
 import { FlashList } from '@/components/FlashList'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { getStoreMethods, useStore } from '@/store'
 
 import { CommentItem } from './Comment'
@@ -137,7 +137,7 @@ export default function ReplyList(props: ReplyListProps) {
     >
       {/* flex-1 撑满 sheet 的内容区（sheet 高度已扣除把手），不要再写死高度 */}
       <View className={`flex-1 overflow-hidden rounded-t-[28px] ${theme.background.surface}`}>
-        <View className="relative h-12 flex-row items-center justify-center border-b border-slate-100 px-4 dark:border-slate-800">
+        <View className="relative h-12 flex-row items-center justify-center border-b border-divider-subtle px-4">
           <Text className="text-base font-semibold tabular-nums">
             {typeof allCount === 'number' ? `${allCount} 条回复` : '回复'}
           </Text>
@@ -155,7 +155,7 @@ export default function ReplyList(props: ReplyListProps) {
           data={replies.data.replies}
           keyExtractor={(item: ReplyItemType) => item.id}
           renderItem={({ item }: { item: ReplyItemType }) => (
-            <View className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
+            <View className="border-b border-divider-subtle px-6 py-4">
               <CommentItem comment={item} {...rowProps} />
             </View>
           )}
@@ -163,7 +163,7 @@ export default function ReplyList(props: ReplyListProps) {
             root ? (
               <View className="px-3 pb-2 pt-3">
                 <Text className={`mb-2 px-1 text-xs font-medium ${theme.text.muted}`}>原评论</Text>
-                <View className="rounded-2xl bg-slate-50 p-3 dark:bg-slate-900">
+                <View className="rounded-2xl bg-fill-subtle p-3">
                   <CommentItem comment={root} {...rowProps} />
                 </View>
                 <View className="flex-row items-center justify-between px-1 pb-1 pt-4">

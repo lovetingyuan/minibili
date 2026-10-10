@@ -3,7 +3,7 @@ import { Button } from '@/components/Button'
 import { Text } from '@/components/Text'
 import { Image, Linking, View } from 'react-native'
 
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 
 import { githubLink } from '../constants'
 import { useStore } from '../store'
@@ -41,7 +41,7 @@ function Welcome({ navigation }: Props) {
           </Text>
           )，所有数据均来源于个人的B站官网，不会传播任何个人数据（仅在本地和B站官方），仅供学习交流！
         </Text>
-        <Text className="mt-5 text-base text-gray-600 dark:text-gray-400">
+        <Text className="mt-5 text-base text-muted">
           如果遇到闪退或报错请及时更新最新版本。
         </Text>
       </View>

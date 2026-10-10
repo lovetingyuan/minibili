@@ -4,7 +4,7 @@ import { ScrollView, TouchableOpacity, View } from 'react-native'
 
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 
 import type { FollowGroupTabsProps } from './FollowGroups.types'
 

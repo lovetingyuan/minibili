@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { Button } from "@/components/Button";
 import { Text } from "@/components/Text";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 
 import type { WebViewErrorProps } from "./WebViewError.types";
 

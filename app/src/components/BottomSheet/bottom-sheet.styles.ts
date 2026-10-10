@@ -1,11 +1,11 @@
 import type { ViewStyle } from "react-native";
 
-import { theme } from "../../constants/theme";
+import { theme } from "../../constants/colors.tw";
 
 /** sheet 面板背景，与两处 sheet 内容区保持一致 */
 export const sheetBackgroundClassName = theme.background.surface;
 /** 内置把手的指示条，与原本自绘把手配色保持一致 */
-export const sheetHandleIndicatorClassName = "bg-slate-300 dark:bg-slate-700";
+export const sheetHandleIndicatorClassName = "bg-handle";
 
 const SHEET_RADIUS = 28;
 const HANDLE_INDICATOR_WIDTH = 40;

@@ -10,7 +10,7 @@ import { ThemedIcon } from '@/components/ThemedIcon'
 import useResolvedColor from '@/hooks/useResolvedColor'
 import useResolvedStyle from '@/hooks/useResolvedStyle'
 import useRouteTheme from '@/hooks/useRouteTheme'
-import useTheme from '@/hooks/useTheme'
+import { theme } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import { useUnreadFollowedUpCount } from '@/store/derives'
 import type { MainTabParamList, RootStackParamList } from '@/types'
@@ -63,7 +63,7 @@ function WatchLaterRoute() {
 }
 
 export function MainTabs() {
-  const theme = useTheme()
+  const badgeContentColor = useResolvedColor(theme.content)
   const activeTintColor = useResolvedColor(theme.primary.text)
   const inactiveTintColor = useResolvedColor(theme.text.muted)
   const headerTitleColor = useResolvedColor(theme.text.primary)
@@ -118,7 +118,7 @@ export function MainTabs() {
           tabBarBadge: followingDynamicsBadge,
           tabBarBadgeStyle: {
             backgroundColor: badgeColor,
-            color: '#FFFFFF',
+            color: badgeContentColor,
             fontSize: 8,
             lineHeight: 14,
             height: 14,
@@ -142,7 +142,7 @@ export function MainTabs() {
           tabBarBadge: hasLiveUps ? '𝘭𝘪𝘷𝘦' : followingsUnreadBadge,
           tabBarBadgeStyle: {
             backgroundColor: hasLiveUps ? liveBadgeColor : badgeColor,
-            color: '#FFFFFF',
+            color: badgeContentColor,
             fontSize: 8,
             lineHeight: 14,
             height: 14,
@@ -165,7 +165,7 @@ export function MainTabs() {
           tabBarBadge: hasUpdate ? '新' : undefined,
           tabBarBadgeStyle: {
             backgroundColor: badgeColor,
-            color: '#FFFFFF',
+            color: badgeContentColor,
             fontSize: 8,
             lineHeight: 14,
             height: 14,
@@ -186,7 +186,7 @@ export function MainTabs() {
 
 function AppRoute() {
   const routeNameRef = useRef<string | undefined>(undefined)
-  const theme = useTheme()
+
   const routeTheme = useRouteTheme()
   const { $firstRun, initialed } = useStore()
   const isFirstRun = $firstRun === -1

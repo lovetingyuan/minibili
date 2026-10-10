@@ -7,7 +7,7 @@ import type { CommentAttitudeKind } from '@/api/comment-actions.types'
 import type { CommentItemType, ReplyItemType } from '@/api/comments'
 import { useComments } from '@/api/comments'
 import { useCommentActions } from '@/api/useCommentActions'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import useKeyboardHeight from '@/hooks/useKeyboardHeight'
@@ -35,7 +35,7 @@ function Loading() {
       {LOADING_COMMENT_WIDTHS.map((width, index) => (
         <View
           className={clsx(
-            'gap-2.5 bg-white p-3 dark:bg-slate-900',
+            'gap-2.5 bg-overlay p-3',
             index === 0 ? 'rounded-b-2xl' : 'rounded-2xl',
           )}
           key={width}
@@ -158,9 +158,9 @@ export default function CommentList(props: CommentListProps) {
         ItemSeparatorComponent={CommentSeparator}
         ListHeaderComponent={
           <View>
-            <View className="bg-white px-3 pt-4 pb-3 dark:bg-slate-950">{header}</View>
+            <View className="bg-surface px-3 pt-4 pb-3">{header}</View>
             <View className={`h-2 ${theme.background.page}`} />
-            <View className="flex-row items-center justify-between border-b border-slate-100 bg-white px-3 pb-2 pt-3 dark:border-slate-800 dark:bg-slate-950">
+            <View className="flex-row items-center justify-between border-b border-divider-subtle bg-surface px-3 pb-2 pt-3">
               <View className="flex-row items-center gap-1.5">
                 <ThemedIcon
                   icon={MessageSquareText}
@@ -179,7 +179,7 @@ export default function CommentList(props: CommentListProps) {
               <View className="flex-row items-center gap-3">
                 {props.dividerRight}
                 <Pressable
-                  className="flex-row items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 dark:bg-slate-800"
+                  className="flex-row items-center gap-1 rounded-full bg-fill-raised px-3 py-1.5"
                   accessibilityRole="button"
                   accessibilityLabel={`当前按${mode === 3 ? '热度' : '时间'}排序，点击切换`}
                   onPress={() => setMode(current => (current === 3 ? 2 : 3))}
@@ -190,7 +190,7 @@ export default function CommentList(props: CommentListProps) {
                   </Text>
                 </Pressable>
                 <Pressable
-                  className="flex-row items-center gap-1 rounded-full bg-slate-100 px-3 py-1.5 dark:bg-slate-800"
+                  className="flex-row items-center gap-1 rounded-full bg-fill-raised px-3 py-1.5"
                   accessibilityRole="button"
                   accessibilityLabel="写评论"
                   onPress={openComposer}

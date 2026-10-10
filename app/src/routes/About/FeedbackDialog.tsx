@@ -8,7 +8,7 @@ import { Dialog } from '@/components/Dialog'
 import { Image } from '@/components/Image'
 import { Button } from '@/components/Button'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { bilibiliSession } from '@/features/bilibili-session/session'
 import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'
 import { showToast } from '@/utils'
@@ -109,6 +109,8 @@ export default function FeedbackDialog({ onClose }: FeedbackDialogProps) {
         editable={!isSubmitting}
         multiline
         placeholder="请描述你的建议或遇到的问题*"
+        placeholderTextColorClassName={theme.icon.muted}
+        selectionColorClassName={theme.primary.accent}
         textAlignVertical="top"
         accessibilityLabel="反馈内容"
         className={`min-h-24 max-h-36 rounded-lg border px-3 py-2 text-base ${inputFocused ? theme.primary.border : theme.border.outline} ${theme.text.primary}`}

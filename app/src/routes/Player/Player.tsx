@@ -17,7 +17,7 @@ import BilibiliWebView from "@/components/BilibiliWebView";
 
 import { useVideoMp4Url } from "@/api/play-url";
 import { UA } from "@/constants";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import { useRecoverableWebView } from "@/hooks/useRecoverableWebView";
 import type { RootStackParamList } from "@/types";
 import { shouldAllowWebViewRequest } from "@/utils/webview-url";
@@ -232,13 +232,13 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
-          <View className="absolute inset-0 bg-black/30" />
+          <View className="absolute inset-0 bg-media-background/30" />
           {children}
         </ImageBackground>
       );
     }
 
-    return <View className="flex-1 items-center justify-center bg-black">{children}</View>;
+    return <View className="flex-1 items-center justify-center bg-media-background">{children}</View>;
   };
   const renderLoading = () => (
     <View className="absolute h-full w-full">
@@ -304,15 +304,15 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
-          <ThemedIcon icon={Play} size={64} color="#ffffff" filled opacity={0.8} />
+          <ThemedIcon icon={Play} size={64} colorClassName="text-media-content" filled opacity={0.8} />
           <View className="absolute bottom-2 left-2 flex-row gap-2">
             {videoInfo?.duration ? (
-              <Text className="rounded bg-gray-900/60 px-2 py-0.5 font-bold text-white">
+              <Text className="rounded bg-media-background/60 px-2 py-0.5 font-bold text-media-content">
                 {parseDuration(videoInfo?.duration)}
               </Text>
             ) : null}
             {isWifi ? null : (
-              <Text className="rounded bg-gray-900/60 px-2 py-[2px] font-bold text-white">
+              <Text className="rounded bg-media-background/60 px-2 py-[2px] font-bold text-media-content">
                 播放将消耗流量
               </Text>
             )}
@@ -322,10 +322,10 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
             <CheckBox
               checked={highQuality}
               title="高清"
-              textClassName="text-white"
-              wrapperClassName="rounded bg-gray-900/60 py-[2px] px-2 text-white font-bold"
-              checkedColorClassName={theme.secondary.accent}
-              uncheckedColor={"white"}
+              textClassName="text-media-content"
+              wrapperClassName="rounded bg-media-background/60 py-[2px] px-2 text-media-content font-bold"
+              checkedColorClassName={theme.secondary.accentOnDark}
+              uncheckedColorClassName={theme.mediaBadge.accent}
               size={18}
               containerClassName="bg-transparent p-0 m-0"
               onPress={() => {
@@ -344,7 +344,7 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
       }}
       key={`${cid}-${highQuality ? "hq" : "sq"}-${webViewKey}-${recoverableWebViewKey}`}
       ref={webViewRef}
-      className="flex-1 bg-black"
+      className="flex-1 bg-media-background"
       originWhitelist={["https://*", "bilibili://*"]}
       allowsFullscreenVideo
       injectedJavaScriptForMainFrameOnly
@@ -404,7 +404,7 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
   return (
     <View
       renderToHardwareTextureAndroid
-      className="relative w-full shrink-0 overflow-hidden bg-black"
+      className="relative w-full shrink-0 overflow-hidden bg-media-background"
       style={{ height: videoViewHeight }}
     >
       {player}
@@ -412,8 +412,8 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
         <View className="absolute inset-0">
           {renderPlayerBackground(
             <View className="items-center gap-3 px-8">
-              <Text className="text-xl font-bold text-white">{errorInfo.title}</Text>
-              <Text className="text-center text-sm leading-6 text-white/80">
+              <Text className="text-xl font-bold text-media-content">{errorInfo.title}</Text>
+              <Text className="text-center text-sm leading-6 text-media-content/80">
                 {errorInfo.description}
               </Text>
               <Pressable
@@ -423,7 +423,7 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
                   void handleRetry();
                 }}
               >
-                <Text className="font-bold text-white">{isRetrying ? "重试中..." : "重试"}</Text>
+                <Text className="font-bold text-media-content">{isRetrying ? "重试中..." : "重试"}</Text>
               </Pressable>
             </View>,
           )}

@@ -2,6 +2,8 @@ import React from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 
 import type { DanmakuItem } from "@/api/danmaku.types";
+import { theme } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
 import useLatest from "@/hooks/useLatest";
 
 import {
@@ -57,6 +59,7 @@ function getDanmakuItems(items: DanmakuItem[], localItems: DanmakuItem[]) {
 
 function DanmakuItemView(props: DanmakuItemViewProps) {
   const { item, isPlaying, playbackRate } = props;
+  const shadowColor = useResolvedColor(theme.media.shadow);
   // 挂载时按当前播放进度定位，暂停状态下进入的弹幕也能停在正确位置
   const [translateX] = React.useState(() => new Animated.Value(item.currentX));
   const itemRef = useLatest(item);
@@ -107,7 +110,7 @@ function DanmakuItemView(props: DanmakuItemViewProps) {
         style={{
           color: item.color,
           fontSize: item.fontSize,
-          textShadowColor: "rgba(0, 0, 0, 0.85)",
+          textShadowColor: shadowColor,
           textShadowOffset: { width: 0, height: 1 },
           textShadowRadius: 2,
         }}

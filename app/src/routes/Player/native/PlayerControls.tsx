@@ -1,5 +1,5 @@
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import { Maximize, Minimize, Pause, Play } from "lucide-react-native";
 import type { LucideIcon } from "lucide-react-native";
@@ -26,7 +26,7 @@ const StyledAnimatedView = withUniwind(Animated.View) as unknown as React.Compon
 function ControlButton(props: {
   icon: LucideIcon;
   label: string;
-  color: string;
+  color?: string;
   size: number;
   onPress: () => void;
 }) {
@@ -49,7 +49,7 @@ function ControlButton(props: {
 function CharacterButton(props: {
   character: string;
   label: string;
-  color: string;
+  color?: string;
   size: number;
   onPress: () => void;
 }) {
@@ -73,7 +73,8 @@ function CharacterButton(props: {
 
 export default function PlayerControls(props: PlayerControlsProps) {
   const { paused, danmakuEnabled, fullscreen, visible } = props;
-  const accentColor = useResolvedColor(theme.secondary.text) ?? "#ff6699";
+  const accentColor = useResolvedColor(theme.secondary.onDark);
+  const contentColor = useResolvedColor(theme.media.content);
   const insets = useSafeAreaInsets();
   const [trackWidth, setTrackWidth] = React.useState(0);
   const [scrubMs, setScrubMs] = React.useState<number | null>(null);
@@ -221,7 +222,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
         />
       </StyledAnimatedView>
       <StyledAnimatedView
-        className="absolute bottom-0 left-0 right-0 bg-black/40 px-3 pb-1 pt-1"
+        className="absolute bottom-0 left-0 right-0 bg-media-background/40 px-3 pb-1 pt-1"
         style={{ opacity }}
         pointerEvents={visible ? "auto" : "none"}
         accessibilityElementsHidden={!visible}
@@ -232,7 +233,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
             icon={paused ? Play : Pause}
             label={paused ? "播放" : "暂停"}
             size={26}
-            color="#ffffff"
+            color={contentColor}
             onPress={() => {
               press(props.onTogglePlay);
             }}
@@ -244,7 +245,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
                 setTrackWidth(event.nativeEvent.layout.width);
               }}
             >
-              <View className="h-[3px] w-full rounded bg-white/30">
+              <View className="h-[3px] w-full rounded bg-media-content/30">
                 <View
                   className={`h-[3px] rounded ${theme.secondary.bg}`}
                   style={{ width: `${progress * 100}%` }}
@@ -265,7 +266,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
             </View>
           </GestureDetector>
           <Text
-            className="min-w-[84px] text-center text-xs tabular-nums text-white"
+            className="min-w-[84px] text-center text-xs tabular-nums text-media-content"
             numberOfLines={1}
           >
             {`${formatPlaybackTime(displayMs / 1000)}/${formatPlaybackTime(durationMs / 1000)}`}
@@ -274,7 +275,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
             character="弹"
             label={danmakuEnabled ? "关闭弹幕" : "打开弹幕"}
             size={14}
-            color={danmakuEnabled ? accentColor : "#ffffff"}
+            color={danmakuEnabled ? accentColor : contentColor}
             onPress={() => {
               press(props.onToggleDanmaku);
             }}
@@ -283,7 +284,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
             icon={fullscreen ? Minimize : Maximize}
             label={fullscreen ? "退出全屏" : "全屏"}
             size={24}
-            color="#ffffff"
+            color={contentColor}
             onPress={() => {
               press(props.onToggleFullscreen);
             }}

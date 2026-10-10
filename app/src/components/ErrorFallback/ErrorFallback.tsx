@@ -5,7 +5,7 @@ import { Button, Text, View } from "react-native";
 
 import { useAppUpdateInfo } from "@/api/check-update";
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import { startAppUpdateDownload } from "@/features/app-update/controller";
 
 export default function ErrorFallback(props: { error: Error; resetError: Function }) {
@@ -16,7 +16,7 @@ export default function ErrorFallback(props: { error: Error; resetError: Functio
     console.error(props.error);
   }
   return (
-    <View className="flex-1 dark:bg-slate-900">
+    <View className="flex-1 bg-page">
       <StatusBar style="auto" />
       <View
         accessible
@@ -26,7 +26,7 @@ export default function ErrorFallback(props: { error: Error; resetError: Functio
       >
         <ThemedIcon icon={CircleAlert} size={112} colorClassName={theme.error.accent} />
       </View>
-      <Text className="mx-7 text-base text-red-600">
+      <Text className="mx-7 text-base text-error">
         非常抱歉，应用发生了未知错误
         {"\n\n"}
         <Text className="text-xs italic">{props.error.message || "😔"}</Text>

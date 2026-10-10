@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Animated, useAnimatedValue, View } from "react-native";
 
 import { Button } from "@/components/Button";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 
 import type { FABProps } from "./FAB.types";

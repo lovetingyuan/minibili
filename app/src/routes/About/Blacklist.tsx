@@ -5,7 +5,7 @@ import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
 import { Chip } from '@/components/Chip'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 
 export default function Blacklist() {
   const [expanded, setExpanded] = React.useState(false)

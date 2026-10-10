@@ -1,6 +1,6 @@
 import { Platform, Text as NativeText } from 'react-native'
 import type { TextStyle } from 'react-native'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import useResolvedStyle from '@/hooks/useResolvedStyle'
 import type { TextProps } from './Text.types'
 

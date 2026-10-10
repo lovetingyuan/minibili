@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { clsx } from "clsx";
 
-import { theme } from "../../constants/theme";
+import { theme } from "../../constants/colors.tw";
 
 import type { DividerProps } from "./Divider.types";
 

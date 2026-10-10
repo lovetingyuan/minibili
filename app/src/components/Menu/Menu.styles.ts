@@ -3,13 +3,12 @@ import { TouchableHighlight } from 'react-native'
 import type { ComponentProps } from 'react'
 import type { TextStyle, ViewStyle } from 'react-native'
 
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
+import useResolvedColor from '@/hooks/useResolvedColor'
+import type { MenuProviderCustomStyles, MenuThemeStyles } from './Menu.types'
+export type { MenuThemeStyles } from './Menu.types'
 
 const SCREEN_INDENT = 8
-
-type MenuProviderCustomStyles = {
-  safeArea: ViewStyle
-}
 
 export const menuProviderCustomStyles: MenuProviderCustomStyles = {
   safeArea: {
@@ -44,11 +43,14 @@ export const menuOptionTouchableProps: Pick<
   'activeOpacity' | 'underlayColor'
 > = {
   activeOpacity: 1,
-  underlayColor: 'rgba(127, 127, 127, 0.16)',
 }
 
 export function MenuOptionTouchableComponent(props: ComponentProps<typeof TouchableHighlight>) {
-  return React.createElement(TouchableHighlight, props)
+  const underlayColor = useResolvedColor('accent-pressed')
+  return React.createElement(TouchableHighlight, {
+    ...props,
+    underlayColor: props.underlayColor ?? underlayColor,
+  })
 }
 
 export const menuSurfaceClassName = `${theme.background.overlay} ${theme.border.divider}`
@@ -56,39 +58,35 @@ export const menuSurfaceClassName = `${theme.background.overlay} ${theme.border.
 export const menuOptionTextClassName = theme.text.primary
 
 export const menuSurfaceStyle: ViewStyle = {
-  backgroundColor: '#fff',
-  borderColor: 'rgba(0, 0, 0, 0.05)',
   borderRadius: 4,
   borderWidth: 1,
   elevation: 4,
-  shadowColor: '#000',
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.15,
   shadowRadius: 6,
 }
 
 export const menuOptionTextStyle: TextStyle = {
-  color: '#000',
   fontSize: 14,
   fontWeight: '400',
   paddingHorizontal: 16,
   textAlign: 'left',
 }
 
-export type MenuThemeStyles = {
-  optionText: TextStyle
-  optionsWrapper: ViewStyle
-}
-
 export function resolveStyleColor(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined
 }
 
-export function createMenuSurfaceStyle(backgroundColor?: string, borderColor?: string): ViewStyle {
+export function createMenuSurfaceStyle(
+  backgroundColor?: string,
+  borderColor?: string,
+  shadowColor?: string,
+): ViewStyle {
   return {
     ...menuSurfaceStyle,
     ...(backgroundColor ? { backgroundColor } : {}),
     ...(borderColor ? { borderColor } : {}),
+    ...(shadowColor ? { shadowColor } : {}),
   }
 }
 
@@ -103,10 +101,15 @@ export function createMenuThemeStyles(theme: {
   optionTextColor?: string
   surfaceBackgroundColor?: string
   surfaceBorderColor?: string
+  shadowColor?: string
 }): MenuThemeStyles {
   return {
     optionText: createMenuOptionTextStyle(theme.optionTextColor),
-    optionsWrapper: createMenuSurfaceStyle(theme.surfaceBackgroundColor, theme.surfaceBorderColor),
+    optionsWrapper: createMenuSurfaceStyle(
+      theme.surfaceBackgroundColor,
+      theme.surfaceBorderColor,
+      theme.shadowColor,
+    ),
   }
 }
 

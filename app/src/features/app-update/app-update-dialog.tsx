@@ -3,7 +3,7 @@ import { ScrollView, View } from 'react-native'
 
 import { Dialog } from '@/components/Dialog'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { showToast } from '@/utils'
 
 import { startAppUpdateDownload } from './controller'

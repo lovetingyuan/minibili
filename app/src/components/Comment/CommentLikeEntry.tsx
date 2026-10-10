@@ -12,7 +12,7 @@ import Animated, {
 import { getInlineEmojiOffset } from '@/components/InlineEmoji'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { parseNumber } from '@/utils'
 
 import type { CommentLikeEntryProps } from './comment.types'

@@ -18,7 +18,7 @@ import {
 
 import { useUserRelation } from '@/api/user-relation'
 import { useVideoInfo } from '@/api/video-info'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { isDownloadingVideo } from '@/features/video-download/controller'
 import { useVideoDownload } from '@/features/video-download/useVideoDownload'
 import { useWatchLaterActions } from '@/hooks/useWatchLaterActions'
@@ -44,7 +44,7 @@ export function PlayHeaderTitle() {
         {route.params?.name || vi?.name}
       </UpName>
       <Text
-        className="ml-3 text-gray-500 dark:text-gray-400"
+        className="ml-3 text-muted"
         onPress={() => {
           if (fans) {
             showToast(`粉丝：${fans.follower}`)

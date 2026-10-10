@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Animated, Platform, StyleSheet, View } from "react-native";
 
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import useResolvedStyle from "@/hooks/useResolvedStyle";
 
@@ -24,8 +24,8 @@ export function Skeleton({
   // Animated.Value 实例在组件生命周期内保持同一个，用 state 承载可以在渲染期安全读取
   const [animationValue] = useState(() => new Animated.Value(0));
   const [layoutWidth, setLayoutWidth] = useState(0);
-  const baseColor = useResolvedColor(theme.slate[2].accent);
-  const highlightColor = useResolvedColor(theme.slate[3].accent);
+  const baseColor = useResolvedColor(theme.skeleton.base);
+  const highlightColor = useResolvedColor(theme.skeleton.highlight);
   const resolvedClassName = useResolvedStyle(className);
   const resolvedSkeletonClassName = useResolvedStyle(skeletonClassName);
 

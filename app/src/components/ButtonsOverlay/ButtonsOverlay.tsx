@@ -1,7 +1,7 @@
 import { Button } from '@/components/Button'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { Modal, Pressable, View } from 'react-native'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 
 function ButtonsOverlay() {
@@ -52,7 +52,7 @@ function ButtonsOverlay() {
     >
       <View className="flex-1 items-center justify-center">
         <Pressable
-          className="absolute inset-0 bg-black/40"
+          className="absolute inset-0 bg-media-background/40"
           accessibilityLabel="关闭菜单"
           accessibilityRole="button"
           onPress={dismiss}

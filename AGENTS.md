@@ -33,7 +33,7 @@ minibili - 使用 Expo + React Native + TailwindCSS 开发的精简版B站APP。
 ### 样式和设计
 
 - 使用 TailwindCSS 语法 + `tw()` 辅助函数，基于 `uniwind`
-- 颜色和主题变量定义在 `src/constants/colors.tw.ts`
+- 颜色和主题变量定义在 `app/global.css`，遵循 Uniwind 的 CSS 主题规范并引用 Tailwind 默认色板；语义 class 映射集中在 `src/constants/colors.tw.ts`，组件不要写死色值或重复深浅色组合。
 - 尽量不要使用 `style` 属性，而是采用 tailwindcss 语法。
 - UI界面布局优先紧凑而简洁，尽量不要留有大的空白。
 - 文案尽量简洁到位，不要引入有较高理解力成本的文案。

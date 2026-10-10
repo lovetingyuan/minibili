@@ -2,7 +2,7 @@ import { Switch } from '@/components/Switch'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { VideoBadge } from '@/components/VideoBadge'
 import type { VideoBadgeTone } from '@/components/VideoBadge'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { Play } from 'lucide-react-native'
 import { Pressable, Text, View } from 'react-native'
 
@@ -21,7 +21,7 @@ type PlayerCoverProps = {
 }
 
 function PlayerPlayIcon() {
-  return <ThemedIcon icon={Play} size={64} color="#ffffff" filled opacity={0.8} />
+  return <ThemedIcon icon={Play} size={64} colorClassName="text-media-content" filled opacity={0.8} />
 }
 
 export default function PlayerCover(props: PlayerCoverProps) {
@@ -44,19 +44,19 @@ export default function PlayerCover(props: PlayerCoverProps) {
       ) : null}
       <View pointerEvents="none" className="absolute bottom-2 left-2 flex-row gap-2">
         {duration ? (
-          <Text className="rounded bg-gray-900/60 px-2 py-0.5 font-bold text-white">
+          <Text className="rounded bg-media-background/60 px-2 py-0.5 font-bold text-media-content">
             {parseDuration(duration)}
           </Text>
         ) : null}
         {isMetered ? (
-          <Text className="rounded bg-gray-900/60 px-2 py-0.5 font-bold text-white">
+          <Text className="rounded bg-media-background/60 px-2 py-0.5 font-bold text-media-content">
             播放将消耗流量
           </Text>
         ) : null}
       </View>
       {isMetered ? (
-        <View className="absolute bottom-2 right-2 flex-row items-center gap-1 rounded bg-gray-900/60 py-0.5 pl-2 pr-1">
-          <Text className="font-bold text-white">1080P</Text>
+        <View className="absolute bottom-2 right-2 flex-row items-center gap-1 rounded bg-media-background/60 py-0.5 pl-2 pr-1">
+          <Text className="font-bold text-media-content">1080P</Text>
           <Switch
             accessibilityRole="switch"
             accessibilityLabel="1080P 播放"

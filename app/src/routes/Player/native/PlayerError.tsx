@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 
 type PlayerErrorProps = {
   retrying: boolean;
@@ -30,13 +30,13 @@ export default function PlayerError(props: PlayerErrorProps) {
   const showRetry = props.showRetry ?? true;
 
   return (
-    <View className="absolute inset-0 items-center justify-center bg-black/80 px-8">
+    <View className="absolute inset-0 items-center justify-center bg-media-background/80 px-8">
       {props.retrying ? (
         <ActivityIndicator size="large" colorClassName={theme.secondary.accent} />
       ) : (
         <>
-          <Text className="text-lg font-bold text-white">{title}</Text>
-          <Text className="mt-2 text-center text-sm leading-6 text-white/80">{description}</Text>
+          <Text className="text-lg font-bold text-media-content">{title}</Text>
+          <Text className="mt-2 text-center text-sm leading-6 text-media-content/80">{description}</Text>
           {actionLabel || showRetry ? (
             <View className="mt-4 flex-row items-center gap-3">
               {actionLabel ? (
@@ -46,7 +46,7 @@ export default function PlayerError(props: PlayerErrorProps) {
                   className={`rounded-full px-6 py-3 ${theme.primary.bg}`}
                   onPress={props.onAction}
                 >
-                  <Text className="font-bold text-white">{actionLabel}</Text>
+                  <Text className="font-bold text-media-content">{actionLabel}</Text>
                 </Pressable>
               ) : null}
               {showRetry ? (
@@ -54,12 +54,12 @@ export default function PlayerError(props: PlayerErrorProps) {
                   accessibilityRole="button"
                   className={
                     actionLabel
-                      ? "rounded-full border border-white/40 px-6 py-3"
+                      ? "rounded-full border border-media-content/40 px-6 py-3"
                       : `rounded-full px-6 py-3 ${theme.primary.bg}`
                   }
                   onPress={props.onRetry}
                 >
-                  <Text className="font-bold text-white">{props.retryLabel ?? "重试"}</Text>
+                  <Text className="font-bold text-media-content">{props.retryLabel ?? "重试"}</Text>
                 </Pressable>
               ) : null}
             </View>

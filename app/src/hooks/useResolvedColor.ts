@@ -10,5 +10,13 @@ export default function useResolvedColor(className?: string) {
     return styles.color;
   }
 
+  if (typeof styles.backgroundColor === "string") {
+    return styles.backgroundColor;
+  }
+
+  if (typeof styles.borderColor === "string") {
+    return styles.borderColor;
+  }
+
   return undefined;
 }

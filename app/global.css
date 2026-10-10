@@ -1,2 +1,97 @@
 @import "tailwindcss";
 @import "uniwind";
+
+/* 固定实底与媒体颜色不随页面主题反转；static 保证原生属性也可读取。 */
+@theme static {
+  --color-primary-solid: var(--color-blue-500);
+  --color-secondary-solid: var(--color-pink-500);
+  --color-brand-content: var(--color-white);
+  --color-primary-on-media: var(--color-blue-300);
+  --color-secondary-on-media: var(--color-pink-300);
+  --color-media-background: var(--color-black);
+  --color-media-content: var(--color-white);
+  --color-media-badge: color-mix(in srgb, var(--color-slate-950) 70%, transparent);
+  --color-media-shadow: color-mix(in srgb, var(--color-black) 85%, transparent);
+  --color-backdrop: var(--color-black);
+  --color-success-solid: var(--color-emerald-600);
+  --color-warning-solid: var(--color-orange-600);
+  --color-error-solid: var(--color-red-600);
+  --color-warning-on-media: var(--color-orange-400);
+  --color-shadow: var(--color-black);
+}
+
+/* 浅色、深色采用同一组语义变量，系统主题由 Uniwind 自动同步。 */
+@layer theme {
+  :root {
+    @variant light {
+      --color-page: var(--color-slate-100);
+      --color-surface: var(--color-white);
+      --color-overlay: var(--color-white);
+      --color-fill: var(--color-slate-100);
+      --color-fill-raised: var(--color-slate-100);
+      --color-fill-subtle: var(--color-slate-50);
+      --color-fill-strong: var(--color-slate-200);
+      --color-placeholder: var(--color-slate-200);
+      --color-fill-disabled: var(--color-slate-300);
+      --color-fill-muted: var(--color-slate-400);
+      --color-divider: var(--color-slate-200);
+      --color-divider-subtle: var(--color-slate-100);
+      --color-outline: var(--color-slate-300);
+      --color-heading: var(--color-slate-900);
+      --color-foreground: var(--color-slate-800);
+      --color-foreground-secondary: var(--color-slate-700);
+      --color-muted: var(--color-slate-600);
+      --color-disabled: var(--color-slate-500);
+      --color-handle: var(--color-slate-300);
+      --color-skeleton: var(--color-slate-200);
+      --color-skeleton-highlight: var(--color-slate-300);
+      --color-primary: var(--color-blue-500);
+      --color-primary-tint: var(--color-blue-50);
+      --color-secondary: var(--color-pink-500);
+      --color-secondary-tint: var(--color-pink-50);
+      --color-success: var(--color-emerald-600);
+      --color-warning: var(--color-orange-600);
+      --color-warning-tint: var(--color-orange-50);
+      --color-error: var(--color-red-600);
+      --color-toast: color-mix(in srgb, var(--color-slate-950) 85%, transparent);
+      --color-toast-content: var(--color-white);
+      --color-toast-border: color-mix(in srgb, var(--color-white) 15%, transparent);
+      --color-pressed: color-mix(in srgb, var(--color-slate-400) 20%, transparent);
+    }
+    @variant dark {
+      --color-page: var(--color-black);
+      --color-surface: var(--color-slate-950);
+      --color-overlay: var(--color-slate-900);
+      --color-fill: var(--color-slate-900);
+      --color-fill-raised: var(--color-slate-800);
+      --color-fill-subtle: var(--color-slate-900);
+      --color-fill-strong: var(--color-slate-800);
+      --color-placeholder: var(--color-slate-700);
+      --color-fill-disabled: var(--color-slate-700);
+      --color-fill-muted: var(--color-slate-600);
+      --color-divider: var(--color-slate-800);
+      --color-divider-subtle: var(--color-slate-800);
+      --color-outline: var(--color-slate-700);
+      --color-heading: var(--color-slate-100);
+      --color-foreground: var(--color-slate-200);
+      --color-foreground-secondary: var(--color-slate-300);
+      --color-muted: var(--color-slate-400);
+      --color-disabled: var(--color-slate-500);
+      --color-handle: var(--color-slate-700);
+      --color-skeleton: var(--color-slate-800);
+      --color-skeleton-highlight: var(--color-slate-700);
+      --color-primary: var(--color-blue-300);
+      --color-primary-tint: var(--color-blue-950);
+      --color-secondary: var(--color-pink-300);
+      --color-secondary-tint: var(--color-pink-950);
+      --color-success: var(--color-emerald-400);
+      --color-warning: var(--color-orange-400);
+      --color-warning-tint: color-mix(in srgb, var(--color-orange-950) 30%, transparent);
+      --color-error: var(--color-red-400);
+      --color-toast: color-mix(in srgb, var(--color-slate-100) 95%, transparent);
+      --color-toast-content: var(--color-slate-950);
+      --color-toast-border: color-mix(in srgb, var(--color-slate-950) 15%, transparent);
+      --color-pressed: color-mix(in srgb, var(--color-slate-400) 20%, transparent);
+    }
+  }
+}

@@ -18,7 +18,7 @@ import {
 } from '@/components/Menu'
 
 import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'
 import { useBlockUpActions } from '@/hooks/useBlockUpActions'
 import { useFollowActions } from '@/hooks/useFollowActions'
@@ -131,7 +131,7 @@ function HeaderLeft() {
         </UpName>
         {fans ? (
           <Text
-            className="ml-2 shrink-0 text-sm text-gray-500 dark:text-gray-400"
+            className="ml-2 shrink-0 text-sm text-muted"
             onPress={() => {
               showToast(`粉丝：${fans.follower}`)
             }}

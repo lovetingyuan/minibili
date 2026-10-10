@@ -7,8 +7,7 @@ import {
   BACKGROUND_PLAY_DURATIONS,
   formatBackgroundPlayDuration,
 } from "@/constants/background-playback";
-import { theme } from "@/constants/theme";
-import useResolvedColor from "@/hooks/useResolvedColor";
+import { theme } from "@/constants/colors.tw";
 import type { BackgroundPlaySelection } from "@/types/background-playback";
 
 import type { BackgroundPlayMenuProps } from "./background-play-menu.types";
@@ -16,7 +15,6 @@ import type { BackgroundPlayMenuProps } from "./background-play-menu.types";
 const OPTIONS: readonly BackgroundPlaySelection[] = [null, ...BACKGROUND_PLAY_DURATIONS];
 
 export default function BackgroundPlayMenu(props: BackgroundPlayMenuProps) {
-  const accentColor = useResolvedColor(theme.secondary.text) ?? "#ff6699";
   const currentLabel = props.enabled ? formatBackgroundPlayDuration(props.durationMinutes) : "关闭";
 
   return (
@@ -26,8 +24,12 @@ export default function BackgroundPlayMenu(props: BackgroundPlayMenuProps) {
         accessibilityLabel={`后台播放，当前${currentLabel}${props.opened ? "，列表已展开" : ""}`}
         onPress={props.onToggle}
       >
-        <View className="h-9 w-9 items-center justify-center rounded-full bg-black/40">
-          <ThemedIcon icon={Headphones} size={20} color={props.enabled ? accentColor : "#ffffff"} />
+        <View className="h-9 w-9 items-center justify-center rounded-full bg-media-background/40">
+          <ThemedIcon
+            icon={Headphones}
+            size={20}
+            colorClassName={props.enabled ? theme.secondary.onDark : theme.media.content}
+          />
         </View>
       </MenuTrigger>
       <MenuOptions>
@@ -45,7 +47,9 @@ export default function BackgroundPlayMenu(props: BackgroundPlayMenuProps) {
                 <Text className={selected ? theme.secondary.text : theme.text.primary}>
                   {label}
                 </Text>
-                {selected ? <ThemedIcon icon={Check} size={18} color={accentColor} /> : null}
+                {selected ? (
+                  <ThemedIcon icon={Check} size={18} colorClassName={theme.secondary.text} />
+                ) : null}
               </View>
             </MenuOption>
           );

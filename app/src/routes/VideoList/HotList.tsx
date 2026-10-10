@@ -22,7 +22,7 @@ function Hot() {
 
   const getFooter = (_list: any[]) => {
     return (
-      <Text className="my-3 text-center text-gray-500">
+      <Text className="my-3 text-center text-muted">
         {loading ? `加载中(${_list.length})...` : isReachingEnd ? `到底了(${_list.length})~` : ""}
       </Text>
     );

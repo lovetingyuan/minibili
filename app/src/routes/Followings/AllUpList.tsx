@@ -40,7 +40,7 @@ export default function AllUpList({ specialMids, onSetGroups }: Props) {
       }
       footer={
         $followedUps.length ? (
-          <Text className="pb-3 text-center text-xs text-gray-500">到底了~</Text>
+          <Text className="pb-3 text-center text-xs text-muted">到底了~</Text>
         ) : null
       }
     />

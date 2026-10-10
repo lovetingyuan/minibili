@@ -6,7 +6,7 @@ import { CheckBox } from '@/components/CheckBox'
 import { Dialog } from '@/components/Dialog'
 import { Button } from '@/components/Button'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
 
 import type { SetUpGroupDialogProps } from './FollowGroups.types'

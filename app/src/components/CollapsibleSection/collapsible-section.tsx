@@ -13,7 +13,7 @@ import Animated, {
 import type { CollapsibleSectionProps } from "./collapsible-section.types";
 
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 
 export function CollapsibleSection({
   children,

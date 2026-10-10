@@ -2,10 +2,9 @@ import { Children } from "react";
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import useResolvedColor from "@/hooks/useResolvedColor";
 import useResolvedStyle from "@/hooks/useResolvedStyle";
-import { withAlpha } from "@/utils/color";
 
 import type { ButtonProps, ButtonRadius, ButtonSize } from "./Button.types";
 
@@ -14,7 +13,6 @@ import type { ButtonProps, ButtonRadius, ButtonSize } from "./Button.types";
 const sizePadding: Record<ButtonSize, number> = { sm: 4, md: 8, lg: 12 };
 const sizeHorizontalPadding = 2;
 const radiusValue: Record<ButtonRadius, number> = { xs: 2, sm: 4, md: 8, lg: 12 };
-const rippleAlpha = 0.32;
 const pressedOpacity = 0.3;
 
 function resolveRadius(radius: ButtonProps["radius"]) {
@@ -46,6 +44,10 @@ export function Button({
   ...pressableProps
 }: ButtonProps) {
   const primaryColor = useResolvedColor(theme.primary.text);
+  const solidColor = useResolvedColor(theme.primary.bg);
+  const contentColor = useResolvedColor(theme.primary.content);
+  const primaryRippleColor = useResolvedColor(theme.ripple.primary);
+  const contentRippleColor = useResolvedColor(theme.ripple.content);
   const disabledBackgroundColor = useResolvedColor(theme.background.fillDisabled.accent);
   const disabledBorderColor = useResolvedColor(theme.background.fillMuted.accent);
   const disabledTitleColor = useResolvedColor(theme.text.disabled);
@@ -57,18 +59,18 @@ export function Button({
   const padding = sizePadding[size];
   const content = children === undefined ? title : children;
   const isSolid = type === "solid";
-  const titleColor = disabled ? disabledTitleColor : isSolid ? "#ffffff" : primaryColor;
+  const titleColor = disabled ? disabledTitleColor : isSolid ? contentColor : primaryColor;
   const backgroundColor = isSolid
     ? disabled
       ? disabledBackgroundColor
-      : primaryColor
+      : solidColor
     : "transparent";
-  // Android 的水波纹用标题色加 32% 透明度；色值解析不出来时退回半透明黑
+  // 水波纹透明度交给 Uniwind 解析，与标题色使用同一套主题变量。
   const androidRipple =
     Platform.OS === "android" && !disabled
       ? {
           borderless: false,
-          color: withAlpha(isSolid ? "#ffffff" : primaryColor, rippleAlpha) ?? "rgba(0, 0, 0, 0.1)",
+          color: isSolid ? contentRippleColor : primaryRippleColor,
           foreground: true,
         }
       : null;
@@ -87,7 +89,11 @@ export function Button({
       <Pressable
         {...pressableProps}
         accessibilityRole={accessibilityRole}
-        accessibilityState={{ ...accessibilityState, busy: loading || !!accessibilityState?.busy, disabled }}
+        accessibilityState={{
+          ...accessibilityState,
+          busy: loading || !!accessibilityState?.busy,
+          disabled,
+        }}
         android_ripple={androidRipple}
         delayLongPress={0}
         disabled={disabled}
@@ -111,7 +117,7 @@ export function Button({
       >
         {loading ? (
           <ActivityIndicator
-            color={isSolid ? "#ffffff" : primaryColor}
+            color={titleColor}
             size="small"
             style={[styles.loading, loadingStyle]}
           />

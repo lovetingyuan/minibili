@@ -2,7 +2,7 @@ import { clsx } from 'clsx'
 import { Linking, View } from 'react-native'
 
 import type { ArticleInlineNode, ArticleParagraph, DynamicArticle } from '@/api/opus-detail.type'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { parseUrl } from '@/utils'
 
 import { InlineEmoji } from '../InlineEmoji'
@@ -105,7 +105,7 @@ function headingClassName(level: number) {
 function ArticleParagraphView(props: { paragraph: ArticleParagraph; selectable?: boolean }) {
   const { paragraph, selectable } = props
   if (paragraph.kind === 'divider') {
-    return <View className="mb-3 h-px bg-slate-200 dark:bg-slate-800" />
+    return <View className="mb-3 h-px bg-divider" />
   }
   if (paragraph.kind === 'images') {
     return <DynamicImageGrid images={paragraph.images} detail natural />

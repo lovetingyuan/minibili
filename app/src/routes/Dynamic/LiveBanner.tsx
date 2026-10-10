@@ -17,7 +17,7 @@ import { useLivingInfo } from '@/api/living-info'
 import { useUserInfo } from '@/api/user-info'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import type { NavigationProps, RootStackParamList } from '@/types'
 
 export default function LiveBanner() {

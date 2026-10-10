@@ -2,6 +2,7 @@ import { clsx } from "clsx";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { AvatarProps, AvatarSize } from "./Avatar.types";
+import { theme } from "@/constants/colors.tw";
 
 const avatarSizes = {
   small: 34,
@@ -58,7 +59,7 @@ export function Avatar({
   const RootComponent = Component ?? (interactive ? Pressable : View);
   const placeholderContent = title ? (
     <Text
-      className={clsx("text-center text-white", titleClassName)}
+      className={clsx("text-center", theme.text.heading, titleClassName)}
       style={[styles.title, { fontSize: dimension / 2 }, titleStyle]}
     >
       {title}
@@ -142,7 +143,6 @@ const styles = StyleSheet.create({
   },
   title: {
     backgroundColor: "transparent",
-    color: "#ffffff",
     textAlign: "center",
     zIndex: 1,
   },

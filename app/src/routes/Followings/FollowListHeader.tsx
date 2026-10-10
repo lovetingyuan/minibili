@@ -4,7 +4,7 @@ import { View } from 'react-native'
 
 import { Button } from '@/components/Button'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'
 import type { MainTabNavigationProp } from '@/types'
 

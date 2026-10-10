@@ -5,6 +5,9 @@ import type { LayoutChangeEvent } from 'react-native'
 import { GestureViewer, useGestureViewerState } from 'react-native-gesture-image-viewer'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import useResolvedColor from '@/hooks/useResolvedColor'
+import useResolvedStyle from '@/hooks/useResolvedStyle'
+import { theme } from '@/constants/colors.tw'
 import { Image } from '@/components/Image'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
@@ -21,7 +24,6 @@ import type {
 } from './image-viewer.types'
 
 const ViewerId = 'images-viewer'
-const BackdropStyle = { backgroundColor: 'rgba(0, 0, 0, 0.88)' }
 
 function getItemDimensions(image: ImageViewerItem) {
   return image.width > 0 && image.height > 0 ? image : undefined
@@ -38,6 +40,7 @@ function ImageViewerGallery({
   onClose,
   width,
 }: ImageViewerGalleryProps) {
+  const backdropStyle = useResolvedStyle('bg-backdrop/88')
   const [originalImageStatuses, dispatchOriginalImageStatus] = useReducer(
     updateOriginalImageStatuses,
     {},
@@ -58,7 +61,7 @@ function ImageViewerGallery({
 
   return (
     <GestureViewer
-      backdropStyle={BackdropStyle}
+      backdropStyle={backdropStyle}
       data={images}
       dismiss={{ enabled: true, resistance: 1, threshold: 100 }}
       getItemDimensions={getItemDimensions}
@@ -105,6 +108,7 @@ function ImageViewerSource({
   onOriginalLoaded,
   originalStatus,
 }: ImageViewerSourceProps) {
+  const contentColor = useResolvedColor(theme.media.content)
   const [loading, setLoading] = useState(true)
   const showOriginal = image.uri !== image.originalUri && originalStatus !== 'idle'
 
@@ -112,7 +116,7 @@ function ImageViewerSource({
     <View className="h-full w-full" pointerEvents="none">
       {loading ? (
         <View className="absolute inset-0 items-center justify-center">
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={contentColor} />
         </View>
       ) : null}
       <Image
@@ -156,6 +160,7 @@ function ImageViewerControls({
   onOriginalRequest,
   originalImageStatuses,
 }: ImageViewerControlsProps) {
+  const contentColor = useResolvedColor(theme.media.content)
   // 页码和下载状态只更新工具栏，不让整个查看器随之重渲染。
   const { currentIndex, totalCount } = useGestureViewerState(ViewerId)
   const { saving, saveImage } = useSaveImage()
@@ -181,11 +186,11 @@ function ImageViewerControls({
         <Pressable
           accessibilityLabel="关闭"
           accessibilityRole="button"
-          className="size-10 items-center justify-center rounded-full bg-black/35"
+          className="size-10 items-center justify-center rounded-full bg-media-background/35"
           hitSlop={12}
           onPress={onClose}
         >
-          <ThemedIcon color="#fff" icon={X} size={24} />
+          <ThemedIcon colorClassName="text-media-content" icon={X} size={24} />
         </Pressable>
       </View>
       <View
@@ -193,7 +198,7 @@ function ImageViewerControls({
         pointerEvents="box-none"
         style={{ bottom: Math.max(28, insets.bottom + 12) }}
       >
-        <View className="flex-row items-center gap-5 rounded-full bg-black/35 px-4 py-2.5">
+        <View className="flex-row items-center gap-5 rounded-full bg-media-background/35 px-4 py-2.5">
           <Pressable
             accessibilityLabel={originalButtonLabel}
             accessibilityRole="button"
@@ -208,11 +213,11 @@ function ImageViewerControls({
             }}
           >
             {originalStatus === 'loading' ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={contentColor} size="small" />
             ) : (
-              <ThemedIcon color="#fff" icon={ScanSearch} size={20} />
+              <ThemedIcon colorClassName="text-media-content" icon={ScanSearch} size={20} />
             )}
-            <Text className="text-sm text-white">{originalButtonLabel}</Text>
+            <Text className="text-sm text-media-content">{originalButtonLabel}</Text>
           </Pressable>
           <Pressable
             accessibilityLabel="下载图片"
@@ -228,13 +233,13 @@ function ImageViewerControls({
             }}
           >
             {saving ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={contentColor} size="small" />
             ) : (
-              <ThemedIcon color="#fff" icon={Download} size={20} />
+              <ThemedIcon colorClassName="text-media-content" icon={Download} size={20} />
             )}
-            <Text className="text-sm text-white">下载</Text>
+            <Text className="text-sm text-media-content">下载</Text>
           </Pressable>
-          <Text className="text-center text-base text-white tabular-nums">
+          <Text className="text-center text-base text-media-content tabular-nums">
             {`${safeActiveIndex + 1} / ${images.length}`}
           </Text>
         </View>

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ArrowUp, X } from "lucide-react-native";
 
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 
 import type { CommentComposerProps } from "./comment-composer.types";
 
@@ -32,7 +32,7 @@ export default function CommentComposer(props: CommentComposerProps) {
 
   return (
     <View
-      className="flex-row items-center gap-2 border-t border-slate-100 bg-white px-3 pt-2 dark:border-slate-800 dark:bg-slate-950"
+      className="flex-row items-center gap-2 border-t border-divider-subtle bg-surface px-3 pt-2"
       style={{ paddingBottom: Math.max(insets.bottom, 8) }}
     >
       <TextInput
@@ -41,7 +41,9 @@ export default function CommentComposer(props: CommentComposerProps) {
         multiline
         autoFocus
         placeholder="发一条友善的评论"
-        className="max-h-28 min-h-9 flex-1 rounded-3xl bg-slate-100 px-4 py-2 text-[15px] text-slate-900 dark:bg-slate-800 dark:text-slate-100"
+        placeholderTextColorClassName={theme.icon.muted}
+        selectionColorClassName={theme.primary.accent}
+        className="max-h-28 min-h-9 flex-1 rounded-3xl bg-fill-raised px-4 py-2 text-[15px] text-heading"
         accessibilityLabel="评论输入框"
         onChangeText={(value) => setDraft([...value].slice(0, MAX_COMMENT_LENGTH).join(""))}
         onSubmitEditing={() => void submit()}
@@ -55,9 +57,13 @@ export default function CommentComposer(props: CommentComposerProps) {
         onPress={() => void submit()}
       >
         {props.pending ? (
-          <ActivityIndicator size="small" colorClassName={theme.mediaBadge.accent} />
+          <ActivityIndicator size="small" colorClassName={theme.icon.disabled} />
         ) : (
-          <ThemedIcon icon={ArrowUp} size={18} colorClassName={theme.mediaBadge.accent} />
+          <ThemedIcon
+            icon={ArrowUp}
+            size={18}
+            colorClassName={canSubmit ? theme.primary.content : theme.icon.disabled}
+          />
         )}
       </Pressable>
       <Pressable

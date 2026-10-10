@@ -7,7 +7,7 @@ import React from 'react'
 import { ScrollView, View } from 'react-native'
 import { Menu, MenuOption, MenuOptions, MenuTrigger, menuOptionClassName } from '@/components/Menu'
 
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { useUserSettings } from '@/features/user-data/useUserSettings'
 
 import { useStore } from '../../store'

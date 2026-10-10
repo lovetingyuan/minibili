@@ -7,7 +7,7 @@ import type { GestureResponderEvent } from 'react-native'
 
 import type { DynamicAdditional } from '@/api/dynamic-items.type'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import type { NavigationProps } from '@/types'
 import { getImagePixelDimensions, parseImgUrl } from '@/utils'
 
@@ -49,13 +49,13 @@ export function Additional(props: { additional: DynamicAdditional | null }) {
       }
       disabled={!interactive}
       onPress={open}
-      className="mb-3 min-h-18 flex-row items-center overflow-hidden rounded-lg bg-slate-100 p-2.5 dark:bg-slate-800"
+      className="mb-3 min-h-18 flex-row items-center overflow-hidden rounded-lg bg-fill-raised p-2.5"
     >
       {additional.cover ? (
         <Image
           source={{ uri: parseImgUrl(additional.cover, coverSize) }}
           contentFit="cover"
-          className="mr-3 aspect-video w-24 shrink-0 rounded-md bg-slate-200 dark:bg-slate-700"
+          className="mr-3 aspect-video w-24 shrink-0 rounded-md bg-placeholder"
         />
       ) : null}
       <View className="min-w-0 flex-1 justify-center gap-0.5 py-0.5">

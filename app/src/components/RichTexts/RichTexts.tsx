@@ -6,7 +6,7 @@ import { Linking, type TextProps, View } from 'react-native'
 
 import type { RichTextNode } from '@/api/dynamic-items.schema'
 import { HandledRichTextType } from '@/api/dynamic-items.type'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { useStore } from '@/store'
 import type { NavigationProps } from '@/types'

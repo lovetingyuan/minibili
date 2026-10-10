@@ -11,7 +11,7 @@ import { Keyboard, Platform, TouchableOpacity, View } from 'react-native'
 import type { EmitterSubscription } from 'react-native'
 
 import { useSearchUps } from '@/api/search-up'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import {
   buildUpSearchItems,
   type UpSearchItem,

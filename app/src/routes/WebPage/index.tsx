@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native'
 import BilibiliWebView from '@/components/BilibiliWebView'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 
 // import useLiveUrl from '@/api/get-live-url'
 import { useRecoverableWebView } from '@/hooks/useRecoverableWebView'

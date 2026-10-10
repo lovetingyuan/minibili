@@ -10,7 +10,7 @@ import { FlashList } from '@/components/FlashList'
 import { Skeleton } from '@/components/Skeleton'
 import { Text } from '@/components/Text'
 import type { FlashListRef } from '@/components/FlashList'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
 import type { MainTabNavigationProp } from '@/types'
 
@@ -26,7 +26,7 @@ function DynamicListLoading(props: { listHeader?: ReactNode }) {
       {props.listHeader}
       <View className="gap-3">
         {[0, 1, 2].map(index => (
-          <View key={index} className="gap-3 bg-white p-4 dark:bg-slate-950">
+          <View key={index} className="gap-3 bg-surface p-4">
             <View className="flex-row items-center gap-3">
               <Skeleton animation="pulse" circle width={36} height={36} />
               <View className="flex-1 flex-row items-center justify-between gap-3">

@@ -5,14 +5,13 @@ import { Alert } from "react-native";
 import { useAppUpdateInfo } from "@/api/check-update";
 import { serverUrl } from "@/constants";
 import useResolvedColor from "@/hooks/useResolvedColor";
-import useTheme from "@/hooks/useTheme";
+import { theme } from "@/constants/colors.tw";
 
 import TextAction from "./TextAction";
 
 export default Version;
 
 function Version() {
-  const theme = useTheme();
   const updateHighlightColor = useResolvedColor(theme.secondary.text);
   const updateTime: string = Updates.createdAt
     ? `${Updates.createdAt.toLocaleDateString()} ${Updates.createdAt.toLocaleTimeString()}`

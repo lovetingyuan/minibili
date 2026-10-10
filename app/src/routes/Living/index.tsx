@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BilibiliWebView from '@/components/BilibiliWebView'
 
 import bilibiliFetch from '@/api/bilibili-fetch'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { useLiveUpsRefresh } from '@/hooks/useLiveUpsRefresh'
 import { useRecoverableWebView } from '@/hooks/useRecoverableWebView'
 import useUpdateNavigationOptions from '@/hooks/useUpdateNavigationOptions'

@@ -9,7 +9,7 @@ import type { GestureResponderEvent } from 'react-native'
 import type { DynamicAuthor, DynamicContent, DynamicImage } from '@/api/dynamic-items.type'
 import { VideoBadge } from '@/components/VideoBadge'
 import { overlayIcons } from '@/constants/overlay-icons'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { useWatchLaterActions } from '@/hooks/useWatchLaterActions'
 import { useStore } from '@/store'
@@ -90,13 +90,13 @@ export function DynamicImageGrid(props: {
                   contentFit={props.natural ? 'contain' : 'cover'}
                   className={clsx(
                     columns === 1 ? 'w-full rounded-lg' : 'aspect-square w-full',
-                    props.natural && 'bg-slate-100 dark:bg-slate-800',
+                    props.natural && 'bg-fill-raised',
                   )}
                   style={columns === 1 ? { aspectRatio } : undefined}
                 />
                 {!props.detail && index === 8 && props.images.length > 9 ? (
-                  <View className="absolute inset-0 items-center justify-center bg-black/50">
-                    <Text className="text-lg font-semibold text-white">
+                  <View className="absolute inset-0 items-center justify-center bg-media-background/50">
+                    <Text className="text-lg font-semibold text-media-content">
                       +{props.images.length - 9}
                     </Text>
                   </View>
@@ -185,8 +185,8 @@ function VideoCard(props: {
         />
       ) : null}
       <View className="absolute inset-0 items-center justify-center">
-        <View className="h-16 w-16 items-center justify-center rounded-full bg-black/55">
-          <ThemedIcon icon={Play} size={40} color="white" filled />
+        <View className="h-16 w-16 items-center justify-center rounded-full bg-media-background/55">
+          <ThemedIcon icon={Play} size={40} colorClassName={theme.media.content} filled />
         </View>
       </View>
       {content.badge ? (
@@ -197,12 +197,12 @@ function VideoCard(props: {
           variant="overlay"
         />
       ) : null}
-      <View className="absolute bottom-1.5 left-2 flex-row gap-3 rounded bg-black/60 px-2 py-1">
-        <Text className="text-xs text-white">{parseNumber(content.play)} 播放</Text>
-        <Text className="text-xs text-white">{parseNumber(content.danmaku)} 弹幕</Text>
+      <View className="absolute bottom-1.5 left-2 flex-row gap-3 rounded bg-media-background/60 px-2 py-1">
+        <Text className="text-xs text-media-content">{parseNumber(content.play)} 播放</Text>
+        <Text className="text-xs text-media-content">{parseNumber(content.danmaku)} 弹幕</Text>
       </View>
       {content.duration ? (
-        <Text className="absolute bottom-1.5 right-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
+        <Text className="absolute bottom-1.5 right-2 rounded bg-media-background/60 px-2 py-1 text-xs text-media-content">
           {content.duration}
         </Text>
       ) : null}
@@ -223,9 +223,9 @@ function VideoCard(props: {
   )
   const containerClassName = clsx(
     !props.forward && 'mb-3',
-    'overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800',
+    'overflow-hidden rounded-lg bg-fill-raised',
   )
-  const coverClassName = 'relative aspect-video w-full bg-slate-200 dark:bg-slate-700'
+  const coverClassName = 'relative aspect-video w-full bg-placeholder'
 
   if (props.detail) {
     return (
@@ -260,7 +260,7 @@ function LinkCard(props: {
   const coverSize = isArticle ? getImagePixelDimensions(128, 72) : getImagePixelDimensions(96, 80)
   if (content.kind === 'unavailable') {
     return (
-      <View className="mb-3 rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
+      <View className="mb-3 rounded-lg bg-fill-raised p-3">
         <Text className={theme.text.muted}>{content.message}</Text>
       </View>
     )
@@ -269,7 +269,7 @@ function LinkCard(props: {
     <Pressable
       disabled={!content.url}
       onPress={() => content.url && void Linking.openURL(content.url)}
-      className="mb-3 flex-row overflow-hidden rounded-lg bg-slate-100 p-2 dark:bg-slate-800"
+      className="mb-3 flex-row overflow-hidden rounded-lg bg-fill-raised p-2"
     >
       {content.cover ? (
         <Image

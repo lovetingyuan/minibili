@@ -8,7 +8,7 @@ import { BottomSheet } from '@/components/BottomSheet'
 import { FlashList } from '@/components/FlashList'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { parseDuration } from '@/utils'
 
 import { formatVideoPageTitle, getVideoPagesSheetHeight } from './video-pages-sheet.helpers'
@@ -68,7 +68,7 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
     >
       {/* flex-1 撑满 sheet 的内容区（sheet 高度已扣除把手），不要再写死高度 */}
       <View className={`flex-1 overflow-hidden rounded-t-[28px] ${theme.background.surface}`}>
-        <View className="relative h-14 flex-row items-center border-b border-slate-100 px-4 dark:border-slate-800">
+        <View className="relative h-14 flex-row items-center border-b border-divider-subtle px-4">
           <Text className="text-base font-semibold tabular-nums">
             {`分 P · ${props.currentPage}/${props.pages.length}`}
           </Text>
@@ -114,13 +114,13 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
                   className={
                     selected
                       ? `min-w-12 items-center rounded-full px-2 py-1 ${theme.secondary.bg}`
-                      : 'min-w-12 items-center rounded-full bg-slate-100 px-2 py-1 dark:bg-slate-800'
+                      : 'min-w-12 items-center rounded-full bg-fill-raised px-2 py-1'
                   }
                 >
                   <Text
                     className={
                       selected
-                        ? 'text-xs font-semibold tabular-nums text-white'
+                        ? 'text-xs font-semibold tabular-nums text-media-content'
                         : `text-xs font-semibold tabular-nums ${theme.text.secondary}`
                     }
                   >

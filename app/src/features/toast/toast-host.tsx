@@ -4,11 +4,13 @@ import { Text, View } from "react-native";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
 
 import { toastStore } from "./toast-store";
 
 export function ToastHost() {
+  const shadowColor = useResolvedColor("accent-shadow/24");
   const toast = useSyncExternalStore(toastStore.subscribe, toastStore.getSnapshot);
   const insets = useSafeAreaInsets();
 
@@ -32,7 +34,7 @@ export function ToastHost() {
           )}
           style={{
             borderCurve: "continuous",
-            boxShadow: "0 3px 12px rgba(0, 0, 0, 0.24)",
+            boxShadow: shadowColor ? `0 3px 12px ${shadowColor}` : undefined,
           }}
         >
           <Text className={clsx("text-center text-sm font-medium", theme.toast.text)}>

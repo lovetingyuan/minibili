@@ -3,7 +3,7 @@ import { ChevronRight, Clock, History, Star } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
 import { ThemedIcon } from "@/components/ThemedIcon";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import type { MainTabNavigationProp } from "@/types";
 
 export default function LibraryLinks() {

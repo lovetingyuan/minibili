@@ -31,7 +31,7 @@ import { useVideoInfo } from "@/api/video-info";
 import { ThemedIcon } from "@/components/ThemedIcon";
 import { VideoBadge } from "@/components/VideoBadge";
 import { formatBackgroundPlayDuration } from "@/constants/background-playback";
-import { theme } from "@/constants/theme";
+import { theme } from "@/constants/colors.tw";
 import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
 import { bilibiliSession } from "@/features/bilibili-session/session";
@@ -1176,7 +1176,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   return (
     <StyledAnimatedView
       renderToHardwareTextureAndroid
-      className="relative w-full shrink-0 overflow-hidden bg-black"
+      className="relative w-full shrink-0 overflow-hidden bg-media-background"
       style={
         fullscreen
           ? { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 20 }
@@ -1245,8 +1245,8 @@ export default function NativePlayer(props: NativePlayerProps) {
           />
         ) : null}
         {fastRate ? (
-          <View className="rounded bg-black/60 px-2 py-1">
-            <Text className="text-xs font-bold text-white">{`${PLAYER_FAST_RATE}x`}</Text>
+          <View className="rounded bg-media-background/60 px-2 py-1">
+            <Text className="text-xs font-bold text-media-content">{`${PLAYER_FAST_RATE}x`}</Text>
           </View>
         ) : null}
       </View>
@@ -1279,10 +1279,10 @@ export default function NativePlayer(props: NativePlayerProps) {
             accessibilityRole="button"
             accessibilityLabel={playbackEnded ? "重新播放" : "继续播放"}
             hitSlop={12}
-            className="h-14 w-14 items-center justify-center rounded-full bg-black/40"
+            className="h-14 w-14 items-center justify-center rounded-full bg-media-background/40"
             onPress={resumePlayback}
           >
-            <ThemedIcon icon={Play} size={34} color="#ffffff" filled />
+            <ThemedIcon icon={Play} size={34} colorClassName="text-media-content" filled />
           </Pressable>
         </View>
       ) : null}

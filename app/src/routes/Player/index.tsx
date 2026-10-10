@@ -186,7 +186,7 @@ function Play({ route }: Props) {
         onRefresh={refresh}
         dividerRight={
           <View className="flex-row items-center">
-            <Text className="text-xs text-gray-500 dark:text-gray-400">{videoInfo?.tag}</Text>
+            <Text className="text-xs text-muted">{videoInfo?.tag}</Text>
           </View>
         }
       >

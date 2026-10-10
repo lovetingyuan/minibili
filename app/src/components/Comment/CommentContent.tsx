@@ -5,7 +5,7 @@ import { Linking, Pressable, View } from 'react-native'
 
 import { Image } from '@/components/Image'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { useStore } from '@/store'
 import type { NavigationProps } from '@/types'
 import { getImagePixelSize, parseImgUrl, showToast } from '@/utils'
@@ -147,11 +147,11 @@ export function CommentImages(props: CommentImageEntryProps) {
           <Image
             contentFit="cover"
             source={{ uri: parseImgUrl(image.src, getImagePixelSize(size)) }}
-            className={clsx(sizeClassName, 'rounded-lg bg-slate-100 dark:bg-slate-800')}
+            className={clsx(sizeClassName, 'rounded-lg bg-fill-raised')}
           />
           {index === MAX_THUMBNAILS - 1 && imageCount > MAX_THUMBNAILS ? (
-            <View className="absolute inset-0 items-center justify-center rounded-lg bg-black/50">
-              <Text className="text-sm font-semibold text-white">
+            <View className="absolute inset-0 items-center justify-center rounded-lg bg-media-background/50">
+              <Text className="text-sm font-semibold text-media-content">
                 {`+${imageCount - MAX_THUMBNAILS}`}
               </Text>
             </View>

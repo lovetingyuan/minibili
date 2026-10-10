@@ -12,7 +12,7 @@ import {
 import { Dialog } from '@/components/Dialog'
 import { Text } from '@/components/Text'
 import { overlayIcons } from '@/constants/overlay-icons'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
 import {

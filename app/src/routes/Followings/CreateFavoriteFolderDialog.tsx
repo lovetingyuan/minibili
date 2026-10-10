@@ -3,7 +3,7 @@ import { TextInput, View } from 'react-native'
 import { Dialog } from '@/components/Dialog'
 import { Switch } from '@/components/Switch'
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import { FAVORITE_FOLDER_NAME_MAX_LENGTH } from '@/features/bilibili-favorites/folder-name'
 import type { CreateFavoriteFolderDialogProps } from './Favorites.types'
 import { useCreateFavoriteFolder } from './useCreateFavoriteFolder'
@@ -23,6 +23,8 @@ export default function CreateFavoriteFolderDialog(props: CreateFavoriteFolderDi
         autoFocus
         editable={!editor.saving}
         placeholder="收藏夹名称"
+        placeholderTextColorClassName={theme.icon.muted}
+        selectionColorClassName={theme.primary.accent}
         returnKeyType="done"
         accessibilityLabel="收藏夹名称"
         className={`rounded-lg border px-3 py-2 text-base ${theme.border.outline} ${theme.text.primary}`}

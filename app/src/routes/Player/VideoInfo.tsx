@@ -15,7 +15,7 @@ import React from 'react'
 import { Linking, Pressable, View } from 'react-native'
 
 import { VideoBadge } from '@/components/VideoBadge'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import type { NavigationProps, RootStackParamList } from '@/types'
 import { getImagePixelSize, handleShareVideo, parseDate, parseImgUrl, parseNumber } from '@/utils'
 
@@ -105,7 +105,7 @@ function VideoInfo(props: VideoInfoProps) {
       </View>
 
       {videoInfo?.argument ? (
-        <View className="mb-2 self-start rounded-lg bg-orange-50 px-2 py-1 dark:bg-orange-950/30">
+        <View className="mb-2 self-start rounded-lg bg-warning-tint px-2 py-1">
           <Text
             className={`text-xs leading-4 ${theme.warning.text}`}
             onPress={() => {
@@ -155,7 +155,7 @@ function VideoInfo(props: VideoInfoProps) {
             accessibilityRole="button"
             accessibilityLabel="打开分P列表"
             android_ripple={{ color: 'transparent' }}
-            className="flex-row items-center gap-2.5 rounded-2xl bg-slate-100 px-3 py-2 dark:bg-slate-900"
+            className="flex-row items-center gap-2.5 rounded-2xl bg-fill px-3 py-2"
             style={({ pressed }) => ({ opacity: pressed ? 0.72 : 1 })}
             onPress={() => {
               setShowPagesModal(true)
@@ -191,7 +191,7 @@ function VideoInfo(props: VideoInfoProps) {
 
       <VideoDescription text={videoDesc} nodes={videoInfo.descriptionNodes} />
 
-      <View className="mt-3 flex-row items-center rounded-xl bg-slate-50 px-1 py-2 dark:bg-slate-900">
+      <View className="mt-3 flex-row items-center rounded-xl bg-fill-subtle px-1 py-2">
         <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
           <ThemedIcon icon={CirclePlay} size={16} colorClassName={theme.icon.primary} />
           <Text selectable className={`text-xs tabular-nums ${theme.text.primary}`}>

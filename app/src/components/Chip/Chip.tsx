@@ -2,7 +2,7 @@ import { clsx } from "clsx";
 import { Text, View } from "react-native";
 
 import { Button } from "@/components/Button";
-import { theme } from "../../constants/theme";
+import { theme } from "../../constants/colors.tw";
 
 import type { ChipProps } from "./Chip.types";
 
@@ -27,7 +27,7 @@ export function Chip({
       <Text
         className={clsx(
           "px-0.5 text-sm",
-          type === "outline" ? theme.primary.text : "text-white",
+          type === "outline" ? theme.primary.text : theme.primary.content,
           titleClassName,
         )}
         style={titleStyle}

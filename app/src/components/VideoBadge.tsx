@@ -1,7 +1,7 @@
 import { clsx } from 'clsx'
 
 import { Text } from '@/components/Text'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 
 import type { VideoBadgeProps, VideoBadgeTone } from './VideoBadge.types'
 
@@ -23,7 +23,8 @@ export function VideoBadge({ label, tone, variant = 'inline', className }: Video
     <Text
       accessibilityRole="text"
       className={clsx(
-        'shrink-0 rounded font-medium text-white',
+        'shrink-0 rounded font-medium',
+        theme.content,
         variant === 'overlay' ? 'px-1 py-0.5 text-[10px] leading-4' : 'px-1.5 py-0.5 text-xs',
         toneBackground[tone],
         className,

@@ -6,7 +6,7 @@ import { Pressable, View } from 'react-native'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import UpName from '@/components/UpName'
-import { theme } from '@/constants/theme'
+import { theme } from '@/constants/colors.tw'
 import type { NavigationProps } from '@/types'
 
 import { shouldCollapseDescription, VIDEO_DESCRIPTION_COLLAPSED_LINES } from './description'
@@ -16,7 +16,7 @@ import type { VideoDescriptionProps, VideoDescriptionViewProps } from './VideoDe
  * 折叠时“显示更多”浮在最后一行行尾，用卡片底色盖住压在下方的文字，
  * 高度与 leading-6 的行高一致，正好对齐最后一行。
  */
-const COLLAPSED_TOGGLE_CLASS = 'absolute bottom-2.5 right-3 bg-slate-50 pl-1.5 dark:bg-slate-900'
+const COLLAPSED_TOGGLE_CLASS = 'absolute bottom-2.5 right-3 bg-fill-subtle pl-1.5'
 const EXPANDED_TOGGLE_CLASS = 'mt-1 self-end px-1'
 
 export function VideoDescriptionView(props: VideoDescriptionViewProps) {
@@ -28,7 +28,7 @@ export function VideoDescriptionView(props: VideoDescriptionViewProps) {
   const isCollapsed = collapsible && Boolean(collapsed)
 
   return (
-    <View className="relative mt-3 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-slate-900">
+    <View className="relative mt-3 rounded-xl bg-fill-subtle px-3 py-2.5">
       {/* Android 会缓存 Text/Pressable 的原生布局；切换折叠模式时重建节点，避免复用错误的位置。 */}
       <Text
         key={isCollapsed ? 'description-collapsed' : 'description-expanded'}
