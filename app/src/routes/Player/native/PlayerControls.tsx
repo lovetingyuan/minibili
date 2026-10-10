@@ -172,6 +172,7 @@ export default function PlayerControls(props: PlayerControlsProps) {
         importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
       >
         <PlayerTopActions
+          muted={props.muted}
           playbackRate={props.playbackRate}
           playbackRateMenuOpen={activeMenu === "playback-rate"}
           loopEnabled={props.loopEnabled}
@@ -207,6 +208,9 @@ export default function PlayerControls(props: PlayerControlsProps) {
           }}
           onToggleLoop={() => {
             press(props.onToggleLoop);
+          }}
+          onToggleMute={() => {
+            press(props.onToggleMute);
           }}
           onToggleAutoNext={() => {
             press(props.onToggleAutoNext);

@@ -163,6 +163,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [playerStatus, setPlayerStatus] = React.useState<VideoPlayerStatus>("idle");
   const [playbackRate, setPlaybackRate] = React.useState<PlaybackRate>(1);
+  const [muted, setMuted] = React.useState(false);
   const [fastRate, setFastRate] = React.useState(false);
   const [playerError, setPlayerError] = React.useState<string | null>(null);
   const [isRetrying, setIsRetrying] = React.useState(false);
@@ -271,6 +272,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     // 这里对齐 B 站：倍速只改播放速度，音调保持不变
     instance.preservesPitch = true;
     instance.playbackRate = playbackRate;
+    instance.muted = muted;
   });
 
   const effectivePlaybackRate = fastRate ? PLAYER_FAST_RATE : playbackRate;
@@ -465,6 +467,10 @@ export default function NativePlayer(props: NativePlayerProps) {
 
   useEventListener(player, "playingChange", ({ isPlaying: playing }) => {
     updatePlayingState(playing);
+  });
+
+  useEventListener(player, "mutedChange", ({ muted: nextMuted }) => {
+    setMuted(nextMuted);
   });
 
   useEventListener(player, "timeUpdate", ({ currentTime }) => {
@@ -1049,6 +1055,10 @@ export default function NativePlayer(props: NativePlayerProps) {
     setPlaybackRate(rate);
   }
 
+  function handleToggleMute() {
+    player.muted = !player.muted;
+  }
+
   async function handleRetry() {
     pausedByBackgroundTimeoutRef.current = false;
     if (isRetrying) {
@@ -1283,6 +1293,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           currentTimeMs={currentTimeMs}
           durationMs={playbackDurationMs}
           playbackRate={playbackRate}
+          muted={muted}
           danmakuEnabled={$danmakuEnabled}
           canSendDanmaku={Boolean(danmakuAccount)}
           backgroundPlayEnabled={$backgroundPlayEnabled}
@@ -1295,6 +1306,7 @@ export default function NativePlayer(props: NativePlayerProps) {
           fullscreen={fullscreen}
           visible={controlsVisible}
           onTogglePlay={handleTogglePlay}
+          onToggleMute={handleToggleMute}
           onPlaybackRateChange={handlePlaybackRateChange}
           onToggleDanmaku={() => {
             set$danmakuEnabled(!$danmakuEnabled);

@@ -5,6 +5,7 @@ import type {
 import type { PlaybackRate } from "./playback-rate";
 
 export type PlayerTopActionsProps = {
+  muted: boolean;
   playbackRate: PlaybackRate;
   playbackRateMenuOpen: boolean;
   loopEnabled: boolean;
@@ -21,6 +22,7 @@ export type PlayerTopActionsProps = {
    */
   canSendDanmaku: boolean;
   onTogglePlaybackRateMenu: () => void;
+  onToggleMute: () => void;
   onClosePlaybackRateMenu: () => void;
   onPlaybackRateChange: (rate: PlaybackRate) => void;
   onToggleLoop: () => void;

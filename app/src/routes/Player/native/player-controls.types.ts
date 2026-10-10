@@ -19,6 +19,7 @@ export type PlayerControlsProps = {
   currentTimeMs: number;
   durationMs: number;
   playbackRate: PlaybackRate;
+  muted: boolean;
   danmakuEnabled: boolean;
   /**
    * 未登录 B站 时不展示发送弹幕按钮
@@ -35,6 +36,7 @@ export type PlayerControlsProps = {
   fullscreen: boolean;
   visible: boolean;
   onTogglePlay: () => void;
+  onToggleMute: () => void;
   onPlaybackRateChange: (rate: PlaybackRate) => void;
   onToggleDanmaku: () => void;
   onSendDanmaku: () => void;

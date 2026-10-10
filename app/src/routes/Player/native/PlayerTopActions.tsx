@@ -1,5 +1,14 @@
 import { Pressable, Text, View } from "react-native";
-import { Check, ChevronDown, ChevronUp, ListVideo, Pencil, Repeat2 } from "lucide-react-native";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  ListVideo,
+  Pencil,
+  Repeat2,
+  Volume2,
+  VolumeX,
+} from "lucide-react-native";
 
 import { Menu, MenuOption, MenuOptions, MenuTrigger } from "@/components/Menu";
 import { ThemedIcon } from "@/components/ThemedIcon";
@@ -11,7 +20,7 @@ import BackgroundPlayMenu from "./BackgroundPlayMenu";
 import type { PlayerTopActionsProps } from "./player-top-actions.types";
 
 /**
- * 播放器右上角的悬浮按钮：倍速、播放模式、后台播放与发送弹幕。
+ * 播放器右上角的悬浮按钮：倍速、静音、播放模式、后台播放与发送弹幕。
  */
 export default function PlayerTopActions(props: PlayerTopActionsProps) {
   const accentColor = useResolvedColor(theme.secondary.text) ?? "#ff6699";
@@ -67,6 +76,21 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
           })}
         </MenuOptions>
       </Menu>
+      <Pressable
+        className="h-9 w-9 items-center justify-center rounded-full bg-black/40 active:opacity-70"
+        android_ripple={{ color: "transparent" }}
+        accessibilityRole="button"
+        accessibilityLabel={props.muted ? "取消静音" : "静音"}
+        accessibilityState={{ selected: props.muted }}
+        hitSlop={8}
+        onPress={props.onToggleMute}
+      >
+        <ThemedIcon
+          icon={props.muted ? VolumeX : Volume2}
+          size={20}
+          color={props.muted ? accentColor : "#ffffff"}
+        />
+      </Pressable>
       <Pressable
         className="h-9 w-9 items-center justify-center rounded-full bg-black/40"
         android_ripple={{ color: "transparent" }}
