@@ -7,13 +7,19 @@
     "preview": "npm run build && vite preview",
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply minibili --local",
+    "db:migrate:remote": "wrangler d1 migrations apply minibili --remote"
   },
   "dependencies": {
+    "@minibili/shared": "*",
+    "drizzle-orm": "0.45.4",
     "hono": "^4.12.8",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "resend": "^6.30.0"
+    "resend": "^6.30.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.54.8",
@@ -21,6 +27,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
+    "drizzle-kit": "0.31.11",
     "vite": "^8.2.2",
     "wrangler": "^4.131.1"
   }

@@ -6,14 +6,11 @@ import {
   FEEDBACK_MAX_IMAGE_BYTES,
   FEEDBACK_MAX_LENGTH,
 } from "../../../../shared/feedback";
-import type {
-  FeedbackImageMimeType,
-  FeedbackRequest,
-} from "../../../../shared/feedback";
+import type { FeedbackImageMimeType, FeedbackRequest } from "../../../../shared/feedback";
 import type { AppContext } from "../../types";
+import { getClientIp, isRateLimited, RATE_LIMIT_RETRY_AFTER } from "../../utils/rate-limit";
 import { isRecord, readJsonBody, RequestPayloadTooLargeError } from "../../utils/request";
 
-const USER_DIRECTORY_NAME = "global";
 const FEEDBACK_FROM = "MiniBili <minibili_feedback@tingyuan.in>";
 const FEEDBACK_TO = "minibili@tingyuan.in";
 const BASE64_PATTERN = /^[A-Za-z0-9+/]*={0,2}$/;
@@ -32,8 +29,7 @@ function countCharacters(value: string) {
 
 function isFeedbackImageMimeType(value: unknown): value is FeedbackImageMimeType {
   return (
-    typeof value === "string" &&
-    FEEDBACK_IMAGE_MIME_TYPES.some((mimeType) => mimeType === value)
+    typeof value === "string" && FEEDBACK_IMAGE_MIME_TYPES.some((mimeType) => mimeType === value)
   );
 }
 
@@ -135,11 +131,6 @@ function parseFeedbackRequest(value: unknown): FeedbackRequest | null {
   };
 }
 
-async function hashIpAddress(ipAddress: string) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ipAddress));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
 export async function handleSubmitFeedback(c: AppContext) {
   c.header("Cache-Control", "no-store");
   if (!c.req.header("Content-Type")?.toLowerCase().startsWith("application/json")) {
@@ -167,13 +158,8 @@ export async function handleSubmitFeedback(c: AppContext) {
     return c.json({ success: false, error: "反馈内容或图片格式不正确" }, 400);
   }
 
-  const ipHash = await hashIpAddress(c.req.header("CF-Connecting-IP") ?? "local-development");
-  const quota = await c.env.USER_DIRECTORY.getByName(USER_DIRECTORY_NAME).consumeFeedbackQuota({
-    ipHash,
-    usedAt: Date.now(),
-  });
-  if (!quota.allowed) {
-    console.warn(JSON.stringify({ message: "feedback rate limited", scope: quota.scope }));
+  if (await isRateLimited(c.env.RATE_LIMIT_FEEDBACK, "feedback:ip", getClientIp(c))) {
+    c.header("Retry-After", RATE_LIMIT_RETRY_AFTER);
     return c.json({ success: false, error: "提交过于频繁，请稍后再试" }, 429);
   }
 

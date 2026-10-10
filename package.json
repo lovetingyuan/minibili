@@ -4,6 +4,7 @@
   "workspaces": [
     "app",
     "server",
+    "shared",
     "bili-proxy"
   ],
   "scripts": {

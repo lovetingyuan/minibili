@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { SyncOperations, SyncResult } from "../../../../shared/user-data";
+import type { UserDataRequest, SyncResult } from "../../../../shared/user-data";
 import type { BilibiliAccount } from "../bilibili-session/types";
 import type { UserSettingsSchema } from "./settings.schema";
 
@@ -23,7 +23,7 @@ export type UserDataDependencies = {
   isCurrentAccount: (account: UserDataAccount) => boolean;
   sync: (
     account: UserDataAccount,
-    operations: SyncOperations,
+    request: UserDataRequest,
     signal: AbortSignal,
   ) => Promise<SyncResult>;
 };

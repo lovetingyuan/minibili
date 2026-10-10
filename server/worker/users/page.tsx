@@ -123,7 +123,7 @@ export function UsersPage(props: UsersPageProps) {
                 <th scope="col">B站 UID</th>
                 <th scope="col">App 版本</th>
                 <th scope="col">首次登录时间</th>
-                <th scope="col">最近使用时间</th>
+                <th scope="col">最近打开时间</th>
               </tr>
             </thead>
             <tbody>
@@ -148,8 +148,8 @@ export function UsersPage(props: UsersPageProps) {
                   <td data-label="首次登录时间">
                     <UserTime timestamp={user.firstLoginAt} />
                   </td>
-                  <td data-label="最近使用时间">
-                    <UserTime timestamp={user.lastUsedAt} />
+                  <td data-label="最近打开时间">
+                    <UserTime timestamp={user.lastOpenedAt} />
                   </td>
                 </tr>
               ))}
@@ -159,7 +159,7 @@ export function UsersPage(props: UsersPageProps) {
       ) : (
         <section class="state card">
           <h2>{props.query ? "没有匹配的用户" : "暂无用户"}</h2>
-          <p>{props.query ? "请尝试其他昵称或 UID。" : "用户成功同步设置后会显示在这里。"}</p>
+          <p>{props.query ? "请尝试其他昵称或 UID。" : "用户登录并完成启动登记后会显示在这里。"}</p>
         </section>
       )}
     </UsersShell>

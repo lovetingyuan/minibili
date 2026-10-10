@@ -14,7 +14,7 @@ function normalizeVideoCategories(items: { rid: number }[]) {
   return result;
 }
 
-// 新增同步项只需在这里注册 schema 和默认值；服务端无需增加字段或迁移。
+// 本地设置负责默认值和分区补齐；同步字段还需在共享协议和 D1 表中注册。
 export const UserSettingsSchema = z.object({
   $blackTags: z
     .record(z.string(), z.string())

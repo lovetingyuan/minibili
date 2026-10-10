@@ -1,4 +1,4 @@
-import type { JsonValue, SyncOperations } from "../../../../shared/user-data";
+import type { UserDataRequest, UserSettingsPatch } from "../../../../shared/user-data";
 import { BilibiliSessionChangedError } from "../bilibili-session/controller";
 import { UserDataUnauthorizedError } from "./errors";
 import { LocalUserDataSchema, UserSettingsSchema } from "./settings.schema";
@@ -175,20 +175,23 @@ export function createUserDataController(dependencies: UserDataDependencies) {
       // 每轮只发送快照中的脏 key；响应只确认对应版本，不清掉请求期间的新修改。
       do {
         const sent = new Map(pending);
-        const set: Record<string, JsonValue> = {};
-        for (const key of sent.keys()) {
-          set[key] = snapshot.values[key];
+        const settings: UserSettingsPatch = {};
+        if (sent.has("$blackTags")) {
+          settings.blackTags = snapshot.values.$blackTags;
         }
-        const operations: SyncOperations = { get: [...settingKeys] };
-        if (sent.size) {
-          operations.set = set;
+        if (sent.has("$videoCatesList")) {
+          settings.videoCatesList = snapshot.values.$videoCatesList.map(({ rid }) => ({ rid }));
         }
-        const response = await dependencies.sync(expected, operations, controller.signal);
+        const request: UserDataRequest = sent.size ? { settings } : {};
+        const response = await dependencies.sync(expected, request, controller.signal);
         assertCurrent(expected, currentEpoch);
         if (controller.signal.aborted || response.uid !== expected.mid) {
           throw new BilibiliSessionChangedError();
         }
-        const remote = UserSettingsSchema.parse(response.result);
+        const remote = UserSettingsSchema.parse({
+          $blackTags: response.settings.blackTags,
+          $videoCatesList: response.settings.videoCatesList,
+        });
         const values = { ...snapshot.values };
         for (const key of settingKeys) {
           if (pending.has(key) && pending.get(key) !== sent.get(key)) {

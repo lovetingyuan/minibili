@@ -1,67 +1,43 @@
-import { MAX_SYNC_BYTES } from "../../../../shared/user-data";
+import { MAX_SYNC_BYTES } from "../../../../shared/user-data.constants";
+import { UserDataRequestSchema } from "../../../../shared/user-data.schema";
+import { createDb } from "../../db/client";
+import { syncUserData } from "../../db/user-data";
 import type { AppContext } from "../../types";
-import { BilibiliUnauthorizedError, verifyBilibiliIdentity } from "../../services/bilibili-auth";
-import type { BilibiliIdentity } from "../../services/bilibili-auth.types";
-import { getClientIp, isRateLimited, RATE_LIMIT_RETRY_AFTER } from "../../utils/rate-limit";
-import {
-  parseSyncOperations,
-  readJsonBody,
-  RequestPayloadTooLargeError,
-} from "../../utils/request";
-
-const USER_DIRECTORY_NAME = "global";
-const RATE_LIMITED_MESSAGE = "请求过于频繁，请稍后再试";
-const MAX_APP_VERSION_LENGTH = 64;
-
-function getAppVersion(value: string | undefined) {
-  const appVersion = value?.trim();
-  return appVersion && appVersion.length <= MAX_APP_VERSION_LENGTH ? appVersion : null;
-}
+import { authenticateUserRequest, getAppVersion } from "../../services/user-auth";
+import { readJsonBody, RequestPayloadTooLargeError } from "../../utils/request";
 
 export async function handleSyncUserData(c: AppContext) {
   c.header("Cache-Control", "no-store");
   if (!c.req.header("Content-Type")?.toLowerCase().startsWith("application/json")) {
     return c.json({ success: false, error: "同步请求格式错误" }, 400);
   }
-  let operations;
+  let parsed;
   try {
-    operations = parseSyncOperations(await readJsonBody(c.req.raw, MAX_SYNC_BYTES));
+    parsed = UserDataRequestSchema.safeParse(await readJsonBody(c.req.raw, MAX_SYNC_BYTES));
   } catch (error) {
     if (error instanceof RequestPayloadTooLargeError) {
       return c.json({ success: false, error: "请求数据过大" }, 413);
     }
     throw error;
   }
-  if (!operations) {
+  if (!parsed.success) {
     return c.json({ success: false, error: "同步请求格式错误" }, 400);
   }
-  // 先按 IP 限流：未登录请求同样会触发一次 B站 myinfo 调用，必须挡在上游之前。
-  if (await isRateLimited(c.env.RATE_LIMIT_SYNC, "sync:ip", getClientIp(c))) {
-    c.header("Retry-After", RATE_LIMIT_RETRY_AFTER);
-    return c.json({ success: false, error: RATE_LIMITED_MESSAGE }, 429);
-  }
-  let identity: BilibiliIdentity;
-  try {
-    identity = await verifyBilibiliIdentity(c.env, c.req.header("X-Bilibili-Cookie"));
-  } catch (error) {
-    return error instanceof BilibiliUnauthorizedError
-      ? c.json({ success: false, error: "请重新登录 B站" }, 401)
-      : c.json({ success: false, error: "暂时无法验证 B站登录状态，请稍后重试" }, 503);
-  }
-  // 再按 uid 限流，避免单一账号分散到多个出口 IP 后打爆存储写入。
-  if (await isRateLimited(c.env.RATE_LIMIT_SYNC, "sync:uid", identity.uid)) {
-    c.header("Retry-After", RATE_LIMIT_RETRY_AFTER);
-    return c.json({ success: false, error: RATE_LIMITED_MESSAGE }, 429);
+  const identity = await authenticateUserRequest(c);
+  if (identity instanceof Response) {
+    return identity;
   }
   try {
-    const result = await c.env.USER_STORAGE.getByName(identity.uid).syncData(operations);
-    await c.env.USER_DIRECTORY.getByName(USER_DIRECTORY_NAME).recordActivity({
-      uid: identity.uid,
-      nickname: identity.nickname,
-      appVersion: getAppVersion(c.req.header("X-MiniBili-App-Version")),
-      usedAt: Date.now(),
-    });
-    return c.json({ success: true, uid: identity.uid, result });
+    const settings = await syncUserData(
+      createDb(c.env.DB),
+      {
+        ...identity,
+        appVersion: getAppVersion(c.req.header("X-MiniBili-App-Version")),
+        openedAt: Date.now(),
+      },
+      parsed.data.settings ?? {},
+    );
+    return c.json({ success: true, uid: identity.uid, settings });
   } catch (error) {
     console.error(
       JSON.stringify({

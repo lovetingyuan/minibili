@@ -3,21 +3,12 @@ export type UserActivity = {
   nickname: string;
   appVersion: string | null;
   firstLoginAt: number;
-  lastUsedAt: number;
+  lastOpenedAt: number;
 };
 
-export type RecordUserActivityInput = {
+export type RecordUserOpenInput = {
   uid: string;
   nickname: string;
   appVersion: string | null;
-  usedAt: number;
+  openedAt: number;
 };
-
-export type ConsumeFeedbackQuotaInput = {
-  ipHash: string;
-  usedAt: number;
-};
-
-export type FeedbackQuotaResult =
-  | { allowed: true }
-  | { allowed: false; scope: "global" | "ip" };

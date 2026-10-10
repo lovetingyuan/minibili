@@ -1,19 +1,56 @@
-import type { SyncOperations, SyncResult } from "../../../shared/user-data";
-import { MAX_SYNC_BYTES } from "../../../shared/user-data";
+import type { z } from "zod";
+import type { SyncResult, UserDataRequest, UserOpenResult } from "../../../shared/user-data";
+import { MAX_SYNC_BYTES } from "../../../shared/user-data.constants";
+import { UserDataResponseSchema, UserOpenResponseSchema } from "../../../shared/user-data.schema";
 import { serverUrl } from "../constants";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { UserDataUnauthorizedError } from "../features/user-data/errors";
 import type { UserDataAccount } from "../features/user-data/types";
 import { getBilibiliUserId, hasBilibiliLoginCookie } from "./bilibili-cookie.helpers";
-import { UserDataResponseSchema } from "./user-data.schema";
-import type { UserDataRequestDependencies } from "./user-data.types";
+import type { UserApiResult, UserDataRequestDependencies } from "./user-data.types";
 
-export async function requestUserData(
+export function requestUserData(
   account: UserDataAccount,
-  operations: SyncOperations,
+  request: UserDataRequest,
   signal: AbortSignal,
   dependencies: UserDataRequestDependencies,
 ): Promise<SyncResult> {
+  return requestUserApi(
+    "/api/user-data/sync",
+    account,
+    request,
+    UserDataResponseSchema,
+    signal,
+    dependencies,
+    "设置同步",
+  );
+}
+
+export function requestUserOpen(
+  account: UserDataAccount,
+  signal: AbortSignal,
+  dependencies: UserDataRequestDependencies,
+): Promise<UserOpenResult> {
+  return requestUserApi(
+    "/api/users/open",
+    account,
+    {},
+    UserOpenResponseSchema,
+    signal,
+    dependencies,
+    "启动登记",
+  );
+}
+
+async function requestUserApi<T extends UserApiResult>(
+  path: "/api/user-data/sync" | "/api/users/open",
+  account: UserDataAccount,
+  request: UserDataRequest,
+  schema: z.ZodType<T>,
+  signal: AbortSignal,
+  dependencies: UserDataRequestDependencies,
+  action: string,
+): Promise<T> {
   function assertCurrent() {
     if (signal.aborted || !dependencies.isCurrentAccount(account)) {
       throw new BilibiliSessionChangedError();
@@ -28,7 +65,7 @@ export async function requestUserData(
   if (getBilibiliUserId(cookie) !== account.mid) {
     throw new BilibiliSessionChangedError();
   }
-  const body = JSON.stringify(operations);
+  const body = JSON.stringify(request);
   if (new TextEncoder().encode(body).byteLength > MAX_SYNC_BYTES) {
     throw new Error("设置数据过大，无法同步");
   }
@@ -36,9 +73,10 @@ export async function requestUserData(
   const abort = () => controller.abort();
   signal.addEventListener("abort", abort);
   const timeout = setTimeout(abort, 30000);
+  const suffix = action === "设置同步" ? "，本地修改已保留" : "";
   try {
-    // 这是专用的 Worker 请求，不能复用会向任意 B站 URL 附加 Cookie 的 fetcher。
-    const response = await dependencies.request(`${serverUrl}/api/user-data/sync`, {
+    // 凭证仅发送到固定 Worker 入口，禁止重定向和原生 Cookie 附加。
+    const response = await dependencies.request(`${serverUrl}${path}`, {
       method: "POST",
       body,
       headers: {
@@ -55,12 +93,12 @@ export async function requestUserData(
       throw new UserDataUnauthorizedError();
     }
     if (!response.ok) {
-      throw new Error(`设置同步失败（HTTP ${response.status}），本地修改已保留`);
+      throw new Error(`${action}失败（HTTP ${response.status}）${suffix}`);
     }
-    const parsed = UserDataResponseSchema.safeParse(await response.json());
+    const parsed = schema.safeParse(await response.json());
     assertCurrent();
     if (!parsed.success) {
-      throw new Error("设置同步响应异常，本地修改已保留");
+      throw new Error(`${action}响应异常${suffix}`);
     }
     if (parsed.data.uid !== account.mid) {
       throw new BilibiliSessionChangedError();
@@ -75,7 +113,7 @@ export async function requestUserData(
       throw error;
     }
     throw new Error(
-      controller.signal.aborted ? "设置同步超时，本地修改已保留" : "设置同步失败，本地修改已保留",
+      controller.signal.aborted ? `${action}超时${suffix}` : `${action}失败${suffix}`,
     );
   } finally {
     clearTimeout(timeout);

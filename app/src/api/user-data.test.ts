@@ -14,26 +14,30 @@ function setup() {
     readCookie: vi.fn(async () => cookie),
     isCurrentAccount: vi.fn(() => true),
     request: vi.fn(async () =>
-      Response.json({ success: true, uid: "123", result: { test: [true] } }),
+      Response.json({ success: true, uid: "123", settings: { blackTags: {}, videoCatesList: [] } }),
     ),
   };
   const controller = new AbortController();
   return {
     dependencies,
     controller,
-    request: () => requestUserData(account, { get: ["test"] }, controller.signal, dependencies),
+    request: () => requestUserData(account, {}, controller.signal, dependencies),
   };
 }
 afterEach(() => vi.useRealTimers());
 
 test("sends credentials only to the fixed Worker endpoint with redirects and native cookies disabled", async () => {
   const { dependencies, request } = setup();
-  expect(await request()).toEqual({ success: true, uid: "123", result: { test: [true] } });
+  expect(await request()).toEqual({
+    success: true,
+    uid: "123",
+    settings: { blackTags: {}, videoCatesList: [] },
+  });
   expect(dependencies.request).toHaveBeenCalledWith(
     "https://minibili.test/api/user-data/sync",
     expect.objectContaining({
       headers: { "Content-Type": "application/json", "X-Bilibili-Cookie": cookie },
-      body: JSON.stringify({ get: ["test"] }),
+      body: JSON.stringify({}),
       method: "POST",
       credentials: "omit",
       redirect: "error",
@@ -79,7 +83,7 @@ test("expired login is distinguished from a temporary backend failure", async ()
 test("response UID mismatch cannot hydrate another account's data", async () => {
   const { dependencies, request } = setup();
   vi.mocked(dependencies.request).mockResolvedValue(
-    Response.json({ success: true, uid: "456", result: {} }),
+    Response.json({ success: true, uid: "456", settings: { blackTags: {}, videoCatesList: [] } }),
   );
   await expect(request()).rejects.toBeInstanceOf(BilibiliSessionChangedError);
 });
@@ -88,7 +92,11 @@ test("late responses after logout are discarded", async () => {
   const { dependencies, controller, request } = setup();
   vi.mocked(dependencies.request).mockImplementation(async () => {
     controller.abort();
-    return Response.json({ success: true, uid: "123", result: {} });
+    return Response.json({
+      success: true,
+      uid: "123",
+      settings: { blackTags: {}, videoCatesList: [] },
+    });
   });
   await expect(request()).rejects.toBeInstanceOf(BilibiliSessionChangedError);
 });

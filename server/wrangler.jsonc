@@ -7,18 +7,14 @@
   "name": "minibili-server",
   "main": "worker/index.ts",
   "compatibility_date": "2026-03-17",
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "USER_STORAGE",
-        "class_name": "UserStorage",
-      },
-      {
-        "name": "USER_DIRECTORY",
-        "class_name": "UserDirectory",
-      },
-    ],
-  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "minibili",
+      "database_id": "228aee80-8352-45c5-8104-ff29c0fc5cc8",
+      "migrations_dir": "drizzle",
+    },
+  ],
   "migrations": [
     {
       "tag": "v1",
@@ -27,6 +23,10 @@
     {
       "tag": "v2",
       "new_sqlite_classes": ["UserDirectory"],
+    },
+    {
+      "tag": "v3",
+      "deleted_classes": ["UserStorage", "UserDirectory"],
     },
   ],
   /**
@@ -48,6 +48,11 @@
       "name": "RATE_LIMIT_ADMIN",
       "namespace_id": "1003",
       "simple": { "limit": 10, "period": 60 },
+    },
+    {
+      "name": "RATE_LIMIT_FEEDBACK",
+      "namespace_id": "1004",
+      "simple": { "limit": 3, "period": 60 },
     },
   ],
   "assets": {

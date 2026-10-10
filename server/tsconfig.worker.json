@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.node.json",
   "compilerOptions": {
+    "strict": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
     // Worker 代码使用无后缀相对导入，需要 bundler 解析（模板默认的 nodenext 会要求写后缀）。
     "module": "esnext",

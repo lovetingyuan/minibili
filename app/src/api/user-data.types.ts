@@ -1,4 +1,7 @@
 import type { UserDataAccount } from "../features/user-data/types";
+import type { SyncResult, UserOpenResult } from "../../../shared/user-data";
+
+export type UserApiResult = SyncResult | UserOpenResult;
 
 export type UserDataRequestDependencies = {
   appVersion: string | null;

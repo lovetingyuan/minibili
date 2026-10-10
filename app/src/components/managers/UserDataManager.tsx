@@ -8,10 +8,12 @@ import { useBilibiliSession } from "@/features/bilibili-session/useBilibiliSessi
 import { UserDataUnauthorizedError } from "@/features/user-data/errors";
 import { userData } from "@/features/user-data/store";
 import { userDataScope } from "@/features/user-data/controller";
+import { useUserOpen } from "@/features/user-data/useUserOpen";
 
 export default function UserDataManager() {
   const { account: session, isChecking, revalidate } = useBilibiliSession();
   const account = session && bilibiliSession.isCurrentAccount(session) ? session : null;
+  useUserOpen(account);
   const identifiedMidRef = useRef<string | null | undefined>(undefined);
   const snapshot = useSyncExternalStore(userData.subscribe, userData.getSnapshot);
 

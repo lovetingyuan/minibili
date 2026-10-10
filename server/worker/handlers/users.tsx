@@ -1,9 +1,10 @@
 import type { AppContext } from "../types";
+import { createDb } from "../db/client";
+import { listUsers } from "../db/users";
 import { verifyManagementAuth } from "../users/auth";
 import { UsersErrorPage, UsersPage } from "../users/page";
 import { getClientIp, isRateLimited, RATE_LIMIT_RETRY_AFTER } from "../utils/rate-limit";
 
-const DIRECTORY_NAME = "global";
 const MAX_QUERY_LENGTH = 64;
 
 function setPrivatePageHeaders(c: AppContext) {
@@ -46,7 +47,7 @@ export async function handleUsersPage(c: AppContext) {
 
   const query = (new URL(c.req.url).searchParams.get("q")?.trim() ?? "").slice(0, MAX_QUERY_LENGTH);
   try {
-    const users = await c.env.USER_DIRECTORY.getByName(DIRECTORY_NAME).listUsers(query);
+    const users = await listUsers(createDb(c.env.DB), query);
     return c.html(<UsersPage users={users} query={query} />, 200);
   } catch (error) {
     console.error(

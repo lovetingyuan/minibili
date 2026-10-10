@@ -1,22 +1,13 @@
-export type JsonValue =
-  | null
-  | boolean
-  | number
-  | string
-  | JsonValue[]
-  | { [key: string]: JsonValue };
+import type { z } from "zod";
+import type {
+  UserDataRequestSchema,
+  UserDataResponseSchema,
+  UserOpenResponseSchema,
+  UserSettingsSchema,
+} from "./user-data.schema";
 
-export type SyncOperations = {
-  get?: string[];
-  set?: Record<string, JsonValue>;
-  delete?: string[];
-};
-
-export type SyncResult = {
-  success: true;
-  uid: string;
-  result: Record<string, JsonValue>;
-};
-
-export const MAX_SYNC_BYTES = 128 * 1024;
-export const MAX_SYNC_KEYS = 128;
+export type SyncedUserSettings = z.infer<typeof UserSettingsSchema>;
+export type UserSettingsPatch = Partial<SyncedUserSettings>;
+export type UserDataRequest = z.infer<typeof UserDataRequestSchema>;
+export type SyncResult = z.infer<typeof UserDataResponseSchema>;
+export type UserOpenResult = z.infer<typeof UserOpenResponseSchema>;
