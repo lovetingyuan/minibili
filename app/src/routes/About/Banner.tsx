@@ -1,8 +1,9 @@
-import { Image, Linking, Pressable, Share, View } from 'react-native'
+import { Linking, Pressable, Share, View } from 'react-native'
 import { Share2 } from 'lucide-react-native'
 
 import { GitHubIcon } from '@/components/GitHubIcon'
 import { Button } from '@/components/Button'
+import { Image } from '@/components/Image'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
 
@@ -12,24 +13,24 @@ export default Header
 
 function Header() {
   return (
-    <>
+    <View className="mb-4 mt-1 flex-row items-center gap-3">
       <Pressable
-        className="mb-5 mt-1 flex-1 items-center"
+        className="shrink-0"
         onPress={() => {
           Linking.openURL(site)
         }}
       >
         <Image
           source={require('../../../assets/minibili.png')}
-          className="size-32"
-          resizeMode="contain"
+          className="size-24"
+          contentFit="contain"
         />
       </Pressable>
-      <View className="mb-2 flex-row items-center justify-between">
-        <Text className="shrink text-lg" numberOfLines={2}>
-          一款简单的B站浏览App
+      <View className="flex-1 flex-row items-center gap-2">
+        <Text className="flex-1 text-xl" numberOfLines={2}>
+          {'一款简单的\nB站浏览App'}
         </Text>
-        <View className="flex-row items-center gap-2">
+        <View className="shrink-0 flex-row items-center gap-1">
           <Button
             radius={'sm'}
             type="clear"
@@ -54,6 +55,6 @@ function Header() {
           </Button>
         </View>
       </View>
-    </>
+    </View>
   )
 }
