@@ -1,3 +1,4 @@
+import { useLiveUps } from '@/api/live-ups'
 import { useFollowingDynamicsNavRefresh } from '@/api/useFollowingDynamicsNavUpdates'
 import { Text } from '@/components/Text'
 import { orderFollowedUps } from '@/features/bilibili-followings/order-followings'
@@ -20,12 +21,13 @@ export default function AllUpList({ specialMids, onSetGroups }: Props) {
   const $followedUps = useActiveFollowedUps()
   const unreadMids = useUnreadUpMids()
   const { mutate } = useFollowingsState()
+  const { mutate: refreshLiveUps } = useLiveUps()
   const refreshFollowingDynamicsNav = useFollowingDynamicsNavRefresh()
   const orderedUps = orderFollowedUps($followedUps, livingUps, specialMids, unreadMids)
   // 关注列表会被后台同步、拉黑等操作重新校验，只有用户下拉时才显示刷新图标
-  // 下拉时带上小红点的 feed/nav 重新查询，两边都结束后再收起刷新图标
+  // 下拉时同步刷新关注列表、动态未读与直播状态，三项都结束后再收起刷新图标
   const pullToRefresh = usePullToRefresh(async () => {
-    await Promise.allSettled([mutate(), refreshFollowingDynamicsNav()])
+    await Promise.allSettled([mutate(), refreshFollowingDynamicsNav(), refreshLiveUps()])
   })
 
   return (
