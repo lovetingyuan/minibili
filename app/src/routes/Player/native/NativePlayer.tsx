@@ -120,6 +120,7 @@ export default function NativePlayer(props: NativePlayerProps) {
   const {
     imagesList,
     networkUsage,
+    $autoPlayEnabled,
     $danmakuEnabled,
     set$danmakuEnabled,
     $backgroundPlayEnabled,
@@ -722,14 +723,14 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
   }, [playbackAttempt.token, player, source]);
 
-  // 只有确认在 WiFi 下、且拿到播放地址后才自动开播；流量、断网与状态未知都交给用户点击封面。
-  // 这些网络下播放器也还没挂上地址，不会在后台偷偷拉流
+  // 只有开启自动播放、确认在 WiFi 下且拿到地址后才自动开播，其余情况由用户点击封面。
+  // 非 WiFi 网络下也不提前挂地址，避免未经点击就消耗流量。
   React.useEffect(() => {
-    if (!shouldAutoStartPlayback(networkUsage, Boolean(uri))) {
+    if (!shouldAutoStartPlayback(networkUsage, Boolean(uri), $autoPlayEnabled)) {
       return;
     }
     setStarted(true);
-  }, [networkUsage, uri]);
+  }, [networkUsage, uri, $autoPlayEnabled]);
 
   // 默认清晰度只在未开播时跟随网络，开播后固定，避免切网换地址把视频从头开始播
   React.useEffect(() => {

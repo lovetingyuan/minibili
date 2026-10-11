@@ -331,11 +331,15 @@ export function resolvePreferredQuality(
 }
 
 /**
- * 只有确认在 WiFi 下、且已经拿到播放地址时才自动开播；
+ * 只有开启自动播放、确认在 WiFi 下且已经拿到播放地址时才自动开播；
  * 流量、断网与网络状态未知都交给用户点击封面
  */
-export function shouldAutoStartPlayback(networkUsage: NetworkUsage, hasSource: boolean) {
-  return networkUsage === "wifi" && hasSource;
+export function shouldAutoStartPlayback(
+  networkUsage: NetworkUsage,
+  hasSource: boolean,
+  autoPlayEnabled: boolean,
+) {
+  return autoPlayEnabled && networkUsage === "wifi" && hasSource;
 }
 
 /**

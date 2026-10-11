@@ -60,6 +60,8 @@ const getAppValue = () => {
      * 只有确认处于 WiFi（且系统未标记为计费网络）时才认为不消耗流量
      */
     networkUsage: "unknown" as NetworkUsage,
+    /** 是否在非流量网络下进入视频页时自动播放。 */
+    $autoPlayEnabled: true,
     /**
      * 播放器内弹幕开关，默认开启
      */
