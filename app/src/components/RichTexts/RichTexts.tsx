@@ -50,14 +50,7 @@ function RichTexts(props: Props) {
     <View className={clsx('flex-row items-center', hasNodes && 'mb-2')}>
       <ThemedIcon icon={Hash} colorClassName={theme.primary.accent} size={14} />
       <Text
-        onPress={() => {
-          if (props.topic?.jump_url) {
-            navigation.push('WebPage', {
-              title: `话题：${props.topic.name}`,
-              url: parseUrl(props.topic.jump_url),
-            })
-          }
-        }}
+        onPress={() => openUrl(props.topic?.jump_url)}
         className={clsx(theme.primary.text, textSizeClassName)}
       >
         {` ${props.topic.name}`}
@@ -67,7 +60,9 @@ function RichTexts(props: Props) {
 
   const nodes = (props.nodes ?? []).map((node, index) => {
     const key = `${props.idStr ?? 'rich'}-${index}`
-    if (node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AT && node.rid !== undefined) {
+    const isAt = node.type === HandledRichTextType.RICH_TEXT_NODE_TYPE_AT
+    const text = isAt ? ` ${node.text} ` : node.text
+    if (isAt && node.rid !== undefined) {
       return (
         <UpName
           mid={node.rid}
@@ -84,7 +79,7 @@ function RichTexts(props: Props) {
           }}
           className={clsx(theme.primary.text, textSizeClassName)}
         >
-          {node.text}
+          {text}
         </UpName>
       )
     }
@@ -190,7 +185,7 @@ function RichTexts(props: Props) {
         className={clsx(isLink && theme.primary.text, textLineClassName)}
         onPress={isLink ? () => openUrl(node.jump_url) : undefined}
       >
-        {isLink ? `🔗 ${node.text}` : node.text}
+        {isLink ? `🔗 ${text}` : text}
       </Text>
     )
   })

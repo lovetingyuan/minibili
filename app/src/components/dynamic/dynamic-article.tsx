@@ -66,13 +66,13 @@ function ArticleInlineNodes(props: { nodes: ArticleInlineNode[] }) {
           if (node.mid === null) {
             return (
               <Text key={key} className={theme.primary.text}>
-                {node.text}
+                {` ${node.text} `}
               </Text>
             )
           }
           return (
             <UpName key={key} mid={node.mid} className={theme.primary.text}>
-              {node.text}
+              {` ${node.text} `}
             </UpName>
           )
         }
