@@ -5,6 +5,8 @@ export type BottomSheetProps = {
   onClose: () => void;
   /** 吸附点高度，像素值或百分比字符串 */
   snapPoints: (number | string)[];
+  /** 初始吸附点索引，默认 0 */
+  index?: number;
   /** 遮罩最深时的透明度，默认 0.5 */
   backdropOpacity?: number;
   children: ReactNode;

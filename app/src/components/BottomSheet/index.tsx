@@ -58,6 +58,7 @@ export function BottomSheet(props: BottomSheetProps) {
       <BottomSheetModal
         ref={modalRef}
         snapPoints={props.snapPoints}
+        index={props.index ?? 0}
         enableDynamicSizing={false}
         enablePanDownToClose
         // 内容区是可滚动的 FlashList，交给它自己处理手势，sheet 只响应把手拖拽

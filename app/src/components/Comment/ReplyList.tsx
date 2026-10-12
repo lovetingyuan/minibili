@@ -132,7 +132,8 @@ export default function ReplyList(props: ReplyListProps) {
     <BottomSheet
       backdropOpacity={SHEET_BACKDROP_OPACITY}
       onClose={handleClose}
-      snapPoints={[sheetHeight]}
+      snapPoints={['50%', sheetHeight, '80%']}
+      index={1}
       visible={Boolean(repliesInfo)}
     >
       {/* flex-1 撑满 sheet 的内容区（sheet 高度已扣除把手），不要再写死高度 */}
