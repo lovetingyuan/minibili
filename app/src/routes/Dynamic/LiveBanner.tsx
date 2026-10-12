@@ -60,7 +60,7 @@ export default function LiveBanner() {
       accessibilityLabel="UP正在直播，进入直播间"
       className={`flex-row items-center gap-2 px-4 py-2 ${theme.primary.tint}`}
       onPress={() => {
-        navigation.navigate('Living', {
+        navigation.push('Living', {
           title: `${name}的直播间`,
           user: { mid: user.mid, name },
           url: livingUrl,

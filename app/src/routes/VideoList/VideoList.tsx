@@ -89,7 +89,7 @@ function VideoList(props: {
     ])
   }
   const gotoPlay = (data: VideoItemType) => {
-    navigation.navigate('Play', {
+    navigation.push('Play', {
       aid: data.aid,
       bvid: data.bvid,
       title: data.title,

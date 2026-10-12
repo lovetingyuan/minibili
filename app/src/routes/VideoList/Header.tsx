@@ -106,7 +106,7 @@ function HeaderRightComp() {
         type="clear"
         accessibilityLabel="搜索视频"
         onPress={() => {
-          navigation.navigate('SearchVideos')
+          navigation.push('SearchVideos')
         }}
       >
         <ThemedIcon icon={Search} colorClassName={theme.icon.secondary} size={20} />

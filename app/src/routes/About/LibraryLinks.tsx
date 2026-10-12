@@ -15,7 +15,7 @@ export default function LibraryLinks() {
         accessibilityRole="button"
         accessibilityLabel="我的收藏"
         className="flex-row items-center gap-4 rounded-lg bg-transparent px-0 py-3"
-        onPress={() => navigation.navigate("Favorites")}
+        onPress={() => navigation.push("Favorites")}
       >
         <ThemedIcon size={20} icon={Star} colorClassName={theme.primary.accent} />
         <View className="flex-1 items-start justify-center">
@@ -27,7 +27,7 @@ export default function LibraryLinks() {
         accessibilityRole="button"
         accessibilityLabel="观看历史"
         className="flex-row items-center gap-4 rounded-lg bg-transparent px-0 py-3"
-        onPress={() => navigation.navigate("History")}
+        onPress={() => navigation.push("History")}
       >
         <ThemedIcon size={20} icon={History} colorClassName={theme.primary.accent} />
         <View className="flex-1 items-start justify-center">
@@ -39,7 +39,7 @@ export default function LibraryLinks() {
         accessibilityRole="button"
         accessibilityLabel="稍后再看"
         className="flex-row items-center gap-4 rounded-lg bg-transparent px-0 py-3"
-        onPress={() => navigation.navigate("WatchLater")}
+        onPress={() => navigation.push("WatchLater")}
       >
         <ThemedIcon size={20} icon={Clock} colorClassName={theme.primary.accent} />
         <View className="flex-1 items-start justify-center">

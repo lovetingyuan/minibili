@@ -73,7 +73,7 @@ function SearchUpItem(props: { up: UpSearchItem }) {
         activeOpacity={0.8}
         onPress={() => {
           const { mid, face, name, sign } = props.up
-          navigation.navigate('Dynamic', {
+          navigation.push('Dynamic', {
             user: {
               mid,
               face,

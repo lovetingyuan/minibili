@@ -51,7 +51,7 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
           }
         : null,
     )
-    navigation.navigate('Dynamic', {
+    navigation.push('Dynamic', {
       user: {
         mid,
         face,
@@ -64,7 +64,7 @@ function FollowItem({ item, highlight, onSetGroups }: FollowItemProps) {
   const gotoLivePage = () => {
     const liveUrl = livingUps[mid]
     if (liveUrl) {
-      navigation.navigate('Living', {
+      navigation.push('Living', {
         url: liveUrl,
         title: `${name}的直播间`,
         user: { mid, name },

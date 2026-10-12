@@ -15,10 +15,10 @@ export function useOpenDynamicItem() {
   function openDynamicItem(item: DynamicItem, user?: Pick<UpInfo, "mid" | "name">) {
     const videoParams = getDynamicVideoTarget(item);
     if (videoParams) {
-      navigation.navigate("Play", videoParams);
+      navigation.push("Play", videoParams);
       return;
     }
-    navigation.navigate("DynamicDetail", getDynamicDetailTarget(item, user));
+    navigation.push("DynamicDetail", getDynamicDetailTarget(item, user));
   }
 
   return openDynamicItem;

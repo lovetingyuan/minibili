@@ -135,7 +135,7 @@ function VideoCard(props: {
       return
     }
     event?.stopPropagation()
-    navigation.navigate('Play', {
+    navigation.push('Play', {
       bvid: content.bvid,
       aid: content.aid,
       title: content.title,

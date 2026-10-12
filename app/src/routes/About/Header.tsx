@@ -94,7 +94,7 @@ function MineHeaderTitle() {
   const spaceLabel = `查看 ${name} 的主页`
 
   function openUpSpace() {
-    navigation.navigate('Dynamic', getDynamicUpTarget({ mid, name, face }))
+    navigation.push('Dynamic', getDynamicUpTarget({ mid, name, face }))
   }
 
   return (

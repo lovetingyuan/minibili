@@ -24,7 +24,7 @@ export function Additional(props: { additional: DynamicAdditional | null }) {
   function open(event: GestureResponderEvent) {
     event.stopPropagation()
     if (value.bvid) {
-      navigation.navigate('Play', {
+      navigation.push('Play', {
         bvid: value.bvid,
         title: value.title,
         cover: value.cover,

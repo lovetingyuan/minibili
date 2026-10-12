@@ -55,7 +55,7 @@ function HeaderLeft() {
   const { data: fans } = useUserRelation(dynamicUser?.mid)
   // const gotoWebPage = () => {
   //   if (dynamicUser) {
-  //     navigation.navigate('WebPage', {
+  //     navigation.push('WebPage', {
   //       url: `https://space.bilibili.com/${dynamicUser.mid}`,
   //       title: `${dynamicUser.name}的主页`,
   //     })
@@ -211,7 +211,7 @@ function HeaderRight() {
                 if (!dynamicUser) {
                   return
                 }
-                navigation.navigate('Living', {
+                navigation.push('Living', {
                   title: `${dynamicUser.name}的直播间`,
                   user: { mid: dynamicUser.mid, name: dynamicUser.name },
                   url: `https://live.bilibili.com/h5/${roomId}`,

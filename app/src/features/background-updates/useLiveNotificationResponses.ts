@@ -1,3 +1,4 @@
+import { StackActions } from "@react-navigation/native";
 import * as Notifications from "expo-notifications";
 import type { NotificationResponse } from "expo-notifications";
 import { useEffect, useRef } from "react";
@@ -30,11 +31,13 @@ export function useLiveNotificationResponses(account: ForegroundPollAccount | nu
         if (!rootNavigationRef.isReady()) {
           return;
         }
-        rootNavigationRef.navigate("Living", {
-          url: current.data.url,
-          title: `${current.data.name}的直播间`,
-          user: { mid: current.data.mid, name: current.data.name },
-        });
+        rootNavigationRef.dispatch(
+          StackActions.push("Living", {
+            url: current.data.url,
+            title: `${current.data.name}的直播间`,
+            user: { mid: current.data.mid, name: current.data.name },
+          }),
+        );
       }
       pending.current = null;
       handled.current.add(current.identifier);

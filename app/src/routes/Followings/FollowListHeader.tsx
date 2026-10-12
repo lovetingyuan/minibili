@@ -21,7 +21,7 @@ function SearchUpButton() {
         type="clear"
         accessibilityLabel="搜索UP主"
         onPress={() => {
-          navigation.navigate('SearchUps')
+          navigation.push('SearchUps')
         }}
       >
         <ThemedIcon icon={Search} colorClassName={theme.icon.secondary} size={20} />

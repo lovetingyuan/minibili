@@ -52,7 +52,7 @@ function RichTexts(props: Props) {
       <Text
         onPress={() => {
           if (props.topic?.jump_url) {
-            navigation.navigate('WebPage', {
+            navigation.push('WebPage', {
               title: `话题：${props.topic.name}`,
               url: parseUrl(props.topic.jump_url),
             })

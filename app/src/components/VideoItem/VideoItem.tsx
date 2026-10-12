@@ -98,7 +98,7 @@ function VideoListItem<T extends VideoListItemInfo>({
           : undefined
       }
       onPress={() => {
-        navigation.navigate('Play', {
+        navigation.push('Play', {
           aid: video.aid,
           bvid: video.bvid,
           // 搜索结果标题带 <em class="keyword"> 高亮标记，列表渲染需要它，传参给播放页前去掉

@@ -24,7 +24,7 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
   const avatarSize = compact ? 28 : 36
   const meta = [item.date || parseDate(item.time, true), item.pubAction].filter(Boolean).join(' · ')
   const openUpSpace = () => {
-    navigation.navigate('Dynamic', getDynamicUpTarget(item.author))
+    navigation.push('Dynamic', getDynamicUpTarget(item.author))
   }
 
   return (
