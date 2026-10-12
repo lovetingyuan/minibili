@@ -3,6 +3,7 @@ import useSWRInfinite from "swr/infinite";
 
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
+import { enqueueToast } from "../features/toast";
 import { getStoreMethods } from "../store";
 import request from "./fetcher";
 import {
@@ -19,6 +20,7 @@ export function useFollowingDynamicItems() {
     session.account && bilibiliSession.isCurrentAccount(session.account) ? session.account : null;
   const pending = useRef<Promise<FollowingDynamicsPage[] | undefined> | null>(null);
   const refreshingRef = useRef(false);
+  const refreshingAccount = useRef<typeof account>(null);
   const [refreshing, setRefreshing] = useState(false);
   const swr = useSWRInfinite<FollowingDynamicsPage, Error, FollowingDynamicsKeyLoader>(
     (index, previous) => getFollowingDynamicsKey(account, index, previous),
@@ -34,6 +36,15 @@ export function useFollowingDynamicItems() {
       persistSize: false,
       parallel: false,
       shouldRetryOnError: false,
+      onSuccess: () => {
+        if (
+          refreshingAccount.current &&
+          bilibiliSession.isCurrentAccount(refreshingAccount.current)
+        ) {
+          refreshingAccount.current = null;
+          enqueueToast("刷新成功", false);
+        }
+      },
     },
   );
   const pages = account ? (swr.data?.slice(0, swr.size) ?? []) : [];
@@ -99,8 +110,10 @@ export function useFollowingDynamicItems() {
       if (!bilibiliSession.isCurrentAccount(account)) {
         return;
       }
+      refreshingAccount.current = account;
       await swr.mutate();
     } finally {
+      refreshingAccount.current = null;
       refreshingRef.current = false;
       setRefreshing(false);
     }

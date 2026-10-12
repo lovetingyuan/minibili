@@ -1,6 +1,8 @@
+import { useRef } from "react";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 
+import { enqueueToast } from "../features/toast";
 import { usePullToRefresh } from "../hooks/usePullToRefresh";
 import { getDynamicPageKey, mapDynamicItem } from "./dynamic-items.mapper";
 import { DynamicDetailResponseSchema, DynamicListResponseSchema } from "./dynamic-items.schema";
@@ -14,6 +16,7 @@ async function fetchDynamicPage(url: string) {
 }
 
 export function useDynamicItems(mid?: string | number) {
+  const refreshingMid = useRef<string | number | null>(null);
   const swr = useSWRInfinite<DynamicListResponse, Error>(
     (pageIndex, previousPage) => getDynamicPageKey(mid, pageIndex, previousPage),
     fetchDynamicPage,
@@ -21,6 +24,12 @@ export function useDynamicItems(mid?: string | number) {
       revalidateFirstPage: true,
       shouldRetryOnError: false,
       dedupingInterval: 5 * 60 * 1000,
+      onSuccess: () => {
+        if (refreshingMid.current !== null && refreshingMid.current === mid) {
+          refreshingMid.current = null;
+          enqueueToast("刷新成功", false);
+        }
+      },
     },
   );
   const rawItems = swr.data?.flatMap((page) => page.items) ?? [];
@@ -39,11 +48,22 @@ export function useDynamicItems(mid?: string | number) {
 
   // 列表会被后台自动重新校验，刷新图标只在用户下拉时出现
   const pullToRefresh = usePullToRefresh(async () => {
+    if (!mid) {
+      return;
+    }
     await swr.setSize(1);
-    await swr.mutate();
+    refreshingMid.current = mid;
+    try {
+      await swr.mutate();
+    } finally {
+      refreshingMid.current = null;
+    }
   });
 
   function loadMore() {
+    if (pullToRefresh.refreshing) {
+      return;
+    }
     if (swr.error) {
       void swr.mutate();
       return;
@@ -54,6 +74,9 @@ export function useDynamicItems(mid?: string | number) {
   }
 
   async function retry() {
+    if (pullToRefresh.refreshing) {
+      return;
+    }
     await swr.mutate();
   }
 

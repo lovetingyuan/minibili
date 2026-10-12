@@ -35,9 +35,7 @@ function Hot() {
       isRefreshing={isRefreshing}
       onReachEnd={update}
       onRefresh={refresh}
-      onTabReselect={() => {
-        void mutate();
-      }}
+      onTabReselect={refresh}
       footer={getFooter}
     />
   );

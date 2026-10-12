@@ -2,7 +2,7 @@ import React from "react";
 import useSWRInfinite from "swr/infinite";
 import type { z } from "zod";
 
-import { usePullToRefresh } from "../hooks/usePullToRefresh";
+import { enqueueToast } from "../features/toast";
 import type { VideoItemResponseSchema } from "./hot-videos.schema";
 import request from "./fetcher";
 
@@ -40,6 +40,8 @@ export type VideoItem = ReturnType<typeof getVideo>;
 export function useHotVideos() {
   // 热门接口按请求顺序返回分页，换一个 _t 等于从头重新拉一遍列表
   const [revision, setRevision] = React.useState(0);
+  const refreshingRevision = React.useRef<number | null>(null);
+  const [refreshing, setRefreshing] = React.useState(false);
   const { data, mutate, size, setSize, isLoading, error } = useSWRInfinite<{
     list: HotVideoResponse[];
     no_more: boolean;
@@ -50,6 +52,8 @@ export function useHotVideos() {
     request,
     {
       revalidateFirstPage: false,
+      onSuccess: () => finishRefresh(true),
+      onError: () => finishRefresh(false),
       // revalidateAll: true,
       // 热门的请求结果并不是严格按照pn来返回的，而是跟请求顺序有关，
       // 比如请求第一页再请求第三页，这个第三页返回的数据其实是第二页
@@ -59,24 +63,40 @@ export function useHotVideos() {
   const isLoadingMore = isLoading || (size > 0 && !!data && typeof data[size - 1] === "undefined");
   const isReachingEnd = !!data && !!data[data.length - 1]?.no_more;
   const list = data?.flatMap((page) => page.list.map(getVideo)) ?? [];
-  // 列表会被后台自动重新校验，刷新图标只在用户下拉时出现
-  const pullToRefresh = usePullToRefresh(() => {
-    setRevision((current) => current + 1);
-  });
+  function finishRefresh(success: boolean) {
+    if (refreshingRevision.current !== revision) {
+      return;
+    }
+    refreshingRevision.current = null;
+    setRefreshing(false);
+    if (success) {
+      enqueueToast("刷新成功", false);
+    }
+  }
+
+  function refresh() {
+    if (refreshingRevision.current !== null) {
+      return;
+    }
+    const nextRevision = Math.max(Date.now(), revision + 1);
+    refreshingRevision.current = nextRevision;
+    setRefreshing(true);
+    setRevision(nextRevision);
+  }
 
   return {
     list,
-    isRefreshing: pullToRefresh.refreshing,
+    isRefreshing: refreshing,
     isReachingEnd,
     loading: isLoadingMore,
     mutate,
     update: () => {
-      if (isLoadingMore || isReachingEnd) {
+      if (refreshingRevision.current !== null || isLoadingMore || isReachingEnd) {
         return;
       }
       setSize((current) => current + 1);
     },
-    refresh: pullToRefresh.onRefresh,
+    refresh,
     error,
   };
 }
