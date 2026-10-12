@@ -44,7 +44,10 @@ export function CommentItem(props: CommentItemProps) {
   const onDelete = props.onDelete
   const canDelete = Boolean(onDelete && isViewer)
   const deletePending = props.isDeletePending?.(comment.id) ?? false
-  const meta = [comment.time?.replace('发布', ''), comment.location?.replace('IP属地：', '')]
+  const meta = [
+    comment.time?.replace('发布', ''),
+    comment.location?.replace('IP属地：', '').replace(/^\u4e2d\u56fd\u53f0\u6e7e$/, '\u53f0\u6e7e'),
+  ]
     .filter(Boolean)
     .join(' · ')
   const liked = comment.attitude === 'like'
