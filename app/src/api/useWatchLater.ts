@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR, { unstable_serialize, useSWRConfig } from "swr";
 
 import { favoriteMutationKey } from "../features/bilibili-favorites/mutations";
 import { watchLaterMutations } from "../features/bilibili-watch-later/mutations";
@@ -7,10 +7,15 @@ import { BilibiliSessionChangedError } from "../features/bilibili-session/contro
 import { BilibiliAuthExpiredError } from "../features/bilibili-session/auth-expiration";
 import { bilibiliSession } from "../features/bilibili-session/session";
 import { useBilibiliSessionState } from "../features/bilibili-session/useBilibiliSession";
-import { markWatchLaterAdded, markWatchLaterRemoved } from "../store/watch-later";
+import {
+  clearWatchLaterAids,
+  markWatchLaterAdded,
+  markWatchLaterRemoved,
+} from "../store/watch-later";
 import fetcher from "./fetcher";
 import { getBilibiliLoginCookie } from "./get-cookie";
 import {
+  clearWatchLater,
   fetchBilibiliWatchLater,
   getWatchLaterKey,
   getWatchLaterListItems,
@@ -21,6 +26,7 @@ import {
 import type {
   WatchLaterAccount,
   WatchLaterChange,
+  WatchLaterClearMode,
   WatchLaterKey,
   WatchLaterResponse,
 } from "./watch-later.types";
@@ -107,6 +113,71 @@ export function useModifyWatchLater() {
 
   return {
     toggle,
-    isPending: (aid: string) => Boolean(account && pending.has(favoriteMutationKey(account, aid))),
+    isPending: (aid: string) =>
+      Boolean(
+        account &&
+        (pending.has(favoriteMutationKey(account, aid)) ||
+          pending.has(favoriteMutationKey(account, "clear"))),
+      ),
+  };
+}
+
+export function useClearWatchLater() {
+  const { mutate, cache } = useSWRConfig();
+  const pending = useSyncExternalStore(
+    watchLaterMutations.subscribe,
+    watchLaterMutations.getSnapshot,
+  );
+  const account = useWatchLaterAccount(true);
+
+  async function clear(current: WatchLaterAccount, mode: WatchLaterClearMode) {
+    const key = getWatchLaterKey(current);
+
+    async function refresh(clearedAll = false) {
+      if (!bilibiliSession.isCurrentAccount(current)) {
+        throw new BilibiliSessionChangedError();
+      }
+      // 显式 mutation 使清除前的 GET 失效，再等待一次服务端刷新。
+      await mutate<WatchLaterResponse>(
+        key,
+        (cached) => (clearedAll ? { count: 0, list: [] } : cached),
+        { revalidate: false },
+      );
+      const data = await mutate<WatchLaterResponse>(key);
+      const state: unknown = cache.get(unstable_serialize(key));
+      // SWR revalidate 失败仍可能返回旧数据，需要同时检查缓存中的错误。
+      return (
+        data !== undefined &&
+        !(state && typeof state === "object" && "error" in state && state.error)
+      );
+    }
+
+    return watchLaterMutations.runClear(current, async () => {
+      try {
+        await clearWatchLater(current, mode, {
+          readCookie: getBilibiliLoginCookie,
+          isCurrentAccount: bilibiliSession.isCurrentAccount,
+        });
+      } catch (error) {
+        if (error instanceof WatchLaterResultUnknownError) {
+          await refresh().catch(() => {});
+        }
+        throw error;
+      }
+      if (!bilibiliSession.isCurrentAccount(current)) {
+        throw new BilibiliSessionChangedError();
+      }
+      if (mode === "all") {
+        clearWatchLaterAids();
+      }
+      return refresh(mode === "all").catch(() => false);
+    });
+  }
+
+  return {
+    clear,
+    isPending: Boolean(
+      account && [...pending].some((key) => key.startsWith(favoriteMutationKey(account, ""))),
+    ),
   };
 }

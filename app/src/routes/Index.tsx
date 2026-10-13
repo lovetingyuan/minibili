@@ -28,6 +28,7 @@ import FollowingDynamicsContent from './Followings/FollowingDynamicsContent'
 import FollowingsContent from './Followings/FollowingsContent'
 import HistoryContent from './Followings/HistoryContent'
 import WatchLaterContent from './Followings/WatchLaterContent'
+import { headerRight as watchLaterHeaderRight } from './Followings/WatchLaterHeader'
 import Living from './Living'
 import Play from './Player'
 import SearchUps from './SearchUps'
@@ -267,7 +268,7 @@ function AppRoute() {
           <Stack.Screen
             name="WatchLater"
             component={WatchLaterRoute}
-            options={{ headerTitle: '稍后再看' }}
+            options={{ headerTitle: '稍后再看', headerRight: watchLaterHeaderRight }}
           />
           <Stack.Screen
             name="BilibiliLogin"

@@ -17,6 +17,7 @@ import { WatchLaterActionResponseSchema, WatchLaterResponseSchema } from "./watc
 import type {
   WatchLaterAccount,
   WatchLaterChange,
+  WatchLaterClearMode,
   WatchLaterKey,
   WatchLaterListItem,
   WatchLaterRequest,
@@ -126,11 +127,43 @@ export async function modifyWatchLater(
   change: WatchLaterChange,
   dependencies: WatchLaterRequestDependencies,
 ) {
+  assertCurrentAccount(() => dependencies.isCurrentAccount(account));
+  assertVideoAid(change.aid);
+  await postWatchLater(
+    account,
+    change.added ? "add" : "del",
+    { aid: change.aid },
+    change.added ? "添加稍后再看" : "移除稍后再看",
+    dependencies,
+  );
+  return change;
+}
+
+export async function clearWatchLater(
+  account: WatchLaterAccount,
+  mode: WatchLaterClearMode,
+  dependencies: WatchLaterRequestDependencies,
+) {
+  return postWatchLater(
+    account,
+    "clear",
+    { clean_type: mode === "finished" ? "2" : "0" },
+    mode === "finished" ? "清除已看完" : "清除全部",
+    dependencies,
+  );
+}
+
+async function postWatchLater(
+  account: WatchLaterAccount,
+  action: "add" | "del" | "clear",
+  params: Record<string, string>,
+  actionName: string,
+  dependencies: WatchLaterRequestDependencies,
+) {
   function assertCurrent() {
     assertCurrentAccount(() => dependencies.isCurrentAccount(account));
   }
   assertCurrent();
-  assertVideoAid(change.aid);
   const cookie = await dependencies.readCookie();
   assertCurrent();
   if (!cookie || !hasBilibiliLoginCookie(cookie)) {
@@ -143,9 +176,8 @@ export async function modifyWatchLater(
   if (!csrf) {
     throw new WatchLaterLoginRequiredError("登录凭据缺少 CSRF，请重新登录 B站");
   }
-  const actionName = change.added ? "添加稍后再看" : "移除稍后再看";
-  const url = `https://api.bilibili.com/x/v2/history/toview/${change.added ? "add" : "del"}`;
-  const body = new URLSearchParams({ aid: change.aid, csrf });
+  const url = `https://api.bilibili.com/x/v2/history/toview/${action}`;
+  const body = new URLSearchParams({ ...params, csrf });
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), WATCH_LATER_REQUEST_TIMEOUT);
   let receivedResult = false;
@@ -184,7 +216,6 @@ export async function modifyWatchLater(
     if (code !== 0) {
       throw new Error(`${actionName}失败（${code}）：${message || "请稍后重试"}`);
     }
-    return change;
   } catch (error) {
     assertCurrent();
     if (!receivedResult) {

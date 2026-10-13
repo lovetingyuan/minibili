@@ -10,6 +10,7 @@ export type WatchLaterResponse = z.infer<typeof WatchLaterResponseSchema>;
 export type WatchLaterRequest = (url: string) => Promise<unknown>;
 export type WatchLaterKey = readonly ["bilibili-watch-later", string, number];
 export type WatchLaterChange = { aid: string; added: boolean };
+export type WatchLaterClearMode = "finished" | "all";
 export type WatchLaterRequestDependencies = {
   readCookie: () => Promise<string | null>;
   isCurrentAccount: (account: WatchLaterAccount) => boolean;
