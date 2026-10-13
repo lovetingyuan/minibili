@@ -47,7 +47,7 @@ export default function FavoritesContent() {
   const folderList = folders.data?.list ?? []
   const folder = folderList.find(item => item.id === selectedId) ?? folderList[0]
   const resources = useBilibiliFavoriteResources(folder?.id)
-  const { setOverlayButtons } = useStore()
+  const { setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore()
   const { account } = useBilibiliSessionState()
   const { logout } = useBilibiliSessionActions()
   const focused = useIsFocused()
@@ -82,6 +82,7 @@ export default function FavoritesContent() {
   }, [canEdit])
 
   function buttons(item: FavoriteListItem) {
+    const cover = item.video?.cover
     return [
       {
         text: '取消收藏',
@@ -101,6 +102,18 @@ export default function FavoritesContent() {
           })
         },
       },
+      ...(cover
+        ? [
+            {
+              text: '查看封面',
+              icon: overlayIcons.viewCover,
+              onPress: () => {
+                setImagesList([{ src: cover, width: 0, height: 0, ratio: 16 / 9 }])
+                setCurrentImageIndex(0)
+              },
+            },
+          ]
+        : []),
     ]
   }
 

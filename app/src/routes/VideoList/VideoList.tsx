@@ -1,9 +1,12 @@
 import { useNavigation } from '@react-navigation/native'
 import { FlashList } from '@/components/FlashList'
+import { Text } from '@/components/Text'
 import React from 'react'
 import { Alert, TouchableOpacity } from 'react-native'
 
 import type { VideoItem as VideoItemType } from '@/api/hot-videos'
+import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
+import { theme } from '@/constants/colors.tw'
 import { overlayIcons } from '@/constants/overlay-icons'
 import { useBlockUpActions } from '@/hooks/useBlockUpActions'
 import { useWatchLaterActions } from '@/hooks/useWatchLaterActions'
@@ -33,11 +36,12 @@ function VideoList(props: {
     setSetting,
   } = useUserSettings()
   const { confirmBlock } = useBlockUpActions()
+  const { blacklist } = useBilibiliBlacklist()
   const watchLater = useWatchLaterActions()
   const videoList: VideoItemType[] = []
   const uniqVideosMap: Record<string, boolean> = {}
   for (const item of props.videos) {
-    let needShow = !(item.bvid in uniqVideosMap)
+    let needShow = !(item.bvid in uniqVideosMap) && !blacklist.has(String(item.mid))
     if (needShow && props.type === 'Hot' && Object.hasOwn($blackTags, item.tag)) {
       needShow = false
     }
@@ -186,7 +190,15 @@ function VideoList(props: {
       keyExtractor={item => item.bvid}
       renderItem={renderItem}
       persistentScrollbar
-      ListEmptyComponent={<Loading />}
+      ListEmptyComponent={
+        props.videos.length > 0 ? (
+          <Text className={`py-4 text-center text-sm ${theme.text.muted}`}>
+            暂无可显示的视频
+          </Text>
+        ) : (
+          <Loading />
+        )
+      }
       ListFooterComponent={
         typeof props.footer === 'function' ? props.footer(videoList) : props.footer
       }
