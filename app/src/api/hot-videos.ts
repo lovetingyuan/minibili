@@ -3,6 +3,7 @@ import useSWRInfinite from "swr/infinite";
 import type { z } from "zod";
 
 import { enqueueToast } from "../features/toast";
+import { useScreenFocusRefresh } from "../hooks/useScreenFocusRefresh";
 import type { VideoItemResponseSchema } from "./hot-videos.schema";
 import request from "./fetcher";
 
@@ -39,9 +40,14 @@ export type VideoItem = ReturnType<typeof getVideo>;
 
 export function useHotVideos() {
   // 热门接口按请求顺序返回分页，换一个 _t 等于从头重新拉一遍列表
-  const [revision, setRevision] = React.useState(0);
+  const [revision, setRevision] = React.useState(Date.now);
   const refreshingRevision = React.useRef<number | null>(null);
   const [refreshing, setRefreshing] = React.useState(false);
+  useScreenFocusRefresh(() => {
+    if (refreshingRevision.current === null) {
+      setRevision((current) => Math.max(Date.now(), current + 1));
+    }
+  });
   const { data, mutate, size, setSize, isLoading, error } = useSWRInfinite<{
     list: HotVideoResponse[];
     no_more: boolean;
@@ -52,6 +58,7 @@ export function useHotVideos() {
     request,
     {
       revalidateFirstPage: false,
+      revalidateOnFocus: false,
       onSuccess: () => finishRefresh(true),
       onError: () => finishRefresh(false),
       // revalidateAll: true,

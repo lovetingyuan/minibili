@@ -31,7 +31,6 @@ import type {
 
 const options = {
   keepPreviousData: false,
-  revalidateOnFocus: false,
   shouldRetryOnError: (error: Error) =>
     !(
       error instanceof BilibiliAuthExpiredError ||

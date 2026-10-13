@@ -33,7 +33,6 @@ import type { VideoFavoriteChange } from "./video-favorites.types";
 
 const favoriteOptions = {
   keepPreviousData: false,
-  revalidateOnFocus: false,
   revalidateOnReconnect: true,
   shouldRetryOnError: (error: Error) =>
     !(

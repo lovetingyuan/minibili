@@ -27,8 +27,6 @@ import type {
 
 const watchLaterOptions = {
   keepPreviousData: false,
-  revalidateOnFocus: false,
-  revalidateOnReconnect: false,
   shouldRetryOnError: (error: Error) =>
     !(
       error instanceof BilibiliAuthExpiredError ||

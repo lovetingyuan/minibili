@@ -29,6 +29,7 @@
       --color-overlay: var(--color-white);
       --color-fill: var(--color-slate-100);
       --color-fill-raised: var(--color-slate-100);
+      --color-fill-inset: var(--color-slate-200);
       --color-fill-subtle: var(--color-slate-50);
       --color-fill-strong: var(--color-slate-200);
       --color-placeholder: var(--color-slate-200);
@@ -64,6 +65,7 @@
       --color-overlay: var(--color-slate-900);
       --color-fill: var(--color-slate-900);
       --color-fill-raised: var(--color-slate-800);
+      --color-fill-inset: var(--color-slate-900);
       --color-fill-subtle: var(--color-slate-900);
       --color-fill-strong: var(--color-slate-800);
       --color-placeholder: var(--color-slate-700);

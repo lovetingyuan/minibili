@@ -1,7 +1,11 @@
 import React from "react";
 import useSWR from "swr";
 
-import { DANMAKU_SEGMENT_SECONDS, fetchDanmakuSegment } from "@/api/danmaku";
+import {
+  DANMAKU_SEGMENT_SECONDS,
+  fetchDanmakuSegment,
+  invalidateDanmakuSegment,
+} from "@/api/danmaku";
 import type { DanmakuItem } from "@/api/danmaku.types";
 
 import { mergeDanmakuSegmentItems, resolveDanmakuSegmentWindow } from "./danmaku-feed";
@@ -18,10 +22,13 @@ function useDanmakuSegment(cid: number, index: number, enabled: boolean, duratio
     index >= 0 && (durationMs <= 0 || index * DANMAKU_SEGMENT_SECONDS * 1000 < durationMs);
   return useSWR(
     enabled && cid > 0 && inRange ? (["bilibili-danmaku-segment", cid, index] as const) : null,
-    ([, segmentCid, segmentIndex]) => fetchDanmakuSegment(segmentCid, segmentIndex),
+    ([, segmentCid, segmentIndex]) => {
+      invalidateDanmakuSegment(segmentCid, segmentIndex);
+      return fetchDanmakuSegment(segmentCid, segmentIndex);
+    },
     {
       keepPreviousData: false,
-      // 请求层复用已成功的分段；发送后失效的分段在重新挂载时重新拉取。
+      // 弹幕会变化，SWR 校验时也要更新请求层缓存。
       revalidateIfStale: true,
       // 网络抖动后继续恢复当前窗口，不必等到 6 分钟后的下一次分段切换。
       shouldRetryOnError: true,

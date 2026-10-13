@@ -22,9 +22,6 @@ export const useSearchUps = (name: string) => {
         : null;
     },
     fetcher,
-    {
-      revalidateFirstPage: false,
-    },
   );
   const isReachingEnd = !!data && (data[data.length - 1]?.result?.length ?? 0) < 50;
   // const isRefreshing = isValidating && !!data && data.length === size

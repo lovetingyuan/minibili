@@ -48,7 +48,6 @@ import type {
 
 const relationTagOptions = {
   keepPreviousData: false,
-  revalidateOnFocus: false,
   revalidateOnReconnect: true,
   shouldRetryOnError: (error: Error) =>
     !(
@@ -107,7 +106,7 @@ export function useBilibiliRelationTagMembers(tagid?: number, enabled = true) {
         bilibiliSession.isCurrentAccount(current),
       );
     },
-    { ...relationTagOptions, revalidateFirstPage: false, persistSize: false },
+    { ...relationTagOptions, persistSize: false },
   );
   const { data, size, setSize, mutate, isLoading, isValidating, error } = response;
 
@@ -195,7 +194,7 @@ export function useBilibiliSpecialFollowUps() {
       );
       return new Set(members.map((member) => String(member.mid)));
     },
-    { ...relationTagOptions, dedupingInterval: 5 * 60 * 1000 },
+    relationTagOptions,
   );
   return { ...response, data: account ? response.data : undefined };
 }

@@ -1,4 +1,4 @@
-import useSWRImmutable from "swr/immutable";
+import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
 
 import { usePullToRefresh } from "../hooks/usePullToRefresh";
@@ -30,7 +30,7 @@ async function fetchSpaceOpusPage(url: string) {
 }
 
 export function useSpaceContentCounts(mid?: string | number) {
-  const { data } = useSWRImmutable(
+  const { data } = useSWR(
     mid ? buildSpaceContentCountsUrl(mid) : null,
     async (url: string) => SpaceContentCountsSchema.parse(await request<unknown>(url)),
   );
@@ -45,7 +45,7 @@ export function useSpaceVideoItems(owner: SpaceOwner) {
   const swr = useSWRInfinite<SpaceVideoPage, Error>(
     (pageIndex, previousPage) => getSpaceVideoPageKey(owner.mid, pageIndex, previousPage),
     fetchSpaceVideoPage,
-    { revalidateFirstPage: true, shouldRetryOnError: false, dedupingInterval: 5 * 60 * 1000 },
+    { shouldRetryOnError: false },
   );
   const list = dedupeSpaceItems(
     (swr.data ?? []).flatMap((page) =>
@@ -90,7 +90,7 @@ export function useSpaceOpusItems(owner: SpaceOwner) {
   const swr = useSWRInfinite<SpaceOpusPage, Error>(
     (pageIndex, previousPage) => getSpaceOpusPageKey(owner.mid, pageIndex, previousPage),
     fetchSpaceOpusPage,
-    { revalidateFirstPage: true, shouldRetryOnError: false, dedupingInterval: 5 * 60 * 1000 },
+    { shouldRetryOnError: false },
   );
   const list = dedupeSpaceItems(
     (swr.data ?? []).flatMap((page) =>

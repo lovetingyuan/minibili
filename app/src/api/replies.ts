@@ -29,7 +29,6 @@ export function useReplies() {
           ? `/x/v2/reply/reply?oid=${repliesInfo.oid}&type=${repliesInfo.type}&root=${repliesInfo.root}&pn=${index + 1}&ps=20`
           : null,
       fetchRepliesPage,
-      { revalidateFirstPage: false },
     );
 
   const fetchedReplies = data?.flatMap((page) => page.replies) || [];

@@ -21,9 +21,7 @@ export function useDynamicItems(mid?: string | number) {
     (pageIndex, previousPage) => getDynamicPageKey(mid, pageIndex, previousPage),
     fetchDynamicPage,
     {
-      revalidateFirstPage: true,
       shouldRetryOnError: false,
-      dedupingInterval: 5 * 60 * 1000,
       onSuccess: () => {
         if (refreshingMid.current !== null && refreshingMid.current === mid) {
           refreshingMid.current = null;

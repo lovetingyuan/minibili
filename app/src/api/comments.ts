@@ -278,7 +278,6 @@ export function useComments(oid: string | number, type: number, mode = 3) {
         return url ? [url, index] : null;
       },
       ([url]) => fetchCommentsPage(url, type),
-      { revalidateFirstPage: false },
     );
 
   const replies = mergeCommentPages(data);

@@ -4,6 +4,7 @@ import { Text } from '@/components/Text'
 import { orderFollowedUps } from '@/features/bilibili-followings/order-followings'
 import { useFollowingsState } from '@/features/bilibili-followings/useFollowingsState'
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
+import { useScreenFocusRefresh } from '@/hooks/useScreenFocusRefresh'
 import { useStore } from '@/store'
 import { useUnreadUpMids } from '@/store/derives'
 import { useActiveFollowedUps } from '@/store/followings'
@@ -22,6 +23,7 @@ export default function AllUpList({ specialMids, onSetGroups }: Props) {
   const unreadMids = useUnreadUpMids()
   const { mutate } = useFollowingsState()
   const { mutate: refreshLiveUps } = useLiveUps()
+  useScreenFocusRefresh(refreshLiveUps)
   const refreshFollowingDynamicsNav = useFollowingDynamicsNavRefresh()
   const orderedUps = orderFollowedUps($followedUps, livingUps, specialMids, unreadMids)
   // 关注列表会被后台同步、拉黑等操作重新校验，只有用户下拉时才显示刷新图标

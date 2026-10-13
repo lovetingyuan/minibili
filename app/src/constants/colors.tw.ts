@@ -28,6 +28,8 @@ export const theme = {
     page: "bg-page",
     surface: "bg-surface",
     overlay: "bg-overlay",
+    fillRaised: "bg-fill-raised",
+    fillInset: "bg-fill-inset",
     fill: {
       text: "text-fill",
       accent: "accent-fill",

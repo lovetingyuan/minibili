@@ -9,7 +9,7 @@ import { theme } from '@/constants/colors.tw'
 
 export default function Blacklist() {
   const [expanded, setExpanded] = React.useState(false)
-  const { blacklist, account, isPreparing, data, error } = useBilibiliBlacklist()
+  const { blacklist, account, isPreparing, data, error } = useBilibiliBlacklist(true)
   const loading = isPreparing || Boolean(account && data === undefined && !error)
 
   return (

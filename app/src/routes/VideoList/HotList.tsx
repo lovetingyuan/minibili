@@ -1,23 +1,14 @@
-import React from "react";
 import { Text } from "react-native";
 
 import { useHotVideos } from "../../api/hot-videos";
 import useErrToast from "../../hooks/useErrToast";
 import VideoList from "./VideoList";
 
-let refreshTime = Date.now();
-
 export default Hot;
 
 function Hot() {
-  const { list, update, isRefreshing, loading, mutate, isReachingEnd, error, refresh } =
+  const { list, update, isRefreshing, loading, isReachingEnd, error, refresh } =
     useHotVideos();
-  React.useEffect(() => {
-    if (Date.now() - refreshTime > 5 * 60 * 1000) {
-      mutate();
-      refreshTime = Date.now();
-    }
-  }, [mutate]);
   useErrToast("加载视频列表失败", error);
 
   const getFooter = (_list: any[]) => {

@@ -30,8 +30,8 @@ export function useFollowingDynamicItems() {
       ),
     {
       keepPreviousData: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
+      revalidateOnMount: true,
+      // 追加分页时沿用当前游标，进入页面时重新请求。
       revalidateFirstPage: false,
       persistSize: false,
       parallel: false,

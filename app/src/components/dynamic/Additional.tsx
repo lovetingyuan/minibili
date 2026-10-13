@@ -11,7 +11,7 @@ import { theme } from '@/constants/colors.tw'
 import type { NavigationProps } from '@/types'
 import { getImagePixelDimensions, parseImgUrl } from '@/utils'
 
-export function Additional(props: { additional: DynamicAdditional | null }) {
+export function Additional(props: { additional: DynamicAdditional | null; forward?: boolean }) {
   const navigation = useNavigation<NavigationProps['navigation']>()
   const { additional } = props
   if (!additional) {
@@ -49,7 +49,7 @@ export function Additional(props: { additional: DynamicAdditional | null }) {
       }
       disabled={!interactive}
       onPress={open}
-      className="mb-3 min-h-18 flex-row items-center overflow-hidden rounded-lg bg-fill-raised p-2.5"
+      className={`mb-3 min-h-18 flex-row items-center overflow-hidden rounded-lg p-2.5 ${props.forward ? theme.background.fillInset : theme.background.fillRaised}`}
     >
       {additional.cover ? (
         <Image

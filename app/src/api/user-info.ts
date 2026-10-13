@@ -1,4 +1,4 @@
-import useSWRImmutable from "swr/immutable";
+import useSWR from "swr";
 
 import { useStore } from "../store";
 import fetcher from "./fetcher";
@@ -8,7 +8,7 @@ import type { UserInfo } from "./user-info.types";
 
 export function useUserInfo(mid?: number | string) {
   const { get$followedUps, set$followedUps } = useStore();
-  const { data } = useSWRImmutable<UserInfo | undefined>(
+  const { data } = useSWR<UserInfo | undefined>(
     mid ? `/x/web-interface/card?mid=${mid}` : null,
     async (url) => {
       const response = await fetcher<unknown>(url);

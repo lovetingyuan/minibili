@@ -26,8 +26,8 @@ export function useBilibiliHistory() {
       ),
     {
       keepPreviousData: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
+      revalidateOnMount: true,
+      // 加载续页时保留已成功获取的游标链，进入页面时重新请求。
       revalidateFirstPage: false,
       persistSize: false,
       parallel: false,

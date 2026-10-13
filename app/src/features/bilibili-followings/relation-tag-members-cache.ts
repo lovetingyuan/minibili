@@ -25,7 +25,7 @@ export function getRelationTagMembersInfiniteKey(account: RelationTagAccount, ta
   return unstable_serialize(() => getRelationTagMembersKey(account, tagid, 0, null));
 }
 
-/** 清掉分页缓存：列表配置了 revalidateFirstPage: false，不清就会复用旧分页。 */
+/** 分组成员变化后清掉分页缓存，避免后续页面保留旧成员。 */
 export function clearRelationTagMemberPages(
   mutate: ScopedMutator,
   account: RelationTagAccount,

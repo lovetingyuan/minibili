@@ -14,7 +14,6 @@ export const useLivingInfo = (mid?: string | number) => {
     request,
     {
       refreshInterval: 5 * 60 * 1000,
-      dedupingInterval: 60 * 1000,
     },
   );
   if (data && mid) {

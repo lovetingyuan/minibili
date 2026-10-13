@@ -88,7 +88,7 @@ function DynamicBody(props: {
     return (
       <>
         <DynamicArticleContent article={article} selectable={detail} />
-        <Additional additional={item.additional} />
+        <Additional additional={item.additional} forward={forward} />
       </>
     )
   }
@@ -96,7 +96,7 @@ function DynamicBody(props: {
     return (
       <>
         <DynamicArticleLoading />
-        <Additional additional={item.additional} />
+        <Additional additional={item.additional} forward={forward} />
       </>
     )
   }
@@ -135,7 +135,7 @@ function DynamicBody(props: {
         </>
       ) : null}
       <DynamicMedia content={item.content} author={item.author} detail={detail} forward={forward} />
-      <Additional additional={item.additional} />
+      <Additional additional={item.additional} forward={forward} />
     </>
   )
 }

@@ -75,7 +75,7 @@ export function useSpaceVideoSearchItems(owner: SpaceOwner, keyword: string) {
       return buildSpaceVideoSearchUrl(owner.mid, keyword, pageIndex + 1);
     },
     fetchSpaceVideoSearchPage,
-    { revalidateFirstPage: false, shouldRetryOnError: false, dedupingInterval: 5 * 60 * 1000 },
+    { shouldRetryOnError: false },
   );
   const list = dedupeSpaceItems(
     (swr.data ?? []).flatMap((page) =>
@@ -135,7 +135,7 @@ export function useSpaceDynamicSearchItems(owner: SpaceOwner, keyword: string) {
       );
     },
     fetchSpaceDynamicSearchPage,
-    { revalidateFirstPage: false, shouldRetryOnError: false, dedupingInterval: 5 * 60 * 1000 },
+    { shouldRetryOnError: false },
   );
   const list = dedupeSpaceItems((swr.data ?? []).flatMap((page) => page.items.map(mapDynamicItem)));
   const lastPage = swr.data?.[swr.data.length - 1];

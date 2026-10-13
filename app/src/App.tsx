@@ -31,6 +31,7 @@ import {
 import { MenuProvider, menuProviderCustomStyles } from './components/Menu'
 import { posthog } from './config/posthog'
 import useAppOrientation from './hooks/useAppOrientation'
+import { screenFocusRevalidation } from './hooks/useScreenFocusRefresh'
 import { isLoginRequiredError } from './features/bilibili-session/login-required'
 import Route from './routes/Index'
 import ErrorBoundary from 'react-native-error-boundary'
@@ -46,6 +47,7 @@ function captureRenderError(error: Error, componentStack: string) {
 }
 
 const SWRConfigValue: SWRConfiguration & Partial<ProviderConfiguration> = {
+  use: [screenFocusRevalidation],
   fetcher,
   errorRetryCount: 2,
   errorRetryInterval: 1000,
