@@ -132,7 +132,7 @@ export default function ReplyList(props: ReplyListProps) {
     <BottomSheet
       backdropOpacity={SHEET_BACKDROP_OPACITY}
       onClose={handleClose}
-      snapPoints={['50%', '70%']}
+      snapPoints={['70%']}
       index={0}
       visible={Boolean(repliesInfo)}
     >
