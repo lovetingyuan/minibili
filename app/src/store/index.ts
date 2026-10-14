@@ -79,6 +79,8 @@ const getAppValue = () => {
     livingUps: {} as Record<string, string>,
     followingDynamicsUpdateCount: 0,
     currentVideosCate: RanksConfig[0] as (typeof RanksConfig)[number],
+    /** 热门列表当前批次，仅当前运行会话有效，切换页面时复用 SWR 缓存。 */
+    hotVideosRevision: Date.now(),
     imagesList: [] as {
       src: string;
       width: number;

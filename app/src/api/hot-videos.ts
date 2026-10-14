@@ -3,7 +3,7 @@ import useSWRInfinite from "swr/infinite";
 import type { z } from "zod";
 
 import { enqueueToast } from "../features/toast";
-import { useScreenFocusRefresh } from "../hooks/useScreenFocusRefresh";
+import { useStore } from "../store";
 import type { VideoItemResponseSchema } from "./hot-videos.schema";
 import request from "./fetcher";
 
@@ -40,15 +40,11 @@ export type VideoItem = ReturnType<typeof getVideo>;
 
 export function useHotVideos() {
   // 热门接口按请求顺序返回分页，换一个 _t 等于从头重新拉一遍列表
-  const [revision, setRevision] = React.useState(Date.now);
+  const { hotVideosRevision, setHotVideosRevision } = useStore();
+  const [pendingRevision, setPendingRevision] = React.useState<number | null>(null);
+  const revision = pendingRevision ?? hotVideosRevision;
   const refreshingRevision = React.useRef<number | null>(null);
-  const [refreshing, setRefreshing] = React.useState(false);
-  useScreenFocusRefresh(() => {
-    if (refreshingRevision.current === null) {
-      setRevision((current) => Math.max(Date.now(), current + 1));
-    }
-  });
-  const { data, mutate, size, setSize, isLoading, error } = useSWRInfinite<{
+  const { data, mutate, size, setSize, isLoading, isValidating, error } = useSWRInfinite<{
     list: HotVideoResponse[];
     no_more: boolean;
   }>(
@@ -57,11 +53,15 @@ export function useHotVideos() {
     },
     request,
     {
+      keepPreviousData: true,
+      revalidateIfStale: false,
       revalidateFirstPage: false,
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      persistSize: false,
+      parallel: false,
       onSuccess: () => finishRefresh(true),
       onError: () => finishRefresh(false),
-      // revalidateAll: true,
       // 热门的请求结果并不是严格按照pn来返回的，而是跟请求顺序有关，
       // 比如请求第一页再请求第三页，这个第三页返回的数据其实是第二页
       // 所以此处不再验证首页，否则后续请求又是第二页了，而是直接按顺序请求下一页
@@ -75,10 +75,14 @@ export function useHotVideos() {
       return;
     }
     refreshingRevision.current = null;
-    setRefreshing(false);
     if (success) {
+      setHotVideosRevision((current) => Math.max(current, revision));
       enqueueToast("刷新成功", false);
+    } else {
+      // 恢复旧 key 后本次错误不会留在页面上，需在此提示刷新失败。
+      enqueueToast("刷新失败", false);
     }
+    setPendingRevision(null);
   }
 
   function refresh() {
@@ -87,18 +91,17 @@ export function useHotVideos() {
     }
     const nextRevision = Math.max(Date.now(), revision + 1);
     refreshingRevision.current = nextRevision;
-    setRefreshing(true);
-    setRevision(nextRevision);
+    setPendingRevision(nextRevision);
   }
 
   return {
     list,
-    isRefreshing: refreshing,
+    isRefreshing: pendingRevision !== null,
     isReachingEnd,
     loading: isLoadingMore,
     mutate,
     update: () => {
-      if (refreshingRevision.current !== null || isLoadingMore || isReachingEnd) {
+      if (refreshingRevision.current !== null || isValidating || isLoadingMore || isReachingEnd) {
         return;
       }
       setSize((current) => current + 1);
