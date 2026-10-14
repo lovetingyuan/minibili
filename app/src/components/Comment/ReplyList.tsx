@@ -1,7 +1,7 @@
 import { useIsFocused } from '@react-navigation/native'
 import type { FlashListRef } from '@shopify/flash-list'
 import { useEffect, useRef } from 'react'
-import { ActivityIndicator, Pressable, useWindowDimensions, View } from 'react-native'
+import { ActivityIndicator, Pressable, View } from 'react-native'
 import { X } from 'lucide-react-native'
 
 import { useReplies } from '@/api/replies'
@@ -15,9 +15,10 @@ import { getStoreMethods, useStore } from '@/store'
 
 import { CommentItem } from './Comment'
 import CommentPaginationFooter from './CommentPaginationFooter'
-import { getReplySheetHeight, removeReplyFromInfo } from './reply-list.helpers'
+import { removeReplyFromInfo } from './reply-list.helpers'
 import type { ReplyListProps } from './reply-list.types'
 import ReplyComposer from './ReplyComposer'
+import ReplySheetContent from './ReplySheetContent'
 
 const SHEET_BACKDROP_OPACITY = 0.5
 
@@ -26,8 +27,6 @@ export default function ReplyList(props: ReplyListProps) {
   const { setRepliesInfo, repliesInfo } = useStore()
   const focused = useIsFocused()
   const listRef = useRef<FlashListRef<ReplyItemType>>(null)
-  const { height: windowHeight } = useWindowDimensions()
-  const sheetHeight = getReplySheetHeight(windowHeight)
   const loadMoreLock = useRef(false)
 
   useEffect(() => {
@@ -132,13 +131,12 @@ export default function ReplyList(props: ReplyListProps) {
     <BottomSheet
       backdropOpacity={SHEET_BACKDROP_OPACITY}
       onClose={handleClose}
-      snapPoints={['50%', sheetHeight, '80%']}
-      index={1}
+      snapPoints={['50%', '70%']}
+      index={0}
       visible={Boolean(repliesInfo)}
     >
-      {/* flex-1 撑满 sheet 的内容区（sheet 高度已扣除把手），不要再写死高度 */}
-      <View className={`flex-1 overflow-hidden rounded-t-[28px] ${theme.background.surface}`}>
-        <View className="relative h-12 flex-row items-center justify-center border-b border-divider-subtle px-4">
+      <ReplySheetContent>
+        <View className="relative h-12 shrink-0 flex-row items-center justify-center border-b border-divider-subtle px-4">
           <Text className="text-base font-semibold tabular-nums">
             {typeof allCount === 'number' ? `${allCount} 条回复` : '回复'}
           </Text>
@@ -153,6 +151,7 @@ export default function ReplyList(props: ReplyListProps) {
         </View>
         <FlashList
           ref={listRef}
+          className="min-h-0 flex-1"
           data={replies.data.replies}
           keyExtractor={(item: ReplyItemType) => item.id}
           renderItem={({ item }: { item: ReplyItemType }) => (
@@ -211,7 +210,7 @@ export default function ReplyList(props: ReplyListProps) {
             onSubmit={submitReply}
           />
         ) : null}
-      </View>
+      </ReplySheetContent>
     </BottomSheet>
   )
 }
