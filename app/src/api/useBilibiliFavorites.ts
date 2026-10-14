@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR, { unstable_serialize, useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 
 import { clearFavoriteResourcePages } from "../features/bilibili-favorites/mutations";
 import {
   FavoriteResourcesChangedError,
   getFavoriteResourceRevision,
+  getFavoriteResourceState,
   invalidateFavoriteResourceRequests,
 } from "../features/bilibili-favorites/resource-revisions";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
@@ -19,17 +20,18 @@ import {
   FavoriteFolderResultUnknownError,
   fetchBilibiliFavoriteFolders,
   fetchBilibiliFavoriteResources,
+  FAVORITE_PAGE_SIZE,
   getFavoriteFoldersKey,
   getFavoriteListItems,
   getFavoriteResourcesKey,
 } from "./favorites";
 import type {
   FavoriteAccount,
+  FavoriteResourcePage,
   FavoriteResources,
   FavoriteResourcesKeyLoader,
 } from "./favorites.types";
 import { getBilibiliLoginCookie } from "./get-cookie";
-import type { VideoFavoriteChange } from "./video-favorites.types";
 
 const favoriteOptions = {
   keepPreviousData: false,
@@ -65,24 +67,63 @@ export function useBilibiliFavoriteFolders() {
 
 export function useBilibiliFavoriteResources(folderId?: number) {
   const account = useFavoriteAccount();
-  const { mutate: mutateCache } = useSWRConfig();
+  const { cache, mutate: mutateCache } = useSWRConfig();
   const pending = useRef(false);
-  const response = useSWRInfinite<FavoriteResources, Error, FavoriteResourcesKeyLoader>(
+  const response = useSWRInfinite<FavoriteResourcePage, Error, FavoriteResourcesKeyLoader>(
     (index, previous: FavoriteResources | null) =>
       getFavoriteResourcesKey(account, folderId, index, previous),
-    async ([, mid, generation, mediaId, page]) => {
+    async ([, mid, generation, mediaId, logicalPage]) => {
       const current = { mid, generation };
-      const revision = getFavoriteResourceRevision(mutateCache, current, mediaId);
-      const data = await fetchBilibiliFavoriteResources(mediaId, page, fetcher, () =>
-        bilibiliSession.isCurrentAccount(current),
-      );
-      // SWR Infinite 对单页缓存的写入不受聚合 key 的竞态保护，必须在返回数据前拦截。
-      if (getFavoriteResourceRevision(mutateCache, current, mediaId) !== revision) {
+      const state = getFavoriteResourceState(mutateCache, current, mediaId);
+      const { revision, removalCount } = state;
+      const seen = new Set<string>();
+      let previous: FavoriteResourcePage | undefined;
+      for (let index = 0; index < logicalPage - 1; index += 1) {
+        const key = getFavoriteResourcesKey(current, mediaId, index, null);
+        previous = cache.get(unstable_serialize(key))?.data;
+        for (const media of previous?.medias ?? []) {
+          seen.add(`${media.type}:${media.id}`);
+        }
+      }
+      if (logicalPage > 1 && !previous) {
         throw new FavoriteResourcesChangedError();
       }
-      return data;
+      // 热更新前的内存缓存可能还没有分页元数据。
+      const previousPagination = previous?.pagination;
+      // 缓存页序号保持稳定，只回退实际请求页码，补齐删除后前移的分页边界。
+      let serverPage = previous
+        ? Math.max(
+            1,
+            (previousPagination?.serverPage ?? logicalPage - 1) +
+              1 -
+              Math.ceil(
+                (removalCount - (previousPagination?.removalCount ?? 0)) / FAVORITE_PAGE_SIZE,
+              ),
+          )
+        : 1;
+      while (true) {
+        const data = await fetchBilibiliFavoriteResources(mediaId, serverPage, fetcher, () =>
+          bilibiliSession.isCurrentAccount(current),
+        );
+        // SWR Infinite 的单页写入不受聚合 key 的竞态保护。
+        if (getFavoriteResourceRevision(mutateCache, current, mediaId) !== revision) {
+          throw new FavoriteResourcesChangedError();
+        }
+        const medias = data.medias.filter((media) => {
+          const key = `${media.type}:${media.id}`;
+          if (seen.has(key) || (media.type === 2 && state.excludedVideoIds.has(String(media.id)))) {
+            return false;
+          }
+          seen.add(key);
+          return true;
+        });
+        if (medias.length || !data.has_more || !data.medias.length) {
+          return { ...data, medias, pagination: { serverPage, removalCount } };
+        }
+        serverPage += 1;
+      }
     },
-    { ...favoriteOptions, revalidateFirstPage: true, persistSize: false },
+    { ...favoriteOptions, revalidateFirstPage: false, persistSize: false },
   );
   const { data, size, setSize, mutate, isLoading, isValidating, error } = response;
 
@@ -93,7 +134,7 @@ export function useBilibiliFavoriteResources(folderId?: number) {
 
   const pages = account && folderId ? (data?.slice(0, size) ?? []) : [];
   const hasMore = pages.at(-1)?.has_more ?? false;
-  const isLoadingMore = isLoading || (!error && size > pages.length && hasMore);
+  const isLoadingMore = isLoading || (isValidating && !error && size > pages.length && hasMore);
 
   async function loadMore() {
     if (
@@ -109,44 +150,21 @@ export function useBilibiliFavoriteResources(folderId?: number) {
     }
     pending.current = true;
     try {
-      await setSize((value) => value + 1);
+      await setSize((value) => Math.min(value, pages.length) + 1);
     } finally {
       pending.current = false;
     }
   }
 
   async function refresh() {
-    await setSize(1);
-    await mutate();
-  }
-
-  async function refreshAfterChange(change: VideoFavoriteChange) {
-    const removedFromCurrentFolder = Boolean(
-      account &&
-      folderId &&
-      change.initialIds.includes(folderId) &&
-      !change.selectedIds.includes(folderId),
-    );
-    try {
-      if (account && folderId && removedFromCurrentFolder) {
-        invalidateFavoriteResourceRequests(mutateCache, account, [folderId]);
-        await clearFavoriteResourcePages(account, new Set([folderId]), mutateCache);
-      }
-      await refresh();
-    } finally {
-      if (removedFromCurrentFolder) {
-        await mutate(
-          (current) =>
-            current?.map((page) => ({
-              ...page,
-              medias: page.medias.filter(
-                (media) => media.type !== 2 || String(media.id) !== change.video.aid,
-              ),
-            })),
-          { revalidate: false },
-        );
-      }
+    if (!account || !folderId || !bilibiliSession.isCurrentAccount(account)) {
+      return;
     }
+    invalidateFavoriteResourceRequests(mutateCache, account, [folderId]);
+    getFavoriteResourceState(mutateCache, account, folderId).excludedVideoIds.clear();
+    await setSize(1);
+    await clearFavoriteResourcePages(account, new Set([folderId]), mutateCache);
+    await mutate();
   }
 
   return {
@@ -156,7 +174,6 @@ export function useBilibiliFavoriteResources(folderId?: number) {
     isLoadingMore,
     loadMore,
     refresh,
-    refreshAfterChange,
   };
 }
 

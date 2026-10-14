@@ -1,27 +1,9 @@
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 import { theme } from "@/constants/colors.tw";
+import { LoadErrorText } from "@/components/LoadErrorText";
 
-type PlayerErrorProps = {
-  retrying: boolean;
-  onRetry: () => void;
-  /**
-   * 覆盖默认的「视频加载失败」文案。付费/会员/充电等受限内容会用到，
-   * 也用于互动视频片段播完后的提示。
-   */
-  title?: string;
-  description?: string;
-  /** 重试按钮文案，默认「重试」 */
-  retryLabel?: string;
-  /** 受限内容的主操作，例如「在 B站 打开」；有值时展示在重试按钮左侧 */
-  actionLabel?: string;
-  onAction?: () => void;
-  /**
-   * 是否展示重试按钮。付费/会员/充电这类已经判定出受限原因的提示只需要说明，
-   * 重试不会变好，传 false 隐藏
-   */
-  showRetry?: boolean;
-};
+import type { PlayerErrorProps } from "./PlayerError.types";
 
 export default function PlayerError(props: PlayerErrorProps) {
   const title = props.title ?? "视频加载失败";
@@ -36,8 +18,18 @@ export default function PlayerError(props: PlayerErrorProps) {
       ) : (
         <>
           <Text className="text-lg font-bold text-media-content">{title}</Text>
-          <Text className="mt-2 text-center text-sm leading-6 text-media-content/80">{description}</Text>
-          {actionLabel || showRetry ? (
+          {showRetry && !props.retryLabel ? (
+            <LoadErrorText
+              message={description.replace(/，请(?:稍后)?重试$/, '')}
+              className="mt-2 text-sm leading-6"
+              colorClassName={theme.media.secondary}
+              retryClassName={`${theme.media.content} underline`}
+              onRetry={props.onRetry}
+            />
+          ) : (
+            <Text className="mt-2 text-center text-sm leading-6 text-media-content/80">{description}</Text>
+          )}
+          {actionLabel || (showRetry && props.retryLabel) ? (
             <View className="mt-4 flex-row items-center gap-3">
               {actionLabel ? (
                 <Pressable
@@ -49,7 +41,7 @@ export default function PlayerError(props: PlayerErrorProps) {
                   <Text className="font-bold text-media-content">{actionLabel}</Text>
                 </Pressable>
               ) : null}
-              {showRetry ? (
+              {showRetry && props.retryLabel ? (
                 <Pressable
                   accessibilityRole="button"
                   className={
@@ -59,7 +51,7 @@ export default function PlayerError(props: PlayerErrorProps) {
                   }
                   onPress={props.onRetry}
                 >
-                  <Text className="font-bold text-media-content">{props.retryLabel ?? "重试"}</Text>
+                  <Text className="font-bold text-media-content">{props.retryLabel}</Text>
                 </Pressable>
               ) : null}
             </View>

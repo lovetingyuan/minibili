@@ -2,7 +2,7 @@ import { ActivityIndicator, View } from 'react-native'
 
 import { RELATION_TAG_SPECIAL_ID } from '@/api/relation-tags'
 import { useBilibiliRelationTagMembers } from '@/api/useBilibiliRelationTags'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { Text } from '@/components/Text'
 import { theme } from '@/constants/colors.tw'
 import { orderFollowedUps } from '@/features/bilibili-followings/order-followings'
@@ -53,16 +53,12 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
           {members.isLoading ? (
             <ActivityIndicator />
           ) : members.error ? (
-            <>
-              <Text className="text-center">分组加载失败，请检查网络或登录状态后重试</Text>
-              <Button
-                title="重试"
-                loading={members.isValidating}
-                onPress={() => {
-                  void members.mutate().catch(() => {})
-                }}
-              />
-            </>
+            <LoadErrorText
+              disabled={members.isValidating}
+              onRetry={() => {
+                void members.mutate().catch(() => {})
+              }}
+            />
           ) : (
             <Text className={theme.text.muted}>该分组暂无UP</Text>
           )}
@@ -70,17 +66,13 @@ export default function GroupUpList({ tagid, specialMids, onSetGroups, onRefresh
       }
       footer={
         members.error && hasItems ? (
-          <View className="items-center gap-2 py-4">
-            <Text className={`text-sm ${theme.text.muted}`}>加载失败，已保留当前内容</Text>
-            <Button
-              title="重试"
-              type="clear"
-              loading={members.isValidating}
-              onPress={() => {
-                void members.mutate().catch(() => {})
-              }}
-            />
-          </View>
+          <LoadErrorText
+            className="py-4 text-sm"
+            disabled={members.isValidating}
+            onRetry={() => {
+              void members.mutate().catch(() => {})
+            }}
+          />
         ) : members.isLoadingMore && hasItems ? (
           <ActivityIndicator className="my-4" />
         ) : hasItems && !members.hasMore ? (

@@ -6,7 +6,7 @@ import { useOpusDetail } from '@/api/opus-detail'
 import CommentList from '@/components/Comment'
 import { DynamicCard } from '@/components/dynamic/dynamic-card'
 import { LoginRequired } from '@/components/LoginRequired'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { Text } from '@/components/Text'
 import UpName from '@/components/UpName'
 import { theme } from '@/constants/colors.tw'
@@ -65,9 +65,14 @@ function DynamicDetailPage({ route }: Props) {
       <View className="flex-1 items-center justify-center gap-3 px-8">
         <Text className="text-lg font-semibold">动态加载失败</Text>
         <Text selectable className={`text-center text-sm ${theme.text.muted}`}>
-          动态可能已被删除或不可见，请检查网络后重试
+          动态可能已被删除或不可见
         </Text>
-        <Button title="重新加载" type="outline" onPress={refresh} />
+        <LoadErrorText
+          disabled={detail.isValidating || article.isValidating}
+          onRetry={() => {
+            void refresh().catch(() => {})
+          }}
+        />
       </View>
     )
   }

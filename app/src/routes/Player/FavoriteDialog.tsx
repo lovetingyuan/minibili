@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { CheckBox } from '@/components/CheckBox'
 import { Dialog } from '@/components/Dialog'
 import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { Text } from '@/components/Text'
 import { theme } from '@/constants/colors.tw'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
@@ -31,9 +32,11 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
       {editor.loading ? <ActivityIndicator accessibilityLabel="正在加载收藏夹" /> : null}
       {editor.error ? (
         <View className="gap-2 py-2">
-          <Text accessibilityRole="alert" className={theme.error.text}>
-            {editor.error.message}
-          </Text>
+          {isLoginRequiredError(editor.error) || (editor.selection && !editor.needsReload) ? (
+            <Text accessibilityRole="alert" className={theme.error.text}>
+              {editor.error.message}
+            </Text>
+          ) : null}
           {isLoginRequiredError(editor.error) ? (
             <Button
               title="去登录"
@@ -45,11 +48,9 @@ export default function FavoriteDialog(props: FavoriteDialogProps) {
               }}
             />
           ) : !editor.selection || editor.needsReload ? (
-            <Button
-              title="重试"
-              type="clear"
+            <LoadErrorText
               disabled={editor.loading || editor.busy}
-              onPress={() => {
+              onRetry={() => {
                 void editor.reload()
               }}
             />

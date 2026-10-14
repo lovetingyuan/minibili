@@ -5,7 +5,7 @@ import NavigableWebView from '@/components/NavigableWebView'
 import { useSWRConfig } from 'swr'
 
 import { BILIBILI_API_COOKIE_URL, hasBilibiliLoginCookie } from '@/api/bilibili-cookie.helpers'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { Text } from '@/components/Text'
 import { theme } from '@/constants/colors.tw'
 import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
@@ -153,8 +153,7 @@ export default function BilibiliLogin({ navigation }: Props) {
   if (pageFailed) {
     return (
       <View className="flex-1 items-center justify-center gap-4 px-8">
-        <Text>登录页面加载失败，请检查网络后重试</Text>
-        <Button title="重新加载" onPress={reloadPage} />
+        <LoadErrorText onRetry={reloadPage} />
       </View>
     )
   }
@@ -163,11 +162,9 @@ export default function BilibiliLogin({ navigation }: Props) {
     <View className="flex-1">
       {captureFailed ? (
         <View className="items-center gap-2 px-4 py-3">
-          <Text>登录校验或 Cookie 保存失败，请重试</Text>
-          <Button
-            title="重试"
-            size="sm"
-            onPress={() => {
+          <LoadErrorText
+            message="登录校验或 Cookie 保存失败"
+            onRetry={() => {
               setCaptureFailed(false)
               setCaptureVersion(version => version + 1)
             }}

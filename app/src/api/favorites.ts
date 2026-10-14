@@ -29,7 +29,7 @@ import type {
 } from "./favorites.types";
 import { FavoriteLoginRequiredError } from "./video-favorites";
 
-const FAVORITE_PAGE_SIZE = 40;
+export const FAVORITE_PAGE_SIZE = 40;
 const FAVORITE_FOLDER_ADD_URL = "https://api.bilibili.com/x/v3/fav/folder/add";
 const FAVORITE_FOLDER_DEL_URL = "https://api.bilibili.com/x/v3/fav/folder/del";
 const FAVORITE_FOLDER_MUTATION_TIMEOUT = 15000;

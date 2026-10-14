@@ -5,12 +5,12 @@ import { getFavoriteFoldersKey, getFavoriteResourcesKey } from "../../api/favori
 import type {
   FavoriteAccount,
   FavoriteFolders,
-  FavoriteResources,
+  FavoriteResourcePage,
 } from "../../api/favorites.types";
 import { getFavoriteChanges, getVideoFavoriteFoldersKey } from "../../api/video-favorites";
-import type { VideoFavoriteChange } from "../../api/video-favorites.types";
+import type { VideoFavoriteChange, VideoFavoriteFolders } from "../../api/video-favorites.types";
 import { BilibiliSessionChangedError } from "../bilibili-session/controller";
-import { invalidateFavoriteResourceRequests } from "./resource-revisions";
+import { getFavoriteResourceState, invalidateFavoriteResourceRequests } from "./resource-revisions";
 
 export function favoriteMutationKey(account: FavoriteAccount, aid: string) {
   return `${account.mid}:${account.generation}:${aid}`;
@@ -58,7 +58,7 @@ export function createFavoriteMutations(
   };
 }
 
-export async function refreshFavoriteCaches(
+export async function updateFavoriteCaches(
   account: FavoriteAccount,
   change: VideoFavoriteChange,
   mutate: ScopedMutator,
@@ -68,12 +68,27 @@ export async function refreshFavoriteCaches(
   const removedIds = new Set(remove);
   const addedIds = new Set(add);
   invalidateFavoriteResourceRequests(mutate, account, folderIds);
+  for (const folderId of folderIds) {
+    const state = getFavoriteResourceState(mutate, account, folderId);
+    state.removalCount += Number(removedIds.has(folderId));
+    // 续页可能仍返回旧快照；新添加的视频也留待手动刷新后展示。
+    state.excludedVideoIds.add(change.video.aid);
+  }
 
   function updateCount(folderId: number, count: number) {
     return Math.max(0, count + Number(addedIds.has(folderId)) - Number(removedIds.has(folderId)));
   }
-  // 清除未挂载列表的页缓存；只触发 mutate(key) 不会使这些旧数据失效。
-  await clearFavoriteResourcePages(account, folderIds, mutate);
+  function updatePage(page: FavoriteResourcePage) {
+    const folderId = page.info.id;
+    return {
+      ...page,
+      info: { ...page.info, media_count: updateCount(folderId, page.info.media_count) },
+      medias: removedIds.has(folderId)
+        ? page.medias.filter((media) => media.type !== 2 || String(media.id) !== change.video.aid)
+        : page.medias,
+    };
+  }
+
   return Promise.allSettled([
     // 保留收藏夹，避免 selectedId 和分页 key 暂时变成 undefined，触发列表重建。
     mutate<FavoriteFolders>(
@@ -88,21 +103,33 @@ export async function refreshFavoriteCaches(
         },
       { revalidate: false },
     ),
-    mutate(getVideoFavoriteFoldersKey(account, change.video), undefined, { revalidate: false }),
-    ...[...folderIds].map((folderId) =>
-      mutate<FavoriteResources[]>(
-        unstable_serialize(() => getFavoriteResourcesKey(account, folderId, 0, null)),
-        // POST 已确认成功：立即移除对应视频；稍后独立发起 GET，给服务端同步时间。
-        (pages) =>
-          pages?.map((page) => ({
-            ...page,
-            info: { ...page.info, media_count: updateCount(folderId, page.info.media_count) },
-            medias: removedIds.has(folderId)
-              ? page.medias.filter(
-                  (media) => media.type !== 2 || String(media.id) !== change.video.aid,
-                )
-              : page.medias,
+    mutate<VideoFavoriteFolders>(
+      getVideoFavoriteFoldersKey(account, change.video),
+      (current) =>
+        current && {
+          ...current,
+          list: current.list.map((folder) => ({
+            ...folder,
+            fav_state: change.selectedIds.includes(folder.id) ? 1 : 0,
+            media_count: updateCount(folder.id, folder.media_count),
           })),
+        },
+      { revalidate: false },
+    ),
+    mutate<FavoriteResourcePage>(
+      (key) =>
+        Array.isArray(key) &&
+        key[0] === "bilibili-favorite-resources" &&
+        key[1] === account.mid &&
+        key[2] === account.generation &&
+        folderIds.has(key[3]),
+      (current) => current && updatePage(current),
+      { revalidate: false },
+    ),
+    ...[...folderIds].map((folderId) =>
+      mutate<FavoriteResourcePage[]>(
+        unstable_serialize(() => getFavoriteResourcesKey(account, folderId, 0, null)),
+        (pages) => pages?.map(updatePage),
         { revalidate: false },
       ),
     ),

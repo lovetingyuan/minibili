@@ -9,6 +9,7 @@ import type { ReplyItemType } from '@/api/replies'
 import { BottomSheet } from '@/components/BottomSheet'
 import { FlashList } from '@/components/FlashList'
 import { Text } from '@/components/Text'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/colors.tw'
 import { getStoreMethods, useStore } from '@/store'
@@ -180,9 +181,15 @@ export default function ReplyList(props: ReplyListProps) {
               <View className="h-40 items-center justify-center">
                 <ActivityIndicator size="large" colorClassName={theme.primary.accent} />
               </View>
+            ) : replies.error ? (
+              <LoadErrorText
+                className="my-10 text-sm"
+                disabled={replies.isValidating}
+                onRetry={() => void replies.retry()}
+              />
             ) : (
               <Text className="my-10 text-center text-sm">
-                {replies.error ? '回复加载失败' : '还没有回复，来说两句吧'}
+                还没有回复，来说两句吧
               </Text>
             )
           }

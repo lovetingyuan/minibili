@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import type { WebViewMessageEvent } from "react-native-webview";
 import BilibiliWebView from "@/components/BilibiliWebView";
+import { LoadErrorText } from "@/components/LoadErrorText";
 
 import { useVideoMp4Url } from "@/api/play-url";
 import { UA } from "@/constants";
@@ -285,11 +286,11 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
     playerErrorType === "play-url"
       ? {
           title: "视频加载失败",
-          description: "播放地址获取失败，请稍后重试",
+          description: "播放地址获取失败",
         }
       : {
           title: "播放器加载失败",
-          description: "播放器初始化失败，请点击重试",
+          description: "播放器初始化失败",
         };
   const player = !loadPlayer ? (
     <Pressable
@@ -413,18 +414,16 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
           {renderPlayerBackground(
             <View className="items-center gap-3 px-8">
               <Text className="text-xl font-bold text-media-content">{errorInfo.title}</Text>
-              <Text className="text-center text-sm leading-6 text-media-content/80">
-                {errorInfo.description}
-              </Text>
-              <Pressable
-                className={`mt-2 rounded-full px-6 py-3 ${theme.primary.bg} ${isRetrying ? "opacity-60" : ""}`}
+              <LoadErrorText
+                message={errorInfo.description}
+                className="text-sm leading-6"
+                colorClassName={theme.media.secondary}
+                retryClassName={`${theme.media.content} underline`}
                 disabled={isRetrying}
-                onPress={() => {
+                onRetry={() => {
                   void handleRetry();
                 }}
-              >
-                <Text className="font-bold text-media-content">{isRetrying ? "重试中..." : "重试"}</Text>
-              </Pressable>
+              />
             </View>,
           )}
         </View>

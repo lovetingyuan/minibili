@@ -1,11 +1,11 @@
 import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import type { ReactNode } from 'react'
-import { ActivityIndicator, Pressable, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 
 import type { DynamicItem } from '@/api/dynamic-items.type'
 import { LoginRequired } from '@/components/LoginRequired'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { FlashList } from '@/components/FlashList'
 import { Skeleton } from '@/components/Skeleton'
 import { Text } from '@/components/Text'
@@ -16,9 +16,6 @@ import type { MainTabNavigationProp } from '@/types'
 
 import { DynamicCard } from './dynamic-card'
 import type { DynamicListProps } from './dynamic-list.types'
-
-/** 加载失败时只给用户一句话，接口返回的错误码和路径对他没有意义 */
-const ERROR_MESSAGE = '请稍后重试'
 
 function DynamicListLoading(props: { listHeader?: ReactNode }) {
   return (
@@ -45,7 +42,10 @@ function DynamicListLoading(props: { listHeader?: ReactNode }) {
 }
 
 function DynamicListEmpty(
-  props: Pick<DynamicListProps, 'error' | 'errorTitle' | 'emptyTitle' | 'emptyMessage' | 'retry'>,
+  props: Pick<
+    DynamicListProps,
+    'error' | 'errorTitle' | 'emptyTitle' | 'emptyMessage' | 'retry' | 'isRefreshing'
+  >,
 ) {
   // 登录后才能看到的列表（关注动态、空间内容等）失败时不显示通用错误
   if (isLoginRequiredError(props.error)) {
@@ -57,18 +57,18 @@ function DynamicListEmpty(
       <Text className="text-lg font-semibold">
         {props.error ? (props.errorTitle ?? '动态加载失败') : props.emptyTitle}
       </Text>
-      <Text selectable className={`text-center text-sm ${theme.text.muted}`}>
-        {props.error ? ERROR_MESSAGE : props.emptyMessage}
-      </Text>
       {props.error ? (
-        <Button
-          title="重新加载"
-          type="outline"
-          onPress={() => {
+        <LoadErrorText
+          disabled={props.isRefreshing}
+          onRetry={() => {
             void props.retry()
           }}
         />
-      ) : null}
+      ) : (
+        <Text selectable className={`text-center text-sm ${theme.text.muted}`}>
+          {props.emptyMessage}
+        </Text>
+      )}
     </View>
   )
 }
@@ -132,33 +132,28 @@ export function DynamicList(props: DynamicListProps) {
           emptyTitle={props.emptyTitle}
           emptyMessage={props.emptyMessage}
           retry={props.retry}
+          isRefreshing={props.isRefreshing}
         />
       }
       ListFooterComponent={
         props.list.length ? (
-          <Pressable
-            disabled={!props.error && (props.isLoadingMore || props.isReachingEnd)}
-            onPress={
-              props.error
-                ? () => {
-                    void props.retry()
-                  }
-                : undefined
-            }
-            className="items-center py-5"
-          >
+          <View className="items-center py-5">
             {props.isLoadingMore ? (
               <ActivityIndicator colorClassName={theme.secondary.accent} />
+            ) : props.error ? (
+              <LoadErrorText
+                className="text-xs"
+                disabled={props.isRefreshing}
+                onRetry={() => {
+                  void props.retry()
+                }}
+              />
             ) : (
-              <Text className={`text-xs ${props.error ? theme.error.text : theme.text.muted}`}>
-                {props.error
-                  ? '加载下一页失败，点击重试'
-                  : props.isReachingEnd
-                    ? '暂无更多'
-                    : '上拉加载更多'}
+              <Text className={`text-xs ${theme.text.muted}`}>
+                {props.isReachingEnd ? '暂无更多' : '上拉加载更多'}
               </Text>
             )}
-          </Pressable>
+          </View>
         ) : null
       }
       refreshing={props.isRefreshing}

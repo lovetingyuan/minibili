@@ -18,6 +18,7 @@ import {
 import type { FavoriteAccount, FavoriteFolder, FavoriteListItem } from '@/api/favorites.types'
 import { LoginRequired } from '@/components/LoginRequired'
 import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { FlashList } from '@/components/FlashList'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
@@ -196,16 +197,12 @@ export default function FavoritesContent() {
     return (
       <View className="flex-1 items-center justify-center gap-4 px-8">
         {folders.error ? (
-          <>
-            <Text className="text-center">收藏夹加载失败，请检查网络或登录状态后重试</Text>
-            <Button
-              title="重试"
-              loading={folders.isValidating}
-              onPress={() => {
-                void folders.mutate().catch(() => {})
-              }}
-            />
-          </>
+          <LoadErrorText
+            disabled={folders.isValidating}
+            onRetry={() => {
+              void folders.mutate().catch(() => {})
+            }}
+          />
         ) : (
           <>
             <ActivityIndicator size="large" />
@@ -225,7 +222,6 @@ export default function FavoritesContent() {
           video={editing.video}
           onClose={() => setEditing(null)}
           onLoginRequired={loginRequired}
-          onSaved={resources.refreshAfterChange}
         />
       ) : null}
       {folder ? (
@@ -279,18 +275,12 @@ export default function FavoritesContent() {
                 ) : isLoginRequiredError(resources.error) ? (
                   <LoginRequired description="登录后即可查看该收藏夹" />
                 ) : resources.error ? (
-                  <>
-                    <Text className="text-center">
-                      收藏内容加载失败，请检查网络或登录状态后重试
-                    </Text>
-                    <Button
-                      title="重试"
-                      loading={resources.isValidating}
-                      onPress={() => {
-                        void resources.mutate().catch(() => {})
-                      }}
-                    />
-                  </>
+                  <LoadErrorText
+                    disabled={resources.isValidating}
+                    onRetry={() => {
+                      void resources.mutate().catch(() => {})
+                    }}
+                  />
                 ) : (
                   <>
                     <ThemedIcon icon={Star} size={36} colorClassName={theme.icon.disabled} />
@@ -301,17 +291,13 @@ export default function FavoritesContent() {
             }
             ListFooterComponent={
               resources.error && resources.items.length ? (
-                <View className="items-center gap-2 py-4">
-                  <Text className={`text-sm ${theme.text.muted}`}>加载失败，已保留当前内容</Text>
-                  <Button
-                    title="重试"
-                    type="clear"
-                    loading={resources.isValidating}
-                    onPress={() => {
-                      void resources.mutate().catch(() => {})
-                    }}
-                  />
-                </View>
+                <LoadErrorText
+                  className="py-4 text-sm"
+                  disabled={resources.isValidating}
+                  onRetry={() => {
+                    void resources.mutate().catch(() => {})
+                  }}
+                />
               ) : resources.isLoadingMore && resources.items.length ? (
                 <ActivityIndicator className="my-4" />
               ) : resources.items.length && !resources.hasMore ? (

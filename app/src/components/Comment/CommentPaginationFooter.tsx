@@ -1,7 +1,8 @@
-import { Pressable, View } from 'react-native'
+import { View } from 'react-native'
 
 import { theme } from '@/constants/colors.tw'
 import { Text } from '@/components/Text'
+import { LoadErrorText } from '@/components/LoadErrorText'
 
 import type { CommentPaginationFooterProps } from './comment-pagination-footer.types'
 
@@ -12,14 +13,7 @@ export default function CommentPaginationFooter(props: CommentPaginationFooterPr
         props.isValidating ? (
           <Text className={`text-xs ${theme.text.muted}`}>正在加载...</Text>
         ) : props.error ? (
-          <Pressable
-            className="h-10 items-center justify-center px-4"
-            accessibilityRole="button"
-            accessibilityLabel={`加载${props.noun}失败，点击重试`}
-            onPress={props.onRetry}
-          >
-            <Text className={`text-xs ${theme.primary.text}`}>加载失败，点击重试</Text>
-          </Pressable>
+          <LoadErrorText className="py-3 text-xs" onRetry={props.onRetry} />
         ) : (
           <Text className={`text-xs ${theme.text.muted}`}>
             {props.isPageEnd ? `没有更多${props.noun}了` : '上拉加载更多'}
