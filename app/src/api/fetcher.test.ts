@@ -66,7 +66,7 @@ describe("统一 B站请求", () => {
     );
 
     await expect(request("/x/web-interface/nav")).resolves.toEqual({ isLogin: false, wbi_img });
-    expect(mocks.showLoginRequiredAlert).toHaveBeenCalledOnce();
+    expect(mocks.showLoginRequiredAlert).not.toHaveBeenCalled();
     expect(bilibiliAuthExpiration.getSnapshot().error?.code).toBe(-101);
   });
 });
