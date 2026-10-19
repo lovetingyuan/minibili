@@ -54,7 +54,7 @@ function VideoList(props: {
   const navigation = useNavigation<MainTabNavigationProp>()
   const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null)
   const currentVideoRef = React.useRef<VideoItemType | null>(null)
-  const { onTabReselect, type } = props
+  const { onTabReselect } = props
   React.useEffect(() => {
     const timer = setTimeout(() => {
       listRef.current?.scrollToOffset({ offset: 0, animated: false })
@@ -62,7 +62,7 @@ function VideoList(props: {
     return () => clearTimeout(timer)
   }, [currentVideosCate])
   React.useEffect(() => {
-    if (type !== 'Hot' || !onTabReselect) {
+    if (!onTabReselect) {
       return
     }
 
@@ -73,7 +73,7 @@ function VideoList(props: {
       listRef.current?.scrollToOffset({ offset: 0, animated: true })
       onTabReselect()
     })
-  }, [navigation, onTabReselect, type])
+  }, [navigation, onTabReselect])
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
       return
