@@ -1,5 +1,3 @@
-import useSWRInfinite from "swr/infinite";
-
 import type { CommentAttitude } from "./comment-actions.types";
 import { CommentResponseSchema } from "./comments.schema";
 import type {
@@ -11,11 +9,11 @@ import type {
 import type {
   CommentItemType,
   CommentMessageContent,
-  CommentsKeyLoader,
   CommentsPage,
   ReplyItemType,
 } from "./comments.types";
 import fetcher from "./fetcher";
+import { useCommentPagination } from "./useCommentPagination";
 
 const urlReg = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/;
 
@@ -263,22 +261,22 @@ export function removeCommentFromPages(
 }
 
 export function useComments(oid: string | number, type: number, mode = 3) {
-  const { data, error, size, setSize, mutate, isValidating, isLoading } =
-    useSWRInfinite<CommentsPage, Error, CommentsKeyLoader>(
-      (index, previousPageData) => {
-        if (index > 0 && !previousPageData) {
-          return null;
-        }
-        const url = getCommentsPageUrl(
-          oid,
-          type,
-          mode,
-          index === 0 ? undefined : previousPageData?.cursor,
-        );
-        return url ? [url, index] : null;
-      },
-      ([url]) => fetchCommentsPage(url, type),
-    );
+  const pagination = useCommentPagination<CommentsPage>(
+    (index, previousPageData) => {
+      if (index > 0 && !previousPageData) {
+        return null;
+      }
+      const url = getCommentsPageUrl(
+        oid,
+        type,
+        mode,
+        index === 0 ? undefined : previousPageData?.cursor,
+      );
+      return url;
+    },
+    (url) => fetchCommentsPage(url, type),
+  );
+  const { data, error, isValidating, isLoading, mutatePages } = pagination;
 
   const replies = mergeCommentPages(data);
   const lastPage = data?.[data.length - 1];
@@ -287,61 +285,44 @@ export function useComments(oid: string | number, type: number, mode = 3) {
   const allCount = data?.[0]?.cursor.all_count;
 
   async function patchAttitude(id: string, next: CommentAttitude) {
-    await mutate(
-      (pages) =>
-        pages?.map((page) => ({
-          ...page,
-          replies: page.replies.map((reply) =>
-            patchCommentTree(reply, id, (item) => transitionCommentAttitude(item, next)),
-          ),
-        })),
-      { revalidate: false },
+    await mutatePages((pages) =>
+      pages?.map((page) => ({
+        ...page,
+        replies: page.replies.map((reply) =>
+          patchCommentTree(reply, id, (item) => transitionCommentAttitude(item, next)),
+        ),
+      })),
     );
   }
 
   async function prependReply(rootId: string, reply: ReplyItemType) {
-    await mutate(
-      (pages) =>
-        pages?.map((page) => ({
-          ...page,
-          replies: page.replies.map((comment) =>
-            comment.id === rootId
-              ? { ...comment, rcount: comment.rcount + 1, replies: [reply, ...comment.replies] }
-              : comment,
-          ),
-        })),
-      { revalidate: false },
+    await mutatePages((pages) =>
+      pages?.map((page) => ({
+        ...page,
+        replies: page.replies.map((comment) =>
+          comment.id === rootId
+            ? { ...comment, rcount: comment.rcount + 1, replies: [reply, ...comment.replies] }
+            : comment,
+        ),
+      })),
     );
-    await mutate();
   }
 
   async function prependComment(comment: ReplyItemType) {
-    await mutate((pages) => prependCommentToPages(pages, comment), { revalidate: false });
-    await mutate();
+    await mutatePages((pages) => prependCommentToPages(pages, comment));
   }
 
   async function removeComment(target: Pick<ReplyItemType, "id" | "root">) {
-    await mutate((pages) => removeCommentFromPages(pages, target), { revalidate: false });
-    await mutate();
+    await mutatePages((pages) => removeCommentFromPages(pages, target));
   }
 
   return {
     data: { allCount, replies, ownerMid: data?.[0]?.ownerMid },
     isLoading,
-    update() {
-      if (isLoading || isValidating || isPageEnd || error) {
-        return;
-      }
-      void setSize((current) => current + 1);
-    },
-    async retry() {
-      await setSize(size);
-    },
+    update: () => pagination.update(isPageEnd),
+    retry: pagination.retry,
     isValidating,
-    async refresh() {
-      await setSize(1);
-      await mutate();
-    },
+    refresh: pagination.refresh,
     patchAttitude,
     prependReply,
     prependComment,

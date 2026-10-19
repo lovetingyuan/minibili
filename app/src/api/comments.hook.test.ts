@@ -15,6 +15,13 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("swr/infinite", () => ({ default: () => mocks.state }));
+vi.mock("swr", () => ({ useSWRConfig: () => ({ mutate: vi.fn() }) }));
+vi.mock("react", () => ({
+  useEffect: (effect: () => unknown) => effect(),
+  useId: () => "comments-test",
+  useRef: (current: unknown) => ({ current }),
+  useState: (initial: unknown) => [initial, vi.fn()],
+}));
 vi.mock("./fetcher", () => ({ default: vi.fn() }));
 
 import { useComments } from "./comments";
