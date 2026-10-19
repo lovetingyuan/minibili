@@ -38,9 +38,9 @@ export default function Blacklist() {
                     title={up.name}
                     type="outline"
                     accessibilityRole="text"
-                    titleClassName="text-left text-sm font-normal"
+                    titleClassName={`text-left text-sm font-normal ${theme.text.muted}`}
                     containerClassName="mb-2 mr-2 max-w-full self-start"
-                    buttonClassName="px-2 py-[2px]"
+                    buttonClassName={`px-2 py-[2px] ${theme.border.outline}`}
                   />
                 ))}
               </View>
