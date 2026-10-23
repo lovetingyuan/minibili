@@ -19,7 +19,7 @@
  *   npm run dev -- --clear      // 清 Metro 缓存
  *   npm run dev -- --lan        // 不使用 localhost 模式（手机与电脑同网段时直连）
  *
- * 没有可用的 adb 设备时不报错：跳过反代，按 expo 默认的 LAN 模式启动。
+ * 没有可用的 adb 设备时提示原因并退出，不启动 Metro。
  */
 
 import { execFileSync, spawn, spawnSync } from "node:child_process";
@@ -135,7 +135,7 @@ function isPortInUse(port) {
   });
 }
 
-// 没有就绪设备时返回原因，用来决定是否跳过反代。
+// 没有就绪设备时返回原因，用于提示并退出。
 function listReadyDevices() {
   let devices;
   try {
@@ -291,26 +291,23 @@ async function main() {
   const hostFlagGiven = forwardedArgs.some((arg) => HOST_FLAGS.includes(arg));
 
   const { ready, reason, showTips } = listReadyDevices();
-  let reversed = [];
 
   if (ready.length === 0) {
-    log.warn(`${reason}，跳过 adb 反代`);
+    log.error(`${reason}，未启动 Metro`);
     if (showTips) {
       printDeviceTips();
     }
-    log.warn("Metro 将以默认（LAN）模式启动，手机需要与电脑处于同一网段");
-  } else {
-    reversed = await reverseForDevices(ready, metroPort);
-    log.info(
-      `已反代 tcp:${metroPort}（Metro）与 tcp:${API_PORT}（本地 server）：${reversed
-        .map(({ serial }) => serial)
-        .join(", ")}`,
-    );
+    process.exit(1);
   }
 
-  // --localhost 只对走 adb 反代的手机有意义：没有反代时它会让 Metro 只绑回环，
-  // 手机反而连不上，与上面“按 expo 默认的 LAN 模式启动”的提示也不一致。
-  const shouldUseLocalhost = !hostFlagGiven && reversed.length > 0;
+  const reversed = await reverseForDevices(ready, metroPort);
+  log.info(
+    `已反代 tcp:${metroPort}（Metro）与 tcp:${API_PORT}（本地 server）：${reversed
+      .map(({ serial }) => serial)
+      .join(", ")}`,
+  );
+
+  const shouldUseLocalhost = !hostFlagGiven;
 
   if (shouldUseLocalhost) {
     log.info(`Metro 将以 localhost 模式启动，dev client 请打开 http://${LOCAL_IP}:${metroPort}`);
