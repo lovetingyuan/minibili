@@ -16,7 +16,7 @@ export function useUserOpen(account: UserDataAccount | null) {
     ([, mid, generation]) => userOpen.record({ mid, generation }),
     {
       revalidateOnMount: true,
-      revalidateOnFocus: false,
+      revalidateOnFocus: true,
       revalidateOnReconnect: true,
       errorRetryCount: Infinity,
       shouldRetryOnError: (error: Error) =>

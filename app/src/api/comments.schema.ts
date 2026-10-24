@@ -115,7 +115,8 @@ const CommentCursorSchema = z.object({
   prev: z.number(),
   next: z.number(),
   is_end: z.boolean(),
-  all_count: z.number(),
+  // 空评论响应会省略总数，按 0 处理，避免被误判为加载失败。
+  all_count: z.number().default(0),
   mode: z.number(),
   name: z.string(),
   pagination_reply: z

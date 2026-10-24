@@ -79,11 +79,13 @@ test("removes a reply and decrements the thread counts on every cached page", ()
   const pages: RepliesPage[] = [
     {
       page: { num: 1, size: 20, count: 2 },
+      pagination: { count: 2, receivedCount: 1 },
       root: createReply("10", 2),
       replies: [createReply("11")],
     },
     {
       page: { num: 2, size: 20, count: 2 },
+      pagination: { count: 2, receivedCount: 1 },
       root: createReply("10", 2),
       replies: [createReply("12")],
     },

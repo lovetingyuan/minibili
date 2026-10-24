@@ -16,6 +16,13 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("swr/infinite", () => ({ default: () => mocks.state }));
+vi.mock("swr", () => ({ useSWRConfig: () => ({ mutate: vi.fn() }) }));
+vi.mock("react", () => ({
+  useEffect: (effect: () => unknown) => effect(),
+  useId: () => "replies-test",
+  useRef: (current: unknown) => ({ current }),
+  useState: (initial: unknown) => [initial, vi.fn()],
+}));
 vi.mock("@/store", () => ({
   useStore: () => ({
     repliesInfo: {
@@ -70,6 +77,7 @@ test("keeps a failed reply page retryable without marking it as the end", async 
   mocks.state.data = [
     {
       page: { num: 1, size: 1, count: 2 },
+      pagination: { count: 2, receivedCount: 1 },
       replies: [createReply("11")],
       root: null,
     },

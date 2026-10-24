@@ -180,7 +180,7 @@ export function DynamicActions(props: {
     account === undefined || control.phase !== 'ready' || Boolean(account && !current)
 
   return (
-    <View className="flex-row border-t border-divider-subtle pt-3">
+    <View className="flex-row pt-3">
       <DynamicShareButton item={props.item} />
       <DynamicCommentButton
         item={props.item}

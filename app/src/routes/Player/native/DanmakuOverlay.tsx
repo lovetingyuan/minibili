@@ -152,7 +152,11 @@ export default function DanmakuOverlay(props: DanmakuOverlayProps) {
   const geometryKey = `${cid}#${anchorTimeMs}#${width}x${height}x${fontSize}`;
 
   return (
-    <View pointerEvents="none" className="overflow-hidden" style={StyleSheet.absoluteFill}>
+    <View
+      pointerEvents="none"
+      className="overflow-hidden"
+      style={[StyleSheet.absoluteFill, { opacity: props.opacity }]}
+    >
       {visibleItems.map((item) => (
         <DanmakuItemView
           key={`${item.key}#${geometryKey}`}

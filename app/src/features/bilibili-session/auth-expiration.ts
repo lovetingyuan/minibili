@@ -1,4 +1,9 @@
-export type BilibiliAuthExpiredCode = -101 | -111;
+import type {
+  BilibiliAuthExpiredCode,
+  BilibiliAuthExpirationSnapshot,
+} from "./auth-expiration.types";
+
+export type { BilibiliAuthExpiredCode } from "./auth-expiration.types";
 
 export class BilibiliAuthExpiredError extends Error {
   readonly code: BilibiliAuthExpiredCode;
@@ -12,16 +17,15 @@ export class BilibiliAuthExpiredError extends Error {
   }
 }
 
-type BilibiliAuthExpirationSnapshot = {
-  error: BilibiliAuthExpiredError | null;
-  version: number;
+const listeners = new Set<() => void>();
+let snapshot: BilibiliAuthExpirationSnapshot = {
+  error: null,
+  version: 0,
+  confirmedGeneration: null,
 };
 
-const listeners = new Set<() => void>();
-let snapshot: BilibiliAuthExpirationSnapshot = { error: null, version: 0 };
-
-function publish(error: BilibiliAuthExpiredError | null) {
-  snapshot = { error, version: snapshot.version + 1 };
+function publish(error: BilibiliAuthExpiredError | null, confirmedGeneration: number | null = null) {
+  snapshot = { error, version: snapshot.version + 1, confirmedGeneration };
   listeners.forEach((listener) => listener());
 }
 
@@ -39,6 +43,12 @@ export function reportBilibiliAuthExpired(
     publish(error);
   }
   return error;
+}
+
+export function confirmBilibiliAuthExpired(generation: number) {
+  if (snapshot.confirmedGeneration !== generation) {
+    publish(new BilibiliAuthExpiredError(-101), generation);
+  }
 }
 
 export function clearBilibiliAuthExpiration() {

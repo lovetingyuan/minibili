@@ -1,5 +1,6 @@
 import { clsx } from 'clsx'
-import { useEffect, useRef, useState } from 'react'
+import { useIsFocused } from '@react-navigation/native'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Keyboard, Pressable, View } from 'react-native'
 import { ArrowDownUp, MessageSquarePlus, MessageSquareText } from 'lucide-react-native'
 
@@ -59,25 +60,47 @@ function Loading() {
 export default function CommentList(props: CommentListProps) {
   const [mode, setMode] = useState(3)
   const [composing, setComposing] = useState(false)
+  const [closingComposer, setClosingComposer] = useState(false)
+  const focused = useIsFocused()
+  const listKey = `${props.commentType}:${props.commentId}:${mode}`
+  const listSession = useRef<symbol | null>(null)
   const comments = useComments(props.commentId, props.commentType, mode)
   const keyboardHeight = useKeyboardHeight()
-  const loadMoreLock = useRef(false)
   const actions = useCommentActions(
     props.commentId,
     props.commentType,
     props.sourceUrl,
     comments.refresh,
   )
-  // 评论列表会跟着后台重新校验变化，只有用户下拉时才显示刷新图标
   const pullToRefresh = usePullToRefresh(() =>
     Promise.allSettled([comments.refresh(), props.onRefresh?.()]),
   )
 
-  useEffect(() => {
-    if (!comments.isValidating) {
-      loadMoreLock.current = false
+  // 切换列表或离开页面后，旧发送结果不能再关闭当前输入框。
+  useLayoutEffect(() => {
+    listSession.current = focused ? Symbol(listKey) : null
+    return () => {
+      listSession.current = null
     }
-  }, [comments.isValidating, comments.data.replies.length])
+  }, [listKey, focused])
+
+  useEffect(() => {
+    if (!closingComposer) {
+      return
+    }
+    function finishClosing() {
+      setComposing(false)
+      setClosingComposer(false)
+    }
+    // 关闭时先隐藏输入条，原生输入节点等键盘收起后再释放。
+    const subscription = Keyboard.addListener('keyboardDidHide', finishClosing)
+    if (Keyboard.isVisible()) {
+      Keyboard.dismiss()
+    } else {
+      finishClosing()
+    }
+    return () => subscription.remove()
+  }, [closingComposer])
 
   async function changeAttitude(item: ReplyItemType, kind: CommentAttitudeKind) {
     const next = await actions.changeAttitude(item, item.attitude, kind)
@@ -98,13 +121,16 @@ export default function CommentList(props: CommentListProps) {
   }
 
   async function submitComment(message: string) {
+    const submittingSession = listSession.current
     const comment = await actions.submitComment(message)
     if (!comment) {
       return false
     }
     await comments.prependComment(comment)
-    Keyboard.dismiss()
-    setComposing(false)
+    if (listSession.current !== submittingSession) {
+      return true
+    }
+    closeComposer()
     showToast('评论成功')
     return true
   }
@@ -118,20 +144,16 @@ export default function CommentList(props: CommentListProps) {
   }
 
   function openComposer() {
+    setClosingComposer(false)
     setComposing(true)
   }
 
   function closeComposer() {
-    Keyboard.dismiss()
-    setComposing(false)
+    setClosingComposer(true)
   }
 
   function loadMore() {
-    if (loadMoreLock.current || comments.isValidating || comments.isPageEnd || comments.error) {
-      return
-    }
-    loadMoreLock.current = true
-    comments.update()
+    void comments.update()
   }
 
   const allCount = comments.data.allCount ?? props.commentCount
@@ -140,6 +162,7 @@ export default function CommentList(props: CommentListProps) {
   return (
     <View className="flex-1">
       <FlashList
+        key={listKey}
         className={`flex-1 ${theme.background.page}`}
         data={comments.data.replies}
         keyExtractor={(item: CommentItemType) => item.id}
@@ -233,14 +256,19 @@ export default function CommentList(props: CommentListProps) {
           />
         }
         contentInsetAdjustmentBehavior="automatic"
-        maintainVisibleContentPosition={{ disabled: true }}
         refreshing={pullToRefresh.refreshing || Boolean(props.refreshing)}
         onRefresh={pullToRefresh.onRefresh}
         onEndReached={loadMore}
         onEndReachedThreshold={0.3}
       />
       {composing ? (
-        <View className="absolute left-0 right-0" style={{ bottom: keyboardHeight }}>
+        <View
+          className={clsx('absolute left-0 right-0', closingComposer && 'opacity-0')}
+          style={{ bottom: keyboardHeight }}
+          pointerEvents={closingComposer ? 'none' : 'auto'}
+          accessibilityElementsHidden={closingComposer}
+          importantForAccessibility={closingComposer ? 'no-hide-descendants' : 'auto'}
+        >
           <CommentComposer
             pending={actions.isCommentPending}
             onSubmit={submitComment}

@@ -1,10 +1,11 @@
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import type { RouteProp } from '@react-navigation/native'
 import { Pressable, View } from 'react-native'
 
 import type { DynamicItem } from '@/api/dynamic-items.type'
 import type { DynamicArticle } from '@/api/opus-detail.type'
 import { theme } from '@/constants/colors.tw'
-import type { NavigationProps } from '@/types'
+import type { NavigationProps, RootStackParamList } from '@/types'
 import { getImagePixelSize, parseDate, parseImgUrl } from '@/utils'
 
 import { Additional } from './Additional'
@@ -21,9 +22,13 @@ import { useOpenDynamicItem } from './use-open-dynamic-item'
 function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
   const { item, compact } = props
   const navigation = useNavigation<NavigationProps['navigation']>()
+  const route = useRoute<RouteProp<RootStackParamList, 'Dynamic'>>()
   const avatarSize = compact ? 28 : 36
   const meta = [item.date || parseDate(item.time, true), item.pubAction].filter(Boolean).join(' · ')
   const openUpSpace = () => {
+    if (route.name === 'Dynamic' && String(route.params?.user.mid) === String(item.author.mid)) {
+      return
+    }
     navigation.push('Dynamic', getDynamicUpTarget(item.author))
   }
 

@@ -122,6 +122,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     networkUsage,
     $autoPlayEnabled,
     $danmakuEnabled,
+    $danmakuOpacity,
     set$danmakuEnabled,
     $backgroundPlayEnabled,
     set$backgroundPlayEnabled,
@@ -1207,6 +1208,7 @@ export default function NativePlayer(props: NativePlayerProps) {
         <DanmakuOverlay
           cid={cid}
           enabled={$danmakuEnabled}
+          opacity={$danmakuOpacity}
           isPlaying={isPlaying}
           currentTimeMs={currentTimeMs}
           durationMs={playbackDurationMs}

@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native";
 
 import Header from "./Banner";
 import AutoPlaySetting from "./AutoPlaySetting";
+import DanmakuOpacitySetting from "./DanmakuOpacitySetting";
 import BlackTags from "./BlackTags";
 import Blacklist from "./Blacklist";
 import Feedback from "./Feedback";
@@ -31,6 +32,8 @@ function About() {
       <LibraryLinks />
       <Divider className="my-4" />
       <AutoPlaySetting />
+      <Divider className="my-4" />
+      <DanmakuOpacitySetting />
       <Divider className="my-4" />
       <BlackTags />
       <Blacklist />

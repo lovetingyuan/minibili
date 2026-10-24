@@ -19,6 +19,6 @@ export type BilibiliSessionDependencies = {
   clearNativeCookies: () => Promise<void>;
   writeWebViewCookies: (cookie: string) => Promise<void>;
   validateCookie: (cookie: string, signal?: AbortSignal) => Promise<BilibiliProfile | null>;
-  onStoredCredentialsExpired?: () => void;
+  onStoredCredentialsExpired?: (generation: number) => void;
   onLoginSuccess?: () => void;
 };

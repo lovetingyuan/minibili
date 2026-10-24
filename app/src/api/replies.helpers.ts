@@ -7,7 +7,13 @@ export function mergeReplyItems<T extends { id: string }>(
 ) {
   const items = new Map<string, T>();
   added.forEach((item) => items.set(item.id, item));
-  fetched.forEach((item) => items.set(item.id, item));
+  const fetchedIds = new Set<string>();
+  fetched.forEach((item) => {
+    if (!fetchedIds.has(item.id)) {
+      fetchedIds.add(item.id);
+      items.set(item.id, item);
+    }
+  });
   preview.forEach((item) => {
     if (!items.has(item.id)) {
       items.set(item.id, item);

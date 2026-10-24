@@ -28,19 +28,12 @@ export default function ReplyList(props: ReplyListProps) {
   const { setRepliesInfo, repliesInfo } = useStore()
   const focused = useIsFocused()
   const listRef = useRef<FlashListRef<ReplyItemType>>(null)
-  const loadMoreLock = useRef(false)
 
   useEffect(() => {
     if (!focused) {
       setRepliesInfo(null)
     }
   }, [focused, setRepliesInfo])
-
-  useEffect(() => {
-    if (!replies.isValidating) {
-      loadMoreLock.current = false
-    }
-  }, [replies.isValidating, replies.data.replies.length])
 
   function handleClose() {
     setRepliesInfo(null)
@@ -109,11 +102,7 @@ export default function ReplyList(props: ReplyListProps) {
   }
 
   function loadMore() {
-    if (loadMoreLock.current || replies.isValidating || replies.isPageEnd || replies.error) {
-      return
-    }
-    loadMoreLock.current = true
-    replies.update()
+    void replies.update()
   }
 
   const { allCount, root } = replies.data
@@ -132,7 +121,7 @@ export default function ReplyList(props: ReplyListProps) {
     <BottomSheet
       backdropOpacity={SHEET_BACKDROP_OPACITY}
       onClose={handleClose}
-      snapPoints={['50%', '70%']}
+      snapPoints={['70%']}
       index={0}
       visible={Boolean(repliesInfo)}
     >
@@ -151,6 +140,7 @@ export default function ReplyList(props: ReplyListProps) {
           </Pressable>
         </View>
         <FlashList
+          key={`${repliesInfo?.type}:${repliesInfo?.oid}:${repliesInfo?.root}`}
           ref={listRef}
           className="min-h-0 flex-1"
           data={replies.data.replies}
@@ -205,7 +195,6 @@ export default function ReplyList(props: ReplyListProps) {
           }
           contentContainerClassName="pb-3"
           contentInsetAdjustmentBehavior="automatic"
-          maintainVisibleContentPosition={{ disabled: true }}
           onEndReached={loadMore}
           onEndReachedThreshold={0.3}
         />
