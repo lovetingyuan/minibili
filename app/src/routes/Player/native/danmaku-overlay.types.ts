@@ -4,6 +4,7 @@ import type { DanmakuRenderItem } from "./danmaku-track.types";
 export type DanmakuOverlayProps = {
   cid: number;
   enabled: boolean;
+  opacity: number;
   isPlaying: boolean;
   currentTimeMs: number;
   durationMs: number;

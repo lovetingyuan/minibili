@@ -66,6 +66,8 @@ const getAppValue = () => {
      * 播放器内弹幕开关，默认开启
      */
     $danmakuEnabled: true,
+    /** 弹幕不透明度，0 为完全透明，1 为完全不透明。 */
+    $danmakuOpacity: 0.9,
     /**
      * 是否允许 App 退到后台继续播放
      */
@@ -152,6 +154,9 @@ function isCompatibleStoredValue<K extends StoredKeys>(
 ): value is AppContextValueType[K] {
   if (key === "$backgroundPlayDurationMinutes") {
     return isBackgroundPlayDuration(value);
+  }
+  if (key === "$danmakuOpacity") {
+    return typeof value === "number" && value >= 0 && value <= 1 && Number.isInteger(value * 10);
   }
   if (defaultValue === null) {
     return value === null;
