@@ -4,7 +4,6 @@ import {
   isBilibiliAuthExpiredCode,
   reportBilibiliAuthExpired,
 } from "../features/bilibili-session/auth-expiration";
-import { showLoginRequiredAlert } from "../features/bilibili-session/login-required-alert";
 import encWbi from "../utils/wbi";
 import bilibiliFetch from "./bilibili-fetch";
 import { stringifyCommentOid } from "./comment-json.helpers";
@@ -129,11 +128,8 @@ async function performRequest<D>(url: string, requestOptions: RequestOptions = {
       throw new BilibiliAuthExpiredError(res.code, res.message, url);
     }
     const expired = reportBilibiliAuthExpired(res.code, res.message, url);
-    if (url === NAV_URL) {
-      // nav 无论登没登录都会返回 wbi_img，-101 只表示「没登录」而不是请求失败：
-      // 抛错会让所有 wbi 请求一起失败，所以这里只引导登录，data 继续往下返回。
-      showLoginRequiredAlert("登录 B站 后即可使用完整功能");
-    } else {
+    // nav 未登录时仍返回 wbi_img，继续提供签名数据，登录态交给全局管理器复核。
+    if (url !== NAV_URL) {
       throw expired;
     }
   }

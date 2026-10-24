@@ -108,6 +108,7 @@ export const theme = {
   ripple: { primary: "accent-primary/32", content: "accent-brand-content/32" },
   media: {
     content: "text-media-content",
+    secondary: "text-media-content/80",
     muted: "text-media-content/50",
     shadow: "accent-media-shadow",
   },

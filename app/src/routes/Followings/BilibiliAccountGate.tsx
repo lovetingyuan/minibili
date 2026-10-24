@@ -4,7 +4,7 @@ import { ActivityIndicator, View } from 'react-native'
 
 import { useBilibiliFollowings } from '@/api/followings'
 import { LoginRequired } from '@/components/LoginRequired'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { Text } from '@/components/Text'
 import { theme } from '@/constants/colors.tw'
 import { bilibiliSession } from '@/features/bilibili-session/session'
@@ -47,16 +47,13 @@ export default function BilibiliAccountGate({ Content, syncFollowings }: Props) 
     content = (
       <View className="flex-1 items-center justify-center gap-4 px-8">
         {error ? (
-          <>
-            <Text>暂时无法确认登录状态，请检查网络后重试</Text>
-            <Button
-              title="重试"
-              loading={isChecking}
-              onPress={() => {
-                void revalidate()
-              }}
-            />
-          </>
+          <LoadErrorText
+            message="登录状态确认失败"
+            disabled={isChecking}
+            onRetry={() => {
+              void revalidate()
+            }}
+          />
         ) : (
           <ActivityIndicator size="large" colorClassName={theme.secondary.accent} />
         )}

@@ -5,7 +5,7 @@ import { ActivityIndicator, TouchableOpacity, View } from 'react-native'
 import { useBilibiliWatchLater } from '@/api/useWatchLater'
 import type { WatchLaterListItem } from '@/api/watch-later.types'
 import { LoginRequired } from '@/components/LoginRequired'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { FlashList } from '@/components/FlashList'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
@@ -97,14 +97,7 @@ export default function WatchLaterContent() {
               <Text>正在加载 B站稍后再看</Text>
             </>
           ) : watchLater.error ? (
-            <>
-              <Text className="text-center">稍后再看加载失败，请检查网络或登录状态后重试</Text>
-              <Button
-                title="重试"
-                loading={watchLater.isValidating || refreshing}
-                onPress={retry}
-              />
-            </>
+            <LoadErrorText disabled={watchLater.isValidating || refreshing} onRetry={retry} />
           ) : (
             <>
               <ThemedIcon icon={Clock} size={36} colorClassName={theme.icon.disabled} />
@@ -116,15 +109,11 @@ export default function WatchLaterContent() {
       ListFooterComponent={
         watchLater.items.length ? (
           watchLater.error ? (
-            <View className="items-center gap-2 py-4">
-              <Text className={`text-sm ${theme.text.muted}`}>加载失败，已保留当前内容</Text>
-              <Button
-                title="重试"
-                type="clear"
-                loading={watchLater.isValidating || refreshing}
-                onPress={retry}
-              />
-            </View>
+            <LoadErrorText
+              className="py-4 text-sm"
+              disabled={watchLater.isValidating || refreshing}
+              onRetry={retry}
+            />
           ) : (
             <Text className={`py-4 text-center text-xs ${theme.text.muted}`}>暂无更多</Text>
           )

@@ -6,7 +6,7 @@ import { bilibiliSession } from '@/features/bilibili-session/session'
 import { BilibiliCookieModuleUnavailableError } from '@/features/bilibili-session/webview-cookies'
 
 import type { BilibiliWebViewPreparation, BilibiliWebViewProps } from './BilibiliWebView.types'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { Text } from '@/components/Text'
 
 function PreparedWebView(props: BilibiliWebViewProps) {
@@ -39,7 +39,7 @@ function PreparedWebView(props: BilibiliWebViewProps) {
             error:
               cause instanceof BilibiliCookieModuleUnavailableError
                 ? cause.message
-                : '登录 Cookie 同步失败，请重试',
+                : '登录 Cookie 同步失败',
           })
         }
       },
@@ -53,12 +53,9 @@ function PreparedWebView(props: BilibiliWebViewProps) {
       <View className={props.className ?? 'flex-1'} style={[props.containerStyle, props.style]}>
         {preparation.error ? (
           <View className="min-h-40 flex-1 items-center justify-center gap-3 px-6">
-            <Text className="text-center" accessibilityRole="alert">
-              {preparation.error}
-            </Text>
-            <Button
-              title="重试"
-              onPress={() => {
+            <LoadErrorText
+              message={preparation.error}
+              onRetry={() => {
                 setPreparation({ ready: false, error: null })
                 setAttempt(value => value + 1)
               }}

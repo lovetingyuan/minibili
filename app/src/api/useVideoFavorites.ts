@@ -4,9 +4,8 @@ import useSWRMutation from "swr/mutation";
 
 import {
   favoriteMutationKey,
-  refreshFavoriteCaches,
+  updateFavoriteCaches,
 } from "../features/bilibili-favorites/mutations";
-import { syncFavoriteCaches } from "../features/bilibili-favorites/sync";
 import { videoRelationMutations as mutations } from "../features/bilibili-favorites/video-relation-mutations";
 import { BilibiliSessionChangedError } from "../features/bilibili-session/controller";
 import { BilibiliAuthExpiredError } from "../features/bilibili-session/auth-expiration";
@@ -93,19 +92,13 @@ export function useModifyVideoFavorites(account: FavoriteAccount, video: Favorit
   );
   async function save(initialIds: number[], selectedIds: number[]) {
     const change = { video, initialIds, selectedIds };
-    await mutations.run(account, video.aid, () => trigger(change));
-    // 刷新错误与已经成功的写操作分离，不延迟弹窗关闭。
-    void Promise.resolve()
-      .then(async () => {
-        if (!bilibiliSession.isCurrentAccount(account)) {
-          return;
-        }
-        await refreshFavoriteCaches(account, change, mutate);
-        await syncFavoriteCaches(account, change, mutate, () =>
-          bilibiliSession.isCurrentAccount(account),
-        );
-      })
-      .catch(() => {});
+    await mutations.run(account, video.aid, async () => {
+      await trigger(change);
+      if (bilibiliSession.isCurrentAccount(account)) {
+        // 缓存更新失败不应把已经成功的 POST 报告为失败。
+        await updateFavoriteCaches(account, change, mutate).catch(() => {});
+      }
+    });
   }
   return { save, isMutating: pending.has(favoriteMutationKey(account, video.aid)) };
 }

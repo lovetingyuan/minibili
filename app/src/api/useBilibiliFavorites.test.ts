@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { unstable_serialize } from "swr";
 
 import type {
   FavoriteAccount,
+  FavoriteResourcePage,
   FavoriteResources,
   FavoriteResourcesKey,
   FavoriteResourcesKeyLoader,
@@ -18,6 +20,7 @@ const mocks = vi.hoisted(() => ({
   swr: vi.fn(),
   request: vi.fn(),
   mutateCache: vi.fn(),
+  cache: new Map<string, { data: FavoriteResources | FavoriteResourcePage }>(),
   createFolder: vi.fn(),
   deleteFolder: vi.fn(),
   response: {
@@ -48,9 +51,10 @@ vi.mock("react", () => ({
     mocks.effects.push(effect);
   },
 }));
-vi.mock("swr", () => ({
+vi.mock("swr", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("swr")>()),
   default: mocks.swr,
-  useSWRConfig: () => ({ mutate: mocks.mutateCache }),
+  useSWRConfig: () => ({ mutate: mocks.mutateCache, cache: mocks.cache }),
 }));
 vi.mock("swr/infinite", () => ({ default: mocks.infinite }));
 vi.mock("../features/bilibili-session/session", () => ({
@@ -95,6 +99,7 @@ beforeEach(() => {
   mocks.refs = [];
   mocks.refIndex = 0;
   mocks.effects = [];
+  mocks.cache.clear();
   mocks.mutateCache.mockResolvedValue(undefined);
   mocks.createFolder.mockResolvedValue(createdFolder);
   mocks.deleteFolder.mockResolvedValue(undefined);
@@ -125,7 +130,10 @@ describe("favorite hooks", () => {
     invalidateFavoriteResourceRequests(mocks.mutateCache, { mid: "1", generation: 1 }, [123]);
     const freshPage = { ...page, medias: [] };
     mocks.request.mockResolvedValueOnce(freshPage);
-    expect(await fetchPage(["bilibili-favorite-resources", "1", 1, 123, 1])).toEqual(freshPage);
+    expect(await fetchPage(["bilibili-favorite-resources", "1", 1, 123, 1])).toEqual({
+      ...freshPage,
+      pagination: { serverPage: 1, removalCount: 0 },
+    });
     oldRequest.resolve(page);
     await rejected;
     expect(
@@ -145,7 +153,10 @@ describe("favorite hooks", () => {
     invalidateFavoriteResourceRequests(mocks.mutateCache, { mid: "1", generation: 2 }, [123]);
     invalidateFavoriteResourceRequests(vi.fn(), { mid: "1", generation: 1 }, [123]);
     request.resolve(page);
-    await expect(result).resolves.toEqual(page);
+    await expect(result).resolves.toEqual({
+      ...page,
+      pagination: { serverPage: 1, removalCount: 0 },
+    });
   });
 
   test("disables fetching and hides cached contents when the session is no longer current", () => {
@@ -159,15 +170,28 @@ describe("favorite hooks", () => {
   });
 
   test("allows only one pending next-page request even for repeated onEndReached events", async () => {
-    const pending = Promise.withResolvers<FavoriteResources[] | undefined>();
-    mocks.response.setSize.mockReturnValueOnce(pending.promise);
+    // 模拟更新前的缓存，以及续页中断后 size 已增加、数据仍只有一页的状态。
+    mocks.cache.set(unstable_serialize(["bilibili-favorite-resources", "1", 1, 123, 1]), {
+      data: page,
+    });
+    mocks.response.size = 2;
+    const pending = Promise.withResolvers<FavoriteResources>();
+    mocks.request.mockReturnValueOnce(pending.promise);
     const hook = useBilibiliFavoriteResources(123);
+    const fetchPage: (key: FavoriteResourcesKey) => Promise<FavoriteResourcePage> =
+      mocks.infinite.mock.calls[0][1];
+    mocks.response.setSize.mockImplementationOnce(async () => [
+      { ...page, pagination: { serverPage: 1, removalCount: 0 } },
+      await fetchPage(["bilibili-favorite-resources", "1", 1, 123, 2]),
+    ]);
     const first = hook.loadMore();
     await hook.loadMore();
     expect(mocks.response.setSize).toHaveBeenCalledOnce();
     const nextSize = mocks.response.setSize.mock.calls[0][0];
     expect(typeof nextSize === "function" ? nextSize(1) : nextSize).toBe(2);
-    pending.resolve([page]);
+    expect(typeof nextSize === "function" ? nextSize(2) : nextSize).toBe(2);
+    expect(mocks.request).toHaveBeenCalledWith(expect.stringContaining("pn=2&"));
+    pending.resolve({ ...page, medias: [{ id: 11, type: 2, title: "next", bvid: "BV2" }] });
     await first;
     expect(mocks.pending.current).toBe(false);
   });

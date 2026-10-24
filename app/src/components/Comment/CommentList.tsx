@@ -22,6 +22,7 @@ import ReplyList from './ReplyList'
 import { FlashList } from '@/components/FlashList'
 import { Skeleton } from '@/components/Skeleton'
 import { Text } from '@/components/Text'
+import { LoadErrorText } from '@/components/LoadErrorText'
 
 const LOADING_COMMENT_WIDTHS = [78, 62, 90, 45, 72, 55]
 
@@ -209,6 +210,12 @@ export default function CommentList(props: CommentListProps) {
         ListEmptyComponent={
           comments.isLoading ? (
             <Loading />
+          ) : comments.error ? (
+            <LoadErrorText
+              className="my-12 text-sm"
+              disabled={comments.isValidating}
+              onRetry={() => void comments.retry()}
+            />
           ) : (
             <Text className="my-12 text-center text-sm">
               {getCommentListEmptyText(allCount, comments.error)}

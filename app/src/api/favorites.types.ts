@@ -12,6 +12,9 @@ export type FavoriteAccount = Pick<BilibiliAccount, "mid" | "generation">;
 export type FavoriteFolder = z.infer<typeof FavoriteFolderSchema>;
 export type FavoriteFolders = z.infer<typeof FavoriteFoldersSchema>;
 export type FavoriteResources = z.infer<typeof FavoriteResourcesSchema>;
+export type FavoriteResourcePage = FavoriteResources & {
+  pagination: { serverPage: number; removalCount: number };
+};
 export type FavoriteRequest = (url: string) => Promise<unknown>;
 export type FavoriteRequestDependencies = {
   readCookie: () => Promise<string | null>;

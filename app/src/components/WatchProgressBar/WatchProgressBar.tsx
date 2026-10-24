@@ -14,7 +14,7 @@ export function WatchProgressBar(props: { ratio: number }) {
   const percent = Math.min(100, Math.max(MIN_VISIBLE_PERCENT, Math.round(ratio * 100)));
   return (
     <View className="absolute bottom-0 left-0 h-1 w-full overflow-hidden bg-media-background/40">
-      <View className={`h-full ${theme.primary.bg}`} style={{ width: `${percent}%` }} />
+      <View className={`h-full ${theme.secondary.bg}`} style={{ width: `${percent}%` }} />
     </View>
   );
 }

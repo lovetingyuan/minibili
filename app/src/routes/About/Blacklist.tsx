@@ -5,11 +5,13 @@ import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
 import { Chip } from '@/components/Chip'
 import { CollapsibleSection } from '@/components/CollapsibleSection'
 import { Text } from '@/components/Text'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { theme } from '@/constants/colors.tw'
 
 export default function Blacklist() {
   const [expanded, setExpanded] = React.useState(false)
-  const { blacklist, account, isPreparing, data, error } = useBilibiliBlacklist(true)
+  const { blacklist, account, isPreparing, data, error, isValidating, mutate } =
+    useBilibiliBlacklist(true)
   const loading = isPreparing || Boolean(account && data === undefined && !error)
 
   return (
@@ -42,7 +44,14 @@ export default function Blacklist() {
                   />
                 ))}
               </View>
-              {error ? <Text className={`text-sm ${theme.error.text}`}>黑名单加载失败</Text> : null}
+              {error ? (
+                <LoadErrorText
+                  disabled={isValidating}
+                  onRetry={() => {
+                    void mutate().catch(() => {})
+                  }}
+                />
+              ) : null}
               {!error && blacklist.size === 0 ? (
                 <Text className={`py-2 text-sm ${theme.text.muted}`}>暂无黑名单用户</Text>
               ) : null}

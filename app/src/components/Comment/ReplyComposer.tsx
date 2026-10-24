@@ -45,7 +45,7 @@ export default function ReplyComposer(props: ReplyComposerProps) {
 
   return (
     <View
-      className="border-t border-divider-subtle bg-surface px-3 pt-2"
+      className="shrink-0 border-t border-divider-subtle bg-surface px-3 pt-2"
       style={{ paddingBottom: Math.max(insets.bottom, 8) }}
     >
       {count ? (

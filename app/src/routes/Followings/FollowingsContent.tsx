@@ -1,7 +1,7 @@
 import { ActivityIndicator, View } from 'react-native'
 
 import { LoginRequired } from '@/components/LoginRequired'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { Text } from '@/components/Text'
 import { useFollowingsState } from '@/features/bilibili-followings/useFollowingsState'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
@@ -20,10 +20,7 @@ export default function FollowingsContent() {
     return (
       <View className="flex-1 items-center justify-center gap-4 px-8">
         {error ? (
-          <>
-            <Text className="text-center">B站关注列表同步失败，尚未显示旧的本地记录</Text>
-            <Button title="重新同步" loading={isValidating} onPress={retry} />
-          </>
+          <LoadErrorText disabled={isValidating} onRetry={retry} />
         ) : (
           <>
             <ActivityIndicator />

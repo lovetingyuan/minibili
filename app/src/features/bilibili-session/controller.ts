@@ -12,6 +12,8 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
   const listeners = new Set<() => void>();
   let writeQueue: Promise<unknown> = Promise.resolve();
   let logoutPromise: Promise<void> | null = null;
+  let checkPromise: Promise<BilibiliAccount | null> | null = null;
+  let checkGeneration = -1;
 
   function publish(next: BilibiliSessionControl) {
     control = next;
@@ -30,8 +32,7 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
     return result;
   }
 
-  async function check(): Promise<BilibiliAccount | null> {
-    const generation = control.generation;
+  async function checkStoredCookie(generation: number): Promise<BilibiliAccount | null> {
     assertCurrent(generation);
     const cookie = await dependencies.readCookie();
     assertCurrent(generation);
@@ -39,21 +40,54 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
       return null;
     }
     const mid = getBilibiliUserId(cookie);
-    const profile =
-      mid && hasBilibiliLoginCookie(cookie) ? await dependencies.validateCookie(cookie) : null;
-    assertCurrent(generation);
-    if (!profile) {
-      await enqueueWrite(async () => {
-        assertCurrent(generation);
-        // 已确认失效：即使安全存储删除失败，也不能继续显示为已登录。
-        await dependencies.clearCookie().catch(() => {});
-      });
-      assertCurrent(generation);
-      publish({ ...control, generation: generation + 1 });
-      dependencies.onStoredCredentialsExpired?.();
+    if (!mid || !hasBilibiliLoginCookie(cookie)) {
       return null;
     }
-    return { mid: profile.mid.toString(), generation, profile };
+    let failure: Error | undefined;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      if (attempt > 0) {
+        await new Promise<void>((resolve) => setTimeout(resolve, attempt * 1000));
+      }
+      assertCurrent(generation);
+      try {
+        const profile = await dependencies.validateCookie(cookie);
+        assertCurrent(generation);
+        if (profile) {
+          return { mid: profile.mid.toString(), generation, profile };
+        }
+      } catch (cause) {
+        assertCurrent(generation);
+        failure = cause instanceof Error ? cause : new Error("无法确认 B站登录状态");
+      }
+    }
+    // 只有三次都明确返回未登录才清理；请求异常不能证明 Cookie 已失效。
+    if (failure) {
+      throw failure;
+    }
+    await enqueueWrite(async () => {
+      assertCurrent(generation);
+      await dependencies.clearCookie().catch(() => {});
+    });
+    assertCurrent(generation);
+    publish({ ...control, generation: generation + 1 });
+    dependencies.onStoredCredentialsExpired?.(control.generation);
+    return null;
+  }
+
+  async function check(): Promise<BilibiliAccount | null> {
+    const generation = control.generation;
+    assertCurrent(generation);
+    if (checkPromise && checkGeneration === generation) {
+      return checkPromise;
+    }
+    const pending = checkStoredCookie(generation).finally(() => {
+      if (checkPromise === pending) {
+        checkPromise = null;
+      }
+    });
+    checkGeneration = generation;
+    checkPromise = pending;
+    return pending;
   }
 
   async function login(cookie: string, signal: AbortSignal): Promise<BilibiliAccount | null> {

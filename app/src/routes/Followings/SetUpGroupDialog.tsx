@@ -4,7 +4,7 @@ import { ActivityIndicator, ScrollView, View } from 'react-native'
 import { useBilibiliUpRelationTags } from '@/api/useBilibiliRelationTags'
 import { CheckBox } from '@/components/CheckBox'
 import { Dialog } from '@/components/Dialog'
-import { Button } from '@/components/Button'
+import { LoadErrorText } from '@/components/LoadErrorText'
 import { Text } from '@/components/Text'
 import { theme } from '@/constants/colors.tw'
 import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
@@ -72,16 +72,12 @@ export default function SetUpGroupDialog({
       {current.data === undefined ? (
         <View className="items-center gap-3 py-6">
           {current.error ? (
-            <>
-              <Text className="text-center">当前分组加载失败，请检查网络后重试</Text>
-              <Button
-                title="重试"
-                loading={current.isValidating}
-                onPress={() => {
-                  void current.mutate().catch(() => {})
-                }}
-              />
-            </>
+            <LoadErrorText
+              disabled={current.isValidating}
+              onRetry={() => {
+                void current.mutate().catch(() => {})
+              }}
+            />
           ) : (
             <ActivityIndicator />
           )}

@@ -14,6 +14,8 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
     contentContainerStyle,
     ListFooterComponentStyle,
     ListHeaderComponentStyle,
+    // 避免 Android 原生视图裁剪与 FlashList 的视图回收冲突。
+    removeClippedSubviews = false,
     ...props
   }: StyledFlashListProps<T>,
   ref: React.ForwardedRef<FlashListRef<T>>,
@@ -27,6 +29,7 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
     <BaseFlashList
       {...props}
       ref={ref}
+      removeClippedSubviews={removeClippedSubviews}
       style={{ ...style, ...resolvedStyle }}
       contentContainerStyle={[contentContainerStyle, resolvedContentContainerStyle]}
       ListFooterComponentStyle={[ListFooterComponentStyle, resolvedFooterStyle]}

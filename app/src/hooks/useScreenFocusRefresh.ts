@@ -39,10 +39,13 @@ export const screenFocusRevalidation: Middleware = (useSWRNext) =>
   function useScreenSWR(key, fetcher, config) {
     const response = useSWRNext(key, fetcher, config);
     const { cache } = useSWRConfig();
+    // 全局中间件也会接收 useSWRMutation 的结果，它没有 mutate，不能自动刷新。
+    const shouldRevalidate =
+      config.revalidateOnFocus !== false && typeof response.mutate === "function";
 
     useScreenFocusRefresh(() => {
       if (
-        config.revalidateOnFocus === false ||
+        !shouldRevalidate ||
         config.isVisible?.() === false ||
         config.isOnline?.() === false ||
         config.isPaused?.()
@@ -69,7 +72,7 @@ export const screenFocusRevalidation: Middleware = (useSWRNext) =>
       const task = response.mutate().finally(() => pending.delete(cacheKey));
       pending.set(cacheKey, task);
       return task;
-    }, config.revalidateOnFocus !== false);
+    }, shouldRevalidate);
 
     return response;
   };
