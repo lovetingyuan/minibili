@@ -5,6 +5,7 @@ import { createStore, type AtomicStoreMethodsType } from "react-atomic-store";
 
 import { isBackgroundPlayDuration } from "@/constants/background-playback";
 import type { BackgroundPlayDurationMinutes } from "@/types/background-playback";
+import type { VideoQuality } from "@/api/play-url.types";
 
 import { RanksConfig } from "../constants";
 import { enqueueToast } from "../features/toast";
@@ -60,6 +61,8 @@ const getAppValue = () => {
      * 只有确认处于 WiFi（且系统未标记为计费网络）时才认为不消耗流量
      */
     networkUsage: "unknown" as NetworkUsage,
+    /** 手动选择仅本次启动有效；没有 $ 前缀，不写入本地存储。 */
+    preferredVideoQuality: null as VideoQuality | null,
     /** 是否在非流量网络下进入视频页时自动播放。 */
     $autoPlayEnabled: true,
     /**

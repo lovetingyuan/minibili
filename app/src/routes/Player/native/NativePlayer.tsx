@@ -25,6 +25,7 @@ import { getDanmakuSegmentIndex, invalidateDanmakuSegment } from "@/api/danmaku"
 import type { DanmakuItem } from "@/api/danmaku.types";
 import { usePlayResumePosition } from "@/api/play-resume";
 import { useVideoPlayUrl } from "@/api/play-url";
+import type { VideoQuality } from "@/api/play-url.types";
 import { DANMAKU_SEND_STYLE } from "@/api/send-danmaku";
 import { useSendDanmaku } from "@/api/useSendDanmaku";
 import { useVideoInfo } from "@/api/video-info";
@@ -85,6 +86,8 @@ import { usePlayerControlsVisibility } from "./usePlayerControlsVisibility";
 import { usePlayerGestures } from "./usePlayerGestures";
 import { usePlayerPausedUi } from "./usePlayerPausedUi";
 import { usePlaybackResumeState } from "./usePlaybackResumeState";
+import { usePlaybackLoadingTimeout } from "./usePlaybackLoadingTimeout";
+import type { QualitySwitchSnapshot } from "./quality-switch.types";
 
 // Animated.View 需要额外包一层才能识别 className
 const StyledAnimatedView = withUniwind(Animated.View) as unknown as React.ComponentType<
@@ -120,6 +123,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   const {
     imagesList,
     networkUsage,
+    preferredVideoQuality,
+    setPreferredVideoQuality,
     $autoPlayEnabled,
     $danmakuEnabled,
     $danmakuOpacity,
@@ -129,7 +134,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     $backgroundPlayDurationMinutes,
     set$backgroundPlayDurationMinutes,
   } = useStore();
-  const { account } = useBilibiliSessionState();
+  const { account, control: sessionControl } = useBilibiliSessionState();
   const { logout } = useBilibiliSessionActions();
   const { data } = useVideoInfo(route.params.bvid);
   const videoInfo = { ...route.params, ...data };
@@ -144,11 +149,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   const danmakuVideo = videoInfo.aid ? { aid: String(videoInfo.aid), bvid: videoInfo.bvid } : null;
   const { send: sendDanmaku, isSending } = useSendDanmaku(danmakuAccount, danmakuVideo, cid);
 
-  // 只有确认在 WiFi 下才认为不消耗流量：流量、断网与状态未知都按省流处理
   const isMeteredNetwork = networkUsage === "metered";
-  const [highQuality, setHighQuality] = React.useState(false);
-  // 决定默认清晰度的网络条件：未开播时跟随网络，开播后固定。
-  // 播放中改清晰度会换播放地址并重建播放器，视频会从头开始
+  // 未开播时跟随网络；开播后固定默认档，手动选择始终优先。
   const [qualityNetworkUsage, setQualityNetworkUsage] = React.useState(networkUsage);
   const [started, setStarted] = React.useState(false);
   // 原生播放器是否已经上报首帧；Android 上该事件可能早于首帧真正稳定显示
@@ -198,10 +200,10 @@ export default function NativePlayer(props: NativePlayerProps) {
   const seekHintTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   // 已经处理过的失败尝试，避免同一轮重复触发兜底
   const handledAttemptTokenRef = React.useRef(-1);
-  // 已经为新地址补过重载的尝试
-  const reloadedAttemptTokenRef = React.useRef(0);
   // 切换地址后需要恢复的播放进度（毫秒）
   const resumePositionMsRef = React.useRef(0);
+  const qualitySwitchRef = React.useRef<QualitySwitchSnapshot | null>(null);
+  const sourceShouldPlayRef = React.useRef(true);
   // 已经按 B站记录跳转过的分P，避免每次就绪都重复跳转
   const initialResumeHandledRef = React.useRef("");
   // App 在后台时不创建新的播放 service；需要自动播放或 CDN 兜底时等回到前台处理
@@ -215,19 +217,32 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 真正处于暂停态：起播、seek、缓冲造成的短暂暂停不算，避免暂停态的 UI 闪一下
   const pausedUiVisible = usePlayerPausedUi(isPlaying, playerStatus === "loading");
   // 控件显隐跟随稳定的播放状态：播放真正开始前保持显示，之后缓冲也不会把控件弹回来
-  const controlsPlaying = playbackStarted && !pausedUiVisible;
+  const [controlsMenuOpen, setControlsMenuOpen] = React.useState(false);
+  const controlsPlaying = playbackStarted && !pausedUiVisible && !controlsMenuOpen;
   const { controlsVisible, toggleControls, keepControlsVisible, hideControls } =
     usePlayerControlsVisibility(controlsPlaying);
 
-  const qn = resolvePreferredQuality(qualityNetworkUsage, highQuality);
+  const qn = resolvePreferredQuality(
+    started ? qualityNetworkUsage : networkUsage,
+    preferredVideoQuality,
+  );
   const {
     urls,
+    quality,
+    availableQualities,
+    contentType,
     servedDurationMs,
     hasResult: playUrlHasResult,
     error: playUrlError,
     errorCode: playUrlErrorCode,
     retry,
-  } = useVideoPlayUrl(videoInfo.bvid, cid, qn);
+  } = useVideoPlayUrl(
+    videoInfo.bvid,
+    cid,
+    qn,
+    Platform.OS === "android" ? "dash" : "mp4",
+    `${sessionControl.generation}:${sessionControl.phase}:${account?.mid ?? "anonymous"}`,
+  );
   const uri = urls[Math.min(playbackAttempt.index, urls.length - 1)];
   // 能不能完整播放以实际拿到的播放地址为准，view 的付费标记只用来解释原因
   const videoAccess = resolveVideoAccess({
@@ -265,7 +280,8 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 地址不是"拿到就挂"：source 非空会让原生播放器立刻开始拉流，
   // 因此非 WiFi 网络下必须等用户点击封面，在此之前播放器停在 idle，只展示封面
   const canLoadStream = shouldLoadVideoStream({ networkUsage, started });
-  const source = canLoadStream && uri ? createVideoSource(uri, notificationTitle) : null;
+  const source =
+    canLoadStream && uri ? createVideoSource(uri, notificationTitle, contentType) : null;
 
   const player = useVideoPlayer(source, (instance) => {
     instance.timeUpdateEventInterval = 0.25;
@@ -276,6 +292,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     instance.playbackRate = playbackRate;
     instance.muted = muted;
   });
+  const reloadedAttemptRef = React.useRef({ player, token: playbackAttempt.token });
 
   const effectivePlaybackRate = fastRate ? PLAYER_FAST_RATE : playbackRate;
 
@@ -316,7 +333,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     cid,
     page: currentPage,
     durationSeconds,
-    quality: qn,
+    quality: quality ?? qn,
     isFocused,
     isPlaying,
     currentTimeMs,
@@ -341,6 +358,30 @@ export default function NativePlayer(props: NativePlayerProps) {
         ? previousActivePlayer.hasPlayed
         : false,
   };
+  // 在旧实例的 passive effect 释放之前，保存同一分 P 的刷新/登录态换源位置。
+  React.useLayoutEffect(() => {
+    if (
+      previousActivePlayer.player === player ||
+      previousActivePlayer.cid !== cid ||
+      qualitySwitchRef.current
+    ) {
+      return;
+    }
+    const previous = previousActivePlayer.player;
+    if (!previousActivePlayer.hasPlayed && previous.currentTime <= 0 && lastTimeRef.current <= 0) {
+      return;
+    }
+    qualitySwitchRef.current = {
+      key: initialResumeKey,
+      positionMs:
+        resumePositionMsRef.current ||
+        Math.max(0, Math.round(previous.currentTime * 1000) || lastTimeRef.current),
+      playing:
+        started &&
+        (previous.status === "readyToPlay" ? previous.playing : sourceShouldPlayRef.current),
+    };
+    sourceShouldPlayRef.current = qualitySwitchRef.current.playing;
+  }, [player, cid]);
   const playEndGuardRef = React.useRef({ player, handled: false });
   const onPlayEndedRef = React.useRef(onPlayEnded);
   // 播放结束事件在订阅后触发，回调里需要读到最新的播放模式与分 P 数量
@@ -440,6 +481,26 @@ export default function NativePlayer(props: NativePlayerProps) {
    * 即使服务端结果或 15 秒本地落盘迟到，也不会再次 seek。
    */
   function applyPendingResumeIfReady() {
+    const switching = qualitySwitchRef.current;
+    if (switching?.key === initialResumeKey) {
+      if (player.status !== "readyToPlay") {
+        return;
+      }
+      qualitySwitchRef.current = null;
+      sourceShouldPlayRef.current = switching.playing;
+      initialResumeHandledRef.current = initialResumeKey;
+      resumePositionMsRef.current = 0;
+      applyResumePosition(switching.positionMs);
+      if (!started || !switching.playing || !isFocused || pausedByBackgroundTimeoutRef.current) {
+        player.pause();
+      } else if (AppState.currentState === "active") {
+        configureBackgroundPlayback();
+        player.play();
+      } else {
+        pendingAutoplayRef.current = true;
+      }
+      return;
+    }
     const decision = resolvePlayerResumeDecision({
       handled: initialResumeHandledRef.current === initialResumeKey,
       positionMs: playResumePositionMs,
@@ -465,17 +526,29 @@ export default function NativePlayer(props: NativePlayerProps) {
 
   React.useEffect(() => {
     applyPendingResumeIfReady();
-  }, [playResumePositionMs, cid, videoInfo.bvid]);
+  }, [playResumePositionMs, cid, videoInfo.bvid, player]);
 
   useEventListener(player, "playingChange", ({ isPlaying: playing }) => {
+    if (activePlayerRef.current.player !== player) {
+      return;
+    }
     updatePlayingState(playing);
   });
 
   useEventListener(player, "mutedChange", ({ muted: nextMuted }) => {
+    if (activePlayerRef.current.player !== player) {
+      return;
+    }
     setMuted(nextMuted);
   });
 
   useEventListener(player, "timeUpdate", ({ currentTime }) => {
+    if (
+      activePlayerRef.current.player !== player ||
+      qualitySwitchRef.current?.key === initialResumeKey
+    ) {
+      return;
+    }
     const next = Math.max(0, Math.round(currentTime * 1000));
     if (
       playbackMode.loop &&
@@ -508,7 +581,21 @@ export default function NativePlayer(props: NativePlayerProps) {
       return;
     }
     // 自动兜底时记住当前进度，等新地址就绪后接着播
-    resumePositionMsRef.current = Math.round(player.currentTime * 1000) || lastTimeRef.current;
+    resumePositionMsRef.current =
+      qualitySwitchRef.current?.positionMs ??
+      (Math.round(player.currentTime * 1000) || lastTimeRef.current);
+    if (activePlayerRef.current.hasPlayed || resumePositionMsRef.current > 0) {
+      qualitySwitchRef.current ??= {
+        key: initialResumeKey,
+        positionMs: resumePositionMsRef.current,
+        playing:
+          started &&
+          sourceShouldPlayRef.current &&
+          !pausedByBackgroundTimeoutRef.current &&
+          !danmakuComposerOpen &&
+          imagesList.length === 0,
+      };
+    }
     if (__DEV__) {
       // oxlint-disable-next-line no-console
       console.log("playback failover", {
@@ -538,6 +625,9 @@ export default function NativePlayer(props: NativePlayerProps) {
   }
 
   useEventListener(player, "statusChange", ({ status, error }) => {
+    if (activePlayerRef.current.player !== player) {
+      return;
+    }
     setPlayerStatus(status);
     if (status === "readyToPlay") {
       setPlayerError(null);
@@ -592,6 +682,13 @@ export default function NativePlayer(props: NativePlayerProps) {
     }
   });
 
+  usePlaybackLoadingTimeout({
+    player,
+    enabled: Boolean(source) && isFocused && appState === "active" && !playerError,
+    attemptToken: playbackAttempt.token,
+    onTimeout: () => recoverFromPlaybackError("视频加载超时，请重试"),
+  });
+
   React.useEffect(() => {
     if (!uri) {
       return;
@@ -603,6 +700,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     const subscription = endedPlayer.addListener("playToEnd", () => {
       const active = activePlayerRef.current;
       if (
+        qualitySwitchRef.current?.key === `${videoInfo.bvid}:${endedCid}` ||
         playEndGuardRef.current.player !== endedPlayer ||
         playEndGuardRef.current.handled ||
         active.player !== endedPlayer ||
@@ -649,15 +747,17 @@ export default function NativePlayer(props: NativePlayerProps) {
     };
   }, [cid, currentPage, player, uri, videoInfo.bvid]);
 
-  // 切换分P/清晰度时重置兜底状态与续播进度
+  // 只有切分 P 才清空进度，切清晰度使用独立快照恢复。
   React.useEffect(() => {
     handledAttemptTokenRef.current = -1;
     pendingPlaybackErrorRef.current = null;
     resumePositionMsRef.current = 0;
+    qualitySwitchRef.current = null;
+    sourceShouldPlayRef.current = true;
     lastTimeRef.current = 0;
     setPortraitExpanded(false);
     setPlaybackAttempt((current) => ({ index: 0, refreshCount: 0, token: current.token + 1 }));
-  }, [cid, qn]);
+  }, [cid]);
 
   // 切分P时收起弹幕输入条并清空本地回显
   React.useEffect(() => {
@@ -710,16 +810,17 @@ export default function NativePlayer(props: NativePlayerProps) {
     };
   }, [firstFrameRendered, playerStatus, posterDismissed]);
 
-  // 重新获取地址后如果和上一次完全相同，useVideoPlayer 不会重建播放器，这里补一次重载
+  // 刷新后地址未变时实例不会重建，错误或超时的加载也需要补一次重载。
   React.useEffect(() => {
-    if (!source || reloadedAttemptTokenRef.current === playbackAttempt.token) {
+    const previous = reloadedAttemptRef.current;
+    if (!source || (previous.token === playbackAttempt.token && previous.player === player)) {
       return;
     }
     if (AppState.currentState !== "active") {
       return;
     }
-    reloadedAttemptTokenRef.current = playbackAttempt.token;
-    if (player.status === "error") {
+    reloadedAttemptRef.current = { player, token: playbackAttempt.token };
+    if (previous.player === player && (player.status === "error" || player.status === "loading")) {
       void player.replaceAsync(source);
     }
   }, [playbackAttempt.token, player, source]);
@@ -730,30 +831,37 @@ export default function NativePlayer(props: NativePlayerProps) {
     if (!shouldAutoStartPlayback(networkUsage, Boolean(uri), $autoPlayEnabled)) {
       return;
     }
-    setStarted(true);
-  }, [networkUsage, uri, $autoPlayEnabled]);
-
-  // 默认清晰度只在未开播时跟随网络，开播后固定，避免切网换地址把视频从头开始播
-  React.useEffect(() => {
-    if (started || networkUsage === "unknown") {
-      return;
+    if (!started) {
+      startPlayback();
     }
-    setQualityNetworkUsage(networkUsage);
-  }, [networkUsage, started]);
+  }, [networkUsage, uri, $autoPlayEnabled]);
 
   // 切到流量时暂停播放，避免用户在不知情的情况下继续消耗移动流量
   React.useEffect(() => {
     const previousUsage = previousNetworkUsageRef.current;
     previousNetworkUsageRef.current = networkUsage;
-    if (!shouldPausePlaybackOnNetworkChange(previousUsage, networkUsage) || !player.playing) {
+    if (
+      !shouldPausePlaybackOnNetworkChange(previousUsage, networkUsage) ||
+      (!player.playing && !qualitySwitchRef.current?.playing)
+    ) {
       return;
     }
     player.pause();
+    sourceShouldPlayRef.current = false;
+    if (qualitySwitchRef.current) {
+      qualitySwitchRef.current.playing = false;
+    }
     showToast("已切换到移动流量，播放已暂停");
   }, [networkUsage, player]);
 
   React.useEffect(() => {
-    if (!started || !uri) {
+    if (
+      !started ||
+      !uri ||
+      !isFocused ||
+      !sourceShouldPlayRef.current ||
+      qualitySwitchRef.current
+    ) {
       return;
     }
     if (AppState.currentState !== "active") {
@@ -770,7 +878,7 @@ export default function NativePlayer(props: NativePlayerProps) {
       return;
     }
     player.play();
-  }, [started, uri, player]);
+  }, [started, uri, player, isFocused]);
 
   React.useEffect(() => {
     if (appState !== "active" || AppState.currentState !== "active") {
@@ -786,6 +894,10 @@ export default function NativePlayer(props: NativePlayerProps) {
   // 离开播放页暂停，回到页面后由用户手动继续
   React.useEffect(() => {
     if (!isFocused) {
+      sourceShouldPlayRef.current = false;
+      if (qualitySwitchRef.current) {
+        qualitySwitchRef.current.playing = false;
+      }
       pendingAutoplayRef.current = false;
       // 导航事件未触发时，仍在暂停前补报原生播放器的最新位置。
       reportHeartbeatLeavingRef.current();
@@ -895,11 +1007,18 @@ export default function NativePlayer(props: NativePlayerProps) {
     return Math.round(durationSeconds * 1000);
   }
 
-  /**
-   * 点击继续播放：先隐藏控件，避免暂停态强制显示后再等 3 秒自动隐藏。
-   * 播放到结尾后 expo-video 的 play() 不会有任何反应，需要先回到开头
-   */
+  function startPlayback() {
+    sourceShouldPlayRef.current = true;
+    if (qualitySwitchRef.current) {
+      qualitySwitchRef.current.playing = true;
+    }
+    setQualityNetworkUsage(networkUsage);
+    setStarted(true);
+  }
+
+  /** 点击继续播放时收起控件，已经播完则先回到开头。 */
   function resumePlayback() {
+    sourceShouldPlayRef.current = true;
     pausedByBackgroundTimeoutRef.current = false;
     hideControls();
     if (
@@ -921,6 +1040,7 @@ export default function NativePlayer(props: NativePlayerProps) {
    */
   function handleTogglePlay() {
     if (player.playing) {
+      sourceShouldPlayRef.current = false;
       player.pause();
       return;
     }
@@ -1057,6 +1177,30 @@ export default function NativePlayer(props: NativePlayerProps) {
     setPlaybackRate(rate);
   }
 
+  function handleQualityChange(nextQuality: VideoQuality) {
+    if (!availableQualities.includes(nextQuality)) {
+      return;
+    }
+    if (started && nextQuality !== quality) {
+      const positionMs =
+        qualitySwitchRef.current?.positionMs ??
+        Math.max(0, Math.round(player.currentTime * 1000) || lastTimeRef.current);
+      const playing =
+        qualitySwitchRef.current?.playing ??
+        (player.status === "readyToPlay" ? player.playing : sourceShouldPlayRef.current);
+      qualitySwitchRef.current = { key: initialResumeKey, positionMs, playing };
+      sourceShouldPlayRef.current = playing;
+      pendingAutoplayRef.current = false;
+      handledAttemptTokenRef.current = -1;
+      pendingPlaybackErrorRef.current = null;
+      setPlayerError(null);
+      setPlaybackAttempt((attempt) => ({ index: 0, refreshCount: 0, token: attempt.token + 1 }));
+      player.pause();
+    }
+    setPreferredVideoQuality(nextQuality);
+    keepControlsVisible();
+  }
+
   function handleToggleMute() {
     player.muted = !player.muted;
   }
@@ -1072,7 +1216,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     try {
       await retry();
       handledAttemptTokenRef.current = -1;
-      // 重置兜底进度并强制重新加载（地址没变时由 reloadedAttemptToken 的重载逻辑兜底）
+      // 重置兜底进度，地址没变时由重载逻辑兜底。
       setPlaybackAttempt((current) => ({ index: 0, refreshCount: 0, token: current.token + 1 }));
     } catch {
       // 重试失败保留错误态
@@ -1291,6 +1435,10 @@ export default function NativePlayer(props: NativePlayerProps) {
       ) : null}
       {started ? (
         <PlayerControls
+          quality={quality}
+          availableQualities={availableQualities}
+          onQualityChange={handleQualityChange}
+          onMenuOpenChange={setControlsMenuOpen}
           paused={pausedUiVisible}
           ended={playbackEnded}
           currentTimeMs={currentTimeMs}
@@ -1349,15 +1497,16 @@ export default function NativePlayer(props: NativePlayerProps) {
         <PlayerCover
           duration={videoInfo.duration}
           isMetered={isMeteredNetwork}
-          highQuality={highQuality}
+          quality={quality}
+          availableQualities={availableQualities}
           badgeLabel={interactiveAccess?.badge.label}
           badgeTone={interactiveAccess?.badge.tone}
-          onHighQualityChange={setHighQuality}
+          onQualityChange={handleQualityChange}
           onStart={() => {
             if (isMeteredNetwork) {
               showToast("正在使用移动流量播放");
             }
-            setStarted(true);
+            startPlayback();
           }}
         />
       )}

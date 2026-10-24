@@ -1,4 +1,4 @@
-import { type RouteProp, useRoute } from '@react-navigation/native'
+import { type RouteProp, useNavigation, useRoute } from '@react-navigation/native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { Text } from '@/components/Text'
 import { ThemedIcon } from '@/components/ThemedIcon'
@@ -17,8 +17,12 @@ import {
 } from '@/components/Menu'
 
 import { useUserRelation } from '@/api/user-relation'
+import { formatVideoQuality } from '@/api/play-dash'
+import { useVideoDownloadQualities } from '@/api/play-url'
+import type { VideoQuality } from '@/api/play-url.types'
 import { useVideoInfo } from '@/api/video-info'
 import { theme } from '@/constants/colors.tw'
+import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'
 import { isDownloadingVideo } from '@/features/video-download/controller'
 import { useVideoDownload } from '@/features/video-download/useVideoDownload'
 import { useWatchLaterActions } from '@/hooks/useWatchLaterActions'
@@ -62,10 +66,17 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
   const hideMenu = () => setVisible(false)
   const showMenu = () => setVisible(true)
   const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Play'>['route']>()
+  const navigation = useNavigation()
   const { data } = useVideoInfo(route.params.bvid)
   const watchLater = useWatchLaterActions()
-  const { setImagesList, setCurrentImageIndex } = useStore()
+  const { setImagesList, setCurrentImageIndex, setOverlayButtons } = useStore()
   const { task: downloadTask, start: startDownload, cancel: cancelDownload } = useVideoDownload()
+  const { account, control } = useBilibiliSessionState()
+  const downloadQualities = useVideoDownloadQualities(
+    visible ? route.params.bvid : '',
+    props.cid,
+    `${control.generation}:${control.phase}:${account?.mid ?? 'anonymous'}`,
+  )
   const videoInfo = {
     ...route.params,
     ...data,
@@ -83,7 +94,7 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
    * 下载当前分P：地址解析阶段的失败原因即时用 toast 反馈，
    * 下载过程中的进度与结果由通知展示，这里不再等待。
    */
-  async function handleDownloadVideo() {
+  async function handleDownloadVideo(quality: VideoQuality) {
     if (!props.cid) {
       showToast('稍后再试')
       return
@@ -91,6 +102,7 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
     const result = await startDownload({
       bvid: videoInfo.bvid ?? '',
       cid: props.cid,
+      quality,
       title: videoInfo.title,
       page: props.page,
       pageTitle: props.pageTitle,
@@ -100,11 +112,36 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
       return
     }
     if (result === 'unsupported') {
-      showToast('暂不支持下载')
+      showToast('该清晰度暂不可下载')
       return
     }
     if (result === 'failed') {
       showToast('下载失败，请稍后重试')
+    }
+  }
+
+  async function showDownloadQualities() {
+    if (!props.cid) {
+      showToast('稍后再试')
+      return
+    }
+    try {
+      const qualities = await downloadQualities.retry()
+      if (!navigation.isFocused()) {
+        return
+      }
+      if (!qualities.length) {
+        showToast('暂不支持下载')
+        return
+      }
+      setOverlayButtons(
+        qualities.map((quality) => ({
+          text: formatVideoQuality(quality),
+          onPress: () => void handleDownloadVideo(quality),
+        })),
+      )
+    } catch {
+      showToast('清晰度加载失败，请重试')
     }
   }
 
@@ -136,7 +173,7 @@ export function PlayHeaderRight(props: { cid?: number; page?: number; pageTitle?
                   cancelDownload()
                   return
                 }
-                void handleDownloadVideo()
+                void showDownloadQualities()
               }}
             />
           )}

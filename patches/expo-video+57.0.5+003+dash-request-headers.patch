@@ -1,0 +1,12 @@
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/utils/DataSourceUtils.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/utils/DataSourceUtils.kt
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/utils/DataSourceUtils.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/utils/DataSourceUtils.kt
+@@ -20,7 +20,7 @@ fun buildBaseDataSourceFactory(context: Context, videoSource: VideoSource): DataSource.Factory {
+   return if (videoSource.uri?.scheme?.startsWith("http") == true) {
+     buildOkHttpDataSourceFactory(context, videoSource)
+   } else {
+-    DefaultDataSource.Factory(context)
++    DefaultDataSource.Factory(context, buildOkHttpDataSourceFactory(context, videoSource))
+   }
+ }
+ 

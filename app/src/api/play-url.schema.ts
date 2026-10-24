@@ -1,5 +1,28 @@
 import { z } from "zod";
 
+const DashStreamSchema = z.object({
+  id: z.number(),
+  base_url: z.url(),
+  backup_url: z.array(z.url()).nullish(),
+  bandwidth: z.number().positive(),
+  mime_type: z.string(),
+  codecs: z.string(),
+  width: z.number(),
+  height: z.number(),
+  frame_rate: z.string(),
+  segment_base: z.object({
+    initialization: z.string().regex(/^\d+-\d+$/),
+    index_range: z.string().regex(/^\d+-\d+$/),
+  }),
+  codecid: z.number(),
+});
+
+export const DashManifestSchema = z.object({
+  duration: z.number().positive(),
+  video: z.array(DashStreamSchema),
+  audio: z.array(DashStreamSchema).nullish(),
+});
+
 export const PlayUrlResponseSchema = z.object({
   from: z.string(),
   result: z.string(),
@@ -39,4 +62,10 @@ export const PlayUrlResponseSchema = z.object({
   last_play_time: z.number(),
   last_play_cid: z.number(),
   // view_info: null,
+});
+
+export const DashPlayUrlResponseSchema = z.object({
+  quality: z.number(),
+  timelength: z.number().nonnegative(),
+  dash: DashManifestSchema.nullish(),
 });

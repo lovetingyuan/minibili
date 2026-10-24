@@ -17,6 +17,7 @@ import { theme } from "@/constants/colors.tw";
 import { formatPlaybackRate, PLAYBACK_RATES } from "./playback-rate";
 import BackgroundPlayMenu from "./BackgroundPlayMenu";
 import type { PlayerTopActionsProps } from "./player-top-actions.types";
+import QualityMenu from "./QualityMenu";
 
 /**
  * 播放器右上角的悬浮按钮：倍速、静音、播放模式、后台播放与发送弹幕。
@@ -25,7 +26,8 @@ export default function PlayerTopActions(props: PlayerTopActionsProps) {
   const playbackRateLabel = formatPlaybackRate(props.playbackRate);
 
   return (
-    <View className="flex-row items-center gap-2">
+    <View className="flex-row flex-wrap justify-end items-center gap-1">
+      <QualityMenu {...props.qualityMenu} />
       <Menu
         opened={props.playbackRateMenuOpen}
         onBackdropPress={props.onClosePlaybackRateMenu}

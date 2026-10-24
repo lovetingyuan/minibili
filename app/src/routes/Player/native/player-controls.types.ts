@@ -3,8 +3,9 @@ import type {
   BackgroundPlaySelection,
 } from "@/types/background-playback";
 import type { PlaybackRate } from "./playback-rate";
+import type { VideoQuality } from "@/api/play-url.types";
 
-export type PlayerControlsMenu = "playback-rate" | "background-play" | null;
+export type PlayerControlsMenu = "quality" | "playback-rate" | "background-play" | null;
 
 export type PlayerControlsProps = {
   /**
@@ -35,6 +36,10 @@ export type PlayerControlsProps = {
   showAutoNext: boolean;
   fullscreen: boolean;
   visible: boolean;
+  quality: VideoQuality | undefined;
+  availableQualities: readonly VideoQuality[];
+  onQualityChange: (quality: VideoQuality) => void;
+  onMenuOpenChange: (open: boolean) => void;
   onTogglePlay: () => void;
   onToggleMute: () => void;
   onPlaybackRateChange: (rate: PlaybackRate) => void;

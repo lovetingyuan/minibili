@@ -1,5 +1,5 @@
 import type { BilibiliAccount } from "../features/bilibili-session/types";
-import type { VideoQuality } from "./play-url";
+import type { VideoQuality } from "./play-url.types";
 
 /** 上报账号：与其它写接口一致，用 mid + 会话代次判断请求是否仍然有效 */
 export type PlayHeartbeatAccount = Pick<BilibiliAccount, "mid" | "generation">;

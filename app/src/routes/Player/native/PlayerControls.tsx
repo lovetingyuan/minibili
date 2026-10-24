@@ -79,6 +79,10 @@ export default function PlayerControls(props: PlayerControlsProps) {
   const [trackWidth, setTrackWidth] = React.useState(0);
   const [scrubMs, setScrubMs] = React.useState<number | null>(null);
   const [activeMenu, setActiveMenu] = React.useState<PlayerControlsMenu>(null);
+  React.useEffect(() => {
+    props.onMenuOpenChange(activeMenu !== null);
+    return () => props.onMenuOpenChange(false);
+  }, [activeMenu, props.onMenuOpenChange]);
   const scrubRef = React.useRef<number | null>(null);
   const [opacity] = React.useState(() => new Animated.Value(visible ? 1 : 0));
 
@@ -173,6 +177,20 @@ export default function PlayerControls(props: PlayerControlsProps) {
         importantForAccessibility={visible ? "auto" : "no-hide-descendants"}
       >
         <PlayerTopActions
+          qualityMenu={{
+            quality: props.quality,
+            availableQualities: props.availableQualities,
+            opened: activeMenu === "quality",
+            onToggle: () => {
+              props.onInteraction();
+              setActiveMenu((menu) => (menu === "quality" ? null : "quality"));
+            },
+            onClose: () => setActiveMenu((menu) => (menu === "quality" ? null : menu)),
+            onSelect: (quality) => {
+              setActiveMenu(null);
+              press(() => props.onQualityChange(quality));
+            },
+          }}
           muted={props.muted}
           playbackRate={props.playbackRate}
           playbackRateMenuOpen={activeMenu === "playback-rate"}

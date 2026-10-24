@@ -1,3 +1,5 @@
+import type { VideoQuality } from "../../api/play-url.types";
+
 /**
  * 视频下载任务状态。
  * downloading - 正在下载（含解析下载地址阶段）
@@ -34,6 +36,7 @@ export type VideoDownloadTask = {
 export type VideoDownloadInput = {
   bvid: string;
   cid: number;
+  quality: VideoQuality;
   title?: string;
   /** 当前分P 序号，默认 1 */
   page?: number;

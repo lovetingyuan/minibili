@@ -1,6 +1,6 @@
 import type { VideoSourceObject } from "expo-video";
 
-import type { VideoQuality } from "@/api/play-url";
+import type { VideoQuality } from "@/api/play-url.types";
 // 使用相对路径，保证 vitest 下无需别名配置即可解析
 import { mediaUA } from "../../../constants";
 import type { NetworkUsage } from "../../../utils/network";
@@ -205,9 +205,14 @@ export function resolvePlayerResumeDecision(
  * 渲染期稳定的值（如路由参数里的标题）：`useVideoPlayer` 会用 JSON 字符串比较
  * source，标题异步补齐会触发播放器重建，导致播放进度归零。
  */
-export function createVideoSource(uri: string, title?: string): VideoSourceObject {
+export function createVideoSource(
+  uri: string,
+  title?: string,
+  contentType: VideoSourceObject["contentType"] = "progressive",
+): VideoSourceObject {
   return {
     uri,
+    contentType,
     headers: {
       Referer: PLAY_URL_REFERER,
       "User-Agent": mediaUA,
@@ -317,17 +322,13 @@ export function toggleControlsVisible(visible: boolean) {
 }
 
 /**
- * 默认清晰度：只有确认在 WiFi 下才用 1080P；流量、断网与状态未知都先用 720P，
- * 用户在流量下手动打开高清开关后才用 1080P
+ * 默认清晰度：流量使用 480P，其它状态使用 1080P；手动选择优先。
  */
 export function resolvePreferredQuality(
   networkUsage: NetworkUsage,
-  highQuality: boolean,
+  preferred: VideoQuality | null,
 ): VideoQuality {
-  if (networkUsage !== "wifi" && !highQuality) {
-    return 64;
-  }
-  return 80;
+  return preferred ?? (networkUsage === "metered" ? 32 : 80);
 }
 
 /**

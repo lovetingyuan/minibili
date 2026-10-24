@@ -1,11 +1,11 @@
-import { View } from "react-native";
+import { View } from 'react-native'
 
-import { Button } from "@/components/Button";
-import { Text } from "@/components/Text";
-import { useStore } from "@/store";
+import { Button } from '@/components/Button'
+import { Text } from '@/components/Text'
+import { useStore } from '@/store'
 
 export default function DanmakuOpacitySetting() {
-  const { $danmakuOpacity, set$danmakuOpacity } = useStore();
+  const { $danmakuOpacity, set$danmakuOpacity } = useStore()
 
   return (
     <View className="flex-row items-center justify-between gap-3">
@@ -20,9 +20,7 @@ export default function DanmakuOpacitySetting() {
           title="−"
           accessibilityLabel="减小弹幕不透明度"
           disabled={$danmakuOpacity <= 0}
-          onPress={() =>
-            set$danmakuOpacity((value) => Math.max(0, Math.round(value * 10) - 1) / 10)
-          }
+          onPress={() => set$danmakuOpacity(value => Math.max(0, Math.round(value * 10) - 1) / 10)}
         />
         <Text
           className="w-8 text-center tabular-nums"
@@ -39,11 +37,9 @@ export default function DanmakuOpacitySetting() {
           title="+"
           accessibilityLabel="增大弹幕不透明度"
           disabled={$danmakuOpacity >= 1}
-          onPress={() =>
-            set$danmakuOpacity((value) => Math.min(10, Math.round(value * 10) + 1) / 10)
-          }
+          onPress={() => set$danmakuOpacity(value => Math.min(10, Math.round(value * 10) + 1) / 10)}
         />
       </View>
     </View>
-  );
+  )
 }

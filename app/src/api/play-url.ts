@@ -3,23 +3,28 @@ import type { z } from "zod";
 
 import request, { getApiErrorCode } from "./fetcher";
 import type { PlayUrlResponseSchema } from "./play-url.schema";
+import { DashPlayUrlResponseSchema } from "./play-url.schema";
+import { createDashPlaySources, VIDEO_QUALITIES } from "./play-dash";
+import type { VideoDownloadSource, VideoQuality, VideoStreamFormat } from "./play-url.types";
+
+export type { VideoDownloadSource, VideoQuality } from "./play-url.types";
 
 type Res = z.infer<typeof PlayUrlResponseSchema>;
 
-/**
- * 只支持 B站的 720P(64) 与 1080P(80)
- */
-export type VideoQuality = 64 | 80;
-
-function createPlayUrlQuery(bvid: string, cid: number, qn: VideoQuality) {
+function createPlayUrlQuery(
+  bvid: string,
+  cid: number,
+  qn: VideoQuality,
+  format: VideoStreamFormat,
+) {
   const search = new URLSearchParams();
   // https://socialsisteryi.github.io/bilibili-API-collect/docs/video/videostream_url.html
   Object.entries({
     bvid,
     cid,
-    type: "mp4",
-    qn,
-    fnval: 1,
+    ...(format === "mp4" ? { type: "mp4" } : {}),
+    qn: format === "dash" ? 80 : qn,
+    fnval: format === "dash" ? 16 : 1,
     fnver: 0,
     fourk: 1,
     try_look: 1,
@@ -65,22 +70,29 @@ export function isUnplayablePlayUrlCode(code: number | null | undefined) {
 }
 
 /**
- * 原生播放器使用的播放地址，返回渐进式 mp4（单文件带音轨）。
- * 未登录时 B站最高只返回 720P，此时 quality 会是 64，调用方按返回的清晰度静默播放。
- * 返回主地址与各 CDN 备用镜像，播放失败时由调用方按顺序回退。
+ * Android 使用 DASH；其它平台保留渐进式 MP4。清晰度以实际下发的视频流为准。
  */
-export function useVideoPlayUrl(bvid: string, cid: number | undefined, qn: VideoQuality) {
-  const search = bvid && cid ? createPlayUrlQuery(bvid, cid, qn) : null;
+export function useVideoPlayUrl(
+  bvid: string,
+  cid: number | undefined,
+  qn: VideoQuality,
+  format: VideoStreamFormat = "mp4",
+  sessionKey = "",
+) {
+  const search = bvid && cid ? createPlayUrlQuery(bvid, cid, qn, format) : null;
 
   const {
     data,
     error: playUrlError,
     mutate,
-  } = useSWR<Res>(
-    search ? `/x/player/wbi/playurl?${search}` : null,
-    (url) => request<Res>(url + "&_t=" + Date.now()),
+  } = useSWR<Res | z.infer<typeof DashPlayUrlResponseSchema>>(
+    search ? [`/x/player/wbi/playurl?${search}`, sessionKey] : null,
+    async ([url]) => {
+      const response = await request<Res>(url + "&_t=" + Date.now());
+      return format === "dash" ? DashPlayUrlResponseSchema.parse(response) : response;
+    },
     {
-      // 播放地址是有时效的签名地址，只在切清晰度/切分P/手动重试时更新，避免重建播放器
+      // DASH 一次取齐可用档位，切清晰度只重选本地清单；地址失效后由播放器显式刷新。
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
@@ -91,12 +103,21 @@ export function useVideoPlayUrl(bvid: string, cid: number | undefined, qn: Video
     },
   );
 
-  const durl = data?.durl?.[0];
+  const progressive = data && "durl" in data ? data : undefined;
+  const durl = progressive?.durl?.[0];
+  const dashSources = createDashPlaySources(data && "dash" in data ? data.dash : undefined, qn);
+  const mp4Quality = VIDEO_QUALITIES.find((quality) => quality === data?.quality);
   return {
-    urls: collectPlayUrls(durl?.url, durl?.backup_url),
-    quality: data?.quality,
+    urls: format === "dash" ? dashSources.urls : collectPlayUrls(durl?.url, durl?.backup_url),
+    quality: format === "dash" ? dashSources.quality : mp4Quality,
+    availableQualities:
+      format === "dash"
+        ? dashSources.availableQualities
+        : VIDEO_QUALITIES.filter((quality) => progressive?.accept_quality.includes(quality)),
+    contentType: format === "dash" ? ("dash" as const) : ("progressive" as const),
     /** 实际可播时长（毫秒），明显短于视频总时长时说明只拿到了试看片段 */
-    servedDurationMs: sumPlayUrlDurationMs(data?.durl),
+    servedDurationMs:
+      format === "dash" ? (data?.timelength ?? 0) : sumPlayUrlDurationMs(progressive?.durl),
     /**
      * 播放地址请求是否已经有结果（成功或失败）。
      * 没有结果时不能判定「不可播放」，否则请求期间每个视频都会闪一次加载失败。
@@ -151,18 +172,6 @@ export function useVideoMp4Url(bvid: string, cid?: number, highQuality?: boolean
 }
 
 /**
- * 可下载的视频文件信息。
- * urls 是主地址与 B站分配的 CDN 备用镜像，按顺序回退。
- */
-export type VideoDownloadSource = {
-  urls: string[];
-  /** 服务端实际返回的清晰度，如 64(720P)、32(480P) */
-  quality: number;
-  /** 文件总字节数，服务端未返回时为 0 */
-  size: number;
-};
-
-/**
  * 服务端没有返回可下载的渐进式地址（付费内容、接口限制等）。
  */
 export class VideoDownloadUnsupportedError extends Error {
@@ -172,26 +181,14 @@ export class VideoDownloadUnsupportedError extends Error {
   }
 }
 
-/**
- * 取下载地址：fnval=0 让服务端返回渐进式 mp4（音轨已封装在同一个文件里），
- * 下载后无需再做音视频合并；未登录时最高 720P。
- * 注意不能带 fnval 的 DASH 位，否则服务端只返回 dash、没有 durl。
- */
-export async function getVideoDownloadSource(
-  bvid: string,
-  cid: number,
-): Promise<VideoDownloadSource> {
-  if (!bvid || !cid) {
-    throw new VideoDownloadUnsupportedError();
-  }
-
+function createVideoDownloadUrl(bvid: string, cid: number, quality: VideoQuality) {
   const search = new URLSearchParams();
   // https://socialsisteryi.github.io/bilibili-API-collect/docs/video/videostream_url.html
   const query = {
     bvid,
     cid,
     type: "mp4",
-    qn: 64,
+    qn: quality,
     fnval: 0,
     fnver: 0,
     fourk: 1,
@@ -203,10 +200,46 @@ export async function getVideoDownloadSource(
     search.append(k, `${v}`);
   });
 
-  const res = await request<Res>(`/x/player/wbi/playurl?${search}`);
+  return `/x/player/wbi/playurl?${search}`;
+}
+
+function collectDownloadQualities(data?: Res) {
+  const durl = data?.durl?.[0];
+  return data && collectPlayUrls(durl?.url, durl?.backup_url).length
+    ? VIDEO_QUALITIES.filter(
+        (quality) => quality <= data.quality && data.accept_quality.includes(quality),
+      )
+    : [];
+}
+
+/** 只展示 MP4 下载接口实际提供的档位，DASH 的可播清晰度不代表可直接下载。 */
+export function useVideoDownloadQualities(bvid: string, cid?: number, sessionKey = "") {
+  const { data, error, isLoading, mutate } = useSWR<Res>(
+    bvid && cid ? [createVideoDownloadUrl(bvid, cid, 80), sessionKey] : null,
+    ([url]) => request<Res>(url),
+    { revalidateOnFocus: false, revalidateOnReconnect: false, errorRetryCount: 0 },
+  );
+  return {
+    qualities: collectDownloadQualities(data),
+    isLoading,
+    error,
+    retry: async () => collectDownloadQualities(await mutate()),
+  };
+}
+
+/** fnval=0 返回音视频已合并的 MP4；实际档位必须与用户选择一致。 */
+export async function getVideoDownloadSource(
+  bvid: string,
+  cid: number,
+  quality: VideoQuality = 64,
+): Promise<VideoDownloadSource> {
+  if (!bvid || !cid) {
+    throw new VideoDownloadUnsupportedError();
+  }
+  const res = await request<Res>(createVideoDownloadUrl(bvid, cid, quality));
   const durl = res.durl?.[0];
   const urls = collectPlayUrls(durl?.url, durl?.backup_url);
-  if (!urls.length) {
+  if (!urls.length || res.quality !== quality) {
     throw new VideoDownloadUnsupportedError();
   }
   return {

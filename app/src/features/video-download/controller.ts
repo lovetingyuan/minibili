@@ -303,7 +303,7 @@ export async function startVideoDownload(
 
   try {
     notifyEnabled = await resolveNotificationPermission();
-    const source = await getVideoDownloadSource(input.bvid, input.cid);
+    const source = await getVideoDownloadSource(input.bvid, input.cid, input.quality);
     urls = source.urls;
     quality = source.quality;
     size = source.size;

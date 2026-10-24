@@ -3,7 +3,7 @@ import type {
   PlayHeartbeatSession,
   PlayHeartbeatVideo,
 } from "@/api/play-heartbeat.types";
-import type { VideoQuality } from "@/api/play-url";
+import type { VideoQuality } from "@/api/play-url.types";
 
 export type PlayHeartbeatReporterProps = {
   bvid: string;

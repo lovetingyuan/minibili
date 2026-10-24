@@ -3,8 +3,10 @@ import type {
   BackgroundPlaySelection,
 } from "@/types/background-playback";
 import type { PlaybackRate } from "./playback-rate";
+import type { QualityMenuProps } from "./quality-menu.types";
 
 export type PlayerTopActionsProps = {
+  qualityMenu: QualityMenuProps;
   muted: boolean;
   playbackRate: PlaybackRate;
   playbackRateMenuOpen: boolean;

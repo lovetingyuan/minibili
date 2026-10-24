@@ -1,31 +1,22 @@
-import { Switch } from '@/components/Switch'
-import { ThemedIcon } from '@/components/ThemedIcon'
-import { VideoBadge } from '@/components/VideoBadge'
-import type { VideoBadgeTone } from '@/components/VideoBadge'
-import { theme } from '@/constants/colors.tw'
-import { Play } from 'lucide-react-native'
-import { Pressable, Text, View } from 'react-native'
+import React from "react";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { VideoBadge } from "@/components/VideoBadge";
+import { Play } from "lucide-react-native";
+import { Pressable, Text, View } from "react-native";
 
-import { parseDuration } from '@/utils'
-
-type PlayerCoverProps = {
-  duration?: number
-  /** 当前网络会消耗移动流量 */
-  isMetered: boolean
-  highQuality: boolean
-  onHighQualityChange: (enabled: boolean) => void
-  onStart: () => void
-  /** 受限内容的角标，例如「充电专属 · 可试看」 */
-  badgeLabel?: string | null
-  badgeTone?: VideoBadgeTone
-}
+import { parseDuration } from "@/utils";
+import QualityMenu from "./QualityMenu";
+import type { PlayerCoverProps } from "./player-cover.types";
 
 function PlayerPlayIcon() {
-  return <ThemedIcon icon={Play} size={64} colorClassName="text-media-content" filled opacity={0.8} />
+  return (
+    <ThemedIcon icon={Play} size={64} colorClassName="text-media-content" filled opacity={0.8} />
+  );
 }
 
 export default function PlayerCover(props: PlayerCoverProps) {
-  const { duration, isMetered, highQuality, badgeLabel } = props
+  const { duration, isMetered, badgeLabel } = props;
+  const [qualityMenuOpen, setQualityMenuOpen] = React.useState(false);
 
   return (
     <View className="flex-1">
@@ -39,7 +30,7 @@ export default function PlayerCover(props: PlayerCoverProps) {
       </Pressable>
       {badgeLabel ? (
         <View pointerEvents="none" className="absolute left-2 top-2">
-          <VideoBadge label={badgeLabel} tone={props.badgeTone ?? 'charge'} variant="overlay" />
+          <VideoBadge label={badgeLabel} tone={props.badgeTone ?? "charge"} variant="overlay" />
         </View>
       ) : null}
       <View pointerEvents="none" className="absolute bottom-2 left-2 flex-row gap-2">
@@ -54,23 +45,19 @@ export default function PlayerCover(props: PlayerCoverProps) {
           </Text>
         ) : null}
       </View>
-      {isMetered ? (
-        <View className="absolute bottom-2 right-2 flex-row items-center gap-1 rounded bg-media-background/60 py-0.5 pl-2 pr-1">
-          <Text className="font-bold text-media-content">1080P</Text>
-          <Switch
-            accessibilityRole="switch"
-            accessibilityLabel="1080P 播放"
-            accessibilityHint="开启后将使用移动流量播放 1080P 视频"
-            accessibilityState={{ checked: highQuality }}
-            value={highQuality}
-            onValueChange={props.onHighQualityChange}
-            colorClassName={theme.secondary.accent}
-            trackColorOnClassName={theme.secondary.accent}
-            trackColorOffClassName={theme.background.fillMuted.accent}
-            style={{ transform: [{ scale: 0.72 }] }}
-          />
-        </View>
-      ) : null}
+      <View className="absolute right-2 top-2">
+        <QualityMenu
+          quality={props.quality}
+          availableQualities={props.availableQualities}
+          opened={qualityMenuOpen}
+          onToggle={() => setQualityMenuOpen(!qualityMenuOpen)}
+          onClose={() => setQualityMenuOpen(false)}
+          onSelect={(quality) => {
+            setQualityMenuOpen(false);
+            props.onQualityChange(quality);
+          }}
+        />
+      </View>
     </View>
-  )
+  );
 }
