@@ -1,7 +1,7 @@
 import type { FlashListRef } from '@shopify/flash-list'
 import { Check, X } from 'lucide-react-native'
 import React from 'react'
-import { Pressable, useWindowDimensions, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 
 import type { VideoInfo } from '@/api/video-info'
 import { BottomSheet } from '@/components/BottomSheet'
@@ -11,7 +11,7 @@ import { ThemedIcon } from '@/components/ThemedIcon'
 import { theme } from '@/constants/colors.tw'
 import { parseDuration } from '@/utils'
 
-import { formatVideoPageTitle, getVideoPagesSheetHeight } from './video-pages-sheet.helpers'
+import { formatVideoPageTitle } from './video-pages-sheet.helpers'
 
 type VideoPage = VideoInfo['pages'][number]
 
@@ -26,10 +26,8 @@ type VideoPagesSheetProps = {
 const SHEET_BACKDROP_OPACITY = 0.35
 
 export default function VideoPagesSheet(props: VideoPagesSheetProps) {
-  const { height } = useWindowDimensions()
   const listRef = React.useRef<FlashListRef<VideoPage>>(null)
   const loadedRef = React.useRef(false)
-  const sheetHeight = getVideoPagesSheetHeight(height, props.pages.length)
 
   function scrollToCurrentPage() {
     listRef.current?.scrollToIndex({
@@ -63,7 +61,7 @@ export default function VideoPagesSheet(props: VideoPagesSheetProps) {
     <BottomSheet
       backdropOpacity={SHEET_BACKDROP_OPACITY}
       onClose={props.onClose}
-      snapPoints={[sheetHeight]}
+      snapPoints={['70%']}
       visible={props.visible}
     >
       {/* flex-1 撑满 sheet 的内容区（sheet 高度已扣除把手），不要再写死高度 */}

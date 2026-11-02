@@ -46,7 +46,7 @@ export function CommentItem(props: CommentItemProps) {
   const deletePending = props.isDeletePending?.(comment.id) ?? false
   const meta = [
     comment.time?.replace('发布', ''),
-    comment.location?.replace('IP属地：', '').replace(/^\u4e2d\u56fd\u53f0\u6e7e$/, '\u53f0\u6e7e'),
+    comment.location?.replace('IP属地：', '').replace(/^\u4e2d\u56fd(\u53f0\u6e7e|\u9999\u6e2f|\u6fb3\u95e8)$/, '$1'),
   ]
     .filter(Boolean)
     .join(' · ')
