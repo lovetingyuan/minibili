@@ -1,15 +1,15 @@
-import React from 'react'
-import { ActivityIndicator, ScrollView, View } from 'react-native'
+import React from "react";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 
-import { useBilibiliUpRelationTags } from '@/api/useBilibiliRelationTags'
-import { CheckBox } from '@/components/CheckBox'
-import { Dialog } from '@/components/Dialog'
-import { LoadErrorText } from '@/components/LoadErrorText'
-import { Text } from '@/components/Text'
-import { theme } from '@/constants/colors.tw'
-import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
+import { useBilibiliUpRelationTags } from "@/api/useBilibiliRelationTags";
+import { CheckBox } from "@/components/CheckBox";
+import { Dialog } from "@/components/Dialog";
+import { LoadErrorText } from "@/components/LoadErrorText";
+import { Text } from "@/components/Text";
+import { theme } from "@/constants/colors.tw";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
 
-import type { SetUpGroupDialogProps } from './FollowGroups.types'
+import type { SetUpGroupDialogProps } from "./FollowGroups.types";
 
 export default function SetUpGroupDialog({
   up,
@@ -18,48 +18,48 @@ export default function SetUpGroupDialog({
   onSubmit,
   onLoginRequired,
 }: SetUpGroupDialogProps) {
-  const current = useBilibiliUpRelationTags(up.mid)
-  const [selected, setSelected] = React.useState<number[] | null>(null)
-  const [submitting, setSubmitting] = React.useState(false)
-  const [error, setError] = React.useState<Error | null>(null)
-  const initialized = React.useRef(false)
+  const current = useBilibiliUpRelationTags(up.mid);
+  const [selected, setSelected] = React.useState<number[] | null>(null);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
+  const initialized = React.useRef(false);
 
   React.useEffect(() => {
     if (initialized.current || !current.data) {
-      return
+      return;
     }
-    initialized.current = true
-    setSelected(current.data)
-  }, [current.data])
+    initialized.current = true;
+    setSelected(current.data);
+  }, [current.data]);
 
-  const selectedIds = selected ?? []
-  const selectedIdSet = new Set(selectedIds)
-  const canSubmit = selected !== null && !submitting
+  const selectedIds = selected ?? [];
+  const selectedIdSet = new Set(selectedIds);
+  const canSubmit = selected !== null && !submitting;
 
   function toggle(tagid: number) {
-    setSelected(previous => {
-      const ids = previous ?? []
-      return ids.includes(tagid) ? ids.filter(id => id !== tagid) : [...ids, tagid]
-    })
+    setSelected((previous) => {
+      const ids = previous ?? [];
+      return ids.includes(tagid) ? ids.filter((id) => id !== tagid) : [...ids, tagid];
+    });
   }
 
   async function submit() {
     if (!canSubmit) {
-      return
+      return;
     }
-    setSubmitting(true)
-    setError(null)
+    setSubmitting(true);
+    setError(null);
     try {
-      await onSubmit(selectedIds)
+      await onSubmit(selectedIds);
     } catch (cause) {
-      const failure = cause instanceof Error ? cause : new Error('设置分组失败，请稍后重试')
+      const failure = cause instanceof Error ? cause : new Error("设置分组失败，请稍后重试");
       if (isLoginRequiredError(failure)) {
-        onLoginRequired(failure)
-        return
+        onLoginRequired(failure);
+        return;
       }
-      setError(failure)
+      setError(failure);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -75,7 +75,7 @@ export default function SetUpGroupDialog({
             <LoadErrorText
               disabled={current.isValidating}
               onRetry={() => {
-                void current.mutate().catch(() => {})
+                void current.mutate().catch(() => {});
               }}
             />
           ) : (
@@ -84,14 +84,14 @@ export default function SetUpGroupDialog({
         </View>
       ) : groups.length ? (
         <ScrollView className="max-h-72" nestedScrollEnabled>
-          {groups.map(group => (
+          {groups.map((group) => (
             <CheckBox
               key={group.tagid}
               checked={selectedIdSet.has(group.tagid)}
               disabled={submitting}
               title={`${group.name}（${group.count}）`}
               onPress={() => {
-                toggle(group.tagid)
+                toggle(group.tagid);
               }}
               containerClassName="bg-transparent py-1 pl-0"
               textClassName={theme.text.primary}
@@ -115,7 +115,7 @@ export default function SetUpGroupDialog({
           loading={submitting}
           disabled={!canSubmit}
           onPress={() => {
-            void submit()
+            void submit();
           }}
         />
         <Dialog.Button
@@ -126,5 +126,5 @@ export default function SetUpGroupDialog({
         />
       </Dialog.Actions>
     </Dialog>
-  )
+  );
 }

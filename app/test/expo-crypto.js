@@ -10,7 +10,7 @@ const ALGORITHM_BY_NAME = {
   "SHA-256": "sha256",
   "SHA-384": "sha384",
   "SHA-512": "sha512",
-  "MD5": "md5",
+  MD5: "md5",
 };
 
 export const CryptoDigestAlgorithm = {

@@ -24,6 +24,4 @@ export type FeedbackRequest = {
   image?: FeedbackImagePayload;
 };
 
-export type FeedbackResponse =
-  | { success: true }
-  | { success: false; error: string };
+export type FeedbackResponse = { success: true } | { success: false; error: string };

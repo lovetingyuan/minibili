@@ -21,9 +21,7 @@ function Ranks() {
       type="Rank"
       footer={
         <View>
-          <Text className="my-3 text-center text-muted">
-            {isLoading ? "加载中..." : "到底了~"}
-          </Text>
+          <Text className="my-3 text-center text-muted">{isLoading ? "加载中..." : "到底了~"}</Text>
         </View>
       }
     />

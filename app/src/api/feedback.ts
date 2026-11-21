@@ -45,7 +45,9 @@ async function submitFeedback(input: SubmitFeedbackInput) {
       throw new Error(`反馈提交失败（HTTP ${response.status}）`);
     }
     if (!response.ok || !parsed.data.success) {
-      throw new Error(parsed.data.success ? `反馈提交失败（HTTP ${response.status}）` : parsed.data.error);
+      throw new Error(
+        parsed.data.success ? `反馈提交失败（HTTP ${response.status}）` : parsed.data.error,
+      );
     }
     return parsed.data;
   } catch (error) {

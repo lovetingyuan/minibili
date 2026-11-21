@@ -116,9 +116,7 @@ describe("useBilibiliWatchLater", () => {
     useBilibiliWatchLater();
     const load = mocks.fetcher as (key: unknown) => Promise<unknown>;
     await expect(load(["bilibili-watch-later", "123", 2])).resolves.toMatchObject({ count: 1 });
-    expect(mocks.request).toHaveBeenCalledExactlyOnceWith(
-      "/x/v2/history/toview/web",
-    );
+    expect(mocks.request).toHaveBeenCalledExactlyOnceWith("/x/v2/history/toview/web");
   });
 });
 

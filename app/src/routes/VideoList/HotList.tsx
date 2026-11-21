@@ -7,8 +7,7 @@ import VideoList from "./VideoList";
 export default Hot;
 
 function Hot() {
-  const { list, update, isRefreshing, loading, isReachingEnd, error, refresh } =
-    useHotVideos();
+  const { list, update, isRefreshing, loading, isReachingEnd, error, refresh } = useHotVideos();
   useErrToast("加载视频列表失败", error);
 
   const getFooter = (_list: any[]) => {

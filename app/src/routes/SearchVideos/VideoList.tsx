@@ -1,62 +1,62 @@
-import { Image } from '@/components/Image'
-import { Skeleton } from '@/components/Skeleton'
-import { Text } from '@/components/Text'
-import { FlashList } from '@/components/FlashList'
-import type { ImageLoadEventData } from 'expo-image'
-import React from 'react'
-import { Keyboard, Platform, TouchableOpacity, View } from 'react-native'
-import type { EmitterSubscription } from 'react-native'
+import { Image } from "@/components/Image";
+import { Skeleton } from "@/components/Skeleton";
+import { Text } from "@/components/Text";
+import { FlashList } from "@/components/FlashList";
+import type { ImageLoadEventData } from "expo-image";
+import React from "react";
+import { Keyboard, Platform, TouchableOpacity, View } from "react-native";
+import type { EmitterSubscription } from "react-native";
 
-import { useHotSearch } from '@/api/hot-search'
-import { type SearchedVideoType, useSearchVideos } from '@/api/search-video'
-import VideoListItem from '@/components/VideoItem'
-import { theme } from '@/constants/colors.tw'
-import { useStore } from '@/store'
-import { useWatchProgressRatio } from '@/store/watch-progress'
-import { getImagePixelSize, parseImgUrl } from '@/utils'
-import type { FlashListRef } from '@/components/FlashList'
+import { useHotSearch } from "@/api/hot-search";
+import { type SearchedVideoType, useSearchVideos } from "@/api/search-video";
+import VideoListItem from "@/components/VideoItem";
+import { theme } from "@/constants/colors.tw";
+import { useStore } from "@/store";
+import { useWatchProgressRatio } from "@/store/watch-progress";
+import { getImagePixelSize, parseImgUrl } from "@/utils";
+import type { FlashListRef } from "@/components/FlashList";
 
-const EMPTY_LIST_BOTTOM_SPACING = 16
+const EMPTY_LIST_BOTTOM_SPACING = 16;
 
 function useKeyboardInset() {
   const [keyboardInset, setKeyboardInset] = React.useState(() => {
-    if (Platform.OS !== 'android') {
-      return 0
+    if (Platform.OS !== "android") {
+      return 0;
     }
-    return Keyboard.metrics()?.height ?? 0
-  })
+    return Keyboard.metrics()?.height ?? 0;
+  });
 
   React.useEffect(() => {
-    if (Platform.OS !== 'android') {
-      return
+    if (Platform.OS !== "android") {
+      return;
     }
 
     const subscriptions: EmitterSubscription[] = [
-      Keyboard.addListener('keyboardDidShow', event => {
-        setKeyboardInset(event.endCoordinates.height)
+      Keyboard.addListener("keyboardDidShow", (event) => {
+        setKeyboardInset(event.endCoordinates.height);
       }),
-      Keyboard.addListener('keyboardDidHide', () => {
-        setKeyboardInset(0)
+      Keyboard.addListener("keyboardDidHide", () => {
+        setKeyboardInset(0);
       }),
-    ]
+    ];
 
     return () => {
-      subscriptions.forEach(subscription => {
-        subscription.remove()
-      })
-    }
-  }, [])
+      subscriptions.forEach((subscription) => {
+        subscription.remove();
+      });
+    };
+  }, []);
 
-  return keyboardInset
+  return keyboardInset;
 }
 
 function HotSearchIcon(props: { icon: string }) {
-  const [aspectRatio, setAspectRatio] = React.useState<number | null>(null)
-  const source = { uri: parseImgUrl(props.icon, { height: getImagePixelSize(16) }) }
+  const [aspectRatio, setAspectRatio] = React.useState<number | null>(null);
+  const source = { uri: parseImgUrl(props.icon, { height: getImagePixelSize(16) }) };
 
   function handleLoad(event: ImageLoadEventData) {
     if (event.source.width > 0 && event.source.height > 0) {
-      setAspectRatio(event.source.width / event.source.height)
+      setAspectRatio(event.source.width / event.source.height);
     }
   }
 
@@ -72,12 +72,12 @@ function HotSearchIcon(props: { icon: string }) {
       contentFit="contain"
       className="ml-1"
     />
-  )
+  );
 }
 
 function EmptyContent(props: { loading: boolean; onSearch: (k: string) => void }) {
-  const hotSearchList = useHotSearch()
-  const { $watchedHotSearch } = useStore()
+  const hotSearchList = useHotSearch();
+  const { $watchedHotSearch } = useStore();
 
   if (props.loading) {
     return (
@@ -100,43 +100,43 @@ function EmptyContent(props: { loading: boolean; onSearch: (k: string) => void }
                 </View>
               </View>
             </View>
-          )
+          );
         })}
       </View>
-    )
+    );
   }
   if (hotSearchList?.length) {
     return (
       <View className="pb-2">
-        {hotSearchList.map(hot => {
+        {hotSearchList.map((hot) => {
           return (
             <TouchableOpacity
               key={hot.hot_id}
               activeOpacity={0.7}
               onPress={() => {
-                props.onSearch(hot.keyword)
+                props.onSearch(hot.keyword);
               }}
               className="mx-2 my-1 flex-1 flex-row items-center p-2"
             >
-              <Text className={`text-base ${hot.keyword in $watchedHotSearch ? 'opacity-40' : ''}`}>
-                {hot.position}.{' '}
+              <Text className={`text-base ${hot.keyword in $watchedHotSearch ? "opacity-40" : ""}`}>
+                {hot.position}.{" "}
               </Text>
-              <Text className={`text-base ${hot.keyword in $watchedHotSearch ? 'opacity-40' : ''}`}>
+              <Text className={`text-base ${hot.keyword in $watchedHotSearch ? "opacity-40" : ""}`}>
                 {hot.show_name}
               </Text>
               {hot.icon ? <HotSearchIcon icon={hot.icon} /> : null}
             </TouchableOpacity>
-          )
+          );
         })}
       </View>
-    )
+    );
   }
-  return <Text className="my-20 text-center text-base">暂无结果</Text>
+  return <Text className="my-20 text-center text-base">暂无结果</Text>;
 }
 
 function SearchVideoItem(props: { video: SearchedVideoType }) {
-  const progressRatio = useWatchProgressRatio(props.video.bvid)
-  return <VideoListItem video={props.video} progressRatio={progressRatio} />
+  const progressRatio = useWatchProgressRatio(props.video.bvid);
+  return <VideoListItem video={props.video} progressRatio={progressRatio} />;
 }
 
 function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
@@ -146,15 +146,15 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
     update,
     isReachingEnd,
     isLoadingMore,
-  } = useSearchVideos(props.keyword)
-  const listRef = React.useRef<FlashListRef<SearchedVideoType> | null>(null)
-  const keyboardInset = useKeyboardInset()
+  } = useSearchVideos(props.keyword);
+  const listRef = React.useRef<FlashListRef<SearchedVideoType> | null>(null);
+  const keyboardInset = useKeyboardInset();
 
   React.useEffect(() => {
     if (listRef.current) {
-      listRef.current.scrollToOffset({ offset: 0 })
+      listRef.current.scrollToOffset({ offset: 0 });
     }
-  }, [props.keyword])
+  }, [props.keyword]);
 
   return (
     <FlashList
@@ -162,11 +162,11 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
       keyExtractor={(v: SearchedVideoType) => v.bvid}
       ref={listRef}
       renderItem={({ item }: { item: SearchedVideoType }) => {
-        return <SearchVideoItem video={item} />
+        return <SearchVideoItem video={item} />;
       }}
       persistentScrollbar
       keyboardShouldPersistTaps="handled"
-      automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+      automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
       ListEmptyComponent={<EmptyContent loading={isLoading} onSearch={props.onSearch} />}
       ListFooterComponent={
         isLoadingMore ? (
@@ -176,15 +176,15 @@ function VideoList(props: { keyword: string; onSearch: (k: string) => void }) {
         ) : null
       }
       contentContainerStyle={{
-        paddingBottom: EMPTY_LIST_BOTTOM_SPACING + (Platform.OS === 'android' ? keyboardInset : 0),
+        paddingBottom: EMPTY_LIST_BOTTOM_SPACING + (Platform.OS === "android" ? keyboardInset : 0),
       }}
       contentContainerClassName="px-1 pt-4"
       onEndReached={() => {
-        update()
+        update();
       }}
       onEndReachedThreshold={1}
     />
-  )
+  );
 }
 
-export default VideoList
+export default VideoList;

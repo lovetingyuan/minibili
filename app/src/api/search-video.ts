@@ -26,14 +26,11 @@ function getVideoInfo(video: SearchVideoItemType) {
 
 export const useSearchVideos = (name: string) => {
   const { data, size, setSize, isValidating, isLoading, error } =
-    useSWRInfinite<SearchVideoResponse>(
-      (index) => {
-        return name
-          ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=${index + 1}&page_size=50&platform=pc&search_type=video`
-          : null;
-      },
-      fetcher,
-    );
+    useSWRInfinite<SearchVideoResponse>((index) => {
+      return name
+        ? `/x/web-interface/wbi/search/type?keyword=${encodeURIComponent(name)}&page=${index + 1}&page_size=50&platform=pc&search_type=video`
+        : null;
+    }, fetcher);
   const isReachingEnd = !!data && (data[data.length - 1]?.result?.length ?? 0) < 50;
   // const isRefreshing = isValidating && !!data && data.length === size
   // 只有真的在追加分页时才提示加载中，避免后台重新校验时冒出来

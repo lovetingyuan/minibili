@@ -76,10 +76,7 @@ export function FAB({
               : "h-14 w-14 px-4 py-4",
           buttonClassName,
         )}
-        buttonStyle={[
-          !disabled && { backgroundColor: color ?? secondaryColor },
-          buttonStyle,
-        ]}
+        buttonStyle={[!disabled && { backgroundColor: color ?? secondaryColor }, buttonStyle]}
         containerStyle={[{ elevation: disabled ? 0 : 4 }, containerStyle]}
         titleClassName={clsx("mx-2", upperCase && "uppercase", titleClassName)}
       >

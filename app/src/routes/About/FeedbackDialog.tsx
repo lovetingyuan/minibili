@@ -1,102 +1,102 @@
-import { File } from 'expo-file-system'
-import { useState } from 'react'
-import { TextInput, View } from 'react-native'
+import { File } from "expo-file-system";
+import { useState } from "react";
+import { TextInput, View } from "react-native";
 
-import { useSubmitFeedback } from '@/api/feedback'
-import type { SelectedFeedbackImage } from '@/api/feedback.types'
-import { Dialog } from '@/components/Dialog'
-import { Image } from '@/components/Image'
-import { Button } from '@/components/Button'
-import { Text } from '@/components/Text'
-import { theme } from '@/constants/colors.tw'
-import { bilibiliSession } from '@/features/bilibili-session/session'
-import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'
-import { showToast } from '@/utils'
+import { useSubmitFeedback } from "@/api/feedback";
+import type { SelectedFeedbackImage } from "@/api/feedback.types";
+import { Dialog } from "@/components/Dialog";
+import { Image } from "@/components/Image";
+import { Button } from "@/components/Button";
+import { Text } from "@/components/Text";
+import { theme } from "@/constants/colors.tw";
+import { bilibiliSession } from "@/features/bilibili-session/session";
+import { useBilibiliSessionState } from "@/features/bilibili-session/useBilibiliSession";
+import { showToast } from "@/utils";
 import {
   FEEDBACK_IMAGE_MIME_TYPES,
   FEEDBACK_MAX_IMAGE_BYTES,
   FEEDBACK_MAX_LENGTH,
-} from '../../../../shared/feedback'
-import type { FeedbackImageMimeType } from '../../../../shared/feedback'
+} from "../../../../shared/feedback";
+import type { FeedbackImageMimeType } from "../../../../shared/feedback";
 
-import type { FeedbackDialogProps } from './feedback.types'
+import type { FeedbackDialogProps } from "./feedback.types";
 
 const MIME_BY_EXTENSION: Record<string, FeedbackImageMimeType> = {
-  '.gif': 'image/gif',
-  '.jpeg': 'image/jpeg',
-  '.jpg': 'image/jpeg',
-  '.png': 'image/png',
-  '.webp': 'image/webp',
-}
+  ".gif": "image/gif",
+  ".jpeg": "image/jpeg",
+  ".jpg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+};
 
 function getImageMimeType(file: File): FeedbackImageMimeType | null {
   const normalizedType =
-    file.type.toLowerCase() === 'image/jpg' ? 'image/jpeg' : file.type.toLowerCase()
-  const matchingType = FEEDBACK_IMAGE_MIME_TYPES.find(mimeType => mimeType === normalizedType)
-  return matchingType ?? MIME_BY_EXTENSION[file.extension.toLowerCase()] ?? null
+    file.type.toLowerCase() === "image/jpg" ? "image/jpeg" : file.type.toLowerCase();
+  const matchingType = FEEDBACK_IMAGE_MIME_TYPES.find((mimeType) => mimeType === normalizedType);
+  return matchingType ?? MIME_BY_EXTENSION[file.extension.toLowerCase()] ?? null;
 }
 
 function formatFileSize(size: number) {
   if (size < 1024 * 1024) {
-    return `${Math.max(1, Math.round(size / 1024))} KB`
+    return `${Math.max(1, Math.round(size / 1024))} KB`;
   }
-  return `${(size / 1024 / 1024).toFixed(1)} MB`
+  return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }
 
 export default function FeedbackDialog({ onClose }: FeedbackDialogProps) {
-  const [feedback, setFeedback] = useState('')
-  const [image, setImage] = useState<SelectedFeedbackImage | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [inputFocused, setInputFocused] = useState(false)
-  const { account, control } = useBilibiliSessionState()
-  const { submit, isSubmitting } = useSubmitFeedback()
-  const characterCount = Array.from(feedback).length
+  const [feedback, setFeedback] = useState("");
+  const [image, setImage] = useState<SelectedFeedbackImage | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [inputFocused, setInputFocused] = useState(false);
+  const { account, control } = useBilibiliSessionState();
+  const { submit, isSubmitting } = useSubmitFeedback();
+  const characterCount = Array.from(feedback).length;
   const canSubmit =
-    Boolean(feedback.trim()) && characterCount <= FEEDBACK_MAX_LENGTH && !isSubmitting
+    Boolean(feedback.trim()) && characterCount <= FEEDBACK_MAX_LENGTH && !isSubmitting;
   const currentAccount =
-    control.phase === 'ready' && account && bilibiliSession.isCurrentAccount(account)
+    control.phase === "ready" && account && bilibiliSession.isCurrentAccount(account)
       ? account
-      : null
+      : null;
 
   function close() {
     if (!isSubmitting) {
-      onClose()
+      onClose();
     }
   }
 
   async function pickImage() {
-    setError(null)
+    setError(null);
     try {
-      const result = await File.pickFileAsync({ mimeTypes: 'image/*' })
+      const result = await File.pickFileAsync({ mimeTypes: "image/*" });
       if (result.canceled) {
-        return
+        return;
       }
-      const mimeType = getImageMimeType(result.result)
+      const mimeType = getImageMimeType(result.result);
       if (!mimeType) {
-        setError('仅支持 JPEG、PNG、WebP 或 GIF 图片')
-        return
+        setError("仅支持 JPEG、PNG、WebP 或 GIF 图片");
+        return;
       }
       if (result.result.size > FEEDBACK_MAX_IMAGE_BYTES) {
-        setError('图片不能超过 5MB')
-        return
+        setError("图片不能超过 5MB");
+        return;
       }
-      setImage({ file: result.result, mimeType })
+      setImage({ file: result.result, mimeType });
     } catch {
-      setError('无法读取所选图片，请重新选择')
+      setError("无法读取所选图片，请重新选择");
     }
   }
 
   async function handleSubmit() {
     if (!canSubmit) {
-      return
+      return;
     }
-    setError(null)
+    setError(null);
     try {
-      await submit({ feedback: feedback.trim(), biliId: currentAccount?.mid ?? null, image })
-      showToast('反馈已发送，感谢你的意见')
-      onClose()
+      await submit({ feedback: feedback.trim(), biliId: currentAccount?.mid ?? null, image });
+      showToast("反馈已发送，感谢你的意见");
+      onClose();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : '反馈提交失败，请稍后重试')
+      setError(cause instanceof Error ? cause.message : "反馈提交失败，请稍后重试");
     }
   }
 
@@ -116,9 +116,9 @@ export default function FeedbackDialog({ onClose }: FeedbackDialogProps) {
         className={`min-h-24 max-h-36 rounded-lg border px-3 py-2 text-base ${inputFocused ? theme.primary.border : theme.border.outline} ${theme.text.primary}`}
         onFocus={() => setInputFocused(true)}
         onBlur={() => setInputFocused(false)}
-        onChangeText={value => {
-          setFeedback(Array.from(value).slice(0, FEEDBACK_MAX_LENGTH).join(''))
-          setError(null)
+        onChangeText={(value) => {
+          setFeedback(Array.from(value).slice(0, FEEDBACK_MAX_LENGTH).join(""));
+          setError(null);
         }}
       />
 
@@ -161,8 +161,8 @@ export default function FeedbackDialog({ onClose }: FeedbackDialogProps) {
               disabled={isSubmitting}
               titleClassName={theme.error.text}
               onPress={() => {
-                setImage(null)
-                setError(null)
+                setImage(null);
+                setError(null);
               }}
             >
               移除
@@ -194,5 +194,5 @@ export default function FeedbackDialog({ onClose }: FeedbackDialogProps) {
         />
       </Dialog.Actions>
     </Dialog>
-  )
+  );
 }

@@ -24,7 +24,10 @@ let snapshot: BilibiliAuthExpirationSnapshot = {
   confirmedGeneration: null,
 };
 
-function publish(error: BilibiliAuthExpiredError | null, confirmedGeneration: number | null = null) {
+function publish(
+  error: BilibiliAuthExpiredError | null,
+  confirmedGeneration: number | null = null,
+) {
   snapshot = { error, version: snapshot.version + 1, confirmedGeneration };
   listeners.forEach((listener) => listener());
 }

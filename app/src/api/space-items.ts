@@ -30,9 +30,8 @@ async function fetchSpaceOpusPage(url: string) {
 }
 
 export function useSpaceContentCounts(mid?: string | number) {
-  const { data } = useSWR(
-    mid ? buildSpaceContentCountsUrl(mid) : null,
-    async (url: string) => SpaceContentCountsSchema.parse(await request<unknown>(url)),
+  const { data } = useSWR(mid ? buildSpaceContentCountsUrl(mid) : null, async (url: string) =>
+    SpaceContentCountsSchema.parse(await request<unknown>(url)),
   );
 
   return {

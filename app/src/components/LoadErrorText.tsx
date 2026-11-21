@@ -1,12 +1,12 @@
-import { Text } from '@/components/Text'
-import { theme } from '@/constants/colors.tw'
-import type { LoadErrorTextProps } from './LoadErrorText.types'
+import { Text } from "@/components/Text";
+import { theme } from "@/constants/colors.tw";
+import type { LoadErrorTextProps } from "./LoadErrorText.types";
 
 export function LoadErrorText({
-  message = '加载失败',
+  message = "加载失败",
   disabled = false,
   onRetry,
-  className = 'text-sm',
+  className = "text-sm",
   colorClassName = theme.text.muted,
   retryClassName = theme.primary.text,
 }: LoadErrorTextProps) {
@@ -25,5 +25,5 @@ export function LoadErrorText({
         点击重试
       </Text>
     </Text>
-  )
+  );
 }

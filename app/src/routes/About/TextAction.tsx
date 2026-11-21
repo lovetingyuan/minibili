@@ -1,21 +1,21 @@
-import { Button } from '@/components/Button'
-import { Text } from '@/components/Text'
-import React from 'react'
-import { View } from 'react-native'
+import { Button } from "@/components/Button";
+import { Text } from "@/components/Text";
+import React from "react";
+import { View } from "react-native";
 
-export default TextAction
+export default TextAction;
 
 function TextAction(
   props: React.PropsWithChildren<{
-    text: string
-    onTextPress?: () => void
-    onTextLongPress?: () => void
+    text: string;
+    onTextPress?: () => void;
+    onTextLongPress?: () => void;
     buttons: {
-      text: string
-      loading?: boolean
-      color?: string
-      onPress: () => void
-    }[]
+      text: string;
+      loading?: boolean;
+      color?: string;
+      onPress: () => void;
+    }[];
   }>,
 ) {
   return (
@@ -24,7 +24,7 @@ function TextAction(
         {props.text}
       </Text>
       <View className="flex-row">
-        {props.buttons.map(button => {
+        {props.buttons.map((button) => {
           return (
             <Button
               type="clear"
@@ -34,15 +34,15 @@ function TextAction(
               buttonClassName="h-8"
               titleStyle={button.color ? { color: button.color } : undefined}
               onPress={() => {
-                button.onPress()
+                button.onPress();
               }}
             >
               {button.text}
             </Button>
-          )
+          );
         })}
       </View>
       {props.children}
     </View>
-  )
+  );
 }

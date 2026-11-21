@@ -151,7 +151,10 @@ export async function showFatalError(error: any) {
   // }
   const availableUpdate =
     process.env.EXPO_OS === "android"
-      ? resolveAvailableAppUpdate(updateInfo ?? undefined, Application.nativeApplicationVersion ?? "0.0.0")
+      ? resolveAvailableAppUpdate(
+          updateInfo ?? undefined,
+          Application.nativeApplicationVersion ?? "0.0.0",
+        )
       : null;
 
   Alert.alert(

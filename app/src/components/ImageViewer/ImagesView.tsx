@@ -1,36 +1,36 @@
-import { Download, ScanSearch, X } from 'lucide-react-native'
-import { useReducer, useState } from 'react'
-import { ActivityIndicator, Modal, Pressable, useWindowDimensions, View } from 'react-native'
-import type { LayoutChangeEvent } from 'react-native'
-import { GestureViewer, useGestureViewerState } from 'react-native-gesture-image-viewer'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Download, ScanSearch, X } from "lucide-react-native";
+import { useReducer, useState } from "react";
+import { ActivityIndicator, Modal, Pressable, useWindowDimensions, View } from "react-native";
+import type { LayoutChangeEvent } from "react-native";
+import { GestureViewer, useGestureViewerState } from "react-native-gesture-image-viewer";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import useResolvedColor from '@/hooks/useResolvedColor'
-import useResolvedStyle from '@/hooks/useResolvedStyle'
-import { theme } from '@/constants/colors.tw'
-import { Image } from '@/components/Image'
-import { Text } from '@/components/Text'
-import { ThemedIcon } from '@/components/ThemedIcon'
-import { useSaveImage } from '@/hooks/useSaveImage'
-import { useStore } from '@/store'
-import { showToast } from '@/utils'
-import { normalizeImages } from './image-viewer-images'
-import { getOriginalImageButtonLabel, updateOriginalImageStatuses } from './image-viewer-state'
+import useResolvedColor from "@/hooks/useResolvedColor";
+import useResolvedStyle from "@/hooks/useResolvedStyle";
+import { theme } from "@/constants/colors.tw";
+import { Image } from "@/components/Image";
+import { Text } from "@/components/Text";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { useSaveImage } from "@/hooks/useSaveImage";
+import { useStore } from "@/store";
+import { showToast } from "@/utils";
+import { normalizeImages } from "./image-viewer-images";
+import { getOriginalImageButtonLabel, updateOriginalImageStatuses } from "./image-viewer-state";
 import type {
   ImageViewerControlsProps,
   ImageViewerGalleryProps,
   ImageViewerItem,
   ImageViewerSourceProps,
-} from './image-viewer.types'
+} from "./image-viewer.types";
 
-const ViewerId = 'images-viewer'
+const ViewerId = "images-viewer";
 
 function getItemDimensions(image: ImageViewerItem) {
-  return image.width > 0 && image.height > 0 ? image : undefined
+  return image.width > 0 && image.height > 0 ? image : undefined;
 }
 
 function getItemKey(image: ImageViewerItem) {
-  return `${image.uri}:${image.width}:${image.height}`
+  return `${image.uri}:${image.width}:${image.height}`;
 }
 
 function ImageViewerGallery({
@@ -40,24 +40,24 @@ function ImageViewerGallery({
   onClose,
   width,
 }: ImageViewerGalleryProps) {
-  const backdropStyle = useResolvedStyle('bg-backdrop/88')
+  const backdropStyle = useResolvedStyle("bg-backdrop/88");
   const [originalImageStatuses, dispatchOriginalImageStatus] = useReducer(
     updateOriginalImageStatuses,
     {},
-  )
+  );
 
   const handleOriginalLoaded = (uri: string) => {
-    dispatchOriginalImageStatus({ type: 'loaded', uri })
-  }
+    dispatchOriginalImageStatus({ type: "loaded", uri });
+  };
 
   const handleOriginalFailed = (uri: string) => {
-    dispatchOriginalImageStatus({ type: 'failed', uri })
-    showToast('原图加载失败，请稍后重试')
-  }
+    dispatchOriginalImageStatus({ type: "failed", uri });
+    showToast("原图加载失败，请稍后重试");
+  };
 
   const requestOriginal = (uri: string) => {
-    dispatchOriginalImageStatus({ type: 'request', uri })
-  }
+    dispatchOriginalImageStatus({ type: "request", uri });
+  };
 
   return (
     <GestureViewer
@@ -92,13 +92,13 @@ function ImageViewerGallery({
           info={info}
           onOriginalFailed={handleOriginalFailed}
           onOriginalLoaded={handleOriginalLoaded}
-          originalStatus={originalImageStatuses[image.originalUri] ?? 'idle'}
+          originalStatus={originalImageStatuses[image.originalUri] ?? "idle"}
         />
       )}
       width={width}
       windowSize={3}
     />
-  )
+  );
 }
 
 function ImageViewerSource({
@@ -108,9 +108,9 @@ function ImageViewerSource({
   onOriginalLoaded,
   originalStatus,
 }: ImageViewerSourceProps) {
-  const contentColor = useResolvedColor(theme.media.content)
-  const [loading, setLoading] = useState(true)
-  const showOriginal = image.uri !== image.originalUri && originalStatus !== 'idle'
+  const contentColor = useResolvedColor(theme.media.content);
+  const [loading, setLoading] = useState(true);
+  const showOriginal = image.uri !== image.originalUri && originalStatus !== "idle";
 
   return (
     <View className="h-full w-full" pointerEvents="none">
@@ -125,10 +125,10 @@ function ImageViewerSource({
         contentFit="contain"
         onError={() => setLoading(false)}
         onLoad={({ source }) => {
-          info.setItemDimensions(source)
-          setLoading(false)
+          info.setItemDimensions(source);
+          setLoading(false);
         }}
-        priority={info.isActive ? 'high' : 'normal'}
+        priority={info.isActive ? "high" : "normal"}
         recyclingKey={image.uri}
         source={{ uri: image.uri }}
         transition={0}
@@ -140,17 +140,17 @@ function ImageViewerSource({
           contentFit="contain"
           onError={() => onOriginalFailed(image.originalUri)}
           onLoad={({ source }) => {
-            info.setItemDimensions(source)
-            onOriginalLoaded(image.originalUri)
+            info.setItemDimensions(source);
+            onOriginalLoaded(image.originalUri);
           }}
-          priority={info.isActive ? 'high' : 'normal'}
+          priority={info.isActive ? "high" : "normal"}
           recyclingKey={image.originalUri}
           source={{ uri: image.originalUri }}
           transition={120}
         />
       ) : null}
     </View>
-  )
+  );
 }
 
 function ImageViewerControls({
@@ -160,21 +160,21 @@ function ImageViewerControls({
   onOriginalRequest,
   originalImageStatuses,
 }: ImageViewerControlsProps) {
-  const contentColor = useResolvedColor(theme.media.content)
+  const contentColor = useResolvedColor(theme.media.content);
   // 页码和下载状态只更新工具栏，不让整个查看器随之重渲染。
-  const { currentIndex, totalCount } = useGestureViewerState(ViewerId)
-  const { saving, saveImage } = useSaveImage()
-  const insets = useSafeAreaInsets()
-  const activeIndex = totalCount === images.length ? currentIndex : initialIndex
-  const safeActiveIndex = Math.min(Math.max(activeIndex, 0), images.length - 1)
-  const activeImage = images[safeActiveIndex]
+  const { currentIndex, totalCount } = useGestureViewerState(ViewerId);
+  const { saving, saveImage } = useSaveImage();
+  const insets = useSafeAreaInsets();
+  const activeIndex = totalCount === images.length ? currentIndex : initialIndex;
+  const safeActiveIndex = Math.min(Math.max(activeIndex, 0), images.length - 1);
+  const activeImage = images[safeActiveIndex];
   const originalStatus = activeImage
-    ? (originalImageStatuses[activeImage.originalUri] ?? 'idle')
-    : 'idle'
-  const isOriginal = activeImage?.uri === activeImage?.originalUri
-  const originalButtonLabel = getOriginalImageButtonLabel(originalStatus, isOriginal)
-  const originalButtonDisabled = !activeImage || isOriginal || originalStatus !== 'idle'
-  const downloadButtonDisabled = !activeImage || saving
+    ? (originalImageStatuses[activeImage.originalUri] ?? "idle")
+    : "idle";
+  const isOriginal = activeImage?.uri === activeImage?.originalUri;
+  const originalButtonLabel = getOriginalImageButtonLabel(originalStatus, isOriginal);
+  const originalButtonDisabled = !activeImage || isOriginal || originalStatus !== "idle";
+  const downloadButtonDisabled = !activeImage || saving;
 
   return (
     <View className="absolute inset-0" pointerEvents="box-none">
@@ -203,16 +203,16 @@ function ImageViewerControls({
             accessibilityLabel={originalButtonLabel}
             accessibilityRole="button"
             accessibilityState={{ disabled: originalButtonDisabled }}
-            className={`flex-row items-center gap-2 ${originalButtonDisabled ? 'opacity-70' : ''}`}
+            className={`flex-row items-center gap-2 ${originalButtonDisabled ? "opacity-70" : ""}`}
             disabled={originalButtonDisabled}
             hitSlop={12}
             onPress={() => {
               if (!originalButtonDisabled && activeImage) {
-                onOriginalRequest(activeImage.originalUri)
+                onOriginalRequest(activeImage.originalUri);
               }
             }}
           >
-            {originalStatus === 'loading' ? (
+            {originalStatus === "loading" ? (
               <ActivityIndicator color={contentColor} size="small" />
             ) : (
               <ThemedIcon colorClassName="text-media-content" icon={ScanSearch} size={20} />
@@ -223,12 +223,12 @@ function ImageViewerControls({
             accessibilityLabel="下载图片"
             accessibilityRole="button"
             accessibilityState={{ disabled: downloadButtonDisabled }}
-            className={`flex-row items-center gap-2 ${downloadButtonDisabled ? 'opacity-70' : ''}`}
+            className={`flex-row items-center gap-2 ${downloadButtonDisabled ? "opacity-70" : ""}`}
             disabled={downloadButtonDisabled}
             hitSlop={12}
             onPress={() => {
               if (!downloadButtonDisabled && activeImage) {
-                void saveImage(activeImage.originalUri)
+                void saveImage(activeImage.originalUri);
               }
             }}
           >
@@ -245,31 +245,31 @@ function ImageViewerControls({
         </View>
       </View>
     </View>
-  )
+  );
 }
 
 function ImagesView() {
-  const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } = useStore()
-  const windowDimensions = useWindowDimensions()
-  const [viewport, setViewport] = useState(windowDimensions)
-  const images = normalizeImages(imagesList, viewport.width, viewport.height)
-  const visible = images.length > 0
-  const galleryKey = `${currentImageIndex}:${images.map(image => image.originalUri).join('|')}`
+  const { imagesList, currentImageIndex, setImagesList, setCurrentImageIndex } = useStore();
+  const windowDimensions = useWindowDimensions();
+  const [viewport, setViewport] = useState(windowDimensions);
+  const images = normalizeImages(imagesList, viewport.width, viewport.height);
+  const visible = images.length > 0;
+  const galleryKey = `${currentImageIndex}:${images.map((image) => image.originalUri).join("|")}`;
 
   const closeViewer = () => {
-    setImagesList([])
-    setCurrentImageIndex(0)
-  }
+    setImagesList([]);
+    setCurrentImageIndex(0);
+  };
 
   const handleLayout = ({ nativeEvent: { layout } }: LayoutChangeEvent) => {
     if (layout.width > 0 && layout.height > 0) {
-      setViewport(previous =>
+      setViewport((previous) =>
         previous.width === layout.width && previous.height === layout.height
           ? previous
           : { ...previous, width: layout.width, height: layout.height },
-      )
+      );
     }
-  }
+  };
 
   return (
     <Modal
@@ -294,7 +294,7 @@ function ImagesView() {
         ) : null}
       </View>
     </Modal>
-  )
+  );
 }
 
-export default ImagesView
+export default ImagesView;

@@ -1,36 +1,38 @@
-import { useNavigation, useRoute } from '@react-navigation/native'
-import type { RouteProp } from '@react-navigation/native'
-import { Pressable, View } from 'react-native'
+import { useNavigation, useRoute } from "@react-navigation/native";
+import type { RouteProp } from "@react-navigation/native";
+import { Pressable, View } from "react-native";
 
-import type { DynamicItem } from '@/api/dynamic-items.type'
-import type { DynamicArticle } from '@/api/opus-detail.type'
-import { theme } from '@/constants/colors.tw'
-import type { NavigationProps, RootStackParamList } from '@/types'
-import { getImagePixelSize, parseDate, parseImgUrl } from '@/utils'
+import type { DynamicItem } from "@/api/dynamic-items.type";
+import type { DynamicArticle } from "@/api/opus-detail.type";
+import { theme } from "@/constants/colors.tw";
+import type { NavigationProps, RootStackParamList } from "@/types";
+import { getImagePixelSize, parseDate, parseImgUrl } from "@/utils";
 
-import { Additional } from './Additional'
-import RichTexts from '../RichTexts'
-import { Avatar } from '../Avatar'
-import { Text } from '@/components/Text'
-import UpName from '../UpName'
-import { DynamicArticleContent, DynamicArticleLoading } from './dynamic-article'
-import { DynamicActions } from './dynamic-actions'
-import { DynamicMedia } from './dynamic-media'
-import { getDynamicUpTarget } from './dynamic-target'
-import { useOpenDynamicItem } from './use-open-dynamic-item'
+import { Additional } from "./Additional";
+import RichTexts from "../RichTexts";
+import { Avatar } from "../Avatar";
+import { Text } from "@/components/Text";
+import UpName from "../UpName";
+import { DynamicArticleContent, DynamicArticleLoading } from "./dynamic-article";
+import { DynamicActions } from "./dynamic-actions";
+import { DynamicMedia } from "./dynamic-media";
+import { getDynamicUpTarget } from "./dynamic-target";
+import { useOpenDynamicItem } from "./use-open-dynamic-item";
 
 function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
-  const { item, compact } = props
-  const navigation = useNavigation<NavigationProps['navigation']>()
-  const route = useRoute<RouteProp<RootStackParamList, 'Dynamic'>>()
-  const avatarSize = compact ? 28 : 36
-  const meta = [item.date || parseDate(item.time, true), item.pubAction].filter(Boolean).join(' · ')
+  const { item, compact } = props;
+  const navigation = useNavigation<NavigationProps["navigation"]>();
+  const route = useRoute<RouteProp<RootStackParamList, "Dynamic">>();
+  const avatarSize = compact ? 28 : 36;
+  const meta = [item.date || parseDate(item.time, true), item.pubAction]
+    .filter(Boolean)
+    .join(" · ");
   const openUpSpace = () => {
-    if (route.name === 'Dynamic' && String(route.params?.user.mid) === String(item.author.mid)) {
-      return
+    if (route.name === "Dynamic" && String(route.params?.user.mid) === String(item.author.mid)) {
+      return;
     }
-    navigation.push('Dynamic', getDynamicUpTarget(item.author))
-  }
+    navigation.push("Dynamic", getDynamicUpTarget(item.author));
+  };
 
   return (
     <View className="mb-3 flex-row items-center">
@@ -56,9 +58,9 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
           mid={item.author.mid}
           numberOfLines={1}
           onPress={openUpSpace}
-          className={`shrink ${compact ? 'text-sm font-semibold' : 'text-base font-semibold'}`}
+          className={`shrink ${compact ? "text-sm font-semibold" : "text-base font-semibold"}`}
         >
-          {item.author.name || '未知用户'}
+          {item.author.name || "未知用户"}
         </UpName>
         {item.top ? (
           <View
@@ -77,17 +79,17 @@ function DynamicAuthorRow(props: { item: DynamicItem; compact?: boolean }) {
         ) : null}
       </View>
     </View>
-  )
+  );
 }
 
 function DynamicBody(props: {
-  item: DynamicItem
-  detail?: boolean
-  forward?: boolean
-  article?: DynamicArticle
-  articleLoading?: boolean
+  item: DynamicItem;
+  detail?: boolean;
+  forward?: boolean;
+  article?: DynamicArticle;
+  articleLoading?: boolean;
 }) {
-  const { item, detail, forward, article, articleLoading } = props
+  const { item, detail, forward, article, articleLoading } = props;
   // 专栏全文可用时，正文以全文为准，避免再渲染一遍折叠摘要
   if (article) {
     return (
@@ -95,7 +97,7 @@ function DynamicBody(props: {
         <DynamicArticleContent article={article} selectable={detail} />
         <Additional additional={item.additional} forward={forward} />
       </>
-    )
+    );
   }
   if (articleLoading) {
     return (
@@ -103,7 +105,7 @@ function DynamicBody(props: {
         <DynamicArticleLoading />
         <Additional additional={item.additional} forward={forward} />
       </>
-    )
+    );
   }
   return (
     <>
@@ -142,69 +144,67 @@ function DynamicBody(props: {
       <DynamicMedia content={item.content} author={item.author} detail={detail} forward={forward} />
       <Additional additional={item.additional} forward={forward} />
     </>
-  )
+  );
 }
 
 function ForwardCard(props: { item: DynamicItem; detail?: boolean }) {
-  const openDynamicItem = useOpenDynamicItem()
-  const { item, detail } = props
+  const openDynamicItem = useOpenDynamicItem();
+  const { item, detail } = props;
   // 被转发的原动态失效时接口只会给出一个没有 id 的占位数据：
   // 既没有可跳转的详情页，也没有作者信息，因此只展示不可交互的失效提示。
   if (!item.id) {
     return (
       <View className="mb-3 rounded-lg bg-fill-raised p-3">
         <Text className={`text-sm ${theme.text.muted}`}>
-          {item.content.kind === 'unavailable' ? item.content.message : '原动态不可见'}
+          {item.content.kind === "unavailable" ? item.content.message : "原动态不可见"}
         </Text>
       </View>
-    )
+    );
   }
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="查看被转发的动态"
       className="mb-3 rounded-lg bg-fill-raised p-3"
-      onPress={event => {
+      onPress={(event) => {
         // 内层卡片拦截点击，避免同时触发外层转发动态的整卡跳转
-        event.stopPropagation()
-        openDynamicItem(item)
+        event.stopPropagation();
+        openDynamicItem(item);
       }}
     >
       <DynamicAuthorRow item={item} compact />
       <DynamicBody item={item} detail={detail} forward />
     </Pressable>
-  )
+  );
 }
 
 export function DynamicCard(props: {
-  item: DynamicItem
-  detail?: boolean
-  onPress?: () => void
-  onCommentPress?: () => void
-  article?: DynamicArticle
-  articleLoading?: boolean
-  showActions?: boolean
+  item: DynamicItem;
+  detail?: boolean;
+  onPress?: () => void;
+  onCommentPress?: () => void;
+  article?: DynamicArticle;
+  articleLoading?: boolean;
+  showActions?: boolean;
 }) {
-  const { item, detail, onPress, article, articleLoading } = props
+  const { item, detail, onPress, article, articleLoading } = props;
   const body = (
     <>
       <DynamicAuthorRow item={item} />
       <DynamicBody item={item} detail={detail} article={article} articleLoading={articleLoading} />
       {item.original ? <ForwardCard item={item.original} detail={detail} /> : null}
     </>
-  )
+  );
   return (
-    <View
-      className={detail ? 'bg-surface px-3 py-4' : 'bg-surface p-4'}
-    >
+    <View className={detail ? "bg-surface px-3 py-4" : "bg-surface p-4"}>
       {onPress ? <Pressable onPress={onPress}>{body}</Pressable> : <View>{body}</View>}
       {props.showActions === false ? null : (
         <DynamicActions
           item={item}
           onCommentPress={props.onCommentPress ?? (detail ? undefined : onPress)}
-          commentAccessibilityLabel={detail ? '写评论' : '查看评论'}
+          commentAccessibilityLabel={detail ? "写评论" : "查看评论"}
         />
       )}
     </View>
-  )
+  );
 }

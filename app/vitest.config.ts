@@ -3,23 +3,15 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 const reactNativeStub = fileURLToPath(new URL("./test/react-native.js", import.meta.url));
-const reanimatedStub = fileURLToPath(
-  new URL("./test/react-native-reanimated.js", import.meta.url),
-);
+const reanimatedStub = fileURLToPath(new URL("./test/react-native-reanimated.js", import.meta.url));
 const safeAreaStub = fileURLToPath(
   new URL("./test/react-native-safe-area-context.js", import.meta.url),
 );
-const expoSecureStoreStub = fileURLToPath(
-  new URL("./test/expo-secure-store.js", import.meta.url),
-);
+const expoSecureStoreStub = fileURLToPath(new URL("./test/expo-secure-store.js", import.meta.url));
 const expoCryptoStub = fileURLToPath(new URL("./test/expo-crypto.js", import.meta.url));
-const expoApplicationStub = fileURLToPath(
-  new URL("./test/expo-application.js", import.meta.url),
-);
+const expoApplicationStub = fileURLToPath(new URL("./test/expo-application.js", import.meta.url));
 const expoUpdatesStub = fileURLToPath(new URL("./test/expo-updates.js", import.meta.url));
-const expoFileSystemStub = fileURLToPath(
-  new URL("./test/expo-file-system.js", import.meta.url),
-);
+const expoFileSystemStub = fileURLToPath(new URL("./test/expo-file-system.js", import.meta.url));
 const expoIntentLauncherStub = fileURLToPath(
   new URL("./test/expo-intent-launcher.js", import.meta.url),
 );

@@ -1,6 +1,6 @@
-import { Switch as NativeSwitch } from 'react-native'
-import useResolvedColor from '@/hooks/useResolvedColor'
-import type { SwitchProps } from './Switch.types'
+import { Switch as NativeSwitch } from "react-native";
+import useResolvedColor from "@/hooks/useResolvedColor";
+import type { SwitchProps } from "./Switch.types";
 
 export function Switch({
   colorClassName,
@@ -12,10 +12,10 @@ export function Switch({
   trackColor,
   ...props
 }: SwitchProps) {
-  const resolvedColor = useResolvedColor(colorClassName)
-  const resolvedIosBackgroundColor = useResolvedColor(iosBackgroundColorClassName)
-  const resolvedTrackColorOn = useResolvedColor(trackColorOnClassName)
-  const resolvedTrackColorOff = useResolvedColor(trackColorOffClassName)
+  const resolvedColor = useResolvedColor(colorClassName);
+  const resolvedIosBackgroundColor = useResolvedColor(iosBackgroundColorClassName);
+  const resolvedTrackColorOn = useResolvedColor(trackColorOnClassName);
+  const resolvedTrackColorOff = useResolvedColor(trackColorOffClassName);
 
   return (
     <NativeSwitch
@@ -27,5 +27,5 @@ export function Switch({
         true: resolvedTrackColorOn ?? trackColor?.true,
       }}
     />
-  )
+  );
 }

@@ -1,6 +1,6 @@
-import { useIsFocused } from '@react-navigation/native'
-import { Star } from 'lucide-react-native'
-import React from 'react'
+import { useIsFocused } from "@react-navigation/native";
+import { Star } from "lucide-react-native";
+import React from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,58 +8,58 @@ import {
   ScrollView,
   TouchableOpacity,
   View,
-} from 'react-native'
+} from "react-native";
 
 import {
   useBilibiliFavoriteFolderActions,
   useBilibiliFavoriteFolders,
   useBilibiliFavoriteResources,
-} from '@/api/useBilibiliFavorites'
-import type { FavoriteAccount, FavoriteFolder, FavoriteListItem } from '@/api/favorites.types'
-import { LoginRequired } from '@/components/LoginRequired'
-import { Button } from '@/components/Button'
-import { LoadErrorText } from '@/components/LoadErrorText'
-import { FlashList } from '@/components/FlashList'
-import { Text } from '@/components/Text'
-import { ThemedIcon } from '@/components/ThemedIcon'
-import VideoListItem from '@/components/VideoItem'
-import { overlayIcons } from '@/constants/overlay-icons'
-import { theme } from '@/constants/colors.tw'
-import { BilibiliSessionChangedError } from '@/features/bilibili-session/controller'
-import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
-import { showLoginRequiredAlert } from '@/features/bilibili-session/login-required-alert'
-import { bilibiliSession } from '@/features/bilibili-session/session'
+} from "@/api/useBilibiliFavorites";
+import type { FavoriteAccount, FavoriteFolder, FavoriteListItem } from "@/api/favorites.types";
+import { LoginRequired } from "@/components/LoginRequired";
+import { Button } from "@/components/Button";
+import { LoadErrorText } from "@/components/LoadErrorText";
+import { FlashList } from "@/components/FlashList";
+import { Text } from "@/components/Text";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import VideoListItem from "@/components/VideoItem";
+import { overlayIcons } from "@/constants/overlay-icons";
+import { theme } from "@/constants/colors.tw";
+import { BilibiliSessionChangedError } from "@/features/bilibili-session/controller";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
+import { showLoginRequiredAlert } from "@/features/bilibili-session/login-required-alert";
+import { bilibiliSession } from "@/features/bilibili-session/session";
 import {
   useBilibiliSessionActions,
   useBilibiliSessionState,
-} from '@/features/bilibili-session/useBilibiliSession'
-import { useStore } from '@/store'
-import { showToast } from '@/utils'
-import FavoriteDialog from '../Player/FavoriteDialog'
-import FavoriteFolderTabs from './FavoriteFolderTabs'
-import type { FavoriteEditorTarget } from './Favorites.types'
+} from "@/features/bilibili-session/useBilibiliSession";
+import { useStore } from "@/store";
+import { showToast } from "@/utils";
+import FavoriteDialog from "../Player/FavoriteDialog";
+import FavoriteFolderTabs from "./FavoriteFolderTabs";
+import type { FavoriteEditorTarget } from "./Favorites.types";
 
 export default function FavoritesContent() {
-  const folders = useBilibiliFavoriteFolders()
-  const { deleteFolder } = useBilibiliFavoriteFolderActions()
-  const [selectedId, setSelectedId] = React.useState<number>()
-  const [refreshing, setRefreshing] = React.useState(false)
-  const refreshingRef = React.useRef(false)
-  const folderList = folders.data?.list ?? []
-  const folder = folderList.find(item => item.id === selectedId) ?? folderList[0]
-  const resources = useBilibiliFavoriteResources(folder?.id)
-  const { setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore()
-  const { account } = useBilibiliSessionState()
-  const { logout } = useBilibiliSessionActions()
-  const focused = useIsFocused()
-  const notifiedFoldersErrorRef = React.useRef(false)
-  const [editing, setEditing] = React.useState<FavoriteEditorTarget | null>(null)
-  const canEdit = Boolean(editing && focused && bilibiliSession.isCurrentAccount(editing.account))
+  const folders = useBilibiliFavoriteFolders();
+  const { deleteFolder } = useBilibiliFavoriteFolderActions();
+  const [selectedId, setSelectedId] = React.useState<number>();
+  const [refreshing, setRefreshing] = React.useState(false);
+  const refreshingRef = React.useRef(false);
+  const folderList = folders.data?.list ?? [];
+  const folder = folderList.find((item) => item.id === selectedId) ?? folderList[0];
+  const resources = useBilibiliFavoriteResources(folder?.id);
+  const { setOverlayButtons, setImagesList, setCurrentImageIndex } = useStore();
+  const { account } = useBilibiliSessionState();
+  const { logout } = useBilibiliSessionActions();
+  const focused = useIsFocused();
+  const notifiedFoldersErrorRef = React.useRef(false);
+  const [editing, setEditing] = React.useState<FavoriteEditorTarget | null>(null);
+  const canEdit = Boolean(editing && focused && bilibiliSession.isCurrentAccount(editing.account));
 
   React.useEffect(() => {
     if (!folders.error) {
-      notifiedFoldersErrorRef.current = false
-      return
+      notifiedFoldersErrorRef.current = false;
+      return;
     }
     if (
       !focused ||
@@ -70,129 +70,129 @@ export default function FavoritesContent() {
       isLoginRequiredError(folders.error) ||
       notifiedFoldersErrorRef.current
     ) {
-      return
+      return;
     }
-    notifiedFoldersErrorRef.current = true
-    showToast('收藏夹刷新失败，请稍后重试', true)
-  }, [account, focused, folders.data, folders.error])
+    notifiedFoldersErrorRef.current = true;
+    showToast("收藏夹刷新失败，请稍后重试", true);
+  }, [account, focused, folders.data, folders.error]);
 
   React.useEffect(() => {
     if (!canEdit) {
-      setEditing(null)
+      setEditing(null);
     }
-  }, [canEdit])
+  }, [canEdit]);
 
   function buttons(item: FavoriteListItem) {
-    const cover = item.video?.cover
+    const cover = item.video?.cover;
     return [
       {
-        text: '取消收藏',
+        text: "取消收藏",
         icon: overlayIcons.unfavorite,
         onPress: () => {
           if (!account || !bilibiliSession.isCurrentAccount(account)) {
-            showToast('登录状态已改变，请重新登录后操作')
-            return
+            showToast("登录状态已改变，请重新登录后操作");
+            return;
           }
           if (!item.video?.aid || !item.video.bvid) {
-            showToast('该收藏内容暂不支持编辑，请到 B站操作')
-            return
+            showToast("该收藏内容暂不支持编辑，请到 B站操作");
+            return;
           }
           setEditing({
             account,
             video: { aid: String(item.video.aid), bvid: item.video.bvid },
-          })
+          });
         },
       },
       ...(cover
         ? [
             {
-              text: '查看封面',
+              text: "查看封面",
               icon: overlayIcons.viewCover,
               onPress: () => {
-                setImagesList([{ src: cover, width: 0, height: 0, ratio: 16 / 9 }])
-                setCurrentImageIndex(0)
+                setImagesList([{ src: cover, width: 0, height: 0, ratio: 16 / 9 }]);
+                setCurrentImageIndex(0);
               },
             },
           ]
         : []),
-    ]
+    ];
   }
 
   function requestRelogin(error: Error, target: FavoriteAccount) {
-    setEditing(null)
-    showLoginRequiredAlert(error.message, { session: { account: target, logout } })
+    setEditing(null);
+    showLoginRequiredAlert(error.message, { session: { account: target, logout } });
   }
 
   function loginRequired(error: Error) {
     if (editing) {
-      requestRelogin(error, editing.account)
+      requestRelogin(error, editing.account);
     }
   }
 
   function folderButtons(folder: FavoriteFolder) {
     return [
       {
-        text: '删除收藏夹',
+        text: "删除收藏夹",
         icon: overlayIcons.remove,
         onPress: () => {
           Alert.alert(
-            '删除收藏夹',
+            "删除收藏夹",
             `删除「${folder.title}」后无法恢复，收藏夹内的视频不会从 B站删除。`,
             [
-              { text: '取消', style: 'cancel' },
+              { text: "取消", style: "cancel" },
               {
-                text: '删除',
-                style: 'destructive',
+                text: "删除",
+                style: "destructive",
                 onPress: () => {
-                  void removeFolder(folder)
+                  void removeFolder(folder);
                 },
               },
             ],
-          )
+          );
         },
       },
-    ]
+    ];
   }
 
   async function removeFolder(folder: FavoriteFolder) {
     if (!account || !bilibiliSession.isCurrentAccount(account)) {
-      showToast('登录状态已改变，请重新登录后操作')
-      return
+      showToast("登录状态已改变，请重新登录后操作");
+      return;
     }
     try {
-      await deleteFolder(folder.id)
-      showToast(`已删除收藏夹「${folder.title}」`)
+      await deleteFolder(folder.id);
+      showToast(`已删除收藏夹「${folder.title}」`);
     } catch (cause) {
-      const error = cause instanceof Error ? cause : new Error('删除收藏夹失败，请稍后重试')
+      const error = cause instanceof Error ? cause : new Error("删除收藏夹失败，请稍后重试");
       if (isLoginRequiredError(error)) {
-        requestRelogin(error, account)
-        return
+        requestRelogin(error, account);
+        return;
       }
-      showToast(error.message)
+      showToast(error.message);
     }
   }
 
   React.useEffect(() => {
-    setSelectedId(folder?.id)
-  }, [folder?.id])
+    setSelectedId(folder?.id);
+  }, [folder?.id]);
 
   async function refresh() {
     if (refreshingRef.current) {
-      return
+      return;
     }
-    refreshingRef.current = true
-    setRefreshing(true)
+    refreshingRef.current = true;
+    setRefreshing(true);
     try {
-      await Promise.allSettled([folders.mutate(), resources.refresh()])
+      await Promise.allSettled([folders.mutate(), resources.refresh()]);
     } finally {
-      refreshingRef.current = false
-      setRefreshing(false)
+      refreshingRef.current = false;
+      setRefreshing(false);
     }
   }
 
   if (!folders.data) {
     if (isLoginRequiredError(folders.error)) {
-      return <LoginRequired description="登录后即可查看你的收藏夹" />
+      return <LoginRequired description="登录后即可查看你的收藏夹" />;
     }
     return (
       <View className="flex-1 items-center justify-center gap-4 px-8">
@@ -200,7 +200,7 @@ export default function FavoritesContent() {
           <LoadErrorText
             disabled={folders.isValidating}
             onRetry={() => {
-              void folders.mutate().catch(() => {})
+              void folders.mutate().catch(() => {});
             }}
           />
         ) : (
@@ -210,7 +210,7 @@ export default function FavoritesContent() {
           </>
         )}
       </View>
-    )
+    );
   }
 
   return (
@@ -230,13 +230,13 @@ export default function FavoritesContent() {
             folders={folderList}
             selectedId={folder.id}
             onSelect={setSelectedId}
-            onLongPress={item => setOverlayButtons(folderButtons(item))}
+            onLongPress={(item) => setOverlayButtons(folderButtons(item))}
             disabled={refreshing}
           />
           <FlashList
             key={folder.id}
             data={resources.items}
-            keyExtractor={item => item.key}
+            keyExtractor={(item) => item.key}
             renderItem={({ item }) =>
               item.video ? (
                 <VideoListItem video={item.video} playCountOnCover buttons={() => buttons(item)} />
@@ -248,7 +248,7 @@ export default function FavoritesContent() {
                   className={`mx-3 my-2 gap-2 rounded-lg p-4 ${theme.background.fill.bg}`}
                 >
                   <Text className={theme.text.secondary} numberOfLines={2}>
-                    {item.title || '不可用的收藏内容'}
+                    {item.title || "不可用的收藏内容"}
                   </Text>
                   <Text className={`text-sm ${theme.text.muted}`}>
                     该收藏内容暂不支持播放或已失效
@@ -258,13 +258,13 @@ export default function FavoritesContent() {
             }
             refreshing={refreshing}
             onRefresh={() => {
-              void refresh()
+              void refresh();
             }}
             onEndReached={() => {
-              void resources.loadMore().catch(() => {})
+              void resources.loadMore().catch(() => {});
             }}
             onEndReachedThreshold={0.5}
-            contentContainerClassName={resources.items.length ? 'pt-2 pb-4' : 'grow px-4 py-4'}
+            contentContainerClassName={resources.items.length ? "pt-2 pb-4" : "grow px-4 py-4"}
             ListEmptyComponent={
               <View className="items-center justify-center gap-4 px-6 py-16">
                 {resources.isLoading ? (
@@ -278,7 +278,7 @@ export default function FavoritesContent() {
                   <LoadErrorText
                     disabled={resources.isValidating}
                     onRetry={() => {
-                      void resources.mutate().catch(() => {})
+                      void resources.mutate().catch(() => {});
                     }}
                   />
                 ) : (
@@ -295,7 +295,7 @@ export default function FavoritesContent() {
                   className="py-4 text-sm"
                   disabled={resources.isValidating}
                   onRetry={() => {
-                    void resources.mutate().catch(() => {})
+                    void resources.mutate().catch(() => {});
                   }}
                 />
               ) : resources.isLoadingMore && resources.items.length ? (
@@ -313,7 +313,7 @@ export default function FavoritesContent() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => {
-                void refresh()
+                void refresh();
               }}
             />
           }
@@ -325,11 +325,11 @@ export default function FavoritesContent() {
             type="clear"
             loading={refreshing}
             onPress={() => {
-              void refresh()
+              void refresh();
             }}
           />
         </ScrollView>
       )}
     </View>
-  )
+  );
 }

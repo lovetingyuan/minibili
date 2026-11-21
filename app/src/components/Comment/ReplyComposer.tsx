@@ -1,45 +1,45 @@
-import { BottomSheetTextInput } from '@gorhom/bottom-sheet'
-import { useEffect, useRef, useState } from 'react'
-import type { ComponentRef } from 'react'
-import { ActivityIndicator, Keyboard, Pressable, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useResolveClassNames } from 'uniwind'
-import { ArrowUp } from 'lucide-react-native'
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { useEffect, useRef, useState } from "react";
+import type { ComponentRef } from "react";
+import { ActivityIndicator, Keyboard, Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useResolveClassNames } from "uniwind";
+import { ArrowUp } from "lucide-react-native";
 
-import { Text } from '@/components/Text'
-import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/colors.tw'
-import useResolvedColor from '@/hooks/useResolvedColor'
+import { Text } from "@/components/Text";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { theme } from "@/constants/colors.tw";
+import useResolvedColor from "@/hooks/useResolvedColor";
 
-import type { ReplyComposerProps } from './reply-composer.types'
+import type { ReplyComposerProps } from "./reply-composer.types";
 
 // BottomSheetTextInput 内部包了一层手势库的 TextInput，className 透传不可靠，改由类名解析成 style
 const INPUT_CLASS_NAME =
-  'max-h-28 min-h-11 flex-1 rounded-3xl bg-fill-raised px-4 py-2.5 text-[15px] text-heading'
+  "max-h-28 min-h-11 flex-1 rounded-3xl bg-fill-raised px-4 py-2.5 text-[15px] text-heading";
 
 export default function ReplyComposer(props: ReplyComposerProps) {
-  const [draft, setDraft] = useState('')
-  const inputRef = useRef<ComponentRef<typeof BottomSheetTextInput>>(null)
-  const insets = useSafeAreaInsets()
-  const inputStyle = useResolveClassNames(INPUT_CLASS_NAME)
-  const placeholderColor = useResolvedColor(theme.text.muted)
-  const selectionColor = useResolvedColor(theme.primary.accent)
-  const count = [...draft].length
-  const canSubmit = Boolean(draft.trim()) && !props.pending
+  const [draft, setDraft] = useState("");
+  const inputRef = useRef<ComponentRef<typeof BottomSheetTextInput>>(null);
+  const insets = useSafeAreaInsets();
+  const inputStyle = useResolveClassNames(INPUT_CLASS_NAME);
+  const placeholderColor = useResolvedColor(theme.text.muted);
+  const selectionColor = useResolvedColor(theme.primary.accent);
+  const count = [...draft].length;
+  const canSubmit = Boolean(draft.trim()) && !props.pending;
 
   useEffect(() => {
     if (props.focusRequested) {
-      inputRef.current?.focus()
+      inputRef.current?.focus();
     }
-  }, [props.focusRequested, props.target.id])
+  }, [props.focusRequested, props.target.id]);
 
   async function submit() {
     if (!draft.trim() || props.pending) {
-      return
+      return;
     }
     if (await props.onSubmit(draft)) {
-      setDraft('')
-      Keyboard.dismiss()
+      setDraft("");
+      Keyboard.dismiss();
     }
   }
 
@@ -70,7 +70,7 @@ export default function ReplyComposer(props: ReplyComposerProps) {
           selectionColor={selectionColor}
           style={inputStyle}
           accessibilityLabel={`回复 ${props.target.name}`}
-          onChangeText={value => setDraft([...value].slice(0, 1000).join(''))}
+          onChangeText={(value) => setDraft([...value].slice(0, 1000).join(""))}
           onSubmitEditing={() => void submit()}
         />
         <Pressable
@@ -93,5 +93,5 @@ export default function ReplyComposer(props: ReplyComposerProps) {
         </Pressable>
       </View>
     </View>
-  )
+  );
 }

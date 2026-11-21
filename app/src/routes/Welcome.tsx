@@ -1,25 +1,25 @@
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Button } from '@/components/Button'
-import { Text } from '@/components/Text'
-import { Image, Linking, View } from 'react-native'
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Button } from "@/components/Button";
+import { Text } from "@/components/Text";
+import { Image, Linking, View } from "react-native";
 
-import { theme } from '@/constants/colors.tw'
+import { theme } from "@/constants/colors.tw";
 
-import { githubLink } from '../constants'
-import { useStore } from '../store'
-import type { RootStackParamList } from '../types'
+import { githubLink } from "../constants";
+import { useStore } from "../store";
+import type { RootStackParamList } from "../types";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>
+type Props = NativeStackScreenProps<RootStackParamList, "Welcome">;
 
-export default Welcome
+export default Welcome;
 
 function Welcome({ navigation }: Props) {
-  const { set$firstRun } = useStore()
+  const { set$firstRun } = useStore();
   return (
     <View className="h-full flex-1 py-10">
       <View className="flex-row justify-center">
         <Image
-          source={require('../../assets/minibili.png')}
+          source={require("../../assets/minibili.png")}
           className="size-36"
           resizeMode="contain"
         />
@@ -34,27 +34,25 @@ function Welcome({ navigation }: Props) {
           <Text
             className={theme.primary.text}
             onPress={() => {
-              Linking.openURL(githubLink)
+              Linking.openURL(githubLink);
             }}
           >
-            {'github'}
+            {"github"}
           </Text>
           )，所有数据均来源于个人的B站官网，不会传播任何个人数据（仅在本地和B站官方），仅供学习交流！
         </Text>
-        <Text className="mt-5 text-base text-muted">
-          如果遇到闪退或报错请及时更新最新版本。
-        </Text>
+        <Text className="mt-5 text-base text-muted">如果遇到闪退或报错请及时更新最新版本。</Text>
       </View>
       <Button
         size="lg"
         containerClassName="mx-5 rounded-lg"
         onPress={() => {
-          set$firstRun(Date.now())
-          navigation.replace('MainTabs')
+          set$firstRun(Date.now());
+          navigation.replace("MainTabs");
         }}
       >
         了解并开始使用
       </Button>
     </View>
-  )
+  );
 }

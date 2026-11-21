@@ -20,14 +20,16 @@ export default function PlayerError(props: PlayerErrorProps) {
           <Text className="text-lg font-bold text-media-content">{title}</Text>
           {showRetry && !props.retryLabel ? (
             <LoadErrorText
-              message={description.replace(/，请(?:稍后)?重试$/, '')}
+              message={description.replace(/，请(?:稍后)?重试$/, "")}
               className="mt-2 text-sm leading-6"
               colorClassName={theme.media.secondary}
               retryClassName={`${theme.media.content} underline`}
               onRetry={props.onRetry}
             />
           ) : (
-            <Text className="mt-2 text-center text-sm leading-6 text-media-content/80">{description}</Text>
+            <Text className="mt-2 text-center text-sm leading-6 text-media-content/80">
+              {description}
+            </Text>
           )}
           {actionLabel || (showRetry && props.retryLabel) ? (
             <View className="mt-4 flex-row items-center gap-3">

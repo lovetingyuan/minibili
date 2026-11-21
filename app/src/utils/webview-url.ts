@@ -23,9 +23,7 @@ function getHostname(url: string) {
 
 export function isBilibiliHost(url: string) {
   const hostname = getHostname(url);
-  return BILIBILI_HOSTS.some(
-    (host) => hostname === host || hostname.endsWith(`.${host}`),
-  );
+  return BILIBILI_HOSTS.some((host) => hostname === host || hostname.endsWith(`.${host}`));
 }
 
 export function isHttpUrl(url: string) {

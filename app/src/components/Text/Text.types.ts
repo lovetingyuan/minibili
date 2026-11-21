@@ -1,5 +1,5 @@
-import type { TextProps as NativeTextProps } from 'react-native'
+import type { TextProps as NativeTextProps } from "react-native";
 
 export type TextProps = NativeTextProps & {
-  className?: string
-}
+  className?: string;
+};

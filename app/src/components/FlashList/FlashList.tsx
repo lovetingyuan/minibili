@@ -1,8 +1,8 @@
-import React from 'react'
-import { FlashList as BaseFlashList } from '@shopify/flash-list'
-import type { FlashListRef } from '@shopify/flash-list'
-import useResolvedStyle from '@/hooks/useResolvedStyle'
-import type { FlashListComponent, StyledFlashListProps } from './FlashList.types'
+import React from "react";
+import { FlashList as BaseFlashList } from "@shopify/flash-list";
+import type { FlashListRef } from "@shopify/flash-list";
+import useResolvedStyle from "@/hooks/useResolvedStyle";
+import type { FlashListComponent, StyledFlashListProps } from "./FlashList.types";
 
 const FlashListBase = React.forwardRef(function FlashListInner<T>(
   {
@@ -20,10 +20,10 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
   }: StyledFlashListProps<T>,
   ref: React.ForwardedRef<FlashListRef<T>>,
 ) {
-  const resolvedStyle = useResolvedStyle(className)
-  const resolvedContentContainerStyle = useResolvedStyle(contentContainerClassName)
-  const resolvedFooterStyle = useResolvedStyle(ListFooterComponentClassName)
-  const resolvedHeaderStyle = useResolvedStyle(ListHeaderComponentClassName)
+  const resolvedStyle = useResolvedStyle(className);
+  const resolvedContentContainerStyle = useResolvedStyle(contentContainerClassName);
+  const resolvedFooterStyle = useResolvedStyle(ListFooterComponentClassName);
+  const resolvedHeaderStyle = useResolvedStyle(ListHeaderComponentClassName);
 
   return (
     <BaseFlashList
@@ -35,7 +35,7 @@ const FlashListBase = React.forwardRef(function FlashListInner<T>(
       ListFooterComponentStyle={[ListFooterComponentStyle, resolvedFooterStyle]}
       ListHeaderComponentStyle={[ListHeaderComponentStyle, resolvedHeaderStyle]}
     />
-  )
-}) as FlashListComponent
+  );
+}) as FlashListComponent;
 
-export const FlashList = FlashListBase
+export const FlashList = FlashListBase;

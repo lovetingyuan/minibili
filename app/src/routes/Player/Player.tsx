@@ -239,7 +239,9 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
       );
     }
 
-    return <View className="flex-1 items-center justify-center bg-media-background">{children}</View>;
+    return (
+      <View className="flex-1 items-center justify-center bg-media-background">{children}</View>
+    );
   };
   const renderLoading = () => (
     <View className="absolute h-full w-full">
@@ -305,7 +307,13 @@ function Player(props: { currentPage: number; onPlayEnded: (event: PlayEndedEven
           resizeMode="cover"
           className="flex-1 items-center justify-center"
         >
-          <ThemedIcon icon={Play} size={64} colorClassName="text-media-content" filled opacity={0.8} />
+          <ThemedIcon
+            icon={Play}
+            size={64}
+            colorClassName="text-media-content"
+            filled
+            opacity={0.8}
+          />
           <View className="absolute bottom-2 left-2 flex-row gap-2">
             {videoInfo?.duration ? (
               <Text className="rounded bg-media-background/60 px-2 py-0.5 font-bold text-media-content">

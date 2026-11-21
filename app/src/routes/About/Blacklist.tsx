@@ -1,23 +1,23 @@
-import React from 'react'
-import { ActivityIndicator, View } from 'react-native'
+import React from "react";
+import { ActivityIndicator, View } from "react-native";
 
-import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
-import { Chip } from '@/components/Chip'
-import { CollapsibleSection } from '@/components/CollapsibleSection'
-import { Text } from '@/components/Text'
-import { LoadErrorText } from '@/components/LoadErrorText'
-import { theme } from '@/constants/colors.tw'
+import { useBilibiliBlacklist } from "@/api/useBilibiliBlacklist";
+import { Chip } from "@/components/Chip";
+import { CollapsibleSection } from "@/components/CollapsibleSection";
+import { Text } from "@/components/Text";
+import { LoadErrorText } from "@/components/LoadErrorText";
+import { theme } from "@/constants/colors.tw";
 
 export default function Blacklist() {
-  const [expanded, setExpanded] = React.useState(false)
+  const [expanded, setExpanded] = React.useState(false);
   const { blacklist, account, isPreparing, data, error, isValidating, mutate } =
-    useBilibiliBlacklist(true)
-  const loading = isPreparing || Boolean(account && data === undefined && !error)
+    useBilibiliBlacklist(true);
+  const loading = isPreparing || Boolean(account && data === undefined && !error);
 
   return (
     <CollapsibleSection
       expanded={expanded}
-      title={`黑名单${account && data !== undefined ? `（${blacklist.size}）` : ''}`}
+      title={`黑名单${account && data !== undefined ? `（${blacklist.size}）` : ""}`}
       onPress={() => setExpanded(!expanded)}
     >
       {expanded ? (
@@ -32,7 +32,7 @@ export default function Blacklist() {
           ) : (
             <>
               <View className="flex-row flex-wrap">
-                {Array.from(blacklist.values()).map(up => (
+                {Array.from(blacklist.values()).map((up) => (
                   <Chip
                     key={up.mid}
                     title={up.name}
@@ -48,7 +48,7 @@ export default function Blacklist() {
                 <LoadErrorText
                   disabled={isValidating}
                   onRetry={() => {
-                    void mutate().catch(() => {})
+                    void mutate().catch(() => {});
                   }}
                 />
               ) : null}
@@ -60,5 +60,5 @@ export default function Blacklist() {
         </View>
       ) : null}
     </CollapsibleSection>
-  )
+  );
 }

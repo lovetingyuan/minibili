@@ -1,99 +1,99 @@
-import { useNavigation } from '@react-navigation/native'
-import { FlashList } from '@/components/FlashList'
-import { Text } from '@/components/Text'
-import React from 'react'
-import { Alert, TouchableOpacity } from 'react-native'
+import { useNavigation } from "@react-navigation/native";
+import { FlashList } from "@/components/FlashList";
+import { Text } from "@/components/Text";
+import React from "react";
+import { Alert, TouchableOpacity } from "react-native";
 
-import type { VideoItem as VideoItemType } from '@/api/hot-videos'
-import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
-import { theme } from '@/constants/colors.tw'
-import { overlayIcons } from '@/constants/overlay-icons'
-import { useBlockUpActions } from '@/hooks/useBlockUpActions'
-import { useWatchLaterActions } from '@/hooks/useWatchLaterActions'
-import { useStore } from '@/store'
-import { useUserSettings } from '@/features/user-data/useUserSettings'
-import type { MainTabNavigationProp } from '@/types'
-import { handleShareVideo, parseNumber } from '@/utils'
-import type { FlashListRef } from '@/components/FlashList'
+import type { VideoItem as VideoItemType } from "@/api/hot-videos";
+import { useBilibiliBlacklist } from "@/api/useBilibiliBlacklist";
+import { theme } from "@/constants/colors.tw";
+import { overlayIcons } from "@/constants/overlay-icons";
+import { useBlockUpActions } from "@/hooks/useBlockUpActions";
+import { useWatchLaterActions } from "@/hooks/useWatchLaterActions";
+import { useStore } from "@/store";
+import { useUserSettings } from "@/features/user-data/useUserSettings";
+import type { MainTabNavigationProp } from "@/types";
+import { handleShareVideo, parseNumber } from "@/utils";
+import type { FlashListRef } from "@/components/FlashList";
 
-import Loading from './Loading'
-import VideoItem from './VideoItem'
+import Loading from "./Loading";
+import VideoItem from "./VideoItem";
 
-type Footer = React.ReactElement | null | undefined
+type Footer = React.ReactElement | null | undefined;
 
 function VideoList(props: {
-  videos: VideoItemType[]
-  type: 'Hot' | 'Rank' | 'Search'
-  footer?: Footer | ((l: VideoItemType[]) => Footer)
-  onReachEnd?: () => void
-  onRefresh?: () => void
-  onTabReselect?: () => void
-  isRefreshing?: boolean
+  videos: VideoItemType[];
+  type: "Hot" | "Rank" | "Search";
+  footer?: Footer | ((l: VideoItemType[]) => Footer);
+  onReachEnd?: () => void;
+  onRefresh?: () => void;
+  onTabReselect?: () => void;
+  isRefreshing?: boolean;
 }) {
-  const { setOverlayButtons, currentVideosCate, setImagesList, setCurrentImageIndex } = useStore()
+  const { setOverlayButtons, currentVideosCate, setImagesList, setCurrentImageIndex } = useStore();
   const {
     values: { $blackTags },
     setSetting,
-  } = useUserSettings()
-  const { confirmBlock } = useBlockUpActions()
-  const { blacklist } = useBilibiliBlacklist()
-  const watchLater = useWatchLaterActions()
-  const videoList: VideoItemType[] = []
-  const uniqVideosMap: Record<string, boolean> = {}
+  } = useUserSettings();
+  const { confirmBlock } = useBlockUpActions();
+  const { blacklist } = useBilibiliBlacklist();
+  const watchLater = useWatchLaterActions();
+  const videoList: VideoItemType[] = [];
+  const uniqVideosMap: Record<string, boolean> = {};
   for (const item of props.videos) {
-    let needShow = !(item.bvid in uniqVideosMap) && !blacklist.has(String(item.mid))
-    if (needShow && props.type === 'Hot' && Object.hasOwn($blackTags, item.tag)) {
-      needShow = false
+    let needShow = !(item.bvid in uniqVideosMap) && !blacklist.has(String(item.mid));
+    if (needShow && props.type === "Hot" && Object.hasOwn($blackTags, item.tag)) {
+      needShow = false;
     }
     if (needShow) {
-      uniqVideosMap[item.bvid] = true
-      videoList.push(item)
+      uniqVideosMap[item.bvid] = true;
+      videoList.push(item);
     }
   }
 
-  const navigation = useNavigation<MainTabNavigationProp>()
-  const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null)
-  const currentVideoRef = React.useRef<VideoItemType | null>(null)
-  const { onTabReselect } = props
+  const navigation = useNavigation<MainTabNavigationProp>();
+  const listRef = React.useRef<FlashListRef<VideoItemType> | null>(null);
+  const currentVideoRef = React.useRef<VideoItemType | null>(null);
+  const { onTabReselect } = props;
   React.useEffect(() => {
     const timer = setTimeout(() => {
-      listRef.current?.scrollToOffset({ offset: 0, animated: false })
-    })
-    return () => clearTimeout(timer)
-  }, [currentVideosCate])
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
+    });
+    return () => clearTimeout(timer);
+  }, [currentVideosCate]);
   React.useEffect(() => {
     if (!onTabReselect) {
-      return
+      return;
     }
 
-    return navigation.addListener('tabPress', () => {
+    return navigation.addListener("tabPress", () => {
       if (!navigation.isFocused()) {
-        return
+        return;
       }
-      listRef.current?.scrollToOffset({ offset: 0, animated: true })
-      onTabReselect()
-    })
-  }, [navigation, onTabReselect])
+      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      onTabReselect();
+    });
+  }, [navigation, onTabReselect]);
   const addBlackTagName = () => {
     if (!currentVideoRef.current) {
-      return
+      return;
     }
-    const { tag } = currentVideoRef.current
-    Alert.alert(`不再看 ${tag} 类型的视频？`, '', [
+    const { tag } = currentVideoRef.current;
+    Alert.alert(`不再看 ${tag} 类型的视频？`, "", [
       {
-        text: '取消',
-        style: 'cancel',
+        text: "取消",
+        style: "cancel",
       },
       {
-        text: '确定',
+        text: "确定",
         onPress: () => {
-          setSetting('$blackTags', previous => ({ ...previous, [tag]: tag }))
+          setSetting("$blackTags", (previous) => ({ ...previous, [tag]: tag }));
         },
       },
-    ])
-  }
+    ]);
+  };
   const gotoPlay = (data: VideoItemType) => {
-    navigation.push('Play', {
+    navigation.push("Play", {
       aid: data.aid,
       bvid: data.bvid,
       title: data.title,
@@ -105,34 +105,34 @@ function VideoList(props: {
       date: data.date,
       tag: data.tag,
       // video: data,
-    })
-  }
+    });
+  };
   const renderItem = (props: { index: number; item: VideoItemType }) => {
-    const { item, index } = props
-    const blank = index % 2 ? 'ml-1.5 mr-2' : 'ml-2 mr-1.5'
+    const { item, index } = props;
+    const blank = index % 2 ? "ml-1.5 mr-2" : "ml-2 mr-1.5";
     return (
       <TouchableOpacity
         activeOpacity={0.8}
         className={`mb-6 flex-1 self-stretch ${blank}`}
         onPress={() => gotoPlay(item)}
         onLongPress={() => {
-          currentVideoRef.current = item
-          setOverlayButtons(buttons(item))
+          currentVideoRef.current = item;
+          setOverlayButtons(buttons(item));
         }}
       >
         <VideoItem video={item} />
       </TouchableOpacity>
-    )
-  }
+    );
+  };
   const buttons = (video: VideoItemType) =>
     [
       {
-        text: watchLater.isAdded(video.aid) ? '从稍后再看移除' : '添加到稍后再看',
+        text: watchLater.isAdded(video.aid) ? "从稍后再看移除" : "添加到稍后再看",
         icon: watchLater.isAdded(video.aid)
           ? overlayIcons.removeWatchLater
           : overlayIcons.addWatchLater,
         onPress: () => {
-          void watchLater.toggle({ aid: video.aid })
+          void watchLater.toggle({ aid: video.aid });
         },
       },
       {
@@ -140,7 +140,7 @@ function VideoList(props: {
         icon: overlayIcons.blockUp,
         onPress: () => confirmBlock({ mid: video.mid, name: video.name }),
       },
-      props.type === 'Hot' && {
+      props.type === "Hot" && {
         text: `不再看「${currentVideoRef.current?.tag}」类型的视频`,
         icon: overlayIcons.hideTagType,
         onPress: addBlackTagName,
@@ -150,63 +150,61 @@ function VideoList(props: {
         icon: overlayIcons.share,
         onPress: () => {
           if (currentVideoRef.current) {
-            const { name, title, bvid } = currentVideoRef.current
-            handleShareVideo(name, title, bvid)
+            const { name, title, bvid } = currentVideoRef.current;
+            handleShareVideo(name, title, bvid);
           }
         },
       },
       {
-        text: '查看封面',
+        text: "查看封面",
         icon: overlayIcons.viewCover,
         onPress: () => {
-          setCurrentImageIndex(0)
+          setCurrentImageIndex(0);
           setImagesList([
             {
               src: video.cover,
               width: video.width,
               height: video.height,
             },
-          ])
+          ]);
         },
       },
-    ].filter(v => v && typeof v === 'object')
+    ].filter((v) => v && typeof v === "object");
   const refreshProps = props.onRefresh
     ? {
         onRefresh: props.onRefresh,
         refreshing: props.isRefreshing,
       }
-    : null
+    : null;
   const reachEndProps = props.onReachEnd
     ? {
         onEndReached: props.onReachEnd,
         onEndReachedThreshold: 0.5,
       }
-    : null
+    : null;
   return (
     <FlashList
       ref={listRef}
       numColumns={2}
       data={videoList}
-      keyExtractor={item => item.bvid}
+      keyExtractor={(item) => item.bvid}
       renderItem={renderItem}
       persistentScrollbar
       ListEmptyComponent={
         props.videos.length > 0 ? (
-          <Text className={`py-4 text-center text-sm ${theme.text.muted}`}>
-            暂无可显示的视频
-          </Text>
+          <Text className={`py-4 text-center text-sm ${theme.text.muted}`}>暂无可显示的视频</Text>
         ) : (
           <Loading />
         )
       }
       ListFooterComponent={
-        typeof props.footer === 'function' ? props.footer(videoList) : props.footer
+        typeof props.footer === "function" ? props.footer(videoList) : props.footer
       }
       contentContainerClassName="px-1 pt-6"
       {...refreshProps}
       {...reachEndProps}
     />
-  )
+  );
 }
 
-export default VideoList
+export default VideoList;

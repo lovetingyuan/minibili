@@ -1,2 +1,2 @@
-export { Image } from './Image'
-export type { StyledImageProps } from './Image.types'
+export { Image } from "./Image";
+export type { StyledImageProps } from "./Image.types";

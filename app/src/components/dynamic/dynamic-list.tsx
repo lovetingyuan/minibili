@@ -1,28 +1,28 @@
-import { useNavigation } from '@react-navigation/native'
-import React from 'react'
-import type { ReactNode } from 'react'
-import { ActivityIndicator, View } from 'react-native'
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
+import type { ReactNode } from "react";
+import { ActivityIndicator, View } from "react-native";
 
-import type { DynamicItem } from '@/api/dynamic-items.type'
-import { LoginRequired } from '@/components/LoginRequired'
-import { LoadErrorText } from '@/components/LoadErrorText'
-import { FlashList } from '@/components/FlashList'
-import { Skeleton } from '@/components/Skeleton'
-import { Text } from '@/components/Text'
-import type { FlashListRef } from '@/components/FlashList'
-import { theme } from '@/constants/colors.tw'
-import { isLoginRequiredError } from '@/features/bilibili-session/login-required'
-import type { MainTabNavigationProp } from '@/types'
+import type { DynamicItem } from "@/api/dynamic-items.type";
+import { LoginRequired } from "@/components/LoginRequired";
+import { LoadErrorText } from "@/components/LoadErrorText";
+import { FlashList } from "@/components/FlashList";
+import { Skeleton } from "@/components/Skeleton";
+import { Text } from "@/components/Text";
+import type { FlashListRef } from "@/components/FlashList";
+import { theme } from "@/constants/colors.tw";
+import { isLoginRequiredError } from "@/features/bilibili-session/login-required";
+import type { MainTabNavigationProp } from "@/types";
 
-import { DynamicCard } from './dynamic-card'
-import type { DynamicListProps } from './dynamic-list.types'
+import { DynamicCard } from "./dynamic-card";
+import type { DynamicListProps } from "./dynamic-list.types";
 
 function DynamicListLoading(props: { listHeader?: ReactNode }) {
   return (
     <View className={`flex-1 ${theme.background.page}`}>
       {props.listHeader}
       <View className="gap-3">
-        {[0, 1, 2].map(index => (
+        {[0, 1, 2].map((index) => (
           <View key={index} className="gap-3 bg-surface p-4">
             <View className="flex-row items-center gap-3">
               <Skeleton animation="pulse" circle width={36} height={36} />
@@ -38,30 +38,30 @@ function DynamicListLoading(props: { listHeader?: ReactNode }) {
         ))}
       </View>
     </View>
-  )
+  );
 }
 
 function DynamicListEmpty(
   props: Pick<
     DynamicListProps,
-    'error' | 'errorTitle' | 'emptyTitle' | 'emptyMessage' | 'retry' | 'isRefreshing'
+    "error" | "errorTitle" | "emptyTitle" | "emptyMessage" | "retry" | "isRefreshing"
   >,
 ) {
   // 登录后才能看到的列表（关注动态、空间内容等）失败时不显示通用错误
   if (isLoginRequiredError(props.error)) {
-    return <LoginRequired description="登录后即可查看该内容" />
+    return <LoginRequired description="登录后即可查看该内容" />;
   }
 
   return (
     <View className="items-center gap-3 px-8 py-24">
       <Text className="text-lg font-semibold">
-        {props.error ? (props.errorTitle ?? '动态加载失败') : props.emptyTitle}
+        {props.error ? (props.errorTitle ?? "动态加载失败") : props.emptyTitle}
       </Text>
       {props.error ? (
         <LoadErrorText
           disabled={props.isRefreshing}
           onRetry={() => {
-            void props.retry()
+            void props.retry();
           }}
         />
       ) : (
@@ -70,35 +70,35 @@ function DynamicListEmpty(
         </Text>
       )}
     </View>
-  )
+  );
 }
 
 export function DynamicList(props: DynamicListProps) {
-  const navigation = useNavigation<MainTabNavigationProp>()
-  const listRef = React.useRef<FlashListRef<DynamicItem> | null>(null)
-  const [scrollToTopRequest, setScrollToTopRequest] = React.useState(0)
-  const { onTabPress } = props
+  const navigation = useNavigation<MainTabNavigationProp>();
+  const listRef = React.useRef<FlashListRef<DynamicItem> | null>(null);
+  const [scrollToTopRequest, setScrollToTopRequest] = React.useState(0);
+  const { onTabPress } = props;
 
   React.useEffect(() => {
     if (!onTabPress) {
-      return
+      return;
     }
 
-    return navigation.addListener('tabPress', async () => {
+    return navigation.addListener("tabPress", async () => {
       if (await onTabPress()) {
-        setScrollToTopRequest(request => request + 1)
+        setScrollToTopRequest((request) => request + 1);
       }
-    })
-  }, [navigation, onTabPress])
+    });
+  }, [navigation, onTabPress]);
 
   React.useEffect(() => {
     if (scrollToTopRequest && navigation.isFocused()) {
-      listRef.current?.scrollToOffset({ offset: 0, animated: true })
+      listRef.current?.scrollToOffset({ offset: 0, animated: true });
     }
-  }, [navigation, scrollToTopRequest])
+  }, [navigation, scrollToTopRequest]);
 
   if (props.isLoading && !props.list.length) {
-    return <DynamicListLoading listHeader={props.listHeader} />
+    return <DynamicListLoading listHeader={props.listHeader} />;
   }
 
   return (
@@ -108,8 +108,8 @@ export function DynamicList(props: DynamicListProps) {
       contentInsetAdjustmentBehavior="automatic"
       contentContainerClassName="pb-6"
       data={props.list}
-      keyExtractor={item => item.id}
-      getItemType={item => `${item.content.kind}:${item.original?.content.kind ?? 'none'}`}
+      keyExtractor={(item) => item.id}
+      getItemType={(item) => `${item.content.kind}:${item.original?.content.kind ?? "none"}`}
       renderItem={({ item }) => (
         <View className="mb-3">
           <DynamicCard
@@ -140,12 +140,12 @@ export function DynamicList(props: DynamicListProps) {
                 className="text-xs"
                 disabled={props.isRefreshing}
                 onRetry={() => {
-                  void props.retry()
+                  void props.retry();
                 }}
               />
             ) : (
               <Text className={`text-xs ${theme.text.muted}`}>
-                {props.isReachingEnd ? '暂无更多' : '上拉加载更多'}
+                {props.isReachingEnd ? "暂无更多" : "上拉加载更多"}
               </Text>
             )}
           </View>
@@ -153,12 +153,12 @@ export function DynamicList(props: DynamicListProps) {
       }
       refreshing={props.isRefreshing}
       onRefresh={() => {
-        void props.refresh()
+        void props.refresh();
       }}
       onEndReached={() => {
-        void props.loadMore()
+        void props.loadMore();
       }}
       onEndReachedThreshold={0.7}
     />
-  )
+  );
 }

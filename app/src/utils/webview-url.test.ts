@@ -41,9 +41,9 @@ describe("shouldAllowWebViewRequest", () => {
   });
 
   test("blocks external top-frame navigation", () => {
-    expect(
-      shouldAllowWebViewRequest({ url: "https://evil.example/phish", isTopFrame: true }),
-    ).toBe(false);
+    expect(shouldAllowWebViewRequest({ url: "https://evil.example/phish", isTopFrame: true })).toBe(
+      false,
+    );
   });
 
   test("keeps subframe resources working on third-party hosts", () => {

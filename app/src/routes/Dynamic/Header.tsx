@@ -1,58 +1,58 @@
-import { useNavigation, useRoute } from '@react-navigation/native'
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { Avatar } from '@/components/Avatar'
-import { Text } from '@/components/Text'
-import { ThemedIcon } from '@/components/ThemedIcon'
-import UpName from '@/components/UpName'
-import { clsx } from 'clsx'
-import * as Clipboard from 'expo-clipboard'
-import React from 'react'
-import { EllipsisVertical } from 'lucide-react-native'
-import { View } from 'react-native'
+import { useNavigation, useRoute } from "@react-navigation/native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Avatar } from "@/components/Avatar";
+import { Text } from "@/components/Text";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import UpName from "@/components/UpName";
+import { clsx } from "clsx";
+import * as Clipboard from "expo-clipboard";
+import React from "react";
+import { EllipsisVertical } from "lucide-react-native";
+import { View } from "react-native";
 import {
   Menu,
   MenuOption,
   MenuOptions,
   MenuTrigger,
   menuTriggerIconButtonStyles,
-} from '@/components/Menu'
+} from "@/components/Menu";
 
-import { useBilibiliBlacklist } from '@/api/useBilibiliBlacklist'
-import { theme } from '@/constants/colors.tw'
-import { useBilibiliSessionState } from '@/features/bilibili-session/useBilibiliSession'
-import { useBlockUpActions } from '@/hooks/useBlockUpActions'
-import { useFollowActions } from '@/hooks/useFollowActions'
-import { useFollowedUpsMap } from '@/store/derives'
+import { useBilibiliBlacklist } from "@/api/useBilibiliBlacklist";
+import { theme } from "@/constants/colors.tw";
+import { useBilibiliSessionState } from "@/features/bilibili-session/useBilibiliSession";
+import { useBlockUpActions } from "@/hooks/useBlockUpActions";
+import { useFollowActions } from "@/hooks/useFollowActions";
+import { useFollowedUpsMap } from "@/store/derives";
 
-import { useLivingInfo } from '../../api/living-info'
-import { useUserRelation } from '../../api/user-relation'
-import { useUserInfo } from '../../api/user-info'
-import { useStore } from '../../store'
-import type { NavigationProps, RootStackParamList, UpInfo } from '../../types'
-import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast } from '../../utils'
+import { useLivingInfo } from "../../api/living-info";
+import { useUserRelation } from "../../api/user-relation";
+import { useUserInfo } from "../../api/user-info";
+import { useStore } from "../../store";
+import type { NavigationProps, RootStackParamList, UpInfo } from "../../types";
+import { getImagePixelSize, handleShareUp, parseImgUrl, parseNumber, showToast } from "../../utils";
 
 // 头像右上角的性别角标，只用性别符号本身，不加底色
 const sexBadgeMap: Record<string, { symbol: string; textClassName: string; label: string }> = {
-  男: { symbol: '♂', textClassName: theme.primary.text, label: '男性' },
-  女: { symbol: '♀', textClassName: theme.secondary.text, label: '女性' },
-}
+  男: { symbol: "♂", textClassName: theme.primary.text, label: "男性" },
+  女: { symbol: "♀", textClassName: theme.secondary.text, label: "女性" },
+};
 
 /** 当前空间是否就是登录用户自己 */
-function useIsSelfSpace(mid: UpInfo['mid'] | undefined) {
-  const { account } = useBilibiliSessionState()
-  return account != null && String(account.mid) === String(mid)
+function useIsSelfSpace(mid: UpInfo["mid"] | undefined) {
+  const { account } = useBilibiliSessionState();
+  return account != null && String(account.mid) === String(mid);
 }
 
 function HeaderLeft() {
-  const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
-  const { data: userInfo } = useUserInfo(route.params?.user.mid)
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
+  const { data: userInfo } = useUserInfo(route.params?.user.mid);
   const dynamicUser = {
     ...route.params?.user,
     ...userInfo,
-  }
-  const isSelf = useIsSelfSpace(dynamicUser?.mid)
-  const sexBadge = dynamicUser?.sex ? sexBadgeMap[dynamicUser.sex] : undefined
-  const { data: fans } = useUserRelation(dynamicUser?.mid)
+  };
+  const isSelf = useIsSelfSpace(dynamicUser?.mid);
+  const sexBadge = dynamicUser?.sex ? sexBadgeMap[dynamicUser.sex] : undefined;
+  const { data: fans } = useUserRelation(dynamicUser?.mid);
   // const gotoWebPage = () => {
   //   if (dynamicUser) {
   //     navigation.push('WebPage', {
@@ -62,27 +62,27 @@ function HeaderLeft() {
   //   }
   // }
   // const level = dynamicUser?.level ? levelList[dynamicUser.level] : ''
-  const userName = dynamicUser?.name || '' // ? dynamicUser.name + level : ''
-  const _followedUpsMap = useFollowedUpsMap()
-  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
-  const { setImagesList, setCurrentImageIndex } = useStore()
+  const userName = dynamicUser?.name || ""; // ? dynamicUser.name + level : ''
+  const _followedUpsMap = useFollowedUpsMap();
+  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
+  const { setImagesList, setCurrentImageIndex } = useStore();
 
   const copyUserName = () => {
     if (!dynamicUser?.name) {
-      return
+      return;
     }
     void Clipboard.setStringAsync(dynamicUser.name).then(() => {
-      showToast(`已复制：${dynamicUser.name}`)
-    })
-  }
+      showToast(`已复制：${dynamicUser.name}`);
+    });
+  };
 
   const viewAvatar = () => {
     if (!dynamicUser?.face) {
-      return
+      return;
     }
-    setImagesList([{ src: dynamicUser.face, width: 0, height: 0, ratio: 1 }])
-    setCurrentImageIndex(0)
-  }
+    setImagesList([{ src: dynamicUser.face, width: 0, height: 0, ratio: 1 }]);
+    setCurrentImageIndex(0);
+  };
 
   return (
     <View className="-left-3 mr-4 flex-none flex-row items-center">
@@ -103,7 +103,7 @@ function HeaderLeft() {
             >
               <Text
                 className={clsx(
-                  'text-center text-sm font-bold leading-none',
+                  "text-center text-sm font-bold leading-none",
                   sexBadge.textClassName,
                 )}
               >
@@ -118,9 +118,9 @@ function HeaderLeft() {
         <UpName
           mid={dynamicUser.mid}
           className={clsx(
-            'shrink text-lg',
+            "shrink text-lg",
             isSelf && theme.primary.text,
-            followed && [theme.secondary.text, 'font-bold'],
+            followed && [theme.secondary.text, "font-bold"],
           )}
           // adjustsFontSizeToFit
           onPress={copyUserName}
@@ -133,7 +133,7 @@ function HeaderLeft() {
           <Text
             className="ml-2 shrink-0 text-sm text-muted"
             onPress={() => {
-              showToast(`粉丝：${fans.follower}`)
+              showToast(`粉丝：${fans.follower}`);
             }}
           >
             {parseNumber(fans.follower)}粉丝
@@ -141,39 +141,39 @@ function HeaderLeft() {
         ) : null}
       </View>
     </View>
-  )
+  );
 }
 
-export const headerRight = () => <HeaderRight />
-export const headerTitle = () => <HeaderLeft />
+export const headerRight = () => <HeaderRight />;
+export const headerTitle = () => <HeaderLeft />;
 
 function HeaderRight() {
-  const route = useRoute<NativeStackScreenProps<RootStackParamList, 'Dynamic'>['route']>()
-  const dynamicUser = route.params?.user
-  const isSelf = useIsSelfSpace(dynamicUser?.mid)
-  const navigation = useNavigation<NavigationProps['navigation']>()
-  const [visible, setVisible] = React.useState(false)
-  const hideMenu = () => setVisible(false)
-  const showMenu = () => setVisible(true)
-  const actions = useFollowActions()
-  const { confirmBlock } = useBlockUpActions()
-  const { blacklist } = useBilibiliBlacklist()
+  const route = useRoute<NativeStackScreenProps<RootStackParamList, "Dynamic">["route"]>();
+  const dynamicUser = route.params?.user;
+  const isSelf = useIsSelfSpace(dynamicUser?.mid);
+  const navigation = useNavigation<NavigationProps["navigation"]>();
+  const [visible, setVisible] = React.useState(false);
+  const hideMenu = () => setVisible(false);
+  const showMenu = () => setVisible(true);
+  const actions = useFollowActions();
+  const { confirmBlock } = useBlockUpActions();
+  const { blacklist } = useBilibiliBlacklist();
   // 与主页直播入口用同一个 SWR key，命中缓存即可拿到直播间 id
-  const { roomId } = useLivingInfo(dynamicUser?.mid)
-  const _followedUpsMap = useFollowedUpsMap()
-  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap
-  const blocked = dynamicUser?.mid !== undefined && blacklist.has(String(dynamicUser.mid))
+  const { roomId } = useLivingInfo(dynamicUser?.mid);
+  const _followedUpsMap = useFollowedUpsMap();
+  const followed = dynamicUser?.mid && dynamicUser.mid in _followedUpsMap;
+  const blocked = dynamicUser?.mid !== undefined && blacklist.has(String(dynamicUser.mid));
   const followOptionText = actions.isPreparing
-    ? '同步关注列表中'
+    ? "同步关注列表中"
     : actions.pendingMid
-      ? '关注处理中'
+      ? "关注处理中"
       : followed
-        ? '取消关注'
-        : '关注UP'
+        ? "取消关注"
+        : "关注UP";
 
   // 自己的空间没有关注、拉黑等操作，整块菜单不展示
   if (isSelf) {
-    return null
+    return null;
   }
 
   return (
@@ -192,40 +192,40 @@ function HeaderRight() {
             text={followOptionText}
             disabled={actions.disabled}
             onSelect={() => {
-              hideMenu()
+              hideMenu();
               if (!dynamicUser) {
-                return
+                return;
               }
               if (followed) {
-                actions.confirmUnfollow(dynamicUser)
-                return
+                actions.confirmUnfollow(dynamicUser);
+                return;
               }
-              void actions.follow(dynamicUser)
+              void actions.follow(dynamicUser);
             }}
           />
           {roomId ? (
             <MenuOption
               text="打开直播间"
               onSelect={() => {
-                hideMenu()
+                hideMenu();
                 if (!dynamicUser) {
-                  return
+                  return;
                 }
-                navigation.push('Living', {
+                navigation.push("Living", {
                   title: `${dynamicUser.name}的直播间`,
                   user: { mid: dynamicUser.mid, name: dynamicUser.name },
                   url: `https://live.bilibili.com/h5/${roomId}`,
-                })
+                });
               }}
             />
           ) : null}
           <MenuOption
-            text={blocked ? '已拉黑' : '拉黑UP'}
+            text={blocked ? "已拉黑" : "拉黑UP"}
             disabled={blocked}
             onSelect={() => {
-              hideMenu()
+              hideMenu();
               if (!blocked && dynamicUser) {
-                confirmBlock({ mid: dynamicUser.mid, name: dynamicUser.name })
+                confirmBlock({ mid: dynamicUser.mid, name: dynamicUser.name });
               }
             }}
           />
@@ -233,26 +233,26 @@ function HeaderRight() {
             text="分享UP"
             onSelect={() => {
               if (dynamicUser) {
-                const { name, mid, sign } = dynamicUser
-                handleShareUp(name, mid, sign)
+                const { name, mid, sign } = dynamicUser;
+                handleShareUp(name, mid, sign);
               }
-              hideMenu()
+              hideMenu();
             }}
           />
           <MenuOption
             text="复制ID"
             onSelect={() => {
               if (dynamicUser?.mid) {
-                const mid = String(dynamicUser.mid)
+                const mid = String(dynamicUser.mid);
                 void Clipboard.setStringAsync(mid).then(() => {
-                  showToast(`已复制：${mid}`)
-                })
+                  showToast(`已复制：${mid}`);
+                });
               }
-              hideMenu()
+              hideMenu();
             }}
           />
         </MenuOptions>
       </Menu>
     </View>
-  )
+  );
 }

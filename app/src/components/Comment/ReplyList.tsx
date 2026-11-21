@@ -1,112 +1,112 @@
-import { useIsFocused } from '@react-navigation/native'
-import type { FlashListRef } from '@shopify/flash-list'
-import { useEffect, useRef } from 'react'
-import { ActivityIndicator, Pressable, View } from 'react-native'
-import { X } from 'lucide-react-native'
+import { useIsFocused } from "@react-navigation/native";
+import type { FlashListRef } from "@shopify/flash-list";
+import { useEffect, useRef } from "react";
+import { ActivityIndicator, Pressable, View } from "react-native";
+import { X } from "lucide-react-native";
 
-import { useReplies } from '@/api/replies'
-import type { ReplyItemType } from '@/api/replies'
-import { BottomSheet } from '@/components/BottomSheet'
-import { FlashList } from '@/components/FlashList'
-import { Text } from '@/components/Text'
-import { LoadErrorText } from '@/components/LoadErrorText'
-import { ThemedIcon } from '@/components/ThemedIcon'
-import { theme } from '@/constants/colors.tw'
-import { getStoreMethods, useStore } from '@/store'
+import { useReplies } from "@/api/replies";
+import type { ReplyItemType } from "@/api/replies";
+import { BottomSheet } from "@/components/BottomSheet";
+import { FlashList } from "@/components/FlashList";
+import { Text } from "@/components/Text";
+import { LoadErrorText } from "@/components/LoadErrorText";
+import { ThemedIcon } from "@/components/ThemedIcon";
+import { theme } from "@/constants/colors.tw";
+import { getStoreMethods, useStore } from "@/store";
 
-import { CommentItem } from './Comment'
-import CommentPaginationFooter from './CommentPaginationFooter'
-import { removeReplyFromInfo } from './reply-list.helpers'
-import type { ReplyListProps } from './reply-list.types'
-import ReplyComposer from './ReplyComposer'
-import ReplySheetContent from './ReplySheetContent'
+import { CommentItem } from "./Comment";
+import CommentPaginationFooter from "./CommentPaginationFooter";
+import { removeReplyFromInfo } from "./reply-list.helpers";
+import type { ReplyListProps } from "./reply-list.types";
+import ReplyComposer from "./ReplyComposer";
+import ReplySheetContent from "./ReplySheetContent";
 
-const SHEET_BACKDROP_OPACITY = 0.5
+const SHEET_BACKDROP_OPACITY = 0.5;
 
 export default function ReplyList(props: ReplyListProps) {
-  const replies = useReplies()
-  const { setRepliesInfo, repliesInfo } = useStore()
-  const focused = useIsFocused()
-  const listRef = useRef<FlashListRef<ReplyItemType>>(null)
+  const replies = useReplies();
+  const { setRepliesInfo, repliesInfo } = useStore();
+  const focused = useIsFocused();
+  const listRef = useRef<FlashListRef<ReplyItemType>>(null);
 
   useEffect(() => {
     if (!focused) {
-      setRepliesInfo(null)
+      setRepliesInfo(null);
     }
-  }, [focused, setRepliesInfo])
+  }, [focused, setRepliesInfo]);
 
   function handleClose() {
-    setRepliesInfo(null)
+    setRepliesInfo(null);
   }
 
   function selectTarget(target: ReplyItemType) {
     if (repliesInfo) {
-      setRepliesInfo({ ...repliesInfo, replyTarget: target, focusComposer: true })
+      setRepliesInfo({ ...repliesInfo, replyTarget: target, focusComposer: true });
     }
   }
 
-  async function changeAttitude(item: ReplyItemType, kind: 'like' | 'dislike') {
-    const next = await props.onAttitude(item, kind)
+  async function changeAttitude(item: ReplyItemType, kind: "like" | "dislike") {
+    const next = await props.onAttitude(item, kind);
     if (next) {
-      await replies.patchAttitude(item.id, next)
+      await replies.patchAttitude(item.id, next);
     } else {
-      await replies.refresh().catch(() => {})
+      await replies.refresh().catch(() => {});
     }
-    return next
+    return next;
   }
 
   async function submitReply(message: string) {
     if (!repliesInfo) {
-      return false
+      return false;
     }
-    const reply = await props.onSubmitReply(repliesInfo.replyTarget, message)
+    const reply = await props.onSubmitReply(repliesInfo.replyTarget, message);
     if (!reply) {
-      await replies.refresh().catch(() => {})
-      return false
+      await replies.refresh().catch(() => {});
+      return false;
     }
-    await replies.prependReply(reply)
+    await replies.prependReply(reply);
     // 异步返回后取 store 里的最新快照，避免闭包里的 repliesInfo 过期
-    const currentInfo = getStoreMethods().getRepliesInfo()
+    const currentInfo = getStoreMethods().getRepliesInfo();
     if (currentInfo && String(currentInfo.root) === String(repliesInfo.root)) {
       setRepliesInfo({
         ...currentInfo,
         allCount: currentInfo.allCount + 1,
         previewReplies: [reply, ...currentInfo.previewReplies],
         addedReplies: [reply, ...currentInfo.addedReplies],
-      })
+      });
     }
-    listRef.current?.scrollToOffset({ offset: 0, animated: true })
-    return true
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+    return true;
   }
 
   async function deleteReply(target: ReplyItemType) {
-    const deleted = await props.onDelete(target)
+    const deleted = await props.onDelete(target);
     if (!deleted) {
-      await replies.refresh().catch(() => {})
-      return false
+      await replies.refresh().catch(() => {});
+      return false;
     }
-    const currentInfo = getStoreMethods().getRepliesInfo()
+    const currentInfo = getStoreMethods().getRepliesInfo();
     if (!currentInfo || String(currentInfo.root) !== String(repliesInfo?.root)) {
-      return true
+      return true;
     }
     if (target.id === String(currentInfo.root)) {
-      setRepliesInfo(null)
-      return true
+      setRepliesInfo(null);
+      return true;
     }
-    await replies.removeReply(target.id)
-    const latestInfo = getStoreMethods().getRepliesInfo()
+    await replies.removeReply(target.id);
+    const latestInfo = getStoreMethods().getRepliesInfo();
     if (latestInfo && String(latestInfo.root) === String(currentInfo.root)) {
-      setRepliesInfo(removeReplyFromInfo(latestInfo, target.id))
+      setRepliesInfo(removeReplyFromInfo(latestInfo, target.id));
     }
-    return true
+    return true;
   }
 
   function loadMore() {
-    void replies.update()
+    void replies.update();
   }
 
-  const { allCount, root } = replies.data
-  const ownerMid = repliesInfo?.ownerMid
+  const { allCount, root } = replies.data;
+  const ownerMid = repliesInfo?.ownerMid;
   const rowProps = {
     ownerMid,
     onAttitude: changeAttitude,
@@ -115,20 +115,20 @@ export default function ReplyList(props: ReplyListProps) {
     viewerMid: props.viewerMid,
     isDeletePending: props.isDeletePending,
     isAttitudePending: props.isAttitudePending,
-  }
+  };
 
   return (
     <BottomSheet
       backdropOpacity={SHEET_BACKDROP_OPACITY}
       onClose={handleClose}
-      snapPoints={['70%']}
+      snapPoints={["70%"]}
       index={0}
       visible={Boolean(repliesInfo)}
     >
       <ReplySheetContent>
         <View className="relative h-12 shrink-0 flex-row items-center justify-center border-b border-divider-subtle px-4">
           <Text className="text-base font-semibold tabular-nums">
-            {typeof allCount === 'number' ? `${allCount} 条回复` : '回复'}
+            {typeof allCount === "number" ? `${allCount} 条回复` : "回复"}
           </Text>
           <Pressable
             className="absolute right-2 h-11 w-11 items-center justify-center rounded-full"
@@ -160,7 +160,7 @@ export default function ReplyList(props: ReplyListProps) {
                 <View className="flex-row items-center justify-between px-1 pb-1 pt-4">
                   <Text className="text-sm font-semibold">全部回复</Text>
                   <Text className={`text-xs tabular-nums ${theme.text.muted}`}>
-                    {typeof allCount === 'number' ? allCount : ''}
+                    {typeof allCount === "number" ? allCount : ""}
                   </Text>
                 </View>
               </View>
@@ -178,9 +178,7 @@ export default function ReplyList(props: ReplyListProps) {
                 onRetry={() => void replies.retry()}
               />
             ) : (
-              <Text className="my-10 text-center text-sm">
-                还没有回复，来说两句吧
-              </Text>
+              <Text className="my-10 text-center text-sm">还没有回复，来说两句吧</Text>
             )
           }
           ListFooterComponent={
@@ -208,5 +206,5 @@ export default function ReplyList(props: ReplyListProps) {
         ) : null}
       </ReplySheetContent>
     </BottomSheet>
-  )
+  );
 }
