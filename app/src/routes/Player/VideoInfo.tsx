@@ -8,7 +8,6 @@ import {
   ChevronRight,
   CirclePlay,
   ListVideo,
-  MessageCircle,
   Share2,
 } from 'lucide-react-native'
 import React from 'react'
@@ -198,19 +197,12 @@ function VideoInfo(props: VideoInfoProps) {
             {parseNumber(videoInfo?.playNum)}
           </Text>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="写评论"
-          accessibilityHint="打开评论输入框"
-          className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1"
-          hitSlop={6}
-          onPress={props.onCommentPress}
-        >
-          <ThemedIcon icon={MessageCircle} size={16} colorClassName={theme.icon.primary} />
+        <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1 px-0.5 py-1">
+          <Text className={`text-sm font-medium ${theme.text.heading}`}>弹</Text>
           <Text selectable className={`text-xs tabular-nums ${theme.text.primary}`}>
             {parseNumber(videoInfo?.danmuNum)}
           </Text>
-        </Pressable>
+        </View>
         <LikeButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.likeNum} />
         <FavoriteButton aid={videoInfo.aid} bvid={videoInfo.bvid} count={videoInfo.collectNum} />
         <Pressable

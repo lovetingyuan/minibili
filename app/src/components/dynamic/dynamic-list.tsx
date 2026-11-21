@@ -76,31 +76,26 @@ function DynamicListEmpty(
 export function DynamicList(props: DynamicListProps) {
   const navigation = useNavigation<MainTabNavigationProp>()
   const listRef = React.useRef<FlashListRef<DynamicItem> | null>(null)
-  const pendingScrollTopRef = React.useRef(false)
-  const { onTabReselect } = props
+  const [scrollToTopRequest, setScrollToTopRequest] = React.useState(0)
+  const { onTabPress } = props
 
   React.useEffect(() => {
-    if (!onTabReselect) {
+    if (!onTabPress) {
       return
     }
 
-    return navigation.addListener('tabPress', () => {
-      if (!navigation.isFocused()) {
-        return
+    return navigation.addListener('tabPress', async () => {
+      if (await onTabPress()) {
+        setScrollToTopRequest(request => request + 1)
       }
-      // 刷新会替换整个列表，等新列表渲染出来后再滚动，否则滚动位置会被新数据覆盖
-      pendingScrollTopRef.current = true
-      onTabReselect()
     })
-  }, [navigation, onTabReselect])
+  }, [navigation, onTabPress])
 
   React.useEffect(() => {
-    if (!pendingScrollTopRef.current || props.isRefreshing) {
-      return
+    if (scrollToTopRequest && navigation.isFocused()) {
+      listRef.current?.scrollToOffset({ offset: 0, animated: true })
     }
-    pendingScrollTopRef.current = false
-    listRef.current?.scrollToOffset({ offset: 0, animated: true })
-  }, [props.isRefreshing])
+  }, [navigation, scrollToTopRequest])
 
   if (props.isLoading && !props.list.length) {
     return <DynamicListLoading listHeader={props.listHeader} />

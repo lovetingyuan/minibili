@@ -190,15 +190,12 @@ function Play({ route }: Props) {
           </View>
         }
       >
-        {({ openComposer }) => (
-          <VideoInfo
-            currentPage={currentPage}
-            previewReason={previewReason}
-            setCurrentPage={handleSelectPage}
-            onCommentPress={openComposer}
-            watchingCount={watchingCount}
-          />
-        )}
+        <VideoInfo
+          currentPage={currentPage}
+          previewReason={previewReason}
+          setCurrentPage={handleSelectPage}
+          watchingCount={watchingCount}
+        />
       </CommentList>
     </View>
   )

@@ -19,11 +19,14 @@ export function useFollowingDynamicItems() {
   const account =
     session.account && bilibiliSession.isCurrentAccount(session.account) ? session.account : null;
   const pending = useRef<Promise<FollowingDynamicsPage[] | undefined> | null>(null);
-  const refreshingRef = useRef(false);
+  const refreshTask = useRef<Promise<boolean> | null>(null);
   const refreshingAccount = useRef<typeof account>(null);
   const [refreshing, setRefreshing] = useState(false);
   const swr = useSWRInfinite<FollowingDynamicsPage, Error, FollowingDynamicsKeyLoader>(
-    (index, previous) => getFollowingDynamicsKey(account, index, previous),
+    (index, previous) =>
+      index > 0 && refreshingAccount.current
+        ? null
+        : getFollowingDynamicsKey(account, index, previous),
     ([, mid, generation, page, offset]) =>
       fetchFollowingDynamicsPage(page, offset, request, () =>
         bilibiliSession.isCurrentAccount({ mid, generation }),
@@ -78,7 +81,7 @@ export function useFollowingDynamicItems() {
       !account ||
       !bilibiliSession.isCurrentAccount(account) ||
       pending.current ||
-      refreshingRef.current ||
+      refreshTask.current ||
       swr.isValidating ||
       isLoadingMore ||
       swr.error ||
@@ -95,28 +98,38 @@ export function useFollowingDynamicItems() {
     }
   }
 
-  async function refresh() {
-    if (!account || !bilibiliSession.isCurrentAccount(account) || refreshingRef.current) {
-      return;
+  function refresh(): Promise<boolean> {
+    if (!account || !bilibiliSession.isCurrentAccount(account)) {
+      return Promise.resolve(false);
     }
-    refreshingRef.current = true;
+    if (refreshTask.current) {
+      return refreshTask.current;
+    }
+
     setRefreshing(true);
-    try {
-      await pending.current?.catch(() => {});
-      if (!bilibiliSession.isCurrentAccount(account)) {
-        return;
+    const task = (async () => {
+      try {
+        await pending.current?.catch(() => {});
+        if (!bilibiliSession.isCurrentAccount(account)) {
+          return false;
+        }
+        // 刷新期间只请求首页，成功后再重置页数，避免提前截短列表。
+        refreshingAccount.current = account;
+        await swr.mutate();
+        // mutate 失败时也可能返回缓存，只有 onSuccess 会清除这次刷新的标记。
+        if (refreshingAccount.current !== null || !bilibiliSession.isCurrentAccount(account)) {
+          return false;
+        }
+        await swr.setSize(1);
+        return bilibiliSession.isCurrentAccount(account);
+      } finally {
+        refreshingAccount.current = null;
+        refreshTask.current = null;
+        setRefreshing(false);
       }
-      await swr.setSize(1);
-      if (!bilibiliSession.isCurrentAccount(account)) {
-        return;
-      }
-      refreshingAccount.current = account;
-      await swr.mutate();
-    } finally {
-      refreshingAccount.current = null;
-      refreshingRef.current = false;
-      setRefreshing(false);
-    }
+    })();
+    refreshTask.current = task;
+    return task;
   }
 
   async function retry() {
@@ -124,7 +137,7 @@ export function useFollowingDynamicItems() {
       !account ||
       !bilibiliSession.isCurrentAccount(account) ||
       pending.current ||
-      refreshingRef.current ||
+      refreshTask.current ||
       swr.isValidating
     ) {
       return;
