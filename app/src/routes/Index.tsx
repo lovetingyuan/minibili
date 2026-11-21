@@ -16,6 +16,7 @@ import { useUnreadFollowedUpCount } from '@/store/derives'
 import type { MainTabParamList, RootStackParamList } from '@/types'
 import { useAppUpdateInfo } from '@/api/check-update'
 import { posthog, PostHogNavigationProvider } from '@/config/posthog'
+import { sentryNavigation } from '@/config/sentry'
 
 import About from './About'
 import BilibiliLogin from './BilibiliLogin'
@@ -210,6 +211,7 @@ function AppRoute() {
       ref={rootNavigationRef}
       theme={routeTheme}
       onReady={() => {
+        sentryNavigation.registerNavigationContainer(rootNavigationRef)
         flushPendingBilibiliLogin()
         trackCurrentScreen()
       }}

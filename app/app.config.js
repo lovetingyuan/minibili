@@ -72,6 +72,14 @@ module.exports = {
     "expo-asset",
     "expo-image",
     "expo-localization",
+    [
+      "@sentry/react-native/expo",
+      {
+        organization: "tingyuan-tw",
+        project: "minibili-app",
+        disableAutoUpload: !process.env.SENTRY_AUTH_TOKEN,
+      },
+    ],
     ...(isProduction
       ? [
           // source map / native 符号上传要用个人 API key（POSTHOG_CLI_API_KEY、POSTHOG_CLI_PROJECT_ID、
@@ -150,7 +158,8 @@ module.exports = {
       timeZone: "Asia/Shanghai",
     }).format(new Date()),
     gitHash,
-    // dsn: process.env.SENTRY_DSN,
+    sentryDsn: process.env.SENTRY_DSN,
+    sentryEnvironment: variant,
     posthogEnabled: isProduction,
     ...(isProduction
       ? {
@@ -160,18 +169,6 @@ module.exports = {
       : {}),
     releaseName: release,
   },
-  // hooks: {
-  //   postPublish: [
-  //     {
-  //       file: 'sentry-expo/upload-sourcemaps',
-  //       config: {
-  //         organization: process.env.SENTRY_ORG,
-  //         project: process.env.SENTRY_PROJECT,
-  //         // authToken: process.env.SENTRY_AUTH_TOKEN,
-  //       },
-  //     },
-  //   ],
-  // },
   updates: {
     url: "https://u.expo.dev/17ac07b9-df37-4b3a-9a31-50da2bb5d44c",
     // EAS 的 preview profile 会带上 channel=preview（见 eas.json），本地构建时靠 APP_VARIANT 补齐，

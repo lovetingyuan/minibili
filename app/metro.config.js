@@ -1,9 +1,13 @@
-const { getPostHogExpoConfig } = require("posthog-react-native/metro");
-const { getDefaultConfig } = require("expo/metro-config");
+const {
+  unstableBeforeAssetSerializationDebugIdPlugin: postHogDebugIdPlugin,
+} = require("posthog-react-native/metro");
+const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const { withUniwindConfig } = require("uniwind/metro");
 
 const isProduction = ["production", "prod"].includes(process.env.APP_VARIANT);
-const config = isProduction ? getPostHogExpoConfig(__dirname) : getDefaultConfig(__dirname);
+const config = getSentryExpoConfig(__dirname, {
+  unstable_beforeAssetSerializationPlugins: isProduction ? [postHogDebugIdPlugin] : [],
+});
 
 const defaultResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {

@@ -1,7 +1,9 @@
+import * as Sentry from "@sentry/react-native";
 import { registerRootComponent } from "expo";
 import "./features/background-updates/task";
 
 import App from "./App";
+import { initSentry } from "./config/sentry";
 import { showFatalError, showToast } from "./utils";
 
 if (typeof ErrorUtils === "object") {
@@ -14,4 +16,5 @@ if (typeof ErrorUtils === "object") {
   });
 }
 
-registerRootComponent(App);
+initSentry();
+registerRootComponent(Sentry.wrap(App));

@@ -5,6 +5,7 @@ import {
   saveBilibiliLoginCookie,
 } from "../../api/get-cookie";
 import { clearWBIInfoCache } from "../../api/user-nav";
+import { setSentryBilibiliUser } from "../../config/sentry";
 import { clearBilibiliAuthExpiration, confirmBilibiliAuthExpired } from "./auth-expiration";
 import { createBilibiliSession } from "./controller";
 import { writeBilibiliWebViewCookies } from "./webview-cookies";
@@ -14,6 +15,7 @@ export const bilibiliSession = createBilibiliSession({
   saveCookie: saveBilibiliLoginCookie,
   clearCookie: clearBilibiliLoginCookie,
   validateCookie: validateBilibiliCookie,
+  onAccountChanged: setSentryBilibiliUser,
   writeWebViewCookies: writeBilibiliWebViewCookies,
   onStoredCredentialsExpired: confirmBilibiliAuthExpired,
   onLoginSuccess() {

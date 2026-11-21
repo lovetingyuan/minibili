@@ -2,6 +2,7 @@ import '../global.css'
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import NetInfo from '@react-native-community/netinfo'
+import { captureException } from '@sentry/react-native'
 import { StatusBar } from 'expo-status-bar'
 import { AppState } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -41,6 +42,7 @@ import { ToastHost } from './features/toast'
 let online = true
 
 function captureRenderError(error: Error, componentStack: string) {
+  captureException(error, { contexts: { react: { componentStack } } })
   if (!__DEV__) {
     posthog?.captureException(error, { component_stack: componentStack })
   }

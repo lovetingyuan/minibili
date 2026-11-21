@@ -15,8 +15,12 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
   let checkPromise: Promise<BilibiliAccount | null> | null = null;
   let checkGeneration = -1;
 
-  function publish(next: BilibiliSessionControl) {
+  function publish(next: BilibiliSessionControl, account: BilibiliAccount | null = null) {
+    const accountChanged = next.generation !== control.generation;
     control = next;
+    if (accountChanged) {
+      dependencies.onAccountChanged?.(account);
+    }
     listeners.forEach((listener) => listener());
   }
 
@@ -37,10 +41,12 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
     const cookie = await dependencies.readCookie();
     assertCurrent(generation);
     if (!cookie) {
+      dependencies.onAccountChanged?.(null);
       return null;
     }
     const mid = getBilibiliUserId(cookie);
     if (!mid || !hasBilibiliLoginCookie(cookie)) {
+      dependencies.onAccountChanged?.(null);
       return null;
     }
     let failure: Error | undefined;
@@ -53,7 +59,9 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
         const profile = await dependencies.validateCookie(cookie);
         assertCurrent(generation);
         if (profile) {
-          return { mid: profile.mid.toString(), generation, profile };
+          const account = { mid: profile.mid.toString(), generation, profile };
+          dependencies.onAccountChanged?.(account);
+          return account;
         }
       } catch (cause) {
         assertCurrent(generation);
@@ -107,9 +115,10 @@ export function createBilibiliSession(dependencies: BilibiliSessionDependencies)
       await dependencies.saveCookie(cookie);
       // 写入开始后允许页面离开；退出操作会排队清理，不能被这次保存覆盖。
       assertCurrent(generation);
-      publish({ ...control, generation: generation + 1 });
+      const account = { mid: profile.mid.toString(), generation: generation + 1, profile };
+      publish({ ...control, generation: account.generation }, account);
       dependencies.onLoginSuccess?.();
-      return { mid: profile.mid.toString(), generation: control.generation, profile };
+      return account;
     });
   }
 
