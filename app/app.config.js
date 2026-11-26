@@ -75,9 +75,12 @@ module.exports = {
     [
       "@sentry/react-native/expo",
       {
+        url: "https://sentry.io/",
         organization: "tingyuan-tw",
         project: "minibili-app",
-        disableAutoUpload: !process.env.SENTRY_AUTH_TOKEN,
+        // 本地构建未配置 token 时跳过自动上传；EAS 生产构建强制开启，避免缺 token 时静默产出无 source map 的正式包
+        disableAutoUpload:
+          !process.env.SENTRY_AUTH_TOKEN && !(isProduction && Boolean(process.env.EAS_BUILD)),
       },
     ],
     ...(isProduction

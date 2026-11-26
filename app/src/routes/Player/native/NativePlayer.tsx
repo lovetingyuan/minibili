@@ -284,6 +284,7 @@ export default function NativePlayer(props: NativePlayerProps) {
     canLoadStream && uri ? createVideoSource(uri, notificationTitle, contentType) : null;
 
   const player = useVideoPlayer(source, (instance) => {
+    instance.audioMixingMode = "auto";
     instance.timeUpdateEventInterval = 0.25;
     instance.loop = playbackMode.loop;
     // Android 上 expo-video 默认把音调跟着倍速一起拉伸（iOS 默认保音调），

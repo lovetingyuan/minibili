@@ -11,9 +11,14 @@ export function initSentry() {
     return;
   }
 
+  const environment =
+    typeof extra.sentryEnvironment === "string" && extra.sentryEnvironment
+      ? extra.sentryEnvironment
+      : "production";
+
   Sentry.init({
     dsn: extra.sentryDsn,
-    environment: __DEV__ ? "development" : extra.sentryEnvironment,
+    environment: __DEV__ ? "development" : environment,
     sendDefaultPii: false,
     tracesSampleRate: __DEV__ ? 1 : 0.1,
     tracePropagationTargets: [],

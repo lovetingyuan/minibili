@@ -1,0 +1,432 @@
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/listeners/VideoPlayerListener.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/listeners/VideoPlayerListener.kt
+index caef5c8..c6aacbf 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/listeners/VideoPlayerListener.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/listeners/VideoPlayerListener.kt
+@@ -19,6 +19,7 @@ import expo.modules.video.records.VideoTrack
+ interface VideoPlayerListener {
+   fun onStatusChanged(player: VideoPlayer, status: PlayerStatus, oldStatus: PlayerStatus?, error: PlaybackError?) {}
+   fun onIsPlayingChanged(player: VideoPlayer, isPlaying: Boolean, oldIsPlaying: Boolean?) {}
++  fun onPlayWhenReadyChanged(player: VideoPlayer, playWhenReady: Boolean, oldPlayWhenReady: Boolean?) {}
+   fun onVolumeChanged(player: VideoPlayer, volume: Float, oldVolume: Float?) {}
+   fun onMutedChanged(player: VideoPlayer, muted: Boolean, oldMuted: Boolean?) {}
+   fun onSourceChanged(player: VideoPlayer, source: VideoSource?, oldSource: VideoSource?) {}
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/AudioFocusManager.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/AudioFocusManager.kt
+index cdce796..9289bd0 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/AudioFocusManager.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/AudioFocusManager.kt
+@@ -9,8 +9,10 @@ import androidx.media3.common.util.UnstableApi
+ import expo.modules.kotlin.AppContext
+ import expo.modules.video.FailedToGetAudioFocusManagerException
+ import expo.modules.video.enums.AudioMixingMode
++import expo.modules.video.enums.PlayerStatus
+ import expo.modules.video.player.VideoPlayer
+ import expo.modules.video.listeners.VideoPlayerListener
++import expo.modules.video.records.PlaybackError
+ import kotlinx.coroutines.launch
+ import java.lang.ref.WeakReference
+ 
+@@ -24,72 +26,96 @@ class AudioFocusManager(private val appContext: AppContext) : AudioManager.OnAud
+ 
+   private var players: MutableList<WeakReference<VideoPlayer>> = mutableListOf()
+   private var currentFocusRequest: AudioFocusRequest? = null
++  private var hasLegacyAudioFocus: Boolean = false
+   private var currentMixingMode: AudioMixingMode = AudioMixingMode.MIX_WITH_OTHERS
++  private val hasAudioFocus: Boolean
++    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++      currentFocusRequest != null
++    } else {
++      hasLegacyAudioFocus
++    }
+   private val anyPlayerRequiresFocus: Boolean
+     get() = players.toList().any {
+       playerRequiresFocus(it)
+     }
+ 
+-  private fun requestAudioFocus() {
++  private fun requestAudioFocus() = synchronized(this) {
++    pruneReleasedPlayers()
+     val audioMixingMode = findAudioMixingMode()
+ 
+     // We don't request AudioFocus if we want to mix the audio with others
+     if (audioMixingMode == AudioMixingMode.MIX_WITH_OTHERS || !anyPlayerRequiresFocus) {
+       abandonAudioFocus()
+-      currentMixingMode = audioMixingMode
+       return
+     }
+     val audioFocusType = when (audioMixingMode) {
+       AudioMixingMode.DUCK_OTHERS -> AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
+-      AudioMixingMode.AUTO -> AudioManager.AUDIOFOCUS_GAIN
+-      AudioMixingMode.DO_NOT_MIX -> AudioManager.AUDIOFOCUS_GAIN
+-      else -> AudioManager.AUDIOFOCUS_GAIN
++      // Use transient focus so abandoning focus when playback ends or stops restores
++      // the previous audio focus holder instead of permanently evicting it.
++      AudioMixingMode.AUTO -> AudioManager.AUDIOFOCUS_GAIN_TRANSIENT
++      AudioMixingMode.DO_NOT_MIX -> AudioManager.AUDIOFOCUS_GAIN_TRANSIENT
++      else -> AudioManager.AUDIOFOCUS_GAIN_TRANSIENT
+     }
+ 
+     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+       // We already have audio focus
+       currentFocusRequest?.let {
+         if (it.focusGain == audioFocusType) {
++          currentMixingMode = audioMixingMode
+           return
+         }
+       }
+ 
+-      val newFocusRequest = AudioFocusRequest.Builder(audioFocusType).run {
+-        setAudioAttributes(
+-          AudioAttributes.Builder().run {
+-            setUsage(AudioAttributes.USAGE_MEDIA)
+-            setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+-            setOnAudioFocusChangeListener(this@AudioFocusManager)
+-            build()
+-          }
+-        ).build()
++      val newFocusRequest = AudioFocusRequest.Builder(audioFocusType)
++        .setAudioAttributes(
++          AudioAttributes.Builder()
++            .setUsage(AudioAttributes.USAGE_MEDIA)
++            .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
++            .build()
++        )
++        .setOnAudioFocusChangeListener(this@AudioFocusManager)
++        .build()
++      val result = audioManager.requestAudioFocus(newFocusRequest)
++      if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
++        currentFocusRequest = newFocusRequest
++        currentMixingMode = audioMixingMode
+       }
+-      currentFocusRequest = newFocusRequest
+-      audioManager.requestAudioFocus(newFocusRequest)
+     } else {
+       @Suppress("DEPRECATION")
+-      audioManager.requestAudioFocus(
++      val result = audioManager.requestAudioFocus(
+         this,
+         AudioManager.STREAM_MUSIC,
+         audioFocusType
+       )
++      if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
++        hasLegacyAudioFocus = true
++        currentMixingMode = audioMixingMode
++      }
+     }
+-    currentMixingMode = audioMixingMode
+   }
+ 
+-  private fun abandonAudioFocus() {
+-    currentFocusRequest?.let {
+-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++  private fun abandonAudioFocus() = synchronized(this) {
++    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++      currentFocusRequest?.let {
+         audioManager.abandonAudioFocusRequest(it)
+-      } else {
+-        @Suppress("DEPRECATION")
+-        audioManager.abandonAudioFocus(this)
+       }
++      currentFocusRequest = null
++    } else if (hasLegacyAudioFocus) {
++      @Suppress("DEPRECATION")
++      audioManager.abandonAudioFocus(this)
++      hasLegacyAudioFocus = false
+     }
+-    currentFocusRequest = null
++    currentMixingMode = AudioMixingMode.MIX_WITH_OTHERS
++  }
++
++  fun release() = synchronized(this) {
++    players.forEach { it.get()?.removeListener(this) }
++    players.clear()
++    abandonAudioFocus()
+   }
+ 
+-  fun registerPlayer(player: VideoPlayer) {
++  fun registerPlayer(player: VideoPlayer) = synchronized(this) {
++    pruneReleasedPlayers()
+     players.find { it.get() == player } ?: run {
+       players.add(WeakReference(player))
+     }
+@@ -97,9 +123,9 @@ class AudioFocusManager(private val appContext: AppContext) : AudioManager.OnAud
+     updateAudioFocus()
+   }
+ 
+-  fun unregisterPlayer(player: VideoPlayer) {
++  fun unregisterPlayer(player: VideoPlayer) = synchronized(this) {
+     player.removeListener(this)
+-    players.removeAll { it.get() == player }
++    players.removeAll { it.get() == player || it.get() == null }
+     updateAudioFocus()
+   }
+ 
+@@ -113,10 +139,28 @@ class AudioFocusManager(private val appContext: AppContext) : AudioManager.OnAud
+   override fun onIsPlayingChanged(player: VideoPlayer, isPlaying: Boolean, oldIsPlaying: Boolean?) {
+     // we can't use `updateAudioFocus`, because when losing focus the videos are paused sequentially,
+     // which can lead to unexpected results.
+-    if (!isPlaying && !anyPlayerRequiresFocus) {
+-      abandonAudioFocus()
+-    } else if (isPlaying && anyPlayerRequiresFocus) {
+-      requestAudioFocus()
++    synchronized(this) {
++      if (!isPlaying && !anyPlayerRequiresFocus) {
++        abandonAudioFocus()
++      } else if (isPlaying && anyPlayerRequiresFocus) {
++        requestAudioFocus()
++      }
++    }
++  }
++
++  override fun onStatusChanged(player: VideoPlayer, status: PlayerStatus, oldStatus: PlayerStatus?, error: PlaybackError?) {
++    synchronized(this) {
++      if ((status == PlayerStatus.IDLE || status == PlayerStatus.ERROR) && !anyPlayerRequiresFocus) {
++        abandonAudioFocus()
++      }
++    }
++  }
++
++  override fun onPlayWhenReadyChanged(player: VideoPlayer, playWhenReady: Boolean, oldPlayWhenReady: Boolean?) {
++    synchronized(this) {
++      if (!playWhenReady && !anyPlayerRequiresFocus) {
++        abandonAudioFocus()
++      }
+     }
+   }
+ 
+@@ -133,34 +177,46 @@ class AudioFocusManager(private val appContext: AppContext) : AudioManager.OnAud
+   override fun onAudioFocusChange(focusChange: Int) {
+     when (focusChange) {
+       AudioManager.AUDIOFOCUS_LOSS -> {
++        val playersSnapshot = synchronized(this) {
++          currentFocusRequest = null
++          hasLegacyAudioFocus = false
++          currentMixingMode = AudioMixingMode.MIX_WITH_OTHERS
++          players.toList()
++        }
+         appContext.mainQueue.launch {
+-          players.forEach {
++          playersSnapshot.forEach {
+             pausePlayerIfUnmuted(it)
+           }
+-          currentFocusRequest = null
+         }
+       }
+ 
+       AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+         // W could pause/mix the players here individually, but we will keep the behaviour in line with iOS,
+         // find the dominant audioMixingMode and apply it to all players.
+-        val audioMixingMode = findAudioMixingMode()
+-        if (audioMixingMode == AudioMixingMode.MIX_WITH_OTHERS) {
+-          return
++        val playersSnapshot = synchronized(this) {
++          val audioMixingMode = findAudioMixingMode()
++          if (audioMixingMode == AudioMixingMode.MIX_WITH_OTHERS) {
++            return
++          }
++          // We pause and do not auto-resume on AUDIOFOCUS_GAIN, so abandon our stack entry
++          // to avoid blocking an underlying audio holder from regaining focus later.
++          abandonAudioFocus()
++          players.toList()
+         }
+         appContext.mainQueue.launch {
+-          players.forEach {
++          playersSnapshot.forEach {
+             pausePlayerIfUnmuted(it)
+           }
+-          currentFocusRequest = null
+         }
+       }
+ 
+       AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+-        val audioMixingMode = findAudioMixingMode()
++        val (audioMixingMode, playersSnapshot) = synchronized(this) {
++          findAudioMixingMode() to players.toList()
++        }
+ 
+         appContext.mainQueue.launch {
+-          players.forEach {
++          playersSnapshot.forEach {
+             if (audioMixingMode == AudioMixingMode.DO_NOT_MIX) {
+               pausePlayerIfUnmuted(it)
+             } else {
+@@ -173,8 +229,11 @@ class AudioFocusManager(private val appContext: AppContext) : AudioManager.OnAud
+       AudioManager.AUDIOFOCUS_GAIN -> {
+         //  TODO: For now this behaves like iOS and doesn't resume playback automatically
+         //  In future versions we can add a prop to control this behavior.
++        val playersSnapshot = synchronized(this) {
++          players.toList()
++        }
+         appContext.mainQueue.launch {
+-          players.forEach {
++          playersSnapshot.forEach {
+             unduckPlayer(it)
+           }
+         }
+@@ -184,9 +243,20 @@ class AudioFocusManager(private val appContext: AppContext) : AudioManager.OnAud
+ 
+   // Utils
+ 
++  private fun pruneReleasedPlayers() {
++    players.removeAll { it.get() == null }
++  }
++
++  private fun playerIsActiveForFocus(player: VideoPlayer): Boolean {
++    // Keep existing focus across mid-playback buffering/seeking while playback is still intended,
++    // while releasing promptly on pause (playWhenReady = false), completion (status IDLE), or error.
++    return player.playing || (hasAudioFocus && player.playWhenReady && player.status == PlayerStatus.LOADING)
++  }
++
+   private fun playerRequiresFocus(weakPlayer: WeakReference<VideoPlayer>): Boolean {
+-    val player = weakPlayer?.get() ?: return false // Return false if player is null
+-    return (!player.muted && player.playing && player.volume > 0) || player.audioMixingMode == AudioMixingMode.DO_NOT_MIX
++    val player = weakPlayer.get() ?: return false // Return false if player is null
++    val outputsAudio = !player.muted && player.volume > 0
++    return (outputsAudio || player.audioMixingMode == AudioMixingMode.DO_NOT_MIX) && playerIsActiveForFocus(player)
+   }
+ 
+   private fun pausePlayerIfUnmuted(weakPlayer: WeakReference<VideoPlayer>) {
+@@ -217,7 +287,8 @@ class AudioFocusManager(private val appContext: AppContext) : AudioManager.OnAud
+     }
+   }
+ 
+-  private fun updateAudioFocus() {
++  private fun updateAudioFocus() = synchronized(this) {
++    pruneReleasedPlayers()
+     if (anyPlayerRequiresFocus || findAudioMixingMode() != currentMixingMode) {
+       requestAudioFocus()
+     } else {
+@@ -229,7 +300,7 @@ class AudioFocusManager(private val appContext: AppContext) : AudioManager.OnAud
+     val playersSnapshot = players.toList()
+ 
+     val mixingModes = playersSnapshot.mapNotNull { player ->
+-      player.get()?.takeIf { it.playing }?.audioMixingMode
++      player.get()?.takeIf { playerIsActiveForFocus(it) }?.audioMixingMode
+     }
+     if (mixingModes.isEmpty()) {
+       return AudioMixingMode.MIX_WITH_OTHERS
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/VideoManager.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/VideoManager.kt
+index c1ede38..02fefb3 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/VideoManager.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/managers/VideoManager.kt
+@@ -59,6 +59,9 @@ object VideoManager {
+   fun onModuleDestroyed(appContext: AppContext) {
+     backgroundStartedAtMs = null
+     videoPlayersToVideoViews.keys.toList().forEach { it.backgroundPlaybackTimer.release() }
++    if (this::audioFocusManager.isInitialized) {
++      audioFocusManager.release()
++    }
+     pictureInPicture.release()
+     listeners.clear()
+   }
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/player/PlayerEvent.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/player/PlayerEvent.kt
+index 5fcf3e5..b957523 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/player/PlayerEvent.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/player/PlayerEvent.kt
+@@ -44,6 +44,11 @@ sealed class PlayerEvent {
+     override val jsEventPayload = IsPlayingEventPayload(isPlaying, oldIsPlaying)
+   }
+ 
++  data class PlayWhenReadyChanged(val playWhenReady: Boolean, val oldPlayWhenReady: Boolean?) : PlayerEvent() {
++    override val name = "playWhenReadyChange"
++    override val emitToJS = false
++  }
++
+   data class VolumeChanged(val volume: Float, val oldVolume: Float?) : PlayerEvent() {
+     override val name = "volumeChange"
+     override val jsEventPayload = VolumeChangedEventPayload(volume, oldVolume)
+@@ -152,6 +157,7 @@ sealed class PlayerEvent {
+     when (this) {
+       is StatusChanged -> listeners.forEach { it.onStatusChanged(player, status, oldStatus, error) }
+       is IsPlayingChanged -> listeners.forEach { it.onIsPlayingChanged(player, isPlaying, oldIsPlaying) }
++      is PlayWhenReadyChanged -> listeners.forEach { it.onPlayWhenReadyChanged(player, playWhenReady, oldPlayWhenReady) }
+       is VolumeChanged -> listeners.forEach { it.onVolumeChanged(player, volume, oldVolume) }
+       is SourceChanged -> listeners.forEach { it.onSourceChanged(player, source, oldSource) }
+       is PlaybackRateChanged -> listeners.forEach { it.onPlaybackRateChanged(player, rate, oldRate) }
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/player/VideoPlayer.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/player/VideoPlayer.kt
+index 6662d69..32c5d89 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/player/VideoPlayer.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/player/VideoPlayer.kt
+@@ -103,7 +103,11 @@ class VideoPlayer(val context: Context, appContext: AppContext, source: VideoSou
+ 
+   // Volume of the player if there was no mute applied.
+   var userVolume = 1f
++  @Volatile
+   var status: PlayerStatus = IDLE
++  @Volatile
++  var playWhenReady: Boolean = false
++    private set
+   var requiresLinearPlayback = false
+   var staysActiveInBackground = false
+     set(value) {
+@@ -235,7 +239,12 @@ class VideoPlayer(val context: Context, appContext: AppContext, source: VideoSou
+ 
+   private val playerListener = object : Player.Listener {
+     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
++      val oldPlayWhenReady = this@VideoPlayer.playWhenReady
++      this@VideoPlayer.playWhenReady = playWhenReady
+       if (playWhenReady) backgroundPlaybackTimer.onPlaybackRequested()
++      if (oldPlayWhenReady != playWhenReady) {
++        sendEvent(PlayerEvent.PlayWhenReadyChanged(playWhenReady, oldPlayWhenReady))
++      }
+     }
+ 
+     override fun onIsPlayingChanged(isPlaying: Boolean) {
+diff --git a/node_modules/expo-video/ios/VideoManager.swift b/node_modules/expo-video/ios/VideoManager.swift
+index c2ebd04..773655d 100644
+--- a/node_modules/expo-video/ios/VideoManager.swift
++++ b/node_modules/expo-video/ios/VideoManager.swift
+@@ -14,6 +14,7 @@ class VideoManager {
+   private var mediaServicesResetObserver: NSObjectProtocol?
+   private var videoViews = NSHashTable<VideoView>.weakObjects()
+   private var videoPlayers = NSHashTable<VideoPlayer>.weakObjects()
++  private var hasActivatedAudioSession = false
+ 
+   var hasRegisteredPlayers: Bool {
+     return !videoPlayers.allObjects.isEmpty
+@@ -53,6 +54,7 @@ class VideoManager {
+         return
+       }
+       self.videoPlayers.remove(videoPlayer)
++      self.setAudioSession()
+     }
+   }
+ 
+@@ -123,6 +125,9 @@ class VideoManager {
+     let isOutputtingAudio = videoPlayers.allObjects.contains { player in
+       player.isPlaying && !player.isMuted
+     }
++    let isWaitingToOutputAudio = hasActivatedAudioSession && videoPlayers.allObjects.contains { player in
++      !player.isMuted && player.ref.timeControlStatus == .waitingToPlayAtSpecifiedRate
++    }
+     let anyPlayerShowsNotification = videoPlayers.allObjects.contains { player in
+       player.showNowPlayingNotification
+     }
+@@ -132,9 +137,19 @@ class VideoManager {
+     let shouldDuckOthers = audioMixingMode == .duckOthers && isOutputtingAudio
+ 
+     // The now playing notification won't be shown if we allow the audio to mix with others
+-    let autoShouldMix = !isOutputtingAudio && !anyPlayerShowsNotification
++    let autoShouldMix = !isOutputtingAudio && !isWaitingToOutputAudio && !anyPlayerShowsNotification
+     let shouldMixWithOthers = shouldMixOverride || autoShouldMix
+ 
++    if !isOutputtingAudio && !doNotMixOverride && !isWaitingToOutputAudio && hasActivatedAudioSession {
++      do {
++        try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
++        hasActivatedAudioSession = false
++      } catch {
++        log.warn("[expo-video] Failed to deactivate the audio session. \(error.localizedDescription)")
++      }
++      return
++    }
++
+     if shouldMixWithOthers && !shouldDuckOthers && !doNotMixOverride {
+       audioSessionCategoryOptions.insert(.mixWithOthers)
+     } else {
+@@ -159,6 +174,7 @@ class VideoManager {
+     if isOutputtingAudio || doNotMixOverride {
+       do {
+         try audioSession.setActive(true)
++        hasActivatedAudioSession = true
+       } catch {
+         log.warn("[expo-video] Failed to activate the audio session. This might cause issues with audio playback. \(error.localizedDescription)")
+       }
